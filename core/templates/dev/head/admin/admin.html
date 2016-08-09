@@ -8,6 +8,7 @@
     <script>
       var GLOBALS = {
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
+        ASSET_DIR_PREFIX: JSON.parse('{{ASSET_DIR_PREFIX|js_string}}'),
         DEMO_EXPLORATION_IDS: JSON.parse('{{demo_exploration_ids|js_string}}')
       }
     </script>
@@ -23,7 +24,7 @@
       <div class="navbar-container" style="background-color: #00376d">
         <div class="navbar-header protractor-test-navbar-header pull-left">
           <a class="oppia-navbar-brand-name oppia-transition-200" href="/library">
-            <img src="/images/logo/288x128_logo_white.png" class="oppia-logo" ng-class="'oppia-logo-wide'">
+            <img ng-src="<[logoWhiteImgUrl]>" class="oppia-logo" ng-class="'oppia-logo-wide'">
           </a>
           <ul class="nav navbar-nav oppia-navbar-breadcrumb">
             <li>
@@ -104,22 +105,22 @@
 
             <ul class="nav oppia-navbar-tabs oppia-navbar-tabs-admin">
               <li class="oppia-clickable-navbar-element pull-right">
-                <a class="oppia-navbar-tab" href="#misc" tooltip="Miscellaneous" tooltip-placement="bottom" ng-click="showMiscTab()">
+                <a class="oppia-navbar-tab" ng-href="<[MISC_URL]>" tooltip="Miscellaneous" tooltip-placement="bottom" ng-click="showMiscTab()">
                   Misc
                 </a>
               </li>
               <li class="oppia-clickable-navbar-element pull-right">
-                <a class="oppia-navbar-tab protractor-test-admin-config-tab" href="#config" tooltip="Config" tooltip-placement="bottom" ng-click="showConfigTab()">
+                <a class="oppia-navbar-tab protractor-test-admin-config-tab" ng-href="<[CONFIG_URL]>" tooltip="Config" tooltip-placement="bottom" ng-click="showConfigTab()">
                   Config
                 </a>
               </li>
               <li class="oppia-clickable-navbar-element pull-right">
-                <a class="oppia-navbar-tab" href="#jobs" tooltip="Jobs" tooltip-placement="bottom" ng-click="showJobsTab()">
+                <a class="oppia-navbar-tab" ng-href="<[JOBS_URL]>" tooltip="Jobs" tooltip-placement="bottom" ng-click="showJobsTab()">
                   Jobs
                 </a>
               </li>
               <li class="dropdown oppia-navbar-clickable-dropdown pull-right">
-                <a class="oppia-navbar-tab" href="#activities" tooltip="Activities" tooltip-placement="bottom" ng-click="showActivitiesTab()">
+                <a class="oppia-navbar-tab" ng-href="<[ACTIVITIES_URL]>" tooltip="Activities" tooltip-placement="bottom" ng-click="showActivitiesTab()">
                   Activities
                 </a>
               </li>
@@ -135,46 +136,54 @@
     <br>
 
     <div class="row">
-      <div class="col-lg-12 col-md-12 col-sm-12" ng-if="currentTab === TAB_ACTIVITIES" style="margin-top: 16px;">
-        <md-card class="oppia-page-card oppia-long-text" style="max-width:700px">
-          <div class="container" style="margin-left: 0;">
-            <h3>Reload a single exploration</h3>
-            {% for exploration in demo_explorations %}
-              <div class="row protractor-test-reload-exploration-row">
-                <span class="col-lg-4 col-md-4 col-sm-4 protractor-test-reload-exploration-title">
-                  {{exploration[1]}}
-                </span>
-                <span class="col-lg-2 col-md-2 col-sm-2">
-                  <button type="button" class="btn btn-default protractor-test-reload-exploration-button pull-right" ng-click="reloadExploration({{exploration[0]}})">
-                  Reload
-                  </button>
-                </span>
-              </div>
-            {% endfor %}
-            <button type="button" class="btn btn-default protractor-test-reload-all-explorations-button" ng-click="reloadAllExplorations()">
-            Reload All Explorations
-            </button>
-          </div>
-        </md-card>
+      {% if DEV_MODE %}
+        <div class="col-lg-12 col-md-12 col-sm-12" ng-if="currentTab === TAB_ACTIVITIES" style="margin-top: 16px;">
+          <md-card class="oppia-page-card oppia-long-text" style="max-width: 700px">
+            <div class="container" style="margin-left: 0;">
+              <h3>Reload a single exploration</h3>
+              {% for exploration in demo_explorations %}
+                <div class="row protractor-test-reload-exploration-row">
+                  <span class="col-lg-4 col-md-4 col-sm-4 protractor-test-reload-exploration-title">
+                    {{exploration[1]}}
+                  </span>
+                  <span class="col-lg-2 col-md-2 col-sm-2">
+                    <button type="button" class="btn btn-default protractor-test-reload-exploration-button pull-right" ng-click="reloadExploration({{exploration[0]}})">
+                    Reload
+                    </button>
+                  </span>
+                </div>
+              {% endfor %}
+              <button type="button" class="btn btn-default protractor-test-reload-all-explorations-button" ng-click="reloadAllExplorations()">
+              Reload All Explorations
+              </button>
+            </div>
+          </md-card>
 
-        <md-card class="oppia-page-card oppia-long-text" style="max-width: 700px">
-          <div class="container" style="margin-left: 0;">
-            <h3>Reload a single collection</h3>
-            {% for collection in demo_collections %}
-              <div class="row protractor-test-reload-collection-row">
-                <span class="col-lg-4 col-md-4 col-sm-4 protractor-test-reload-collection-title">
-                  {{collection[1]}}
-                </span>
-                <span class="col-lg-2 col-md-2 col-sm-2">
-                  <button type="button" class="btn btn-default protractor-test-reload-collection-button pull-right" ng-click="reloadCollection({{collection[0]}})">
-                  Reload
-                  </button>
-                </span>
-              </div>
-            {% endfor %}
-          </div>
-        </md-card>
-      </div><br><br>
+          <md-card class="oppia-page-card oppia-long-text" style="max-width: 700px">
+            <div class="container" style="margin-left: 0;">
+              <h3>Reload a single collection</h3>
+              {% for collection in demo_collections %}
+                <div class="row protractor-test-reload-collection-row">
+                  <span class="col-lg-4 col-md-4 col-sm-4 protractor-test-reload-collection-title">
+                    {{collection[1]}}
+                  </span>
+                  <span class="col-lg-2 col-md-2 col-sm-2">
+                    <button type="button" class="btn btn-default protractor-test-reload-collection-button pull-right" ng-click="reloadCollection({{collection[0]}})">
+                    Reload
+                    </button>
+                  </span>
+                </div>
+              {% endfor %}
+            </div>
+          </md-card>
+        </div><br><br>
+      {% else %}
+        <div class="col-lg-12 col-md-12 col-sm-12" ng-if="currentTab === TAB_ACTIVITIES" style="margin-top: 16px;">
+          <md-card class="oppia-page-card oppia-long-text" style="max-width: 700px">
+            The 'Activities' tab is not available in the production environment.
+          </md-card>
+        </div>
+      {% endif %}
 
       <div class="col-lg-12 col-md-12 col-sm-12" style="margin-top: -30px; margin-bottom: -30px">
         <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_JOBS" style="max-width: 900px">
@@ -218,21 +227,25 @@
           <h3>Jobs</h3>
           <h4>Current time: {{human_readable_current_time}}</h4>
           <h4>One-off jobs</h4>
-          <ul>
+          <table class="table table-striped">
             {% for job_spec in one_off_job_specs %}
-              <li>
-                {{job_spec.job_type}}
-                <button class="pull-right" ng-click="startNewJob('{{job_spec.job_type}}')">
-                  Start new job
-                </button>
-                {% if job_spec.is_queued_or_running %}
-                  <span class="oppia-serious-warning-text">
-                    <strong>(warning: an instance of this job type is already running)</strong>
-                  </span>
-                {% endif %}
-              </li>
+              <tr>
+                <td>
+                  {{job_spec.job_type}}
+                </td>
+                <td>
+                  <button class="pull-right" ng-click="startNewJob('{{job_spec.job_type}}')">
+                    Start new job
+                  </button>
+                  {% if job_spec.is_queued_or_running %}
+                    <span class="oppia-serious-warning-text">
+                      <strong>(warning: an instance of this job type is already running)</strong>
+                    </span>
+                  {% endif %}
+                </td>
+              </tr>
             {% endfor %}
-          </ul>
+          </table>
         </md-card>
 
         <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_JOBS" style="max-width: 900px">
@@ -378,6 +391,7 @@
       {{ include_js_file('expressions/evaluator.js') }}
       {{ include_js_file('expressions/parser.js') }}
       {{ value_generators_js }}
+      {{ include_js_file('domain/utilities/UrlInterpolationService.js') }}
     </script>
 
     {{ rte_components_html }}

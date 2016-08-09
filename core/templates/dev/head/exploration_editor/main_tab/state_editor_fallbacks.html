@@ -22,7 +22,7 @@
               <span class="oppia-fallback-sort-handle"
                     ng-if="stateFallbacksService.displayed.length > 1"
                     ng-mousedown="changeActiveFallbackIndex(null)">
-                <img ng-if="editabilityService.isEditable()" src="/images/general/drag_dots.png" width="10">
+                <img ng-if="editabilityService.isEditable()" ng-src="<[dragDotsImgUrl]>" width="10">
               </span>
               <a ng-click="changeActiveFallbackIndex($index)"
                  class="oppia-rule-tab protractor-test-fallback-tab"

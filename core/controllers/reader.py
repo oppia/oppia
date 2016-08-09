@@ -172,8 +172,6 @@ def classify(state, answer):
 class ExplorationPage(base.BaseHandler):
     """Page describing a single exploration."""
 
-    PAGE_NAME_FOR_CSRF = 'player'
-
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -485,8 +483,6 @@ class RatingHandler(base.BaseHandler):
     Note that this represents ratings submitted on completion of the
     exploration.
     """
-
-    PAGE_NAME_FOR_CSRF = 'player'
 
     @require_playable
     def get(self, exploration_id):

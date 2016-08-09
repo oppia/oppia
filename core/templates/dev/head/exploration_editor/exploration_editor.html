@@ -11,20 +11,24 @@
 {% block header_js %}
   {{ super() }}
   <script type="text/javascript">
-    GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
     GLOBALS.ALLOWED_GADGETS = JSON.parse('{{ALLOWED_GADGETS|js_string}}');
     GLOBALS.ALLOWED_INTERACTION_CATEGORIES = JSON.parse(
       '{{ALLOWED_INTERACTION_CATEGORIES|js_string}}');
-    GLOBALS.DEFAULT_OBJECT_VALUES = JSON.parse('{{DEFAULT_OBJECT_VALUES|js_string}}');
+    GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
+    GLOBALS.DEFAULT_OBJECT_VALUES = JSON.parse(
+      '{{DEFAULT_OBJECT_VALUES|js_string}}');
+    GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = JSON.parse(
+      '{{DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR|js_string}}');
     GLOBALS.GADGET_SPECS = JSON.parse('{{GADGET_SPECS|js_string}}');
     GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
-    GLOBALS.INVALID_PARAMETER_NAMES = JSON.parse('{{INVALID_PARAMETER_NAMES|js_string}}');
+    GLOBALS.INVALID_PARAMETER_NAMES = JSON.parse(
+      '{{INVALID_PARAMETER_NAMES|js_string}}');
     GLOBALS.NEW_STATE_TEMPLATE = JSON.parse(
       '{{NEW_STATE_TEMPLATE|js_string}}');
     GLOBALS.PANEL_SPECS = JSON.parse('{{PANEL_SPECS|js_string}}');
+    GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = JSON.parse(
+      '{{SHOW_TRAINABLE_UNRESOLVED_ANSWERS|js_string}}');
     GLOBALS.TAG_REGEX = JSON.parse('{{TAG_REGEX|js_string}}');
-    GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = JSON.parse('{{SHOW_TRAINABLE_UNRESOLVED_ANSWERS|js_string}}');
-    GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = JSON.parse('{{DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR|js_string}}');
   </script>
 
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
@@ -179,7 +183,7 @@
     <li ng-if="isEditableOutsideTutorialMode()">
       <div dropdown class="btn-group" style="margin-right: 10px; margin-top: 8px;"
            title="<[getSaveButtonTooltip()]>">
-        <button id="tutorialSaveButton" class="btn btn-default oppia-save-draft-button protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
+        <button id="tutorialSaveButton" class="btn btn-default oppia-save-draft-button protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable(), 'oppia-save-draft-button-padding': getChangeListLength() && !isPrivate()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
           <span ng-if="!isSaveInProgress">
             <span ng-if="isPrivate()">
               <span ng-if="!saveModalIsOpening">
@@ -201,6 +205,7 @@
                 <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
                    alt="Publish Changes">&#xE2C3;</i>
                 <span class="oppia-save-publish-button-label">Publish Changes</span>
+                <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()" style="opacity: 0.5">(<[getChangeListLength()]>)</span>
               </span>
 
               <span ng-if="saveModalIsOpening">
@@ -225,7 +230,7 @@
                 ng-disabled="!getChangeListLength()" dropdown-toggle>
           <span class="caret"></span>
         </button>
-        <ul class="dropdown-menu" role="menu" style="min-width: 120px; right: inherit; width: 120px;">
+        <ul class="dropdown-menu" role="menu" style="min-width: 120px; right: inherit;" ng-style="{ width: getChangeListLength() && !isPrivate() ? '150px' : '120px' }">
           <li><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="protractor-test-discard-changes" title="Discard all pending changes.">Discard Draft</a></li>
         </ul>
       </div>
@@ -250,11 +255,14 @@
           <input type="text" class="form-control" ng-model="explorationTitleService.displayed"
                  placeholder="Music in the 19th Century">
         </p>
-        <p ng-if="requireObjectiveToBeSpecified">
-          Add a goal: what does the exploration help people to do?
-          <input type="text" class="form-control" ng-model="explorationObjectiveService.displayed"
-                 placeholder="Learn how to ...">
-        </p>
+        <form name="objectiveForm">
+          <p ng-if="requireObjectiveToBeSpecified">
+            Add a goal: what does the exploration help people to do?
+            <input name="objectiveInput" type="text" class="form-control" ng-minlength="15" required ng-model="explorationObjectiveService.displayed"
+                   placeholder="Learn how to ...">
+            <span class="help-block" ng-show="objectiveForm.objectiveInput.$touched && !explorationObjectiveService.displayed" style="font-size: smaller; color: red">Please provide a descriptive goal to help people understand what this exploration is about.</span>
+          </p>
+        </form>
         <p ng-if="requireCategoryToBeSpecified">
           Add a category: how would you categorize your exploration?
           <select2-dropdown item="explorationCategoryService.displayed"
@@ -399,7 +407,7 @@
       </div>
     </script>
 
-    <div class="container-fluid oppia-editor-page-container" ng-joy-ride="tutorialInProgress" config="EDITOR_TUTORIAL_OPTIONS" on-finish="onLeaveTutorial()" on-skip="onLeaveTutorial()">
+    <div class="container-fluid oppia-editor-page-container" ng-joy-ride="tutorialInProgress" config="EDITOR_TUTORIAL_OPTIONS" on-finish="onFinishTutorial()" on-skip="onSkipTutorial()">
       <div class="row" ng-if="explorationRightsService.isCloned()">
         <div class="col-lg-12 col-md-12 col-sm-12">
           <div class="oppia-align-center alert alert-warning" style="padding: 2px; width: 90%;">

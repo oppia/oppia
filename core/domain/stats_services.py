@@ -41,11 +41,11 @@ def get_top_unresolved_answers_for_default_rule(exploration_id, state_name):
 
 
 def get_exps_unresolved_answers_for_default_rule(exp_ids):
-    """Gets answer counts per exploration for the answer groups for default
-    rule across all states for explorations with ids in exp_ids.
+    """Gets unresolved answers per exploration for default rule across all
+    states for explorations with ids in exp_ids.
 
-    Note that this method currently returns the counts only for the DEFAULT
-    rule. This should ideally handle all types of unresolved answers.
+    Note that this method currently returns the data only for the DEFAULT rule.
+    This should ideally handle all types of unresolved answers.
 
     Returns a dict of the following format:
         {

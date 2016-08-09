@@ -109,18 +109,18 @@ describe('Full exploration editor', function() {
       editor.expectStateNamesToBe(['final card', 'second']);
 
       // Check behaviour of the back button
-      editor.setObjective('do stuff');
+      editor.setObjective('do some stuff here');
       expect(browser.getCurrentUrl()).toEqual(
         general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId +
-        '#/gui/second');
+        '?new#/gui/second');
       browser.navigate().back();
       expect(browser.getCurrentUrl()).toEqual(
         general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId +
-        '#/settings');
+        '?new#/settings');
       browser.navigate().back();
       expect(browser.getCurrentUrl()).toEqual(
         general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId +
-        '#/gui/second');
+        '?new#/gui/second');
 
       // Check display of content & interaction in the editor
       editor.setContent(function(richTextEditor) {

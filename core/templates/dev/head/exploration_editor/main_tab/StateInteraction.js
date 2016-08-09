@@ -49,11 +49,13 @@ oppia.controller('StateInteraction', [
   'stateInteractionIdService', 'stateCustomizationArgsService',
   'editabilityService', 'explorationStatesService', 'graphDataService',
   'interactionDetailsCache', 'oppiaExplorationHtmlFormatterService',
+  'UrlInterpolationService',
   function($scope, $http, $rootScope, $modal, $filter, alertsService,
       editorContextService, oppiaHtmlEscaper, INTERACTION_SPECS,
       stateInteractionIdService, stateCustomizationArgsService,
       editabilityService, explorationStatesService, graphDataService,
-      interactionDetailsCache, oppiaExplorationHtmlFormatterService) {
+      interactionDetailsCache, oppiaExplorationHtmlFormatterService,
+      UrlInterpolationService) {
     var DEFAULT_TERMINAL_STATE_CONTENT = 'Congratulations, you have finished!';
 
     // Declare dummy submitAnswer() and adjustPageHeight() methods for the
@@ -63,6 +65,11 @@ oppia.controller('StateInteraction', [
 
     $scope.stateInteractionIdService = stateInteractionIdService;
     $scope.hasLoaded = false;
+
+    $scope.userBlueImgUrl = UrlInterpolationService.getStaticImageUrl(
+      '/avatar/user_blue_72px.png');
+    $scope.userBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
+      '/avatar/user_black_72px.png');
 
     $scope.getCurrentInteractionName = function() {
       return (
@@ -180,16 +187,24 @@ oppia.controller('StateInteraction', [
           controller: [
             '$scope', '$modalInstance', 'stateInteractionIdService',
             'stateCustomizationArgsService', 'interactionDetailsCache',
-            'INTERACTION_SPECS',
+            'INTERACTION_SPECS', 'UrlInterpolationService',
+            'editorFirstTimeEventsService',
             function(
                 $scope, $modalInstance, stateInteractionIdService,
                 stateCustomizationArgsService, interactionDetailsCache,
-                INTERACTION_SPECS) {
+                INTERACTION_SPECS, UrlInterpolationService,
+                editorFirstTimeEventsService) {
+              editorFirstTimeEventsService
+                .registerFirstClickAddInteractionEvent();
+
               // This binds the services to the HTML template, so that their
               // displayed values can be used in the HTML.
               $scope.stateInteractionIdService = stateInteractionIdService;
               $scope.stateCustomizationArgsService = (
                 stateCustomizationArgsService);
+
+              $scope.getInteractionThumbnailImageUrl = (
+                UrlInterpolationService.getInteractionThumbnailImageUrl);
 
               $scope.INTERACTION_SPECS = INTERACTION_SPECS;
               $scope.ALLOWED_INTERACTION_CATEGORIES = (
@@ -226,6 +241,9 @@ oppia.controller('StateInteraction', [
               }
 
               $scope.onChangeInteractionId = function(newInteractionId) {
+                editorFirstTimeEventsService
+                  .registerFirstSelectInteractionTypeEvent();
+
                 var interactionSpec = INTERACTION_SPECS[newInteractionId];
                 $scope.customizationArgSpecs = (
                   interactionSpec.customization_arg_specs);
@@ -258,6 +276,8 @@ oppia.controller('StateInteraction', [
               };
 
               $scope.save = function() {
+                editorFirstTimeEventsService
+                  .registerFirstSaveInteractionEvent();
                 $modalInstance.close();
               };
 

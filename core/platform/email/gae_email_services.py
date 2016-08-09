@@ -19,31 +19,7 @@
 from core import counters
 import feconf
 
-from google.appengine.api import app_identity
 from google.appengine.api import mail
-
-
-def send_mail_to_admin(subject, body):
-    """Enqueues a 'send email' request with the GAE mail service.
-
-    Args:
-      - subject: str. The subject line of the email.
-      - body: str. The plaintext body of the email.
-    """
-    if feconf.CAN_SEND_EMAILS_TO_ADMIN:
-        if not mail.is_email_valid(feconf.ADMIN_EMAIL_ADDRESS):
-            raise Exception(
-                'Malformed email address: %s' %
-                feconf.ADMIN_EMAIL_ADDRESS)
-
-        app_id = app_identity.get_application_id()
-        body = '(Sent from %s)\n\n%s' % (app_id, body)
-
-        mail.send_mail(
-            feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS, subject,
-            body)
-        counters.EMAILS_SENT.inc()
-
 
 def send_mail(
         sender_email, recipient_email, subject, plaintext_body, html_body,
@@ -70,8 +46,8 @@ def send_mail(
         to App Engine.
       (and possibly other exceptions, due to mail.send_mail() failures)
     """
-    if not feconf.CAN_SEND_EMAILS_TO_USERS:
-        raise Exception('This app cannot send emails to users.')
+    if not feconf.CAN_SEND_EMAILS:
+        raise Exception('This app cannot send emails.')
 
     if not mail.is_email_valid(sender_email):
         raise ValueError(
@@ -79,7 +55,6 @@ def send_mail(
     if not mail.is_email_valid(recipient_email):
         raise ValueError(
             'Malformed recipient email address: %s' % recipient_email)
-
     if bcc_admin:
         mail.send_mail(
             sender_email, recipient_email, subject, plaintext_body,

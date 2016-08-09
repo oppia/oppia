@@ -29,15 +29,19 @@ env:
     - RUN_E2E_TESTS_MISC=true
     - RUN_E2E_TESTS_I18N=true
     - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=false
-    - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=true
+    # TODO(sll): Reinstate this when we can get it to run in reasonable time.
+    # - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=true
     - RUN_LINT=true
     - RUN_FRONTEND_TESTS=true
     - RUN_PERFORMANCE_TESTS=true
+    - RUN_E2E_TESTS_MAIN_EDITOR_PROD=true
+    - RUN_E2E_TESTS_EDITOR_FEATURES_PROD=true
+    - RUN_E2E_TESTS_EXTENSIONS_PROD=true
+    - RUN_E2E_TESTS_LIBRARY_PROD=true
+    - RUN_E2E_TESTS_MISC_PROD=true
+    - RUN_E2E_TESTS_I18N_PROD=true
 matrix:
-  allow_failures:
-  # The backend tests, with coverage, take too long to run, so we make this
-  # optional.
-  - env: RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=true
+  allow_failures: []
   fast_finish: true
 
 notifications:
@@ -64,6 +68,7 @@ notifications:
 before_install:
 - pip install codecov
 - pip install numpy==1.6.1
+- pip install pyyaml
 - export CHROME_BIN=/usr/bin/google-chrome-stable
 - export DISPLAY=:99.0
 - bash -e /etc/init.d/xvfb start
@@ -87,7 +92,17 @@ script:
 # Travis aborts test run if nothing is printed back to STDOUT for some time.
 # -x is used to avoid that.
 - if [ $RUN_FRONTEND_TESTS == 'true' ]; then bash -x scripts/run_frontend_tests.sh --run-minified-tests=true; fi
-- if [ $RUN_PERFORMANCE_TESTS == 'true' ]; then bash scripts/run_performance_tests.sh; fi
+# TODO(gvishal): add all tests to travis. Running all tests on travis fails currently due to
+# unexplained reasons. Sometimes 2-4 out of the total 7 page tests succeed and then the next one
+# gets stuck for a long time.
+- if [ $RUN_PERFORMANCE_TESTS == 'true' ]; then bash scripts/run_performance_tests.sh --test_name=splash_test; fi
+# Run e2e tests in production mode
+- if [ $RUN_E2E_TESTS_MAIN_EDITOR_PROD == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="mainEditor" --prod_env; fi
+- if [ $RUN_E2E_TESTS_EDITOR_FEATURES_PROD == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="editorFeatures" --prod_env; fi
+- if [ $RUN_E2E_TESTS_EXTENSIONS_PROD == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="extensions" --prod_env; fi
+- if [ $RUN_E2E_TESTS_LIBRARY_PROD == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="library" --prod_env; fi
+- if [ $RUN_E2E_TESTS_MISC_PROD == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="misc" --prod_env; fi
+- if [ $RUN_E2E_TESTS_I18N_PROD == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="i18n" --prod_env; fi
 
 after_success:
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then codecov; fi

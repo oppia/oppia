@@ -51,7 +51,12 @@ oppia.controller('I18nFooter', [
   // The $timeout seems to be necessary for the dropdown to show anything
   // at the outset, if the default language is not English.
   $timeout(function() {
-    $scope.currentLanguageCode = $translate.use();
+    // $translate.use() returns undefined until the language file is fully
+    // loaded, which causes a blank field in the dropdown, hence we use
+    // $translate.proposedLanguage() as suggested in
+    // http://stackoverflow.com/a/28903658
+    $scope.currentLanguageCode = $translate.use() ||
+      $translate.proposedLanguage();
   }, 50);
 
   $scope.changeLanguage = function() {
@@ -59,8 +64,6 @@ oppia.controller('I18nFooter', [
     if (GLOBALS.userIsLoggedIn) {
       $http.put(siteLanguageUrl, {
         site_language_code: $scope.currentLanguageCode
-      }, {
-        requestIsForI18n: true
       });
     }
   };
@@ -81,7 +84,7 @@ oppia.config([
     .registerAvailableLanguageKeys(
       availableLanguageKeys, availableLanguageKeysMap)
     .useStaticFilesLoader({
-      prefix: '/i18n/',
+      prefix: GLOBALS.ASSET_DIR_PREFIX + '/assets/i18n/',
       suffix: '.json'
     })
     // The use of default translation improves the loading time when English is

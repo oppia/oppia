@@ -7,7 +7,8 @@
 {% block header_js %}
   {{ super() }}
   <script type="text/javascript">
-    GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = JSON.parse('{{DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD|js_string}}');
+    GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = JSON.parse(
+      '{{DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD|js_string}}');
   </script>
 {% endblock header_js %}
 
@@ -33,10 +34,20 @@
         <div class="average-ratings stats-card">
           <p class="stat-description">Average Rating</p>
           <h1 class="stat-value"><[dashboardStats.average_ratings || 'N/A']></h1>
+          <p ng-hide="!dashboardStats.num_ratings">
+            (by <[dashboardStats.num_ratings]> users)
+          </p>
         </div>
         <div class="total-plays stats-card">
           <p class="stat-description">Total Plays</p>
           <h1 class="stat-value"><[dashboardStats.total_plays]></h1>
+          <p ng-hide="!relativeChangeInTotalPlays">
+            (+<[relativeChangeInTotalPlays]> from last week)
+          </p>
+        </div>
+        <div class="total-open-feedback stats-card">
+          <p class="stat-description">Open feedback</p>
+          <h1 class="stat-value"><[dashboardStats.total_open_feedback]></h1>
         </div>
       </md-card>
     </div>
@@ -56,16 +67,16 @@
             </a>
           </li>
         {% endif %}
-        <li class="list-card-view-toggle" ng-if="activeTab === 'myExplorations'">
-          <button class="list-view-btn"
-                  ng-class="{'dashboard-active-view': myExplorationsView === 'list'}"
-                  ng-click="setMyExplorationsView('list')">
-            <span class="fa fa-list fa-lg"></span>
-          </button>
+        <li class="list-card-view-toggle dashboard-hide-mobile" ng-if="activeTab === 'myExplorations'">
           <button class="card-view-btn"
                   ng-class="{'dashboard-active-view': myExplorationsView === 'card'}"
                   ng-click="setMyExplorationsView('card')">
             <span class="fa fa-th-large fa-lg"></span>
+          </button>
+          <button class="list-view-btn"
+                  ng-class="{'dashboard-active-view': myExplorationsView === 'list'}"
+                  ng-click="setMyExplorationsView('list')">
+            <span class="fa fa-list fa-lg"></span>
           </button>
         </li>
       </ul>
@@ -96,7 +107,7 @@
             </button>
           </div>
           <div class="oppia-dashboard-intro-picture">
-            <img src="/images/general/empty_dashboard.svg">
+            <img ng-src="<[emptyDashboardImgUrl]>">
           </div>
         </md-card>
       </div>
@@ -106,17 +117,19 @@
                  class="oppia-dashboard-list-view-item">
           <table class="oppia-dashboard-table">
              <colgroup>
-               <col style="width: 40%;">
-               <col style="width: 15%;">
-               <col style="width: 15%;">
-               <col style="width: 15%;">
-               <col style="width: 15%;">
+               <col style="width: 30%;">
+               <col style="width: 14%;">
+               <col style="width: 14%;">
+               <col style="width: 14%;">
+               <col style="width: 14%;">
+               <col style="width: 14%;">
             </colgroup>
             <tr>
               <th>Exploration</th>
               <th>Rating</th>
               <th>Plays</th>
               <th>Feedback</th>
+              <th>Unresolved Answers</th>
               <th>Last Updated</th>
             </tr>
             <tr ng-repeat="exploration in explorationsList track by exploration.id"
@@ -129,10 +142,10 @@
                   featured
                 </span>
               </td>
-              <td colspan="3"
+              <td colspan="4"
                   ng-if="exploration.status === 'private'"
                   class="exp-private-text">
-                This exploration is private. Publish to receive statistics.
+                <[publishText]>
               </td>
               <td ng-if="exploration.status !== 'private'">
                 <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
@@ -142,6 +155,13 @@
               </td>
               <td ng-if="exploration.status !== 'private'">
                 <[exploration.num_total_threads]>
+                <a ng-if="exploration.num_open_threads != 0"
+                   ng-href="/create/<[exploration.id]>#/feedback">
+                  (<[exploration.num_open_threads]> new)
+                </a>
+              </td>
+              <td ng-if="exploration.status !== 'private'">
+                <[exploration.num_unresolved_answers]>
               </td>
               <td>
                 <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
@@ -166,7 +186,7 @@
 
             <div ng-attr-section="'<['right-section']>">
               <div ng-if="exploration.status === 'private'" class="exp-private-text">
-                This exploration is private. Publish to receive statistics.
+                <[publishText]>
               </div>
               <ul ng-if="exploration.status !== 'private'"
                   layout="row"
@@ -205,14 +225,19 @@
 
                 <li flex="50">
                   <span class="fa fa-comments fa-lg"
-                        tooltip="<['I18N_PLAYER_FEEDBACK_TOOLTIP' | translate]>"
+                        tooltip="<['I18N_DASHBOARD_OPEN_FEEDBACK' | translate]>"
                         tooltip-placement="top">
                   </span>
                   <[exploration.num_total_threads]>
+                  <a ng-if="exploration.num_open_threads != 0"
+                     ng-href="/create/<[exploration.id]>#/feedback">
+                      (<[exploration.num_open_threads]> new)
+                  </a>
                 </li>
                 <sharing-links ng-if="exploration.status !== 'private'"
                                ng-click="$event.stopPropagation()"
                                flex="100"
+                               class="dashboard-hide-mobile"
                                layout-type="row"
                                layout-align-type="center left"
                                twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD"
@@ -222,7 +247,6 @@
             </div>
         </md-card>
       </div>
-
     </div>
 
     {% if can_create_collections %}
@@ -237,7 +261,9 @@
               <a ng-href="/collection_editor/create/<[collection.id]>" class="oppia-dashboard-tile-container-link" style="text-decoration: none;">
                 <div class="oppia-dashboard-tile-metadata-parent hidden-xs">
                   <div class="oppia-dashboard-tile-metadata">
-                    Created: <span style="color: black;"><[getLocaleAbbreviatedDatetimeString(collection.created_on_msec)]></span>
+                    Created:<span style="color: black;">
+                      <[getLocaleAbbreviatedDatetimeString(collection.created_on)]>
+                    </span>
 
                     <br>
                     <br>
@@ -282,7 +308,7 @@
                       <span style="color: #888">
                         <strong><[collection.category]></strong>
                         <span style="font-weight: bold;" ng-if="collection.category">&middot;</span>
-                        Last updated <[getLocaleAbbreviatedDatetimeString(collection.last_updated_msec)]>
+                        Last updated <[getLocaleAbbreviatedDatetimeString(collection.last_updated)]>
                       </span>
 
                       <span ng-if="collection.status === 'publicized'">
