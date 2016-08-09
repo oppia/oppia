@@ -114,4 +114,8 @@ describe('Site language', function() {
     general.ensurePageHasNoTranslationIds();
     users.logout();
   });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
+  });
 });

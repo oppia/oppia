@@ -29,8 +29,8 @@ oppia.controller('Dashboard', [
       sortExplorationsService, EXPLORATIONS_SORT_BY_KEYS,
       HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS) {
     var EXP_PUBLISH_TEXTS = {
-      default: 'This exploration is private. Publish it to receive statistics.',
-      sm: 'Publish the exploration to receive statistics.'
+      defaultText: 'This exploration is private. Publish it to receive statistics.',
+      smText: 'Publish the exploration to receive statistics.'
     };
 
     $scope.EXPLORATIONS_SORT_BY_KEYS = EXPLORATIONS_SORT_BY_KEYS;
@@ -44,6 +44,9 @@ oppia.controller('Dashboard', [
     $scope.getLocaleAbbreviatedDatetimeString = (
       oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString);
 
+    $scope.emptyDashboardImgUrl = UrlInterpolationService.getStaticImageUrl(
+      '/general/empty_dashboard.svg');
+
     $scope.activeTab = 'myExplorations';
     $scope.setActiveTab = function(newActiveTabName) {
       $scope.activeTab = newActiveTabName;
@@ -53,7 +56,7 @@ oppia.controller('Dashboard', [
       $window.location = '/create/' + explorationId;
     };
 
-    $scope.myExplorationsView = 'list';
+    $scope.myExplorationsView = 'card';
     $scope.setMyExplorationsView = function(viewType) {
       $scope.myExplorationsView = viewType;
     };
@@ -61,9 +64,9 @@ oppia.controller('Dashboard', [
     $scope.checkForMobileView = function() {
       if ($window.innerWidth < 500) {
         $scope.myExplorationsView = 'card';
-        $scope.publishText = EXP_PUBLISH_TEXTS.sm;
+        $scope.publishText = EXP_PUBLISH_TEXTS.smText;
       } else {
-        $scope.publishText = EXP_PUBLISH_TEXTS.default;
+        $scope.publishText = EXP_PUBLISH_TEXTS.defaultText;
       }
     };
 
@@ -96,6 +99,12 @@ oppia.controller('Dashboard', [
             $scope.isCurrentSortDescending));
         $scope.collectionsList = response.collections_list;
         $scope.dashboardStats = response.dashboard_stats;
+        $scope.lastWeekStats = response.last_week_stats;
+        if ($scope.dashboardStats && $scope.lastWeekStats) {
+          $scope.relativeChangeInTotalPlays = (
+            $scope.dashboardStats.total_plays - $scope.lastWeekStats.total_plays
+          );
+        }
         $rootScope.loadingMessage = '';
       },
       function(errorStatus) {

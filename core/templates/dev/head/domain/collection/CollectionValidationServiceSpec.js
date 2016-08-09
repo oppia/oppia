@@ -282,4 +282,14 @@ describe('Collection validation service', function() {
       'exp_id0, exp_id2'
     ]);
   });
+
+  it('should return false if the tags are not valid', function() {
+    expect(CollectionValidationService.isTagValid(['test'])).toBe(true);
+    expect(CollectionValidationService.isTagValid(['test', 'math'])).toBe(true);
+
+    expect(CollectionValidationService.isTagValid(
+      ['test', 'test'])).toBe(false);
+    expect(CollectionValidationService.isTagValid(
+      ['test '])).toBe(false);
+  });
 });

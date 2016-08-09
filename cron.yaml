@@ -5,3 +5,12 @@ cron:
 - description: clean up old mapreduce jobs
   url: /cron/jobs/cleanup
   schedule: every day 08:00
+- description: weekly copy of a user's dashboard statistics
+  url: /cron/users/dashboard_stats
+  schedule: every monday 09:00
+- description: weekly exploration recommendations computation
+  url: /cron/explorations/recommendations
+  schedule: every tuesday 9:00
+- description: weekly exploration search rank computation
+  url: /cron/explorations/search_rank
+  schedule: every wednesday 9:00

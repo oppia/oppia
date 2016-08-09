@@ -23,7 +23,7 @@ oppia.factory('ExplorationCreationService', [
   function(
       $http, $modal, $timeout, $rootScope, $window,
       alertsService, siteAnalyticsService, UrlInterpolationService) {
-    var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
+    var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>?new';
 
     var explorationCreationInProgress = false;
 
@@ -37,8 +37,7 @@ oppia.factory('ExplorationCreationService', [
         alertsService.clearWarnings();
         $rootScope.loadingMessage = 'Creating exploration';
 
-        $http.post('/contributehandler/create_new', {}, {
-          requestIsForCreateExploration: true
+        $http.post('/contributehandler/create_new', {
         }).then(function(response) {
           siteAnalyticsService.registerCreateNewExplorationEvent(
             response.data.explorationId);

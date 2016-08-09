@@ -1717,7 +1717,8 @@ oppia.factory('graphDataService', [
 
 // Service for the state editor tutorial.
 oppia.factory('stateEditorTutorialFirstTimeService', [
-  '$http', '$rootScope', function($http, $rootScope) {
+  '$http', '$rootScope', 'editorFirstTimeEventsService',
+  function($http, $rootScope, editorFirstTimeEventsService) {
     // Whether this is the first time the tutorial has been seen by this user.
     var _currentlyInFirstVisit = true;
 
@@ -1740,6 +1741,7 @@ oppia.factory('stateEditorTutorialFirstTimeService', [
       markTutorialFinished: function() {
         if (_currentlyInFirstVisit) {
           $rootScope.$broadcast('openPostTutorialHelpPopover');
+          editorFirstTimeEventsService.registerEditorFirstEntryEvent();
         }
 
         _currentlyInFirstVisit = false;
@@ -2379,6 +2381,89 @@ oppia.factory('autosaveInfoModalsService', [
         });
 
         _isModalOpen = true;
+      }
+    };
+  }
+]);
+
+// Service registering analytics events for the editor for events which are
+// only logged when they happen after the editor is opened for the first time
+// for an exploration.
+oppia.factory('editorFirstTimeEventsService', ['siteAnalyticsService',
+  function(siteAnalyticsService) {
+    var explorationId = null;
+    var shouldRegisterEvents = false;
+    var alreadyRegisteredEvents = {};
+    return {
+      initRegisterEvents: function(expId) {
+        if (location.search.split('?')[1] === 'new') {
+          shouldRegisterEvents = true;
+        }
+        explorationId = expId;
+      },
+      registerEditorFirstEntryEvent: function() {
+        if (shouldRegisterEvents &&
+            !alreadyRegisteredEvents.hasOwnProperty('EditorFirstEntryEvent')) {
+          siteAnalyticsService.registerEditorFirstEntryEvent(explorationId);
+          alreadyRegisteredEvents.EditorFirstEntryEvent = true;
+        }
+      },
+      registerFirstOpenContentBoxEvent: function() {
+        if (shouldRegisterEvents &&
+            !alreadyRegisteredEvents.hasOwnProperty(
+              'FirstOpenContentBoxEvent')) {
+          siteAnalyticsService.registerFirstOpenContentBoxEvent(explorationId);
+          alreadyRegisteredEvents.FirstOpenContentBoxEvent = true;
+        }
+      },
+      registerFirstSaveContentEvent: function() {
+        if (shouldRegisterEvents &&
+            !alreadyRegisteredEvents.hasOwnProperty('FirstSaveContentEvent')) {
+          siteAnalyticsService.registerFirstSaveContentEvent(explorationId);
+          alreadyRegisteredEvents.FirstSaveContentEvent = true;
+        }
+      },
+      registerFirstClickAddInteractionEvent: function() {
+        if (shouldRegisterEvents &&
+            !alreadyRegisteredEvents.hasOwnProperty(
+              'FirstClickAddInteractionEvent')) {
+          siteAnalyticsService.registerFirstClickAddInteractionEvent(
+            explorationId);
+          alreadyRegisteredEvents.FirstClickAddInteractionEvent = true;
+        }
+      },
+      registerFirstSelectInteractionTypeEvent: function() {
+        if (shouldRegisterEvents &&
+            !alreadyRegisteredEvents.hasOwnProperty(
+              'FirstSelectInteractionTypeEvent')) {
+          siteAnalyticsService.registerFirstSelectInteractionTypeEvent(
+            explorationId);
+          alreadyRegisteredEvents.FirstSelectInteractionTypeEvent = true;
+        }
+      },
+      registerFirstSaveInteractionEvent: function() {
+        if (shouldRegisterEvents &&
+            !alreadyRegisteredEvents.hasOwnProperty(
+              'FirstSaveInteractionEvent')) {
+          siteAnalyticsService.registerFirstSaveInteractionEvent(explorationId);
+          alreadyRegisteredEvents.FirstSaveInteractionEvent = true;
+        }
+      },
+      registerFirstSaveRuleEvent: function() {
+        if (shouldRegisterEvents &&
+            !alreadyRegisteredEvents.hasOwnProperty('FirstSaveRuleEvent')) {
+          siteAnalyticsService.registerFirstSaveRuleEvent(explorationId);
+          alreadyRegisteredEvents.FirstSaveRuleEvent = true;
+        }
+      },
+      registerFirstCreateSecondStateEvent: function() {
+        if (shouldRegisterEvents &&
+            !alreadyRegisteredEvents.hasOwnProperty(
+              'FirstCreateSecondStateEvent')) {
+          siteAnalyticsService.registerFirstCreateSecondStateEvent(
+            explorationId);
+          alreadyRegisteredEvents.FirstCreateSecondStateEvent = true;
+        }
       }
     };
   }

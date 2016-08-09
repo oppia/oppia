@@ -169,11 +169,11 @@ describe('Code Normalization', function() {
     expect(cns.getNormalizedCode(
       '# This is a comment.\n' +
       '  # This is a comment with some spaces before it.\n' +
-      'def x():         # And a comment with some code before it.\n' +
-      '  y = \'#String with hashes#\''
+      'def x():   # And a comment with some code before it.\n' +
+      '  y = \'#string with hashes#\''
     )).toBe(
-      'def x():         # And a comment with some code before it.\n' +
-      '    y = \'#String with hashes#\''
+      'def x(): # And a comment with some code before it.\n' +
+      '    y = \'#string with hashes#\''
     );
   });
 
@@ -222,6 +222,38 @@ describe('Code Normalization', function() {
       'abc\n' +
       '    bcd\n' +
       'cde'
+    );
+  });
+
+  it('should normalize multiple spaces within a line', function() {
+    expect(cns.getNormalizedCode(
+      'abcdefg\n' +
+      '    hij    klm\n' +
+      '    ab "cde fgh"\n'
+    )).toBe(
+      'abcdefg\n' +
+      '    hij klm\n' +
+      '    ab "cde fgh"'
+    );
+  });
+
+  it('should be case-insensitive within a string but not outside', function() {
+    expect(cns.getNormalizedCode(
+      'abcdefg\n' +
+      '    ABcDe \'HiJkL\'\n' +
+      '    "HiJkL    MNopq  " ABcDe\n' +
+      '    "AbC@\\"DeF7"  GhI# \'JkL-\\\'MnO3\'\n' +
+      '    \'not a Real String\n' +
+      '    """another Unreal String\n' +
+      '    \'a legit " STRING\' now outsiDe string'
+    )).toBe(
+      'abcdefg\n' +
+      '    ABcDe \'hijkl\'\n' +
+      '    "hijkl mnopq " ABcDe\n' +
+      '    "abc@\\"def7" GhI# \'jkl-\\\'mno3\'\n' +
+      '    \'not a Real String\n' +
+      '    """another Unreal String\n' +
+      '    \'a legit " string\' now outsiDe string'
     );
   });
 });

@@ -39,6 +39,26 @@ oppia.factory('UrlInterpolationService', [
     return GLOBALS.ASSET_DIR_PREFIX + resourcePath;
   };
 
+  var validateResourcePath = function(resourcePath) {
+    if (!resourcePath) {
+      alertsService.fatalWarning(
+        'Empty path passed in method.');
+    }
+
+    var RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH = /^\//;
+    // Ensure that resourcePath starts with a forward slash.
+    if (!resourcePath.match(RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH)) {
+      alertsService.fatalWarning(
+        'Path must start with \'\/\': \'' + new String(resourcePath) +
+        '\'.');
+    }
+  };
+
+  var getCachePrefixedUrl = function(resourcePath) {
+    validateResourcePath(resourcePath);
+    return GLOBALS.ASSET_DIR_PREFIX + resourcePath;
+  };
+
   return {
     /**
      * Given a formatted URL, interpolates the URL by inserting values the URL

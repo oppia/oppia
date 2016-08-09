@@ -11,11 +11,12 @@
 {% block header_js %}
   {{ super() }}
   <script type="text/javascript">
+    GLOBALS.canEdit = JSON.parse('{{can_edit|js_string}}');
+    GLOBALS.canUnpublish = JSON.parse('{{can_unpublish|js_string}}');
     GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
     GLOBALS.collectionTitle = JSON.parse('{{title|js_string}}');
     GLOBALS.isPrivate = JSON.parse('{{is_private|js_string}}');
-    GLOBALS.canEdit = JSON.parse('{{can_edit|js_string}}');
-    GLOBALS.canUnpublish = JSON.parse('{{can_unpublish|js_string}}');
+    GLOBALS.TAG_REGEX = JSON.parse('{{TAG_REGEX|js_string}}');
   </script>
 
   <style>
@@ -104,7 +105,6 @@
     {{ include_js_file('domain/editor/ChangeObjectFactory.js') }}
     {{ include_js_file('domain/editor/UndoRedoService.js') }}
     {{ include_js_file('domain/summaries/ExplorationSummaryBackendApiService.js') }}
-    {{ include_js_file('domain/utilities/UrlInterpolationService.js') }}
 
     {# TODO(bhenning): Remove these once RouterServices is decoupled from the exploration editor #}
     {{ include_js_file('exploration_editor/EditorServices.js') }}

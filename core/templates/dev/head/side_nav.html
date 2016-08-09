@@ -1,4 +1,4 @@
-<nav class="oppia-sidebar-menu" ng-class="{'oppia-sidebar-menu-transition': pageHasLoaded}">
+<nav class="oppia-sidebar-menu" ng-controller="SideNav" ng-class="{'oppia-sidebar-menu-transition': pageHasLoaded}">
   <div class="oppia-sidebar-header">
     <div class="oppia-sidebar-logo-container">
     </div>
@@ -26,16 +26,16 @@
       </a>
     </li>
 
-    <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
-      <a href="/forum">
-        <i class="material-icons oppia-sidebar-menu-icon">&#xE7EF;</i>
-        <span translate="I18N_SIDEBAR_FORUM"></span>
+    <li {% if nav_mode == 'donate' %}class="active"{% endif %}>
+      <a href="/donate">
+        <i class="material-icons oppia-sidebar-menu-icon">&#xE87D;</i>
+        <span translate="I18N_SIDEBAR_DONATE"></span>
       </a>
     </li>
 
     <li>
       <a href="https://oppiablog.blogspot.com" target="_blank">
-        <img src="/images/sidebar/blogger.png" class="oppia-sidebar-menu-icon">
+        <img ng-src="<[getStaticImageUrl('/sidebar/blogger.png')]>" class="oppia-sidebar-menu-icon">
         <span translate="I18N_SIDEBAR_BLOG"></span>
       </a>
     </li>
@@ -53,16 +53,16 @@
       <span="I18N_SIDEBAR_FOLLOW_US"></span>:
     </div>
     <a href="https://plus.google.com/109898456505810251700/about" target="_blank">
-      <img src="/images/social/gplus.png">
+      <img ng-src="<[getStaticImageUrl('/social/gplus.png')]>">
     </a>
     <a href="https://www.youtube.com/channel/UC5c1G7BNDCfv1rczcBp9FPw" target="_blank">
-      <img src="/images/social/youtube.png">
+      <img ng-src="<[getStaticImageUrl('/social/youtube.png')]>">
     </a>
     <a href="https://www.facebook.com/oppiaorg" target="_blank">
-      <img src="/images/social/fb.png">
+      <img ng-src="<[getStaticImageUrl('/social/fb.png')]>">
     </a>
     <a href="https://twitter.com/oppiaorg" target="_blank">
-      <img src="/images/social/twitter.png">
+      <img ng-src="<[getStaticImageUrl('/social/twitter.png')]>">
     </a>
   </div>
 </nav>

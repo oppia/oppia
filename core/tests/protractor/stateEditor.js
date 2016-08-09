@@ -155,4 +155,8 @@ describe('State editor', function() {
     editor.saveChanges();
     users.logout();
   });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
+  });
 });

@@ -26,6 +26,8 @@ oppia.controller('Preferences', [
     $rootScope.loadingMessage = 'Loading';
     $scope.profilePictureDataUrl = '';
 
+    $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+
     var _saveDataItem = function(updateType, data) {
       $http.put(_PREFERENCES_DATA_URL, {
         update_type: updateType,
