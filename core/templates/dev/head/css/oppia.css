@@ -1167,13 +1167,14 @@ textarea {
   margin-bottom: 0;
   width: 200px;
 }
+
 .oppia-dashboard-tabs-active .oppia-dashboard-tabs-text {
   margin-left: 7.5px;
   border-bottom: 4px solid #009688;
   color: #009688;
 }
-.oppia-dashboard-tabs-text {
-  border-bottom: none;
+
+.oppia-dashboard-tabs .oppia-dashboard-tabs-text {
   color: #009688;
   font-size: 1em;
   padding: 10px;
@@ -1181,11 +1182,12 @@ textarea {
   text-transform: uppercase;
   width: 100%;
 }
-.oppia-dashboard-tabs-text:hover,
-.oppia-dashboard-tabs-text:focus {
-  color: #009688;
+
+.oppia-dashboard-tabs .oppia-dashboard-tabs-text:hover,
+.oppia-dashboard-tabs .oppia-dashboard-tabs-text:focus {
   text-decoration: none;
 }
+
 .oppia-dashboard-empty-text {
   padding-top: 50px;
 }
@@ -1223,6 +1225,9 @@ textarea {
 
 li.sort-explorations-select {
   width: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 li.sort-explorations-select .sort-by-text,
@@ -3733,6 +3738,18 @@ md-card.preview-conversation-skin-supplemental-card {
   .oppia-dashboard-container {
     padding-left: 10px;
     padding-right: 10px;
+  }
+
+  .oppia-dashboard-container .oppia-dashboard-tabs {
+    justify-content: center;
+  }
+
+  .oppia-dashboard-container .oppia-dashboard-tabs li {
+    width: auto;
+  }
+
+  .oppia-dashboard-container .oppia-dashboard-tabs .sort-explorations-select {
+    margin-top: 8px;
   }
 
   .oppia-dashboard-container .oppia-dashboard-tabs .list-card-view-toggle,
