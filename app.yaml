@@ -50,7 +50,6 @@ handlers:
   static_dir: core/templates/dev/head/css
   secure: always
 - url: /templates/head
-  # NB: not minified. TODO(sll): fix.
   static_dir: core/templates/dev/head
   application_readable: true
   secure: always
