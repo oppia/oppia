@@ -74,6 +74,20 @@ oppia.config([
             }
             return config;
           },
+          response: function(response) {
+            // Making sure that csrf tokens are the latest
+            if (response.data.hasOwnProperty('csrf_token')) {
+              GLOBALS.csrf_token = response.data.csrf_token;
+            }
+            if (response.data.hasOwnProperty('csrf_token_create_exploration')) {
+              GLOBALS.csrf_token_create_exploration = (
+                response.data.csrf_token_create_exploration);
+            }
+            if (response.data.hasOwnProperty('csrf_token_i18n')) {
+              GLOBALS.csrf_token_i18n = response.data.csrf_token_i18n;
+            }
+            return response;
+          },
           responseError: function(rejection) {
             // A rejection status of -1 seems to indicate (it's hard to find
             // documentation) that the response has not completed,
@@ -780,4 +794,14 @@ oppia.factory('codeNormalizationService', [function() {
       return normalizedCodeLines.join('\n');
     }
   };
+}]);
+
+oppia.value('globals', {
+});
+
+oppia.run(['$http', 'globals', function($http, globals) {
+  var url = '/basedata/';
+  $http.get(url).then(function(response) {
+    globals.SUPPORTED_SITE_LANGUAGES = response.data.SUPPORTED_SITE_LANGUAGES;
+  });
 }]);
