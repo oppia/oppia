@@ -3750,6 +3750,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
   .oppia-dashboard-container .oppia-dashboard-tabs .sort-explorations-select {
     margin-top: 8px;
+    width: 100%;
   }
 
   .oppia-dashboard-container .oppia-dashboard-tabs .list-card-view-toggle,
