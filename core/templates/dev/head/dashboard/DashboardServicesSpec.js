@@ -42,7 +42,7 @@ describe('Dashboard services', function() {
         created_on_msec: 1466178691847.67,
         last_updated_msec: 1466178759209.839,
         status: 'public',
-        ratings: {
+        rating: {
           5: 0,
           4: 1,
           3: 0,
@@ -68,7 +68,7 @@ describe('Dashboard services', function() {
         created_on_msec: 1468178691847.71,
         last_updated_msec: 1468178759209.849,
         status: 'private',
-        ratings: {
+        rating: {
           5: 0,
           4: 1,
           3: 0,
@@ -94,7 +94,7 @@ describe('Dashboard services', function() {
         created_on_msec: 1418178691848.19,
         last_updated_msec: 1418178759219.124,
         status: 'private',
-        ratings: {
+        rating: {
           5: 1,
           4: 1,
           3: 2,
@@ -175,11 +175,11 @@ describe('Dashboard services', function() {
     expect(RatingComputationService.computeAverageRating(
       sortedByAverageRating[0][EXPLORATIONS_SORT_BY_KEYS.RATING])).toBe(
         RatingComputationService.computeAverageRating(
-          sampleExplorationsList[2][EXPLORATIONS_SORT_BY_KEYS.RATING]));
+          sampleExplorationsList[1][EXPLORATIONS_SORT_BY_KEYS.RATING]));
     expect(RatingComputationService.computeAverageRating(
       sortedByAverageRating[1][EXPLORATIONS_SORT_BY_KEYS.RATING])).toBe(
         RatingComputationService.computeAverageRating(
-          sampleExplorationsList[1][EXPLORATIONS_SORT_BY_KEYS.RATING]));
+          sampleExplorationsList[2][EXPLORATIONS_SORT_BY_KEYS.RATING]));
     expect(RatingComputationService.computeAverageRating(
       sortedByAverageRating[2][EXPLORATIONS_SORT_BY_KEYS.RATING])).toBe(
         RatingComputationService.computeAverageRating(
