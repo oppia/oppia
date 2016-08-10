@@ -16,63 +16,39 @@
  * @fileoverview Data and controllers for the Oppia admin page.
  */
 
-oppia.controller('Admin', [
-  '$scope', '$http', 'UrlInterpolationService',
-  function($scope, $http, UrlInterpolationService) {
-    $scope.message = '';
-    $scope.adminHandlerUrl = '/adminhandler';
-    var ADMIN_JOB_OUTPUT_URL_PREFIX = '/adminjoboutput';
-    $scope.adminTopicsCsvDownloadHandlerUrl = '/admintopicscsvdownloadhandler';
-    $scope.configProperties = {};
+oppia.constant('ADMIN_TAB_URLS', {
+  ACTIVITIES: '#activities',
+  JOBS: '#jobs',
+  CONFIG: '#config',
+  MISC: '#misc'
+});
 
+oppia.controller('Admin', [
+  '$scope', '$http', 'UrlInterpolationService', 'ADMIN_TAB_URLS',
+  function($scope, $http, UrlInterpolationService, ADMIN_TAB_URLS) {
+    var ADMIN_JOB_OUTPUT_URL_PREFIX = '/adminjoboutput';
+
+    $scope.message = '';
+    $scope.configProperties = {};
+    $scope.adminHandlerUrl = '/adminhandler';
+    $scope.adminTopicsCsvDownloadHandlerUrl = '/admintopicscsvdownloadhandler';
+
+    $scope.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
+    $scope.currentTab = $scope.ADMIN_TAB_URLS.ACTIVITIES;
     $scope.logoWhiteImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/logo/288x128_logo_white.png');
 
-    $scope.TAB_ACTIVITIES = 'TAB_ACTIVITIES';
-    $scope.TAB_JOBS = 'TAB_JOBS';
-    $scope.TAB_CONFIG = 'TAB_CONFIG';
-    $scope.TAB_MISC = 'TAB_MISC';
-    $scope.JOBS_URL = '#jobs';
-    $scope.CONFIG_URL = '#config';
-    $scope.MISC_URL = '#misc';
-    $scope.ACTIVITIES_URL = '#activities';
-
-    $scope.currentTab = $scope.TAB_ACTIVITIES;
-
     $scope.$watch(function() {
       return window.location.hash;
-    }, function(newHash) {
-      switch (newHash) {
-        case $scope.JOBS_URL:
-          $scope.showJobsTab();
-          break;
-        case $scope.CONFIG_URL:
-          $scope.showConfigTab();
-          break;
-        case $scope.MISC_URL:
-          $scope.showMiscTab();
-          break;
-        case $scope.ACTIVITIES_URL:
-          $scope.showActivitiesTab();
-          break;
+    }, function(newHash, oldHash) {
+      if (newHash !== oldHash) {
+        for (var url in $scope.ADMIN_TAB_URLS) {
+          if ($scope.ADMIN_TAB_URLS[url] === newHash) {
+            $scope.currentTab = newHash;
+          }
+        }
       }
     });
-
-    $scope.showActivitiesTab = function() {
-      $scope.currentTab = $scope.TAB_ACTIVITIES;
-    };
-
-    $scope.showJobsTab = function() {
-      $scope.currentTab = $scope.TAB_JOBS;
-    };
-
-    $scope.showConfigTab = function() {
-      $scope.currentTab = $scope.TAB_CONFIG;
-    };
-
-    $scope.showMiscTab = function() {
-      $scope.currentTab = $scope.TAB_MISC;
-    };
 
     $scope.showJobOutput = false;
     $scope.getJobOutput = function(jobId) {
