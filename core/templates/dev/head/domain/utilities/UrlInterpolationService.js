@@ -21,36 +21,14 @@ oppia.factory('UrlInterpolationService', [
     'alertsService', 'utilsService', function(alertsService, utilsService) {
   var validateResourcePath = function(resourcePath) {
     if (!resourcePath) {
-      alertsService.fatalWarning(
-        'Empty path passed in method.');
+      alertsService.fatalWarning('Empty path passed in method.');
     }
 
     var RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH = /^\//;
     // Ensure that resourcePath starts with a forward slash.
     if (!resourcePath.match(RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH)) {
       alertsService.fatalWarning(
-        'Path must start with \'\/\': \'' + new String(resourcePath) +
-        '\'.');
-    }
-  };
-
-  var getCachePrefixedUrl = function(resourcePath) {
-    validateResourcePath(resourcePath);
-    return GLOBALS.ASSET_DIR_PREFIX + resourcePath;
-  };
-
-  var validateResourcePath = function(resourcePath) {
-    if (!resourcePath) {
-      alertsService.fatalWarning(
-        'Empty path passed in method.');
-    }
-
-    var RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH = /^\//;
-    // Ensure that resourcePath starts with a forward slash.
-    if (!resourcePath.match(RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH)) {
-      alertsService.fatalWarning(
-        'Path must start with \'\/\': \'' + new String(resourcePath) +
-        '\'.');
+        'Path must start with \'\/\': \'' + resourcePath + '\'.');
     }
   };
 
@@ -68,8 +46,7 @@ oppia.factory('UrlInterpolationService', [
      *   /createhandler/resolved_answers/<exploration_id>/<escaped_state_name>
      *
      * interpolationValues is an object whose keys are variables within the URL.
-     * For the above example, interpolationValues may look something
-     * like:
+     * For the above example, interpolationValues may look something like:
      *
      *   { 'exploration_id': '0', 'escaped_state_name': 'InputBinaryNumber' }
      *
@@ -79,8 +56,7 @@ oppia.factory('UrlInterpolationService', [
     interpolateUrl: function(urlTemplate, interpolationValues) {
       if (!urlTemplate) {
         alertsService.fatalWarning(
-          'Invalid or empty URL template passed in: \'' +
-          new String(urlTemplate) + '\'');
+          'Invalid or empty URL template passed in: \'' + urlTemplate + '\'');
         return null;
       }
 
