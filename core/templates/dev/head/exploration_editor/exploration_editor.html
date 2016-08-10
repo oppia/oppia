@@ -239,6 +239,7 @@
 {% endblock local_top_nav_options %}
 
 {% block content %}
+  {% include 'exploration_editor/editor_extensions.html' %}
   <div ng-controller="ExplorationEditor" ng-cloak>
 
     <script type="text/ng-template" id="modals/addExplorationMetadata">
@@ -572,7 +573,6 @@
     {{ include_js_file('expressions/expressionInterpolationService.js') }}
   </script>
 
-  {{ interaction_templates }}
   {{ interaction_validators_html }}
   {{ gadget_templates }}
 {% endblock footer_js %}

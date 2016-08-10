@@ -62,10 +62,6 @@ handlers:
   # TODO(Sean Lip): Add cache when system to break cache during
   # new release is figured out.
     Cache-Control: 'no-cache'
-- url: /extensions
-  static_dir: extensions
-  application_readable: true
-  secure: always
 - url: /extensions/gadgets/(.*)/static/(.*)
   static_files: extensions/gadgets/\1/static/\2
   upload: extensions/gadgets/(.*)/static/(.*)
@@ -84,6 +80,10 @@ handlers:
   secure: always
   http_headers:
     Cache-Control: 'no-cache'
+- url: /extensions
+  static_dir: extensions
+  application_readable: true
+  secure: always
 - url: /mapreduce/pipeline/images
   static_dir: third_party/gae-mapreduce-1.9.17.0/mapreduce/lib/pipeline/ui/images
   secure: always

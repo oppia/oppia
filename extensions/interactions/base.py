@@ -173,7 +173,7 @@ class BaseInteraction(object):
         """
         html_templates = utils.get_file_contents(os.path.join(
             feconf.INTERACTIONS_DIR, self.id, '%s.html' % self.id))
-        return jinja_utils.interpolate_cache_slug('%s' % (html_templates))
+        return jinja_utils.interpolate_cache_slug('%s' % html_templates)
 
     @property
     def validator_html(self):
