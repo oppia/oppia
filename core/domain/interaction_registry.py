@@ -85,19 +85,14 @@ class Registry(object):
             for interaction_id in interaction_ids])
 
     @classmethod
-    def get_validators_html(cls, interaction_ids):
-        """Returns the HTML bodies for the interaction validators."""
+    def get_base_validator_html(cls):
+        """Returns the HTML body for the base validator."""
 
         # Add the base validator.
         html_fragments = [
             '<script>%s</script>' %
             utils.get_file_contents(os.path.join(
                 feconf.INTERACTIONS_DIR, 'baseValidator.js'))]
-
-        # Add individual validators for each interaction.
-        html_fragments += [
-            cls.get_interaction_by_id(interaction_id).validator_html
-            for interaction_id in interaction_ids]
 
         return ' \n'.join(html_fragments)
 
