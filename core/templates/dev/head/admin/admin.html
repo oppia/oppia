@@ -373,25 +373,10 @@
 
     {% include 'forms/form_builder_templates.html' %}
     {% include 'footer_js_libs.html' %}
+    {% include 'admin/admin_js_files.html' %}
 
     <script>
-      {{ include_js_file('app.js') }}
-      {{ include_js_file('base.js') }}
-      {{ include_js_file('admin/Admin.js') }}
-      {{ include_js_file('directives.js') }}
-      {{ include_js_file('services/alertsService.js') }}
-      {{ include_js_file('services/explorationContextService.js') }}
-
-      {{ include_js_file('components/ObjectEditorDirective.js') }}
-      {{ include_js_file('components/ValueGeneratorEditorDirective.js') }}
-
-      {{ include_js_file('forms/formBuilder.js') }}
-
-      {{ include_js_file('expressions/expressionSyntaxTree.js') }}
-      {{ include_js_file('expressions/evaluator.js') }}
-      {{ include_js_file('expressions/parser.js') }}
       {{ value_generators_js }}
-      {{ include_js_file('domain/utilities/UrlInterpolationService.js') }}
     </script>
 
     {{ rte_components_html }}
