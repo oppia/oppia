@@ -87,7 +87,7 @@
                   ng-options="EXPLORATIONS_SORT_BY_KEYS[key] as value for (key, value) in HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS">
           </select>
           <span class="sort-order fa"
-                ng-click="sortExplorationsList()"
+                ng-click="sortExplorations(currentSortType)"
                 ng-class="isCurrentSortDescending ? 'fa-long-arrow-up': 'fa-long-arrow-down'">
           </span>
         </li>
@@ -137,45 +137,17 @@
                <col style="width: 16%;">
             </colgroup>
             <tr>
-              <th ng-click="sortExplorationsList(EXPLORATIONS_SORT_BY_KEYS.TITLE)">
-                Exploration
-                <span ng-if="currentSortType === EXPLORATIONS_SORT_BY_KEYS.TITLE"
-                      class="fa"
-                      ng-class="isCurrentSortDescending ? 'fa-caret-up': 'fa-caret-down'">
-                </span>
-              </th>
-              <th ng-click="sortExplorationsList(EXPLORATIONS_SORT_BY_KEYS.RATING)">
-                Rating
-                <span ng-if="currentSortType === EXPLORATIONS_SORT_BY_KEYS.RATING"
-                      class="fa"
-                      ng-class="isCurrentSortDescending ? 'fa-caret-up': 'fa-caret-down'">
-                </span>
-              </th>
-              <th ng-click="sortExplorationsList(EXPLORATIONS_SORT_BY_KEYS.NUM_VIEWS)">
-                Plays
-                <span ng-if="currentSortType === EXPLORATIONS_SORT_BY_KEYS.NUM_VIEWS"
-                      class="fa"
-                      ng-class="isCurrentSortDescending ? 'fa-caret-up': 'fa-caret-down'">
-                </span>
-              </th>
-              <th ng-click="sortExplorationsList(EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK)">
-                Feedback
-                <span ng-if="currentSortType === EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK"
-                      class="fa"
-                      ng-class="isCurrentSortDescending ? 'fa-caret-up': 'fa-caret-down'">
-                </span>
-              </th>
-              <th ng-click="sortExplorationsList(EXPLORATIONS_SORT_BY_KEYS.UNRESOLVED_ANSWERS)">
-                Unresolved Answers
-                <span ng-if="currentSortType === EXPLORATIONS_SORT_BY_KEYS.UNRESOLVED_ANSWERS"
-                      class="fa"
-                      ng-class="isCurrentSortDescending ? 'fa-caret-up': 'fa-caret-down'">
-                </span>
-              </th>
-              <th ng-click="sortExplorationsList(EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED)">
-                Last Updated
-                <span ng-if="currentSortType === EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED"
-                      class="fa"
+              <th ng-repeat="(key, value) in EXPLORATIONS_SORT_BY_KEYS"
+                  class="oppia-dashboard-table-headings"
+                  ng-click="sortExplorations(value)">
+                <p ng-if="key === 'TITLE'">Exploration</p>
+                <p ng-if="key === 'RATING'">Rating</p>
+                <p ng-if="key === 'NUM_VIEWS'">Plays</p>
+                <p ng-if="key === 'OPEN_FEEDBACK'">Feedback</p>
+                <p ng-if="key === 'LAST_UPDATED'">Last Updated</p>
+                <p ng-if="key === 'UNRESOLVED_ANSWERS'">Unresolved Answers</p>
+                <span class="fa"
+                      ng-if="currentSortType === value"
                       ng-class="isCurrentSortDescending ? 'fa-caret-up': 'fa-caret-down'">
                 </span>
               </th>

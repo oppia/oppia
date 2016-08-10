@@ -19,19 +19,19 @@
 oppia.constant('EXPLORATIONS_SORT_BY_KEYS', {
   TITLE: 'title',
   RATING: 'ratings',
-  LAST_UPDATED: 'last_updated_msec',
   NUM_VIEWS: 'num_views',
   OPEN_FEEDBACK: 'num_open_threads',
-  UNRESOLVED_ANSWERS: 'num_unresolved_answers'
+  UNRESOLVED_ANSWERS: 'num_unresolved_answers',
+  LAST_UPDATED: 'last_updated_msec'
 });
 
 oppia.constant('HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', {
   TITLE: 'Title',
   RATING: 'Average Rating',
-  LAST_UPDATED: 'Last Updated',
   NUM_VIEWS: 'Total Plays',
-  OPEN_FEEDBACK: 'New Feedback',
-  UNRESOLVED_ANSWERS: 'Unresolved Answers'
+  OPEN_FEEDBACK: 'Open Feedback',
+  UNRESOLVED_ANSWERS: 'Unresolved Answers',
+  LAST_UPDATED: 'Last Updated'
 });
 
 // Service for sorting the explorations based on different parameters.
@@ -92,6 +92,10 @@ oppia.factory('sortExplorationsService', [
           }
           returnValue = valA - valB;
         }
+        // Reverse the sign of returned value if sort order is to be reversed.
+        if (isDescending) {
+          returnValue = (-1) * returnValue;
+        }
         // NOTE TO DEVELOPERS: Make sure the value returned here is non-zero to
         // keep this sort stable.
         return returnValue ? returnValue : (a.index - b.index);
@@ -99,9 +103,6 @@ oppia.factory('sortExplorationsService', [
       result = result.map(function(value) {
         return value.data;
       });
-      if (isDescending || angular.equals(explorationsList, result)) {
-        return result.reverse();
-      }
       return result;
     };
     return {

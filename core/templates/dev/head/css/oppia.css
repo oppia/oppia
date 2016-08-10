@@ -2204,6 +2204,10 @@ md-card.oppia-dashboard-tile {
   color: #555;
 }
 
+.oppia-dashboard-table .oppia-dashboard-table-headings p {
+  display: inline;
+}
+
 .oppia-dashboard-table th {
   padding: 12px 3px;
 }

@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for DashboardServices.
  */
 
-ddescribe('Dashboard services', function() {
+describe('Dashboard services', function() {
   var sortExplorationsService = null;
   var alertsService = null;
   var sampleExplorationsList = null;

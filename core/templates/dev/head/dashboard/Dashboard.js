@@ -76,16 +76,16 @@ oppia.controller('Dashboard', [
       $scope.checkForMobileView();
     });
 
-    $scope.sortExplorationsList = function(sortType) {
-      $scope.isCurrentSortDescending = !$scope.isCurrentSortDescending;
-      if (sortType) {
+    $scope.sortExplorations = function(sortType) {
+      if (sortType === $scope.currentSortType) {
+        $scope.isCurrentSortDescending = !$scope.isCurrentSortDescending;
+      } else {
         $scope.currentSortType = sortType;
       }
-      $scope.explorationsList = (
-        sortExplorationsService.sortBy(
-          $scope.explorationsList,
-          $scope.currentSortType,
-          $scope.isCurrentSortDescending));
+      $scope.explorationsList = (sortExplorationsService.sortBy(
+        $scope.explorationsList,
+        $scope.currentSortType,
+        $scope.isCurrentSortDescending));
     };
 
     $rootScope.loadingMessage = 'Loading';
