@@ -1,6 +1,7 @@
 <script type="text/ng-template" id="components/activityTilesInfinityGrid">
   <div infinite-scroll="showMoreActivities()" infinite-scroll-distance="1"
-       infinite-scroll-disabled="endOfPageIsReached || searchResultsAreLoading">
+       infinite-scroll-disabled="endOfPageIsReached || searchResultsAreLoading"
+       style="max-width: 856px; margin-left: auto; margin-right: auto;">
     <div ng-repeat="activity in allActivitiesInOrder track by $index" style="display: inline-block;">
       <collection-summary-tile ng-if="activity.activity_type === 'collection'"
                                collection-id="activity.id"
