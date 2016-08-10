@@ -83,7 +83,7 @@
           <p class="sort-by-text">Sort By</p>
           <select ng-model="currentSortType"
                   class="sort-options"
-                  ng-change="sortExplorationsList(currentSortType)"
+                  ng-change="sortExplorations(currentSortType)"
                   ng-options="EXPLORATIONS_SORT_BY_KEYS[key] as value for (key, value) in HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS">
           </select>
           <span class="sort-order fa"

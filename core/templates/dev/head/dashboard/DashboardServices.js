@@ -94,7 +94,7 @@ oppia.factory('sortExplorationsService', [
         }
         // Reverse the sign of returned value if sort order is to be reversed.
         if (isDescending) {
-          returnValue = (-1) * returnValue;
+          returnValue = -1 * returnValue;
         }
         // NOTE TO DEVELOPERS: Make sure the value returned here is non-zero to
         // keep this sort stable.
