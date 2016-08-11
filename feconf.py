@@ -693,11 +693,12 @@ ALL_LANGUAGE_CODES = [{
 DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
 
+# While adding another language, please ensure that the
+# languages are in alphabetical order
 SUPPORTED_SITE_LANGUAGES = {
-    'ch': 'chinese',
+    'id': 'Bahasa Indonesia',
     'en': 'English',
     'es': 'Español',
-    'id': 'Bahasa Indonesia',
     'pt': 'Português',
     'vi': 'Tiếng Việt',
     'hi': 'हिन्दी',
