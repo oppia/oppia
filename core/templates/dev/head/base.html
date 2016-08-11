@@ -349,7 +349,39 @@
     {% include 'components/activity_tiles_infinity_grid_directive.html' %}
     {% include 'components/loading_dots_directive.html' %}
 
-    {% include 'common-js-files.html' %}
+    <script src="{{TEMPLATE_DIR_PREFIX}}/app.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/base.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/directives.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/filters.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/i18n.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/sideNav.js"></script>
+
+    <script src="{{TEMPLATE_DIR_PREFIX}}/forms/formBuilder.js"></script>
+
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/alertsService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/explorationContextService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/autoplayedVideosService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/searchService.js"></script>
+
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/ActivityTilesInfinityGridDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/AlertMessageDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/CollectionCreationService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/CollectionSummaryTileDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/CreateActivityButtonDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/ExplorationCreationService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/ExplorationSummaryTileDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/LoadingDotsDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/ObjectEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingDisplayDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/Select2DropdownDirective.js"></script>
+
+    <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/UrlInterpolationService.js"></script>
+
+    <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionSyntaxTree.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/evaluator.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/parser.js"></script>
+
     <script>
       {{ OBJECT_EDITORS_JS }}
     </script>

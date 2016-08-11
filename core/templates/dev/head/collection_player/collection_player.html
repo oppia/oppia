@@ -98,13 +98,11 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script>
-    {{ include_js_file('collection_player/CollectionPlayer.js') }}
-    {{ include_js_file('collection_player/CollectionNodeListDirective.js') }}
-    {{ include_js_file('domain/collection/CollectionBackendApiService.js') }}
-    {{ include_js_file('domain/collection/CollectionNodeObjectFactory.js') }}
-    {{ include_js_file('domain/collection/CollectionObjectFactory.js') }}
-    {{ include_js_file('domain/collection/CollectionPlaythroughObjectFactory.js') }}
-    {{ include_js_file('domain/collection/SkillListObjectFactory.js') }}
-  </script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/collection_player/CollectionPlayer.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/collection_player/CollectionNodeListDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionNodeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionPlaythroughObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/SkillListObjectFactory.js"></script>
 {% endblock footer_js %}

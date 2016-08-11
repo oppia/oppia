@@ -49,9 +49,10 @@ handlers:
   # NB: not minified. TODO(sll): fix.
   static_dir: core/templates/dev/head/css
   secure: always
-- url: /templates/head
-  static_dir: core/templates/dev/head
-  application_readable: true
+  # Serve only the js files in this directory as static files.
+- url: /templates/dev/head/(.*\.(js))$
+  static_files: core/templates/dev/head/\1
+  upload: core/templates/dev/head/(.*\.(js))$
   secure: always
 - url: /third_party/static
   static_dir: third_party/static

@@ -78,40 +78,38 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script>
-    {{ include_js_file('collection_editor/CollectionEditor.js') }}
-    {{ include_js_file('collection_editor/CollectionEditorNavbarBreadcrumbDirective.js') }}
-    {{ include_js_file('collection_editor/CollectionEditorNavbarDirective.js') }}
-    {{ include_js_file('collection_editor/CollectionEditorStateService.js') }}
-    {{ include_js_file('collection_editor/editor_tab/CollectionLinearizerService.js') }}
-    {{ include_js_file('collection_editor/editor_tab/CollectionMainTabDirective.js') }}
-    {{ include_js_file('collection_editor/editor_tab/CollectionNodeCreatorDirective.js') }}
-    {{ include_js_file('collection_editor/editor_tab/CollectionNodeEditorDirective.js') }}
-    {{ include_js_file('collection_editor/editor_tab/CollectionSkillListDirective.js') }}
-    {{ include_js_file('collection_editor/feedback_tab/CollectionFeedbackTabDirective.js') }}
-    {{ include_js_file('collection_editor/history_tab/CollectionHistoryTabDirective.js') }}
-    {{ include_js_file('collection_editor/settings_tab/CollectionDetailsEditorDirective.js') }}
-    {{ include_js_file('collection_editor/settings_tab/CollectionSettingsTabDirective.js') }}
-    {{ include_js_file('collection_editor/statistics_tab/CollectionStatisticsTabDirective.js') }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/collection_editor/CollectionEditor.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/collection_editor/CollectionEditorNavbarBreadcrumbDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/collection_editor/CollectionEditorNavbarDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/collection_editor/CollectionEditorStateService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/collection_editor/editor_tab/CollectionLinearizerService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/collection_editor/editor_tab/CollectionMainTabDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/collection_editor/editor_tab/CollectionNodeCreatorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/collection_editor/editor_tab/CollectionNodeEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/collection_editor/editor_tab/CollectionSkillListDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/collection_editor/feedback_tab/CollectionFeedbackTabDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/collection_editor/history_tab/CollectionHistoryTabDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/collection_editor/settings_tab/CollectionDetailsEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/collection_editor/settings_tab/CollectionSettingsTabDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/collection_editor/statistics_tab/CollectionStatisticsTabDirective.js"></script>
 
-    {{ include_js_file('domain/collection/CollectionBackendApiService.js') }}
-    {{ include_js_file('domain/collection/CollectionNodeObjectFactory.js') }}
-    {{ include_js_file('domain/collection/CollectionObjectFactory.js') }}
-    {{ include_js_file('domain/collection/CollectionRightsBackendApiService.js') }}
-    {{ include_js_file('domain/collection/CollectionUpdateService.js') }}
-    {{ include_js_file('domain/collection/CollectionValidationService.js') }}
-    {{ include_js_file('domain/collection/SkillListObjectFactory.js') }}
-    {{ include_js_file('domain/collection/WritableCollectionBackendApiService.js') }}
-    {{ include_js_file('domain/editor/ChangeObjectFactory.js') }}
-    {{ include_js_file('domain/editor/UndoRedoService.js') }}
-    {{ include_js_file('domain/summaries/ExplorationSummaryBackendApiService.js') }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionNodeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionRightsBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionUpdateService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionValidationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/SkillListObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/WritableCollectionBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/ChangeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/UndoRedoService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/summaries/ExplorationSummaryBackendApiService.js"></script>
 
-    {# TODO(bhenning): Remove these once RouterServices is decoupled from the exploration editor #}
-    {{ include_js_file('exploration_editor/EditorServices.js') }}
-    {{ include_js_file('exploration_editor/ExplorationEditor.js') }}
-    {{ include_js_file('exploration_editor/GadgetValidationService.js') }}
-    {{ include_js_file('exploration_editor/RouterServices.js') }}
-    {{ include_js_file('expressions/expressionInterpolationService.js') }}
-    {{ include_js_file('services/utilsService.js') }}
-  </script>
+  {# TODO(bhenning): Remove these once RouterServices is decoupled from the exploration editor #}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/EditorServices.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/ExplorationEditor.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/GadgetValidationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/RouterServices.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionInterpolationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/utilsService.js"></script>
 {% endblock footer_js %}

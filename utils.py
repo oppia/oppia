@@ -471,3 +471,19 @@ def get_asset_dir_prefix():
             ASSET_DIR_PREFIX = '/build/%s' % cache_slug
 
     return ASSET_DIR_PREFIX
+
+TEMPLATE_DIR_PREFIX = None
+def get_template_dir_prefix():
+    """Returns prefix for template directory depending whether dev or prod.
+    It is used as a prefix in urls for script files.
+    """
+    global TEMPLATE_DIR_PREFIX # pylint: disable=global-statement
+    if not TEMPLATE_DIR_PREFIX:
+        TEMPLATE_DIR_PREFIX = '/templates/dev/head'
+        if feconf.IS_MINIFIED or not feconf.DEV_MODE:
+            yaml_file_content = dict_from_yaml(
+                get_file_contents('cache_slug.yaml'))
+            cache_slug = yaml_file_content['cache_slug']
+            TEMPLATE_DIR_PREFIX = '/build/%s/templates/head' % cache_slug
+
+    return TEMPLATE_DIR_PREFIX
