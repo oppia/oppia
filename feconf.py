@@ -694,6 +694,7 @@ DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
 
 SUPPORTED_SITE_LANGUAGES = {
+    'ch': 'chinese',
     'en': 'English',
     'es': 'Español',
     'id': 'Bahasa Indonesia',

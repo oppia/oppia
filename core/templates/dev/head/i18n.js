@@ -43,7 +43,23 @@ oppia.controller('I18nFooter', [
   // Changes the language of the translations.
   var preferencesDataUrl = '/preferenceshandler/data';
   var siteLanguageUrl = '/save_site_language';
-  $scope.supportedSiteLanguages = GLOBALS.SUPPORTED_SITE_LANGUAGES;
+
+  var items = Object.keys(GLOBALS.SUPPORTED_SITE_LANGUAGES).map(function(key) {
+    return [key, GLOBALS.SUPPORTED_SITE_LANGUAGES[key]];
+  });
+
+  items.sort(function(first, second) {
+    var textA = first[1].toUpperCase();
+    var textB = second[1].toUpperCase();
+    return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+  });
+
+  var supportedSiteLanguages = {};
+  for (var i = 0; i < items.length; i++) {
+    supportedSiteLanguages[items[i][0]] = items[i][1];
+  }
+
+  $scope.supportedSiteLanguages = supportedSiteLanguages;
   if (GLOBALS.userIsLoggedIn && GLOBALS.preferredSiteLanguageCode) {
     $translate.use(GLOBALS.preferredSiteLanguageCode);
   }
