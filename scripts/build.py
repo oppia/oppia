@@ -22,8 +22,7 @@ import sys
 import yaml
 
 
-# ensure_directory_exists method trims file paths passed to it. Hence, directory
-# paths require a trailing slash.
+
 HEAD_DIR = os.path.join('core', 'templates', 'dev', 'head', '')
 OUT_DIR = os.path.join('core', 'templates', 'prod', 'head', '')
 REMOVE_WS = re.compile(r'\s{2,}').sub
@@ -106,20 +105,22 @@ def copy_files_source_to_target(source, target):
             shutil.copyfile(source_path, target_path)
 
 
-def _build_files():
-    ensure_directory_exists(OUT_DIR)
-    shutil.rmtree(OUT_DIR)
+def build_files(source, target):
+    print 'Processing %s' % os.path.join(os.getcwd(), source)
+    print 'Generating into %s' % os.path.join(os.getcwd(), target)
+    ensure_directory_exists(target)
+    shutil.rmtree(target)
 
-    for root, dirs, files in os.walk(os.path.join(os.getcwd(), HEAD_DIR)):
+    for root, dirs, files in os.walk(os.path.join(os.getcwd(), source)):
         for directory in dirs:
             print 'Processing %s' % os.path.join(root, directory)
         for filename in files:
             source_path = os.path.join(root, filename)
-            if source_path.find(OUT_DIR) > 0:
+            if target in source_path:
                 continue
-            if source_path.find(HEAD_DIR) == -1:
+            if source not in source_path:
                 continue
-            target_path = source_path.replace(HEAD_DIR, OUT_DIR)
+            target_path = source_path.replace(source, target)
             if filename.endswith('.html'):
                 process_html(source_path, target_path)
             if filename.endswith('.css'):
@@ -141,6 +142,8 @@ if __name__ == '__main__':
     CACHE_SLUG = get_cache_slug()
     BUILD_DIR = os.path.join('build', CACHE_SLUG)
 
+    # ensure_directory_exists trims file paths passed to it. Hence, directory
+    # paths require a trailing slash.
     # Process assets, copy it to build/[cache_slug]/assets
     ASSETS_SRC_DIR = os.path.join('assets', '')
     ASSETS_OUT_DIR = os.path.join(BUILD_DIR, 'assets', '')
@@ -157,7 +160,9 @@ if __name__ == '__main__':
     EXTENSIONS_OUT_DIR = os.path.join(BUILD_DIR, 'extensions', '')
     copy_files_source_to_target(EXTENSIONS_SRC_DIR, EXTENSIONS_OUT_DIR)
 
-    _build_files()
+    TEMPLATES_HEAD_DIR = os.path.join('core', 'templates', 'dev', 'head', '')
+    TEMPLATES_OUT_DIR = os.path.join('core', 'templates', 'prod', 'head', '')
+    build_files(TEMPLATES_HEAD_DIR, TEMPLATES_OUT_DIR)
 
     # Process core/templates/prod/head/css, copy it to build/[cache_slug]/css
     CSS_SRC_DIR = os.path.join('core', 'templates', 'prod', 'head', 'css', '')
