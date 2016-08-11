@@ -172,107 +172,109 @@
       </div>
 
       <div ng-if="myExplorationsView === 'card' && explorationsList.length > 0"
-           style="margin-top: 8px;">
+           style="margin-top: 8px; position: relative;">
         <md-card ng-repeat="exploration in explorationsList track by exploration.id"
                  class="oppia-activity-summary-tile oppia-dashboard-card-view-item"
                  scroll-on-click
                  ng-click="showExplorationDropdown(exploration.id)">
-            <div class="title-section" style="background-color: <[exploration.thumbnail_bg_color]>;">
-              <img class="thumbnail-image" ng-src="<[exploration.thumbnail_icon_url]>">
-              <h2 class="activity-title protractor-test-exp-summary-tile-title">
-                <span><[exploration.title || 'Untitled' | truncate:40]></span>
-              </h2>
-            </div>
+          <div class="title-section" style="background-color: <[exploration.thumbnail_bg_color]>;">
+            <img class="thumbnail-image" ng-src="<[exploration.thumbnail_icon_url]>">
+            <h2 class="activity-title protractor-test-exp-summary-tile-title">
+              <span><[exploration.title || 'Untitled' | truncate:40]></span>
+            </h2>
+          </div>
+          <div class="mask-wrap">
             <div class="title-section-mask"></div>
-            <div ng-attr-section="'<['right-section']>">
-              <div ng-if="exploration.status === 'private'" class="exp-private-text">
-                <[publishText]>
-              </div>
-              <ul ng-if="exploration.status !== 'private'"
-                  layout="row"
-                  layout-wrap
-                  class="metrics"
-                  layout-align="space-between center">
-                <li flex="50">
-                  <span class="protractor-test-exp-summary-tile-rating">
-                    <span class="fa fa-star fa-lg"
-                          tooltip="<['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]>"
-                          tooltip-placement="top">
-                    </span>
-                    <span>
-                      <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
-                    </span>
-                  </span>
-                </li>
-
-                <li flex="50">
-                  <span class="fa fa-eye fa-lg"
-                        tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>"
-                        tooltip-placement="top">
-                  </span>
-                  <[exploration.num_views]>
-                </li>
-
-                <li flex="50">
-                  <span class="fa fa-clock-o fa-lg"
-                        tooltip="<['I18N_LIBRARY_LAST_UPDATED' | translate]>"
+          </div>
+          <div ng-attr-section="'<['right-section']>">
+            <div ng-if="exploration.status === 'private'" class="exp-private-text">
+              <[publishText]>
+            </div>
+            <ul ng-if="exploration.status !== 'private'"
+                layout="row"
+                layout-wrap
+                class="metrics"
+                layout-align="space-between center">
+              <li flex="50">
+                <span class="protractor-test-exp-summary-tile-rating">
+                  <span class="fa fa-star fa-lg"
+                        tooltip="<['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]>"
                         tooltip-placement="top">
                   </span>
                   <span>
-                    <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
+                    <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
                   </span>
-                </li>
+                </span>
+              </li>
 
-                <li flex="50">
-                  <span class="fa fa-comments fa-lg"
-                        tooltip="<['I18N_DASHBOARD_OPEN_FEEDBACK' | translate]>"
-                        tooltip-placement="top">
-                  </span>
-                  <[exploration.num_total_threads]>
-                  <a ng-if="exploration.num_open_threads != 0"
-                     ng-href="/create/<[exploration.id]>#/feedback">
-                      (<[exploration.num_open_threads]> new)
-                  </a>
-                </li>
-                <sharing-links ng-if="exploration.status !== 'private'"
-                               ng-click="$event.stopPropagation()"
-                               flex="100"
-                               class="dashboard-hide-mobile"
-                               layout-type="row"
-                               layout-align-type="center left"
-                               twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD"
-                               exploration-id="exploration.id">
-               </sharing-links>
-              </ul>
-            </div>
-            <div class="dropdown-stats"
-                 ng-if="exploration.status !=='private' && isDropdownOpen[$index]">
-              <div class="open-feedback">
-                <div class="open-feedback-text">
-                  <[x]> Open Feedback
-                </div>
+              <li flex="50">
+                <span class="fa fa-eye fa-lg"
+                      tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>"
+                      tooltip-placement="top">
+                </span>
+                <[exploration.num_views]>
+              </li>
+
+              <li flex="50">
+                <span class="fa fa-clock-o fa-lg"
+                      tooltip="<['I18N_LIBRARY_LAST_UPDATED' | translate]>"
+                      tooltip-placement="top">
+                </span>
+                <span>
+                  <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
+                </span>
+              </li>
+
+              <li flex="50">
+                <span class="fa fa-comments fa-lg"
+                      tooltip="<['I18N_DASHBOARD_OPEN_FEEDBACK' | translate]>"
+                      tooltip-placement="top">
+                </span>
+                <[exploration.num_total_threads]>
+                <a ng-if="exploration.num_open_threads != 0"
+                    ng-href="/create/<[exploration.id]>#/feedback">
+                    (<[exploration.num_open_threads]> new)
+                </a>
+              </li>
+              <sharing-links ng-if="exploration.status !== 'private'"
+                              ng-click="$event.stopPropagation()"
+                              flex="100"
+                              class="dashboard-hide-mobile"
+                              layout-type="row"
+                              layout-align-type="center left"
+                              twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD"
+                              exploration-id="exploration.id">
+              </sharing-links>
+            </ul>
+          </div>
+          <md-card class="oppia-exp-dropdown-stats"
+                   ng-if="exploration.status !=='private' && isDropdownOpen[exploration.id]">
+            <div class="new-updates stat-block">
+              <div class="open-feedback-text heading-text">
+                <[x]> Open Feedback
                 <span class="fa"
                       ng-class="subMenuOpen[$index] === 'feedback' ? 'fa-caret-up': 'fa-caret-down'">
                 </span>
               </div>
-              <div class="unresolved-answers">
-                <div class="open-feedback-text">
-                  <[x]> Unresolved Answers from Users
-                </div>
+            </div>
+            <div class="new-updates stat-block">
+              <div class="open-feedback-text heading-text">
+                <[x]> Unresolved Answers from Users
                 <span class="fa"
                       ng-class="subMenuOpen[$index] === 'unresolved_answers' ? 'fa-caret-up': 'fa-caret-down'">
                 </span>
               </div>
-              <div class="new-updates">
-                <div class="open-feedback-text">
-                  <[x]> Updates Since You Last Updated
-                </div>
+            </div>
+            <div class="new-updates stat-block">
+              <div class="open-feedback-text heading-text">
+                <[x]> Updates Since You Last Updated
                 <span class="fa"
                       ng-class="subMenuOpen[$index] === 'updates' ? 'fa-caret-up': 'fa-caret-down'">
                 </span>
               </div>
-              <button>Open In Editor</button>
             </div>
+            <button class="btn open-in-editor-btn">Open In Editor</button>
+          </md-card>
         </md-card>
       </div>
     </div>
@@ -286,7 +288,9 @@
         <ul class="oppia-dashboard-tiles" ng-if="activeTab === 'myCollections'">
           <li ng-repeat="collection in collectionsList">
             <md-card layout="row" class="oppia-dashboard-tile">
-              <a ng-href="/collection_editor/create/<[collection.id]>" class="oppia-dashboard-tile-container-link" style="text-decoration: none;">
+              <a ng-href="/collection_editor/create/<[collection.id]>"
+                 class="oppia-dashboard-tile-container-link"
+                 style="text-decoration: none;">
                 <div class="oppia-dashboard-tile-metadata-parent hidden-xs">
                   <div class="oppia-dashboard-tile-metadata">
                     Created:<span style="color: black;">
@@ -312,7 +316,10 @@
                 </div>
                 <div class="oppia-dashboard-tile-contents">
                   <span class="oppia-dashboard-tile-image-container" style="position: absolute;">
-                    <img class="oppia-dashboard-tile-image" ng-src="<[collection.thumbnail_icon_url]>" style="background-color: <[collection.thumbnail_bg_color]>" ng-class="{'oppia-dashboard-tile-image-private': collection.status === 'private'}">
+                    <img class="oppia-dashboard-tile-image"
+                         ng-src="<[collection.thumbnail_icon_url]>"
+                         style="background-color: <[collection.thumbnail_bg_color]>"
+                         ng-class="{'oppia-dashboard-tile-image-private': collection.status === 'private'}">
                   </span>
 
                   <div class="oppia-dashboard-tile-details">

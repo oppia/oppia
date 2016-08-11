@@ -212,7 +212,7 @@ oppia.directive('scrollOnClick', function() {
     link: function(scope, element) {
       element.on('click', function() {
         $('html, body').animate({
-          scrollTop: element.offset().top
+          scrollTop: element.offset().top - 60
         }, 'slow');
       });
     }

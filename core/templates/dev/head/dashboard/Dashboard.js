@@ -30,6 +30,7 @@ oppia.controller('Dashboard', [
       smText: 'Publish the exploration to receive statistics.'
     };
 
+    $scope.isDropdownOpen = {};
     $scope.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
         GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
@@ -48,6 +49,10 @@ oppia.controller('Dashboard', [
 
     $scope.showExplorationEditor = function(explorationId) {
       $window.location = '/create/' + explorationId;
+    };
+
+    $scope.showExplorationDropdown = function(explorationId) {
+      $scope.isDropdownOpen[explorationId] = true;
     };
 
     $scope.myExplorationsView = 'card';
