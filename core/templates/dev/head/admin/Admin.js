@@ -27,11 +27,11 @@ oppia.controller('Admin', [
   '$scope', '$http', 'UrlInterpolationService', 'ADMIN_TAB_URLS',
   function($scope, $http, UrlInterpolationService, ADMIN_TAB_URLS) {
     var ADMIN_JOB_OUTPUT_URL_PREFIX = '/adminjoboutput';
+    var adminHandlerUrl = '/adminhandler';
+    var adminTopicsCsvDownloadHandlerUrl = '/admintopicscsvdownloadhandler';
 
     $scope.message = '';
     $scope.configProperties = {};
-    $scope.adminHandlerUrl = '/adminhandler';
-    $scope.adminTopicsCsvDownloadHandlerUrl = '/admintopicscsvdownloadhandler';
 
     $scope.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
     $scope.currentTab = $scope.ADMIN_TAB_URLS.ACTIVITIES;
@@ -45,6 +45,7 @@ oppia.controller('Admin', [
         for (var url in $scope.ADMIN_TAB_URLS) {
           if ($scope.ADMIN_TAB_URLS[url] === newHash) {
             $scope.currentTab = newHash;
+            break;
           }
         }
       }
@@ -80,7 +81,7 @@ oppia.controller('Admin', [
     };
 
     $scope.reloadConfigProperties = function() {
-      $http.get($scope.adminHandlerUrl).then(function(response) {
+      $http.get(adminHandlerUrl).then(function(response) {
         $scope.configProperties = response.data.config_properties;
       });
     };
@@ -92,7 +93,7 @@ oppia.controller('Admin', [
         return;
       }
 
-      $http.post($scope.adminHandlerUrl, {
+      $http.post(adminHandlerUrl, {
         action: 'revert_config_property',
         config_property_id: configPropertyId
       }).then(function() {
@@ -107,7 +108,7 @@ oppia.controller('Admin', [
     $scope.migrateFeedback = function() {
       $scope.migrationInProcess = true;
 
-      $http.post($scope.adminHandlerUrl, {
+      $http.post(adminHandlerUrl, {
         action: 'migrate_feedback'
       }).then(function() {
         $scope.message = 'Feedback migrated successfully.';
@@ -136,7 +137,7 @@ oppia.controller('Admin', [
           $scope.configProperties[property].value);
       }
 
-      $http.post($scope.adminHandlerUrl, {
+      $http.post(adminHandlerUrl, {
         action: 'save_config_properties',
         new_config_property_values: newConfigPropertyValues
       }).then(function() {
@@ -157,7 +158,7 @@ oppia.controller('Admin', [
 
       $scope.message = 'Processing...';
 
-      $http.post($scope.adminHandlerUrl, {
+      $http.post(adminHandlerUrl, {
         action: 'clear_search_index'
       }).then(function() {
         $scope.message = 'Index successfully cleared.';
@@ -177,7 +178,7 @@ oppia.controller('Admin', [
 
       $scope.message = 'Processing...';
 
-      $http.post($scope.adminHandlerUrl, {
+      $http.post(adminHandlerUrl, {
         action: 'reload_exploration',
         exploration_id: String(explorationId)
       }).then(function() {
@@ -216,7 +217,7 @@ oppia.controller('Admin', [
       for (var i = 0; i < GLOBALS.DEMO_EXPLORATION_IDS.length; ++i) {
         var explorationId = GLOBALS.DEMO_EXPLORATION_IDS[i];
 
-        $http.post($scope.adminHandlerUrl, {
+        $http.post(adminHandlerUrl, {
           action: 'reload_exploration',
           exploration_id: explorationId
         }).then(function() {
@@ -242,7 +243,7 @@ oppia.controller('Admin', [
 
       $scope.message = 'Processing...';
 
-      $http.post($scope.adminHandlerUrl, {
+      $http.post(adminHandlerUrl, {
         action: 'reload_collection',
         collection_id: String(collectionId)
       }).then(function() {
@@ -255,7 +256,7 @@ oppia.controller('Admin', [
     $scope.startNewJob = function(jobType) {
       $scope.message = 'Starting new job...';
 
-      $http.post($scope.adminHandlerUrl, {
+      $http.post(adminHandlerUrl, {
         action: 'start_new_job',
         job_type: jobType
       }).then(function() {
@@ -269,7 +270,7 @@ oppia.controller('Admin', [
     $scope.cancelJob = function(jobId, jobType) {
       $scope.message = 'Cancelling job...';
 
-      $http.post($scope.adminHandlerUrl, {
+      $http.post(adminHandlerUrl, {
         action: 'cancel_job',
         job_id: jobId,
         job_type: jobType
@@ -284,7 +285,7 @@ oppia.controller('Admin', [
     $scope.startComputation = function(computationType) {
       $scope.message = 'Starting computation...';
 
-      $http.post($scope.adminHandlerUrl, {
+      $http.post(adminHandlerUrl, {
         action: 'start_computation',
         computation_type: computationType
       }).then(function() {
@@ -298,7 +299,7 @@ oppia.controller('Admin', [
     $scope.stopComputation = function(computationType) {
       $scope.message = 'Stopping computation...';
 
-      $http.post($scope.adminHandlerUrl, {
+      $http.post(adminHandlerUrl, {
         action: 'stop_computation',
         computation_type: computationType
       }).then(function() {
@@ -314,7 +315,7 @@ oppia.controller('Admin', [
       var reader = new FileReader();
       reader.onload = function(e) {
         var data = e.target.result;
-        $http.post($scope.adminHandlerUrl, {
+        $http.post(adminHandlerUrl, {
           action: 'upload_topic_similarities',
           data: data
         }).then(function() {
@@ -327,7 +328,7 @@ oppia.controller('Admin', [
     };
 
     $scope.downloadTopicSimilaritiesFile = function() {
-      window.location.href = $scope.adminTopicsCsvDownloadHandlerUrl;
+      window.location.href = adminTopicsCsvDownloadHandlerUrl;
     };
   }
 ]);
