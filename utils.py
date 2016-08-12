@@ -456,34 +456,39 @@ def unescape_encoded_uri_component(escaped_string):
     return urllib.unquote(escaped_string).decode('utf-8')
 
 
-ASSET_DIR_PREFIX = None
+_CACHE_SLUG = None
+def get_cache_slug():
+    """Returns cache slug depending whether dev or prod."""
+    global _CACHE_SLUG # pylint: disable=global-statement
+    if not _CACHE_SLUG:
+        _CACHE_SLUG = ''
+        if feconf.IS_MINIFIED or not feconf.DEV_MODE:
+            yaml_file_content = dict_from_yaml(
+                get_file_contents('cache_slug.yaml'))
+            _CACHE_SLUG = yaml_file_content['cache_slug']
+
+    return _CACHE_SLUG
+
+
 def get_asset_dir_prefix():
     """Returns prefix for asset directory depending whether dev or prod.
     It is used as a prefix in urls for images, css and script files.
     """
-    global ASSET_DIR_PREFIX # pylint: disable=global-statement
-    if not ASSET_DIR_PREFIX:
-        ASSET_DIR_PREFIX = ''
-        if feconf.IS_MINIFIED or not feconf.DEV_MODE:
-            yaml_file_content = dict_from_yaml(
-                get_file_contents('cache_slug.yaml'))
-            cache_slug = yaml_file_content['cache_slug']
-            ASSET_DIR_PREFIX = '/build/%s' % cache_slug
+    asset_dir_prefix = ''
+    if feconf.IS_MINIFIED or not feconf.DEV_MODE:
+        cache_slug = get_cache_slug()
+        asset_dir_prefix = '/build/%s' % cache_slug
 
-    return ASSET_DIR_PREFIX
+    return asset_dir_prefix
 
-TEMPLATE_DIR_PREFIX = None
+
 def get_template_dir_prefix():
     """Returns prefix for template directory depending whether dev or prod.
     It is used as a prefix in urls for script files.
     """
-    global TEMPLATE_DIR_PREFIX # pylint: disable=global-statement
-    if not TEMPLATE_DIR_PREFIX:
-        TEMPLATE_DIR_PREFIX = '/templates/dev/head'
-        if feconf.IS_MINIFIED or not feconf.DEV_MODE:
-            yaml_file_content = dict_from_yaml(
-                get_file_contents('cache_slug.yaml'))
-            cache_slug = yaml_file_content['cache_slug']
-            TEMPLATE_DIR_PREFIX = '/build/%s/templates/head' % cache_slug
+    template_dir_prefix = '/templates/dev/head'
+    if feconf.IS_MINIFIED or not feconf.DEV_MODE:
+        cache_slug = get_cache_slug()
+        template_dir_prefix = '/build/%s/templates/head' % cache_slug
 
-    return TEMPLATE_DIR_PREFIX
+    return template_dir_prefix
