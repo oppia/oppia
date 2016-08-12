@@ -29,7 +29,7 @@ REMOVE_WS = re.compile(r'\s{2,}').sub
 YUICOMPRESSOR_DIR = os.path.join(
     '..', 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar')
 
-FILE_EXTENSIONS_TO_COPY_WITHOUT_MINIFICATION = ['.json']
+FILE_EXTENSIONS_TO_COPY_WITHOUT_MINIFICATION = ['.json', '.png']
 
 
 def _minify(source_path, target_path):

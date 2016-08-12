@@ -21,7 +21,6 @@ import os
 import pkgutil
 
 import feconf
-import utils
 
 
 class Registry(object):
