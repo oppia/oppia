@@ -74,6 +74,8 @@ class ImageHandler(base.BaseHandler):
             fs = fs_domain.AbstractFileSystem(
                 fs_domain.ExplorationFileSystem(exploration_id))
             raw = fs.get(filepath)
+
+            self.response.cache_control = 'public, max-age=600'
             self.response.write(raw)
         except:
             raise self.PageNotFoundException
