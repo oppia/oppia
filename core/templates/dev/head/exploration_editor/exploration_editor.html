@@ -572,7 +572,7 @@
     {{ include_js_file('expressions/expressionInterpolationService.js') }}
   </script>
 
-  {{ interaction_base_validator_html }}
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/interactions/baseValidator.js"></script>
   {{ interaction_templates }}
   {{ gadget_templates }}
 {% endblock footer_js %}

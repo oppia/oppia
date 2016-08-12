@@ -81,9 +81,9 @@ handlers:
   http_headers:
     Cache-Control: 'no-cache'
 # To serve extension resources in dev mode.
-- url: /extensions/(.*\.(js))$
-  static_files: extensions/\1
-  upload: extensions/(.*\.(js))$
+- url: /extensions/(gadgets|interactions|rich_text_components)/(.*\.(js))$
+  static_files: extensions/\1/\2
+  upload: extensions/(gadgets|interactions|rich_text_components)/(.*\.(js))$
   secure: always
 - url: /mapreduce/pipeline/images
   static_dir: third_party/gae-mapreduce-1.9.17.0/mapreduce/lib/pipeline/ui/images
