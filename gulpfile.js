@@ -30,8 +30,7 @@ var argv = yargs
         })
         .option('output_directory', {
           describe: 'A path to the directory where the files will be generated'
-        })
-        .argv;
+        }).argv;
     })
   .command('start_devserver', 'start GAE development server',
     function(yargs) {

@@ -179,7 +179,8 @@ if __name__ == '__main__':
         BUILD_DIR, 'third_party', 'generated')
     build_minified_third_party_libs(THIRD_PARTY_GENERATED_OUT_DIR)
 
-    # Minify extensions, copy it to build/[cache_slug]/extensions
+    # Minify extension static resources, copy it to
+    # build/[cache_slug]/extensions
     EXTENSIONS_SRC_DIR = os.path.join('extensions', '')
     EXTENSIONS_OUT_DIR = os.path.join(BUILD_DIR, 'extensions', '')
     # Certain files' syntax become incorrect after minification and hence

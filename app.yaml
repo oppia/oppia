@@ -80,9 +80,10 @@ handlers:
   secure: always
   http_headers:
     Cache-Control: 'no-cache'
-- url: /extensions
-  static_dir: extensions
-  application_readable: true
+# To serve extension resources in dev mode.
+- url: /extensions/(.*\.(js))$
+  static_files: extensions/\1
+  upload: extensions/(.*\.(js))$
   secure: always
 - url: /mapreduce/pipeline/images
   static_dir: third_party/gae-mapreduce-1.9.17.0/mapreduce/lib/pipeline/ui/images
