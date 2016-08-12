@@ -22,7 +22,6 @@ import sys
 import yaml
 
 
-
 HEAD_DIR = os.path.join('core', 'templates', 'dev', 'head', '')
 OUT_DIR = os.path.join('core', 'templates', 'prod', 'head', '')
 REMOVE_WS = re.compile(r'\s{2,}').sub
