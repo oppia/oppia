@@ -29,6 +29,8 @@ REMOVE_WS = re.compile(r'\s{2,}').sub
 YUICOMPRESSOR_DIR = os.path.join(
     '..', 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar')
 
+FILE_EXTENSIONS_TO_COPY_WITHOUT_MINIFICATION = ['.json']
+
 
 def _minify(source_path, target_path):
     """Runs the given file through a minifier and outputs it to target_path."""
@@ -95,9 +97,9 @@ def copy_files_source_to_target(source, target):
 
         for filename in files:
             source_path = os.path.join(root, filename)
-            if source_path.find(target) > 0:
+            if target in source_path:
                 continue
-            if source_path.find(source) == -1:
+            if source not in source_path:
                 continue
             target_path = source_path.replace(
                 source, target)
@@ -105,7 +107,14 @@ def copy_files_source_to_target(source, target):
             shutil.copyfile(source_path, target_path)
 
 
-def build_files(source, target):
+def build_files(source, target, ignore=None):
+    """Minifies all css and js files, and removes whitespace from html in source
+    directory and copies it to target, ignoring paths/files mentioned in ignore.
+    Copies files in ignore to target without any changes.
+    Arguments:
+        source, target: strings
+        ignore: list of files/paths to ignore
+    """
     print 'Processing %s' % os.path.join(os.getcwd(), source)
     print 'Generating into %s' % os.path.join(os.getcwd(), target)
     ensure_directory_exists(target)
@@ -121,6 +130,21 @@ def build_files(source, target):
             if source not in source_path:
                 continue
             target_path = source_path.replace(source, target)
+
+            only_copy_file = False
+            # Only copy files in ignore or with extensions mentioned in
+            # FILE_EXTENSIONS_TO_COPY_WITHOUT_MINIFICATION variable.
+            # We do not copy any py scripts.
+            if (any(p in source_path for p in ignore) or
+                    any(p in source_path
+                        for p in FILE_EXTENSIONS_TO_COPY_WITHOUT_MINIFICATION)):
+                only_copy_file = True
+
+            if only_copy_file:
+                ensure_directory_exists(target_path)
+                shutil.copyfile(source_path, target_path)
+                continue
+
             if filename.endswith('.html'):
                 process_html(source_path, target_path)
             if filename.endswith('.css'):
@@ -131,8 +155,8 @@ def build_files(source, target):
 
 def get_cache_slug():
     """Returns the cache slug read from file."""
-    with open('cache_slug.yaml', 'r') as f:
-        content = f.read()
+    with open('cache_slug.yaml', 'r') as _:
+        content = _.read()
     retrieved_dict = yaml.safe_load(content)
     assert isinstance(retrieved_dict, dict)
     return retrieved_dict['cache_slug']
@@ -155,14 +179,18 @@ if __name__ == '__main__':
         BUILD_DIR, 'third_party', 'generated')
     build_minified_third_party_libs(THIRD_PARTY_GENERATED_OUT_DIR)
 
-    # Process extensions, copy it to build/[cache_slug]/extensions
+    # Minify extensions, copy it to build/[cache_slug]/extensions
     EXTENSIONS_SRC_DIR = os.path.join('extensions', '')
     EXTENSIONS_OUT_DIR = os.path.join(BUILD_DIR, 'extensions', '')
-    copy_files_source_to_target(EXTENSIONS_SRC_DIR, EXTENSIONS_OUT_DIR)
+    # Certain files' syntax become incorrect after minification and hence
+    # they are ignored.
+    IGNORE_PATHS = [os.path.join('extensions', 'interactions',
+                                 'LogicProof', 'static', 'js')]
+    build_files(EXTENSIONS_SRC_DIR, EXTENSIONS_OUT_DIR, IGNORE_PATHS)
 
     TEMPLATES_HEAD_DIR = os.path.join('core', 'templates', 'dev', 'head', '')
     TEMPLATES_OUT_DIR = os.path.join('core', 'templates', 'prod', 'head', '')
-    build_files(TEMPLATES_HEAD_DIR, TEMPLATES_OUT_DIR)
+    build_files(TEMPLATES_HEAD_DIR, TEMPLATES_OUT_DIR, [])
 
     # Process core/templates/prod/head/css, copy it to build/[cache_slug]/css
     CSS_SRC_DIR = os.path.join('core', 'templates', 'prod', 'head', 'css', '')
