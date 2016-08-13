@@ -391,8 +391,9 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         state_answers = self._get_state_answers(state_name)
         self.assertIsNone(state_answers)
 
-        self.assertEqual(len(job_output), 1)
-        self.assertIn('Failed to normalize', job_output[0])
+        self.assertEqual(len(job_output), 2)
+        self.assertIn('Failed to migrate all answers', job_output[0])
+        self.assertIn('Failed to normalize', job_output[1])
         self._verify_migration_validation_problems(1)
 
     def test_migration_job_should_support_very_large_answers(self):

@@ -1355,6 +1355,9 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # TODO(bhenning): This special value ought to be documented in
         # StateAnswers.
         exploration_version = exploration.version if exploration else 0
+        migrated_answers = []
+        answer_strings = []
+        answer_frequencies = []
         for answer_str, answer_frequency in answers.iteritems():
             # Major point of failure is if answer returns None; the error
             # variable will contain why the reconstitution failed.
@@ -1367,12 +1370,22 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                         'Failed to migrate answer because of %s (answer=%s,'
                         ' state=%s)' % (error, item_id, state.to_dict()))
                     continue
+                migrated_answers.append(answer)
+                answer_strings.append(answer_str)
+                answer_frequencies.append(answer_frequency)
             else:
-                answer = None
                 yield (
                     'Cannot migrate answer due to missing answer state. '
                     'Assuming it is None.')
+                migrated_answers.append(None)
+                answer_strings.append(answer_str)
+                answer_frequencies.append(answer_frequency)
+        if len(migrated_answers) != len(answers):
+            yield 'Failed to migrate all answers for item batch: %s' % item_id
+            return
 
+        for answer, answer_str, answer_frequency in zip(
+                migrated_answers, answer_strings, answer_frequencies):
             submitted_answer_list = [stats_domain.SubmittedAnswer(
                 answer, interaction_id, answer_group_index,
                 rule_spec_index, classification_categorization, params,
