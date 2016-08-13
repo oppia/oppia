@@ -534,7 +534,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         latest_exp_model = exp_models.ExplorationModel.get_by_id(exp_id)
         if not latest_exp_model:
             # The exploration may have been permanently deleted.
-            return (None, None, False)
+            return (None, False)
         if (latest_exp_model.version == 1 or
                 latest_exp_model.last_updated <= when):
             # Short-circuit: the answer was submitted later than the current exp
@@ -542,39 +542,30 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             # wrong with the answer. Just deal with it.
             latest_exp, failed_migration = cls._get_exploration_from_model(
                 latest_exp_model)
-            return (latest_exp, None, failed_migration)
+            return (latest_exp, failed_migration)
 
-        # Look backwards in the history of the exploration, starting with the
-        # latest version. This depends on ExplorationCommitLogEntryModel, which
-        # was added in ecbfff0.
-        versions = list(reversed(range(latest_exp_model.version)))
-        exp_commit_models = (
-            exp_models.ExplorationCommitLogEntryModel.get_multi(
-                ['exploration-%s-%s' % (exp_id, version)
-                 for version in versions],
-                include_deleted=True))
-        for (exp_commit_model, version) in zip(exp_commit_models, versions):
-            if exp_commit_model and exp_commit_model.created_on < when:
+        # Use ExplorationSnapshotContentModel to retrieve dates for past
+        # explorations. This model is fully reliable as it was introduced with
+        # the first public release of Oppia, unlike
+        # ExplorationCommitLogEntryModel.
+        snapshots = exp_services.get_exploration_snapshots_metadata(
+            exp_id, max_version=latest_exp_model.version, allow_deleted=True)
+        when_ms = utils.get_time_in_millisecs(when)
+        for snapshot in reversed(snapshots):
+            if snapshot['created_on_ms'] < when_ms:
                 # Found the closest exploration to the given answer
                 # submission
                 exp_model = cls._get_exploration_model_by_id_version(
-                    exp_id, version)
+                    exp_id, snapshot['version_number'])
                 if not exp_model:
-                    return (None, None, False)
+                    return (None, False)
                 exp, failed_migration = cls._get_exploration_from_model(
                     exp_model)
-                return (exp, None, failed_migration)
+                return (exp, failed_migration)
 
-        # Any data added before ecbfff0 is assumed to match the earliest
-        # recorded commit.
-        history_models = [cls._get_exploration_model_by_id_version(
-            exp_id, version) for version in versions]
-        latest_exp, failed_migration = cls._get_exploration_from_model(
-            latest_exp_model)
-        return (
-            latest_exp,
-            [cls._get_exploration_from_model(model)[0]
-             for model in history_models], failed_migration)
+        # One of the other snapshots should have matched; the answer was
+        # submitted outside all snapshots of the exploration.
+        return (None, False)
 
     # This function comes from extensions.answer_summarizers.models.
     @classmethod
@@ -1241,7 +1232,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             # even though each answer may have been submitted to a different
             # exploration version. This may cause significant migration issues
             # and will be tricky to work around.
-            (exploration, history, failed_migration) = (
+            (exploration, failed_migration) = (
                 AnswerMigrationJob._find_exploration_immediately_before_timestamp( # pylint: disable=line-too-long
                     exploration_id, created_on))
             dated_explorations_dict[created_on] = exploration
@@ -1264,32 +1255,12 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             # Another point of failure is the state not matching due to an
             # incorrect exploration version selection.
             if exploration and state_name not in exploration.states:
-                if history:
-                    recovered_state = False
-                    for old_exp in history:
-                        if old_exp and state_name in old_exp.states:
-                            dated_explorations_dict[created_on] = old_exp
-                            recovered_state = True
-                            yield (
-                                'Recovered missing state from an older version '
-                                'of the exploration')
-                            break
-                    if not recovered_state:
-                        # TODO(bhenning): Add state_name, exploration_id, and
-                        # exploration version. back to this output. It was
-                        # removed to reduce the amount of output from the
-                        # production migration job.
-                        yield (
-                            'Encountered missing state name in exploration '
-                            'referenced to by submitted answers. Migrating '
-                            'with missing state.')
-                else:
-                    # TODO(bhenning): Add exploration_id and exploration
-                    # version. back to this output. It was removed to reduce the
-                    # amount of output from the production migration job.
-                    yield (
-                        'Failed to utilize exploration without history. '
-                        'Migrating with missing state.')
+                # TODO(bhenning): Add exploration id, exploration version, and
+                # answer created timestamp to this output. They will increase
+                # the size of the output.
+                yield (
+                    'Failed to match answer to exploration snapshots '
+                    'history.')
 
         for value_dict in value_dict_list:
             item_id = value_dict['item_id']

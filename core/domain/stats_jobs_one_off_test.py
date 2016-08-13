@@ -72,9 +72,11 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
     def _verify_migration_validation_problems(self, count):
         self.assertEqual(len(self._run_migration_validation_job()), count)
 
-    def _get_state_answers(self, state_name, exploration_version=1):
+    def _get_state_answers(
+            self, state_name, exploration_id=DEMO_EXP_ID,
+            exploration_version=1):
         return stats_services.get_state_answers(
-            self.DEMO_EXP_ID, exploration_version, state_name)
+            exploration_id, exploration_version, state_name)
 
     def setUp(self):
         super(AnswerMigrationJobTests, self).setUp()
@@ -416,6 +418,136 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         state_answers = self._get_state_answers(state_name)
         self.assertEqual(len(state_answers.submitted_answer_list), 1000)
         self.assertEqual(job_output, [])
+        self._verify_no_migration_validation_problems()
+
+    def test_migrated_answer_matches_to_correct_exp_version(self):
+        """This test creates and updates an exploration at certain dates. It
+        then submits an answer for the current exploration, then updates that
+        exploration state to mean something completely different. During
+        migration, the answer should properly be matched to the correct version
+        of the exploration based on time. This scenario was based on a real
+        exploration found in production.
+        """
+        exploration = self.save_new_valid_exploration(
+            'exp_id0', self.owner_id, end_state_name='End')
+        state_name = exploration.init_state_name
+        initial_state = exploration.states[state_name]
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'NumericInput',
+            'old_value': initial_state.interaction.id
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': '4.0'
+                    }
+                }, {
+                    'rule_type': 'IsLessThan',
+                    'inputs': {
+                        'x': '4.0'
+                    }
+                }, {
+                    'rule_type': 'IsGreaterThan',
+                    'inputs': {
+                        'x': '4.0'
+                    }
+                }],
+                'outcome': {
+                    'dest': 'End',
+                    'feedback': ['Yes'],
+                    'param_changes': []
+                }
+            }],
+            'old_value': [
+                answer_group.to_dict()
+                for answer_group in initial_state.interaction.answer_groups]
+        }], 'Add state with rule specs')
+
+        rule_spec_str = 'Equals(4.0)'
+        html_answer = '4.0'
+        self._record_old_answer(
+            state_name, rule_spec_str, html_answer, exploration_id='exp_id0')
+
+        # Update the exploration to have different answer groups.
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'NumericInput',
+            'old_value': initial_state.interaction.id
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': '5.0'
+                    }
+                }, {
+                    'rule_type': 'IsLessThan',
+                    'inputs': {
+                        'x': '5.0'
+                    }
+                }, {
+                    'rule_type': 'IsGreaterThan',
+                    'inputs': {
+                        'x': '5.0'
+                    }
+                }],
+                'outcome': {
+                    'dest': 'End',
+                    'feedback': ['Yes'],
+                    'param_changes': []
+                }
+            }],
+            'old_value': [
+                answer_group.to_dict()
+                for answer_group in initial_state.interaction.answer_groups]
+        }], 'The exploration is now looking for 5')
+
+        # Verify the exploration is at version 3, since the answer should be
+        # migrated to version 2.
+        exploration = exp_services.get_exploration_by_id('exp_id0')
+        self.assertEqual(exploration.version, 3)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0')
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
+
+        # The answer should have been properly migrated to the new storage
+        # model.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0', exploration_version=2)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': 4.0,
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'NumericInput',
+            'params': [],
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+        self.assertEqual(state_answers.exploration_id, 'exp_id0')
+        self.assertEqual(state_answers.exploration_version, 2)
         self._verify_no_migration_validation_problems()
 
     def test_migrate_code_repl(self):
