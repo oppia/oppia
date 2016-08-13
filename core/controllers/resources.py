@@ -77,7 +77,7 @@ class ImageHandler(base.BaseHandler):
 
             self.response.cache_control.no_cache = None
             self.response.cache_control.public = True
-            self.response.cache_control.max-age = 600
+            self.response.cache_control.max_age = 600
             self.response.write(raw)
         except:
             raise self.PageNotFoundException
