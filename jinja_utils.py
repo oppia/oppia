@@ -26,8 +26,6 @@ from jinja2 import meta
 import utils # pylint: disable=relative-import
 
 
-_OPPIA_MODULE_DEFINITION_FILE = 'app.js'
-
 def _js_string_filter(value):
     """Converts a value to a JSON string for use in JavaScript code."""
     string = json.dumps(value)
