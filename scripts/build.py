@@ -160,8 +160,10 @@ if __name__ == '__main__':
     CACHE_SLUG = get_cache_slug()
     BUILD_DIR = os.path.join('build', CACHE_SLUG)
 
-    # ensure_directory_exists trims file paths passed to it. Hence, directory
-    # paths require a trailing slash.
+    # os.path.dirname(path)(in ensure_directory_exists()) returns parent
+    # directory of a path passed as an argument to it. This is as intended
+    # for file paths, but for directory paths we do not want this to happen,
+    # hence we append a trailing slash to it.
     # Process assets, copy it to build/[cache_slug]/assets
     ASSETS_SRC_DIR = os.path.join('assets', '')
     ASSETS_OUT_DIR = os.path.join(BUILD_DIR, 'assets', '')
