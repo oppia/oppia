@@ -130,16 +130,11 @@ def build_files(source, target, ignore=None):
                 continue
             target_path = source_path.replace(source, target)
 
-            only_copy_file = False
             # Only copy files in ignore or with extensions mentioned in
             # FILE_EXTENSIONS_TO_COPY_WITHOUT_MINIFICATION variable.
-            # We do not copy any py scripts.
-            if (any(p in source_path for p in ignore) or
-                    any(p in source_path
-                        for p in FILE_EXTENSIONS_TO_COPY_WITHOUT_MINIFICATION)):
-                only_copy_file = True
-
-            if only_copy_file:
+            file_patterns_to_ignore = (
+                ignore + FILE_EXTENSIONS_TO_COPY_WITHOUT_MINIFICATION)
+            if any(p in source_path for p in file_patterns_to_ignore):
                 ensure_directory_exists(target_path)
                 shutil.copyfile(source_path, target_path)
                 continue
@@ -154,8 +149,8 @@ def build_files(source, target, ignore=None):
 
 def get_cache_slug():
     """Returns the cache slug read from file."""
-    with open('cache_slug.yaml', 'r') as _:
-        content = _.read()
+    with open('cache_slug.yaml', 'r') as cache_slug_file:
+        content = cache_slug_file.read()
     retrieved_dict = yaml.safe_load(content)
     assert isinstance(retrieved_dict, dict)
     return retrieved_dict['cache_slug']

@@ -80,7 +80,10 @@ handlers:
   secure: always
   http_headers:
     Cache-Control: 'no-cache'
-# To serve extension resources in dev mode.
+# Serve js scripts for gadgets, interactions and rich_text_components under
+# extensions in dev mode. This regex allows us to recursively serve js scripts
+# under the three specified directories. "\1" and "\2" insert capture groups
+# from the url pattern.
 - url: /extensions/(gadgets|interactions|rich_text_components)/(.*\.(js))$
   static_files: extensions/\1/\2
   upload: extensions/(gadgets|interactions|rich_text_components)/(.*\.(js))$
