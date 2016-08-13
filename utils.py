@@ -484,11 +484,9 @@ def get_asset_dir_prefix():
 
 def get_template_dir_prefix():
     """Returns prefix for template directory depending whether dev or prod.
-    It is used as a prefix in urls for script files.
+    It is used as a prefix in urls for js script files under the templates
+    directory.
     """
-    template_dir_prefix = '/templates/dev/head'
-    if feconf.IS_MINIFIED or not feconf.DEV_MODE:
-        cache_slug = get_cache_slug()
-        template_dir_prefix = '/build/%s/templates/head' % cache_slug
-
-    return template_dir_prefix
+    template_path = ('/templates/head' if feconf.IS_MINIFIED
+                     or not feconf.DEV_MODE else '/templates/dev/head')
+    return '%s%s' % (get_asset_dir_prefix(), template_path)
