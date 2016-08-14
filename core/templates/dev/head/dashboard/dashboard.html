@@ -86,11 +86,11 @@
           <p class="sort-by-text">Sort By</p>
           <select ng-model="currentSortType"
                   class="sort-options"
-                  ng-change="sortExplorations(currentSortType)"
+                  ng-change="setExplorationsSortingOptions(currentSortType)"
                   ng-options="EXPLORATIONS_SORT_BY_KEYS[key] as value for (key, value) in HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS">
           </select>
           <span class="sort-order fa"
-                ng-click="sortExplorations(currentSortType)"
+                ng-click="setExplorationsSortingOptions(currentSortType)"
                 ng-class="isCurrentSortDescending ? 'fa-long-arrow-up': 'fa-long-arrow-down'">
           </span>
         </li>
@@ -142,7 +142,7 @@
             <tr>
               <th ng-repeat="(key, value) in EXPLORATIONS_SORT_BY_KEYS"
                   class="oppia-dashboard-table-headings"
-                  ng-click="sortExplorations(value)">
+                  ng-click="setExplorationsSortingOptions(value)">
                 <p ng-if="key === 'TITLE'">Exploration</p>
                 <p ng-if="key === 'RATING'">Rating</p>
                 <p ng-if="key === 'NUM_VIEWS'">Plays</p>
@@ -155,7 +155,7 @@
                 </span>
               </th>
             </tr>
-            <tr ng-repeat="exploration in explorationsList | orderBy: sort:isCurrentSortDescending track by exploration.id"
+            <tr ng-repeat="exploration in explorationsList | orderBy:sortExplorations:isCurrentSortDescending track by exploration.id"
                 ng-click="showExplorationEditor(exploration.id)"
                 class="exploration-list-item">
               <td>

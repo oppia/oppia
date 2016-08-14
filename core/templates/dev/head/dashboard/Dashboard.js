@@ -54,7 +54,7 @@ oppia.controller('Dashboard', [
     $scope.HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS = (
       HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS);
     $scope.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
-        GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
+      GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
     $scope.createNewExploration = (
       ExplorationCreationService.createNewExploration);
@@ -92,7 +92,7 @@ oppia.controller('Dashboard', [
       $scope.checkForMobileView();
     });
 
-    $scope.sortExplorations = function(sortType) {
+    $scope.setExplorationsSortingOptions = function(sortType) {
       if (sortType === $scope.currentSortType) {
         $scope.isCurrentSortDescending = !$scope.isCurrentSortDescending;
       } else {
@@ -100,25 +100,27 @@ oppia.controller('Dashboard', [
       }
     };
 
-    $scope.sort = function(entity) {
+    $scope.sortExplorations = function(entity) {
+      var value = entity[$scope.currentSortType];
+      var DEFAULT_TEXT_EMPTY_TITLE = 'Untitled';
       if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.TITLE) {
-        if (!entity[EXPLORATIONS_SORT_BY_KEYS.TITLE]) {
-          return 'Untitled';
+        if (!value) {
+          return DEFAULT_TEXT_EMPTY_TITLE;
         }
       } else if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.RATING) {
-        if (!$scope.getAverageRating(entity[$scope.currentSortType])) {
+        if (!$scope.getAverageRating(value)) {
           return (
             $scope.isCurrentSortDescending ?
               (-1 * $scope.explorationsList.indexOf(entity)) :
               $scope.explorationsList.indexOf(entity));
         }
-        return $scope.getAverageRating(entity[$scope.currentSortType]);
-      } else if (!entity[$scope.currentSortType]) {
+        return $scope.getAverageRating(value);
+      } else if (!value) {
         return ($scope.isCurrentSortDescending ?
                 (-1 * $scope.explorationsList.indexOf(entity)) :
                 $scope.explorationsList.indexOf(entity));
       }
-      return entity[$scope.currentSortType];
+      return value;
     };
 
     $rootScope.loadingMessage = 'Loading';
