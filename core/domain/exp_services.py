@@ -1139,6 +1139,22 @@ def get_next_page_of_all_non_private_commits(
     ) for entry in results], new_urlsafe_start_cursor, more)
 
 
+def get_last_updates_for_exp_ids(user_id, exp_ids):
+    commits_explorations_mapping = {}
+    for entry in exp_models.ExplorationCommitLogEntryModel.get_multi_all_commits(exp_ids): # pylint: disable=line-too-long
+        exp_id = entry.exploration_id
+        commits_explorations_mapping[exp_id] = [entry]
+        if (len(commits_explorations_mapping[exp_id]) <=
+                feconf.NEW_UPDATES_COUNT_DASHBOARD + 1) and (
+                    commits_explorations_mapping[exp_id][-1].user_id != user_id): #pylint: disable=line-too-long
+            commits_explorations_mapping[exp_id].append(entry)
+
+    for exp_id in commits_explorations_mapping:
+        if commits_explorations_mapping[exp_id][-1].user_id == user_id:
+            del commits_explorations_mapping[exp_id][-1]
+
+    return commits_explorations_mapping
+
 def _exp_rights_to_search_dict(rights):
     # Allow searches like "is:featured".
     doc = {}

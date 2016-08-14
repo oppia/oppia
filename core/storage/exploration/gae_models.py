@@ -286,6 +286,11 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
         return cls._fetch_page_sorted_by_last_updated(
             query, page_size, urlsafe_start_cursor)
 
+    @classmethod
+    def get_multi_all_commits(cls, exp_ids):
+        return cls.query().filter(cls.exploration_id.IN(exp_ids)).fetch(
+            feconf.DEFAULT_QUERY_LIMIT)
+
 
 class ExpSummaryModel(base_models.BaseModel):
     """Summary model for an Oppia exploration.
