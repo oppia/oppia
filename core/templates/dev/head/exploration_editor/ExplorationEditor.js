@@ -36,7 +36,6 @@ oppia.controller('ExplorationEditor', [
   'explorationWarningsService', '$templateCache', 'explorationContextService',
   'explorationAdvancedFeaturesService', '$modal', 'changeListService',
   'autosaveInfoModalsService', 'siteAnalyticsService',
-  'editorFirstTimeEventsService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       explorationData, editorContextService, explorationTitleService,
@@ -48,8 +47,7 @@ oppia.controller('ExplorationEditor', [
       explorationParamSpecsService, explorationParamChangesService,
       explorationWarningsService, $templateCache, explorationContextService,
       explorationAdvancedFeaturesService, $modal, changeListService,
-      autosaveInfoModalsService, siteAnalyticsService,
-      editorFirstTimeEventsService) {
+      autosaveInfoModalsService, siteAnalyticsService) {
     $scope.editabilityService = editabilityService;
     $scope.editorContextService = editorContextService;
 
@@ -177,7 +175,7 @@ oppia.controller('ExplorationEditor', [
         }
 
         stateEditorTutorialFirstTimeService.init(
-          data.show_state_editor_tutorial_on_load);
+          data.show_state_editor_tutorial_on_load, $scope.explorationId);
       });
     };
 
@@ -186,8 +184,6 @@ oppia.controller('ExplorationEditor', [
     $scope.$on('initExplorationPage', function(unusedEvtData, successCallback) {
       $scope.initExplorationPage(successCallback);
     });
-
-    editorFirstTimeEventsService.initRegisterEvents($scope.explorationId);
 
     var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
     var _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
