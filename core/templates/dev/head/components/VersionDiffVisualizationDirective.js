@@ -244,11 +244,11 @@ oppia.directive('versionDiffVisualization', [function() {
             }
           },
           controller: [
-            '$scope', '$http', '$modalInstance', '$timeout', 'oppiaHtmlEscaper',
-            'newStateName', 'oldStateName', 'newState', 'oldState', 'headers',
+            '$scope', '$http', '$modalInstance', '$timeout', 'newStateName',
+            'oldStateName', 'newState', 'oldState', 'headers',
             function(
-                $scope, $http, $modalInstance, $timeout, oppiaHtmlEscaper,
-                newStateName, oldStateName, newState, oldState, headers) {
+                $scope, $http, $modalInstance, $timeout, newStateName,
+                oldStateName, newState, oldState, headers) {
               var STATE_YAML_URL = '/createhandler/state_yaml';
 
               $scope.headers = headers;
