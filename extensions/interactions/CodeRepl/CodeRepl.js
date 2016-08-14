@@ -275,15 +275,13 @@ oppia.factory('codeReplRulesService', [
     CodeContains: function(answer, inputs) {
       var normalizedCode =
         codeNormalizationService.getNormalizedCode(answer.code);
-      var normalizedSnippet =
-        codeNormalizationService.getNormalizedCode(inputs.x);
+      var normalizedSnippet = $filter('normalizeWhitespace')(inputs.x);
       return normalizedCode.indexOf(normalizedSnippet) !== -1;
     },
     CodeDoesNotContain: function(answer, inputs) {
       var normalizedCode =
         codeNormalizationService.getNormalizedCode(answer.code);
-      var normalizedSnippet =
-        codeNormalizationService.getNormalizedCode(inputs.x);
+      var normalizedSnippet = $filter('normalizeWhitespace')(inputs.x);
       return normalizedCode.indexOf(normalizedSnippet) === -1;
     },
     OutputContains: function(answer, inputs) {
