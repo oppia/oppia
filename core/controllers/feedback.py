@@ -146,6 +146,19 @@ class SuggestionHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
+class ReportHandler(base.BaseHandler):
+    """"Handles operations relating to learner reports."""
+
+    @base.require_user
+    def post(self, exploration_id):
+        feedback_services.create_report(
+            exploration_id,
+            self.user_id,
+            self.payload.get('state_name'),
+            self.payload.get('report_type'))
+        self.render_json(self.values)
+
+
 class SuggestionActionHandler(base.BaseHandler):
     """"Handles actions performed on threads with suggestions."""
 
@@ -282,3 +295,20 @@ class SuggestionEmailHandler(base.BaseHandler):
         email_manager.send_suggestion_email(
             exploration.title, exploration.id, suggestion.author_id,
             exploration_rights.owner_ids)
+
+
+class ReportEmailHandler(base.BaseHandler):
+    """Handler task of sending report emails to moderators"""
+
+    def post(self):
+        payload = json.loads(self.request.body)
+        exploration_id = payload['exploration_id']
+        report = payload['report_type']
+
+        exploration_rights = (
+            rights_manager.get_exploration_rights(exploration_id))
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+
+        email_manager.send_report_email(
+            exploration.title, exploration.id, self.user_id,
+            report_type, exploration_rights.owner_ids)

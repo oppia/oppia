@@ -23,6 +23,7 @@ from core.domain import config_domain
 from core.domain import html_cleaner
 from core.domain import rights_manager
 from core.domain import user_services
+from core.domain import config_domain
 from core.platform import models
 import feconf
 
@@ -464,4 +465,47 @@ def send_suggestion_email(
             _send_email(
                 recipient_id, feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION,
+                email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_report_email(
+    exploration_title, exploration_id, reporter_id, report_type,
+    exploration_owner_ids):
+    email_subject = 'New report for "%s"' % exploration_title
+
+    email_body_template = (
+        'Hello Moderator,<br>'
+        '%s has submitted a new report on the exploration %s of the type %s, '
+        '<a href="https://www.oppia.org/explore/%s">"%s"</a>.<br>'
+        'The author/s of the exploration is/are %s'
+        'You can modify the exploration by clicking '
+        '<a href="https://www.oppia.org/create/%s">"Edit %s"</a>.<br>'
+        '<br>'
+        'Thanks!<br>'
+        '- The Oppia Team<br>'
+        '<br>%s')
+
+    if not feconf.CAN_SEND_EMAILS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    if not feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS:
+        log_new_error('This app cannot send feedback message emails to users.')
+        return
+
+    for exploration_owner_id in exploration_owner_ids:
+        exploration_owner = exploration_owner + (
+            (user_services.get_user_settings(author_id)).username + ", ")
+
+    email_body = email_body_template % (
+                user_services.get_user_settings(author_id).username,
+                exploration_title, report_type, exploration_id,
+                exploration_title, exploration_owners, exploration_id,
+                exploration_title, EMAIL_FOOTER.value)
+
+    recipient_list = config_domain.MODERATOR_IDS.value
+    for recipient_id in recipient_list:
+        _send_email(
+                recipient_id, feconf.SYSTEM_COMMITTER_ID,
+                feconf.EMAIL_INTENT_REPORT_NOTIFICATION,
                 email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)

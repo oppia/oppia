@@ -33,6 +33,9 @@ URLS = [
     main.get_redirect_route(
         r'%s' % feconf.SUGGESTION_EMAIL_HANDLER_URL,
         feedback.SuggestionEmailHandler, 'suggestion_email_handler'),
+    main.get_redirect_route(
+    	r'%s' % feconf.REPORT_EMAIL_HANDLER_URL,
+        feedback.ReportEmailHandler, 'report_email_handler'),
 ]
 
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
