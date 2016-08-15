@@ -100,7 +100,9 @@ oppia.controller('Dashboard', [
       }
     };
 
-    $scope.sortExplorations = function(entity) {
+    $scope.sortByFunction = function(entity) {
+      // This function is passed as a custom comparator function to `orderBy`,
+      // so that special cases can be handled while sorting explorations.
       var value = entity[$scope.currentSortType];
       var DEFAULT_TEXT_EMPTY_TITLE = 'Untitled';
       if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.TITLE) {

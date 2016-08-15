@@ -155,7 +155,7 @@
                 </span>
               </th>
             </tr>
-            <tr ng-repeat="exploration in explorationsList | orderBy:sortExplorations:isCurrentSortDescending track by exploration.id"
+            <tr ng-repeat="exploration in explorationsList | orderBy:sortByFunction:isCurrentSortDescending track by exploration.id"
                 ng-click="showExplorationEditor(exploration.id)"
                 class="exploration-list-item">
               <td>
