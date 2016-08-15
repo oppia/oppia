@@ -179,7 +179,9 @@
                  is-dropdown-open="isDropdownOpen[exploration.id]"
                  is-private="exploration.status === 'private'"
                  ng-click="openExploration(exploration.status, exploration.id)">
-          <div class="title-section" ng-class="{'oppia-exp-arrow': isDropdownOpen[exploration.id]}" style="background-color: <[exploration.thumbnail_bg_color]>;">
+          <div class="title-section"
+               ng-class="{'oppia-exp-arrow': isDropdownOpen[exploration.id]}"
+               style="background-color: <[exploration.thumbnail_bg_color]>;">
             <img class="thumbnail-image" ng-src="<[exploration.thumbnail_icon_url]>">
             <h2 class="activity-title protractor-test-exp-summary-tile-title">
               <span><[exploration.title || 'Untitled' | truncate:40]></span>
@@ -252,45 +254,48 @@
           <md-card class="oppia-exp-dropdown-stats"
                    ng-if="exploration.status !=='private' && isDropdownOpen[exploration.id]">
             <div class="stat-block">
-              <div class="heading-text" ng-click="toggleDropdown('feedback', $index)">
+              <div class="heading-text"
+                   ng-click="toggleDropdown(EXPLORATION_DROPDOWN_STATS.NEW_FEEDBACK, exploration.id)">
                 <[exploration.new_feedback.length]> Open Feedback
                 <span class="fa"
                       ng-if="exploration.new_feedback.length !==0"
-                      ng-class="statsDropdownOpen[$index] === 'feedback' ? 'fa-caret-up': 'fa-caret-down'">
+                      ng-class="statsDropdownOpened[exploration.id] === EXPLORATION_DROPDOWN_STATS.NEW_FEEDBACK ? 'fa-caret-up': 'fa-caret-down'">
                 </span>
               </div>
               <div class="stat-block-values"
-                   ng-show="exploration.new_feedback.length !==0 && statsDropdownOpen[$index] === 'feedback'">
+                   ng-show="exploration.new_feedback.length !==0 && statsDropdownOpened[exploration.id] === EXPLORATION_DROPDOWN_STATS.NEW_FEEDBACK">
                 <div ng-repeat="feedback in exploration.new_feedback">
                   <[feedback.summary]>
                 </div>
               </div>
             </div>
             <div class="stat-block">
-              <div class="heading-text" ng-click="toggleDropdown('unresolved_answers', $index)">
+              <div class="heading-text"
+                   ng-click="toggleDropdown(EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS, exploration.id)">
                 <[exploration.top_unresolved_answers.length]> Unresolved Answers from Users
                 <span class="fa"
                       ng-if="exploration.top_unresolved_answers.length !== 0"
-                      ng-class="statsDropdownOpen[$index] === 'unresolved_answers' ? 'fa-caret-up': 'fa-caret-down'">
+                      ng-class="statsDropdownOpened[exploration.id] === EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS ? 'fa-caret-up': 'fa-caret-down'">
                 </span>
               </div>
               <div class="stat-block-values"
-                   ng-show="exploration.top_unresolved_answers.length !==0 && statsDropdownOpen[$index] === 'unresolved_answers'">
+                   ng-show="exploration.top_unresolved_answers.length !==0 && statsDropdownOpened[exploration.id] === EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS">
                 <div ng-repeat="answer in exploration.top_unresolved_answers">
                   <[answer.value]> (<[answer.count]> instances in <[answer.state]>)
                 </div>
               </div>
             </div>
             <div class="stat-block">
-              <div class="heading-text" ng-click="toggleDropdown('updates', $index)">
+              <div class="heading-text"
+                   ng-click="toggleDropdown(EXPLORATION_DROPDOWN_STATS.LAST_UPDATES, exploration.id)">
                 <[exploration.last_updates.length]> Updates Since You Last Updated
                 <span class="fa"
                       ng-if="exploration.last_updates.length !==0"
-                      ng-class="statsDropdownOpen[$index] === 'updates' ? 'fa-caret-up': 'fa-caret-down'">
+                      ng-class="statsDropdownOpened[exploration.id] === EXPLORATION_DROPDOWN_STATS.LAST_UPDATES ? 'fa-caret-up': 'fa-caret-down'">
                 </span>
               </div>
               <div class="stat-block-values"
-                   ng-show="exploration.last_updates.length !==0 && statsDropdownOpen[$index] === 'updates'">
+                   ng-show="exploration.last_updates.length !==0 && statsDropdownOpened[exploration.id] === EXPLORATION_DROPDOWN_STATS.LAST_UPDATES">
                 <div ng-repeat="update in exploration.last_updates">
                   <[update.commit_message]>
                 </div>

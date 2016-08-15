@@ -16,14 +16,22 @@
  * @fileoverview Controllers for the creator dashboard.
  */
 
+oppia.constant('EXPLORATION_DROPDOWN_STATS', {
+  NEW_FEEDBACK: 'new_feedback',
+  LAST_UPDATES: 'last_updates',
+  TOP_UNRESOLVED_ANSWERS: 'top_unresolved_answers'
+});
+
 oppia.controller('Dashboard', [
   '$scope', '$rootScope', '$window', 'oppiaDatetimeFormatter', 'alertsService',
   'DashboardBackendApiService', 'RatingComputationService',
   'ExplorationCreationService', 'FATAL_ERROR_CODES', 'UrlInterpolationService',
+  'EXPLORATION_DROPDOWN_STATS',
   function(
       $scope, $rootScope, $window, oppiaDatetimeFormatter, alertsService,
       DashboardBackendApiService, RatingComputationService,
-      ExplorationCreationService, FATAL_ERROR_CODES, UrlInterpolationService) {
+      ExplorationCreationService, FATAL_ERROR_CODES, UrlInterpolationService,
+      EXPLORATION_DROPDOWN_STATS) {
     var EXP_PUBLISH_TEXTS = {
       defaultText: (
         'This exploration is private. Publish it to receive statistics.'),
@@ -31,7 +39,8 @@ oppia.controller('Dashboard', [
     };
 
     $scope.isDropdownOpen = {};
-    $scope.statsDropdownOpen = [];
+    $scope.statsDropdownOpened = {};
+    $scope.EXPLORATION_DROPDOWN_STATS = EXPLORATION_DROPDOWN_STATS;
     $scope.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
         GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
@@ -80,11 +89,11 @@ oppia.controller('Dashboard', [
       $scope.checkForMobileView();
     });
 
-    $scope.toggleDropdown = function(type, index) {
-      if (type === $scope.statsDropdownOpen[index]) {
-        $scope.statsDropdownOpen[index] = '';
+    $scope.toggleDropdown = function(type, explorationId) {
+      if (type === $scope.statsDropdownOpened[explorationId]) {
+        $scope.statsDropdownOpened[explorationId] = '';
       } else {
-        $scope.statsDropdownOpen[index] = type;
+        $scope.statsDropdownOpened[explorationId] = type;
       }
     };
 
