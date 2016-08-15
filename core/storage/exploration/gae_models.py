@@ -288,6 +288,8 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def get_multi_all_commits(cls, exp_ids):
+        if len(exp_ids) == 0:
+            return []
         return cls.query().filter(cls.exploration_id.IN(exp_ids)).fetch(
             feconf.DEFAULT_QUERY_LIMIT)
 

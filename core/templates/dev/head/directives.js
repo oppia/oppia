@@ -209,11 +209,21 @@ oppia.directive('mobileFriendlyTooltip', ['$timeout', function($timeout) {
 oppia.directive('scrollOnClick', function() {
   return {
     restrict: 'A',
+    scope: {
+      isDropdownOpen: '=isDropdownOpen',
+      isPrivate: '=isPrivate'
+    },
     link: function(scope, element) {
+      var isDisabled;
+      scope.$watch('isDropdownOpen', function() {
+        isDisabled = scope.isDropdownOpen || scope.isPrivate;
+      });
       element.on('click', function() {
-        $('html, body').animate({
-          scrollTop: element.offset().top - 60
-        }, 'slow');
+        if (!isDisabled) {
+          $('html, body').animate({
+            scrollTop: element.offset().top - 60
+          }, 'slow');
+        }
       });
     }
   };

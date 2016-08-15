@@ -31,6 +31,7 @@ oppia.controller('Dashboard', [
     };
 
     $scope.isDropdownOpen = {};
+    $scope.statsDropdownOpen = [];
     $scope.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
         GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
@@ -51,8 +52,13 @@ oppia.controller('Dashboard', [
       $window.location = '/create/' + explorationId;
     };
 
-    $scope.showExplorationDropdown = function(explorationId) {
-      $scope.isDropdownOpen[explorationId] = true;
+    $scope.openExploration = function(status, explorationId) {
+      if (status === 'private') {
+        $scope.showExplorationEditor(explorationId);
+      } else {
+        $scope.isDropdownOpen[explorationId] = (
+          !$scope.isDropdownOpen[explorationId]);
+      }
     };
 
     $scope.myExplorationsView = 'card';
@@ -73,6 +79,14 @@ oppia.controller('Dashboard', [
     angular.element($window).bind('resize', function() {
       $scope.checkForMobileView();
     });
+
+    $scope.toggleDropdown = function(type, index) {
+      if (type === $scope.statsDropdownOpen[index]) {
+        $scope.statsDropdownOpen[index] = '';
+      } else {
+        $scope.statsDropdownOpen[index] = type;
+      }
+    };
 
     $rootScope.loadingMessage = 'Loading';
     DashboardBackendApiService.fetchDashboardData().then(

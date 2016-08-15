@@ -126,6 +126,7 @@ class FeedbackThreadModel(base_models.BaseModel):
             cls.exploration_id.IN(exploration_ids)).order(
                 cls.last_updated).fetch()
 
+
 class FeedbackMessageModel(base_models.BaseModel):
     """Feedback messages. One or more of these messages make a thread.
 

@@ -2205,16 +2205,24 @@ md-card.oppia-dashboard-tile {
   vertical-align: middle;
 }
 
+.oppia-exp-arrow:after {
+  content: '';
+  width: 0;
+  height: 0;
+  position: absolute;
+  border-left: 16px solid transparent;
+  border-right: 16px solid transparent;
+  border-bottom: 16px solid #fff;
+  bottom: -114px;
+  left: 70px;
+}
+
 .oppia-exp-dropdown-stats {
   position: absolute;
   margin: 50px 0 0;
   background: white;
   right: 8px;
   left: 8px;
-}
-
-.oppia-exp-dropdown-stats .heading-text:not(:last-child) {
-  border-bottom: 1px solid #ccc;
 }
 
 .oppia-exp-dropdown-stats .stat-block {
@@ -2224,6 +2232,13 @@ md-card.oppia-dashboard-tile {
 
 .stat-block .heading-text span {
   float: right;
+}
+
+.stat-block .stat-block-values {
+  background: #ccc;
+  padding: 10px 18px;
+  margin: 8px -18px -11px;
+  font-size: 0.9em;
 }
 
 .oppia-exp-dropdown-stats .open-in-editor-btn {

@@ -176,8 +176,10 @@
         <md-card ng-repeat="exploration in explorationsList track by exploration.id"
                  class="oppia-activity-summary-tile oppia-dashboard-card-view-item"
                  scroll-on-click
-                 ng-click="showExplorationDropdown(exploration.id)">
-          <div class="title-section" style="background-color: <[exploration.thumbnail_bg_color]>;">
+                 is-dropdown-open="isDropdownOpen[exploration.id]"
+                 is-private="exploration.status === 'private'"
+                 ng-click="openExploration(exploration.status, exploration.id)">
+          <div class="title-section" ng-class="{'oppia-exp-arrow': isDropdownOpen[exploration.id]}" style="background-color: <[exploration.thumbnail_bg_color]>;">
             <img class="thumbnail-image" ng-src="<[exploration.thumbnail_icon_url]>">
             <h2 class="activity-title protractor-test-exp-summary-tile-title">
               <span><[exploration.title || 'Untitled' | truncate:40]></span>
@@ -237,43 +239,67 @@
                 </a>
               </li>
               <sharing-links ng-if="exploration.status !== 'private'"
-                              ng-click="$event.stopPropagation()"
-                              flex="100"
-                              class="dashboard-hide-mobile"
-                              layout-type="row"
-                              layout-align-type="center left"
-                              twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD"
-                              exploration-id="exploration.id">
+                             ng-click="$event.stopPropagation()"
+                             flex="100"
+                             class="dashboard-hide-mobile"
+                             layout-type="row"
+                             layout-align-type="center left"
+                             twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD"
+                             exploration-id="exploration.id">
               </sharing-links>
             </ul>
           </div>
           <md-card class="oppia-exp-dropdown-stats"
                    ng-if="exploration.status !=='private' && isDropdownOpen[exploration.id]">
-            <div class="new-updates stat-block">
-              <div class="open-feedback-text heading-text">
-                <[x]> Open Feedback
+            <div class="stat-block">
+              <div class="heading-text" ng-click="toggleDropdown('feedback', $index)">
+                <[exploration.new_feedback.length]> Open Feedback
                 <span class="fa"
-                      ng-class="subMenuOpen[$index] === 'feedback' ? 'fa-caret-up': 'fa-caret-down'">
+                      ng-if="exploration.new_feedback.length !==0"
+                      ng-class="statsDropdownOpen[$index] === 'feedback' ? 'fa-caret-up': 'fa-caret-down'">
                 </span>
               </div>
-            </div>
-            <div class="new-updates stat-block">
-              <div class="open-feedback-text heading-text">
-                <[x]> Unresolved Answers from Users
-                <span class="fa"
-                      ng-class="subMenuOpen[$index] === 'unresolved_answers' ? 'fa-caret-up': 'fa-caret-down'">
-                </span>
+              <div class="stat-block-values"
+                   ng-show="exploration.new_feedback.length !==0 && statsDropdownOpen[$index] === 'feedback'">
+                <div ng-repeat="feedback in exploration.new_feedback">
+                  <[feedback.summary]>
+                </div>
               </div>
             </div>
-            <div class="new-updates stat-block">
-              <div class="open-feedback-text heading-text">
-                <[x]> Updates Since You Last Updated
+            <div class="stat-block">
+              <div class="heading-text" ng-click="toggleDropdown('unresolved_answers', $index)">
+                <[exploration.top_unresolved_answers.length]> Unresolved Answers from Users
                 <span class="fa"
-                      ng-class="subMenuOpen[$index] === 'updates' ? 'fa-caret-up': 'fa-caret-down'">
+                      ng-if="exploration.top_unresolved_answers.length !== 0"
+                      ng-class="statsDropdownOpen[$index] === 'unresolved_answers' ? 'fa-caret-up': 'fa-caret-down'">
                 </span>
               </div>
+              <div class="stat-block-values"
+                   ng-show="exploration.top_unresolved_answers.length !==0 && statsDropdownOpen[$index] === 'unresolved_answers'">
+                <div ng-repeat="answer in exploration.top_unresolved_answers">
+                  <[answer.value]> (<[answer.count]> instances in <[answer.state]>)
+                </div>
+              </div>
             </div>
-            <button class="btn open-in-editor-btn">Open In Editor</button>
+            <div class="stat-block">
+              <div class="heading-text" ng-click="toggleDropdown('updates', $index)">
+                <[exploration.last_updates.length]> Updates Since You Last Updated
+                <span class="fa"
+                      ng-if="exploration.last_updates.length !==0"
+                      ng-class="statsDropdownOpen[$index] === 'updates' ? 'fa-caret-up': 'fa-caret-down'">
+                </span>
+              </div>
+              <div class="stat-block-values"
+                   ng-show="exploration.last_updates.length !==0 && statsDropdownOpen[$index] === 'updates'">
+                <div ng-repeat="update in exploration.last_updates">
+                  <[update.commit_message]>
+                </div>
+              </div>
+            </div>
+            <button class="btn open-in-editor-btn"
+                    ng-click="showExplorationEditor(exploration.id); $event.stopPropagation()">
+              Open In Editor
+            </button>
           </md-card>
         </md-card>
       </div>
