@@ -41,8 +41,8 @@ class HomePageTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 302)
         self.assertIn('splash', response.headers['location'])
         response.follow().mustcontain(
-            'I18N_LIBRARY_PAGE_TITLE', 'I18N_SIDEBAR_ABOUT_LINK',
-            'I18N_TOPNAV_SIGN_IN', no=['I18N_TOPNAV_LOGOUT'])
+            'I18N_SIDEBAR_ABOUT_LINK', 'I18N_TOPNAV_SIGN_IN',
+            no=['I18N_TOPNAV_LOGOUT'])
 
     def test_notifications_dashboard_redirects_for_logged_out_users(self):
         """Test the logged-out view of the notifications dashboard."""
