@@ -249,11 +249,23 @@ describe('Code Normalization', function() {
     )).toBe(
       'abcdefg\n' +
       '    ABcDe \'hijkl\'\n' +
-      '    "hijkl mnopq " ABcDe\n' +
+      '    "hijkl mnopq" ABcDe\n' +
       '    "abc@\\"def7" GhI# \'jkl-\\\'mno3\'\n' +
       '    \'not a Real String\n' +
       '    """another Unreal String\n' +
       '    \'a legit " string\' now outsiDe string'
+    );
+  });
+
+  it('trims contents of strings', function() {
+    expect(cns.getNormalizedCode(
+      'abcdefg\n' +
+      '    \'   HiJkL \'\n' +
+      '    " HiJkL    "'
+    )).toBe(
+      'abcdefg\n' +
+      '    \'hijkl\'\n' +
+      '    "hijkl"'
     );
   });
 });

@@ -15,7 +15,6 @@
 """Tests for the exploration editor page."""
 
 import datetime
-import json
 import os
 import StringIO
 import zipfile
@@ -614,11 +613,14 @@ param_changes: []
         exploration.add_states(['State A', 'State 2', 'State 3'])
         exploration.states['State A'].update_interaction_id('TextInput')
 
-        download_url = (
-            '/createhandler/state_yaml?'
-            'stringified_state=%s&stringified_width=50' %
-            json.dumps(exploration.states['State A'].to_dict()))
-        response = self.get_json(download_url)
+
+        response = self.testapp.get(
+            '%s/%s' % (feconf.EDITOR_URL_PREFIX, exp_id))
+        csrf_token = self.get_csrf_token_from_response(response)
+        response = self.post_json('/createhandler/state_yaml', {
+            'state_dict': exploration.states['State A'].to_dict(),
+            'width': 50,
+        }, csrf_token=csrf_token)
         self.assertEqual({
             'yaml': self.SAMPLE_STATE_STRING
         }, response)
