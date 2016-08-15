@@ -1726,13 +1726,14 @@ oppia.factory('stateEditorTutorialFirstTimeService', [
 
     return {
       // After the first call to it in a client session, this does nothing.
-      init: function(firstTime) {
+      init: function(firstTime, expId) {
         if (!firstTime || !_currentlyInFirstVisit) {
           _currentlyInFirstVisit = false;
         }
 
         if (_currentlyInFirstVisit) {
           $rootScope.$broadcast('enterEditorForTheFirstTime');
+          editorFirstTimeEventsService.initRegisterEvents(expId);
           $http.post(STARTED_TUTORIAL_EVENT_URL).error(function() {
             console.error('Warning: could not record tutorial start event.');
           });
@@ -2396,9 +2397,7 @@ oppia.factory('editorFirstTimeEventsService', ['siteAnalyticsService',
     var alreadyRegisteredEvents = {};
     return {
       initRegisterEvents: function(expId) {
-        if (location.search.split('?')[1] === 'new') {
-          shouldRegisterEvents = true;
-        }
+        shouldRegisterEvents = true;
         explorationId = expId;
       },
       registerEditorFirstEntryEvent: function() {

@@ -18,7 +18,6 @@
 
 import datetime
 import imghdr
-import json
 import logging
 
 import jinja2
@@ -699,11 +698,11 @@ class StateYamlHandler(EditorHandler):
     layer.
     """
 
-    def get(self):
-        """Handles GET requests."""
+    def post(self):
+        """Handles POST requests."""
         try:
-            state_dict = json.loads(self.request.get('stringified_state'))
-            width = json.loads(self.request.get('stringified_width'))
+            state_dict = self.payload.get('state_dict')
+            width = self.payload.get('width')
         except Exception:
             raise self.PageNotFoundException
 

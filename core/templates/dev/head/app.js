@@ -675,23 +675,34 @@ oppia.factory('codeNormalizationService', [function() {
           answer += str[i];
         }
       } else if (inSingleQuotedString) {
-        answer += str[i].toLowerCase();
         if (str[i] === '\'') {
+          while (answer.length > 0 && answer[answer.length - 1] === ' ') {
+            answer = answer.substring(0, answer.length - 1);
+          }
           inSingleQuotedString = false;
         }
-      } else if (inDoubleQuotedString) {
         answer += str[i].toLowerCase();
+      } else if (inDoubleQuotedString) {
         if (str[i] === '"') {
+          while (answer.length > 0 && answer[answer.length - 1] === ' ') {
+            answer = answer.substring(0, answer.length - 1);
+          }
           inDoubleQuotedString = false;
         }
+        answer += str[i].toLowerCase();
       } else {
+        answer += str[i];
         if (str[i] === '\'') {
           inSingleQuotedString = true;
+          while (i + 1 < str.length && str[i + 1] === ' ') {
+            i++;
+          }
         } else if (str[i] === '"') {
           inDoubleQuotedString = true;
+          while (i + 1 < str.length && str[i + 1] === ' ') {
+            i++;
+          }
         }
-
-        answer += str[i];
       }
     }
 
