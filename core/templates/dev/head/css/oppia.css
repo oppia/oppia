@@ -2206,9 +2206,9 @@ md-card.oppia-dashboard-tile {
 }
 
 .oppia-exp-arrow:after {
+  border-bottom: 16px solid #fff;
   border-left: 16px solid transparent;
   border-right: 16px solid transparent;
-  border-bottom: 16px solid #fff;
   bottom: -114px;
   content: '';
   height: 0;
@@ -3708,9 +3708,9 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-dashboard-card-view-item {
   height: 250px;
-  position: static;
   margin-left: 7.5px;
   margin-right: 7.5px;
+  position: static;
   width: 184px;
 }
 

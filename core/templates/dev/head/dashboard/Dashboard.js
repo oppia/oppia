@@ -101,7 +101,8 @@ oppia.controller('Dashboard', [
       $scope.checkForMobileView();
     });
 
-    $scope.toggleDropdown = function(type, explorationId) {
+    $scope.toggleDropdown = function(type, explorationId, event) {
+      event.stopPropagation();
       if (type === $scope.statsDropdownOpened[explorationId]) {
         $scope.statsDropdownOpened[explorationId] = '';
       } else {

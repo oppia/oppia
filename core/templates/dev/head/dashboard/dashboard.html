@@ -197,10 +197,11 @@
             <div class="title-section-mask"></div>
           </div>
           <md-card class="oppia-exp-dropdown-stats"
+                   ng-click="$event.stopPropagation()"
                    ng-if="exploration.status !=='private' && isDropdownOpen[exploration.id]">
             <div class="stat-block">
               <div class="heading-text"
-                   ng-click="toggleDropdown(EXPLORATION_DROPDOWN_STATS.NEW_FEEDBACK, exploration.id); $event.stopPropagation()">
+                   ng-click="toggleDropdown(EXPLORATION_DROPDOWN_STATS.NEW_FEEDBACK, exploration.id, $event)">
                 <[exploration.new_feedback.length]> Open Feedback
                 <span class="fa"
                       ng-if="exploration.new_feedback.length !==0"
@@ -216,7 +217,7 @@
             </div>
             <div class="stat-block">
               <div class="heading-text"
-                   ng-click="toggleDropdown(EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS, exploration.id); $event.stopPropagation()">
+                   ng-click="toggleDropdown(EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS, exploration.id, $event)">
                 <[exploration.top_unresolved_answers.length]> Unresolved Answers from Users
                 <span class="fa"
                       ng-if="exploration.top_unresolved_answers.length !== 0"
@@ -232,7 +233,7 @@
             </div>
             <div class="stat-block">
               <div class="heading-text"
-                   ng-click="toggleDropdown(EXPLORATION_DROPDOWN_STATS.LAST_UPDATES, exploration.id); $event.stopPropagation()">
+                   ng-click="toggleDropdown(EXPLORATION_DROPDOWN_STATS.LAST_UPDATES, exploration.id, $event)">
                 <[exploration.last_updates.length]> Updates Since You Last Updated
                 <span class="fa"
                       ng-if="exploration.last_updates.length !==0"
