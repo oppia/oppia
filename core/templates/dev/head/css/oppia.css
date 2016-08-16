@@ -2219,10 +2219,11 @@ md-card.oppia-dashboard-tile {
 
 .oppia-exp-dropdown-stats {
   position: absolute;
-  margin: 50px 0 0;
+  margin-top: 49px;
+  z-index: 1;
   background: white;
-  right: 8px;
-  left: 8px;
+  right: 0;
+  left: 0;
 }
 
 .oppia-exp-dropdown-stats .stat-block {
@@ -3786,6 +3787,15 @@ md-card.preview-conversation-skin-supplemental-card {
     top: -40px;
     max-width: 75%;
     position: relative;
+  }
+
+  .oppia-dashboard-card-view-item .mask-wrap {
+    height: 80px;
+    margin-top: -80px;
+  }
+
+  .oppia-dashboard-card-view-item .mask-wrap .title-section-mask {
+    height: 80px;
   }
 
   .oppia-dashboard-card-view-item .metrics {
