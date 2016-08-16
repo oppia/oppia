@@ -65,8 +65,9 @@ oppia.controller('Dashboard', [
       if (status === 'private') {
         $scope.showExplorationEditor(explorationId);
       } else {
-        $scope.isDropdownOpen[explorationId] = (
-          !$scope.isDropdownOpen[explorationId]);
+        var isOpen = !$scope.isDropdownOpen[explorationId];
+        $scope.isDropdownOpen = {};
+        $scope.isDropdownOpen[explorationId] = isOpen;
       }
     };
 
@@ -75,8 +76,12 @@ oppia.controller('Dashboard', [
       $scope.myExplorationsView = viewType;
     };
 
+    $scope.isMobileView = function() {
+      return ($window.innerWidth < 500);
+    };
+
     $scope.checkForMobileView = function() {
-      if ($window.innerWidth < 500) {
+      if ($scope.isMobileView()) {
         $scope.myExplorationsView = 'card';
         $scope.publishText = EXP_PUBLISH_TEXTS.smText;
       } else {

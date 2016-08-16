@@ -2219,7 +2219,7 @@ md-card.oppia-dashboard-tile {
 
 .oppia-exp-dropdown-stats {
   position: absolute;
-  margin-top: 49px;
+  margin-top: 111px;
   z-index: 1;
   background: white;
   right: 0;
@@ -3784,9 +3784,9 @@ md-card.preview-conversation-skin-supplemental-card {
   }
 
   .oppia-dashboard-card-view-item .activity-title {
-    top: -40px;
     max-width: 75%;
     position: relative;
+    top: -40px;
   }
 
   .oppia-dashboard-card-view-item .mask-wrap {
@@ -3805,6 +3805,25 @@ md-card.preview-conversation-skin-supplemental-card {
   .oppia-dashboard-card-view-item .metrics > li {
     flex-basis: 25%;
   }
+
+  .oppia-exp-dropdown-stats {
+    position: static;
+    margin-top: 0;
+    margin: 0;
+    box-shadow: none;
+  }
+
+  .oppia-exp-dropdown-stats .open-in-editor-btn {
+    display: none;
+  }
+
+  .oppia-dashboard-card-view-item.dropdown-open {
+    min-height: 275px;
+  }
+
+  .oppia-exp-arrow:after {
+    content: none;
+  }
 }
 
 /* Styles for small-width screens. */
@@ -3813,43 +3832,52 @@ md-card.preview-conversation-skin-supplemental-card {
   height: 80px;
   width: 95%;
 }
+
 .oppia-activity-summary-tile.small-width .title-section {
   float: left;
   height: 80px;
   width: 70%;
 }
+
 .oppia-activity-summary-tile.small-width .exploration-summary-tile-mask {
   width: 70%;
 }
+
 .oppia-activity-summary-tile.small-width:hover .title-section-mask {
   height: 80px;
   width: 70%;
 }
+
 .oppia-activity-summary-tile.small-width .thumbnail-image {
   height: 20px;
   margin: 8px;
+  position: absolute;
   right: 0;
   top: 0;
-  position: absolute;
   width: 20px;
 }
+
 .oppia-activity-summary-tile.small-width .exploration-title {
   margin: 10px;
   top: 0;
   width: 75%;
 }
+
 .oppia-activity-summary-tile.small-width .metrics {
   display: inline-block;
   margin-top: 12px;
 }
+
 .oppia-activity-summary-tile.small-width .metrics li {
   display: block;
   font-size: 0.7em;
   text-align: left;
 }
+
 .oppia-activity-summary-tile.small-width .metrics li .fa {
   margin-bottom: 10px;
 }
+
 .oppia-activity-summary-tile.small-width .recently-updated {
   background-color: rgb(19,105,193);
   border-radius: 8px;
