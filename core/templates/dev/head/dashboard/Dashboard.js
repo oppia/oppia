@@ -89,6 +89,13 @@ oppia.controller('Dashboard', [
       }
     };
 
+    $scope.isDropdownOpenOnMobile = function(explorationId) {
+      if ($scope.isMobileView() && $scope.isDropdownOpen[explorationId]) {
+        return true;
+      }
+      return false;
+    };
+
     $scope.checkForMobileView();
     angular.element($window).bind('resize', function() {
       $scope.checkForMobileView();

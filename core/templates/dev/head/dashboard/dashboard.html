@@ -183,7 +183,12 @@
           <div class="title-section"
                ng-class="{'oppia-exp-arrow': isDropdownOpen[exploration.id]}"
                style="background-color: <[exploration.thumbnail_bg_color]>;">
-            <img class="thumbnail-image" ng-src="<[exploration.thumbnail_icon_url]>">
+            <img class="thumbnail-image"
+                 ng-src="<[exploration.thumbnail_icon_url]>"
+                 ng-hide="isDropdownOpenOnMobile(exploration.id)">
+            <span class="thumbnail-image caret-thumb fa fa-caret-up"
+                  ng-show="isDropdownOpenOnMobile(exploration.id)">
+            </span>
             <h2 class="activity-title protractor-test-exp-summary-tile-title">
               <span><[exploration.title || 'Untitled' | truncate:40]></span>
             </h2>
@@ -292,8 +297,8 @@
                 </span>
                 <[exploration.num_total_threads]>
                 <a ng-if="exploration.num_open_threads != 0"
-                    ng-href="/create/<[exploration.id]>#/feedback">
-                    (<[exploration.num_open_threads]> new)
+                   ng-href="/create/<[exploration.id]>#/feedback">
+                  (<[exploration.num_open_threads]> new)
                 </a>
               </li>
               <sharing-links ng-if="exploration.status !== 'private'"

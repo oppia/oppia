@@ -2206,29 +2206,29 @@ md-card.oppia-dashboard-tile {
 }
 
 .oppia-exp-arrow:after {
-  content: '';
-  width: 0;
-  height: 0;
-  position: absolute;
   border-left: 16px solid transparent;
   border-right: 16px solid transparent;
   border-bottom: 16px solid #fff;
   bottom: -114px;
+  content: '';
+  height: 0;
   left: 70px;
+  position: absolute;
+  width: 0;
 }
 
 .oppia-exp-dropdown-stats {
-  position: absolute;
-  margin-top: 111px;
-  z-index: 1;
   background: white;
-  right: 0;
   left: 0;
+  margin-top: 111px;
+  position: absolute;
+  right: 0;
+  z-index: 1;
 }
 
 .oppia-exp-dropdown-stats .stat-block {
-  padding: 10px;
   border-bottom: 1px solid #ccc;
+  padding: 10px;
 }
 
 .stat-block .heading-text span {
@@ -2237,16 +2237,16 @@ md-card.oppia-dashboard-tile {
 
 .stat-block .stat-block-values {
   background: #ccc;
-  padding: 10px 18px;
-  margin: 8px -18px -11px;
   font-size: 0.9em;
+  margin: 8px -18px -11px;
+  padding: 10px 18px;
 }
 
 .oppia-exp-dropdown-stats .open-in-editor-btn {
   background: #009688;
-  text-transform: uppercase;
   color: white;
   margin: 15px 0 0 10px;
+  text-transform: uppercase;
 }
 
 ul.oppia-dashboard-tiles {
@@ -3708,16 +3708,16 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-dashboard-card-view-item {
   height: 250px;
+  position: static;
   margin-left: 7.5px;
   margin-right: 7.5px;
   width: 184px;
-  position: static;
 }
 
 .oppia-dashboard-card-view-item .mask-wrap {
-  position: relative;
   height: 162px;
   margin-top: -162px;
+  position: relative;
 }
 
 .oppia-dashboard-card-view-item .exp-private-text {
@@ -3768,8 +3768,9 @@ md-card.preview-conversation-skin-supplemental-card {
 
   .oppia-dashboard-card-view-item {
     display: block;
+    height: auto;
+    min-height: 125px;
     width: auto;
-    height: 125px;
   }
 
   .oppia-dashboard-card-view-item .title-section {
@@ -3781,6 +3782,13 @@ md-card.preview-conversation-skin-supplemental-card {
     left: 100%;
     margin-left: -75px;
     top: 15px;
+  }
+
+  .oppia-dashboard-card-view-item .thumbnail-image.caret-thumb {
+    color: #fff;
+    font-size: 30px;
+    margin-left: -45px;
+    top: 20px;
   }
 
   .oppia-dashboard-card-view-item .activity-title {
@@ -3807,10 +3815,9 @@ md-card.preview-conversation-skin-supplemental-card {
   }
 
   .oppia-exp-dropdown-stats {
-    position: static;
-    margin-top: 0;
-    margin: 0;
     box-shadow: none;
+    margin: 0;
+    position: static;
   }
 
   .oppia-exp-dropdown-stats .open-in-editor-btn {
