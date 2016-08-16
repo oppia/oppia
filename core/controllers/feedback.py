@@ -282,3 +282,29 @@ class SuggestionEmailHandler(base.BaseHandler):
         email_manager.send_suggestion_email(
             exploration.title, exploration.id, suggestion.author_id,
             exploration_rights.owner_ids)
+
+
+class InstantFeedbackEmailHandler(base.BaseHandler):
+    """Handles task of sending feedback message emails instantsly."""
+
+    def post(self):
+        payload = json.loads(self.request.body)
+        user_id = payload['user_id']
+        reference = payload['reference']
+        message = feedback_services.get_message(
+            reference['exploration_id'], reference['thread_id'],
+            reference['message_id'])
+        exploration = exp_services.get_exploration_by_id(
+            reference['exploration_id'])
+        thread = feedback_services.get_thread(
+            reference['exploration_id'], reference['thread_id'])
+
+        if 'updated_status' in payload:
+            status_info = payload['updated_status']
+            text = 'changed status from %s to %s' % (
+                status_info['old_status'], status_info['new_status'])
+        else:
+            text = message.text
+        email_manager.send_instant_feedback_message_email(
+            user_id, message.author_id, text, exploration.title,
+            reference['exploration_id'], thread.subject)

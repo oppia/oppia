@@ -113,6 +113,9 @@ def create_message(
     # added to it.
     if message_id != 0 and (updated_status or updated_subject):
         if updated_status and updated_status != thread.status:
+            add_feedback_thread_status_change_email(
+                author_id, exploration_id, thread_id, message_id, thread.status,
+                updated_status)
             thread.status = updated_status
         if updated_subject and updated_subject != thread.subject:
             thread.subject = updated_subject
@@ -243,6 +246,12 @@ def get_threads(exploration_id):
     return [_get_thread_from_model(model) for model in thread_models]
 
 
+def get_thread(exploration_id, thread_id):
+    model = feedback_models.FeedbackThreadModel.get_by_exp_and_thread_id(
+        exploration_id, thread_id)
+    return _get_thread_from_model(model)
+
+
 def get_open_threads(exploration_id, has_suggestion):
     """If has_suggestion is True, return a list of all open threads that have a
     suggestion, otherwise return a list of all open threads that do not have a
@@ -282,12 +291,34 @@ def get_all_threads(exploration_id, has_suggestion):
     return all_threads
 
 
-def enqueue_feedback_message_email_task(user_id):
-    """Adds a 'send feedback email' task into the taskqueue."""
+def get_all_thread_participants(exploration_id, thread_id):
+    """Returns set of all participants of a thread."""
+    return set([m.author_id for m in get_messages(exploration_id, thread_id)])
+
+
+def enqueue_feedback_message_batch_email_task(user_id):
+    """Adds a 'send feedback email' (batch) task into the taskqueue."""
 
     taskqueue_services.enqueue_task(
         feconf.FEEDBACK_MESSAGE_EMAIL_HANDLER_URL, {'user_id': user_id},
         feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS)
+
+
+def enqueue_feedback_message_instant_email_task(
+        user_id, reference, status_changed, old_status, new_status):
+    """Adds a 'send feedback email' (instant) task into the taskqueue."""
+
+    payload = {
+        'user_id': user_id,
+        'reference': reference
+    }
+    if status_changed:
+        payload['updated_status'] = {
+            'old_status': old_status,
+            'new_status': new_status
+        }
+    taskqueue_services.enqueue_task(
+        feconf.INSTANT_FEEDBACK_EMAIL_HANDLER_URL, payload, 0)
 
 
 def enqueue_suggestion_email_task(exploration_id, thread_id):
@@ -332,7 +363,7 @@ def _add_feedback_message_reference(user_id, reference):
             id=user_id,
             feedback_message_references=[reference.to_dict()])
         model.put()
-        enqueue_feedback_message_email_task(user_id)
+        enqueue_feedback_message_batch_email_task(user_id)
 
 
 def update_feedback_email_retries(user_id):
@@ -368,7 +399,7 @@ def pop_feedback_message_references(user_id, references_length):
             id=user_id,
             feedback_message_references=message_references)
         model.put()
-        enqueue_feedback_message_email_task(user_id)
+        enqueue_feedback_message_batch_email_task(user_id)
 
 
 def clear_feedback_message_references(user_id, exploration_id, thread_id):
@@ -406,16 +437,67 @@ def clear_feedback_message_references(user_id, exploration_id, thread_id):
         model.put()
 
 
+def get_all_recipient_list(exploration_id, thread_id, author_id):
+    """Returns dict containing batch recipients and other recipients
+    for sending feedback message email.
+    """
+    exploration_rights = rights_manager.get_exploration_rights(exploration_id)
+
+    owner_list = set(exploration_rights.owner_ids)
+    participant_list = get_all_thread_participants(exploration_id, thread_id)
+    sender = set([author_id])
+
+    batch_recipients = owner_list - sender
+    other_recipients = participant_list - batch_recipients - sender
+
+    return {
+        'batch_recipients': batch_recipients,
+        'other_recipients': other_recipients
+    }
+
+
+def send_batch_email(recipient_list, feedback_message_reference):
+    """send feedback message email in batch."""
+    for recipient_id in recipient_list:
+        recipient_preferences = (
+            user_services.get_email_preferences(recipient_id))
+        if recipient_preferences['can_receive_feedback_message_email']:
+            transaction_services.run_in_transaction(
+                _add_feedback_message_reference, recipient_id,
+                feedback_message_reference)
+
+
+def send_instant_email(
+        recipient_list, feedback_message_reference, status_changed=False,
+        old_status=None, new_status=None):
+    """send feedback message email instantly."""
+    for recipient_id in recipient_list:
+        recipient_preferences = (
+            user_services.get_email_preferences(recipient_id))
+        if recipient_preferences['can_receive_feedback_message_email']:
+            transaction_services.run_in_transaction(
+                enqueue_feedback_message_instant_email_task, recipient_id,
+                feedback_message_reference.to_dict(), status_changed,
+                old_status, new_status)
+
+
 def add_message_to_email_buffer(author_id, exploration_id, thread_id,
                                 message_id):
-    exploration_rights = rights_manager.get_exploration_rights(exploration_id)
     feedback_message_reference = feedback_domain.FeedbackMessageReference(
         exploration_id, thread_id, message_id)
+    recipients = get_all_recipient_list(exploration_id, thread_id, author_id)
+    send_batch_email(recipients['batch_recipients'],
+                     feedback_message_reference)
+    send_instant_email(recipients['other_recipients'],
+                       feedback_message_reference)
 
-    for owner_id in exploration_rights.owner_ids:
-        owner_preferences = user_services.get_email_preferences(owner_id)
-        if (owner_id != author_id and
-                owner_preferences['can_receive_feedback_message_email']):
-            transaction_services.run_in_transaction(
-                _add_feedback_message_reference, owner_id,
-                feedback_message_reference)
+
+def add_feedback_thread_status_change_email(
+        author_id, exploration_id, thread_id, message_id, old_status,
+        new_status):
+    feedback_message_reference = feedback_domain.FeedbackMessageReference(
+        exploration_id, thread_id, message_id)
+    recipients = get_all_recipient_list(exploration_id, thread_id, author_id)
+    send_instant_email(
+        recipients['other_recipients'], feedback_message_reference,
+        status_changed=True, old_status=old_status, new_status=new_status)

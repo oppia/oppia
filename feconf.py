@@ -190,13 +190,13 @@ NOREPLY_EMAIL_ADDRESS = 'noreply@example.com'
 # correspond to owners of the app before setting this to True. If
 # SYSTEM_EMAIL_ADDRESS is not that of an app owner, email messages from this
 # address cannot be sent. If True then emails can be sent to any user.
-CAN_SEND_EMAILS = False
+CAN_SEND_EMAILS = True
 # If you want to turn on this facility please check the email templates in the
 # send_role_notification_email() function in email_manager.py and modify them
 # accordingly.
 CAN_SEND_EDITOR_ROLE_EMAILS = False
 # If enabled then emails will be sent to creators for feedback messages.
-CAN_SEND_FEEDBACK_MESSAGE_EMAILS = False
+CAN_SEND_FEEDBACK_MESSAGE_EMAILS = True
 # Time to wait before sending feedback message emails (currently set to 1
 # hour).
 DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS = 3600
@@ -433,7 +433,9 @@ FEEDBACK_STATS_URL_PREFIX = '/feedbackstatshandler'
 FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 FEEDBACK_MESSAGE_EMAIL_HANDLER_URL = (
-    '%s/email/feedbackemailhandler' % TASKQUEUE_URL_PREFIX)
+    '%s/email/batchfeedbackemailhandler' % TASKQUEUE_URL_PREFIX)
+INSTANT_FEEDBACK_EMAIL_HANDLER_URL = (
+    '%s/email/instantfeedbackemailhandler' % TASKQUEUE_URL_PREFIX)
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 LIBRARY_INDEX_URL = '/library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'

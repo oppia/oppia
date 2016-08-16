@@ -502,8 +502,11 @@ def get_email_preferences(user_id):
     """Returns a boolean representing whether the user has chosen to receive
     email updates.
     """
-    email_preferences_model = user_models.UserEmailPreferencesModel.get(
-        user_id, strict=False)
+    if user_id:
+        email_preferences_model = user_models.UserEmailPreferencesModel.get(
+            user_id, strict=False)
+    else:
+        email_preferences_model = None
     return {
         'can_receive_email_updates': (
             feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
