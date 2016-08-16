@@ -20,6 +20,7 @@ import copy
 import os
 
 import feconf
+import jinja_utils
 import schema_utils
 import utils
 
@@ -58,28 +59,15 @@ class BaseObject(object):
         return schema_utils.normalize_against_schema(raw, cls.SCHEMA)
 
     @classmethod
-    def has_editor_js_template(cls):
-        return cls.edit_js_filename is not None
-
-    @classmethod
-    def get_editor_js_template(cls):
-        if cls.edit_js_filename is None:
-            raise Exception(
-                'There is no editor template defined for objects of type %s' %
-                cls.__name__)
-        return utils.get_file_contents(os.path.join(
-            os.getcwd(), feconf.OBJECT_TEMPLATES_DIR,
-            '%s.js' % cls.edit_js_filename))
-
-    @classmethod
     def get_editor_html_template(cls):
         if cls.edit_html_filename is None:
             raise Exception(
                 'There is no editor template defined for objects of type %s' %
                 cls.__name__)
-        return utils.get_file_contents(os.path.join(
+        html_templates = utils.get_file_contents(os.path.join(
             os.getcwd(), feconf.OBJECT_TEMPLATES_DIR,
             '%s.html' % cls.edit_html_filename))
+        return jinja_utils.interpolate_cache_slug('%s' % html_templates)
 
 
 class Boolean(BaseObject):
