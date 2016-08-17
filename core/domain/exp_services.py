@@ -1163,6 +1163,7 @@ def get_last_updates_for_exp_ids(user_id, exp_ids):
 
     return commits_explorations_mapping
 
+
 def _exp_rights_to_search_dict(rights):
     # Allow searches like "is:featured".
     doc = {}

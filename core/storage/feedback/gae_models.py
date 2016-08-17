@@ -112,6 +112,17 @@ class FeedbackThreadModel(base_models.BaseModel):
             exploration_id, thread_id))
 
     @classmethod
+    def get_threads(cls, exploration_id):
+        """Returns threads ordered by last updated associated to the
+        exploration.
+
+        Does not include the deleted entries.
+        """
+        return cls.get_all().filter(
+            cls.exploration_id == exploration_id).order(
+                cls.last_updated).fetch()
+
+    @classmethod
     def get_threads_multi(cls, exploration_ids):
         """Returns an array of threads ordered by last updated associated to
         explorations with ids in exploration_ids.

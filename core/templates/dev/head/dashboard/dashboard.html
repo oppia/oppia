@@ -209,9 +209,10 @@
                 </span>
               </div>
               <div class="stat-block-values"
-                   ng-show="exploration.new_feedback.length !==0 && statsDropdownOpened[exploration.id] === EXPLORATION_DROPDOWN_STATS.NEW_FEEDBACK">
+                   ng-if="exploration.new_feedback.length !==0"
+                   ng-show="statsDropdownOpened[exploration.id] === EXPLORATION_DROPDOWN_STATS.NEW_FEEDBACK">
                 <div ng-repeat="feedback in exploration.new_feedback">
-                  <[feedback.summary]>
+                  <[feedback.text]> (by <[feedback.author_username]>)
                 </div>
               </div>
             </div>
@@ -225,7 +226,8 @@
                 </span>
               </div>
               <div class="stat-block-values"
-                   ng-show="exploration.top_unresolved_answers.length !==0 && statsDropdownOpened[exploration.id] === EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS">
+                   ng-if="exploration.top_unresolved_answers.length !==0"
+                   ng-show="statsDropdownOpened[exploration.id] === EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS">
                 <div ng-repeat="answer in exploration.top_unresolved_answers">
                   <[answer.value]> (<[answer.count]> instances in <[answer.state]>)
                 </div>
@@ -241,7 +243,8 @@
                 </span>
               </div>
               <div class="stat-block-values"
-                   ng-show="exploration.last_updates.length !==0 && statsDropdownOpened[exploration.id] === EXPLORATION_DROPDOWN_STATS.LAST_UPDATES">
+                   ng-if="exploration.last_updates.length !==0"
+                   ng-show="statsDropdownOpened[exploration.id] === EXPLORATION_DROPDOWN_STATS.LAST_UPDATES">
                 <div ng-repeat="update in exploration.last_updates">
                   <[update.commit_message]>
                 </div>
