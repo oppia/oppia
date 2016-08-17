@@ -4045,13 +4045,13 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-donation-card {
-  margin: auto;
+  margin: 0px auto 30px auto;
   position: relative;
   width: 660px;
 }
 
 .oppia-donation-card-content-wide {
-  margin: 0 auto;
+  margin: 0px auto;
   min-height: 670px;
   overflow: auto;
 }
