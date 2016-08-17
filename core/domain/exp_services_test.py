@@ -1796,7 +1796,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
             self.COMMIT_ALBERT_CREATE_EXP_2, commit_dicts[-3])
         self.assertFalse(more)
 
-    def test_latest_updates_exp_ids(self):
+    def test_latest_updates(self):
         exp_commits_mapping_albert = (
             exp_services.get_last_updates_for_exp_ids(
                 self.albert_id, [self.EXP_ID_1, self.EXP_ID_2]))
@@ -1808,22 +1808,22 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
             exp_services.get_last_updates_for_exp_ids(
                 self.bob_id, [self.EXP_ID_1, self.EXP_ID_2]))
         self.assertEqual(len(exp_commits_mapping_bob), 2)
-        self.assertEqual(len(exp_commits_mapping_bob[self.EXP_ID_1]), 2)
-        self.assertEqual(len(exp_commits_mapping_bob[self.EXP_ID_2]), 2)
+        self.assertEqual(len(exp_commits_mapping_bob[self.EXP_ID_1]), 1)
+        self.assertEqual(len(exp_commits_mapping_bob[self.EXP_ID_2]), 3)
 
         self.assertDictContainsSubset(
             self.COMMIT_ALBERT_DELETE_EXP_1,
             exp_commits_mapping_bob[self.EXP_ID_1][0].to_dict())
-        self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_DELETE_EXP_1,
-            exp_commits_mapping_bob[self.EXP_ID_1][1].to_dict())
 
         self.assertDictContainsSubset(
             self.COMMIT_ALBERT_PUBLISH_EXP_2,
             exp_commits_mapping_bob[self.EXP_ID_2][0].to_dict())
         self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_PUBLISH_EXP_2,
+            self.COMMIT_ALBERT_EDIT_EXP_2,
             exp_commits_mapping_bob[self.EXP_ID_2][1].to_dict())
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_CREATE_EXP_2,
+            exp_commits_mapping_bob[self.EXP_ID_2][2].to_dict())
 
 
 class ExplorationCommitLogSpecialCasesUnitTests(ExplorationServicesUnitTests):

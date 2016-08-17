@@ -1141,16 +1141,24 @@ def get_next_page_of_all_non_private_commits(
 
 def get_last_updates_for_exp_ids(user_id, exp_ids):
     commits_explorations_mapping = {}
-    for entry in exp_models.ExplorationCommitLogEntryModel.get_multi_all_commits(exp_ids): # pylint: disable=line-too-long
+    all_commits = (
+        exp_models.ExplorationCommitLogEntryModel.get_multi_all_commits(
+            exp_ids))
+    for entry in all_commits:
+        commits_explorations_mapping[entry.exploration_id] = []
+
+    for entry in all_commits:
         exp_id = entry.exploration_id
-        commits_explorations_mapping[exp_id] = [entry]
         if (len(commits_explorations_mapping[exp_id]) <=
-                feconf.NEW_UPDATES_COUNT_DASHBOARD + 1) and (
-                    commits_explorations_mapping[exp_id][-1].user_id != user_id): #pylint: disable=line-too-long
-            commits_explorations_mapping[exp_id].append(entry)
+                feconf.NEW_UPDATES_COUNT_DASHBOARD):
+            if len(commits_explorations_mapping[exp_id]) == 0:
+                commits_explorations_mapping[exp_id].append(entry)
+            elif commits_explorations_mapping[exp_id][-1].user_id != user_id:
+                commits_explorations_mapping[exp_id].append(entry)
 
     for exp_id in commits_explorations_mapping:
-        if commits_explorations_mapping[exp_id][-1].user_id == user_id:
+        if (len(commits_explorations_mapping[exp_id]) > 0 and
+                (commits_explorations_mapping[exp_id][-1].user_id == user_id)):
             del commits_explorations_mapping[exp_id][-1]
 
     return commits_explorations_mapping

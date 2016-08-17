@@ -203,7 +203,8 @@ class FeedbackMessageModel(base_models.BaseModel):
         if len(thread_ids) == 0:
             return []
         return cls.get_all().filter(
-            cls.thread_id.IN(thread_ids)).order(cls.last_updated).fetch()
+            cls.thread_id.IN(thread_ids)).order(cls.last_updated).fetch(
+                feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_most_recent_message(cls, exploration_id, thread_id):
