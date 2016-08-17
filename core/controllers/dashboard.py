@@ -174,15 +174,16 @@ class DashboardHandler(base.BaseHandler):
             stats_services.get_exps_unresolved_answers_for_default_rule(
                 exploration_ids_subscribed_to))
 
-        new_feedback = (
-            feedback_services.get_threads_multi(
+        new_feedback_messages = (
+            feedback_services.get_feedback_messages_multi_for_exp(
                 exploration_ids_subscribed_to,
                 limit=feconf.NEW_FEEDBACK_COUNT_DASHBOARD))
-        new_feedback_dict = {}
-        for exp_id in new_feedback:
-            new_feedback_dict[exp_id] = []
-            for feedback in new_feedback[exp_id]:
-                new_feedback_dict[exp_id].append(feedback.to_dict())
+        new_feedback_messages_dict = {}
+        for exp_id in new_feedback_messages:
+            new_feedback_messages_dict[exp_id] = []
+            for feedback_message in new_feedback_messages[exp_id]:
+                new_feedback_messages_dict[exp_id].append(
+                    feedback_message.to_dict())
 
         last_updates = (
             exp_services.get_last_updates_for_exp_ids(
@@ -196,7 +197,7 @@ class DashboardHandler(base.BaseHandler):
         for ind, exploration in enumerate(exp_summary_list):
             exploration.update(feedback_thread_analytics[ind].to_dict())
             exploration.update({
-                'new_feedback': new_feedback_dict[exploration['id']],
+                'new_feedback': new_feedback_messages_dict[exploration['id']],
                 'num_unresolved_answers': (
                     unresolved_answers_dict[exploration['id']]['count']
                     if exploration['id'] in unresolved_answers_dict else 0

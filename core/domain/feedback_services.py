@@ -215,6 +215,14 @@ def create_suggestion(exploration_id, author_id, exploration_version,
     enqueue_suggestion_email_task(exploration_id, thread_id)
 
 
+def _get_thread_from_model(thread_model):
+    return feedback_domain.FeedbackThread(
+        thread_model.id, thread_model.exploration_id, thread_model.state_name,
+        thread_model.original_author_id, thread_model.status,
+        thread_model.subject, thread_model.summary, thread_model.has_suggestion,
+        thread_model.created_on, thread_model.last_updated)
+
+
 def _get_suggestion_from_model(suggestion_model):
     return feedback_domain.Suggestion(
         suggestion_model.id, suggestion_model.author_id,
@@ -229,32 +237,29 @@ def get_suggestion(exploration_id, thread_id):
     return _get_suggestion_from_model(model) if model else None
 
 
-def _get_thread_from_model(thread_model):
-    return feedback_domain.FeedbackThread(
-        thread_model.id, thread_model.exploration_id, thread_model.state_name,
-        thread_model.original_author_id, thread_model.status,
-        thread_model.subject, thread_model.summary, thread_model.has_suggestion,
-        thread_model.created_on, thread_model.last_updated)
-
-
-def get_threads_multi(exploration_ids, limit=None):
+def get_feedback_messages_multi_for_exp(exploration_ids, limit=None):
     thread_models_exps = feedback_models.FeedbackThreadModel.get_threads_multi(
         exploration_ids)
+    messages_models_exps = (
+        feedback_models.FeedbackMessageModel.get_messages_multi(
+            [thread.id for thread in thread_models_exps]))
     result = {}
     for exp_id in exploration_ids:
         result[exp_id] = []
-    for thread_models_exp in thread_models_exps:
-        if limit and len(result[thread_models_exp.exploration_id]) < limit:
-            result[thread_models_exp.exploration_id].append(
-                _get_thread_from_model(thread_models_exp))
+    for message_models_exp in messages_models_exps:
+        if limit and len(result[message_models_exp.exploration_id]) < limit:
+            result[message_models_exp.exploration_id].append(
+                _get_message_from_model(message_models_exp))
         elif not limit:
-            result[thread_models_exp.exploration_id].append(
-                _get_thread_from_model(thread_models_exp))
+            result[message_models_exp.exploration_id].append(
+                _get_message_from_model(message_models_exp))
     return result
 
 
 def get_threads(exploration_id):
-    return get_threads_multi([exploration_id])[exploration_id]
+    thread_models = feedback_models.FeedbackThreadModel.get_threads(
+        exploration_id)
+    return [_get_thread_from_model(model) for model in thread_models]
 
 
 def get_open_threads(exploration_id, has_suggestion):

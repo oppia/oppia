@@ -94,8 +94,8 @@ class FeedbackThreadModel(base_models.BaseModel):
     def create(cls, exploration_id, thread_id):
         """Creates a new FeedbackThreadModel entry.
 
-        Throws an exception if a thread with the given exploration ID and
-        thread ID combination exists already.
+        Throws an exception if a thread with the given exploration ID and thread
+        ID combination exists already.
         """
         instance_id = cls.generate_full_thread_id(exploration_id, thread_id)
         if cls.get_by_id(instance_id):
@@ -197,6 +197,13 @@ class FeedbackMessageModel(base_models.BaseModel):
             exploration_id, thread_id)
         return cls.get_all().filter(
             cls.thread_id == full_thread_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_messages_multi(cls, thread_ids):
+        if len(thread_ids) == 0:
+            return []
+        return cls.get_all().filter(
+            cls.thread_id.IN(thread_ids)).order(cls.last_updated).fetch()
 
     @classmethod
     def get_most_recent_message(cls, exploration_id, thread_id):
