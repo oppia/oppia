@@ -1796,6 +1796,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
             self.COMMIT_ALBERT_CREATE_EXP_2, commit_dicts[-3])
         self.assertFalse(more)
 
+
     def test_latest_updates(self):
         exp_commits_mapping_albert = (
             exp_services.get_last_updates_for_exp_ids(

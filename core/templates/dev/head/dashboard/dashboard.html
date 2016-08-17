@@ -246,7 +246,7 @@
                    ng-if="exploration.last_updates.length !==0"
                    ng-show="statsDropdownOpened[exploration.id] === EXPLORATION_DROPDOWN_STATS.LAST_UPDATES">
                 <div ng-repeat="update in exploration.last_updates">
-                  <[update.commit_message]>
+                  <[update.commit_message]> (by <[update.username]>)
                 </div>
               </div>
             </div>

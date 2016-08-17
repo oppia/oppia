@@ -215,14 +215,6 @@ def create_suggestion(exploration_id, author_id, exploration_version,
     enqueue_suggestion_email_task(exploration_id, thread_id)
 
 
-def _get_thread_from_model(thread_model):
-    return feedback_domain.FeedbackThread(
-        thread_model.id, thread_model.exploration_id, thread_model.state_name,
-        thread_model.original_author_id, thread_model.status,
-        thread_model.subject, thread_model.summary, thread_model.has_suggestion,
-        thread_model.created_on, thread_model.last_updated)
-
-
 def _get_suggestion_from_model(suggestion_model):
     return feedback_domain.Suggestion(
         suggestion_model.id, suggestion_model.author_id,
@@ -235,6 +227,14 @@ def get_suggestion(exploration_id, thread_id):
     model = feedback_models.SuggestionModel.get_by_exploration_and_thread_id(
         exploration_id, thread_id)
     return _get_suggestion_from_model(model) if model else None
+
+
+def _get_thread_from_model(thread_model):
+    return feedback_domain.FeedbackThread(
+        thread_model.id, thread_model.exploration_id, thread_model.state_name,
+        thread_model.original_author_id, thread_model.status,
+        thread_model.subject, thread_model.summary, thread_model.has_suggestion,
+        thread_model.created_on, thread_model.last_updated)
 
 
 def get_feedback_messages_multi_for_exp(exploration_ids, limit=None):
