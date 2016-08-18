@@ -334,11 +334,9 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script>
-    {{ include_js_file('components/CollectionCreationService.js') }}
-    {{ include_js_file('components/ExplorationEmbedButtonService.js') }}
-    {{ include_js_file('components/SharingLinksDirective.js') }}
-    {{ include_js_file('dashboard/Dashboard.js') }}
-    {{ include_js_file('domain/dashboard/DashboardBackendApiService.js') }}
-  </script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/CollectionCreationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/ExplorationEmbedButtonService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/SharingLinksDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/dashboard/Dashboard.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/dashboard/DashboardBackendApiService.js"></script>
 {% endblock footer_js %}

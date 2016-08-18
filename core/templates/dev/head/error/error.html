@@ -60,9 +60,7 @@
 
 {% block footer_js %} 
   {{ super() }}
-  <script>
-    {{ include_js_file('error/Error.js') }}
-  </script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/error/Error.js"></script>
 {% endblock footer_js %}
 
 {% block footer%}

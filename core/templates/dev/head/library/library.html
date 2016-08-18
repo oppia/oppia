@@ -175,13 +175,11 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script>
-    {{ include_js_file('components/CircularImageDirective.js') }}
-    {{ include_js_file('components/ProfileLinkImageDirective.js') }}
-    {{ include_js_file('components/SearchBarDirective.js') }}
-    {{ include_js_file('components/SearchResultsDirective.js') }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/CircularImageDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/ProfileLinkImageDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/SearchBarDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/SearchResultsDirective.js"></script>
 
-    {{ include_js_file('library/Library.js') }}
-    {{ include_js_file('library/LibraryFooter.js') }}
-  </script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/library/Library.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/library/LibraryFooter.js"></script>
 {% endblock footer_js %}
