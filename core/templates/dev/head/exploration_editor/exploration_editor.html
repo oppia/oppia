@@ -253,14 +253,15 @@
         <p ng-if="requireTitleToBeSpecified">
           Add a title: what should your exploration be called?
           <input type="text" class="form-control" ng-model="explorationTitleService.displayed"
-                 placeholder="Music in the 19th Century">
+                 placeholder="Music in the 19th Century" maxlength="40">
         </p>
         <form name="objectiveForm">
-          <p ng-if="requireObjectiveToBeSpecified">
+          <p ng-if="requireObjectiveToBeSpecified"
+             ng-class="{'has-error': (objectiveForm.objectiveInput.$touched || objectiveHasBeenPreviouslyEdited) && explorationObjectiveService.displayed.length < 15}">
             Add a goal: what does the exploration help people to do?
-            <input name="objectiveInput" type="text" class="form-control" ng-minlength="15" required ng-model="explorationObjectiveService.displayed"
+            <input name="objectiveInput" type="text" class="form-control" ng-model="explorationObjectiveService.displayed"
                    placeholder="Learn how to ...">
-            <span class="help-block" ng-show="objectiveForm.objectiveInput.$touched && !explorationObjectiveService.displayed" style="font-size: smaller; color: red">Please provide a descriptive goal to help people understand what this exploration is about.</span>
+            <span class="help-block" ng-show="(objectiveForm.objectiveInput.$touched || objectiveHasBeenPreviouslyEdited) && explorationObjectiveService.displayed.length < 15" style="font-size: smaller; color: #a94442">Please provide a descriptive goal to help people understand what this exploration is about.</span>
           </p>
         </form>
         <p ng-if="requireCategoryToBeSpecified">
