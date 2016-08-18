@@ -106,7 +106,7 @@ def copy_files_source_to_target(source, target):
             shutil.copyfile(source_path, target_path)
 
 
-def build_files(source, target, ignore=None):
+def build_files(source, target, ignore):
     """Minifies all css and js files, and removes whitespace from html in source
     directory and copies it to target, ignoring paths/files mentioned in ignore.
     Copies files in ignore to target without any changes.
