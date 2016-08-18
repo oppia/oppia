@@ -726,6 +726,9 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
                 explorationLanguageCodeService);
               $scope.explorationTagsService = explorationTagsService;
 
+              $scope.objectiveHasBeenPreviouslyEdited = (
+                explorationObjectiveService.savedMemento.length > 0);
+
               $scope.requireTitleToBeSpecified = (
                 !explorationTitleService.savedMemento);
               $scope.requireObjectiveToBeSpecified = (
