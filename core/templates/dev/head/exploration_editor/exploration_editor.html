@@ -257,11 +257,11 @@
         </p>
         <form name="objectiveForm">
           <p ng-if="requireObjectiveToBeSpecified"
-             ng-class="{'has-error': explorationObjectiveService.displayed.length <= 15}">
+             ng-class="{'has-error': explorationObjectiveService.displayed.length < 15}">
             Add a goal: what does the exploration help people to do?
-            <input name="objectiveInput" type="text" class="form-control" required ng-model="explorationObjectiveService.displayed"
+            <input name="objectiveInput" type="text" class="form-control" ng-model="explorationObjectiveService.displayed"
                    placeholder="Learn how to ...">
-            <span class="help-block" ng-show="!explorationObjectiveService.displayed" style="font-size: smaller; color: red">Please provide a descriptive goal to help people understand what this exploration is about.</span>
+            <span class="help-block" ng-show="(objectiveForm.objectiveInput.$touched || explorationObjectiveService.displayed) && explorationObjectiveService.displayed.length < 15" style="font-size: smaller; color: #a94442">Please provide a descriptive goal to help people understand what this exploration is about.</span>
           </p>
         </form>
         <p ng-if="requireCategoryToBeSpecified">
