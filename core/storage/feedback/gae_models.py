@@ -120,7 +120,7 @@ class FeedbackThreadModel(base_models.BaseModel):
         """
         return cls.get_all().filter(
             cls.exploration_id == exploration_id).order(
-                cls.last_updated).fetch()
+                cls.last_updated).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_threads_multi(cls, exploration_ids):
@@ -135,7 +135,7 @@ class FeedbackThreadModel(base_models.BaseModel):
             return []
         return cls.get_all().filter(
             cls.exploration_id.IN(exploration_ids)).order(
-                cls.last_updated).fetch()
+                cls.last_updated).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
 
 class FeedbackMessageModel(base_models.BaseModel):

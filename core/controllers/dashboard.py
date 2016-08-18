@@ -175,7 +175,7 @@ class DashboardHandler(base.BaseHandler):
                 exploration_ids_subscribed_to))
 
         new_feedback_messages = (
-            feedback_services.get_feedback_messages_multi_for_exp(
+            feedback_services.get_messages_multi_for_exps(
                 exploration_ids_subscribed_to,
                 limit=feconf.NEW_FEEDBACK_COUNT_DASHBOARD))
         new_feedback_messages_dict = {}

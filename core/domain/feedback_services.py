@@ -237,7 +237,7 @@ def _get_thread_from_model(thread_model):
         thread_model.created_on, thread_model.last_updated)
 
 
-def get_feedback_messages_multi_for_exp(exploration_ids, limit=None):
+def get_messages_multi_for_exps(exploration_ids, limit=None):
     thread_models_exps = feedback_models.FeedbackThreadModel.get_threads_multi(
         exploration_ids)
     messages_models_exps = (
