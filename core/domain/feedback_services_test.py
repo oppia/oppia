@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for feedback-related services."""
+from core.domain import feedback_domain
 from core.domain import feedback_jobs_continuous_test
 from core.domain import feedback_services
 from core.domain import user_services
@@ -336,9 +337,17 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
 
     def test_create_new_instant_task(self):
         user_id = 'user'
-        reference = 'reference'
+        reference = {
+            'exploration_id': 'eid',
+            'thread_id': 'tid',
+            'message_id': 'mid'
+        }
+        reference_domain = feedback_domain.FeedbackMessageReference(
+            reference['exploration_id'], reference['thread_id'],
+            reference['message_id'])
+
         feedback_services.enqueue_feedback_message_instant_email_task(
-            user_id, reference, False, None, None)
+            user_id, reference_domain, False, None, None)
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
 
         tasks = self.get_pending_tasks()

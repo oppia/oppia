@@ -285,7 +285,7 @@ class SuggestionEmailHandler(base.BaseHandler):
 
 
 class InstantFeedbackEmailHandler(base.BaseHandler):
-    """Handles task of sending feedback message emails instantsly."""
+    """Handles task of sending feedback message emails instantly."""
 
     def post(self):
         payload = json.loads(self.request.body)

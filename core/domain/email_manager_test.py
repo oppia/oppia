@@ -1265,7 +1265,7 @@ class FeedbackMessageInstantEmailTests(test_utils.GenericTestBase):
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
 
     def test_that_suggestion_emails_are_correct(self):
-        expected_email_subject = 'New Oppia message'
+        expected_email_subject = 'New Oppia message in "a subject"'
 
         expected_email_html_body = (
             'Hi newuser,<br><br>'
