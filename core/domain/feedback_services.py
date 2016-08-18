@@ -238,6 +238,14 @@ def _get_thread_from_model(thread_model):
 
 
 def get_messages_multi_for_exps(exploration_ids, limit=None):
+    """Fetch the feedback threads for the given list of exploration_ids, and use
+    those to finally get the new (open) feedback messages.
+
+    Returns an object keyed by exploration_ids whose values are a list of
+    feedback message domain objects, limited by 'limit' argument passed here.
+    Default value of limit is None, implying that the result will not be limited
+    at all in such a case.
+    """
     thread_models_exps = feedback_models.FeedbackThreadModel.get_threads_multi(
         exploration_ids)
     messages_models_exps = (
@@ -247,12 +255,10 @@ def get_messages_multi_for_exps(exploration_ids, limit=None):
     for exp_id in exploration_ids:
         result[exp_id] = []
     for message_models_exp in messages_models_exps:
-        if limit and len(result[message_models_exp.exploration_id]) < limit:
+        if not limit or len(result[message_models_exp.exploration_id]) < limit:
             result[message_models_exp.exploration_id].append(
                 _get_message_from_model(message_models_exp))
-        elif not limit:
-            result[message_models_exp.exploration_id].append(
-                _get_message_from_model(message_models_exp))
+
     return result
 
 

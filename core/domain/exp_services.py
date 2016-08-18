@@ -1140,6 +1140,14 @@ def get_next_page_of_all_non_private_commits(
 
 
 def get_last_updates_for_exp_ids(user_id, exp_ids):
+    """Returns the latest updates(commits) ordered by latest to oldest in time
+    for the given exp_ids. A commit is considered to be latest only if there
+    have been no commits by the owner himself after that particular commit.
+
+    Returns a dict keyed by exp_ids whose values are arrays which contain all
+    such commits which have been made by anyone but the owner for the
+    exploration, limited by value of feconf.NEW_UPDATES_COUNT_DASHBOARD.
+    """
     commits_explorations_mapping = {}
     all_commits = (
         exp_models.ExplorationCommitLogEntryModel.get_multi_all_commits(
