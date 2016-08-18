@@ -182,8 +182,12 @@ class DashboardHandler(base.BaseHandler):
         for exp_id in new_feedback_messages:
             new_feedback_messages_dict[exp_id] = []
             for feedback_message in new_feedback_messages[exp_id]:
-                new_feedback_messages_dict[exp_id].append(
-                    feedback_message.to_dict())
+                message_dict = feedback_message.to_dict()
+                message_dict['created_on'] = (
+                    utils.get_time_in_millisecs(message_dict['created_on']))
+                message_dict['last_updated'] = (
+                    utils.get_time_in_millisecs(message_dict['last_updated']))
+                new_feedback_messages_dict[exp_id].append(message_dict)
 
         last_updates = (
             exp_services.get_last_updates_for_exp_ids(
@@ -192,7 +196,12 @@ class DashboardHandler(base.BaseHandler):
         for exp_id in last_updates:
             last_updates_dict[exp_id] = []
             for update in last_updates[exp_id]:
-                last_updates_dict[exp_id].append(update.to_dict())
+                update_dict = update.to_dict()
+                update_dict['created_on'] = (
+                    utils.get_time_in_millisecs(update_dict['created_on']))
+                update_dict['last_updated'] = (
+                    utils.get_time_in_millisecs(update_dict['last_updated']))
+                last_updates_dict[exp_id].append(update_dict)
 
         for ind, exploration in enumerate(exp_summary_list):
             exploration.update(feedback_thread_analytics[ind].to_dict())
