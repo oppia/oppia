@@ -24,12 +24,12 @@
 {% endblock navbar_breadcrumb %}
 
 {% block content %}
-  <div class="oppia-page-card oppia-about-content">
-    <div class="oppia-about-card-content-wide" style="height:450px">
+  <div class="oppia-page-card oppia-about-content" ng-controller="Thanks">
+    <div class="oppia-about-card-content-wide" style="height: 450px">
       <h2>Thank you for donating to The Oppia Foundation!</h2>
       <br>
       <div style="float:left;">
-        <img src="/images/general/donate.png" alt="Donation Otter" style="height:250px;">
+        <img ng-src="<[thanksImgUrl]>" alt="Otter holding a gift" style="height: 250px;">
       </div>
       <div style="float:right;">
         <p>
@@ -47,6 +47,13 @@
     </div>
   </div>
 {% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script>
+    {{ include_js_file('pages/Thanks.js') }}
+  </script>
+{% endblock footer_js %}
 
 {% block footer%}
   {% include 'footer.html' %}
