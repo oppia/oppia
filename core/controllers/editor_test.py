@@ -93,8 +93,6 @@ class EditorTest(BaseEditorControllerTest):
         self.assert_can_edit(response.body)
         self.assertIn('Stats', response.body)
         self.assertIn('History', response.body)
-        # Test that the value generator JS is included.
-        self.assertIn('RandomSelector', response.body)
 
         self.logout()
 

@@ -373,25 +373,26 @@
 
     {% include 'forms/form_builder_templates.html' %}
     {% include 'footer_js_libs.html' %}
+    
+    <script src="{{TEMPLATE_DIR_PREFIX}}/app.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/base.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/admin/Admin.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/directives.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/alertsService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/explorationContextService.js"></script>
+
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/ObjectEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/ValueGeneratorEditorDirective.js"></script>
+
+    <script src="{{TEMPLATE_DIR_PREFIX}}/forms/formBuilder.js"></script>
+
+    <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionSyntaxTree.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/evaluator.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/parser.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/UrlInterpolationService.js"></script>
 
     <script>
-      {{ include_js_file('app.js') }}
-      {{ include_js_file('base.js') }}
-      {{ include_js_file('admin/Admin.js') }}
-      {{ include_js_file('directives.js') }}
-      {{ include_js_file('services/alertsService.js') }}
-      {{ include_js_file('services/explorationContextService.js') }}
-
-      {{ include_js_file('components/ObjectEditorDirective.js') }}
-      {{ include_js_file('components/ValueGeneratorEditorDirective.js') }}
-
-      {{ include_js_file('forms/formBuilder.js') }}
-
-      {{ include_js_file('expressions/expressionSyntaxTree.js') }}
-      {{ include_js_file('expressions/evaluator.js') }}
-      {{ include_js_file('expressions/parser.js') }}
       {{ value_generators_js }}
-      {{ include_js_file('domain/utilities/UrlInterpolationService.js') }}
     </script>
 
     {{ rte_components_html }}
