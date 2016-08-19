@@ -327,6 +327,7 @@ class BaseHandler(webapp2.RequestHandler):
             'SITE_NAME': SITE_NAME.value,
             'SUPPORTED_SITE_LANGUAGES': feconf.SUPPORTED_SITE_LANGUAGES,
             'SYSTEM_USERNAMES': feconf.SYSTEM_USERNAMES,
+            'TEMPLATE_DIR_PREFIX': utils.get_template_dir_prefix(),
             'can_create_collections': (
                 self.username and self.username in
                 config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value
