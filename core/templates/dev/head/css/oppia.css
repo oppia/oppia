@@ -1158,9 +1158,9 @@ textarea {
   border-bottom: 1px solid #eee;
   display: flex;
   flex-wrap: wrap;
+  margin-bottom: 0;
   padding-left: 0;
   text-align: center;
-  margin-bottom: 0;
 }
 .oppia-dashboard-tabs li {
   display: flex;
@@ -1169,9 +1169,9 @@ textarea {
 }
 
 .oppia-dashboard-tabs-active .oppia-dashboard-tabs-text {
-  margin-left: 7.5px;
   border-bottom: 4px solid #009688;
   color: #009688;
+  margin-left: 7.5px;
 }
 
 .oppia-dashboard-tabs .oppia-dashboard-tabs-text {
@@ -1224,10 +1224,10 @@ textarea {
 }
 
 li.sort-explorations-select {
-  width: auto;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  width: auto;
 }
 
 li.sort-explorations-select .sort-by-text,
