@@ -21,6 +21,6 @@ oppia.controller('Donate', [
   function(
       $scope, UrlInterpolationService) {
     $scope.donateImgUrl = UrlInterpolationService.getStaticImageUrl(
-      '/general/opp_donate_text.png');
+      '/general/opp_donate_text.svg');
   }
 ]);
