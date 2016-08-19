@@ -114,8 +114,6 @@
   <script src="/third_party/static/code-mirror-3.19.0/mode/python/python.js"></script>
   <script src="/third_party/static/ui-codemirror-0.1.2/src/ui-codemirror.js"></script>
   {{ super() }}
-  <script>
-    {{ include_js_file('filters.js') }}
-    {{ include_js_file('forms/formBuilderTests.js') }}
-  </script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/filters.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/forms/formBuilderTests.js"></script>
 {% endblock footer_js %}

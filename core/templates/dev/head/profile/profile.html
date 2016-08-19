@@ -143,7 +143,5 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script>
-    {{ include_js_file('profile/Profile.js') }}
-  </script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/profile/Profile.js"></script>
 {% endblock footer_js %}

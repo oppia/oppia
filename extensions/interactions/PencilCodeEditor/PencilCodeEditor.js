@@ -203,6 +203,13 @@ oppia.factory('pencilCodeEditorRulesService', [
         $filter('normalizeWhitespace')(inputs.x);
       return normalizedOutput === normalizedExpectedOutput;
     },
+    OutputRoughlyEquals: function(answer, inputs) {
+      var normalizedOutput = $filter(
+        'normalizeWhitespacePunctuationAndCase')(answer.output);
+      var normalizedExpectedOutput =
+        $filter('normalizeWhitespacePunctuationAndCase')(inputs.x);
+      return normalizedOutput === normalizedExpectedOutput;
+    },
     ResultsInError: function(answer) {
       return !!(answer.error.trim());
     },

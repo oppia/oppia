@@ -163,3 +163,8 @@ if __name__ == '__main__':
     CSS_SRC_DIR = os.path.join('core', 'templates', 'prod', 'head', 'css', '')
     CSS_OUT_DIR = os.path.join(BUILD_DIR, 'css', '')
     copy_files_source_to_target(CSS_SRC_DIR, CSS_OUT_DIR)
+
+    # Copy core/templates/prod/head/ to build/[cache_slug]/templates/head/
+    TEMPLATES_SRC_DIR = os.path.join('core', 'templates', 'prod', 'head', '')
+    TEMPLATES_OUT_DIR = os.path.join(BUILD_DIR, 'templates', 'head', '')
+    copy_files_source_to_target(TEMPLATES_SRC_DIR, TEMPLATES_OUT_DIR)

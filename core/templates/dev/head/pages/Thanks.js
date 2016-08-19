@@ -13,14 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the donate page.
+ * @fileoverview Controllers for the 'thanks' page.
  */
 
-oppia.controller('Donate', [
+oppia.controller('Thanks', [
   '$scope', 'UrlInterpolationService',
   function(
       $scope, UrlInterpolationService) {
-    $scope.donateImgUrl = UrlInterpolationService.getStaticImageUrl(
-      '/general/opp_donate_text.png');
+    $scope.thanksImgUrl = UrlInterpolationService.getStaticImageUrl(
+      '/general/donate.png');
   }
 ]);

@@ -49,6 +49,13 @@ handlers:
   # NB: not minified. TODO(sll): fix.
   static_dir: core/templates/dev/head/css
   secure: always
+# Serve js scripts under core/templates/dev/head. This regex allows
+# us to recursively serve js scripts. "\1" inserts text captured by
+# the capture group in the URL pattern.
+- url: /templates/dev/head/(.*\.(js))$
+  static_files: core/templates/dev/head/\1
+  upload: core/templates/dev/head/(.*\.(js))$
+  secure: always
 - url: /third_party/static
   static_dir: third_party/static
   secure: always
