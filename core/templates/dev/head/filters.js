@@ -119,23 +119,25 @@ oppia.filter('truncateAtFirstEllipsis', [function() {
   };
 }]);
 
-oppia.filter('wrapTextWithEllipsis', ['$filter', function($filter) {
-  return function(input, characterCount) {
-    if (typeof input === 'string' || input instanceof String) {
-      input = $filter('normalizeWhitespace')(input);
-      if (input.length <= characterCount || characterCount < 3) {
-        // String fits within the criteria; no wrapping is necessary.
+oppia.filter('wrapTextWithEllipsis', [
+  '$filter', 'utilsService', function($filter, utilsService) {
+    return function(input, characterCount) {
+      if (utilsService.isString(input)) {
+        input = $filter('normalizeWhitespace')(input);
+        if (input.length <= characterCount || characterCount < 3) {
+          // String fits within the criteria; no wrapping is necessary.
+          return input;
+        }
+
+        // Replace characters counting backwards from character count with an
+        // ellipsis, then trim the string.
+        return input.substr(0, characterCount - 3).trim() + '...';
+      } else {
         return input;
       }
-
-      // Replace characters counting backwards from character count with an
-      // ellipsis, then trim the string.
-      return input.substr(0, characterCount - 3).trim() + '...';
-    } else {
-      return input;
-    }
-  };
-}]);
+    };
+  }
+]);
 
 // Filter that returns true iff an outcome has a self-loop and no feedback.
 oppia.filter('isOutcomeConfusing', [function() {
@@ -254,9 +256,9 @@ oppia.filter('parameterizeRuleDescription', [
 
 // Filter that removes whitespace from the beginning and end of a string, and
 // replaces interior whitespace with a single space character.
-oppia.filter('normalizeWhitespace', [function() {
+oppia.filter('normalizeWhitespace', ['utilsService', function(utilsService) {
   return function(input) {
-    if (typeof input === 'string' || input instanceof String) {
+    if (utilsService.isString(input)) {
       // Remove whitespace from the beginning and end of the string, and
       // replace interior whitespace with a single space character.
       input = input.trim();

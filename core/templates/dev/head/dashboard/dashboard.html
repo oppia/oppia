@@ -61,8 +61,11 @@
           </a>
         </li>
         {% if can_create_collections %}
-          <li ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myCollections'}">
-            <a class="oppia-dashboard-tabs-text" ng-click="setActiveTab('myCollections')"
+          <li ng-if="collectionsList.length == 0"></li>
+          <li ng-if="collectionsList.length > 0"
+              ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myCollections'}">
+            <a class="oppia-dashboard-tabs-text"
+               ng-click="setActiveTab('myCollections')"
                translate="I18N_DASHBOARD_MY_COLLECTIONS">
             </a>
           </li>
@@ -78,6 +81,18 @@
                   ng-click="setMyExplorationsView('list')">
             <span class="fa fa-list fa-lg"></span>
           </button>
+        </li>
+        <li class="sort-explorations-select" ng-if="activeTab === 'myExplorations'">
+          <p class="sort-by-text">Sort By</p>
+          <select ng-model="currentSortType"
+                  class="sort-options"
+                  ng-change="setExplorationsSortingOptions(currentSortType)"
+                  ng-options="EXPLORATIONS_SORT_BY_KEYS[key] as value for (key, value) in HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS">
+          </select>
+          <span class="sort-order fa"
+                ng-click="setExplorationsSortingOptions(currentSortType)"
+                ng-class="isCurrentSortDescending ? 'fa-long-arrow-up': 'fa-long-arrow-down'">
+          </span>
         </li>
       </ul>
     </div>
@@ -117,22 +132,30 @@
                  class="oppia-dashboard-list-view-item">
           <table class="oppia-dashboard-table">
              <colgroup>
-               <col style="width: 30%;">
-               <col style="width: 14%;">
-               <col style="width: 14%;">
-               <col style="width: 14%;">
-               <col style="width: 14%;">
-               <col style="width: 14%;">
+               <col style="width: 26%;">
+               <col style="width: 13%;">
+               <col style="width: 13%;">
+               <col style="width: 16%;">
+               <col style="width: 16%;">
+               <col style="width: 16%;">
             </colgroup>
             <tr>
-              <th>Exploration</th>
-              <th>Rating</th>
-              <th>Plays</th>
-              <th>Feedback</th>
-              <th>Unresolved Answers</th>
-              <th>Last Updated</th>
+              <th ng-repeat="(key, value) in EXPLORATIONS_SORT_BY_KEYS"
+                  class="oppia-dashboard-table-headings"
+                  ng-click="setExplorationsSortingOptions(value)">
+                <p ng-if="key === 'TITLE'">Exploration</p>
+                <p ng-if="key === 'RATING'">Rating</p>
+                <p ng-if="key === 'NUM_VIEWS'">Plays</p>
+                <p ng-if="key === 'OPEN_FEEDBACK'">Feedback</p>
+                <p ng-if="key === 'LAST_UPDATED'">Last Updated</p>
+                <p ng-if="key === 'UNRESOLVED_ANSWERS'">Unresolved Answers</p>
+                <span class="fa"
+                      ng-if="currentSortType === value"
+                      ng-class="isCurrentSortDescending ? 'fa-caret-up': 'fa-caret-down'">
+                </span>
+              </th>
             </tr>
-            <tr ng-repeat="exploration in explorationsList track by exploration.id"
+            <tr ng-repeat="exploration in explorationsList | orderBy:sortByFunction:isCurrentSortDescending track by exploration.id"
                 ng-click="showExplorationEditor(exploration.id)"
                 class="exploration-list-item">
               <td>
