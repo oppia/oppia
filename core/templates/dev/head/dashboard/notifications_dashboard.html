@@ -74,7 +74,5 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script>
-    {{ include_js_file('/dashboard/NotificationsDashboard.js') }}
-  </script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/dashboard/NotificationsDashboard.js"></script>
 {% endblock footer_js %}

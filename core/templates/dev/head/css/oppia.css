@@ -3449,13 +3449,13 @@ md-card.preview-conversation-skin-supplemental-card {
     The margin setting is so that exploration summary tiles and collection
     summary tiles would be the same widths (214px).
   */
-  margin: 12px 7px;
+  margin: 12px 5.5px;
   padding: 0;
   position: relative;
   text-align: left;
   vertical-align: top;
   white-space: normal;
-  width: 200px;
+  width: 197px;
 }
 
 @media only screen and (max-width: 500px) {
