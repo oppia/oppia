@@ -661,59 +661,6 @@ oppia.factory('codeNormalizationService', [function() {
   var removeIntermediateWhitespace = function(str) {
     return str.replace(/\s+/g, ' ');
   };
-  var normalizeCaseInStrings = function(str) {
-    // Note that this only takes into account single-line strings. It also
-    // tries to properly account for escaped characters.
-    var inSingleQuotedString = false;
-    var inDoubleQuotedString = false;
-    var answer = '';
-    for (var i = 0; i < str.length; i++) {
-      if (str[i] === '\\') {
-        answer += str[i];
-        i++;
-        if (i < str.length) {
-          answer += str[i];
-        }
-      } else if (inSingleQuotedString) {
-        if (str[i] === '\'') {
-          while (answer.length > 0 && answer[answer.length - 1] === ' ') {
-            answer = answer.substring(0, answer.length - 1);
-          }
-          inSingleQuotedString = false;
-        }
-        answer += str[i].toLowerCase();
-      } else if (inDoubleQuotedString) {
-        if (str[i] === '"') {
-          while (answer.length > 0 && answer[answer.length - 1] === ' ') {
-            answer = answer.substring(0, answer.length - 1);
-          }
-          inDoubleQuotedString = false;
-        }
-        answer += str[i].toLowerCase();
-      } else {
-        answer += str[i];
-        if (str[i] === '\'') {
-          inSingleQuotedString = true;
-          while (i + 1 < str.length && str[i + 1] === ' ') {
-            i++;
-          }
-        } else if (str[i] === '"') {
-          inDoubleQuotedString = true;
-          while (i + 1 < str.length && str[i + 1] === ' ') {
-            i++;
-          }
-        }
-      }
-    }
-
-    // If the string is invalid (with regards to quotation marks), just return
-    // it without normalization.
-    if (inSingleQuotedString || inDoubleQuotedString) {
-      answer = str;
-    }
-
-    return answer;
-  };
   return {
     getNormalizedCode: function(codeString) {
       /*
@@ -784,8 +731,8 @@ oppia.factory('codeNormalizationService', [function() {
         for (var i = 0; i < numSpacesToDesiredIndentLevel[numSpaces]; i++) {
           normalizedLine += FOUR_SPACES;
         }
-        normalizedLine += normalizeCaseInStrings(removeIntermediateWhitespace(
-          removeLeadingWhitespace(line)));
+        normalizedLine += removeIntermediateWhitespace(
+          removeLeadingWhitespace(line));
         normalizedCodeLines.push(normalizedLine);
       });
       return normalizedCodeLines.join('\n');

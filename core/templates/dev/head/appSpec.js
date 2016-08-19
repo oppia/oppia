@@ -236,36 +236,4 @@ describe('Code Normalization', function() {
       '    ab "cde fgh"'
     );
   });
-
-  it('should be case-insensitive within a string but not outside', function() {
-    expect(cns.getNormalizedCode(
-      'abcdefg\n' +
-      '    ABcDe \'HiJkL\'\n' +
-      '    "HiJkL    MNopq  " ABcDe\n' +
-      '    "AbC@\\"DeF7"  GhI# \'JkL-\\\'MnO3\'\n' +
-      '    \'not a Real String\n' +
-      '    """another Unreal String\n' +
-      '    \'a legit " STRING\' now outsiDe string'
-    )).toBe(
-      'abcdefg\n' +
-      '    ABcDe \'hijkl\'\n' +
-      '    "hijkl mnopq" ABcDe\n' +
-      '    "abc@\\"def7" GhI# \'jkl-\\\'mno3\'\n' +
-      '    \'not a Real String\n' +
-      '    """another Unreal String\n' +
-      '    \'a legit " string\' now outsiDe string'
-    );
-  });
-
-  it('trims contents of strings', function() {
-    expect(cns.getNormalizedCode(
-      'abcdefg\n' +
-      '    \'   HiJkL \'\n' +
-      '    " HiJkL    "'
-    )).toBe(
-      'abcdefg\n' +
-      '    \'hijkl\'\n' +
-      '    "hijkl"'
-    );
-  });
 });

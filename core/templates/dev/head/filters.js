@@ -268,6 +268,50 @@ oppia.filter('normalizeWhitespace', [function() {
   };
 }]);
 
+// Filter that takes a string, trims and normalizes spaces within each
+// line, and removes blank lines. Note that any spaces whose removal does not
+// result in two alphanumeric "words" being joined together are also removed,
+// so "hello ? " becomes "hello?".
+oppia.filter('normalizeWhitespacePunctuationAndCase', [function() {
+  return function(input) {
+    if (typeof input === 'string' || input instanceof String) {
+      var isAlphanumeric = function(character) {
+        return 'qwertyuiopasdfghjklzxcvbnm0123456789'.indexOf(
+          character.toLowerCase()) !== -1;
+      };
+
+      input = input.trim();
+      var inputLines = input.split('\n');
+      var resultLines = [];
+      for (var i = 0; i < inputLines.length; i++) {
+        var result = '';
+
+        var inputLine = inputLines[i].trim().replace(/\s{2,}/g, ' ');
+        for (var j = 0; j < inputLine.length; j++) {
+          var currentChar = inputLine.charAt(j).toLowerCase();
+          if (currentChar === ' ') {
+            if (j > 0 && j < inputLine.length - 1 &&
+                isAlphanumeric(inputLine.charAt(j - 1)) &&
+                isAlphanumeric(inputLine.charAt(j + 1))) {
+              result += currentChar;
+            }
+          } else {
+            result += currentChar;
+          }
+        }
+
+        if (result) {
+          resultLines.push(result);
+        }
+      }
+
+      return resultLines.join('\n');
+    } else {
+      return input;
+    }
+  };
+}]);
+
 oppia.filter('convertToPlainText', [function() {
   return function(input) {
     var strippedText = input.replace(/(<([^>]+)>)/ig, '');
