@@ -25,7 +25,7 @@ oppia.controller('Signup', [
     var _SIGNUP_DATA_URL = '/signuphandler/data';
     $rootScope.loadingMessage = 'I18N_SIGNUP_LOADING';
     $scope.warningI18nCode = '';
-    $scope.showEmailPreferencesForm = GLOBALS.CAN_SEND_EMAILS_TO_USERS;
+    $scope.showEmailPreferencesForm = GLOBALS.CAN_SEND_EMAILS;
     $scope.submissionInProcess = false;
 
     $http.get(_SIGNUP_DATA_URL).then(function(response) {
@@ -128,7 +128,7 @@ oppia.controller('Signup', [
         requestParams.username = username;
       }
 
-      if (GLOBALS.CAN_SEND_EMAILS_TO_USERS && !$scope.hasUsername) {
+      if (GLOBALS.CAN_SEND_EMAILS && !$scope.hasUsername) {
         if (canReceiveEmailUpdates === null) {
           $scope.emailPreferencesWarningText = 'I18N_SIGNUP_FIELD_REQUIRED';
           return;

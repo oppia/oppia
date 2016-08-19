@@ -158,6 +158,8 @@ oppia.directive('searchBar', [function() {
         };
 
         var updateSearchFieldsBasedOnUrlQuery = function() {
+          var oldQueryString = searchService.getCurrentUrlQueryString();
+
           $scope.selectionDetails.categories.selections = {};
           $scope.selectionDetails.languageCodes.selections = {};
 
@@ -167,7 +169,11 @@ oppia.directive('searchBar', [function() {
           updateSelectionDetails('categories');
           updateSelectionDetails('languageCodes');
 
-          onSearchQueryChangeExec();
+          var newQueryString = searchService.getCurrentUrlQueryString();
+
+          if (oldQueryString !== newQueryString) {
+            onSearchQueryChangeExec();
+          }
         };
 
         $scope.$on('$locationChangeSuccess', function() {

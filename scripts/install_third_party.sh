@@ -137,6 +137,13 @@ if [ ! -d "$TOOLS_DIR/selenium-2.53.2" ]; then
   pip install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
 fi
 
+echo Checking if requests is installed in $TOOLS_DIR/pip_packages
+if [ ! -d "$TOOLS_DIR/requests-2.10.0" ]; then
+  echo Installing requests
+
+  pip install requests==2.10.0 --target="$TOOLS_DIR/requests-2.10.0"
+fi
+
 # install pre-push script
 echo Installing pre-push hook for git
 $PYTHON_CMD $OPPIA_DIR/scripts/pre_push_hook.py --install

@@ -471,14 +471,6 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
       _sendEventToGoogleAnalytics(
         'CommitToPrivateExploration', 'click', explorationId);
     },
-    registerOpenPublishExplorationModalEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'PublishExplorationModal', 'open', explorationId);
-    },
-    registerPublishExplorationEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'PublishExploration', 'click', explorationId);
-    },
     registerShareExplorationEvent: function(network) {
       _sendSocialEventToGoogleAnalytics(
         network, 'share', $window.location.pathname);
@@ -489,6 +481,87 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
     registerCommitChangesToPublicExplorationEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
         'CommitToPublicExploration', 'click', explorationId);
+    },
+    // Metrics for tutorial on first creating exploration
+    registerTutorialModalOpenEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'TutorialModalOpen', 'open', explorationId);
+    },
+    registerDeclineTutorialModalEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'DeclineTutorialModal', 'click', explorationId);
+    },
+    registerAcceptTutorialModalEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'AcceptTutorialModal', 'click', explorationId);
+    },
+    // Metrics for visiting the help center
+    registerClickHelpButtonEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'ClickHelpButton', 'click', explorationId);
+    },
+    registerVisitHelpCenterEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'VisitHelpCenter', 'click', explorationId);
+    },
+    registerOpenTutorialFromHelpCenterEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'OpenTutorialFromHelpCenter', 'click', explorationId);
+    },
+    // Metrics for exiting the tutorial
+    registerSkipTutorialEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'SkipTutorial', 'click', explorationId);
+    },
+    registerFinishTutorialEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FinishTutorial', 'click', explorationId);
+    },
+    // Metrics for first time editor use
+    registerEditorFirstEntryEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FirstEnterEditor', 'open', explorationId);
+    },
+    registerFirstOpenContentBoxEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FirstOpenContentBox', 'open', explorationId);
+    },
+    registerFirstSaveContentEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FirstSaveContent', 'click', explorationId);
+    },
+    registerFirstClickAddInteractionEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FirstClickAddInteraction', 'click', explorationId);
+    },
+    registerFirstSelectInteractionTypeEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FirstSelectInteractionType', 'click', explorationId);
+    },
+    registerFirstSaveInteractionEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FirstSaveInteraction', 'click', explorationId);
+    },
+    registerFirstSaveRuleEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FirstSaveRule', 'click', explorationId);
+    },
+    registerFirstCreateSecondStateEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FirstCreateSecondState', 'create', explorationId);
+    },
+    // Metrics for publishing explorations
+    registerSavePlayableExplorationEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'SavePlayableExploration', 'save', explorationId);
+    },
+    registerOpenPublishExplorationModalEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'PublishExplorationModal', 'open', explorationId);
+    },
+    registerPublishExplorationEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'PublishExploration', 'click', explorationId);
     }
   };
 }]);
@@ -585,6 +658,9 @@ oppia.factory('codeNormalizationService', [function() {
   var removeTrailingWhitespace = function(str) {
     return str.replace(/\s+$/g, '');
   };
+  var removeIntermediateWhitespace = function(str) {
+    return str.replace(/\s+/g, ' ');
+  };
   return {
     getNormalizedCode: function(codeString) {
       /*
@@ -593,7 +669,9 @@ oppia.factory('codeNormalizationService', [function() {
        *
        * - Strips out lines that start with '#' (comments), possibly preceded by
        *     whitespace.
-       * - Trims trailing whitespace on each line.
+       * - Trims trailing whitespace on each line, and normalizes multiple
+       *     whitespace characters within a single line into one space
+       *     character.
        * - Removes blank newlines.
        * - Make the indentation level four spaces.
        */
@@ -653,7 +731,8 @@ oppia.factory('codeNormalizationService', [function() {
         for (var i = 0; i < numSpacesToDesiredIndentLevel[numSpaces]; i++) {
           normalizedLine += FOUR_SPACES;
         }
-        normalizedLine += removeLeadingWhitespace(line);
+        normalizedLine += removeIntermediateWhitespace(
+          removeLeadingWhitespace(line));
         normalizedCodeLines.push(normalizedLine);
       });
       return normalizedCodeLines.join('\n');

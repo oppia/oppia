@@ -33,19 +33,19 @@ var _selectLanguage = function(language) {
 describe('Site language', function() {
   beforeEach(function() {
     // Starting language is English
-    browser.get('/splash');
+    browser.get('/about');
     _selectLanguage('English');
-    expect(browser.getTitle()).toEqual('Oppia: Teach, Learn, Explore');
+    expect(browser.getTitle()).toEqual('About us - Oppia');
   });
 
   afterEach(function() {
     // Reset language back to English
-    browser.get('/splash');
+    browser.get('/about');
     _selectLanguage('English');
   });
 
   it('should change after selecting a different language', function() {
-    browser.get('/splash');
+    browser.get('/about');
     _selectLanguage('Español');
     browser.get('/library');
     expect(browser.getTitle()).toEqual('Biblioteca - Oppia');
@@ -74,7 +74,7 @@ describe('Site language', function() {
       function() {
     users.createUser('feanor@example.com', 'Feanor');
     users.login('feanor@example.com');
-    browser.get('/splash');
+    browser.get('/about');
     _selectLanguage('Español');
     browser.get('/library');
     expect(browser.getTitle()).toEqual('Biblioteca - Oppia');
@@ -102,7 +102,7 @@ describe('Site language', function() {
   it('should not change in an exploration', function() {
     users.createUser('mangue@example.com', 'Mangue');
     users.login('mangue@example.com', true);
-    browser.get('/splash');
+    browser.get('/about');
     _selectLanguage('Español');
     admin.reloadExploration('protractor_test_1.yaml');
     // Open exploration
@@ -113,5 +113,9 @@ describe('Site language', function() {
     expect(placeholder).toEqual('Ingresa un número');
     general.ensurePageHasNoTranslationIds();
     users.logout();
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
   });
 });

@@ -2810,6 +2810,11 @@ div#ng-curtain {
   font-size: 100%;
 }
 
+.ta-editor .placeholder-text {
+  color: #999;
+  font-size: 0.9em;
+}
+
 .form-control.oppia-rte-content > .ta-bind {
   height: auto;
   min-height: 80px;
@@ -3444,13 +3449,13 @@ md-card.preview-conversation-skin-supplemental-card {
     The margin setting is so that exploration summary tiles and collection
     summary tiles would be the same widths (214px).
   */
-  margin: 12px 7px;
+  margin: 12px 5.5px;
   padding: 0;
   position: relative;
   text-align: left;
   vertical-align: top;
   white-space: normal;
-  width: 200px;
+  width: 197px;
 }
 
 @media only screen and (max-width: 500px) {
@@ -3919,6 +3924,8 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-about-three-cols-layout {
   display: inline-block;
   margin-right: 20px;
+  /* This is a backup for browsers that do not support calc. */
+  width: 28%;
   width: calc((100% - 60px) / 3);
 }
 
@@ -3941,6 +3948,7 @@ md-card.preview-conversation-skin-supplemental-card {
   color: #fff;
   width: 100%;
 }
+
 .oppia-about-page-extra-info {
   height: 220px;
 }
@@ -4036,6 +4044,47 @@ md-card.preview-conversation-skin-supplemental-card {
   list-style-type: none;
 }
 
+.oppia-donation-card {
+  margin: auto;
+  position: relative;
+  width: 660px;
+}
+
+.oppia-donation-card-content-wide {
+  margin: 0 auto;
+  min-height: 670px;
+  overflow: auto;
+}
+
+.oppia-donate-info {
+  float: left;
+  width: calc(100% - 340px);
+}
+
+.oppia-donate-options {
+  background-color: #009688;
+  display: block;
+  float: right;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  padding: 10px;
+  width: 340px;
+}
+
+.btn.oppia-donate-options-button {
+  background-color: rgba(0,0,0,0.2);
+  color: rgba(255,255,255,1.0);
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 16px;
+  height: 40px;
+  margin: 15px auto;
+  width: 180px;
+}
+
+.btn.oppia-donate-options-button:hover {
+  background-color: rgba(5, 190, 178, 1);
+  color: rgba(255,255,255,1);
+}
+
 /*
   about/learners/creators media queries
 */
@@ -4043,6 +4092,19 @@ md-card.preview-conversation-skin-supplemental-card {
 @media only screen and (min-width: 1400px) {
   .oppia-about-content, .oppia-about-extra-content {
     width: 960px;
+  }
+}
+
+@media only screen and (max-width: 1140px) {
+  .oppia-donation-card-content-wide {
+    margin-bottom: 30px;
+  }
+  .oppia-donate-info {
+    display: none;
+  }
+  .oppia-donate-options {
+    float: clear;
+    width: 100%;
   }
 }
 
