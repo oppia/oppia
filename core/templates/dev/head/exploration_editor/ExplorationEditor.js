@@ -232,7 +232,7 @@ oppia.controller('ExplorationEditor', [
       text: (
         '<p>After you\'ve written the content of your conversation, ' +
         'choose an <b>interaction type</b>. ' +
-        'An interaction is how you want your leaner to respond ' +
+        'An interaction is how you want your learner to respond ' +
         'to your question.</p> ' +
         '<p>Oppia has several built-in interactions, including:</p>' +
         '<ul>' +
