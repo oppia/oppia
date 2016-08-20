@@ -1162,30 +1162,33 @@ textarea {
   text-align: center;
   margin-bottom: 0;
 }
+
 .oppia-dashboard-tabs li {
   display: flex;
   margin-bottom: 0;
   width: 200px;
 }
+
 .oppia-dashboard-tabs-active .oppia-dashboard-tabs-text {
   margin-left: 7.5px;
   border-bottom: 4px solid #009688;
   color: #009688;
 }
+
 .oppia-dashboard-tabs-text {
   border-bottom: none;
-  color: #009688;
   font-size: 1em;
   padding: 10px;
   text-decoration: none;
   text-transform: uppercase;
   width: 100%;
 }
-.oppia-dashboard-tabs-text:hover,
-.oppia-dashboard-tabs-text:focus {
-  color: #009688;
+
+.oppia-dashboard-tabs .oppia-dashboard-tabs-text:hover,
+.oppia-dashboard-tabs .oppia-dashboard-tabs-text:focus {
   text-decoration: none;
 }
+
 .oppia-dashboard-empty-text {
   padding-top: 50px;
 }

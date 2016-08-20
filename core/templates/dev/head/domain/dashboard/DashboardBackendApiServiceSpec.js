@@ -56,7 +56,31 @@ describe('Dashboard backend API service', function() {
         num_views: 2,
         num_open_threads: 0,
         num_total_threads: 0,
-        num_unresolved_answers: 2
+        num_unresolved_answers: 2,
+        new_feedback: [
+          {
+            author_username: 'avijit',
+            created_on: 1471649252020.614,
+            exploration_id: 'ASt_bM51b4k8',
+            message_id: 0,
+            text: 'Awesome :)',
+            updated_status: 'open',
+            updated_subject: '(Feedback from a learner)'
+          }
+        ],
+        top_unresolved_answers: [
+          {
+            state: 'Introduction',
+            value: '40',
+            count: 2
+          },
+          {
+            state: 'Introduction',
+            value: '20',
+            count: 1
+          }
+        ],
+        last_updates: []
       }],
       collections_list: [],
       dashboard_stats: {
