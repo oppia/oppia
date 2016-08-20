@@ -1191,7 +1191,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             'exploration_id': exp_id,
             'state_name': state_name,
             'rule_str': rule_str,
-            'created_on': item.created_on
+            'created_on': item.created_on,
+            'last_updated': item.last_updated
         })
 
     @staticmethod
@@ -1267,6 +1268,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             item = stats_models.StateRuleAnswerLogModel.get(item_id)
             rule_str = value_dict['rule_str']
             created_on = value_dict['created_on']
+            last_updated = value_dict['last_updated']
             exploration = dated_explorations_dict[created_on]
             if exploration and state_name in exploration.states:
                 state = exploration.states[state_name]
@@ -1276,7 +1278,12 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 item_id, exploration_id, exploration, state_name, state,
                 item.answers, rule_str)
             for error in migration_errors:
-                yield error
+                yield (
+                    'Item ID: %s, created: %s, last updated: %s, '
+                    'state name: %s, exp id: %s, exp version: %s, error: %s' % (
+                        item_id, created_on, last_updated, state_name,
+                        exploration_id, exploration.version
+                        if exploration else 'Unknown', error))
 
     @classmethod
     def _migrate_answers(cls, item_id, exploration_id, exploration, state_name,
@@ -1311,9 +1318,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             # return none when it's not a default result.
             if answer_group_index is None or rule_spec_index is None:
                 yield (
-                    'Failed to match rule string: \'%s\' for answer \'%s\' '
-                    'because of %s (state=%s)' % (
-                        rule_str, item_id, error_string, state.to_dict()))
+                    'Failed to match rule string: \'%s\' because of %s '
+                    '(state=%s)' % (rule_str, error_string, state.to_dict()))
                 return
 
             answer_groups = state.interaction.answer_groups
@@ -1367,8 +1373,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                         state, rule_spec, rule_str, answer_str))
                 if error:
                     yield (
-                        'Failed to migrate answer because of %s (answer=%s,'
-                        ' state=%s)' % (error, item_id, state.to_dict()))
+                        'Failed to migrate answer because of %s (state=%s)' % (
+                            error, state.to_dict()))
                     continue
                 migrated_answers.append(answer)
                 answer_strings.append(answer_str)

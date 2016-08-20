@@ -192,7 +192,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         exp_services.delete_exploration(
             self.owner_id, self.DEMO_EXP_ID, force_deletion=True)
 
-        job_output = self._run_migration_job()
+        job_output = sorted(self._run_migration_job())
 
         # There should still be no answers in the new data storage model.
         state_answers = self._get_state_answers(
@@ -220,16 +220,16 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self.assertIn(
             'Encountered permanently missing exploration referenced to by '
             'submitted answers. Migrating with missing exploration.',
-            job_output)
-        self.assertIn(
-            'Assuming answer belongs to the default outcome due to missing '
-            'state object.', job_output)
+            job_output[0])
         self.assertIn(
             'Assuming answer belongs to EndExploration due to missing state '
-            'object', job_output)
+            'object', job_output[1])
+        self.assertIn(
+            'Assuming answer belongs to the default outcome due to missing '
+            'state object.', job_output[2])
         self.assertIn(
             'Cannot migrate answer due to missing answer state. Assuming it is '
-            'None.', job_output)
+            'None.', job_output[3])
         self._verify_no_migration_validation_problems()
 
     def test_rule_parameter_evaluation_with_invalid_characters(self):
@@ -392,8 +392,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self.assertIsNone(state_answers)
 
         self.assertEqual(len(job_output), 2)
-        self.assertIn('Failed to migrate all answers', job_output[0])
-        self.assertIn('Failed to normalize', job_output[1])
+        self.assertIn('Failed to normalize', job_output[0])
+        self.assertIn('Failed to migrate all answers', job_output[1])
         self._verify_migration_validation_problems(1)
 
     def test_migration_job_should_support_very_large_answers(self):
