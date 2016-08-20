@@ -551,6 +551,95 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self.assertEqual(state_answers.exploration_version, 2)
         self._verify_no_migration_validation_problems()
 
+    # TODO(bhenning): There are other scenarios to consider for this type of
+    # migration, as well. For instance, if any of the following happen between
+    # the created_on and last_updated dates for a given model:
+    #   1. Interaction ID changed
+    #   2. Answer groups changed
+    #   3. Rule specs changed
+    # Also, there should be a test to verify that the latest matching version is
+    # the one selected (rather than the earliest). This is done in hopes of
+    # answers being submitted long after the exploration was released.
+    def test_migrated_answer_matches_to_correct_exp_version_after_stats(self):
+        """Tests whether an answer is correctly matched to a given exp version
+        if its answer model was created before the state could support a
+        submitted answer. This is verified by creating an exploration without an
+        interaction but a default outcome, visiting the stats page in the editor
+        is simulated by creating a new answer model for this state, then the
+        state is updated to have a valid exploration and an answer is submitted
+        for it. This is based on a real exploration found in production.
+        """
+        exploration = self.save_new_valid_exploration(
+            'exp_id0', self.owner_id, end_state_name='End')
+        state_name = exploration.init_state_name
+        initial_state = exploration.states[state_name]
+
+        # Although a user can't update an exploration to contain a default
+        # outcome without an interaction ID, the modern exploration version can
+        # migrate certain states that previously had some default information to
+        # contain a default outcome even without an initialized interaction.
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+            'new_value': {
+                'dest': state_name,
+                'feedback': [],
+                'param_changes': ''
+            }
+        }], 'Update state to have default outcome')
+
+        # Ensure the entity exists, even though it's empty. This happens for a
+        # variety of read-only reasons.
+        rule_spec_str = 'Default'
+        stats_models.StateRuleAnswerLogModel.get_or_create(
+            'exp_id0', state_name, rule_spec_str)
+
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'Continue',
+            'old_value': initial_state.interaction.id
+        }], 'Update state to have Continue interaction')
+
+        html_answer = ''
+        self._record_old_answer(
+            state_name, rule_spec_str, html_answer, exploration_id='exp_id0')
+
+        # Verify the exploration is at version 3.
+        exploration = exp_services.get_exploration_by_id('exp_id0')
+        self.assertEqual(exploration.version, 3)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0')
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
+
+        # The answer should be matched to version 3 of the exploration.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0', exploration_version=3)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': None,
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'Continue',
+            'params': [],
+            'rule_spec_str': 'Default',
+            'answer_str': ''
+        }])
+        self.assertEqual(state_answers.exploration_id, 'exp_id0')
+        self.assertEqual(state_answers.exploration_version, 3)
+        self._verify_no_migration_validation_problems()
+
     def test_migrate_code_repl(self):
         state_name = 'Code Editor'
 
