@@ -44,7 +44,8 @@ oppia.controller('I18nFooter', [
   var preferencesDataUrl = '/preferenceshandler/data';
   var siteLanguageUrl = '/save_site_language';
   $scope.supportedSiteLanguages = {};
-  for (var index = 0; index < GLOBALS.SUPPORTED_SITE_LANGUAGES.length; index++) {
+  var numberOfLanguages = GLOBALS.SUPPORTED_SITE_LANGUAGES.length;
+  for (var index = 0; index < numberOfLanguages; index++) {
     $scope.supportedSiteLanguages[GLOBALS.SUPPORTED_SITE_LANGUAGES[index].id] =
     GLOBALS.SUPPORTED_SITE_LANGUAGES[index].text;
   }
