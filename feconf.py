@@ -434,9 +434,11 @@ FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 FEEDBACK_MESSAGE_EMAIL_HANDLER_URL = (
     '%s/email/batchfeedbackemailhandler' % TASKQUEUE_URL_PREFIX)
+FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
+FEEDBACK_THREAD_STATUS_CHANGE_EMAIL = (
+    '%s/email/feedbackthreadstatuschangeemailhandler' % TASKQUEUE_URL_PREFIX)
 INSTANT_FEEDBACK_EMAIL_HANDLER_URL = (
     '%s/email/instantfeedbackemailhandler' % TASKQUEUE_URL_PREFIX)
-FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 LIBRARY_INDEX_URL = '/library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
 LIBRARY_SEARCH_URL = '/search/find'

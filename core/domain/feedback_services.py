@@ -124,14 +124,9 @@ def create_message(
             feconf.CAN_SEND_EMAILS and
             feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS):
             # send feedback message email if user is registered.
-        if old_status == new_status:
-            add_message_to_email_buffer(
-                author_id, exploration_id, thread_id, message_id, len(text),
-                False, None, None)
-        else:
-            add_message_to_email_buffer(
-                author_id, exploration_id, thread_id, message_id, len(text),
-                True, old_status, new_status)
+        _add_message_to_email_buffer(
+            author_id, exploration_id, thread_id, message_id, len(text),
+            old_status, new_status)
 
     if author_id:
         subscription_services.subscribe_to_thread(author_id, full_thread_id)
@@ -220,7 +215,7 @@ def create_suggestion(exploration_id, author_id, exploration_version,
         feedback_models.FeedbackThreadModel.generate_full_thread_id(
             exploration_id, thread_id))
     subscription_services.subscribe_to_thread(author_id, full_thread_id)
-    enqueue_suggestion_email_task(exploration_id, thread_id)
+    _enqueue_suggestion_email_task(exploration_id, thread_id)
 
 
 def _get_suggestion_from_model(suggestion_model):
@@ -309,24 +304,34 @@ def enqueue_feedback_message_batch_email_task(user_id):
         feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS)
 
 
-def enqueue_feedback_message_instant_email_task(
-        user_id, reference, status_changed, old_status, new_status):
+def enqueue_feedback_message_instant_email_task(user_id, reference):
     """Adds a 'send feedback email' (instant) task into the taskqueue."""
 
     payload = {
         'user_id': user_id,
         'reference': reference.to_dict()
     }
-    if status_changed:
-        payload['updated_status'] = {
-            'old_status': old_status,
-            'new_status': new_status
-        }
     taskqueue_services.enqueue_task(
         feconf.INSTANT_FEEDBACK_EMAIL_HANDLER_URL, payload, 0)
 
 
-def enqueue_suggestion_email_task(exploration_id, thread_id):
+def _enqueue_feedback_thread_status_change_email_task(
+        user_id, reference, old_status, new_status):
+    """Adds task for sending email when feedback thread status is changed."""
+
+    payload = {
+        'user_id': user_id,
+        'reference': reference.to_dict(),
+        'updated_status': {
+            'old_status': old_status,
+            'new_status': new_status
+        }
+    }
+    taskqueue_services.enqueue_task(
+        feconf.FEEDBACK_THREAD_STATUS_CHANGE_EMAIL, payload, 0)
+
+
+def _enqueue_suggestion_email_task(exploration_id, thread_id):
     """Adds a 'send suggestion email' task into taskqueue."""
 
     payload = {
@@ -459,7 +464,7 @@ def get_all_recipient_ids(exploration_id, thread_id, author_id):
     return (batch_recipient_ids, other_recipient_ids)
 
 
-def send_batch_emails(recipient_list, feedback_message_reference):
+def _send_batch_emails(recipient_list, feedback_message_reference):
     """send feedback message email in batch."""
     for recipient_id in recipient_list:
         recipient_preferences = (
@@ -470,9 +475,8 @@ def send_batch_emails(recipient_list, feedback_message_reference):
                 feedback_message_reference)
 
 
-def send_instant_emails(
-        recipient_list, feedback_message_reference, status_changed=False,
-        old_status=None, new_status=None):
+def _send_instant_emails(
+        recipient_list, feedback_message_reference):
     """send feedback message email instantly."""
     for recipient_id in recipient_list:
         recipient_preferences = (
@@ -480,13 +484,24 @@ def send_instant_emails(
         if recipient_preferences['can_receive_feedback_message_email']:
             transaction_services.run_in_transaction(
                 enqueue_feedback_message_instant_email_task, recipient_id,
-                feedback_message_reference, status_changed,
-                old_status, new_status)
+                feedback_message_reference)
 
 
-def add_message_to_email_buffer(
+def _send_feedback_thread_status_change_email(
+        recipient_list, feedback_message_reference, old_status, new_status):
+    """send email feedback thread status change."""
+    for recipient_id in recipient_list:
+        recipient_preferences = (
+            user_services.get_email_preferences(recipient_id))
+        if recipient_preferences['can_receive_feedback_message_email']:
+            transaction_services.run_in_transaction(
+                _enqueue_feedback_thread_status_change_email_task, recipient_id,
+                feedback_message_reference, old_status, new_status)
+
+
+def _add_message_to_email_buffer(
         author_id, exploration_id, thread_id, message_id, message_length,
-        status_changed, old_status, new_status):
+        old_status, new_status):
     """sends email of feedback message to all thread participants.
 
     sends email for new feedback message and change in status of thread.
@@ -505,14 +520,14 @@ def add_message_to_email_buffer(
     batch_recipient_ids, other_recipient_ids = (
         get_all_recipient_ids(exploration_id, thread_id, author_id))
 
-    if status_changed:
-        # send email for status change.
-        send_instant_emails(
+    if old_status != new_status:
+        # send email for feedback thread status change.
+        _send_feedback_thread_status_change_email(
             other_recipient_ids, feedback_message_reference,
-            status_changed=True, old_status=old_status, new_status=new_status)
+            old_status, new_status)
 
     if message_length > 0:
         # send feedback message email only if message text is non empty.
         # it can be empty in case when only status is changed.
-        send_batch_emails(batch_recipient_ids, feedback_message_reference)
-        send_instant_emails(other_recipient_ids, feedback_message_reference)
+        _send_batch_emails(batch_recipient_ids, feedback_message_reference)
+        _send_instant_emails(other_recipient_ids, feedback_message_reference)

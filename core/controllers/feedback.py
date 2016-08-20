@@ -291,6 +291,7 @@ class InstantFeedbackEmailHandler(base.BaseHandler):
         payload = json.loads(self.request.body)
         user_id = payload['user_id']
         reference = payload['reference']
+
         message = feedback_services.get_message(
             reference['exploration_id'], reference['thread_id'],
             reference['message_id'])
@@ -299,12 +300,32 @@ class InstantFeedbackEmailHandler(base.BaseHandler):
         thread = feedback_services.get_thread(
             reference['exploration_id'], reference['thread_id'])
 
-        if 'updated_status' in payload:
-            status_info = payload['updated_status']
-            text = 'changed status from %s to %s' % (
-                status_info['old_status'], status_info['new_status'])
-        else:
-            text = message.text
+        email_manager.send_instant_feedback_message_email(
+            user_id, message.author_id, message.text, exploration.title,
+            reference['exploration_id'], thread.subject)
+
+
+class FeedbackThreadStatusChangeEmailHandler(base.BaseHandler):
+    """Handles task of sending email instantly when feedback thread status is
+    changed."""
+
+    def post(self):
+        payload = json.loads(self.request.body)
+        user_id = payload['user_id']
+        reference = payload['reference']
+        status_info = payload['updated_status']
+
+        message = feedback_services.get_message(
+            reference['exploration_id'], reference['thread_id'],
+            reference['message_id'])
+        exploration = exp_services.get_exploration_by_id(
+            reference['exploration_id'])
+        thread = feedback_services.get_thread(
+            reference['exploration_id'], reference['thread_id'])
+
+        text = 'changed status from %s to %s' % (
+            status_info['old_status'], status_info['new_status'])
+
         email_manager.send_instant_feedback_message_email(
             user_id, message.author_id, text, exploration.title,
             reference['exploration_id'], thread.subject)
