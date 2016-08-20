@@ -183,10 +183,6 @@ class DashboardHandler(base.BaseHandler):
             new_feedback_messages_dict[exp_id] = []
             for feedback_message in new_feedback_messages[exp_id]:
                 message_dict = feedback_message.to_dict()
-                message_dict['created_on'] = (
-                    utils.get_time_in_millisecs(message_dict['created_on']))
-                message_dict['last_updated'] = (
-                    utils.get_time_in_millisecs(message_dict['last_updated']))
                 new_feedback_messages_dict[exp_id].append(message_dict)
 
         last_updates = (
