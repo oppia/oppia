@@ -695,14 +695,25 @@ SAME_TOPIC_SIMILARITY = 1.0
 
 # While adding another language, please ensure that the
 # languages are in alphabetical order
-SUPPORTED_SITE_LANGUAGES = {
-    'id': 'Bahasa Indonesia',
-    'en': 'English',
-    'es': 'Español',
-    'pt': 'Português',
-    'vi': 'Tiếng Việt',
-    'hi': 'हिन्दी',
-}
+SUPPORTED_SITE_LANGUAGES = [{
+    'id': 'id',
+    'text': 'Bahasa Indonesia'
+}, {
+    'id': 'en',
+    'text': 'English'
+}, {
+    'id': 'es',
+    'text': 'Español'
+}, {
+    'id': 'pt',
+    'text': 'Português'
+}, {
+    'id': 'vi',
+    'text': 'Tiếng Việt'
+}, {
+    'id': 'hi',
+    'text': 'हिन्दी'
+}]
 SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 

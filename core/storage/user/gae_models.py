@@ -60,7 +60,8 @@ class UserSettingsModel(base_models.BaseModel):
     # System language preference (for I18N).
     preferred_site_language_code = ndb.StringProperty(
         default=None,
-        choices=feconf.SUPPORTED_SITE_LANGUAGES.keys())
+        choices=[feconf.SUPPORTED_SITE_LANGUAGES[index].get('id')
+                 for index in range(len(feconf.SUPPORTED_SITE_LANGUAGES))])
 
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):
