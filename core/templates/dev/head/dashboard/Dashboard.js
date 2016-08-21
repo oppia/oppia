@@ -38,7 +38,9 @@ oppia.controller('Dashboard', [
       smText: 'Publish the exploration to receive statistics.'
     };
 
-    $scope.isDropdownOpen = {};
+    $scope.activeExplorationId = '';
+    // Keeps track of the sub-dropdown that is opened in the main exploration
+    // dropdown.
     $scope.statsDropdownOpened = {};
     $scope.EXPLORATION_DROPDOWN_STATS = EXPLORATION_DROPDOWN_STATS;
     $scope.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
@@ -64,10 +66,10 @@ oppia.controller('Dashboard', [
     $scope.openExploration = function(status, explorationId) {
       if (status === 'private') {
         $scope.showExplorationEditor(explorationId);
+      } else if ($scope.activeExplorationId === explorationId) {
+        $scope.activeExplorationId = '';
       } else {
-        var isOpen = !$scope.isDropdownOpen[explorationId];
-        $scope.isDropdownOpen = {};
-        $scope.isDropdownOpen[explorationId] = isOpen;
+        $scope.activeExplorationId = explorationId;
       }
     };
 
@@ -76,12 +78,12 @@ oppia.controller('Dashboard', [
       $scope.myExplorationsView = viewType;
     };
 
-    $scope.isMobileView = function() {
+    $scope.checkMobileView = function() {
       return ($window.innerWidth < 500);
     };
 
-    $scope.checkForMobileView = function() {
-      if ($scope.isMobileView()) {
+    $scope.updatesGivenScreenWidth = function() {
+      if ($scope.checkMobileView()) {
         $scope.myExplorationsView = 'card';
         $scope.publishText = EXP_PUBLISH_TEXTS.smText;
       } else {
@@ -89,19 +91,23 @@ oppia.controller('Dashboard', [
       }
     };
 
-    $scope.isDropdownOpenOnMobile = function(explorationId) {
-      if ($scope.isMobileView() && $scope.isDropdownOpen[explorationId]) {
+    $scope.activeExplorationIdOnMobile = function(explorationId) {
+      if ($scope.checkMobileView() &&
+          $scope.activeExplorationId === explorationId) {
         return true;
       }
       return false;
     };
 
-    $scope.checkForMobileView();
+    $scope.updatesGivenScreenWidth();
     angular.element($window).bind('resize', function() {
-      $scope.checkForMobileView();
+      $scope.updatesGivenScreenWidth();
     });
 
-    $scope.toggleDropdown = function(type, explorationId, event) {
+    // Used to toggle between the sub dropdowns that appear for displaying
+    // statistics within the main dropdown for an exploration. The argument
+    // 'type' can take values out of values of EXPLORATION_DROPDOWN_STATS.
+    $scope.toggleSubDropdown = function(type, explorationId, event) {
       event.stopPropagation();
       if (type === $scope.statsDropdownOpened[explorationId]) {
         $scope.statsDropdownOpened[explorationId] = '';
