@@ -469,8 +469,8 @@ def send_suggestion_email(
 
 
 def send_report_email(
-    exploration_title, exploration_id, reporter_id, report_type,
-    exploration_owner_ids):
+        exploration_title, exploration_id, reporter_id, report_type,
+        exploration_owner_ids):
     email_subject = 'New report for "%s"' % exploration_title
 
     email_body_template = (
@@ -495,17 +495,17 @@ def send_report_email(
 
     for exploration_owner_id in exploration_owner_ids:
         exploration_owner = exploration_owner + (
-            (user_services.get_user_settings(author_id)).username + ", ")
+            (user_services.get_user_settings(exploration_owner_id)).username + ", ")
 
     email_body = email_body_template % (
-                user_services.get_user_settings(author_id).username,
-                exploration_title, report_type, exploration_id,
-                exploration_title, exploration_owners, exploration_id,
-                exploration_title, EMAIL_FOOTER.value)
+        user_services.get_user_settings(reporter_id).username,
+        exploration_title, report_type, exploration_id,
+        exploration_title, exploration_owners, exploration_id,
+        exploration_title, EMAIL_FOOTER.value)
 
     recipient_list = config_domain.MODERATOR_IDS.value
     for recipient_id in recipient_list:
         _send_email(
-                recipient_id, feconf.SYSTEM_COMMITTER_ID,
-                feconf.EMAIL_INTENT_REPORT_NOTIFICATION,
-                email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+            recipient_id, feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_REPORT_NOTIFICATION,
+            email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
