@@ -23,7 +23,6 @@ from core.domain import config_domain
 from core.domain import html_cleaner
 from core.domain import rights_manager
 from core.domain import user_services
-from core.domain import config_domain
 from core.platform import models
 import feconf
 
@@ -493,14 +492,16 @@ def send_report_email(
         log_new_error('This app cannot send feedback message emails to users.')
         return
 
+    exploration_owner = " "    
     for exploration_owner_id in exploration_owner_ids:
         exploration_owner = exploration_owner + (
-            (user_services.get_user_settings(exploration_owner_id)).username + ", ")
+            (user_services.get_user_settings(
+                exploration_owner_id)).username + ", ")
 
     email_body = email_body_template % (
         user_services.get_user_settings(reporter_id).username,
         exploration_title, report_type, exploration_id,
-        exploration_title, exploration_owners, exploration_id,
+        exploration_title, exploration_owner, exploration_id,
         exploration_title, EMAIL_FOOTER.value)
 
     recipient_list = config_domain.MODERATOR_IDS.value
