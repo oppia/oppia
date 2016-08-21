@@ -60,8 +60,10 @@
              translate="I18N_DASHBOARD_MY_EXPLORATIONS">
           </a>
         </li>
-        {% if can_create_collections %}
+        {% if not can_create_collections %}
           <li ng-if="collectionsList.length == 0"></li>
+        {% endif %}
+        {% if can_create_collections %}
           <li ng-if="collectionsList.length > 0"
               ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myCollections'}">
             <a class="oppia-dashboard-tabs-text"
