@@ -492,7 +492,7 @@ def send_report_email(
         log_new_error('This app cannot send feedback message emails to users.')
         return
 
-    exploration_owner = " "    
+    exploration_owner = " "
     for exploration_owner_id in exploration_owner_ids:
         exploration_owner = exploration_owner + (
             (user_services.get_user_settings(
