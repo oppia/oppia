@@ -41,7 +41,7 @@ describe('Dashboard backend API service', function() {
         created_on_msec: 1466178691847.67,
         last_updated_msec: 1466178759209.839,
         status: 'public',
-        ratings: {
+        rating: {
           5: 0,
           4: 1,
           3: 0,
