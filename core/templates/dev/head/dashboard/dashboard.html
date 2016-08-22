@@ -197,7 +197,7 @@
       </div>
 
       <div ng-if="myExplorationsView === 'card' && explorationsList.length > 0"
-           style="margin-top: 8px; position: relative;">
+           class="oppia-card-view-wrap">
         <md-card ng-repeat="exploration in explorationsList | orderBy:sortByFunction:isCurrentSortDescending track by exploration.id"
                  class="oppia-activity-summary-tile oppia-dashboard-card-view-item"
                  ng-class="{'dropdown-open': activeExplorationId === exploration.id}"
@@ -226,50 +226,51 @@
                    ng-if="exploration.status !=='private' && activeExplorationId === exploration.id">
             <div class="stat-block">
               <div class="heading-text"
-                   ng-click="toggleSubDropdown(EXPLORATION_DROPDOWN_STATS.NEW_FEEDBACK, exploration.id, $event)">
+                   ng-click="toggleSubDropdown(EXPLORATION_DROPDOWN_STATS.NEW_FEEDBACK, $event)">
                 <[exploration.new_feedback.length]> Open Feedback
                 <span class="fa"
-                      ng-if="exploration.new_feedback.length !==0"
-                      ng-class="statsDropdownOpened[exploration.id] === EXPLORATION_DROPDOWN_STATS.NEW_FEEDBACK ? 'fa-caret-up': 'fa-caret-down'">
+                      ng-if="exploration.new_feedback.length !==0 && !checkMobileView()"
+                      ng-class="activeSubDropdown === EXPLORATION_DROPDOWN_STATS.NEW_FEEDBACK ? 'fa-caret-up': 'fa-caret-down'">
                 </span>
               </div>
               <div class="stat-block-values"
                    ng-if="exploration.new_feedback.length !==0"
-                   ng-show="statsDropdownOpened[exploration.id] === EXPLORATION_DROPDOWN_STATS.NEW_FEEDBACK">
+                   ng-show="activeSubDropdown === EXPLORATION_DROPDOWN_STATS.NEW_FEEDBACK || checkMobileView()">
                 <div ng-repeat="feedback in exploration.new_feedback">
-                  <[feedback.text]> (by <[feedback.author_username]>)
+                  <[feedback.text | truncate: 100]> (by <[feedback.author_username]>)
                 </div>
               </div>
             </div>
             <div class="stat-block">
               <div class="heading-text"
-                   ng-click="toggleSubDropdown(EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS, exploration.id, $event)">
+                   ng-if="!checkMobileView()"
+                   ng-click="toggleSubDropdown(EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS, $event)">
                 <[exploration.top_unresolved_answers.length]> Unresolved Answers from Users
                 <span class="fa"
-                      ng-if="exploration.top_unresolved_answers.length !== 0"
-                      ng-class="statsDropdownOpened[exploration.id] === EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS ? 'fa-caret-up': 'fa-caret-down'">
+                      ng-if="exploration.top_unresolved_answers.length !== 0 && !checkMobileView()"
+                      ng-class="activeSubDropdown === EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS ? 'fa-caret-up': 'fa-caret-down'">
                 </span>
               </div>
               <div class="stat-block-values"
                    ng-if="exploration.top_unresolved_answers.length !==0"
-                   ng-show="statsDropdownOpened[exploration.id] === EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS">
+                   ng-show="activeSubDropdown === EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS">
                 <div ng-repeat="answer in exploration.top_unresolved_answers">
-                  <[answer.value]> (<[answer.count]> instances in <[answer.state]>)
+                  <[answer.value | truncate: 100]> (<[answer.count]> instances in <[answer.state]>)
                 </div>
               </div>
             </div>
             <div class="stat-block">
               <div class="heading-text"
-                   ng-click="toggleSubDropdown(EXPLORATION_DROPDOWN_STATS.LAST_UPDATES, exploration.id, $event)">
+                   ng-click="toggleSubDropdown(EXPLORATION_DROPDOWN_STATS.LAST_UPDATES, $event)">
                 <[exploration.last_updates.length]> Updates Since You Last Updated
                 <span class="fa"
-                      ng-if="exploration.last_updates.length !==0"
-                      ng-class="statsDropdownOpened[exploration.id] === EXPLORATION_DROPDOWN_STATS.LAST_UPDATES ? 'fa-caret-up': 'fa-caret-down'">
+                      ng-if="exploration.last_updates.length !==0 && !checkMobileView()"
+                      ng-class="activeSubDropdown === EXPLORATION_DROPDOWN_STATS.LAST_UPDATES ? 'fa-caret-up': 'fa-caret-down'">
                 </span>
               </div>
               <div class="stat-block-values"
                    ng-if="exploration.last_updates.length !==0"
-                   ng-show="statsDropdownOpened[exploration.id] === EXPLORATION_DROPDOWN_STATS.LAST_UPDATES">
+                   ng-show="activeSubDropdown === EXPLORATION_DROPDOWN_STATS.LAST_UPDATES || checkMobileView()">
                 <div ng-repeat="update in exploration.last_updates">
                   <[update.commit_message]> (by <[update.username]>)
                 </div>

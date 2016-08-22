@@ -2276,6 +2276,7 @@ md-card.oppia-dashboard-tile {
   font-size: 0.9em;
   margin: 8px -18px -11px;
   padding: 10px 18px;
+  word-break: break-all;
 }
 
 .oppia-exp-dropdown-stats .open-in-editor-btn {
@@ -3740,6 +3741,11 @@ md-card.preview-conversation-skin-supplemental-card {
   font-size: 1.1em;
   font-weight: bold;
   padding: 5px 8px 4px 8px;
+}
+
+.oppia-card-view-wrap {
+  margin-top: 8px;
+  position: relative;
 }
 
 .oppia-dashboard-card-view-item {

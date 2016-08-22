@@ -61,7 +61,7 @@ oppia.controller('Dashboard', [
     $scope.activeExplorationId = '';
     // Keeps track of the sub-dropdown that is opened in the main exploration
     // dropdown.
-    $scope.statsDropdownOpened = {};
+    $scope.activeSubDropdown = '';
 
     $scope.EXPLORATION_DROPDOWN_STATS = EXPLORATION_DROPDOWN_STATS;
     $scope.EXPLORATIONS_SORT_BY_KEYS = EXPLORATIONS_SORT_BY_KEYS;
@@ -91,10 +91,10 @@ oppia.controller('Dashboard', [
     $scope.openExploration = function(status, explorationId) {
       if (status === 'private') {
         $scope.showExplorationEditor(explorationId);
-      } else if ($scope.activeExplorationId === explorationId) {
-        $scope.activeExplorationId = '';
       } else {
-        $scope.activeExplorationId = explorationId;
+        $scope.activeSubDropdown = '';
+        $scope.activeExplorationId = (
+          ($scope.activeExplorationId === explorationId) ? '' : explorationId);
       }
     };
 
@@ -117,11 +117,8 @@ oppia.controller('Dashboard', [
     };
 
     $scope.activeExplorationIdOnMobile = function(explorationId) {
-      if ($scope.checkMobileView() &&
-          $scope.activeExplorationId === explorationId) {
-        return true;
-      }
-      return false;
+      return ($scope.checkMobileView() &&
+              $scope.activeExplorationId === explorationId);
     };
 
     $scope.updatesGivenScreenWidth();
@@ -132,13 +129,10 @@ oppia.controller('Dashboard', [
     // Used to toggle between the sub dropdowns that appear for displaying
     // statistics within the main dropdown for an exploration. The argument
     // 'type' can take values out of values of EXPLORATION_DROPDOWN_STATS.
-    $scope.toggleSubDropdown = function(type, explorationId, event) {
+    $scope.toggleSubDropdown = function(type, event) {
       event.stopPropagation();
-      if (type === $scope.statsDropdownOpened[explorationId]) {
-        $scope.statsDropdownOpened[explorationId] = '';
-      } else {
-        $scope.statsDropdownOpened[explorationId] = type;
-      }
+      $scope.activeSubDropdown = (
+        (type === $scope.activeSubDropdown) ? '' : type);
     };
 
     $scope.setExplorationsSortingOptions = function(sortType) {
