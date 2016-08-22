@@ -1053,7 +1053,6 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.GenericTestBase):
                 messages[0].body.decode(),
                 expected_email_text_body)
 
-
     def test_that_emails_are_sent_for_both_status_change_and_message(self):
         expected_email_html_body_message = (
             'Hi newuser,<br><br>'

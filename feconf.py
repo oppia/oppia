@@ -435,7 +435,7 @@ FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 FEEDBACK_MESSAGE_EMAIL_HANDLER_URL = (
     '%s/email/batchfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX)
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
-FEEDBACK_THREAD_STATUS_CHANGE_EMAIL = (
+FEEDBACK_STATUS_EMAIL_HANDLER_URL = (
     '%s/email/feedbackthreadstatuschangeemailhandler' % TASKQUEUE_URL_PREFIX)
 INSTANT_FEEDBACK_EMAIL_HANDLER_URL = (
     '%s/email/instantfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX)

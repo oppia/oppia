@@ -38,7 +38,7 @@ URLS = [
         feedback.InstantFeedbackMessageEmailHandler,
         'instant_feedback_message_email_handler'),
     main.get_redirect_route(
-        r'%s' % feconf.FEEDBACK_THREAD_STATUS_CHANGE_EMAIL,
+        r'%s' % feconf.FEEDBACK_STATUS_EMAIL_HANDLER_URL,
         feedback.FeedbackThreadStatusChangeEmailHandler,
         'feedback_thread_status_change_email_handler'),
 ]

@@ -326,7 +326,7 @@ def _enqueue_feedback_thread_status_change_email_task(
         'new_status': new_status
     }
     taskqueue_services.enqueue_task(
-        feconf.FEEDBACK_THREAD_STATUS_CHANGE_EMAIL, payload, 0)
+        feconf.FEEDBACK_STATUS_EMAIL_HANDLER_URL, payload, 0)
 
 
 def _enqueue_suggestion_email_task(exploration_id, thread_id):
@@ -509,7 +509,7 @@ def _add_message_to_email_buffer(
         exploration_id: id of exploration that received new message.
         thread_id: id of thread that received new message.
         message_id: id of new message.
-        status_changed: True if thread status is changed else False.
+        message_length: length of the feedback message to be sent.
         old_status: value of old thread status.
         new_status: value of new thread status.
     """
@@ -519,13 +519,13 @@ def _add_message_to_email_buffer(
         _get_all_recipient_ids(exploration_id, thread_id, author_id))
 
     if old_status != new_status:
-        # send email for feedback thread status change.
+        # Send email for feedback thread status change.
         _send_feedback_thread_status_change_emails(
             other_recipient_ids, feedback_message_reference,
             old_status, new_status)
 
     if message_length > 0:
-        # send feedback message email only if message text is non empty.
-        # it can be empty in case when only status is changed.
+        # Send feedback message email only if message text is non empty.
+        # It can be empty in the case when only status is changed.
         _send_batch_emails(batch_recipient_ids, feedback_message_reference)
         _send_instant_emails(other_recipient_ids, feedback_message_reference)
