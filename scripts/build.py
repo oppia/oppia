@@ -28,7 +28,7 @@ REMOVE_WS = re.compile(r'\s{2,}').sub
 YUICOMPRESSOR_DIR = os.path.join(
     '..', 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar')
 
-FILE_EXTENSIONS_TO_COPY_WITHOUT_MINIFICATION = ['.json', '.png']
+FILE_EXTENSIONS_TO_IGNORE = ['.py']
 
 
 def _minify(source_path, target_path):
@@ -106,13 +106,14 @@ def copy_files_source_to_target(source, target):
             shutil.copyfile(source_path, target_path)
 
 
-def build_files(source, target, ignore):
+def build_files(source, target, copy_without_minification):
     """Minifies all css and js files, and removes whitespace from html in source
-    directory and copies it to target, ignoring paths/files mentioned in ignore.
-    Copies files in ignore to target without any changes.
+    directory and copies it to target.
+    Copies files in copy_without_minification to target without any changes.
     Arguments:
         source, target: strings
-        ignore: list of files/paths to ignore
+        copy_without_minification: list of files/paths to copy without
+            minification
     """
     print 'Processing %s' % os.path.join(os.getcwd(), source)
     print 'Generating into %s' % os.path.join(os.getcwd(), target)
@@ -130,11 +131,13 @@ def build_files(source, target, ignore):
                 continue
             target_path = source_path.replace(source, target)
 
-            # Only copy files in ignore or with extensions mentioned in
-            # FILE_EXTENSIONS_TO_COPY_WITHOUT_MINIFICATION variable.
-            file_patterns_to_ignore = (
-                ignore + FILE_EXTENSIONS_TO_COPY_WITHOUT_MINIFICATION)
-            if any(p in source_path for p in file_patterns_to_ignore):
+            # Ignore files with certain extensions
+            if any(p in source_path for p in FILE_EXTENSIONS_TO_IGNORE):
+                continue
+            # Copy files in copy_without_minification or with extensions other
+            # than html, css and js directly.
+            if (any(p in source_path for p in copy_without_minification) or
+                    any(p not in source_path for p in ['html', 'css', 'js'])):
                 ensure_directory_exists(target_path)
                 shutil.copyfile(source_path, target_path)
                 continue
@@ -180,10 +183,10 @@ if __name__ == '__main__':
     EXTENSIONS_SRC_DIR = os.path.join('extensions', '')
     EXTENSIONS_OUT_DIR = os.path.join(BUILD_DIR, 'extensions', '')
     # Certain files' syntax become incorrect after minification and hence
-    # they are ignored.
-    IGNORE_PATHS = [os.path.join('extensions', 'interactions',
-                                 'LogicProof', 'static', 'js')]
-    build_files(EXTENSIONS_SRC_DIR, EXTENSIONS_OUT_DIR, IGNORE_PATHS)
+    # they are copied without minification.
+    COPY_WITHOUT_MINIFICATION = [os.path.join('extensions', 'interactions',
+                                              'LogicProof', 'static', 'js')]
+    build_files(EXTENSIONS_SRC_DIR, EXTENSIONS_OUT_DIR, COPY_WITHOUT_MINIFICATION)
 
     TEMPLATES_HEAD_DIR = os.path.join('core', 'templates', 'dev', 'head', '')
     TEMPLATES_OUT_DIR = os.path.join('core', 'templates', 'prod', 'head', '')
