@@ -309,7 +309,7 @@ def enqueue_feedback_message_instant_email_task(user_id, reference):
 
     payload = {
         'user_id': user_id,
-        'reference': reference.to_dict()
+        'reference_dict': reference.to_dict()
     }
     taskqueue_services.enqueue_task(
         feconf.INSTANT_FEEDBACK_EMAIL_HANDLER_URL, payload, 0)
@@ -321,11 +321,9 @@ def _enqueue_feedback_thread_status_change_email_task(
 
     payload = {
         'user_id': user_id,
-        'reference': reference.to_dict(),
-        'updated_status': {
-            'old_status': old_status,
-            'new_status': new_status
-        }
+        'reference_dict': reference.to_dict(),
+        'old_status': old_status,
+        'new_status': new_status
     }
     taskqueue_services.enqueue_task(
         feconf.FEEDBACK_THREAD_STATUS_CHANGE_EMAIL, payload, 0)
@@ -447,7 +445,7 @@ def clear_feedback_message_references(user_id, exploration_id, thread_id):
         model.put()
 
 
-def get_all_recipient_ids(exploration_id, thread_id, author_id):
+def _get_all_recipient_ids(exploration_id, thread_id, author_id):
     """Fetches all valid recipient ids from exploration and thread.
 
     Returns a tuple with batch_recipients and other_recipients.
@@ -487,7 +485,7 @@ def _send_instant_emails(
                 feedback_message_reference)
 
 
-def _send_feedback_thread_status_change_email(
+def _send_feedback_thread_status_change_emails(
         recipient_list, feedback_message_reference, old_status, new_status):
     """send email feedback thread status change."""
     for recipient_id in recipient_list:
@@ -518,11 +516,11 @@ def _add_message_to_email_buffer(
     feedback_message_reference = feedback_domain.FeedbackMessageReference(
         exploration_id, thread_id, message_id)
     batch_recipient_ids, other_recipient_ids = (
-        get_all_recipient_ids(exploration_id, thread_id, author_id))
+        _get_all_recipient_ids(exploration_id, thread_id, author_id))
 
     if old_status != new_status:
         # send email for feedback thread status change.
-        _send_feedback_thread_status_change_email(
+        _send_feedback_thread_status_change_emails(
             other_recipient_ids, feedback_message_reference,
             old_status, new_status)
 

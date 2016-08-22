@@ -1264,7 +1264,7 @@ class FeedbackMessageInstantEmailTests(test_utils.GenericTestBase):
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
 
-    def test_that_suggestion_emails_are_correct(self):
+    def test_that_feedback_message_emails_are_correct(self):
         expected_email_subject = 'New Oppia message in "a subject"'
 
         expected_email_html_body = (
@@ -1296,7 +1296,8 @@ class FeedbackMessageInstantEmailTests(test_utils.GenericTestBase):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             email_manager.send_instant_feedback_message_email(
                 self.new_user_id, self.editor_id, 'editor message',
-                self.exploration.title, self.exploration.id, 'a subject')
+                'New Oppia message in "a subject"', self.exploration.title,
+                self.exploration.id, 'a subject')
 
             # make sure correct email is sent.
             messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)

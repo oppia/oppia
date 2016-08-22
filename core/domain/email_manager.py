@@ -468,9 +468,8 @@ def send_suggestion_email(
 
 
 def send_instant_feedback_message_email(
-        recipient_id, sender_id, message, exploration_title, exploration_id,
-        thread_title):
-    email_subject_template = 'New Oppia message in "%s"'
+        recipient_id, sender_id, message, email_subject, exploration_title,
+        exploration_id, thread_title):
 
     email_body_template = (
         'Hi %s,<br><br>'
@@ -500,7 +499,6 @@ def send_instant_feedback_message_email(
             recipient_settings.username, thread_title, exploration_id,
             exploration_title, sender_settings.username, message,
             EMAIL_FOOTER.value)
-        email_subject = email_subject_template % (thread_title)
         _send_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION, email_subject,

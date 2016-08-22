@@ -284,25 +284,26 @@ class SuggestionEmailHandler(base.BaseHandler):
             exploration_rights.owner_ids)
 
 
-class InstantFeedbackEmailHandler(base.BaseHandler):
+class InstantFeedbackMessageEmailHandler(base.BaseHandler):
     """Handles task of sending feedback message emails instantly."""
 
     def post(self):
         payload = json.loads(self.request.body)
         user_id = payload['user_id']
-        reference = payload['reference']
+        reference_dict = payload['reference_dict']
 
         message = feedback_services.get_message(
-            reference['exploration_id'], reference['thread_id'],
-            reference['message_id'])
+            reference_dict['exploration_id'], reference_dict['thread_id'],
+            reference_dict['message_id'])
         exploration = exp_services.get_exploration_by_id(
-            reference['exploration_id'])
+            reference_dict['exploration_id'])
         thread = feedback_services.get_thread(
-            reference['exploration_id'], reference['thread_id'])
+            reference_dict['exploration_id'], reference_dict['thread_id'])
 
+        subject = 'New Oppia message in "%s"' % thread.subject
         email_manager.send_instant_feedback_message_email(
-            user_id, message.author_id, message.text, exploration.title,
-            reference['exploration_id'], thread.subject)
+            user_id, message.author_id, message.text, subject,
+            exploration.title, reference_dict['exploration_id'], thread.subject)
 
 
 class FeedbackThreadStatusChangeEmailHandler(base.BaseHandler):
@@ -312,20 +313,20 @@ class FeedbackThreadStatusChangeEmailHandler(base.BaseHandler):
     def post(self):
         payload = json.loads(self.request.body)
         user_id = payload['user_id']
-        reference = payload['reference']
-        status_info = payload['updated_status']
+        reference_dict = payload['reference_dict']
+        old_status = payload['old_status']
+        new_status = payload['new_status']
 
         message = feedback_services.get_message(
-            reference['exploration_id'], reference['thread_id'],
-            reference['message_id'])
+            reference_dict['exploration_id'], reference_dict['thread_id'],
+            reference_dict['message_id'])
         exploration = exp_services.get_exploration_by_id(
-            reference['exploration_id'])
+            reference_dict['exploration_id'])
         thread = feedback_services.get_thread(
-            reference['exploration_id'], reference['thread_id'])
+            reference_dict['exploration_id'], reference_dict['thread_id'])
 
-        text = 'changed status from %s to %s' % (
-            status_info['old_status'], status_info['new_status'])
-
+        text = 'changed status from %s to %s' % (old_status, new_status)
+        subject = 'Oppia thread status change: "%s"' % thread.subject
         email_manager.send_instant_feedback_message_email(
-            user_id, message.author_id, text, exploration.title,
-            reference['exploration_id'], thread.subject)
+            user_id, message.author_id, text, subject, exploration.title,
+            reference_dict['exploration_id'], thread.subject)
