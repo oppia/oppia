@@ -106,14 +106,11 @@ def copy_files_source_to_target(source, target):
             shutil.copyfile(source_path, target_path)
 
 
-def build_files(source, target, copy_without_minification):
+def build_files(source, target):
     """Minifies all css and js files, and removes whitespace from html in source
     directory and copies it to target.
-    Copies files in copy_without_minification to target without any changes.
     Arguments:
         source, target: strings
-        copy_without_minification: list of files/paths to copy without
-            minification
     """
     print 'Processing %s' % os.path.join(os.getcwd(), source)
     print 'Generating into %s' % os.path.join(os.getcwd(), target)
@@ -132,23 +129,18 @@ def build_files(source, target, copy_without_minification):
             target_path = source_path.replace(source, target)
 
             # Ignore files with certain extensions
-            if any(p in source_path for p in FILE_EXTENSIONS_TO_IGNORE):
-                continue
-            # Copy files in copy_without_minification or with extensions other
-            # than html, css and js directly.
-            if (any(p in source_path for p in copy_without_minification) or
-                    any(p not in source_path for p in ['html', 'css', 'js'])):
-                ensure_directory_exists(target_path)
-                shutil.copyfile(source_path, target_path)
+            if any(source_path.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
                 continue
 
             if filename.endswith('.html'):
                 process_html(source_path, target_path)
-            if filename.endswith('.css'):
+            elif filename.endswith('.css'):
                 process_css(source_path, target_path)
-            if filename.endswith('.js'):
+            elif filename.endswith('.js'):
                 process_js(source_path, target_path)
-
+            else:
+                ensure_directory_exists(target_path)
+                shutil.copyfile(source_path, target_path)
 
 def get_cache_slug():
     """Returns the cache slug read from file."""
@@ -182,15 +174,11 @@ if __name__ == '__main__':
     # build/[cache_slug]/extensions
     EXTENSIONS_SRC_DIR = os.path.join('extensions', '')
     EXTENSIONS_OUT_DIR = os.path.join(BUILD_DIR, 'extensions', '')
-    # Certain files' syntax become incorrect after minification and hence
-    # they are copied without minification.
-    COPY_WITHOUT_MINIFICATION = [os.path.join('extensions', 'interactions',
-                                              'LogicProof', 'static', 'js')]
-    build_files(EXTENSIONS_SRC_DIR, EXTENSIONS_OUT_DIR, COPY_WITHOUT_MINIFICATION)
+    build_files(EXTENSIONS_SRC_DIR, EXTENSIONS_OUT_DIR)
 
     TEMPLATES_HEAD_DIR = os.path.join('core', 'templates', 'dev', 'head', '')
     TEMPLATES_OUT_DIR = os.path.join('core', 'templates', 'prod', 'head', '')
-    build_files(TEMPLATES_HEAD_DIR, TEMPLATES_OUT_DIR, [])
+    build_files(TEMPLATES_HEAD_DIR, TEMPLATES_OUT_DIR)
 
     # Process core/templates/prod/head/css, copy it to build/[cache_slug]/css
     CSS_SRC_DIR = os.path.join('core', 'templates', 'prod', 'head', 'css', '')
