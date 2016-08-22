@@ -85,6 +85,7 @@ def strip_html_tags(html):
     """Strips all HTML markup from an HTML string."""
     return bleach.clean(html, tags=[], attributes={}, strip=True)
 
+
 def textangular_to_ckeditor(content):
     # Wrapping div serves as a parent to everything else.
     content = '<div>' + content + '</div>'
@@ -122,6 +123,16 @@ def textangular_to_ckeditor(content):
     # Replace all spans with whatever is inside them.
     for span in soup.find_all('span'):
         span.unwrap()
+
+    for br in soup.find_all('br'):
+        if br.contents:
+            # This happens in <pre> blocks, we want to replace br
+            # with newlines.
+            br.insert_before('\n')
+            br.unwrap()
+        else:
+            # In all other cases, just replace with whitespace.
+            br.replace_with(u'\xa0')
 
     # Remove the wrapping div
     soup.div.unwrap()
