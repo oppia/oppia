@@ -1158,22 +1158,23 @@ textarea {
   border-bottom: 1px solid #eee;
   display: flex;
   flex-wrap: wrap;
+  margin-bottom: 0;
   padding-left: 0;
   text-align: center;
-  margin-bottom: 0;
 }
 .oppia-dashboard-tabs li {
   display: flex;
   margin-bottom: 0;
   width: 200px;
 }
+
 .oppia-dashboard-tabs-active .oppia-dashboard-tabs-text {
-  margin-left: 7.5px;
   border-bottom: 4px solid #009688;
   color: #009688;
+  margin-left: 7.5px;
 }
-.oppia-dashboard-tabs-text {
-  border-bottom: none;
+
+.oppia-dashboard-tabs .oppia-dashboard-tabs-text {
   color: #009688;
   font-size: 1em;
   padding: 10px;
@@ -1181,11 +1182,12 @@ textarea {
   text-transform: uppercase;
   width: 100%;
 }
-.oppia-dashboard-tabs-text:hover,
-.oppia-dashboard-tabs-text:focus {
-  color: #009688;
+
+.oppia-dashboard-tabs .oppia-dashboard-tabs-text:hover,
+.oppia-dashboard-tabs .oppia-dashboard-tabs-text:focus {
   text-decoration: none;
 }
+
 .oppia-dashboard-empty-text {
   padding-top: 50px;
 }
@@ -1219,6 +1221,35 @@ textarea {
 .list-card-view-toggle .dashboard-active-view {
   background: #009688;
   color: #fff;
+}
+
+li.sort-explorations-select {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: auto;
+}
+
+li.sort-explorations-select .sort-by-text,
+li.sort-explorations-select .sort-options,
+li.sort-explorations-select .sort-order {
+  display: inline-block;
+}
+
+li.sort-explorations-select .sort-by-text {
+  margin: 8px 8px 0 ;
+}
+
+li.sort-explorations-select .sort-options {
+  background: #fff;
+  border-color: #ddd;
+  height: 32px;
+  margin: 7px 7px 0 0;
+}
+
+li.sort-explorations-select .sort-order {
+  cursor: pointer;
+  margin: 14px 8px 0 0;
 }
 
 /* Rules for the tiles in the creator dashboard. */
@@ -2176,6 +2207,10 @@ md-card.oppia-dashboard-tile {
 .oppia-dashboard-table tr:first-child {
   border-bottom: 2px solid #ccc;
   color: #555;
+}
+
+.oppia-dashboard-table .oppia-dashboard-table-headings p {
+  display: inline;
 }
 
 .oppia-dashboard-table th {
@@ -3703,6 +3738,19 @@ md-card.preview-conversation-skin-supplemental-card {
   .oppia-dashboard-container {
     padding-left: 10px;
     padding-right: 10px;
+  }
+
+  .oppia-dashboard-container .oppia-dashboard-tabs {
+    justify-content: center;
+  }
+
+  .oppia-dashboard-container .oppia-dashboard-tabs li {
+    width: auto;
+  }
+
+  .oppia-dashboard-container .oppia-dashboard-tabs .sort-explorations-select {
+    margin-top: 8px;
+    width: 100%;
   }
 
   .oppia-dashboard-container .oppia-dashboard-tabs .list-card-view-toggle,

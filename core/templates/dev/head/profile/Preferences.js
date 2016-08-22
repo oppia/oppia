@@ -18,10 +18,10 @@
 
 oppia.controller('Preferences', [
   '$scope', '$http', '$rootScope', '$modal', '$timeout', '$translate',
-  'alertsService', 'UrlInterpolationService',
+  'alertsService', 'UrlInterpolationService', 'utilsService',
   function(
       $scope, $http, $rootScope, $modal, $timeout, $translate, alertsService,
-      UrlInterpolationService) {
+      UrlInterpolationService, utilsService) {
     var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
     $rootScope.loadingMessage = 'Loading';
     $scope.profilePictureDataUrl = '';
@@ -59,7 +59,7 @@ oppia.controller('Preferences', [
 
       if (subjectInterests instanceof Array) {
         for (var i = 0; i < subjectInterests.length; i++) {
-          if (typeof subjectInterests[i] === 'string') {
+          if (utilsService.isString(subjectInterests[i])) {
             if (!TAG_REGEX.test(subjectInterests[i])) {
               $scope.subjectInterestsWarningText = (
                 'Subject interests should use only lowercase letters.');
