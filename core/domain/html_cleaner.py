@@ -87,6 +87,7 @@ def strip_html_tags(html):
 
 
 def textangular_to_ckeditor(content):
+    '''Converts rte content from textAngular format to CkEditor format.'''
     # Wrapping div serves as a parent to everything else.
     content = '<div>' + content + '</div>'
     soup = BeautifulSoup(content, 'html.parser')
@@ -137,3 +138,29 @@ def textangular_to_ckeditor(content):
     # Remove the wrapping div
     soup.div.unwrap()
     return soup.encode_contents(formatter='html')
+
+
+def verify_for_ckeditor(content):
+    '''Verifies that content matches expected CKEditor format.'''
+    soup = BeautifulSoup(content, 'html.parser')
+
+    assert len(soup.find_all('br')) == 0, 'Contains <br> tags.'
+    assert len(soup.find_all('b')) == 0, \
+        'Contains <b> tags (should be <strong>).'
+    assert len(soup.find_all('i')) == 0, 'Contains <i> tags (should be <em>).'
+    assert len(soup.find_all('span')) == 0, \
+        'Contains <span> tags (should be removed).'
+
+    valid_parent_names = set(['li', 'blockquote', 'pre', '[document]'])
+    invalid_ancestor_names = set(['p'])
+    components_names = ['image', 'collapsible', 'tabs']
+    tag_names = ['oppia-noninteractive-' + component_name
+                 for component_name in components_names]
+
+    for component in soup.find_all(tag_names):
+        assert component.parent.name in valid_parent_names, \
+            'Block component parent %s is not valid' % component.parent.name
+        ancestor_names = set([el.name for el in component.parents])
+        assert invalid_ancestor_names.isdisjoint(ancestor_names), \
+            'Block component has invalid ancestor(s): %s' % \
+            invalid_ancestor_names.intersection(ancestor_names)
