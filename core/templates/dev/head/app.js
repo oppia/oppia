@@ -617,6 +617,7 @@ oppia.factory('extensionTagAssemblerService', [
           $filter('camelCaseToHyphens')(caSpecName) + '-with-value',
           oppiaHtmlEscaper.objToEscapedJson(caSpecValue));
       }
+      element.attr('on-submit', 'submitAnswer(answer, rulesService);');
       return element;
     }
   };
