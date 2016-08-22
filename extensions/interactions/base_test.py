@@ -277,6 +277,16 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self.assertIn(
                 '%s id="response/%s"' % (directive_prefix, interaction_id),
                 html_file_content)
+            # Check that the html template includes js script for the
+            # interaction.
+            self.assertIn(
+                '<script src="{{cache_slug}}/extensions/interactions/%s/%s.js">'
+                '</script>' % (interaction_id, interaction_id),
+                html_file_content)
+            self.assertIn(
+                '<script src="{{cache_slug}}/extensions/interactions/%s/'
+                'validator.js"></script>' % interaction_id,
+                html_file_content)
             self.assertNotIn('<script>', js_file_content)
             self.assertNotIn('</script>', js_file_content)
             self.assertIn(
