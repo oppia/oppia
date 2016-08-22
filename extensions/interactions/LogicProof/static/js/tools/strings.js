@@ -21,7 +21,7 @@ var DEFAULT_VOCABULARY = {
   arbitrary: ['was arbitrary', 'is arbitrary'],
   take: ['take'],
   satisfying: ['satisfying', 'such that'],
-  if: ['if'],
+  "if": ['if'],
   given: ['given'],
   contradiction: ['contradiction'],
   at: ['at']
