@@ -16,7 +16,9 @@ oppia.directive('oppiaInteractiveLogicProof', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        onSubmit: '&'
+      },
       templateUrl: 'interaction/LogicProof',
       controller: ['$scope', '$attrs', '$modal', 'logicProofRulesService',
           function($scope, $attrs, $modal, logicProofRulesService) {
@@ -226,7 +228,10 @@ oppia.directive('oppiaInteractiveLogicProof', [
             submission.displayed_proof = $scope.displayProof(
               $scope.proofString);
           }
-          $scope.$parent.submitAnswer(submission, logicProofRulesService);
+          $scope.onSubmit({
+            answer: submission,
+            rulesService: logicProofRulesService
+          });
         };
 
         $scope.showHelp = function() {
