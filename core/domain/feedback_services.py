@@ -218,8 +218,7 @@ def create_suggestion(exploration_id, author_id, exploration_version,
     _enqueue_suggestion_email_task(exploration_id, thread_id)
 
 
-def create_report(exploration_id, reporter_id, state_name,
-                  report_type):
+def create_report(exploration_id, report_type):
     """Enqueues report emails"""
 
     enqueue_report_email_task(exploration_id, report_type)

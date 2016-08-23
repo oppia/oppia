@@ -153,8 +153,6 @@ class ReportHandler(base.BaseHandler):
     def post(self, exploration_id):
         feedback_services.create_report(
             exploration_id,
-            self.user_id,
-            self.payload.get('state_name'),
             self.payload.get('report_type'))
         self.render_json(self.values)
 
