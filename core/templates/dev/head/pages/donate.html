@@ -76,7 +76,7 @@
         <h2 style="color: #fff; font-size: 20px; margin-bottom: 20px; margin-top: 20px;">
           Your generous gift funds:</h2>
         <div style="margin-bottom: 16px; text-align: center;">
-          <img src="assets/images/general/opp_donate_text.png">
+          <img ng-src="<[donateImgUrl]>">
         </div>
       </div>
     </div>
@@ -85,9 +85,7 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script>
-    {{ include_js_file('pages/Donate.js') }}
-  </script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/Donate.js"></script>
 {% endblock footer_js %}
 
 {% block footer%}

@@ -18,7 +18,6 @@
 
 import datetime
 import imghdr
-import json
 import logging
 
 import jinja2
@@ -193,9 +192,6 @@ class ExplorationPage(EditorHandler):
             rte_component_registry.Registry.get_html_for_all_components() +
             interaction_registry.Registry.get_interaction_html(
                 interaction_ids))
-        interaction_validators_html = (
-            interaction_registry.Registry.get_validators_html(
-                interaction_ids))
 
         gadget_types = gadget_registry.Registry.get_all_gadget_types()
         gadget_templates = (
@@ -235,8 +231,6 @@ class ExplorationPage(EditorHandler):
             'gadget_templates': jinja2.utils.Markup(gadget_templates),
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
-            'interaction_validators_html': jinja2.utils.Markup(
-                interaction_validators_html),
             'meta_description': feconf.CREATE_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_CREATE,
             'value_generators_js': jinja2.utils.Markup(
@@ -699,11 +693,11 @@ class StateYamlHandler(EditorHandler):
     layer.
     """
 
-    def get(self):
-        """Handles GET requests."""
+    def post(self):
+        """Handles POST requests."""
         try:
-            state_dict = json.loads(self.request.get('stringified_state'))
-            width = json.loads(self.request.get('stringified_width'))
+            state_dict = self.payload.get('state_dict')
+            width = self.payload.get('width')
         except Exception:
             raise self.PageNotFoundException
 

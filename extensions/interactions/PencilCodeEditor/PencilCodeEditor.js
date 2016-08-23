@@ -24,7 +24,9 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        onSubmit: '&'
+      },
       templateUrl: 'interaction/PencilCodeEditor',
       controller: [
         '$scope', '$attrs', '$element', '$timeout', 'focusService',
@@ -103,12 +105,15 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
               console.log('------');
 
               hasSubmittedAnswer = true;
-              $scope.$parent.submitAnswer({
-                code: normalizedCode,
-                output: output || '',
-                evaluation: '',
-                error: ''
-              }, pencilCodeEditorRulesService);
+              $scope.onSubmit({
+                answer: {
+                  code: normalizedCode,
+                  output: output || '',
+                  evaluation: '',
+                  error: ''
+                },
+                rulesService: pencilCodeEditorRulesService
+              });
             }, true);
           });
 
@@ -201,6 +206,13 @@ oppia.factory('pencilCodeEditorRulesService', [
       var normalizedOutput = $filter('normalizeWhitespace')(answer.output);
       var normalizedExpectedOutput =
         $filter('normalizeWhitespace')(inputs.x);
+      return normalizedOutput === normalizedExpectedOutput;
+    },
+    OutputRoughlyEquals: function(answer, inputs) {
+      var normalizedOutput = $filter(
+        'normalizeWhitespacePunctuationAndCase')(answer.output);
+      var normalizedExpectedOutput =
+        $filter('normalizeWhitespacePunctuationAndCase')(inputs.x);
       return normalizedOutput === normalizedExpectedOutput;
     },
     ResultsInError: function(answer) {

@@ -36,7 +36,6 @@ oppia.controller('ExplorationEditor', [
   'explorationWarningsService', '$templateCache', 'explorationContextService',
   'explorationAdvancedFeaturesService', '$modal', 'changeListService',
   'autosaveInfoModalsService', 'siteAnalyticsService',
-  'editorFirstTimeEventsService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       explorationData, editorContextService, explorationTitleService,
@@ -48,8 +47,7 @@ oppia.controller('ExplorationEditor', [
       explorationParamSpecsService, explorationParamChangesService,
       explorationWarningsService, $templateCache, explorationContextService,
       explorationAdvancedFeaturesService, $modal, changeListService,
-      autosaveInfoModalsService, siteAnalyticsService,
-      editorFirstTimeEventsService) {
+      autosaveInfoModalsService, siteAnalyticsService) {
     $scope.editabilityService = editabilityService;
     $scope.editorContextService = editorContextService;
 
@@ -177,7 +175,7 @@ oppia.controller('ExplorationEditor', [
         }
 
         stateEditorTutorialFirstTimeService.init(
-          data.show_state_editor_tutorial_on_load);
+          data.show_state_editor_tutorial_on_load, $scope.explorationId);
       });
     };
 
@@ -186,8 +184,6 @@ oppia.controller('ExplorationEditor', [
     $scope.$on('initExplorationPage', function(unusedEvtData, successCallback) {
       $scope.initExplorationPage(successCallback);
     });
-
-    editorFirstTimeEventsService.initRegisterEvents($scope.explorationId);
 
     var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
     var _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
@@ -713,7 +709,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       if (additionalMetadataNeeded) {
         $modal.open({
           templateUrl: 'modals/addExplorationMetadata',
-          backdrop: true,
+          backdrop: 'static',
           controller: [
             '$scope', '$modalInstance', 'explorationObjectiveService',
             'explorationTitleService', 'explorationCategoryService',
@@ -729,6 +725,9 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               $scope.explorationLanguageCodeService = (
                 explorationLanguageCodeService);
               $scope.explorationTagsService = explorationTagsService;
+
+              $scope.objectiveHasBeenPreviouslyEdited = (
+                explorationObjectiveService.savedMemento.length > 0);
 
               $scope.requireTitleToBeSpecified = (
                 !explorationTitleService.savedMemento);
@@ -832,6 +831,12 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               };
 
               $scope.cancel = function() {
+                explorationTitleService.restoreFromMemento();
+                explorationObjectiveService.restoreFromMemento();
+                explorationCategoryService.restoreFromMemento();
+                explorationLanguageCodeService.restoreFromMemento();
+                explorationTagsService.restoreFromMemento();
+
                 $modalInstance.dismiss('cancel');
                 alertsService.clearWarnings();
               };
