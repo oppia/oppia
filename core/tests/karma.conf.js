@@ -13,10 +13,10 @@ module.exports = function(config) {
       'core/tests/karma-globals.js',
       // Since jquery,jquery-ui,angular,angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
-      'third_party/static/jquery-2.1.1/jquery.min.js',
+      'third_party/static/jquery-3.0.0/jquery.min.js',
       'third_party/static/jqueryui-1.10.3/jquery-ui.min.js',
-      'third_party/static/angularjs-1.4.7/angular.js',
-      'third_party/static/angularjs-1.4.7/angular-mocks.js',
+      'third_party/static/angularjs-1.5.8/angular.js',
+      'third_party/static/angularjs-1.5.8/angular-mocks.js',
       'third_party/static/math-expressions-762ffd/build/math-expressions.js',
       generatedJs,
       'core/templates/dev/head/*.js',

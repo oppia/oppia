@@ -58,9 +58,9 @@
     },
     "frontend": {
       "angular": {
-        "version": "1.4.7",
+        "version": "1.5.8",
         "downloadFormat": "files",
-        "url": "https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7",
+        "url": "https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8",
         "targetDirPrefix": "angularjs-",
         "files": [
           "angular.js", "angular.min.js", "angular.min.js.map", "angular-animate.js",
@@ -79,9 +79,9 @@
         }
       },
       "angularTest": {
-        "version": "1.4.7",
+        "version": "1.5.8",
         "downloadFormat": "files",
-        "url": "https://code.angularjs.org/1.4.7",
+        "url": "https://code.angularjs.org/1.5.8",
         "targetDirPrefix": "angularjs-",
         "files": ["angular-mocks.js", "angular-scenario.js"]
       },
@@ -239,9 +239,9 @@
         }
       },
       "jquery": {
-        "version": "2.1.1",
+        "version": "3.0.0",
         "downloadFormat": "files",
-        "url": "https://ajax.googleapis.com/ajax/libs/jquery/2.1.1",
+        "url": "https://ajax.googleapis.com/ajax/libs/jquery/3.0.0",
         "rootDirPrefix": "jquery-",
         "targetDirPrefix": "jquery-",
         "files": ["jquery.js", "jquery.min.js", "jquery.min.js.map"],

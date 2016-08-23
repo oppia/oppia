@@ -39,11 +39,7 @@ var scrollToTop = function() {
 
 // We will report all console logs of level greater than this.
 var CONSOLE_LOG_THRESHOLD = 900;
-var CONSOLE_ERRORS_TO_IGNORE = [
-  // This error arises when a logout event takes place before a page has fully
-  // loaded.
-  'http://localhost:9001/third_party/static/angularjs-1.4.7/angular.js 12477:24'
-];
+var CONSOLE_ERRORS_TO_IGNORE = [];
 
 var checkForConsoleErrors = function(errorsToIgnore) {
   var irrelevantErrors = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
