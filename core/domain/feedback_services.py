@@ -355,7 +355,7 @@ def enqueue_report_email_task(exploration_id, report_type):
         'exploration_id': exploration_id,
         'report_type': report_type
     }
-    # Suggestion emails are sent immidiately.
+    # Report emails are sent immidiately.
     taskqueue_services.enqueue_task(
         feconf.REPORT_EMAIL_HANDLER_URL, payload, 0)
 

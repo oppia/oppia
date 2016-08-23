@@ -303,7 +303,7 @@ class ReportEmailHandler(base.BaseHandler):
     def post(self):
         payload = json.loads(self.request.body)
         exploration_id = payload['exploration_id']
-        report = payload['report_type']
+        report_type = payload['report_type']
 
         exploration_rights = (
             rights_manager.get_exploration_rights(exploration_id))
