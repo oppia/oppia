@@ -22,13 +22,13 @@ import sys
 import yaml
 
 
-# ensure_directory_exists method trims file paths passed to it. Hence, directory
-# paths require a trailing slash.
 HEAD_DIR = os.path.join('core', 'templates', 'dev', 'head', '')
 OUT_DIR = os.path.join('core', 'templates', 'prod', 'head', '')
 REMOVE_WS = re.compile(r'\s{2,}').sub
 YUICOMPRESSOR_DIR = os.path.join(
     '..', 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar')
+
+FILE_EXTENSIONS_TO_COPY_WITHOUT_MINIFICATION = ['.json', '.png']
 
 
 def _minify(source_path, target_path):
@@ -96,9 +96,9 @@ def copy_files_source_to_target(source, target):
 
         for filename in files:
             source_path = os.path.join(root, filename)
-            if source_path.find(target) > 0:
+            if target in source_path:
                 continue
-            if source_path.find(source) == -1:
+            if source not in source_path:
                 continue
             target_path = source_path.replace(
                 source, target)
@@ -106,20 +106,39 @@ def copy_files_source_to_target(source, target):
             shutil.copyfile(source_path, target_path)
 
 
-def _build_files():
-    ensure_directory_exists(OUT_DIR)
-    shutil.rmtree(OUT_DIR)
+def build_files(source, target, ignore):
+    """Minifies all css and js files, and removes whitespace from html in source
+    directory and copies it to target, ignoring paths/files mentioned in ignore.
+    Copies files in ignore to target without any changes.
+    Arguments:
+        source, target: strings
+        ignore: list of files/paths to ignore
+    """
+    print 'Processing %s' % os.path.join(os.getcwd(), source)
+    print 'Generating into %s' % os.path.join(os.getcwd(), target)
+    ensure_directory_exists(target)
+    shutil.rmtree(target)
 
-    for root, dirs, files in os.walk(os.path.join(os.getcwd(), HEAD_DIR)):
+    for root, dirs, files in os.walk(os.path.join(os.getcwd(), source)):
         for directory in dirs:
             print 'Processing %s' % os.path.join(root, directory)
         for filename in files:
             source_path = os.path.join(root, filename)
-            if source_path.find(OUT_DIR) > 0:
+            if target in source_path:
                 continue
-            if source_path.find(HEAD_DIR) == -1:
+            if source not in source_path:
                 continue
-            target_path = source_path.replace(HEAD_DIR, OUT_DIR)
+            target_path = source_path.replace(source, target)
+
+            # Only copy files in ignore or with extensions mentioned in
+            # FILE_EXTENSIONS_TO_COPY_WITHOUT_MINIFICATION variable.
+            file_patterns_to_ignore = (
+                ignore + FILE_EXTENSIONS_TO_COPY_WITHOUT_MINIFICATION)
+            if any(p in source_path for p in file_patterns_to_ignore):
+                ensure_directory_exists(target_path)
+                shutil.copyfile(source_path, target_path)
+                continue
+
             if filename.endswith('.html'):
                 process_html(source_path, target_path)
             if filename.endswith('.css'):
@@ -130,8 +149,8 @@ def _build_files():
 
 def get_cache_slug():
     """Returns the cache slug read from file."""
-    with open('cache_slug.yaml', 'r') as f:
-        content = f.read()
+    with open('cache_slug.yaml', 'r') as cache_slug_file:
+        content = cache_slug_file.read()
     retrieved_dict = yaml.safe_load(content)
     assert isinstance(retrieved_dict, dict)
     return retrieved_dict['cache_slug']
@@ -141,6 +160,10 @@ if __name__ == '__main__':
     CACHE_SLUG = get_cache_slug()
     BUILD_DIR = os.path.join('build', CACHE_SLUG)
 
+    # os.path.dirname(path)(in ensure_directory_exists()) returns parent
+    # directory of a path passed as an argument to it. This is as intended
+    # for file paths, but for directory paths we do not want this to happen,
+    # hence we append a trailing slash to it.
     # Process assets, copy it to build/[cache_slug]/assets
     ASSETS_SRC_DIR = os.path.join('assets', '')
     ASSETS_OUT_DIR = os.path.join(BUILD_DIR, 'assets', '')
@@ -152,12 +175,19 @@ if __name__ == '__main__':
         BUILD_DIR, 'third_party', 'generated')
     build_minified_third_party_libs(THIRD_PARTY_GENERATED_OUT_DIR)
 
-    # Process extensions, copy it to build/[cache_slug]/extensions
+    # Minify extension static resources, copy it to
+    # build/[cache_slug]/extensions
     EXTENSIONS_SRC_DIR = os.path.join('extensions', '')
     EXTENSIONS_OUT_DIR = os.path.join(BUILD_DIR, 'extensions', '')
-    copy_files_source_to_target(EXTENSIONS_SRC_DIR, EXTENSIONS_OUT_DIR)
+    # Certain files' syntax become incorrect after minification and hence
+    # they are ignored.
+    IGNORE_PATHS = [os.path.join('extensions', 'interactions',
+                                 'LogicProof', 'static', 'js')]
+    build_files(EXTENSIONS_SRC_DIR, EXTENSIONS_OUT_DIR, IGNORE_PATHS)
 
-    _build_files()
+    TEMPLATES_HEAD_DIR = os.path.join('core', 'templates', 'dev', 'head', '')
+    TEMPLATES_OUT_DIR = os.path.join('core', 'templates', 'prod', 'head', '')
+    build_files(TEMPLATES_HEAD_DIR, TEMPLATES_OUT_DIR, [])
 
     # Process core/templates/prod/head/css, copy it to build/[cache_slug]/css
     CSS_SRC_DIR = os.path.join('core', 'templates', 'prod', 'head', 'css', '')
