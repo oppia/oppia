@@ -24,7 +24,7 @@ var logicProofData = (function() {
     arbitrary: ['was arbitrary', 'is arbitrary'],
     take: ['take'],
     satisfying: ['satisfying', 'such that'],
-    "if": ['if'],
+    'if': ['if'],
     given: ['given'],
     contradiction: ['contradiction'],
     at: ['at']
@@ -44,7 +44,7 @@ var logicProofData = (function() {
   // symbol keys from the list of operators).
   var BASE_STUDENT_LANGUAGE = {
     types: {
-      "boolean": {
+      'boolean': {
         quantifiable: false
       },
       element: {
@@ -334,7 +334,7 @@ var logicProofData = (function() {
 
   var BASE_CONTROL_LANGUAGE = {
     types: {
-      "boolean": {
+      'boolean': {
         quantifiable: false
       },
       // Used for line numbers & indentation.
@@ -716,7 +716,7 @@ var logicProofData = (function() {
           output: 'set_of_formulas'
         }]
       },
-      "if": {
+      'if': {
         // NOTE: this prefix function is unusual in having a boolean input
         kind: 'prefix_function',
         typing: [{

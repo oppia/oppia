@@ -196,7 +196,7 @@ var logicProofTeacher = (function() {
         content: ' has already been defined.'
       }]],
       parameters: {
-        "function": {
+        'function': {
           format: 'string'
         }
       }
