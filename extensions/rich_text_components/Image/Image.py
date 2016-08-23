@@ -52,6 +52,16 @@ class Image(base.BaseRichTextComponent):
             'type': 'unicode',
         },
         'default_value': '',
+    }, {
+        'name': 'width',
+        'description': 'Width of the image',
+        'schema': {
+            'type': 'float',
+            'ui_config': {
+                'slider': True,
+            },
+        },
+        'default_value': 300.0,
     }]
 
     @property

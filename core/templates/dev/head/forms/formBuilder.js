@@ -26,6 +26,20 @@ oppia.constant(
   'RTE_COMPONENT_SPECS',
   window.GLOBALS.RTE_COMPONENT_SPECS ? window.GLOBALS.RTE_COMPONENT_SPECS : {});
 
+// Service for retrieving width of the image
+oppia.factory('imageComponentWidthService', function() {
+  var imageWidth = null;
+
+  return {
+    set: function(value) {
+      imageWidth = value;
+    },
+    get: function() {
+      return imageWidth;
+    }
+  };
+});
+
 // Service for retrieving parameter specifications.
 oppia.factory('parameterSpecsService', ['$log', function($log) {
   var paramSpecs = {};
@@ -627,6 +641,10 @@ oppia.factory('rteHelperService', [
           el.attr(
             $filter('camelCaseToHyphens')(attrName) + '-with-value',
             oppiaHtmlEscaper.objToEscapedJson(customizationArgsDict[attrName]));
+          if (componentDefn.name === 'image' && attrName === 'width') {
+            el.attr('width',
+            oppiaHtmlEscaper.objToEscapedJson(customizationArgsDict[attrName]));
+          }
         }
 
         return el.get(0);
@@ -1296,6 +1314,7 @@ oppia.directive('schemaBasedFloatEditor', [function() {
     scope: {
       localValue: '=',
       isDisabled: '&',
+      uiConfig: '&',
       allowExpressions: '&',
       validators: '&',
       labelForFocusTarget: '&',
@@ -1306,9 +1325,10 @@ oppia.directive('schemaBasedFloatEditor', [function() {
     restrict: 'E',
     controller: [
       '$scope', '$filter', '$timeout', 'parameterSpecsService',
-      'focusService',
+      'focusService', 'imageComponentWidthService',
       function(
-          $scope, $filter, $timeout, parameterSpecsService, focusService) {
+          $scope, $filter, $timeout, parameterSpecsService, focusService,
+          imageComponentWidthService) {
         $scope.hasLoaded = false;
         $scope.isUserCurrentlyTyping = false;
         $scope.hasFocusedAtLeastOnce = false;
@@ -1362,6 +1382,17 @@ oppia.directive('schemaBasedFloatEditor', [function() {
             $scope.isUserCurrentlyTyping = true;
           }
         };
+
+        if (typeof $scope.uiConfig() !== 'undefined' &&
+            $scope.uiConfig().slider === true) {
+          if (!$scope.localValue) {
+            $scope.localValue = 300.0;
+          }
+
+          $scope.$watch('localValue', function(newValue) {
+            imageComponentWidthService.set(newValue);
+          });
+        }
 
         if ($scope.localValue === undefined) {
           $scope.localValue = 0.0;

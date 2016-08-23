@@ -24,7 +24,7 @@
   <schema-based-float-editor ng-if="schema().type === 'float' && !schema().choices"
                              local-value="$parent.localValue" is-disabled="isDisabled()"
                              allow-expressions="allowExpressions()"
-                             validators="schema().validators"
+                             validators="schema().validators" ui-config="schema().ui_config"
                              label-for-focus-target="labelForFocusTarget()"
                              on-input-blur="onInputBlur"
                              on-input-focus="onInputFocus">
@@ -132,7 +132,7 @@
 <script type="text/ng-template" id="schemaBasedEditor/float">
   <span ng-model="localValue" ui-validate="'validate($value)'">
     <span ng-form="floatForm">
-      <span ng-if="!expressionMode">
+      <span ng-if="!expressionMode && uiConfig().slider === undefined">
         <input type="text" ng-model="$parent.localValue" class="form-control protractor-test-float-form-input"
                name="floatValue" ng-attr-placeholder="<['I18N_FORMS_TYPE_NUMBER' | translate]>" ng-disabled="isDisabled()"
                require-is-float apply-validation="validators()"
@@ -162,6 +162,15 @@
             <span ng-if="expressionMode"><del>E</del></span>
           </button>
         </span>
+      </span>
+
+      <span ng-if="uiConfig().slider !== undefined">
+          <md-slider-container>
+          <md-slider flex="" min="50" max="600" ng-model="$parent.$parent.$parent.localValue" aria-label="blue" id="blue-slider" step="1"></md-slider>
+          <md-input-container>
+            <input flex="" ng-model="$parent.$parent.$parent.localValue" aria-label="blue" aria-controls="blue-slider" type="number" id="input-width" step="1">
+          </md-input-container>
+          </md-slider-container>
       </span>
     </span>
   </span>

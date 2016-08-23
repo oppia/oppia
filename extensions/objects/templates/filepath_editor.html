@@ -7,7 +7,7 @@
 </style>
 
 <div ng-model="localValue" ui-validate="'validate($value)'">
-  <div ng-show="!imageUploaderIsActive">
+  <div ng-show="!imageUploaderIsActive" style="position: relative;">
     <div ng-if="!filepathsLoaded">
       <span class="text-align: center; width: 50px;">
         Loading...
@@ -22,15 +22,16 @@
         <[filepath]>
       </label>
     </div>
-    <img ng-if="localValue.label" ng-src="<[getPreviewUrl(localValue.label)]>"/>
-
+    <div ng-if="localValue.label" style="display: block; height: 300px; width: 567px; overflow: auto;">
+      <img ng-if="localValue.label" ng-src="<[getPreviewUrl(localValue.label)]>" width="<[width]>" style="display: block;"/>
+    </div>
     <br><br>
     <button type="button" class="btn btn-default" ng-click="openImageUploader()">Upload a new image</button>
   </div>
 
   <div ng-if="imageUploaderIsActive" style="border: 1px solid black; padding: 5px;">
     <div class="oppia-warning">
-      Before uploading any images, please ensure that they are compatible with the <a href="/about#license" target="_blank">license terms</a> of this site (the link opens in a new window).
+      Before uploading any images, please ensure that they are compatible with the <a href="/about#license" target="_blank">license terms</a> oautof this site (the link opens in a new window).
     </div>
 
     <br>
@@ -52,7 +53,8 @@
 
       <img ng-src="<[imagePreview]>" style="display: block; margin-left: auto; margin-right: auto;">
     </div>
-
+    
+    
     <br>
     Choose a filename:
     <input type="text" ng-model="currentFilename" class="protractor-test-file-name">

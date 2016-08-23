@@ -66,7 +66,11 @@ ALLOWED_CUSTOM_OBJ_TYPES = [
 UI_CONFIG_SPECS = {
     SCHEMA_TYPE_BOOL: {},
     SCHEMA_TYPE_DICT: {},
-    SCHEMA_TYPE_FLOAT: {},
+    SCHEMA_TYPE_FLOAT: {
+        'slider': {
+            'type': SCHEMA_TYPE_BOOL,
+        }
+    },
     SCHEMA_TYPE_HTML: {
         'hide_complex_extensions': {
             'type': SCHEMA_TYPE_BOOL,
