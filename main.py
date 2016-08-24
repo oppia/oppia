@@ -277,6 +277,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
         reader.ExplorationPage, 'exploration_page'),
     get_redirect_route(
+        r'%s/<exploration_id>' % feconf.EXPLORATION_URL_EMBED_PREFIX,
+        reader.ExplorationPageEmbed, 'exploration_embed_page'),
+    get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_INIT_URL_PREFIX,
         reader.ExplorationHandler, 'exploration_handler'),
     get_redirect_route(
