@@ -33,7 +33,7 @@ oppia.controller('Donate', [
       return false;
     };
 
-    $scope.onDonateThroughPayPal = function(form) {
+    $scope.onDonateThroughPayPal = function() {
       // Redirection to PayPal will be initiated at the same time as this
       // function is run, but should be slow enough to allow this function time
       // to complete. It is not possible to do $http.post() in javascript after

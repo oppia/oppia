@@ -30,6 +30,6 @@ oppia.controller('Teach', [
         $window.location = 'https://goo.gl/forms/ljmQ9R3AZRkT2kU23';
       }, 150);
       return false;
-    }
+    };
   }
 ]);
