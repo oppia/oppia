@@ -21,7 +21,8 @@ var logicProofConversion = (function() {
   // NOTE: the 'old' values must all be single characters
   var REPLACEMENT_PAIRS = [{
     old: '&',
-    'new': '\u2227' 
+    // jscs:disable disallowQuotedKeysInObjects
+    'new': '\u2227'
   }, {
     old: '|',
     'new': '\u2228'
@@ -37,6 +38,7 @@ var logicProofConversion = (function() {
   }, {
     old: '\u0009',
     'new': '  '
+    // jscs:enable disallowQuotedKeysInObjects
   }];
 
   var convertToLogicCharacters = function(oldString) {
@@ -44,7 +46,7 @@ var logicProofConversion = (function() {
     for (var i = 0; i < REPLACEMENT_PAIRS.length; i++) {
       // We don't use .replace() as it only affects the first instance
       replacedString = replacedString.split(
-        'EPL'CEMENT_PAIRS[i].old).join(REPLACEMENT_PAIRS[i]['new']);
+        REPLACEMENT_PAIRS[i].old).join(REPLACEMENT_PAIRS[i]['new']);
     }
     return replacedString;
   };

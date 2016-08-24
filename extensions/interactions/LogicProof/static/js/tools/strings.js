@@ -21,7 +21,9 @@ var DEFAULT_VOCABULARY = {
   arbitrary: ['was arbitrary', 'is arbitrary'],
   take: ['take'],
   satisfying: ['satisfying', 'such that'],
+  // jscs:disable disallowQuotedKeysInObjects
   'if': ['if'],
+  // jscs:enable disallowQuotedKeysInObjects
   given: ['given'],
   contradiction: ['contradiction'],
   at: ['at']
