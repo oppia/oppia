@@ -21,6 +21,7 @@ import json
 import os
 import re
 import types
+import collections
 
 from core.controllers import base
 from core.domain import exp_services
@@ -29,6 +30,7 @@ from core.tests import test_utils
 import feconf
 import main
 import utils
+
 
 import webapp2
 import webtest
@@ -268,6 +270,31 @@ class I18nDictsTest(test_utils.GenericTestBase):
                 for key in untranslated_keys:
                     self.log_line('- %s' % key)
                 self.log_line('')
+
+    def alphabetic_test_i18n_keys(self):
+        """Tests that all JSON files are arranged in aplhabetical order."""
+        filenames = os.listdir(
+            os.path.join(os.getcwd(), self.get_static_asset_filepath(),
+                         'assets', 'i18n'))
+        for filename in filenames:
+            json_file_content = json.loads(utils.get_file_contents(
+                os.path.join(os.getcwd(), self.get_static_asset_filepath(),
+                             'assets', 'i18n', filename)),
+                                           object_pairs_hook=
+                                           collections.OrderedDict)
+            json_file_parsing = json.dumps(json_file_content, indent=2,
+                                           ensure_ascii=False).encode('utf-8')
+            #Remove extra space in parsed json format.
+            json_file_parsing = json_file_parsing.replace(" ", "")
+            _file_ = open(os.path.join(os.getcwd(),
+                                       self.get_static_asset_filepath(),
+                                       'assets', 'i18n', filename), 'r')
+            file_string = _file_.read()
+            #Remove extra space in actual file.
+            file_string = file_string.replace(" ", "")
+            file_string = file_string[:len(file_string) - 1]
+
+        self.assertEqual(json_file_parsing, file_string)
 
     def test_keys_match_en_qqq(self):
         """Tests that en.json and qqq.json have the exact same set of keys."""
