@@ -31,8 +31,8 @@ oppia.constant('EDITOR_TAB_CONTEXT', {
 oppia.factory('explorationContextService', [
   '$window', 'PAGE_CONTEXT', 'EDITOR_TAB_CONTEXT',
   function($window, PAGE_CONTEXT, EDITOR_TAB_CONTEXT) {
-    var _pageContext = null;
-    var _explorationId = null;
+    var pageContext = null;
+    var explorationId = null;
 
     return {
       // Returns a string representing the current tab of the editor (either
@@ -53,16 +53,17 @@ oppia.factory('explorationContextService', [
       // If the current page is not one in either EDITOR or LEARNER then
       // return PAGE_CONTEXT.OTHER
       getPageContext: function() {
-        if (_pageContext) {
-          return _pageContext;
+        if (pageContext) {
+          return pageContext;
         } else {
           var pathnameArray = $window.location.pathname.split('/');
           for (var i = 0; i < pathnameArray.length; i++) {
-            if (pathnameArray[i] === 'explore') {
-              _pageContext = PAGE_CONTEXT.LEARNER;
+            if (pathnameArray[i] === 'explore' ||
+                pathnameArray[i] === 'embed') {
+              pageContext = PAGE_CONTEXT.LEARNER;
               return PAGE_CONTEXT.LEARNER;
             } else if (pathnameArray[i] === 'create') {
-              _pageContext = PAGE_CONTEXT.EDITOR;
+              pageContext = PAGE_CONTEXT.EDITOR;
               return PAGE_CONTEXT.EDITOR;
             }
           }
@@ -79,17 +80,21 @@ oppia.factory('explorationContextService', [
       // Returns a string representing the explorationId (obtained from the
       // URL).
       getExplorationId: function() {
-        if (_explorationId) {
-          return _explorationId;
+        if (explorationId) {
+          return explorationId;
         } else {
           // The pathname should be one of /explore/{exploration_id} or
-          // /create/{exploration_id} .
+          // /create/{exploration_id} or /embed/exploration/{exploration_id}.
           var pathnameArray = $window.location.pathname.split('/');
           for (var i = 0; i < pathnameArray.length; i++) {
             if (pathnameArray[i] === 'explore' ||
                 pathnameArray[i] === 'create') {
-              _explorationId = pathnameArray[i + 1];
+              explorationId = pathnameArray[i + 1];
               return pathnameArray[i + 1];
+            }
+            if (pathnameArray[i] === 'embed') {
+              explorationId = pathnameArray[i + 2];
+              return explorationId;
             }
           }
 
