@@ -24,7 +24,9 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        onSubmit: '&'
+      },
       templateUrl: 'interaction/PencilCodeEditor',
       controller: [
         '$scope', '$attrs', '$element', '$timeout', 'focusService',
@@ -103,12 +105,15 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
               console.log('------');
 
               hasSubmittedAnswer = true;
-              $scope.$parent.submitAnswer({
-                code: normalizedCode,
-                output: output || '',
-                evaluation: '',
-                error: ''
-              }, pencilCodeEditorRulesService);
+              $scope.onSubmit({
+                answer: {
+                  code: normalizedCode,
+                  output: output || '',
+                  evaluation: '',
+                  error: ''
+                },
+                rulesService: pencilCodeEditorRulesService
+              });
             }, true);
           });
 

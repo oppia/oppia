@@ -214,6 +214,12 @@ class GadgetUnitTests(test_utils.GenericTestBase):
                 '<script type="text/ng-template" id="gadget/%s"' %
                 gadget_type,
                 html_file_content)
+            # Check that the html template includes js script for the
+            # gadget.
+            self.assertIn(
+                '<script src="{{cache_slug}}/extensions/gadgets/%s/%s.js">'
+                '</script>' % (gadget_type, gadget_type),
+                html_file_content)
             self.assertNotIn('<script>', js_file_content)
             self.assertNotIn('</script>', js_file_content)
 

@@ -626,10 +626,10 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(len(threads), 4)
 
 
-class FeedbackMessageEmailHandlerTests(test_utils.GenericTestBase):
+class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(FeedbackMessageEmailHandlerTests, self).setUp()
+        super(FeedbackMessageBatchEmailHandlerTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
@@ -933,3 +933,204 @@ class SuggestionEmailHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(
                 owner_messages[0].body.decode(),
                 expected_owner_email_text_body)
+
+
+class FeedbackMessageInstantEmailHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(FeedbackMessageInstantEmailHandlerTests, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+
+        self.exploration = self.save_new_default_exploration(
+            'A', self.editor_id, 'Title')
+        self.can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS', True)
+        self.can_send_feedback_email_ctx = self.swap(
+            feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+
+    def test_that_emails_are_sent_for_feedback_message(self):
+        expected_email_html_body = (
+            'Hi newuser,<br><br>'
+            'New update to thread "a subject" on '
+            '<a href="https://www.oppia.org/A">Title</a>:<br>'
+            '<ul><li>editor: editor message<br></li></ul>'
+            '(You received this message because you are a '
+            'participant in this thread.)<br><br>'
+            'Best wishes,<br>'
+            'The Oppia team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_email_text_body = (
+            'Hi newuser,\n'
+            '\n'
+            'New update to thread "a subject" on Title:\n'
+            '- editor: editor message\n'
+            '(You received this message because you are a'
+            ' participant in this thread.)\n'
+            '\n'
+            'Best wishes,\n'
+            'The Oppia team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name',
+                self.new_user_id, 'a subject', 'some text')
+            self.process_and_flush_pending_tasks()
+
+            threadlist = feedback_services.get_all_threads(
+                self.exploration.id, False)
+            thread_id = threadlist[0].get_thread_id()
+
+            feedback_services.create_message(
+                self.exploration.id, thread_id, self.editor_id, None, None,
+                'editor message')
+            self.process_and_flush_pending_tasks()
+
+            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(),
+                expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(),
+                expected_email_text_body)
+
+    def test_that_emails_are_sent_for_status_change(self):
+        expected_email_html_body = (
+            'Hi newuser,<br><br>'
+            'New update to thread "a subject" on '
+            '<a href="https://www.oppia.org/A">Title</a>:<br>'
+            '<ul><li>editor: changed status from open to fixed<br></li></ul>'
+            '(You received this message because you are a '
+            'participant in this thread.)<br><br>'
+            'Best wishes,<br>'
+            'The Oppia team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_email_text_body = (
+            'Hi newuser,\n'
+            '\n'
+            'New update to thread "a subject" on Title:\n'
+            '- editor: changed status from open to fixed\n'
+            '(You received this message because you are a'
+            ' participant in this thread.)\n'
+            '\n'
+            'Best wishes,\n'
+            'The Oppia team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name',
+                self.new_user_id, 'a subject', 'some text')
+            self.process_and_flush_pending_tasks()
+
+            threadlist = feedback_services.get_all_threads(
+                self.exploration.id, False)
+            thread_id = threadlist[0].get_thread_id()
+
+            feedback_services.create_message(
+                self.exploration.id, thread_id, self.editor_id,
+                feedback_models.STATUS_CHOICES_FIXED, None, '')
+            self.process_and_flush_pending_tasks()
+
+            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(),
+                expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(),
+                expected_email_text_body)
+
+    def test_that_emails_are_sent_for_both_status_change_and_message(self):
+        expected_email_html_body_message = (
+            'Hi newuser,<br><br>'
+            'New update to thread "a subject" on '
+            '<a href="https://www.oppia.org/A">Title</a>:<br>'
+            '<ul><li>editor: editor message<br></li></ul>'
+            '(You received this message because you are a '
+            'participant in this thread.)<br><br>'
+            'Best wishes,<br>'
+            'The Oppia team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_email_text_body_message = (
+            'Hi newuser,\n'
+            '\n'
+            'New update to thread "a subject" on Title:\n'
+            '- editor: editor message\n'
+            '(You received this message because you are a'
+            ' participant in this thread.)\n'
+            '\n'
+            'Best wishes,\n'
+            'The Oppia team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+
+        expected_email_html_body_status = (
+            'Hi newuser,<br><br>'
+            'New update to thread "a subject" on '
+            '<a href="https://www.oppia.org/A">Title</a>:<br>'
+            '<ul><li>editor: changed status from open to fixed<br></li></ul>'
+            '(You received this message because you are a '
+            'participant in this thread.)<br><br>'
+            'Best wishes,<br>'
+            'The Oppia team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_email_text_body_status = (
+            'Hi newuser,\n'
+            '\n'
+            'New update to thread "a subject" on Title:\n'
+            '- editor: changed status from open to fixed\n'
+            '(You received this message because you are a'
+            ' participant in this thread.)\n'
+            '\n'
+            'Best wishes,\n'
+            'The Oppia team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name',
+                self.new_user_id, 'a subject', 'some text')
+            self.process_and_flush_pending_tasks()
+
+            threadlist = feedback_services.get_all_threads(
+                self.exploration.id, False)
+            thread_id = threadlist[0].get_thread_id()
+
+            feedback_services.create_message(
+                self.exploration.id, thread_id, self.editor_id,
+                feedback_models.STATUS_CHOICES_FIXED, None, 'editor message')
+            self.process_and_flush_pending_tasks()
+
+            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            self.assertEqual(len(messages), 2)
+            self.assertEqual(
+                messages[0].html.decode(),
+                expected_email_html_body_status)
+            self.assertEqual(
+                messages[0].body.decode(),
+                expected_email_text_body_status)
+            self.assertEqual(
+                messages[1].html.decode(),
+                expected_email_html_body_message)
+            self.assertEqual(
+                messages[1].body.decode(),
+                expected_email_text_body_message)
