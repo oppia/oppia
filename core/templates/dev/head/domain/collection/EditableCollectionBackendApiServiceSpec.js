@@ -101,7 +101,6 @@ describe('Editable collection backend API service', function() {
     $httpBackend.flush();
     originalColl = angular.copy(coll);
 
-    coll.title = 'New Title';
     sampleDataResults.collection.title = 'New Title';
     sampleDataResults.collection.schema_version = '2';
 
@@ -111,8 +110,8 @@ describe('Editable collection backend API service', function() {
     //Attempt Update to collection
     EditableBackendApiService.updateCollection('0', 
       '2', 
-      'Changed title',
-      'UndoRedoService').then(successHandler, failHandler);
+      'New Title',
+      UndoRedoService.getChangeList()).then(successHandler, failHandler);
     $httpBackend.flush();
 
     expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
