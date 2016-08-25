@@ -270,6 +270,10 @@ class ExplorationPage(base.BaseHandler):
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests."""
+        if self.request.get('iframed'):
+            self.redirect('/embed/exploration/%s' % exploration_id)
+            return
+
         version_str = self.request.get('v')
         version = int(version_str) if version_str else None
 
