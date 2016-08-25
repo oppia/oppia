@@ -28,7 +28,8 @@ describe('Editable collection backend API service', function() {
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
   beforeEach(inject(function($injector) {
-    EditableBackendApiService = $injector.get('EditableCollectionBackendApiService');
+    EditableBackendApiService = $injector.get(
+      'EditableCollectionBackendApiService');
     UndoRedoService = $injector.get('UndoRedoService');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
@@ -106,10 +107,11 @@ describe('Editable collection backend API service', function() {
 
     $httpBackend.expect('PUT', '/collection_editor_handler/data/0').respond(
       sampleDataResults);
-    
-    //Attempt Update to collection
-    EditableBackendApiService.updateCollection('0', 
-      '2', 
+
+    // Attempt Update to collection
+    EditableBackendApiService.updateCollection(
+      '0',
+      '2',
       'New Title',
       UndoRedoService.getChangeList()).then(successHandler, failHandler);
     $httpBackend.flush();

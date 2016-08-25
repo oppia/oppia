@@ -27,7 +27,8 @@ describe('Read only collection backend API service', function() {
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
   beforeEach(inject(function($injector) {
-    ReadOnlyBackendApiService = $injector.get('ReadOnlyCollectionBackendApiService');
+    ReadOnlyBackendApiService = $injector.get(
+      'ReadOnlyCollectionBackendApiService');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');

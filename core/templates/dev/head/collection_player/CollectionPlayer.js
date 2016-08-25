@@ -95,7 +95,8 @@ oppia.controller('CollectionPlayer', [
     };
 
     // Load the collection the learner wants to view.
-    ReadOnlyCollectionBackendApiService.loadCollection($scope.collectionId).then(
+    ReadOnlyCollectionBackendApiService.loadCollection(
+      $scope.collectionId).then(
       function(collectionBackendObject) {
         $scope.collection = CollectionObjectFactory.create(
           collectionBackendObject);

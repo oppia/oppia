@@ -153,14 +153,14 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
                 'Trying to update version %s of collection from version %s, '
                 'which is too old. Please reload the page and try again.'
                 % (collection_version, version_from_payload))
-    
+
     @require_editor
     def get(self, collection_id):
         """Populates the data on the individual collection page."""
 
         collection = (
-                collection_services.get_collection_by_id(collection_id))
-        
+            collection_services.get_collection_by_id(collection_id))
+
         if (collection is None or
                 not rights_manager.Actor(self.user_id).can_view(
                     feconf.ACTIVITY_TYPE_COLLECTION, collection_id)):

@@ -42,8 +42,8 @@ oppia.factory('EditableCollectionBackendApiService', [
             collection_id: collectionId
           });
 
-        //Does not work with following line
-        //collectionDataUrl += '?allow_invalid_explorations=true';
+        // Does not work with following line
+        // collectionDataUrl += '?allow_invalid_explorations=true';
 
         $http.get(collectionDataUrl).then(function(response) {
           var collection = angular.copy(response.data.collection);
@@ -76,7 +76,8 @@ oppia.factory('EditableCollectionBackendApiService', [
 
           // Update the CollectionBackendApiService's cache with the new
           // collection.
-          ReadOnlyCollectionBackendApiService.cacheCollection(collectionId, collection);
+          ReadOnlyCollectionBackendApiService.cacheCollection(
+            collectionId, collection);
 
           if (successCallback) {
             successCallback(collection);
@@ -108,7 +109,7 @@ oppia.factory('EditableCollectionBackendApiService', [
          * cached within the CollectionBackendApiService to ensure the cache is
          * not out-of-date with any updates made by this backend API service.
          */
-         updateCollection: function(
+        updateCollection: function(
             collectionId, collectionVersion, commitMessage, changeList) {
           return $q(function(resolve, reject) {
             _updateCollection(
