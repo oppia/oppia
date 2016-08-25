@@ -1,3 +1,17 @@
+PENCIL CODE
+-----------
+The pencilcodeembed-1a392ad-modified.js script in this folder is taken from
+
+    https://github.com/PencilCode/pencilcode/blob/1a392ad8d0cb9296768c5fc492c72c6ba296a932/content/lib/pencilcodeembed.js
+
+which is licensed under the MIT license. Licensing information can be found at:
+
+    https://github.com/PencilCode/pencilcode/blob/master/LICENSE
+
+Note that the script has been slightly modified to hardcode the pencilcode.net
+domain. For more details, see the "NOTE TO DEVELOPERS" section in the file.
+
+
 TESTING INSTRUCTIONS
 --------------------
 
