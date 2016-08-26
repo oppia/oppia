@@ -18,7 +18,7 @@ oppia.directive('booleanEditor', [
     '$compile', 'OBJECT_EDITOR_URL_PREFIX',
     function($compile, OBJECT_EDITOR_URL_PREFIX) {
   return {
-    controller: function($scope) {
+    controller: ['$scope', function($scope) {
       // Reset the component each time the value changes (e.g. if this is part
       // of an editable list).
       $scope.$watch('$parent.value', function(newValue) {
@@ -30,7 +30,7 @@ oppia.directive('booleanEditor', [
       $scope.$watch('localValue.label', function(newValue) {
         $scope.$parent.value = newValue;
       });
-    },
+    }],
     link: function(scope, element) {
       scope.getTemplateUrl = function() {
         return OBJECT_EDITOR_URL_PREFIX + 'Boolean';
