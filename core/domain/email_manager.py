@@ -140,6 +140,8 @@ SENDER_VALIDATORS = {
         lambda x: rights_manager.Actor(x).is_admin()),
     feconf.EMAIL_INTENT_DELETE_EXPLORATION: (
         lambda x: rights_manager.Actor(x).is_moderator()),
+    feconf.EMAIL_INTENT_REPORT_BAD_CONTENT: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
 }
 
 
@@ -505,16 +507,14 @@ def send_instant_feedback_message_email(
             email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
-def send_report_email(
-        exploration_title, exploration_id, reporter_id, report_type,
-        exploration_owner_ids):
-    email_subject = 'New report for "%s"' % exploration_title
+def send_flagged_exploration_email(
+        exploration_title, exploration_id, reporter_id, report_text):
+    email_subject = 'New flag has been raised for "%s"' % exploration_title
 
     email_body_template = (
         'Hello Moderator,<br>'
-        '%s has submitted a new report on the exploration %s of the type %s, '
-        '<a href="https://www.oppia.org/explore/%s">"%s"</a>.<br>'
-        'The author/s of the exploration is/are %s'
+        '%s has submitted a new report on the exploration %s on '
+        'the grounds of %s .<br>'
         'You can modify the exploration by clicking '
         '<a href="https://www.oppia.org/create/%s">"Edit %s"</a>.<br>'
         '<br>'
@@ -526,25 +526,14 @@ def send_report_email(
         log_new_error('This app cannot send emails to users.')
         return
 
-    if not feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS:
-        log_new_error('This app cannot send feedback message emails to users.')
-        return
-
-    exploration_owner = " "
-    for exploration_owner_id in exploration_owner_ids:
-        exploration_owner = exploration_owner + (
-            (user_services.get_user_settings(
-                exploration_owner_id)).username + ", ")
-
     email_body = email_body_template % (
         user_services.get_user_settings(reporter_id).username,
         exploration_title, report_type, exploration_id,
-        exploration_title, exploration_owner, exploration_id,
         exploration_title, EMAIL_FOOTER.value)
 
     recipient_list = config_domain.MODERATOR_IDS.value
     for recipient_id in recipient_list:
         _send_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
-            feconf.EMAIL_INTENT_REPORT_NOTIFICATION,
+            feconf.EMAIL_INTENT_REPORT_BAD_CONTENT,
             email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)

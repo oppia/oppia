@@ -223,7 +223,7 @@ EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
 EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION = 'editor_role_notification'
 EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION = 'feedback_message_notification'
 EMAIL_INTENT_SUGGESTION_NOTIFICATION = 'suggestion_notification'
-EMAIL_INTENT_REPORT_NOTIFICATION = 'report_notification'
+EMAIL_INTENT_REPORT_BAD_CONTENT = 'report_bad_content'
 EMAIL_INTENT_MARKETING = 'marketing'
 EMAIL_INTENT_PUBLICIZE_EXPLORATION = 'publicize_exploration'
 EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
@@ -460,9 +460,9 @@ SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
-REPORT_EMAIL_HANDLER_URL = (
-    '%s/email/reportemailhandler' % TASKQUEUE_URL_PREFIX)
-REPORT_URL_PREFIX = '/reporthandler'
+FLAG_EXPLORATION_EMAIL_HANDLER_URL = (
+    '%s/email/flagexplorationemailhandler' % TASKQUEUE_URL_PREFIX)
+FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 
 
 NAV_MODE_ABOUT = 'about'

@@ -36,6 +36,7 @@ from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import summary_services
+from core.domain import moderator_services
 import feconf
 import utils
 
@@ -553,3 +554,29 @@ class RecommendationsHandler(base.BaseHandler):
                     author_recommended_exp_ids + auto_recommended_exp_ids)),
         })
         self.render_json(self.values)
+
+
+
+class FlagExplorationHandler(base.BaseHandler):
+    """"Handles operations relating to learner flagging of explorations."""
+
+    @base.require_user
+    def post(self, exploration_id):
+        moderator_services.enqueue_flag_exploration_email_task(
+            exploration_id,
+            self.payload.get('report_text'))
+        self.render_json(self.values)
+
+
+class FlagExplorationEmailHandler(base.BaseHandler):
+    """Handles task of sending emails about flagged explorations to moderators."""
+
+    def post(self):
+        payload = json.loads(self.request.body)
+        exploration_id = payload['exploration_id']
+        report_text = payload['report_text']
+
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+
+        email_manager.send_flagged_exploration_email(
+            exploration.title, exploration.id, self.user_id, report_text)

@@ -1326,3 +1326,90 @@ class FeedbackMessageInstantEmailTests(test_utils.GenericTestBase):
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION)
+
+
+class ReportEmailTest(test_utils.GenericTestBase):
+    def setUp(self):
+        super(ReportEmailTest, self).setUp()
+
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
+
+        self.exploration = self.save_new_default_exploration(
+            'A', self.editor_id, 'Title')
+        self.owner_ids = [self.editor_id]
+
+        self.report_type = 'AD'
+
+        self.can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS', True)
+        self.can_send_feedback_email_ctx = self.swap(
+            feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+
+    def test_that_report_emails_are_correct(self):
+        expected_email_subject = 'New flag has been raised for "Title"'
+
+        expected_email_html_body = (
+            'Hello Moderator,<br>'
+            'newuser has submitted a new report on the exploration Title'
+            'of the grounds of AD .'
+            '<a href="https://www.oppia.org/explore/A">"Title"</a>.<br>'
+            'The author/s of the exploration is/are editor, '
+            'You can modify the exploration by clicking '
+            '<a href="https://www.oppia.org/create/A">'
+            '"Edit Title"</a>.<br>'
+            '<br>'
+            'Thanks!<br>'
+            '- The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_email_text_body = (
+            'Hello Moderator,\n'
+            'newuser has submitted a new report on the exploration Title'
+            'of the type AD, "Title"\n'
+            'The author/s of the exploration is/are editor, '
+            'You can modify the exploration by clicking "Edit Title"\n'
+            '\n'
+            'Thanks!\n'
+            '- The Oppia Team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            email_manager.send_report_email(
+                self.exploration.title, self.exploration.id, self.new_user_id,
+                self.report_type, self.owner_ids)
+
+            # make sure correct email is sent.
+            messages = self.mail_stub.get_sent_messages(to=self.MODERATOR_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(),
+                expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(),
+                expected_email_text_body)
+
+            # Make sure correct email model is stored.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            sent_email_model = all_models[0]
+            self.assertEqual(
+                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(
+                sent_email_model.recipient_id, self.moderator_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.MODERATOR_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)

@@ -218,12 +218,6 @@ def create_suggestion(exploration_id, author_id, exploration_version,
     _enqueue_suggestion_email_task(exploration_id, thread_id)
 
 
-def create_report(exploration_id, report_type):
-    """Enqueues report emails"""
-
-    enqueue_report_email_task(exploration_id, report_type)
-
-
 def _get_suggestion_from_model(suggestion_model):
     return feedback_domain.Suggestion(
         suggestion_model.id, suggestion_model.author_id,
@@ -345,18 +339,6 @@ def _enqueue_suggestion_email_task(exploration_id, thread_id):
     # Suggestion emails are sent immidiately.
     taskqueue_services.enqueue_task(
         feconf.SUGGESTION_EMAIL_HANDLER_URL, payload, 0)
-
-
-def enqueue_report_email_task(exploration_id, report_type):
-    """Adds a 'send report email' task into taskqueue."""
-
-    payload = {
-        'exploration_id': exploration_id,
-        'report_type': report_type
-    }
-    # Report emails are sent immidiately.
-    taskqueue_services.enqueue_task(
-        feconf.REPORT_EMAIL_HANDLER_URL, payload, 0)
 
 
 def get_feedback_message_references(user_id):

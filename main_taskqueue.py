@@ -16,6 +16,7 @@
 
 # pylint: disable=relative-import
 from core.controllers import feedback
+from core.domain import reader
 from core.platform import models
 import feconf
 import main
@@ -34,8 +35,8 @@ URLS = [
         r'%s' % feconf.SUGGESTION_EMAIL_HANDLER_URL,
         feedback.SuggestionEmailHandler, 'suggestion_email_handler'),
     main.get_redirect_route(
-        r'%s' % feconf.REPORT_EMAIL_HANDLER_URL,
-        feedback.ReportEmailHandler, 'report_email_handler'),
+        r'%s' % feconf.FLAG_EXPLORATION_EMAIL_HANDLER_URL,
+        reader.FlagExplorationEmailHandler, 'flag_exploration_email_handler'),
     main.get_redirect_route(
         r'%s' % feconf.INSTANT_FEEDBACK_EMAIL_HANDLER_URL,
         feedback.InstantFeedbackMessageEmailHandler,
