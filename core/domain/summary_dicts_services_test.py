@@ -122,7 +122,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
 
         rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
 
-        collection_dict = summary_dicts_services.get_learner_collection_dict_by_id(
+        collection_dict = summary_dicts_services.get_learner_collection_dict_by_id( # pylint: disable=line-too-long
             self.COLLECTION_ID, self.owner_id, allow_invalid_explorations=True)
 
         # The author's private exploration will be contained in the public
@@ -489,7 +489,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         """
 
         recently_published_exploration_summaries = (
-            summary_dicts_services.get_recently_published_exploration_summary_dicts())
+            summary_dicts_services.get_recently_published_exploration_summary_dicts())  # pylint: disable=line-too-long
         test_summary_1 = {
             'status': 'public',
             'thumbnail_bg_color': '#a33f40',
@@ -553,7 +553,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             }], 'Changed title.')
 
         recently_published_exploration_summaries = (
-            summary_dicts_services.get_recently_published_exploration_summary_dicts())
+            summary_dicts_services.get_recently_published_exploration_summary_dicts())  # pylint: disable=line-too-long
         self.assertEqual(
             recently_published_exploration_summaries[1]['title'], 'New title')
         self.assertDictContainsSubset(
@@ -684,7 +684,7 @@ class ExplorationDisplayableSummariesTest(
         # Should only return [EXP_ID_2]
 
         displayable_summaries = (
-            summary_dicts_services.get_displayable_exp_summary_dicts_matching_ids(
+            summary_dicts_services.get_displayable_exp_summary_dicts_matching_ids(  # pylint: disable=line-too-long
                 [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5]))
         expected_summary = {
             'category': u'A category',
@@ -709,7 +709,7 @@ class ExplorationDisplayableSummariesTest(
         # If a new exploration is created by another user (Bob) and not public,
         # then Albert cannot see it when querying for explorations.
         displayable_summaries = (
-            summary_dicts_services.get_displayable_exp_summary_dicts_matching_ids(
+            summary_dicts_services.get_displayable_exp_summary_dicts_matching_ids(  # pylint: disable=line-too-long
                 [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5],
                 editor_user_id=self.albert_id))
 
@@ -724,7 +724,7 @@ class ExplorationDisplayableSummariesTest(
             rights_manager.ROLE_EDITOR)
 
         displayable_summaries = (
-            summary_dicts_services.get_displayable_exp_summary_dicts_matching_ids(
+            summary_dicts_services.get_displayable_exp_summary_dicts_matching_ids(  # pylint: disable=line-too-long
                 [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5],
                 editor_user_id=self.albert_id))
 
