@@ -16,7 +16,7 @@
 
 from core.controllers import base
 from core.domain import email_manager
-from core.domain import summary_services
+from core.domain import summary_dicts_services
 from core.domain import user_services
 import feconf
 import utils
@@ -80,10 +80,10 @@ class ProfileHandler(base.BaseHandler):
             user_settings.user_id)
         if user_contributions:
             created_exp_summary_dicts = (
-                summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                summary_dicts_services.get_displayable_exp_summary_dicts_matching_ids( # pylint: disable=line-too-long
                     user_contributions.created_exploration_ids))
             edited_exp_summary_dicts = (
-                summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                summary_dicts_services.get_displayable_exp_summary_dicts_matching_ids( # pylint: disable=line-too-long
                     user_contributions.edited_exploration_ids))
         profile_is_of_current_user = (self.username == username)
 
