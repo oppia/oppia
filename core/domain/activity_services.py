@@ -25,6 +25,9 @@ import feconf
 
 
 def get_featured_activity_references():
+    """
+    Gets a list of featured activity reference models.
+    """
     featured_model_instance = (
         activity_models.ActivityReferencesModel.get_or_create(
             activity_models.ACTIVITY_REFERENCE_LIST_FEATURED))
@@ -58,6 +61,11 @@ def update_featured_activity_references(featured_activity_references):
 
 
 def remove_featured_activity(activity_type, activity_id):
+    """
+    Removes an activity reference from the list of featured
+    activity references by taking activity_type and activity_id to 
+    check for the activity reference that needs to be removed.
+     """
     featured_references = get_featured_activity_references()
 
     activity_reference_found = False
