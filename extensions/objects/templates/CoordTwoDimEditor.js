@@ -16,7 +16,7 @@ oppia.directive('coordTwoDimEditor', [
     '$compile', 'OBJECT_EDITOR_URL_PREFIX',
     function($compile, OBJECT_EDITOR_URL_PREFIX) {
   return {
-    controller: [function($scope, $timeout) {
+    controller: ['$scope', function($scope, $timeout) {
       $scope.schemaLatitude = {
         type: 'float',
         validators: [{

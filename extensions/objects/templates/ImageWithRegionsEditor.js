@@ -32,7 +32,7 @@ oppia.directive('imageWithRegionsEditor', [
       restrict: 'E',
       scope: true,
       template: '<div ng-include="getTemplateUrl()"></div>',
-      controller: [function($scope, $element) {
+      controller: ['$scope', '$element', function($scope, $element) {
         $scope.alwaysEditable = true;
 
         $scope.REGION_LABEL_OFFSET_X = 6;

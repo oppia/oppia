@@ -28,7 +28,7 @@ oppia.directive('sanitizedUrlEditor', [
     restrict: 'E',
     scope: true,
     template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: [function($scope) {
+    controller: ['$scope', function($scope) {
       $scope.$watch('$parent.initArgs', function(newValue) {
         $scope.largeInput = false;
         if (newValue && newValue.largeInput) {

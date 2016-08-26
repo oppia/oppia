@@ -29,7 +29,7 @@ oppia.directive('logicQuestionEditor', [
     restrict: 'E',
     scope: true,
     template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: [function($scope) {
+    controller: ['$scope', function($scope) {
       $scope.alwaysEditable = true;
       $scope.localValue = {
         assumptionsString: logicProofShared.displayExpressionArray(

@@ -29,7 +29,7 @@ oppia.directive('setOfHtmlStringEditor', [
     restrict: 'E',
     scope: true,
     template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: [function($scope) {
+    controller: ['$scope', function($scope) {
       $scope.SCHEMA = {
         type: 'list',
         items: {
