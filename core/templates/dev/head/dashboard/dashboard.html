@@ -241,9 +241,8 @@
                 </div>
               </div>
             </div>
-            <div class="stat-block">
+            <div class="stat-block" ng-if="!checkMobileView()">
               <div class="heading-text"
-                   ng-if="!checkMobileView()"
                    ng-click="toggleSubDropdown(EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS, $event)">
                 <[exploration.top_unresolved_answers.length]> Unresolved Answers from Users
                 <span class="fa"

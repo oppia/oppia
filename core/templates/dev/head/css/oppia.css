@@ -3770,6 +3770,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-dashboard-card-view-item .metrics {
   height: 50px;
   margin: 13px 0 0 0;
+  padding-bottom: 10px;
 }
 
 .oppia-dashboard-card-view-item .metrics > li {
@@ -3877,10 +3878,6 @@ md-card.preview-conversation-skin-supplemental-card {
 
   .oppia-exp-dropdown-stats .open-in-editor-btn {
     display: none;
-  }
-
-  .oppia-dashboard-card-view-item.dropdown-open {
-    min-height: 275px;
   }
 
   .oppia-exp-arrow:after {
