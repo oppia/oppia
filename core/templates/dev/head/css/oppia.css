@@ -2736,9 +2736,10 @@ div#ng-curtain {
 
 .oppia-page-card {
   background: rgb(255,255,255);
+  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);
   margin-left: auto;
   margin-right: auto;
-  margin-bottom: 30px;
+  margin-bottom: 80px;
   margin-top: 40px;
   padding: 30px 55px 30px 45px;
 }
@@ -4106,6 +4107,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-donate-info {
   float: left;
+  padding-bottom:30px;
   width: calc(100% - 340px);
 }
 
@@ -4115,6 +4117,7 @@ md-card.preview-conversation-skin-supplemental-card {
   float: right;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   padding: 10px;
+  padding-bottom:35px;
   width: 340px;
 }
 
