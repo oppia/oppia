@@ -551,15 +551,6 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self.assertEqual(state_answers.exploration_version, 2)
         self._verify_no_migration_validation_problems()
 
-    # TODO(bhenning): There are other scenarios to consider for this type of
-    # migration, as well. For instance, if any of the following happen between
-    # the created_on and last_updated dates for a given model:
-    #   1. Interaction ID changed
-    #   2. Answer groups changed
-    #   3. Rule specs changed
-    # Also, there should be a test to verify that the latest matching version is
-    # the one selected (rather than the earliest). This is done in hopes of
-    # answers being submitted long after the exploration was released.
     def test_migrated_answer_matches_to_correct_exp_version_after_stats(self):
         """Tests whether an answer is correctly matched to a given exp version
         if its answer model was created before the state could support a
@@ -586,7 +577,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'new_value': {
                 'dest': state_name,
                 'feedback': [],
-                'param_changes': ''
+                'param_changes': []
             }
         }], 'Update state to have default outcome')
 
@@ -638,6 +629,673 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         }])
         self.assertEqual(state_answers.exploration_id, 'exp_id0')
         self.assertEqual(state_answers.exploration_version, 3)
+        self._verify_no_migration_validation_problems()
+
+    def test_migrated_answer_matches_correct_version_after_inter_change(self):
+        """Tests whether an answer is correctly matched to a given exp version
+        if the interaction of the matching state has changed between created_on
+        and last_updated for the submitted answers.
+        """
+        exploration = self.save_new_valid_exploration(
+            'exp_id0', self.owner_id, end_state_name='End')
+        state_name = exploration.init_state_name
+        initial_state = exploration.states[state_name]
+
+        # Set the initial state to be text input.
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'TextInput'
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+            'new_value': {
+                'dest': state_name,
+                'feedback': [],
+                'param_changes': []
+            }
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'Contains',
+                    'inputs': {
+                        'x': 'dle'
+                    }
+                }],
+                'outcome': {
+                    'dest': state_name,
+                    'feedback': [],
+                    'param_changes': []
+                }
+            }]
+        }], 'Create initial text input state')
+
+        # Insert an answer for the TextInput version of the state.
+        rule_spec_str_text_input = 'Contains(dle)'
+        html_answer_text_input = 'fiddle'
+        self._record_old_answer(
+            state_name, rule_spec_str_text_input, html_answer_text_input,
+            exploration_id='exp_id0')
+
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': []
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'Continue',
+            'old_value': initial_state.interaction.id
+        }], 'Update state to have Continue interaction')
+
+        # Insert an answer for the Continue version of the state.
+        rule_spec_str_continue = 'Default'
+        html_answer_continue = ''
+        self._record_old_answer(
+            state_name, rule_spec_str_continue, html_answer_continue,
+            exploration_id='exp_id0')
+
+        # Verify the exploration is at version 3.
+        exploration = exp_services.get_exploration_by_id('exp_id0')
+        self.assertEqual(exploration.version, 3)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0')
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
+
+        # The first answer should match version 2 and the second answer should
+        # match version 3 of the exploration, since an interaction ID occurred
+        # between those two answers.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0', exploration_version=2)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': 'fiddle',
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': exp_domain.EXPLICIT_CLASSIFICATION,
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'TextInput',
+            'params': [],
+            'rule_spec_str': rule_spec_str_text_input,
+            'answer_str': html_answer_text_input
+        }])
+        self.assertEqual(state_answers.exploration_id, 'exp_id0')
+        self.assertEqual(state_answers.exploration_version, 2)
+
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0', exploration_version=3)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': None,
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'Continue',
+            'params': [],
+            'rule_spec_str': rule_spec_str_continue,
+            'answer_str': html_answer_continue
+        }])
+        self.assertEqual(state_answers.exploration_id, 'exp_id0')
+        self.assertEqual(state_answers.exploration_version, 3)
+
+        self._verify_no_migration_validation_problems()
+
+    def test_migrated_answer_matches_correct_version_after_group_change(self):
+        """Tests whether an answer is correctly matched to a given exp version
+        if the answer groups of the matching state have changed between
+        created_on and last_updated for the submitted answers.
+        """
+        exploration = self.save_new_valid_exploration(
+            'exp_id0', self.owner_id, end_state_name='End')
+        state_name = exploration.init_state_name
+
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'TextInput'
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+            'new_value': {
+                'dest': state_name,
+                'feedback': [],
+                'param_changes': []
+            }
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'Contains',
+                    'inputs': {
+                        'x': 'dle'
+                    }
+                }],
+                'outcome': {
+                    'dest': state_name,
+                    'feedback': [],
+                    'param_changes': []
+                }
+            }, {
+                'rule_specs': [{
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': 'eatery'
+                    }
+                }],
+                'outcome': {
+                    'dest': state_name,
+                    'feedback': [],
+                    'param_changes': []
+                }
+            }]
+        }], 'Create initial text input state')
+
+        # Insert an answer for the current version of the state.
+        rule_spec_str = 'Equals(eatery)'
+        html_answer = 'eatery'
+        self._record_old_answer(
+            state_name, rule_spec_str, html_answer, exploration_id='exp_id0')
+
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': 'eatery'
+                    }
+                }],
+                'outcome': {
+                    'dest': state_name,
+                    'feedback': [],
+                    'param_changes': []
+                }
+            }]
+        }], 'Change the answer groups')
+
+        # Insert an answer for the new version of the state.
+        self._record_old_answer(
+            state_name, rule_spec_str, html_answer, exploration_id='exp_id0')
+
+        # Verify the exploration is at version 3.
+        exploration = exp_services.get_exploration_by_id('exp_id0')
+        self.assertEqual(exploration.version, 3)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0')
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
+
+        # The first answer should match version 2 and the second answer should
+        # match version 3 of the exploration, since an interaction ID occurred
+        # between those two answers.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0', exploration_version=2)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': 'eatery',
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 1,
+            'rule_spec_index': 0,
+            'classification_categorization': exp_domain.EXPLICIT_CLASSIFICATION,
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'TextInput',
+            'params': [],
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+        self.assertEqual(state_answers.exploration_id, 'exp_id0')
+        self.assertEqual(state_answers.exploration_version, 2)
+
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0', exploration_version=3)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': 'eatery',
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': exp_domain.EXPLICIT_CLASSIFICATION,
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'TextInput',
+            'params': [],
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+        self.assertEqual(state_answers.exploration_id, 'exp_id0')
+        self.assertEqual(state_answers.exploration_version, 3)
+
+        self._verify_no_migration_validation_problems()
+
+    def test_migrated_answer_matches_correct_version_after_rule_change(self):
+        """Tests whether an answer is correctly matched to a given exp version
+        if the rule specs of the matching state have changed between created_on
+        and last_updated for the submitted answers.
+        """
+        exploration = self.save_new_valid_exploration(
+            'exp_id0', self.owner_id, end_state_name='End')
+        state_name = exploration.init_state_name
+
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'TextInput'
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+            'new_value': {
+                'dest': state_name,
+                'feedback': [],
+                'param_changes': []
+            }
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'Contains',
+                    'inputs': {
+                        'x': 'dle'
+                    }
+                }, {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': 'eatery'
+                    }
+                }],
+                'outcome': {
+                    'dest': state_name,
+                    'feedback': [],
+                    'param_changes': []
+                }
+            }]
+        }], 'Create initial text input state')
+
+        # Insert an answer for the current version of the state.
+        rule_spec_str = 'Equals(eatery)'
+        html_answer = 'eatery'
+        self._record_old_answer(
+            state_name, rule_spec_str, html_answer, exploration_id='exp_id0')
+
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': 'eatery'
+                    }
+                }],
+                'outcome': {
+                    'dest': state_name,
+                    'feedback': [],
+                    'param_changes': []
+                }
+            }]
+        }], 'Change the rule specs')
+
+        # Insert an answer for the new version of the state.
+        self._record_old_answer(
+            state_name, rule_spec_str, html_answer, exploration_id='exp_id0')
+
+        # Verify the exploration is at version 3.
+        exploration = exp_services.get_exploration_by_id('exp_id0')
+        self.assertEqual(exploration.version, 3)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0')
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
+
+        # The first answer should match version 2 and the second answer should
+        # match version 3 of the exploration, since an interaction ID occurred
+        # between those two answers.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0', exploration_version=2)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': 'eatery',
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 1,
+            'classification_categorization': exp_domain.EXPLICIT_CLASSIFICATION,
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'TextInput',
+            'params': [],
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+        self.assertEqual(state_answers.exploration_id, 'exp_id0')
+        self.assertEqual(state_answers.exploration_version, 2)
+
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0', exploration_version=3)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': 'eatery',
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': exp_domain.EXPLICIT_CLASSIFICATION,
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'TextInput',
+            'params': [],
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+        self.assertEqual(state_answers.exploration_id, 'exp_id0')
+        self.assertEqual(state_answers.exploration_version, 3)
+
+        self._verify_no_migration_validation_problems()
+
+    def test_migrated_answer_matches_correct_version_after_cust_change(self):
+        """Tests whether an answer is correctly matched to a given exp version
+        if the interaction customization arguments of the matching state has
+        changed between created_on and last_updated for the submitted answers.
+        """
+        exploration = self.save_new_valid_exploration(
+            'exp_id0', self.owner_id, end_state_name='End')
+        state_name = exploration.init_state_name
+
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'MultipleChoiceInput'
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+            'new_value': {
+                'dest': state_name,
+                'feedback': [],
+                'param_changes': []
+            }
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': 0
+                    }
+                }],
+                'outcome': {
+                    'dest': state_name,
+                    'feedback': [],
+                    'param_changes': []
+                }
+            }, {
+                'rule_specs': [{
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': 1
+                    }
+                }],
+                'outcome': {
+                    'dest': state_name,
+                    'feedback': [],
+                    'param_changes': []
+                }
+            }]
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+            'new_value': {
+                'choices': {
+                    'value': [
+                        'Choice 1',
+                        'Choice 2'
+                    ]
+                }
+            }
+        }], 'Create initial multiple choice state')
+
+        # Insert an answer for the current multiple choice options.
+        rule_spec_str0 = 'Equals(1)'
+        html_answer0 = 'Choice 2'
+        self._record_old_answer(
+            state_name, rule_spec_str0, html_answer0, exploration_id='exp_id0')
+
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+            'new_value': {
+                'choices': {
+                    'value': [
+                        'Choice A',
+                        'Choice B'
+                    ]
+                }
+            }
+        }], 'Update state to have different multiple choice options')
+
+        # Insert an answer for the new version of the state.
+        rule_spec_str1 = 'Equals(1)'
+        html_answer1 = 'Choice B'
+        self._record_old_answer(
+            state_name, rule_spec_str1, html_answer1, exploration_id='exp_id0')
+
+        # Verify the exploration is at version 3.
+        exploration = exp_services.get_exploration_by_id('exp_id0')
+        self.assertEqual(exploration.version, 3)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0')
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
+
+        # The first answer should match version 2 and the second answer should
+        # match version 3 of the exploration, since the customization arguments
+        # changed between those two versions.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0', exploration_version=2)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': 1,
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 1,
+            'rule_spec_index': 0,
+            'classification_categorization': exp_domain.EXPLICIT_CLASSIFICATION,
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'MultipleChoiceInput',
+            'params': [],
+            'rule_spec_str': rule_spec_str0,
+            'answer_str': html_answer0
+        }])
+        self.assertEqual(state_answers.exploration_id, 'exp_id0')
+        self.assertEqual(state_answers.exploration_version, 2)
+
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0', exploration_version=3)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': 1,
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 1,
+            'rule_spec_index': 0,
+            'classification_categorization': exp_domain.EXPLICIT_CLASSIFICATION,
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'MultipleChoiceInput',
+            'params': [],
+            'rule_spec_str': rule_spec_str1,
+            'answer_str': html_answer1
+        }])
+        self.assertEqual(state_answers.exploration_id, 'exp_id0')
+        self.assertEqual(state_answers.exploration_version, 3)
+
+        self._verify_no_migration_validation_problems()
+
+    def test_migrated_answer_matches_to_latest_correct_exp_version(self):
+        """Tests to ensure that if irrelevant changes happen after a given
+        answer is submitted, that answer will be matched to the latest matching
+        exploration version.
+        """
+        exploration = self.save_new_valid_exploration(
+            'exp_id0', self.owner_id, end_state_name='End')
+        state_name = exploration.init_state_name
+        initial_state = exploration.states[state_name]
+
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'TextInput'
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'Contains',
+                    'inputs': {
+                        'x': 'ate'
+                    }
+                }],
+                'outcome': {
+                    'dest': state_name,
+                    'feedback': [],
+                    'param_changes': []
+                }
+            }]
+        }], 'Create initial text input state')
+
+        # Submit an answer to this version of the exploration.
+        rule_spec_str0 = 'Contains(ate)'
+        html_answer0 = 'levitate'
+        self._record_old_answer(
+            state_name, rule_spec_str0, html_answer0, exploration_id='exp_id0')
+
+        # Make a few more changes to the exploration.
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'new_value': [{
+                'type': 'text',
+                'value': 'Changes to the state content'
+            }]
+        }], 'Change the state content')
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'new_value': [{
+                'type': 'text',
+                'value': 'Better changes to the state content'
+            }]
+        }], 'Change the state content (again)')
+
+        # Submit another answer.
+        rule_spec_str1 = 'Contains(ate)'
+        html_answer1 = 'appreciate'
+        self._record_old_answer(
+            state_name, rule_spec_str1, html_answer1, exploration_id='exp_id0')
+
+        # Now make a change to the exploration that would change which version
+        # the answers should be matched to.
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': []
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'Continue',
+            'old_value': initial_state.interaction.id
+        }], 'Update state to have Continue interaction')
+
+        # Verify the exploration is at version 5.
+        exploration = exp_services.get_exploration_by_id('exp_id0')
+        self.assertEqual(exploration.version, 5)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0')
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
+
+        # Both answers should be matched to version 4 of the exploration, since
+        # that's the latest version to which they both match but is before a
+        # version which changes their meaning.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0', exploration_version=4)
+        submitted_answer_list = state_answers.get_submitted_answer_dict_list()
+        self.assertIn({
+            'answer': 'levitate',
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': exp_domain.EXPLICIT_CLASSIFICATION,
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'TextInput',
+            'params': [],
+            'rule_spec_str': rule_spec_str0,
+            'answer_str': html_answer0
+        }, submitted_answer_list)
+        self.assertIn({
+            'answer': 'appreciate',
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': exp_domain.EXPLICIT_CLASSIFICATION,
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'TextInput',
+            'params': [],
+            'rule_spec_str': rule_spec_str1,
+            'answer_str': html_answer1
+        }, submitted_answer_list)
+        self.assertEqual(state_answers.exploration_id, 'exp_id0')
+        self.assertEqual(state_answers.exploration_version, 4)
         self._verify_no_migration_validation_problems()
 
     def test_migrate_code_repl(self):
