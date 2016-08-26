@@ -453,6 +453,13 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
       _sendEventToGoogleAnalytics(
         'BrowseLibraryButton', 'click', $window.location.pathname);
     },
+    registerGoToDonationSiteEvent: function(donationSiteName) {
+      _sendEventToGoogleAnalytics(
+        'GoToDonationSite', 'click', donationSiteName);
+    },
+    registerApplyToTeachWithOppiaEvent: function() {
+      _sendEventToGoogleAnalytics('ApplyToTeachWithOppia', 'click', '');
+    },
     registerClickCreateExplorationButtonEvent: function() {
       _sendEventToGoogleAnalytics(
         'CreateExplorationButton', 'click', $window.location.pathname);
