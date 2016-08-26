@@ -20,6 +20,7 @@ from core.domain import activity_services
 from core.domain import exp_services
 from core.domain import collection_services
 from core.domain import rights_manager
+from core.domain import summary_services
 from core.domain import stats_jobs_continuous
 import feconf
 import utils
@@ -104,7 +105,7 @@ def get_displayable_exp_summary_dicts_matching_ids(
     summary tiles in the frontend.
     """
     exploration_summaries = (
-        exp_services.get_exploration_summaries_matching_ids(exploration_ids))
+        summary_services.get_exploration_summaries_matching_ids(exploration_ids)) # pylint: disable=line-too-long
 
     filtered_exploration_summaries = []
     for exploration_summary in exploration_summaries:
@@ -130,7 +131,7 @@ def get_recently_published_exploration_summary_dicts():
     """
     recently_published_exploration_summaries = [
         exp_summary for exp_summary in
-        exp_services.get_recently_published_exploration_summaries().values()]
+        summary_services.get_recently_published_exploration_summaries().values()] # pylint: disable=line-too-long
 
     # Arranging recently published exploration summaries with respect to time.
     # sorted() is used to sort the random list of recently published summaries.
@@ -149,7 +150,7 @@ def get_top_rated_exploration_summary_dicts(language_codes):
     """
     filtered_exp_summaries = [
         exp_summary for exp_summary in
-        exp_services.get_top_rated_exploration_summaries().values()
+        summary_services.get_top_rated_exploration_summaries().values()
         if exp_summary.language_code in language_codes and
         sum(exp_summary.ratings.values()) > 0]
 
@@ -187,7 +188,7 @@ def get_library_groups(language_codes):
 
     collection_summaries = [
         summary for summary in
-        collection_services.get_collection_summaries_matching_ids(
+        summary_services.get_collection_summaries_matching_ids(
             all_collection_ids)
         if summary is not None]
     collection_summary_dicts = {
@@ -208,7 +209,7 @@ def get_library_groups(language_codes):
 
     exp_summaries = [
         summary for summary in
-        exp_services.get_exploration_summaries_matching_ids(all_exp_ids)
+        summary_services.get_exploration_summaries_matching_ids(all_exp_ids)
         if summary is not None]
 
     exp_summary_dicts = {
@@ -398,6 +399,20 @@ def get_displayable_collection_summary_dicts_matching_ids(collection_ids):
     displayed on the library page as collection summary tiles.
     """
     collection_summaries = (
-        collection_services.get_collection_summaries_matching_ids(
+        summary_services.get_collection_summaries_matching_ids(
             collection_ids))
     return _get_displayable_collection_summary_dicts(collection_summaries)
+
+
+def _get_collection_summary_dicts_from_models(collection_summary_models):
+    """Given an iterable of CollectionSummaryModel instances, create a dict
+    containing corresponding collection summary domain objects, keyed by id.
+    """
+    collection_summaries = [
+        summary_services.get_collection_summary_from_model(
+            collection_summary_model)
+        for collection_summary_model in collection_summary_models]
+    result = {}
+    for collection_summary in collection_summaries:
+        result[collection_summary.id] = collection_summary
+    return result

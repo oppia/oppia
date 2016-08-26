@@ -16,9 +16,9 @@
 
 """Unit tests for recommendations_services."""
 
-from core.domain import exp_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
+from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -268,7 +268,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             sorted(recommendations_services.RECOMMENDATION_CATEGORIES))
 
     def test_get_item_similarity(self):
-        exp_summaries = exp_services.get_all_exploration_summaries()
+        exp_summaries = summary_services.get_all_exploration_summaries()
 
         self.assertEqual(recommendations_services.get_item_similarity(
             exp_summaries['exp_id_1'].category,
@@ -290,7 +290,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             exp_summaries['exp_id_4'].status), 9.0)
 
         rights_manager.publicize_exploration(self.admin_id, 'exp_id_4')
-        exp_summaries = exp_services.get_all_exploration_summaries()
+        exp_summaries = summary_services.get_all_exploration_summaries()
         self.assertEqual(recommendations_services.get_item_similarity(
             exp_summaries['exp_id_4'].category,
             exp_summaries['exp_id_4'].language_code,
@@ -302,7 +302,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             exp_summaries['exp_id_4'].status), 10.0)
 
         rights_manager.unpublish_exploration(self.admin_id, 'exp_id_2')
-        exp_summaries = exp_services.get_all_exploration_summaries()
+        exp_summaries = summary_services.get_all_exploration_summaries()
         self.assertEqual(recommendations_services.get_item_similarity(
             exp_summaries['exp_id_1'].category,
             exp_summaries['exp_id_1'].language_code,

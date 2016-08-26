@@ -18,10 +18,10 @@ import ast
 import logging
 
 from core import jobs
-from core.domain import exp_services
 from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import stats_jobs_continuous
+from core.domain import summary_services
 from core.platform import models
 import feconf
 import utils
@@ -335,7 +335,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                 model.total_plays += 1
                 model.put()
 
-        exp_summary = exp_services.get_exploration_summary_by_id(exp_id)
+        exp_summary = summary_services.get_exploration_summary_by_id(exp_id)
         if exp_summary:
             for user_id in exp_summary.owner_ids:
                 if event_type == feconf.EVENT_TYPE_START_EXPLORATION:
@@ -461,7 +461,7 @@ class UserStatsMRJobManager(
         # Turn answer count into reach
         reach = answer_count**exponent
 
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = summary_services.get_exploration_summary_by_id(
             item.id)
         contributors = exploration_summary.contributors_summary
         total_commits = sum(contributors.itervalues())

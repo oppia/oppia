@@ -21,6 +21,7 @@ import datetime
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rating_services
+from core.domain import summary_services
 from core.tests import test_utils
 
 
@@ -42,7 +43,8 @@ class RatingServicesTests(test_utils.GenericTestBase):
             rating_services.get_overall_ratings_for_exploration(self.EXP_ID),
             {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0})
 
-        exp_summary = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+        exp_summary = summary_services.get_exploration_summary_by_id(
+            self.EXP_ID)
         self.assertEqual(
             exp_summary.scaled_average_rating, 0)
 
@@ -57,7 +59,8 @@ class RatingServicesTests(test_utils.GenericTestBase):
         rating_services.assign_rating_to_exploration(
             self.USER_ID_1, self.EXP_ID, 3)
 
-        exp_summary = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+        exp_summary = summary_services.get_exploration_summary_by_id(
+            self.EXP_ID)
         self.assertAlmostEqual(
             exp_summary.scaled_average_rating, 1.5667471839848, places=4)
 

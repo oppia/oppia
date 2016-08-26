@@ -20,6 +20,7 @@ import datetime
 
 from core.domain import event_services
 from core.domain import exp_services
+from core.domain import summary_services
 from core.platform import models
 import feconf
 (exp_models, user_models,) = models.Registry.import_models([
@@ -65,7 +66,7 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
         return old_rating
     old_rating = transaction_services.run_in_transaction(_update_user_rating)
 
-    exploration_summary = exp_services.get_exploration_summary_by_id(
+    exploration_summary = summary_services.get_exploration_summary_by_id(
         exploration_id)
     if not exploration_summary.ratings:
         exploration_summary.ratings = feconf.get_empty_ratings()
@@ -80,7 +81,7 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
         exp_services.get_scaled_average_rating(
             exploration_summary.ratings))
 
-    exp_services.save_exploration_summary(exploration_summary)
+    summary_services.save_exploration_summary(exploration_summary)
 
 
 def get_user_specific_rating_for_exploration(user_id, exploration_id):
@@ -107,5 +108,5 @@ def get_when_exploration_rated(user_id, exploration_id):
 
 
 def get_overall_ratings_for_exploration(exploration_id):
-    exp_summary = exp_services.get_exploration_summary_by_id(exploration_id)
+    exp_summary = summary_services.get_exploration_summary_by_id(exploration_id)
     return exp_summary.ratings

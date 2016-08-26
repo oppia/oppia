@@ -26,6 +26,7 @@ from core.domain import feedback_services
 from core.domain import stats_services
 from core.domain import subscription_services
 from core.domain import summary_dicts_services
+from core.domain import summary_services
 from core.domain import user_jobs_continuous
 from core.domain import user_services
 import feconf
@@ -155,10 +156,10 @@ class DashboardHandler(base.BaseHandler):
                 self.user_id))
 
         subscribed_exploration_summaries = filter(None, (
-            exp_services.get_exploration_summaries_matching_ids(
+            summary_services.get_exploration_summaries_matching_ids(
                 exploration_ids_subscribed_to)))
         subscribed_collection_summaries = filter(None, (
-            collection_services.get_collection_summaries_matching_ids(
+            summary_services.get_collection_summaries_matching_ids(
                 subscription_services.get_collection_ids_subscribed_to(
                     self.user_id))))
 

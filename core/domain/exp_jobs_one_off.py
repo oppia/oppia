@@ -23,6 +23,7 @@ from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import summary_services
 from core.platform import models
 import feconf
 import utils
@@ -101,10 +102,10 @@ class ExplorationContributorsSummaryOneOffJob(jobs.BaseMapReduceJobManager):
         if item.deleted:
             return
 
-        summary = exp_services.get_exploration_summary_by_id(item.id)
+        summary = summary_services.get_exploration_summary_by_id(item.id)
         summary.contributors_summary = (
             exp_services.compute_exploration_contributors_summary(item.id))
-        exp_services.save_exploration_summary(summary)
+        summary_services.save_exploration_summary(summary)
 
     @staticmethod
     def reduce(key, values):
