@@ -57,13 +57,6 @@ indexes:
 
 - kind: ExplorationCommitLogEntryModel
   properties:
-  - name: deleted
-  - name: exploration_id
-  - name: last_updated
-    direction: desc
-
-- kind: ExplorationCommitLogEntryModel
-  properties:
   - name: exploration_id
   - name: last_updated
     direction: desc
@@ -94,35 +87,6 @@ indexes:
   properties:
   - name: realtime_layer
   - name: created_on
-
-- kind: FeedbackMessageModel
-  properties:
-  - name: <property object at 0x103ef5ba8>
-  - name: deleted
-  - name: last_updated
-
-- kind: FeedbackMessageModel
-  properties:
-  - name: <property object at 0x10c580ba8>
-  - name: deleted
-  - name: last_updated
-
-- kind: FeedbackMessageModel
-  properties:
-  - name: <property object at 0x110151ba8>
-  - name: deleted
-  - name: last_updated
-
-- kind: FeedbackMessageModel
-  properties:
-  - name: deleted
-  - name: last_updated
-
-- kind: FeedbackMessageModel
-  properties:
-  - name: deleted
-  - name: thread_id
-  - name: last_updated
 
 - kind: FeedbackMessageModel
   properties:

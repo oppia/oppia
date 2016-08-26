@@ -1152,8 +1152,9 @@ def get_last_updates_for_exp_ids(user_id, exp_ids):
     all_commits = (
         exp_models.ExplorationCommitLogEntryModel.get_multi_all_commits(
             exp_ids))
-    for entry in all_commits:
-        commits_explorations_mapping[entry.exploration_id] = []
+
+    for exp_id in exp_ids:
+        commits_explorations_mapping[exp_id] = []
 
     for entry in all_commits:
         exp_id = entry.exploration_id
