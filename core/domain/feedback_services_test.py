@@ -335,7 +335,7 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
 
         tasks = self.get_pending_tasks()
         self.assertEqual(
-            tasks[0].url, feconf.FEEDBACK_MESSAGE_EMAIL_HANDLER_URL)
+            tasks[0].url, feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS)
 
     def test_create_new_instant_task(self):
         user_id = 'user'
@@ -355,7 +355,7 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
         tasks = self.get_pending_tasks()
         payload = json.loads(tasks[0].payload)
         self.assertEqual(
-            tasks[0].url, feconf.INSTANT_FEEDBACK_EMAIL_HANDLER_URL)
+            tasks[0].url, feconf.TASK_URL_INSTANT_FEEDBACK_EMAILS)
         self.assertDictEqual(payload['reference_dict'], reference_dict)
 
 
@@ -487,7 +487,7 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
 
             tasks = self.get_pending_tasks()
             self.assertEqual(
-                tasks[0].url, feconf.FEEDBACK_MESSAGE_EMAIL_HANDLER_URL)
+                tasks[0].url, feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS)
             self.process_and_flush_pending_tasks()
 
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
