@@ -1350,7 +1350,7 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
 
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
-        
+
     def test_that_flag_exploration_emails_are_correct(self):
         expected_email_subject = 'New flag has been raised for "Title"'
 
