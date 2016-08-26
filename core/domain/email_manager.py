@@ -507,7 +507,7 @@ def send_instant_feedback_message_email(
             email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
-def send_flagged_exploration_email(
+def send_flag_exploration_email(
         exploration_title, exploration_id, reporter_id, report_text):
     email_subject = 'New flag has been raised for "%s"' % exploration_title
 
@@ -528,7 +528,7 @@ def send_flagged_exploration_email(
 
     email_body = email_body_template % (
         user_services.get_user_settings(reporter_id).username,
-        exploration_title, report_type, exploration_id,
+        exploration_title, report_text, exploration_id,
         exploration_title, EMAIL_FOOTER.value)
 
     recipient_list = config_domain.MODERATOR_IDS.value

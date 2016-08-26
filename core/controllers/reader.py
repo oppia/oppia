@@ -578,5 +578,5 @@ class FlagExplorationEmailHandler(base.BaseHandler):
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
 
-        email_manager.send_flagged_exploration_email(
+        email_manager.send_flag_exploration_email(
             exploration.title, exploration.id, self.user_id, report_text)
