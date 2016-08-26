@@ -37,6 +37,7 @@ from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import summary_services
 from core.domain import moderator_services
+from core.domain import email_manager
 import feconf
 import utils
 
@@ -569,7 +570,8 @@ class FlagExplorationHandler(base.BaseHandler):
 
 
 class FlagExplorationEmailHandler(base.BaseHandler):
-    """Handles task of sending emails about flagged explorations to moderators."""
+    """Handles task of sending emails about flagged explorations
+    to moderators."""
 
     def post(self):
         payload = json.loads(self.request.body)

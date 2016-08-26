@@ -1328,9 +1328,9 @@ class FeedbackMessageInstantEmailTests(test_utils.GenericTestBase):
                 feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION)
 
 
-"""class ReportEmailTest(test_utils.GenericTestBase):
+""" class FlagExplorationEmailTest(test_utils.GenericTestBase):
     def setUp(self):
-        super(ReportEmailTest, self).setUp()
+        super(FlagExplorationEmailTest, self).setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -1346,14 +1346,12 @@ class FeedbackMessageInstantEmailTests(test_utils.GenericTestBase):
             'A', self.editor_id, 'Title')
         self.owner_ids = [self.editor_id]
 
-        self.report_type = 'AD'
+        self.report_text = 'AD'
 
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
-        self.can_send_feedback_email_ctx = self.swap(
-            feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
-
-    def test_that_report_emails_are_correct(self):
+        
+    def test_that_flag_exploration_emails_are_correct(self):
         expected_email_subject = 'New flag has been raised for "Title"'
 
         expected_email_html_body = (
@@ -1384,10 +1382,10 @@ class FeedbackMessageInstantEmailTests(test_utils.GenericTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
-            email_manager.send_report_email(
+        with self.can_send_emails_ctx:
+            email_manager.send_flag_exploration_email(
                 self.exploration.title, self.exploration.id, self.new_user_id,
-                self.report_type, self.owner_ids)
+                self.report_text)
 
             # make sure correct email is sent.
             messages = self.mail_stub.get_sent_messages(to=self.MODERATOR_EMAIL)
@@ -1412,4 +1410,5 @@ class FeedbackMessageInstantEmailTests(test_utils.GenericTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)"""
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+"""

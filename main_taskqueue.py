@@ -16,7 +16,7 @@
 
 # pylint: disable=relative-import
 from core.controllers import feedback
-from core.domain import reader
+from core.controllers import reader
 from core.platform import models
 import feconf
 import main
