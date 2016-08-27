@@ -22,7 +22,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import param_domain
-from core.domain import moderator_services
+#from core.domain import moderator_services
 from core.tests import test_utils
 import feconf
 import utils
@@ -376,7 +376,7 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        
+
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
@@ -453,7 +453,7 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
             'You can change your email preferences via the Preferences page.')
 
         with self.can_send_emails_ctx:
-            
+
             self.process_and_flush_pending_tasks()
 
             messages = self.mail_stub.get_sent_messages(to=self.MODERATOR_EMAIL)
