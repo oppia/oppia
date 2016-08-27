@@ -490,7 +490,7 @@ oppia.directive('conversationSkin', [function() {
             if ($scope.isIframed) {
               var explorationLanguageCode = (
                 oppiaPlayerService.getExplorationLanguageCode());
-              if (langCodes.indexOf(explorationLanguageCode) > -1) {
+              if (langCodes.indexOf(explorationLanguageCode) !== -1) {
                 $translate.use(explorationLanguageCode);
               } else {
                 $translate.use('en');
