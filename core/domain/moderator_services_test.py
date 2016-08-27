@@ -18,7 +18,7 @@
 #import types
 
 #from core.domain import moderator_services
-#from core.tests import test_utils
+from core.tests import test_utils
 #import feconf
 
 
