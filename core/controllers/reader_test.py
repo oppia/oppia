@@ -22,6 +22,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import param_domain
+from core.domain import moderator_services
 from core.tests import test_utils
 import feconf
 import utils
@@ -362,3 +363,166 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
             ratings['overall_ratings'],
             {'1': 0, '2': 0, '3': 0, '4': 2, '5': 0})
         self.logout()
+
+
+class FlagExplorationHandlerTests(test_utils.GenericTestBase):
+
+    """EXP_ID = '0'
+
+    def setUp(self):
+        super(FlagExplorationHandlerTests, self).setUp()
+
+        # Register users.
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
+
+        # Load exploration 0.
+        exp_services.delete_demo(self.EXP_ID)
+        exp_services.load_demo(self.EXP_ID)
+
+        # Login and create exploration.
+        self.login(self.EDITOR_EMAIL)
+
+        # Create exploration.
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.editor_id,
+            title='Title',
+            category='This is just a spam category',
+            objective='Test a spam exploration.')
+        self.can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS', True)
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        init_state = exploration.states[exploration.init_state_name]
+        init_interaction = init_state.interaction
+        init_interaction.default_outcome.dest = exploration.init_state_name
+        exploration.add_states(['State A', 'State 2', 'State 3'])
+        exploration.states['State A'].update_interaction_id('TextInput')
+        exploration.states['State 2'].update_interaction_id('TextInput')
+        exploration.states['State 3'].update_interaction_id('TextInput')
+        exp_services._save_exploration(self.editor_id, exploration, '', [])  # pylint: disable=protected-access
+        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
+        rights_manager.assign_role_for_exploration(
+            self.editor_id, self.EXP_ID, self.moderator_id,
+            rights_manager.ROLE_EDITOR)
+        self.logout()
+
+        # Login and flag exploration.
+        self.login(self.NEW_USER_EMAIL)
+
+        response = self.testapp.get('/explore/%s' % self.EXP_ID)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # Create report for exploration.
+        self.post_json(
+            '%s/%s' % (feconf.FLAG_EXPLORATION_URL_PREFIX, self.EXP_ID), {
+                'report_text': 'AD',
+            }, csrf_token)
+
+        self.logout()
+
+    def test_that_emails_are_sent(self):
+        expected_email_html_body = (
+            'Hello Moderator,<br>'
+            'newuser has submitted a new report on the exploration Title'
+            ' on the grounds of AD .<br>'
+            'You can modify the exploration by clicking '
+            '<a href="https://www.oppia.org/create/A">'
+            '"Edit Title"</a>.<br>'
+            '<br>'
+            'Thanks!<br>'
+            '- The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_email_text_body = (
+            'Hello Moderator,\n'
+            'newuser has submitted a new report on the exploration Title'
+            ' on the grounds of AD .\n'
+            'You can modify the exploration by clicking "Edit Title".\n'
+            '\n'
+            'Thanks!\n'
+            '- The Oppia Team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+
+        with self.can_send_emails_ctx:
+            
+            self.process_and_flush_pending_tasks()
+
+            messages = self.mail_stub.get_sent_messages(to=self.MODERATOR_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(),
+                expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(),
+                expected_email_text_body)"""
+
+
+class FlagExplorationEmailHandlerTest(test_utils.GenericTestBase):
+
+    """def setUp(self):
+        super(FlagExplorationEmailHandlerTest, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
+
+        self.exploration = self.save_new_default_exploration(
+            'A', self.editor_id, 'Title')
+        self.can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS', True)
+        self.report_text = 'AD'
+
+    def test_that_emails_are_sent(self):
+        expected_email_html_body = (
+            'Hello Moderator,<br>'
+            'newuser has submitted a new report on the exploration Title'
+            ' on the grounds of AD .<br>'
+            'You can modify the exploration by clicking '
+            '<a href="https://www.oppia.org/create/A">'
+            '"Edit Title"</a>.<br>'
+            '<br>'
+            'Thanks!<br>'
+            '- The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_email_text_body = (
+            'Hello Moderator,\n'
+            'newuser has submitted a new report on the exploration Title'
+            ' on the grounds of AD .\n'
+            'You can modify the exploration by clicking "Edit Title".\n'
+            '\n'
+            'Thanks!\n'
+            '- The Oppia Team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+
+        with self.can_send_emails_ctx:
+            moderator_services.enqueue_flag_exploration_email_task(
+                self.exploration.id, self.report_text)
+
+            self.process_and_flush_pending_tasks()
+
+            messages = self.mail_stub.get_sent_messages(to=self.MODERATOR_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(),
+                expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(),
+                expected_email_text_body)"""

@@ -1329,7 +1329,7 @@ class FeedbackMessageInstantEmailTests(test_utils.GenericTestBase):
 
 
 class FlagExplorationEmailTest(test_utils.GenericTestBase):
-    """def setUp(self):
+    def setUp(self):
         super(FlagExplorationEmailTest, self).setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -1357,9 +1357,7 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
         expected_email_html_body = (
             'Hello Moderator,<br>'
             'newuser has submitted a new report on the exploration Title'
-            'of the grounds of AD .'
-            '<a href="https://www.oppia.org/explore/A">"Title"</a>.<br>'
-            'The author/s of the exploration is/are editor, '
+            ' on the grounds of AD .<br>'
             'You can modify the exploration by clicking '
             '<a href="https://www.oppia.org/create/A">'
             '"Edit Title"</a>.<br>'
@@ -1373,9 +1371,8 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
         expected_email_text_body = (
             'Hello Moderator,\n'
             'newuser has submitted a new report on the exploration Title'
-            'of the type AD, "Title"\n'
-            'The author/s of the exploration is/are editor, '
-            'You can modify the exploration by clicking "Edit Title"\n'
+            ' on the grounds of AD .\n'
+            'You can modify the exploration by clicking "Edit Title".\n'
             '\n'
             'Thanks!\n'
             '- The Oppia Team\n'
@@ -1410,4 +1407,7 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)"""
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_REPORT_BAD_CONTENT)
