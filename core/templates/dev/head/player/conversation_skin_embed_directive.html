@@ -80,7 +80,7 @@
                               <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
                       </div>
                     <div ng-if="!isCurrentSupplementalCardNonempty() || isScreenNarrowAndShowingTutorCard()">
-                      <md-button class="instructions-button" ng-click="showSupplementalCardIfScreenIsNarrow()">
+                      <md-button class="instructions-button oppia-learner-continue-button" ng-click="showSupplementalCardIfScreenIsNarrow()">
                           <[exploration.getInteractionInstructions(activeCard.stateName)]>
                       </md-button>
                     </div>
@@ -224,10 +224,15 @@
     }
 
     .logo-bottom-nav-bar {
-      display: flex;
-      align-items: center;
-      float: right;
+      height: 50%;
       max-height: 50px;
+      overflow: auto;
+      margin: auto;
+      position: relative;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
     }
 
     .nav-bar-bottom-replay-content {
@@ -794,6 +799,9 @@
       }
       .replay-nav-icon {
         font-size: 40px;
+      }
+      .help-card-standard {
+        bottom: -20px;
       }
     }
   </style>
