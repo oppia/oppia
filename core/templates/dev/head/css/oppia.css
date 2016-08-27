@@ -2746,10 +2746,6 @@ div#ng-curtain {
   margin-bottom: 10px;
 }
 
-.oppia-notifications-tray {
-  margin-left: -8px;
-}
-
 .oppia-notifications-dashboard-card {
   padding: 15px 40px;
 }
@@ -3734,7 +3730,7 @@ md-card.preview-conversation-skin-supplemental-card {
   font-size: 16px;
 }
 
-@media(max-width: 500px) {
+@media(max-width: 815px) {
   .oppia-dashboard-container {
     padding-left: 10px;
     padding-right: 10px;
