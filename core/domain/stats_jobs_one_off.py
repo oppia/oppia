@@ -494,39 +494,43 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     _NOTE_DURATION_FRACTION_PART = 1
 
     @classmethod
-    def _get_exploration_model_by_id_version(cls, exp_id, version):
+    def _get_exploration_models_by_versions(cls, exp_id, versions):
+        """Similar to VersionedModel.get_version(), except this allows retrieval
+        of exploration models marked as deleted.
+        """
         try:
-            # From VersionedModel.get_version(), except this allows retrieval of
-            # exploration models marked as deleted.
-            exp_model = exp_models.ExplorationModel(id=exp_id)
             # pylint: disable=protected-access
-            exp_model._reconstitute_from_snapshot_id(
-                exp_models.ExplorationModel._get_snapshot_id(exp_id, version))
-            return exp_model
+            snapshot_ids = [
+                exp_models.ExplorationModel._get_snapshot_id(exp_id, version)
+                for version in versions]
+            exp_models_by_versions = [
+                exp_models.ExplorationModel(id=exp_id) for _ in versions]
+            return exp_models.ExplorationModel._reconstitute_multi_from_models(
+                zip(snapshot_ids, exp_models_by_versions))
         except Exception:
             return None
 
     @classmethod
-    def _get_exploration_from_model(cls, exp_model):
+    def _get_explorations_from_models(cls, exp_models_by_versions):
         try:
-            if exp_model:
-                return (
-                    exp_services.get_exploration_from_model(exp_model), False)
-            else:
-                return (None, False)
+            return (list([
+                exp_services.get_exploration_from_model(exp_model)
+                for exp_model in exp_models_by_versions
+            ]), False)
         except utils.ExplorationConversionError:
             return (None, True)
 
     @classmethod
-    def _find_exploration_immediately_before_timestamp(cls, exp_id, when):
-        # Find the latest exploration version before the given time.
-
-        # NOTE(bhenning): Also, it's possible some of these answers were
-        # submitted during a playthrough where the exploration was changed
-        # midway. There's not a lot that can be done about this; hopefully the
-        # job can convert the answer correctly or detect if it can't. If this
-        # ends up being a major issue, it might be mitigated by scanning stats
-        # around the time the answer was submitted, but it's not possible to
+    def _get_all_exploration_versions(cls, exp_id):
+        """Return all exploration versions for the given exploration ID in
+        descending order by version, or an empty list if none could be found
+        (such as if the exploration was permanently deleted). This function can
+        retrieve deleted explorations. Returns None if any exploration that
+        would have been returned failed a migration.
+        """
+        # NOTE(bhenning): It's possible some of these answers were submitted
+        # during a playthrough where the exploration was changed midway. There's
+        # not a lot that can be done about this since it's not possible to
         # demultiplex the stream of answers and identify which session they are
         # associated with.
 
@@ -534,38 +538,16 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         latest_exp_model = exp_models.ExplorationModel.get_by_id(exp_id)
         if not latest_exp_model:
             # The exploration may have been permanently deleted.
-            return (None, False)
-        if (latest_exp_model.version == 1 or
-                latest_exp_model.last_updated <= when):
-            # Short-circuit: the answer was submitted later than the current exp
-            # version. Otherwise, this is the only version and something is
-            # wrong with the answer. Just deal with it.
-            latest_exp, failed_migration = cls._get_exploration_from_model(
-                latest_exp_model)
-            return (latest_exp, failed_migration)
+            return []
 
-        # Use ExplorationSnapshotContentModel to retrieve dates for past
-        # explorations. This model is fully reliable as it was introduced with
-        # the first public release of Oppia, unlike
-        # ExplorationCommitLogEntryModel.
-        snapshots = exp_services.get_exploration_snapshots_metadata(
-            exp_id, max_version=latest_exp_model.version, allow_deleted=True)
-        when_ms = utils.get_time_in_millisecs(when)
-        for snapshot in reversed(snapshots):
-            if snapshot['created_on_ms'] < when_ms:
-                # Found the closest exploration to the given answer
-                # submission
-                exp_model = cls._get_exploration_model_by_id_version(
-                    exp_id, snapshot['version_number'])
-                if not exp_model:
-                    return (None, False)
-                exp, failed_migration = cls._get_exploration_from_model(
-                    exp_model)
-                return (exp, failed_migration)
-
-        # One of the other snapshots should have matched; the answer was
-        # submitted outside all snapshots of the exploration.
-        return (None, False)
+        versions = list(reversed(xrange(1, latest_exp_model.version + 1)))
+        exp_models_by_versions = cls._get_exploration_models_by_versions(
+            exp_id, versions)
+        if not exp_models_by_versions:
+            return []
+        exps, failed_migration = cls._get_explorations_from_models(
+            exp_models_by_versions)
+        return None if failed_migration else exps
 
     # This function comes from extensions.answer_summarizers.models.
     @classmethod
@@ -1191,15 +1173,12 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             'exploration_id': exp_id,
             'state_name': state_name,
             'rule_str': rule_str,
-            'created_on': item.created_on,
             'last_updated': item.last_updated
         })
 
     @staticmethod
     def reduce(key, stringified_values):
-        # TODO(bhenning): Throw errors for all major points of failure.
-
-        # Print any errors or notices encountered during the map step.
+        # Output any errors or notices encountered during the map step.
         if key == AnswerMigrationJob._ERROR_KEY or (
                 key == AnswerMigrationJob._ALREADY_MIGRATED_KEY):
             for value in stringified_values:
@@ -1218,76 +1197,164 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         exploration_id = first_value_dict['exploration_id']
         state_name = first_value_dict['state_name']
 
-        dated_explorations_dict = {}
-        for value_dict in value_dict_list:
-            created_on = value_dict['created_on']
+        # One major point of failure is the exploration not existing. Another
+        # major point of failure comes from the time matching.
+        explorations = AnswerMigrationJob._get_all_exploration_versions(
+            exploration_id)
 
-            # Avoid unnecessary exploration loads.
-            if created_on in dated_explorations_dict:
-                continue
-
-            # One major point of failure is the exploration not existing.
-            # Another major point of failure comes from the time matching. Since
-            # one entity in StateRuleAnswerLogModel represents many different
-            # answers, all answers are being matched to a single exploration
-            # even though each answer may have been submitted to a different
-            # exploration version. This may cause significant migration issues
-            # and will be tricky to work around.
-            (exploration, failed_migration) = (
-                AnswerMigrationJob._find_exploration_immediately_before_timestamp( # pylint: disable=line-too-long
-                    exploration_id, created_on))
-            dated_explorations_dict[created_on] = exploration
-
-            if not exploration:
-                # TODO(bhenning): Add exploration_id back to this output. It was
-                # removed to reduce the amount of output from the production
-                # migration job.
-                if failed_migration:
-                    yield (
-                        'Encountered exploration which cannot be converted to '
-                        'the latest states schema version. Migrating with '
-                        'missing exploration.')
-                else:
-                    yield (
-                        'Encountered permanently missing exploration '
-                        'referenced to by submitted answers. Migrating with '
-                        'missing exploration.')
-
-            # Another point of failure is the state not matching due to an
-            # incorrect exploration version selection.
-            if exploration and state_name not in exploration.states:
-                # TODO(bhenning): Add exploration id, exploration version, and
-                # answer created timestamp to this output. They will increase
-                # the size of the output.
-                yield (
-                    'Failed to match answer to exploration snapshots '
-                    'history.')
+        if explorations is None:
+            yield (
+                'Encountered exploration (exp ID: %s) which cannot be '
+                'converted to the latest states schema version. Cannot '
+                'recover.' % (exploration_id))
+            return
+        elif len(explorations) == 0:
+            yield (
+                'Encountered permanently missing exploration referenced to by '
+                'submitted answers. Migrating with missing exploration and '
+                'state.')
 
         for value_dict in value_dict_list:
             item_id = value_dict['item_id']
             item = stats_models.StateRuleAnswerLogModel.get(item_id)
             rule_str = value_dict['rule_str']
-            created_on = value_dict['created_on']
             last_updated = value_dict['last_updated']
-            exploration = dated_explorations_dict[created_on]
-            if exploration and state_name in exploration.states:
-                state = exploration.states[state_name]
-            else:
-                state = None
+
             migration_errors = AnswerMigrationJob._migrate_answers(
-                item_id, exploration_id, exploration, state_name, state,
-                item.answers, rule_str)
+                item_id, explorations, exploration_id, state_name, item.answers,
+                rule_str, last_updated)
+
             for error in migration_errors:
                 yield (
-                    'Item ID: %s, created: %s, last updated: %s, '
-                    'state name: %s, exp id: %s, exp version: %s, error: %s' % (
-                        item_id, created_on, last_updated, state_name,
-                        exploration_id, exploration.version
-                        if exploration else 'Unknown', error))
+                    'Item ID: %s, last updated: %s, state name: %s, '
+                    'exp id: %s, error: %s' % (
+                        item_id, last_updated, state_name, exploration_id,
+                        error))
 
     @classmethod
-    def _migrate_answers(cls, item_id, exploration_id, exploration, state_name,
-                         state, answers, rule_str):
+    def _migrate_answers(cls, item_id, explorations, exploration_id, state_name,
+                         answers, rule_str, last_updated):
+        migrated_answers = []
+        matched_explorations = []
+        answer_strings = []
+        answer_frequencies = []
+        for answer_str, answer_frequency in answers.iteritems():
+            migrated_answer, matched_exp, error = cls._try_migrate_answer(
+                answer_str, rule_str, last_updated, explorations, state_name)
+            if not error:
+                migrated_answers.append(migrated_answer)
+                matched_explorations.append(matched_exp)
+                answer_strings.append(answer_str)
+                answer_frequencies.append(answer_frequency)
+            else:
+                yield error
+
+        if len(migrated_answers) != len(answers):
+            yield 'Failed to migrate all answers for item batch: %s' % item_id
+            return
+
+        for answer, exploration, answer_str, answer_frequency in zip(
+                migrated_answers, matched_explorations, answer_strings,
+                answer_frequencies):
+            # The resolved answer will simply be duplicated in the new data
+            # store to replicate frequency.
+            submitted_answer_list = [answer] * answer_frequency
+
+            if exploration:
+                stats_services.record_answers(
+                    exploration, state_name, submitted_answer_list)
+                exploration_version = exploration.version
+            else:
+                exploration_version = (
+                    stats_domain.MIGRATED_STATE_ANSWER_MISSING_EXPLORATION_VERSION) # pylint: disable=line-too-long
+                interaction_id = (
+                    stats_domain.MIGRATED_STATE_ANSWER_MISSING_EXPLORATION_INTERACTION_ID) # pylint: disable=line-too-long
+
+                # NOTE(bhenning): This has code skew with
+                # stats_services.record_answer(), however this approach allows
+                # the answer to be recorded without loaded exploration or state
+                # objects.
+                state_answers = stats_domain.StateAnswers(
+                    exploration_id, exploration_version, state_name,
+                    interaction_id, submitted_answer_list)
+                state_answers.validate()
+                stats_models.StateAnswersModel.insert_submitted_answers(
+                    state_answers.exploration_id,
+                    state_answers.exploration_version, state_answers.state_name,
+                    state_answers.interaction_id,
+                    state_answers.get_submitted_answer_dict_list())
+
+            stats_models.MigratedAnswerModel.finish_migrating_answer(
+                item_id, exploration_id, exploration_version, state_name)
+
+    @classmethod
+    def _try_migrate_answer(cls, answer_str, rule_str, last_updated,
+                            explorations, state_name):
+        """Try to migrate the answer based on the given list of explorations.
+        The explorations are descending in order by their version. More recent
+        explorations (earlier in the list) are filtered out based on the
+        last_updated timestamp, which is the latest possible time the given
+        answer could have been submitted. This function guarantees the best
+        possible migrated answer for the most recent exploration which is not
+        newer than the answer. If the answer can successfully be migrated to two
+        different answer object types, this function will fail due to an
+        ambiguous migration result.
+
+        Returns a tuple containing the migrated answer, the exploration that was
+        used to migrate the answer, an an error. The error is None unless the
+        migration failed.
+        """
+        # TODO(bhenning): Consider outputting the results of running this
+        # matching procedure (e.g. how many versions were skipped with errors
+        # before a matching answer was found).
+        if not explorations:
+            answer, error = cls._migrate_answer(
+                answer_str, rule_str, None, state_name)
+            return (answer, None, error)
+
+        matched_answer = None
+        first_error = None
+        matched_exploration = None
+        # pylint: disable=unidiomatic-typecheck
+        for exploration in explorations:
+            # A newer exploration could not be the recipient of this answer if
+            # the last answer for this entity was submitted before this version
+            # of the exploration was created.
+            if exploration.created_on >= last_updated:
+                continue
+            answer, error = cls._migrate_answer(
+                answer_str, rule_str, exploration, state_name)
+            if not answer:
+                if not first_error:
+                    first_error = error
+            elif not matched_answer:
+                matched_answer = answer
+                matched_exploration = exploration
+            elif type(answer.normalized_answer) != type(
+                    matched_answer.normalized_answer):
+                return (
+                    None,
+                    None,
+                    'Migrated answer \'%s\' can migrate to two types: %s (exp '
+                    'version: %s) and %s (exp version: %s)' % (
+                        answer_str, type(matched_answer.normalized_answer),
+                        matched_exploration.version,
+                        type(answer.normalized_answer), exploration.version))
+        if matched_answer:
+            first_error = None
+        return (matched_answer, matched_exploration, first_error)
+
+    @classmethod
+    def _migrate_answer(cls, answer_str, rule_str, exploration, state_name):
+        # Another point of failure is the state not matching due to an
+        # incorrect exploration version selection.
+        if exploration and state_name not in exploration.states:
+            return (
+                None,
+                'Failed to match answer \'%s\' to exploration snapshots '
+                'history (exp ID: %s, exp version: %s).' % (
+                    answer_str, exploration.id, exploration.version))
+
         classification_categorization = (
             cls._infer_classification_categorization(rule_str))
 
@@ -1296,7 +1363,17 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # being ignored.
         if classification_categorization == (
                 exp_domain.TRAINING_DATA_CLASSIFICATION):
-            return
+            return (None, 'Cannot reconstitute fuzzy rule')
+
+        # Params were, unfortunately, never stored. They cannot be trivially
+        # recovered.
+        params = []
+
+        # These are values which cannot be reconstituted; use special sentinel
+        # values for them, instead.
+        session_id = stats_domain.MIGRATED_STATE_ANSWER_SESSION_ID
+        time_spent_in_sec = (
+            stats_domain.MIGRATED_STATE_ANSWER_TIME_SPENT_IN_SEC)
 
         # Unfortunately, the answer_group_index and rule_spec_index may be
         # wrong for soft rules, since previously there was no way of
@@ -1309,7 +1386,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         answer_group = None
         rule_spec = None
 
-        if state:
+        if exploration:
+            state = exploration.states[state_name]
             (answer_group_index, rule_spec_index, error_string) = (
                 cls._infer_which_answer_group_and_rule_match_answer(
                     state, rule_str))
@@ -1317,106 +1395,38 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             # Major point of failure: answer_group_index or rule_spec_index may
             # return none when it's not a default result.
             if answer_group_index is None or rule_spec_index is None:
-                yield (
+                return (
+                    None,
                     'Failed to match rule string: \'%s\' because of %s '
                     '(state=%s)' % (rule_str, error_string, state.to_dict()))
-                return
 
             answer_groups = state.interaction.answer_groups
             if answer_group_index != len(answer_groups):
                 answer_group = answer_groups[answer_group_index]
                 rule_spec = answer_group.rule_specs[rule_spec_index]
-        else:
-            yield (
-                'Assuming answer belongs to the default outcome due to missing '
-                'state object.')
 
-        # These are values which cannot be reconstituted; use special sentinel
-        # values for them, instead.
-        session_id = stats_domain.MIGRATED_STATE_ANSWER_SESSION_ID
-        time_spent_in_sec = (
-            stats_domain.MIGRATED_STATE_ANSWER_TIME_SPENT_IN_SEC)
-
-        # Params were, unfortunately, never stored. They cannot be trivially
-        # recovered.
-        params = []
-
-        # A note on frequency: the resolved answer will simply be duplicated in
-        # the new data store to replicate frequency. This is not 100% accurate
-        # since each answer may have been submitted at different times and,
-        # thus, for different versions of the exploration. This information is
-        # practically impossible to recover, so this strategy is considered
-        # adequate.
-        if state:
-            interaction_id = state.interaction.id
-        else:
-            # TODO(bhenning): A sentinel value would be better here. However,
-            # that would require StateAnswers.validate() to be updated to
-            # accommodate this special value.
-            interaction_id = 'EndExploration'
-            yield (
-                'Assuming answer belongs to EndExploration due to missing '
-                'state object')
-
-        # TODO(bhenning): This special value ought to be documented in
-        # StateAnswers.
-        exploration_version = exploration.version if exploration else 0
-        migrated_answers = []
-        answer_strings = []
-        answer_frequencies = []
-        for answer_str, answer_frequency in answers.iteritems():
             # Major point of failure is if answer returns None; the error
             # variable will contain why the reconstitution failed.
-            if state:
-                (answer, error) = (
-                    AnswerMigrationJob._reconstitute_answer_object(
-                        state, rule_spec, rule_str, answer_str))
-                if error:
-                    yield (
-                        'Failed to migrate answer because of %s (state=%s)' % (
-                            error, state.to_dict()))
-                    continue
-                migrated_answers.append(answer)
-                answer_strings.append(answer_str)
-                answer_frequencies.append(answer_frequency)
-            else:
-                yield (
-                    'Cannot migrate answer due to missing answer state. '
-                    'Assuming it is None.')
-                migrated_answers.append(None)
-                answer_strings.append(answer_str)
-                answer_frequencies.append(answer_frequency)
-        if len(migrated_answers) != len(answers):
-            yield 'Failed to migrate all answers for item batch: %s' % item_id
-            return
+            (answer, error) = AnswerMigrationJob._reconstitute_answer_object(
+                state, rule_spec, rule_str, answer_str)
+            if error:
+                return (None, error)
 
-        for answer, answer_str, answer_frequency in zip(
-                migrated_answers, answer_strings, answer_frequencies):
-            submitted_answer_list = [stats_domain.SubmittedAnswer(
-                answer, interaction_id, answer_group_index,
+            return (stats_domain.SubmittedAnswer(
+                answer, state.interaction.id, answer_group_index,
                 rule_spec_index, classification_categorization, params,
                 session_id, time_spent_in_sec, rule_spec_str=rule_str,
-                answer_str=answer_str)] * answer_frequency
-            if exploration and state:
-                stats_services.record_answers(
-                    exploration, state_name, submitted_answer_list)
-            else:
-                # TODO(bhenning): Avoid this code skew with
-                # stats_services.record_answer(), if possible. However, this
-                # approach allows the answer to be recorded without loaded
-                # exploration or state objects.
-                state_answers = stats_domain.StateAnswers(
-                    exploration_id, exploration_version, state_name,
-                    interaction_id, submitted_answer_list)
-                state_answers.validate()
-                stats_models.StateAnswersModel.insert_submitted_answers(
-                    state_answers.exploration_id,
-                    state_answers.exploration_version, state_answers.state_name,
-                    state_answers.interaction_id,
-                    state_answers.get_submitted_answer_dict_list())
+                answer_str=answer_str), None)
+        else:
+            return (stats_domain.SubmittedAnswer(
+                stats_domain.MIGRATED_STATE_ANSWER_MISSING_EXPLORATION_ANSWER,
+                stats_domain.MIGRATED_STATE_ANSWER_MISSING_EXPLORATION_INTERACTION_ID, # pylint: disable=line-too-long
+                answer_group_index, rule_spec_index,
+                classification_categorization, params, session_id,
+                time_spent_in_sec, rule_spec_str=rule_str,
+                answer_str=answer_str), None)
 
-        stats_models.MigratedAnswerModel.finish_migrating_answer(
-            item_id, exploration_id, exploration_version, state_name)
+
 
     # Following are helpers and constants related to reconstituting the
     # CheckedProof object.

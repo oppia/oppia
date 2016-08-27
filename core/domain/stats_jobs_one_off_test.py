@@ -21,6 +21,7 @@ import logging
 from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import stats_jobs_one_off
 from core.domain import user_services
@@ -102,7 +103,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should not be properly migrated.
         state_answers = self._get_state_answers(state_name)
         self.assertIsNone(state_answers)
-        self.assertEqual(job_output, [])
+        self.assertIn('Cannot reconstitute fuzzy rule', sorted(job_output)[0])
 
     def test_supports_migrating_params_out_of_order(self):
         state_name = 'Music Notes Input'
@@ -192,44 +193,38 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         exp_services.delete_exploration(
             self.owner_id, self.DEMO_EXP_ID, force_deletion=True)
 
-        job_output = sorted(self._run_migration_job())
+        job_output = self._run_migration_job()
 
         # There should still be no answers in the new data storage model.
         state_answers = self._get_state_answers(
-            state_name, exploration_version=0)
+            state_name, exploration_version=(
+                stats_domain.MIGRATED_STATE_ANSWER_MISSING_EXPLORATION_VERSION))
 
         self.assertEqual(state_answers.exploration_id, self.DEMO_EXP_ID)
-        self.assertEqual(state_answers.exploration_version, 0)
+        self.assertEqual(state_answers.exploration_version, (
+            stats_domain.MIGRATED_STATE_ANSWER_MISSING_EXPLORATION_VERSION))
         self.assertEqual(state_answers.state_name, state_name)
-        self.assertEqual(state_answers.interaction_id, 'EndExploration')
+        self.assertEqual(state_answers.interaction_id, (
+            stats_domain.MIGRATED_STATE_ANSWER_MISSING_EXPLORATION_INTERACTION_ID)) # pylint: disable=line-too-long
         self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
-            'answer': None,
+            'answer': (
+                stats_domain.MIGRATED_STATE_ANSWER_MISSING_EXPLORATION_ANSWER),
             'time_spent_in_sec': 0.0,
             'answer_group_index': None,
             'rule_spec_index': None,
             'classification_categorization': (
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
-            'interaction_id': 'EndExploration',
+            'interaction_id': (
+                stats_domain.MIGRATED_STATE_ANSWER_MISSING_EXPLORATION_INTERACTION_ID), # pylint: disable=line-too-long
             'params': [],
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
 
-        self.assertEqual(len(job_output), 4)
-        self.assertIn(
+        self.assertEqual(job_output, [
             'Encountered permanently missing exploration referenced to by '
-            'submitted answers. Migrating with missing exploration.',
-            job_output[0])
-        self.assertIn(
-            'Assuming answer belongs to EndExploration due to missing state '
-            'object', job_output[1])
-        self.assertIn(
-            'Assuming answer belongs to the default outcome due to missing '
-            'state object.', job_output[2])
-        self.assertIn(
-            'Cannot migrate answer due to missing answer state. Assuming it is '
-            'None.', job_output[3])
+            'submitted answers. Migrating with missing exploration and state.'])
         self._verify_no_migration_validation_problems()
 
     def test_rule_parameter_evaluation_with_invalid_characters(self):
@@ -283,8 +278,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         state_answers = self._get_state_answers(state_name)
         self.assertIsNone(state_answers)
 
-        self.assertEqual(len(job_output), 1)
-        self.assertIn('failing to evaluate param string', job_output[0])
+        self.assertEqual(len(job_output), 2)
+        self.assertIn('failing to evaluate param string', sorted(job_output)[0])
         self._verify_migration_validation_problems(1)
 
     def test_multiple_migrations_does_not_duplicate_answers(self):
@@ -385,15 +380,15 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         state_answers = self._get_state_answers(state_name)
         self.assertIsNone(state_answers)
 
-        job_output = self._run_migration_job()
+        job_output = sorted(self._run_migration_job())
 
         # The answer should fail to migrate because it cannot be normalized.
         state_answers = self._get_state_answers(state_name)
         self.assertIsNone(state_answers)
 
         self.assertEqual(len(job_output), 2)
-        self.assertIn('Failed to normalize', job_output[0])
-        self.assertIn('Failed to migrate all answers', job_output[1])
+        self.assertIn('Failed to migrate all answers', job_output[0])
+        self.assertIn('Failed to normalize', job_output[1])
         self._verify_migration_validation_problems(1)
 
     def test_migration_job_should_support_very_large_answers(self):
@@ -757,273 +752,6 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
 
         self._verify_no_migration_validation_problems()
 
-    def test_migrated_answer_matches_correct_version_after_group_change(self):
-        """Tests whether an answer is correctly matched to a given exp version
-        if the answer groups of the matching state have changed between
-        created_on and last_updated for the submitted answers.
-        """
-        exploration = self.save_new_valid_exploration(
-            'exp_id0', self.owner_id, end_state_name='End')
-        state_name = exploration.init_state_name
-
-        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-            'new_value': 'TextInput'
-        }, {
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
-            'new_value': {
-                'dest': state_name,
-                'feedback': [],
-                'param_changes': []
-            }
-        }, {
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
-            'new_value': [{
-                'rule_specs': [{
-                    'rule_type': 'Contains',
-                    'inputs': {
-                        'x': 'dle'
-                    }
-                }],
-                'outcome': {
-                    'dest': state_name,
-                    'feedback': [],
-                    'param_changes': []
-                }
-            }, {
-                'rule_specs': [{
-                    'rule_type': 'Equals',
-                    'inputs': {
-                        'x': 'eatery'
-                    }
-                }],
-                'outcome': {
-                    'dest': state_name,
-                    'feedback': [],
-                    'param_changes': []
-                }
-            }]
-        }], 'Create initial text input state')
-
-        # Insert an answer for the current version of the state.
-        rule_spec_str = 'Equals(eatery)'
-        html_answer = 'eatery'
-        self._record_old_answer(
-            state_name, rule_spec_str, html_answer, exploration_id='exp_id0')
-
-        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
-            'new_value': [{
-                'rule_specs': [{
-                    'rule_type': 'Equals',
-                    'inputs': {
-                        'x': 'eatery'
-                    }
-                }],
-                'outcome': {
-                    'dest': state_name,
-                    'feedback': [],
-                    'param_changes': []
-                }
-            }]
-        }], 'Change the answer groups')
-
-        # Insert an answer for the new version of the state.
-        self._record_old_answer(
-            state_name, rule_spec_str, html_answer, exploration_id='exp_id0')
-
-        # Verify the exploration is at version 3.
-        exploration = exp_services.get_exploration_by_id('exp_id0')
-        self.assertEqual(exploration.version, 3)
-
-        # There should be no answers in the new data storage model.
-        state_answers = self._get_state_answers(
-            state_name, exploration_id='exp_id0')
-        self.assertIsNone(state_answers)
-
-        job_output = self._run_migration_job()
-        self.assertEqual(job_output, [])
-
-        # The first answer should match version 2 and the second answer should
-        # match version 3 of the exploration, since an interaction ID occurred
-        # between those two answers.
-        state_answers = self._get_state_answers(
-            state_name, exploration_id='exp_id0', exploration_version=2)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
-            'answer': 'eatery',
-            'time_spent_in_sec': 0.0,
-            'answer_group_index': 1,
-            'rule_spec_index': 0,
-            'classification_categorization': exp_domain.EXPLICIT_CLASSIFICATION,
-            'session_id': 'migrated_state_answer_session_id',
-            'interaction_id': 'TextInput',
-            'params': [],
-            'rule_spec_str': rule_spec_str,
-            'answer_str': html_answer
-        }])
-        self.assertEqual(state_answers.exploration_id, 'exp_id0')
-        self.assertEqual(state_answers.exploration_version, 2)
-
-        state_answers = self._get_state_answers(
-            state_name, exploration_id='exp_id0', exploration_version=3)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
-            'answer': 'eatery',
-            'time_spent_in_sec': 0.0,
-            'answer_group_index': 0,
-            'rule_spec_index': 0,
-            'classification_categorization': exp_domain.EXPLICIT_CLASSIFICATION,
-            'session_id': 'migrated_state_answer_session_id',
-            'interaction_id': 'TextInput',
-            'params': [],
-            'rule_spec_str': rule_spec_str,
-            'answer_str': html_answer
-        }])
-        self.assertEqual(state_answers.exploration_id, 'exp_id0')
-        self.assertEqual(state_answers.exploration_version, 3)
-
-        self._verify_no_migration_validation_problems()
-
-    def test_migrated_answer_matches_correct_version_after_rule_change(self):
-        """Tests whether an answer is correctly matched to a given exp version
-        if the rule specs of the matching state have changed between created_on
-        and last_updated for the submitted answers.
-        """
-        exploration = self.save_new_valid_exploration(
-            'exp_id0', self.owner_id, end_state_name='End')
-        state_name = exploration.init_state_name
-
-        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-            'new_value': 'TextInput'
-        }, {
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
-            'new_value': {
-                'dest': state_name,
-                'feedback': [],
-                'param_changes': []
-            }
-        }, {
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
-            'new_value': [{
-                'rule_specs': [{
-                    'rule_type': 'Contains',
-                    'inputs': {
-                        'x': 'dle'
-                    }
-                }, {
-                    'rule_type': 'Equals',
-                    'inputs': {
-                        'x': 'eatery'
-                    }
-                }],
-                'outcome': {
-                    'dest': state_name,
-                    'feedback': [],
-                    'param_changes': []
-                }
-            }]
-        }], 'Create initial text input state')
-
-        # Insert an answer for the current version of the state.
-        rule_spec_str = 'Equals(eatery)'
-        html_answer = 'eatery'
-        self._record_old_answer(
-            state_name, rule_spec_str, html_answer, exploration_id='exp_id0')
-
-        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
-            'new_value': [{
-                'rule_specs': [{
-                    'rule_type': 'Equals',
-                    'inputs': {
-                        'x': 'eatery'
-                    }
-                }],
-                'outcome': {
-                    'dest': state_name,
-                    'feedback': [],
-                    'param_changes': []
-                }
-            }]
-        }], 'Change the rule specs')
-
-        # Insert an answer for the new version of the state.
-        self._record_old_answer(
-            state_name, rule_spec_str, html_answer, exploration_id='exp_id0')
-
-        # Verify the exploration is at version 3.
-        exploration = exp_services.get_exploration_by_id('exp_id0')
-        self.assertEqual(exploration.version, 3)
-
-        # There should be no answers in the new data storage model.
-        state_answers = self._get_state_answers(
-            state_name, exploration_id='exp_id0')
-        self.assertIsNone(state_answers)
-
-        job_output = self._run_migration_job()
-        self.assertEqual(job_output, [])
-
-        # The first answer should match version 2 and the second answer should
-        # match version 3 of the exploration, since an interaction ID occurred
-        # between those two answers.
-        state_answers = self._get_state_answers(
-            state_name, exploration_id='exp_id0', exploration_version=2)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
-            'answer': 'eatery',
-            'time_spent_in_sec': 0.0,
-            'answer_group_index': 0,
-            'rule_spec_index': 1,
-            'classification_categorization': exp_domain.EXPLICIT_CLASSIFICATION,
-            'session_id': 'migrated_state_answer_session_id',
-            'interaction_id': 'TextInput',
-            'params': [],
-            'rule_spec_str': rule_spec_str,
-            'answer_str': html_answer
-        }])
-        self.assertEqual(state_answers.exploration_id, 'exp_id0')
-        self.assertEqual(state_answers.exploration_version, 2)
-
-        state_answers = self._get_state_answers(
-            state_name, exploration_id='exp_id0', exploration_version=3)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
-            'answer': 'eatery',
-            'time_spent_in_sec': 0.0,
-            'answer_group_index': 0,
-            'rule_spec_index': 0,
-            'classification_categorization': exp_domain.EXPLICIT_CLASSIFICATION,
-            'session_id': 'migrated_state_answer_session_id',
-            'interaction_id': 'TextInput',
-            'params': [],
-            'rule_spec_str': rule_spec_str,
-            'answer_str': html_answer
-        }])
-        self.assertEqual(state_answers.exploration_id, 'exp_id0')
-        self.assertEqual(state_answers.exploration_version, 3)
-
-        self._verify_no_migration_validation_problems()
-
     def test_migrated_answer_matches_correct_version_after_cust_change(self):
         """Tests whether an answer is correctly matched to a given exp version
         if the interaction customization arguments of the matching state has
@@ -1310,6 +1038,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self.assertIsNone(state_answers)
 
         job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -1332,7 +1061,6 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': rule_spec_str,
             'answer_str': code_answer
         }])
-        self.assertEqual(job_output, [])
         self._verify_no_migration_validation_problems()
 
     def test_migrate_continue(self):
@@ -1344,6 +1072,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self.assertIsNone(state_answers)
 
         job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -1361,7 +1090,6 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': 'Default',
             'answer_str': ''
         }])
-        self.assertEqual(job_output, [])
         self._verify_no_migration_validation_problems()
 
     def test_migrate_image_click_input(self):
@@ -1376,6 +1104,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self.assertIsNone(state_answers)
 
         job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -1396,7 +1125,6 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
-        self.assertEqual(job_output, [])
         self._verify_no_migration_validation_problems()
 
     def test_migrate_interactive_map(self):
@@ -1412,6 +1140,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self.assertIsNone(state_answers)
 
         job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -1429,7 +1158,6 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
-        self.assertEqual(job_output, [])
         self._verify_no_migration_validation_problems()
 
     def test_migrate_item_selection_input(self):
@@ -1446,6 +1174,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self.assertIsNone(state_answers)
 
         job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -1463,7 +1192,6 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
-        self.assertEqual(job_output, [])
         self._verify_no_migration_validation_problems()
 
     def test_migrate_logic_proof(self):
@@ -1478,6 +1206,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self.assertIsNone(state_answers)
 
         job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -1500,7 +1229,6 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
-        self.assertEqual(job_output, [])
         self._verify_no_migration_validation_problems()
 
     def test_migrate_math_expression_input(self):
@@ -1517,6 +1245,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self.assertIsNone(state_answers)
 
         job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -1537,7 +1266,6 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
-        self.assertEqual(job_output, [])
         self._verify_no_migration_validation_problems()
 
     def test_migrate_multiple_choice_input(self):
@@ -1552,6 +1280,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self.assertIsNone(state_answers)
 
         job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -1569,7 +1298,6 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
-        self.assertEqual(job_output, [])
         self._verify_no_migration_validation_problems()
 
     def test_migrate_music_notes_input(self):
@@ -1586,6 +1314,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self.assertIsNone(state_answers)
 
         job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -1609,7 +1338,6 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
-        self.assertEqual(job_output, [])
         self._verify_no_migration_validation_problems()
 
     def test_migrate_numeric_input(self):
@@ -1624,6 +1352,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self.assertIsNone(state_answers)
 
         job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -1641,7 +1370,6 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
-        self.assertEqual(job_output, [])
         self._verify_no_migration_validation_problems()
 
     def test_migrate_pencil_code_editor(self):
@@ -1659,6 +1387,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self.assertIsNone(state_answers)
 
         job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -1682,7 +1411,6 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
-        self.assertEqual(job_output, [])
         self._verify_no_migration_validation_problems()
 
     def test_migrate_set_input(self):
@@ -1698,6 +1426,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self.assertIsNone(state_answers)
 
         job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -1715,7 +1444,6 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
-        self.assertEqual(job_output, [])
         self._verify_no_migration_validation_problems()
 
     def test_migrate_set_input_with_html(self):
@@ -1731,6 +1459,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self.assertIsNone(state_answers)
 
         job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -1748,7 +1477,6 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
-        self.assertEqual(job_output, [])
         self._verify_no_migration_validation_problems()
 
     def test_migrate_text_input(self):
@@ -1763,6 +1491,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self.assertIsNone(state_answers)
 
         job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -1780,5 +1509,4 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
-        self.assertEqual(job_output, [])
         self._verify_no_migration_validation_problems()

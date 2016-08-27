@@ -232,9 +232,8 @@ class VersionedModel(BaseModel):
         self.populate(**snapshot_dict)
         return self
 
-    def _reconstitute_from_snapshot_id(self, snapshot_id):
+    def _reconstitute_from_snapshot_model(self, snapshot_model):
         """Makes this instance into a reconstitution of the given snapshot."""
-        snapshot_model = self.SNAPSHOT_CONTENT_CLASS.get(snapshot_id)
         snapshot_dict = snapshot_model.content
         reconstituted_model = self._reconstitute(snapshot_dict)
         # TODO(sll): The 'created_on' and 'last_updated' values here will be
@@ -247,6 +246,33 @@ class VersionedModel(BaseModel):
         reconstituted_model.created_on = snapshot_model.created_on
         reconstituted_model.last_updated = snapshot_model.last_updated
         return reconstituted_model
+
+    def _reconstitute_from_snapshot_id(self, snapshot_id):
+        """Makes this instance into a reconstitution of the given snapshot."""
+        snapshot_model = self.SNAPSHOT_CONTENT_CLASS.get(snapshot_id)
+        return self._reconstitute_from_snapshot_model(snapshot_model)
+
+    @classmethod
+    def _reconstitute_multi_from_models(cls, snapshot_id_model_list):
+        """Iterates through each entry in the list and reconstitutes the model
+        with the corresponding snapshot ID. Each value in the list is a tuple
+        where the first entry is a snapshot ID and the second is a model object.
+        This function should be more efficient than using
+        _reconstitute_from_snapshot_id for N models. Returns a list of the
+        reconstituted models.
+        """
+        snapshot_ids = [
+            snapshot_id_model[0]
+            for snapshot_id_model in snapshot_id_model_list]
+        models_to_reconstitute = [
+            snapshot_id_model[1]
+            for snapshot_id_model in snapshot_id_model_list]
+        snapshot_models = cls.SNAPSHOT_CONTENT_CLASS.get_multi(snapshot_ids)
+        return [
+            # pylint: disable=protected-access
+            model._reconstitute_from_snapshot_model(snapshot_model)
+            for model, snapshot_model in zip(
+                models_to_reconstitute, snapshot_models)]
 
     @classmethod
     def _get_snapshot_id(cls, instance_id, version_number):
