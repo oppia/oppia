@@ -613,6 +613,19 @@ oppia.factory('oppiaDebouncer', [function() {
   };
 }]);
 
+// Shim service for functions on $window that allows these functions to be
+// mocked in unit tests.
+oppia.factory('currentLocationService', ['$window', function($window) {
+  return {
+    getHash: function() {
+      return $window.location.hash;
+    },
+    getPathname: function() {
+      return $window.location.pathname;
+    }
+  };
+}]);
+
 // Service for assembling extension tags (for gadgets and interactions).
 oppia.factory('extensionTagAssemblerService', [
     '$filter', 'oppiaHtmlEscaper', function($filter, oppiaHtmlEscaper) {
