@@ -946,6 +946,12 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             clicked_index = int(rule_str[len(rule_spec.rule_type) + 1:-1])
             customization_args = interaction.customization_args
             choices = customization_args['choices']['value']
+            if clicked_index >= len(choices):
+                return (
+                    None,
+                    'Clicked index %d is out of bounds for corresponding '
+                    'choices in the exploration: %s (len=%d)' % (
+                        clicked_index, choices, len(choices)))
             if answer_str != choices[clicked_index]:
                 return (
                     None,
