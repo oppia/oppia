@@ -74,10 +74,11 @@ oppia.config([
     function($translateProvider, DEFAULT_TRANSLATIONS) {
   var availableLanguageKeys = [];
   var availableLanguageKeysMap = {};
-  for (var prop in GLOBALS.SUPPORTED_SITE_LANGUAGES) {
-    availableLanguageKeys.push(GLOBALS.SUPPORTED_SITE_LANGUAGES[prop].id);
-    availableLanguageKeysMap[GLOBALS.SUPPORTED_SITE_LANGUAGES[prop].id + '*'] =
-    GLOBALS.SUPPORTED_SITE_LANGUAGES[prop].id;
+  var numOfLanguages = GLOBALS.SUPPORTED_SITE_LANGUAGES.length;
+  for (var index = 0; index < numOfLanguages; index++) {
+    availableLanguageKeys.push(GLOBALS.SUPPORTED_SITE_LANGUAGES[index].id);
+    availableLanguageKeysMap[GLOBALS.SUPPORTED_SITE_LANGUAGES[index].id + '*'] =
+    GLOBALS.SUPPORTED_SITE_LANGUAGES[index].id;
   }
   availableLanguageKeysMap['*'] = 'en';
 
