@@ -33,7 +33,6 @@ from google.appengine.api import users
 from core import counters
 from core.domain import config_domain
 from core.domain import config_services
-from core.domain import obj_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import user_services
@@ -317,16 +316,13 @@ class BaseHandler(webapp2.RequestHandler):
             # The 'path' variable starts with a forward slash.
             'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
             'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
-            # TODO(sll): Consider including the obj_editor html directly as
-            # part of the base HTML template?
-            'OBJECT_EDITORS_JS': jinja2.utils.Markup(
-                obj_services.get_all_object_editor_js_templates()),
             'RTE_COMPONENT_SPECS': (
                 rte_component_registry.Registry.get_all_specs()),
             'SITE_FEEDBACK_FORM_URL': SITE_FEEDBACK_FORM_URL.value,
             'SITE_NAME': SITE_NAME.value,
             'SUPPORTED_SITE_LANGUAGES': feconf.SUPPORTED_SITE_LANGUAGES,
             'SYSTEM_USERNAMES': feconf.SYSTEM_USERNAMES,
+            'TEMPLATE_DIR_PREFIX': utils.get_template_dir_prefix(),
             'can_create_collections': (
                 self.username and self.username in
                 config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value

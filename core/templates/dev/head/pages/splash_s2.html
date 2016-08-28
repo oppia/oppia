@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block prerender %}
+  <link rel="prerender" href="/library">
+{% endblock prerender %}
+
 {% block maintitle %}
   I18N_SPLASH_PAGE_TITLE
 {% endblock maintitle %}
@@ -190,7 +194,5 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script>
-    {{ include_js_file('pages/Splash.js') }}
-  </script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/Splash.js"></script>
 {% endblock footer_js %}

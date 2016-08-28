@@ -13,23 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the teach page.
+ * @fileoverview Controllers for the 'thanks' page.
  */
 
-oppia.controller('Teach', [
-  '$scope', '$timeout', '$window', 'siteAnalyticsService',
-  'UrlInterpolationService',
+oppia.controller('Thanks', [
+  '$scope', 'UrlInterpolationService',
   function(
-      $scope, $timeout, $window, siteAnalyticsService,
-      UrlInterpolationService) {
-    $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-
-    $scope.onApplyToTeachWithOppia = function() {
-      siteAnalyticsService.registerApplyToTeachWithOppiaEvent();
-      $timeout(function() {
-        $window.location = 'https://goo.gl/forms/ljmQ9R3AZRkT2kU23';
-      }, 150);
-      return false;
-    };
+      $scope, UrlInterpolationService) {
+    $scope.thanksImgUrl = UrlInterpolationService.getStaticImageUrl(
+      '/general/donate.png');
   }
 ]);

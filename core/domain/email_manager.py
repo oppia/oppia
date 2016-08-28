@@ -465,3 +465,41 @@ def send_suggestion_email(
                 recipient_id, feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION,
                 email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_instant_feedback_message_email(
+        recipient_id, sender_id, message, email_subject, exploration_title,
+        exploration_id, thread_title):
+
+    email_body_template = (
+        'Hi %s,<br><br>'
+        'New update to thread "%s" on '
+        '<a href="https://www.oppia.org/%s">%s</a>:<br>'
+        '<ul><li>%s: %s<br></li></ul>'
+        '(You received this message because you are a '
+        'participant in this thread.)<br><br>'
+        'Best wishes,<br>'
+        'The Oppia team<br>'
+        '<br>%s')
+
+    if not feconf.CAN_SEND_EMAILS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    if not feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS:
+        log_new_error('This app cannot send feedback message emails to users.')
+        return
+
+    sender_settings = user_services.get_user_settings(sender_id)
+    recipient_settings = user_services.get_user_settings(recipient_id)
+    recipient_preferences = user_services.get_email_preferences(recipient_id)
+
+    if recipient_preferences['can_receive_feedback_message_email']:
+        email_body = email_body_template % (
+            recipient_settings.username, thread_title, exploration_id,
+            exploration_title, sender_settings.username, message,
+            EMAIL_FOOTER.value)
+        _send_email(
+            recipient_id, feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION, email_subject,
+            email_body, feconf.NOREPLY_EMAIL_ADDRESS)
