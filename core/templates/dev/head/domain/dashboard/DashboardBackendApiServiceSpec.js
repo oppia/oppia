@@ -79,8 +79,7 @@ describe('Dashboard backend API service', function() {
             value: '20',
             count: 1
           }
-        ],
-        last_updates: []
+        ]
       }],
       collections_list: [],
       dashboard_stats: {

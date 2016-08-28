@@ -185,20 +185,6 @@ class DashboardHandler(base.BaseHandler):
                 message_dict = feedback_message.to_dict()
                 new_feedback_messages_dict[exp_id].append(message_dict)
 
-        last_updates = (
-            exp_services.get_last_updates_for_exp_ids(
-                self.user_id, exploration_ids_subscribed_to))
-        last_updates_dict = {}
-        for exp_id in last_updates:
-            last_updates_dict[exp_id] = []
-            for update in last_updates[exp_id]:
-                update_dict = update.to_dict()
-                update_dict['created_on'] = (
-                    utils.get_time_in_millisecs(update_dict['created_on']))
-                update_dict['last_updated'] = (
-                    utils.get_time_in_millisecs(update_dict['last_updated']))
-                last_updates_dict[exp_id].append(update_dict)
-
         for ind, exploration in enumerate(exp_summary_list):
             exploration.update(feedback_thread_analytics[ind].to_dict())
             exploration.update({
@@ -211,8 +197,7 @@ class DashboardHandler(base.BaseHandler):
                     unresolved_answers_dict[exploration['id']]
                     ['unresolved_answers']
                     [:feconf.TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD]
-                ),
-                'last_updates': last_updates_dict[exploration['id']]
+                )
             })
 
         exp_summary_list = sorted(
