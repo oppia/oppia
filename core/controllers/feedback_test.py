@@ -484,23 +484,21 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         threads = response_dict['threads']
         self.assertEqual(len(threads), 1)
 
-        # Test invalid list type in GET request. We are using testapp.get()
-        # here because get_json() with expect_errors=True does not work as
-        # expected. Please look at the doc string for get_json() for details.
-        response_dict = self.testapp.get(
+        response_dict = self.get_json(
             '%s/%s?list_type=%s&has_suggestion=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'invalid',
                 'true'),
-            status=400, expect_errors=True)
-        self.assertEqual(response_dict.status_int, 400)
+            expected_status_int=400, expect_errors=True)
+        self.assertIn('Invalid list type.', response_dict['error'])
 
         # Pass invalid value for has_suggestion.
-        response_dict = self.testapp.get(
+        response_dict = self.get_json(
             '%s/%s?list_type=%s&has_suggestion=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'closed',
                 'invalid'),
-            status=400, expect_errors=True)
-        self.assertEqual(response_dict.status_int, 400)
+            expected_status_int=400, expect_errors=True)
+        self.assertIn(
+            'Invalid value for has_suggestion.', response_dict['error'])
 
     def _accept_suggestion(self, thread_id, csrf_token,
                            expect_errors=False, expected_status_int=200):
