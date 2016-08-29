@@ -697,8 +697,8 @@ ALL_LANGUAGE_CODES = [{
 DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
 
-# While adding another language, please ensure that the
-# languages are in alphabetical order
+# NOTE TO DEVELOPERS: While adding another language, please ensure that the
+# languages are in alphabetical order.
 SUPPORTED_SITE_LANGUAGES = [{
     'id': 'id',
     'text': 'Bahasa Indonesia'
