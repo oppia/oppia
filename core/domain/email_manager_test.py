@@ -1395,7 +1395,7 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
                 expected_email_text_body)
 
             #make sure correct emails are sent to multiple moderators
-            message = messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(),

@@ -429,8 +429,8 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
     def test_that_emails_are_sent(self):
         expected_email_html_body = (
             'Hello Moderator,<br>'
-            'newuser has submitted a new report on the exploration Welcome to Oppia!'
-            ' on the grounds of AD .<br>'
+            'newuser has submitted a new report on the exploration'
+            ' Welcome to Oppia! on the grounds of AD .<br>'
             'You can modify the exploration by clicking '
             '<a href="https://www.oppia.org/create/0">'
             '"Edit Welcome to Oppia!"</a>.<br>'
@@ -443,9 +443,10 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
 
         expected_email_text_body = (
             'Hello Moderator,\n'
-            'newuser has submitted a new report on the exploration Welcome to Oppia!'
-            ' on the grounds of AD .\n'
-            'You can modify the exploration by clicking "Edit Welcome to Oppia!".\n'
+            'newuser has submitted a new report on the exploration'
+            ' Welcome to Oppia! on the grounds of AD .\n'
+            'You can modify the exploration by clicking '
+            '"Edit Welcome to Oppia!".\n'
             '\n'
             'Thanks!\n'
             '- The Oppia Team\n'
