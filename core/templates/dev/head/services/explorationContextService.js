@@ -29,8 +29,8 @@ oppia.constant('EDITOR_TAB_CONTEXT', {
 });
 
 oppia.factory('explorationContextService', [
-  '$window', 'PAGE_CONTEXT', 'EDITOR_TAB_CONTEXT',
-  function($window, PAGE_CONTEXT, EDITOR_TAB_CONTEXT) {
+  'currentLocationService', 'PAGE_CONTEXT', 'EDITOR_TAB_CONTEXT',
+  function(currentLocationService, PAGE_CONTEXT, EDITOR_TAB_CONTEXT) {
     var pageContext = null;
     var explorationId = null;
 
@@ -39,7 +39,7 @@ oppia.factory('explorationContextService', [
       // 'editor' or 'preview'), or null if the current tab is neither of these,
       // or the current page is not the editor.
       getEditorTabContext: function() {
-        var hash = $window.location.hash;
+        var hash = currentLocationService.getHash();
         if (hash.indexOf('#/gui') === 0) {
           return EDITOR_TAB_CONTEXT.EDITOR;
         } else if (hash.indexOf('#/preview') === 0) {
@@ -56,7 +56,7 @@ oppia.factory('explorationContextService', [
         if (pageContext) {
           return pageContext;
         } else {
-          var pathnameArray = $window.location.pathname.split('/');
+          var pathnameArray = currentLocationService.getPathname().split('/');
           for (var i = 0; i < pathnameArray.length; i++) {
             if (pathnameArray[i] === 'explore' ||
                 pathnameArray[i] === 'embed') {
@@ -85,7 +85,7 @@ oppia.factory('explorationContextService', [
         } else {
           // The pathname should be one of /explore/{exploration_id} or
           // /create/{exploration_id} or /embed/exploration/{exploration_id}.
-          var pathnameArray = $window.location.pathname.split('/');
+          var pathnameArray = currentLocationService.getPathname().split('/');
           for (var i = 0; i < pathnameArray.length; i++) {
             if (pathnameArray[i] === 'explore' ||
                 pathnameArray[i] === 'create') {

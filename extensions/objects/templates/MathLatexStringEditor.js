@@ -29,7 +29,7 @@ oppia.directive('mathLatexStringEditor', [
       restrict: 'E',
       scope: true,
       template: '<span ng-include="getTemplateUrl()"></span>',
-      controller: function($scope) {
+      controller: ['$scope', function($scope) {
         $scope.alwaysEditable = $scope.$parent.alwaysEditable;
 
         // Reset the component each time the value changes (e.g. if this is part
@@ -72,7 +72,7 @@ oppia.directive('mathLatexStringEditor', [
 
           $scope.closeEditor();
         }
-      }
+      }]
     };
   }
 ]);

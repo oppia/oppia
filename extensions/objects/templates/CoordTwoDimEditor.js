@@ -16,7 +16,7 @@ oppia.directive('coordTwoDimEditor', [
     '$compile', 'OBJECT_EDITOR_URL_PREFIX',
     function($compile, OBJECT_EDITOR_URL_PREFIX) {
   return {
-    controller: function($scope, $timeout) {
+    controller: ['$scope', function($scope, $timeout) {
       $scope.schemaLatitude = {
         type: 'float',
         validators: [{
@@ -93,7 +93,7 @@ oppia.directive('coordTwoDimEditor', [
         updateMarker(latLng.lat(), latLng.lng());
         $scope.$parent.value = [latLng.lat(), latLng.lng()];
       };
-    },
+    }],
     link: function(scope, element) {
       scope.getTemplateUrl = function() {
         return OBJECT_EDITOR_URL_PREFIX + 'CoordTwoDim';
