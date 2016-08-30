@@ -271,8 +271,9 @@ class I18nDictsTest(test_utils.GenericTestBase):
                     self.log_line('- %s' % key)
                 self.log_line('')
 
-    def alphabetic_test_i18n_keys(self):
-        """Tests that all JSON files are arranged in aplhabetical order."""
+    def test_alphabetic_i18n_keys(self):
+        """Tests that the keys of all i18n json files are arranged in
+        alphabetical order."""
         filenames = os.listdir(
             os.path.join(os.getcwd(), self.get_static_asset_filepath(),
                          'assets', 'i18n'))
