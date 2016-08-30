@@ -89,7 +89,9 @@
             In addition, if the exploration is iframed, the terminal card will
             have no learner input section, so we do not show it.
           -->
-          <div ng-if="(!waitingForOppiaFeedback || !exploration.isInteractionInline(activeCard.stateName)) && ((activeCard.interactionHtml && !activeCard.destStateName) || (activeCard.destStateName && !helpCardHasContinueButton)) && (!isOnTerminalCard() || !isIframed || (activeCard.destStateName && !helpCardHasContinueButton)) && isCurrentCardAtEndOfTranscript()">
+          <div ng-if="exploration.isInteractionInline(activeCard.stateName) && !waitingForOppiaFeedback &&
+          ((activeCard.interactionHtml && !activeCard.destStateName) || activeCard.destStateName) &&
+          (!isOnTerminalCard() || !isIframed || activeCard.destStateName) && isCurrentCardAtEndOfTranscript()">
             <div class="conversation-skin-inline-interaction">
               <div ng-if="activeCard.destStateName && activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].oppiaFeedbackHtml && !helpCardHasContinueButton">
                 <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
@@ -104,18 +106,20 @@
                        angular-html-bind="activeCard.interactionHtml">
                   </div>
                 </div>
-                <div ng-if="!exploration.isInteractionInline(activeCard.stateName)" style="opacity: 0.8;">
-                  <div ng-if="isCurrentSupplementalCardNonempty() && !isScreenNarrowAndShowingTutorCard()" style="padding: 6px 12px;">
-                    <[exploration.getInteractionInstructions(activeCard.stateName)]>
-                    <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
-                  </div>
-                  <div ng-if="!isCurrentSupplementalCardNonempty() || isScreenNarrowAndShowingTutorCard()">
-                    <md-button class="instructions-button" ng-click="showSupplementalCardIfScreenIsNarrow()">
-                      <[exploration.getInteractionInstructions(activeCard.stateName)]>
-                    </md-button>
-                  </div>
-                </div>
               </div>
+            </div>
+          </div>
+
+          <div ng-if="!exploration.isInteractionInline(activeCard.stateName)"
+              class="conversation-skin-inline-interaction" style="opacity: 0.8;">
+            <div ng-if="!isViewportNarrow()" style="padding: 6px 12px;">
+              <[exploration.getInteractionInstructions(activeCard.stateName)]>
+              <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
+            </div>
+            <div ng-if="isViewportNarrow()">
+              <md-button class="instructions-button" ng-click="showSupplementalCardIfScreenIsNarrow()">
+                <[exploration.getInteractionInstructions(activeCard.stateName)]>
+              </md-button>
             </div>
           </div>
 
