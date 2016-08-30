@@ -262,6 +262,10 @@ def get_messages_multi_for_exps(exploration_ids, limit=None):
     return result
 
 
+def get_messages_for_exp_id(exp_id, limit=None):
+    return get_messages_multi_for_exps([exp_id], limit)[exp_id]
+
+
 def get_threads(exploration_id):
     thread_models = feedback_models.FeedbackThreadModel.get_threads(
         exploration_id)

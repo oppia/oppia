@@ -33,7 +33,24 @@ oppia.factory('DashboardBackendApiService', [
     });
   };
 
+  var _fetchExplorationNewFeedback = function(explorationId) {
+    var requestUrl = (
+      '/dashboardhandler/explorationfeedback/?exp_id=' + explorationId);
+    return $q(function(resolve, reject) {
+      $http.get(requestUrl).then(function(response) {
+        if (resolve) {
+          resolve(angular.copy(response.data));
+        }
+      }, function(errorResponse) {
+        if (reject) {
+          reject(errorResponse.status);
+        }
+      });
+    });
+  };
+
   return {
-    fetchDashboardData: _fetchDashboardData
+    fetchDashboardData: _fetchDashboardData,
+    fetchExplorationNewFeedback: _fetchExplorationNewFeedback
   };
 }]);

@@ -423,6 +423,8 @@ COLLECTION_URL_PREFIX = '/collection'
 DASHBOARD_URL = '/dashboard'
 DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % DASHBOARD_URL
 DASHBOARD_DATA_URL = '/dashboardhandler/data'
+DASHBOARD_EXPLORATION_NEW_FEEDBACK_PREFIX = (
+    '/dashboardhandler/explorationfeedback/')
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'

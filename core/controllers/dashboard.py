@@ -278,6 +278,21 @@ class NotificationsHandler(base.BaseHandler):
         })
 
 
+class ExplorationNewFeedback(base.BaseHandler):
+    """Returns the new feedback for an exploration."""
+
+    @base.require_fully_signed_up
+    def get(self):
+        """Handles GET requests."""
+        new_feedback_dict = [
+            feedback_message.to_dict()
+            for feedback_message in feedback_services.get_messages_for_exp_id(
+                self.request.get('exp_id'))]
+        self.render_json({
+            'new_feedback': new_feedback_dict
+        })
+
+
 class NewExploration(base.BaseHandler):
     """Creates a new exploration."""
 

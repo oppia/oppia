@@ -18,7 +18,6 @@
 
 oppia.constant('EXPLORATION_DROPDOWN_STATS', {
   NEW_FEEDBACK: 'new_feedback',
-  LAST_UPDATES: 'last_updates',
   TOP_UNRESOLVED_ANSWERS: 'top_unresolved_answers'
 });
 

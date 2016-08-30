@@ -186,6 +186,10 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.DASHBOARD_DATA_URL, dashboard.DashboardHandler,
         'dashboard_handler'),
     get_redirect_route(
+        r'%s' % feconf.DASHBOARD_EXPLORATION_NEW_FEEDBACK_PREFIX,
+        dashboard.ExplorationNewFeedback,
+        'exploration_new_feedback'),
+    get_redirect_route(
         r'%s' % feconf.NEW_EXPLORATION_URL,
         dashboard.NewExploration, 'new_exploration'),
     get_redirect_route(
