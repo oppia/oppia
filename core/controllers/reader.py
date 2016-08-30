@@ -270,12 +270,15 @@ class ExplorationPage(base.BaseHandler):
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests."""
-        if self.request.get('iframed'):
-            self.redirect('/embed/exploration/%s' % exploration_id)
-            return
-
         version_str = self.request.get('v')
         version = int(version_str) if version_str else None
+
+        if self.request.get('iframed'):
+            redirect_url = '/embed/exploration/%s' % exploration_id
+            if version_str:
+                redirect_url += '?v=%s' % version_str
+            self.redirect(redirect_url)
+            return
 
         # Note: this is an optional argument and will be None when the
         # exploration is being played outside the context of a collection.
