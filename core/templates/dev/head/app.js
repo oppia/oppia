@@ -571,6 +571,10 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
     registerPublishExplorationEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
         'PublishExploration', 'click', explorationId);
+    },
+    registerVisitOppiaFromIframeEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'VisitOppiaFromIframe', 'click', explorationId);
     }
   };
 }]);

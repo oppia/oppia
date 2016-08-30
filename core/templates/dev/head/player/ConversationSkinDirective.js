@@ -264,13 +264,15 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
       'playerTranscriptService', 'LearnerParamsService',
       'playerPositionService', 'explorationRecommendationsService',
       'StatsReportingService', 'UrlInterpolationService',
+      'siteAnalyticsService',
       function(
           $scope, $timeout, $rootScope, $window, $translate,
           messengerService, oppiaPlayerService, urlService, focusService,
           LearnerViewRatingService, windowDimensionsService,
           playerTranscriptService, LearnerParamsService,
           playerPositionService, explorationRecommendationsService,
-          StatsReportingService, UrlInterpolationService) {
+          StatsReportingService, UrlInterpolationService,
+          siteAnalyticsService) {
         $scope.CONTINUE_BUTTON_FOCUS_LABEL = 'continueButton';
         // The exploration domain object.
         $scope.exploration = null;
@@ -779,6 +781,11 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
 
         $scope.collectionId = GLOBALS.collectionId;
         $scope.collectionTitle = GLOBALS.collectionTitle;
+
+        $scope.onNavigateFromIframe = function() {
+          siteAnalyticsService.registerVisitOppiaFromIframeEvent(
+            $scope.explorationId);
+        };
       }
     ]
   };
