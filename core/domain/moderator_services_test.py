@@ -14,9 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#import datetime
-#import types
-
 from core.domain import moderator_services
 from core.tests import test_utils
 import feconf
