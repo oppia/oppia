@@ -22,7 +22,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import param_domain
-#from core.domain import moderator_services
+from core.domain import moderator_services
 from core.tests import test_utils
 import feconf
 import utils
@@ -367,7 +367,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
 
 class FlagExplorationHandlerTests(test_utils.GenericTestBase):
 
-    """EXP_ID = '0'
+    EXP_ID = '0'
 
     def setUp(self):
         super(FlagExplorationHandlerTests, self).setUp()
@@ -392,7 +392,7 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
         # Create exploration.
         self.save_new_valid_exploration(
             self.EXP_ID, self.editor_id,
-            title='Title',
+            title='Welcome to Oppia!',
             category='This is just a spam category',
             objective='Test a spam exploration.')
         self.can_send_emails_ctx = self.swap(
@@ -429,11 +429,11 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
     def test_that_emails_are_sent(self):
         expected_email_html_body = (
             'Hello Moderator,<br>'
-            'newuser has submitted a new report on the exploration Title'
+            'newuser has submitted a new report on the exploration Welcome to Oppia!'
             ' on the grounds of AD .<br>'
             'You can modify the exploration by clicking '
-            '<a href="https://www.oppia.org/create/A">'
-            '"Edit Title"</a>.<br>'
+            '<a href="https://www.oppia.org/create/0">'
+            '"Edit Welcome to Oppia!"</a>.<br>'
             '<br>'
             'Thanks!<br>'
             '- The Oppia Team<br>'
@@ -443,9 +443,9 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
 
         expected_email_text_body = (
             'Hello Moderator,\n'
-            'newuser has submitted a new report on the exploration Title'
+            'newuser has submitted a new report on the exploration Welcome to Oppia!'
             ' on the grounds of AD .\n'
-            'You can modify the exploration by clicking "Edit Title".\n'
+            'You can modify the exploration by clicking "Edit Welcome to Oppia!".\n'
             '\n'
             'Thanks!\n'
             '- The Oppia Team\n'
@@ -453,8 +453,9 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
             'You can change your email preferences via the Preferences page.')
 
         with self.can_send_emails_ctx:
-
+            self.login(self.NEW_USER_EMAIL)
             self.process_and_flush_pending_tasks()
+            self.logout()
 
             messages = self.mail_stub.get_sent_messages(to=self.MODERATOR_EMAIL)
             self.assertEqual(len(messages), 1)
@@ -463,12 +464,12 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
                 expected_email_html_body)
             self.assertEqual(
                 messages[0].body.decode(),
-                expected_email_text_body)"""
+                expected_email_text_body)
 
 
 class FlagExplorationEmailHandlerTest(test_utils.GenericTestBase):
 
-    """def setUp(self):
+    def setUp(self):
         super(FlagExplorationEmailHandlerTest, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -513,11 +514,12 @@ class FlagExplorationEmailHandlerTest(test_utils.GenericTestBase):
             'You can change your email preferences via the Preferences page.')
 
         with self.can_send_emails_ctx:
+            self.login(self.NEW_USER_EMAIL)
             moderator_services.enqueue_flag_exploration_email_task(
                 self.exploration.id, self.report_text)
 
             self.process_and_flush_pending_tasks()
-
+            self.logout()
             messages = self.mail_stub.get_sent_messages(to=self.MODERATOR_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -525,4 +527,4 @@ class FlagExplorationEmailHandlerTest(test_utils.GenericTestBase):
                 expected_email_html_body)
             self.assertEqual(
                 messages[0].body.decode(),
-                expected_email_text_body)"""
+                expected_email_text_body)

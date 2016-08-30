@@ -1340,7 +1340,7 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
 
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
-        self.set_moderators([self.MODERATOR_USERNAME])
+        self.set_moderators([self.MODERATOR_USERNAME, self.NEW_USER_USERNAME])
 
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, 'Title')
@@ -1386,6 +1386,16 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
 
             # make sure correct email is sent.
             messages = self.mail_stub.get_sent_messages(to=self.MODERATOR_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(),
+                expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(),
+                expected_email_text_body)
+
+            #make sure correct emails are sent to multiple moderators
+            message = messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(),

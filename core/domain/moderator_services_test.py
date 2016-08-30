@@ -17,13 +17,13 @@
 #import datetime
 #import types
 
-#from core.domain import moderator_services
+from core.domain import moderator_services
 from core.tests import test_utils
-#import feconf
+import feconf
 
 
 class FlagExplorationEmailEnqueueTaskTest(test_utils.GenericTestBase):
-    """def setUp(self):
+    def setUp(self):
         super(FlagExplorationEmailEnqueueTaskTest, self).setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -74,9 +74,12 @@ class FlagExplorationEmailEnqueueTaskTest(test_utils.GenericTestBase):
             'You can change your email preferences via the Preferences page.')
 
         with self.can_send_emails_ctx:
+            self.login(self.NEW_USER_EMAIL)
             moderator_services.enqueue_flag_exploration_email_task(
                 self.exploration.id, self.report_text)
 
+            self.process_and_flush_pending_tasks()
+            self.logout()
             # make sure correct email is sent.
             messages = self.mail_stub.get_sent_messages(to=self.MODERATOR_EMAIL)
             self.assertEqual(len(messages), 1)
@@ -85,4 +88,4 @@ class FlagExplorationEmailEnqueueTaskTest(test_utils.GenericTestBase):
                 expected_email_html_body)
             self.assertEqual(
                 messages[0].body.decode(),
-                expected_email_text_body)"""
+                expected_email_text_body)

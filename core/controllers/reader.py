@@ -561,7 +561,7 @@ class RecommendationsHandler(base.BaseHandler):
 class FlagExplorationHandler(base.BaseHandler):
     """"Handles operations relating to learner flagging of explorations."""
 
-    @base.require_user
+    #@base.require_user
     def post(self, exploration_id):
         moderator_services.enqueue_flag_exploration_email_task(
             exploration_id,
@@ -581,4 +581,4 @@ class FlagExplorationEmailHandler(base.BaseHandler):
         exploration = exp_services.get_exploration_by_id(exploration_id)
 
         email_manager.send_flag_exploration_email(
-            exploration.title, exploration.id, self.user_id, report_text)
+            exploration.title, exploration_id, self.user_id, report_text)
