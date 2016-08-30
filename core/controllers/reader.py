@@ -60,6 +60,11 @@ def require_playable(handler):
                 'error/disabled_exploration.html', iframe_restriction=None)
             return
 
+        # This check is needed in order to show the correct page when a 404
+        # error is raised.
+        if feconf.EXPLORATION_URL_EMBED_PREFIX in self.request.uri:
+            self.values['iframed'] = True
+
         # Checks if the user for the current session is logged in.
         if rights_manager.Actor(self.user_id).can_play(
                 feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
@@ -249,16 +254,13 @@ class ExplorationPageEmbed(base.BaseHandler):
                     config_domain.BANNED_USERNAMES.value and
                     rights_manager.Actor(self.user_id).can_edit(
                         feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
-        if not rights_manager.Actor(self.user_id).can_view(
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
-            raise self.PageNotFoundException
 
         # If the exploration does not exist, an Exception is raised.
         exploration_data_values = _get_exploration_player_data(
             exploration_id, version, collection_id, can_edit)
-        exploration_data_values['iframed'] = True
 
         self.values.update(exploration_data_values)
+        self.values['iframed'] = True
 
         self.render_template(
             'player/exploration_player.html', iframe_restriction=None)
@@ -288,17 +290,16 @@ class ExplorationPage(base.BaseHandler):
                     config_domain.BANNED_USERNAMES.value and
                     rights_manager.Actor(self.user_id).can_edit(
                         feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
-        if not rights_manager.Actor(self.user_id).can_view(
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
+
+        try:
+            # If the exploration does not exist, a 404 error is raised.
+            exploration_data_values = _get_exploration_player_data(
+                exploration_id, version, collection_id, can_edit)
+        except Exception:
             raise self.PageNotFoundException
 
-        # If the exploration does not exist, an Exception is raised.
-        exploration_data_values = _get_exploration_player_data(
-            exploration_id, version, collection_id, can_edit)
-        exploration_data_values['iframed'] = False
-
         self.values.update(exploration_data_values)
-
+        self.values['iframed'] = False
         self.render_template('player/exploration_player.html')
 
 

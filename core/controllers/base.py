@@ -397,8 +397,12 @@ class BaseHandler(webapp2.RequestHandler):
             self.render_json(values)
         else:
             self.values.update(values)
-            self.render_template(
-                'error/error.html', iframe_restriction=None)
+            if 'iframed' in self.values and self.values['iframed']:
+                self.render_template(
+                    'error/error_iframed.html', iframe_restriction=None)
+            else:
+                self.render_template(
+                    'error/error.html', iframe_restriction=None)
 
     def handle_exception(self, exception, unused_debug_mode):
         """Overwrites the default exception handler."""

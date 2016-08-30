@@ -26,9 +26,9 @@ var player = require('../protractor_utils/player.js');
 describe('Embedding', function() {
   it('should display and play embedded explorations', function() {
     var TEST_PAGES = [
-      'embedding_tests_dev_0.0.1.html',
       'embedding_tests_dev_0.0.1.min.html',
-      'embedding_tests_jsdelivr_0.0.1.min.html'];
+      'embedding_tests_jsdelivr_0.0.1.min.html',
+      'embedding_tests_dev_0.0.2.min.html'];
     // The length of time the page waits before confirming an exploration
     // cannot be loaded.
     var LOADING_TIMEOUT = 10000;

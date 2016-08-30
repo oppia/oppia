@@ -161,10 +161,7 @@
         width: width,
         fixedheight: fixedHeight,
         fixedwidth: fixedWidth,
-        frameborder: 0,
-        // Hide the iframe first so that autofocus will not scroll the page.
-        style: (
-          'margin: 10px; position: fixed; top: -9999px; visibility: hidden;')
+        frameborder: 0
       };
       for (var key in iframeAttrs) {
         this.iframe.setAttribute(key, iframeAttrs[key]);
