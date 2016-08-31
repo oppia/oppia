@@ -832,9 +832,16 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             r'\((?P<x>-?\d+\.?\d*), (?P<y>-?\d+\.?\d*)\)')
         match = pattern.match(answer_str)
         if not match:
-            return (
-                None, 'Bad answer string in InteractiveMap %s rule.' % (
-                    rule_spec.rule_type))
+            # Prior to #380ea2 on 03 June 2014, the answers were stored as
+            # stringifications of the CoordTwoDim object using schema_utils, so
+            # the pattern for reconstruction is slightly different.
+            pattern = re.compile(
+                r'\[(?P<x>-?\d+\.?\d*), (?P<y>-?\d+\.?\d*)\]')
+            match = pattern.match(answer_str)
+            if not match:
+                return (
+                    None, 'Bad answer string in InteractiveMap %s rule.' % (
+                        rule_spec.rule_type))
         coord_two_dim_list = [
             float(match.group('x')), float(match.group('y'))
         ]
@@ -1075,9 +1082,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 None,
                 'Unsupported rule type encountered while attempting to '
                 'reconstitute TextInput object: %s' % rule_spec.rule_type)
-        input_value = cls._get_plaintext(answer_str)
         return cls._normalize_raw_answer_object(
-            objects.NormalizedString, input_value, answer_str)
+            objects.NormalizedString, answer_str, answer_str)
 
     @classmethod
     def _reconstitute_answer_object(

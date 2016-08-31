@@ -27,6 +27,7 @@ from core.domain import stats_jobs_one_off
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
+from extensions.objects.models import objects
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
@@ -1160,6 +1161,44 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         }])
         self._verify_no_migration_validation_problems()
 
+    def test_migrate_interactive_map_with_old_answer_html_formatting(self):
+        """Similar to test_migrate_interactive_map, except this uses an answer
+        string which comes from schema_utils, as was stored prior to commit
+        #380ea2. This test is based on an exploration found in production.
+        """
+        state_name = 'World Map'
+
+        rule_spec_str = (
+            'Within(100.0,[19.228176737766262, -99.13993835449219])')
+        html_answer = '%s' % (
+            objects.CoordTwoDim.normalize([18.979026, -99.316406]))
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
+
+        # The answer should have been properly migrated to the new storage
+        # model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': [18.979026, -99.316406],
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 2,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'InteractiveMap',
+            'params': [],
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+        self._verify_no_migration_validation_problems()
+
     def test_migrate_item_selection_input(self):
         state_name = 'Item Selection'
 
@@ -1498,6 +1537,42 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         state_answers = self._get_state_answers(state_name)
         self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': 'appreciate',
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'TextInput',
+            'params': [],
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+        self._verify_no_migration_validation_problems()
+
+    def test_migrate_text_input_with_illegal_characters(self):
+        """Similar to test_migrate_text_input, except answers with illegal
+        characters like '<' and '>' are migrated. This test is based on an
+        exploration found in production.
+        """
+        state_name = 'Text Input'
+
+        rule_spec_str = 'Contains(ate)'
+        html_answer = 'Let f(x)<|a|'
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
+
+        # The answer should have been properly migrated to the new storage
+        # model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': 'Let f(x)<|a|',
             'time_spent_in_sec': 0.0,
             'answer_group_index': 0,
             'rule_spec_index': 0,
