@@ -30,20 +30,17 @@
 // it if it's agreed upon).
 oppia.factory('EditableCollectionBackendApiService', [
     '$http', '$q', 'COLLECTION_DATA_URL_TEMPLATE',
-    'COLLECTION_EDITABLE_DATA_URL_TEMPLATE', 'UrlInterpolationService',
+    'EDITABLE_COLLECTION_DATA_URL_TEMPLATE', 'UrlInterpolationService',
     'ReadOnlyCollectionBackendApiService',
     function($http, $q, COLLECTION_DATA_URL_TEMPLATE,
-      COLLECTION_EDITABLE_DATA_URL_TEMPLATE, UrlInterpolationService,
+      EDITABLE_COLLECTION_DATA_URL_TEMPLATE, UrlInterpolationService,
       ReadOnlyCollectionBackendApiService) {
       var _fetchCollection = function(
           collectionId, successCallback, errorCallback) {
         var collectionDataUrl = UrlInterpolationService.interpolateUrl(
-          COLLECTION_DATA_URL_TEMPLATE, {
+          EDITABLE_COLLECTION_DATA_URL_TEMPLATE, {
             collection_id: collectionId
           });
-
-        // Does not work with following line
-        // collectionDataUrl += '?allow_invalid_explorations=true';
 
         $http.get(collectionDataUrl).then(function(response) {
           var collection = angular.copy(response.data.collection);
@@ -61,7 +58,7 @@ oppia.factory('EditableCollectionBackendApiService', [
           collectionId, collectionVersion, commitMessage, changeList,
           successCallback, errorCallback) {
         var editableCollectionDataUrl = UrlInterpolationService.interpolateUrl(
-          COLLECTION_EDITABLE_DATA_URL_TEMPLATE, {
+          EDITABLE_COLLECTION_DATA_URL_TEMPLATE, {
             collection_id: collectionId
           });
 
@@ -74,7 +71,7 @@ oppia.factory('EditableCollectionBackendApiService', [
           // The returned data is an updated collection dict.
           var collection = angular.copy(response.data);
 
-          // Update the CollectionBackendApiService's cache with the new
+          // Update the ReadOnlyCollectionBackendApiService's cache with the new
           // collection.
           ReadOnlyCollectionBackendApiService.cacheCollection(
             collectionId, collection);

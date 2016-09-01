@@ -13,11 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ReadOnlyBackendApiService.
+ * @fileoverview Unit tests for ReadOnlyCollectionBackendApiService.
  */
 
 describe('Read only collection backend API service', function() {
-  var ReadOnlyBackendApiService = null;
+  var ReadOnlyCollectionBackendApiService = null;
   var sampleDataResults = null;
   var $rootScope = null;
   var $scope = null;
@@ -27,7 +27,7 @@ describe('Read only collection backend API service', function() {
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
   beforeEach(inject(function($injector) {
-    ReadOnlyBackendApiService = $injector.get(
+    ReadOnlyCollectionBackendApiService = $injector.get(
       'ReadOnlyCollectionBackendApiService');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
@@ -64,7 +64,7 @@ describe('Read only collection backend API service', function() {
 
     $httpBackend.expect('GET', '/collection_handler/data/0').respond(
       sampleDataResults);
-    ReadOnlyBackendApiService.fetchCollection('0').then(
+    ReadOnlyCollectionBackendApiService.fetchCollection('0').then(
       successHandler, failHandler);
     $httpBackend.flush();
 
@@ -80,7 +80,7 @@ describe('Read only collection backend API service', function() {
     // Loading a collection the first time should fetch it from the backend.
     $httpBackend.expect('GET', '/collection_handler/data/0').respond(
       sampleDataResults);
-    ReadOnlyBackendApiService.loadCollection('0').then(
+    ReadOnlyCollectionBackendApiService.loadCollection('0').then(
       successHandler, failHandler);
     $httpBackend.flush();
 
@@ -88,7 +88,7 @@ describe('Read only collection backend API service', function() {
     expect(failHandler).not.toHaveBeenCalled();
 
     // Loading a collection the second time should not fetch it.
-    ReadOnlyBackendApiService.loadCollection('0').then(
+    ReadOnlyCollectionBackendApiService.loadCollection('0').then(
       successHandler, failHandler);
 
     expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
@@ -103,7 +103,7 @@ describe('Read only collection backend API service', function() {
     // Loading a collection the first time should fetch it from the backend.
     $httpBackend.expect('GET', '/collection_handler/data/0').respond(
       500, 'Error loading collection 0.');
-    ReadOnlyBackendApiService.loadCollection('0').then(
+    ReadOnlyCollectionBackendApiService.loadCollection('0').then(
       successHandler, failHandler);
     $httpBackend.flush();
 
@@ -116,12 +116,12 @@ describe('Read only collection backend API service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     // The collection should not currently be cached.
-    expect(ReadOnlyBackendApiService.isCached('0')).toBeFalsy();
+    expect(ReadOnlyCollectionBackendApiService.isCached('0')).toBeFalsy();
 
     // Loading a collection the first time should fetch it from the backend.
     $httpBackend.expect('GET', '/collection_handler/data/0').respond(
       sampleDataResults);
-    ReadOnlyBackendApiService.loadCollection('0').then(
+    ReadOnlyCollectionBackendApiService.loadCollection('0').then(
       successHandler, failHandler);
     $httpBackend.flush();
 
@@ -129,21 +129,21 @@ describe('Read only collection backend API service', function() {
     expect(failHandler).not.toHaveBeenCalled();
 
     // The collection should now be cached.
-    expect(ReadOnlyBackendApiService.isCached('0')).toBeTruthy();
+    expect(ReadOnlyCollectionBackendApiService.isCached('0')).toBeTruthy();
 
     // The collection should be loadable from the cache.
-    ReadOnlyBackendApiService.loadCollection('0').then(
+    ReadOnlyCollectionBackendApiService.loadCollection('0').then(
       successHandler, failHandler);
     expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
     expect(failHandler).not.toHaveBeenCalled();
 
     // Resetting the cache will cause another fetch from the backend.
-    ReadOnlyBackendApiService.clearCollectionCache();
-    expect(ReadOnlyBackendApiService.isCached('0')).toBeFalsy();
+    ReadOnlyCollectionBackendApiService.clearCollectionCache();
+    expect(ReadOnlyCollectionBackendApiService.isCached('0')).toBeFalsy();
 
     $httpBackend.expect('GET', '/collection_handler/data/0').respond(
       sampleDataResults);
-    ReadOnlyBackendApiService.loadCollection('0').then(
+    ReadOnlyCollectionBackendApiService.loadCollection('0').then(
       successHandler, failHandler);
     $httpBackend.flush();
 
@@ -156,20 +156,20 @@ describe('Read only collection backend API service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     // The collection should not currently be cached.
-    expect(ReadOnlyBackendApiService.isCached('0')).toBeFalsy();
+    expect(ReadOnlyCollectionBackendApiService.isCached('0')).toBeFalsy();
 
     // Cache a collection.
-    ReadOnlyBackendApiService.cacheCollection('0', {
+    ReadOnlyCollectionBackendApiService.cacheCollection('0', {
       id: '0',
       nodes: []
     });
 
     // It should now be cached.
-    expect(ReadOnlyBackendApiService.isCached('0')).toBeTruthy();
+    expect(ReadOnlyCollectionBackendApiService.isCached('0')).toBeTruthy();
 
     // A new collection should not have been fetched from the backend. Also,
     // the returned collection should match the expected collection object.
-    ReadOnlyBackendApiService.loadCollection('0').then(
+    ReadOnlyCollectionBackendApiService.loadCollection('0').then(
       successHandler, failHandler);
 
     // http://brianmcd.com/2014/03/27/
