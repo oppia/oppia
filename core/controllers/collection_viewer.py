@@ -84,14 +84,11 @@ class CollectionDataHandler(base.BaseHandler):
     def get(self, collection_id):
         """Populates the data on the individual collection page."""
 
-        # All read only data will not allow invalid explorations
-        allow_invalid_explorations = False
-
         try:
             collection_dict = (
                 summary_services.get_learner_collection_dict_by_id(
                     collection_id, self.user_id,
-                    allow_invalid_explorations=allow_invalid_explorations))
+                    allow_invalid_explorations=False))
         except Exception as e:
             raise self.PageNotFoundException(e)
 

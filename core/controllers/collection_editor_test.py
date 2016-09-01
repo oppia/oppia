@@ -22,6 +22,7 @@ from core.tests import test_utils
 import feconf
 
 
+
 class BaseCollectionEditorControllerTest(test_utils.GenericTestBase):
 
     CAN_EDIT_STR = 'GLOBALS.canEdit = JSON.parse(\'true\');'
@@ -98,6 +99,68 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         self.assertIn('Introduction to Collections in Oppia', response.body)
         self.assert_can_edit(response.body)
         self.logout()
+
+
+    def test_editable_collection_handler_get(self):
+        whitelisted_usernames = [self.EDITOR_USERNAME]
+        self.set_config_property(
+            config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES,
+            whitelisted_usernames)
+
+        # Check that non-editors cannot access the editor data handler.
+        # This is due to them not being whitelisted.
+        response = self.testapp.get(
+            '%s/%s' % (feconf.EDITABLE_COLLECTION_DATA_URL_PREFIX,
+                       self.COLLECTION_ID))
+        self.assertEqual(response.status_int, 302)
+
+        # Check that whitelisted users can access the data
+        # from the editable_collection_data_handler
+        self.login(self.EDITOR_EMAIL)
+
+        json_response = self.get_json(
+            '%s/%s' % (feconf.EDITABLE_COLLECTION_DATA_URL_PREFIX,
+                       self.COLLECTION_ID))
+        self.assertEqual(self.COLLECTION_ID, json_response['collection_id'])
+        self.assertEqual(
+            'Introduction to Collections in Oppia', json_response['title'])
+
+        self.logout()
+
+
+    def test_editable_collection_handler_put(self):
+        whitelisted_usernames = [self.EDITOR_USERNAME]
+        self.set_config_property(
+            config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES,
+            whitelisted_usernames)
+
+        # Check that whitelisted users can access the data
+        # from the editable_collection_data_handler
+        self.login(self.EDITOR_EMAIL)
+
+        # Call create handler to return csrf token
+        response = self.testapp.get(
+            '%s/%s' % (feconf.COLLECTION_EDITOR_URL_PREFIX,
+                       self.COLLECTION_ID))
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        json_dict = {"version" : 1,
+                     "commit_message" : "changed title",
+                     "change_list" :
+                     [{'cmd': 'edit_collection_property',
+                       'property_name': 'title',
+                       'new_value': 'A new title'}]}
+
+        json_response = self.put_json(
+            '%s/%s' % (feconf.EDITABLE_COLLECTION_DATA_URL_PREFIX,
+                       self.COLLECTION_ID), json_dict, csrf_token=csrf_token)
+
+        self.assertEqual(self.COLLECTION_ID, json_response['collection_id'])
+        self.assertEqual(2, json_response['collection']['version'])
+        self.assertEqual(
+            'A new title', json_response['title'])
+        self.logout()
+
 
     def test_collection_rights_handler(self):
         collection_id = 'collection_id'

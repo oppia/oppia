@@ -95,9 +95,7 @@ class CollectionEditorHandler(base.BaseHandler):
 class CollectionEditorPage(CollectionEditorHandler):
     """The editor page for a single collection."""
 
-    # TODO(bhenning): Implement read-only version of the editor. Until that
-    # exists, ensure the user has proper permission to edit this collection
-    # before seeing the editor.
+    # Require editor handles all edit permissions for a collection
     @require_editor
     def get(self, collection_id):
         """Handles GET requests."""
@@ -105,20 +103,8 @@ class CollectionEditorPage(CollectionEditorHandler):
         collection = collection_services.get_collection_by_id(
             collection_id, strict=False)
 
-        if (collection is None or
-                not rights_manager.Actor(self.user_id).can_view(
-                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id)):
-            self.redirect('/')
-            return
-
-        can_edit = (
-            bool(self.user_id) and
-            self.username not in config_domain.BANNED_USERNAMES.value and
-            rights_manager.Actor(self.user_id).can_edit(
-                feconf.ACTIVITY_TYPE_COLLECTION, collection_id))
-
         self.values.update({
-            'can_edit': can_edit,
+            'can_edit': True,
             'can_unpublish': rights_manager.Actor(
                 self.user_id).can_unpublish(
                     feconf.ACTIVITY_TYPE_COLLECTION, collection_id),
@@ -154,6 +140,7 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
                 'which is too old. Please reload the page and try again.'
                 % (collection_version, version_from_payload))
 
+    # Require editor handles all edit permissions for a collection
     @require_editor
     def get(self, collection_id):
         """Populates the data on the individual collection page."""
@@ -161,24 +148,22 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
         collection = (
             collection_services.get_collection_by_id(collection_id))
 
-        if (collection is None or
-                not rights_manager.Actor(self.user_id).can_view(
-                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id)):
-            self.redirect('/')
-            return
-
-        can_edit = (
-            bool(self.user_id) and
-            self.username not in config_domain.BANNED_USERNAMES.value and
-            rights_manager.Actor(self.user_id).can_edit(
-                feconf.ACTIVITY_TYPE_COLLECTION, collection_id))
+        try:
+            # Try to retrieve collection
+            collection_dict = (
+                summary_services.get_learner_collection_dict_by_id(
+                    collection_id, self.user_id,
+                    allow_invalid_explorations=True))
+        except Exception as e:
+            raise self.PageNotFoundException(e)
 
         self.values.update({
-            'can_edit': can_edit,
+            'can_edit': True,
             'can_unpublish': rights_manager.Actor(
                 self.user_id).can_unpublish(
                     feconf.ACTIVITY_TYPE_COLLECTION, collection_id),
             'collection_id': collection.id,
+            'collection': collection_dict,
             'is_private': rights_manager.is_collection_private(collection_id),
             'nav_mode': feconf.NAV_MODE_CREATE,
             'title': collection.title,
@@ -190,7 +175,7 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_STATS)
         })
 
-        self.render_template(self.values)
+        self.render_json(self.values)
 
     @require_editor
     def put(self, collection_id):
@@ -210,12 +195,19 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
             raise self.InvalidInputException(e)
 
         # Retrieve the updated collection.
+        collection = (
+            collection_services.get_collection_by_id(collection_id))
+
         collection_dict = (
             summary_services.get_learner_collection_dict_by_id(
                 collection_id, self.user_id, allow_invalid_explorations=True))
 
-        # Send the updated collection back to the frontend.
-        self.values.update(collection_dict)
+        # return updated collection
+        self.values.update({
+            'collection_id': collection.id,
+            'collection': collection_dict,
+            'title': collection.title})
+
         self.render_json(self.values)
 
 
