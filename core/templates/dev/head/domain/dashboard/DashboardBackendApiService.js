@@ -37,7 +37,9 @@ oppia.factory('DashboardBackendApiService', [
     var requestUrl = (
       '/dashboardhandler/explorationfeedback/?exp_id=' + explorationId);
     return $q(function(resolve, reject) {
-      $http.get(requestUrl).then(function(response) {
+      $http.get(requestUrl, {
+        cache: true
+      }).then(function(response) {
         if (resolve) {
           resolve(angular.copy(response.data));
         }

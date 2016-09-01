@@ -115,6 +115,10 @@ def get_exps_unresolved_answers_for_default_rule(exp_ids):
     return exps_answers_mapping
 
 
+def get_exp_unresolved_answers_for_default_rule(exp_id):
+    return get_exps_unresolved_answers_for_default_rule([exp_id])[exp_id]
+
+
 def get_state_rules_stats(exploration_id, state_name):
     """Gets statistics for the answer groups and rules of this state.
 
