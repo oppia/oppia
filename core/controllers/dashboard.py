@@ -170,9 +170,27 @@ class DashboardHandler(base.BaseHandler):
             feedback_services.get_thread_analytics_multi(
                 exploration_ids_subscribed_to))
 
+        unresolved_answers_dict = (
+            stats_services.get_exps_unresolved_answers_for_default_rule(
+                exploration_ids_subscribed_to))
+
+        for ind, exploration in enumerate(exp_summary_list):
+            exploration.update(feedback_thread_analytics[ind].to_dict())
+            exploration.update({
+                'num_unresolved_answers': (
+                    unresolved_answers_dict[exploration['id']]['count']
+                    if exploration['id'] in unresolved_answers_dict else 0
+                ),
+                'top_unresolved_answers': (
+                    unresolved_answers_dict[exploration['id']]
+                    ['unresolved_answers']
+                    [:feconf.TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD]
+                )
+            })
+
         exp_summary_list = sorted(
             exp_summary_list,
-            key=lambda x: (x['last_updated_msec']),
+            key=lambda x: (x['num_open_threads'], x['last_updated_msec']),
             reverse=True)
 
         if (self.username in
@@ -254,20 +272,11 @@ class ExplorationStats(base.BaseHandler):
     @base.require_fully_signed_up
     def get(self):
         """Handles GET requests."""
-        exp_id = self.request.get('exp_id')
-        new_feedback_dict = [
-            feedback_message.to_dict()
-            for feedback_message in feedback_services.get_messages_for_exp_id(
-                exp_id)]
-        unresolved_answers_dict = (
-            stats_services.get_exp_unresolved_answers_for_default_rule(
-                exp_id))
         self.render_json({
-            'new_feedback': new_feedback_dict,
-            'num_unresolved_answers': unresolved_answers_dict['count'],
-            'top_unresolved_answers': (
-                unresolved_answers_dict['unresolved_answers']
-                [:feconf.TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD])
+            'new_feedback': [
+                feedback_message.to_dict()
+                for feedback_message in feedback_services.get_messages_for_exp_id( # pylint: disable=line-too-long
+                    self.request.get('exp_id'))]
         })
 
 

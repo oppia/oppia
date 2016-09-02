@@ -244,16 +244,16 @@
             <div class="stat-block" ng-if="!checkMobileView()">
               <div class="heading-text"
                    ng-click="toggleSubDropdown(EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS, $event)">
-                <[explorationStats[exploration.id].top_unresolved_answers.length]> Unresolved Answers from Users
+                <[exploration.top_unresolved_answers.length]> Unresolved Answers from Users
                 <span class="fa"
-                      ng-if="explorationStats[exploration.id].top_unresolved_answers.length !== 0 && !checkMobileView()"
+                      ng-if="exploration.top_unresolved_answers.length !== 0 && !checkMobileView()"
                       ng-class="activeSubDropdown === EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS ? 'fa-caret-up': 'fa-caret-down'">
                 </span>
               </div>
               <div class="stat-block-values"
-                   ng-if="explorationStats[exploration.id].top_unresolved_answers.length !==0"
+                   ng-if="exploration.top_unresolved_answers.length !==0"
                    ng-show="activeSubDropdown === EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS">
-                <div ng-repeat="answer in explorationStats[exploration.id].top_unresolved_answers">
+                <div ng-repeat="answer in exploration.top_unresolved_answers">
                   <[answer.value | truncate: 100]> (<[answer.count]> instances in <[answer.state]>)
                 </div>
               </div>
