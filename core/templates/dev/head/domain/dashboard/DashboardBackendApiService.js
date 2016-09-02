@@ -33,9 +33,9 @@ oppia.factory('DashboardBackendApiService', [
     });
   };
 
-  var _fetchExplorationNewFeedback = function(explorationId) {
+  var _fetchExplorationStats = function(explorationId) {
     var requestUrl = (
-      '/dashboardhandler/explorationfeedback/?exp_id=' + explorationId);
+      '/dashboardhandler/explorationstats/?exp_id=' + explorationId);
     return $q(function(resolve, reject) {
       $http.get(requestUrl, {
         cache: true
@@ -53,6 +53,6 @@ oppia.factory('DashboardBackendApiService', [
 
   return {
     fetchDashboardData: _fetchDashboardData,
-    fetchExplorationNewFeedback: _fetchExplorationNewFeedback
+    fetchExplorationStats: _fetchExplorationStats
   };
 }]);

@@ -18,8 +18,11 @@
 
 describe('Dashboard backend API service', function() {
   var DashboardBackendApiService = null;
-  var sampleDataResults = null;
+  var UrlInterpolationService = null;
   var $httpBackend = null;
+  var sampleDataResults = null;
+  var sampleExplorationStatsData = null;
+  var SAMPLE_EXP_ID = 'hyuy4GUlvTqJ';
 
   beforeEach(module('oppia'));
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
@@ -32,7 +35,7 @@ describe('Dashboard backend API service', function() {
     // Sample dashboard data returnable from the backend
     sampleDataResults = {
       explorations_list: [{
-        id: 'hyuy4GUlvTqJ',
+        id: SAMPLE_EXP_ID,
         title: 'Sample Title',
         activity_type: 'exploration',
         category: 'Computing',
@@ -57,17 +60,6 @@ describe('Dashboard backend API service', function() {
         num_open_threads: 0,
         num_total_threads: 0,
         num_unresolved_answers: 2,
-        new_feedback: [
-          {
-            author_username: 'avijit',
-            created_on: 1471649252020.614,
-            exploration_id: 'ASt_bM51b4k8',
-            message_id: 0,
-            text: 'Awesome :)',
-            updated_status: 'open',
-            updated_subject: '(Feedback from a learner)'
-          }
-        ],
         top_unresolved_answers: [
           {
             state: 'Introduction',
@@ -95,6 +87,18 @@ describe('Dashboard backend API service', function() {
         total_open_feedback: 1
       }
     };
+
+    sampleExplorationStatsData = {
+      new_feedback: [{
+        author_username: 'avijit',
+        created_on: 1471649252020.614,
+        exploration_id: 'ASt_bM51b4k8',
+        message_id: 0,
+        text: 'Awesome :)',
+        updated_status: 'open',
+        updated_subject: '(Feedback from a learner)'
+      }]
+    };
   }));
 
   afterEach(function() {
@@ -117,7 +121,7 @@ describe('Dashboard backend API service', function() {
     expect(failHandler).not.toHaveBeenCalled();
   });
 
-  it('should use the rejection handler if the backend request failed',
+  it('should use rejection handler if dashboard data backend request failed',
       function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
@@ -126,6 +130,43 @@ describe('Dashboard backend API service', function() {
     $httpBackend.expect('GET', '/dashboardhandler/data').respond(
       ERROR_STATUS_CODE, 'Error loading dashboard data.');
     DashboardBackendApiService.fetchDashboardData().then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(ERROR_STATUS_CODE);
+  });
+
+  it('should successfully fetch statistics for an exploration from the backend',
+      function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect(
+      'GET',
+      '/dashboardhandler/explorationstats/?exp_id=' + SAMPLE_EXP_ID
+    ).respond(
+      sampleExplorationStatsData);
+    DashboardBackendApiService.fetchExplorationStats(SAMPLE_EXP_ID).then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+
+    expect(successHandler).toHaveBeenCalledWith(sampleExplorationStatsData);
+    expect(failHandler).not.toHaveBeenCalled();
+  });
+
+  it('should use rejection handler if exploration stats backend request failed',
+      function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    var ERROR_STATUS_CODE = 500;
+    $httpBackend.expect(
+      'GET',
+      '/dashboardhandler/explorationstats/?exp_id=' + SAMPLE_EXP_ID
+    ).respond(
+      ERROR_STATUS_CODE, 'Error fetching exploration stats.');
+    DashboardBackendApiService.fetchExplorationStats(SAMPLE_EXP_ID).then(
       successHandler, failHandler);
     $httpBackend.flush();
 

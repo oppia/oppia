@@ -92,17 +92,16 @@ oppia.controller('Dashboard', [
       if (status === 'private') {
         $scope.showExplorationEditor(explorationId);
       } else {
-        DashboardBackendApiService.fetchExplorationNewFeedback(explorationId)
-          .then(
-            function(response) {
-              $scope.explorationStats[explorationId] = response;
-            }, function(errorStatus) {
-              if (FATAL_ERROR_CODES.indexOf(errorStatus) !== -1) {
-                alertsService.addWarning(
-                  'Failed to get statistics for this exploration');
-              }
+        DashboardBackendApiService.fetchExplorationStats(explorationId).then(
+          function(response) {
+            $scope.explorationStats[explorationId] = response;
+          }, function(errorStatus) {
+            if (FATAL_ERROR_CODES.indexOf(errorStatus) !== -1) {
+              alertsService.addWarning(
+                'Failed to get statistics for this exploration');
             }
-          );
+          }
+        );
         $scope.activeSubDropdown = '';
         $scope.activeExplorationId = (
           ($scope.activeExplorationId === explorationId) ? '' : explorationId);
