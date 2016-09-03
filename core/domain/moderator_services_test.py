@@ -33,6 +33,8 @@ class FlagExplorationEmailEnqueueTaskTest(test_utils.GenericTestBase):
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
 
+        self.no_user = None
+
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, 'Title')
         self.owner_ids = [self.editor_id]
@@ -47,10 +49,11 @@ class FlagExplorationEmailEnqueueTaskTest(test_utils.GenericTestBase):
         expected_email_html_body = (
             'Hello Moderator,<br>'
             'newuser has submitted a new report on the exploration Title'
-            ' on the grounds of AD .<br>'
+            ' on the grounds of: <br>'
+            'AD .<br>'
             'You can modify the exploration by clicking '
             '<a href="https://www.oppia.org/create/A">'
-            '"Edit Title"</a>.<br>'
+            '"here"</a>.<br>'
             '<br>'
             'Thanks!<br>'
             '- The Oppia Team<br>'
@@ -61,8 +64,9 @@ class FlagExplorationEmailEnqueueTaskTest(test_utils.GenericTestBase):
         expected_email_text_body = (
             'Hello Moderator,\n'
             'newuser has submitted a new report on the exploration Title'
-            ' on the grounds of AD .\n'
-            'You can modify the exploration by clicking "Edit Title".\n'
+            ' on the grounds of: \n'
+            'AD .\n'
+            'You can modify the exploration by clicking "here".\n'
             '\n'
             'Thanks!\n'
             '- The Oppia Team\n'
@@ -70,12 +74,11 @@ class FlagExplorationEmailEnqueueTaskTest(test_utils.GenericTestBase):
             'You can change your email preferences via the Preferences page.')
 
         with self.can_send_emails_ctx:
-            self.login(self.NEW_USER_EMAIL)
             moderator_services.enqueue_flag_exploration_email_task(
-                self.exploration.id, self.report_text)
+                self.exploration.id, self.report_text, self.new_user_id)
 
             self.process_and_flush_pending_tasks()
-            self.logout()
+
             # make sure correct email is sent.
             messages = self.mail_stub.get_sent_messages(to=self.MODERATOR_EMAIL)
             self.assertEqual(len(messages), 1)
@@ -85,3 +88,11 @@ class FlagExplorationEmailEnqueueTaskTest(test_utils.GenericTestBase):
             self.assertEqual(
                 messages[0].body.decode(),
                 expected_email_text_body)
+
+    def test_emails_are_not_sent(self):
+            try:
+                moderator_services.enqueue_flag_exploration_email_task(
+                    self.exploration.id, self.report_text, self.no_user)
+                self.assertFail()
+            except Exception as inst:
+                self.assertEqual(inst.message, 'User has to be logged in to report.')

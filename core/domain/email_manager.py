@@ -509,14 +509,15 @@ def send_instant_feedback_message_email(
 
 def send_flag_exploration_email(
         exploration_title, exploration_id, reporter_id, report_text):
-    email_subject = 'New flag has been raised for "%s"' % exploration_title
+    email_subject = 'Exploration flagged by user: "%s"' % exploration_title
 
     email_body_template = (
         'Hello Moderator,<br>'
         '%s has submitted a new report on the exploration %s on '
-        'the grounds of %s .<br>'
+        'the grounds of: <br>'
+        '%s .<br>'
         'You can modify the exploration by clicking '
-        '<a href="https://www.oppia.org/create/%s">"Edit %s"</a>.<br>'
+        '<a href="https://www.oppia.org/create/%s">"here"</a>.<br>'
         '<br>'
         'Thanks!<br>'
         '- The Oppia Team<br>'
@@ -529,7 +530,7 @@ def send_flag_exploration_email(
     email_body = email_body_template % (
         user_services.get_user_settings(reporter_id).username,
         exploration_title, report_text, exploration_id,
-        exploration_title, EMAIL_FOOTER.value)
+        EMAIL_FOOTER.value)
 
     recipient_list = config_domain.MODERATOR_IDS.value
     for recipient_id in recipient_list:

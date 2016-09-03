@@ -25,19 +25,19 @@ from core.domain import classifier_services
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import dependency_registry
+from core.domain import email_manager
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import gadget_registry
 from core.domain import interaction_registry
+from core.domain import moderator_services
 from core.domain import rating_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import summary_services
-from core.domain import moderator_services
-from core.domain import email_manager
 import feconf
 import utils
 
@@ -561,24 +561,27 @@ class RecommendationsHandler(base.BaseHandler):
 class FlagExplorationHandler(base.BaseHandler):
     """"Handles operations relating to learner flagging of explorations."""
 
-    #@base.require_user
+    @base.require_user
     def post(self, exploration_id):
         moderator_services.enqueue_flag_exploration_email_task(
             exploration_id,
-            self.payload.get('report_text'))
+            self.payload.get('report_text'),
+            self.user_id)
         self.render_json(self.values)
 
 
 class FlagExplorationEmailHandler(base.BaseHandler):
     """Handles task of sending emails about flagged explorations
-    to moderators."""
+    to moderators.
+    """
 
     def post(self):
         payload = json.loads(self.request.body)
         exploration_id = payload['exploration_id']
         report_text = payload['report_text']
+        reporter_id = payload['reporter_id']
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
 
         email_manager.send_flag_exploration_email(
-            exploration.title, exploration_id, self.user_id, report_text)
+            exploration.title, exploration_id, reporter_id, report_text)
