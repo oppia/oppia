@@ -96,5 +96,5 @@ class FlagExplorationEmailEnqueueTaskTest(test_utils.GenericTestBase):
             self.assertFail()
         except Exception as inst:
             self.assertEqual(inst.message,
-                'User has to be logged in to report.')
+                        'User has to be logged in to report.')
 

@@ -469,4 +469,6 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
             }, csrf_token)
         self.assertRaisesRegexp(
         Exception,
-            'User has to logged in to report.')"""
+            'User has to logged in to report.')
+    """
+
