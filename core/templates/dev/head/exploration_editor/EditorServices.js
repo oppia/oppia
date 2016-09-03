@@ -137,7 +137,7 @@ oppia.factory('explorationData', [
           $log.info('Changes to this exploration were saved successfully.');
           explorationData.data = response.data;
           if (successCallback) {
-            successCallback();
+            successCallback(response);
           }
         }, function() {
           if (errorCallback) {

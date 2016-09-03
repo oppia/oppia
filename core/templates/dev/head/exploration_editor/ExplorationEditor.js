@@ -641,9 +641,14 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         siteAnalyticsService.registerSavePlayableExplorationEvent(
           explorationData.explorationId);
       }
-
       $scope.isSaveInProgress = true;
-      explorationData.save(changeList, commitMessage, function() {
+      explorationData.save(changeList, commitMessage, function(response) {
+        if (response.data.is_version_of_draft_valid === false &&
+            response.data.draft_changes !== null &&
+            response.data.draft_changes.length > 0) {
+          autosaveInfoModalsService.showVersionMismatchModal(changeList);
+          return;
+        }
         changeListService.discardAllChanges();
         $rootScope.$broadcast('initExplorationPage');
         $rootScope.$broadcast('refreshVersionHistory', {
@@ -897,14 +902,6 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       }
 
       explorationData.getLastSavedData().then(function(data) {
-        explorationData.getData().then(function(currentData) {
-          if (data.version > currentData.version) {
-            autosaveInfoModalsService.showVersionMismatchModal(
-              changeListService.getChangeList());
-            return;
-          }
-        });
-
         var oldStates = data.states;
         var newStates = explorationStatesService.getStates();
         var diffGraphData = ExplorationDiffService.getDiffGraphData(
