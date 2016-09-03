@@ -457,8 +457,8 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
                 messages[0].body.decode(),
                 expected_email_text_body)
 
-"""    def test_that_emails_are_not_sent(self):
-
+    def test_that_emails_are_not_sent(self):
+    """
         response = self.testapp.get('/explore/%s' % self.EXP_ID)
         csrf_token = self.get_csrf_token_from_response(response)
 
