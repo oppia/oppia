@@ -34,6 +34,6 @@ def enqueue_flag_exploration_email_task(exploration_id, report_text,
             'reporter_id': reporter_id,
             }
 
-    	# Email about flagged explorations are sent immediately to moderators.
+        # Email about flagged explorations are sent immediately to moderators.
         taskqueue_services.enqueue_task(
             feconf.FLAG_EXPLORATION_EMAIL_HANDLER_URL, payload, 0)
