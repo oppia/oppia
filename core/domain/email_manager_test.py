@@ -1341,12 +1341,12 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
 
-        self.MODERATOR_TWO_EMAIL = 'moderator2@example.com'
-        self.MODERATOR_TWO_USERNAME = 'moderator2'
-        self.signup(self.MODERATOR_TWO_EMAIL, self.MODERATOR_TWO_USERNAME)
-        self.moderator2_id = self.get_user_id_from_email(self.MODERATOR_TWO_EMAIL)
+        self.MODERATORS_EMAIL = 'moderator2@example.com'
+        self.MODERATORS_USERNAME = 'moderator2'
+        self.signup(self.MODERATORS_EMAIL, self.MODERATORS_USERNAME)
+        self.moderator2_id = self.get_user_id_from_email(self.MODERATORS_EMAIL)
 
-        self.set_moderators([self.MODERATOR_TWO_USERNAME, self.MODERATOR_USERNAME])
+        self.set_moderators([self.MODERATORS_USERNAME, self.MODERATOR_USERNAME])
 
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, 'Title')

@@ -458,7 +458,7 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
                 expected_email_text_body)
 
     def test_that_emails_are_not_sent(self):
-    """
+        """
         response = self.testapp.get('/explore/%s' % self.EXP_ID)
         csrf_token = self.get_csrf_token_from_response(response)
 
@@ -470,5 +470,4 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
         self.assertRaisesRegexp(
         Exception,
             'User has to logged in to report.')
-    """
-
+        """
