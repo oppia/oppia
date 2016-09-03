@@ -251,9 +251,7 @@ def get_messages_multi_for_exps(exploration_ids, limit=None):
     messages_models_exps = (
         feedback_models.FeedbackMessageModel.get_messages_multi(
             [thread.id for thread in thread_models_exps]))
-    result = {}
-    for exp_id in exploration_ids:
-        result[exp_id] = []
+    result = dict.fromkeys(exploration_ids, [])
     for message_models_exp in messages_models_exps:
         if not limit or len(result[message_models_exp.exploration_id]) < limit:
             result[message_models_exp.exploration_id].append(
