@@ -90,9 +90,9 @@ class FlagExplorationEmailEnqueueTaskTest(test_utils.GenericTestBase):
                 expected_email_text_body)
 
     def test_emails_are_not_sent(self):
-            try:
-                moderator_services.enqueue_flag_exploration_email_task(
-                    self.exploration.id, self.report_text, self.no_user)
-                self.assertFail()
-            except Exception as inst:
-                self.assertEqual(inst.message, 'User has to be logged in to report.')
+        try:
+            moderator_services.enqueue_flag_exploration_email_task(
+                self.exploration.id, self.report_text, self.no_user)
+            self.assertFail()
+        except Exception as inst:
+            self.assertEqual(inst.message, 'User has to be logged in to report.')

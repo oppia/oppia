@@ -1341,12 +1341,12 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
 
-        self.MODERATOR2_EMAIL = 'moderator2@example.com'
-        self.MODERATOR2_USERNAME = 'moderator2'
+        self.MODERATOR_2_EMAIL = 'moderator2@example.com'
+        self.MODERATOR_2_USERNAME = 'moderator2'
         self.signup(self.MODERATOR2_EMAIL, self.MODERATOR2_USERNAME)
-        self.moderator2_id = self.get_user_id_from_email(self.MODERATOR2_EMAIL)
+        self.moderator_2_id = self.get_user_id_from_email(self.MODERATOR2_EMAIL)
 
-        self.set_moderators([self.MODERATOR2_USERNAME, self.MODERATOR_USERNAME])
+        self.set_moderators([self.MODERATOR_2_USERNAME, self.MODERATOR_USERNAME])
 
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, 'Title')
@@ -1358,7 +1358,7 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
             feconf, 'CAN_SEND_EMAILS', True)
 
     def test_that_flag_exploration_emails_are_correct(self):
-        
+
         expected_email_subject = 'Exploration flagged by user: "Title"'
 
         expected_email_html_body = (
@@ -1404,7 +1404,8 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
                 expected_email_text_body)
 
             # Make sure correct email is sent to multiple moderators.
-            messages = self.mail_stub.get_sent_messages(to=self.MODERATOR2_EMAIL)
+            messages = self.mail_stub.get_sent_messages(
+                to=self.MODERATOR_2_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(),
@@ -1418,10 +1419,10 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
             sent_email_model = all_models[0]
             self.assertEqual(
                 sent_email_model.subject, expected_email_subject)
-            """self.assertEqual(
-                sent_email_model.recipient_id, self.moderator_id)
-            self.assertEqual(
-                sent_email_model.recipient_email, self.MODERATOR_EMAIL)"""
+            #self.assertEqual(
+            #    sent_email_model.recipient_id, self.moderator_id)
+            #self.assertEqual(
+            #    sent_email_model.recipient_email, self.MODERATOR_EMAIL)
             self.assertEqual(
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(

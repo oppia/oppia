@@ -20,7 +20,6 @@ from core.controllers import reader
 from core.domain import classifier_services
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import moderator_services
 from core.domain import param_domain
 from core.domain import rights_manager
 from core.tests import test_utils
@@ -377,7 +376,7 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        
+
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
@@ -470,5 +469,4 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
             }, csrf_token)
         self.assertRaisesRegexp(
         Exception,
-            'User has to logged in to report.')
-"""
+            'User has to logged in to report.')"""
