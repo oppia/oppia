@@ -28,7 +28,8 @@ oppia.controller('Admin', [
   function($scope, $http, UrlInterpolationService, ADMIN_TAB_URLS) {
     var ADMIN_JOB_OUTPUT_URL_PREFIX = '/adminjoboutput';
     var ADMIN_HANDLER_URL = '/adminhandler';
-    var ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL = '/admintopicscsvdownloadhandler';
+    var ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL = (
+      '/admintopicscsvdownloadhandler');
 
     $scope.message = '';
     $scope.configProperties = {};
