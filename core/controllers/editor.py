@@ -18,7 +18,6 @@
 
 import datetime
 import imghdr
-import json
 import logging
 
 import jinja2
@@ -150,9 +149,7 @@ def require_editor(handler):
 
 class EditorHandler(base.BaseHandler):
     """Base class for all handlers for the editor page."""
-
-    # The page name to use as a key for generating CSRF tokens.
-    PAGE_NAME_FOR_CSRF = 'editor'
+    pass
 
 
 class ExplorationPage(EditorHandler):
@@ -195,9 +192,6 @@ class ExplorationPage(EditorHandler):
             rte_component_registry.Registry.get_html_for_all_components() +
             interaction_registry.Registry.get_interaction_html(
                 interaction_ids))
-        interaction_validators_html = (
-            interaction_registry.Registry.get_validators_html(
-                interaction_ids))
 
         gadget_types = gadget_registry.Registry.get_all_gadget_types()
         gadget_templates = (
@@ -237,8 +231,6 @@ class ExplorationPage(EditorHandler):
             'gadget_templates': jinja2.utils.Markup(gadget_templates),
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
-            'interaction_validators_html': jinja2.utils.Markup(
-                interaction_validators_html),
             'meta_description': feconf.CREATE_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_CREATE,
             'value_generators_js': jinja2.utils.Markup(
@@ -260,8 +252,6 @@ class ExplorationPage(EditorHandler):
 
 class ExplorationHandler(EditorHandler):
     """Page with editor data for a single exploration."""
-
-    PAGE_NAME_FOR_CSRF = 'editor'
 
     def _get_exploration_data(
             self, exploration_id, apply_draft=False, version=None):
@@ -401,8 +391,6 @@ class ExplorationHandler(EditorHandler):
 class ExplorationRightsHandler(EditorHandler):
     """Handles management of exploration editing rights."""
 
-    PAGE_NAME_FOR_CSRF = 'editor'
-
     @require_editor
     def put(self, exploration_id):
         """Updates the editing rights for the given exploration."""
@@ -496,8 +484,6 @@ class ExplorationRightsHandler(EditorHandler):
 class ExplorationModeratorRightsHandler(EditorHandler):
     """Handles management of exploration rights by moderators."""
 
-    PAGE_NAME_FOR_CSRF = 'editor'
-
     @base.require_moderator
     def put(self, exploration_id):
         """Updates the publication status of the given exploration, and sends
@@ -557,8 +543,6 @@ class ExplorationModeratorRightsHandler(EditorHandler):
 
 class ResolvedAnswersHandler(EditorHandler):
     """Allows learners' answers for a state to be marked as resolved."""
-
-    PAGE_NAME_FOR_CSRF = 'editor'
 
     @require_editor
     def put(self, exploration_id, state_name):
@@ -709,11 +693,11 @@ class StateYamlHandler(EditorHandler):
     layer.
     """
 
-    def get(self):
-        """Handles GET requests."""
+    def post(self):
+        """Handles POST requests."""
         try:
-            state_dict = json.loads(self.request.get('stringified_state'))
-            width = json.loads(self.request.get('stringified_width'))
+            state_dict = self.payload.get('state_dict')
+            width = self.payload.get('width')
         except Exception:
             raise self.PageNotFoundException
 

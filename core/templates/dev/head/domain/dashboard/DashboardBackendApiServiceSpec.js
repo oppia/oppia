@@ -26,6 +26,7 @@ describe('Dashboard backend API service', function() {
 
   beforeEach(inject(function($injector) {
     DashboardBackendApiService = $injector.get('DashboardBackendApiService');
+    UrlInterpolationService = $injector.get('UrlInterpolationService');
     $httpBackend = $injector.get('$httpBackend');
 
     // Sample dashboard data returnable from the backend
@@ -40,7 +41,7 @@ describe('Dashboard backend API service', function() {
         created_on_msec: 1466178691847.67,
         last_updated_msec: 1466178759209.839,
         status: 'public',
-        ratings: {
+        rating: {
           5: 0,
           4: 1,
           3: 0,
@@ -49,16 +50,26 @@ describe('Dashboard backend API service', function() {
         },
         community_owned: false,
         tags: '',
-        thumbnail_icon_url: '/images/subjects/Computing.svg',
+        thumbnail_icon_url: UrlInterpolationService.getStaticImageUrl(
+          '/subjects/Computing.svg'),
         thumbnail_bg_color: '#bb8b2f',
         num_views: 2,
         num_open_threads: 0,
-        num_total_threads: 0
+        num_total_threads: 0,
+        num_unresolved_answers: 2
       }],
       collections_list: [],
       dashboard_stats: {
         total_plays: 10,
-        average_ratings: 4.0
+        num_ratings: 1,
+        average_ratings: 4.0,
+        total_open_feedback: 5
+      },
+      last_week_stats: {
+        total_plays: 2,
+        average_ratings: 3.5,
+        num_ratings: 3,
+        total_open_feedback: 1
       }
     };
   }));

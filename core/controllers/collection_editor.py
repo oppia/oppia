@@ -89,15 +89,11 @@ def require_editor(handler):
 
 class CollectionEditorHandler(base.BaseHandler):
     """Base class for all handlers for the collection editor page."""
-
-    # The page name to use as a key for generating CSRF tokens.
-    PAGE_NAME_FOR_CSRF = 'collection_editor'
+    pass
 
 
 class CollectionEditorPage(CollectionEditorHandler):
     """The editor page for a single collection."""
-
-    PAGE_HAS_CREATE_EXP_REQUEST = True
 
     # TODO(bhenning): Implement read-only version of the editor. Until that
     # exists, ensure the user has proper permission to edit this collection
@@ -135,7 +131,8 @@ class CollectionEditorPage(CollectionEditorHandler):
             'SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK': (
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK),
             'SHOW_COLLECTION_NAVIGATION_TAB_STATS': (
-                feconf.SHOW_COLLECTION_NAVIGATION_TAB_STATS)
+                feconf.SHOW_COLLECTION_NAVIGATION_TAB_STATS),
+            'TAG_REGEX': feconf.TAG_REGEX,
         })
 
         self.render_template('collection_editor/collection_editor.html')

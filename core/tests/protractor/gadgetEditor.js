@@ -151,4 +151,8 @@ describe('Gadget editor', function() {
     editor.deleteGadget('SuperCoconuts');
     editor.expectGadgetWithTypeDoesNotExist('SuperCoconuts');
   });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
+  });
 });

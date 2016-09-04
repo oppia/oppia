@@ -15,7 +15,6 @@
 """Tests for the exploration editor page."""
 
 import datetime
-import json
 import os
 import StringIO
 import zipfile
@@ -94,8 +93,6 @@ class EditorTest(BaseEditorControllerTest):
         self.assert_can_edit(response.body)
         self.assertIn('Stats', response.body)
         self.assertIn('History', response.body)
-        # Test that the value generator JS is included.
-        self.assertIn('RandomSelector', response.body)
 
         self.logout()
 
@@ -117,8 +114,7 @@ class EditorTest(BaseEditorControllerTest):
 
         response = self.testapp.get(feconf.DASHBOARD_URL)
         self.assertEqual(response.status_int, 200)
-        csrf_token = self.get_csrf_token_from_response(
-            response, token_type=feconf.CSRF_PAGE_NAME_CREATE_EXPLORATION)
+        csrf_token = self.get_csrf_token_from_response(response)
         exp_id = self.post_json(
             feconf.NEW_EXPLORATION_URL, {}, csrf_token
         )[dashboard.EXPLORATION_ID_KEY]
@@ -615,11 +611,14 @@ param_changes: []
         exploration.add_states(['State A', 'State 2', 'State 3'])
         exploration.states['State A'].update_interaction_id('TextInput')
 
-        download_url = (
-            '/createhandler/state_yaml?'
-            'stringified_state=%s&stringified_width=50' %
-            json.dumps(exploration.states['State A'].to_dict()))
-        response = self.get_json(download_url)
+
+        response = self.testapp.get(
+            '%s/%s' % (feconf.EDITOR_URL_PREFIX, exp_id))
+        csrf_token = self.get_csrf_token_from_response(response)
+        response = self.post_json('/createhandler/state_yaml', {
+            'state_dict': exploration.states['State A'].to_dict(),
+            'width': 50,
+        }, csrf_token=csrf_token)
         self.assertEqual({
             'yaml': self.SAMPLE_STATE_STRING
         }, response)
@@ -1048,7 +1047,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
         with self.swap(
             feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
             ), self.swap(
-                feconf, 'CAN_SEND_EMAILS_TO_USERS', False):
+                feconf, 'CAN_SEND_EMAILS', False):
             # Log in as a moderator.
             self.login(self.MODERATOR_EMAIL)
 
@@ -1101,7 +1100,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
                 valid_payload, csrf_token, expect_errors=True,
                 expected_status_int=500)
 
-            with self.swap(feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
+            with self.swap(feconf, 'CAN_SEND_EMAILS', True):
                 # Now the email gets sent with no error.
                 self.put_json(
                     '/createhandler/moderatorrights/%s' % self.EXP_ID,
@@ -1114,7 +1113,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
         with self.swap(
             feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
             ), self.swap(
-                feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
+                feconf, 'CAN_SEND_EMAILS', True):
             # Log in as a moderator.
             self.login(self.MODERATOR_EMAIL)
 
@@ -1176,7 +1175,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
         with self.swap(
             feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
             ), self.swap(
-                feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
+                feconf, 'CAN_SEND_EMAILS', True):
             # Log in as a moderator.
             self.login(self.MODERATOR_EMAIL)
 
@@ -1238,7 +1237,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
         with self.swap(
             feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
             ), self.swap(
-                feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
+                feconf, 'CAN_SEND_EMAILS', True):
             # Log in as a non-moderator.
             self.login(self.EDITOR_EMAIL)
 

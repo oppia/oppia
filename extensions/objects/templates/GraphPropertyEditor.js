@@ -30,7 +30,7 @@ oppia.directive('graphPropertyEditor', [
     restrict: 'E',
     scope: true,
     template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: function($scope) {
+    controller: ['$scope', function($scope) {
       $scope.alwaysEditable = true;
 
       $scope.graphProperties = [{
@@ -59,6 +59,6 @@ oppia.directive('graphPropertyEditor', [
       $scope.$watch('localValue.property', function() {
         $scope.$parent.value = $scope.localValue.property.name;
       });
-    }
+    }]
   };
 }]);

@@ -78,11 +78,15 @@ oppia.constant('NOTE_NAMES_TO_MIDI_VALUES', {
 oppia.directive('oppiaInteractiveMusicNotesInput', [
   'oppiaHtmlEscaper', 'NOTE_NAMES_TO_MIDI_VALUES',
   'musicNotesInputRulesService', 'musicPhrasePlayerService',
+  'UrlInterpolationService',
   function(oppiaHtmlEscaper, NOTE_NAMES_TO_MIDI_VALUES,
-      musicNotesInputRulesService, musicPhrasePlayerService) {
+      musicNotesInputRulesService, musicPhrasePlayerService,
+      UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        onSubmit: '&'
+      },
       templateUrl: 'interaction/MusicNotesInput',
       link: function(scope, element, attrs) {
         // This is needed in order for the scope to be retrievable during Karma
@@ -91,6 +95,9 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         element[0].isolateScope = function() {
           return scope;
         };
+
+        scope.getStaticResourceUrl = (
+          UrlInterpolationService.getStaticResourceUrl);
 
         scope.SOUNDFONT_URL = '/third_party/static/midi-js-2ef687/soundfont/';
         scope.sequenceToGuess = oppiaHtmlEscaper.escapedJsonToObj(
@@ -749,8 +756,10 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
               _convertNoteToReadableNote(scope.noteSequence[i].note));
           }
           readableSequence = _makeAllNotesHaveDurationOne(readableSequence);
-          scope.$parent.submitAnswer(
-            readableSequence, musicNotesInputRulesService);
+          scope.onSubmit({
+            answer: readableSequence,
+            rulesService: musicNotesInputRulesService
+          });
         };
 
         /*******************************************************************

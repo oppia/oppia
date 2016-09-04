@@ -32,11 +32,7 @@ var createExplorationAndStartTutorial = function() {
   browser.get(general.LIBRARY_URL_SUFFIX);
   element(by.css('.protractor-test-create-activity')).click();
 
-  // Wait for the "create activity" modal to load.
-  browser.waitForAngular();
-  element(by.css('.protractor-test-create-exploration')).click();
-
-  // Wait for the editor to fully load.
+  // Wait for the dashboard to transition the creator into the editor page.
   browser.waitForAngular();
 };
 

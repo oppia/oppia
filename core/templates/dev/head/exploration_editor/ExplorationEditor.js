@@ -35,7 +35,7 @@ oppia.controller('ExplorationEditor', [
   'explorationParamSpecsService', 'explorationParamChangesService',
   'explorationWarningsService', '$templateCache', 'explorationContextService',
   'explorationAdvancedFeaturesService', '$modal', 'changeListService',
-  'autosaveInfoModalsService',
+  'autosaveInfoModalsService', 'siteAnalyticsService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       explorationData, editorContextService, explorationTitleService,
@@ -47,7 +47,7 @@ oppia.controller('ExplorationEditor', [
       explorationParamSpecsService, explorationParamChangesService,
       explorationWarningsService, $templateCache, explorationContextService,
       explorationAdvancedFeaturesService, $modal, changeListService,
-      autosaveInfoModalsService) {
+      autosaveInfoModalsService, siteAnalyticsService) {
     $scope.editabilityService = editabilityService;
     $scope.editorContextService = editorContextService;
 
@@ -175,7 +175,7 @@ oppia.controller('ExplorationEditor', [
         }
 
         stateEditorTutorialFirstTimeService.init(
-          data.show_state_editor_tutorial_on_load);
+          data.show_state_editor_tutorial_on_load, $scope.explorationId);
       });
     };
 
@@ -321,11 +321,21 @@ oppia.controller('ExplorationEditor', [
       /\{\{/g, '<[').replace(/\}\}/g, ']>');
     $templateCache.put('ng-joyride-title-tplv1.html', ngJoyrideTemplate);
 
-    $scope.onLeaveTutorial = function() {
+    var leaveTutorial = function() {
       editabilityService.onEndTutorial();
       $scope.$apply();
       stateEditorTutorialFirstTimeService.markTutorialFinished();
       $scope.tutorialInProgress = false;
+    };
+
+    $scope.onSkipTutorial = function() {
+      siteAnalyticsService.registerSkipTutorialEvent($scope.explorationId);
+      leaveTutorial();
+    };
+
+    $scope.onFinishTutorial = function() {
+      siteAnalyticsService.registerFinishTutorialEvent($scope.explorationId);
+      leaveTutorial();
     };
 
     $scope.tutorialInProgress = false;
@@ -345,12 +355,29 @@ oppia.controller('ExplorationEditor', [
         templateUrl: 'modals/welcomeExploration',
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
-            $scope.beginTutorial = $modalInstance.close;
+          '$scope', '$modalInstance', 'UrlInterpolationService',
+          'siteAnalyticsService', 'explorationContextService',
+          function($scope, $modalInstance, UrlInterpolationService,
+              siteAnalyticsService, explorationContextService) {
+            var explorationId = explorationContextService.getExplorationId();
+
+            siteAnalyticsService.registerTutorialModalOpenEvent(explorationId);
+
+            $scope.beginTutorial = function() {
+              siteAnalyticsService.registerAcceptTutorialModalEvent(
+                explorationId);
+              $modalInstance.close();
+            };
 
             $scope.cancel = function() {
+              siteAnalyticsService.registerDeclineTutorialModalEvent(
+                explorationId);
               $modalInstance.dismiss('cancel');
             };
+
+            $scope.editorWelcomeImgUrl = (
+              UrlInterpolationService.getStaticImageUrl(
+                '/general/editor_welcome.svg'));
           }
         ],
         windowClass: 'oppia-welcome-modal'
@@ -373,12 +400,14 @@ oppia.controller('EditorNavigation', [
   '$scope', '$rootScope', '$timeout', '$modal', 'routerService',
   'explorationRightsService', 'explorationWarningsService',
   'stateEditorTutorialFirstTimeService',
-  'threadDataService',
+  'threadDataService', 'siteAnalyticsService',
+  'explorationContextService',
   function(
     $scope, $rootScope, $timeout, $modal, routerService,
     explorationRightsService, explorationWarningsService,
     stateEditorTutorialFirstTimeService,
-    threadDataService) {
+    threadDataService, siteAnalyticsService,
+    explorationContextService) {
     $scope.postTutorialHelpPopoverIsShown = false;
 
     $scope.$on('openPostTutorialHelpPopover', function() {
@@ -396,14 +425,27 @@ oppia.controller('EditorNavigation', [
     };
 
     $scope.showUserHelpModal = function() {
+      var explorationId = explorationContextService.getExplorationId();
+      siteAnalyticsService.registerClickHelpButtonEvent(explorationId);
       var modalInstance = $modal.open({
         templateUrl: 'modals/userHelp',
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
-            $scope.beginTutorial = $modalInstance.close;
+          '$scope', '$modalInstance',
+          'siteAnalyticsService', 'explorationContextService',
+          function(
+            $scope, $modalInstance,
+            siteAnalyticsService, explorationContextService) {
+            var explorationId = explorationContextService.getExplorationId();
+
+            $scope.beginTutorial = function() {
+              siteAnalyticsService.registerOpenTutorialFromHelpCenterEvent(
+                explorationId);
+              $modalInstance.close();
+            };
 
             $scope.goToHelpCenter = function() {
+              siteAnalyticsService.registerVisitHelpCenterEvent(explorationId);
               $modalInstance.dismiss('cancel');
             };
           }
@@ -567,7 +609,11 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         backdrop: true,
         controller: [
           '$scope', '$modalInstance', 'explorationContextService',
-          function($scope, $modalInstance, explorationContextService) {
+          'UrlInterpolationService',
+          function($scope, $modalInstance, explorationContextService,
+            UrlInterpolationService) {
+            $scope.congratsImgUrl = UrlInterpolationService.getStaticImageUrl(
+              '/general/congrats.svg');
             $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
               GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
             $scope.close = function() {
@@ -588,6 +634,11 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
           explorationData.explorationId);
       } else {
         siteAnalyticsService.registerCommitChangesToPublicExplorationEvent(
+          explorationData.explorationId);
+      }
+
+      if (explorationWarningsService.countWarnings() === 0) {
+        siteAnalyticsService.registerSavePlayableExplorationEvent(
           explorationData.explorationId);
       }
 
@@ -658,7 +709,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       if (additionalMetadataNeeded) {
         $modal.open({
           templateUrl: 'modals/addExplorationMetadata',
-          backdrop: true,
+          backdrop: 'static',
           controller: [
             '$scope', '$modalInstance', 'explorationObjectiveService',
             'explorationTitleService', 'explorationCategoryService',
@@ -675,10 +726,13 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
                 explorationLanguageCodeService);
               $scope.explorationTagsService = explorationTagsService;
 
+              $scope.objectiveHasBeenPreviouslyEdited = (
+                explorationObjectiveService.savedMemento.length > 0);
+
               $scope.requireTitleToBeSpecified = (
                 !explorationTitleService.savedMemento);
               $scope.requireObjectiveToBeSpecified = (
-                !explorationObjectiveService.savedMemento);
+                explorationObjectiveService.savedMemento.length < 15);
               $scope.requireCategoryToBeSpecified = (
                 !explorationCategoryService.savedMemento);
               $scope.askForLanguageCheck = (
@@ -777,6 +831,12 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               };
 
               $scope.cancel = function() {
+                explorationTitleService.restoreFromMemento();
+                explorationObjectiveService.restoreFromMemento();
+                explorationCategoryService.restoreFromMemento();
+                explorationLanguageCodeService.restoreFromMemento();
+                explorationTagsService.restoreFromMemento();
+
                 $modalInstance.dismiss('cancel');
                 alertsService.clearWarnings();
               };

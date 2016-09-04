@@ -247,6 +247,7 @@ oppia.controller('FeedbackTab', [
 
     $scope.setActiveThread = function(threadId) {
       threadDataService.fetchMessages(threadId);
+      threadDataService.markThreadAsSeen(threadId);
 
       var allThreads = [].concat(
         $scope.threadData.feedbackThreads, $scope.threadData.suggestionThreads);

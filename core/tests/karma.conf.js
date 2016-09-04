@@ -1,8 +1,8 @@
 var argv = require('yargs').argv;
 var isMinificationNeeded = (argv.minify === 'True');
-var generatedJs = 'third_party/generated/dev/js/third_party.js';
+var generatedJs = 'third_party/generated/js/third_party.js';
 if (isMinificationNeeded) {
-  generatedJs = 'third_party/generated/prod/js/third_party.min.js';
+  generatedJs = 'third_party/generated/js/third_party.min.js';
 };
 
 module.exports = function(config) {
@@ -29,7 +29,7 @@ module.exports = function(config) {
       'extensions/interactions/**/*.html',
       'extensions/interactions/rules.json',
       {
-        pattern: 'i18n/**/*.json',
+        pattern: 'assets/i18n/**/*.json',
         watched: true,
         served: true,
         included: false

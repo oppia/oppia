@@ -7,7 +7,8 @@
 {% block header_js %}
   {{ super() }}
   <script type="text/javascript">
-    GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = JSON.parse('{{DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD|js_string}}');
+    GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = JSON.parse(
+      '{{DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD|js_string}}');
   </script>
 {% endblock header_js %}
 
@@ -33,10 +34,20 @@
         <div class="average-ratings stats-card">
           <p class="stat-description">Average Rating</p>
           <h1 class="stat-value"><[dashboardStats.average_ratings || 'N/A']></h1>
+          <p ng-hide="!dashboardStats.num_ratings">
+            (by <[dashboardStats.num_ratings]> users)
+          </p>
         </div>
         <div class="total-plays stats-card">
           <p class="stat-description">Total Plays</p>
           <h1 class="stat-value"><[dashboardStats.total_plays]></h1>
+          <p ng-hide="!relativeChangeInTotalPlays">
+            (+<[relativeChangeInTotalPlays]> from last week)
+          </p>
+        </div>
+        <div class="total-open-feedback stats-card">
+          <p class="stat-description">Open feedback</p>
+          <h1 class="stat-value"><[dashboardStats.total_open_feedback]></h1>
         </div>
       </md-card>
     </div>
@@ -50,30 +61,44 @@
           </a>
         </li>
         {% if can_create_collections %}
-          <li ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myCollections'}">
-            <a class="oppia-dashboard-tabs-text" ng-click="setActiveTab('myCollections')"
+          <li ng-if="collectionsList.length == 0"></li>
+          <li ng-if="collectionsList.length > 0"
+              ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myCollections'}">
+            <a class="oppia-dashboard-tabs-text"
+               ng-click="setActiveTab('myCollections')"
                translate="I18N_DASHBOARD_MY_COLLECTIONS">
             </a>
           </li>
         {% endif %}
-        <li class="list-card-view-toggle" ng-if="activeTab === 'myExplorations'">
-          <button class="list-view-btn"
-                  ng-class="{'dashboard-active-view': myExplorationsView === 'list'}"
-                  ng-click="setMyExplorationsView('list')">
-            <span class="fa fa-list fa-lg"></span>
-          </button>
+        <li class="list-card-view-toggle dashboard-hide-mobile" ng-if="activeTab === 'myExplorations'">
           <button class="card-view-btn"
                   ng-class="{'dashboard-active-view': myExplorationsView === 'card'}"
                   ng-click="setMyExplorationsView('card')">
             <span class="fa fa-th-large fa-lg"></span>
           </button>
+          <button class="list-view-btn"
+                  ng-class="{'dashboard-active-view': myExplorationsView === 'list'}"
+                  ng-click="setMyExplorationsView('list')">
+            <span class="fa fa-list fa-lg"></span>
+          </button>
+        </li>
+        <li class="sort-explorations-select" ng-if="activeTab === 'myExplorations'">
+          <p class="sort-by-text">Sort By</p>
+          <select ng-model="currentSortType"
+                  class="sort-options"
+                  ng-change="setExplorationsSortingOptions(currentSortType)"
+                  ng-options="EXPLORATIONS_SORT_BY_KEYS[key] as value for (key, value) in HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS">
+          </select>
+          <span class="sort-order fa"
+                ng-click="setExplorationsSortingOptions(currentSortType)"
+                ng-class="isCurrentSortDescending ? 'fa-long-arrow-up': 'fa-long-arrow-down'">
+          </span>
         </li>
       </ul>
     </div>
 
     <div ng-if="explorationsList.length === 0 && collectionsList.length === 0">
       <h2 style="margin-bottom: -20px;
-                 margin-left: 52px;
                  font-family: 'Capriola', 'Roboto', Arial, sans-serif;">
         Creator Dashboard
       </h2>
@@ -96,7 +121,7 @@
             </button>
           </div>
           <div class="oppia-dashboard-intro-picture">
-            <img src="/images/general/empty_dashboard.svg">
+            <img ng-src="<[emptyDashboardImgUrl]>">
           </div>
         </md-card>
       </div>
@@ -106,20 +131,30 @@
                  class="oppia-dashboard-list-view-item">
           <table class="oppia-dashboard-table">
              <colgroup>
-               <col style="width: 40%;">
-               <col style="width: 15%;">
-               <col style="width: 15%;">
-               <col style="width: 15%;">
-               <col style="width: 15%;">
+               <col style="width: 26%;">
+               <col style="width: 13%;">
+               <col style="width: 13%;">
+               <col style="width: 16%;">
+               <col style="width: 16%;">
+               <col style="width: 16%;">
             </colgroup>
             <tr>
-              <th>Exploration</th>
-              <th>Rating</th>
-              <th>Plays</th>
-              <th>Feedback</th>
-              <th>Last Updated</th>
+              <th ng-repeat="(key, value) in EXPLORATIONS_SORT_BY_KEYS"
+                  class="oppia-dashboard-table-headings"
+                  ng-click="setExplorationsSortingOptions(value)">
+                <p ng-if="key === 'TITLE'">Exploration</p>
+                <p ng-if="key === 'RATING'">Rating</p>
+                <p ng-if="key === 'NUM_VIEWS'">Plays</p>
+                <p ng-if="key === 'OPEN_FEEDBACK'">Feedback</p>
+                <p ng-if="key === 'LAST_UPDATED'">Last Updated</p>
+                <p ng-if="key === 'UNRESOLVED_ANSWERS'">Unresolved Answers</p>
+                <span class="fa"
+                      ng-if="currentSortType === value"
+                      ng-class="isCurrentSortDescending ? 'fa-caret-up': 'fa-caret-down'">
+                </span>
+              </th>
             </tr>
-            <tr ng-repeat="exploration in explorationsList track by exploration.id"
+            <tr ng-repeat="exploration in explorationsList | orderBy:sortByFunction:isCurrentSortDescending track by exploration.id"
                 ng-click="showExplorationEditor(exploration.id)"
                 class="exploration-list-item">
               <td>
@@ -129,10 +164,10 @@
                   featured
                 </span>
               </td>
-              <td colspan="3"
+              <td colspan="4"
                   ng-if="exploration.status === 'private'"
                   class="exp-private-text">
-                This exploration is private. Publish to receive statistics.
+                <[publishText]>
               </td>
               <td ng-if="exploration.status !== 'private'">
                 <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
@@ -142,6 +177,13 @@
               </td>
               <td ng-if="exploration.status !== 'private'">
                 <[exploration.num_total_threads]>
+                <a ng-if="exploration.num_open_threads != 0"
+                   ng-href="/create/<[exploration.id]>#/feedback">
+                  (<[exploration.num_open_threads]> new)
+                </a>
+              </td>
+              <td ng-if="exploration.status !== 'private'">
+                <[exploration.num_unresolved_answers]>
               </td>
               <td>
                 <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
@@ -166,7 +208,7 @@
 
             <div ng-attr-section="'<['right-section']>">
               <div ng-if="exploration.status === 'private'" class="exp-private-text">
-                This exploration is private. Publish to receive statistics.
+                <[publishText]>
               </div>
               <ul ng-if="exploration.status !== 'private'"
                   layout="row"
@@ -205,13 +247,19 @@
 
                 <li flex="50">
                   <span class="fa fa-comments fa-lg"
-                        tooltip="<['I18N_PLAYER_FEEDBACK_TOOLTIP' | translate]>"
+                        tooltip="<['I18N_DASHBOARD_OPEN_FEEDBACK' | translate]>"
                         tooltip-placement="top">
                   </span>
                   <[exploration.num_total_threads]>
+                  <a ng-if="exploration.num_open_threads != 0"
+                     ng-href="/create/<[exploration.id]>#/feedback">
+                      (<[exploration.num_open_threads]> new)
+                  </a>
                 </li>
                 <sharing-links ng-if="exploration.status !== 'private'"
+                               ng-click="$event.stopPropagation()"
                                flex="100"
+                               class="dashboard-hide-mobile"
                                layout-type="row"
                                layout-align-type="center left"
                                twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD"
@@ -221,7 +269,6 @@
             </div>
         </md-card>
       </div>
-
     </div>
 
     {% if can_create_collections %}
@@ -236,7 +283,9 @@
               <a ng-href="/collection_editor/create/<[collection.id]>" class="oppia-dashboard-tile-container-link" style="text-decoration: none;">
                 <div class="oppia-dashboard-tile-metadata-parent hidden-xs">
                   <div class="oppia-dashboard-tile-metadata">
-                    Created: <span style="color: black;"><[getLocaleAbbreviatedDatetimeString(collection.created_on_msec)]></span>
+                    Created:<span style="color: black;">
+                      <[getLocaleAbbreviatedDatetimeString(collection.created_on)]>
+                    </span>
 
                     <br>
                     <br>
@@ -281,7 +330,7 @@
                       <span style="color: #888">
                         <strong><[collection.category]></strong>
                         <span style="font-weight: bold;" ng-if="collection.category">&middot;</span>
-                        Last updated <[getLocaleAbbreviatedDatetimeString(collection.last_updated_msec)]>
+                        Last updated <[getLocaleAbbreviatedDatetimeString(collection.last_updated)]>
                       </span>
 
                       <span ng-if="collection.status === 'publicized'">
@@ -307,11 +356,9 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script>
-    {{ include_js_file('components/CollectionCreationService.js') }}
-    {{ include_js_file('components/ExplorationEmbedButtonService.js') }}
-    {{ include_js_file('components/SharingLinksDirective.js') }}
-    {{ include_js_file('dashboard/Dashboard.js') }}
-    {{ include_js_file('domain/dashboard/DashboardBackendApiService.js') }}
-  </script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/CollectionCreationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/ExplorationEmbedButtonService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/SharingLinksDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/dashboard/Dashboard.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/dashboard/DashboardBackendApiService.js"></script>
 {% endblock footer_js %}

@@ -24,7 +24,8 @@ var logicProofData = (function() {
     arbitrary: ['was arbitrary', 'is arbitrary'],
     take: ['take'],
     satisfying: ['satisfying', 'such that'],
-    if: ['if'],
+    // jscs:disable disallowQuotedKeysInObjects
+    'if': ['if'],
     given: ['given'],
     contradiction: ['contradiction'],
     at: ['at']
@@ -44,7 +45,8 @@ var logicProofData = (function() {
   // symbol keys from the list of operators).
   var BASE_STUDENT_LANGUAGE = {
     types: {
-      boolean: {
+      'boolean': {
+        // jscs:enable disallowQuotedKeysInObjects
         quantifiable: false
       },
       element: {
@@ -334,7 +336,9 @@ var logicProofData = (function() {
 
   var BASE_CONTROL_LANGUAGE = {
     types: {
-      boolean: {
+      // jscs:disable disallowQuotedKeysInObjects
+      'boolean': {
+        // jscs:enable disallowQuotedKeysInObjects
         quantifiable: false
       },
       // Used for line numbers & indentation.
@@ -716,7 +720,9 @@ var logicProofData = (function() {
           output: 'set_of_formulas'
         }]
       },
-      if: {
+      // jscs:disable disallowQuotedKeysInObjects
+      'if': {
+        // jscs:enable disallowQuotedKeysInObjects
         // NOTE: this prefix function is unusual in having a boolean input
         kind: 'prefix_function',
         typing: [{

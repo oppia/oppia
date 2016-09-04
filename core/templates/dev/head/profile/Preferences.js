@@ -18,12 +18,15 @@
 
 oppia.controller('Preferences', [
   '$scope', '$http', '$rootScope', '$modal', '$timeout', '$translate',
-  'alertsService',
+  'alertsService', 'UrlInterpolationService', 'utilsService',
   function(
-      $scope, $http, $rootScope, $modal, $timeout, $translate, alertsService) {
+      $scope, $http, $rootScope, $modal, $timeout, $translate, alertsService,
+      UrlInterpolationService, utilsService) {
     var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
     $rootScope.loadingMessage = 'Loading';
     $scope.profilePictureDataUrl = '';
+
+    $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
     var _saveDataItem = function(updateType, data) {
       $http.put(_PREFERENCES_DATA_URL, {
@@ -56,7 +59,7 @@ oppia.controller('Preferences', [
 
       if (subjectInterests instanceof Array) {
         for (var i = 0; i < subjectInterests.length; i++) {
-          if (typeof subjectInterests[i] === 'string') {
+          if (utilsService.isString(subjectInterests[i])) {
             if (!TAG_REGEX.test(subjectInterests[i])) {
               $scope.subjectInterestsWarningText = (
                 'Subject interests should use only lowercase letters.');
@@ -178,13 +181,7 @@ oppia.controller('Preferences', [
       }
     );
 
-    $scope.SITE_LANGUAGE_CHOICES = [];
-    for (var languageKey in GLOBALS.SUPPORTED_SITE_LANGUAGES) {
-      $scope.SITE_LANGUAGE_CHOICES.push({
-        id: languageKey,
-        text: GLOBALS.SUPPORTED_SITE_LANGUAGES[languageKey]
-      });
-    }
+    $scope.SITE_LANGUAGE_CHOICES = GLOBALS.SUPPORTED_SITE_LANGUAGES;
 
     $scope.hasPageLoaded = false;
     $http.get(_PREFERENCES_DATA_URL).then(function(response) {

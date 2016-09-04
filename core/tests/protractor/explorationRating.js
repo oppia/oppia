@@ -47,7 +47,7 @@ describe('Library index page', function() {
     users.login('user1@explorationRating.com');
     workflow.createAndPublishExploration(
       EXPLORATION_RATINGTEST, CATEGORY_BUSINESS,
-      'an objective', LANGUAGE_ENGLISH);
+      'this is an objective', LANGUAGE_ENGLISH);
     users.logout();
 
     // Create test users, play exploration and review them after completion
@@ -70,6 +70,7 @@ describe('Library index page', function() {
     library.playExploration(EXPLORATION_RATINGTEST);
     player.expectExplorationRatingOnInformationCardToEqual('4.0');
   });
+
   afterEach(function() {
     general.checkForConsoleErrors([]);
   });
