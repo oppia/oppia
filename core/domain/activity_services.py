@@ -27,6 +27,12 @@ import feconf
 def get_featured_activity_references():
     """
     Gets a list of featured activity reference models.
+    
+    Args:
+    None
+    
+    Returns:
+    A list having featured activity references.
     """
     featured_model_instance = (
         activity_models.ActivityReferencesModel.get_or_create(
@@ -42,6 +48,15 @@ def update_featured_activity_references(featured_activity_references):
 
     This assumes that the input is a list of activity references corresponding
     to publicly-viewable activities.
+    
+    Args:
+        featured_activity_references: A list of featured activity references
+    
+    Returns:
+        None
+    
+    Raises:
+        Exception:checking if an activity reference list does not have duplicates.
     """
     for activity_reference in featured_activity_references:
         activity_reference.validate()
@@ -65,6 +80,17 @@ def remove_featured_activity(activity_type, activity_id):
     Removes an activity reference from the list of featured
     activity references by taking activity_type and activity_id to 
     check for the activity reference that needs to be removed.
+    
+    Args:
+        activity_type: A string sequence representing the type of
+            of activity
+        activity_id: An integer for uniquely identifying an
+            activity reference.
+    
+    Returns:
+        A logging info to display the activity reference 
+        which was removed from the list. 
+    
      """
     featured_references = get_featured_activity_references()
 
@@ -91,8 +117,17 @@ def split_by_type(activity_references):
     The elements in each of the returned lists are in the same order as those
     in the input list.
 
-    If any activity reference is incorrectly formatted, this raises an
-    Exception.
+    Args:
+        activity_references: A list containing activity references.
+    
+    Returns:
+        A list containing exploration ID and the second containing 
+        collection ID.
+        
+    Raises:
+        Exception:If any activity reference is incorrectly formatted, this raises an
+        Exception.
+        
     """
     exploration_ids, collection_ids = [], []
     for activity_reference in activity_references:
