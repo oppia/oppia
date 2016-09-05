@@ -28,17 +28,38 @@ class ActivityReference(object):
     """
 
     def __init__(self, activity_type, activity_id):
+        """Constructs an ActivityReference instance.
+
+        Args:
+          activity_type: str.
+          activity_id:   str.
+        """
         self.type = activity_type
         self.id = activity_id
 
     def get_hash(self):
+        """Gets instance hash.
+
+        Returns:
+          A str in the form of 'type:id'.
+        """
         return '%s:%s' % (self.type, self.id)
 
     def validate(self):
+        """Checks if instance type is valid.
+
+        Raises:
+          Exception: type is invalid.
+        """
         if self.type not in feconf.ALL_ACTIVITY_TYPES:
             raise Exception('Invalid activity type: %s' % self.type)
 
     def to_dict(self):
+        """Exports instance to a dict.
+
+        Returns:
+          A dict.
+        """
         return {
             'type': self.type,
             'id': self.id,
