@@ -25,14 +25,13 @@ import feconf
 
 
 def get_featured_activity_references():
-    """
-    Gets a list of featured activity reference models.
+    """Gets a list of ActivityReference domain models.
     
     Args:
-    None
+        None
     
     Returns:
-    A list having featured activity references.
+        A list of all ActivityReference domain objects that are currently featured
     """
     featured_model_instance = (
         activity_models.ActivityReferencesModel.get_or_create(
@@ -50,13 +49,14 @@ def update_featured_activity_references(featured_activity_references):
     to publicly-viewable activities.
     
     Args:
-        featured_activity_references: A list of featured activity references
+        featured_activity_references: A list of ActivityReference domain objects 
+            representing the full list of 'featured' activities.
     
     Returns:
         None
     
     Raises:
-        Exception:checking if an activity reference list does not have duplicates.
+         Exception: The input list of ActivityReference domain objects has duplicates.
     """
     for activity_reference in featured_activity_references:
         activity_reference.validate()
@@ -76,22 +76,15 @@ def update_featured_activity_references(featured_activity_references):
 
 
 def remove_featured_activity(activity_type, activity_id):
-    """
-    Removes an activity reference from the list of featured
-    activity references by taking activity_type and activity_id to 
-    check for the activity reference that needs to be removed.
+    """Removes the specified activity reference from the list of featured activity references.
     
     Args:
-        activity_type: A string sequence representing the type of
-            of activity
-        activity_id: An integer for uniquely identifying an
-            activity reference.
+        activity_type: str. The type of the activity to remove.
+        activity_id: str. The id of the activity to remove.
     
     Returns:
-        A logging info to display the activity reference 
-        which was removed from the list. 
-    
-     """
+        None
+    """
     featured_references = get_featured_activity_references()
 
     activity_reference_found = False
@@ -118,16 +111,15 @@ def split_by_type(activity_references):
     in the input list.
 
     Args:
-        activity_references: A list containing activity references.
+        activity_references: A list of ActivityReference domain objects.
     
     Returns:
-        A list containing exploration ID and the second containing 
-        collection ID.
+        A two-tuple where first element of the tuple are exploration ids
+        and the second element is a list of all collection 
+        ids represented in the input list.
         
     Raises:
-        Exception:If any activity reference is incorrectly formatted, this raises an
-        Exception.
-        
+        Exception: The activity reference type is invalid.
     """
     exploration_ids, collection_ids = [], []
     for activity_reference in activity_references:
