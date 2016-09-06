@@ -25,6 +25,10 @@ class ActivityReference(object):
     An activity is a piece of learning material that can be created in Oppia.
     Currently, the only available types of activities are explorations and
     collections.
+
+    Attributes:
+        activity_type: A string indicating the activity type.
+        activity_id: A string indicating the activity id.
     """
 
     def __init__(self, activity_type, activity_id):
@@ -42,7 +46,8 @@ class ActivityReference(object):
         return '%s:%s' % (self.type, self.id)
 
     def validate(self):
-        """Checks that all fields of this ActivityReference domain object are valid.
+        """Checks that all fields of this ActivityReference domain object
+        are valid.
 
         Raises:
             Exception: The activity type is invalid.
