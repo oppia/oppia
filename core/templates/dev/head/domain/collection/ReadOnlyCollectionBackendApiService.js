@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to retrieve read only information about collections from the
- * backend.
+ * @fileoverview Service to retrieve read only information
+ * about collections from the backend.
  */
 
 // TODO(bhenning): For preview mode, this service should be replaced by a
