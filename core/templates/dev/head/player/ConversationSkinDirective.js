@@ -206,6 +206,7 @@ oppia.animation('.conversation-skin-animate-cards', function() {
   };
 });
 
+// TODO: move to TutorCard
 oppia.animation('.conversation-skin-animate-card-contents', function() {
   var animateCardChange = function(element, className, done) {
     if (className !== 'animate-card-change') {
@@ -640,6 +641,11 @@ oppia.directive('conversationSkin', [function() {
           },
           TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC + TIME_FADEIN_MSEC +
           TIME_PADDING_MSEC);
+        };
+
+        $scope.showNextCard = function() {
+          $scope.showPendingCard($scope.upcomingStateName,
+            $scope.upcomingParams, $scope.upcomingContentHtml);
         };
 
         var scrollToBottom = function() {
