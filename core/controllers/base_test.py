@@ -283,7 +283,7 @@ class I18nDictsTest(test_utils.GenericTestBase):
                 for line in f:
                     line = line.replace("{", "")
                     line = line.replace("}", "")
-                self.assertGreater(next_line, line)
+                    self.assertGreater(next_line, line)
 
     def test_keys_match_en_qqq(self):
         """Tests that en.json and qqq.json have the exact same set of keys."""
