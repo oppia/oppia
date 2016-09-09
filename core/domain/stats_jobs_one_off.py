@@ -1236,12 +1236,21 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 item_id, explorations, exploration_id, state_name, item.answers,
                 rule_str, last_updated)
 
-            for error in migration_errors:
-                yield (
-                    'Item ID: %s, last updated: %s, state name: %s, '
-                    'exp id: %s, error: %s' % (
-                        item_id, last_updated, state_name, exploration_id,
-                        error))
+            try:
+                for error in migration_errors:
+                    yield (
+                        'Item ID: %s, last updated: %s, state name: %s, '
+                        'exp id: %s, error: %s' % (
+                            item_id, last_updated, state_name, exploration_id,
+                            error))
+            except UnicodeDecodeError:
+                yield 'UnicodeDecodeError for item ID: %s' % item_id
+                yield 'UnicodeDecodeError for (item: %s), last updated: %s' % (
+                    item_id, last_updated)
+                yield 'UnicodeDecodeError for (item: %s), state name: %s' % (
+                    item_id, state_name)
+                yield 'UnicodeDecodeError for (item: %s), exp id: %s' % (
+                    item_id, exploration_id)
 
     @classmethod
     def _migrate_answers(cls, item_id, explorations, exploration_id, state_name,
@@ -1348,7 +1357,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                     None,
                     None,
                     'Migrated answer \'%s\' can migrate to two types: %s (exp '
-                    'version: %s) and %s (exp version: %s)' % (
+                    'version: %d) and %s (exp version: %d)' % (
                         answer_str, type(matched_answer.normalized_answer),
                         matched_exploration.version,
                         type(answer.normalized_answer), exploration.version))
@@ -1364,7 +1373,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             return (
                 None,
                 'Failed to match answer \'%s\' to exploration snapshots '
-                'history (exp ID: %s, exp version: %s).' % (
+                'history (exp ID: %s, exp version: %d).' % (
                     answer_str, exploration.id, exploration.version))
 
         classification_categorization = (
