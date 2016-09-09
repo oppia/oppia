@@ -1363,6 +1363,10 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                         type(answer.normalized_answer), exploration.version))
         if matched_answer:
             first_error = None
+        elif not first_error:
+            first_error = (
+                'Failed to successfully reconstitute any answer from answer '
+                'string \'%s\'' % answer_str)
         return (matched_answer, matched_exploration, first_error)
 
     @classmethod
