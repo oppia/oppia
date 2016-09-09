@@ -629,7 +629,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
         expected_email_html_body = (
             'Hi editor,<br>'
             '<br>'
-            'You have 1 new message(s) about your Oppia explorations:<br>'
+            'You\'ve received 1 new message on your Oppia explorations:<br>'
             '<ul><li>Title: some text<br></li></ul>'
             'You can view and reply to your messages from your '
             '<a href="https://www.oppia.org/dashboard">dashboard</a>.'
@@ -645,7 +645,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
         expected_email_text_body = (
             'Hi editor,\n'
             '\n'
-            'You have 1 new message(s) about your Oppia explorations:\n'
+            'You\'ve received 1 new message on your Oppia explorations:\n'
             '- Title: some text\n'
             'You can view and reply to your messages from your dashboard.'
             '\n'
@@ -684,7 +684,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
         expected_email_html_body = (
             'Hi editor,<br>'
             '<br>'
-            'You have 1 new message(s) about your Oppia explorations:<br>'
+            'You\'ve received 1 new message on your Oppia explorations:<br>'
             '<ul><li>Title: some text<br></li>'
             '<li>Title: more text<br></li></ul>'
             'You can view and reply to your messages from your '
@@ -701,7 +701,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
         expected_email_text_body = (
             'Hi editor,\n'
             '\n'
-            'You have 1 new message(s) about your Oppia explorations:\n'
+            'You\'ve received 1 new message on your Oppia explorations:\n'
             '- Title: some text\n'
             '- Title: more text\n'
             'You can view and reply to your messages from your dashboard.'
