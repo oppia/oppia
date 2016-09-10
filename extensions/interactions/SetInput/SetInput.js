@@ -23,7 +23,9 @@
 oppia.directive('oppiaInteractiveSetInput', [function() {
   return {
     restrict: 'E',
-    scope: {},
+    scope: {
+      onSubmit: '&'
+    },
     templateUrl: 'interaction/SetInput',
     controller: ['$scope', '$attrs', '$translate', 'setInputRulesService',
         function($scope, $attrs, $translate, setInputRulesService) {
@@ -58,7 +60,10 @@ oppia.directive('oppiaInteractiveSetInput', [function() {
             'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
         } else {
           $scope.errorMessage = '';
-          $scope.$parent.submitAnswer(answer, setInputRulesService);
+          $scope.onSubmit({
+            answer: answer,
+            rulesService: setInputRulesService
+          });
         }
       };
     }]

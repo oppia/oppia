@@ -412,6 +412,14 @@ ALLOW_YAML_FILE_UPLOAD = False
 
 # Prefix for all taskqueue-related URLs.
 TASKQUEUE_URL_PREFIX = '/task'
+TASK_URL_FEEDBACK_MESSAGE_EMAILS = (
+    '%s/email/batchfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX)
+TASK_URL_FEEDBACK_STATUS_EMAILS = (
+    '%s/email/feedbackthreadstatuschangeemailhandler' % TASKQUEUE_URL_PREFIX)
+TASK_URL_INSTANT_FEEDBACK_EMAILS = (
+    '%s/email/instantfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX)
+TASK_URL_SUGGESTION_EMAILS = (
+    '%s/email/suggestionemailhandler' % TASKQUEUE_URL_PREFIX)
 
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
@@ -432,13 +440,7 @@ EXPLORATION_URL_PREFIX = '/explore'
 FEEDBACK_STATS_URL_PREFIX = '/feedbackstatshandler'
 FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
-FEEDBACK_MESSAGE_EMAIL_HANDLER_URL = (
-    '%s/email/batchfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX)
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
-FEEDBACK_STATUS_EMAIL_HANDLER_URL = (
-    '%s/email/feedbackthreadstatuschangeemailhandler' % TASKQUEUE_URL_PREFIX)
-INSTANT_FEEDBACK_EMAIL_HANDLER_URL = (
-    '%s/email/instantfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX)
 LIBRARY_INDEX_URL = '/library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
 LIBRARY_SEARCH_URL = '/search/find'
@@ -453,8 +455,6 @@ SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
 SPLASH_URL = '/splash'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
-SUGGESTION_EMAIL_HANDLER_URL = (
-    '%s/email/suggestionemailhandler' % TASKQUEUE_URL_PREFIX)
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
@@ -697,14 +697,27 @@ ALL_LANGUAGE_CODES = [{
 DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
 
-SUPPORTED_SITE_LANGUAGES = {
-    'en': 'English',
-    'es': 'Español',
-    'id': 'Bahasa Indonesia',
-    'pt': 'Português',
-    'vi': 'Tiếng Việt',
-    'hi': 'हिन्दी',
-}
+# NOTE TO DEVELOPERS: While adding another language, please ensure that the
+# languages are in alphabetical order.
+SUPPORTED_SITE_LANGUAGES = [{
+    'id': 'id',
+    'text': 'Bahasa Indonesia'
+}, {
+    'id': 'en',
+    'text': 'English'
+}, {
+    'id': 'es',
+    'text': 'Español'
+}, {
+    'id': 'pt',
+    'text': 'Português'
+}, {
+    'id': 'vi',
+    'text': 'Tiếng Việt'
+}, {
+    'id': 'hi',
+    'text': 'हिन्दी'
+}]
 SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 
