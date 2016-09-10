@@ -215,6 +215,7 @@
 
             <span>H</span>
             <ul>
+              <li>Hamza Chandad</li>
               <li>Hitesh Sharma</li>
               <li>Huong Le</li>
             </ul>
@@ -429,9 +430,7 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script>
-    {{ include_js_file('pages/About.js') }}
-  </script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/About.js"></script>
 {% endblock footer_js %}
 
 {% block footer%}

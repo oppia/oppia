@@ -3,6 +3,54 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://github.com/oppia/oppia/commits/master
 
 
+v2.3.3 (9 Sep 2016)
+-------------------
+Splash, About and Donation pages:
+* Update the Donation page.
+* Change splash pages used in experiments.
+* Fix #2400: Change margins and box-shadow on About and Donation page.
+* Fix broken url link to image on donation thanks page.
+* Use static URLs for the images on the Donate and Thanks pages.
+* Fix #2371: Prevent 404 errors when loading images in activity creation modal.
+
+Speed:
+* Cache images served via ImageHandler
+* Add pre-rendering to splash pages.
+* Externalize first party js modules.
+* Handle extension resources
+* Fix #2413: ignore copying python files when generating build directory
+* Fix #2380: remove js inlining from objects/templates
+
+Emails:
+* Fix #2259: Implement mailgun api for sending emails.
+* Fix #2349: Add service for sending feedback email to thread participants.
+
+Dashboard:
+* Add sorting to the creator dashboard.
+* Fix #2244: Fix activity tiles alignment.
+
+Mobile:
+* Fix #2044: User can now open and close the sidebar by swiping right and left.
+* Fix #1799: The explorations are now centered for a non-mobile device.
+
+Library:
+* Fix #2163: handle error due to invalid search cursor being used when searching in the library.
+* Align the tops of the exploration and collection cards on the library page.
+
+Editor, player and interactions:
+* Fix save diff modal not loading sometimes.
+* Modify code REPL rules to do less normalization for snippets.
+* Fix #2311: Add word-wrap for exploration card content.
+* Remove title, goal, and category alertService alerts.
+* Refactor interaction $scope.$parent.submitAnswer.
+* Extract non-inline interaction code from div['.conversation-skin-inline-interaction'].
+
+Misc:
+* Add tests to collection linearizer service
+* Fix #1800: remove unnecessary margins and update responsive breakpoint in Notifications page.
+* Fix #2354: put languages in alphabetical order in language dropdown.
+
+
 v2.3.2 (7 Aug 2016)
 -------------------
 Splash, About and Donation pages:

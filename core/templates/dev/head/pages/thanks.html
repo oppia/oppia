@@ -50,9 +50,7 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script>
-    {{ include_js_file('pages/Thanks.js') }}
-  </script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/Thanks.js"></script>
 {% endblock footer_js %}
 
 {% block footer%}

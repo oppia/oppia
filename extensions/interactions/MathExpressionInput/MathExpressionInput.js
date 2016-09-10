@@ -24,7 +24,9 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
   function(oppiaHtmlEscaper, mathExpressionInputRulesService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        onSubmit: '&'
+      },
       templateUrl: 'interaction/MathExpressionInput',
       controller: [
         '$scope', '$attrs', '$timeout', '$element', 'LABEL_FOR_CLEARING_FOCUS',
@@ -77,8 +79,10 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
               return;
             }
 
-            $scope.$parent.submitAnswer(
-              answer, mathExpressionInputRulesService);
+            $scope.onSubmit({
+              answer: answer,
+              rulesService: mathExpressionInputRulesService
+            });
           };
         }
       ]

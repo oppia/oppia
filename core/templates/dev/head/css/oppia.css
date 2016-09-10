@@ -1158,22 +1158,23 @@ textarea {
   border-bottom: 1px solid #eee;
   display: flex;
   flex-wrap: wrap;
+  margin-bottom: 0;
   padding-left: 0;
   text-align: center;
-  margin-bottom: 0;
 }
 .oppia-dashboard-tabs li {
   display: flex;
   margin-bottom: 0;
   width: 200px;
 }
+
 .oppia-dashboard-tabs-active .oppia-dashboard-tabs-text {
-  margin-left: 7.5px;
   border-bottom: 4px solid #009688;
   color: #009688;
+  margin-left: 7.5px;
 }
-.oppia-dashboard-tabs-text {
-  border-bottom: none;
+
+.oppia-dashboard-tabs .oppia-dashboard-tabs-text {
   color: #009688;
   font-size: 1em;
   padding: 10px;
@@ -1181,11 +1182,12 @@ textarea {
   text-transform: uppercase;
   width: 100%;
 }
-.oppia-dashboard-tabs-text:hover,
-.oppia-dashboard-tabs-text:focus {
-  color: #009688;
+
+.oppia-dashboard-tabs .oppia-dashboard-tabs-text:hover,
+.oppia-dashboard-tabs .oppia-dashboard-tabs-text:focus {
   text-decoration: none;
 }
+
 .oppia-dashboard-empty-text {
   padding-top: 50px;
 }
@@ -1219,6 +1221,35 @@ textarea {
 .list-card-view-toggle .dashboard-active-view {
   background: #009688;
   color: #fff;
+}
+
+li.sort-explorations-select {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: auto;
+}
+
+li.sort-explorations-select .sort-by-text,
+li.sort-explorations-select .sort-options,
+li.sort-explorations-select .sort-order {
+  display: inline-block;
+}
+
+li.sort-explorations-select .sort-by-text {
+  margin: 8px 8px 0 ;
+}
+
+li.sort-explorations-select .sort-options {
+  background: #fff;
+  border-color: #ddd;
+  height: 32px;
+  margin: 7px 7px 0 0;
+}
+
+li.sort-explorations-select .sort-order {
+  cursor: pointer;
+  margin: 14px 8px 0 0;
 }
 
 /* Rules for the tiles in the creator dashboard. */
@@ -2178,6 +2209,10 @@ md-card.oppia-dashboard-tile {
   color: #555;
 }
 
+.oppia-dashboard-table .oppia-dashboard-table-headings p {
+  display: inline;
+}
+
 .oppia-dashboard-table th {
   padding: 12px 3px;
 }
@@ -2701,18 +2736,15 @@ div#ng-curtain {
 
 .oppia-page-card {
   background: rgb(255,255,255);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   margin-left: auto;
   margin-right: auto;
-  margin-bottom: 30px;
+  margin-bottom: 80px;
   margin-top: 40px;
   padding: 30px 55px 30px 45px;
 }
 .oppia-page-card li {
   margin-bottom: 10px;
-}
-
-.oppia-notifications-tray {
-  margin-left: -8px;
 }
 
 .oppia-notifications-dashboard-card {
@@ -3449,13 +3481,13 @@ md-card.preview-conversation-skin-supplemental-card {
     The margin setting is so that exploration summary tiles and collection
     summary tiles would be the same widths (214px).
   */
-  margin: 12px 7px;
+  margin: 12px 5.5px;
   padding: 0;
   position: relative;
   text-align: left;
   vertical-align: top;
   white-space: normal;
-  width: 200px;
+  width: 197px;
 }
 
 @media only screen and (max-width: 500px) {
@@ -3699,10 +3731,23 @@ md-card.preview-conversation-skin-supplemental-card {
   font-size: 16px;
 }
 
-@media(max-width: 500px) {
+@media(max-width: 815px) {
   .oppia-dashboard-container {
     padding-left: 10px;
     padding-right: 10px;
+  }
+
+  .oppia-dashboard-container .oppia-dashboard-tabs {
+    justify-content: center;
+  }
+
+  .oppia-dashboard-container .oppia-dashboard-tabs li {
+    width: auto;
+  }
+
+  .oppia-dashboard-container .oppia-dashboard-tabs .sort-explorations-select {
+    margin-top: 8px;
+    width: 100%;
   }
 
   .oppia-dashboard-container .oppia-dashboard-tabs .list-card-view-toggle,
@@ -4058,6 +4103,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-donate-info {
   float: left;
+  padding-bottom: 30px;
   width: calc(100% - 340px);
 }
 
@@ -4066,7 +4112,7 @@ md-card.preview-conversation-skin-supplemental-card {
   display: block;
   float: right;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  padding: 10px;
+  padding: 10px 10px 35px 10px;
   width: 340px;
 }
 

@@ -1,5 +1,6 @@
 <script type="text/ng-template" id="components/activityTilesInfinityGrid">
-  <div infinite-scroll="showMoreActivities()" infinite-scroll-distance="1"
+  <div class="oppia-activities-infinity-grid-container" infinite-scroll="
+       showMoreActivities()" infinite-scroll-distance="1"
        infinite-scroll-disabled="endOfPageIsReached || searchResultsAreLoading">
     <div ng-repeat="activity in allActivitiesInOrder track by $index" style="display: inline-block;">
       <collection-summary-tile ng-if="activity.activity_type === 'collection'"
@@ -37,6 +38,12 @@
 </script>
 
 <style>
+  .oppia-activities-infinity-grid-container {
+    max-width: 856px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
   .oppia-search-results-loading-message {
     background-color: #e9e9e9;
     bottom: 0;

@@ -194,7 +194,5 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script>
-    {{ include_js_file('pages/Splash.js') }}
-  </script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/Splash.js"></script>
 {% endblock footer_js %}
