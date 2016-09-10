@@ -97,37 +97,35 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script>
-    {{ include_js_file('services/explorationServices.js') }}
-    {{ include_js_file('services/messengerService.js') }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/explorationServices.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/messengerService.js"></script>
 
-    {{ include_js_file('components/ExplorationEmbedButtonService.js') }}
-    {{ include_js_file('components/GadgetDirective.js') }}
-    {{ include_js_file('components/GadgetPanelDirective.js') }}
-    {{ include_js_file('components/ProfileLinkImageDirective.js') }}
-    {{ include_js_file('components/SharingLinksDirective.js') }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/ExplorationEmbedButtonService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/GadgetDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/GadgetPanelDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/ProfileLinkImageDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/SharingLinksDirective.js"></script>
 
-    {{ include_js_file('domain/exploration/ExplorationObjectFactory.js') }}
-    {{ include_js_file('domain/exploration/StateObjectFactory.js') }}
-    {{ include_js_file('domain/utilities/StopwatchObjectFactory.js') }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ExplorationObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StateObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/StopwatchObjectFactory.js"></script>
 
-    {{ include_js_file('player/AnswerClassificationService.js') }}
-    {{ include_js_file('player/AnswerFeedbackPairDirective.js') }}
-    {{ include_js_file('player/ConversationSkinDirective.js') }}
-    {{ include_js_file('player/ExplorationRecommendationsService.js') }}
-    {{ include_js_file('player/FeedbackPopupDirective.js') }}
-    {{ include_js_file('player/LearnerLocalNav.js') }}
-    {{ include_js_file('player/LearnerParamsService.js') }}
-    {{ include_js_file('player/LearnerViewBreadcrumb.js') }}
-    {{ include_js_file('player/LearnerViewRatingService.js') }}
-    {{ include_js_file('player/PlayerPositionService.js') }}
-    {{ include_js_file('player/PlayerServices.js') }}
-    {{ include_js_file('player/PlayerTranscriptService.js') }}
-    {{ include_js_file('player/ProgressDotsDirective.js') }}
-    {{ include_js_file('player/StatsReportingService.js') }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/player/AnswerClassificationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/player/AnswerFeedbackPairDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/player/ConversationSkinDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/player/ExplorationRecommendationsService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/player/FeedbackPopupDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/player/LearnerLocalNav.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/player/LearnerParamsService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/player/LearnerViewBreadcrumb.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/player/LearnerViewRatingService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/player/PlayerPositionService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/player/PlayerServices.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/player/PlayerTranscriptService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/player/ProgressDotsDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/player/StatsReportingService.js"></script>
 
-    {{ include_js_file('expressions/expressionInterpolationService.js') }}
-  </script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionInterpolationService.js"></script>
 
   {{ interaction_templates }}
   {{ gadget_templates }}

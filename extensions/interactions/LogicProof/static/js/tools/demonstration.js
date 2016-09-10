@@ -249,19 +249,21 @@ logicDemo.controller('TestCtrl', function($scope) {
 
   $scope.REPLACEMENT_PAIRS = [{
     old: '\u2227',
-    new: '\\u2227'
+    // jscs:disable disallowQuotedKeysInObjects
+    'new': '\\u2227'
   }, {
     old: '\u2228',
-    new: '\\u2228'
+    'new': '\\u2228'
   }, {
     old: '\u2200',
-    new: '\\u2200'
+    'new': '\\u2200'
   }, {
     old: '\u2203',
-    new: '\\u2203'
+    'new': '\\u2203'
   }, {
     old: '\u2208',
-    new: '\\u2208'
+    'new': '\\u2208'
+    // jscs:enable disallowQuotedKeysInObjects
   }];
 
   // JSON.stringify will display '\u2227' from strings.js as '∧'. We do not
@@ -272,7 +274,7 @@ logicDemo.controller('TestCtrl', function($scope) {
     for (var i = 0; i < $scope.REPLACEMENT_PAIRS.length; i++) {
       // We use this as .replace() only replaces one instance.
       output = output.split($scope.REPLACEMENT_PAIRS[i].old).join(
-        $scope.REPLACEMENT_PAIRS[i].new);
+        $scope.REPLACEMENT_PAIRS[i]['new']);
     }
     return output;
   };

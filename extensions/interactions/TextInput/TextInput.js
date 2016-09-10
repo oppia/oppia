@@ -23,7 +23,9 @@ oppia.directive('oppiaInteractiveTextInput', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        onSubmit: '&'
+      },
       templateUrl: 'interaction/TextInput',
       controller: ['$scope', '$attrs', 'focusService', 'textInputRulesService',
           function($scope, $attrs, focusService, textInputRulesService) {
@@ -49,8 +51,10 @@ oppia.directive('oppiaInteractiveTextInput', [
             return;
           }
 
-          $scope.$parent.submitAnswer(
-            answer, textInputRulesService);
+          $scope.onSubmit({
+            answer: answer,
+            rulesService: textInputRulesService
+          });
         };
       }]
     };

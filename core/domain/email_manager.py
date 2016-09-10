@@ -27,6 +27,7 @@ from core.platform import models
 import feconf
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
+app_identity_services = models.Registry.import_app_identity_services()
 email_services = models.Registry.import_email_services()
 transaction_services = models.Registry.import_transaction_services()
 
@@ -57,7 +58,7 @@ EMAIL_CONTENT_SCHEMA = {
 
 EMAIL_SENDER_NAME = config_domain.ConfigProperty(
     'email_sender_name', {'type': 'unicode'},
-    'The sender name for outgoing emails.', 'Site Admin')
+    'The default sender name for outgoing emails.', 'Site Admin')
 EMAIL_FOOTER = config_domain.ConfigProperty(
     'email_footer', {'type': 'unicode', 'ui_config': {'rows': 5}},
     'The footer to append to all outgoing emails. (This should be written in '
@@ -156,7 +157,7 @@ def _require_sender_id_is_valid(intent, sender_id):
 
 def _send_email(
         recipient_id, sender_id, intent, email_subject, email_html_body,
-        sender_email, bcc_admin=False):
+        sender_email, bcc_admin=False, sender_name=None):
     """Sends an email to the given recipient.
 
     This function should be used for sending all user-facing emails.
@@ -165,6 +166,9 @@ def _send_email(
     intent. Currently we support only system-generated emails and emails
     initiated by moderator actions.
     """
+    if sender_name is None:
+        sender_name = EMAIL_SENDER_NAME.value
+
     _require_sender_id_is_valid(intent, sender_id)
 
     recipient_email = user_services.get_email_from_user_id(recipient_id)
@@ -189,8 +193,7 @@ def _send_email(
         return
 
     def _send_email_in_transaction():
-        sender_name_email = '%s <%s>' % (
-            EMAIL_SENDER_NAME.value, sender_email)
+        sender_name_email = '%s <%s>' % (sender_name, sender_email)
 
         email_services.send_mail(
             sender_name_email, recipient_email, email_subject,
@@ -202,11 +205,21 @@ def _send_email(
     return transaction_services.run_in_transaction(_send_email_in_transaction)
 
 
+def send_mail_to_admin(email_subject, email_body):
+    """Sends email to admin."""
+    app_id = app_identity_services.get_application_id()
+    body = '(Sent from %s)\n\n%s' % (app_id, email_body)
+
+    email_services.send_mail(
+        feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS, email_subject,
+        body, None, bcc_admin=False)
+
+
 def send_post_signup_email(user_id):
     """Sends a post-signup email to the given user.
 
     The caller is responsible for ensuring that emails are allowed to be sent
-    to users (i.e. feconf.CAN_SEND_EMAILS_TO_USERS is True).
+    to users (i.e. feconf.CAN_SEND_EMAILS is True).
     """
     for key, content in SIGNUP_EMAIL_CONTENT.value.iteritems():
         if content == SIGNUP_EMAIL_CONTENT.default_value[key]:
@@ -258,10 +271,10 @@ def require_moderator_email_prereqs_are_satisfied():
         raise Exception(
             'For moderator emails to be sent, please ensure that '
             'REQUIRE_EMAIL_ON_MODERATOR_ACTION is set to True.')
-    if not feconf.CAN_SEND_EMAILS_TO_USERS:
+    if not feconf.CAN_SEND_EMAILS:
         raise Exception(
             'For moderator emails to be sent, please ensure that '
-            'CAN_SEND_EMAILS_TO_USERS is set to True.')
+            'CAN_SEND_EMAILS is set to True.')
 
 
 def send_moderator_action_email(
@@ -270,7 +283,7 @@ def send_moderator_action_email(
     unpublish, delete) to the given user.
 
     The caller is responsible for ensuring that emails are allowed to be sent
-    to users (i.e. feconf.CAN_SEND_EMAILS_TO_USERS is True).
+    to users (i.e. feconf.CAN_SEND_EMAILS is True).
     """
     require_moderator_email_prereqs_are_satisfied()
     email_config = feconf.VALID_MODERATOR_ACTIONS[intent]
@@ -304,12 +317,12 @@ def send_role_notification_email(
     """
     # Editor role email body and email subject templates.
     email_subject_template = (
-        '%s invited you to collaborate on Oppia.org')
+        '%s - invitation to collaborate')
 
     email_body_template = (
         'Hi %s,<br>'
         '<br>'
-        '<b>%s</b> has granted you %s to their learning exploration, '
+        '<b>%s</b> has granted you %s to their exploration, '
         '"<a href="http://www.oppia.org/create/%s">%s</a>", on Oppia.org.<br>'
         '<br>'
         'This allows you to:<br>'
@@ -324,7 +337,7 @@ def send_role_notification_email(
         '<br>%s')
 
     # Return from here if sending email is turned off.
-    if not feconf.CAN_SEND_EMAILS_TO_USERS:
+    if not feconf.CAN_SEND_EMAILS:
         log_new_error('This app cannot send emails to users.')
         return
 
@@ -348,8 +361,7 @@ def send_role_notification_email(
     role_descriptipn = EDITOR_ROLE_EMAIL_HTML_ROLES[recipient_role]
     rights_html = EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE[role_descriptipn]
 
-    email_subject = email_subject_template % (
-        inviter_user_settings.username)
+    email_subject = email_subject_template % exploration_title
     email_body = email_body_template % (
         recipient_user_settings.username, inviter_user_settings.username,
         role_descriptipn, exploration_id, exploration_title, rights_html,
@@ -358,7 +370,8 @@ def send_role_notification_email(
     _send_email(
         recipient_id, feconf.SYSTEM_COMMITTER_ID,
         feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION, email_subject, email_body,
-        feconf.NOREPLY_EMAIL_ADDRESS)
+        feconf.NOREPLY_EMAIL_ADDRESS,
+        sender_name=inviter_user_settings.username)
 
 
 def send_feedback_message_email(recipient_id, feedback_messages):
@@ -369,12 +382,14 @@ def send_feedback_message_email(recipient_id, feedback_messages):
     - feedback_messages: dictionary containing feedback messages.
     """
 
-    email_subject = 'New messages on Oppia.'
+    email_subject = (
+        'You\'ve received %s new message%s on your explorations' %
+        (len(feedback_messages), 's' if len(feedback_messages) > 1 else ''))
 
     email_body_template = (
         'Hi %s,<br>'
         '<br>'
-        'You have %s new message(s) about your Oppia explorations:<br>'
+        'You\'ve received %s new message%s on your Oppia explorations:<br>'
         '<ul>%s</ul>'
         'You can view and reply to your messages from your '
         '<a href="https://www.oppia.org/dashboard">dashboard</a>.'
@@ -385,7 +400,7 @@ def send_feedback_message_email(recipient_id, feedback_messages):
         'The Oppia Team<br>'
         '<br>%s')
 
-    if not feconf.CAN_SEND_EMAILS_TO_USERS:
+    if not feconf.CAN_SEND_EMAILS:
         log_new_error('This app cannot send emails to users.')
         return
 
@@ -405,8 +420,9 @@ def send_feedback_message_email(recipient_id, feedback_messages):
                 '<li>%s: %s<br></li>' % (reference['title'], message))
 
     email_body = email_body_template % (
-        recipient_user_settings.username, len(feedback_messages), messages_html,
-        EMAIL_FOOTER.value)
+        recipient_user_settings.username, len(feedback_messages),
+        's' if len(feedback_messages) > 1 else '',
+        messages_html, EMAIL_FOOTER.value)
 
     _send_email(
         recipient_id, feconf.SYSTEM_COMMITTER_ID,
@@ -430,7 +446,7 @@ def send_suggestion_email(
         '- The Oppia Team<br>'
         '<br>%s')
 
-    if not feconf.CAN_SEND_EMAILS_TO_USERS:
+    if not feconf.CAN_SEND_EMAILS:
         log_new_error('This app cannot send emails to users.')
         return
 
@@ -454,3 +470,41 @@ def send_suggestion_email(
                 recipient_id, feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION,
                 email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_instant_feedback_message_email(
+        recipient_id, sender_id, message, email_subject, exploration_title,
+        exploration_id, thread_title):
+
+    email_body_template = (
+        'Hi %s,<br><br>'
+        'New update to thread "%s" on '
+        '<a href="https://www.oppia.org/%s">%s</a>:<br>'
+        '<ul><li>%s: %s<br></li></ul>'
+        '(You received this message because you are a '
+        'participant in this thread.)<br><br>'
+        'Best wishes,<br>'
+        'The Oppia team<br>'
+        '<br>%s')
+
+    if not feconf.CAN_SEND_EMAILS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    if not feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS:
+        log_new_error('This app cannot send feedback message emails to users.')
+        return
+
+    sender_settings = user_services.get_user_settings(sender_id)
+    recipient_settings = user_services.get_user_settings(recipient_id)
+    recipient_preferences = user_services.get_email_preferences(recipient_id)
+
+    if recipient_preferences['can_receive_feedback_message_email']:
+        email_body = email_body_template % (
+            recipient_settings.username, thread_title, exploration_id,
+            exploration_title, sender_settings.username, message,
+            EMAIL_FOOTER.value)
+        _send_email(
+            recipient_id, feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION, email_subject,
+            email_body, feconf.NOREPLY_EMAIL_ADDRESS)

@@ -1,5 +1,5 @@
 application: oppiaserver
-version: 2-3-2
+version: 2-3-3
 runtime: python27
 api_version: 1
 threadsafe: false
@@ -49,6 +49,13 @@ handlers:
   # NB: not minified. TODO(sll): fix.
   static_dir: core/templates/dev/head/css
   secure: always
+# Serve js scripts under core/templates/dev/head. This regex allows
+# us to recursively serve js scripts. "\1" inserts text captured by
+# the capture group in the URL pattern.
+- url: /templates/dev/head/(.*\.(js))$
+  static_files: core/templates/dev/head/\1
+  upload: core/templates/dev/head/(.*\.(js))$
+  secure: always
 - url: /third_party/static
   static_dir: third_party/static
   secure: always
@@ -80,6 +87,14 @@ handlers:
   secure: always
   http_headers:
     Cache-Control: 'no-cache'
+# Serve js scripts for gadgets, interactions, rich_text_components and objects
+# under extensions in dev mode. This regex allows us to recursively serve js
+# scripts under the three specified directories. "\1" and "\2" insert capture
+# groups from the url pattern.
+- url: /extensions/(gadgets|interactions|rich_text_components|objects)/(.*\.(js))$
+  static_files: extensions/\1/\2
+  upload: extensions/(gadgets|interactions|rich_text_components|objects)/(.*\.(js))$
+  secure: always
 - url: /mapreduce/pipeline/images
   static_dir: third_party/gae-mapreduce-1.9.17.0/mapreduce/lib/pipeline/ui/images
   secure: always

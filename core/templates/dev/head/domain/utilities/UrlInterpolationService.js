@@ -17,25 +17,18 @@
  * necessary to have a fully-qualified URL.
  */
 
-oppia.factory('UrlInterpolationService', ['alertsService',
-    function(alertsService) {
-  // http://stackoverflow.com/questions/203739
-  var _isString = function(value) {
-    return (typeof value === 'string') || (value instanceof String);
-  };
-
+oppia.factory('UrlInterpolationService', [
+    'alertsService', 'utilsService', function(alertsService, utilsService) {
   var validateResourcePath = function(resourcePath) {
     if (!resourcePath) {
-      alertsService.fatalWarning(
-        'Empty path passed in method.');
+      alertsService.fatalWarning('Empty path passed in method.');
     }
 
     var RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH = /^\//;
     // Ensure that resourcePath starts with a forward slash.
     if (!resourcePath.match(RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH)) {
       alertsService.fatalWarning(
-        'Path must start with \'\/\': \'' + new String(resourcePath) +
-        '\'.');
+        'Path must start with \'\/\': \'' + resourcePath + '\'.');
     }
   };
 
@@ -63,8 +56,7 @@ oppia.factory('UrlInterpolationService', ['alertsService',
     interpolateUrl: function(urlTemplate, interpolationValues) {
       if (!urlTemplate) {
         alertsService.fatalWarning(
-          'Invalid or empty URL template passed in: \'' +
-          new String(urlTemplate) + '\'');
+          'Invalid or empty URL template passed in: \'' + urlTemplate + '\'');
         return null;
       }
 
@@ -99,7 +91,7 @@ oppia.factory('UrlInterpolationService', ['alertsService',
       var escapedInterpolationValues = {};
       for (var varName in interpolationValues) {
         var value = interpolationValues[varName];
-        if (!_isString(value)) {
+        if (!utilsService.isString(value)) {
           alertsService.fatalWarning(
             'Parameters passed into interpolateUrl must be strings.');
           return null;

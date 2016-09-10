@@ -20,13 +20,13 @@ from pipeline import pipeline
 
 from core import jobs
 from core.controllers import base
+from core.domain import email_manager
 from core.domain import exp_jobs_one_off
 from core.domain import recommendations_jobs_one_off
 from core.domain import user_jobs_one_off
 from core.platform import models
 import utils
 
-email_services = models.Registry.import_email_services()
 (job_models,) = models.Registry.import_models([models.NAMES.job])
 
 # The default retention time is 2 days.
@@ -86,7 +86,7 @@ class JobStatusMailerHandler(base.BaseHandler):
             email_subject = 'MapReduce status report'
             email_message = 'All MapReduce jobs are running fine.'
 
-        email_services.send_mail_to_admin(email_subject, email_message)
+        email_manager.send_mail_to_admin(email_subject, email_message)
 
 
 class CronDashboardStatsHandler(base.BaseHandler):

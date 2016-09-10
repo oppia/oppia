@@ -43,6 +43,8 @@ oppia.factory('CollectionLinearizerService', [
       });
     };
 
+    // Given a non linear collection input, the function will linearize it by
+    // picking the first node it encounters on the branch and ignore the others.
     var _getCollectionNodesInPlayableOrder = function(collection) {
       var nodeList = collection.getStartingCollectionNodes();
       var completedExpIds = nodeList.map(function(collectionNode) {
@@ -59,7 +61,7 @@ oppia.factory('CollectionLinearizerService', [
       return nodeList;
     };
 
-    var _addAfter = function(collection, curExplorationId, newExplorationId) {
+    var addAfter = function(collection, curExplorationId, newExplorationId) {
       // In order for the new node to succeed the current node, the new node
       // must require the acquired skills of the current node.
       var curCollectionNode = collection.getCollectionNodeByExplorationId(
@@ -69,7 +71,7 @@ oppia.factory('CollectionLinearizerService', [
         collection, newExplorationId, curAcquiredSkillList.getSkills());
     };
 
-    var _findNodeIndex = function(linearNodeList, explorationId) {
+    var findNodeIndex = function(linearNodeList, explorationId) {
       var index = -1;
       for (var i = 0; i < linearNodeList.length; i++) {
         if (linearNodeList[i].getExplorationId() === explorationId) {
@@ -80,26 +82,26 @@ oppia.factory('CollectionLinearizerService', [
       return index;
     };
 
-    var _getNodeLeftOf = function(linearNodeList, nodeIndex) {
+    var getNodeLeftOf = function(linearNodeList, nodeIndex) {
       return nodeIndex > 0 ? linearNodeList[nodeIndex - 1] : null;
     };
 
-    var _getNodeRightOf = function(linearNodeList, nodeIndex) {
+    var getNodeRightOf = function(linearNodeList, nodeIndex) {
       var lastIndex = linearNodeList.length - 1;
       return nodeIndex < lastIndex ? linearNodeList[nodeIndex + 1] : null;
     };
 
     // Swap the node at the specified index with the node immediately to the
     // left of it.
-    var _swapLeft = function(collection, linearNodeList, nodeIndex) {
+    var swapLeft = function(collection, linearNodeList, nodeIndex) {
       // There are three cases when swapping a node left:
       //   1. There is a node right of it but not left
       //   2. There is a node left of it but not right
       //   3. There are nodes both to the left and right of it
 
       var node = linearNodeList[nodeIndex];
-      var leftNode = _getNodeLeftOf(linearNodeList, nodeIndex);
-      var rightNode = _getNodeRightOf(linearNodeList, nodeIndex);
+      var leftNode = getNodeLeftOf(linearNodeList, nodeIndex);
+      var rightNode = getNodeRightOf(linearNodeList, nodeIndex);
       if (!leftNode) {
         // Case 1 is a no-op: there's nothing to swap with.
         return;
@@ -128,20 +130,20 @@ oppia.factory('CollectionLinearizerService', [
           collection, rightNode.getExplorationId(), leftAcquiredSkills);
       }
     };
-    var _swapRight = function(collection, linearNodeList, nodeIndex) {
+    var swapRight = function(collection, linearNodeList, nodeIndex) {
       // Swapping right is the same as swapping the node one to the right
       // leftward.
       if (nodeIndex < linearNodeList.length - 1) {
-        _swapLeft(collection, linearNodeList, nodeIndex + 1);
+        swapLeft(collection, linearNodeList, nodeIndex + 1);
       }
       // Otherwise it is a no-op (cannot swap the last node right).
     };
 
-    var _shiftNode = function(collection, explorationId, swapFunction) {
+    var shiftNode = function(collection, explorationId, swapFunction) {
       // There is nothing to shift if the collection has only 1 node.
       if (collection.getCollectionNodeCount() > 1) {
         var linearNodeList = _getCollectionNodesInPlayableOrder(collection);
-        var nodeIndex = _findNodeIndex(linearNodeList, explorationId);
+        var nodeIndex = findNodeIndex(linearNodeList, explorationId);
         if (nodeIndex === -1) {
           return false;
         }
@@ -154,7 +156,7 @@ oppia.factory('CollectionLinearizerService', [
       /**
        * Given a collection and a list of completed exploration IDs within the
        * context of that collection, returns a list of which explorations in the
-       * collection is immediately playablen by the user. NOTE: This function
+       * collection is immediately playable by the user. NOTE: This function
        * does not assume that the collection is linear.
        */
       getNextExplorationIds: function(collection, completedExpIds) {
@@ -187,7 +189,7 @@ oppia.factory('CollectionLinearizerService', [
 
         if (linearNodeList.length > 0) {
           var lastNode = linearNodeList[linearNodeList.length - 1];
-          _addAfter(collection, lastNode.getExplorationId(), explorationId);
+          addAfter(collection, lastNode.getExplorationId(), explorationId);
         }
       },
 
@@ -199,19 +201,20 @@ oppia.factory('CollectionLinearizerService', [
        * collection.
        */
       removeCollectionNode: function(collection, explorationId) {
+        if (!collection.containsCollectionNode(explorationId)) {
+          return false;
+        }
+
         // Relinking is only needed if more than just the specified node is in
         // the collection.
         if (collection.getCollectionNodeCount() > 1) {
           var linearNodeList = _getCollectionNodesInPlayableOrder(collection);
-          var nodeIndex = _findNodeIndex(linearNodeList, explorationId);
-          if (nodeIndex === -1) {
-            return false;
-          }
+          var nodeIndex = findNodeIndex(linearNodeList, explorationId);
 
           // Ensure any present left/right nodes are appropriately linked after
           // the node is removed.
-          var leftNode = _getNodeLeftOf(linearNodeList, nodeIndex);
-          var rightNode = _getNodeRightOf(linearNodeList, nodeIndex);
+          var leftNode = getNodeLeftOf(linearNodeList, nodeIndex);
+          var rightNode = getNodeRightOf(linearNodeList, nodeIndex);
           var newPrerequisiteSkills = [];
           if (leftNode) {
             newPrerequisiteSkills = leftNode.getAcquiredSkillList().getSkills();
@@ -233,7 +236,7 @@ oppia.factory('CollectionLinearizerService', [
        * exploration ID does not associate to any nodes in the collection.
        */
       shiftNodeLeft: function(collection, explorationId) {
-        return _shiftNode(collection, explorationId, _swapLeft);
+        return shiftNode(collection, explorationId, swapLeft);
       },
 
       /**
@@ -244,7 +247,7 @@ oppia.factory('CollectionLinearizerService', [
        * exploration ID does not associate to any nodes in the collection.
        */
       shiftNodeRight: function(collection, explorationId) {
-        return _shiftNode(collection, explorationId, _swapRight);
+        return shiftNode(collection, explorationId, swapRight);
       }
     };
   }]);

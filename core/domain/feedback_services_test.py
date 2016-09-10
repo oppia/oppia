@@ -13,8 +13,12 @@
 # limitations under the License.
 
 """Tests for feedback-related services."""
+import json
+
+from core.domain import feedback_domain
 from core.domain import feedback_jobs_continuous_test
 from core.domain import feedback_services
+from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -325,14 +329,35 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 class EmailsTaskqueueTests(test_utils.GenericTestBase):
     """Tests for tasks in emails taskqueue."""
 
-    def test_create_new_task(self):
+    def test_create_new_batch_task(self):
         user_id = 'user'
-        feedback_services.enqueue_feedback_message_email_task(user_id)
+        feedback_services.enqueue_feedback_message_batch_email_task(user_id)
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
 
         tasks = self.get_pending_tasks()
         self.assertEqual(
-            tasks[0].url, feconf.FEEDBACK_MESSAGE_EMAIL_HANDLER_URL)
+            tasks[0].url, feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS)
+
+    def test_create_new_instant_task(self):
+        user_id = 'user'
+        reference_dict = {
+            'exploration_id': 'eid',
+            'thread_id': 'tid',
+            'message_id': 'mid'
+        }
+        reference = feedback_domain.FeedbackMessageReference(
+            reference_dict['exploration_id'], reference_dict['thread_id'],
+            reference_dict['message_id'])
+
+        feedback_services.enqueue_feedback_message_instant_email_task(
+            user_id, reference)
+        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+
+        tasks = self.get_pending_tasks()
+        payload = json.loads(tasks[0].payload)
+        self.assertEqual(
+            tasks[0].url, feconf.TASK_URL_INSTANT_FEEDBACK_EMAILS)
+        self.assertDictEqual(payload['reference_dict'], reference_dict)
 
 
 class FeedbackMessageEmailTests(test_utils.GenericTestBase):
@@ -346,64 +371,81 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, 'Title')
-        self.thread_id = 'thread'
-        self.message_id1 = 'msg1'
-        self.message_id2 = 'msg2'
         self.can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+            feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
 
     def test_send_feedback_message_email(self):
-        feedback_services.add_message_to_email_buffer(
-            self.user_id_a, self.exploration.id, self.thread_id,
-            self.message_id1)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name', self.user_id_a,
+                'a subject', 'some text')
+            threadlist = feedback_services.get_all_threads(
+                self.exploration.id, False)
+            thread_id = threadlist[0].get_thread_id()
 
-        expected_feedback_message_dict = {
-            'exploration_id': self.exploration.id,
-            'thread_id': self.thread_id,
-            'message_id': self.message_id1
-        }
-        model = feedback_models.UnsentFeedbackEmailModel.get(self.editor_id)
+            messagelist = feedback_services.get_messages(
+                self.exploration.id, thread_id)
+            self.assertEqual(len(messagelist), 1)
 
-        self.assertEqual(len(model.feedback_message_references), 1)
-        self.assertDictEqual(
-            model.feedback_message_references[0],
-            expected_feedback_message_dict)
-        self.assertEqual(model.retries, 0)
+            expected_feedback_message_dict = {
+                'exploration_id': self.exploration.id,
+                'thread_id': thread_id,
+                'message_id': messagelist[0].message_id
+            }
+            # There are two jobs in the taskqueue: one for the realtime event
+            # associated with creating a thread, and one for sending the email.
+            self.assertEqual(self.count_jobs_in_taskqueue(), 2)
+            model = feedback_models.UnsentFeedbackEmailModel.get(self.editor_id)
+
+            self.assertEqual(len(model.feedback_message_references), 1)
+            self.assertDictEqual(
+                model.feedback_message_references[0],
+                expected_feedback_message_dict)
+            self.assertEqual(model.retries, 0)
 
     def test_add_new_feedback_message(self):
-        feedback_services.add_message_to_email_buffer(
-            self.user_id_a, self.exploration.id, self.thread_id,
-            self.message_id1)
-        feedback_services.add_message_to_email_buffer(
-            self.user_id_a, self.exploration.id, self.thread_id,
-            self.message_id2)
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name', self.user_id_a,
+                'a subject', 'some text')
+            threadlist = feedback_services.get_all_threads(
+                self.exploration.id, False)
+            thread_id = threadlist[0].get_thread_id()
 
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            feedback_services.create_message(
+                self.exploration.id, thread_id, self.user_id_a, None, None,
+                'editor message')
+            # There are two jobs in the taskqueue: one for the realtime event
+            # associated with creating a thread, and one for sending the email.
+            self.assertEqual(self.count_jobs_in_taskqueue(), 2)
 
-        expected_feedback_message_dict1 = {
-            'exploration_id': self.exploration.id,
-            'thread_id': self.thread_id,
-            'message_id': self.message_id1
-        }
-        expected_feedback_message_dict2 = {
-            'exploration_id': self.exploration.id,
-            'thread_id': self.thread_id,
-            'message_id': self.message_id2
-        }
+            messagelist = feedback_services.get_messages(
+                self.exploration.id, thread_id)
+            self.assertEqual(len(messagelist), 2)
 
-        model = feedback_models.UnsentFeedbackEmailModel.get(self.editor_id)
+            expected_feedback_message_dict1 = {
+                'exploration_id': self.exploration.id,
+                'thread_id': thread_id,
+                'message_id': messagelist[0].message_id
+            }
+            expected_feedback_message_dict2 = {
+                'exploration_id': self.exploration.id,
+                'thread_id': thread_id,
+                'message_id': messagelist[1].message_id
+            }
 
-        self.assertEqual(len(model.feedback_message_references), 2)
-        self.assertDictEqual(
-            model.feedback_message_references[0],
-            expected_feedback_message_dict1)
-        self.assertDictEqual(
-            model.feedback_message_references[1],
-            expected_feedback_message_dict2)
-        self.assertEqual(model.retries, 0)
+            model = feedback_models.UnsentFeedbackEmailModel.get(self.editor_id)
+
+            self.assertEqual(len(model.feedback_message_references), 2)
+            self.assertDictEqual(
+                model.feedback_message_references[0],
+                expected_feedback_message_dict1)
+            self.assertDictEqual(
+                model.feedback_message_references[1],
+                expected_feedback_message_dict2)
+            self.assertEqual(model.retries, 0)
 
     def test_email_is_not_sent_if_recipient_has_declined_such_emails(self):
         user_services.update_email_preferences(
@@ -440,13 +482,13 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
                 self.exploration.id, 'a_state_name', self.user_id_a,
                 'a subject', 'some text')
 
-            # There are two jobs in the taskqueue: one for the realtime even
+            # There are two jobs in the taskqueue: one for the realtime event
             # associated with creating a thread, and one for sending the email.
             self.assertEqual(self.count_jobs_in_taskqueue(), 2)
 
             tasks = self.get_pending_tasks()
             self.assertEqual(
-                tasks[0].url, feconf.FEEDBACK_MESSAGE_EMAIL_HANDLER_URL)
+                tasks[0].url, feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS)
             self.process_and_flush_pending_tasks()
 
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
@@ -454,7 +496,7 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
 
     def test_that_emails_are_not_sent_if_service_is_disabled(self):
         cannot_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS_TO_USERS', False)
+            feconf, 'CAN_SEND_EMAILS', False)
         cannot_send_feedback_message_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', False)
         with cannot_send_emails_ctx, cannot_send_feedback_message_email_ctx:
@@ -494,3 +536,583 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
+
+    def test_that_email_is_sent_for_reply_on_feedback(self):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name', self.user_id_a,
+                'a subject', 'A message')
+            # There are two jobs in the taskqueue: one for the realtime event
+            # associated with creating a thread, and one for sending the email.
+            self.assertEqual(self.count_jobs_in_taskqueue(), 2)
+            self.process_and_flush_pending_tasks()
+
+            threadlist = feedback_services.get_all_threads(
+                self.exploration.id, False)
+            thread_id = threadlist[0].get_thread_id()
+
+            feedback_services.create_message(
+                self.exploration.id, thread_id, self.editor_id, None, None,
+                'editor message')
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+
+    def test_that_email_is_sent_for_changing_status_of_thread(self):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name', self.user_id_a,
+                'a subject', 'A message')
+            # There are two jobs in the taskqueue: one for the realtime event
+            # associated with creating a thread, and one for sending the email.
+            self.assertEqual(self.count_jobs_in_taskqueue(), 2)
+            self.process_and_flush_pending_tasks()
+
+            threadlist = feedback_services.get_all_threads(
+                self.exploration.id, False)
+            thread_id = threadlist[0].get_thread_id()
+
+            feedback_services.create_message(
+                self.exploration.id, thread_id, self.editor_id,
+                feedback_models.STATUS_CHOICES_FIXED, None, '')
+            # There are two jobs in the taskqueue: one for the realtime event
+            # associated with changing subject of thread, and one for sending
+            # the email.
+            self.assertEqual(self.count_jobs_in_taskqueue(), 2)
+            self.process_and_flush_pending_tasks()
+
+    def test_that_email_is_sent_for_each_feedback_message(self):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name', self.user_id_a,
+                'a subject', 'A message')
+            threadlist = feedback_services.get_all_threads(
+                self.exploration.id, False)
+            thread_id = threadlist[0].get_thread_id()
+            # There are two jobs in the taskqueue: one for the realtime event
+            # associated with creating a thread, and one for sending the email.
+            self.assertEqual(self.count_jobs_in_taskqueue(), 2)
+            self.process_and_flush_pending_tasks()
+
+            feedback_services.create_message(
+                self.exploration.id, thread_id, self.editor_id, None, None,
+                'editor message')
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+
+            feedback_services.create_message(
+                self.exploration.id, thread_id, self.editor_id, None, None,
+                'editor message2')
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+
+
+
+
+class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(FeedbackMessageBatchEmailHandlerTests, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+
+        self.exploration = self.save_new_default_exploration(
+            'A', self.editor_id, 'Title')
+        self.can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS', True)
+        self.can_send_feedback_email_ctx = self.swap(
+            feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+
+    def test_that_emails_are_sent(self):
+        expected_email_html_body = (
+            'Hi editor,<br>'
+            '<br>'
+            'You\'ve received 1 new message on your Oppia explorations:<br>'
+            '<ul><li>Title: some text<br></li></ul>'
+            'You can view and reply to your messages from your '
+            '<a href="https://www.oppia.org/dashboard">dashboard</a>.'
+            '<br>'
+            'Thanks, and happy teaching!<br>'
+            '<br>'
+            'Best wishes,<br>'
+            'The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_email_text_body = (
+            'Hi editor,\n'
+            '\n'
+            'You\'ve received 1 new message on your Oppia explorations:\n'
+            '- Title: some text\n'
+            'You can view and reply to your messages from your dashboard.'
+            '\n'
+            'Thanks, and happy teaching!\n'
+            '\n'
+            'Best wishes,\n'
+            'The Oppia Team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name',
+                self.new_user_id, 'a subject', 'some text')
+
+            threadlist = feedback_services.get_all_threads(
+                self.exploration.id, False)
+            thread_id = threadlist[0].get_thread_id()
+
+            messagelist = feedback_services.get_messages(
+                self.exploration.id, thread_id)
+            self.assertEqual(len(messagelist), 1)
+
+            self.process_and_flush_pending_tasks()
+
+            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(),
+                expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(),
+                expected_email_text_body)
+
+    def test_that_correct_emails_are_sent_for_multiple_feedback(self):
+        expected_email_html_body = (
+            'Hi editor,<br>'
+            '<br>'
+            'You\'ve received 1 new message on your Oppia explorations:<br>'
+            '<ul><li>Title: some text<br></li>'
+            '<li>Title: more text<br></li></ul>'
+            'You can view and reply to your messages from your '
+            '<a href="https://www.oppia.org/dashboard">dashboard</a>.'
+            '<br>'
+            'Thanks, and happy teaching!<br>'
+            '<br>'
+            'Best wishes,<br>'
+            'The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_email_text_body = (
+            'Hi editor,\n'
+            '\n'
+            'You\'ve received 1 new message on your Oppia explorations:\n'
+            '- Title: some text\n'
+            '- Title: more text\n'
+            'You can view and reply to your messages from your dashboard.'
+            '\n'
+            'Thanks, and happy teaching!\n'
+            '\n'
+            'Best wishes,\n'
+            'The Oppia Team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name',
+                self.new_user_id, 'a subject', 'some text')
+
+            threadlist = feedback_services.get_all_threads(
+                self.exploration.id, False)
+            thread_id = threadlist[0].get_thread_id()
+
+            feedback_services.create_message(
+                self.exploration.id, thread_id, self.new_user_id,
+                feedback_models.STATUS_CHOICES_OPEN, 'subject', 'more text')
+
+            messagelist = feedback_services.get_messages(
+                self.exploration.id, thread_id)
+            self.assertEqual(len(messagelist), 2)
+
+            self.process_and_flush_pending_tasks()
+
+            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(),
+                expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(),
+                expected_email_text_body)
+
+    def test_that_emails_are_not_sent_if_already_seen(self):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name',
+                self.new_user_id, 'a subject', 'some text')
+
+            threadlist = feedback_services.get_all_threads(
+                self.exploration.id, False)
+            thread_id = threadlist[0].get_thread_id()
+
+            self.login(self.EDITOR_EMAIL)
+            csrf_token = self.get_csrf_token_from_response(
+                self.testapp.get('/create/%s' % self.exploration.id))
+            self.post_json('%s' % feconf.FEEDBACK_THREAD_VIEW_EVENT_URL, {
+                'exploration_id': self.exploration.id,
+                'thread_id': thread_id}, csrf_token)
+
+            self.process_and_flush_pending_tasks()
+            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            self.assertEqual(len(messages), 0)
+
+
+class SuggestionEmailHandlerTest(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(SuggestionEmailHandlerTest, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+
+        self.exploration = self.save_new_default_exploration(
+            'A', self.editor_id, 'Title')
+        self.can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS', True)
+        self.can_send_feedback_email_ctx = self.swap(
+            feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+
+    def test_that_emails_are_sent(self):
+        expected_email_html_body = (
+            'Hi editor,<br>'
+            'newuser has submitted a new suggestion for your Oppia '
+            'exploration, '
+            '<a href="https://www.oppia.org/create/A">"Title"</a>.<br>'
+            'You can accept or reject this suggestion by visiting the '
+            '<a href="https://www.oppia.org/create/A#/feedback">'
+            'feedback page</a> '
+            'for your exploration.<br>'
+            '<br>'
+            'Thanks!<br>'
+            '- The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_email_text_body = (
+            'Hi editor,\n'
+            'newuser has submitted a new suggestion for your Oppia '
+            'exploration, "Title".\n'
+            'You can accept or reject this suggestion by visiting the '
+            'feedback page for your exploration.\n'
+            '\n'
+            'Thanks!\n'
+            '- The Oppia Team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_suggestion(
+                self.exploration.id, self.new_user_id, self.exploration.version,
+                'a state', 'simple description', {'content': {}})
+
+            self.process_and_flush_pending_tasks()
+
+            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(),
+                expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(),
+                expected_email_text_body)
+
+    def test_correct_email_is_sent_for_multiple_recipients(self):
+        rights_manager.assign_role_for_exploration(
+            self.editor_id, self.exploration.id, self.owner_id,
+            rights_manager.ROLE_OWNER)
+
+        expected_editor_email_html_body = (
+            'Hi editor,<br>'
+            'newuser has submitted a new suggestion for your Oppia '
+            'exploration, '
+            '<a href="https://www.oppia.org/create/A">"Title"</a>.<br>'
+            'You can accept or reject this suggestion by visiting the '
+            '<a href="https://www.oppia.org/create/A#/feedback">'
+            'feedback page</a> '
+            'for your exploration.<br>'
+            '<br>'
+            'Thanks!<br>'
+            '- The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_owner_email_html_body = (
+            'Hi owner,<br>'
+            'newuser has submitted a new suggestion for your Oppia '
+            'exploration, '
+            '<a href="https://www.oppia.org/create/A">"Title"</a>.<br>'
+            'You can accept or reject this suggestion by visiting the '
+            '<a href="https://www.oppia.org/create/A#/feedback">'
+            'feedback page</a> '
+            'for your exploration.<br>'
+            '<br>'
+            'Thanks!<br>'
+            '- The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_editor_email_text_body = (
+            'Hi editor,\n'
+            'newuser has submitted a new suggestion for your Oppia '
+            'exploration, "Title".\n'
+            'You can accept or reject this suggestion by visiting the '
+            'feedback page for your exploration.\n'
+            '\n'
+            'Thanks!\n'
+            '- The Oppia Team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+
+        expected_owner_email_text_body = (
+            'Hi owner,\n'
+            'newuser has submitted a new suggestion for your Oppia '
+            'exploration, "Title".\n'
+            'You can accept or reject this suggestion by visiting the '
+            'feedback page for your exploration.\n'
+            '\n'
+            'Thanks!\n'
+            '- The Oppia Team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_suggestion(
+                self.exploration.id, self.new_user_id, self.exploration.version,
+                'a state', 'simple description', {'content': {}})
+
+            self.process_and_flush_pending_tasks()
+
+            editor_messages = (
+                self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL))
+            self.assertEqual(len(editor_messages), 1)
+            self.assertEqual(
+                editor_messages[0].html.decode(),
+                expected_editor_email_html_body)
+            self.assertEqual(
+                editor_messages[0].body.decode(),
+                expected_editor_email_text_body)
+
+            owner_messages = (
+                self.mail_stub.get_sent_messages(to=self.OWNER_EMAIL))
+            self.assertEqual(len(owner_messages), 1)
+            self.assertEqual(
+                owner_messages[0].html.decode(),
+                expected_owner_email_html_body)
+            self.assertEqual(
+                owner_messages[0].body.decode(),
+                expected_owner_email_text_body)
+
+
+class FeedbackMessageInstantEmailHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(FeedbackMessageInstantEmailHandlerTests, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+
+        self.exploration = self.save_new_default_exploration(
+            'A', self.editor_id, 'Title')
+        self.can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS', True)
+        self.can_send_feedback_email_ctx = self.swap(
+            feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+
+    def test_that_emails_are_sent_for_feedback_message(self):
+        expected_email_html_body = (
+            'Hi newuser,<br><br>'
+            'New update to thread "a subject" on '
+            '<a href="https://www.oppia.org/A">Title</a>:<br>'
+            '<ul><li>editor: editor message<br></li></ul>'
+            '(You received this message because you are a '
+            'participant in this thread.)<br><br>'
+            'Best wishes,<br>'
+            'The Oppia team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_email_text_body = (
+            'Hi newuser,\n'
+            '\n'
+            'New update to thread "a subject" on Title:\n'
+            '- editor: editor message\n'
+            '(You received this message because you are a'
+            ' participant in this thread.)\n'
+            '\n'
+            'Best wishes,\n'
+            'The Oppia team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name',
+                self.new_user_id, 'a subject', 'some text')
+            self.process_and_flush_pending_tasks()
+
+            threadlist = feedback_services.get_all_threads(
+                self.exploration.id, False)
+            thread_id = threadlist[0].get_thread_id()
+
+            feedback_services.create_message(
+                self.exploration.id, thread_id, self.editor_id, None, None,
+                'editor message')
+            self.process_and_flush_pending_tasks()
+
+            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(),
+                expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(),
+                expected_email_text_body)
+
+    def test_that_emails_are_sent_for_status_change(self):
+        expected_email_html_body = (
+            'Hi newuser,<br><br>'
+            'New update to thread "a subject" on '
+            '<a href="https://www.oppia.org/A">Title</a>:<br>'
+            '<ul><li>editor: changed status from open to fixed<br></li></ul>'
+            '(You received this message because you are a '
+            'participant in this thread.)<br><br>'
+            'Best wishes,<br>'
+            'The Oppia team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_email_text_body = (
+            'Hi newuser,\n'
+            '\n'
+            'New update to thread "a subject" on Title:\n'
+            '- editor: changed status from open to fixed\n'
+            '(You received this message because you are a'
+            ' participant in this thread.)\n'
+            '\n'
+            'Best wishes,\n'
+            'The Oppia team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name',
+                self.new_user_id, 'a subject', 'some text')
+            self.process_and_flush_pending_tasks()
+
+            threadlist = feedback_services.get_all_threads(
+                self.exploration.id, False)
+            thread_id = threadlist[0].get_thread_id()
+
+            feedback_services.create_message(
+                self.exploration.id, thread_id, self.editor_id,
+                feedback_models.STATUS_CHOICES_FIXED, None, '')
+            self.process_and_flush_pending_tasks()
+
+            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(),
+                expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(),
+                expected_email_text_body)
+
+    def test_that_emails_are_sent_for_both_status_change_and_message(self):
+        expected_email_html_body_message = (
+            'Hi newuser,<br><br>'
+            'New update to thread "a subject" on '
+            '<a href="https://www.oppia.org/A">Title</a>:<br>'
+            '<ul><li>editor: editor message<br></li></ul>'
+            '(You received this message because you are a '
+            'participant in this thread.)<br><br>'
+            'Best wishes,<br>'
+            'The Oppia team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_email_text_body_message = (
+            'Hi newuser,\n'
+            '\n'
+            'New update to thread "a subject" on Title:\n'
+            '- editor: editor message\n'
+            '(You received this message because you are a'
+            ' participant in this thread.)\n'
+            '\n'
+            'Best wishes,\n'
+            'The Oppia team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+
+        expected_email_html_body_status = (
+            'Hi newuser,<br><br>'
+            'New update to thread "a subject" on '
+            '<a href="https://www.oppia.org/A">Title</a>:<br>'
+            '<ul><li>editor: changed status from open to fixed<br></li></ul>'
+            '(You received this message because you are a '
+            'participant in this thread.)<br><br>'
+            'Best wishes,<br>'
+            'The Oppia team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_email_text_body_status = (
+            'Hi newuser,\n'
+            '\n'
+            'New update to thread "a subject" on Title:\n'
+            '- editor: changed status from open to fixed\n'
+            '(You received this message because you are a'
+            ' participant in this thread.)\n'
+            '\n'
+            'Best wishes,\n'
+            'The Oppia team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name',
+                self.new_user_id, 'a subject', 'some text')
+            self.process_and_flush_pending_tasks()
+
+            threadlist = feedback_services.get_all_threads(
+                self.exploration.id, False)
+            thread_id = threadlist[0].get_thread_id()
+
+            feedback_services.create_message(
+                self.exploration.id, thread_id, self.editor_id,
+                feedback_models.STATUS_CHOICES_FIXED, None, 'editor message')
+            self.process_and_flush_pending_tasks()
+
+            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            self.assertEqual(len(messages), 2)
+            self.assertEqual(
+                messages[0].html.decode(),
+                expected_email_html_body_status)
+            self.assertEqual(
+                messages[0].body.decode(),
+                expected_email_text_body_status)
+            self.assertEqual(
+                messages[1].html.decode(),
+                expected_email_html_body_message)
+            self.assertEqual(
+                messages[1].body.decode(),
+                expected_email_text_body_message)

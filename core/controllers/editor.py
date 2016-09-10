@@ -192,9 +192,6 @@ class ExplorationPage(EditorHandler):
             rte_component_registry.Registry.get_html_for_all_components() +
             interaction_registry.Registry.get_interaction_html(
                 interaction_ids))
-        interaction_validators_html = (
-            interaction_registry.Registry.get_validators_html(
-                interaction_ids))
 
         gadget_types = gadget_registry.Registry.get_all_gadget_types()
         gadget_templates = (
@@ -234,8 +231,6 @@ class ExplorationPage(EditorHandler):
             'gadget_templates': jinja2.utils.Markup(gadget_templates),
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
-            'interaction_validators_html': jinja2.utils.Markup(
-                interaction_validators_html),
             'meta_description': feconf.CREATE_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_CREATE,
             'value_generators_js': jinja2.utils.Markup(
