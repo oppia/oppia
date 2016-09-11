@@ -40,6 +40,7 @@ SCHEMA_KEY_CHOICES = 'choices'
 SCHEMA_KEY_NAME = 'name'
 SCHEMA_KEY_SCHEMA = 'schema'
 SCHEMA_KEY_OBJ_TYPE = 'obj_type'
+SCHEMA_KEY_PLACEHOLDER_TEXT = 'placeholder_text'
 SCHEMA_KEY_VALIDATORS = 'validators'
 
 SCHEMA_TYPE_BOOL = 'bool'

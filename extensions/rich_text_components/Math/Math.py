@@ -32,6 +32,7 @@ class Math(base.BaseRichTextComponent):
         'schema': {
             'type': 'custom',
             'obj_type': 'MathLatexString',
+            'placeholder_text': '\\frac{x}{y}'
         },
-        'default_value': '\\frac{x}{y}'
+        'default_value': ''
     }]

@@ -33,6 +33,8 @@ SCHEMA_KEY_CHOICES = schema_utils.SCHEMA_KEY_CHOICES
 SCHEMA_KEY_NAME = schema_utils.SCHEMA_KEY_NAME
 SCHEMA_KEY_SCHEMA = schema_utils.SCHEMA_KEY_SCHEMA
 SCHEMA_KEY_OBJ_TYPE = schema_utils.SCHEMA_KEY_OBJ_TYPE
+if schema_utils.SCHEMA_KEY_PLACEHOLDER_TEXT:
+    SCHEMA_KEY_PLACEHOLDER_TEXT = schema_utils.SCHEMA_KEY_PLACEHOLDER_TEXT
 SCHEMA_KEY_VALIDATORS = schema_utils.SCHEMA_KEY_VALIDATORS
 SCHEMA_KEY_DESCRIPTION = 'description'
 SCHEMA_KEY_UI_CONFIG = 'ui_config'
@@ -233,7 +235,7 @@ def validate_schema(schema):
         _validate_dict_keys(
             schema,
             [SCHEMA_KEY_TYPE, SCHEMA_KEY_OBJ_TYPE],
-            [])
+            [SCHEMA_KEY_PLACEHOLDER_TEXT])
         assert schema[SCHEMA_KEY_OBJ_TYPE] in ALLOWED_CUSTOM_OBJ_TYPES, schema
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
         _validate_dict_keys(

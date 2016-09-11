@@ -7,10 +7,17 @@
 
 <div ng-if="active || alwaysEditable">
   <div>
-    <textarea ng-model="localValue.label"></textarea>
+    <textarea ng-model="localValue.label" placeholder="<[placeholderText]>"></textarea>
   </div>
-  Preview: <span mathjax-bind="localValue.label"></span>
+  Preview: <span ng-if="localValue.label" mathjax-bind="localValue.label"></span>
+           <span ng-if="!localValue.label" class="placeholder-text" mathjax-bind="placeholderText"></span>
   <button type="button" class="btn btn-default"  ng-if="!alwaysEditable" ng-click="replaceValue(localValue.label)">
     Close
   </button>
 </div>
+
+<style>
+  .placeholder-text {
+    color: #808080;
+  }
+</style>
