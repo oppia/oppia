@@ -208,7 +208,14 @@ oppia.directive('answerGroupEditor', [function() {
         };
 
         $scope.cancelActiveRuleEdit = function() {
-          $scope.rules.splice($scope.activeRuleIndex, 1);
+          if ($scope.rulesMemento !== null) {
+            $scope.rules.splice(0, $scope.rules.length);
+            for (var i = 0; i < $scope.rulesMemento.length; i++) {
+              $scope.rules.push($scope.rulesMemento[i]);
+            }
+          } else {
+            $scope.rules.splice($scope.activeRuleIndex, 1);
+          }
           $scope.saveRules();
         };
 
