@@ -237,7 +237,7 @@
                    ng-if="explorationStats[exploration.id].new_feedback.length !==0"
                    ng-show="activeSubDropdown === EXPLORATION_DROPDOWN_STATS.NEW_FEEDBACK || checkMobileView()">
                 <div ng-repeat="feedback in explorationStats[exploration.id].new_feedback">
-                  <[feedback.text | truncate: 100]> (by <[feedback.author_username]>)
+                  <[feedback.text | truncate: 100]> (by <[feedback.author_username || 'a learner']>)
                 </div>
               </div>
             </div>
