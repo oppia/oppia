@@ -51,6 +51,11 @@
 #
 # runs all tests in the core/controllers/ directory.
 #
+# (4) Enable the verbose log by add the argument. It will display the outputs of
+#   the tests being run.
+#
+#   --verbose or -v
+#
 # IMPORTANT: Only one of --test_path and --test_target should be specified.
 
 if [ -z "$BASH_VERSION" ]
