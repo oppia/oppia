@@ -73,6 +73,10 @@ oppia.controller('Dashboard', [
       $window.location = '/create/' + explorationId;
     };
 
+    $scope.showCollectionEditor = function(collectionId) {
+      $window.location = '/collection_editor/create/' + collectionId;
+    };
+
     $scope.myExplorationsView = 'card';
     $scope.setMyExplorationsView = function(viewType) {
       $scope.myExplorationsView = viewType;
