@@ -435,6 +435,36 @@ class Collection(object):
                 next_exp_ids.append(node.exploration_id)
         return next_exp_ids
 
+    def get_next_exploration_id_in_sequence(self, current_exploration):
+        collection_node = self.get_node(current_exploration)
+        leading_skills_p = [list(collection_node.acquired_skills)]
+        result1 = []
+        result2 = []
+        result3 = []
+
+        def get_leading_skills(child_node):
+            for node in self.nodes:
+                for skill in child_node.prerequisite_skills:
+                    if skill in node.acquired_skills:
+                        leading_skills_p[0] += node.prerequisite_skills
+                        get_leading_skills(node)
+        get_leading_skills(collection_node)
+        for node in self.nodes:
+            for prereq_skill in node.prerequisite_skills:
+                if prereq_skill in leading_skills_p[0]:
+                    if prereq_skill in collection_node.acquired_skills:
+                        result1.append(node.exploration_id)
+                    else:
+                        result2.append(node.exploration_id)
+                else:
+                    result3.append(node.exploration_id)
+        if result1:
+            return result1
+        if result2:
+            return result2
+        else:
+            return result3
+
     @classmethod
     def is_demo_collection_id(cls, collection_id):
         """Whether the collection id is that of a demo collection."""
