@@ -518,7 +518,7 @@ oppia.controller('EditorNavbarBreadcrumb', [
 ]);
 
 oppia.controller('ExplorationSaveAndPublishButtons', [
-  '$scope', '$http', '$rootScope', '$window', '$timeout', '$modal',
+  '$scope', '$http', '$rootScope', '$window', '$timeout', '$modal', '$log',
   'alertsService', 'changeListService', 'focusService', 'routerService',
   'explorationData', 'explorationRightsService', 'editabilityService',
   'explorationWarningsService', 'siteAnalyticsService',
@@ -528,7 +528,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
   'autosaveInfoModalsService', 'ExplorationDiffService',
   'explorationInitStateNameService',
   function(
-      $scope, $http, $rootScope, $window, $timeout, $modal,
+      $scope, $http, $rootScope, $window, $timeout, $modal, $log,
       alertsService, changeListService, focusService, routerService,
       explorationData, explorationRightsService, editabilityService,
       explorationWarningsService, siteAnalyticsService,
@@ -642,27 +642,31 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
           explorationData.explorationId);
       }
       $scope.isSaveInProgress = true;
-      explorationData.save(changeList, commitMessage, function(response) {
-        if (response.data.is_version_of_draft_valid === false &&
-            response.data.draft_changes !== null &&
-            response.data.draft_changes.length > 0) {
-          autosaveInfoModalsService.showVersionMismatchModal(changeList);
-          return;
+
+      explorationData.save(
+        changeList, commitMessage, function(isDraftVersionValid, draftChanges) {
+          if (isDraftVersionValid === false &&
+              draftChanges !== null &&
+              draftChanges.length > 0) {
+            autosaveInfoModalsService.showVersionMismatchModal(changeList);
+            return;
+          }
+          $log.info('Changes to this exploration were saved successfully.');
+          changeListService.discardAllChanges();
+          $rootScope.$broadcast('initExplorationPage');
+          $rootScope.$broadcast('refreshVersionHistory', {
+            forceRefresh: true
+          });
+          alertsService.addSuccessMessage('Changes saved.');
+          $scope.lastSaveOrDiscardAction = 'save';
+          $scope.isSaveInProgress = false;
+          if (successCallback) {
+            successCallback();
+          }
+        }, function() {
+          $scope.isSaveInProgress = false;
         }
-        changeListService.discardAllChanges();
-        $rootScope.$broadcast('initExplorationPage');
-        $rootScope.$broadcast('refreshVersionHistory', {
-          forceRefresh: true
-        });
-        alertsService.addSuccessMessage('Changes saved.');
-        $scope.lastSaveOrDiscardAction = 'save';
-        $scope.isSaveInProgress = false;
-        if (successCallback) {
-          successCallback();
-        }
-      }, function() {
-        $scope.isSaveInProgress = false;
-      });
+      );
     };
 
     var openPublishExplorationModal = function() {
