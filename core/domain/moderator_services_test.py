@@ -20,7 +20,7 @@ import feconf
 
 
 class FlagExplorationEmailEnqueueTaskTest(test_utils.GenericTestBase):
-    """Test that flag-exploration-email-tasks works as expected."""    
+    """Test that flag-exploration-email-tasks works as expected."""
 
     def setUp(self):
         super(FlagExplorationEmailEnqueueTaskTest, self).setUp()
