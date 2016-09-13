@@ -1421,7 +1421,7 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
 
             # Make sure correct email models are stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
-            all_models.sort(key = lambda x : x.recipient_id)
+            all_models.sort(key=lambda x: x.recipient_id)
             sent_email_model = all_models[0]
             self.assertEqual(
                 sent_email_model.subject, expected_email_subject)

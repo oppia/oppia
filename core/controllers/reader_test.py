@@ -401,7 +401,9 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_that_emails_are_sent(self):
-        """Check that emails are sent to moderaters when a logged-in user reports."""    
+        """Check that emails are sent to moderaters when a logged-in 
+        user reports.
+        """
 
         # Login and flag exploration.
         self.login(self.NEW_USER_EMAIL)

@@ -20,7 +20,6 @@ from core.controllers import base
 from core.domain import email_manager
 from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import moderator_services
 from core.domain import rights_manager
 from core.platform import models
 
