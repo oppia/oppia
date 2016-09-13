@@ -204,6 +204,7 @@ class DashboardHandler(base.BaseHandler):
                     'created_on': utils.get_time_in_millisecs(
                         collection_summary.collection_model_created_on),
                     'status': collection_summary.status,
+                    'node_count': collection_summary.node_count,
                     'community_owned': collection_summary.community_owned,
                     'thumbnail_icon_url': (
                         utils.get_thumbnail_icon_url_for_category(
