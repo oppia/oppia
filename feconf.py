@@ -600,7 +600,8 @@ SEARCH_DROPDOWN_CATEGORIES = sorted([
 ])
 
 # The header for the "Featured Activities" category in the library index page.
-LIBRARY_CATEGORY_FEATURED_ACTIVITIES = 'Featured Activities'
+LIBRARY_GROUP_FEATURED_ACTIVITIES_I18N_ID = \
+'I18N_LIBRARY_GROUPS_FEATURED_ACTIVITIES'
 # The header for the "Top Rated Explorations" category in the library index
 # page.
 LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = 'Top Rated Explorations'
