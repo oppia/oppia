@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2016 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,4 +33,4 @@ def enqueue_flag_exploration_email_task(exploration_id, report_text,
 
     # Email about flagged explorations are sent immediately to moderators.
     taskqueue_services.enqueue_task(
-        feconf.FLAG_EXPLORATION_EMAIL_HANDLER_URL, payload, 0)
+        feconf.TASK_URL_FLAG_EXPLORATION_EMAILS, payload, 0)

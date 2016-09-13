@@ -181,13 +181,7 @@ oppia.controller('Preferences', [
       }
     );
 
-    $scope.SITE_LANGUAGE_CHOICES = [];
-    for (var languageKey in GLOBALS.SUPPORTED_SITE_LANGUAGES) {
-      $scope.SITE_LANGUAGE_CHOICES.push({
-        id: languageKey,
-        text: GLOBALS.SUPPORTED_SITE_LANGUAGES[languageKey]
-      });
-    }
+    $scope.SITE_LANGUAGE_CHOICES = GLOBALS.SUPPORTED_SITE_LANGUAGES;
 
     $scope.hasPageLoaded = false;
     $http.get(_PREFERENCES_DATA_URL).then(function(response) {

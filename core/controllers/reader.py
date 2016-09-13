@@ -557,7 +557,6 @@ class RecommendationsHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-
 class FlagExplorationHandler(base.BaseHandler):
     """"Handles operations relating to learner flagging of explorations."""
 
@@ -568,20 +567,3 @@ class FlagExplorationHandler(base.BaseHandler):
             self.payload.get('report_text'),
             self.user_id)
         self.render_json(self.values)
-
-
-class FlagExplorationEmailHandler(base.BaseHandler):
-    """Handles task of sending emails about flagged explorations
-    to moderators.
-    """
-
-    def post(self):
-        payload = json.loads(self.request.body)
-        exploration_id = payload['exploration_id']
-        report_text = payload['report_text']
-        reporter_id = payload['reporter_id']
-
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-
-        email_manager.send_flag_exploration_email(
-            exploration.title, exploration_id, reporter_id, report_text)

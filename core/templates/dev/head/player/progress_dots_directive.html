@@ -38,11 +38,20 @@
     }
 
     .oppia-progress-dot {
+      position: relative;
       border-radius: 50%;
       float: left;
       height: 12px;
       margin-left: 10px;
       width: 12px;
+    }
+    .oppia-progress-dot:after {
+      content: "";
+      position: absolute;
+      top: -15px;
+      left: -5px;
+      right: -5px;
+      bottom: -10px;
     }
     .oppia-progress-dot-active {
       background-color: #fff;

@@ -93,6 +93,8 @@ class EmailRightsTest(test_utils.GenericTestBase):
 class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
     """Tests that sending exploration membership email works as expected."""
 
+    EXPLORATION_TITLE = 'Title'
+
     def setUp(self):
         super(ExplorationMembershipEmailTests, self).setUp()
 
@@ -103,10 +105,10 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
         self.exploration = self.save_new_default_exploration(
-            'A', self.editor_id, 'Title')
+            'A', self.editor_id, self.EXPLORATION_TITLE)
 
         self.expected_email_subject = (
-            'editor invited you to collaborate on Oppia.org')
+            '%s - invitation to collaborate') % self.EXPLORATION_TITLE
 
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
@@ -166,7 +168,8 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                '%s <%s>' % (
+                    self.EDITOR_USERNAME, feconf.NOREPLY_EMAIL_ADDRESS))
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION)
@@ -179,7 +182,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             'Hi newuser,<br>'
             '<br>'
             '<b>editor</b> has granted you manager rights to their '
-            'learning exploration, '
+            'exploration, '
             '"<a href="http://www.oppia.org/create/A">Title</a>", '
             'on Oppia.org.<br>'
             '<br>'
@@ -204,7 +207,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             'Hi newuser,\n'
             '\n'
             'editor has granted you manager rights to their '
-            'learning exploration, "Title", on Oppia.org.\n'
+            'exploration, "Title", on Oppia.org.\n'
             '\n'
             'This allows you to:\n'
             '- Change the exploration permissions\n'
@@ -240,7 +243,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             'Hi newuser,<br>'
             '<br>'
             '<b>editor</b> has granted you editor rights to their '
-            'learning exploration, '
+            'exploration, '
             '"<a href="http://www.oppia.org/create/A">Title</a>"'
             ', on Oppia.org.<br>'
             '<br>'
@@ -264,7 +267,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             'Hi newuser,\n'
             '\n'
             'editor has granted you editor rights to their '
-            'learning exploration, "Title", on Oppia.org.\n'
+            'exploration, "Title", on Oppia.org.\n'
             '\n'
             'This allows you to:\n'
             '- Edit the exploration\n'
@@ -299,7 +302,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             'Hi newuser,<br>'
             '<br>'
             '<b>editor</b> has granted you playtest access to their '
-            'learning exploration, '
+            'exploration, '
             '"<a href="http://www.oppia.org/create/A">Title</a>"'
             ', on Oppia.org.<br>'
             '<br>'
@@ -322,7 +325,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             'Hi newuser,\n'
             '\n'
             'editor has granted you playtest access to their '
-            'learning exploration, "Title", on Oppia.org.\n'
+            'exploration, "Title", on Oppia.org.\n'
             '\n'
             'This allows you to:\n'
             '- View and playtest the exploration\n'
@@ -1082,7 +1085,8 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, 'Title')
 
-        self.expected_email_subject = 'New messages on Oppia.'
+        self.expected_email_subject = (
+            'You\'ve received 1 new message on your explorations')
 
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
@@ -1093,7 +1097,7 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
         expected_email_html_body = (
             'Hi editor,<br>'
             '<br>'
-            'You have 1 new message(s) about your Oppia explorations:<br>'
+            'You\'ve received 1 new message on your Oppia explorations:<br>'
             '<ul><li>Title: A message<br></li></ul>'
             'You can view and reply to your messages from your '
             '<a href="https://www.oppia.org/dashboard">dashboard</a>.'
@@ -1109,7 +1113,7 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
         expected_email_text_body = (
             'Hi editor,\n'
             '\n'
-            'You have 1 new message(s) about your Oppia explorations:\n'
+            'You\'ve received 1 new message on your Oppia explorations:\n'
             '- Title: A message\n'
             'You can view and reply to your messages from your dashboard.'
             '\n'

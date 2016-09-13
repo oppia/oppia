@@ -518,7 +518,7 @@ oppia.controller('EditorNavbarBreadcrumb', [
 ]);
 
 oppia.controller('ExplorationSaveAndPublishButtons', [
-  '$scope', '$http', '$rootScope', '$window', '$timeout', '$modal',
+  '$scope', '$http', '$rootScope', '$window', '$timeout', '$modal', '$log',
   'alertsService', 'changeListService', 'focusService', 'routerService',
   'explorationData', 'explorationRightsService', 'editabilityService',
   'explorationWarningsService', 'siteAnalyticsService',
@@ -528,7 +528,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
   'autosaveInfoModalsService', 'ExplorationDiffService',
   'explorationInitStateNameService',
   function(
-      $scope, $http, $rootScope, $window, $timeout, $modal,
+      $scope, $http, $rootScope, $window, $timeout, $modal, $log,
       alertsService, changeListService, focusService, routerService,
       explorationData, explorationRightsService, editabilityService,
       explorationWarningsService, siteAnalyticsService,
@@ -641,23 +641,32 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         siteAnalyticsService.registerSavePlayableExplorationEvent(
           explorationData.explorationId);
       }
-
       $scope.isSaveInProgress = true;
-      explorationData.save(changeList, commitMessage, function() {
-        changeListService.discardAllChanges();
-        $rootScope.$broadcast('initExplorationPage');
-        $rootScope.$broadcast('refreshVersionHistory', {
-          forceRefresh: true
-        });
-        alertsService.addSuccessMessage('Changes saved.');
-        $scope.lastSaveOrDiscardAction = 'save';
-        $scope.isSaveInProgress = false;
-        if (successCallback) {
-          successCallback();
+
+      explorationData.save(
+        changeList, commitMessage, function(isDraftVersionValid, draftChanges) {
+          if (isDraftVersionValid === false &&
+              draftChanges !== null &&
+              draftChanges.length > 0) {
+            autosaveInfoModalsService.showVersionMismatchModal(changeList);
+            return;
+          }
+          $log.info('Changes to this exploration were saved successfully.');
+          changeListService.discardAllChanges();
+          $rootScope.$broadcast('initExplorationPage');
+          $rootScope.$broadcast('refreshVersionHistory', {
+            forceRefresh: true
+          });
+          alertsService.addSuccessMessage('Changes saved.');
+          $scope.lastSaveOrDiscardAction = 'save';
+          $scope.isSaveInProgress = false;
+          if (successCallback) {
+            successCallback();
+          }
+        }, function() {
+          $scope.isSaveInProgress = false;
         }
-      }, function() {
-        $scope.isSaveInProgress = false;
-      });
+      );
     };
 
     var openPublishExplorationModal = function() {
@@ -897,14 +906,6 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       }
 
       explorationData.getLastSavedData().then(function(data) {
-        explorationData.getData().then(function(currentData) {
-          if (data.version > currentData.version) {
-            autosaveInfoModalsService.showVersionMismatchModal(
-              changeListService.getChangeList());
-            return;
-          }
-        });
-
         var oldStates = data.states;
         var newStates = explorationStatesService.getStates();
         var diffGraphData = ExplorationDiffService.getDiffGraphData(
