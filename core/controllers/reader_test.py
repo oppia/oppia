@@ -365,6 +365,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
 
 
 class FlagExplorationHandlerTests(test_utils.GenericTestBase):
+    """Integrates tests for flagging an exploration"""
 
     EXP_ID = '0'
     REPORT_TEXT = 'AD'
@@ -396,19 +397,18 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
             objective='Test a spam exploration.')
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        exp_services._save_exploration(self.editor_id, exploration, '', [])  # pylint: disable=protected-access
         rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
         self.logout()
 
     def test_that_emails_are_sent(self):
+        """Check that emails are sent to moderaters when a logged-in user reports."""    
+
         # Login and flag exploration.
         self.login(self.NEW_USER_EMAIL)
 
         response = self.testapp.get('/explore/%s' % self.EXP_ID)
         csrf_token = self.get_csrf_token_from_response(response)
 
-        # Create report for exploration.
         self.post_json(
             '%s/%s' % (feconf.FLAG_EXPLORATION_URL_PREFIX, self.EXP_ID), {
                 'report_text': self.REPORT_TEXT,
@@ -457,17 +457,16 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
                 messages[0].body.decode(),
                 expected_email_text_body)
 
-    def test_that_emails_are_not_sent(self):
-        """
-        response = self.testapp.get('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+    def test_non_logged_in_users_cannot_report(self):
+        """Check that non-logged in users cannot report."""
+
+        self.login(self.NEW_USER_EMAIL)
+        csrf_token = self.get_csrf_token_from_response(
+            self.testapp.get('/explore/%s' % self.EXP_ID))
+        self.logout()
 
         # Create report for exploration.
         self.post_json(
             '%s/%s' % (feconf.FLAG_EXPLORATION_URL_PREFIX, self.EXP_ID), {
                 'report_text': self.REPORT_TEXT,
-            }, csrf_token)
-        self.assertRaisesRegexp(
-        Exception,
-            'User has to logged in to report.')
-        """
+            }, csrf_token, expected_status_int=401, expect_errors=True)

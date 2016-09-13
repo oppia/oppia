@@ -20,6 +20,8 @@ import feconf
 
 
 class FlagExplorationEmailEnqueueTaskTest(test_utils.GenericTestBase):
+    """Test that flag-exploration-email-tasks works as expected."""    
+
     def setUp(self):
         super(FlagExplorationEmailEnqueueTaskTest, self).setUp()
 
@@ -88,13 +90,3 @@ class FlagExplorationEmailEnqueueTaskTest(test_utils.GenericTestBase):
             self.assertEqual(
                 messages[0].body.decode(),
                 expected_email_text_body)
-
-    def test_emails_are_not_sent(self):
-        try:
-            moderator_services.enqueue_flag_exploration_email_task(
-                self.exploration.id, self.report_text, self.no_user)
-            self.assertFail()
-        except Exception as inst:
-            self.assertEqual(inst.message,
-                             'User has to be logged in to report.')
-

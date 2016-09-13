@@ -1329,6 +1329,8 @@ class FeedbackMessageInstantEmailTests(test_utils.GenericTestBase):
 
 
 class FlagExplorationEmailTest(test_utils.GenericTestBase):
+    """Test that emails are sent to moderators when explorations are flagged."""
+
     def setUp(self):
         super(FlagExplorationEmailTest, self).setUp()
 
@@ -1358,7 +1360,6 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
             feconf, 'CAN_SEND_EMAILS', True)
 
     def test_that_flag_exploration_emails_are_correct(self):
-
         expected_email_subject = 'Exploration flagged by user: "Title"'
 
         expected_email_html_body = (
@@ -1416,13 +1417,29 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
 
             # Make sure correct email models are stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
+            all_models.sort(key = lambda x : x.recipient_id)
             sent_email_model = all_models[0]
             self.assertEqual(
                 sent_email_model.subject, expected_email_subject)
-            #self.assertEqual(
-            #    sent_email_model.recipient_id, self.moderator_id)
-            #self.assertEqual(
-            #    sent_email_model.recipient_email, self.MODERATOR_EMAIL)
+            self.assertEqual(
+                sent_email_model.recipient_id, self.moderator_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.MODERATOR_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_REPORT_BAD_CONTENT)
+            sent_email_model = all_models[1]
+            self.assertEqual(
+                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(
+                sent_email_model.recipient_id, self.moderator2_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.moderator2_email)
             self.assertEqual(
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
