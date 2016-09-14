@@ -393,7 +393,9 @@ oppia.factory('expressionSyntaxTreeService', [
         eval: function(args) {
           verifyNumArgs(args, 2);
           var numericArgs = _coerceAllArgsToNumber(args);
-          return Math.log(numericArgs[0]) / Math.log(numericArgs[1]);
+          var preciseAns = Math.log(numericArgs[0]) / Math.log(numericArgs[1]);
+          // Round answer upto 9 decimal places
+          return Math.round(preciseAns * Math.pow(10, 9)) / Math.pow(10, 9);
         },
         getType: function(args) {
           verifyNumArgs(args, 2);
