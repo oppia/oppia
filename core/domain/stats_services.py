@@ -69,7 +69,7 @@ def get_exps_unresolved_answers_for_default_rule(exp_ids):
           }
         }
     """
-    def _get_explorations_state_tuples_by_ids(exp_ids):
+    def _get_explorations_states_tuples_by_ids(exp_ids):
         """Returns a list of all (exp_id, state_name) tuples for the given
         exp_ids.
         E.g. - [
@@ -78,16 +78,17 @@ def get_exps_unresolved_answers_for_default_rule(exp_ids):
           ('eid2', 'Introduction'),
           ('eid3', 'Introduction')
         ]
-        when exp_ids = ['eid1', 'eid2', 'eid3']."""
+        when exp_ids = ['eid1', 'eid2', 'eid3'].
+        """
         explorations = (
             exp_services.get_multiple_explorations_by_id(exp_ids, strict=False))
         return [
-            (exp_domain_object.id, state_key)
-            for exp_domain_object in explorations.values()
-            for state_key in exp_domain_object.states
+            (exploration.id, state_name)
+            for exploration in explorations.values()
+            for state_name in exploration.states
         ]
 
-    explorations_states_tuples = _get_explorations_state_tuples_by_ids(exp_ids)
+    explorations_states_tuples = _get_explorations_states_tuples_by_ids(exp_ids)
     exploration_states_answers_list = get_top_state_rule_answers_multi(
         explorations_states_tuples, [exp_domain.DEFAULT_RULESPEC_STR])
     exps_answers_mapping = {}

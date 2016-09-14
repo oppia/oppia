@@ -266,8 +266,8 @@ class NotificationsHandler(base.BaseHandler):
         })
 
 
-class ExplorationStats(base.BaseHandler):
-    """Returns the new feedback and unresolved answers for an exploration."""
+class ExplorationDashboardStatsHandler(base.BaseHandler):
+    """Returns the new feedback for an exploration."""
 
     @base.require_fully_signed_up
     def get(self):
@@ -275,7 +275,8 @@ class ExplorationStats(base.BaseHandler):
         self.render_json({
             'new_feedback': [
                 feedback_message.to_dict()
-                for feedback_message in feedback_services.get_messages_for_exp_id( # pylint: disable=line-too-long
+                for feedback_message in
+                feedback_services.get_messages_for_exp_id( # pylint: disable=line-too-long
                     self.request.get('exp_id'))]
         })
 

@@ -113,8 +113,8 @@ class FeedbackThreadModel(base_models.BaseModel):
 
     @classmethod
     def get_threads(cls, exploration_id):
-        """Returns threads ordered by last updated associated to the
-        exploration.
+        """Returns a list of threads associated to the exploration, ordered by
+        their last updated field.
 
         Does not include the deleted entries.
         """
