@@ -365,7 +365,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
 
 
 class FlagExplorationHandlerTests(test_utils.GenericTestBase):
-    """Integrates tests for flagging an exploration"""
+    """Backend integration tests for flagging an exploration."""
 
     EXP_ID = '0'
     REPORT_TEXT = 'AD'
@@ -420,13 +420,13 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
 
         expected_email_html_body = (
             'Hello Moderator,<br>'
-            'newuser has submitted a new report on the exploration '
-            'Welcome to Oppia!'
-            ' on the grounds of: <br>'
+            'newuser has flagged exploration '
+            '"Welcome to Oppia!"'
+            ' on the following grounds: <br>'
             'AD .<br>'
             'You can modify the exploration by clicking '
             '<a href="https://www.oppia.org/create/0">'
-            '"here"</a>.<br>'
+            'here</a>.<br>'
             '<br>'
             'Thanks!<br>'
             '- The Oppia Team<br>'
@@ -436,11 +436,11 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
 
         expected_email_text_body = (
             'Hello Moderator,\n'
-            'newuser has submitted a new report on the exploration '
-            'Welcome to Oppia!'
-            ' on the grounds of: \n'
+            'newuser has flagged exploration '
+            '"Welcome to Oppia!"'
+            ' on the following grounds: \n'
             'AD .\n'
-            'You can modify the exploration by clicking "here".\n'
+            'You can modify the exploration by clicking here.\n'
             '\n'
             'Thanks!\n'
             '- The Oppia Team\n'

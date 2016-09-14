@@ -50,12 +50,12 @@ class FlagExplorationEmailEnqueueTaskTest(test_utils.GenericTestBase):
 
         expected_email_html_body = (
             'Hello Moderator,<br>'
-            'newuser has submitted a new report on the exploration Title'
-            ' on the grounds of: <br>'
+            'newuser has flagged exploration "Title" on the following '
+            'grounds: <br>'
             'AD .<br>'
             'You can modify the exploration by clicking '
             '<a href="https://www.oppia.org/create/A">'
-            '"here"</a>.<br>'
+            'here</a>.<br>'
             '<br>'
             'Thanks!<br>'
             '- The Oppia Team<br>'
@@ -65,10 +65,10 @@ class FlagExplorationEmailEnqueueTaskTest(test_utils.GenericTestBase):
 
         expected_email_text_body = (
             'Hello Moderator,\n'
-            'newuser has submitted a new report on the exploration Title'
-            ' on the grounds of: \n'
+            'newuser has flagged exploration "Title" on the following '
+            'grounds: \n'
             'AD .\n'
-            'You can modify the exploration by clicking "here".\n'
+            'You can modify the exploration by clicking here.\n'
             '\n'
             'Thanks!\n'
             '- The Oppia Team\n'
@@ -81,7 +81,7 @@ class FlagExplorationEmailEnqueueTaskTest(test_utils.GenericTestBase):
 
             self.process_and_flush_pending_tasks()
 
-            # make sure correct email is sent.
+            # Make sure correct email is sent.
             messages = self.mail_stub.get_sent_messages(to=self.MODERATOR_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(

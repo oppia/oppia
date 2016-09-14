@@ -518,11 +518,11 @@ def send_flag_exploration_email(
 
     email_body_template = (
         'Hello Moderator,<br>'
-        '%s has submitted a new report on the exploration %s on '
-        'the grounds of: <br>'
+        '%s has flagged exploration "%s" on the following '
+        'grounds: <br>'
         '%s .<br>'
         'You can modify the exploration by clicking '
-        '<a href="https://www.oppia.org/create/%s">"here"</a>.<br>'
+        '<a href="https://www.oppia.org/create/%s">here</a>.<br>'
         '<br>'
         'Thanks!<br>'
         '- The Oppia Team<br>'

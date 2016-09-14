@@ -557,7 +557,7 @@ class RecommendationsHandler(base.BaseHandler):
 
 
 class FlagExplorationHandler(base.BaseHandler):
-    """"Handles operations relating to learner flagging of explorations."""
+    """Handles operations relating to learner flagging of explorations."""
 
     @base.require_user
     def post(self, exploration_id):
