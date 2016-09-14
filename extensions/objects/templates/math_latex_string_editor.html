@@ -7,7 +7,7 @@
 
 <div ng-if="active || alwaysEditable">
   <div>
-    <textarea ng-model="localValue.label" placeholder="<[placeholderText]>"></textarea>
+    <textarea ng-model="localValue.label" placeholder="\frac{x}{y}"></textarea>
   </div>
   Preview: <span ng-if="localValue.label" mathjax-bind="localValue.label"></span>
            <span ng-if="!localValue.label" class="placeholder-text" mathjax-bind="placeholderText"></span>

@@ -1734,8 +1734,7 @@ oppia.directive('schemaBasedCustomEditor', [
       scope: {
         localValue: '=',
         // The class of the object being edited.
-        objType: '=',
-        placeholderText: '='
+        objType: '='
       },
       templateUrl: 'schemaBasedEditor/custom',
       restrict: 'E',

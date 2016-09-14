@@ -25,8 +25,7 @@ oppia.directive('objectEditor', ['$compile', '$log', function($compile, $log) {
       initArgs: '=',
       isEditable: '@',
       objType: '@',
-      value: '=',
-      placeholderText: '@'
+      value: '='
     },
     link: function(scope, element) {
       // Converts a camel-cased string to a lower-case hyphen-separated string.

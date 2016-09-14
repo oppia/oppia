@@ -63,7 +63,7 @@
 
   <schema-based-custom-editor ng-if="schema().type === 'custom' && !schema().choices"
                               obj-type="schema().obj_type" local-value="$parent.localValue"
-                              is-disabled="isDisabled()" placeholder-text="schema().placeholder_text">
+                              is-disabled="isDisabled()">
   </schema-based-custom-editor>
 </script>
 
@@ -277,7 +277,7 @@
 </script>
 
 <script type="text/ng-template" id="schemaBasedEditor/custom">
-  <object-editor obj-type="<[objType]>" value="$parent.$parent.localValue" always-editable="true" placeholder-text="<[placeholderText]>">
+  <object-editor obj-type="<[objType]>" value="$parent.$parent.localValue" always-editable="true">
   </object-editor>
 </script>
 
