@@ -29,7 +29,8 @@ class SplashPage(base.BaseHandler):
         """Handles GET requests."""
         c_value = self.request.get('c')
         if not c_value:
-            c_value = 's%d' % random.randrange(5)
+            # We only show s3 and s4.
+            c_value = 's%d' % (3 + random.randrange(2))
             self.redirect('/splash?c=%s' % c_value)
 
         self.values.update({

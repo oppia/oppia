@@ -388,6 +388,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<exploration_id>' % feconf.SUGGESTION_URL_PREFIX,
         feedback.SuggestionHandler, 'suggestion_handler'),
     get_redirect_route(
+        r'%s/<exploration_id>' % feconf.FLAG_EXPLORATION_URL_PREFIX,
+        reader.FlagExplorationHandler, 'flag_exploration_handler'),
+    get_redirect_route(
         r'%s/<exploration_id>/<thread_id>' %
         feconf.SUGGESTION_ACTION_URL_PREFIX,
         feedback.SuggestionActionHandler, 'suggestion_action_handler'),
