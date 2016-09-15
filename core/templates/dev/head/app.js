@@ -453,6 +453,13 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
       _sendEventToGoogleAnalytics(
         'BrowseLibraryButton', 'click', $window.location.pathname);
     },
+    registerGoToDonationSiteEvent: function(donationSiteName) {
+      _sendEventToGoogleAnalytics(
+        'GoToDonationSite', 'click', donationSiteName);
+    },
+    registerApplyToTeachWithOppiaEvent: function() {
+      _sendEventToGoogleAnalytics('ApplyToTeachWithOppia', 'click', '');
+    },
     registerClickCreateExplorationButtonEvent: function() {
       _sendEventToGoogleAnalytics(
         'CreateExplorationButton', 'click', $window.location.pathname);
@@ -606,6 +613,19 @@ oppia.factory('oppiaDebouncer', [function() {
   };
 }]);
 
+// Shim service for functions on $window that allows these functions to be
+// mocked in unit tests.
+oppia.factory('currentLocationService', ['$window', function($window) {
+  return {
+    getHash: function() {
+      return $window.location.hash;
+    },
+    getPathname: function() {
+      return $window.location.pathname;
+    }
+  };
+}]);
+
 // Service for assembling extension tags (for gadgets and interactions).
 oppia.factory('extensionTagAssemblerService', [
     '$filter', 'oppiaHtmlEscaper', function($filter, oppiaHtmlEscaper) {
@@ -660,48 +680,6 @@ oppia.factory('codeNormalizationService', [function() {
   };
   var removeIntermediateWhitespace = function(str) {
     return str.replace(/\s+/g, ' ');
-  };
-  var normalizeCaseInStrings = function(str) {
-    // Note that this only takes into account single-line strings. It also
-    // tries to properly account for escaped characters.
-    var inSingleQuotedString = false;
-    var inDoubleQuotedString = false;
-    var answer = '';
-    for (var i = 0; i < str.length; i++) {
-      if (str[i] === '\\') {
-        answer += str[i];
-        i++;
-        if (i < str.length) {
-          answer += str[i];
-        }
-      } else if (inSingleQuotedString) {
-        answer += str[i].toLowerCase();
-        if (str[i] === '\'') {
-          inSingleQuotedString = false;
-        }
-      } else if (inDoubleQuotedString) {
-        answer += str[i].toLowerCase();
-        if (str[i] === '"') {
-          inDoubleQuotedString = false;
-        }
-      } else {
-        if (str[i] === '\'') {
-          inSingleQuotedString = true;
-        } else if (str[i] === '"') {
-          inDoubleQuotedString = true;
-        }
-
-        answer += str[i];
-      }
-    }
-
-    // If the string is invalid (with regards to quotation marks), just return
-    // it without normalization.
-    if (inSingleQuotedString || inDoubleQuotedString) {
-      answer = str;
-    }
-
-    return answer;
   };
   return {
     getNormalizedCode: function(codeString) {
@@ -773,8 +751,8 @@ oppia.factory('codeNormalizationService', [function() {
         for (var i = 0; i < numSpacesToDesiredIndentLevel[numSpaces]; i++) {
           normalizedLine += FOUR_SPACES;
         }
-        normalizedLine += normalizeCaseInStrings(removeIntermediateWhitespace(
-          removeLeadingWhitespace(line)));
+        normalizedLine += removeIntermediateWhitespace(
+          removeLeadingWhitespace(line));
         normalizedCodeLines.push(normalizedLine);
       });
       return normalizedCodeLines.join('\n');

@@ -26,8 +26,6 @@ from jinja2 import meta
 import utils # pylint: disable=relative-import
 
 
-_OPPIA_MODULE_DEFINITION_FILE = 'app.js'
-
 def _js_string_filter(value):
     """Converts a value to a JSON string for use in JavaScript code."""
     string = json.dumps(value)
@@ -59,17 +57,6 @@ def get_jinja_env(dir_path):
         os.path.dirname(__file__), dir_path))
     env = jinja2.Environment(autoescape=True, loader=loader)
 
-    def include_js_file(filepath):
-        """Include a raw JS file in the template without evaluating it."""
-        assert filepath.endswith('.js')
-        raw_file_contents = loader.get_source(env, filepath)[0]
-        if filepath == _OPPIA_MODULE_DEFINITION_FILE:
-            return jinja2.Markup(raw_file_contents)
-        else:
-            # Wrap the file in an immediately-invoked function expression
-            # (IIFE) to prevent pollution of the global scope.
-            return jinja2.Markup('(function() {%s})();' % raw_file_contents)
-
     def get_static_resource_url(resource_suffix):
         """Returns the relative path for the resource, appending it to the
         corresponding cache slug. resource_suffix should have a leading
@@ -85,7 +72,6 @@ def get_jinja_env(dir_path):
         return '%s%s%s' % (
             domain_url, utils.get_asset_dir_prefix(), resource_suffix)
 
-    env.globals['include_js_file'] = include_js_file
     env.globals['get_static_resource_url'] = get_static_resource_url
     env.globals['get_complete_static_resource_url'] = (
         get_complete_static_resource_url)

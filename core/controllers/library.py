@@ -34,11 +34,18 @@ current_user_services = models.Registry.import_current_user_services()
 
 def get_matching_activity_dicts(query_string, search_cursor):
     """Given a query string and a search cursor, returns a list of activity
-       dicts that satisfy the search query.
+    dicts that satisfy the search query.
     """
-    collection_ids, search_cursor = (
-        collection_services.get_collection_ids_matching_query(
-            query_string, cursor=search_cursor))
+    # We only populate collections in the initial load, since the current
+    # frontend search infrastructure is set up to only deal with one search
+    # cursor at a time.
+    # TODO(sll): Remove this special casing.
+    collection_ids = []
+    if not search_cursor:
+        collection_ids, _ = (
+            collection_services.get_collection_ids_matching_query(
+                query_string))
+
     exp_ids, new_search_cursor = (
         exp_services.get_exploration_ids_matching_query(
             query_string, cursor=search_cursor))

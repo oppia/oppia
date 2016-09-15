@@ -27,9 +27,7 @@ describe('Validators service', function() {
     }));
 
     it('should correctly validate entity names', function() {
-      GLOBALS = {
-        INVALID_NAME_CHARS: 'xyz'
-      };
+      GLOBALS.INVALID_NAME_CHARS = 'xyz';
 
       expect(vs.isValidEntityName('b')).toBe(true);
       expect(vs.isValidEntityName('b   ')).toBe(true);
@@ -44,9 +42,7 @@ describe('Validators service', function() {
     });
 
     it('should correctly validate exploration titles', function() {
-      GLOBALS = {
-        INVALID_NAME_CHARS: '#'
-      };
+      GLOBALS.INVALID_NAME_CHARS = '#';
 
       expect(vs.isValidExplorationTitle('b')).toBe(true);
       expect(vs.isValidExplorationTitle('abc def')).toBe(true);
@@ -234,26 +230,6 @@ describe('Code Normalization', function() {
       'abcdefg\n' +
       '    hij klm\n' +
       '    ab "cde fgh"'
-    );
-  });
-
-  it('should be case-insensitive within a string but not outside', function() {
-    expect(cns.getNormalizedCode(
-      'abcdefg\n' +
-      '    ABcDe \'HiJkL\'\n' +
-      '    "HiJkL    MNopq  " ABcDe\n' +
-      '    "AbC@\\"DeF7"  GhI# \'JkL-\\\'MnO3\'\n' +
-      '    \'not a Real String\n' +
-      '    """another Unreal String\n' +
-      '    \'a legit " STRING\' now outsiDe string'
-    )).toBe(
-      'abcdefg\n' +
-      '    ABcDe \'hijkl\'\n' +
-      '    "hijkl mnopq " ABcDe\n' +
-      '    "abc@\\"def7" GhI# \'jkl-\\\'mno3\'\n' +
-      '    \'not a Real String\n' +
-      '    """another Unreal String\n' +
-      '    \'a legit " string\' now outsiDe string'
     );
   });
 });

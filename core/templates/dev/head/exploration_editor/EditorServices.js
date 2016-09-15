@@ -134,10 +134,11 @@ oppia.factory('explorationData', [
           version: explorationData.data.version
         }).then(function(response) {
           alertsService.clearWarnings();
-          $log.info('Changes to this exploration were saved successfully.');
           explorationData.data = response.data;
           if (successCallback) {
-            successCallback();
+            successCallback(
+              response.data.is_version_of_draft_valid,
+              response.data.draft_changes);
           }
         }, function() {
           if (errorCallback) {
@@ -1726,13 +1727,14 @@ oppia.factory('stateEditorTutorialFirstTimeService', [
 
     return {
       // After the first call to it in a client session, this does nothing.
-      init: function(firstTime) {
+      init: function(firstTime, expId) {
         if (!firstTime || !_currentlyInFirstVisit) {
           _currentlyInFirstVisit = false;
         }
 
         if (_currentlyInFirstVisit) {
           $rootScope.$broadcast('enterEditorForTheFirstTime');
+          editorFirstTimeEventsService.initRegisterEvents(expId);
           $http.post(STARTED_TUTORIAL_EVENT_URL).error(function() {
             console.error('Warning: could not record tutorial start event.');
           });
@@ -2396,9 +2398,7 @@ oppia.factory('editorFirstTimeEventsService', ['siteAnalyticsService',
     var alreadyRegisteredEvents = {};
     return {
       initRegisterEvents: function(expId) {
-        if (location.search.split('?')[1] === 'new') {
-          shouldRegisterEvents = true;
-        }
+        shouldRegisterEvents = true;
         explorationId = expId;
       },
       registerEditorFirstEntryEvent: function() {

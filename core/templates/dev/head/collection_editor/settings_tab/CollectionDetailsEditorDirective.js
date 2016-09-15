@@ -80,31 +80,16 @@ oppia.directive('collectionDetailsEditor', [function() {
         $scope.$on(EVENT_COLLECTION_REINITIALIZED, refreshSettingsTab);
 
         $scope.updateCollectionTitle = function() {
-          if (!$scope.displayedCollectionTitle) {
-            alertsService.addWarning(
-              'Please specify a title for the collection.');
-            return;
-          }
           CollectionUpdateService.setCollectionTitle(
             $scope.collection, $scope.displayedCollectionTitle);
         };
 
         $scope.updateCollectionObjective = function() {
-          if (!$scope.displayedCollectionObjective) {
-            alertsService.addWarning(
-              'Please specify a goal for the collection.');
-            return;
-          }
           CollectionUpdateService.setCollectionObjective(
             $scope.collection, $scope.displayedCollectionObjective);
         };
 
         $scope.updateCollectionCategory = function() {
-          if (!$scope.displayedCollectionCategory) {
-            alertsService.addWarning(
-              'Please specify a category for the collection.');
-            return;
-          }
           CollectionUpdateService.setCollectionCategory(
             $scope.collection, $scope.displayedCollectionCategory);
         };

@@ -24,7 +24,9 @@ oppia.directive('oppiaInteractiveCodeRepl', [
   function(oppiaHtmlEscaper, codeReplRulesService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        onSubmit: '&'
+      },
       templateUrl: 'interaction/CodeRepl',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.language = oppiaHtmlEscaper.escapedJsonToObj(
@@ -209,14 +211,17 @@ oppia.directive('oppiaInteractiveCodeRepl', [
         };
 
         $scope.sendResponse = function(evaluation, err) {
-          $scope.$parent.submitAnswer({
-            // Replace tabs with 2 spaces.
-            // TODO(sll): Change the default Python indentation to 4 spaces.
-            code: $scope.code.replace(/\t/g, '  ') || '',
-            output: $scope.output,
-            evaluation: $scope.evaluation,
-            error: (err || '')
-          }, codeReplRulesService);
+          $scope.onSubmit({
+            answer: {
+              // Replace tabs with 2 spaces.
+              // TODO(sll): Change the default Python indentation to 4 spaces.
+              code: $scope.code.replace(/\t/g, '  ') || '',
+              output: $scope.output,
+              evaluation: $scope.evaluation,
+              error: (err || '')
+            },
+            rulesService: codeReplRulesService
+          });
 
           // Without this, the error message displayed in the user-facing
           // console will sometimes not update.

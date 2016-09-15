@@ -257,6 +257,9 @@ body {
   min-height: 630px;
   padding: 30px;
   position: relative;
+  width: -webkit-calc(100% - 280px);
+  width: -moz-calc(100% - 280px);
+  width: -o-calc(100% - 280px);
   width: calc(100% - 280px);
 }
 
@@ -302,6 +305,9 @@ body {
     display: inline-block;
     float: left;
     margin-right: 20px;
+    width: -webkit-calc(80% - 70px);
+    width: -moz-calc(80% - 70px);
+    width: -o-calc(80% - 70px);
     width: calc(80% - 70px);
   }
   .oppia-profile-username-large-screen {
@@ -993,7 +999,9 @@ textarea {
 }
 
 .oppia-library-group-header-container {
-  width: 95%;
+  width: -webkit-calc(100% - 120px);
+  width: -moz-calc(100% - 120px);
+  width: -o-calc(100% - 120px);
   width: calc(100% - 120px);
   max-width: 928px;
   min-width: 315px;
@@ -1021,7 +1029,9 @@ textarea {
 
 @media(max-width: 720px) {
   .oppia-library-group-header {
-    width: 76%;
+    width: -webkit-calc(80% - 120px);
+    width: -moz-calc(80% - 120px);
+    width: -o-calc(80% - 120px);
     width: calc(80% - 120px);
   }
 }
@@ -1156,24 +1166,27 @@ textarea {
 
 .oppia-dashboard-tabs {
   border-bottom: 1px solid #eee;
+  display: -webkit-flex;
   display: flex;
   flex-wrap: wrap;
+  margin-bottom: 0;
   padding-left: 0;
   text-align: center;
-  margin-bottom: 0;
 }
 .oppia-dashboard-tabs li {
+  display: -webkit-flex;
   display: flex;
   margin-bottom: 0;
   width: 200px;
 }
+
 .oppia-dashboard-tabs-active .oppia-dashboard-tabs-text {
-  margin-left: 7.5px;
   border-bottom: 4px solid #009688;
   color: #009688;
+  margin-left: 7.5px;
 }
-.oppia-dashboard-tabs-text {
-  border-bottom: none;
+
+.oppia-dashboard-tabs .oppia-dashboard-tabs-text {
   color: #009688;
   font-size: 1em;
   padding: 10px;
@@ -1181,11 +1194,12 @@ textarea {
   text-transform: uppercase;
   width: 100%;
 }
-.oppia-dashboard-tabs-text:hover,
-.oppia-dashboard-tabs-text:focus {
-  color: #009688;
+
+.oppia-dashboard-tabs .oppia-dashboard-tabs-text:hover,
+.oppia-dashboard-tabs .oppia-dashboard-tabs-text:focus {
   text-decoration: none;
 }
+
 .oppia-dashboard-empty-text {
   padding-top: 50px;
 }
@@ -1219,6 +1233,35 @@ textarea {
 .list-card-view-toggle .dashboard-active-view {
   background: #009688;
   color: #fff;
+}
+
+li.sort-explorations-select {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: auto;
+}
+
+li.sort-explorations-select .sort-by-text,
+li.sort-explorations-select .sort-options,
+li.sort-explorations-select .sort-order {
+  display: inline-block;
+}
+
+li.sort-explorations-select .sort-by-text {
+  margin: 8px 8px 0 ;
+}
+
+li.sort-explorations-select .sort-options {
+  background: #fff;
+  border-color: #ddd;
+  height: 32px;
+  margin: 7px 7px 0 0;
+}
+
+li.sort-explorations-select .sort-order {
+  cursor: pointer;
+  margin: 14px 8px 0 0;
 }
 
 /* Rules for the tiles in the creator dashboard. */
@@ -2178,6 +2221,10 @@ md-card.oppia-dashboard-tile {
   color: #555;
 }
 
+.oppia-dashboard-table .oppia-dashboard-table-headings p {
+  display: inline;
+}
+
 .oppia-dashboard-table th {
   padding: 12px 3px;
 }
@@ -2701,18 +2748,15 @@ div#ng-curtain {
 
 .oppia-page-card {
   background: rgb(255,255,255);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   margin-left: auto;
   margin-right: auto;
-  margin-bottom: 30px;
+  margin-bottom: 80px;
   margin-top: 40px;
   padding: 30px 55px 30px 45px;
 }
 .oppia-page-card li {
   margin-bottom: 10px;
-}
-
-.oppia-notifications-tray {
-  margin-left: -8px;
 }
 
 .oppia-notifications-dashboard-card {
@@ -3306,7 +3350,16 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-splash-background-icon-row {
-  margin: 0 calc((100% - 2700px)/2);
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: -webkit-calc((100% - 2700px)/2);
+  margin-left: -moz-calc((100% - 2700px)/2);
+  margin-left: -o-calc((100% - 2700px)/2);
+  margin-left: calc((100% - 2700px)/2);
+  margin-right: -webkit-calc((100% - 2700px)/2);
+  margin-right: -moz-calc((100% - 2700px)/2);
+  margin-right: -o-calc((100% - 2700px)/2);
+  margin-right: calc((100% - 2700px)/2);
   position: relative;
   text-align: center;
   width: 2700px;
@@ -3363,12 +3416,18 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 @media (min-width: 768px) {
   .oppia-splash-button-browse {
+    left: -webkit-calc(50% - 200px);
+    left: -moz-calc(50% - 200px);
+    left: -o-calc(50% - 200px);
     left: calc(50% - 200px);
   }
   .oppia-splash-button-create {
     /* Need double math to prevent issues with addition after minification.
       https://github.com/yui/yuicompressor/issues/59#issuecomment-35528166
     */
+    left: -webkit-calc(50% - -200px);
+    left: -moz-calc(50% - -200px);
+    left: -o-calc(50% - -200px);
     left: calc(50% - -200px);
   }
 
@@ -3449,13 +3508,13 @@ md-card.preview-conversation-skin-supplemental-card {
     The margin setting is so that exploration summary tiles and collection
     summary tiles would be the same widths (214px).
   */
-  margin: 12px 7px;
+  margin: 12px 5.5px;
   padding: 0;
   position: relative;
   text-align: left;
   vertical-align: top;
   white-space: normal;
-  width: 200px;
+  width: 197px;
 }
 
 @media only screen and (max-width: 500px) {
@@ -3699,10 +3758,23 @@ md-card.preview-conversation-skin-supplemental-card {
   font-size: 16px;
 }
 
-@media(max-width: 500px) {
+@media(max-width: 815px) {
   .oppia-dashboard-container {
     padding-left: 10px;
     padding-right: 10px;
+  }
+
+  .oppia-dashboard-container .oppia-dashboard-tabs {
+    justify-content: center;
+  }
+
+  .oppia-dashboard-container .oppia-dashboard-tabs li {
+    width: auto;
+  }
+
+  .oppia-dashboard-container .oppia-dashboard-tabs .sort-explorations-select {
+    margin-top: 8px;
+    width: 100%;
   }
 
   .oppia-dashboard-container .oppia-dashboard-tabs .list-card-view-toggle,
@@ -3924,8 +3996,9 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-about-three-cols-layout {
   display: inline-block;
   margin-right: 20px;
-  /* This is a backup for browsers that do not support calc. */
-  width: 28%;
+  width: -webkit-calc((100% - 60px) / 3);
+  width: -moz-calc((100% - 60px) / 3);
+  width: -o-calc((100% - 60px) / 3);
   width: calc((100% - 60px) / 3);
 }
 
@@ -3977,14 +4050,19 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-about-tabs {
   border-bottom: 1px solid #eee;
+  display: -webkit-flex;
   display: flex;
   text-align: center;
   margin-bottom: 0;
 }
 
 .oppia-about-tabs li {
+  display: -webkit-flex;
   display: flex;
   margin-bottom: 0;
+  width: -webkit-calc(100% / 3);
+  width: -moz-calc(100% / 3);
+  width: -o-calc(100% / 3);
   width: calc(100% / 3);
 }
 
@@ -4012,7 +4090,10 @@ md-card.preview-conversation-skin-supplemental-card {
   width: 200px;
 }
 
-.oppia-about-teach-tabs ul li{
+.oppia-about-teach-tabs ul li {
+  width: -webkit-calc(100% / 2);
+  width: -moz-calc(100% / 2);
+  width: -o-calc(100% / 2);
   width: calc(100% / 2);
 }
 
@@ -4058,6 +4139,10 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-donate-info {
   float: left;
+  padding-bottom: 30px;
+  width: -webkit-calc(100% - 340px);
+  width: -moz-calc(100% - 340px);
+  width: -o-calc(100% - 340px);
   width: calc(100% - 340px);
 }
 
@@ -4066,7 +4151,7 @@ md-card.preview-conversation-skin-supplemental-card {
   display: block;
   float: right;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  padding: 10px;
+  padding: 10px 10px 35px 10px;
   width: 340px;
 }
 

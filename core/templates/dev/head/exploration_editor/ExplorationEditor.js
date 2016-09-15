@@ -36,7 +36,6 @@ oppia.controller('ExplorationEditor', [
   'explorationWarningsService', '$templateCache', 'explorationContextService',
   'explorationAdvancedFeaturesService', '$modal', 'changeListService',
   'autosaveInfoModalsService', 'siteAnalyticsService',
-  'editorFirstTimeEventsService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       explorationData, editorContextService, explorationTitleService,
@@ -48,8 +47,7 @@ oppia.controller('ExplorationEditor', [
       explorationParamSpecsService, explorationParamChangesService,
       explorationWarningsService, $templateCache, explorationContextService,
       explorationAdvancedFeaturesService, $modal, changeListService,
-      autosaveInfoModalsService, siteAnalyticsService,
-      editorFirstTimeEventsService) {
+      autosaveInfoModalsService, siteAnalyticsService) {
     $scope.editabilityService = editabilityService;
     $scope.editorContextService = editorContextService;
 
@@ -177,7 +175,7 @@ oppia.controller('ExplorationEditor', [
         }
 
         stateEditorTutorialFirstTimeService.init(
-          data.show_state_editor_tutorial_on_load);
+          data.show_state_editor_tutorial_on_load, $scope.explorationId);
       });
     };
 
@@ -186,8 +184,6 @@ oppia.controller('ExplorationEditor', [
     $scope.$on('initExplorationPage', function(unusedEvtData, successCallback) {
       $scope.initExplorationPage(successCallback);
     });
-
-    editorFirstTimeEventsService.initRegisterEvents($scope.explorationId);
 
     var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
     var _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
@@ -522,7 +518,7 @@ oppia.controller('EditorNavbarBreadcrumb', [
 ]);
 
 oppia.controller('ExplorationSaveAndPublishButtons', [
-  '$scope', '$http', '$rootScope', '$window', '$timeout', '$modal',
+  '$scope', '$http', '$rootScope', '$window', '$timeout', '$modal', '$log',
   'alertsService', 'changeListService', 'focusService', 'routerService',
   'explorationData', 'explorationRightsService', 'editabilityService',
   'explorationWarningsService', 'siteAnalyticsService',
@@ -532,7 +528,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
   'autosaveInfoModalsService', 'ExplorationDiffService',
   'explorationInitStateNameService',
   function(
-      $scope, $http, $rootScope, $window, $timeout, $modal,
+      $scope, $http, $rootScope, $window, $timeout, $modal, $log,
       alertsService, changeListService, focusService, routerService,
       explorationData, explorationRightsService, editabilityService,
       explorationWarningsService, siteAnalyticsService,
@@ -645,23 +641,32 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         siteAnalyticsService.registerSavePlayableExplorationEvent(
           explorationData.explorationId);
       }
-
       $scope.isSaveInProgress = true;
-      explorationData.save(changeList, commitMessage, function() {
-        changeListService.discardAllChanges();
-        $rootScope.$broadcast('initExplorationPage');
-        $rootScope.$broadcast('refreshVersionHistory', {
-          forceRefresh: true
-        });
-        alertsService.addSuccessMessage('Changes saved.');
-        $scope.lastSaveOrDiscardAction = 'save';
-        $scope.isSaveInProgress = false;
-        if (successCallback) {
-          successCallback();
+
+      explorationData.save(
+        changeList, commitMessage, function(isDraftVersionValid, draftChanges) {
+          if (isDraftVersionValid === false &&
+              draftChanges !== null &&
+              draftChanges.length > 0) {
+            autosaveInfoModalsService.showVersionMismatchModal(changeList);
+            return;
+          }
+          $log.info('Changes to this exploration were saved successfully.');
+          changeListService.discardAllChanges();
+          $rootScope.$broadcast('initExplorationPage');
+          $rootScope.$broadcast('refreshVersionHistory', {
+            forceRefresh: true
+          });
+          alertsService.addSuccessMessage('Changes saved.');
+          $scope.lastSaveOrDiscardAction = 'save';
+          $scope.isSaveInProgress = false;
+          if (successCallback) {
+            successCallback();
+          }
+        }, function() {
+          $scope.isSaveInProgress = false;
         }
-      }, function() {
-        $scope.isSaveInProgress = false;
-      });
+      );
     };
 
     var openPublishExplorationModal = function() {
@@ -713,7 +718,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       if (additionalMetadataNeeded) {
         $modal.open({
           templateUrl: 'modals/addExplorationMetadata',
-          backdrop: true,
+          backdrop: 'static',
           controller: [
             '$scope', '$modalInstance', 'explorationObjectiveService',
             'explorationTitleService', 'explorationCategoryService',
@@ -729,6 +734,9 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               $scope.explorationLanguageCodeService = (
                 explorationLanguageCodeService);
               $scope.explorationTagsService = explorationTagsService;
+
+              $scope.objectiveHasBeenPreviouslyEdited = (
+                explorationObjectiveService.savedMemento.length > 0);
 
               $scope.requireTitleToBeSpecified = (
                 !explorationTitleService.savedMemento);
@@ -832,6 +840,12 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               };
 
               $scope.cancel = function() {
+                explorationTitleService.restoreFromMemento();
+                explorationObjectiveService.restoreFromMemento();
+                explorationCategoryService.restoreFromMemento();
+                explorationLanguageCodeService.restoreFromMemento();
+                explorationTagsService.restoreFromMemento();
+
                 $modalInstance.dismiss('cancel');
                 alertsService.clearWarnings();
               };
@@ -892,14 +906,6 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       }
 
       explorationData.getLastSavedData().then(function(data) {
-        explorationData.getData().then(function(currentData) {
-          if (data.version > currentData.version) {
-            autosaveInfoModalsService.showVersionMismatchModal(
-              changeListService.getChangeList());
-            return;
-          }
-        });
-
         var oldStates = data.states;
         var newStates = explorationStatesService.getStates();
         var diffGraphData = ExplorationDiffService.getDiffGraphData(
