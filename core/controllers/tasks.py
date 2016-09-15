@@ -1,4 +1,4 @@
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2016 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -132,3 +132,20 @@ class FeedbackThreadStatusChangeEmailHandler(base.BaseHandler):
         email_manager.send_instant_feedback_message_email(
             user_id, message.author_id, text, subject, exploration.title,
             reference_dict['exploration_id'], thread.subject)
+
+
+class FlagExplorationEmailHandler(base.BaseHandler):
+    """Handles task of sending emails about flagged explorations
+    to moderators.
+    """
+
+    def post(self):
+        payload = json.loads(self.request.body)
+        exploration_id = payload['exploration_id']
+        report_text = payload['report_text']
+        reporter_id = payload['reporter_id']
+
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+
+        email_manager.send_flag_exploration_email(
+            exploration.title, exploration_id, reporter_id, report_text)

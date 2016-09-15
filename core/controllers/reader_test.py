@@ -20,8 +20,8 @@ from core.controllers import reader
 from core.domain import classifier_services
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import rights_manager
 from core.domain import param_domain
+from core.domain import rights_manager
 from core.tests import test_utils
 import feconf
 import utils
@@ -362,3 +362,113 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
             ratings['overall_ratings'],
             {'1': 0, '2': 0, '3': 0, '4': 2, '5': 0})
         self.logout()
+
+
+class FlagExplorationHandlerTests(test_utils.GenericTestBase):
+    """Backend integration tests for flagging an exploration."""
+
+    EXP_ID = '0'
+    REPORT_TEXT = 'AD'
+
+    def setUp(self):
+        super(FlagExplorationHandlerTests, self).setUp()
+
+        # Register users.
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
+
+        # Load exploration 0.
+        exp_services.load_demo(self.EXP_ID)
+
+        # Login and create exploration.
+        self.login(self.EDITOR_EMAIL)
+
+        # Create exploration.
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.editor_id,
+            title='Welcome to Oppia!',
+            category='This is just a spam category',
+            objective='Test a spam exploration.')
+        self.can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS', True)
+        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
+        self.logout()
+
+    def test_that_emails_are_sent(self):
+        """Check that emails are sent to moderaters when a logged-in
+        user reports.
+        """
+
+        # Login and flag exploration.
+        self.login(self.NEW_USER_EMAIL)
+
+        response = self.testapp.get('/explore/%s' % self.EXP_ID)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        self.post_json(
+            '%s/%s' % (feconf.FLAG_EXPLORATION_URL_PREFIX, self.EXP_ID), {
+                'report_text': self.REPORT_TEXT,
+            }, csrf_token)
+
+        self.logout()
+
+        expected_email_html_body = (
+            'Hello Moderator,<br>'
+            'newuser has flagged exploration '
+            '"Welcome to Oppia!"'
+            ' on the following grounds: <br>'
+            'AD .<br>'
+            'You can modify the exploration by clicking '
+            '<a href="https://www.oppia.org/create/0">'
+            'here</a>.<br>'
+            '<br>'
+            'Thanks!<br>'
+            '- The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_email_text_body = (
+            'Hello Moderator,\n'
+            'newuser has flagged exploration '
+            '"Welcome to Oppia!"'
+            ' on the following grounds: \n'
+            'AD .\n'
+            'You can modify the exploration by clicking here.\n'
+            '\n'
+            'Thanks!\n'
+            '- The Oppia Team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+
+        with self.can_send_emails_ctx:
+            self.process_and_flush_pending_tasks()
+
+            messages = self.mail_stub.get_sent_messages(to=self.MODERATOR_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(),
+                expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(),
+                expected_email_text_body)
+
+    def test_non_logged_in_users_cannot_report(self):
+        """Check that non-logged in users cannot report."""
+
+        self.login(self.NEW_USER_EMAIL)
+        csrf_token = self.get_csrf_token_from_response(
+            self.testapp.get('/explore/%s' % self.EXP_ID))
+        self.logout()
+
+        # Create report for exploration.
+        self.post_json(
+            '%s/%s' % (feconf.FLAG_EXPLORATION_URL_PREFIX, self.EXP_ID), {
+                'report_text': self.REPORT_TEXT,
+            }, csrf_token, expected_status_int=401, expect_errors=True)

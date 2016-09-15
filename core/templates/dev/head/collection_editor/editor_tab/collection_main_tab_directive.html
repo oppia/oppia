@@ -1,6 +1,6 @@
 <script type="text/ng-template" id="inline/collection_main_tab_directive">
   <div ng-if="hasLoadedCollection()">
-    <div class="oppia-page-cards-container">
+    <div class="collection-editor-cards-container">
       <md-card class="oppia-page-card oppia-long-text">
         <!-- Collection node list graph -->
         <div class="collection-editor-node-list-container">
@@ -10,7 +10,9 @@
           <div ng-if="collection.getCollectionNodeCount() > 0">
             <div class="collection-editor-node-container"
                  ng-repeat="node in getLinearlySortedNodes() track by $index">
-              <collection-node-editor collection-node="node" linear-index="$index">
+              <collection-node-editor collection-node="node"
+                                      linear-index="$index"
+                                      ng-class="{true: 'collection-editor-last-node'} [$last]">
               </collection-node-editor>
 
               <div ng-if="!$last"
@@ -39,9 +41,19 @@
 </script>
 
 <style>
+  .collection-editor-cards-container {
+    margin: auto;
+    max-width: 898px;
+    position: relative;
+  }
+
+  .collection-editor-last-node {
+    margin-right: 20px;
+  }
+
   .collection-editor-node-list-container {
     background-color: white;
-    border: 1px solid #333;
+    border: 1px solid #BDBDBD;
     display: block;
     margin: 30px auto;
     min-width: 98%;
