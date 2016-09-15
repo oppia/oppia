@@ -15,6 +15,7 @@
 """Main package for URL routing for requests originating from the task queue."""
 
 # pylint: disable=relative-import
+
 from core.controllers import tasks
 from core.platform import models
 import feconf
@@ -35,6 +36,9 @@ URLS = [
         r'%s' % feconf.TASK_URL_SUGGESTION_EMAILS,
         tasks.SuggestionEmailHandler,
         'suggestion_email_task_handler'),
+    main.get_redirect_route(
+        r'%s' % feconf.TASK_URL_FLAG_EXPLORATION_EMAILS,
+        tasks.FlagExplorationEmailHandler, 'flag_exploration_email_handler'),
     main.get_redirect_route(
         r'%s' % feconf.TASK_URL_INSTANT_FEEDBACK_EMAILS,
         tasks.InstantFeedbackMessageEmailHandler,
