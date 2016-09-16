@@ -45,10 +45,7 @@ def update_featured_activity_references(featured_activity_references):
 
     Args:
         featured_activity_references: A list of ActivityReference domain
-            objectsrepresenting the full list of 'featured' activities.
-
-    Returns:
-        None
+            objects representing the full list of 'featured' activities.
 
     Raises:
          Exception: The input list of ActivityReference
