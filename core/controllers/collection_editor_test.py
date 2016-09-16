@@ -22,7 +22,6 @@ from core.tests import test_utils
 import feconf
 
 
-
 class BaseCollectionEditorControllerTest(test_utils.GenericTestBase):
 
     CAN_EDIT_STR = 'GLOBALS.canEdit = JSON.parse(\'true\');'
