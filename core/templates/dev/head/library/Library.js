@@ -65,11 +65,9 @@ oppia.controller('Library', [
       // Transforms the group names into translation ids
       $scope.leftmostCardIndices = [];
       for (i = 0; i < $scope.libraryGroups.length; i++) {
-        if ($scope.libraryGroups[i].show_view_all_button) {
-          $scope.leftmostCardIndices.push(0);
-          $scope.libraryGroups[i].translationId = i18nIdService.getLibraryId(
-            'groups', $scope.libraryGroups[i].header);
-        }
+        $scope.leftmostCardIndices.push(0);
+        $scope.libraryGroups[i].translationId = i18nIdService.getLibraryId(
+          'groups', $scope.libraryGroups[i].header);
       }
     });
 

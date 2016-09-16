@@ -343,7 +343,7 @@ def get_library_groups(language_codes):
             'header': group['header'],
             'categories': group['search_categories'],
             'activity_summary_dicts': summary_dicts,
-            'show_view_all_button': True,
+            'has_full_results_page': True,
         })
 
     return results
