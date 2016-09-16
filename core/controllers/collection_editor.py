@@ -95,7 +95,6 @@ class CollectionEditorHandler(base.BaseHandler):
 class CollectionEditorPage(CollectionEditorHandler):
     """The editor page for a single collection."""
 
-    # Require editor handles all edit permissions for a collection
     @require_editor
     def get(self, collection_id):
         """Handles GET requests."""
@@ -140,13 +139,9 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
                 'which is too old. Please reload the page and try again.'
                 % (collection_version, version_from_payload))
 
-    # Require editor handles all edit permissions for a collection
     @require_editor
     def get(self, collection_id):
         """Populates the data on the individual collection page."""
-
-        collection = (
-            collection_services.get_collection_by_id(collection_id))
 
         try:
             # Try to retrieve collection
@@ -158,21 +153,7 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
             raise self.PageNotFoundException(e)
 
         self.values.update({
-            'can_edit': True,
-            'can_unpublish': rights_manager.Actor(
-                self.user_id).can_unpublish(
-                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id),
-            'collection_id': collection.id,
-            'collection': collection_dict,
-            'is_private': rights_manager.is_collection_private(collection_id),
-            'nav_mode': feconf.NAV_MODE_CREATE,
-            'title': collection.title,
-            'SHOW_COLLECTION_NAVIGATION_TAB_HISTORY': (
-                feconf.SHOW_COLLECTION_NAVIGATION_TAB_HISTORY),
-            'SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK': (
-                feconf.SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK),
-            'SHOW_COLLECTION_NAVIGATION_TAB_STATS': (
-                feconf.SHOW_COLLECTION_NAVIGATION_TAB_STATS)
+            'collection': collection_dict
         })
 
         self.render_json(self.values)
@@ -202,11 +183,10 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
             summary_services.get_learner_collection_dict_by_id(
                 collection_id, self.user_id, allow_invalid_explorations=True))
 
-        # return updated collection
+        # Return updated collection.
         self.values.update({
-            'collection_id': collection.id,
-            'collection': collection_dict,
-            'title': collection.title})
+            'collection': collection_dict
+        })
 
         self.render_json(self.values)
 

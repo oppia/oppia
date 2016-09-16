@@ -93,7 +93,9 @@ class CollectionDataHandler(base.BaseHandler):
             raise self.PageNotFoundException(e)
 
         self.values.update({
-            'can_edit': False,
+            'can_edit': (
+                self.user_id and rights_manager.Actor(self.user_id).can_edit(
+                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id)),
             'collection': collection_dict,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),

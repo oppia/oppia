@@ -42,7 +42,7 @@ describe('Editable collection backend API service', function() {
         title: 'Collection Under Test',
         category: 'Test',
         objective: 'To pass',
-        schema_version: '1',
+        version: '1',
         nodes: [{
           exploration_id: '0',
           prerequisite_skills: [],
@@ -98,23 +98,26 @@ describe('Editable collection backend API service', function() {
     // Loading a collection the first time should fetch it from the backend.
     $httpBackend.expect('GET', '/collection_editor_handler/data/0').respond(
       sampleDataResults);
-    coll = EditableCollectionBackendApiService.fetchCollection('0');
-    $httpBackend.flush();
-    originalColl = angular.copy(coll);
 
-    sampleDataResults.collection.title = 'New Title';
-    sampleDataResults.collection.schema_version = '2';
+    var collectFunc = EditableCollectionBackendApiService.fetchCollection('0');
+    collectFunc.then(function(data) {
+      collection = data;
+    });
+    $httpBackend.flush();
+
+    collection.title = 'New Title';
+    collection.version = '2';
 
     $httpBackend.expect('PUT', '/collection_editor_handler/data/0').respond(
-      sampleDataResults);
+      collection);
 
     // Send a request to update collection
     EditableCollectionBackendApiService.updateCollection(
-      '0', '2', 'New Title', UndoRedoService.getChangeList()).then(
+      collection.id, collection.version, collection.title, []).then(
         successHandler, failHandler);
     $httpBackend.flush();
 
-    expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+    expect(successHandler).toHaveBeenCalledWith(collection);
     expect(failHandler).not.toHaveBeenCalled();
   });
 });
