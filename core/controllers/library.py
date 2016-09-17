@@ -21,7 +21,7 @@ import string
 from core.controllers import base
 from core.domain import collection_services
 from core.domain import exp_services
-from core.domain import summary_services
+from core.domain import summary_dicts_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -51,10 +51,10 @@ def get_matching_activity_dicts(query_string, search_cursor):
             query_string, cursor=search_cursor))
     activity_list = []
     activity_list = (
-        summary_services.get_displayable_collection_summary_dicts_matching_ids(
+        summary_dicts_services.get_displayable_collection_summary_dicts_matching_ids( # pylint: disable=line-too-long
             collection_ids))
     activity_list += (
-        summary_services.get_displayable_exp_summary_dicts_matching_ids(
+        summary_dicts_services.get_displayable_exp_summary_dicts_matching_ids(
             exp_ids))
 
     if len(activity_list) == feconf.DEFAULT_QUERY_LIMIT:
@@ -96,15 +96,15 @@ class LibraryIndexHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         # TODO(sll): Support index pages for other language codes.
-        summary_dicts_by_category = summary_services.get_library_groups([
+        summary_dicts_by_category = summary_dicts_services.get_library_groups([
             feconf.DEFAULT_LANGUAGE_CODE])
         recently_published_summary_dicts = (
-            summary_services.get_recently_published_exploration_summary_dicts())
+            summary_dicts_services.get_recently_published_exploration_summary_dicts()) # pylint: disable=line-too-long
         top_rated_activity_summary_dicts = (
-            summary_services.get_top_rated_exploration_summary_dicts(
+            summary_dicts_services.get_top_rated_exploration_summary_dicts(
                 [feconf.DEFAULT_LANGUAGE_CODE]))
         featured_activity_summary_dicts = (
-            summary_services.get_featured_activity_summary_dicts(
+            summary_dicts_services.get_featured_activity_summary_dicts(
                 [feconf.DEFAULT_LANGUAGE_CODE]))
 
         preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
@@ -207,12 +207,12 @@ class ExplorationSummariesHandler(base.BaseHandler):
 
         if include_private_exps:
             summaries = (
-                summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                summary_dicts_services.get_displayable_exp_summary_dicts_matching_ids( # pylint: disable=line-too-long
                     exp_ids,
                     editor_user_id=editor_user_id))
         else:
             summaries = (
-                summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                summary_dicts_services.get_displayable_exp_summary_dicts_matching_ids( # pylint: disable=line-too-long
                     exp_ids))
         self.values.update({
             'summaries': summaries

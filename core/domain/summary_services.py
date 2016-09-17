@@ -17,46 +17,25 @@
 """Commands that can be used to operate on activity summaries."""
 
 from core.domain import activity_services
-from core.domain import collection_services
-from core.domain import exp_services
+from core.domain import exp_domain
+from core.domain import collection_domain
 from core.domain import rights_manager
-from core.domain import stats_jobs_continuous
 from core.domain import user_services
+from core.platform import models
 import feconf
-import utils
 
-_LIBRARY_INDEX_GROUPS = [{
-    'header': 'Mathematics & Statistics',
-    'search_categories': [
-        'Mathematics', 'Algebra', 'Arithmetic', 'Calculus', 'Combinatorics',
-        'Geometry', 'Graph Theory', 'Logic', 'Probability', 'Statistics',
-        'Trigonometry',
-    ],
-}, {
-    'header': 'Computing',
-    'search_categories': ['Algorithms', 'Computing', 'Programming'],
-}, {
-    'header': 'Science',
-    'search_categories': [
-        'Astronomy', 'Biology', 'Chemistry', 'Engineering', 'Environment',
-        'Medicine', 'Physics',
-    ],
-}, {
-    'header': 'Humanities',
-    'search_categories': [
-        'Architecture', 'Art', 'Music', 'Philosophy', 'Poetry'
-    ],
-}, {
-    'header': 'Languages',
-    'search_categories': [
-        'Languages', 'Reading', 'English', 'Latin', 'Spanish', 'Gaulish'
-    ],
-}, {
-    'header': 'Social Science',
-    'search_categories': [
-        'Business', 'Economics', 'Geography', 'Government', 'History', 'Law'
-    ],
-}]
+(collection_models, exp_models) = models.Registry.import_models([
+    models.NAMES.collection, models.NAMES.exploration
+])
+
+# TODO(bhenning): Improve the ranking calculation. Some possible suggestions
+# for a better ranking include using an average of the search ranks of each
+# exploration referenced in the collection and/or demoting collections
+# for any validation errors from explorations referenced in the collection.
+_STATUS_PUBLICIZED_BONUS = 30
+# This is done to prevent the rank hitting 0 too easily. Note that
+# negative ranks are disallowed in the Search API.
+_DEFAULT_RANK = 20
 
 
 def get_human_readable_contributors_summary(contributors_summary):
@@ -75,279 +54,6 @@ def get_human_readable_contributors_summary(contributors_summary):
     }
 
 
-def get_learner_collection_dict_by_id(
-        collection_id, user_id, strict=True, allow_invalid_explorations=False,
-        version=None):
-    """Creates and returns a dictionary representation of a collection given by
-    the provided collection ID. This dictionary contains extra information
-    along with the dict returned by collection_domain.Collection.to_dict()
-    which includes useful data for the collection learner view. The information
-    includes progress in the collection, information about explorations
-    referenced within the collection, and a slightly nicer data structure for
-    frontend work.
-    This raises a ValidationError if the collection retrieved using the given
-    ID references non-existent explorations.
-    which includes useful data for the collection learner view.
-    """
-    collection = collection_services.get_collection_by_id(
-        collection_id, strict=strict, version=version)
-
-    exp_ids = collection.exploration_ids
-    exp_summary_dicts = get_displayable_exp_summary_dicts_matching_ids(
-        exp_ids, editor_user_id=user_id)
-    exp_summaries_dict_map = {
-        exp_summary_dict['id']: exp_summary_dict
-        for exp_summary_dict in exp_summary_dicts
-    }
-
-    # TODO(bhenning): Users should not be recommended explorations they have
-    # completed outside the context of a collection (see #1461).
-    next_exploration_ids = None
-    completed_exp_ids = None
-    if user_id:
-        completed_exp_ids = (
-            collection_services.get_valid_completed_exploration_ids(
-                user_id, collection_id, collection))
-        next_exploration_ids = collection.get_next_exploration_ids(
-            completed_exp_ids)
-    else:
-        # If the user is not logged in or they have not completed any of
-        # the explorations yet within the context of this collection,
-        # recommend the initial explorations.
-        next_exploration_ids = collection.init_exploration_ids
-        completed_exp_ids = []
-
-    collection_dict = collection.to_dict()
-    collection_dict['skills'] = collection.skills
-    collection_dict['playthrough_dict'] = {
-        'next_exploration_ids': next_exploration_ids,
-        'completed_exploration_ids': completed_exp_ids
-    }
-    collection_dict['version'] = collection.version
-    collection_is_public = rights_manager.is_collection_public(collection_id)
-
-    # Insert an 'exploration' dict into each collection node, where the
-    # dict includes meta information about the exploration (ID and title).
-    for collection_node in collection_dict['nodes']:
-        exploration_id = collection_node['exploration_id']
-        summary_dict = exp_summaries_dict_map.get(exploration_id)
-        if not allow_invalid_explorations:
-            if not summary_dict:
-                raise utils.ValidationError(
-                    'Expected collection to only reference valid '
-                    'explorations, but found an exploration with ID: %s (was '
-                    'the exploration deleted or is it a private exploration '
-                    'that you do not have edit access to?)'
-                    % exploration_id)
-            if collection_is_public and rights_manager.is_exploration_private(
-                    exploration_id):
-                raise utils.ValidationError(
-                    'Cannot reference a private exploration within a public '
-                    'collection, exploration ID: %s' % exploration_id)
-
-        if summary_dict:
-            collection_node['exploration_summary'] = summary_dict
-        else:
-            collection_node['exploration_summary'] = None
-
-    return collection_dict
-
-
-def get_displayable_collection_summary_dicts_matching_ids(collection_ids):
-    """Returns a list with all collection summary objects that can be
-    displayed on the library page as collection summary tiles.
-    """
-    collection_summaries = (
-        collection_services.get_collection_summaries_matching_ids(
-            collection_ids))
-    return _get_displayable_collection_summary_dicts(collection_summaries)
-
-
-def get_displayable_exp_summary_dicts_matching_ids(
-        exploration_ids, editor_user_id=None):
-    """Given a list of exploration ids, optionally filters the list for
-    explorations that are currently non-private and not deleted, and returns a
-    list of dicts of the corresponding exploration summaries. This function can
-    also filter based on a user ID who has edit access to the corresponding
-    exploration, where the editor ID is for private explorations. Please use
-    this function when needing summary information to display on exploration
-    summary tiles in the frontend.
-    """
-    exploration_summaries = (
-        exp_services.get_exploration_summaries_matching_ids(exploration_ids))
-
-    filtered_exploration_summaries = []
-    for exploration_summary in exploration_summaries:
-        if exploration_summary is None:
-            continue
-        if exploration_summary.status == (
-                rights_manager.ACTIVITY_STATUS_PRIVATE):
-            if editor_user_id is None:
-                continue
-            if not rights_manager.Actor(editor_user_id).can_edit(
-                    feconf.ACTIVITY_TYPE_EXPLORATION,
-                    exploration_summary.id):
-                continue
-
-        filtered_exploration_summaries.append(exploration_summary)
-
-    return get_displayable_exp_summary_dicts(filtered_exploration_summaries)
-
-
-def get_displayable_exp_summary_dicts(exploration_summaries):
-    """Given a list of exploration summary domain objects, returns a list,
-    with the same number of elements, of the corresponding human-readable
-    exploration summary dicts.
-
-    This assumes that all the exploration summary domain objects passed in are
-    valid (i.e., none of them are None).
-    """
-    exploration_ids = [
-        exploration_summary.id
-        for exploration_summary in exploration_summaries]
-
-    view_counts = (
-        stats_jobs_continuous.StatisticsAggregator.get_views_multi(
-            exploration_ids))
-    displayable_exp_summaries = []
-
-    for ind, exploration_summary in enumerate(exploration_summaries):
-        if not exploration_summary:
-            continue
-
-        summary_dict = {
-            'id': exploration_summary.id,
-            'title': exploration_summary.title,
-            'activity_type': feconf.ACTIVITY_TYPE_EXPLORATION,
-            'category': exploration_summary.category,
-            'created_on_msec': utils.get_time_in_millisecs(
-                exploration_summary.exploration_model_created_on),
-            'objective': exploration_summary.objective,
-            'language_code': exploration_summary.language_code,
-            'last_updated_msec': utils.get_time_in_millisecs(
-                exploration_summary.exploration_model_last_updated
-            ),
-            'status': exploration_summary.status,
-            'ratings': exploration_summary.ratings,
-            'community_owned': exploration_summary.community_owned,
-            'tags': exploration_summary.tags,
-            'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
-                exploration_summary.category),
-            'thumbnail_bg_color': utils.get_hex_color_for_category(
-                exploration_summary.category),
-            'num_views': view_counts[ind],
-        }
-
-        displayable_exp_summaries.append(summary_dict)
-
-    return displayable_exp_summaries
-
-
-def _get_displayable_collection_summary_dicts(collection_summaries):
-    displayable_collection_summaries = []
-    for collection_summary in collection_summaries:
-        if collection_summary and collection_summary.status != (
-                rights_manager.ACTIVITY_STATUS_PRIVATE):
-            displayable_collection_summaries.append({
-                'id': collection_summary.id,
-                'title': collection_summary.title,
-                'category': collection_summary.category,
-                'activity_type': feconf.ACTIVITY_TYPE_COLLECTION,
-                'objective': collection_summary.objective,
-                'language_code': collection_summary.language_code,
-                'tags': collection_summary.tags,
-                'node_count': collection_summary.node_count,
-                'last_updated_msec': utils.get_time_in_millisecs(
-                    collection_summary.collection_model_last_updated),
-                'thumbnail_icon_url': (
-                    utils.get_thumbnail_icon_url_for_category(
-                        collection_summary.category)),
-                'thumbnail_bg_color': utils.get_hex_color_for_category(
-                    collection_summary.category)})
-    return displayable_collection_summaries
-
-
-def get_library_groups(language_codes):
-    """Returns a list of groups for the library index page. Each group has a
-    header and a list of dicts representing activity summaries.
-    """
-    language_codes_suffix = ''
-    if language_codes:
-        language_codes_suffix = ' language_code=("%s")' % (
-            '" OR "'.join(language_codes))
-
-    def _generate_query(categories):
-        # This assumes that 'categories' is non-empty.
-        return 'category=("%s")%s' % (
-            '" OR "'.join(categories), language_codes_suffix)
-
-    # Collect all collection ids so that the summary details can be retrieved
-    # with a single get_multi() call.
-    all_collection_ids = []
-    header_to_collection_ids = {}
-    for group in _LIBRARY_INDEX_GROUPS:
-        collection_ids = collection_services.search_collections(
-            _generate_query(group['search_categories']), 8)[0]
-        header_to_collection_ids[group['header']] = collection_ids
-        all_collection_ids += collection_ids
-
-    collection_summaries = [
-        summary for summary in
-        collection_services.get_collection_summaries_matching_ids(
-            all_collection_ids)
-        if summary is not None]
-    collection_summary_dicts = {
-        summary_dict['id']: summary_dict
-        for summary_dict in _get_displayable_collection_summary_dicts(
-            collection_summaries)
-    }
-
-    # Collect all exp ids so that the summary details can be retrieved with a
-    # single get_multi() call.
-    all_exp_ids = []
-    header_to_exp_ids = {}
-    for group in _LIBRARY_INDEX_GROUPS:
-        exp_ids = exp_services.search_explorations(
-            _generate_query(group['search_categories']), 8)[0]
-        header_to_exp_ids[group['header']] = exp_ids
-        all_exp_ids += exp_ids
-
-    exp_summaries = [
-        summary for summary in
-        exp_services.get_exploration_summaries_matching_ids(all_exp_ids)
-        if summary is not None]
-
-    exp_summary_dicts = {
-        summary_dict['id']: summary_dict
-        for summary_dict in get_displayable_exp_summary_dicts(exp_summaries)
-    }
-
-    results = []
-    for group in _LIBRARY_INDEX_GROUPS:
-        summary_dicts = []
-        collection_ids_to_display = header_to_collection_ids[group['header']]
-        summary_dicts = [
-            collection_summary_dicts[collection_id]
-            for collection_id in collection_ids_to_display
-            if collection_id in collection_summary_dicts]
-
-        exp_ids_to_display = header_to_exp_ids[group['header']]
-        summary_dicts += [
-            exp_summary_dicts[exp_id] for exp_id in exp_ids_to_display
-            if exp_id in exp_summary_dicts]
-
-        if not summary_dicts:
-            continue
-
-        results.append({
-            'header': group['header'],
-            'categories': group['search_categories'],
-            'activity_summary_dicts': summary_dicts,
-        })
-
-    return results
-
-
 def require_activities_to_be_public(activity_references):
     """Raises an exception if any activity reference in the list does not
     exist, or is not public.
@@ -358,13 +64,11 @@ def require_activities_to_be_public(activity_references):
     activity_summaries_by_type = [{
         'type': feconf.ACTIVITY_TYPE_EXPLORATION,
         'ids': exploration_ids,
-        'summaries': exp_services.get_exploration_summaries_matching_ids(
-            exploration_ids),
+        'summaries': get_exploration_summaries_matching_ids(exploration_ids),
     }, {
         'type': feconf.ACTIVITY_TYPE_COLLECTION,
         'ids': collection_ids,
-        'summaries': collection_services.get_collection_summaries_matching_ids(
-            collection_ids),
+        'summaries': get_collection_summaries_matching_ids(collection_ids),
     }]
 
     for activities_info in activity_summaries_by_type:
@@ -379,72 +83,246 @@ def require_activities_to_be_public(activity_references):
                     (activities_info['type'], activities_info['ids'][index]))
 
 
-def get_featured_activity_summary_dicts(language_codes):
-    """Returns a list of featured activities with the given language codes.
+def get_exploration_summary_from_model(exp_summary_model):
+    return exp_domain.ExplorationSummary(
+        exp_summary_model.id, exp_summary_model.title,
+        exp_summary_model.category, exp_summary_model.objective,
+        exp_summary_model.language_code, exp_summary_model.tags,
+        exp_summary_model.ratings, exp_summary_model.scaled_average_rating,
+        exp_summary_model.status, exp_summary_model.community_owned,
+        exp_summary_model.owner_ids, exp_summary_model.editor_ids,
+        exp_summary_model.viewer_ids,
+        exp_summary_model.contributor_ids,
+        exp_summary_model.contributors_summary, exp_summary_model.version,
+        exp_summary_model.exploration_model_created_on,
+        exp_summary_model.exploration_model_last_updated,
+        exp_summary_model.first_published_msec
+    )
 
-    The return value is sorted according to the list stored in the datastore.
+
+def get_exploration_summary_by_id(exploration_id):
+    """Returns a domain object representing an exploration summary."""
+    # TODO(msl): Maybe use memcache similarly to get_exploration_by_id.
+    exp_summary_model = exp_models.ExpSummaryModel.get(
+        exploration_id)
+    if exp_summary_model:
+        exp_summary = get_exploration_summary_from_model(exp_summary_model)
+        return exp_summary
+    else:
+        return None
+
+
+def _get_exploration_summaries_from_models(exp_summary_models):
+    """Given an iterable of ExpSummaryModel instances, create a dict containing
+    corresponding exploration summary domain objects, keyed by id.
     """
-    activity_references = activity_services.get_featured_activity_references()
-    exploration_ids, collection_ids = activity_services.split_by_type(
-        activity_references)
-
-    exp_summary_dicts = get_displayable_exp_summary_dicts_matching_ids(
-        exploration_ids)
-    col_summary_dicts = get_displayable_collection_summary_dicts_matching_ids(
-        collection_ids)
-
-    summary_dicts_by_id = {
-        feconf.ACTIVITY_TYPE_EXPLORATION: {
-            summary_dict['id']: summary_dict
-            for summary_dict in exp_summary_dicts
-        },
-        feconf.ACTIVITY_TYPE_COLLECTION: {
-            summary_dict['id']: summary_dict
-            for summary_dict in col_summary_dicts
-        },
-    }
-
-    featured_summary_dicts = []
-    for reference in activity_references:
-        if reference.id in summary_dicts_by_id[reference.type]:
-            summary_dict = summary_dicts_by_id[reference.type][reference.id]
-            if summary_dict and summary_dict['language_code'] in language_codes:
-                featured_summary_dicts.append(summary_dict)
-    return featured_summary_dicts
+    exploration_summaries = [
+        get_exploration_summary_from_model(exp_summary_model)
+        for exp_summary_model in exp_summary_models]
+    result = {}
+    for exp_summary in exploration_summaries:
+        result[exp_summary.id] = exp_summary
+    return result
 
 
-def get_top_rated_exploration_summary_dicts(language_codes):
-    """Returns a list of top rated explorations with the given language code.
-
-    The return value is sorted in decreasing order of average rating.
+def get_exploration_summaries_matching_ids(exp_ids):
+    """Given a list of exploration ids, return a list with the corresponding
+    summary domain objects (or None if the corresponding summary does not
+    exist).
     """
-    filtered_exp_summaries = [
-        exp_summary for exp_summary in
-        exp_services.get_top_rated_exploration_summaries().values()
-        if exp_summary.language_code in language_codes and
-        sum(exp_summary.ratings.values()) > 0]
-
-    sorted_exp_summaries = sorted(
-        filtered_exp_summaries,
-        key=lambda exp_summary: exp_summary.scaled_average_rating,
-        reverse=True)[:feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS]
-
-    return get_displayable_exp_summary_dicts(sorted_exp_summaries)
+    return [
+        (get_exploration_summary_from_model(model) if model else None)
+        for model in exp_models.ExpSummaryModel.get_multi(exp_ids)]
 
 
-def get_recently_published_exploration_summary_dicts():
-    """Returns a list of recently published explorations
-     with the given language code.
+def get_non_private_exploration_summaries():
+    """Returns a dict with all non-private exploration summary domain objects,
+    keyed by their id.
     """
-    recently_published_exploration_summaries = [
-        exp_summary for exp_summary in
-        exp_services.get_recently_published_exploration_summaries().values()]
+    return _get_exploration_summaries_from_models(
+        exp_models.ExpSummaryModel.get_non_private())
 
-    # Arranging recently published exploration summaries with respect to time.
-    # sorted() is used to sort the random list of recently published summaries.
-    summaries = sorted(
-        recently_published_exploration_summaries,
-        key=lambda exp_summary: exp_summary.first_published_msec,
-        reverse=True)
 
-    return get_displayable_exp_summary_dicts(summaries)
+def get_top_rated_exploration_summaries():
+    """Returns a dict with top rated exploration summary domain objects,
+    keyed by their id.
+    """
+    return _get_exploration_summaries_from_models(
+        exp_models.ExpSummaryModel.get_top_rated())
+
+
+def get_recently_published_exploration_summaries():
+    """Returns a dict with all featured exploration summary domain objects,
+    keyed by their id.
+    """
+    return _get_exploration_summaries_from_models(
+        exp_models.ExpSummaryModel.get_recently_published())
+
+
+def get_all_exploration_summaries():
+    """Returns a dict with all exploration summary domain objects,
+    keyed by their id.
+    """
+    return _get_exploration_summaries_from_models(
+        exp_models.ExpSummaryModel.get_all())
+
+
+def save_exploration_summary(exp_summary):
+    """Save an exploration summary domain object as an ExpSummaryModel entity
+    in the datastore.
+    """
+    exp_summary_model = exp_models.ExpSummaryModel(
+        id=exp_summary.id,
+        title=exp_summary.title,
+        category=exp_summary.category,
+        objective=exp_summary.objective,
+        language_code=exp_summary.language_code,
+        tags=exp_summary.tags,
+        ratings=exp_summary.ratings,
+        scaled_average_rating=exp_summary.scaled_average_rating,
+        status=exp_summary.status,
+        community_owned=exp_summary.community_owned,
+        owner_ids=exp_summary.owner_ids,
+        editor_ids=exp_summary.editor_ids,
+        viewer_ids=exp_summary.viewer_ids,
+        contributor_ids=exp_summary.contributor_ids,
+        contributors_summary=exp_summary.contributors_summary,
+        version=exp_summary.version,
+        exploration_model_last_updated=(
+            exp_summary.exploration_model_last_updated),
+        exploration_model_created_on=(
+            exp_summary.exploration_model_created_on),
+        first_published_msec=(
+            exp_summary.first_published_msec)
+    )
+
+    exp_summary_model.put()
+
+
+def delete_exploration_summary(exploration_id):
+    """Delete an exploration summary model."""
+
+    exp_models.ExpSummaryModel.get(exploration_id).delete()
+
+
+def get_search_rank_from_exp_summary(exp_summary):
+    """Returns an integer determining the document's rank in search.
+
+    Featured explorations get a ranking bump, and so do explorations that
+    have been more recently updated. Good ratings will increase the ranking
+    and bad ones will lower it.
+    """
+    # TODO(sll): Improve this calculation.
+    rating_weightings = {'1': -5, '2': -2, '3': 2, '4': 5, '5': 10}
+
+    rank = _DEFAULT_RANK + (
+        _STATUS_PUBLICIZED_BONUS
+        if exp_summary.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED
+        else 0)
+
+    if exp_summary.ratings:
+        for rating_value in exp_summary.ratings:
+            rank += (
+                exp_summary.ratings[rating_value] *
+                rating_weightings[rating_value])
+
+    # Ranks must be non-negative.
+    return max(rank, 0)
+
+
+def get_collection_summaries_matching_ids(collection_ids):
+    """Given a list of collection ids, return a list with the corresponding
+    summary domain objects (or None if the corresponding summary does not
+    exist).
+    """
+    return [
+        (get_collection_summary_from_model(model) if model else None)
+        for model in collection_models.CollectionSummaryModel.get_multi(
+            collection_ids)]
+
+
+def get_collection_summary_from_model(collection_summary_model):
+    return collection_domain.CollectionSummary(
+        collection_summary_model.id, collection_summary_model.title,
+        collection_summary_model.category, collection_summary_model.objective,
+        collection_summary_model.language_code, collection_summary_model.tags,
+        collection_summary_model.status,
+        collection_summary_model.community_owned,
+        collection_summary_model.owner_ids,
+        collection_summary_model.editor_ids,
+        collection_summary_model.viewer_ids,
+        collection_summary_model.contributor_ids,
+        collection_summary_model.contributors_summary,
+        collection_summary_model.version,
+        collection_summary_model.node_count,
+        collection_summary_model.collection_model_created_on,
+        collection_summary_model.collection_model_last_updated
+    )
+
+
+def get_collection_summary_by_id(collection_id):
+    """Returns a domain object representing a collection summary."""
+    # TODO(msl): Maybe use memcache similarly to get_collection_by_id.
+    collection_summary_model = collection_models.CollectionSummaryModel.get(
+        collection_id)
+    if collection_summary_model:
+        collection_summary = get_collection_summary_from_model(
+            collection_summary_model)
+        return collection_summary
+    else:
+        return None
+
+
+def is_exp_summary_editable(exp_summary, user_id=None):
+    """Checks if a given user may edit an exploration by checking
+    the given domain object.
+    """
+    return user_id is not None and (
+        user_id in exp_summary.editor_ids
+        or user_id in exp_summary.owner_ids
+        or exp_summary.community_owned)
+
+
+def is_collection_summary_editable(collection_summary, user_id=None):
+    """Checks if a given user may edit an collection by checking
+    the given domain object.
+    """
+    return user_id is not None and (
+        user_id in collection_summary.editor_ids
+        or user_id in collection_summary.owner_ids
+        or collection_summary.community_owned)
+
+
+def save_collection_summary(collection_summary):
+    """Save a collection summary domain object as a CollectionSummaryModel
+    entity in the datastore.
+    """
+    collection_summary_model = collection_models.CollectionSummaryModel(
+        id=collection_summary.id,
+        title=collection_summary.title,
+        category=collection_summary.category,
+        objective=collection_summary.objective,
+        language_code=collection_summary.language_code,
+        tags=collection_summary.tags,
+        status=collection_summary.status,
+        community_owned=collection_summary.community_owned,
+        owner_ids=collection_summary.owner_ids,
+        editor_ids=collection_summary.editor_ids,
+        viewer_ids=collection_summary.viewer_ids,
+        contributor_ids=collection_summary.contributor_ids,
+        contributors_summary=collection_summary.contributors_summary,
+        version=collection_summary.version,
+        node_count=collection_summary.node_count,
+        collection_model_last_updated=(
+            collection_summary.collection_model_last_updated),
+        collection_model_created_on=(
+            collection_summary.collection_model_created_on)
+    )
+
+    collection_summary_model.put()
+
+
+def delete_collection_summary(collection_id):
+    """Delete a collection summary model."""
+
+    collection_models.CollectionSummaryModel.get(collection_id).delete()

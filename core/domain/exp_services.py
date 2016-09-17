@@ -36,6 +36,7 @@ from core.domain import exp_domain
 from core.domain import feedback_services
 from core.domain import fs_domain
 from core.domain import rights_manager
+from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -151,23 +152,6 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
         last_updated=exploration_model.last_updated)
 
 
-def get_exploration_summary_from_model(exp_summary_model):
-    return exp_domain.ExplorationSummary(
-        exp_summary_model.id, exp_summary_model.title,
-        exp_summary_model.category, exp_summary_model.objective,
-        exp_summary_model.language_code, exp_summary_model.tags,
-        exp_summary_model.ratings, exp_summary_model.scaled_average_rating,
-        exp_summary_model.status, exp_summary_model.community_owned,
-        exp_summary_model.owner_ids, exp_summary_model.editor_ids,
-        exp_summary_model.viewer_ids,
-        exp_summary_model.contributor_ids,
-        exp_summary_model.contributors_summary, exp_summary_model.version,
-        exp_summary_model.exploration_model_created_on,
-        exp_summary_model.exploration_model_last_updated,
-        exp_summary_model.first_published_msec
-    )
-
-
 def get_exploration_by_id(exploration_id, strict=True, version=None):
     """Returns a domain object representing an exploration."""
     exploration_memcache_key = _get_exploration_memcache_key(
@@ -187,18 +171,6 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
             return exploration
         else:
             return None
-
-
-def get_exploration_summary_by_id(exploration_id):
-    """Returns a domain object representing an exploration summary."""
-    # TODO(msl): Maybe use memcache similarly to get_exploration_by_id.
-    exp_summary_model = exp_models.ExpSummaryModel.get(
-        exploration_id)
-    if exp_summary_model:
-        exp_summary = get_exploration_summary_from_model(exp_summary_model)
-        return exp_summary
-    else:
-        return None
 
 
 def get_multiple_explorations_by_id(exp_ids, strict=True):
@@ -254,16 +226,6 @@ def get_new_exploration_id():
     return exp_models.ExplorationModel.get_new_id('')
 
 
-def is_exp_summary_editable(exp_summary, user_id=None):
-    """Checks if a given user may edit an exploration by checking
-    the given domain object.
-    """
-    return user_id is not None and (
-        user_id in exp_summary.editor_ids
-        or user_id in exp_summary.owner_ids
-        or exp_summary.community_owned)
-
-
 # Query methods.
 def get_exploration_titles_and_categories(exp_ids):
     """Returns exploration titles and categories for the given ids.
@@ -289,29 +251,6 @@ def get_exploration_titles_and_categories(exp_ids):
                 'category': exploration.category,
             }
     return result
-
-
-def _get_exploration_summaries_from_models(exp_summary_models):
-    """Given an iterable of ExpSummaryModel instances, create a dict containing
-    corresponding exploration summary domain objects, keyed by id.
-    """
-    exploration_summaries = [
-        get_exploration_summary_from_model(exp_summary_model)
-        for exp_summary_model in exp_summary_models]
-    result = {}
-    for exp_summary in exploration_summaries:
-        result[exp_summary.id] = exp_summary
-    return result
-
-
-def get_exploration_summaries_matching_ids(exp_ids):
-    """Given a list of exploration ids, return a list with the corresponding
-    summary domain objects (or None if the corresponding summary does not
-    exist).
-    """
-    return [
-        (get_exploration_summary_from_model(model) if model else None)
-        for model in exp_models.ExpSummaryModel.get_multi(exp_ids)]
 
 
 def get_exploration_ids_matching_query(query_string, cursor=None):
@@ -356,38 +295,6 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
             '%s retries were needed.' % (query_string, MAX_ITERATIONS))
 
     return (returned_exploration_ids, search_cursor)
-
-
-def get_non_private_exploration_summaries():
-    """Returns a dict with all non-private exploration summary domain objects,
-    keyed by their id.
-    """
-    return _get_exploration_summaries_from_models(
-        exp_models.ExpSummaryModel.get_non_private())
-
-
-def get_top_rated_exploration_summaries():
-    """Returns a dict with top rated exploration summary domain objects,
-    keyed by their id.
-    """
-    return _get_exploration_summaries_from_models(
-        exp_models.ExpSummaryModel.get_top_rated())
-
-
-def get_recently_published_exploration_summaries():
-    """Returns a dict with all featured exploration summary domain objects,
-    keyed by their id.
-    """
-    return _get_exploration_summaries_from_models(
-        exp_models.ExpSummaryModel.get_recently_published())
-
-
-def get_all_exploration_summaries():
-    """Returns a dict with all exploration summary domain objects,
-    keyed by their id.
-    """
-    return _get_exploration_summaries_from_models(
-        exp_models.ExpSummaryModel.get_all())
 
 
 # Methods for exporting states and explorations to other formats.
@@ -700,7 +607,7 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
 
     # Delete the exploration summary, regardless of whether or not
     # force_deletion is True.
-    delete_exploration_summary(exploration_id)
+    summary_services.delete_exploration_summary(exploration_id)
 
     # Remove the exploration from the featured activity references, if
     # necessary.
@@ -755,7 +662,8 @@ def publish_exploration_and_update_user_profiles(committer_id, exp_id):
     """
     rights_manager.publish_exploration(committer_id, exp_id)
     contribution_time_msec = utils.get_current_time_in_millisecs()
-    contributor_ids = get_exploration_summary_by_id(exp_id).contributor_ids
+    contributor_ids = summary_services.get_exploration_summary_by_id(
+        exp_id).contributor_ids
     for contributor in contributor_ids:
         user_services.update_first_contribution_msec_if_not_set(
             contributor, contribution_time_msec)
@@ -815,7 +723,7 @@ def create_exploration_summary(exploration_id, contributor_id_to_add):
     exploration = get_exploration_by_id(exploration_id)
     exp_summary = compute_summary_of_exploration(
         exploration, contributor_id_to_add)
-    save_exploration_summary(exp_summary)
+    summary_services.save_exploration_summary(exp_summary)
 
 
 def update_exploration_summary(exploration_id, contributor_id_to_add):
@@ -823,7 +731,7 @@ def update_exploration_summary(exploration_id, contributor_id_to_add):
     exploration = get_exploration_by_id(exploration_id)
     exp_summary = compute_summary_of_exploration(
         exploration, contributor_id_to_add)
-    save_exploration_summary(exp_summary)
+    summary_services.save_exploration_summary(exp_summary)
 
 
 def compute_summary_of_exploration(exploration, contributor_id_to_add):
@@ -835,7 +743,8 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
     exp_rights = exp_models.ExplorationRightsModel.get_by_id(exploration.id)
     exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exploration.id)
     if exp_summary_model:
-        old_exp_summary = get_exploration_summary_from_model(exp_summary_model)
+        old_exp_summary = summary_services.get_exploration_summary_from_model(
+            exp_summary_model)
         ratings = old_exp_summary.ratings or feconf.get_empty_ratings()
         scaled_average_rating = get_scaled_average_rating(
             old_exp_summary.ratings)
@@ -906,44 +815,6 @@ def compute_exploration_contributors_summary(exploration_id):
         else:
             current_version -= 1
     return contributors_summary
-
-
-def save_exploration_summary(exp_summary):
-    """Save an exploration summary domain object as an ExpSummaryModel entity
-    in the datastore.
-    """
-    exp_summary_model = exp_models.ExpSummaryModel(
-        id=exp_summary.id,
-        title=exp_summary.title,
-        category=exp_summary.category,
-        objective=exp_summary.objective,
-        language_code=exp_summary.language_code,
-        tags=exp_summary.tags,
-        ratings=exp_summary.ratings,
-        scaled_average_rating=exp_summary.scaled_average_rating,
-        status=exp_summary.status,
-        community_owned=exp_summary.community_owned,
-        owner_ids=exp_summary.owner_ids,
-        editor_ids=exp_summary.editor_ids,
-        viewer_ids=exp_summary.viewer_ids,
-        contributor_ids=exp_summary.contributor_ids,
-        contributors_summary=exp_summary.contributors_summary,
-        version=exp_summary.version,
-        exploration_model_last_updated=(
-            exp_summary.exploration_model_last_updated),
-        exploration_model_created_on=(
-            exp_summary.exploration_model_created_on),
-        first_published_msec=(
-            exp_summary.first_published_msec)
-    )
-
-    exp_summary_model.put()
-
-
-def delete_exploration_summary(exploration_id):
-    """Delete an exploration summary model."""
-
-    exp_models.ExpSummaryModel.get(exploration_id).delete()
 
 
 def revert_exploration(
@@ -1192,34 +1063,9 @@ def get_scaled_average_rating(ratings):
     return 1 + 4 * wilson_score_lower_bound
 
 
-def get_search_rank_from_exp_summary(exp_summary):
-    """Returns an integer determining the document's rank in search.
-
-    Featured explorations get a ranking bump, and so do explorations that
-    have been more recently updated. Good ratings will increase the ranking
-    and bad ones will lower it.
-    """
-    # TODO(sll): Improve this calculation.
-    rating_weightings = {'1': -5, '2': -2, '3': 2, '4': 5, '5': 10}
-
-    rank = _DEFAULT_RANK + (
-        _STATUS_PUBLICIZED_BONUS
-        if exp_summary.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED
-        else 0)
-
-    if exp_summary.ratings:
-        for rating_value in exp_summary.ratings:
-            rank += (
-                exp_summary.ratings[rating_value] *
-                rating_weightings[rating_value])
-
-    # Ranks must be non-negative.
-    return max(rank, 0)
-
-
 def get_search_rank(exp_id):
-    exp_summary = get_exploration_summary_by_id(exp_id)
-    return get_search_rank_from_exp_summary(exp_summary)
+    exp_summary = summary_services.get_exploration_summary_by_id(exp_id)
+    return summary_services.get_search_rank_from_exp_summary(exp_summary)
 
 
 def _exp_to_search_dict(exp):

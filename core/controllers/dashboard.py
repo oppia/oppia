@@ -25,6 +25,7 @@ from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import stats_services
 from core.domain import subscription_services
+from core.domain import summary_dicts_services
 from core.domain import summary_services
 from core.domain import user_jobs_continuous
 from core.domain import user_services
@@ -155,14 +156,14 @@ class DashboardHandler(base.BaseHandler):
                 self.user_id))
 
         subscribed_exploration_summaries = filter(None, (
-            exp_services.get_exploration_summaries_matching_ids(
+            summary_services.get_exploration_summaries_matching_ids(
                 exploration_ids_subscribed_to)))
         subscribed_collection_summaries = filter(None, (
-            collection_services.get_collection_summaries_matching_ids(
+            summary_services.get_collection_summaries_matching_ids(
                 subscription_services.get_collection_ids_subscribed_to(
                     self.user_id))))
 
-        exp_summary_list = summary_services.get_displayable_exp_summary_dicts(
+        exp_summary_list = summary_dicts_services.get_displayable_exp_summary_dicts( # pylint: disable=line-too-long
             subscribed_exploration_summaries)
         collection_summary_list = []
 
@@ -192,7 +193,7 @@ class DashboardHandler(base.BaseHandler):
                 config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value):
             for collection_summary in subscribed_collection_summaries:
                 # TODO(sll): Reuse _get_displayable_collection_summary_dicts()
-                # in summary_services, instead of replicating it like this.
+                # in summary_dict_services, instead of replicating it like this.
                 collection_summary_list.append({
                     'id': collection_summary.id,
                     'title': collection_summary.title,

@@ -20,6 +20,8 @@ from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import rights_manager
 from core.domain import user_services
+from core.domain import summary_services
+from core.domain import summary_dicts_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -37,7 +39,7 @@ transaction_services = models.Registry.import_transaction_services()
 
 # pylint: disable=protected-access
 def _count_at_least_editable_collection_summaries(user_id):
-    return len(collection_services._get_collection_summary_dicts_from_models(
+    return len(summary_dicts_services._get_collection_summary_dicts_from_models(
         collection_models.CollectionSummaryModel.get_at_least_editable(
             user_id=user_id)))
 
@@ -634,7 +636,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             'Change title and category')
 
         retrieved_collection_summary = (
-            collection_services.get_collection_summary_by_id(
+            summary_services.get_collection_summary_by_id(
                 self.COLLECTION_ID))
 
         self.assertEqual(retrieved_collection_summary.contributor_ids,
@@ -1676,121 +1678,3 @@ class CollectionSearchTests(CollectionServicesUnitTests):
         self.assertEqual(
             collection_services._get_search_rank(self.COLLECTION_ID),
             base_search_rank + 30)
-
-
-class CollectionSummaryTests(CollectionServicesUnitTests):
-    """Test collection summaries."""
-
-    ALBERT_EMAIL = 'albert@example.com'
-    BOB_EMAIL = 'bob@example.com'
-    ALBERT_NAME = 'albert'
-    BOB_NAME = 'bob'
-
-    COLLECTION_ID_1 = 'cid1'
-    COLLECTION_ID_2 = 'cid2'
-
-    def test_is_collection_summary_editable(self):
-        self.save_new_default_collection(self.COLLECTION_ID, self.owner_id)
-
-        # Check that only the owner may edit.
-        collection_summary = collection_services.get_collection_summary_by_id(
-            self.COLLECTION_ID)
-        self.assertTrue(collection_services.is_collection_summary_editable(
-            collection_summary, user_id=self.owner_id))
-        self.assertFalse(collection_services.is_collection_summary_editable(
-            collection_summary, user_id=self.editor_id))
-        self.assertFalse(collection_services.is_collection_summary_editable(
-            collection_summary, user_id=self.viewer_id))
-
-        # Owner makes viewer a viewer and editor an editor.
-        rights_manager.assign_role_for_collection(
-            self.owner_id, self.COLLECTION_ID, self.viewer_id,
-            rights_manager.ROLE_VIEWER)
-        rights_manager.assign_role_for_collection(
-            self.owner_id, self.COLLECTION_ID, self.editor_id,
-            rights_manager.ROLE_EDITOR)
-
-        # Check that owner and editor may edit, but not viewer.
-        collection_summary = collection_services.get_collection_summary_by_id(
-            self.COLLECTION_ID)
-        self.assertTrue(collection_services.is_collection_summary_editable(
-            collection_summary, user_id=self.owner_id))
-        self.assertTrue(collection_services.is_collection_summary_editable(
-            collection_summary, user_id=self.editor_id))
-        self.assertFalse(collection_services.is_collection_summary_editable(
-            collection_summary, user_id=self.viewer_id))
-
-    def test_contributor_ids(self):
-        # Sign up two users.
-        albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.signup(self.BOB_EMAIL, self.BOB_NAME)
-        # Have Albert create a collection.
-        self.save_new_valid_collection(self.COLLECTION_ID, albert_id)
-        # Have Bob edit the collection.
-        changelist_cmds = [{
-            'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-            'property_name': 'title',
-            'new_value': 'Collection Bob title'
-        }]
-        collection_services.update_collection(
-            bob_id, self.COLLECTION_ID, changelist_cmds,
-            'Changed title to Bob title.')
-        # Albert adds an owner and an editor.
-        rights_manager.assign_role_for_collection(
-            albert_id, self.COLLECTION_ID, self.viewer_id,
-            rights_manager.ROLE_VIEWER)
-        rights_manager.assign_role_for_collection(
-            albert_id, self.COLLECTION_ID, self.editor_id,
-            rights_manager.ROLE_EDITOR)
-        # Verify that only Albert and Bob are listed as contributors for the
-        # collection.
-        collection_summary = collection_services.get_collection_summary_by_id(
-            self.COLLECTION_ID)
-        self.assertEqual(
-            collection_summary.contributor_ids,
-            [albert_id, bob_id])
-
-    def _check_contributors_summary(self, collection_id, expected):
-        contributors_summary = collection_services.get_collection_summary_by_id(
-            collection_id).contributors_summary
-        self.assertEqual(expected, contributors_summary)
-
-    def test_contributor_summary(self):
-        albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.signup(self.BOB_EMAIL, self.BOB_NAME)
-
-        # Have Albert create a new collection. Version 1
-        self.save_new_valid_collection(self.COLLECTION_ID, albert_id)
-        self._check_contributors_summary(self.COLLECTION_ID, {albert_id: 1})
-        changelist_cmds = [{
-            'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-            'property_name': 'title',
-            'new_value': 'Collection Bob title'
-        }]
-         # Have Bob update that collection. Version 2
-        collection_services.update_collection(
-            bob_id, self.COLLECTION_ID, changelist_cmds, 'Changed title.')
-        self._check_contributors_summary(self.COLLECTION_ID,
-                                         {albert_id: 1, bob_id: 1})
-        # Have Bob update that collection. Version 3
-        collection_services.update_collection(
-            bob_id, self.COLLECTION_ID, changelist_cmds, 'Changed title.')
-        self._check_contributors_summary(self.COLLECTION_ID,
-                                         {albert_id: 1, bob_id: 2})
-
-        # Have Albert update that collection. Version 4
-        collection_services.update_collection(
-            albert_id, self.COLLECTION_ID, changelist_cmds, 'Changed title.')
-        self._check_contributors_summary(self.COLLECTION_ID,
-                                         {albert_id: 2, bob_id: 2})
-
-        # TODO(madiyar): uncomment after revert_collection implementation
-        # Have Albert revert to version 3. Version 5
-        # collection_services.revert_collection(albert_id,
-        #       self.COLLECTION_ID, 4, 3)
-        # self._check_contributors_summary(self.COLLECTION_ID,
-        #                                 {albert_id: 1, bob_id: 2})

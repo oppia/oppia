@@ -32,6 +32,7 @@ from core.domain import activity_services
 from core.domain import collection_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -134,25 +135,6 @@ def get_collection_from_model(collection_model, run_conversion=True):
         collection_model.last_updated)
 
 
-def get_collection_summary_from_model(collection_summary_model):
-    return collection_domain.CollectionSummary(
-        collection_summary_model.id, collection_summary_model.title,
-        collection_summary_model.category, collection_summary_model.objective,
-        collection_summary_model.language_code, collection_summary_model.tags,
-        collection_summary_model.status,
-        collection_summary_model.community_owned,
-        collection_summary_model.owner_ids,
-        collection_summary_model.editor_ids,
-        collection_summary_model.viewer_ids,
-        collection_summary_model.contributor_ids,
-        collection_summary_model.contributors_summary,
-        collection_summary_model.version,
-        collection_summary_model.node_count,
-        collection_summary_model.collection_model_created_on,
-        collection_summary_model.collection_model_last_updated
-    )
-
-
 def get_collection_by_id(collection_id, strict=True, version=None):
     """Returns a domain object representing a collection."""
     collection_memcache_key = _get_collection_memcache_key(
@@ -171,19 +153,6 @@ def get_collection_by_id(collection_id, strict=True, version=None):
             return collection
         else:
             return None
-
-
-def get_collection_summary_by_id(collection_id):
-    """Returns a domain object representing a collection summary."""
-    # TODO(msl): Maybe use memcache similarly to get_collection_by_id.
-    collection_summary_model = collection_models.CollectionSummaryModel.get(
-        collection_id)
-    if collection_summary_model:
-        collection_summary = get_collection_summary_from_model(
-            collection_summary_model)
-        return collection_summary
-    else:
-        return None
 
 
 def get_multiple_collections_by_id(collection_ids, strict=True):
@@ -238,16 +207,6 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
 def get_new_collection_id():
     """Returns a new collection id."""
     return collection_models.CollectionModel.get_new_id('')
-
-
-def is_collection_summary_editable(collection_summary, user_id=None):
-    """Checks if a given user may edit an collection by checking
-    the given domain object.
-    """
-    return user_id is not None and (
-        user_id in collection_summary.editor_ids
-        or user_id in collection_summary.owner_ids
-        or collection_summary.community_owned)
 
 
 # Query methods.
@@ -339,30 +298,6 @@ def record_played_exploration_in_collection_context(
     if exploration_id not in progress_model.completed_explorations:
         progress_model.completed_explorations.append(exploration_id)
         progress_model.put()
-
-
-def _get_collection_summary_dicts_from_models(collection_summary_models):
-    """Given an iterable of CollectionSummaryModel instances, create a dict
-    containing corresponding collection summary domain objects, keyed by id.
-    """
-    collection_summaries = [
-        get_collection_summary_from_model(collection_summary_model)
-        for collection_summary_model in collection_summary_models]
-    result = {}
-    for collection_summary in collection_summaries:
-        result[collection_summary.id] = collection_summary
-    return result
-
-
-def get_collection_summaries_matching_ids(collection_ids):
-    """Given a list of collection ids, return a list with the corresponding
-    summary domain objects (or None if the corresponding summary does not
-    exist).
-    """
-    return [
-        (get_collection_summary_from_model(model) if model else None)
-        for model in collection_models.CollectionSummaryModel.get_multi(
-            collection_ids)]
 
 
 # TODO(bhenning): Update this function to support also matching the query to
@@ -505,7 +440,7 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     # Validate that all explorations referenced by the collection exist.
     exp_ids = collection.exploration_ids
     exp_summaries = (
-        exp_services.get_exploration_summaries_matching_ids(exp_ids))
+        summary_services.get_exploration_summaries_matching_ids(exp_ids))
     exp_summaries_dict = {
         exp_id: exp_summaries[ind] for (ind, exp_id) in enumerate(exp_ids)
     }
@@ -626,7 +561,7 @@ def delete_collection(committer_id, collection_id, force_deletion=False):
 
     # Delete the summary of the collection (regardless of whether
     # force_deletion is True or not).
-    delete_collection_summary(collection_id)
+    summary_services.delete_collection_summary(collection_id)
 
     # Remove the collection from the featured activity list, if necessary.
     activity_services.remove_featured_activity(
@@ -663,7 +598,7 @@ def publish_collection_and_update_user_profiles(committer_id, col_id):
     """
     rights_manager.publish_collection(committer_id, col_id)
     contribution_time_msec = utils.get_current_time_in_millisecs()
-    collection_summary = get_collection_summary_by_id(col_id)
+    collection_summary = summary_services.get_collection_summary_by_id(col_id)
     contributor_ids = collection_summary.contributor_ids
     for contributor in contributor_ids:
         user_services.update_first_contribution_msec_if_not_set(
@@ -706,7 +641,7 @@ def create_collection_summary(collection_id, contributor_id_to_add):
     collection = get_collection_by_id(collection_id)
     collection_summary = compute_summary_of_collection(
         collection, contributor_id_to_add)
-    save_collection_summary(collection_summary)
+    summary_services.save_collection_summary(collection_summary)
 
 
 def update_collection_summary(collection_id, contributor_id_to_add):
@@ -791,41 +726,6 @@ def compute_collection_contributors_summary(collection_id):
         else:
             current_version -= 1
     return contributors_summary
-
-
-def save_collection_summary(collection_summary):
-    """Save a collection summary domain object as a CollectionSummaryModel
-    entity in the datastore.
-    """
-    collection_summary_model = collection_models.CollectionSummaryModel(
-        id=collection_summary.id,
-        title=collection_summary.title,
-        category=collection_summary.category,
-        objective=collection_summary.objective,
-        language_code=collection_summary.language_code,
-        tags=collection_summary.tags,
-        status=collection_summary.status,
-        community_owned=collection_summary.community_owned,
-        owner_ids=collection_summary.owner_ids,
-        editor_ids=collection_summary.editor_ids,
-        viewer_ids=collection_summary.viewer_ids,
-        contributor_ids=collection_summary.contributor_ids,
-        contributors_summary=collection_summary.contributors_summary,
-        version=collection_summary.version,
-        node_count=collection_summary.node_count,
-        collection_model_last_updated=(
-            collection_summary.collection_model_last_updated),
-        collection_model_created_on=(
-            collection_summary.collection_model_created_on)
-    )
-
-    collection_summary_model.put()
-
-
-def delete_collection_summary(collection_id):
-    """Delete a collection summary model."""
-
-    collection_models.CollectionSummaryModel.get(collection_id).delete()
 
 
 def save_new_collection_from_yaml(committer_id, yaml_content, collection_id):

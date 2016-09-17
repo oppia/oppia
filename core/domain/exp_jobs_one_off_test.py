@@ -21,6 +21,7 @@ from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import summary_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -220,7 +221,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
             # Get and check job output.
-            actual_job_output = exp_services.get_all_exploration_summaries()
+            actual_job_output = summary_services.get_all_exploration_summaries()
             self.assertEqual(
                 actual_job_output.keys(), expected_job_output.keys())
 
@@ -318,7 +319,7 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = summary_services.get_exploration_summary_by_id(
             exploration.id)
         self.assertEqual(
             [user_a_id], exploration_summary.contributor_ids)
@@ -348,7 +349,7 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
 
         # Verify that the length of the contributor list is one, and that
         # the list contains the user who made these commits.
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = summary_services.get_exploration_summary_by_id(
             exploration.id)
         self.assertEqual(
             [user_a_id], exploration_summary.contributor_ids)
@@ -382,7 +383,7 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
 
         # Verify that the committer list does not contain the user
         # who only reverted.
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = summary_services.get_exploration_summary_by_id(
             exploration.id)
         self.assertEqual([user_a_id], exploration_summary.contributor_ids)
 
@@ -399,7 +400,7 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
         # Check that the system id was not added to the exploration's
         # contributor ids.
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = summary_services.get_exploration_summary_by_id(
             exploration.id)
         self.assertNotIn(
             feconf.SYSTEM_COMMITTER_ID,
@@ -418,7 +419,7 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
         # Check that the migration bot id was not added to the exploration's
         # contributor ids.
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = summary_services.get_exploration_summary_by_id(
             exploration.id)
         self.assertNotIn(
             feconf.MIGRATION_BOT_USERNAME, exploration_summary.contributor_ids)
@@ -471,7 +472,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
         exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = summary_services.get_exploration_summary_by_id(
             exploration.id)
 
         self.assertEqual(
@@ -510,7 +511,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
         exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = summary_services.get_exploration_summary_by_id(
             exploration.id)
 
         # Check that the contributors_summary does not contains user_b_id
@@ -555,7 +556,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         # Check that USER A's number of contributions is equal to 2
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = summary_services.get_exploration_summary_by_id(
             exploration.id)
         self.assertEqual(2, exploration_summary.contributors_summary[user_a_id])
 
@@ -583,7 +584,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
         # Check that no system id was added to the exploration's
         # contributor's summary
 
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = summary_services.get_exploration_summary_by_id(
             exploration.id)
 
         for system_id in feconf.SYSTEM_USER_IDS:

@@ -19,9 +19,9 @@
 import ast
 
 from core import jobs
-from core.domain import exp_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
+from core.domain import summary_services
 from core.platform import models
 (exp_models, recommendations_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.recommendations])
@@ -48,7 +48,7 @@ class ExplorationRecommendationsOneOffJob(jobs.BaseMapReduceJobManager):
 
         exp_summary_id = item.id
         exp_summaries_dict = (
-            exp_services.get_non_private_exploration_summaries())
+            summary_services.get_non_private_exploration_summaries())
 
         # Note: This is needed because the exp_summaries_dict is sometimes
         # different from the summaries in the datastore, especially when
