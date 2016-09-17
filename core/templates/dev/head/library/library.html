@@ -59,10 +59,14 @@
           <div class="oppia-library-group" ng-repeat="group in libraryGroups track by $index">
             <div class="row oppia-library-group-header-container">
               <h2 class="oppia-library-group-header">
-                <a ng-click="showAllResultsForCategories(group.categories)" translate="<[group.translationId]>">
+                <a ng-if="group.has_full_results_page"
+                   ng-click="showAllResultsForCategories(group.categories)"
+                   translate="<[group.translationId]>">
                 </a>
+                <span ng-if="!group.has_full_results_page" translate="<[group.translationId]>">
+                </span>
               </h2>
-              <div class="pull-right">
+              <div class="pull-right" ng-if="group.has_full_results_page">
                 <button class="btn oppia-library-group-view-all-btn oppia-transition-200" ng-click="showAllResultsForCategories(group.categories)" translate="I18N_LIBRARY_VIEW_ALL">
                 </button>
               </div>
