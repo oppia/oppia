@@ -301,8 +301,10 @@ def create_suggestion(exploration_id, author_id, exploration_version,
             this indicates that the thread pertains to the exploration as a
             whole.
         description: str. Learner-provided description of suggestion changes.
-        suggestion_content: dict. Multiple key-value pairs. Key is the
-            content type while value is the actual content.
+        suggestion_content: dict. Only contains two items, of which the keys
+            are "type" and "value". For some historical reason, the value of
+            "type" is always "text" while the value of "value" is the actual
+            content of the suggestion.
     """
     thread_id = _create_models_for_thread_and_first_message(
         exploration_id, state_name, author_id, description,
