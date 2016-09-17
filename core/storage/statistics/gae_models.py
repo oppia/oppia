@@ -749,6 +749,9 @@ class MigratedAnswerModel(base_models.BaseModel):
                 exploration_id=exploration_id, state_name=state_name,
                 exploration_versions=set([exploration_version]))
         else:
+            # Avoid an unnecessary put if the given version is already recorded
+            if exploration_version in model.exploration_versions:
+                return
             model.exploration_versions = set(
                 model.exploration_versions + [exploration_version])
         model.put()

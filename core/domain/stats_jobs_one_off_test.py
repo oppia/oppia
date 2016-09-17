@@ -417,6 +417,78 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self.assertEqual(job_output, [])
         self._verify_no_migration_validation_problems()
 
+    def test_migration_job_should_migrate_100_answers(self):
+        """This test ensures the migration job properly migrates 100 answers,
+        since it splits up answers in batches of 100 for less intense
+        submission.
+        """
+        state_name = 'Text Input'
+
+        rule_spec_str = 'Contains(ate)'
+        html_answer = 'Plate'
+        self._record_old_answer(
+            state_name, rule_spec_str, html_answer, submitted_answer_count=100)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+
+        # All 100 answers should be retrievable.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(len(state_answers.submitted_answer_list), 100)
+        self.assertEqual(job_output, [])
+        self._verify_no_migration_validation_problems()
+
+    def test_migration_job_should_migrate_101_answers(self):
+        """This test ensures the migration job properly migrates 101 answers,
+        since it splits up answers in batches of 100 for less intense
+        submission.
+        """
+        state_name = 'Text Input'
+
+        rule_spec_str = 'Contains(ate)'
+        html_answer = 'Plate'
+        self._record_old_answer(
+            state_name, rule_spec_str, html_answer, submitted_answer_count=101)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+
+        # All 100 answers should be retrievable.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(len(state_answers.submitted_answer_list), 101)
+        self.assertEqual(job_output, [])
+        self._verify_no_migration_validation_problems()
+
+    def test_migration_job_should_migrate_200_answers(self):
+        """This test ensures the migration job properly migrates 200 answers,
+        since it splits up answers in batches of 100 for less intense
+        submission.
+        """
+        state_name = 'Text Input'
+
+        rule_spec_str = 'Contains(ate)'
+        html_answer = 'Plate'
+        self._record_old_answer(
+            state_name, rule_spec_str, html_answer, submitted_answer_count=200)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+
+        # All 100 answers should be retrievable.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(len(state_answers.submitted_answer_list), 200)
+        self.assertEqual(job_output, [])
+        self._verify_no_migration_validation_problems()
+
     def test_migrated_answer_matches_to_correct_exp_version(self):
         """This test creates and updates an exploration at certain dates. It
         then submits an answer for the current exploration, then updates that

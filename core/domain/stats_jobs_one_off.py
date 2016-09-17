@@ -1259,18 +1259,38 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         matched_explorations = []
         answer_strings = []
         answer_frequencies = []
+        migrated_answer_count = 0
         for answer_str, answer_frequency in answers.iteritems():
             migrated_answer, matched_exp, error = cls._try_migrate_answer(
                 answer_str, rule_str, last_updated, explorations, state_name)
             if not error:
-                migrated_answers.append(migrated_answer)
-                matched_explorations.append(matched_exp)
-                answer_strings.append(answer_str)
-                answer_frequencies.append(answer_frequency)
+                # Split the answer into batches of 100 for frequency, to avoid
+                # saving too many answers to the datatore in one go. Simply
+                # repeating the answer, exploration, and answer string is
+                # adequate because answers can be stored incrementally.
+                def _append_answer(
+                        migrated_answer, matched_exp, answer_str, frequency):
+                    migrated_answers.append(migrated_answer)
+                    matched_explorations.append(matched_exp)
+                    answer_strings.append(answer_str)
+                    answer_frequencies.append(frequency)
+
+                batch_count = answer_frequency / 100
+                for _ in xrange(batch_count):
+                    _append_answer(
+                        migrated_answer, matched_exp, answer_str, 100)
+
+                remaining_answers = answer_frequency % 100
+                if remaining_answers > 0:
+                    _append_answer(
+                        migrated_answer, matched_exp, answer_str,
+                        remaining_answers)
+
+                migrated_answer_count = migrated_answer_count + 1
             else:
                 yield error
 
-        if len(migrated_answers) != len(answers):
+        if migrated_answer_count != len(answers):
             yield 'Failed to migrate all answers for item batch: %s' % item_id
             return
 
@@ -1293,8 +1313,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
                 # NOTE(bhenning): This has code skew with
                 # stats_services.record_answer(), however this approach allows
-                # the answer to be recorded without loaded exploration or state
-                # objects.
+                # the answer to be recorded without a loaded exploration or
+                # state objects.
                 state_answers = stats_domain.StateAnswers(
                     exploration_id, exploration_version, state_name,
                     interaction_id, submitted_answer_list)
