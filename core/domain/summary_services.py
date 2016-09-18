@@ -26,33 +26,33 @@ import feconf
 import utils
 
 _LIBRARY_INDEX_GROUPS = [{
-    'header': 'Mathematics & Statistics',
+    'header': 'I18N_LIBRARY_GROUPS_MATHEMATICS_&_STATISTICS',
     'search_categories': [
         'Mathematics', 'Algebra', 'Arithmetic', 'Calculus', 'Combinatorics',
         'Geometry', 'Graph Theory', 'Logic', 'Probability', 'Statistics',
         'Trigonometry',
     ],
 }, {
-    'header': 'Computing',
+    'header': 'I18N_LIBRARY_GROUPS_COMPUTING',
     'search_categories': ['Algorithms', 'Computing', 'Programming'],
 }, {
-    'header': 'Science',
+    'header': 'I18N_LIBRARY_GROUPS_SCIENCE',
     'search_categories': [
         'Astronomy', 'Biology', 'Chemistry', 'Engineering', 'Environment',
         'Medicine', 'Physics',
     ],
 }, {
-    'header': 'Humanities',
+    'header': 'I18N_LIBRARY_GROUPS_HUMANITIES',
     'search_categories': [
         'Architecture', 'Art', 'Music', 'Philosophy', 'Poetry'
     ],
 }, {
-    'header': 'Languages',
+    'header': 'I18N_LIBRARY_GROUPS_LANGUAGES',
     'search_categories': [
         'Languages', 'Reading', 'English', 'Latin', 'Spanish', 'Gaulish'
     ],
 }, {
-    'header': 'Social Science',
+    'header': 'I18N_LIBRARY_GROUPS_SOCIAL_SCIENCE',
     'search_categories': [
         'Business', 'Economics', 'Geography', 'Government', 'History', 'Law'
     ],

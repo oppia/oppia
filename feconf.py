@@ -608,13 +608,14 @@ SEARCH_DROPDOWN_CATEGORIES = sorted([
 ])
 
 # The header for the "Featured Activities" category in the library index page.
-LIBRARY_CATEGORY_FEATURED_ACTIVITIES = 'Featured Activities'
+LIBRARY_CATEGORY_FEATURED_ACTIVITIES = 'I18N_LIBRARY_GROUPS_FEATURED_ACTIVITIES'
 # The header for the "Top Rated Explorations" category in the library index
 # page.
-LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = 'Top Rated Explorations'
+LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = \
+'I18N_LIBRARY_GROUPS_TOP_RATED_EXPLORATIONS'
 # The header for the "Recently Published" category in the library index
 # page.
-LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'Recently Published'
+LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'I18N_LIBRARY_GROUPS_RECENTLY_PUBLISHED'
 
 # List of supported language codes. Each description has a
 # parenthetical part that may be stripped out to give a shorter
