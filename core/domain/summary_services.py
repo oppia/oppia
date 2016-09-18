@@ -26,33 +26,33 @@ import feconf
 import utils
 
 _LIBRARY_INDEX_GROUPS = [{
-    'header': 'I18N_LIBRARY_GROUPS_MATHEMATICS_&_STATISTICS',
+    'header_i18n_id': 'I18N_LIBRARY_GROUPS_MATHEMATICS_&_STATISTICS',
     'search_categories': [
         'Mathematics', 'Algebra', 'Arithmetic', 'Calculus', 'Combinatorics',
         'Geometry', 'Graph Theory', 'Logic', 'Probability', 'Statistics',
         'Trigonometry',
     ],
 }, {
-    'header': 'I18N_LIBRARY_GROUPS_COMPUTING',
+    'header_i18n_id': 'I18N_LIBRARY_GROUPS_COMPUTING',
     'search_categories': ['Algorithms', 'Computing', 'Programming'],
 }, {
-    'header': 'I18N_LIBRARY_GROUPS_SCIENCE',
+    'header_i18n_id': 'I18N_LIBRARY_GROUPS_SCIENCE',
     'search_categories': [
         'Astronomy', 'Biology', 'Chemistry', 'Engineering', 'Environment',
         'Medicine', 'Physics',
     ],
 }, {
-    'header': 'I18N_LIBRARY_GROUPS_HUMANITIES',
+    'header_i18n_id': 'I18N_LIBRARY_GROUPS_HUMANITIES',
     'search_categories': [
         'Architecture', 'Art', 'Music', 'Philosophy', 'Poetry'
     ],
 }, {
-    'header': 'I18N_LIBRARY_GROUPS_LANGUAGES',
+    'header_i18n_id': 'I18N_LIBRARY_GROUPS_LANGUAGES',
     'search_categories': [
         'Languages', 'Reading', 'English', 'Latin', 'Spanish', 'Gaulish'
     ],
 }, {
-    'header': 'I18N_LIBRARY_GROUPS_SOCIAL_SCIENCE',
+    'header_i18n_id': 'I18N_LIBRARY_GROUPS_SOCIAL_SCIENCE',
     'search_categories': [
         'Business', 'Economics', 'Geography', 'Government', 'History', 'Law'
     ],
@@ -288,7 +288,7 @@ def get_library_groups(language_codes):
     for group in _LIBRARY_INDEX_GROUPS:
         collection_ids = collection_services.search_collections(
             _generate_query(group['search_categories']), 8)[0]
-        header_to_collection_ids[group['header']] = collection_ids
+        header_to_collection_ids[group['header_i18n_id']] = collection_ids
         all_collection_ids += collection_ids
 
     collection_summaries = [
@@ -309,7 +309,7 @@ def get_library_groups(language_codes):
     for group in _LIBRARY_INDEX_GROUPS:
         exp_ids = exp_services.search_explorations(
             _generate_query(group['search_categories']), 8)[0]
-        header_to_exp_ids[group['header']] = exp_ids
+        header_to_exp_ids[group['header_i18n_id']] = exp_ids
         all_exp_ids += exp_ids
 
     exp_summaries = [
@@ -325,13 +325,14 @@ def get_library_groups(language_codes):
     results = []
     for group in _LIBRARY_INDEX_GROUPS:
         summary_dicts = []
-        collection_ids_to_display = header_to_collection_ids[group['header']]
+        collection_ids_to_display = (
+            header_to_collection_ids[group['header_i18n_id']])
         summary_dicts = [
             collection_summary_dicts[collection_id]
             for collection_id in collection_ids_to_display
             if collection_id in collection_summary_dicts]
 
-        exp_ids_to_display = header_to_exp_ids[group['header']]
+        exp_ids_to_display = header_to_exp_ids[group['header_i18n_id']]
         summary_dicts += [
             exp_summary_dicts[exp_id] for exp_id in exp_ids_to_display
             if exp_id in exp_summary_dicts]
@@ -340,7 +341,7 @@ def get_library_groups(language_codes):
             continue
 
         results.append({
-            'header': group['header'],
+            'header_i18n_id': group['header_i18n_id'],
             'categories': group['search_categories'],
             'activity_summary_dicts': summary_dicts,
             'has_full_results_page': True,

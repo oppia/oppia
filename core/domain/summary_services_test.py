@@ -284,7 +284,7 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
         }
         expected_group = {
             'categories': ['Algorithms', 'Computing', 'Programming'],
-            'header': 'I18N_LIBRARY_GROUPS_COMPUTING',
+            'header_i18n_id': 'I18N_LIBRARY_GROUPS_COMPUTING',
         }
 
         self.assertEqual(len(library_groups), 1)
