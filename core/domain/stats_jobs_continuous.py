@@ -413,30 +413,47 @@ class InteractionAnswerSummariesMRJobManager(
 
     @staticmethod
     def map(item):
+        def _encode(item):
+            """Encodes strings in answers as utf-8."""
+            if isinstance(item, basestring):
+                return item.encode('utf-8')
+            elif isinstance(item, int) or isinstance(item, float):
+                return item
+            elif isinstance(item, list):
+                return [_encode(subitem) for subitem in item]
+            elif isinstance(item, dict):
+                return {
+                    key: _encode(item[key]) for key in item
+                }
+            else:
+                raise Exception('Cannot encode item: %s' % item)
+
         # pylint: disable=line-too-long
         if InteractionAnswerSummariesMRJobManager._entity_created_before_job_queued(
                 item):
             state_answers_dict = {
                 'exploration_id': item.exploration_id,
                 'exploration_version': item.exploration_version,
-                'state_name': item.state_name,
+                'state_name': item.state_name.encode('utf-8'),
                 'interaction_id': item.interaction_id,
-                'submitted_answer_list': copy.deepcopy(
-                    item.submitted_answer_list)
+                'submitted_answer_list': [
+                    _encode(x) for x in item.submitted_answer_list],
             }
 
             # Output answers submitted to the exploration for this exp version.
-            yield ('%s:%s:%s' % (
+            versioned_key = '%s:%s:%s' % (
                 item.exploration_id, item.exploration_version,
-                item.state_name), state_answers_dict)
+                item.state_name.encode('utf-8'))
+            yield (versioned_key, state_answers_dict)
 
             # Output the same set of answers independent of the version. This
             # allows the reduce step to aggregate answers across all
             # exploration versions.
             state_answers_dict['exploration_version'] = VERSION_ALL
-            yield ('%s:%s:%s' % (
+            all_versions_key = '%s:%s:%s' % (
                 item.exploration_id, VERSION_ALL,
-                item.state_name), state_answers_dict)
+                item.state_name.encode('utf-8'))
+            yield (all_versions_key, state_answers_dict)
 
     @staticmethod
     def reduce(key, stringified_submitted_answer_list):

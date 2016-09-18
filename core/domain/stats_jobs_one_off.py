@@ -1236,21 +1236,12 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 item_id, explorations, exploration_id, state_name, item.answers,
                 rule_str, last_updated)
 
-            try:
-                for error in migration_errors:
-                    yield (
-                        'Item ID: %s, last updated: %s, state name: %s, '
-                        'exp id: %s, error: %s' % (
-                            item_id, last_updated, state_name, exploration_id,
-                            error))
-            except UnicodeDecodeError:
-                yield 'UnicodeDecodeError for item ID: %s' % item_id
-                yield 'UnicodeDecodeError for (item: %s), last updated: %s' % (
-                    item_id, last_updated)
-                yield 'UnicodeDecodeError for (item: %s), state name: %s' % (
-                    item_id, state_name)
-                yield 'UnicodeDecodeError for (item: %s), exp id: %s' % (
-                    item_id, exploration_id)
+            for error in migration_errors:
+                yield (
+                    'Item ID: %s, last updated: %s, state name: %s, '
+                    'exp id: %s, error: %s' % (
+                        item_id, last_updated, state_name, exploration_id,
+                        error))
 
     @classmethod
     def _migrate_answers(cls, item_id, explorations, exploration_id, state_name,
@@ -1378,7 +1369,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                     None,
                     'Migrated answer \'%s\' can migrate to two types: %s (exp '
                     'version: %d) and %s (exp version: %d)' % (
-                        answer_str, type(matched_answer.normalized_answer),
+                        answer_str.encode('utf-8'),
+                        type(matched_answer.normalized_answer),
                         matched_exploration.version,
                         type(answer.normalized_answer), exploration.version))
         if matched_answer:
@@ -1386,7 +1378,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         elif not first_error:
             first_error = (
                 'Failed to successfully reconstitute any answer from answer '
-                'string \'%s\'' % answer_str)
+                'string \'%s\'' % answer_str.encode('utf-8'))
         return (matched_answer, matched_exploration, first_error)
 
     @classmethod
@@ -1398,7 +1390,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 None,
                 'Failed to match answer \'%s\' to exploration snapshots '
                 'history (exp ID: %s, exp version: %d).' % (
-                    answer_str, exploration.id, exploration.version))
+                    answer_str.encode('utf-8'), exploration.id,
+                    exploration.version))
 
         classification_categorization = (
             cls._infer_classification_categorization(rule_str))
@@ -1443,7 +1436,10 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 return (
                     None,
                     'Failed to match rule string: \'%s\' because of %s '
-                    '(state=%s)' % (rule_str, error_string, state.to_dict()))
+                    '(state=%s)' % (
+                        rule_str.encode('utf-8'),
+                        error_string.encode('utf-8'),
+                        state.to_dict()))
 
             answer_groups = state.interaction.answer_groups
             if answer_group_index != len(answer_groups):

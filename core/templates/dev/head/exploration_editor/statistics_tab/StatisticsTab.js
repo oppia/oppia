@@ -151,10 +151,10 @@ oppia.controller('StatisticsTab', [
             }
           },
           controller: [
-            '$scope', '$modalInstance', 'stateName', 'stateStats',
-            'improvementType',
-            function($scope, $modalInstance, stateName, stateStats,
-                improvementType) {
+            '$scope', '$modalInstance', '$filter', 'stateName', 'stateStats',
+            'improvementType', 'visualizationsInfo', 'oppiaHtmlEscaper',
+            function($scope, $modalInstance, $filter, stateName, stateStats,
+                improvementType, visualizationsInfo, oppiaHtmlEscaper) {
               $scope.stateName = stateName;
               $scope.stateStats = stateStats;
               $scope.improvementType = improvementType;
