@@ -126,3 +126,28 @@ class HtmlStripperUnitTests(test_utils.GenericTestBase):
 
         for datum in test_data:
             self.assertEqual(html_cleaner.strip_html_tags(datum[0]), datum[1])
+
+
+class RteVerificationUnitTests(test_utils.GenericTestBase):
+    """Test the Rte output format verification function."""
+
+    def test_verification_function(self):
+        test_content = '''
+        <p>Test list</p>
+
+        <ol>
+        <li>123</li>
+        <li><strong>abc</strong></li>
+        <li>blah</li>
+        <li><oppia-noninteractive-math raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;"></oppia-noninteractive-math></li>
+        </ol>
+
+        <p>&nbsp;</p>
+
+        <p>A random sentence, then a block component.</p>
+        <oppia-noninteractive-collapsible content-with-value="&amp;quot;You have opened the collapsible block.&amp;quot;" heading-with-value="&amp;quot;Sample Header&amp;quot;"></oppia-noninteractive-collapsible>
+
+        <pre>
+        Formatted stuff.</pre>
+        '''
+        html_cleaner.verify_for_ckeditor(test_content)
