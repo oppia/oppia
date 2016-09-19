@@ -20,6 +20,7 @@ import logging
 import urlparse
 
 from bs4 import BeautifulSoup
+from bs4.element import Tag
 import bleach
 
 from core.domain import rte_component_registry
@@ -86,18 +87,23 @@ def strip_html_tags(html):
     return bleach.clean(html, tags=[], attributes={}, strip=True)
 
 
+BLOCK_COMPONENT_NAMES = ['image', 'collapsible', 'tabs', 'videos']
+INLINE_COMPONENT_NAMES = ['link', 'math']
+BLOCK_COMPONENT_TAG_NAMES = ['oppia-noninteractive-' + component_name
+                             for component_name in BLOCK_COMPONENT_NAMES]
+INLINE_COMPONENT_TAG_NAMES = ['oppia_noninteractive-' + component_name
+                              for component_name in INLINE_COMPONENT_NAMES]
+
+
 def textangular_to_ckeditor(content):
-    '''Converts rte content from textAngular format to CkEditor format.'''
+    """Converts rte content from textAngular format to CkEditor format."""
     # Wrapping div serves as a parent to everything else.
     content = '<div>' + content + '</div>'
     soup = BeautifulSoup(content, 'html.parser')
 
     # Move block components out of <p>,<b>, and <i>
     invalid_parents = ['p', 'b', 'i']
-    components_names = ['image', 'collapsible', 'tabs']
-    tag_names = ['oppia-noninteractive-' + component_name
-                 for component_name in components_names]
-    components = soup.find_all(tag_names)
+    components = soup.find_all(BLOCK_COMPONENT_TAG_NAMES)
     for component in components:
         while component.parent.name in invalid_parents:
             parent_name = component.parent.name
@@ -140,27 +146,46 @@ def textangular_to_ckeditor(content):
     return soup.encode_contents(formatter='html')
 
 
+COMPONENT_PREFIX = 'oppia-noninteractive-'
+BLOCK_COMPONENT_NAMES = ['image', 'collapsible', 'tabs', 'videos']
+INLINE_COMPONENT_NAMES = ['link', 'math']
+BLOCK_COMPONENT_TAG_NAMES = [COMPONENT_PREFIX + component_name
+                             for component_name in BLOCK_COMPONENT_NAMES]
+INLINE_COMPONENT_TAG_NAMES = [COMPONENT_PREFIX + component_name
+                              for component_name in INLINE_COMPONENT_NAMES]
+
+TOP_LEVEL_ALLOWED = ['p', 'h1', 'h2', 'h3', 'pre', 'ul', 'ol', 'blockquote']
+TOP_LEVEL_ALLOWED += BLOCK_COMPONENT_TAG_NAMES
+STANDARD_DESCENDANTS = ['em', 'strong'] + INLINE_COMPONENT_TAG_NAMES
+ALLOWED_DESCENDANTS = {
+    'p': STANDARD_DESCENDANTS,
+    'h1': STANDARD_DESCENDANTS,
+    'h2': STANDARD_DESCENDANTS,
+    'h3': STANDARD_DESCENDANTS,
+    'ul': ['li'],
+    'ol': ['li'],
+    'li': STANDARD_DESCENDANTS + ['h1', 'h2', 'h3'],
+    'em': ['strong'] + INLINE_COMPONENT_TAG_NAMES,
+    'strong': ['em'] + INLINE_COMPONENT_TAG_NAMES,
+    'pre': STANDARD_DESCENDANTS,
+    'blockquote': STANDARD_DESCENDANTS
+}
+
+
 def verify_for_ckeditor(content):
-    '''Verifies that content matches expected CKEditor format.'''
+    """Verifies that content matches expected CKEditor format."""
     soup = BeautifulSoup(content, 'html.parser')
 
-    assert len(soup.find_all('br')) == 0, 'Contains <br> tags.'
-    assert len(soup.find_all('b')) == 0, \
-        'Contains <b> tags (should be <strong>).'
-    assert len(soup.find_all('i')) == 0, 'Contains <i> tags (should be <em>).'
-    assert len(soup.find_all('span')) == 0, \
-        'Contains <span> tags (should be removed).'
-
-    valid_parent_names = set(['li', 'blockquote', 'pre', '[document]'])
-    invalid_ancestor_names = set(['p'])
-    components_names = ['image', 'collapsible', 'tabs']
-    tag_names = ['oppia-noninteractive-' + component_name
-                 for component_name in components_names]
-
-    for component in soup.find_all(tag_names):
-        assert component.parent.name in valid_parent_names, \
-            'Block component parent %s is not valid' % component.parent.name
-        ancestor_names = set([el.name for el in component.parents])
-        assert invalid_ancestor_names.isdisjoint(ancestor_names), \
-            'Block component has invalid ancestor(s): %s' % \
-            invalid_ancestor_names.intersection(ancestor_names)
+    # Iterating over the top level tags in the document first to check
+    # if they are a proper top level tag, and then iterating over
+    # all descendants of each top level tag.
+    for child in soup.children:
+        if isinstance(child, Tag):
+            assert child.name in TOP_LEVEL_ALLOWED, (
+                'Invalid top level tag: %s.' % child.name)
+            for descendant in child.descendants:
+                if isinstance(descendant, Tag):
+                    assert descendant.name in ALLOWED_DESCENDANTS[
+                        descendant.parent.name], (
+                            '%s is not a valid child of parent %s.' % (
+                                descendant.name, descendant.parent.name))
