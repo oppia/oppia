@@ -284,11 +284,11 @@ def get_library_groups(language_codes):
     # Collect all collection ids so that the summary details can be retrieved
     # with a single get_multi() call.
     all_collection_ids = []
-    header_to_collection_ids = {}
+    header_id_to_collection_ids = {}
     for group in _LIBRARY_INDEX_GROUPS:
         collection_ids = collection_services.search_collections(
             _generate_query(group['search_categories']), 8)[0]
-        header_to_collection_ids[group['header_i18n_id']] = collection_ids
+        header_id_to_collection_ids[group['header_i18n_id']] = collection_ids
         all_collection_ids += collection_ids
 
     collection_summaries = [
@@ -326,7 +326,7 @@ def get_library_groups(language_codes):
     for group in _LIBRARY_INDEX_GROUPS:
         summary_dicts = []
         collection_ids_to_display = (
-            header_to_collection_ids[group['header_i18n_id']])
+            header_id_to_collection_ids[group['header_i18n_id']])
         summary_dicts = [
             collection_summary_dicts[collection_id]
             for collection_id in collection_ids_to_display
