@@ -607,14 +607,15 @@ SEARCH_DROPDOWN_CATEGORIES = sorted([
     'History',
 ])
 
-# The header for the "Featured Activities" category in the library index page.
+# The i18n id for the header of the "Featured Activities" category in the
+# library index page.
 LIBRARY_CATEGORY_FEATURED_ACTIVITIES = 'I18N_LIBRARY_GROUPS_FEATURED_ACTIVITIES'
-# The header for the "Top Rated Explorations" category in the library index
-# page.
+# The i18n id for the header of the "Top Rated Explorations" category in the
+# library index page.
 LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = (
     'I18N_LIBRARY_GROUPS_TOP_RATED_EXPLORATIONS')
-# The header for the "Recently Published" category in the library index
-# page.
+# The i18n id for the header of the "Recently Published" category in the
+# library index page.
 LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'I18N_LIBRARY_GROUPS_RECENTLY_PUBLISHED'
 
 # List of supported language codes. Each description has a
