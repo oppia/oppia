@@ -883,7 +883,7 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
 
 class CollectionNodeMetadataDictsTest(
         exp_services_test.ExplorationServicesUnitTests):
-    """Test functions for getting displayable exploration summary dicts."""
+    """Test functions for getting collection node metadata dicts."""
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -919,7 +919,7 @@ class CollectionNodeMetadataDictsTest(
 
         rights_manager.publish_exploration(self.albert_id, self.EXP_ID)
 
-    def test_get_displayable_exp_summary_dicts_matching_ids(self):
+    def test_get_exploration_metadata_dicts(self):
         # An exploration is passed:
         # EXP_ID -- Exploration owned by Albert
 
