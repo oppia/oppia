@@ -163,6 +163,72 @@ def get_displayable_collection_summary_dicts_matching_ids(collection_ids):
     return _get_displayable_collection_summary_dicts(collection_summaries)
 
 
+def get_collection_node_metadata_dicts(query_string, search_cursor):
+    """Given a query string and a search cursor, returns a list of exploration
+    dicts that satisfy the search query.
+
+    Args:
+        query_string: str. The search query for which the search is to be
+            performed.
+        search_cursor: The cursor location for next search.
+    Returns:
+        exploration_list: A list of metadata dicts of the exploration ids 
+            for the query_string.
+        new_search_cursor: New search cursor location.
+    """
+
+    exp_ids, new_search_cursor = (
+        exp_services.get_exploration_ids_matching_query(
+            query_string, cursor=search_cursor))
+
+    exploration_list = (get_exploration_metadata_dicts(exp_ids))
+
+    return exploration_list, new_search_cursor
+
+
+def get_exploration_metadata_dicts(exploration_ids, editor_user_id=None):
+    """Given a list of exploration ids, optionally filters the list for
+    explorations that are currently non-private and not deleted, and returns a
+    list of dicts of the corresponding exploration summaries for collection
+    node search.
+    
+    Args:
+        exploration_ids: A list of exploration ids for which exploration
+            metadata dicts are to be returned.
+        editor_user_id: str or None. User id of the editor to check for users
+            rights for a specific exploration.
+    Returns:
+        A list of metadata dicts of the exploration ids passed as a list.
+        Metadata dicts: 'id': Exploration id
+                        'title': Exploration title
+                        'objective': Exploration objecive
+    """
+
+    exploration_summaries = (
+        exp_services.get_exploration_summaries_matching_ids(exploration_ids))
+
+    filtered_exploration_summaries = []
+    for exploration_summary in exploration_summaries:
+        if exploration_summary is None:
+            continue
+        if exploration_summary.status == (
+                rights_manager.ACTIVITY_STATUS_PRIVATE):
+            if editor_user_id is None:
+                continue
+            if not rights_manager.Actor(editor_user_id).can_edit(
+                    feconf.ACTIVITY_TYPE_EXPLORATION,
+                    exploration_summary.id):
+                continue
+
+        filtered_exploration_summaries.append(exploration_summary)
+
+    return [{
+        'id': summary.id,
+        'title': summary.title,
+        'objective': summary.objective,
+    } for summary in filtered_exploration_summaries if summary]
+
+
 def get_displayable_exp_summary_dicts_matching_ids(
         exploration_ids, editor_user_id=None):
     """Given a list of exploration ids, optionally filters the list for
