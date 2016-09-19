@@ -879,3 +879,56 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
                 feconf.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0),
             activity_domain.ActivityReference(
                 feconf.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2)])
+
+
+class CollectionNodeMetadataDictsTest(
+        exp_services_test.ExplorationServicesUnitTests):
+    """Test functions for getting displayable exploration summary dicts."""
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    EXP_ID = 'eid'
+
+    def setUp(self):
+        """Populate with one exploration and its summary.
+
+        The sequence of events is:
+        - (1) Albert creates EXP_ID_1.
+        - (2) Albert publishes EXP_ID_1.
+        - (3) Albert retrieves collection node metadata dicts.
+        """
+
+        super(CollectionNodeMetadataDictsTest, self).setUp()
+
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+
+        self.save_new_valid_exploration(self.EXP_ID, self.albert_id)
+
+        exp_services.update_exploration(
+            self.albert_id, self.EXP_ID, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'Exploration 1 Albert title'
+            }, {
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'An objective'
+            }], 'Changed title and objective.')
+
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID)
+
+    def test_get_displayable_exp_summary_dicts_matching_ids(self):
+        # An exploration is passed:
+        # EXP_ID -- Exploration owned by Albert
+
+        summaries = (summary_services.get_exploration_metadata_dicts(
+            [self.EXP_ID]))
+
+        expected_summary = {
+            'id': self.EXP_ID,
+            'objective': u'An objective',
+            'title': u'Exploration 1 Albert title',
+        }
+        self.assertDictContainsSubset(expected_summary, summaries[0])
