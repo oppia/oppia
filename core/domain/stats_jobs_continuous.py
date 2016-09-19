@@ -16,7 +16,6 @@
 
 import ast
 import collections
-import copy
 import datetime
 import itertools
 
@@ -414,7 +413,7 @@ class InteractionAnswerSummariesMRJobManager(
     @staticmethod
     def map(item):
         def _encode(item):
-            """Encodes strings in answers as utf-8."""
+            """Encodes a Python value as UTF-8."""
             if isinstance(item, basestring):
                 return item.encode('utf-8')
             elif isinstance(item, int) or isinstance(item, float):
@@ -423,7 +422,7 @@ class InteractionAnswerSummariesMRJobManager(
                 return [_encode(subitem) for subitem in item]
             elif isinstance(item, dict):
                 return {
-                    key: _encode(item[key]) for key in item
+                    key: _encode(value) for key, value in item.iteritems()
                 }
             else:
                 raise Exception('Cannot encode item: %s' % item)
@@ -434,16 +433,15 @@ class InteractionAnswerSummariesMRJobManager(
             state_answers_dict = {
                 'exploration_id': item.exploration_id,
                 'exploration_version': item.exploration_version,
-                'state_name': item.state_name.encode('utf-8'),
+                'state_name': _encode(item.state_name),
                 'interaction_id': item.interaction_id,
-                'submitted_answer_list': [
-                    _encode(x) for x in item.submitted_answer_list],
+                'submitted_answer_list': _encode(item.submitted_answer_list),
             }
 
             # Output answers submitted to the exploration for this exp version.
             versioned_key = '%s:%s:%s' % (
                 item.exploration_id, item.exploration_version,
-                item.state_name.encode('utf-8'))
+                _encode(item.state_name))
             yield (versioned_key, state_answers_dict)
 
             # Output the same set of answers independent of the version. This
@@ -452,7 +450,7 @@ class InteractionAnswerSummariesMRJobManager(
             state_answers_dict['exploration_version'] = VERSION_ALL
             all_versions_key = '%s:%s:%s' % (
                 item.exploration_id, VERSION_ALL,
-                item.state_name.encode('utf-8'))
+                _encode(item.state_name))
             yield (all_versions_key, state_answers_dict)
 
     @staticmethod
