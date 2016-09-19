@@ -992,11 +992,13 @@ oppia.directive('ckEditorRte', [
         // Whitelist the transparent block component overlay, which is
         // a div with a CSS class.
         var blockOverlayRule = ' div(oppia-rte-component-overlay);';
+        var preRule = ' pre';
         // Put all the rules together.
         var extraAllowedContentRules = componentRule +
                                        inlineWrapperRule +
                                        blockWrapperRule +
-                                       blockOverlayRule;
+                                       blockOverlayRule +
+                                       preRule;
 
         // The button corresponding to a widget has the same name,
         // with a capitalized first letter.
@@ -1027,7 +1029,7 @@ oppia.directive('ckEditorRte', [
             },
             {
               name: 'basicstyles',
-              items: ['Bold', '-', 'Italic', '-', 'RemoveFormat']
+              items: ['Bold', '-', 'Italic', '-', 'RemoveFormat', 'Format']
             },
             {
               name: 'paragraph',
