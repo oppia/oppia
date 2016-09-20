@@ -14,7 +14,6 @@
 
 """Controllers for simple, mostly-static pages (like About, Forum, etc.)."""
 
-import random
 import urllib
 import urlparse
 
@@ -28,16 +27,30 @@ class SplashPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         c_value = self.request.get('c')
-        if not c_value:
-            # We only show s3 and s4.
-            c_value = 's%d' % (3 + random.randrange(2))
-            self.redirect('/splash?c=%s' % c_value)
-
         self.values.update({
             'meta_description': feconf.SPLASH_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_SPLASH,
         })
-        self.render_template('pages/splash_%s.html' % c_value)
+
+        if not c_value:
+            self.render_template('pages/splash.html')
+        else:
+            try:
+                self.render_template('pages/splash_%s.html' % c_value)
+            except Exception:
+                # Old c values may have been deprecated, in which case we
+                # revert to the default splash page URL. When redirecting,
+                # we pass any arguments along (except the c_value).
+                arguments = self.request.arguments()
+                query_suffix = '&'.join([
+                    '%s=%s' % (arg_name, self.request.get(arg_name))
+                    for arg_name in arguments if arg_name != 'c'])
+
+                target_url = feconf.SPLASH_URL
+                if query_suffix:
+                    target_url += '?%s' % query_suffix
+                self.redirect(target_url)
+                return
 
 
 class AboutPage(base.BaseHandler):
