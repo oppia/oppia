@@ -279,11 +279,23 @@ class I18nDictsTest(test_utils.GenericTestBase):
         for filename in filenames:
             with open(os.path.join(os.getcwd(), 'assets', 'i18n', filename),
                       mode='r') as f:
-                next_line = next(f)
-                for line in f:
-                    line = line.replace("{", "")
-                    line = line.replace("}", "")
-                    self.assertGreater(next_line, line)
+                lines = f.readlines()
+                if lines[0] == '{\n':
+                    lines.remove(lines[0])
+                if lines[-1] == '}\n':
+                    lines.pop()
+
+                string_lines = ''.join(lines)
+                #string_lines = string_lines.replace("\"", "")
+                string_lines = string_lines.replace(":", "")
+                string_lines = string_lines.replace(",", "")
+                string_list = string_lines.split()
+
+                key_list = []
+                for string in string_list:
+                    if string.startswith('"I18N_'):
+                        key_list.append(string)
+                self.assertEqual(sorted(key_list), key_list)
 
     def test_keys_match_en_qqq(self):
         """Tests that en.json and qqq.json have the exact same set of keys."""
