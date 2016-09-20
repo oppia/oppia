@@ -42,7 +42,8 @@ def get_top_unresolved_answers_for_default_rule(exploration_id, state_name):
 
 def get_exps_unresolved_answers_for_default_rule(exp_ids):
     """Gets unresolved answers per exploration for default rule across all
-    states for explorations with ids in exp_ids.
+    states for explorations with ids in exp_ids. The value of total count should
+    match the sum of values of indiviual counts for each unresolved answer.
 
     Note that this method currently returns the data only for the DEFAULT rule.
     This should ideally handle all types of unresolved answers.
@@ -50,7 +51,7 @@ def get_exps_unresolved_answers_for_default_rule(exp_ids):
     Returns a dict of the following format:
         {
           'exp_id_1': {
-            'count': 10 (number of unresolved answers for this exploration),
+            'count': 7 (number of unresolved answers for this exploration),
             'unresolved_answers': (list of unresolved answers sorted by count)
               [
                 {'count': 4, 'value': 'answer_1', 'state': 'Introduction'},
@@ -59,12 +60,13 @@ def get_exps_unresolved_answers_for_default_rule(exp_ids):
               ]
           },
           'exp_id_2': {
-            'count': 20,
+            'count': 13,
             'unresolved_answers':
               [
                 {'count': 8, 'value': 'answer_5', 'state': 'Introduction'},
                 {'count': 3, 'value': 'answer_4', 'state': 'Quest'},
                 {'count': 1, 'value': 'answer_6', 'state': 'End'}
+                {'count': 1, 'value': 'answer_8', 'state': 'End'}
               ]
           }
         }
