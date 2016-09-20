@@ -55,7 +55,7 @@ oppia.controller('flagExplorationPopup', [
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
             };     
-          };
+          }
         ]
       }).result.then(function(result) {
         var flagExplorationUrl = (
