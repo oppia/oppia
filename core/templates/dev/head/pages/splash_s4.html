@@ -24,14 +24,7 @@
 {% block content %}
   <div ng-controller="Splash">
     <div class="oppia-splash-section-one text-center">
-      <h1 class="oppia-splash-h1" style="max-width: 800px; font-size: 2.3em; line-height: 1.5em; padding-bottom: 0.5em;">Hard to keep students engaged?</h1>
-
-      <div style="position: relative; left: -webkit-calc(-70px + 15%); left: -moz-calc(-70px + 15%); left: -o-calc(-70px + 15%); left: calc(-70px + 15%);">
-        <h2 style="max-width: 400px; color: #005c53; font-size: 1.6em; font-family: Capriola; line-height: 1.5em;">
-          Interactive lessons allow students to learn at their own pace
-        </h2>
-      </div>
-
+      <h1 class="oppia-splash-h1" translate="I18N_SPLASH_TITLE"></h1>
       <div style="position: relative;">
         <div style="padding-left: 200px;">
           <div class="oppia-splash-background-icon-row">
@@ -134,34 +127,33 @@
         </div>
 
         <div style="position: absolute; width: 100%;">
+          <button type="button" ng-click="onClickBrowseLibraryButton()"
+                  class="btn oppia-splash-button oppia-splash-button-browse oppia-transition-200"
+                  style="left: -webkit-calc(130px + 15%); left: -moz-calc(130px + 15%); left: -o-calc(130px + 15%); left: calc(130px + 15%); bottom: 210px; z-index: 10;"
+                  translate="I18N_ACTION_BROWSE_EXPLORATIONS">
+          </button>
+
           {% if not user_is_logged_in %}
             <!-- User must complete the registration process. -->
             <button type="button"
                     ng-click="onRedirectToLogin('/dashboard?mode=create')"
                     class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200"
-                    style="left: -webkit-calc(130px + 15%); left: -moz-calc(130px + 15%); left: -o-calc(130px + 15%); left: calc(130px + 15%); bottom: 210px; z-index: 10;"
-                    translate="I18N_ACTION_CREATE_LESSON">
+                    style="left: -webkit-calc(130px + 15%); left: -moz-calc(130px + 15%); left: -o-calc(130px + 15%); left: calc(130px + 15%); bottom: 150px; font-size: 0.93em; z-index: 10; padding-top: 13px;"
+                    translate="I18N_ACTION_CREATE_EXPLORATION">
             </button>
           {% else %}
             <button type="button"
                     ng-click="onClickCreateExplorationButton()"
                     class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200"
-                    style="left: -webkit-calc(130px + 15%); left: -moz-calc(130px + 15%); left: -o-calc(130px + 15%); left: calc(130px + 15%); bottom: 210px; z-index: 10;"
-                    translate="I18N_ACTION_CREATE_LESSON">
+                    style="left: -webkit-calc(130px + 15%); left: -moz-calc(130px + 15%); left: -o-calc(130px + 15%); left: calc(130px + 15%); bottom: 150px; font-size: 0.93em; z-index: 10; padding-top: 13px;"
+                    translate="I18N_ACTION_CREATE_EXPLORATION">
             </button>
           {% endif %}
-
-          <button type="button" ng-click="onClickBrowseLibraryButton()"
-                  class="btn oppia-splash-button oppia-splash-button-browse oppia-transition-200"
-                  style="left: -webkit-calc(130px + 15%); left: -moz-calc(130px + 15%); left: -o-calc(130px + 15%); left: calc(130px + 15%); bottom: 150px; font-size: 0.93em; z-index: 10;"
-                  translate="I18N_ACTION_BROWSE_LESSONS">
-          </button>
         </div>
       </div>
 
       <div class="oppia-splash-h2-container">
-        <h2 class="oppia-splash-h2" style="padding-bottom: 30px; font-size: 1.6em; padding-top: 100px; max-width: 700px;">
-        </h2>
+        <h2 class="oppia-splash-h2" translate="I18N_SPLASH_SUBTITLE" style="padding-bottom: 30px; padding-top: 90px; font-size: 1.6em; max-width: 700px;"></h2>
       </div>
     </div>
 
@@ -169,14 +161,14 @@
       <div class="oppia-splash-section-two-content" style="padding-top: 0;">
         <div class="oppia-splash-bullet" style="overflow: visible;">
           <div class="oppia-splash-bullet-block oppia-splash-block-left-image">
-            <img ng-src="<[getStaticImageUrl('/splash/bullet1icon.svg')]>" class="oppia-splash-overlapping-image-1">
+            <img ng-src="<[getStaticImageUrl('/splash/bullet1icon.svg')]>"  class="oppia-splash-overlapping-image-1">
           </div>
           <div class="oppia-splash-bullet-block oppia-splash-block-right-text"
-               translate="I18N_SPLASH_FIRST_EXPLORATION_DESCRIPTION_ALTERNATE">
+               translate="I18N_SPLASH_FIRST_EXPLORATION_DESCRIPTION">
           </div>
         </div>
 
-        <div class="oppia-splash-bullet" style="clear: both;">
+        <div class="oppia-splash-bullet">
           <div class="oppia-splash-bullet-block oppia-splash-block-right-image">
             <img ng-src="<[getStaticImageUrl('/splash/bullet2icon.svg')]>">
           </div>

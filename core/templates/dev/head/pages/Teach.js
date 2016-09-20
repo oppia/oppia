@@ -17,9 +17,19 @@
  */
 
 oppia.controller('Teach', [
-  '$scope', 'UrlInterpolationService',
+  '$scope', '$timeout', '$window', 'siteAnalyticsService',
+  'UrlInterpolationService',
   function(
-      $scope, UrlInterpolationService) {
+      $scope, $timeout, $window, siteAnalyticsService,
+      UrlInterpolationService) {
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+
+    $scope.onApplyToTeachWithOppia = function() {
+      siteAnalyticsService.registerApplyToTeachWithOppiaEvent();
+      $timeout(function() {
+        $window.location = 'https://goo.gl/forms/ljmQ9R3AZRkT2kU23';
+      }, 150);
+      return false;
+    };
   }
 ]);

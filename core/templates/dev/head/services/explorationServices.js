@@ -32,7 +32,7 @@ oppia.factory('oppiaExplorationHtmlFormatterService', [
         element = (
           extensionTagAssemblerService.formatCustomizationArgAttrs(
             element, interactionCustomizationArgSpecs));
-
+        element.attr('on-submit', 'submitAnswer(answer, rulesService);');
         if (labelForFocusTarget) {
           element.attr('label-for-focus-target', labelForFocusTarget);
         }
