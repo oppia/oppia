@@ -25,9 +25,7 @@ oppia.controller('flagExplorationPopup', [
         backdrop: true,
         controller: [
         '$scope', '$modalInstance', 'explorationContextService',
-        '$http',
-          function($scope, $modalInstance, explorationContextService,
-            $http) {
+          function($scope, $modalInstance, explorationContextService) {
             var explorationId = (
               explorationContextService.getExplorationId());
             $scope.other = false;
