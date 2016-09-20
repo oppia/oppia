@@ -19,7 +19,6 @@ oppia.controller('flagExplorationPopup', [
   '$scope', '$element', '$http', 'explorationContextService', '$modal',
   function(
     $scope, $element, $http, explorationContextService, $modal) {
-
     $scope.showFlagExplorationModal = function() {
       $modal.open({
         templateUrl: 'modals/flagExploration',
@@ -34,7 +33,7 @@ oppia.controller('flagExplorationPopup', [
             $scope.other = false;
 
             $scope.triggerOther = function(value) {
-              if (value == 'other') {
+              if (value === 'other') {
                 $scope.other = true;
                 $scope.flagMessage = null;
               } else {
@@ -48,13 +47,13 @@ oppia.controller('flagExplorationPopup', [
                 $modalInstance.close({
                   report: $scope.flagMessage,
                   exp_id: explorationId
-                })
+                });
               }
             };
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-            };     
+            };
           }
         ]
       }).result.then(function(result) {
