@@ -237,31 +237,25 @@ def _get_thread_from_model(thread_model):
         thread_model.created_on, thread_model.last_updated)
 
 
-def get_messages_multi_for_exps(exploration_ids, limit=None):
-    """Fetch the feedback threads for the given list of exploration_ids, and use
-    those to finally get the new (open) feedback messages.
+def get_messages_for_exp_id(exp_id, limit=None):
+    """Fetch the feedback threads for the given exploration, and use those to
+    finally get the new (open) feedback messages.
 
-    Returns an object keyed by exploration_ids whose values are a list of
-    feedback message domain objects, limited by 'limit' argument passed here.
-    Default value of limit is None, implying that the result will not be limited
-    at all in such a case.
+    Returns a list of feedback message domain objects, limited by 'limit'
+    argument passed here. Default value of limit is None, implying that the
+    result will not be limited at all in such a case.
     """
-    thread_models_exps = feedback_models.FeedbackThreadModel.get_threads_multi(
-        exploration_ids)
-    messages_models_exps = (
-        feedback_models.FeedbackMessageModel.get_messages_multi(
-            [thread.id for thread in thread_models_exps]))
-    result = {exploration_id: [] for exploration_id in exploration_ids}
-    for message_models_exp in messages_models_exps:
-        if not limit or len(result[message_models_exp.exploration_id]) < limit:
-            result[message_models_exp.exploration_id].append(
-                _get_message_from_model(message_models_exp))
+    thread_models = feedback_models.FeedbackThreadModel.get_threads(exp_id)
+    messages_models = (
+        feedback_models.FeedbackMessageModel.get_messages(
+            [thread.id for thread in thread_models]))
+
+    result = []
+    for message_model in messages_models:
+        if not limit or len(result) < limit:
+            result.append(_get_message_from_model(message_model))
 
     return result
-
-
-def get_messages_for_exp_id(exp_id, limit=None):
-    return get_messages_multi_for_exps([exp_id], limit)[exp_id]
 
 
 def get_threads(exploration_id):

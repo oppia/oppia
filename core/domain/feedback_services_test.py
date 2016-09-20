@@ -268,62 +268,6 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.assertDictContainsSubset(self.EXPECTED_THREAD_DICT,
                                       threads[0].to_dict())
 
-    def test_get_threads_multiple_explorations(self):
-        feedback_services.create_thread(
-            self.EXP_ID_1, self.EXPECTED_THREAD_DICT['state_name'], None,
-            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
-        feedback_services.create_thread(
-            self.EXP_ID_2, self.EXPECTED_THREAD_DICT['state_name'], None,
-            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
-
-        messages = feedback_services.get_messages_multi_for_exps(
-            [self.EXP_ID_1, self.EXP_ID_2])
-        self.assertEqual(2, len(messages))
-        self.assertEqual(1, len(messages[self.EXP_ID_1]))
-        self.assertEqual(1, len(messages[self.EXP_ID_2]))
-        self.assertDictContainsSubset(self.EXPECTED_MESSAGE_DICT_EXP_1,
-                                      messages[self.EXP_ID_1][0].to_dict())
-        self.assertDictContainsSubset(self.EXPECTED_MESSAGE_DICT_EXP_2,
-                                      messages[self.EXP_ID_2][0].to_dict())
-
-    def test_get_feedback_messages_multi_with_limit_multiple_explorations(self):
-        feedback_services.create_thread(
-            self.EXP_ID_1, self.EXPECTED_THREAD_DICT['state_name'], None,
-            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
-        feedback_services.create_thread(
-            self.EXP_ID_2, self.EXPECTED_THREAD_DICT['state_name'], None,
-            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
-        feedback_services.create_thread(
-            self.EXP_ID_2, self.EXPECTED_THREAD_DICT['state_name'], None,
-            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
-        feedback_services.create_thread(
-            self.EXP_ID_2, self.EXPECTED_THREAD_DICT['state_name'], None,
-            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
-        feedback_services.create_thread(
-            self.EXP_ID_2, self.EXPECTED_THREAD_DICT['state_name'], None,
-            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
-        feedback_services.create_thread(
-            self.EXP_ID_2, self.EXPECTED_THREAD_DICT['state_name'], None,
-            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
-        feedback_services.create_thread(
-            self.EXP_ID_2, self.EXPECTED_THREAD_DICT['state_name'], None,
-            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
-
-        messages = feedback_services.get_messages_multi_for_exps(
-            [self.EXP_ID_1, self.EXP_ID_2],
-            limit=feconf.NEW_FEEDBACK_COUNT_DASHBOARD)
-        self.assertEqual(2, len(messages))
-        self.assertEqual(1, len(messages[self.EXP_ID_1]))
-        self.assertEqual(3, len(messages[self.EXP_ID_2]))
-        self.assertDictContainsSubset(self.EXPECTED_MESSAGE_DICT_EXP_1,
-                                      messages[self.EXP_ID_1][0].to_dict())
-        self.assertDictContainsSubset(self.EXPECTED_MESSAGE_DICT_EXP_2,
-                                      messages[self.EXP_ID_2][0].to_dict())
-        self.assertDictContainsSubset(self.EXPECTED_MESSAGE_DICT_EXP_2,
-                                      messages[self.EXP_ID_2][1].to_dict())
-        self.assertDictContainsSubset(self.EXPECTED_MESSAGE_DICT_EXP_2,
-                                      messages[self.EXP_ID_2][2].to_dict())
-
     def test_get_all_threads(self):
         # Create an anonymous feedback thread
         feedback_services.create_thread(

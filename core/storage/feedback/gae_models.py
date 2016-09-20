@@ -122,21 +122,6 @@ class FeedbackThreadModel(base_models.BaseModel):
             cls.exploration_id == exploration_id).order(
                 cls.last_updated).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
-    @classmethod
-    def get_threads_multi(cls, exploration_ids):
-        """Returns an array of threads ordered by last updated associated to
-        explorations with ids in exploration_ids.
-
-        Does not include the deleted entries.
-        """
-        # To prevent "BadQueryError: Cannot convert FalseNode to predicate":
-        # http://stackoverflow.com/a/15552890
-        if len(exploration_ids) == 0:
-            return []
-        return cls.get_all().filter(
-            cls.exploration_id.IN(exploration_ids)).order(
-                cls.last_updated).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
 
 class FeedbackMessageModel(base_models.BaseModel):
     """Feedback messages. One or more of these messages make a thread.
@@ -208,14 +193,6 @@ class FeedbackMessageModel(base_models.BaseModel):
             exploration_id, thread_id)
         return cls.get_all().filter(
             cls.thread_id == full_thread_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-    @classmethod
-    def get_messages_multi(cls, thread_ids):
-        if len(thread_ids) == 0:
-            return []
-        return cls.get_all().filter(
-            cls.thread_id.IN(thread_ids)).order(cls.last_updated).fetch(
-                feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_most_recent_message(cls, exploration_id, thread_id):
