@@ -26,6 +26,11 @@
                    ng-class="{'conversation-skin-progress-dots-iframed': isIframed, 'conversation-skin-progress-dots-not-iframed': !isIframed}">
     </progress-dots>
 
+    {% if username %}
+    <button value="Flag" ng-click="showFlagExplorationModal()" ng-controller="flagExplorationPopup" style="margin-top: 20px;position: relative; left: 68%">
+    Flag</button>
+    {% endif %}
+
     <div class="conversation-skin-cards-container conversation-skin-animate-cards"
          ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
       <div ng-show='!isViewportNarrow() || isScreenNarrowAndShowingTutorCard()'

@@ -1,0 +1,47 @@
+<script type="text/ng-template" id="modals/flagExploration" ng-controller="flagExplorationPopup">
+  <div class="modal-header">
+    <h3>
+      <span>Report Exploration</span>
+    </h3>
+  </div>
+  <div class="modal-body oppia-long-text">
+    <form>
+      <div class="radio">
+      <label><input type="radio" name="AD" value="AD" ng-model="flag" ng-change="triggerOther(flag)">It is an Ad</label>
+      </div>
+      <div class="radio">
+      <label><input type="radio" name="inappropriate" value="inappropriate" ng-model="flag" ng-change="triggerOther(flag)">Inappropriate Content</label>
+      </div>
+      <div class="radio">
+      <label><input type="radio" name="duplicate" value="duplicate" ng-model="flag" ng-change="triggerOther(flag)">Duplicate Content</label>
+      </div>
+      <div class="radio">
+        <label><input type="radio" name="Other" value="other" ng-model="flag" ng-change="triggerOther(flag)">Other</label>
+        <p ng-show="other">Please enter a brief description of what you want to report about the exploration:
+        <textarea rows="3" cols="50" ng-model="flagMessage"
+        class="protractor-test-commit-message-input"></textarea>
+        </p>
+      </div>
+    </form>
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-success protractor-test-close-save-modal" ng-click="submitFlag()">
+    Submit  
+    </button>
+  </div>
+</script>
+<script type="text/ng-template" id="modals/explorationFlagSubmitted" ng-controller="flagExplorationPopup">
+    <div class="modal-header">
+      <h3>Thanks!</h3>
+    </div>
+
+    <div class="modal-body">
+      <p>
+        Your Flag has been forwarded to the Moderators for review.
+      </p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-default" ng-click="close()">Close</button>
+    </div>
+  </script>
