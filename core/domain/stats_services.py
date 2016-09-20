@@ -152,7 +152,8 @@ def get_exploration_stats(exploration_id, exploration_version):
                     state_hit_counts[state_name]['total_entry_count']
                     if state_name in state_hit_counts else 0),
                 'no_submitted_answer_count': (
-                    state_hit_counts[state_name].get('no_answer_count', 0)),
+                    state_hit_counts[state_name].get('no_answer_count', 0)
+                    if state_name in state_hit_counts else 0),
                 'num_default_answers': count_top_state_rule_answers(
                     exploration_id, state_name,
                     exp_domain.DEFAULT_OUTCOME_CLASSIFICATION, 100),
