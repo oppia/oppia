@@ -19,10 +19,7 @@ oppia.controller('flagExplorationPopup', [
   '$scope', '$element', '$http', 'explorationContextService', '$modal',
   function(
     $scope, $element, $http, explorationContextService, $modal) {
-    $scope.flag = null;
-    $scope.radioChanged = function() {
-      console.log($scope.flag);
-    }
+
     $scope.showFlagExplorationModal = function() {
       $modal.open({
         templateUrl: 'modals/flagExploration',
@@ -37,15 +34,15 @@ oppia.controller('flagExplorationPopup', [
             $scope.other = false;
 
             $scope.triggerOther = function(value) {
-              if(value == 'other'){
+              if (value == 'other') {
                 $scope.other = true;
                 $scope.flagMessage = null;
               } else {
                 $scope.other = false;
                 $scope.flagMessage = $scope.flag;
               }
-            }
-                
+            };
+
             $scope.submitFlag = function() {
               if ($scope.flagMessage) {
                 $modalInstance.close({
@@ -53,20 +50,19 @@ oppia.controller('flagExplorationPopup', [
                   exp_id: explorationId
                 })
               }
-            }
+            };
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-            };
-                
-          }
+            };     
+          };
         ]
       }).result.then(function(result) {
         var flagExplorationUrl = (
             '/flagexplorationhandler/' + result.exp_id);
         $http.post(flagExplorationUrl, {
-                  report: result.report
-        }).error(function(res){
+          report: result.report
+        }).error(function(res) {
           alertsService.addWarning(res);
         });
         $modal.open({
@@ -77,12 +73,11 @@ oppia.controller('flagExplorationPopup', [
             function($scope, $modalInstance) {
               $scope.close = function() {
                 $modalInstance.dismiss('cancel');
-              }
+              };
             }
           ]
-        })
-      })
+        });
+      });
     };
-          
   }
 ]);
