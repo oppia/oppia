@@ -201,6 +201,14 @@ class BaseHandler(webapp2.RequestHandler):
                     user_settings.profile_picture_data_url)
                 if user_settings.last_started_state_editor_tutorial:
                     self.has_seen_editor_tutorial = True
+                # In order to avoid too many datastore writes, we do not bother
+                # recording a log-in if the current time is sufficiently close
+                # to the last log-in time.
+                if (user_settings.last_logged_in is None or
+                        not utils.are_datetimes_close(
+                            datetime.datetime.utcnow(),
+                            user_settings.last_logged_in)):
+                    user_services.record_user_logged_in(self.user_id)
 
         self.is_moderator = rights_manager.Actor(self.user_id).is_moderator()
         self.is_admin = rights_manager.Actor(self.user_id).is_admin()
