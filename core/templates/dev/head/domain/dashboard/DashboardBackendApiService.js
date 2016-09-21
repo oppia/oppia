@@ -19,11 +19,7 @@
 
 oppia.factory('DashboardBackendApiService', ['$http', function($http) {
   var _fetchDashboardData = function() {
-    return $http.get('/dashboardhandler/data').then(function(response) {
-      return angular.copy(response.data);
-    }, function(errorResponse) {
-      return errorResponse.status;
-    });
+    return $http.get('/dashboardhandler/data');
   };
 
   var _fetchExplorationStats = function(explorationId) {
@@ -31,10 +27,6 @@ oppia.factory('DashboardBackendApiService', ['$http', function($http) {
       '/dashboardhandler/explorationstats/?exp_id=' + explorationId);
     return $http.get(requestUrl, {
       cache: true
-    }).then(function(response) {
-      return angular.copy(response.data);
-    }, function(errorResponse) {
-      return errorResponse.status;
     });
   };
 

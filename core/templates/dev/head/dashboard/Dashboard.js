@@ -94,9 +94,9 @@ oppia.controller('Dashboard', [
       } else {
         DashboardBackendApiService.fetchExplorationStats(explorationId).then(
           function(response) {
-            $scope.explorationStats[explorationId] = response;
-          }, function(errorStatus) {
-            if (FATAL_ERROR_CODES.indexOf(errorStatus) !== -1) {
+            $scope.explorationStats[explorationId] = response.data;
+          }, function(errorResponse) {
+            if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
               alertsService.addWarning(
                 'Failed to get statistics for this exploration');
             }
@@ -184,12 +184,13 @@ oppia.controller('Dashboard', [
     $rootScope.loadingMessage = 'Loading';
     DashboardBackendApiService.fetchDashboardData().then(
       function(response) {
+        var responseData = response.data;
         $scope.currentSortType = EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK;
         $scope.isCurrentSortDescending = true;
-        $scope.explorationsList = response.explorations_list;
-        $scope.collectionsList = response.collections_list;
-        $scope.dashboardStats = response.dashboard_stats;
-        $scope.lastWeekStats = response.last_week_stats;
+        $scope.explorationsList = responseData.explorations_list;
+        $scope.collectionsList = responseData.collections_list;
+        $scope.dashboardStats = responseData.dashboard_stats;
+        $scope.lastWeekStats = responseData.last_week_stats;
         if ($scope.dashboardStats && $scope.lastWeekStats) {
           $scope.relativeChangeInTotalPlays = (
             $scope.dashboardStats.total_plays - $scope.lastWeekStats.total_plays
@@ -197,8 +198,8 @@ oppia.controller('Dashboard', [
         }
         $rootScope.loadingMessage = '';
       },
-      function(errorStatus) {
-        if (FATAL_ERROR_CODES.indexOf(errorStatus) !== -1) {
+      function(errorResponse) {
+        if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
           alertsService.addWarning('Failed to get dashboard data');
         }
       }

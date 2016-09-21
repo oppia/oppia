@@ -18,7 +18,6 @@
 
 describe('Dashboard backend API service', function() {
   var DashboardBackendApiService = null;
-  var UrlInterpolationService = null;
   var $httpBackend = null;
   var sampleDataResults = null;
   var sampleExplorationStatsData = null;
@@ -31,74 +30,6 @@ describe('Dashboard backend API service', function() {
     DashboardBackendApiService = $injector.get('DashboardBackendApiService');
     UrlInterpolationService = $injector.get('UrlInterpolationService');
     $httpBackend = $injector.get('$httpBackend');
-
-    // Sample dashboard data returnable from the backend
-    sampleDataResults = {
-      explorations_list: [{
-        id: SAMPLE_EXP_ID,
-        title: 'Sample Title',
-        activity_type: 'exploration',
-        category: 'Computing',
-        objective: 'Sample objective',
-        language_code: 'en',
-        created_on_msec: 1466178691847.67,
-        last_updated_msec: 1466178759209.839,
-        status: 'public',
-        rating: {
-          5: 0,
-          4: 1,
-          3: 0,
-          2: 0,
-          1: 0
-        },
-        community_owned: false,
-        tags: '',
-        thumbnail_icon_url: UrlInterpolationService.getStaticImageUrl(
-          '/subjects/Computing.svg'),
-        thumbnail_bg_color: '#bb8b2f',
-        num_views: 2,
-        num_open_threads: 0,
-        num_total_threads: 0,
-        num_unresolved_answers: 2,
-        top_unresolved_answers: [
-          {
-            state: 'Introduction',
-            value: '40',
-            count: 2
-          },
-          {
-            state: 'Introduction',
-            value: '20',
-            count: 1
-          }
-        ]
-      }],
-      collections_list: [],
-      dashboard_stats: {
-        total_plays: 10,
-        num_ratings: 1,
-        average_ratings: 4.0,
-        total_open_feedback: 5
-      },
-      last_week_stats: {
-        total_plays: 2,
-        average_ratings: 3.5,
-        num_ratings: 3,
-        total_open_feedback: 1
-      }
-    };
-
-    sampleExplorationStatsData = {
-      new_feedback: [{
-        author_username: 'avijit',
-        created_on: 1471649252020.614,
-        exploration_id: 'ASt_bM51b4k8',
-        message_id: 0,
-        text: 'Awesome :)',
-        updated_status: 'open',
-        updated_subject: '(Feedback from a learner)'
-      }]
-    };
   }));
 
   afterEach(function() {
@@ -117,7 +48,7 @@ describe('Dashboard backend API service', function() {
       successHandler, failHandler);
     $httpBackend.flush();
 
-    expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+    expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
   });
 
@@ -134,7 +65,7 @@ describe('Dashboard backend API service', function() {
     $httpBackend.flush();
 
     expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(ERROR_STATUS_CODE);
+    expect(failHandler).toHaveBeenCalled();
   });
 
   it('should successfully fetch statistics for an exploration from the backend',
@@ -151,7 +82,7 @@ describe('Dashboard backend API service', function() {
       successHandler, failHandler);
     $httpBackend.flush();
 
-    expect(successHandler).toHaveBeenCalledWith(sampleExplorationStatsData);
+    expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
   });
 
@@ -171,6 +102,6 @@ describe('Dashboard backend API service', function() {
     $httpBackend.flush();
 
     expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(ERROR_STATUS_CODE);
+    expect(failHandler).toHaveBeenCalled();
   });
 });
