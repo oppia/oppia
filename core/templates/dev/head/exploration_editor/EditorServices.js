@@ -134,10 +134,11 @@ oppia.factory('explorationData', [
           version: explorationData.data.version
         }).then(function(response) {
           alertsService.clearWarnings();
-          $log.info('Changes to this exploration were saved successfully.');
           explorationData.data = response.data;
           if (successCallback) {
-            successCallback();
+            successCallback(
+              response.data.is_version_of_draft_valid,
+              response.data.draft_changes);
           }
         }, function() {
           if (errorCallback) {

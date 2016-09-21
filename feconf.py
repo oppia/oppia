@@ -223,6 +223,7 @@ EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
 EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION = 'editor_role_notification'
 EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION = 'feedback_message_notification'
 EMAIL_INTENT_SUGGESTION_NOTIFICATION = 'suggestion_notification'
+EMAIL_INTENT_REPORT_BAD_CONTENT = 'report_bad_content'
 EMAIL_INTENT_MARKETING = 'marketing'
 EMAIL_INTENT_PUBLICIZE_EXPLORATION = 'publicize_exploration'
 EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
@@ -416,6 +417,8 @@ TASK_URL_FEEDBACK_MESSAGE_EMAILS = (
     '%s/email/batchfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX)
 TASK_URL_FEEDBACK_STATUS_EMAILS = (
     '%s/email/feedbackthreadstatuschangeemailhandler' % TASKQUEUE_URL_PREFIX)
+TASK_URL_FLAG_EXPLORATION_EMAILS = (
+    '%s/email/flagexplorationemailhandler' % TASKQUEUE_URL_PREFIX)
 TASK_URL_INSTANT_FEEDBACK_EMAILS = (
     '%s/email/instantfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX)
 TASK_URL_SUGGESTION_EMAILS = (
@@ -441,6 +444,7 @@ FEEDBACK_STATS_URL_PREFIX = '/feedbackstatshandler'
 FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
+FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 LIBRARY_INDEX_URL = '/library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
 LIBRARY_SEARCH_URL = '/search/find'
@@ -603,14 +607,16 @@ SEARCH_DROPDOWN_CATEGORIES = sorted([
     'History',
 ])
 
-# The header for the "Featured Activities" category in the library index page.
-LIBRARY_CATEGORY_FEATURED_ACTIVITIES = 'Featured Activities'
-# The header for the "Top Rated Explorations" category in the library index
-# page.
-LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = 'Top Rated Explorations'
-# The header for the "Recently Published" category in the library index
-# page.
-LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'Recently Published'
+# The i18n id for the header of the "Featured Activities" category in the
+# library index page.
+LIBRARY_CATEGORY_FEATURED_ACTIVITIES = 'I18N_LIBRARY_GROUPS_FEATURED_ACTIVITIES'
+# The i18n id for the header of the "Top Rated Explorations" category in the
+# library index page.
+LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = (
+    'I18N_LIBRARY_GROUPS_TOP_RATED_EXPLORATIONS')
+# The i18n id for the header of the "Recently Published" category in the
+# library index page.
+LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'I18N_LIBRARY_GROUPS_RECENTLY_PUBLISHED'
 
 # List of supported language codes. Each description has a
 # parenthetical part that may be stripped out to give a shorter

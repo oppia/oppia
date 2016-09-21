@@ -140,6 +140,8 @@ SENDER_VALIDATORS = {
         lambda x: rights_manager.Actor(x).is_admin()),
     feconf.EMAIL_INTENT_DELETE_EXPLORATION: (
         lambda x: rights_manager.Actor(x).is_moderator()),
+    feconf.EMAIL_INTENT_REPORT_BAD_CONTENT: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
 }
 
 
@@ -508,3 +510,36 @@ def send_instant_feedback_message_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION, email_subject,
             email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_flag_exploration_email(
+        exploration_title, exploration_id, reporter_id, report_text):
+    email_subject = 'Exploration flagged by user: "%s"' % exploration_title
+
+    email_body_template = (
+        'Hello Moderator,<br>'
+        '%s has flagged exploration "%s" on the following '
+        'grounds: <br>'
+        '%s .<br>'
+        'You can modify the exploration by clicking '
+        '<a href="https://www.oppia.org/create/%s">here</a>.<br>'
+        '<br>'
+        'Thanks!<br>'
+        '- The Oppia Team<br>'
+        '<br>%s')
+
+    if not feconf.CAN_SEND_EMAILS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    email_body = email_body_template % (
+        user_services.get_user_settings(reporter_id).username,
+        exploration_title, report_text, exploration_id,
+        EMAIL_FOOTER.value)
+
+    recipient_list = config_domain.MODERATOR_IDS.value
+    for recipient_id in recipient_list:
+        _send_email(
+            recipient_id, feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_REPORT_BAD_CONTENT,
+            email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
