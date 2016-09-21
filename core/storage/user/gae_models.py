@@ -40,6 +40,9 @@ class UserSettingsModel(base_models.BaseModel):
     last_agreed_to_terms = ndb.DateTimeProperty(default=None)
     # When the user last started the state editor tutorial. May be None.
     last_started_state_editor_tutorial = ndb.DateTimeProperty(default=None)  # pylint: disable=invalid-name
+    # When the user last logged in. This may be out-of-date by up to
+    # feconf.PROXIMAL_TIMEDELTA_SECS seconds.
+    last_logged_in = ndb.DateTimeProperty(default=None)
     # User uploaded profile picture as a dataURI string. May be None.
     profile_picture_data_url = ndb.TextProperty(default=None, indexed=False)
     # User specified biography (to be shown on their profile page).
@@ -59,9 +62,8 @@ class UserSettingsModel(base_models.BaseModel):
         choices=[lc['code'] for lc in feconf.ALL_LANGUAGE_CODES])
     # System language preference (for I18N).
     preferred_site_language_code = ndb.StringProperty(
-        default=None,
-        choices=[language['id'] for language in feconf.SUPPORTED_SITE_LANGUAGES]
-        )
+        default=None, choices=[
+            language['id'] for language in feconf.SUPPORTED_SITE_LANGUAGES])
 
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):

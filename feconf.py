@@ -520,6 +520,10 @@ UPDATE_TYPE_EXPLORATION_COMMIT = 'exploration_commit'
 UPDATE_TYPE_COLLECTION_COMMIT = 'collection_commit'
 UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
 
+# The time difference between which to consider two login events "close". This
+# is taken to be 12 hours.
+PROXIMAL_TIMEDELTA_SECS = 12 * 60 * 60
+
 DEFAULT_COLOR = '#a33f40'
 DEFAULT_THUMBNAIL_ICON = 'Lightbulb'
 
