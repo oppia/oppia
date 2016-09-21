@@ -138,22 +138,19 @@ mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
 # Register the URLs with the classes responsible for handling them.
 URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/_ah/warmup', WarmupHandler),
+    get_redirect_route(r'/', HomePageRedirectHandler),
 
     get_redirect_route(feconf.SPLASH_URL, pages.SplashPage),
     get_redirect_route(r'/about', pages.AboutPage),
-    get_redirect_route(
-        r'/foundation', pages.AboutRedirectPage),
-    get_redirect_route(
-        r'/credits', pages.AboutRedirectPage),
+    get_redirect_route(r'/foundation', pages.AboutRedirectPage),
+    get_redirect_route(r'/credits', pages.AboutRedirectPage),
     get_redirect_route(r'/teach', pages.TeachPage),
-    get_redirect_route(
-        r'/participate', pages.TeachRedirectPage),
-    get_redirect_route(
-        r'/site_guidelines', pages.TeachRedirectPage),
-    get_redirect_route(
-        r'/console_errors', pages.ConsoleErrorPage),
+    get_redirect_route(r'/participate', pages.TeachRedirectPage),
+    get_redirect_route(r'/site_guidelines', pages.TeachRedirectPage),
+    get_redirect_route(r'/console_errors', pages.ConsoleErrorPage),
     get_redirect_route(r'/contact', pages.ContactPage),
 
+    get_redirect_route(r'/blog', pages.BlogPage),
     get_redirect_route(r'/forum', pages.ForumPage),
     get_redirect_route(r'/donate', pages.DonatePage),
     get_redirect_route(r'/thanks', pages.ThanksPage),
@@ -162,8 +159,7 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
-    get_redirect_route(
-        r'/adminjoboutput', admin.AdminJobOutput),
+    get_redirect_route(r'/adminjoboutput', admin.AdminJobOutput),
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvDownloadHandler),
@@ -188,163 +184,185 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/my_explorations', dashboard.DashboardRedirectPage),
 
-    get_redirect_route(r'/imagehandler/<exploration_id>/<encoded_filepath>',
-                       resources.ImageHandler),
-    get_redirect_route(r'/object_editor_template/<obj_type>',
-                       resources.ObjectEditorTemplateHandler),
-    get_redirect_route(r'/value_generator_handler/<generator_id>',
-                       resources.ValueGeneratorHandler),
-
-    get_redirect_route(r'/', HomePageRedirectHandler),
+    get_redirect_route(
+        r'/imagehandler/<exploration_id>/<encoded_filepath>',
+        resources.ImageHandler),
+    get_redirect_route(
+        r'/object_editor_template/<obj_type>',
+        resources.ObjectEditorTemplateHandler),
+    get_redirect_route(
+        r'/value_generator_handler/<generator_id>',
+        resources.ValueGeneratorHandler),
 
     get_redirect_route(r'%s' % feconf.LIBRARY_INDEX_URL, library.LibraryPage),
     get_redirect_route(r'/libraryindexhandler', library.LibraryIndexHandler),
     get_redirect_route(r'%s' % feconf.LIBRARY_SEARCH_URL, library.LibraryPage),
-    get_redirect_route(r'%s' % feconf.LIBRARY_SEARCH_DATA_URL,
-                       library.SearchHandler),
+    get_redirect_route(
+        r'%s' % feconf.LIBRARY_SEARCH_DATA_URL, library.SearchHandler),
     get_redirect_route(r'/gallery', library.LibraryRedirectPage),
     get_redirect_route(r'/contribute', library.LibraryRedirectPage),
     get_redirect_route(r'/learn', library.LibraryRedirectPage),
     get_redirect_route(r'/playtest', library.LibraryRedirectPage),
-    get_redirect_route(feconf.EXPLORATION_SUMMARIES_DATA_URL,
-                       library.ExplorationSummariesHandler),
+    get_redirect_route(
+        feconf.EXPLORATION_SUMMARIES_DATA_URL,
+        library.ExplorationSummariesHandler),
 
     get_redirect_route(r'/profile/<username>', profile.ProfilePage),
-    get_redirect_route(r'/profilehandler/data/<username>',
-                       profile.ProfileHandler),
+    get_redirect_route(
+        r'/profilehandler/data/<username>', profile.ProfileHandler),
     get_redirect_route(r'/preferences', profile.PreferencesPage),
-    get_redirect_route(r'/preferenceshandler/data',
-                       profile.PreferencesHandler),
-    get_redirect_route(r'/preferenceshandler/profile_picture',
-                       profile.ProfilePictureHandler),
+    get_redirect_route(
+        r'/preferenceshandler/data', profile.PreferencesHandler),
+    get_redirect_route(
+        r'/preferenceshandler/profile_picture', profile.ProfilePictureHandler),
     get_redirect_route(
         r'/preferenceshandler/profile_picture_by_username/<username>',
         profile.ProfilePictureHandlerByUsername),
     get_redirect_route(r'%s' % feconf.SIGNUP_URL, profile.SignupPage),
     get_redirect_route(r'%s' % feconf.SIGNUP_DATA_URL, profile.SignupHandler),
-    get_redirect_route(r'%s' % feconf.USERNAME_CHECK_DATA_URL,
-                       profile.UsernameCheckHandler),
-    get_redirect_route(r'%s' % feconf.SITE_LANGUAGE_DATA_URL,
-                       profile.SiteLanguageHandler),
+    get_redirect_route(
+        r'%s' % feconf.USERNAME_CHECK_DATA_URL, profile.UsernameCheckHandler),
+    get_redirect_route(
+        r'%s' % feconf.SITE_LANGUAGE_DATA_URL, profile.SiteLanguageHandler),
 
     get_redirect_route(r'/moderator', moderator.ModeratorPage),
-    get_redirect_route(r'/moderatorhandler/featured',
-                       moderator.FeaturedActivitiesHandler),
-    get_redirect_route(r'/moderatorhandler/email_draft/<action>',
-                       moderator.EmailDraftHandler),
+    get_redirect_route(
+        r'/moderatorhandler/featured', moderator.FeaturedActivitiesHandler),
+    get_redirect_route(
+        r'/moderatorhandler/email_draft/<action>', moderator.EmailDraftHandler),
 
-    get_redirect_route(r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
-                       reader.ExplorationPage),
-    get_redirect_route(r'%s/<exploration_id>' %
-                       feconf.EXPLORATION_INIT_URL_PREFIX,
-                       reader.ExplorationHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
+        reader.ExplorationPage),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.EXPLORATION_INIT_URL_PREFIX,
+        reader.ExplorationHandler),
     get_redirect_route(
         '/explorehandler/exploration_start_event/<exploration_id>',
         reader.ExplorationStartEventHandler),
-    get_redirect_route(r'/explorehandler/state_hit_event/<exploration_id>',
-                       reader.StateHitEventHandler),
+    get_redirect_route(
+        r'/explorehandler/state_hit_event/<exploration_id>',
+        reader.StateHitEventHandler),
     get_redirect_route(
         r'/explorehandler/answer_submitted_event/<exploration_id>',
         reader.AnswerSubmittedEventHandler),
-    get_redirect_route(r'/explorehandler/give_feedback/<exploration_id>',
-                       reader.ReaderFeedbackHandler),
+    get_redirect_route(
+        r'/explorehandler/give_feedback/<exploration_id>',
+        reader.ReaderFeedbackHandler),
     get_redirect_route(
         r'/explorehandler/exploration_complete_event/<exploration_id>',
         reader.ExplorationCompleteEventHandler),
     get_redirect_route(
         r'/explorehandler/exploration_maybe_leave_event/<exploration_id>',
         reader.ExplorationMaybeLeaveHandler),
-    get_redirect_route(r'/explorehandler/classify/<exploration_id>',
-                       reader.ClassifyHandler),
-    get_redirect_route(r'/explorehandler/rating/<exploration_id>',
-                       reader.RatingHandler),
-    get_redirect_route(r'/explorehandler/recommendations/<exploration_id>',
-                       reader.RecommendationsHandler),
+    get_redirect_route(
+        r'/explorehandler/classify/<exploration_id>', reader.ClassifyHandler),
+    get_redirect_route(
+        r'/explorehandler/rating/<exploration_id>', reader.RatingHandler),
+    get_redirect_route(
+        r'/explorehandler/recommendations/<exploration_id>',
+        reader.RecommendationsHandler),
 
-    get_redirect_route(r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,
-                       editor.ExplorationPage),
-    get_redirect_route(r'/createhandler/data/<exploration_id>',
-                       editor.ExplorationHandler),
-    get_redirect_route(r'/createhandler/download/<exploration_id>',
-                       editor.ExplorationDownloadHandler),
-    get_redirect_route(r'/createhandler/imageupload/<exploration_id>',
-                       editor.ImageUploadHandler),
-    get_redirect_route(r'/createhandler/resolved_answers/<exploration_id>/' +
-                       r'<escaped_state_name>',
-                       editor.ResolvedAnswersHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,
+        editor.ExplorationPage),
+    get_redirect_route(
+        r'/createhandler/data/<exploration_id>', editor.ExplorationHandler),
+    get_redirect_route(
+        r'/createhandler/download/<exploration_id>',
+        editor.ExplorationDownloadHandler),
+    get_redirect_route(
+        r'/createhandler/imageupload/<exploration_id>',
+        editor.ImageUploadHandler),
+    get_redirect_route(
+        r'/createhandler/resolved_answers/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long
+        editor.ResolvedAnswersHandler),
     get_redirect_route(r'/createhandler/state_yaml', editor.StateYamlHandler),
     get_redirect_route(
         r'/createhandler/training_data/<exploration_id>/<escaped_state_name>',
         editor.UntrainedAnswersHandler),
-    get_redirect_route(r'/createhandler/resource_list/<exploration_id>',
-                       editor.ExplorationResourcesHandler),
-    get_redirect_route(r'/createhandler/revert/<exploration_id>',
-                       editor.ExplorationRevertHandler),
+    get_redirect_route(
+        r'/createhandler/resource_list/<exploration_id>',
+        editor.ExplorationResourcesHandler),
+    get_redirect_route(
+        r'/createhandler/revert/<exploration_id>',
+        editor.ExplorationRevertHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_RIGHTS_PREFIX,
         editor.ExplorationRightsHandler),
-    get_redirect_route(r'/createhandler/moderatorrights/<exploration_id>',
-                       editor.ExplorationModeratorRightsHandler),
-    get_redirect_route(r'/createhandler/snapshots/<exploration_id>',
-                       editor.ExplorationSnapshotsHandler),
-    get_redirect_route(r'/createhandler/statisticsversion/<exploration_id>',
-                       editor.ExplorationStatsVersionsHandler),
+    get_redirect_route(
+        r'/createhandler/moderatorrights/<exploration_id>',
+        editor.ExplorationModeratorRightsHandler),
+    get_redirect_route(
+        r'/createhandler/snapshots/<exploration_id>',
+        editor.ExplorationSnapshotsHandler),
+    get_redirect_route(
+        r'/createhandler/statisticsversion/<exploration_id>',
+        editor.ExplorationStatsVersionsHandler),
     get_redirect_route(
         r'/createhandler/statistics/<exploration_id>/<exploration_version>',
         editor.ExplorationStatisticsHandler),
-    get_redirect_route(r'/createhandler/state_rules_stats/<exploration_id>/' +
-                       r'<escaped_state_name>',
-                       editor.StateRulesStatsHandler),
-    get_redirect_route(r'/createhandler/started_tutorial_event',
-                       editor.StartedTutorialEventHandler),
-    get_redirect_route(r'/createhandler/autosave_draft/<exploration_id>',
-                       editor.EditorAutosaveHandler),
+    get_redirect_route(
+        r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long
+        editor.StateRulesStatsHandler),
+    get_redirect_route(
+        r'/createhandler/started_tutorial_event',
+        editor.StartedTutorialEventHandler),
+    get_redirect_route(
+        r'/createhandler/autosave_draft/<exploration_id>',
+        editor.EditorAutosaveHandler),
 
-    get_redirect_route(r'%s' % feconf.RECENT_COMMITS_DATA_URL,
-                       recent_commits.RecentCommitsHandler),
-    get_redirect_route(r'%s' % feconf.RECENT_FEEDBACK_MESSAGES_DATA_URL,
-                       feedback.RecentFeedbackMessagesHandler),
+    get_redirect_route(
+        r'%s' % feconf.RECENT_COMMITS_DATA_URL,
+        recent_commits.RecentCommitsHandler),
+    get_redirect_route(
+        r'%s' % feconf.RECENT_FEEDBACK_MESSAGES_DATA_URL,
+        feedback.RecentFeedbackMessagesHandler),
 
-    get_redirect_route(r'%s' % feconf.FEEDBACK_THREAD_VIEW_EVENT_URL,
-                       feedback.FeedbackThreadViewEventHandler),
-    get_redirect_route(r'%s/<exploration_id>' %
-                       feconf.FEEDBACK_THREADLIST_URL_PREFIX,
-                       feedback.ThreadListHandler),
-    get_redirect_route(r'%s/<exploration_id>/<thread_id>' %
-                       feconf.FEEDBACK_THREAD_URL_PREFIX,
-                       feedback.ThreadHandler),
-    get_redirect_route(r'%s/<exploration_id>' %
-                       feconf.FEEDBACK_STATS_URL_PREFIX,
-                       feedback.FeedbackStatsHandler),
-    get_redirect_route(r'%s/<exploration_id>' % feconf.SUGGESTION_URL_PREFIX,
-                       feedback.SuggestionHandler),
-    get_redirect_route(r'%s/<exploration_id>' %
-                       feconf.FLAG_EXPLORATION_URL_PREFIX,
-                       reader.FlagExplorationHandler),
-    get_redirect_route(r'%s/<exploration_id>/<thread_id>' %
-                       feconf.SUGGESTION_ACTION_URL_PREFIX,
-                       feedback.SuggestionActionHandler),
-    get_redirect_route(r'%s/<exploration_id>' %
-                       feconf.SUGGESTION_LIST_URL_PREFIX,
-                       feedback.SuggestionListHandler),
+    get_redirect_route(
+        r'%s' % feconf.FEEDBACK_THREAD_VIEW_EVENT_URL,
+        feedback.FeedbackThreadViewEventHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.FEEDBACK_THREADLIST_URL_PREFIX,
+        feedback.ThreadListHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>/<thread_id>' % feconf.FEEDBACK_THREAD_URL_PREFIX,
+        feedback.ThreadHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.FEEDBACK_STATS_URL_PREFIX,
+        feedback.FeedbackStatsHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.SUGGESTION_URL_PREFIX,
+        feedback.SuggestionHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.FLAG_EXPLORATION_URL_PREFIX,
+        reader.FlagExplorationHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>/<thread_id>' %
+        feconf.SUGGESTION_ACTION_URL_PREFIX,
+        feedback.SuggestionActionHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.SUGGESTION_LIST_URL_PREFIX,
+        feedback.SuggestionListHandler),
 
-    get_redirect_route(r'%s/<collection_id>' % feconf.COLLECTION_URL_PREFIX,
-                       collection_viewer.CollectionPage),
-    get_redirect_route(r'%s/<collection_id>' %
-                       feconf.COLLECTION_DATA_URL_PREFIX,
-                       collection_viewer.CollectionDataHandler),
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_URL_PREFIX,
+        collection_viewer.CollectionPage),
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_DATA_URL_PREFIX,
+        collection_viewer.CollectionDataHandler),
 
-    get_redirect_route(r'%s/<collection_id>' %
-                       feconf.COLLECTION_EDITOR_URL_PREFIX,
-                       collection_editor.CollectionEditorPage),
-    get_redirect_route(r'%s/<collection_id>' %
-                       feconf.COLLECTION_WRITABLE_DATA_URL_PREFIX,
-                       collection_editor.WritableCollectionDataHandler),
-    get_redirect_route(r'%s/<collection_id>' % feconf.COLLECTION_RIGHTS_PREFIX,
-                       collection_editor.CollectionRightsHandler),
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_EDITOR_URL_PREFIX,
+        collection_editor.CollectionEditorPage),
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_WRITABLE_DATA_URL_PREFIX,
+        collection_editor.WritableCollectionDataHandler),
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_RIGHTS_PREFIX,
+        collection_editor.CollectionRightsHandler),
 
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
-
     get_redirect_route(r'/logout', base.LogoutPage),
 
     # 404 error handler.

@@ -33,8 +33,8 @@
       </a>
     </li>
 
-    <li>
-      <a href="https://oppiablog.blogspot.com" target="_blank">
+    <li {% if nav_mode == 'blog' %}class="active"{% endif %}>
+      <a href="/blog">
         <img ng-src="<[getStaticImageUrl('/sidebar/blogger.png')]>" class="oppia-sidebar-menu-icon">
         <span translate="I18N_SIDEBAR_BLOG"></span>
       </a>
