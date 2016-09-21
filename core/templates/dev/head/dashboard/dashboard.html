@@ -226,7 +226,7 @@
             <div class="stat-block">
               <div class="heading-text"
                    ng-click="toggleSubDropdown(EXPLORATION_DROPDOWN_STATS.NEW_FEEDBACK, $event)">
-                <[explorationStats[exploration.id] ? explorationStats[exploration.id].new_feedback.length + ' Open Feedback': 'Retreivng Feedback Data ...']>
+                <[explorationStats[exploration.id] ? explorationStats[exploration.id].new_feedback.length + ' Open Feedback': 'Retrieving Feedback Data ...']>
                 <span class="fa"
                       ng-if="explorationStats[exploration.id].new_feedback.length !==0 && !checkMobileView()"
                       ng-class="activeSubDropdown === EXPLORATION_DROPDOWN_STATS.NEW_FEEDBACK ? 'fa-caret-up': 'fa-caret-down'">
@@ -243,7 +243,7 @@
             <div class="stat-block" ng-if="!checkMobileView()">
               <div class="heading-text"
                    ng-click="toggleSubDropdown(EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS, $event)">
-                <[explorationStats[exploration.id] ? exploration.top_unresolved_answers.length + ' Unresolved Answers from Users': 'Retreivng Answers Data ...']>
+                <[explorationStats[exploration.id] ? exploration.top_unresolved_answers.length + ' Unresolved Answers from Users': 'Retrieving Answers Data ...']>
                 <span class="fa"
                       ng-if="exploration.top_unresolved_answers.length !== 0 && !checkMobileView()"
                       ng-class="activeSubDropdown === EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS ? 'fa-caret-up': 'fa-caret-down'">

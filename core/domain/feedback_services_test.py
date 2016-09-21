@@ -225,20 +225,6 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         'subject': u'a subject second'
     }
 
-    EXPECTED_MESSAGE_DICT_EXP_1 = {
-        'exploration_id': EXP_ID_1,
-        'text': u'not used here',
-        'updated_status': u'open',
-        'updated_subject': u'a subject'
-    }
-
-    EXPECTED_MESSAGE_DICT_EXP_2 = {
-        'exploration_id': EXP_ID_2,
-        'text': u'not used here',
-        'updated_status': u'open',
-        'updated_subject': u'a subject'
-    }
-
     def setUp(self):
         super(FeedbackThreadUnitTests, self).setUp()
 
