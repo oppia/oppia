@@ -39,37 +39,72 @@ oppia.controller('Library', [
 
     // Keeps track of the index of the left-most visible card of each group.
     $scope.leftmostCardIndices = [];
+    $scope.inRankMode = ($window.location.pathname.indexOf('/explorations') === 0);
+    if (!$scope.inRankMode) {
+      $http.get('/libraryindexhandler').success(function(data) {
+        $scope.libraryGroups = data.activity_summary_dicts_by_category;
 
-    $http.get('/libraryindexhandler').success(function(data) {
-      $scope.libraryGroups = data.activity_summary_dicts_by_category;
+        $rootScope.$broadcast(
+          'preferredLanguageCodesLoaded', data.preferred_language_codes);
 
-      $rootScope.$broadcast(
-        'preferredLanguageCodesLoaded', data.preferred_language_codes);
+        $rootScope.loadingMessage = '';
 
-      $rootScope.loadingMessage = '';
+        // Pause is necessary to ensure all elements have loaded, same for
+        // initCarousels.
+        // TODO(sll): On small screens, the tiles do not have a defined width.
+        // The use of 214 here is a hack, and the underlying problem of the tiles
+        // not having a defined width on small screens needs to be fixed.
+        $timeout(function() {
+          tileDisplayWidth = $('exploration-summary-tile').width() || 214;
+        }, 20);
 
-      // Pause is necessary to ensure all elements have loaded, same for
-      // initCarousels.
-      // TODO(sll): On small screens, the tiles do not have a defined width.
-      // The use of 214 here is a hack, and the underlying problem of the tiles
-      // not having a defined width on small screens needs to be fixed.
-      $timeout(function() {
-        tileDisplayWidth = $('exploration-summary-tile').width() || 214;
-      }, 20);
+        // Initialize the carousel(s) on the library index page.
+        $timeout(initCarousels, 390);
 
-      // Initialize the carousel(s) on the library index page.
-      $timeout(initCarousels, 390);
+        // The following initializes the tracker to have all
+        // elements flush left.
+        // Transforms the group names into translation ids
+        $scope.leftmostCardIndices = [];
+        for (i = 0; i < $scope.libraryGroups.length; i++) {
+          $scope.leftmostCardIndices.push(0);
+          $scope.libraryGroups[i].translationId = i18nIdService.getLibraryId(
+            'groups', $scope.libraryGroups[i].header);
+        }
+      });
+    };
+    
+    if ($scope.inRankMode) {
+      $http.get('/rankexplorationshandler').success(function(data) {
+        $scope.libraryGroups = data.activity_list;
+        console.log($scope.libraryGroups);
+        $rootScope.$broadcast(
+          'preferredLanguageCodesLoaded', data.preferred_language_codes);
 
-      // The following initializes the tracker to have all
-      // elements flush left.
-      // Transforms the group names into translation ids
-      $scope.leftmostCardIndices = [];
-      for (i = 0; i < $scope.libraryGroups.length; i++) {
-        $scope.leftmostCardIndices.push(0);
-        $scope.libraryGroups[i].translationId = i18nIdService.getLibraryId(
-          'groups', $scope.libraryGroups[i].header);
-      }
-    });
+        $rootScope.loadingMessage = '';
+
+        // Pause is necessary to ensure all elements have loaded, same for
+        // initCarousels.
+        // TODO(sll): On small screens, the tiles do not have a defined width.
+        // The use of 214 here is a hack, and the underlying problem of the tiles
+        // not having a defined width on small screens needs to be fixed.
+        $timeout(function() {
+          tileDisplayWidth = $('exploration-summary-tile').width() || 214;
+        }, 20);
+
+        // Initialize the carousel(s) on the library index page.
+        $timeout(initCarousels, 390);
+
+        // The following initializes the tracker to have all
+        // elements flush left.
+        // Transforms the group names into translation ids
+        $scope.leftmostCardIndices = [];
+        for (i = 0; i < $scope.libraryGroups.length; i++) {
+          $scope.leftmostCardIndices.push(0);
+          $scope.libraryGroups[i].translationId = i18nIdService.getLibraryId(
+            'groups', $scope.libraryGroups[i].header);
+        }
+      }); 
+    } 
 
     // If the value below is changed, the following CSS values in oppia.css
     // must be changed:
@@ -187,8 +222,19 @@ oppia.controller('Library', [
       $scope.$apply();
     });
 
-    // The following checks if the page is in search mode.
-    $scope.inSearchMode = ($window.location.pathname.indexOf('/search') === 0);
+    var activateRecentMode = function() {
+      if (!$scope.inRankMode) {
+        $('.oppia-library-container').fadeOut(function() {
+          $scope.inRankMode = true;
+          $timeout(function() {
+            $('.oppia-library-container').fadeIn();
+          }, 50);
+        });
+      }
+    };
+
+// The following checks if the page is in search mode.
+$scope.inSearchMode = ($window.location.pathname.indexOf('/search') === 0);
     var activateSearchMode = function() {
       if (!$scope.inSearchMode) {
         $('.oppia-library-container').fadeOut(function() {
@@ -201,14 +247,19 @@ oppia.controller('Library', [
     };
 
     $scope.showAllResultsForCategories = function(categories) {
-      var selectedCategories = {};
-      for (i = 0; i < categories.length; i++) {
-        selectedCategories[categories[i]] = true;
+      if (categories[0] == 'recently_published' || categories[0] == 'top_rated') {
+        $window.location.href = '/explorations/' + categories[0];
       }
+      else {
+      var selectedCategories = {};
+        for (i = 0; i < categories.length; i++) {
+          selectedCategories[categories[i]] = true;
+        }
 
-      var targetSearchQueryUrl = searchService.getSearchUrlQueryString(
-        '', selectedCategories, {});
-      $window.location.href = '/search/find?q=' + targetSearchQueryUrl;
+        var targetSearchQueryUrl = searchService.getSearchUrlQueryString(
+          '', selectedCategories, {});
+        $window.location.href = '/search/find?q=' + targetSearchQueryUrl;
+      }
     };
 
     var libraryWindowCutoffPx = 530;

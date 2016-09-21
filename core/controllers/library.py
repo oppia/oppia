@@ -70,10 +70,10 @@ class LibraryPage(base.BaseHandler):
     for search results.
     """
 
-    def get(self):
+    def get(self, rank_method):
         """Handles GET requests."""
         search_mode = 'search' in self.request.url
-
+        rank_mode = 'explorations' in self.request.url
         self.values.update({
             'meta_description': (
                 feconf.SEARCH_PAGE_DESCRIPTION if search_mode
@@ -85,6 +85,7 @@ class LibraryPage(base.BaseHandler):
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
             'search_mode': search_mode,
+            'rank_mode': rank_mode,
             'SEARCH_DROPDOWN_CATEGORIES': feconf.SEARCH_DROPDOWN_CATEGORIES,
         })
         self.render_template('library/library.html')
@@ -93,7 +94,7 @@ class LibraryPage(base.BaseHandler):
 class LibraryIndexHandler(base.BaseHandler):
     """Provides data for the default library index page."""
 
-    def get(self):
+    def get(self, rank_method):
         """Handles GET requests."""
         # TODO(sll): Support index pages for other language codes.
         summary_dicts_by_category = summary_services.get_library_groups([
@@ -115,14 +116,14 @@ class LibraryIndexHandler(base.BaseHandler):
         if recently_published_summary_dicts:
             summary_dicts_by_category.insert(0, {
                 'activity_summary_dicts': recently_published_summary_dicts,
-                'categories': [],
+                'categories': ['recently_published'],
                 'header': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
                 'has_full_results_page': True,
             })
         if top_rated_activity_summary_dicts:
             summary_dicts_by_category.insert(0, {
                 'activity_summary_dicts': top_rated_activity_summary_dicts,
-                'categories': [],
+                'categories': ['top_rated'],
                 'header': feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS,
                 'has_full_results_page': True,
             })
@@ -144,7 +145,6 @@ class LibraryIndexHandler(base.BaseHandler):
 
 class SearchHandler(base.BaseHandler):
     """Provides data for activity search results."""
-
     def get(self):
         """Handles GET requests."""
         query_string = utils.unescape_encoded_uri_component(
@@ -170,6 +170,30 @@ class SearchHandler(base.BaseHandler):
         self.values.update({
             'activity_list': activity_list,
             'search_cursor': new_search_cursor,
+        })
+
+        self.render_json(self.values)
+
+class RankExplorationsHandler(base.BaseHandler):
+
+    def get(self):
+        summary_dicts_by_category = []
+        recently_published_summary_dicts = (
+            summary_services.get_recently_published_exploration_summary_dicts())
+        preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
+        if self.user_id:
+            user_settings = user_services.get_user_settings(self.user_id)
+            preferred_language_codes = user_settings.preferred_language_codes
+        if recently_published_summary_dicts:
+            summary_dicts_by_category.insert(0, {
+                'activity_summary_dicts': recently_published_summary_dicts,
+                'categories': ['recently_published'],
+                'header': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
+                'has_full_results_page': True,
+            })
+        self.values.update({
+            'activity_list': summary_dicts_by_category,
+            'preferred_language_codes': preferred_language_codes,
         })
 
         self.render_json(self.values)
