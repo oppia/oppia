@@ -184,13 +184,16 @@ class FeedbackMessageModel(base_models.BaseModel):
         return super(FeedbackMessageModel, cls).get(instance_id, strict=strict)
 
     @classmethod
-    def get_messages(cls, exploration_id, thread_id):
+    def get_messages(cls, exploration_id, thread_id, is_full_thread_id=False):
         """Returns an array of messages in the thread.
 
         Does not include the deleted entries.
         """
-        full_thread_id = FeedbackThreadModel.generate_full_thread_id(
-            exploration_id, thread_id)
+        full_thread_id = (
+            FeedbackThreadModel.generate_full_thread_id(
+                exploration_id, thread_id)
+            if not is_full_thread_id else thread_id)
+        print full_thread_id
         return cls.get_all().filter(
             cls.thread_id == full_thread_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
 

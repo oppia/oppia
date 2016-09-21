@@ -277,7 +277,7 @@ class ExplorationDashboardStatsHandler(base.BaseHandler):
             'new_feedback': [
                 feedback_message.to_dict()
                 for feedback_message in
-                feedback_services.get_messages_for_exp_id( # pylint: disable=line-too-long
+                feedback_services.get_messages_for_exp_id(
                     self.request.get('exp_id'))]
         })
 

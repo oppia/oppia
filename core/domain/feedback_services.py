@@ -370,19 +370,26 @@ def get_messages_for_exp_id(exp_id, limit=None):
     """Fetch the feedback threads for the given exploration, and use those to
     finally get the new (open) feedback messages.
 
-    Returns a list of feedback message domain objects, limited by 'limit'
-    argument passed here. Default value of limit is None, implying that the
-    result will not be limited at all in such a case.
+    Args:
+        exp_id: str.
+        limit: Max. number of FeedbackMessage objects to be returned. Default
+            value of None implies that the result will not be limited at all.
+
+    Returns:
+       A list of FeedbackMessage.
     """
     thread_models = feedback_models.FeedbackThreadModel.get_threads(exp_id)
-    messages_models = (
-        feedback_models.FeedbackMessageModel.get_messages(
-            [thread.id for thread in thread_models]))
+
+    message_models = []
+    for thread in thread_models:
+        message_models.extend(
+            feedback_models.FeedbackMessageModel.get_messages(
+                exp_id, thread.id, is_full_thread_id=True))
 
     result = []
-    for message_model in messages_models:
+    for message in message_models:
         if not limit or len(result) < limit:
-            result.append(_get_message_from_model(message_model))
+            result.append(_get_message_from_model(message))
 
     return result
 
