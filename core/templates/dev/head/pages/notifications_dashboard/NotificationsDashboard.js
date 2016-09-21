@@ -27,7 +27,7 @@ oppia.controller('DashboardNotifications', [
   $scope.getItemUrl = function(activityId, notificationType) {
     return '/create/' + activityId + (
       notificationType === 'feedback_thread' ? '#/feedback' : '');
-  }
+  };
 
   $scope.navigateToProfile = function($event, username) {
     $event.stopPropagation();
