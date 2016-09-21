@@ -986,7 +986,7 @@ class CollectionNodeMetadataDictsTest(
 
     def test_user_validity(self):
         summaries = (summary_services.get_exploration_metadata_dicts(
-            [self.EXP_ID1, self.EXP_ID4]), self.bob_id)
+            [self.EXP_ID1, self.EXP_ID4], self.bob_id))
 
         expected_summary = {
             'id': self.EXP_ID4,
