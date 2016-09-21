@@ -205,7 +205,7 @@ class BaseHandler(webapp2.RequestHandler):
                 # recording a log-in if the current time is sufficiently close
                 # to the last log-in time.
                 if (user_settings.last_logged_in is None or
-                        utils.are_datetimes_close(
+                        not utils.are_datetimes_close(
                             datetime.datetime.utcnow(),
                             user_settings.last_logged_in)):
                     user_services.record_user_logged_in(self.user_id)
