@@ -280,21 +280,13 @@ class I18nDictsTest(test_utils.GenericTestBase):
             with open(os.path.join(os.getcwd(), 'assets', 'i18n', filename),
                       mode='r') as f:
                 lines = f.readlines()
-                if lines[0] == '{\n':
-                    lines.remove(lines[0])
-                if lines[-1] == '}\n':
-                    lines.pop()
+                self.assertEqual(lines[0], '{\n')
+                self.assertEqual(lines[-1], '}\n')
+                lines = lines[1:-1]
 
-                string_lines = ''.join(lines)
-                #string_lines = string_lines.replace("\"", "")
-                string_lines = string_lines.replace(":", "")
-                string_lines = string_lines.replace(",", "")
-                string_list = string_lines.split()
-
-                key_list = []
-                for string in string_list:
-                    if string.startswith('"I18N_'):
-                        key_list.append(string)
+                key_list = [line[:line.find(':')].strip() for line in lines]
+                for key in key_list:
+                    self.assertTrue(key.startswith('"I18N_'))
                 self.assertEqual(sorted(key_list), key_list)
 
     def test_keys_match_en_qqq(self):
