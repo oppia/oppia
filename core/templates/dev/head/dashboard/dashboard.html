@@ -193,10 +193,11 @@
         </md-card>
       </div>
 
-      <div ng-if="myExplorationsView === 'card' && explorationsList.length > 0" style="margin-top: 8px;">
-        <md-card ng-repeat="exploration in explorationsList track by exploration.id" class="oppia-activity-summary-tile oppia-dashboard-card-view-item"
-                   ng-click="showExplorationEditor(exploration.id)">
-          <a ng-href="/create/<[exploration.id]>" style="text-decoration: none;">
+      <div ng-if="myExplorationsView === 'card' && explorationsList.length > 0"
+           style="margin-top: 8px;">
+        <md-card ng-repeat="exploration in explorationsList track by exploration.id"
+                 class="oppia-activity-summary-tile oppia-dashboard-card-view-item"
+                 ng-click="showExplorationEditor(exploration.id)">
             <div class="title-section" style="background-color: <[exploration.thumbnail_bg_color]>;">
               <img class="thumbnail-image" ng-src="<[exploration.thumbnail_icon_url]>">
               <h2 class="activity-title protractor-test-exp-summary-tile-title">
@@ -266,8 +267,7 @@
                </sharing-links>
               </ul>
             </div>
-          </a>
-        </md-card>  
+        </md-card>
       </div>
     </div>
 
