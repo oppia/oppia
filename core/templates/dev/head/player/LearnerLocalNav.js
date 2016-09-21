@@ -93,10 +93,8 @@ oppia.controller('LearnerLocalNav', [
         templateUrl: 'modals/flagExploration',
         backdrop: true,
         controller: [
-            '$scope', '$modalInstance', 'oppiaPlayerService',
-          'UrlInterpolationService', 'FLAG_EXPLORATION_URL',
-          function($scope, $modalInstance, oppiaPlayerService,
-            UrlInterpolationService, FLAG_EXPLORATION_URL) {
+            '$scope', '$modalInstance',
+          function($scope, $modalInstance) {
             $scope.otherFlagDropdown = false;
 
             $scope.triggerOtherFlagDropdown = function(value) {
