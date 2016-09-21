@@ -163,25 +163,27 @@ def get_displayable_collection_summary_dicts_matching_ids(collection_ids):
     return _get_displayable_collection_summary_dicts(collection_summaries)
 
 
-def get_collection_node_metadata_dicts(query_string, search_cursor):
+def get_collection_node_metadata_dicts(query_string, search_cursor, user_id):
     """Given a query string and a search cursor, returns a list of exploration
     dicts that satisfy the search query.
 
     Args:
         query_string: str. The search query for which the search is to be
             performed.
-        search_cursor: The cursor location for next search.
+        search_cursor: str or None. The cursor location to start the search
+            from. If None, the returned values are from the beginning
+            of the results list.
+        user_id: str. The user id of editor.
     Returns:
-        exploration_list: A list of metadata dicts of the exploration ids 
+        exploration_list: A list of metadata dicts of the exploration ids
             for the query_string.
         new_search_cursor: New search cursor location.
     """
-
     exp_ids, new_search_cursor = (
         exp_services.get_exploration_ids_matching_query(
             query_string, cursor=search_cursor))
 
-    exploration_list = (get_exploration_metadata_dicts(exp_ids))
+    exploration_list = get_exploration_metadata_dicts(exp_ids, user_id)
 
     return exploration_list, new_search_cursor
 
@@ -191,19 +193,19 @@ def get_exploration_metadata_dicts(exploration_ids, editor_user_id=None):
     explorations that are currently non-private and not deleted, and returns a
     list of dicts of the corresponding exploration summaries for collection
     node search.
-    
+
     Args:
         exploration_ids: A list of exploration ids for which exploration
             metadata dicts are to be returned.
-        editor_user_id: str or None. User id of the editor to check for users
-            rights for a specific exploration.
+        editor_user_id: str or None. If not None, private explorations that are
+            editable by this user are also returned.
     Returns:
-        A list of metadata dicts of the exploration ids passed as a list.
-        Metadata dicts: 'id': Exploration id
-                        'title': Exploration title
-                        'objective': Exploration objecive
+        A list of metadata dicts corresponding to the given exploration ids.
+        Each dict has three keys:
+            'id': the exploration id
+            'title': the exploration title
+            'objective': the exploration objective
     """
-
     exploration_summaries = (
         exp_services.get_exploration_summaries_matching_ids(exploration_ids))
 
@@ -222,11 +224,27 @@ def get_exploration_metadata_dicts(exploration_ids, editor_user_id=None):
 
         filtered_exploration_summaries.append(exploration_summary)
 
+    return to_metadata_dict(filtered_exploration_summaries)
+
+
+def to_metadata_dict(summaries):
+    """Given a list of exploration summaries, this method returns the list of
+     dict containing id, title and objective of an explorations.
+
+    Args:
+        summaries: A list of exploration summaries.
+    Returns:
+        A list of metadata dicts corresponding to the given exploration ids.
+        Each dict has three keys:
+            'id': the exploration id
+            'title': the exploration title
+            'objective': the exploration objective
+    """
     return [{
         'id': summary.id,
         'title': summary.title,
         'objective': summary.objective,
-    } for summary in filtered_exploration_summaries if summary]
+    } for summary in summaries if summary]
 
 
 def get_displayable_exp_summary_dicts_matching_ids(

@@ -233,7 +233,7 @@ class ExplorationMetadataSearchHandler(base.BaseHandler):
 
         collection_node_metadata_list, new_search_cursor = (
             summary_services.get_collection_node_metadata_dicts(
-                query_string, search_cursor))
+                query_string, search_cursor, self.user_id))
 
         self.values.update({
             'collection_node_metadata_list': collection_node_metadata_list,
