@@ -146,6 +146,7 @@ class LogoutPage(webapp2.RequestHandler):
         else:
             self.redirect(url_to_redirect_to)
 
+CACHED_PAGES = {}
 
 class BaseHandler(webapp2.RequestHandler):
     """Base class for all Oppia handlers."""
@@ -298,7 +299,26 @@ class BaseHandler(webapp2.RequestHandler):
 
     def render_template(
             self, filename, values=None, iframe_restriction='DENY',
-            redirect_url_on_logout=None):
+            redirect_url_on_logout=None, cached=False):
+        print 'id for base handler: ', id(CACHED_PAGES)
+        if cached and filename in CACHED_PAGES:
+            self.response.headers['Strict-Transport-Security'] = (
+                'max-age=31536000; includeSubDomains')
+            self.response.headers['X-Content-Type-Options'] = 'nosniff'
+
+            if iframe_restriction is not None:
+                if iframe_restriction in ['SAMEORIGIN', 'DENY']:
+                    self.response.headers['X-Frame-Options'] = \
+                        iframe_restriction
+                else:
+                    raise Exception(
+                        'Invalid X-Frame-Options: %s' % iframe_restriction)
+
+            self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
+            self.response.pragma = 'no-cache'
+            self.response.write(CACHED_PAGES[filename])
+            return
+
         if values is None:
             values = self.values
 
@@ -386,8 +406,10 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
 
-        self.response.write(self.jinja2_env.get_template(
-            filename).render(**values))
+        content = self.jinja2_env.get_template(
+            filename).render(**values)
+        CACHED_PAGES[filename] = content
+        self.response.write(content)
 
         # Calculate the processing time of this request.
         duration = datetime.datetime.utcnow() - self.start_time

@@ -62,7 +62,7 @@ class AboutPage(base.BaseHandler):
             'meta_description': feconf.ABOUT_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_ABOUT,
         })
-        self.render_template('pages/about.html')
+        self.render_template('pages/about.html', cached=True)
 
 
 class TeachPage(base.BaseHandler):
