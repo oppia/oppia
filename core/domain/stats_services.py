@@ -45,8 +45,9 @@ def get_exps_unresolved_answers_for_default_rule(exp_ids):
     states for explorations with ids in exp_ids. The value of total count should
     match the sum of values of indiviual counts for each unresolved answer.
 
-    Note that this method currently returns the data only for the DEFAULT rule.
-    This should ideally handle all types of unresolved answers.
+    TODO(526avijitgupta): Note that this method currently returns the data only
+    for the DEFAULT rule. This should ideally handle all types of unresolved
+    answers.
 
     Returns a dict of the following format:
         {
@@ -116,10 +117,6 @@ def get_exps_unresolved_answers_for_default_rule(exp_ids):
             reverse=True))
 
     return exps_answers_mapping
-
-
-def get_exp_unresolved_answers_for_default_rule(exp_id):
-    return get_exps_unresolved_answers_for_default_rule([exp_id])[exp_id]
 
 
 def get_state_rules_stats(exploration_id, state_name):

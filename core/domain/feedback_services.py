@@ -381,15 +381,15 @@ def get_messages_for_exp_id(exp_id, limit=None):
     thread_models = feedback_models.FeedbackThreadModel.get_threads(exp_id)
 
     message_models = []
-    for thread in thread_models:
+    for thread_model in thread_models:
         message_models.extend(
             feedback_models.FeedbackMessageModel.get_messages(
-                exp_id, thread.id, is_full_thread_id=True))
+                exp_id, thread_model.thread_id))
 
     result = []
-    for message in message_models:
+    for message_model in message_models:
         if not limit or len(result) < limit:
-            result.append(_get_message_from_model(message))
+            result.append(_get_message_from_model(message_model))
 
     return result
 
