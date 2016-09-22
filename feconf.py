@@ -520,6 +520,12 @@ UPDATE_TYPE_EXPLORATION_COMMIT = 'exploration_commit'
 UPDATE_TYPE_COLLECTION_COMMIT = 'collection_commit'
 UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
 
+# User query status.
+USER_QUERY_STATUS_PROCESSING = "processing"
+USER_QUERY_STATUS_COMPLETED = "completed"
+USER_QUERY_STATUS_ARCHIVED = "archived"
+USER_QUERY_STATUS_FAILED = "failed"
+
 DEFAULT_COLOR = '#a33f40'
 DEFAULT_THUMBNAIL_ICON = 'Lightbulb'
 

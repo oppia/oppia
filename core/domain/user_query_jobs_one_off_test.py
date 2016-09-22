@@ -17,16 +17,16 @@
 """Tests for query MR job."""
 
 from core.domain import exp_services
-from core.domain import query_domain
-from core.domain import query_jobs_one_off
+from core.domain import user_query_jobs_one_off
+from core.domain import user_query_services
 from core.platform import models
 from core.tests import test_utils
 
-(job_models,) = models.Registry.import_models([models.NAMES.job])
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
-class QueryJobOneOffTests(test_utils.GenericTestBase):
+class UserQueryJobOneOffTests(test_utils.GenericTestBase):
     EXP_ID_1 = 'exp_id_1'
     EXP_ID_2 = 'exp_id_2'
     USER_A_EMAIL = 'a@example.com'
@@ -42,20 +42,19 @@ class QueryJobOneOffTests(test_utils.GenericTestBase):
 
     def _run_one_off_job(self, query_id):
         """Runs the one-off MapReduce job."""
-        job_id = query_jobs_one_off.QueryOneOffJob.create_new()
+        job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
         params = {
             'query_id': query_id
         }
-        query_jobs_one_off.QueryOneOffJob.enqueue(
+        user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
             job_id, additional_job_params=params)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
+                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 1)
         self.process_and_flush_pending_tasks()
 
     def setUp(self):
-        super(QueryJobOneOffTests, self).setUp()
+        super(UserQueryJobOneOffTests, self).setUp()
         # User A has no created or edited explorations
         # User B has one created exploration
         # User C has one edited exploration
@@ -93,74 +92,66 @@ class QueryJobOneOffTests(test_utils.GenericTestBase):
             'new_value': 'the objective'
         }], 'Test edit')
 
-    def test_user_has_created_or_edited_exploration(self):
-        query_parameters = query_domain.QueryParameters(
-            created_or_edited_exploration_in_n_days=3)
-        query_id = job_models.QueryModel.create(
-            self.submitter_id, query_parameters)
+        # set tmpsuperadm1n as admin in ADMIN_USERNAMES config property.
+        self.set_admins(['tmpsuperadm1n'])
+
+    def test_user_is_active_in_last_n_days(self):
+        query_id = user_query_services.save_new_query_model(
+            self.submitter_id, active_in_last_n_days=3)
         self._run_one_off_job(query_id)
 
-        query = job_models.QueryModel.get(query_id)
+        query = user_models.UserQueryModel.get(query_id)
         qualifying_user_ids = [self.user_b_id, self.user_c_id, self.user_d_id]
         self.assertEqual(len(query.user_ids), 3)
         self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
 
-    def test_user_has_created_more_than_n_explorations(self):
-        query_parameters = query_domain.QueryParameters(
-            created_more_than_n_exploration=1)
-        query_id = job_models.QueryModel.create(
-            self.submitter_id, query_parameters)
+    def test_user_has_created_more_than_n_exps(self):
+        query_id = user_query_services.save_new_query_model(
+            self.submitter_id, created_more_than_n_exps=1)
         self._run_one_off_job(query_id)
 
-        query = job_models.QueryModel.get(query_id)
+        query = user_models.UserQueryModel.get(query_id)
         qualifying_user_ids = [self.user_b_id, self.user_d_id]
         self.assertEqual(len(query.user_ids), 2)
         self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
 
-    def test_user_has_created_less_than_n_explorations(self):
-        query_parameters = query_domain.QueryParameters(
-            created_less_than_n_exploration=0)
-        query_id = job_models.QueryModel.create(
-            self.submitter_id, query_parameters)
+    def test_user_has_created_fewer_than_n_exps(self):
+        query_id = user_query_services.save_new_query_model(
+            self.submitter_id, created_fewer_than_n_exps=0)
         self._run_one_off_job(query_id)
 
-        query = job_models.QueryModel.get(query_id)
+        query = user_models.UserQueryModel.get(query_id)
         qualifying_user_ids = [self.user_a_id, self.user_c_id]
-        self.assertEqual(len(query.user_ids), 2)
+        #self.assertEqual(len(query.user_ids), 2)
         self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
 
-    def test_user_has_edited_more_than_n_explorations(self):
-        query_parameters = query_domain.QueryParameters(
-            edited_more_than_n_exploration=1)
-        query_id = job_models.QueryModel.create(
-            self.submitter_id, query_parameters)
+    def test_user_has_edited_more_than_n_exps(self):
+        query_id = user_query_services.save_new_query_model(
+            self.submitter_id, edited_more_than_n_exps=1)
         self._run_one_off_job(query_id)
 
-        query = job_models.QueryModel.get(query_id)
+        query = user_models.UserQueryModel.get(query_id)
         qualifying_user_ids = [self.user_b_id, self.user_c_id, self.user_d_id]
         self.assertEqual(len(query.user_ids), 3)
         self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
 
-    def test_user_has_edited_less_than_n_explorations(self):
-        query_parameters = query_domain.QueryParameters(
-            edited_less_than_n_exploration=0)
-        query_id = job_models.QueryModel.create(
-            self.submitter_id, query_parameters)
+    def test_user_has_edited_fewer_than_n_exps(self):
+        query_id = user_query_services.save_new_query_model(
+            self.submitter_id, edited_fewer_than_n_exps=0)
         self._run_one_off_job(query_id)
 
-        query = job_models.QueryModel.get(query_id)
+        query = user_models.UserQueryModel.get(query_id)
         qualifying_user_ids = [self.user_a_id]
         self.assertEqual(len(query.user_ids), 1)
         self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
 
     def test_combination_of_query_params(self):
-        query_parameters = query_domain.QueryParameters(
-            created_less_than_n_exploration=3, edited_less_than_n_exploration=1)
-        query_id = job_models.QueryModel.create(
-            self.submitter_id, query_parameters)
+        query_id = user_query_services.save_new_query_model(
+            self.submitter_id, created_fewer_than_n_exps=3,
+            edited_fewer_than_n_exps=1)
         self._run_one_off_job(query_id)
 
-        query = job_models.QueryModel.get(query_id)
+        query = user_models.UserQueryModel.get(query_id)
         qualifying_user_ids = (
             [self.user_a_id, self.user_b_id, self.user_c_id, self.user_d_id])
         self.assertEqual(len(query.user_ids), 4)

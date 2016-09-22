@@ -67,3 +67,39 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             self.USER_ID, 'unknown_exp_id')
 
         self.assertEqual(retrieved_object, None)
+
+
+class UserQueryModelTests(test_utils.GenericTestBase):
+    """Tests for UserQueryModel."""
+    def test_instance_stores_correct_data(self):
+        submitter_id = 'submitter'
+        query_id = 'qid'
+        active_in_last_n_days = 5
+        created_more_than_n_exps = 1
+        created_fewer_than_n_exps = 3
+        edited_more_than_n_exps = 2
+        edited_fewer_than_n_exps = 5
+        login_in_last_n_days = 10
+        user_models.UserQueryModel(
+            id=query_id,
+            active_in_last_n_days=active_in_last_n_days,
+            created_more_than_n_exps=created_more_than_n_exps,
+            created_fewer_than_n_exps=created_fewer_than_n_exps,
+            edited_more_than_n_exps=edited_more_than_n_exps,
+            edited_fewer_than_n_exps=edited_fewer_than_n_exps,
+            login_in_last_n_days=login_in_last_n_days,
+            submitter_id=submitter_id).put()
+
+        query_model = user_models.UserQueryModel.get(query_id)
+        self.assertEqual(query_model.submitter_id, submitter_id)
+        self.assertEqual(
+            query_model.active_in_last_n_days, active_in_last_n_days)
+        self.assertEqual(query_model.login_in_last_n_days, login_in_last_n_days)
+        self.assertEqual(
+            query_model.created_more_than_n_exps, created_more_than_n_exps)
+        self.assertEqual(
+            query_model.created_fewer_than_n_exps, created_fewer_than_n_exps)
+        self.assertEqual(
+            query_model.edited_more_than_n_exps, edited_more_than_n_exps)
+        self.assertEqual(
+            query_model.edited_fewer_than_n_exps, edited_fewer_than_n_exps)

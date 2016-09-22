@@ -315,3 +315,41 @@ class CollectionProgressModel(base_models.BaseModel):
             return instance_model
         else:
             return cls.create(user_id, collection_id)
+
+
+class UserQueryModel(base_models.BaseModel):
+    """Model for storing result of queries.
+
+    The id of each instance of this model is alphanumeric id of length 12
+    unique to each model instance.
+    """
+    # Options for a query specified by query submitter.
+    # Query option to specify whether user has created or edited one or more
+    # explorations in last N days.
+    active_in_last_n_days = ndb.IntegerProperty(default=None)
+    # Query option to check whether given user has logged in
+    # since last n days.
+    login_in_last_n_days = ndb.IntegerProperty(default=None)
+    # Query option to check whether user has created more than
+    # N explorations.
+    created_more_than_n_exps = ndb.IntegerProperty(default=None)
+    # Query option to check whether user has created less than
+    # N explorations.
+    created_fewer_than_n_exps = ndb.IntegerProperty(default=None)
+    # Query option to check if user has edited more than N explorations.
+    edited_more_than_n_exps = ndb.IntegerProperty(default=None)
+    # Query option to check if user has edited less than N explorations.
+    edited_fewer_than_n_exps = ndb.IntegerProperty(default=None)
+    # list of all user_ids who satisfy all parameters given in above query.
+    user_ids = ndb.StringProperty(repeated=True)
+    # id of the user who submitted the query.
+    submitter_id = ndb.StringProperty(indexed=True)
+    # current status of the query.
+    query_status = ndb.StringProperty(
+        indexed=True,
+        choices=[
+            feconf.USER_QUERY_STATUS_PROCESSING,
+            feconf.USER_QUERY_STATUS_COMPLETED,
+            feconf.USER_QUERY_STATUS_ARCHIVED,
+            feconf.USER_QUERY_STATUS_FAILED
+        ])
