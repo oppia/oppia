@@ -895,6 +895,7 @@ class CollectionNodeMetadataDictsTest(
     EXP_ID2 = 'eid2'
     EXP_ID3 = 'eid3'
     EXP_ID4 = 'eid4'
+    EXP_ID5 = 'eid5'
 
     def setUp(self):
         super(CollectionNodeMetadataDictsTest, self).setUp()
@@ -956,6 +957,19 @@ class CollectionNodeMetadataDictsTest(
                 'new_value': 'An objective 4'
             }], 'Changed title and objective.')
 
+        self.save_new_valid_exploration(self.EXP_ID5, self.albert_id)
+
+        exp_services.update_exploration(
+            self.albert_id, self.EXP_ID5, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'Exploration 5 Albert title'
+            }, {
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'An objective 5'
+            }], 'Changed title and objective.')
+
         rights_manager.publish_exploration(self.albert_id, self.EXP_ID1)
         rights_manager.publish_exploration(self.albert_id, self.EXP_ID2)
         rights_manager.publish_exploration(self.albert_id, self.EXP_ID3)
@@ -986,7 +1000,7 @@ class CollectionNodeMetadataDictsTest(
 
     def test_user_validity(self):
         summaries = (summary_services.get_exploration_metadata_dicts(
-            [self.EXP_ID1, self.EXP_ID4], self.bob_id))
+            [self.EXP_ID5, self.EXP_ID4], self.bob_id))
 
         expected_summary = {
             'id': self.EXP_ID4,
