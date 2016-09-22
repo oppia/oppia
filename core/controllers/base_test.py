@@ -30,6 +30,7 @@ import feconf
 import main
 import utils
 
+
 import webapp2
 import webtest
 
@@ -268,6 +269,25 @@ class I18nDictsTest(test_utils.GenericTestBase):
                 for key in untranslated_keys:
                     self.log_line('- %s' % key)
                 self.log_line('')
+
+    def test_alphabetic_i18n_keys(self):
+        """Tests that the keys of all i18n json files are arranged in
+        alphabetical order."""
+        filenames = os.listdir(
+            os.path.join(os.getcwd(), self.get_static_asset_filepath(),
+                         'assets', 'i18n'))
+        for filename in filenames:
+            with open(os.path.join(os.getcwd(), 'assets', 'i18n', filename),
+                      mode='r') as f:
+                lines = f.readlines()
+                self.assertEqual(lines[0], '{\n')
+                self.assertEqual(lines[-1], '}\n')
+                lines = lines[1:-1]
+
+                key_list = [line[:line.find(':')].strip() for line in lines]
+                for key in key_list:
+                    self.assertTrue(key.startswith('"I18N_'))
+                self.assertEqual(sorted(key_list), key_list)
 
     def test_keys_match_en_qqq(self):
         """Tests that en.json and qqq.json have the exact same set of keys."""

@@ -61,9 +61,9 @@
               <h2 class="oppia-library-group-header">
                 <a ng-if="group.has_full_results_page"
                    ng-click="showAllResultsForCategories(group.categories)"
-                   translate="<[group.translationId]>">
+                   translate="<[group.header_i18n_id]>">
                 </a>
-                <span ng-if="!group.has_full_results_page" translate="<[group.translationId]>">
+                <span ng-if="!group.has_full_results_page" translate="<[group.header_i18n_id]>">
                 </span>
               </h2>
               <div class="pull-right" ng-if="group.has_full_results_page">

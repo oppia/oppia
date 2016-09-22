@@ -64,12 +64,16 @@ class TeachPage(base.BaseHandler):
         self.render_template('pages/teach.html')
 
 
-class ConsoleErrorPage(base.BaseHandler):
-    """Page with missing resources to test cache slugs."""
+class BlogPage(base.BaseHandler):
+    """Page embedding the Oppia blog."""
 
     def get(self):
         """Handles GET requests."""
-        self.render_template('pages/console_errors.html')
+        self.values.update({
+            'meta_description': feconf.BLOG_PAGE_DESCRIPTION,
+            'nav_mode': feconf.NAV_MODE_BLOG,
+        })
+        self.render_template('pages/blog.html')
 
 
 class ContactPage(base.BaseHandler):
@@ -165,3 +169,11 @@ class TeachRedirectPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.redirect('/teach')
+
+
+class ConsoleErrorPage(base.BaseHandler):
+    """Page with missing resources to test cache slugs."""
+
+    def get(self):
+        """Handles GET requests."""
+        self.render_template('pages/console_errors.html')
