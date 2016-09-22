@@ -75,6 +75,16 @@ class LibraryPage(base.BaseHandler):
         search_mode = 'search' in self.request.url
         rank_mode = 'explorations' in self.request.url
 
+        if rank_mode:
+            if kwargs['rank_method'] == 'recently_published':
+                title = feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED
+            elif kwargs['rank_method'] == 'top_rated':
+                title = feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS
+        elif search_mode:
+            title = 'Find explorations to learn from - Oppia'
+        else:
+            title = 'I18N_LIBRARY_PAGE_TITLE'
+
         self.values.update({
             'meta_description': (
                 feconf.SEARCH_PAGE_DESCRIPTION if search_mode
@@ -87,6 +97,7 @@ class LibraryPage(base.BaseHandler):
                 utils.get_all_language_codes_and_names()),
             'search_mode': search_mode,
             'rank_mode': rank_mode,
+            'title': title,
             'SEARCH_DROPDOWN_CATEGORIES': feconf.SEARCH_DROPDOWN_CATEGORIES,
         })
         self.render_template('library/library.html')
