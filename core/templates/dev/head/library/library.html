@@ -44,7 +44,7 @@
         </div>
 
         <div class="oppia-exp-summary-tiles-container" ng-if="inRankMode">
-          <div class="oppia-library-group" ng-repeat="group in libraryGroups track by $index">
+          <div class="oppia-library-group" ng-repeat="group in libraryGroups track by $index" style="margin-right: auto; margin-left: auto; max-width: 856px;"">
             <div ng-repeat="tile in group.activity_summary_dicts" style="display: inline-block;">
               <exploration-summary-tile ng-if="tile.activity_type == 'exploration'"
                                         exploration-id="tile.id"
