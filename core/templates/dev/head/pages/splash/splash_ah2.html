@@ -24,11 +24,11 @@
 {% block content %}
   <div ng-controller="Splash">
     <div class="oppia-splash-section-one text-center">
-      <h1 class="oppia-splash-h1" style="max-width: 800px; font-size: 2.3em; line-height: 1.5em; padding-bottom: 0.5em;">Lesson plans aren't just for the schoolday</h1>
+      <h1 class="oppia-splash-h1" style="max-width: 800px; font-size: 2.3em; line-height: 1.5em; padding-bottom: 0.5em;">Students don't want to do homework?</h1>
 
-      <div style="position: relative; left: -webkit-calc(-70px + 15%); left: -moz-calc(-70px + 15%); left: -o-calc(-70px + 15%); left: calc(-70px + 15%);">
+      <div style="position: relative; left: left: -webkit-calc(-70px + 15%); left: -moz-calc(-70px + 15%); left: -o-calc(-70px + 15%); left: calc(-70px + 15%);">
         <h2 style="max-width: 400px; color: #005c53; font-size: 1.6em; font-family: Capriola; line-height: 1.5em;">
-          Create fun interactive quizzes that students can do at home.
+          Transform your existing homework exercises into fun online activities.
         </h2>
       </div>
 
@@ -162,14 +162,6 @@
       <div class="oppia-splash-h2-container">
         <h2 class="oppia-splash-h2" style="padding-bottom: 30px; font-size: 1.6em; padding-top: 100px; max-width: 700px;">
         </h2>
-
-        <div style="height: 0; margin: 0 auto 60px auto; width: 70%; padding-bottom: 56.25%; position: relative;">
-          <iframe title="Oppia.org - Intelligent Online Learning" width="100%"
-                  height="100%" src="https://www.youtube.com/embed/Ntcw0H0hwPU"
-                  frameborder="0" allowfullscreen
-                  style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
-          </iframe>
-        </div>
       </div>
     </div>
 
@@ -226,5 +218,5 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/Splash.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/splash/Splash.js"></script>
 {% endblock footer_js %}
