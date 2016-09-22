@@ -70,10 +70,11 @@ class LibraryPage(base.BaseHandler):
     for search results.
     """
 
-    def get(self, rank_method):
+    def get(self, **information):
         """Handles GET requests."""
         search_mode = 'search' in self.request.url
         rank_mode = 'explorations' in self.request.url
+
         self.values.update({
             'meta_description': (
                 feconf.SEARCH_PAGE_DESCRIPTION if search_mode
@@ -94,46 +95,70 @@ class LibraryPage(base.BaseHandler):
 class LibraryIndexHandler(base.BaseHandler):
     """Provides data for the default library index page."""
 
-    def get(self, rank_method):
+    def get(self, **information):
         """Handles GET requests."""
         # TODO(sll): Support index pages for other language codes.
-        summary_dicts_by_category = summary_services.get_library_groups([
-            feconf.DEFAULT_LANGUAGE_CODE])
-        recently_published_summary_dicts = (
-            summary_services.get_recently_published_exploration_summary_dicts())
-        top_rated_activity_summary_dicts = (
-            summary_services.get_top_rated_exploration_summary_dicts(
-                [feconf.DEFAULT_LANGUAGE_CODE]))
-        featured_activity_summary_dicts = (
-            summary_services.get_featured_activity_summary_dicts(
-                [feconf.DEFAULT_LANGUAGE_CODE]))
+
+        summary_dicts_by_category = []
+        if information['rank_method'] == 'library':
+            summary_dicts_by_category = summary_services.get_library_groups([
+                feconf.DEFAULT_LANGUAGE_CODE])
+            recently_published_summary_dicts = (
+                summary_services.get_recently_published_exploration_summary_dicts())
+            top_rated_activity_summary_dicts = (
+                summary_services.get_top_rated_exploration_summary_dicts(
+                    [feconf.DEFAULT_LANGUAGE_CODE]))
+            featured_activity_summary_dicts = (
+                summary_services.get_featured_activity_summary_dicts(
+                    [feconf.DEFAULT_LANGUAGE_CODE]))
+
+            if recently_published_summary_dicts:
+                summary_dicts_by_category.insert(0, {
+                    'activity_summary_dicts': recently_published_summary_dicts,
+                    'categories': ['recently_published'],
+                    'header': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
+                    'has_full_results_page': True,
+                })
+            if top_rated_activity_summary_dicts:
+                summary_dicts_by_category.insert(0, {
+                    'activity_summary_dicts': top_rated_activity_summary_dicts,
+                    'categories': ['top_rated'],
+                    'header': feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS,
+                    'has_full_results_page': True,
+                })
+            if featured_activity_summary_dicts:
+                summary_dicts_by_category.insert(0, {
+                    'activity_summary_dicts': featured_activity_summary_dicts,
+                    'categories': [],
+                    'header': feconf.LIBRARY_CATEGORY_FEATURED_ACTIVITIES,
+                    'has_full_results_page': False,
+                })
+        if information['rank_method'] == 'recently_published':
+            recently_published_summary_dicts = (
+                summary_services.get_recently_published_exploration_summary_dicts())
+            if recently_published_summary_dicts:
+                summary_dicts_by_category.insert(0, {
+                    'activity_summary_dicts': recently_published_summary_dicts,
+                    'categories': ['recently_published'],
+                    'header': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
+                    'has_full_results_page': True,
+                })
+        if information['rank_method'] == 'top_rated':
+            top_rated_activity_summary_dicts = (
+                summary_services.get_top_rated_exploration_summary_dicts(
+                    [feconf.DEFAULT_LANGUAGE_CODE]))
+            if top_rated_activity_summary_dicts:
+                summary_dicts_by_category.insert(0, {
+                    'activity_summary_dicts': top_rated_activity_summary_dicts,
+                    'categories': ['top_rated'],
+                    'header': feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS,
+                    'has_full_results_page': True,
+                })
 
         preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
         if self.user_id:
             user_settings = user_services.get_user_settings(self.user_id)
             preferred_language_codes = user_settings.preferred_language_codes
-
-        if recently_published_summary_dicts:
-            summary_dicts_by_category.insert(0, {
-                'activity_summary_dicts': recently_published_summary_dicts,
-                'categories': ['recently_published'],
-                'header': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
-                'has_full_results_page': True,
-            })
-        if top_rated_activity_summary_dicts:
-            summary_dicts_by_category.insert(0, {
-                'activity_summary_dicts': top_rated_activity_summary_dicts,
-                'categories': ['top_rated'],
-                'header': feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS,
-                'has_full_results_page': True,
-            })
-        if featured_activity_summary_dicts:
-            summary_dicts_by_category.insert(0, {
-                'activity_summary_dicts': featured_activity_summary_dicts,
-                'categories': [],
-                'header': feconf.LIBRARY_CATEGORY_FEATURED_ACTIVITIES,
-                'has_full_results_page': False,
-            })
 
         self.values.update({
             'activity_summary_dicts_by_category': (
@@ -170,30 +195,6 @@ class SearchHandler(base.BaseHandler):
         self.values.update({
             'activity_list': activity_list,
             'search_cursor': new_search_cursor,
-        })
-
-        self.render_json(self.values)
-
-class RankExplorationsHandler(base.BaseHandler):
-
-    def get(self):
-        summary_dicts_by_category = []
-        recently_published_summary_dicts = (
-            summary_services.get_recently_published_exploration_summary_dicts())
-        preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
-        if self.user_id:
-            user_settings = user_services.get_user_settings(self.user_id)
-            preferred_language_codes = user_settings.preferred_language_codes
-        if recently_published_summary_dicts:
-            summary_dicts_by_category.insert(0, {
-                'activity_summary_dicts': recently_published_summary_dicts,
-                'categories': ['recently_published'],
-                'header': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
-                'has_full_results_page': True,
-            })
-        self.values.update({
-            'activity_list': summary_dicts_by_category,
-            'preferred_language_codes': preferred_language_codes,
         })
 
         self.render_json(self.values)
