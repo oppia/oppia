@@ -70,7 +70,7 @@ class LibraryPage(base.BaseHandler):
     for search results.
     """
 
-    def get(self, **information):
+    def get(self, **kwargs):
         """Handles GET requests."""
         search_mode = 'search' in self.request.url
         rank_mode = 'explorations' in self.request.url
@@ -95,19 +95,47 @@ class LibraryPage(base.BaseHandler):
 class LibraryIndexHandler(base.BaseHandler):
     """Provides data for the default library index page."""
 
-    def get(self, **information):
+    def get(self, **kwargs):
         """Handles GET requests."""
         # TODO(sll): Support index pages for other language codes.
 
         summary_dicts_by_category = []
-        if information['rank_method'] == 'library':
+
+        if kwargs['rank_method'] == 'recently_published':
+            recently_published_summary_dicts = (
+                summary_services.get_recently_published_exploration_summary_dicts( # pylint: disable=line-too-long
+                    feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE))
+            if recently_published_summary_dicts:
+                summary_dicts_by_category.insert(0, {
+                    'activity_summary_dicts': recently_published_summary_dicts,
+                    'categories': ['recently_published'],
+                    'header': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
+                    'has_full_results_page': True,
+                })
+
+        elif kwargs['rank_method'] == 'top_rated':
+            top_rated_activity_summary_dicts = (
+                summary_services.get_top_rated_exploration_summary_dicts(
+                    [feconf.DEFAULT_LANGUAGE_CODE],
+                    feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE))
+            if top_rated_activity_summary_dicts:
+                summary_dicts_by_category.insert(0, {
+                    'activity_summary_dicts': top_rated_activity_summary_dicts,
+                    'categories': ['top_rated'],
+                    'header': feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS,
+                    'has_full_results_page': True,
+                })
+
+        else:
             summary_dicts_by_category = summary_services.get_library_groups([
                 feconf.DEFAULT_LANGUAGE_CODE])
             recently_published_summary_dicts = (
-                summary_services.get_recently_published_exploration_summary_dicts())
+                summary_services.get_recently_published_exploration_summary_dicts( # pylint: disable=line-too-long
+                    feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE))
             top_rated_activity_summary_dicts = (
                 summary_services.get_top_rated_exploration_summary_dicts(
-                    [feconf.DEFAULT_LANGUAGE_CODE]))
+                    [feconf.DEFAULT_LANGUAGE_CODE],
+                    feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE))
             featured_activity_summary_dicts = (
                 summary_services.get_featured_activity_summary_dicts(
                     [feconf.DEFAULT_LANGUAGE_CODE]))
@@ -132,27 +160,6 @@ class LibraryIndexHandler(base.BaseHandler):
                     'categories': [],
                     'header': feconf.LIBRARY_CATEGORY_FEATURED_ACTIVITIES,
                     'has_full_results_page': False,
-                })
-        if information['rank_method'] == 'recently_published':
-            recently_published_summary_dicts = (
-                summary_services.get_recently_published_exploration_summary_dicts())
-            if recently_published_summary_dicts:
-                summary_dicts_by_category.insert(0, {
-                    'activity_summary_dicts': recently_published_summary_dicts,
-                    'categories': ['recently_published'],
-                    'header': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
-                    'has_full_results_page': True,
-                })
-        if information['rank_method'] == 'top_rated':
-            top_rated_activity_summary_dicts = (
-                summary_services.get_top_rated_exploration_summary_dicts(
-                    [feconf.DEFAULT_LANGUAGE_CODE]))
-            if top_rated_activity_summary_dicts:
-                summary_dicts_by_category.insert(0, {
-                    'activity_summary_dicts': top_rated_activity_summary_dicts,
-                    'categories': ['top_rated'],
-                    'header': feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS,
-                    'has_full_results_page': True,
                 })
 
         preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]

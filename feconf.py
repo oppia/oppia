@@ -72,12 +72,20 @@ RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
 DEFAULT_QUERY_LIMIT = 1000
 
 # The maximum number of results to retrieve in a datastore query
-# for top rated published explorations.
-NUMBER_OF_TOP_RATED_EXPLORATIONS = 8
+# for top rated published explorations in /library page.
+NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE = 8
 
 # The maximum number of results to retrieve in a datastore query
-# for recently published explorations.
-RECENTLY_PUBLISHED_QUERY_LIMIT = 8
+# for recently published explorations in /library page.
+RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE = 8
+
+# The maximum number of results to retrieve in a datastore query
+# for top rated published explorations in /explorations/top_rated page
+NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE = 24
+
+# The maximum number of results to retrieve in a datastore query
+# for recently published explorations in /explorations/recently_published_page
+RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 24
 
 # The current version of the dashboard stats blob schema. If any backward-
 # incompatible changes are made to the stats blob schema in the data store,

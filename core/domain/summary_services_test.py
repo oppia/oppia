@@ -637,7 +637,7 @@ class TopRatedExplorationDisplayableSummariesTest(
 
         top_rated_exploration_summaries = (
             summary_services.get_top_rated_exploration_summary_dicts([
-                feconf.DEFAULT_LANGUAGE_CODE]))
+                feconf.DEFAULT_LANGUAGE_CODE], 8))
         expected_summary = {
             'status': u'public',
             'thumbnail_bg_color': '#a33f40',
@@ -674,7 +674,7 @@ class TopRatedExplorationDisplayableSummariesTest(
 
         top_rated_exploration_summaries = (
             summary_services.get_top_rated_exploration_summary_dicts([
-                feconf.DEFAULT_LANGUAGE_CODE]))
+                feconf.DEFAULT_LANGUAGE_CODE], 8))
 
         expected_summary = {
             'status': u'public',
@@ -757,7 +757,8 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         """
 
         recently_published_exploration_summaries = (
-            summary_services.get_recently_published_exploration_summary_dicts())
+            summary_services.get_recently_published_exploration_summary_dicts(
+                feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE))
         test_summary_1 = {
             'status': 'public',
             'thumbnail_bg_color': '#a33f40',
@@ -821,7 +822,8 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             }], 'Changed title.')
 
         recently_published_exploration_summaries = (
-            summary_services.get_recently_published_exploration_summary_dicts())
+            summary_services.get_recently_published_exploration_summary_dicts(
+                feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE))
         self.assertEqual(
             recently_published_exploration_summaries[1]['title'], 'New title')
         self.assertDictContainsSubset(

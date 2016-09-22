@@ -371,10 +371,11 @@ class ExpSummaryModel(base_models.BaseModel):
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_top_rated(cls):
+    def get_top_rated(cls, number_of_explorations_to_fetch):
         """Returns an iterable with the top rated exp summaries that are
         public in descending order.
         """
+        print number_of_explorations_to_fetch
         return ExpSummaryModel.query().filter(
             ndb.OR(ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLIC,
                    ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLICIZED)
@@ -382,7 +383,7 @@ class ExpSummaryModel(base_models.BaseModel):
             ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).order(
             -ExpSummaryModel.scaled_average_rating
-        ).fetch(feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS)
+        ).fetch(number_of_explorations_to_fetch)
 
     @classmethod
     def get_private_at_least_viewable(cls, user_id):
@@ -412,7 +413,7 @@ class ExpSummaryModel(base_models.BaseModel):
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_recently_published(cls):
+    def get_recently_published(cls, number_of_explorations_to_fetch):
         """Returns an iterable with exp summaries that are recently
         published.
         """
@@ -423,4 +424,4 @@ class ExpSummaryModel(base_models.BaseModel):
             ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).order(
             -ExpSummaryModel.first_published_msec
-        ).fetch(feconf.RECENTLY_PUBLISHED_QUERY_LIMIT)
+        ).fetch(number_of_explorations_to_fetch)

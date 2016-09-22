@@ -43,7 +43,26 @@
           <search-results></search-results>
         </div>
 
-        <div class="oppia-exp-summary-tiles-container" ng-if="!inSearchMode">
+        <div class="oppia-exp-summary-tiles-container" ng-if="inRankMode">
+          <div class="oppia-library-group" ng-repeat="group in libraryGroups track by $index">
+            <div ng-repeat="tile in group.activity_summary_dicts" style="display: inline-block;">
+              <exploration-summary-tile ng-if="tile.activity_type == 'exploration'"
+                                        exploration-id="tile.id"
+                                        exploration-title="tile.title"
+                                        last-updated-msec="tile.last_updated_msec"
+                                        objective="tile.objective"
+                                        category="tile.category"
+                                        ratings="tile.ratings"
+                                        num-views="tile.num_views"
+                                        thumbnail-icon-url="tile.thumbnail_icon_url"
+                                        thumbnail-bg-color="tile.thumbnail_bg_color"
+                                        class="protractor-test-exp-summary-tile">
+              </exploration-summary-tile>
+            </div>
+          </div>         
+        </div>
+
+        <div class="oppia-exp-summary-tiles-container" ng-if="!inSearchMode && !inRankMode">
           <img ng-src="<[bannerImageFileUrl]>" align="center"
                width="100%">
           <div style="text-align: center; width: 100%;">
@@ -171,7 +190,7 @@
 
 {% block footer %}
   <div ng-controller="LibraryFooter">
-    <div ng-if="!inSearchMode">
+    <div ng-if="!inSearchMode && !inRankMode">
       {% include 'footer.html' %}
     </div>
   </div>
