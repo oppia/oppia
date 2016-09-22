@@ -128,7 +128,7 @@ oppia.controller('LearnerLocalNav', [
             }
         );
         var report = (
-          "[" + result.state + "] (" + result.report_type + ") "
+          '[' + result.state + '] (' + result.report_type + ') '
           + result.report_text);
         $http.post(flagExplorationUrl, {
           report_text: report
