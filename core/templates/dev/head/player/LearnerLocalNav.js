@@ -16,13 +16,13 @@
  * @fileoverview Controller for the local navigation in the learner view.
  */
 oppia.constant(
-  'FLAG_EXPLORATION_URL', '/flagexplorationhandler/<exploration_id>');
+  'FLAG_EXPLORATION_URL_TEMPLATE', '/flagexplorationhandler/<exploration_id>');
 
 oppia.controller('LearnerLocalNav', [
   '$scope', '$modal', '$http', 'oppiaPlayerService', 'alertsService',
-  'UrlInterpolationService', 'FLAG_EXPLORATION_URL',
+  'UrlInterpolationService', 'FLAG_EXPLORATION_URL_TEMPLATE',
   function($scope, $modal, $http, oppiaPlayerService, alertsService,
-    UrlInterpolationService, FLAG_EXPLORATION_URL) {
+    UrlInterpolationService, FLAG_EXPLORATION_URL_TEMPLATE) {
     $scope.explorationId = oppiaPlayerService.getExplorationId();
     $scope.showLearnerSuggestionModal = function() {
       $modal.open({
@@ -30,11 +30,11 @@ oppia.controller('LearnerLocalNav', [
         backdrop: 'static',
         resolve: {},
         controller: [
-            '$scope', '$modalInstance', '$timeout', 'playerPositionService',
+          '$scope', '$modalInstance', '$timeout', 'playerPositionService',
           'oppiaPlayerService',
           function(
               $scope, $modalInstance, $timeout, playerPositionService,
-            oppiaPlayerService) {
+              oppiaPlayerService) {
             var stateName = playerPositionService.getCurrentStateName();
             $scope.initContent = oppiaPlayerService.getStateContentHtml(
               stateName);
@@ -93,24 +93,25 @@ oppia.controller('LearnerLocalNav', [
         templateUrl: 'modals/flagExploration',
         backdrop: true,
         controller: [
-            '$scope', '$modalInstance',
-          function($scope, $modalInstance) {
+            '$scope', '$modalInstance', 'playerPositionService',
+          function($scope, $modalInstance, playerPositionService) {
             $scope.otherFlagDropdown = false;
+            var stateName = playerPositionService.getCurrentStateName();
 
-            $scope.triggerOtherFlagDropdown = function(value) {
-              if (value === 'other') {
-                $scope.otherFlagDropdown = true;
-                $scope.flagMessage = null;
+            $scope.showFlagMessageTextarea = function(value) {
+              if (value) {
+                return true;
               } else {
-                $scope.otherFlagDropdown = false;
-                $scope.flagMessage = $scope.flag;
+                return false;
               }
             };
 
             $scope.submitReport = function() {
               if ($scope.flagMessage) {
                 $modalInstance.close({
-                  report: $scope.flagMessage
+                  report_type: $scope.flag,
+                  report_text: $scope.flagMessage,
+                  state: stateName
                 });
               }
             };
@@ -122,12 +123,15 @@ oppia.controller('LearnerLocalNav', [
         ]
       }).result.then(function(result) {
         var flagExplorationUrl = UrlInterpolationService.interpolateUrl(
-            FLAG_EXPLORATION_URL, {
+            FLAG_EXPLORATION_URL_TEMPLATE, {
               exploration_id: $scope.explorationId
             }
         );
+        var report = (
+          "[" + result.state + "] (" + result.report_type + ") "
+          + result.report_text);
         $http.post(flagExplorationUrl, {
-          report: result.report
+          report_text: report
         }).error(function(error) {
           alertsService.addWarning(error);
         });

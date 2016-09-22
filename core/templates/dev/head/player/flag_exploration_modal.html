@@ -1,0 +1,45 @@
+<script type="text/ng-template" id="modals/flagExploration">
+  <div class="modal-header">
+    <h3>
+      <span>Report this exploration</span>
+    </h3>
+  </div>
+  <div class="modal-body oppia-long-text">
+    <h4>
+      <span><b>What is the issue?</b></span>
+    </h4>  
+    <form>
+      <div class="radio">
+        <label>
+          <input type="radio" value="ad" ng-model="flag" ng-change="showFlagMessageTextarea(flag)">
+          Misleading content, spam or ads
+        </label>
+      </div>
+      <div class="radio">
+        <label>
+          <input type="radio" value="poor_experience" ng-model="flag" ng-change="showFlagMessageTextarea(flag)">
+          Poor learning experience
+        </label>
+      </div>
+      <div class="radio">
+        <label>
+          <input type="radio" value="other" ng-model="flag" ng-change="showFlagMessageTextarea(flag)">
+          Other
+        </label>
+        <p ng-show="showFlagMessageTextarea(flag)">
+          Please provide additional details for the moderators:
+          <textarea rows="3" cols="50" ng-model="flagMessage">
+          </textarea>
+        </p>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">
+      Cancel
+    </button>
+    <button class="btn btn-success" ng-click="submitReport()" ng-disabled="!flagMessage">
+      Submit  
+    </button>
+  </div>
+</script>
