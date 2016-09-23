@@ -24,11 +24,11 @@
 {% block content %}
   <div ng-controller="Splash">
     <div class="oppia-splash-section-one text-center">
-      <h1 class="oppia-splash-h1" style="max-width: 800px; font-size: 2.3em; line-height: 1.5em; padding-bottom: 0.5em;">Volunteer teaching on your own schedule</h1>
+      <h1 class="oppia-splash-h1" style="max-width: 800px; font-size: 2.3em; line-height: 1.5em; padding-bottom: 0.5em;">Need new homework ideas?</h1>
 
       <div style="position: relative; left: -webkit-calc(-70px + 15%); left: -moz-calc(-70px + 15%); left: -o-calc(-70px + 15%); left: calc(-70px + 15%);">
         <h2 style="max-width: 400px; color: #005c53; font-size: 1.6em; font-family: Capriola; line-height: 1.5em;">
-          Create online lessons at a time that suits you.
+          Easily create interactive homework that you don't need to grade.
         </h2>
       </div>
 
@@ -171,11 +171,8 @@
           <div class="oppia-splash-bullet-block oppia-splash-block-left-image">
             <img ng-src="<[getStaticImageUrl('/splash/bullet1icon.svg')]>" class="oppia-splash-overlapping-image-1">
           </div>
-          <div class="oppia-splash-bullet-block oppia-splash-block-right-text">
-            If you want to volunteer your time to teach, but have a busy
-            schedule, creating online lessons lets you reach students without
-            needing to fit their schedules. Students can go through your lessons
-            whenever they want.
+          <div class="oppia-splash-bullet-block oppia-splash-block-right-text"
+               translate="I18N_SPLASH_FIRST_EXPLORATION_DESCRIPTION_ALTERNATE">
           </div>
         </div>
 
@@ -183,9 +180,8 @@
           <div class="oppia-splash-bullet-block oppia-splash-block-right-image">
             <img ng-src="<[getStaticImageUrl('/splash/bullet2icon.svg')]>">
           </div>
-          <div class="oppia-splash-bullet-block oppia-splash-block-left-text">
-            It's easy and free to publish a lesson in Oppia. Just sign up and
-            get started. You can come back and improve the lesson any time.
+          <div class="oppia-splash-bullet-block oppia-splash-block-left-text"
+               translate="I18N_SPLASH_SECOND_EXPLORATION_DESCRIPTION">
           </div>
         </div>
 
@@ -193,9 +189,8 @@
           <div class="oppia-splash-bullet-block oppia-splash-block-left-image">
             <img ng-src="<[getStaticImageUrl('/splash/bullet3icon.svg')]>">
           </div>
-          <div class="oppia-splash-bullet-block oppia-splash-block-right-text">
-            You can also see students' progress, and use this information to
-            refine your lessons.
+          <div class="oppia-splash-bullet-block oppia-splash-block-right-text"
+               translate="I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION">
           </div>
         </div>
       </div>
@@ -223,5 +218,5 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/Splash.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/splash/Splash.js"></script>
 {% endblock footer_js %}

@@ -24,11 +24,11 @@
 {% block content %}
   <div ng-controller="Splash">
     <div class="oppia-splash-section-one text-center">
-      <h1 class="oppia-splash-h1" style="max-width: 800px; font-size: 2.3em; line-height: 1.5em; padding-bottom: 0.5em;">Students don't want to do homework?</h1>
+      <h1 class="oppia-splash-h1" style="max-width: 800px; font-size: 2.3em; line-height: 1.5em; padding-bottom: 0.5em;">Tired of grading homework?</h1>
 
-      <div style="position: relative; left: left: -webkit-calc(-70px + 15%); left: -moz-calc(-70px + 15%); left: -o-calc(-70px + 15%); left: calc(-70px + 15%);">
+      <div style="position: relative; left: -webkit-calc(-70px + 15%); left: -moz-calc(-70px + 15%); left: -o-calc(-70px + 15%); left: calc(-70px + 15%);">
         <h2 style="max-width: 400px; color: #005c53; font-size: 1.6em; font-family: Capriola; line-height: 1.5em;">
-          Transform your existing homework exercises into fun online activities.
+          Interactive explorations help students learn faster, and don't need grading.
         </h2>
       </div>
 
@@ -218,5 +218,5 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/Splash.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/splash/Splash.js"></script>
 {% endblock footer_js %}

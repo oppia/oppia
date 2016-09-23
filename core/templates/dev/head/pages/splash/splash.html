@@ -24,14 +24,7 @@
 {% block content %}
   <div ng-controller="Splash">
     <div class="oppia-splash-section-one text-center">
-      <h1 class="oppia-splash-h1" style="max-width: 800px; font-size: 2.3em; line-height: 1.5em; padding-bottom: 0.5em;">Keep students engaged throughout a whole class</h1>
-
-      <div style="position: relative; left: -webkit-calc(-70px + 15%); left: -moz-calc(-70px + 15%); left: -o-calc(-70px + 15%); left: calc(-70px + 15%);">
-        <h2 style="max-width: 400px; color: #005c53; font-size: 1.6em; font-family: Capriola; line-height: 1.5em;">
-          They explore on their own, freeing you up to give focused help.
-        </h2>
-      </div>
-
+      <h1 class="oppia-splash-h1" translate="I18N_SPLASH_TITLE"></h1>
       <div style="position: relative;">
         <div style="padding-left: 200px;">
           <div class="oppia-splash-background-icon-row">
@@ -160,8 +153,7 @@
       </div>
 
       <div class="oppia-splash-h2-container">
-        <h2 class="oppia-splash-h2" style="padding-bottom: 30px; font-size: 1.6em; padding-top: 100px; max-width: 700px;">
-        </h2>
+        <h2 class="oppia-splash-h2" translate="I18N_SPLASH_SUBTITLE_ALTERNATE" style="padding-bottom: 30px; font-size: 1.6em; padding-top: 100px; max-width: 700px;"></h2>
       </div>
     </div>
 
@@ -176,7 +168,7 @@
           </div>
         </div>
 
-        <div class="oppia-splash-bullet" style="clear: both;">
+        <div class="oppia-splash-bullet">
           <div class="oppia-splash-bullet-block oppia-splash-block-right-image">
             <img ng-src="<[getStaticImageUrl('/splash/bullet2icon.svg')]>">
           </div>
@@ -218,5 +210,5 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/Splash.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/splash/Splash.js"></script>
 {% endblock footer_js %}

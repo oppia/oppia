@@ -24,11 +24,11 @@
 {% block content %}
   <div ng-controller="Splash">
     <div class="oppia-splash-section-one text-center">
-      <h1 class="oppia-splash-h1" style="max-width: 800px; font-size: 2.0em; line-height: 1.5em; padding-bottom: 0.5em;">Multiply the impact of your volunteer teaching</h1>
+      <h1 class="oppia-splash-h1" style="max-width: 800px; font-size: 2.3em; line-height: 1.5em; padding-bottom: 0.5em;">Volunteer teaching on your own schedule</h1>
 
       <div style="position: relative; left: -webkit-calc(-70px + 15%); left: -moz-calc(-70px + 15%); left: -o-calc(-70px + 15%); left: calc(-70px + 15%);">
         <h2 style="max-width: 400px; color: #005c53; font-size: 1.6em; font-family: Capriola; line-height: 1.5em;">
-          Reach hundreds of students.
+          Create online lessons at a time that suits you.
         </h2>
       </div>
 
@@ -172,7 +172,10 @@
             <img ng-src="<[getStaticImageUrl('/splash/bullet1icon.svg')]>" class="oppia-splash-overlapping-image-1">
           </div>
           <div class="oppia-splash-bullet-block oppia-splash-block-right-text">
-            Make an impact with your volunteering. Oppia enables you to reach more students than you can alone.
+            If you want to volunteer your time to teach, but have a busy
+            schedule, creating online lessons lets you reach students without
+            needing to fit their schedules. Students can go through your lessons
+            whenever they want.
           </div>
         </div>
 
@@ -181,9 +184,8 @@
             <img ng-src="<[getStaticImageUrl('/splash/bullet2icon.svg')]>">
           </div>
           <div class="oppia-splash-bullet-block oppia-splash-block-left-text">
-            It's easy and free to create a lesson in Oppia. Just <a ng-click="onRedirectToLogin('/dashboard?mode=create')">sign up</a> and get
-            started! You'll be able to see how many students have started your
-            lessons, and get detailed information on their progress.
+            It's easy and free to publish a lesson in Oppia. Just sign up and
+            get started. You can come back and improve the lesson any time.
           </div>
         </div>
 
@@ -192,10 +194,8 @@
             <img ng-src="<[getStaticImageUrl('/splash/bullet3icon.svg')]>">
           </div>
           <div class="oppia-splash-bullet-block oppia-splash-block-right-text">
-            You can also improve your lessons over time. For example, if many
-            students get stuck at a particular step, you can add extra
-            information to be shown only to those students who answered a
-            certain question incorrectly.
+            You can also see students' progress, and use this information to
+            refine your lessons.
           </div>
         </div>
       </div>
@@ -223,5 +223,5 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/Splash.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/splash/Splash.js"></script>
 {% endblock footer_js %}
