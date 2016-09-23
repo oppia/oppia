@@ -105,9 +105,9 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
         self.assertEqual(len(query.user_ids), 3)
         self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
 
-    def test_user_has_created_more_than_n_exps(self):
+    def test_user_has_created_at_least_n_exps(self):
         query_id = user_query_services.save_new_query_model(
-            self.submitter_id, created_more_than_n_exps=1)
+            self.submitter_id, created_at_least_n_exps=1)
         self._run_one_off_job(query_id)
 
         query = user_models.UserQueryModel.get(query_id)
@@ -117,17 +117,17 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
 
     def test_user_has_created_fewer_than_n_exps(self):
         query_id = user_query_services.save_new_query_model(
-            self.submitter_id, created_fewer_than_n_exps=0)
+            self.submitter_id, created_fewer_than_n_exps=1)
         self._run_one_off_job(query_id)
 
         query = user_models.UserQueryModel.get(query_id)
         qualifying_user_ids = [self.user_a_id, self.user_c_id]
-        #self.assertEqual(len(query.user_ids), 2)
+        self.assertEqual(len(query.user_ids), 2)
         self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
 
-    def test_user_has_edited_more_than_n_exps(self):
+    def test_user_has_edited_at_least_n_exps(self):
         query_id = user_query_services.save_new_query_model(
-            self.submitter_id, edited_more_than_n_exps=1)
+            self.submitter_id, edited_at_least_n_exps=1)
         self._run_one_off_job(query_id)
 
         query = user_models.UserQueryModel.get(query_id)
@@ -137,13 +137,13 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
 
     def test_user_has_edited_fewer_than_n_exps(self):
         query_id = user_query_services.save_new_query_model(
-            self.submitter_id, edited_fewer_than_n_exps=0)
+            self.submitter_id, edited_fewer_than_n_exps=1)
         self._run_one_off_job(query_id)
 
         query = user_models.UserQueryModel.get(query_id)
         qualifying_user_ids = [self.user_a_id]
         self.assertEqual(len(query.user_ids), 1)
-        self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
+        self.assertEqual(query.user_ids, qualifying_user_ids)
 
     def test_combination_of_query_params(self):
         query_id = user_query_services.save_new_query_model(
@@ -152,7 +152,6 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
         self._run_one_off_job(query_id)
 
         query = user_models.UserQueryModel.get(query_id)
-        qualifying_user_ids = (
-            [self.user_a_id, self.user_b_id, self.user_c_id, self.user_d_id])
-        self.assertEqual(len(query.user_ids), 4)
-        self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
+        qualifying_user_ids = [self.user_a_id]
+        self.assertEqual(len(query.user_ids), 1)
+        self.assertEqual(query.user_ids, qualifying_user_ids)

@@ -77,33 +77,30 @@ class UserQueryOneOffJob(jobs.BaseMapReduceJobManager):
                     edited_n_explorations = True
                     break
 
-            if created_n_explorations or edited_n_explorations:
-                yield(query_id, user_id)
+            if not (created_n_explorations or edited_n_explorations):
                 return
 
-        if query_model.created_more_than_n_exps is not None:
-            if (len(user_contributions.created_exploration_ids) >=
-                    query_model.created_more_than_n_exps):
-                yield(query_id, user_id)
+        if query_model.created_at_least_n_exps is not None:
+            if (len(user_contributions.created_exploration_ids) <
+                    query_model.created_at_least_n_exps):
                 return
 
         if query_model.created_fewer_than_n_exps is not None:
-            if (len(user_contributions.created_exploration_ids) <=
+            if (len(user_contributions.created_exploration_ids) >=
                     query_model.created_fewer_than_n_exps):
-                yield(query_id, user_id)
                 return
 
-        if query_model.edited_more_than_n_exps is not None:
-            if (len(user_contributions.edited_exploration_ids) >=
-                    query_model.edited_more_than_n_exps):
-                yield(query_id, user_id)
+        if query_model.edited_at_least_n_exps is not None:
+            if (len(user_contributions.edited_exploration_ids) <
+                    query_model.edited_at_least_n_exps):
                 return
 
         if query_model.edited_fewer_than_n_exps is not None:
-            if (len(user_contributions.edited_exploration_ids) <=
+            if (len(user_contributions.edited_exploration_ids) >=
                     query_model.edited_fewer_than_n_exps):
-                yield(query_id, user_id)
                 return
+
+        yield(query_id, user_id)
 
     @staticmethod
     def reduce(query_model_id, stringified_user_ids):

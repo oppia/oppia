@@ -27,11 +27,11 @@ class UserQueryServicesTest(test_utils.GenericTestBase):
     def test_save_new_query_model(self):
         submitter_id = 'submitter'
         active_in_last_n_days = 10
-        created_more_than_n_exps = 5
+        created_at_least_n_exps = 5
         login_in_last_n_days = 30
         query_id = user_query_services.save_new_query_model(
             submitter_id, active_in_last_n_days=active_in_last_n_days,
-            created_more_than_n_exps=created_more_than_n_exps,
+            created_at_least_n_exps=created_at_least_n_exps,
             login_in_last_n_days=login_in_last_n_days)
 
         query_model = user_models.UserQueryModel.get(query_id)
@@ -40,8 +40,8 @@ class UserQueryServicesTest(test_utils.GenericTestBase):
         self.assertEqual(
             query_model.active_in_last_n_days, active_in_last_n_days)
         self.assertEqual(
-            query_model.created_more_than_n_exps, created_more_than_n_exps)
+            query_model.created_at_least_n_exps, created_at_least_n_exps)
         self.assertEqual(query_model.login_in_last_n_days, login_in_last_n_days)
         self.assertIsNone(query_model.created_fewer_than_n_exps)
-        self.assertIsNone(query_model.edited_more_than_n_exps)
+        self.assertIsNone(query_model.edited_at_least_n_exps)
         self.assertIsNone(query_model.edited_fewer_than_n_exps)

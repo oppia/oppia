@@ -332,19 +332,19 @@ class UserQueryModel(base_models.BaseModel):
     login_in_last_n_days = ndb.IntegerProperty(default=None)
     # Query option to check whether user has created more than
     # N explorations.
-    created_more_than_n_exps = ndb.IntegerProperty(default=None)
+    created_at_least_n_exps = ndb.IntegerProperty(default=None)
     # Query option to check whether user has created less than
     # N explorations.
     created_fewer_than_n_exps = ndb.IntegerProperty(default=None)
     # Query option to check if user has edited more than N explorations.
-    edited_more_than_n_exps = ndb.IntegerProperty(default=None)
+    edited_at_least_n_exps = ndb.IntegerProperty(default=None)
     # Query option to check if user has edited less than N explorations.
     edited_fewer_than_n_exps = ndb.IntegerProperty(default=None)
-    # list of all user_ids who satisfy all parameters given in above query.
+    # List of all user_ids who satisfy all parameters given in above query.
     user_ids = ndb.StringProperty(repeated=True)
-    # id of the user who submitted the query.
+    # Id of the user who submitted the query.
     submitter_id = ndb.StringProperty(indexed=True)
-    # current status of the query.
+    # Current status of the query.
     query_status = ndb.StringProperty(
         indexed=True,
         choices=[
