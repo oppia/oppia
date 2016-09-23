@@ -28,6 +28,7 @@ oppia.controller('Library', [
       'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
     $scope.bannerImageFilename = possibleBannerFilenames[
       Math.floor(Math.random() * possibleBannerFilenames.length)];
+
     $scope.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
       '/library/' + $scope.bannerImageFilename);
 
@@ -38,10 +39,12 @@ oppia.controller('Library', [
 
     // Keeps track of the index of the left-most visible card of each group.
     $scope.leftmostCardIndices = [];
+
     $scope.inRankMode = ($window.location.pathname.indexOf(
       '/explorations') === 0);
     $scope.rankMethod = $window.location.pathname.substr(
       $window.location.pathname.lastIndexOf('/') + 1);
+
     $http.get('/libraryindexhandler/' + $scope.rankMethod).success(
       function(data) {
       $scope.libraryGroups = data.activity_summary_dicts_by_category;
