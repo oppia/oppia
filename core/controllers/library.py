@@ -190,6 +190,7 @@ class LibraryIndexHandler(base.BaseHandler):
 
 class SearchHandler(base.BaseHandler):
     """Provides data for activity search results."""
+
     def get(self):
         """Handles GET requests."""
         query_string = utils.unescape_encoded_uri_component(

@@ -375,7 +375,6 @@ class ExpSummaryModel(base_models.BaseModel):
         """Returns an iterable with the top rated exp summaries that are
         public in descending order.
         """
-        print number_of_explorations_to_fetch
         return ExpSummaryModel.query().filter(
             ndb.OR(ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLIC,
                    ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLICIZED)

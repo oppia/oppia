@@ -190,17 +190,6 @@ oppia.controller('Library', [
       $scope.$apply();
     });
 
-    var activateRecentMode = function() {
-      if (!$scope.inRankMode) {
-        $('.oppia-library-container').fadeOut(function() {
-          $scope.inRankMode = true;
-          $timeout(function() {
-            $('.oppia-library-container').fadeIn();
-          }, 50);
-        });
-      }
-    };
-
     // The following checks if the page is in search mode.
     $scope.inSearchMode = ($window.location.pathname.indexOf('/search') === 0);
     var activateSearchMode = function() {
