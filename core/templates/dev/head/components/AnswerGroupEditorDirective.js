@@ -224,7 +224,6 @@ oppia.directive('answerGroupEditor', [function() {
         $scope.changeActiveRuleIndex = function(newIndex) {
           responsesService.changeActiveRuleIndex(newIndex);
           $scope.activeRuleIndex = responsesService.getActiveRuleIndex();
-          $scope.getOnSaveAnswerGroupRulesFn()($scope.rules);
         };
 
         $scope.openRuleEditor = function(index) {
