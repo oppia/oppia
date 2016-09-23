@@ -195,9 +195,11 @@ URLS = MAPREDUCE_HANDLERS + [
         resources.ValueGeneratorHandler),
 
     get_redirect_route(r'%s' % feconf.LIBRARY_INDEX_URL, library.LibraryPage),
-    get_redirect_route(r'/explorations/<rank_method>', library.LibraryPage),
-    get_redirect_route(r'/libraryindexhandler/<rank_method>',
-                       library.LibraryIndexHandler),
+    get_redirect_route(r'/explorations/<rank_method>',
+                       library.LibraryGroupPage),
+    get_redirect_route(r'/libraryindexhandler', library.LibraryIndexHandler),
+    get_redirect_route(r'/librarygroupindexhandler/<rank_method>',
+                       library.LibraryGroupIndexHandler),
     get_redirect_route(r'%s' % feconf.LIBRARY_SEARCH_URL, library.LibraryPage),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_SEARCH_DATA_URL, library.SearchHandler),

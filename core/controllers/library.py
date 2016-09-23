@@ -70,19 +70,12 @@ class LibraryPage(base.BaseHandler):
     for search results.
     """
 
-    def get(self, **kwargs):
+    def get(self):
         """Handles GET requests."""
         search_mode = 'search' in self.request.url
         rank_mode = 'explorations' in self.request.url
 
-        if rank_mode:
-            if kwargs['rank_method'] == 'recently_published':
-                title = feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED
-            elif kwargs['rank_method'] == 'top_rated':
-                title = feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS
-            else:
-                raise self.PageNotFoundException
-        elif search_mode:
+        if search_mode:
             title = 'Find explorations to learn from - Oppia'
         else:
             title = 'I18N_LIBRARY_PAGE_TITLE'
@@ -108,13 +101,104 @@ class LibraryPage(base.BaseHandler):
 class LibraryIndexHandler(base.BaseHandler):
     """Provides data for the default library index page."""
 
-    def get(self, **kwargs):
+    def get(self):
+        """Handles GET requests."""
+        # TODO(sll): Support index pages for other language codes.
+
+        summary_dicts_by_category = summary_services.get_library_groups([
+            feconf.DEFAULT_LANGUAGE_CODE])
+        recently_published_summary_dicts = (
+            summary_services.get_recently_published_exploration_summary_dicts( # pylint: disable=line-too-long
+                feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE))
+        top_rated_activity_summary_dicts = (
+            summary_services.get_top_rated_exploration_summary_dicts(
+                [feconf.DEFAULT_LANGUAGE_CODE],
+                feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE))
+        featured_activity_summary_dicts = (
+            summary_services.get_featured_activity_summary_dicts(
+                [feconf.DEFAULT_LANGUAGE_CODE]))
+
+        if recently_published_summary_dicts:
+            summary_dicts_by_category.insert(0, {
+                'activity_summary_dicts': recently_published_summary_dicts,
+                'categories': ['recently_published'],
+                'header': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
+                'has_full_results_page': True,
+            })
+        if top_rated_activity_summary_dicts:
+            summary_dicts_by_category.insert(0, {
+                'activity_summary_dicts': top_rated_activity_summary_dicts,
+                'categories': ['top_rated'],
+                'header': feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS,
+                'has_full_results_page': True,
+            })
+        if featured_activity_summary_dicts:
+            summary_dicts_by_category.insert(0, {
+                'activity_summary_dicts': featured_activity_summary_dicts,
+                'categories': [],
+                'header': feconf.LIBRARY_CATEGORY_FEATURED_ACTIVITIES,
+                'has_full_results_page': False,
+            })
+
+        preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
+        if self.user_id:
+            user_settings = user_services.get_user_settings(self.user_id)
+            preferred_language_codes = user_settings.preferred_language_codes
+
+        self.values.update({
+            'activity_summary_dicts_by_category': (
+                summary_dicts_by_category),
+            'preferred_language_codes': preferred_language_codes,
+        })
+        self.render_json(self.values)
+
+
+class LibraryGroupPage(base.BaseHandler):
+    """The main library page. Used for both the default list of categories and
+    for search results.
+    """
+
+    def get(self, rank_method):
+        """Handles GET requests."""
+
+        search_mode = 'search' in self.request.url
+        rank_mode = 'explorations' in self.request.url
+
+        if rank_method == 'recently_published':
+            title = feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED
+        elif rank_method == 'top_rated':
+            title = feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS
+        else:
+            raise self.PageNotFoundException
+
+        self.values.update({
+            'meta_description': (
+                feconf.SEARCH_PAGE_DESCRIPTION if search_mode
+                else feconf.LIBRARY_PAGE_DESCRIPTION),
+            'nav_mode': feconf.NAV_MODE_LIBRARY,
+            'has_fully_registered': bool(
+                self.user_id and
+                user_services.has_fully_registered(self.user_id)),
+            'LANGUAGE_CODES_AND_NAMES': (
+                utils.get_all_language_codes_and_names()),
+            'search_mode': search_mode,
+            'rank_mode': rank_mode,
+            'title': title,
+            'SEARCH_DROPDOWN_CATEGORIES': feconf.SEARCH_DROPDOWN_CATEGORIES,
+        })
+        self.render_template('library/library.html')
+
+
+class LibraryGroupIndexHandler(base.BaseHandler):
+    """Provides data for categories such as top rated and recently published"""
+
+    def get(self, rank_method):
         """Handles GET requests."""
         # TODO(sll): Support index pages for other language codes.
 
         summary_dicts_by_category = []
 
-        if kwargs['rank_method'] == 'recently_published':
+        if rank_method == 'recently_published':
             recently_published_summary_dicts = (
                 summary_services.get_recently_published_exploration_summary_dicts( # pylint: disable=line-too-long
                     feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE))
@@ -126,7 +210,7 @@ class LibraryIndexHandler(base.BaseHandler):
                     'has_full_results_page': True,
                 })
 
-        elif kwargs['rank_method'] == 'top_rated':
+        elif rank_method == 'top_rated':
             top_rated_activity_summary_dicts = (
                 summary_services.get_top_rated_exploration_summary_dicts(
                     [feconf.DEFAULT_LANGUAGE_CODE],
@@ -137,42 +221,6 @@ class LibraryIndexHandler(base.BaseHandler):
                     'categories': ['top_rated'],
                     'header': feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS,
                     'has_full_results_page': True,
-                })
-
-        else:
-            summary_dicts_by_category = summary_services.get_library_groups([
-                feconf.DEFAULT_LANGUAGE_CODE])
-            recently_published_summary_dicts = (
-                summary_services.get_recently_published_exploration_summary_dicts( # pylint: disable=line-too-long
-                    feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE))
-            top_rated_activity_summary_dicts = (
-                summary_services.get_top_rated_exploration_summary_dicts(
-                    [feconf.DEFAULT_LANGUAGE_CODE],
-                    feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE))
-            featured_activity_summary_dicts = (
-                summary_services.get_featured_activity_summary_dicts(
-                    [feconf.DEFAULT_LANGUAGE_CODE]))
-
-            if recently_published_summary_dicts:
-                summary_dicts_by_category.insert(0, {
-                    'activity_summary_dicts': recently_published_summary_dicts,
-                    'categories': ['recently_published'],
-                    'header': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
-                    'has_full_results_page': True,
-                })
-            if top_rated_activity_summary_dicts:
-                summary_dicts_by_category.insert(0, {
-                    'activity_summary_dicts': top_rated_activity_summary_dicts,
-                    'categories': ['top_rated'],
-                    'header': feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS,
-                    'has_full_results_page': True,
-                })
-            if featured_activity_summary_dicts:
-                summary_dicts_by_category.insert(0, {
-                    'activity_summary_dicts': featured_activity_summary_dicts,
-                    'categories': [],
-                    'header': feconf.LIBRARY_CATEGORY_FEATURED_ACTIVITIES,
-                    'has_full_results_page': False,
                 })
 
         preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
