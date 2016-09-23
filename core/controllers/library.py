@@ -104,7 +104,6 @@ class LibraryIndexHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         # TODO(sll): Support index pages for other language codes.
-
         summary_dicts_by_category = summary_services.get_library_groups([
             feconf.DEFAULT_LANGUAGE_CODE])
         recently_published_summary_dicts = (
@@ -118,32 +117,33 @@ class LibraryIndexHandler(base.BaseHandler):
             summary_services.get_featured_activity_summary_dicts(
                 [feconf.DEFAULT_LANGUAGE_CODE]))
 
+        preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
+        if self.user_id:
+            user_settings = user_services.get_user_settings(self.user_id)
+            preferred_language_codes = user_settings.preferred_language_codes
+
         if recently_published_summary_dicts:
             summary_dicts_by_category.insert(0, {
                 'activity_summary_dicts': recently_published_summary_dicts,
                 'categories': ['recently_published'],
-                'header': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
+                'header_i18n_id': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
                 'has_full_results_page': True,
             })
         if top_rated_activity_summary_dicts:
             summary_dicts_by_category.insert(0, {
                 'activity_summary_dicts': top_rated_activity_summary_dicts,
                 'categories': ['top_rated'],
-                'header': feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS,
+                'header_i18n_id': (
+                    feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS),
                 'has_full_results_page': True,
             })
         if featured_activity_summary_dicts:
             summary_dicts_by_category.insert(0, {
                 'activity_summary_dicts': featured_activity_summary_dicts,
                 'categories': [],
-                'header': feconf.LIBRARY_CATEGORY_FEATURED_ACTIVITIES,
+                'header_i18n_id': feconf.LIBRARY_CATEGORY_FEATURED_ACTIVITIES,
                 'has_full_results_page': False,
             })
-
-        preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
-        if self.user_id:
-            user_settings = user_services.get_user_settings(self.user_id)
-            preferred_language_codes = user_settings.preferred_language_codes
 
         self.values.update({
             'activity_summary_dicts_by_category': (
