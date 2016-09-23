@@ -84,7 +84,7 @@ RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE = 8
 NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE = 24
 
 # The maximum number of results to retrieve in a datastore query
-# for recently published explorations in /explorations/recently_published_page
+# for recently published explorations in /explorations/recently_published page
 RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 24
 
 # The current version of the dashboard stats blob schema. If any backward-

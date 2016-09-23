@@ -201,8 +201,8 @@ oppia.controller('Library', [
       }
     };
 
-// The following checks if the page is in search mode.
-$scope.inSearchMode = ($window.location.pathname.indexOf('/search') === 0);
+    // The following checks if the page is in search mode.
+    $scope.inSearchMode = ($window.location.pathname.indexOf('/search') === 0);
     var activateSearchMode = function() {
       if (!$scope.inSearchMode) {
         $('.oppia-library-container').fadeOut(function() {
@@ -215,11 +215,12 @@ $scope.inSearchMode = ($window.location.pathname.indexOf('/search') === 0);
     };
 
     $scope.showAllResultsForCategories = function(categories) {
-      if (categories[0] == 'recently_published' || categories[0] == 'top_rated') {
+      var isRecentlyPublishedCategory = categories[0] === 'recently_published';
+      var isTopRatedCategory = categories[0] === 'top_rated';
+      if (isRecentlyPublishedCategory || isTopRatedCategory) {
         $window.location.href = '/explorations/' + categories[0];
-      }
-      else {
-      var selectedCategories = {};
+      } else {
+        var selectedCategories = {};
         for (i = 0; i < categories.length; i++) {
           selectedCategories[categories[i]] = true;
         }
