@@ -636,8 +636,9 @@ class TopRatedExplorationDisplayableSummariesTest(
             self.bob_id, self.EXP_ID_1, 1)
 
         top_rated_exploration_summaries = (
-            summary_services.get_top_rated_exploration_summary_dicts([
-                feconf.DEFAULT_LANGUAGE_CODE], 8))
+            summary_services.get_top_rated_exploration_summary_dicts(
+                [feconf.DEFAULT_LANGUAGE_CODE],
+                feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE))
         expected_summary = {
             'status': u'public',
             'thumbnail_bg_color': '#a33f40',
@@ -673,8 +674,9 @@ class TopRatedExplorationDisplayableSummariesTest(
             self.bob_id, self.EXP_ID_2, 5)
 
         top_rated_exploration_summaries = (
-            summary_services.get_top_rated_exploration_summary_dicts([
-                feconf.DEFAULT_LANGUAGE_CODE], 8))
+            summary_services.get_top_rated_exploration_summary_dicts(
+                [feconf.DEFAULT_LANGUAGE_CODE],
+                feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE))
 
         expected_summary = {
             'status': u'public',

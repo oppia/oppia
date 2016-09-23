@@ -80,6 +80,8 @@ class LibraryPage(base.BaseHandler):
                 title = feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED
             elif kwargs['rank_method'] == 'top_rated':
                 title = feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS
+            else:
+                raise self.PageNotFoundException
         elif search_mode:
             title = 'Find explorations to learn from - Oppia'
         else:
