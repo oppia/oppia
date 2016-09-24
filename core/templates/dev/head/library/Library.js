@@ -236,11 +236,9 @@ oppia.controller('Library', [
       }
     };
 
-    $scope.showAllResultsForCategories = function(categories) {
-      var isRecentlyPublishedCategory = categories[0] === 'recently_published';
-      var isTopRatedCategory = categories[0] === 'top_rated';
-      if (isRecentlyPublishedCategory || isTopRatedCategory) {
-        $window.location.href = '/explorations/' + categories[0];
+    $scope.showAllResultsForCategories = function(categories, fullResultsUrl) {
+      if (fullResultsUrl) {
+        $window.location.href = fullResultsUrl;
       } else {
         var selectedCategories = {};
         for (i = 0; i < categories.length; i++) {

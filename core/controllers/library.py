@@ -128,6 +128,7 @@ class LibraryIndexHandler(base.BaseHandler):
                 'categories': ['recently_published'],
                 'header_i18n_id': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
                 'has_full_results_page': True,
+                'full_results_url': '/explorations/recently_published',
             })
         if top_rated_activity_summary_dicts:
             summary_dicts_by_category.insert(0, {
@@ -136,6 +137,7 @@ class LibraryIndexHandler(base.BaseHandler):
                 'header_i18n_id': (
                     feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS),
                 'has_full_results_page': True,
+                'full_results_url': '/explorations/top_rated',
             })
         if featured_activity_summary_dicts:
             summary_dicts_by_category.insert(0, {
@@ -143,6 +145,7 @@ class LibraryIndexHandler(base.BaseHandler):
                 'categories': [],
                 'header_i18n_id': feconf.LIBRARY_CATEGORY_FEATURED_ACTIVITIES,
                 'has_full_results_page': False,
+                'full_results_url': None,
             })
 
         self.values.update({
@@ -154,8 +157,7 @@ class LibraryIndexHandler(base.BaseHandler):
 
 
 class LibraryGroupPage(base.BaseHandler):
-    """The main library page. Used for both the default list of categories and
-    for search results.
+    """The page for displaying top rated and recently published explorations
     """
 
     def get(self, rank_method):
@@ -193,9 +195,6 @@ class LibraryGroupIndexHandler(base.BaseHandler):
     """Provides data for categories such as top rated and recently published"""
 
     def get(self, rank_method):
-        """Handles GET requests."""
-        # TODO(sll): Support index pages for other language codes.
-
         summary_dicts_by_category = []
 
         if rank_method == 'recently_published':
@@ -208,6 +207,7 @@ class LibraryGroupIndexHandler(base.BaseHandler):
                     'categories': ['recently_published'],
                     'header': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
                     'has_full_results_page': True,
+                    'full_results_url': '/explorations/recently_published',
                 })
 
         elif rank_method == 'top_rated':
@@ -221,6 +221,7 @@ class LibraryGroupIndexHandler(base.BaseHandler):
                     'categories': ['top_rated'],
                     'header': feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS,
                     'has_full_results_page': True,
+                    'full_results_url': '/explorations/top_rated',
                 })
 
         preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]

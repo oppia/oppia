@@ -345,6 +345,7 @@ def get_library_groups(language_codes):
             'categories': group['search_categories'],
             'activity_summary_dicts': summary_dicts,
             'has_full_results_page': True,
+            'full_results_url': None,
         })
 
     return results
