@@ -406,7 +406,7 @@ class BaseHandler(webapp2.RequestHandler):
         else:
             self.values.update(values)
             self.render_template(
-                'error/error.html', iframe_restriction=None)
+                'pages/error/error.html', iframe_restriction=None)
 
     def handle_exception(self, exception, unused_debug_mode):
         """Overwrites the default exception handler."""

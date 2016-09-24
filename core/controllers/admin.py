@@ -134,7 +134,7 @@ class AdminPage(base.BaseHandler):
                 editor.get_value_generators_js()),
         })
 
-        self.render_template('admin/admin.html')
+        self.render_template('pages/admin/admin.html')
 
 
 class AdminHandler(base.BaseHandler):

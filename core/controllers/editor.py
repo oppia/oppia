@@ -161,7 +161,8 @@ class ExplorationPage(EditorHandler):
         """Handles GET requests."""
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             self.render_template(
-                'error/disabled_exploration.html', iframe_restriction=None)
+                'pages/error/disabled_exploration.html',
+                iframe_restriction=None)
             return
 
         exploration = exp_services.get_exploration_by_id(

@@ -58,7 +58,8 @@ def require_playable(handler):
     def test_can_play(self, exploration_id, **kwargs):
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             self.render_template(
-                'error/disabled_exploration.html', iframe_restriction=None)
+                'pages/error/disabled_exploration.html',
+                iframe_restriction=None)
             return
 
         # Checks if the user for the current session is logged in.
