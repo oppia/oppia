@@ -1,33 +1,33 @@
 <script type="text/ng-template" id="modals/flagExploration">
   <div class="modal-header">
     <h3>
-      <span>Report this exploration</span>
+      <span><['I18N_PLAYER_REPORT_MODAL_HEADER' | translate]></span>
     </h3>
   </div>
   <div class="modal-body oppia-long-text">
     <h4>
-      <span><b>What is the issue?</b></span>
+      <span><b><['I18N_PLAYER_REPORT_MODAL_BODY_HEADER' | translate]></b></span>
     </h4>  
     <form>
       <div class="radio">
         <label>
           <input type="radio" value="ad" ng-model="flag" ng-change="showFlagMessageTextarea(flag)">
-          Misleading content, spam or ads
+          <['I18N_PLAYER_REPORT_MODAL_BODY_AD' | translate]>
         </label>
       </div>
       <div class="radio">
         <label>
           <input type="radio" value="poor_experience" ng-model="flag" ng-change="showFlagMessageTextarea(flag)">
-          Poor learning experience
+          <['I18N_PLAYER_REPORT_MODAL_BODY_POOR_EXPERIENCE' | translate]>
         </label>
       </div>
       <div class="radio">
         <label>
           <input type="radio" value="other" ng-model="flag" ng-change="showFlagMessageTextarea(flag)">
-          Other
+          <['I18N_PLAYER_REPORT_MODAL_BODY_OTHER' | translate]>
         </label>
         <p ng-show="showFlagMessageTextarea(flag)">
-          Please provide additional details for the moderators:
+          <['I18N_PLAYER_REPORT_MODAL_BODY_ADDITIONAL_DETAILS' | translate]>
           <textarea rows="3" cols="50" ng-model="flagMessage">
           </textarea>
         </p>
@@ -36,10 +36,10 @@
   </div>
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">
-      Cancel
+      <['I18N_PLAYER_REPORT_MODAL_FOOTER_CANCEL' | translate]>
     </button>
     <button class="btn btn-success" ng-click="submitReport()" ng-disabled="!flagMessage">
-      Submit  
+      <['I18N_PLAYER_REPORT_MODAL_FOOTER_SUBMIT' | translate]>
     </button>
   </div>
 </script>
