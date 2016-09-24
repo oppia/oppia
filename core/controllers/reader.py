@@ -258,9 +258,11 @@ class ExplorationPage(base.BaseHandler):
 
         if is_iframed:
             self.render_template(
-                'player/exploration_player.html', iframe_restriction=None)
+                'pages/exploration_player/exploration_player.html',
+                iframe_restriction=None)
         else:
-            self.render_template('player/exploration_player.html')
+            self.render_template(
+                'pages/exploration_player/exploration_player.html')
 
 
 class ExplorationHandler(base.BaseHandler):

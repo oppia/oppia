@@ -93,13 +93,14 @@
   </div>
 
   {% include 'attribution_guide.html' %}
-  {% include 'collection_player/collection_node_list_directive.html' %}
+  {% include 'pages/collection_player/collection_node_list_directive.html' %}
 {% endblock %}
 
 {% block footer_js %}
   {{ super() }}
-  <script src="{{TEMPLATE_DIR_PREFIX}}/collection_player/CollectionPlayer.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/collection_player/CollectionNodeListDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_player/CollectionPlayer.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_player/CollectionNodeListDirective.js"></script>
+
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionNodeObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionObjectFactory.js"></script>

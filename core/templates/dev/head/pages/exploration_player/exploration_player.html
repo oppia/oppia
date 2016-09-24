@@ -70,7 +70,7 @@
       </button>
     </div>
   </script>
-  {% include 'player/learner_local_nav.html' %}
+  {% include 'pages/exploration_player/learner_local_nav.html' %}
 {% endblock local_top_nav_options %}
 
 {% block content %}
@@ -88,11 +88,11 @@
   {% include 'components/profile_link_image_directive.html' %}
   {% include 'components/sharing_links_directive.html' %}
 
-  {% include 'player/answer_feedback_pair_directive.html' %}
-  {% include 'player/conversation_skin_directive.html' %}
-  {% include 'player/feedback_popup_directive.html' %}
-  {% include 'player/information_card_modal.html' %}
-  {% include 'player/progress_dots_directive.html' %}
+  {% include 'pages/exploration_player/answer_feedback_pair_directive.html' %}
+  {% include 'pages/exploration_player/conversation_skin_directive.html' %}
+  {% include 'pages/exploration_player/feedback_popup_directive.html' %}
+  {% include 'pages/exploration_player/information_card_modal.html' %}
+  {% include 'pages/exploration_player/progress_dots_directive.html' %}
 {% endblock %}
 
 {% block footer_js %}
@@ -110,20 +110,20 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StateObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/StopwatchObjectFactory.js"></script>
 
-  <script src="{{TEMPLATE_DIR_PREFIX}}/player/AnswerClassificationService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/player/AnswerFeedbackPairDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/player/ConversationSkinDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/player/ExplorationRecommendationsService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/player/FeedbackPopupDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/player/LearnerLocalNav.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/player/LearnerParamsService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/player/LearnerViewBreadcrumb.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/player/LearnerViewRatingService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/player/PlayerPositionService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/player/PlayerServices.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/player/PlayerTranscriptService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/player/ProgressDotsDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/player/StatsReportingService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerClassificationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerFeedbackPairDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ConversationSkinDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationRecommendationsService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/FeedbackPopupDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerLocalNav.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerParamsService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerViewBreadcrumb.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerViewRatingService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerPositionService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerServices.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerTranscriptService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ProgressDotsDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/StatsReportingService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionInterpolationService.js"></script>
 
