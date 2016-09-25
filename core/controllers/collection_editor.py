@@ -135,7 +135,7 @@ class CollectionEditorPage(CollectionEditorHandler):
             'TAG_REGEX': feconf.TAG_REGEX,
         })
 
-        self.render_template('collection_editor/collection_editor.html')
+        self.render_template('pages/collection_editor/collection_editor.html')
 
 
 class WritableCollectionDataHandler(CollectionEditorHandler):

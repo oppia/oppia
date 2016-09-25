@@ -318,6 +318,14 @@ def get_human_readable_time_string(time_msec):
     return time.strftime('%B %d %H:%M:%S', time.gmtime(time_msec / 1000.0))
 
 
+def are_datetimes_close(later_datetime, earlier_datetime):
+    """Given two datetimes, determines whether they are separated by less than
+    feconf.PROXIMAL_TIMEDELTA_SECS seconds.
+    """
+    difference_in_secs = (later_datetime - earlier_datetime).total_seconds()
+    return difference_in_secs < feconf.PROXIMAL_TIMEDELTA_SECS
+
+
 def generate_random_string(length):
     return base64.urlsafe_b64encode(os.urandom(length))
 

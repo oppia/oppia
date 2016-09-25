@@ -93,6 +93,8 @@ class EmailRightsTest(test_utils.GenericTestBase):
 class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
     """Tests that sending exploration membership email works as expected."""
 
+    EXPLORATION_TITLE = 'Title'
+
     def setUp(self):
         super(ExplorationMembershipEmailTests, self).setUp()
 
@@ -103,10 +105,10 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
         self.exploration = self.save_new_default_exploration(
-            'A', self.editor_id, 'Title')
+            'A', self.editor_id, self.EXPLORATION_TITLE)
 
         self.expected_email_subject = (
-            'editor invited you to collaborate on Oppia.org')
+            '%s - invitation to collaborate') % self.EXPLORATION_TITLE
 
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
@@ -166,7 +168,8 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                '%s <%s>' % (
+                    self.EDITOR_USERNAME, feconf.NOREPLY_EMAIL_ADDRESS))
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION)
@@ -179,7 +182,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             'Hi newuser,<br>'
             '<br>'
             '<b>editor</b> has granted you manager rights to their '
-            'learning exploration, '
+            'exploration, '
             '"<a href="http://www.oppia.org/create/A">Title</a>", '
             'on Oppia.org.<br>'
             '<br>'
@@ -204,7 +207,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             'Hi newuser,\n'
             '\n'
             'editor has granted you manager rights to their '
-            'learning exploration, "Title", on Oppia.org.\n'
+            'exploration, "Title", on Oppia.org.\n'
             '\n'
             'This allows you to:\n'
             '- Change the exploration permissions\n'
@@ -240,7 +243,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             'Hi newuser,<br>'
             '<br>'
             '<b>editor</b> has granted you editor rights to their '
-            'learning exploration, '
+            'exploration, '
             '"<a href="http://www.oppia.org/create/A">Title</a>"'
             ', on Oppia.org.<br>'
             '<br>'
@@ -264,7 +267,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             'Hi newuser,\n'
             '\n'
             'editor has granted you editor rights to their '
-            'learning exploration, "Title", on Oppia.org.\n'
+            'exploration, "Title", on Oppia.org.\n'
             '\n'
             'This allows you to:\n'
             '- Edit the exploration\n'
@@ -299,7 +302,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             'Hi newuser,<br>'
             '<br>'
             '<b>editor</b> has granted you playtest access to their '
-            'learning exploration, '
+            'exploration, '
             '"<a href="http://www.oppia.org/create/A">Title</a>"'
             ', on Oppia.org.<br>'
             '<br>'
@@ -322,7 +325,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             'Hi newuser,\n'
             '\n'
             'editor has granted you playtest access to their '
-            'learning exploration, "Title", on Oppia.org.\n'
+            'exploration, "Title", on Oppia.org.\n'
             '\n'
             'This allows you to:\n'
             '- View and playtest the exploration\n'
@@ -1082,7 +1085,8 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, 'Title')
 
-        self.expected_email_subject = 'New messages on Oppia.'
+        self.expected_email_subject = (
+            'You\'ve received 1 new message on your explorations')
 
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
@@ -1093,7 +1097,7 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
         expected_email_html_body = (
             'Hi editor,<br>'
             '<br>'
-            'You have 1 new message(s) about your Oppia explorations:<br>'
+            'You\'ve received 1 new message on your Oppia explorations:<br>'
             '<ul><li>Title: A message<br></li></ul>'
             'You can view and reply to your messages from your '
             '<a href="https://www.oppia.org/dashboard">dashboard</a>.'
@@ -1109,7 +1113,7 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
         expected_email_text_body = (
             'Hi editor,\n'
             '\n'
-            'You have 1 new message(s) about your Oppia explorations:\n'
+            'You\'ve received 1 new message on your Oppia explorations:\n'
             '- Title: A message\n'
             'You can view and reply to your messages from your dashboard.'
             '\n'
@@ -1299,7 +1303,7 @@ class FeedbackMessageInstantEmailTests(test_utils.GenericTestBase):
                 'New Oppia message in "a subject"', self.exploration.title,
                 self.exploration.id, 'a subject')
 
-            # make sure correct email is sent.
+            # Make sure correct email is sent.
             messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -1326,3 +1330,125 @@ class FeedbackMessageInstantEmailTests(test_utils.GenericTestBase):
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION)
+
+
+class FlagExplorationEmailTest(test_utils.GenericTestBase):
+    """Test that emails are sent to moderators when explorations are flagged."""
+
+    def setUp(self):
+        super(FlagExplorationEmailTest, self).setUp()
+
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
+
+        self.moderator2_email = 'moderator2@example.com'
+        self.moderator2_username = 'moderator2'
+        self.signup(self.moderator2_email, self.moderator2_username)
+        self.moderator2_id = self.get_user_id_from_email(self.moderator2_email)
+
+        self.set_moderators([self.moderator2_username, self.MODERATOR_USERNAME])
+
+        self.exploration = self.save_new_default_exploration(
+            'A', self.editor_id, 'Title')
+        self.owner_ids = [self.editor_id]
+
+        self.report_text = 'AD'
+
+        self.can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS', True)
+
+    def test_that_flag_exploration_emails_are_correct(self):
+        expected_email_subject = 'Exploration flagged by user: "Title"'
+
+        expected_email_html_body = (
+            'Hello Moderator,<br>'
+            'newuser has flagged exploration "Title" on the following '
+            'grounds: <br>'
+            'AD .<br>'
+            'You can modify the exploration by clicking '
+            '<a href="https://www.oppia.org/create/A">'
+            'here</a>.<br>'
+            '<br>'
+            'Thanks!<br>'
+            '- The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_email_text_body = (
+            'Hello Moderator,\n'
+            'newuser has flagged exploration "Title" on the following '
+            'grounds: \n'
+            'AD .\n'
+            'You can modify the exploration by clicking here.\n'
+            '\n'
+            'Thanks!\n'
+            '- The Oppia Team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+
+        with self.can_send_emails_ctx:
+            email_manager.send_flag_exploration_email(
+                self.exploration.title, self.exploration.id, self.new_user_id,
+                self.report_text)
+
+            # Make sure correct email is sent.
+            messages = self.mail_stub.get_sent_messages(to=self.MODERATOR_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(),
+                expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(),
+                expected_email_text_body)
+
+            # Make sure correct email is sent to multiple moderators.
+            messages = self.mail_stub.get_sent_messages(
+                to=self.moderator2_email)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(),
+                expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(),
+                expected_email_text_body)
+
+            # Make sure correct email models are stored.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            all_models.sort(key=lambda x: x.recipient_id)
+            sent_email_model = all_models[0]
+            self.assertEqual(
+                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(
+                sent_email_model.recipient_id, self.moderator_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.MODERATOR_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_REPORT_BAD_CONTENT)
+            sent_email_model = all_models[1]
+            self.assertEqual(
+                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(
+                sent_email_model.recipient_id, self.moderator2_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.moderator2_email)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_REPORT_BAD_CONTENT)

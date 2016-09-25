@@ -33,5 +33,5 @@ class Math(base.BaseRichTextComponent):
             'type': 'custom',
             'obj_type': 'MathLatexString',
         },
-        'default_value': '\\frac{x}{y}'
+        'default_value': ''
     }]

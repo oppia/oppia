@@ -223,6 +223,7 @@ EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
 EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION = 'editor_role_notification'
 EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION = 'feedback_message_notification'
 EMAIL_INTENT_SUGGESTION_NOTIFICATION = 'suggestion_notification'
+EMAIL_INTENT_REPORT_BAD_CONTENT = 'report_bad_content'
 EMAIL_INTENT_MARKETING = 'marketing'
 EMAIL_INTENT_PUBLICIZE_EXPLORATION = 'publicize_exploration'
 EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
@@ -412,6 +413,16 @@ ALLOW_YAML_FILE_UPLOAD = False
 
 # Prefix for all taskqueue-related URLs.
 TASKQUEUE_URL_PREFIX = '/task'
+TASK_URL_FEEDBACK_MESSAGE_EMAILS = (
+    '%s/email/batchfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX)
+TASK_URL_FEEDBACK_STATUS_EMAILS = (
+    '%s/email/feedbackthreadstatuschangeemailhandler' % TASKQUEUE_URL_PREFIX)
+TASK_URL_FLAG_EXPLORATION_EMAILS = (
+    '%s/email/flagexplorationemailhandler' % TASKQUEUE_URL_PREFIX)
+TASK_URL_INSTANT_FEEDBACK_EMAILS = (
+    '%s/email/instantfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX)
+TASK_URL_SUGGESTION_EMAILS = (
+    '%s/email/suggestionemailhandler' % TASKQUEUE_URL_PREFIX)
 
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
@@ -433,13 +444,8 @@ EXPLORATION_URL_EMBED_PREFIX = '/embed/exploration'
 FEEDBACK_STATS_URL_PREFIX = '/feedbackstatshandler'
 FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
-FEEDBACK_MESSAGE_EMAIL_HANDLER_URL = (
-    '%s/email/batchfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX)
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
-FEEDBACK_STATUS_EMAIL_HANDLER_URL = (
-    '%s/email/feedbackthreadstatuschangeemailhandler' % TASKQUEUE_URL_PREFIX)
-INSTANT_FEEDBACK_EMAIL_HANDLER_URL = (
-    '%s/email/instantfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX)
+FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 LIBRARY_INDEX_URL = '/library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
 LIBRARY_SEARCH_URL = '/search/find'
@@ -454,14 +460,13 @@ SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
 SPLASH_URL = '/splash'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
-SUGGESTION_EMAIL_HANDLER_URL = (
-    '%s/email/suggestionemailhandler' % TASKQUEUE_URL_PREFIX)
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 
 NAV_MODE_ABOUT = 'about'
+NAV_MODE_BLOG = 'blog'
 NAV_MODE_COLLECTION = 'collection'
 NAV_MODE_CONTACT = 'contact'
 NAV_MODE_CREATE = 'create'
@@ -516,6 +521,10 @@ OUTPUT_FORMAT_ZIP = 'zip'
 UPDATE_TYPE_EXPLORATION_COMMIT = 'exploration_commit'
 UPDATE_TYPE_COLLECTION_COMMIT = 'collection_commit'
 UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
+
+# The time difference between which to consider two login events "close". This
+# is taken to be 12 hours.
+PROXIMAL_TIMEDELTA_SECS = 12 * 60 * 60
 
 DEFAULT_COLOR = '#a33f40'
 DEFAULT_THUMBNAIL_ICON = 'Lightbulb'
@@ -604,14 +613,16 @@ SEARCH_DROPDOWN_CATEGORIES = sorted([
     'History',
 ])
 
-# The header for the "Featured Activities" category in the library index page.
-LIBRARY_CATEGORY_FEATURED_ACTIVITIES = 'Featured Activities'
-# The header for the "Top Rated Explorations" category in the library index
-# page.
-LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = 'Top Rated Explorations'
-# The header for the "Recently Published" category in the library index
-# page.
-LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'Recently Published'
+# The i18n id for the header of the "Featured Activities" category in the
+# library index page.
+LIBRARY_CATEGORY_FEATURED_ACTIVITIES = 'I18N_LIBRARY_GROUPS_FEATURED_ACTIVITIES'
+# The i18n id for the header of the "Top Rated Explorations" category in the
+# library index page.
+LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = (
+    'I18N_LIBRARY_GROUPS_TOP_RATED_EXPLORATIONS')
+# The i18n id for the header of the "Recently Published" category in the
+# library index page.
+LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'I18N_LIBRARY_GROUPS_RECENTLY_PUBLISHED'
 
 # List of supported language codes. Each description has a
 # parenthetical part that may be stripped out to give a shorter
@@ -727,6 +738,8 @@ ABOUT_PAGE_DESCRIPTION = (
     'Oppia is an open source learning platform that connects a community of '
     'teachers and learners. You can use this site to create 1-1 learning '
     'scenarios for others.')
+BLOG_PAGE_DESCRIPTION = (
+    'Keep up to date with Oppia news and updates via our blog.')
 CONTACT_PAGE_DESCRIPTION = (
     'Contact the Oppia team, submit feedback, and learn how to get involved '
     'with the Oppia project.')

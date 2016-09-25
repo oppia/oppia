@@ -31,6 +31,7 @@ from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import gadget_registry
 from core.domain import interaction_registry
+from core.domain import moderator_services
 from core.domain import rating_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
@@ -57,7 +58,8 @@ def require_playable(handler):
     def test_can_play(self, exploration_id, **kwargs):
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             self.render_template(
-                'error/disabled_exploration.html', iframe_restriction=None)
+                'pages/error/disabled_exploration.html',
+                iframe_restriction=None)
             return
 
         # This check is needed in order to show the correct page when a 404
@@ -301,6 +303,7 @@ class ExplorationPage(base.BaseHandler):
         self.values.update(exploration_data_values)
         self.values['iframed'] = False
         self.render_template('player/exploration_player.html')
+
 
 
 class ExplorationHandler(base.BaseHandler):
@@ -594,4 +597,16 @@ class RecommendationsHandler(base.BaseHandler):
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
                     author_recommended_exp_ids + auto_recommended_exp_ids)),
         })
+        self.render_json(self.values)
+
+
+class FlagExplorationHandler(base.BaseHandler):
+    """Handles operations relating to learner flagging of explorations."""
+
+    @base.require_user
+    def post(self, exploration_id):
+        moderator_services.enqueue_flag_exploration_email_task(
+            exploration_id,
+            self.payload.get('report_text'),
+            self.user_id)
         self.render_json(self.values)

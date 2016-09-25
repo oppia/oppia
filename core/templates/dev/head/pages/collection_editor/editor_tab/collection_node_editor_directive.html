@@ -1,0 +1,67 @@
+<script type="text/ng-template" id="inline/collection_node_editor_directive">
+  <md-card class="collection-editor-node">
+    <div class="collection-editor-node-title">
+      <a ng-href="/create/<[getCollectionNode().getExplorationId()]>" target="_blank">
+        <[getCollectionNode().getExplorationTitle()]>
+      </a>
+    </div>
+    <span class="collection-editor-delete-node">
+      <span ng-click="deleteNode()" aria-hidden="true">
+        <i class="material-icons md-18">&#xE14C;</i>
+      </span>
+    </span>
+    <span ng-click="shiftNodeLeft()"
+          ng-if="getLinearIndex() > 0"
+          class="collection-editor-shift-left-arrow"
+          aria-hidden="true">
+      <i class="material-icons">&#xE5CB;</i>
+    </span>
+    <span ng-click="shiftNodeRight()"
+          ng-if="getLinearIndex() < collection.getCollectionNodeCount() - 1"
+          class="collection-editor-shift-right-arrow"
+          aria-hidden="true">
+      <i class="material-icons">&#xE5CC;</i>
+    </span>
+  </md-card>
+</script>
+
+<style>
+  .collection-editor-node {
+    background-color: #F5F5F5;
+    color: #424242;
+    display: inline-block;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 0.8em;
+    margin: 0;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    position: relative;
+    text-align: center;
+  }
+
+  .collection-editor-delete-node {
+    color: #ef5350;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  .collection-editor-shift-left-arrow {
+    bottom: 0;
+    color: #000;
+    left: 0;
+    opacity: 0.7;
+    position: absolute;
+  }
+  .collection-editor-shift-right-arrow {
+    bottom: 0;
+    color: #000;
+    position: absolute;
+    opacity: 0.7;
+    right: 0;
+  }
+
+  .collection-editor-node-title {
+    padding: 16px 16px 20px 16px;
+  }
+</style>

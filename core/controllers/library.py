@@ -87,7 +87,7 @@ class LibraryPage(base.BaseHandler):
             'search_mode': search_mode,
             'SEARCH_DROPDOWN_CATEGORIES': feconf.SEARCH_DROPDOWN_CATEGORIES,
         })
-        self.render_template('library/library.html')
+        self.render_template('pages/library/library.html')
 
 
 class LibraryIndexHandler(base.BaseHandler):
@@ -116,19 +116,23 @@ class LibraryIndexHandler(base.BaseHandler):
             summary_dicts_by_category.insert(0, {
                 'activity_summary_dicts': recently_published_summary_dicts,
                 'categories': [],
-                'header': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
+                'header_i18n_id': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
+                'has_full_results_page': True,
             })
         if top_rated_activity_summary_dicts:
             summary_dicts_by_category.insert(0, {
                 'activity_summary_dicts': top_rated_activity_summary_dicts,
                 'categories': [],
-                'header': feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS,
+                'header_i18n_id': (
+                    feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS),
+                'has_full_results_page': True,
             })
         if featured_activity_summary_dicts:
             summary_dicts_by_category.insert(0, {
                 'activity_summary_dicts': featured_activity_summary_dicts,
                 'categories': [],
-                'header': feconf.LIBRARY_CATEGORY_FEATURED_ACTIVITIES,
+                'header_i18n_id': feconf.LIBRARY_CATEGORY_FEATURED_ACTIVITIES,
+                'has_full_results_page': False,
             })
 
         self.values.update({
