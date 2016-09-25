@@ -57,7 +57,7 @@ oppia.directive('oppiaInteractiveEndExploration', [function() {
           // Display a message if any author-recommended explorations are
           // invalid.
           var explorationId = explorationContextService.getExplorationId();
-          $http.get('/explorationsummarieshandler/data', {
+          $http.get('/libraryummarieshandler/data', {
             params: {
               stringified_exp_ids: JSON.stringify(
                 authorRecommendedExplorationIds)

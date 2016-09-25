@@ -39,7 +39,7 @@
           <search-results></search-results>
         </div>
 
-        <div class="oppia-exp-summary-tiles-container" ng-if="inRankMode">
+        <div class="oppia-exp-summary-tiles-container" ng-if="inRankMode" style="margin-bottom: 40px;">
           <div ng-repeat="group in libraryGroups track by $index"
                style="margin-right: auto; margin-left: auto; max-width: 856px;">
             <div ng-repeat="tile in group.activity_summary_dicts" style="display: inline-block;">
@@ -187,7 +187,7 @@
 
 {% block footer %}
   <div ng-controller="LibraryFooter">
-    <div ng-if="!inSearchMode && !inRankMode">
+    <div ng-if="!inSearchMode">
       {% include 'footer.html' %}
     </div>
   </div>

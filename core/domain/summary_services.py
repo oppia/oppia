@@ -416,36 +416,32 @@ def get_featured_activity_summary_dicts(language_codes):
     return featured_summary_dicts
 
 
-def get_top_rated_exploration_summary_dicts(
-        language_codes, number_of_explorations_to_fetch):
+def get_top_rated_exploration_summary_dicts(language_codes, limit):
     """Returns a list of top rated explorations with the given language code.
 
     The return value is sorted in decreasing order of average rating.
     """
     filtered_exp_summaries = [
         exp_summary for exp_summary in
-        exp_services.get_top_rated_exploration_summaries(
-            number_of_explorations_to_fetch).values()
+        exp_services.get_top_rated_exploration_summaries(limit).values()
         if exp_summary.language_code in language_codes and
         sum(exp_summary.ratings.values()) > 0]
 
     sorted_exp_summaries = sorted(
         filtered_exp_summaries,
         key=lambda exp_summary: exp_summary.scaled_average_rating,
-        reverse=True)[:number_of_explorations_to_fetch]
+        reverse=True)
 
     return get_displayable_exp_summary_dicts(sorted_exp_summaries)
 
 
-def get_recently_published_exploration_summary_dicts(
-        number_of_explorations_to_fetch):
+def get_recently_published_exp_summary_dicts(limit):
     """Returns a list of recently published explorations
      with the given language code.
     """
     recently_published_exploration_summaries = [
         exp_summary for exp_summary in
-        exp_services.get_recently_published_exploration_summaries(
-            number_of_explorations_to_fetch).values()]
+        exp_services.get_recently_published_exp_summaries(limit).values()]
 
     # Arranging recently published exploration summaries with respect to time.
     # sorted() is used to sort the random list of recently published summaries.

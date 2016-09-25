@@ -73,7 +73,6 @@ class LibraryPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         search_mode = 'search' in self.request.url
-        rank_mode = 'explorations' in self.request.url
 
         if search_mode:
             title = 'Find explorations to learn from - Oppia'
@@ -90,8 +89,6 @@ class LibraryPage(base.BaseHandler):
                 user_services.has_fully_registered(self.user_id)),
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
-            'search_mode': search_mode,
-            'rank_mode': rank_mode,
             'title': title,
             'SEARCH_DROPDOWN_CATEGORIES': feconf.SEARCH_DROPDOWN_CATEGORIES,
         })
@@ -107,7 +104,7 @@ class LibraryIndexHandler(base.BaseHandler):
         summary_dicts_by_category = summary_services.get_library_groups([
             feconf.DEFAULT_LANGUAGE_CODE])
         recently_published_summary_dicts = (
-            summary_services.get_recently_published_exploration_summary_dicts( # pylint: disable=line-too-long
+            summary_services.get_recently_published_exp_summary_dicts(
                 feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE))
         top_rated_activity_summary_dicts = (
             summary_services.get_top_rated_exploration_summary_dicts(
@@ -125,19 +122,19 @@ class LibraryIndexHandler(base.BaseHandler):
         if recently_published_summary_dicts:
             summary_dicts_by_category.insert(0, {
                 'activity_summary_dicts': recently_published_summary_dicts,
-                'categories': ['recently_published'],
+                'categories': [],
                 'header_i18n_id': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
                 'has_full_results_page': True,
-                'full_results_url': '/explorations/recently_published',
+                'full_results_url': '/library/recently_published',
             })
         if top_rated_activity_summary_dicts:
             summary_dicts_by_category.insert(0, {
                 'activity_summary_dicts': top_rated_activity_summary_dicts,
-                'categories': ['top_rated'],
+                'categories': [],
                 'header_i18n_id': (
                     feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS),
                 'has_full_results_page': True,
-                'full_results_url': '/explorations/top_rated',
+                'full_results_url': '/library/top_rated',
             })
         if featured_activity_summary_dicts:
             summary_dicts_by_category.insert(0, {
@@ -157,34 +154,27 @@ class LibraryIndexHandler(base.BaseHandler):
 
 
 class LibraryGroupPage(base.BaseHandler):
-    """The page for displaying top rated and recently published explorations
+    """The page for displaying top rated and recently published explorations.
     """
 
-    def get(self, rank_method):
+    def get(self, group_name):
         """Handles GET requests."""
-
-        search_mode = 'search' in self.request.url
-        rank_mode = 'explorations' in self.request.url
-
-        if rank_method == 'recently_published':
+        if group_name == feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED:
             title = feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED
-        elif rank_method == 'top_rated':
+        elif group_name == feconf.LIBRARY_GROUP_TOP_RATED:
             title = feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS
         else:
             raise self.PageNotFoundException
 
         self.values.update({
             'meta_description': (
-                feconf.SEARCH_PAGE_DESCRIPTION if search_mode
-                else feconf.LIBRARY_PAGE_DESCRIPTION),
+                feconf.GROUP_PAGE_DESCRIPTION),
             'nav_mode': feconf.NAV_MODE_LIBRARY,
             'has_fully_registered': bool(
                 self.user_id and
                 user_services.has_fully_registered(self.user_id)),
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
-            'search_mode': search_mode,
-            'rank_mode': rank_mode,
             'title': title,
             'SEARCH_DROPDOWN_CATEGORIES': feconf.SEARCH_DROPDOWN_CATEGORIES,
         })
@@ -192,36 +182,40 @@ class LibraryGroupPage(base.BaseHandler):
 
 
 class LibraryGroupIndexHandler(base.BaseHandler):
-    """Provides data for categories such as top rated and recently published"""
+    """Provides data for categories such as top rated and recently published."""
 
-    def get(self, rank_method):
+    def get(self, group_name):
+        """Handles GET requests for group pages."""
+        # TODO(sll): Support index pages for other language codes.
         summary_dicts_by_category = []
 
-        if rank_method == 'recently_published':
+        if group_name == feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED:
             recently_published_summary_dicts = (
-                summary_services.get_recently_published_exploration_summary_dicts( # pylint: disable=line-too-long
+                summary_services.get_recently_published_exp_summary_dicts(
                     feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE))
             if recently_published_summary_dicts:
-                summary_dicts_by_category.insert(0, {
+                summary_dicts_by_category.append({
                     'activity_summary_dicts': recently_published_summary_dicts,
-                    'categories': ['recently_published'],
+                    'categories': [],
                     'header': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
                     'has_full_results_page': True,
-                    'full_results_url': '/explorations/recently_published',
+                    'full_results_url': (
+                        '/library/' + feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED),
                 })
 
-        elif rank_method == 'top_rated':
+        elif group_name == feconf.LIBRARY_GROUP_TOP_RATED:
             top_rated_activity_summary_dicts = (
                 summary_services.get_top_rated_exploration_summary_dicts(
                     [feconf.DEFAULT_LANGUAGE_CODE],
                     feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE))
             if top_rated_activity_summary_dicts:
-                summary_dicts_by_category.insert(0, {
+                summary_dicts_by_category.append({
                     'activity_summary_dicts': top_rated_activity_summary_dicts,
-                    'categories': ['top_rated'],
+                    'categories': [],
                     'header': feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS,
                     'has_full_results_page': True,
-                    'full_results_url': '/explorations/top_rated',
+                    'full_results_url': (
+                        '/library/' + feconf.LIBRARY_GROUP_TOP_RATED),
                 })
 
         preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]

@@ -80,11 +80,11 @@ NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE = 8
 RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE = 8
 
 # The maximum number of results to retrieve in a datastore query
-# for top rated published explorations in /explorations/top_rated page
+# for top rated published explorations in /library/top_rated page
 NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE = 28
 
 # The maximum number of results to retrieve in a datastore query
-# for recently published explorations in /explorations/recently_published page
+# for recently published explorations in /library/recently_published page
 RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 28
 
 # The current version of the dashboard stats blob schema. If any backward-
@@ -631,6 +631,12 @@ LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = (
 # library index page.
 LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'I18N_LIBRARY_GROUPS_RECENTLY_PUBLISHED'
 
+# The group name that appears at the end of the url for the recently published
+# page.
+LIBRARY_GROUP_RECENTLY_PUBLISHED = 'recently_published'
+# The group name that appears at the end of the url for the top rated page.
+LIBRARY_GROUP_TOP_RATED = 'top_rated'
+
 # List of supported language codes. Each description has a
 # parenthetical part that may be stripped out to give a shorter
 # description.
@@ -761,6 +767,10 @@ DONATE_PAGE_DESCRIPTION = (
 FORUM_PAGE_DESCRIPTION = (
     'Engage with the Oppia community by discussing questions, bugs and '
     'explorations in the forum.')
+GROUP_PAGE_DESCRIPTION = (
+    'Discover the explorations belonging to a particular group such as '
+    'top rated or recently published. Learn from these explorations or help '
+    'improve an existing one for the community')
 LIBRARY_PAGE_DESCRIPTION = (
     'Looking to learn something new? Find explorations created by professors, '
     'teachers and Oppia users in a subject you\'re interested in, and start '
