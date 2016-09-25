@@ -93,8 +93,10 @@ oppia.controller('LearnerLocalNav', [
         templateUrl: 'modals/flagExploration',
         backdrop: true,
         controller: [
-            '$scope', '$modalInstance', 'playerPositionService', 'focusService',
-          function($scope, $modalInstance, playerPositionService, focusService) {
+            '$scope', '$modalInstance', 'playerPositionService',
+            'focusService',
+          function($scope, $modalInstance, playerPositionService,
+            focusService) {
             $scope.flagMessageTextareaIsShown = false;
             var stateName = playerPositionService.getCurrentStateName();
 
