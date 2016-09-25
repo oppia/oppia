@@ -26,9 +26,9 @@
           <input type="radio" value="other" ng-model="flag" ng-change="showFlagMessageTextarea(flag)">
           <['I18N_PLAYER_REPORT_MODAL_BODY_OTHER' | translate]>
         </label>
-        <p ng-show="showFlagMessageTextarea(flag)">
+        <p ng-show="flagMessageTextareaIsShown">
           <['I18N_PLAYER_REPORT_MODAL_BODY_ADDITIONAL_DETAILS' | translate]>
-          <textarea rows="3" cols="50" ng-model="flagMessage">
+          <textarea rows="3" cols="50" ng-model="flagMessage" class="form-control" focus-on="flagMessageTextarea" autofocus="true">
           </textarea>
         </p>
       </div>
