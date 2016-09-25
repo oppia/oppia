@@ -312,7 +312,6 @@ def is_collection_summary_editable(collection_summary, user_id=None):
     Args:
         collection_summary: CollectionSummary. A collection summary domain
             object that the user with the given id is editing.
-
         user_id: str. User id of the user.
 
     Returns:
@@ -379,7 +378,6 @@ def get_completed_exploration_ids(user_id, collection_id):
         collection yet. Thus, we just assume the user and collection exist for
         the sake of this call, so it returns an empty list, indicating that no
         progress has yet been made.
-
     """
     progress_model = user_models.CollectionProgressModel.get(
         user_id, collection_id)
