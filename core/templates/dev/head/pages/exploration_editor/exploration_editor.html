@@ -328,7 +328,7 @@
         <button class="btn btn-success protractor-test-confirm-publish" ng-click="publish()">Publish Exploration</button>
       </div>
     </script>
-    {% include 'exploration_editor/share_publish_modal.html' %}
+    {% include 'pages/exploration_editor/share_publish_modal.html' %}
     {% include 'components/exploration_welcome_modal_directive.html' %}
     {% include 'components/help_modal_directive.html' %}
 
@@ -419,30 +419,30 @@
       </div>
 
       <div ng-show="getTabStatuses().active === 'main'">
-        {% include 'exploration_editor/main_tab/main_tab.html' %}
+        {% include 'pages/exploration_editor/main_tab/main_tab.html' %}
       </div>
 
       <!-- This is an ng-if, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
       <div ng-if="getTabStatuses().active === 'preview'">
-        {% include 'exploration_editor/preview_tab/preview_tab.html' %}
-        {% include 'exploration_editor/preview_tab/preview_set_parameters_modal_directive.html' %}
+        {% include 'pages/exploration_editor/preview_tab/preview_tab.html' %}
+        {% include 'pages/exploration_editor/preview_tab/preview_set_parameters_modal_directive.html' %}
       </div>
 
       <div ng-show="getTabStatuses().active === 'stats'">
-        {% include 'exploration_editor/statistics_tab/statistics_tab.html' %}
+        {% include 'pages/exploration_editor/statistics_tab/statistics_tab.html' %}
       </div>
 
       <div ng-show="getTabStatuses().active === 'settings'">
-        {% include 'exploration_editor/settings_tab/settings_tab.html' %}
+        {% include 'pages/exploration_editor/settings_tab/settings_tab.html' %}
       </div>
 
       <div ng-show="getTabStatuses().active === 'history'">
-        {% include 'exploration_editor/history_tab/history_tab.html' %}
+        {% include 'pages/exploration_editor/history_tab/history_tab.html' %}
       </div>
 
       <div ng-show="getTabStatuses().active === 'feedback'">
-        {% include 'exploration_editor/feedback_tab/feedback_tab.html' %}
-        {% include 'exploration_editor/feedback_tab/thread_table_directive.html' %}
+        {% include 'pages/exploration_editor/feedback_tab/feedback_tab.html' %}
+        {% include 'pages/exploration_editor/feedback_tab/thread_table_directive.html' %}
       </div>
     </div>
   </div>
@@ -488,9 +488,9 @@
   {% include 'components/state_graph_viz_directive.html' %}
   {% include 'components/version_diff_visualization_directive.html' %}
 
-  {% include 'player/answer_feedback_pair_directive.html' %}
-  {% include 'player/conversation_skin_directive.html' %}
-  {% include 'player/progress_dots_directive.html' %}
+  {% include 'pages/exploration_player/answer_feedback_pair_directive.html' %}
+  {% include 'pages/exploration_player/conversation_skin_directive.html' %}
+  {% include 'pages/exploration_player/progress_dots_directive.html' %}
 {% endblock content %}
 
 {% block footer_js %}
@@ -523,13 +523,13 @@
   <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/SetOfUnicodeStringEditor.js"></script>
   <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/UnicodeStringEditor.js"></script>
 
-  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/ExplorationEditor.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/EditorServices.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/ExplorationDiffService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/ExplorationEditorAdvancedFeaturesService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/GadgetValidationService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/ParameterMetadataService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/RouterServices.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationEditor.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorServices.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationDiffService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationEditorAdvancedFeaturesService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/GadgetValidationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ParameterMetadataService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/RouterServices.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/AnswerGroupEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/BarChartDirective.js"></script>
@@ -558,41 +558,41 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/messengerService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/utilsService.js"></script>
 
-  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/main_tab/ExplorationGraph.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/main_tab/GadgetEditor.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/main_tab/SidebarStateName.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/main_tab/StateEditor.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/main_tab/StateFallbacks.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/main_tab/StateInteraction.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/main_tab/StateParameterChanges.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/main_tab/StateResponses.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/main_tab/StateStatistics.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/main_tab/ExplorationGraph.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/main_tab/GadgetEditor.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/main_tab/SidebarStateName.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/main_tab/StateEditor.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/main_tab/StateFallbacks.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/main_tab/StateInteraction.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/main_tab/StateParameterChanges.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/main_tab/StateResponses.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/main_tab/StateStatistics.js"></script>
 
-  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/preview_tab/PreviewTab.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/statistics_tab/StatisticsTab.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/settings_tab/SettingsTab.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/history_tab/HistoryTab.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/history_tab/HistoryServices.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/feedback_tab/FeedbackTab.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/feedback_tab/ThreadDataService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/feedback_tab/ThreadStatusDisplayService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/exploration_editor/feedback_tab/ThreadTableDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/preview_tab/PreviewTab.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/statistics_tab/StatisticsTab.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/settings_tab/SettingsTab.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/history_tab/HistoryTab.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/history_tab/HistoryServices.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/feedback_tab/FeedbackTab.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/feedback_tab/ThreadDataService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/feedback_tab/ThreadTableDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ExplorationObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StateObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/StopwatchObjectFactory.js"></script>
 
-  <script src="{{TEMPLATE_DIR_PREFIX}}/player/AnswerClassificationService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/player/AnswerFeedbackPairDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/player/ConversationSkinDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/player/ExplorationRecommendationsService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/player/LearnerParamsService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/player/LearnerViewRatingService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/player/PlayerPositionService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/player/PlayerServices.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/player/PlayerTranscriptService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/player/ProgressDotsDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/player/StatsReportingService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerClassificationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerFeedbackPairDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ConversationSkinDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationRecommendationsService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerParamsService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerViewRatingService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerPositionService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerServices.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerTranscriptService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ProgressDotsDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/StatsReportingService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionInterpolationService.js"></script>
 
