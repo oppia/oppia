@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block maintitle %}
+  {{ collection_title }} - Oppia
+{% endblock maintitle %}
+
+{% block header_js %}
+  {{ super() }}
+  {% if collection_id %}
+    <script type="text/javascript">
+      GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
+      GLOBALS.isLoggedIn = Boolean(JSON.parse('{{is_logged_in|js_string}}'));
+    </script>
+
+    <style>
+      html, body {
+        background: url("/assets/common/images/general/background.jpg") no-repeat center center fixed;
+        background-size: cover;
+      }
+    </style>
+  {% endif %}
+
+  {{dependencies_html}}
+{% endblock header_js %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      <span class="protractor-test-collection-header">
+        Collection
+        <span class="oppia-navbar-breadcrumb-separator"></span>
+        <span>{{collection_title}}</span>
+      </span>
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
+{% block local_top_nav_options %}
+  <ul class="nav navbar-nav oppia-navbar-nav navbar-right" style="margin-right: 0px;">
+    {% if can_edit %}
+      <li>
+        <a ng-href="/collection_editor/create/{{collection_id}}" tooltip="Edit" tooltip-placement="bottom" target="_blank">
+          <i class="material-icons">&#xE254;</i>
+        </a>
+      </li>
+    {% endif %}
+  </ul>
+{% endblock local_top_nav_options %}
+
+{% block content %}
+  <div ng-controller="CollectionPlayer">
+    <div ng-if="collection" class="oppia-collection-player-tiles-container">
+      <h2 ng-if="!collectionPlaythrough.hasFinishedCollection()" class="oppia-page-heading">
+        <span ng-if="!collectionPlaythrough.hasStartedCollection()">Begin <[collection.getTitle()]>:</span>
+        <span ng-if="collectionPlaythrough.hasStartedCollection()">Continue <[collection.getTitle()]>:</span>
+      </h2>
+      <h2 ng-if="collectionPlaythrough.hasFinishedCollection()" class="oppia-page-heading">
+        <span>You have finished the collection! Feel free to replay any explorations below.</span>
+      </h2>
+
+      {% if is_logged_in %}
+        <div ng-if="collectionPlaythrough.getNextRecommendedCollectionNodeCount() > 0" class="oppia-collection-player-tile-section">
+          <div class="oppia-collection-player-small-text">
+            Next exploration<span ng-if="collectionPlaythrough.getNextRecommendedCollectionNodeCount() > 1">s</span> to play
+          </div>
+          <collection-node-list collection-id="collectionId" collection-nodes="getNextRecommendedCollectionNodes()"></collection-node-list>
+        </div>
+
+        <div ng-if="collectionPlaythrough.getCompletedExplorationNodeCount() > 0" class="oppia-collection-player-tile-section">
+          <div class="oppia-collection-player-small-text">
+            Completed exploration<span ng-if="collectionPlaythrough.getCompletedExplorationNodeCount() > 1">s</span>
+          </div>
+          <collection-node-list collection-id="collectionId" collection-nodes="getCompletedExplorationNodes()"></collection-node-list>
+        </div>
+
+        <div ng-if="showingAllExplorations && (getNonRecommendedCollectionNodeCount() > 0)" class="oppia-collection-player-tile-section oppia-collection-animate-slide">
+          <div class="oppia-collection-player-small-text">
+            Upcoming exploration<span ng-if="getNonRecommendedCollectionNodeCount() > 1">s</span> in this collection
+          </div>
+          <collection-node-list collection-id="collectionId" collection-nodes="getNonRecommendedCollectionNodes()"></collection-node-list>
+        </div>
+
+        <a class="oppia-collection-player-small-text" ng-if="getNonRecommendedCollectionNodeCount() > 0" ng-click="toggleShowAllExplorations()">
+          <span ng-if="!showingAllExplorations"><span class="fa fa-chevron-down"></span> Show upcoming explorations</span>
+          <span ng-if="showingAllExplorations"><span class="fa fa-chevron-up"></span> Only show current progress</span>
+        </a>
+      {% else %}
+        <div class="oppia-collection-player-small-text">You must login to save your progress.</div>
+        <collection-node-list collection-id="collectionId" collection-nodes="collection.getCollectionNodes()"></collection-node-list>
+      {% endif %}
+    </div>
+  </div>
+
+  {% include 'attribution_guide.html' %}
+  {% include 'pages/collection_player/collection_node_list_directive.html' %}
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_player/CollectionPlayer.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_player/CollectionNodeListDirective.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionNodeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionPlaythroughObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/SkillListObjectFactory.js"></script>
+{% endblock footer_js %}
