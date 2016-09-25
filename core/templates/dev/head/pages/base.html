@@ -69,7 +69,7 @@
     {% block base_url %}{% endblock base_url %}
 
     {% block header_css %}
-      {% include 'header_css_libs.html' %}
+      {% include 'pages/header_css_libs.html' %}
     {% endblock header_css %}
 
     <script>
@@ -94,6 +94,7 @@
         DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}'),
         INVALID_NAME_CHARS: JSON.parse('{{INVALID_NAME_CHARS|js_string}}'),
         MINIFICATION: JSON.parse('{{MINIFICATION|js_string}}'),
+        NAV_MODE: JSON.parse('{{nav_mode|js_string}}'),
         /* A list of functions to be called when an exploration is completed */
         POST_COMPLETION_HOOKS: [],
         preferredSiteLanguageCode: JSON.parse(
@@ -112,7 +113,7 @@
     </script>
 
     {% block header_js %}
-      {% include 'header_js_libs.html' %}
+      {% include 'pages/header_js_libs.html' %}
     {% endblock header_js %}
 
     {{BEFORE_END_HEAD_TAG_HOOK}}
@@ -316,9 +317,7 @@
               </div>
             </noscript>
 
-
-            {% include 'side_nav.html' %}
-
+            <side-navigation-bar></side-navigation-bar>
           </div>
         </div>
       </div>
@@ -339,24 +338,24 @@
       {% endif %}
     {% endif %}
 
-    {% include 'directives.html' %}
-    {% include 'forms/form_builder_templates.html' %}
-    {% include 'footer_js_libs.html' %}
-    {% include 'components/collection_summary_tile_directive.html' %}
-    {% include 'components/exploration_summary_tile_directive.html' %}
-    {% include 'components/rating_display.html' %}
-    {% include 'components/create_activity_button_directive.html' %}
+    {% include 'pages/footer_js_libs.html' %}
+
     {% include 'components/activity_tiles_infinity_grid_directive.html' %}
+    {% include 'components/collection_summary_tile_directive.html' %}
+    {% include 'components/create_activity_button_directive.html' %}
+    {% include 'components/exploration_summary_tile_directive.html' %}
+    {% include 'components/forms/form_builder_templates.html' %}
+    {% include 'components/forms/image_uploader_directive.html' %}
     {% include 'components/loading_dots_directive.html' %}
+    {% include 'components/rating_display.html' %}
+    {% include 'components/side_navigation_bar/side_navigation_bar.html' %}
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/app.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/base.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/directives.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/filters.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/i18n.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/sideNav.js"></script>
 
-    <script src="{{TEMPLATE_DIR_PREFIX}}/forms/formBuilder.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/Base.js"></script>
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/alertsService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/explorationContextService.js"></script>
@@ -371,11 +370,14 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/CreateActivityButtonDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/ExplorationCreationService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/ExplorationSummaryTileDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/ImageUploaderDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/LoadingDotsDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/ObjectEditorDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingDisplayDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/Select2DropdownDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/side_navigation_bar/SideNavigationBar.js"></script>
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/UrlInterpolationService.js"></script>
 

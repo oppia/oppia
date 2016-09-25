@@ -1,0 +1,40 @@
+<script type="text/ng-template" id="components/imageUploader">
+  <div class="image-uploader-drop-area">
+    <div class="image-uploader-text" translate="I18N_DIRECTIVES_DRAG_IMAGE_HERE"></div>
+  </div>
+
+  <div class="image-uploader-file-input-container">
+    <span translate="I18N_DIRECTIVES_OR_SELECT_FILE"></span>
+    <input type="file" class="image-uploader-file-input" ng-class="fileInputClassName">
+  </div>
+</script>
+
+<style>
+  .image-uploader-drop-area {
+    background: #eee;
+    height: 200px;
+    width: 100%;
+  }
+
+  .image-uploader-text {
+    color: #888;
+    font-size: 2em;
+    height: 100%;
+    margin: 0 auto;
+    padding-top: 80px;
+    text-align: center;
+    width: 100%;
+  }
+
+  .image-uploader-is-active {
+    background: red;
+  }
+
+  .image-uploader-file-input-container {
+    margin-top: 20px;
+  }
+
+  .image-uploader-file-input {
+    margin-top: 10px;
+  }
+</style>
