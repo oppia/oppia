@@ -14,6 +14,8 @@
 
 """Controllers for the moderator page."""
 
+import feconf
+
 from core.controllers import base
 from core.domain import activity_domain
 from core.domain import activity_services
@@ -32,6 +34,8 @@ class ModeratorPage(base.BaseHandler):
 
 class FeaturedActivitiesHandler(base.BaseHandler):
     """The moderator page handler for featured activities."""
+
+    GET_HANDLER_TYPE = feconf.HANDLER_TYPE_JSON
 
     @base.require_moderator
     def get(self):
@@ -67,6 +71,8 @@ class FeaturedActivitiesHandler(base.BaseHandler):
 
 class EmailDraftHandler(base.BaseHandler):
     """Provide default email templates for moderator emails."""
+
+    GET_HANDLER_TYPE = feconf.HANDLER_TYPE_JSON
 
     @base.require_moderator
     def get(self, action):

@@ -294,3 +294,25 @@ class I18nDictsTest(test_utils.GenericTestBase):
         en_key_list = self._extract_keys_from_json_file('en.json')
         qqq_key_list = self._extract_keys_from_json_file('qqq.json')
         self.assertEqual(en_key_list, qqq_key_list)
+
+
+class GetHandlerTypeIfExceptionRaisedTest(test_utils.GenericTestBase):
+
+    class FakeHandler(base.BaseHandler):
+        GET_HANDLER_TYPE = feconf.HANDLER_TYPE_JSON
+        def get(self):
+            raise self.InternalErrorException('fake exception')
+
+    def setUp(self):
+        super(GetHandlerTypeIfExceptionRaisedTest, self).setUp()
+        transaction_services = models.Registry.import_transaction_services()
+        self.URLS = main.URLS[:-1] + [main.get_redirect_route(r'/fake', self.FakeHandler),
+                                      main.get_redirect_route(r'/<:.*>', base.Error404Handler)]
+        app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
+            webapp2.WSGIApplication(self.URLS, debug=feconf.DEBUG))
+        self.testapp = webtest.TestApp(app)
+
+    def test_get_handler_type(self):
+        response = self.get_json('/fake', expect_errors=True)
+        self.assertTrue(type(response) == type({}))
+        self.assertEqual(500, response['code'])

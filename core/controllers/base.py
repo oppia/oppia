@@ -159,6 +159,9 @@ class BaseHandler(webapp2.RequestHandler):
     # users have agreed to the latest terms.
     REDIRECT_UNFINISHED_SIGNUPS = True
 
+    # What format the get method returns when exception raised, json or html
+    GET_HANDLER_TYPE = feconf.HANDLER_TYPE_HTML
+
     @webapp2.cached_property
     def jinja2_env(self):
         return jinja_utils.get_jinja_env(feconf.FRONTEND_TEMPLATES_DIR)
@@ -401,7 +404,9 @@ class BaseHandler(webapp2.RequestHandler):
         values['code'] = error_code
 
         # This checks if the response should be JSON or HTML.
-        if self.payload is not None:
+        # For get method, the payload is None so GET_HANDLER_TYPE takes effect
+        # For other methods, self.payload is not None
+        if self.payload is not None or self.GET_HANDLER_TYPE == feconf.HANDLER_TYPE_JSON:
             self.render_json(values)
         else:
             self.values.update(values)
