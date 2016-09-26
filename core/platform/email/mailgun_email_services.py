@@ -17,7 +17,6 @@
 """Provides mailgun api to send email."""
 import requests
 
-from core import counters
 import feconf
 
 MAILGUN_PUBLIC_DOMAIN_URL = "https://api.mailgun.net/v3/address/validate"
@@ -92,5 +91,3 @@ def send_mail(
     requests.post(
         mailgun_domain_name, auth=('api', feconf.MAILGUN_API_KEY),
         data=data)
-
-    counters.EMAILS_SENT.inc()

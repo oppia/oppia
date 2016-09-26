@@ -16,7 +16,6 @@
 
 """Provides email services."""
 
-from core import counters
 import feconf
 
 from google.appengine.api import mail
@@ -63,5 +62,3 @@ def send_mail(
         mail.send_mail(
             sender_email, recipient_email, subject, plaintext_body,
             html=html_body)
-
-    counters.EMAILS_SENT.inc()

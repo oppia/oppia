@@ -337,21 +337,6 @@
           </div>
         </md-card>
 
-        <md-card class="oppia-page-card oppia-long-text" style="max-width: 700px;" ng-if="currentTab === TAB_MISC">
-          <h3>Performance Counters</h3>
-          <ul>
-            {% for counter in counters %}
-              <li>
-                {{counter.description}} : {{counter.value}}
-              </li>
-            {% endfor %}
-          </ul>
-        </md-card>
-        <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_MISC" style="max-width: 700px">
-          <h3>Search Index</h3>
-
-          <button ng-click="clearSearchIndex()">Clear Search Index</button>
-        </md-card>
         <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_MISC" style="max-width: 700px">
           <h3>Topic Similarities</h3>
           <div>
@@ -361,6 +346,11 @@
             <button ng-click="uploadTopicSimilaritiesFile()">Upload</button><br>
             <button ng-click="downloadTopicSimilaritiesFile()">Download current topic similarities</button>
           </div>
+        </md-card>
+
+        <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_MISC" style="max-width: 700px">
+          <h3>Search Index</h3>
+          <button ng-click="clearSearchIndex()">Clear Search Index</button>
         </md-card>
       </div>
     </div>

@@ -30,7 +30,6 @@ import jinja2
 import webapp2
 from google.appengine.api import users
 
-from core import counters
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import rights_manager
@@ -289,13 +288,6 @@ class BaseHandler(webapp2.RequestHandler):
         json_output = json.dumps(values, cls=utils.JSONEncoderForHTML)
         self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
 
-        # Calculate the processing time of this request.
-        duration = datetime.datetime.utcnow() - self.start_time
-        processing_time = duration.seconds + duration.microseconds / 1E6
-
-        counters.JSON_RESPONSE_TIME_SECS.inc(increment=processing_time)
-        counters.JSON_RESPONSE_COUNT.inc()
-
     def render_template(
             self, filename, values=None, iframe_restriction='DENY',
             redirect_url_on_logout=None):
@@ -388,13 +380,6 @@ class BaseHandler(webapp2.RequestHandler):
 
         self.response.write(self.jinja2_env.get_template(
             filename).render(**values))
-
-        # Calculate the processing time of this request.
-        duration = datetime.datetime.utcnow() - self.start_time
-        processing_time = duration.seconds + duration.microseconds / 1E6
-
-        counters.HTML_RESPONSE_TIME_SECS.inc(increment=processing_time)
-        counters.HTML_RESPONSE_COUNT.inc()
 
     def _render_exception(self, error_code, values):
         assert error_code in [400, 401, 404, 500]
