@@ -1,7 +1,13 @@
 {% extends "base.html" %}
 
 {% block maintitle %}
-  {{ title }}
+  {% if search_mode %}
+    Find explorations to learn from - Oppia
+  {% elif group_mode %}
+    Find explorations to learn from - Oppia
+  {% else %}
+    I18N_LIBRARY_PAGE_TITLE
+  {% endif %}
 {% endblock maintitle %}
 
 {% block navbar_breadcrumb %}

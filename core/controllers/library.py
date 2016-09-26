@@ -74,11 +74,6 @@ class LibraryPage(base.BaseHandler):
         """Handles GET requests."""
         search_mode = 'search' in self.request.url
 
-        if search_mode:
-            title = 'Find explorations to learn from - Oppia'
-        else:
-            title = 'I18N_LIBRARY_PAGE_TITLE'
-
         self.values.update({
             'meta_description': (
                 feconf.SEARCH_PAGE_DESCRIPTION if search_mode
@@ -89,7 +84,7 @@ class LibraryPage(base.BaseHandler):
                 user_services.has_fully_registered(self.user_id)),
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
-            'title': title,
+            'search_mode': search_mode,
             'SEARCH_DROPDOWN_CATEGORIES': feconf.SEARCH_DROPDOWN_CATEGORIES,
         })
         self.render_template('library/library.html')
@@ -159,10 +154,9 @@ class LibraryGroupPage(base.BaseHandler):
 
     def get(self, group_name):
         """Handles GET requests."""
-        if group_name == feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED:
-            title = feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED
-        elif group_name == feconf.LIBRARY_GROUP_TOP_RATED:
-            title = feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS
+        if (group_name == feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED or
+                group_name == feconf.LIBRARY_GROUP_TOP_RATED):
+            group_mode = True
         else:
             raise self.PageNotFoundException
 
@@ -175,7 +169,7 @@ class LibraryGroupPage(base.BaseHandler):
                 user_services.has_fully_registered(self.user_id)),
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
-            'title': title,
+            'group_mode': group_mode,
             'SEARCH_DROPDOWN_CATEGORIES': feconf.SEARCH_DROPDOWN_CATEGORIES,
         })
         self.render_template('library/library.html')
@@ -217,6 +211,8 @@ class LibraryGroupIndexHandler(base.BaseHandler):
                     'full_results_url': (
                         '/library/' + feconf.LIBRARY_GROUP_TOP_RATED),
                 })
+        else:
+            return self.PageNotFoundException
 
         preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
         if self.user_id:
