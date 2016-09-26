@@ -231,8 +231,10 @@ class TestBase(unittest.TestCase):
         """Get a JSON response, transformed to a Python object. This method
         does not support calling testapp.get() with errors expected in response
         because testapp.get() in that case does not return a JSON object."""
-        json_response = self.testapp.get(url, params, expect_errors=expect_errors)
-        return self._parse_json_response(json_response, expect_errors=expect_errors)
+        json_response = self.testapp.get(
+            url, params, expect_errors=expect_errors)
+        return self._parse_json_response(
+            json_response, expect_errors=expect_errors)
 
     def post_json(self, url, payload, csrf_token=None, expect_errors=False,
                   expected_status_int=200, upload_files=None):

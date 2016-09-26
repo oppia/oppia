@@ -306,13 +306,16 @@ class GetHandlerTypeIfExceptionRaisedTest(test_utils.GenericTestBase):
     def setUp(self):
         super(GetHandlerTypeIfExceptionRaisedTest, self).setUp()
         transaction_services = models.Registry.import_transaction_services()
-        self.URLS = main.URLS[:-1] + [main.get_redirect_route(r'/fake', self.FakeHandler),
-                                      main.get_redirect_route(r'/<:.*>', base.Error404Handler)]
+
+        self.URLS = main.URLS[:-1] # pylint: disable=invalid-name
+        self.URLS.append(main.get_redirect_route(r'/fake', self.FakeHandler))
+        self.URLS.append(main.get_redirect_route(
+            r'/<:.*>', base.Error404Handler))
         app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
             webapp2.WSGIApplication(self.URLS, debug=feconf.DEBUG))
         self.testapp = webtest.TestApp(app)
 
     def test_get_handler_type(self):
         response = self.get_json('/fake', expect_errors=True)
-        self.assertTrue(type(response) == type({}))
+        self.assertTrue(isinstance(response, dict))
         self.assertEqual(500, response['code'])

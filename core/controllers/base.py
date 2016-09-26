@@ -406,7 +406,7 @@ class BaseHandler(webapp2.RequestHandler):
         # This checks if the response should be JSON or HTML.
         # For get method, the payload is None so GET_HANDLER_TYPE takes effect
         # For other methods, self.payload is not None
-        if self.payload is not None or self.GET_HANDLER_TYPE == feconf.HANDLER_TYPE_JSON:
+        if self.payload is not None or self.GET_HANDLER_TYPE == feconf.HANDLER_TYPE_JSON: #pylint: disable=line-too-long
             self.render_json(values)
         else:
             self.values.update(values)
