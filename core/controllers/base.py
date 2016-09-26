@@ -410,7 +410,7 @@ class BaseHandler(webapp2.RequestHandler):
                     'error/error_iframed.html', iframe_restriction=None)
             else:
                 self.render_template(
-                    'error/error.html', iframe_restriction=None)
+                    'pages/error/error.html')
 
 
     def handle_exception(self, exception, unused_debug_mode):
