@@ -297,10 +297,9 @@ class BaseHandler(webapp2.RequestHandler):
         counters.JSON_RESPONSE_COUNT.inc()
 
     def render_template(
-            self, filename, values=None, iframe_restriction='DENY',
+            self, filename, iframe_restriction='DENY',
             redirect_url_on_logout=None):
-        if values is None:
-            values = self.values
+        values = self.values
 
         scheme, netloc, path, _, _ = urlparse.urlsplit(self.request.uri)
 
@@ -348,6 +347,10 @@ class BaseHandler(webapp2.RequestHandler):
                 'Oppia is a free, open-source learning platform. Join the '
                 'community to create or try an exploration today!')
 
+        # nav_mode is used as part of the GLOBALS object in the frontend, but
+        # not every backend handler declares a nav_mode. Thus, the following
+        # code is a failsafe to ensure that the nav_mode key is added to all
+        # page requests.
         if 'nav_mode' not in values:
             values['nav_mode'] = ''
 
@@ -389,8 +392,8 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
 
-        self.response.write(self.jinja2_env.get_template(
-            'pages/%s' % filename).render(**values))
+        self.response.write(
+            self.jinja2_env.get_template(filename).render(**values))
 
         # Calculate the processing time of this request.
         duration = datetime.datetime.utcnow() - self.start_time
@@ -408,7 +411,8 @@ class BaseHandler(webapp2.RequestHandler):
             self.render_json(values)
         else:
             self.values.update(values)
-            self.render_template('error/error.html', iframe_restriction=None)
+            self.render_template(
+                'pages/error/error.html', iframe_restriction=None)
 
     def handle_exception(self, exception, unused_debug_mode):
         """Overwrites the default exception handler."""
