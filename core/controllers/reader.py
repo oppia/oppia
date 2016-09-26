@@ -265,7 +265,7 @@ class ExplorationPageEmbed(base.BaseHandler):
         self.values['iframed'] = True
 
         self.render_template(
-            'player/exploration_player.html', iframe_restriction=None)
+            'pages/exploration_player/exploration_player.html', iframe_restriction=None)
 
 
 class ExplorationPage(base.BaseHandler):
@@ -302,7 +302,7 @@ class ExplorationPage(base.BaseHandler):
 
         self.values.update(exploration_data_values)
         self.values['iframed'] = False
-        self.render_template('player/exploration_player.html')
+        self.render_template('pages/exploration_player/exploration_player.html')
 
 
 
