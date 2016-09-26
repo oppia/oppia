@@ -1207,7 +1207,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # condition since the order of value_dict_list is not deterministic.
         first_value_dict = value_dict_list[0]
         exploration_id = first_value_dict['exploration_id']
-        state_name = first_value_dict['state_name']
+        state_name = first_value_dict['state_name'].decode('utf-8')
 
         # One major point of failure is the exploration not existing. Another
         # major point of failure comes from the time matching.
@@ -1240,8 +1240,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 yield (
                     'Item ID: %s, last updated: %s, state name: %s, '
                     'exp id: %s, error: %s' % (
-                        item_id, last_updated, state_name, exploration_id,
-                        error))
+                        item_id, last_updated, state_name.encode('utf-8'),
+                        exploration_id, error))
 
     @classmethod
     def _migrate_answers(cls, item_id, explorations, exploration_id, state_name,
