@@ -88,8 +88,10 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         user_services.get_or_create_user(self.owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
+        self.text_input_state_name = self.exploration.init_state_name
+
     def test_fuzzy_matches_does_not_migrate(self):
-        state_name = 'Text Input'
+        state_name = self.text_input_state_name
 
         rule_spec_str = 'FuzzyMatches'
         html_answer = 'weight'
@@ -147,7 +149,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self._verify_no_migration_validation_problems()
 
     def test_migrated_answer_from_deleted_exploration_is_still_migrated(self):
-        state_name = 'Text Input'
+        state_name = self.text_input_state_name
 
         rule_spec_str = 'Contains(ate)'
         html_answer = 'appreciate'
@@ -181,7 +183,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self._verify_no_migration_validation_problems()
 
     def test_migrated_answer_from_fully_deleted_exploration_is_migrated(self):
-        state_name = 'Text Input'
+        state_name = self.text_input_state_name
 
         rule_spec_str = 'Contains(ate)'
         html_answer = 'appreciate'
@@ -284,7 +286,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self._verify_migration_validation_problems(1)
 
     def test_multiple_migrations_does_not_duplicate_answers(self):
-        state_name = 'Text Input'
+        state_name = self.text_input_state_name
 
         rule_spec_str = 'Contains(ate)'
         self._record_old_answer(state_name, rule_spec_str, 'levitate')
@@ -312,7 +314,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self._verify_no_migration_validation_problems()
 
     def test_migration_results_can_be_validated(self):
-        state_name1 = 'Text Input'
+        state_name1 = self.text_input_state_name
         rule_spec_str1 = 'Contains(ate)'
 
         state_name2 = 'Code Editor'
@@ -397,7 +399,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         large numbers of answers to the new data store that would require the
         new data store to begin using its linked-list functionality.
         """
-        state_name = 'Text Input'
+        state_name = self.text_input_state_name
 
         rule_spec_str = 'Contains(ate)'
         html_answer = ''.join([str(x) for x in xrange(1024)])
@@ -422,7 +424,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         since it splits up answers in batches of 100 for less intense
         submission.
         """
-        state_name = 'Text Input'
+        state_name = self.text_input_state_name
 
         rule_spec_str = 'Contains(ate)'
         html_answer = 'Plate'
@@ -446,7 +448,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         since it splits up answers in batches of 100 for less intense
         submission.
         """
-        state_name = 'Text Input'
+        state_name = self.text_input_state_name
 
         rule_spec_str = 'Contains(ate)'
         html_answer = 'Plate'
@@ -470,7 +472,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         since it splits up answers in batches of 100 for less intense
         submission.
         """
-        state_name = 'Text Input'
+        state_name = self.text_input_state_name
 
         rule_spec_str = 'Contains(ate)'
         html_answer = 'Plate'
@@ -1591,7 +1593,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self._verify_no_migration_validation_problems()
 
     def test_migrate_text_input(self):
-        state_name = 'Text Input'
+        state_name = self.text_input_state_name
 
         rule_spec_str = 'Contains(ate)'
         html_answer = 'appreciate'
@@ -1627,7 +1629,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         characters like '<' and '>' are migrated. This test is based on an
         exploration found in production.
         """
-        state_name = 'Text Input'
+        state_name = self.text_input_state_name
 
         rule_spec_str = 'Contains(ate)'
         html_answer = 'Let f(x)<|a|'

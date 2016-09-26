@@ -1,7 +1,7 @@
 author_notes: ''
 blurb: ''
 category: Test
-init_state_name: Text Input
+init_state_name: "Text Input state name with unicode \u0105\u0142"
 language_code: en
 objective: Dummy exploration for testing all interactions
 param_changes: []
@@ -752,7 +752,7 @@ states:
           trigger_type: NthResubmission
       id: SetInput
     param_changes: []
-  Text Input:
+  "Text Input state name with unicode \u0105\u0142":
     content:
     - type: text
       value: <p>Text input. Please add a word containing "ate".</p>
@@ -774,7 +774,7 @@ states:
         rows:
           value: 1
       default_outcome:
-        dest: Text Input
+        dest: "Text Input state name with unicode \u0105\u0142"
         feedback:
         - <p>The answer needs to contain "ate".</p>
         param_changes: []
