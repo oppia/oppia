@@ -19,7 +19,6 @@
 oppia.directive('attributionGuide', [function() {
   return {
     restrict: 'E',
-    templateUrl: 'components/attributionGuide',
-    controller: []
+    templateUrl: 'components/attributionGuide'
   };
 }]);
