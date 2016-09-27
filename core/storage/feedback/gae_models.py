@@ -126,6 +126,17 @@ class FeedbackThreadModel(base_models.BaseModel):
             cls.exploration_id == exploration_id).order(
                 cls.last_updated).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
+    @classmethod
+    def get_latest_updated_threads(cls, exploration_id):
+        """Returns a list of threads associated to the exploration limited to a
+        particular value, ordered by their last updated field.
+
+        Does not include the deleted entries.
+        """
+        return cls.get_all().filter(
+            cls.exploration_id == exploration_id).order(
+                cls.last_updated).fetch(feconf.NEW_FEEDBACK_COUNT_DASHBOARD)
+
 
 class FeedbackMessageModel(base_models.BaseModel):
     """Feedback messages. One or more of these messages make a thread.

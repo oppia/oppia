@@ -277,9 +277,7 @@ class ExplorationDashboardStatsHandler(base.BaseHandler):
             'new_feedback': [
                 feedback_message.to_dict()
                 for feedback_message in
-                feedback_services.get_messages_for_exp_id(
-                    exploration_id,
-                    limit=feconf.NEW_FEEDBACK_COUNT_DASHBOARD)]
+                feedback_services.get_new_messages_for_exp_id(exploration_id)]
         })
 
 
