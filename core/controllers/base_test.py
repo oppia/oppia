@@ -299,23 +299,20 @@ class I18nDictsTest(test_utils.GenericTestBase):
 class GetHandlerTypeIfExceptionRaisedTest(test_utils.GenericTestBase):
 
     class FakeHandler(base.BaseHandler):
-        GET_HANDLER_TYPE = feconf.HANDLER_TYPE_JSON
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         def get(self):
             raise self.InternalErrorException('fake exception')
 
-    def setUp(self):
-        super(GetHandlerTypeIfExceptionRaisedTest, self).setUp()
-        transaction_services = models.Registry.import_transaction_services()
+    def test_error_response_for_get_request_of_type_json_has_json_format(self):
+        fake_urls = []
+        fake_urls.append(main.get_redirect_route(r'/fake', self.FakeHandler))
+        fake_urls.append(main.URLS[-1])
+        with self.swap(main, 'URLS', fake_urls):
+            transaction_services = models.Registry.import_transaction_services()
+            app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
+                webapp2.WSGIApplication(main.URLS, debug=feconf.DEBUG))
+            self.testapp = webtest.TestApp(app)
 
-        self.URLS = main.URLS[:-1] # pylint: disable=invalid-name
-        self.URLS.append(main.get_redirect_route(r'/fake', self.FakeHandler))
-        self.URLS.append(main.get_redirect_route(
-            r'/<:.*>', base.Error404Handler))
-        app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
-            webapp2.WSGIApplication(self.URLS, debug=feconf.DEBUG))
-        self.testapp = webtest.TestApp(app)
-
-    def test_get_handler_type(self):
-        response = self.get_json('/fake', expect_errors=True)
-        self.assertTrue(isinstance(response, dict))
-        self.assertEqual(500, response['code'])
+            response = self.get_json('/fake', expect_errors=True)
+            self.assertTrue(isinstance(response, dict))
+            self.assertEqual(500, response['code'])

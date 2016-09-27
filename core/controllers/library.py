@@ -93,7 +93,7 @@ class LibraryPage(base.BaseHandler):
 class LibraryIndexHandler(base.BaseHandler):
     """Provides data for the default library index page."""
 
-    GET_HANDLER_TYPE = feconf.HANDLER_TYPE_JSON
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self):
         """Handles GET requests."""
@@ -148,7 +148,7 @@ class LibraryIndexHandler(base.BaseHandler):
 class SearchHandler(base.BaseHandler):
     """Provides data for activity search results."""
 
-    GET_HANDLER_TYPE = feconf.HANDLER_TYPE_JSON
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self):
         """Handles GET requests."""
@@ -193,7 +193,7 @@ class ExplorationSummariesHandler(base.BaseHandler):
     controller supports returning private explorations for the given user.
     """
 
-    GET_HANDLER_TYPE = feconf.HANDLER_TYPE_JSON
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self):
         """Handles GET requests."""

@@ -160,7 +160,7 @@ class BaseHandler(webapp2.RequestHandler):
     REDIRECT_UNFINISHED_SIGNUPS = True
 
     # What format the get method returns when exception raised, json or html
-    GET_HANDLER_TYPE = feconf.HANDLER_TYPE_HTML
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
 
     @webapp2.cached_property
     def jinja2_env(self):
@@ -404,9 +404,10 @@ class BaseHandler(webapp2.RequestHandler):
         values['code'] = error_code
 
         # This checks if the response should be JSON or HTML.
-        # For get method, the payload is None so GET_HANDLER_TYPE takes effect
-        # For other methods, self.payload is not None
-        if self.payload is not None or self.GET_HANDLER_TYPE == feconf.HANDLER_TYPE_JSON: #pylint: disable=line-too-long
+        # For GET requests, there is no payload, so we check against
+        # GET_HANDLER_ERROR_RETURN_TYPE.
+        # Otherwise, we check whether self.payload exists.
+        if self.payload is not None or self.GET_HANDLER_ERROR_RETURN_TYPE == feconf.HANDLER_TYPE_JSON: #pylint: disable=line-too-long
             self.render_json(values)
         else:
             self.values.update(values)

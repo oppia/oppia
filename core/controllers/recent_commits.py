@@ -27,7 +27,7 @@ class RecentCommitsHandler(base.BaseHandler):
     # exploration_id. For the former, do a check to ensure that the user is
     # allowed to see this data (as it may include private explorations).
 
-    GET_HANDLER_TYPE = feconf.HANDLER_TYPE_JSON
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self):
         """Handles GET requests."""

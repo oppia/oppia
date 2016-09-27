@@ -779,6 +779,6 @@ TERMS_PAGE_DESCRIPTION = (
 THANKS_PAGE_DESCRIPTION = (
     'Thank you for donating to The Oppia Foundation.')
 
-# The type returned by a handler when exception raised
+# The type of the response returned by a handler when an exception is raised.
 HANDLER_TYPE_HTML = 'html'
 HANDLER_TYPE_JSON = 'json'
