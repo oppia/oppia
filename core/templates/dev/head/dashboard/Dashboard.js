@@ -44,13 +44,13 @@ oppia.controller('Dashboard', [
   'DashboardBackendApiService', 'RatingComputationService',
   'ExplorationCreationService', 'UrlInterpolationService', 'FATAL_ERROR_CODES',
   'EXPLORATION_DROPDOWN_STATS', 'EXPLORATIONS_SORT_BY_KEYS',
-  'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS',
+  'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', 'WARNING_CONNECTION_PROBLEM',
   function(
       $scope, $rootScope, $window, oppiaDatetimeFormatter, alertsService,
       DashboardBackendApiService, RatingComputationService,
       ExplorationCreationService, UrlInterpolationService, FATAL_ERROR_CODES,
       EXPLORATION_DROPDOWN_STATS, EXPLORATIONS_SORT_BY_KEYS,
-      HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS) {
+      HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS, WARNING_CONNECTION_PROBLEM) {
     var EXP_PUBLISH_TEXTS = {
       defaultText: (
         'This exploration is private. Publish it to receive statistics.'),
@@ -96,10 +96,11 @@ oppia.controller('Dashboard', [
           function(response) {
             $scope.explorationStats[explorationId] = response.data;
           }, function(errorResponse) {
-            if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-              alertsService.addWarning(
-                'Failed to get statistics for this exploration');
-            }
+            var warningMessage = (
+              FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1 ?
+                'Failed to get statistics for this exploration':
+                WARNING_CONNECTION_PROBLEM);
+            alertsService.addWarning(warningMessage);
           }
         );
         $scope.activeSubDropdown = '';
@@ -198,10 +199,11 @@ oppia.controller('Dashboard', [
         }
         $rootScope.loadingMessage = '';
       },
-      function(errorResponse) {
-        if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-          alertsService.addWarning('Failed to get dashboard data');
-        }
+      function(errorResponse, errorStatus) {
+        var warningMessage = (
+          FATAL_ERROR_CODES.indexOf(errorStatus) !== -1 ?
+            'Failed to get dashboard data': WARNING_CONNECTION_PROBLEM);
+        alertsService.addWarning(warningMessage);
       }
     );
   }

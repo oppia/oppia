@@ -271,14 +271,14 @@ class ExplorationDashboardStatsHandler(base.BaseHandler):
     """Returns the new feedback for an exploration."""
 
     @base.require_fully_signed_up
-    def get(self):
+    def get(self, exploration_id):
         """Handles GET requests."""
         self.render_json({
             'new_feedback': [
                 feedback_message.to_dict()
                 for feedback_message in
                 feedback_services.get_messages_for_exp_id(
-                    self.request.get('exp_id'),
+                    exploration_id,
                     limit=feconf.NEW_FEEDBACK_COUNT_DASHBOARD)]
         })
 

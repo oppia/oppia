@@ -23,9 +23,7 @@ oppia.factory('DashboardBackendApiService', ['$http', function($http) {
   };
 
   var _fetchExplorationStats = function(explorationId) {
-    var requestUrl = (
-      '/dashboardhandler/explorationstats/?exp_id=' + explorationId);
-    return $http.get(requestUrl, {
+    return $http.get('/dashboardhandler/explorationstats/' + explorationId, {
       cache: true
     });
   };

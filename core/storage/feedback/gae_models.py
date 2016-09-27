@@ -198,7 +198,8 @@ class FeedbackMessageModel(base_models.BaseModel):
                 exploration_id, thread_id))
 
         return cls.get_all().filter(
-            cls.thread_id == full_thread_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+            cls.thread_id == full_thread_id).fetch(
+                feconf.NEW_FEEDBACK_COUNT_DASHBOARD)
 
     @classmethod
     def get_most_recent_message(cls, exploration_id, thread_id):
