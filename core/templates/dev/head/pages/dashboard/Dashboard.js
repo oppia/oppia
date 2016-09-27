@@ -98,7 +98,7 @@ oppia.controller('Dashboard', [
           }, function(errorResponse) {
             var warningMessage = (
               FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1 ?
-                'Failed to get statistics for this exploration':
+                'Failed to get statistics for this exploration' :
                 WARNING_CONNECTION_PROBLEM);
             alertsService.addWarning(warningMessage);
           }
@@ -202,7 +202,7 @@ oppia.controller('Dashboard', [
       function(errorResponse, errorStatus) {
         var warningMessage = (
           FATAL_ERROR_CODES.indexOf(errorStatus) !== -1 ?
-            'Failed to get dashboard data': WARNING_CONNECTION_PROBLEM);
+            'Failed to get dashboard data' : WARNING_CONNECTION_PROBLEM);
         alertsService.addWarning(warningMessage);
       }
     );

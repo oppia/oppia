@@ -101,12 +101,16 @@ describe('Dashboard backend API service', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
+  var DASHBOARD_DATA_URL = '/dashboardhandler/data';
+  var EXPLORATION_STATS_URL_PREFIX = '/dashboardhandler/explorationstats/';
+  var ERROR_STATUS_CODE = 500;
+
   it('should successfully fetch an creator dashboard data from the backend',
       function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expect('GET', '/dashboardhandler/data').respond(
+    $httpBackend.expect('GET', DASHBOARD_DATA_URL).respond(
       sampleDataResults);
     DashboardBackendApiService.fetchDashboardData().then(
       successHandler, failHandler);
@@ -121,8 +125,7 @@ describe('Dashboard backend API service', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    var ERROR_STATUS_CODE = 500;
-    $httpBackend.expect('GET', '/dashboardhandler/data').respond(
+    $httpBackend.expect('GET', DASHBOARD_DATA_URL).respond(
       ERROR_STATUS_CODE, 'Error loading dashboard data.');
     DashboardBackendApiService.fetchDashboardData().then(
       successHandler, failHandler);
@@ -138,9 +141,7 @@ describe('Dashboard backend API service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     $httpBackend.expect(
-      'GET',
-      '/dashboardhandler/explorationstats/?exp_id=' + SAMPLE_EXP_ID
-    ).respond(
+      'GET', EXPLORATION_STATS_URL_PREFIX + SAMPLE_EXP_ID).respond(
       sampleExplorationStatsData);
     DashboardBackendApiService.fetchExplorationStats(SAMPLE_EXP_ID).then(
       successHandler, failHandler);
@@ -155,12 +156,9 @@ describe('Dashboard backend API service', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    var ERROR_STATUS_CODE = 500;
     $httpBackend.expect(
-      'GET',
-      '/dashboardhandler/explorationstats/?exp_id=' + SAMPLE_EXP_ID
-    ).respond(
-      ERROR_STATUS_CODE, 'Error fetching exploration stats.');
+      'GET', EXPLORATION_STATS_URL_PREFIX + SAMPLE_EXP_ID).respond(
+        ERROR_STATUS_CODE, 'Error fetching exploration stats.');
     DashboardBackendApiService.fetchExplorationStats(SAMPLE_EXP_ID).then(
       successHandler, failHandler);
     $httpBackend.flush();
