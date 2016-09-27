@@ -152,14 +152,8 @@ class LibraryGroupPage(base.BaseHandler):
     """The page for displaying top rated and recently published explorations.
     """
 
-    def get(self, group_name):
+    def get(self):
         """Handles GET requests."""
-        if (group_name == feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED or
-                group_name == feconf.LIBRARY_GROUP_TOP_RATED):
-            group_mode = True
-        else:
-            raise self.PageNotFoundException
-
         self.values.update({
             'meta_description': (
                 feconf.GROUP_PAGE_DESCRIPTION),
@@ -169,7 +163,6 @@ class LibraryGroupPage(base.BaseHandler):
                 user_services.has_fully_registered(self.user_id)),
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
-            'group_mode': group_mode,
             'SEARCH_DROPDOWN_CATEGORIES': feconf.SEARCH_DROPDOWN_CATEGORIES,
         })
         self.render_template('library/library.html')
