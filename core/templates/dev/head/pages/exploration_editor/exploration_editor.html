@@ -1,0 +1,603 @@
+{% extends "base.html" %}
+
+{% block maintitle %}
+  {% if title %}
+    {{ title }} - Oppia Editor
+  {% else %}
+    Untitled Exploration - Oppia Editor
+  {% endif %}
+{% endblock maintitle %}
+
+{% block header_js %}
+  {{ super() }}
+  <script type="text/javascript">
+    GLOBALS.ALLOWED_GADGETS = JSON.parse('{{ALLOWED_GADGETS|js_string}}');
+    GLOBALS.ALLOWED_INTERACTION_CATEGORIES = JSON.parse(
+      '{{ALLOWED_INTERACTION_CATEGORIES|js_string}}');
+    GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
+    GLOBALS.DEFAULT_OBJECT_VALUES = JSON.parse(
+      '{{DEFAULT_OBJECT_VALUES|js_string}}');
+    GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = JSON.parse(
+      '{{DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR|js_string}}');
+    GLOBALS.GADGET_SPECS = JSON.parse('{{GADGET_SPECS|js_string}}');
+    GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
+    GLOBALS.INVALID_PARAMETER_NAMES = JSON.parse(
+      '{{INVALID_PARAMETER_NAMES|js_string}}');
+    GLOBALS.NEW_STATE_TEMPLATE = JSON.parse(
+      '{{NEW_STATE_TEMPLATE|js_string}}');
+    GLOBALS.PANEL_SPECS = JSON.parse('{{PANEL_SPECS|js_string}}');
+    GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = JSON.parse(
+      '{{SHOW_TRAINABLE_UNRESOLVED_ANSWERS|js_string}}');
+    GLOBALS.TAG_REGEX = JSON.parse('{{TAG_REGEX|js_string}}');
+  </script>
+
+  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+  <script type="text/javascript">
+    if (window.google && window.google.load) {
+      google.load('visualization', '1', {packages: ['corechart']});
+    } else {
+      throw 'error: Could not load google visualization library. Are you offline?';
+    }
+  </script>
+
+  <style>
+    html, body {
+      background-color: #eee;
+    }
+  </style>
+
+  {{dependencies_html}}
+{% endblock header_js %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb ng-cloak" ng-controller="EditorNavbarBreadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      <span ng-if="navbarTitle">
+        <[navbarTitle]>
+        <span class="oppia-navbar-breadcrumb-separator" style="margin-left: 5px;"></span>
+        <span>
+          <[getCurrentTabName()]>
+        </span>
+      </span>
+      <span ng-if="navbarTitle === ''" ng-click="editTitle()" style="opacity: 0.6;">
+        Untitled Exploration
+      </span>
+      <span ng-if="navbarTitle === null">
+        Loading...
+      </span>
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
+{% block local_top_nav_options %}
+  <ul class="nav navbar-nav oppia-navbar-nav pull-right ng-cloak" ng-controller="EditorNavigation" style="margin-left: 20px;">
+    <li ng-class="{'active': getTabStatuses().active === 'main', 'dropdown': countWarnings()}">
+      <a href="#" tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()"
+         class="oppia-editor-navbar-tab-anchor protractor-test-main-tab">
+        <i class="material-icons">&#xE254;</i>
+      </a>
+      <div ng-show="countWarnings()" class="oppia-editor-warnings-indicator" ng-click="selectMainTab()" ng-class="{'oppia-editor-warnings-critical-color': hasCriticalWarnings(), 'oppia-editor-warnings-error-color': !hasCriticalWarnings()}">
+        <span class="oppia-editor-warnings-count">
+          <[countWarnings()]>
+        </span>
+      </div>
+      <ul class="dropdown-menu oppia-editor-warnings-box">
+        <span class="oppia-editor-warnings-header">Warnings</span>
+        <li class="oppia-editor-warnings-text" ng-repeat="warning in getWarnings() track by $index">
+          <hr class="oppia-editor-warnings-separator">
+          <span ng-if="warning.type === 'critical'">
+            <strong><[warning.message]></strong>
+          </span>
+          <span ng-if="warning.type !== 'critical'">
+            <[warning.message]>
+          </span>
+        </li>
+      </ul>
+    </li>
+
+    {% if username %}
+      <li id="tutorialPreviewTab" ng-class="{'active': getTabStatuses().active === 'preview'}">
+        <a href="#" tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()"
+           class="oppia-editor-navbar-tab-anchor protractor-test-preview-tab">
+          <i class="material-icons">&#xE037;</i>
+        </a>
+      </li>
+    {% endif %}
+
+    <li ng-class="{'active': getTabStatuses().active === 'settings'}">
+      <a href="#" tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()"
+         class="oppia-editor-navbar-tab-anchor protractor-test-settings-tab">
+        <i class="material-icons">&#xE8B8;</i>
+      </a>
+    </li>
+
+    {% if username %}
+      <li ng-class="{'active': getTabStatuses().active === 'stats'}">
+        <a href="#" tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()"
+           class="oppia-editor-navbar-tab-anchor">
+          <i class="material-icons">&#xE24B;</i>
+        </a>
+      </li>
+    {% endif %}
+
+    <li ng-class="{'active': getTabStatuses().active === 'history'}">
+      <a href="#" tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()"
+         disabled="explorationRightsService.isCloned()"
+         class="oppia-editor-navbar-tab-anchor protractor-test-history-tab">
+        <i class="material-icons">&#xE192;</i>
+      </a>
+    </li>
+
+    <li ng-class="{'active': getTabStatuses().active === 'feedback'}" ng-click="selectFeedbackTab()">
+      <a href="#" tooltip="Feedback" tooltip-placement="bottom"
+         class="oppia-editor-navbar-tab-anchor">
+        <i class="material-icons">&#xE87F;</i>
+      </a>
+      <div ng-show="getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
+        <span class="oppia-exploration-open-threads-count">
+          <[getOpenThreadsCount()]>
+        </span>
+      </div>
+    </li>
+
+    {% if username %}
+      <li class="dropdown" popover-is-open="postTutorialHelpPopoverIsShown"
+          popover-placement="bottom" popover-trigger="none"
+          popover="To get help in the future, click here!">
+        <a href="#" tooltip="Help" tooltip-placement="bottom"
+           class="oppia-editor-navbar-tab-anchor" ng-click="showUserHelpModal()">
+          <i class="material-icons">&#xE887;</i>
+        </a>
+      </li>
+    {% endif %}
+  </ul>
+
+  <ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak" ng-controller="ExplorationSaveAndPublishButtons">
+    <li ng-if="isPrivate()">
+      <div class="btn-group" style="margin-right: 10px; margin-top: 8px;"
+           title="<[getPublishExplorationButtonTooltip()]>">
+        <button type="button" class="btn btn-default oppia-editor-publish-button protractor-test-publish-exploration"
+                ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}"
+                ng-click="showPublishExplorationModal()"
+                ng-disabled="isExplorationLockedForEditing() || countWarnings()">
+          <span ng-if="!publishModalIsOpening">
+            <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+               alt="Publish to Oppia Library">&#xE2C3;</i>
+            <span class="oppia-save-publish-button-label">Publish</span>
+          </span>
+          <span ng-if="publishModalIsOpening">
+            <i class="oppia-save-publish-loading oppia-save-publish-button-icon"
+               alt="Publish to Oppia Library">
+                 <loading-dots></loading-dots>
+            </i>
+            <span class="oppia-save-publish-button-label">
+              Saving
+              <loading-dots></loading-dots>
+            </span>
+          </span>
+        </button>
+      </div>
+    </li>
+
+    <li ng-if="isEditableOutsideTutorialMode()">
+      <div dropdown class="btn-group" style="margin-right: 10px; margin-top: 8px;"
+           title="<[getSaveButtonTooltip()]>">
+        <button id="tutorialSaveButton" class="btn btn-default oppia-save-draft-button protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable(), 'oppia-save-draft-button-padding': getChangeListLength() && !isPrivate()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
+          <span ng-if="!isSaveInProgress">
+            <span ng-if="isPrivate()">
+              <span ng-if="!saveModalIsOpening">
+                <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+                   alt="Save Draft">&#xE161;</i>
+                <span class="oppia-save-publish-button-label">Save Draft</span>
+                <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()" style="opacity: 0.5">(<[getChangeListLength()]>)</span>
+              </span>
+
+              <span ng-if="saveModalIsOpening">
+                <span class="oppia-save-publish-button-label">
+                  Saving
+                </span>
+                <loading-dots></loading-dots>
+              </span>
+            </span>
+            <span ng-if="!isPrivate()" title="Publish Changes">
+              <span ng-if="!saveModalIsOpening">
+                <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+                   alt="Publish Changes">&#xE2C3;</i>
+                <span class="oppia-save-publish-button-label">Publish Changes</span>
+                <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()" style="opacity: 0.5">(<[getChangeListLength()]>)</span>
+              </span>
+
+              <span ng-if="saveModalIsOpening">
+                <span class="oppia-save-publish-button-label">
+                  Publishing
+                </span>
+                <loading-dots></loading-dots>
+              </span>
+            </span>
+          </span>
+          <span ng-if="isSaveInProgress">
+            <span ng-if="isPrivate()" class="oppia-save-publish-button-label">
+              Saving
+            </span>
+            <span ng-if="!isPrivate()" class="oppia-save-publish-button-label">
+              Publishing
+            </span>
+            <loading-dots></loading-dots>
+          </span>
+        </button>
+        <button type="button" class="btn btn-default dropdown-toggle protractor-test-save-discard-toggle"
+                ng-disabled="!getChangeListLength()" dropdown-toggle>
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu" style="min-width: 120px; right: inherit;" ng-style="{ width: getChangeListLength() && !isPrivate() ? '150px' : '120px' }">
+          <li><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="protractor-test-discard-changes" title="Discard all pending changes.">Discard Draft</a></li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+{% endblock local_top_nav_options %}
+
+{% block content %}
+  <div ng-controller="ExplorationEditor" ng-cloak>
+
+    <script type="text/ng-template" id="modals/addExplorationMetadata">
+      <div class="modal-header">
+        <h3>Add Some Details</h3>
+      </div>
+
+      <div class="modal-body oppia-long-text">
+        <p>
+          Just a few more things before you publish:
+        </p>
+        <p ng-if="requireTitleToBeSpecified">
+          Add a title: what should your exploration be called?
+          <input type="text" class="form-control" ng-model="explorationTitleService.displayed"
+                 placeholder="Music in the 19th Century" maxlength="40">
+        </p>
+        <form name="objectiveForm">
+          <p ng-if="requireObjectiveToBeSpecified"
+             ng-class="{'has-error': (objectiveForm.objectiveInput.$touched || objectiveHasBeenPreviouslyEdited) && explorationObjectiveService.displayed.length < 15}">
+            Add a goal: what does the exploration help people to do?
+            <input name="objectiveInput" type="text" class="form-control" ng-model="explorationObjectiveService.displayed"
+                   placeholder="Learn how to ...">
+            <span class="help-block" ng-show="(objectiveForm.objectiveInput.$touched || objectiveHasBeenPreviouslyEdited) && explorationObjectiveService.displayed.length < 15" style="font-size: smaller; color: #a94442">Please provide a descriptive goal to help people understand what this exploration is about.</span>
+          </p>
+        </form>
+        <p ng-if="requireCategoryToBeSpecified">
+          Add a category: how would you categorize your exploration?
+          <select2-dropdown item="explorationCategoryService.displayed"
+                            choices="CATEGORY_LIST_FOR_SELECT2"
+                            placeholder="Choose or type new"
+                            new-choice-regex="^[A-Z a-z]+$"
+                            width="100%"
+                            invalid-search-term-message="Invalid category name">
+          </select2-dropdown>
+        </p>
+
+        <p ng-if="askForLanguageCheck">
+          Verify the language: is your exploration written in this language?
+          <select id="explorationLanguageCode" class="form-control protractor-test-exploration-language-select" ng-model="explorationLanguageCodeService.displayed" ng-change="saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in explorationLanguageCodeService.getAllLanguageCodes()">
+          </select>
+        </p>
+        <p ng-if="askForTags">
+          Add tags to help learners discover your exploration.
+          <select2-dropdown item="explorationTagsService.displayed"
+                            tag-mode="true"
+                            allow-multiple-choices="true"
+                            invalid-search-term-message="Add a new tag (using lowercase letters and spaces)..."
+                            new-choice-regex="<[TAG_REGEX]>"
+                            width="100%"
+                            placeholder="Skills, concepts, topics, ..."
+                            on-selection-change="saveExplorationTags()">
+          </select2-dropdown>
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-success protractor-test-confirm-pre-publication" ng-click="save()" ng-disabled="!isSavingAllowed()">Save Changes</button>
+      </div>
+    </script>
+
+    <script type="text/ng-template" id="modals/publishExploration">
+      <div class="modal-header">
+        <h3>Publish Exploration</h3>
+      </div>
+
+      <div class="modal-body oppia-long-text">
+        <p>
+          Congratulations, you're about to publish an exploration!
+        </p>
+        <p>
+          Before publishing, please ensure that your exploration fits the
+          <a href="/teach#playbook" target="_blank">site publication criteria</a>. In particular, it should:
+          <ul>
+            <li>help its intended audience learn something new</li>
+            <li>provide useful feedback/guidance to help them if they get stuck.</li>
+          </ul>
+        </p>
+        <p>
+          Once the exploration is published, it will be available in the Oppia library for anyone to learn from and provide feedback. You can also check out
+            its stats by clicking on the Stats tab in the top right of the editor.
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-success protractor-test-confirm-publish" ng-click="publish()">Publish Exploration</button>
+      </div>
+    </script>
+    {% include 'pages/exploration_editor/share_publish_modal.html' %}
+    {% include 'components/exploration_welcome_modal_directive.html' %}
+    {% include 'components/help_modal_directive.html' %}
+
+    <script type="text/ng-template" id="modals/saveExploration">
+      <div class="modal-header">
+        <h3>
+          <span ng-if="isExplorationPrivate">Save Draft</span>
+          <span ng-if="!isExplorationPrivate">Publish Changes</span>
+        </h3>
+      </div>
+      <div class="modal-body oppia-long-text">
+        <p>
+          <span ng-if="isExplorationPrivate">(Optional)</span>
+          Please enter a brief description of what you have changed:
+          <textarea rows="3" cols="50" ng-model="commitMessage" focus-on="saveChangesModalOpened" class="protractor-test-commit-message-input" autofocus></textarea>
+        </p>
+        <button class="btn btn-default" ng-click="onClickToggleDiffButton()">
+          <span ng-if="!showDiff">Show Changes</span>
+          <span ng-if="showDiff">Hide Changes</span>
+        </button>
+
+        <version-diff-visualization ng-if="showDiff" diff-data="diffData"
+                                    earlier-version-header="earlierVersionHeader"
+                                    later-version-header="laterVersionHeader">
+        </version-diff-visualization>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-success protractor-test-close-save-modal" ng-disabled="!isExplorationPrivate && !commitMessage" ng-click="save(commitMessage)">
+          <span ng-if="isExplorationPrivate">Save Draft</span>
+          <span ng-if="!isExplorationPrivate">Publish Changes</span>
+        </button>
+      </div>
+    </script>
+
+    <script type="text/ng-template" id="modals/saveValidationFail">
+      <div class="modal-header">
+        <h3>Error Saving Exploration</h3>
+      </div>
+
+      <div class="modal-body">
+        <p>
+          Sorry, an unexpected error occurred. Please refresh the page to
+          return to the most recent draft of your exploration.
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-default" ng-click="closeAndRefresh()">
+          Close and Refresh
+        </button>
+      </div>
+    </script>
+
+    <script type="text/ng-template" id="modals/saveVersionMismatch">
+      <div class="modal-header">
+        <h3>Error Saving Exploration</h3>
+      </div>
+
+      <div class="modal-body">
+        <p>
+          Sorry! Someone else has saved a new version of this exploration, so
+          your pending changes cannot be saved.
+        </p>
+
+        <p ng-show="hasLostChanges">
+          The lost changes are displayed below. You may want to copy and
+          paste these changes before discarding them.
+        </p>
+
+        <div class="oppia-lost-changes" ng-bind-html="lostChangesHtml">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-default" ng-click="discardChanges()">Discard Changes</button>
+      </div>
+    </script>
+
+    <div class="container-fluid oppia-editor-page-container" ng-joy-ride="tutorialInProgress" config="EDITOR_TUTORIAL_OPTIONS" on-finish="onFinishTutorial()" on-skip="onSkipTutorial()">
+      <div class="row" ng-if="explorationRightsService.isCloned()">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <div class="oppia-align-center alert alert-warning" style="padding: 2px; width: 90%;">
+            <strong>Note:</strong> This is a private, unpublishable copy of a
+            <a ng-href="<[getExplorationUrl(explorationRightsService.clonedFrom())]>" target="_blank">public exploration</a>.
+          </div>
+        </div>
+      </div>
+
+      <div ng-show="getTabStatuses().active === 'main'">
+        {% include 'pages/exploration_editor/main_tab/main_tab.html' %}
+      </div>
+
+      <!-- This is an ng-if, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
+      <div ng-if="getTabStatuses().active === 'preview'">
+        {% include 'pages/exploration_editor/preview_tab/preview_tab.html' %}
+        {% include 'pages/exploration_editor/preview_tab/preview_set_parameters_modal_directive.html' %}
+      </div>
+
+      <div ng-show="getTabStatuses().active === 'stats'">
+        {% include 'pages/exploration_editor/statistics_tab/statistics_tab.html' %}
+      </div>
+
+      <div ng-show="getTabStatuses().active === 'settings'">
+        {% include 'pages/exploration_editor/settings_tab/settings_tab.html' %}
+      </div>
+
+      <div ng-show="getTabStatuses().active === 'history'">
+        {% include 'pages/exploration_editor/history_tab/history_tab.html' %}
+      </div>
+
+      <div ng-show="getTabStatuses().active === 'feedback'">
+        {% include 'pages/exploration_editor/feedback_tab/feedback_tab.html' %}
+        {% include 'pages/exploration_editor/feedback_tab/thread_table_directive.html' %}
+      </div>
+    </div>
+  </div>
+
+  <!-- These definitions must be included exactly once on the page for the graph SVGs to work in Firefox. -->
+  <svg width="0" height="0">
+    <defs>
+      <marker id="arrowhead" viewBox="0 0 18 18" refX="10" refY="3"
+              markerWidth="10" markerHeight="6" orient="auto">
+        <path d="M 0 0 L 10 4 L 0 8 z" fill="grey"></path>
+      </marker>
+      <marker id="arrowhead-green" viewBox="0 0 18 18" refX="10" refY="3"
+              markerWidth="10" markerHeight="6" orient="auto">
+        <path d="M 0 0 L 10 4 L 0 8 z" fill="#1F7D1F"></path>
+      </marker>
+      <marker id="arrowhead-red" viewBox="0 0 18 18" refX="10" refY="3"
+              markerWidth="10" markerHeight="6" orient="auto">
+        <path d="M 0 0 L 10 4 L 0 8 z" fill="#B22222"></path>
+      </marker>
+      <linearGradient id="nodegradient" x1="0%" x2="100%" y1="0%" y2="0%">
+        <stop offset="0%" style="stop-opacity: 1; stop-color: darkseagreen;"></stop>
+        <stop offset="100%" style="stop-opacity: 0.1; stop-color: darkseagreen;"></stop>
+      </linearGradient>
+    </defs>
+  </svg>
+
+  {% include 'components/answer_group_editor_directive.html' %}
+  {% include 'components/exploration_embed_button_modal.html' %}
+  {% include 'components/fallback_editor_directive.html' %}
+  {% include 'components/classifier_panel_directive.html' %}
+  {% include 'components/gadget_directive.html' %}
+  {% include 'components/gadget_panel_directive.html' %}
+  {% include 'components/html_select_directive.html' %}
+  {% include 'components/outcome_editor_directive.html' %}
+  {% include 'components/outcome_destination_editor_directive.html' %}
+  {% include 'components/outcome_feedback_editor_directive.html' %}
+  {% include 'components/param_changes_editor_directive.html' %}
+  {% include 'components/profile_link_text_directive.html' %}
+  {% include 'components/response_header_directive.html' %}
+  {% include 'components/rule_editor_directive.html' %}
+  {% include 'components/sharing_links_directive.html' %}
+  {% include 'components/state_diff_modal_directive.html' %}
+  {% include 'components/state_graph_viz_directive.html' %}
+  {% include 'components/version_diff_visualization_directive.html' %}
+
+  {% include 'pages/exploration_player/answer_feedback_pair_directive.html' %}
+  {% include 'pages/exploration_player/conversation_skin_directive.html' %}
+  {% include 'pages/exploration_player/progress_dots_directive.html' %}
+{% endblock content %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="/third_party/static/d3js-3.4.11/d3.min.js"></script>
+  <script>
+    {{ value_generators_js }}
+  </script>
+
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/BooleanEditor.js"></script>
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/CodeStringEditor.js"></script>
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/CoordTwoDimEditor.js"></script>
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/FilepathEditor.js"></script>
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/GraphEditor.js"></script>
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/GraphPropertyEditor.js"></script>
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/HtmlEditor.js"></script>
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/ImageWithRegionsEditor.js"></script>
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/IntEditor.js"></script>
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/ListOfUnicodeStringEditor.js"></script>
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/LogicErrorCategoryEditor.js"></script>
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/LogicQuestionEditor.js"></script>
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/MathLatexStringEditor.js"></script>
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/MusicPhraseEditor.js"></script>
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/NonnegativeIntEditor.js"></script>
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/NormalizedStringEditor.js"></script>
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/ParameterNameEditor.js"></script>
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/RealEditor.js"></script>
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/SanitizedUrlEditor.js"></script>
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/SetOfHtmlStringEditor.js"></script>
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/SetOfUnicodeStringEditor.js"></script>
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/UnicodeStringEditor.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationEditor.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorServices.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationDiffService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationEditorAdvancedFeaturesService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/GadgetValidationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ParameterMetadataService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/RouterServices.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/AnswerGroupEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/BarChartDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/CodemirrorMergeviewDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/ExplorationEmbedButtonService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/FallbackEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/ClassifierRulePanelDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/GadgetDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/GadgetPanelDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/HtmlSelectDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/OutcomeEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/OutcomeDestinationEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/OutcomeFeedbackEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/ParamChangesEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/ProfileLinkTextDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/ResponseHeaderDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/RuleEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/RuleTypeSelectorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/SharingLinksDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/StateGraphLayoutService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/StateGraphVizDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/ValueGeneratorEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/VersionDiffVisualizationDirective.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/explorationServices.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/messengerService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/utilsService.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/main_tab/ExplorationGraph.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/main_tab/GadgetEditor.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/main_tab/SidebarStateName.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/main_tab/StateEditor.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/main_tab/StateFallbacks.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/main_tab/StateInteraction.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/main_tab/StateParameterChanges.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/main_tab/StateResponses.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/main_tab/StateStatistics.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/preview_tab/PreviewTab.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/statistics_tab/StatisticsTab.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/settings_tab/SettingsTab.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/history_tab/HistoryTab.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/history_tab/HistoryServices.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/feedback_tab/FeedbackTab.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/feedback_tab/ThreadDataService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/feedback_tab/ThreadTableDirective.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ExplorationObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StateObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/StopwatchObjectFactory.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerClassificationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerFeedbackPairDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ConversationSkinDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationRecommendationsService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerParamsService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerViewRatingService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerPositionService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerServices.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerTranscriptService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ProgressDotsDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/StatsReportingService.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionInterpolationService.js"></script>
+
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/interactions/baseValidator.js"></script>
+
+  {{ interaction_templates }}
+  {{ gadget_templates }}
+{% endblock footer_js %}

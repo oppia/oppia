@@ -58,7 +58,7 @@ class ProfilePage(base.BaseHandler):
             'nav_mode': feconf.NAV_MODE_PROFILE,
             'PROFILE_USERNAME': user_settings.username,
         })
-        self.render_template('profile/profile.html')
+        self.render_template('pages/profile/profile.html')
 
 
 class ProfileHandler(base.BaseHandler):
@@ -117,7 +117,7 @@ class PreferencesPage(base.BaseHandler):
                 utils.get_all_language_codes_and_names()),
         })
         self.render_template(
-            'profile/preferences.html', redirect_url_on_logout='/')
+            'pages/preferences/preferences.html', redirect_url_on_logout='/')
 
 
 class PreferencesHandler(base.BaseHandler):
@@ -223,7 +223,7 @@ class SignupPage(base.BaseHandler):
             'nav_mode': feconf.NAV_MODE_SIGNUP,
             'CAN_SEND_EMAILS': feconf.CAN_SEND_EMAILS,
         })
-        self.render_template('profile/signup.html')
+        self.render_template('pages/signup/signup.html')
 
 
 class SignupHandler(base.BaseHandler):
