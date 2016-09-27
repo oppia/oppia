@@ -30,7 +30,6 @@ import jinja2
 import webapp2
 from google.appengine.api import users
 
-from core import counters
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import rights_manager
@@ -201,6 +200,14 @@ class BaseHandler(webapp2.RequestHandler):
                     user_settings.profile_picture_data_url)
                 if user_settings.last_started_state_editor_tutorial:
                     self.has_seen_editor_tutorial = True
+                # In order to avoid too many datastore writes, we do not bother
+                # recording a log-in if the current time is sufficiently close
+                # to the last log-in time.
+                if (user_settings.last_logged_in is None or
+                        not utils.are_datetimes_close(
+                            datetime.datetime.utcnow(),
+                            user_settings.last_logged_in)):
+                    user_services.record_user_logged_in(self.user_id)
 
         self.is_moderator = rights_manager.Actor(self.user_id).is_moderator()
         self.is_admin = rights_manager.Actor(self.user_id).is_admin()
@@ -281,18 +288,10 @@ class BaseHandler(webapp2.RequestHandler):
         json_output = json.dumps(values, cls=utils.JSONEncoderForHTML)
         self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
 
-        # Calculate the processing time of this request.
-        duration = datetime.datetime.utcnow() - self.start_time
-        processing_time = duration.seconds + duration.microseconds / 1E6
-
-        counters.JSON_RESPONSE_TIME_SECS.inc(increment=processing_time)
-        counters.JSON_RESPONSE_COUNT.inc()
-
     def render_template(
-            self, filename, values=None, iframe_restriction='DENY',
+            self, filename, iframe_restriction='DENY',
             redirect_url_on_logout=None):
-        if values is None:
-            values = self.values
+        values = self.values
 
         scheme, netloc, path, _, _ = urlparse.urlsplit(self.request.uri)
 
@@ -340,6 +339,13 @@ class BaseHandler(webapp2.RequestHandler):
                 'Oppia is a free, open-source learning platform. Join the '
                 'community to create or try an exploration today!')
 
+        # nav_mode is used as part of the GLOBALS object in the frontend, but
+        # not every backend handler declares a nav_mode. Thus, the following
+        # code is a failsafe to ensure that the nav_mode key is added to all
+        # page requests.
+        if 'nav_mode' not in values:
+            values['nav_mode'] = ''
+
         if redirect_url_on_logout is None:
             redirect_url_on_logout = self.request.uri
         if self.user_id:
@@ -378,15 +384,8 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
 
-        self.response.write(self.jinja2_env.get_template(
-            filename).render(**values))
-
-        # Calculate the processing time of this request.
-        duration = datetime.datetime.utcnow() - self.start_time
-        processing_time = duration.seconds + duration.microseconds / 1E6
-
-        counters.HTML_RESPONSE_TIME_SECS.inc(increment=processing_time)
-        counters.HTML_RESPONSE_COUNT.inc()
+        self.response.write(
+            self.jinja2_env.get_template(filename).render(**values))
 
     def _render_exception(self, error_code, values):
         assert error_code in [400, 401, 404, 500]
@@ -398,7 +397,7 @@ class BaseHandler(webapp2.RequestHandler):
         else:
             self.values.update(values)
             self.render_template(
-                'error/error.html', iframe_restriction=None)
+                'pages/error/error.html', iframe_restriction=None)
 
     def handle_exception(self, exception, unused_debug_mode):
         """Overwrites the default exception handler."""

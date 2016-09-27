@@ -58,7 +58,8 @@ def require_playable(handler):
     def test_can_play(self, exploration_id, **kwargs):
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             self.render_template(
-                'error/disabled_exploration.html', iframe_restriction=None)
+                'pages/error/disabled_exploration.html',
+                iframe_restriction=None)
             return
 
         # Checks if the user for the current session is logged in.
@@ -257,9 +258,11 @@ class ExplorationPage(base.BaseHandler):
 
         if is_iframed:
             self.render_template(
-                'player/exploration_player.html', iframe_restriction=None)
+                'pages/exploration_player/exploration_player.html',
+                iframe_restriction=None)
         else:
-            self.render_template('player/exploration_player.html')
+            self.render_template(
+                'pages/exploration_player/exploration_player.html')
 
 
 class ExplorationHandler(base.BaseHandler):

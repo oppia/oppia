@@ -27,7 +27,7 @@ class ModeratorPage(base.BaseHandler):
     @base.require_moderator
     def get(self):
         """Handles GET requests."""
-        self.render_template('moderator/moderator.html')
+        self.render_template('pages/moderator/moderator.html')
 
 
 class FeaturedActivitiesHandler(base.BaseHandler):
