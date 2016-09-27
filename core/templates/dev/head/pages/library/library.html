@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends 'pages/base.html' %}
 
 {% block maintitle %}
   {% if search_mode %}
@@ -172,7 +172,7 @@
 {% block footer %}
   <div ng-controller="LibraryFooter">
     <div ng-if="!inSearchMode">
-      {% include 'footer.html' %}
+      {% include 'pages/footer.html' %}
     </div>
   </div>
 {% endblock footer %}

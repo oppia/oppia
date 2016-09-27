@@ -289,10 +289,9 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
 
     def render_template(
-            self, filename, values=None, iframe_restriction='DENY',
+            self, filename, iframe_restriction='DENY',
             redirect_url_on_logout=None):
-        if values is None:
-            values = self.values
+        values = self.values
 
         scheme, netloc, path, _, _ = urlparse.urlsplit(self.request.uri)
 
@@ -340,6 +339,13 @@ class BaseHandler(webapp2.RequestHandler):
                 'Oppia is a free, open-source learning platform. Join the '
                 'community to create or try an exploration today!')
 
+        # nav_mode is used as part of the GLOBALS object in the frontend, but
+        # not every backend handler declares a nav_mode. Thus, the following
+        # code is a failsafe to ensure that the nav_mode key is added to all
+        # page requests.
+        if 'nav_mode' not in values:
+            values['nav_mode'] = ''
+
         if redirect_url_on_logout is None:
             redirect_url_on_logout = self.request.uri
         if self.user_id:
@@ -378,8 +384,8 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
 
-        self.response.write(self.jinja2_env.get_template(
-            filename).render(**values))
+        self.response.write(
+            self.jinja2_env.get_template(filename).render(**values))
 
     def _render_exception(self, error_code, values):
         assert error_code in [400, 401, 404, 500]

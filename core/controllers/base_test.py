@@ -167,7 +167,7 @@ class EscapingTest(test_utils.GenericTestBase):
 
         def get(self):
             """Handles GET requests."""
-            self.render_template('pages/tests/contact.html')
+            self.render_template('pages/tests/jinja_escaping.html')
 
         def post(self):
             """Handles POST requests."""

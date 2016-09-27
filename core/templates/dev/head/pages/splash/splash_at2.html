@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends 'pages/base.html' %}
 
 {% block prerender %}
   <link rel="prerender" href="/library">
@@ -221,7 +221,7 @@
 {% endblock %}
 
 {% block footer %}
-  {% include 'footer.html' %}
+  {% include 'pages/footer.html' %}
 {% endblock %}
 
 {% block footer_js %}
