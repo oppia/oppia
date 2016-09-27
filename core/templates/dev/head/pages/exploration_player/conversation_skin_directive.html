@@ -23,28 +23,32 @@
   <div role="main" style="margin: 0 auto; position: relative;" ng-if="hasFullyLoaded">
     <progress-dots num-dots="numProgressDots"
                    class="conversation-skin-progress-dots"
-                   ng-class="{'conversation-skin-progress-dots-iframed': isIframed, 'conversation-skin-progress-dots-not-iframed': !isIframed}">
+                   ng-class="{'conversation-skin-progress-dots-iframed': isIframed, 'conversation-skin-progress-dots-not-iframed': !isIframed}"
+                   ng-click="toggleConversation(0)">
     </progress-dots>
 
     <div class="conversation-skin-cards-container conversation-skin-animate-cards"
-         ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
-      <div ng-show='!isViewportNarrow() || isScreenNarrowAndShowingTutorCard()'
+         ng-class="{'animate-to-two-cards': isAnimatingToTwoCards,
+                    'animate-to-one-card': isAnimatingToOneCard,
+                    'conversation-dialog': is_dialog}">
+      <div ng-show='is_dialog || !isViewportNarrow() || isScreenNarrowAndShowingTutorCard()'
            class="conversation-skin-main-tutor-card"
            ng-class="{'animate-card-width': startCardChangeAnimation,
                       'has-shadow': isViewportNarrow() && isCurrentSupplementalCardNonempty(),
                       'conversation-skin-animate-tutor-card-on-narrow': isViewportNarrow() && isCurrentSupplementalCardNonempty() }">
         <div class="conversation-skin-tutor-card-content conversation-skin-animate-card-contents"
-             ng-class="{'animate-card-change': startCardChangeAnimation}">
+             ng-class="{'animate-card-change': startCardChangeAnimation && !is_dialog}"
+             ng-repeat="hCard in (is_dialog ? historyCards : [activeCard])">
           <div class="conversation-skin-tutor-card-top-section">
             <img class="conversation-skin-oppia-avatar"
                  ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt="">
             <div class="conversation-skin-tutor-card-top-content protractor-test-conversation-content"
-                 angular-html-bind="activeCard.contentHtml"
+                 angular-html-bind="hCard.contentHtml"
                  focus-on="<[getContentFocusLabel($index)]>">
             </div>
           </div>
 
-          <div ng-if="(activeCard.answerFeedbackPairs.length > 1 && exploration.isInteractionInline(activeCard.stateName)) || (activeCard.answerFeedbackPairs.length > 0 && !exploration.isInteractionInline(activeCard.stateName))">
+          <div ng-if="!is_dialog && ((activeCard.answerFeedbackPairs.length > 1 && exploration.isInteractionInline(activeCard.stateName)) || (activeCard.answerFeedbackPairs.length > 0 && !exploration.isInteractionInline(activeCard.stateName)))">
             <h4 class="conversation-skin-responses-dropdown-container"
                 ng-click="toggleShowPreviousResponses()">
               <span class="conversation-skin-responses-dropdown-text">
@@ -59,11 +63,12 @@
             </h4>
           </div>
 
-          <div ng-show="arePreviousResponsesShown"
+          <div ng-show="is_dialog || arePreviousResponsesShown"
                class="conversation-skin-tutor-card-middle-section conversation-skin-responses-animate-slide">
-            <div ng-repeat="responsePair in activeCard.answerFeedbackPairs track by $index">
-              <div ng-if="!$last || !exploration.isInteractionInline(activeCard.stateName)">
+            <div ng-repeat="responsePair in hCard.answerFeedbackPairs track by $index">
+              <div ng-if="!$last || !exploration.isInteractionInline(hCard.stateName)">
                 <answer-feedback-pair data="responsePair"
+                                      card="hCard"
                                       profile-picture="profilePicture"
                                       oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL">
                 </answer-feedback-pair>
@@ -72,8 +77,10 @@
           </div>
 
           <!-- If the interaction is inline, always show the most recent response pair, if there is one. -->
-          <div class="conversation-skin-tutor-card-bottom-section" ng-if="exploration.isInteractionInline(activeCard.stateName) && activeCard.answerFeedbackPairs.length > 0">
-            <answer-feedback-pair data="activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1]"
+          <div class="conversation-skin-tutor-card-bottom-section"
+               ng-if="exploration.isInteractionInline(hCard.stateName) && hCard.answerFeedbackPairs.length > 0">
+            <answer-feedback-pair data="hCard.answerFeedbackPairs[hCard.answerFeedbackPairs.length - 1]"
+                                  card="hCard"
                                   profile-picture="profilePicture"
                                   oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL">
             </answer-feedback-pair>
@@ -88,12 +95,14 @@
             In addition, if the exploration is iframed, the terminal card will
             have no learner input section, so we do not show it.
           -->
-          <div ng-if="exploration.isInteractionInline(activeCard.stateName) && !waitingForOppiaFeedback &&
+          <div ng-if="$last && hCard.stateName == activeCard.stateName && exploration.isInteractionInline(activeCard.stateName) && !waitingForOppiaFeedback &&
           ((activeCard.interactionHtml && !activeCard.destStateName) || activeCard.destStateName) &&
           (!isOnTerminalCard() || !isIframed || activeCard.destStateName) && isCurrentCardAtEndOfTranscript()">
             <div class="conversation-skin-inline-interaction">
               <div ng-if="activeCard.destStateName && activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].oppiaFeedbackHtml">
+                <div ng-if="is_dialog" ng-init="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)"></div>
                 <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
+                           ng-if="!is_dialog"
                            focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
                            ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)"
                            translate="I18N_PLAYER_CONTINUE_BUTTON">
@@ -107,16 +116,48 @@
             </div>
           </div>
 
-          <div ng-if="!exploration.isInteractionInline(activeCard.stateName)"
-              class="conversation-skin-inline-interaction" style="opacity: 0.8;">
-            <div ng-if="!isViewportNarrow()" style="padding: 6px 12px;">
+          <div ng-if="$last && hCard.stateName == activeCard.stateName && !exploration.isInteractionInline(activeCard.stateName)"
+               class="conversation-skin-inline-interaction"
+               ng-class="{'show-supplemental-card': is_dialog && isScreenNarrowAndShowingSupplementalCard() && isCurrentSupplementalCardNonempty()}">
+            <div ng-if="is_dialog || !isViewportNarrow()" style="padding: 6px 12px;">
               <[exploration.getInteractionInstructions(activeCard.stateName)]>
               <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
             </div>
-            <div ng-if="isViewportNarrow()">
+            <div ng-if="!is_dialog && isViewportNarrow()">
               <md-button class="instructions-button" ng-click="showSupplementalCardIfScreenIsNarrow()">
                 <[exploration.getInteractionInstructions(activeCard.stateName)]>
               </md-button>
+            </div>
+
+            <div ng-if="is_dialog && isCurrentSupplementalCardNonempty()"
+                 ng-class="{'conversation-skin-supplemental-card-container show-supplemental-card': isScreenNarrowAndShowingSupplementalCard() && isCurrentSupplementalCardNonempty(),
+                            'conversation-skin-supplemental-card-container': !isScreenNarrowAndShowingSupplementalCard() || !isCurrentSupplementalCardNonempty()}">
+
+              <img class="conversation-skin-oppia-avatar show-tutor-card"
+                   ng-if="isScreenNarrowAndShowingSupplementalCard() && isCurrentSupplementalCardNonempty()"
+                   ng-src="<[OPPIA_AVATAR_IMAGE_URL]>"
+                   ng-click="showTutorCardIfScreenIsNarrow()" alt="">
+
+              <div ng-if="isScreenNarrowAndShowingTutorCard()" class="supplemental-mask"
+                 ng-click="showSupplementalCardIfScreenIsNarrow()">
+              </div>
+
+              <div class="protractor-test-conversation-input"
+                   angular-html-bind="activeCard.interactionHtml">
+              </div>
+
+              <div ng-class="{'conversation-skin-help-card help-card-standard': !isWindowTall(),
+                              'conversation-skin-help-card help-card-tall': isWindowTall()}" ng-if="helpCardHtml">
+                <img class="conversation-skin-oppia-avatar"
+                     ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt="">
+                <button type="button" class="conversation-skin-close-help-card-button"
+                          ng-click="clearHelpCard()" ng-if="!helpCardHasContinueButton">
+                  <i class="material-icons md-18">&#xE5CD;</i>
+                </button>
+                <div class="conversation-skin-help-card-content" angular-html-bind="helpCardHtml"></div>
+                <br>
+                <div ng-if="helpCardHasContinueButton" ng-init="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)"></div>
+              </div>
             </div>
           </div>
 
@@ -128,9 +169,23 @@
             </div>
           </div>
         </div>
+
+        <conversation-toggle class="conversation-skin-toggle">
+          <div class="oppia-conversation-toggle"
+                ng-class="{'oppia-conversation-toggle-dialog' : is_dialog}"
+                ng-click="toggleConversation()">
+            <span class="conversation-skin-toggle-text">
+                Conversation display mode
+            </span>
+            <span class="conversation-skin-toggle-icon"
+                  ng-class="{'conversation-skin-toggle-icon-rotated': is_dialog}">
+              <i class="material-icons">&#xE037;</i>
+            </span>
+          </div>
+        </conversation-toggle>
       </div>
 
-      <div ng-if="isCurrentSupplementalCardNonempty()"
+      <div ng-if="!is_dialog && isCurrentSupplementalCardNonempty()"
            class="conversation-skin-supplemental-card-container">
 
         <img class="conversation-skin-oppia-avatar show-tutor-card"
@@ -715,7 +770,6 @@
         height: 40px;
         left: 100%;
         position: absolute;
-        position: absolute;
         transform: translate(-100%, -100%);
         width: 40px;
         z-index: 16;
@@ -727,6 +781,108 @@
     .conversation-skin-sharing-links {
       display: table;
       margin: auto;
+    }
+
+    /* Conversation dialog */
+    .conversation-dialog .conversation-skin-help-card {
+      border-radius: 0px;
+      box-shadow: none;
+      padding: 12px 12px 12px 21px;
+      right: initial;
+    }
+
+    .conversation-dialog .help-card-tall {
+      position: relative;
+      bottom: initial;
+    }
+
+    .conversation-dialog .conversation-skin-supplemental-card-container {
+      position: relative;
+      min-width: 360px;
+      margin-left: 0;
+    }
+
+    .conversation-dialog .conversation-skin-inline-interaction.show-supplemental-card {
+      opacity: 1 !important;
+      z-index: 10000;
+    }
+    .conversation-dialog .conversation-skin-supplemental-card-container.show-supplemental-card {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: calc(100vh - 40px);
+      padding: 0;
+      margin: 0;
+      transform: initial;
+    }
+    .conversation-dialog .conversation-skin-supplemental-card-container.show-supplemental-card #map_canvas {
+      height: calc(100vh - 48px);
+    }
+    .conversation-dialog .conversation-skin-supplemental-card-container.show-supplemental-card .oppia-image-click-img {
+      max-height: calc(100vh - 48px);
+    }
+    .conversation-dialog .conversation-skin-supplemental-card-container.show-supplemental-card .help-card-tall,
+    .conversation-dialog .conversation-skin-supplemental-card-container.show-supplemental-card .help-card-standard {
+      position: fixed;
+      bottom: 0;
+    }
+
+    .conversation-dialog #map_canvas,
+    .conversation-dialog .pencil-code-editor-container,
+    .conversation-dialog .oppia-image-click-img,
+    .conversation-dialog .logic-proof-container,
+    .conversation-dialog .graph-input-container,
+    .conversation-dialog .code-repl-container,
+    .conversation-dialog .music-notes-input-container {
+      max-width: 100%;
+      min-width: 0px;
+      width: 100%;
+    }
+
+    .conversation-dialog .oppia-music-input-play-btn {
+      margin-left: -11%;
+    }
+    /*/Conversation dialog */
+
+
+    .conversation-skin-toggle {
+      display: block;
+    }
+
+    .oppia-conversation-toggle {
+      text-align: center;
+      line-height: 1.5;
+      color: #fff;
+      background-color: #009688;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .oppia-conversation-toggle-dialog {
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .conversation-skin-toggle-text {
+      vertical-align: middle;
+    }
+
+    .conversation-skin-toggle-icon {
+      display: inline-block;
+      vertical-align: middle;
+      -moz-transition: all 0.2s;
+      -o-transition: all 0.2s;
+      -webkit-transition: all 0.2s;
+      font-size: 10px;
+      transition: 0.2s;
+    }
+
+    .conversation-skin-toggle-icon-rotated {
+      -moz-transform: rotate(-90deg);
+      -o-transform: rotate(-90deg);
+      -webkit-transform: rotate(-90deg);
+      transform: rotate(-90deg);
     }
   </style>
 </script>

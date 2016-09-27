@@ -59,6 +59,13 @@ oppia.factory('playerTranscriptService', ['$log', function($log) {
       });
       return result;
     },
+    getHistoryCards: function() {
+      var result = [];
+      transcript.forEach(function(transcriptItem) {
+        result.push(transcriptItem);
+      });
+      return result;
+    },
     addNewCard: function(stateName, params, contentHtml, interactionHtml) {
       transcript.push({
         stateName: stateName,

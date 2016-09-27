@@ -250,7 +250,9 @@ oppia.animation('.conversation-skin-animate-card-contents', function() {
 oppia.directive('conversationSkin', ['urlService', function(urlService) {
   return {
     restrict: 'E',
-    scope: {},
+    scope: {
+      is_dialog: '&'
+    },
     link: function(scope) {
       var isIframed = urlService.isIframed();
       scope.directiveTemplateId = isIframed ?
@@ -304,6 +306,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
             '/avatar/oppia_black_72px.png'));
 
         $scope.activeCard = null;
+        $scope.historyCards = null;
         $scope.numProgressDots = 0;
         $scope.arePreviousResponsesShown = false;
 
@@ -320,6 +323,9 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
 
         $scope.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER =
           GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER;
+
+        // Default conversation mode display
+        $scope.is_dialog = false;
 
         oppiaPlayerService.getUserProfileImage().then(function(result) {
           $scope.profilePicture = result;
@@ -383,6 +389,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
         var _navigateToActiveCard = function() {
           var index = playerPositionService.getActiveCardIndex();
           $scope.activeCard = playerTranscriptService.getCard(index);
+          $scope.historyCards = playerTranscriptService.getHistoryCards();
           $scope.arePreviousResponsesShown = false;
           $scope.clearHelpCard();
           tutorCardIsDisplayedIfNarrow = true;
@@ -642,7 +649,11 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
 
           $timeout(function() {
             focusService.setFocusIfOnDesktop(_nextFocusLabel);
-            scrollToTop();
+            if ($scope.is_dialog) {
+              scrollToBottom();
+            } else {
+              scrollToTop();
+            }
           },
           TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC + 0.5 * TIME_FADEIN_MSEC);
 
@@ -785,6 +796,30 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
         $scope.onNavigateFromIframe = function() {
           siteAnalyticsService.registerVisitOppiaFromIframeEvent(
             $scope.explorationId);
+        };
+
+        $scope.toggleConversation = function(mode) {
+          switch (mode) {
+            case 0: $scope.is_dialog = false;
+              break;
+            case 1: $scope.is_dialog = true;
+              break;
+            default: $scope.is_dialog = !$scope.is_dialog;
+          }
+
+          if ($scope.is_dialog) {
+            playerPositionService.setActiveCardIndex(
+              $scope.numProgressDots - 1);
+          }
+
+          $timeout(function() {
+            if ($scope.is_dialog) {
+              scrollToBottom();
+            } else {
+              scrollToTop();
+            }
+          },
+          TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC + 0.5 * TIME_FADEIN_MSEC);
         };
       }
     ]
