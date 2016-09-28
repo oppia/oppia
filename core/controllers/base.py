@@ -408,7 +408,7 @@ class BaseHandler(webapp2.RequestHandler):
         # GET_HANDLER_ERROR_RETURN_TYPE.
         # Otherwise, we check whether self.payload exists.
         if (self.payload is not None or
-            self.GET_HANDLER_ERROR_RETURN_TYPE == feconf.HANDLER_TYPE_JSON):
+                self.GET_HANDLER_ERROR_RETURN_TYPE == feconf.HANDLER_TYPE_JSON):
             self.render_json(values)
         else:
             self.values.update(values)
