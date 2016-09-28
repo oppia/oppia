@@ -199,7 +199,7 @@ URLS = MAPREDUCE_HANDLERS + [
                        library.LibraryGroupPage),
     get_redirect_route(r'/library/top_rated', library.LibraryGroupPage),
     get_redirect_route(r'/libraryindexhandler', library.LibraryIndexHandler),
-    get_redirect_route(r'/librarygroupindexhandler/<group_name>',
+    get_redirect_route(r'/librarygroupindexhandler',
                        library.LibraryGroupIndexHandler),
     get_redirect_route(r'%s' % feconf.LIBRARY_SEARCH_URL, library.LibraryPage),
     get_redirect_route(

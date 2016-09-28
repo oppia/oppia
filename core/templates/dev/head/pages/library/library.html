@@ -3,6 +3,8 @@
 {% block maintitle %}
   {% if search_mode %}
     Find explorations to learn from - Oppia
+  {% elif group_mode %}
+    Find explorations to learn from - Oppia
   {% else %}
     I18N_LIBRARY_PAGE_TITLE
   {% endif %}
@@ -43,7 +45,7 @@
           <search-results></search-results>
         </div>
 
-        <div class="oppia-exp-summary-tiles-container" ng-if="inRankMode" style="margin-bottom: 40px;">
+        <div class="oppia-exp-summary-tiles-container" ng-if="inRankMode" style="margin-bottom: 20px;">
           <div ng-repeat="group in libraryGroups track by $index"
                style="margin-right: auto; margin-left: auto; max-width: 856px;">
             <div ng-repeat="tile in group.activity_summary_dicts" style="display: inline-block;">

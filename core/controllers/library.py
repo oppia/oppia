@@ -154,6 +154,9 @@ class LibraryGroupPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
+        group_mode = (feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED or
+                      feconf.LIBRARY_GROUP_TOP_RATED in self.request.url)
+
         self.values.update({
             'meta_description': (
                 feconf.GROUP_PAGE_DESCRIPTION),
@@ -163,6 +166,7 @@ class LibraryGroupPage(base.BaseHandler):
                 user_services.has_fully_registered(self.user_id)),
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
+            'group_mode': group_mode,
             'SEARCH_DROPDOWN_CATEGORIES': feconf.SEARCH_DROPDOWN_CATEGORIES,
         })
         self.render_template('pages/library/library.html')
@@ -171,10 +175,11 @@ class LibraryGroupPage(base.BaseHandler):
 class LibraryGroupIndexHandler(base.BaseHandler):
     """Provides data for categories such as top rated and recently published."""
 
-    def get(self, group_name):
+    def get(self):
         """Handles GET requests for group pages."""
         # TODO(sll): Support index pages for other language codes.
         summary_dicts_by_category = []
+        group_name = self.request.get('group_name')
 
         if group_name == feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED:
             recently_published_summary_dicts = (

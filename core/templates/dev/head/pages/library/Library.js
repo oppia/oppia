@@ -42,11 +42,15 @@ oppia.controller('Library', [
 
     $scope.inRankMode = ($window.location.pathname.indexOf(
       '/library/') === 0);
-    $scope.rankMethod = $window.location.pathname.substr(
+    $scope.groupName = $window.location.pathname.substr(
       $window.location.pathname.lastIndexOf('/') + 1);
 
     if ($scope.inRankMode) {
-      $http.get('/librarygroupindexhandler/' + $scope.rankMethod).success(
+      $http.get('/librarygroupindexhandler', {
+        params: {
+          group_name: $scope.groupName
+        }
+      }).success(
       function(data) {
         $scope.libraryGroups = data.activity_summary_dicts_by_category;
 
