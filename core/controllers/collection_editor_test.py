@@ -182,10 +182,10 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
                        self.COLLECTION_ID),
             self.json_dict, csrf_token=csrf_token)
 
-        self.assertEqual(self.COLLECTION_ID, json_response['id'])
-        self.assertEqual(2, json_response['version'])
+        self.assertEqual(self.COLLECTION_ID, json_response['collection']['id'])
+        self.assertEqual(2, json_response['collection']['version'])
         self.assertEqual(
-            'A new title', json_response['title'])
+            'A new title', json_response['collection']['title'])
         self.logout()
 
     def test_collection_rights_handler(self):
