@@ -165,7 +165,7 @@ class LibraryGroupPage(base.BaseHandler):
                 utils.get_all_language_codes_and_names()),
             'SEARCH_DROPDOWN_CATEGORIES': feconf.SEARCH_DROPDOWN_CATEGORIES,
         })
-        self.render_template('library/library.html')
+        self.render_template('pages/library/library.html')
 
 
 class LibraryGroupIndexHandler(base.BaseHandler):
