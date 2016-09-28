@@ -3,7 +3,7 @@ version: 2-3-2
 runtime: python27
 api_version: 1
 threadsafe: false
-instance_class: F4
+instance_class: F2
 
 builtins:
 - appstats: on
@@ -87,13 +87,13 @@ handlers:
   secure: always
   http_headers:
     Cache-Control: 'no-cache'
-# Serve js scripts for gadgets, interactions and rich_text_components under
-# extensions in dev mode. This regex allows us to recursively serve js scripts
-# under the three specified directories. "\1" and "\2" insert capture groups
-# from the url pattern.
-- url: /extensions/(gadgets|interactions|rich_text_components)/(.*\.(js))$
+# Serve js scripts for gadgets, interactions, rich_text_components and objects
+# under extensions in dev mode. This regex allows us to recursively serve js
+# scripts under the three specified directories. "\1" and "\2" insert capture
+# groups from the url pattern.
+- url: /extensions/(gadgets|interactions|rich_text_components|objects)/(.*\.(js))$
   static_files: extensions/\1/\2
-  upload: extensions/(gadgets|interactions|rich_text_components)/(.*\.(js))$
+  upload: extensions/(gadgets|interactions|rich_text_components|objects)/(.*\.(js))$
   secure: always
 - url: /mapreduce/pipeline/images
   static_dir: third_party/gae-mapreduce-1.9.17.0/mapreduce/lib/pipeline/ui/images

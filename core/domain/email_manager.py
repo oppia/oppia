@@ -58,7 +58,7 @@ EMAIL_CONTENT_SCHEMA = {
 
 EMAIL_SENDER_NAME = config_domain.ConfigProperty(
     'email_sender_name', {'type': 'unicode'},
-    'The sender name for outgoing emails.', 'Site Admin')
+    'The default sender name for outgoing emails.', 'Site Admin')
 EMAIL_FOOTER = config_domain.ConfigProperty(
     'email_footer', {'type': 'unicode', 'ui_config': {'rows': 5}},
     'The footer to append to all outgoing emails. (This should be written in '
@@ -140,6 +140,8 @@ SENDER_VALIDATORS = {
         lambda x: rights_manager.Actor(x).is_admin()),
     feconf.EMAIL_INTENT_DELETE_EXPLORATION: (
         lambda x: rights_manager.Actor(x).is_moderator()),
+    feconf.EMAIL_INTENT_REPORT_BAD_CONTENT: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
 }
 
 
@@ -157,7 +159,7 @@ def _require_sender_id_is_valid(intent, sender_id):
 
 def _send_email(
         recipient_id, sender_id, intent, email_subject, email_html_body,
-        sender_email, bcc_admin=False):
+        sender_email, bcc_admin=False, sender_name=None):
     """Sends an email to the given recipient.
 
     This function should be used for sending all user-facing emails.
@@ -166,6 +168,9 @@ def _send_email(
     intent. Currently we support only system-generated emails and emails
     initiated by moderator actions.
     """
+    if sender_name is None:
+        sender_name = EMAIL_SENDER_NAME.value
+
     _require_sender_id_is_valid(intent, sender_id)
 
     recipient_email = user_services.get_email_from_user_id(recipient_id)
@@ -190,8 +195,7 @@ def _send_email(
         return
 
     def _send_email_in_transaction():
-        sender_name_email = '%s <%s>' % (
-            EMAIL_SENDER_NAME.value, sender_email)
+        sender_name_email = '%s <%s>' % (sender_name, sender_email)
 
         email_services.send_mail(
             sender_name_email, recipient_email, email_subject,
@@ -315,12 +319,12 @@ def send_role_notification_email(
     """
     # Editor role email body and email subject templates.
     email_subject_template = (
-        '%s invited you to collaborate on Oppia.org')
+        '%s - invitation to collaborate')
 
     email_body_template = (
         'Hi %s,<br>'
         '<br>'
-        '<b>%s</b> has granted you %s to their learning exploration, '
+        '<b>%s</b> has granted you %s to their exploration, '
         '"<a href="http://www.oppia.org/create/%s">%s</a>", on Oppia.org.<br>'
         '<br>'
         'This allows you to:<br>'
@@ -359,8 +363,7 @@ def send_role_notification_email(
     role_descriptipn = EDITOR_ROLE_EMAIL_HTML_ROLES[recipient_role]
     rights_html = EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE[role_descriptipn]
 
-    email_subject = email_subject_template % (
-        inviter_user_settings.username)
+    email_subject = email_subject_template % exploration_title
     email_body = email_body_template % (
         recipient_user_settings.username, inviter_user_settings.username,
         role_descriptipn, exploration_id, exploration_title, rights_html,
@@ -369,7 +372,8 @@ def send_role_notification_email(
     _send_email(
         recipient_id, feconf.SYSTEM_COMMITTER_ID,
         feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION, email_subject, email_body,
-        feconf.NOREPLY_EMAIL_ADDRESS)
+        feconf.NOREPLY_EMAIL_ADDRESS,
+        sender_name=inviter_user_settings.username)
 
 
 def send_feedback_message_email(recipient_id, feedback_messages):
@@ -380,12 +384,14 @@ def send_feedback_message_email(recipient_id, feedback_messages):
     - feedback_messages: dictionary containing feedback messages.
     """
 
-    email_subject = 'New messages on Oppia.'
+    email_subject = (
+        'You\'ve received %s new message%s on your explorations' %
+        (len(feedback_messages), 's' if len(feedback_messages) > 1 else ''))
 
     email_body_template = (
         'Hi %s,<br>'
         '<br>'
-        'You have %s new message(s) about your Oppia explorations:<br>'
+        'You\'ve received %s new message%s on your Oppia explorations:<br>'
         '<ul>%s</ul>'
         'You can view and reply to your messages from your '
         '<a href="https://www.oppia.org/dashboard">dashboard</a>.'
@@ -416,8 +422,9 @@ def send_feedback_message_email(recipient_id, feedback_messages):
                 '<li>%s: %s<br></li>' % (reference['title'], message))
 
     email_body = email_body_template % (
-        recipient_user_settings.username, len(feedback_messages), messages_html,
-        EMAIL_FOOTER.value)
+        recipient_user_settings.username, len(feedback_messages),
+        's' if len(feedback_messages) > 1 else '',
+        messages_html, EMAIL_FOOTER.value)
 
     _send_email(
         recipient_id, feconf.SYSTEM_COMMITTER_ID,
@@ -503,3 +510,36 @@ def send_instant_feedback_message_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION, email_subject,
             email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_flag_exploration_email(
+        exploration_title, exploration_id, reporter_id, report_text):
+    email_subject = 'Exploration flagged by user: "%s"' % exploration_title
+
+    email_body_template = (
+        'Hello Moderator,<br>'
+        '%s has flagged exploration "%s" on the following '
+        'grounds: <br>'
+        '%s .<br>'
+        'You can modify the exploration by clicking '
+        '<a href="https://www.oppia.org/create/%s">here</a>.<br>'
+        '<br>'
+        'Thanks!<br>'
+        '- The Oppia Team<br>'
+        '<br>%s')
+
+    if not feconf.CAN_SEND_EMAILS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    email_body = email_body_template % (
+        user_services.get_user_settings(reporter_id).username,
+        exploration_title, report_text, exploration_id,
+        EMAIL_FOOTER.value)
+
+    recipient_list = config_domain.MODERATOR_IDS.value
+    for recipient_id in recipient_list:
+        _send_email(
+            recipient_id, feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_REPORT_BAD_CONTENT,
+            email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)

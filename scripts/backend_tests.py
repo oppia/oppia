@@ -54,7 +54,11 @@ _PARSER.add_argument(
     '--test_path',
     help='optional subdirectory path containing the test(s) to run',
     type=str)
-
+_PARSER.add_argument(
+    '-v',
+    '--verbose',
+    help='optional; if specified, display the output of the tests being run',
+    action='store_true')
 
 def log(message, show_time=False):
     """Logs a message to the terminal.
@@ -96,17 +100,22 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
 class TaskThread(threading.Thread):
     """Runs a task in its own thread."""
 
-    def __init__(self, func, name=None):
+    def __init__(self, func, verbose, name=None):
         super(TaskThread, self).__init__()
         self.func = func
         self.output = None
         self.exception = None
+        self.verbose = verbose
         self.name = name
         self.finished = False
 
     def run(self):
         try:
             self.output = self.func()
+            if self.verbose:
+                log('LOG %s:' % self.name, show_time=True)
+                log(self.output)
+                log('----------------------------------------')
             log('FINISHED %s: %.1f secs' %
                 (self.name, time.time() - self.start_time), show_time=True)
             self.finished = True
@@ -238,7 +247,7 @@ def main():
     for test_target in all_test_targets:
         test = TestingTaskSpec(
             test_target, parsed_args.generate_coverage_report)
-        task = TaskThread(test.run, name=test_target)
+        task = TaskThread(test.run, parsed_args.verbose, name=test_target)
         task_to_taskspec[task] = test
         tasks.append(task)
 

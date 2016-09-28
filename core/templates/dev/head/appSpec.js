@@ -27,9 +27,7 @@ describe('Validators service', function() {
     }));
 
     it('should correctly validate entity names', function() {
-      GLOBALS = {
-        INVALID_NAME_CHARS: 'xyz'
-      };
+      GLOBALS.INVALID_NAME_CHARS = 'xyz';
 
       expect(vs.isValidEntityName('b')).toBe(true);
       expect(vs.isValidEntityName('b   ')).toBe(true);
@@ -44,9 +42,7 @@ describe('Validators service', function() {
     });
 
     it('should correctly validate exploration titles', function() {
-      GLOBALS = {
-        INVALID_NAME_CHARS: '#'
-      };
+      GLOBALS.INVALID_NAME_CHARS = '#';
 
       expect(vs.isValidExplorationTitle('b')).toBe(true);
       expect(vs.isValidExplorationTitle('abc def')).toBe(true);

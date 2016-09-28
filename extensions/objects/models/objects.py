@@ -20,6 +20,7 @@ import copy
 import os
 
 import feconf
+import jinja_utils
 import schema_utils
 import utils
 
@@ -77,9 +78,10 @@ class BaseObject(object):
             raise Exception(
                 'There is no editor template defined for objects of type %s' %
                 cls.__name__)
-        return utils.get_file_contents(os.path.join(
+        html_templates = utils.get_file_contents(os.path.join(
             os.getcwd(), feconf.OBJECT_TEMPLATES_DIR,
             '%s.html' % cls.edit_html_filename))
+        return jinja_utils.interpolate_cache_slug('%s' % html_templates)
 
 
 class Boolean(BaseObject):

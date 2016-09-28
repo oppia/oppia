@@ -2661,10 +2661,10 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
                        'generate_new_thread_id', self._generate_thread_id):
             feedback_services.create_suggestion(
                 self.EXP_ID1, self.user_id, 3, 'state_name', 'description',
-                {'old_content': {}})
+                {'type': 'text', 'value': ''})
             feedback_services.create_suggestion(
                 self.EXP_ID2, self.user_id, 3, 'state_name', 'description',
-                {'old_content': {}})
+                {'type': 'text', 'value': ''})
 
     def test_accept_suggestion_valid_suggestion(self):
         with self.swap(exp_services, '_is_suggestion_valid',

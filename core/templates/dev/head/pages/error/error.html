@@ -1,0 +1,68 @@
+{% extends 'pages/base.html' %}
+
+{% block navbar_breadcrumb %}
+{% endblock navbar_breadcrumb %}
+
+{% block maintitle %}
+  {% if code == 400 %}
+    I18N_ERROR_PAGE_TITLE_400
+  {% elif code == 401 %}
+    I18N_ERROR_PAGE_TITLE_401
+  {% elif code == 404 %}
+    I18N_ERROR_PAGE_TITLE_404
+  {% elif code == 500 %}
+    I18N_ERROR_PAGE_TITLE_500
+  {% endif %}
+{% endblock maintitle %}
+
+{% block content %}
+  <div class="oppia-content" ng-controller="Error">
+    <br>
+
+    <div class="oppia-wide-panel oppia-error-wide-container">
+      <div class="oppia-wide-panel-content protractor-test-error-container">
+        <h4>
+          {% if code == 400 %}
+            <span translate="I18N_ERROR_HEADER_400"></span>
+            - Bad Request
+          {% elif code == 401 %}
+            <span translate="I18N_ERROR_HEADER_401"></span>
+            - Unauthorized
+          {% elif code == 404 %}
+            <span translate="I18N_ERROR_HEADER_404"></span>
+            - Page Not Found
+          {% elif code == 500 %}
+            <span translate="I18N_ERROR_HEADER_500"></span>
+            - System Error
+          {% endif %}
+        </h4>
+
+        <br>
+
+        <img ng-src="<[oopsMintImgUrl]>" alt="Oops!" width="299" height="142"/>
+        <p><h3>
+          {% if code == 400 %}
+            <h3 translate="I18N_ERROR_MESSAGE_400"></h3>
+          {% elif code == 401 %}
+            <h3 translate="I18N_ERROR_MESSAGE_401"></h3>
+          {% elif code == 404 %}
+            <h3 translate="I18N_ERROR_MESSAGE_404"></h3>
+          {% elif code == 500 %}
+            <h3 translate="I18N_ERROR_MESSAGE_500"></h3>
+          {% endif %}
+        </p>
+        <p><span translate="I18N_ERROR_NEXT_STEPS" translate-values="{issueTrackerUrl: 'https://github.com/oppia/oppia/issues/new', homeUrl: '/'}"></span></p>
+      </div>
+    </div>
+
+  </div>
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/error/Error.js"></script>
+{% endblock footer_js %}
+
+{% block footer %}
+  {% include 'pages/footer.html' %}
+{% endblock %}

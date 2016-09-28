@@ -58,7 +58,7 @@ class NotificationsDashboardPage(base.BaseHandler):
                 'nav_mode': feconf.NAV_MODE_DASHBOARD,
             })
             self.render_template(
-                'dashboard/notifications_dashboard.html',
+                'pages/notifications_dashboard/notifications_dashboard.html',
                 redirect_url_on_logout='/')
         else:
             self.redirect(utils.set_url_query_parameter(
@@ -127,7 +127,7 @@ class DashboardPage(base.BaseHandler):
                     DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD.value)
             })
             self.render_template(
-                'dashboard/dashboard.html', redirect_url_on_logout='/')
+                'pages/dashboard/dashboard.html', redirect_url_on_logout='/')
         else:
             self.redirect(utils.set_url_query_parameter(
                 feconf.SIGNUP_URL, 'return_url', feconf.DASHBOARD_URL))
@@ -204,6 +204,7 @@ class DashboardHandler(base.BaseHandler):
                     'created_on': utils.get_time_in_millisecs(
                         collection_summary.collection_model_created_on),
                     'status': collection_summary.status,
+                    'node_count': collection_summary.node_count,
                     'community_owned': collection_summary.community_owned,
                     'thumbnail_icon_url': (
                         utils.get_thumbnail_icon_url_for_category(
