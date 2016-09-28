@@ -14,10 +14,9 @@
 
 """Controllers for queries relating to recent commits."""
 
-import feconf
-
 from core.controllers import base
 from core.domain import exp_services
+import feconf
 
 
 class RecentCommitsHandler(base.BaseHandler):

@@ -14,13 +14,12 @@
 
 """Controllers for the moderator page."""
 
-import feconf
-
 from core.controllers import base
 from core.domain import activity_domain
 from core.domain import activity_services
 from core.domain import email_manager
 from core.domain import summary_services
+import feconf
 
 
 class ModeratorPage(base.BaseHandler):
