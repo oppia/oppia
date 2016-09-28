@@ -87,6 +87,10 @@ describe('Dashboard backend API service', function() {
     }]
   };
 
+  var DASHBOARD_DATA_URL = '/dashboardhandler/data';
+  var EXPLORATION_STATS_URL_PREFIX = '/dashboardhandler/explorationstats/';
+  var ERROR_STATUS_CODE = 500;
+
   beforeEach(module('oppia'));
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
@@ -100,10 +104,6 @@ describe('Dashboard backend API service', function() {
     $httpBackend.verifyNoOutstandingExpectation();
     $httpBackend.verifyNoOutstandingRequest();
   });
-
-  var DASHBOARD_DATA_URL = '/dashboardhandler/data';
-  var EXPLORATION_STATS_URL_PREFIX = '/dashboardhandler/explorationstats/';
-  var ERROR_STATUS_CODE = 500;
 
   it('should successfully fetch an creator dashboard data from the backend',
       function() {
