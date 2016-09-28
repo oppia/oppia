@@ -255,6 +255,8 @@ class ExplorationPage(EditorHandler):
 class ExplorationHandler(EditorHandler):
     """Page with editor data for a single exploration."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     def _get_exploration_data(
             self, exploration_id, apply_draft=False, version=None):
         """Returns a description of the given exploration."""
@@ -569,6 +571,8 @@ class UntrainedAnswersHandler(EditorHandler):
     """
     NUMBER_OF_TOP_ANSWERS_PER_RULE = 50
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     def get(self, exploration_id, escaped_state_name):
         """Handles GET requests."""
         try:
@@ -655,6 +659,9 @@ class ExplorationDownloadHandler(EditorHandler):
     """Downloads an exploration as a zip file, or dict of YAML strings
     representing states.
     """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     def get(self, exploration_id):
         """Handles GET requests."""
         try:
@@ -711,6 +718,8 @@ class StateYamlHandler(EditorHandler):
 class ExplorationResourcesHandler(EditorHandler):
     """Manages assets associated with an exploration."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     @require_editor
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -723,6 +732,8 @@ class ExplorationResourcesHandler(EditorHandler):
 
 class ExplorationSnapshotsHandler(EditorHandler):
     """Returns the exploration snapshot history."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -776,6 +787,8 @@ class ExplorationRevertHandler(EditorHandler):
 class ExplorationStatisticsHandler(EditorHandler):
     """Returns statistics for an exploration."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     def get(self, exploration_id, exploration_version):
         """Handles GET requests."""
         try:
@@ -789,6 +802,8 @@ class ExplorationStatisticsHandler(EditorHandler):
 
 class ExplorationStatsVersionsHandler(EditorHandler):
     """Returns statistics versions for an exploration."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -804,6 +819,8 @@ class ExplorationStatsVersionsHandler(EditorHandler):
 
 class StateRulesStatsHandler(EditorHandler):
     """Returns detailed learner answer statistics for a state."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self, exploration_id, escaped_state_name):
         """Handles GET requests."""
