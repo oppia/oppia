@@ -1,0 +1,70 @@
+<script type="text/ng-template" id="components/sideNavigationBar">
+  <nav class="oppia-sidebar-menu oppia-sidebar-menu-transition">
+    <div class="oppia-sidebar-header">
+      <div class="oppia-sidebar-logo-container">
+      </div>
+    </div>
+
+    <ul>
+      <li ng-class="{'active': NAV_MODE === 'library'}">
+        <a href="/library">
+          <i class="material-icons oppia-sidebar-menu-icon">&#xE88A;</i>
+          <span translate="I18N_SIDEBAR_LIBRARY_LINK"></span>
+        </a>
+      </li>
+
+      <li ng-class="{'active': NAV_MODE === 'about'}">
+        <a href="/about">
+          <i class="material-icons oppia-sidebar-menu-icon">&#xE887;</i>
+          <span translate="I18N_SIDEBAR_ABOUT_LINK"></span>
+        </a>
+      </li>
+
+      <li ng-class="{'active': NAV_MODE === 'teach'}">
+        <a href="/teach">
+          <i class="material-icons oppia-sidebar-menu-icon">&#xE88E;</i>
+          <span translate="I18N_SIDEBAR_TEACH_WITH_OPPIA"></span>
+        </a>
+      </li>
+
+      <li ng-class="{'active': NAV_MODE === 'donate'}">
+        <a href="/donate">
+          <i class="material-icons oppia-sidebar-menu-icon">&#xE87D;</i>
+          <span translate="I18N_SIDEBAR_DONATE"></span>
+        </a>
+      </li>
+
+      <li ng-class="{'active': NAV_MODE === 'blog'}">
+        <a href="/blog">
+          <img ng-src="<[getStaticImageUrl('/sidebar/blogger.png')]>" class="oppia-sidebar-menu-icon">
+          <span translate="I18N_SIDEBAR_BLOG"></span>
+        </a>
+      </li>
+
+      <li ng-class="{'active': NAV_MODE === 'contact'}">
+        <a href="/contact">
+          <i class="material-icons oppia-sidebar-menu-icon">&#xE87F;</i>
+          <span translate="I18N_SIDEBAR_CONTACT_US"></span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="oppia-sidebar-footer">
+      <div>
+        <span translate="I18N_SIDEBAR_FOLLOW_US"></span>:
+      </div>
+      <a href="https://plus.google.com/109898456505810251700/about" target="_blank">
+        <img ng-src="<[getStaticImageUrl('/social/gplus.png')]>">
+      </a>
+      <a href="https://www.youtube.com/channel/UC5c1G7BNDCfv1rczcBp9FPw" target="_blank">
+        <img ng-src="<[getStaticImageUrl('/social/youtube.png')]>">
+      </a>
+      <a href="https://www.facebook.com/oppiaorg" target="_blank">
+        <img ng-src="<[getStaticImageUrl('/social/fb.png')]>">
+      </a>
+      <a href="https://twitter.com/oppiaorg" target="_blank">
+        <img ng-src="<[getStaticImageUrl('/social/twitter.png')]>">
+      </a>
+    </div>
+  </nav>
+</script>

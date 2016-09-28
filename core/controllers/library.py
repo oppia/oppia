@@ -87,7 +87,7 @@ class LibraryPage(base.BaseHandler):
             'search_mode': search_mode,
             'SEARCH_DROPDOWN_CATEGORIES': feconf.SEARCH_DROPDOWN_CATEGORIES,
         })
-        self.render_template('library/library.html')
+        self.render_template('pages/library/library.html')
 
 
 class LibraryIndexHandler(base.BaseHandler):

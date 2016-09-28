@@ -33,10 +33,10 @@ class SplashPage(base.BaseHandler):
         })
 
         if not c_value:
-            self.render_template('pages/splash.html')
+            self.render_template('pages/splash/splash.html')
         else:
             try:
-                self.render_template('pages/splash_%s.html' % c_value)
+                self.render_template('pages/splash/splash_%s.html' % c_value)
             except Exception:
                 # Old c values may have been deprecated, in which case we
                 # revert to the default splash page URL. When redirecting,
@@ -62,7 +62,7 @@ class AboutPage(base.BaseHandler):
             'meta_description': feconf.ABOUT_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_ABOUT,
         })
-        self.render_template('pages/about.html')
+        self.render_template('pages/about/about.html')
 
 
 class TeachPage(base.BaseHandler):
@@ -74,7 +74,7 @@ class TeachPage(base.BaseHandler):
             'meta_description': feconf.TEACH_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_TEACH,
         })
-        self.render_template('pages/teach.html')
+        self.render_template('pages/teach/teach.html')
 
 
 class BlogPage(base.BaseHandler):
@@ -86,7 +86,7 @@ class BlogPage(base.BaseHandler):
             'meta_description': feconf.BLOG_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_BLOG,
         })
-        self.render_template('pages/blog.html')
+        self.render_template('pages/blog/blog.html')
 
 
 class ContactPage(base.BaseHandler):
@@ -98,7 +98,7 @@ class ContactPage(base.BaseHandler):
             'meta_description': feconf.CONTACT_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_CONTACT,
         })
-        self.render_template('pages/contact.html')
+        self.render_template('pages/contact/contact.html')
 
 
 class DonatePage(base.BaseHandler):
@@ -110,7 +110,7 @@ class DonatePage(base.BaseHandler):
             'meta_description': feconf.DONATE_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_DONATE,
         })
-        self.render_template('pages/donate.html')
+        self.render_template('pages/donate/donate.html')
 
 
 class ThanksPage(base.BaseHandler):
@@ -122,7 +122,7 @@ class ThanksPage(base.BaseHandler):
             'meta_description': feconf.THANKS_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_THANKS,
         })
-        self.render_template('pages/thanks.html')
+        self.render_template('pages/thanks/thanks.html')
 
 
 class ForumPage(base.BaseHandler):
@@ -145,7 +145,7 @@ class ForumPage(base.BaseHandler):
             'meta_description': feconf.FORUM_PAGE_DESCRIPTION,
             'on_localhost': netloc.startswith('localhost'),
         })
-        self.render_template('pages/forum.html')
+        self.render_template('pages/forum/forum.html')
 
 
 class TermsPage(base.BaseHandler):
@@ -157,7 +157,7 @@ class TermsPage(base.BaseHandler):
             'meta_description': feconf.TERMS_PAGE_DESCRIPTION,
         })
 
-        self.render_template('pages/terms.html')
+        self.render_template('pages/terms/terms.html')
 
 
 class PrivacyPage(base.BaseHandler):
@@ -165,7 +165,7 @@ class PrivacyPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        self.render_template('pages/privacy.html')
+        self.render_template('pages/privacy/privacy.html')
 
 
 class AboutRedirectPage(base.BaseHandler):
@@ -189,4 +189,4 @@ class ConsoleErrorPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        self.render_template('pages/console_errors.html')
+        self.render_template('pages/tests/console_errors.html')

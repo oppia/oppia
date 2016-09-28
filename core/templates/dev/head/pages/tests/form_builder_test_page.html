@@ -1,0 +1,119 @@
+{% extends 'pages/base.html' %}
+
+{% block maintitle %}
+  Tests for the Form Builder - Oppia
+{% endblock maintitle %}
+
+{% block header_js %}
+  <script>
+    GLOBALS.ADDITIONAL_ANGULAR_MODULES = ['ui.codemirror'];
+  </script>
+  {{ super() }}
+{% endblock header_js %}
+
+{% block content %}
+  <div class="container" ng-controller="FormBuilderTests">
+    <h3>Test page for object editors</h3>
+
+    <h4>Editors sharing a common value</h4>
+    <table class="table">
+      <tr>
+        <th>Form name</th>
+        <th>Read-only version</th>
+        <th>Preview version</th>
+        <th>Editable version</th>
+      </tr>
+      <tr>
+        <td class="col-sm-3 col-md-3 col-lg-3">
+          <h5>Unicode form (copy 1)</h5>
+          <em>Saved value:</em> <[unicodeForm.value]>
+        </td>
+        <td class="col-sm-3 col-md-3 col-lg-3">
+          <schema-based-viewer schema="unicodeForm.schema" local-value="unicodeForm.value">
+          </schema-based-viewer>
+        </td>
+        <td class="col-sm-3 col-md-3 col-lg-3">
+          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value" is-disabled="true" allow-expressions="unicodeForm.allowExpressions">
+          </form-overlay>
+        </td>
+        <td class="col-sm-3 col-md-3 col-lg-3">
+          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value" allow-expressions="unicodeForm.allowExpressions">
+          </form-overlay>
+        </td>
+      </tr>
+      <tr>
+        <td class="col-sm-3 col-md-3 col-lg-3">
+          <h5>Unicode form (copy 2)</h5>
+          <em>Saved value:</em> <[unicodeForm.value]>
+        <td class="col-sm-3 col-md-3 col-lg-3">
+          <schema-based-viewer schema="unicodeForm.schema" local-value="unicodeForm.value">
+          </schema-based-viewer>
+        </td>
+        <td class="col-sm-3 col-md-3 col-lg-3">
+          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value" is-disabled="true" allow-expressions="unicodeForm.allowExpressions">
+          </form-overlay>
+        </td>
+        <td class="col-sm-3 col-md-3 col-lg-3">
+          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value" allow-expressions="unicodeForm.allowExpressions">
+          </form-overlay>
+        </td>
+      </tr>
+    </table>
+
+    <div ng-repeat="formset in formsets">
+      <h4><[formset.name]></h4>
+      <table class="table">
+        <tr>
+          <th>Form name</th>
+          <th>Read-only version</th>
+          <th>Preview version</th>
+          <th>Editable version</th>
+        </tr>
+        <tr ng-repeat="form in formset.forms">
+          <td class="col-sm-3 col-md-3 col-lg-3">
+            <h5><[form.name]></h5>
+            <div>
+              <em>Saved value:</em>
+              <div style="max-width: 300px; word-wrap: break-word;">
+                <[form.value]>
+              </span>
+            </div>
+          </td>
+          <td class="col-sm-3 col-md-3 col-lg-3">
+            <schema-based-viewer schema="form.schema" local-value="form.value">
+            </schema-based-viewer>
+          </td>
+          <td class="col-sm-3 col-md-3 col-lg-3">
+            <form-overlay definition="form.schema" saved-value="form.value" is-disabled="true" allow-expressions="form.allowExpressions">
+            </form-overlay>
+          </td>
+          <td class="col-sm-3 col-md-3 col-lg-3">
+            <form-overlay definition="form.schema" saved-value="form.value" allow-expressions="form.allowExpressions">
+            </form-overlay>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <script type="text/ng-template" id="formOverlay/entryPoint">
+    <ng-form name="schemaForm">
+      <schema-based-editor local-value="localValue" schema="definition" is-disabled="isDisabled()" allow-expressions="allowExpressions()">
+      </schema-based-editor>
+    </ng-form>
+
+    <div ng-if="!isDisabled()">
+      <button ng-click="submitValue(localValue)" class="btn btn-success" ng-disabled="schemaForm.$invalid">Submit</button>
+      <button ng-click="cancelEdit()" class="btn btn-default">Cancel</button>
+    </div>
+  </script>
+{% endblock %}
+
+{% block footer_js %}
+  <script src="/third_party/static/code-mirror-3.19.0/lib/codemirror.js"></script>
+  <script src="/third_party/static/code-mirror-3.19.0/mode/python/python.js"></script>
+  <script src="/third_party/static/ui-codemirror-0.1.2/src/ui-codemirror.js"></script>
+  {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/filters.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/tests/FormBuilderTestPage.js"></script>
+{% endblock footer_js %}
