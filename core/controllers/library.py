@@ -120,7 +120,7 @@ class LibraryIndexHandler(base.BaseHandler):
                 'categories': [],
                 'header_i18n_id': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
                 'has_full_results_page': True,
-                'full_results_url': '/library/recently_published',
+                'full_results_url': feconf.LIBRARY_RECENTLY_PUBLISHED_URL,
             })
         if top_rated_activity_summary_dicts:
             summary_dicts_by_category.insert(0, {
@@ -129,7 +129,7 @@ class LibraryIndexHandler(base.BaseHandler):
                 'header_i18n_id': (
                     feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS),
                 'has_full_results_page': True,
-                'full_results_url': '/library/top_rated',
+                'full_results_url': feconf.LIBRARY_TOP_RATED_URL,
             })
         if featured_activity_summary_dicts:
             summary_dicts_by_category.insert(0, {
@@ -154,12 +154,11 @@ class LibraryGroupPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        group_mode = (feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED or
-                      feconf.LIBRARY_GROUP_TOP_RATED in self.request.url)
+        group_mode = True
 
         self.values.update({
             'meta_description': (
-                feconf.GROUP_PAGE_DESCRIPTION),
+                feconf.LIBRARY_GROUP_PAGE_DESCRIPTION),
             'nav_mode': feconf.NAV_MODE_LIBRARY,
             'has_fully_registered': bool(
                 self.user_id and
@@ -190,9 +189,6 @@ class LibraryGroupIndexHandler(base.BaseHandler):
                     'activity_summary_dicts': recently_published_summary_dicts,
                     'categories': [],
                     'header': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
-                    'has_full_results_page': True,
-                    'full_results_url': (
-                        '/library/' + feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED),
                 })
 
         elif group_name == feconf.LIBRARY_GROUP_TOP_RATED:
@@ -205,9 +201,6 @@ class LibraryGroupIndexHandler(base.BaseHandler):
                     'activity_summary_dicts': top_rated_activity_summary_dicts,
                     'categories': [],
                     'header': feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS,
-                    'has_full_results_page': True,
-                    'full_results_url': (
-                        '/library/' + feconf.LIBRARY_GROUP_TOP_RATED),
                 })
         else:
             return self.PageNotFoundException

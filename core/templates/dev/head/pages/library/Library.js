@@ -40,12 +40,13 @@ oppia.controller('Library', [
     // Keeps track of the index of the left-most visible card of each group.
     $scope.leftmostCardIndices = [];
 
-    $scope.inRankMode = ($window.location.pathname.indexOf(
-      '/library/') === 0);
+    $scope.inGroupMode = ($window.location.pathname.indexOf(
+      'recently_published') === 9) || ($window.location.pathname.indexOf(
+      'top_rated') === 9);
     $scope.groupName = $window.location.pathname.substr(
       $window.location.pathname.lastIndexOf('/') + 1);
 
-    if ($scope.inRankMode) {
+    if ($scope.inGroupMode) {
       $http.get('/librarygroupindexhandler', {
         params: {
           group_name: $scope.groupName
