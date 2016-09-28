@@ -770,3 +770,159 @@ class LastLoginIntegrationTest(test_utils.GenericTestBase):
                 user_services.get_user_settings(self.viewer_id).last_logged_in,
                 previous_last_logged_in_datetime)
             self.logout()
+
+
+class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
+    EXP_ID = 'exp'
+
+    def setUp(self):
+        """Create users for creating and editing exploration."""
+        super(LastExplorationEditedIntegrationTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='End')
+
+    def edit_exploration(self):
+        """Edit an existing exploration as EDITOR."""
+        self.login(self.EDITOR_EMAIL)
+        exp_services.update_exploration(self.editor_id, self.EXP_ID, [{
+            'cmd': 'edit_exploration_property',
+            'property_name': 'objective',
+            'new_value': 'the objective'
+        }], 'Test edit')
+        self.logout()
+
+    def reduce_last_exploration_edited_time(self, delta_hours):
+        user_settings = user_services.get_user_settings(self.editor_id)
+        user_settings.last_exploration_edited_time = (
+            user_settings.last_exploration_edited_time -
+            datetime.timedelta(hours=delta_hours))
+        user_services._save_user_settings(user_settings) # pylint: disable=protected-access
+
+    def test_legacy_user(self):
+        """Test the case of a user who are editing exploration for first time
+        after the last edited time check was introduced.
+        """
+        # Set up a 'previous-generation' user.
+        user_settings = user_services.get_user_settings(self.editor_id)
+        user_settings.last_exploration_edited_time = None
+        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
+
+        self.assertIsNone(
+            user_services.get_user_settings(self.editor_id).
+            last_exploration_edited_time)
+
+        self.edit_exploration()
+
+        self.assertIsNotNone(
+            user_services.get_user_settings(self.editor_id).
+            last_exploration_edited_time)
+
+    def test_last_exp_edit_time_remains_if_enough_time_has_not_elapsed(self):
+        self.edit_exploration()
+        self.reduce_last_exploration_edited_time(delta_hours=11)
+        previous_last_exploration_edited_time = (
+            user_services.get_user_settings(self.editor_id).
+            last_exploration_edited_time)
+        self.assertIsNotNone(previous_last_exploration_edited_time)
+
+        # Editing exploration after delta hours time.
+        self.edit_exploration()
+        self.assertEqual(
+            (user_services.get_user_settings(self.editor_id).
+             last_exploration_edited_time),
+            previous_last_exploration_edited_time)
+
+    def test_last_exp_edit_time_is_updated_if_enough_time_has_elapsed(self):
+        self.edit_exploration()
+        self.reduce_last_exploration_edited_time(delta_hours=13)
+        previous_last_exploration_edited_time = (
+            user_services.get_user_settings(self.editor_id).
+            last_exploration_edited_time)
+        self.assertIsNotNone(previous_last_exploration_edited_time)
+
+        # Editing exploration after delta hours time.
+        self.edit_exploration()
+
+        self.assertGreater(
+            (user_services.get_user_settings(self.editor_id).
+             last_exploration_edited_time),
+            previous_last_exploration_edited_time)
+
+
+class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
+    EXP_ID_A = 'exp_a'
+    EXP_ID_B = 'exp_b'
+
+    def setUp(self):
+        """Create user for creating exploration."""
+        super(LastExplorationCreatedIntegrationTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+    def create_exploration(self, exp_id):
+        """Edit an existing exploration as EDITOR."""
+        self.login(self.OWNER_EMAIL)
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, end_state_name='End')
+        self.logout()
+
+    def reduce_last_exploration_created_time(self, delta_hours):
+        user_settings = user_services.get_user_settings(self.owner_id)
+        user_settings.last_exploration_created_time = (
+            user_settings.last_exploration_created_time -
+            datetime.timedelta(hours=delta_hours))
+        user_services._save_user_settings(user_settings) # pylint: disable=protected-access
+
+    def test_legacy_user(self):
+        """Test the case of a user who are creating exploration for first time
+        after the last edited time check was introduced.
+        """
+        # Set up a 'previous-generation' user.
+        user_settings = user_services.get_user_settings(self.owner_id)
+        user_settings.last_exploration_created_time = None
+        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
+
+        self.assertIsNone(
+            user_services.get_user_settings(self.owner_id).
+            last_exploration_created_time)
+
+        self.create_exploration(self.EXP_ID_A)
+
+        self.assertIsNotNone(
+            user_services.get_user_settings(self.owner_id).
+            last_exploration_created_time)
+
+    def test_last_exp_edit_time_remains_if_enough_time_has_not_elapsed(self):
+        self.create_exploration(self.EXP_ID_A)
+        self.reduce_last_exploration_created_time(delta_hours=11)
+        previous_last_exploration_created_time = (
+            user_services.get_user_settings(self.owner_id).
+            last_exploration_created_time)
+        self.assertIsNotNone(previous_last_exploration_created_time)
+
+        # Creating another exploration after delta hours time.
+        self.create_exploration(self.EXP_ID_B)
+        self.assertEqual(
+            (user_services.get_user_settings(self.owner_id).
+             last_exploration_created_time),
+            previous_last_exploration_created_time)
+
+    def test_last_exp_edit_time_is_updated_if_enough_time_has_elapsed(self):
+        self.create_exploration(self.EXP_ID_A)
+        self.reduce_last_exploration_created_time(delta_hours=13)
+        previous_last_exploration_created_time = (
+            user_services.get_user_settings(self.owner_id).
+            last_exploration_created_time)
+        self.assertIsNotNone(previous_last_exploration_created_time)
+
+        # Creating another exploration after delta hours time.
+        self.create_exploration(self.EXP_ID_B)
+        self.assertGreater(
+            (user_services.get_user_settings(self.owner_id).
+             last_exploration_created_time),
+            previous_last_exploration_created_time)
