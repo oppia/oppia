@@ -326,17 +326,19 @@
     {% endif %}
   </div>
 
-  {% include 'components/create_activity_modal.html' %}
-  {% include 'components/exploration_embed_button_modal.html' %}
-  {% include 'components/sharing_links_directive.html' %}
-  {% include 'components/upload_activity_modal.html' %}
+  {% include 'components/embed_modal/embed_exploration_modal_directive.html' %}
+  {% include 'components/share/sharing_links_directive.html' %}
+
+  {% include 'pages/dashboard/create_activity_modal_directive.html' %}
+  {% include 'pages/dashboard/upload_activity_modal_directive.html' %}
 {% endblock %}
 
 {% block footer_js %}
   {{ super() }}
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/CollectionCreationService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/ExplorationEmbedButtonService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/SharingLinksDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/dashboard/Dashboard.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/embed_modal/ExplorationEmbedButtonService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/share/SharingLinksDirective.js"></script>
+
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/dashboard/DashboardBackendApiService.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/dashboard/Dashboard.js"></script>
 {% endblock footer_js %}

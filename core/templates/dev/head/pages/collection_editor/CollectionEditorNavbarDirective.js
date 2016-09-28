@@ -48,7 +48,6 @@ oppia.directive('collectionEditorNavbar', [function() {
         $scope.selectSettingsTab = routerService.navigateToSettingsTab;
         $scope.selectStatsTab = routerService.navigateToStatsTab;
         $scope.selectHistoryTab = routerService.navigateToHistoryTab;
-        $scope.selectFeedbackTab = routerService.navigateToFeedbackTab;
 
         var _validateCollection = function() {
           if ($scope.isPrivate) {

@@ -128,8 +128,6 @@ class CollectionEditorPage(CollectionEditorHandler):
             'title': collection.title,
             'SHOW_COLLECTION_NAVIGATION_TAB_HISTORY': (
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_HISTORY),
-            'SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK': (
-                feconf.SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK),
             'SHOW_COLLECTION_NAVIGATION_TAB_STATS': (
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_STATS),
             'TAG_REGEX': feconf.TAG_REGEX,
