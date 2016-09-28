@@ -175,10 +175,6 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        # Retrieve the updated collection.
-        collection = (
-            collection_services.get_collection_by_id(collection_id))
-
         collection_dict = (
             summary_services.get_learner_collection_dict_by_id(
                 collection_id, self.user_id, allow_invalid_explorations=True))
