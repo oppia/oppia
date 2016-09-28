@@ -68,6 +68,8 @@ class NotificationsDashboardPage(base.BaseHandler):
 class NotificationsDashboardHandler(base.BaseHandler):
     """Provides data for the user notifications dashboard."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     def get(self):
         """Handles GET requests."""
         if self.user_id is None:
@@ -135,6 +137,8 @@ class DashboardPage(base.BaseHandler):
 
 class DashboardHandler(base.BaseHandler):
     """Provides data for the user's creator dashboard page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self):
         """Handles GET requests."""
@@ -241,6 +245,8 @@ class DashboardHandler(base.BaseHandler):
 
 class NotificationsHandler(base.BaseHandler):
     """Provides data about unseen notifications."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self):
         """Handles GET requests."""
