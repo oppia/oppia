@@ -99,10 +99,10 @@ describe('Editable collection backend API service', function() {
     $httpBackend.expect('GET', '/collection_editor_handler/data/0').respond(
       sampleDataResults);
 
-    var collectFunc = EditableCollectionBackendApiService.fetchCollection('0');
-    collectFunc.then(function(data) {
-      collection = data;
-    });
+    EditableCollectionBackendApiService.fetchCollection('0').then(
+      function(data) {
+        collection = data;
+      });
     $httpBackend.flush();
 
     collection.title = 'New Title';
