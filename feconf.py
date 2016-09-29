@@ -511,7 +511,7 @@ SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 # exploration.
 TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
 # Number of open feedback to be displayed in the dashboard for each exploration.
-NEW_FEEDBACK_COUNT_DASHBOARD = 3
+OPEN_FEEDBACK_COUNT_DASHBOARD = 3
 # NOTE TO DEVELOPERS: This should be synchronized with base.js
 ENABLE_STRING_CLASSIFIER = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False

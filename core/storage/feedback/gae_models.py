@@ -116,26 +116,17 @@ class FeedbackThreadModel(base_models.BaseModel):
             exploration_id, thread_id))
 
     @classmethod
-    def get_threads(cls, exploration_id):
+    def get_threads(cls, exploration_id, limit=feconf.DEFAULT_QUERY_LIMIT):
         """Returns a list of threads associated to the exploration, ordered by
-        their last updated field.
+        their last updated field. The number of entities fetched is limited by
+        the `limit` argument to this method, whose default value is equal to the
+        the default query limit.
 
         Does not include the deleted entries.
         """
         return cls.get_all().filter(
             cls.exploration_id == exploration_id).order(
-                cls.last_updated).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-    @classmethod
-    def get_latest_updated_threads(cls, exploration_id):
-        """Returns a list of threads associated to the exploration limited to a
-        particular value, ordered by their last updated field.
-
-        Does not include the deleted entries.
-        """
-        return cls.get_all().filter(
-            cls.exploration_id == exploration_id).order(
-                cls.last_updated).fetch(feconf.NEW_FEEDBACK_COUNT_DASHBOARD)
+                cls.last_updated).fetch(limit)
 
 
 class FeedbackMessageModel(base_models.BaseModel):

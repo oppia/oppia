@@ -268,16 +268,16 @@ class NotificationsHandler(base.BaseHandler):
 
 
 class ExplorationDashboardStatsHandler(base.BaseHandler):
-    """Returns the new feedback for an exploration."""
+    """Returns the most recent open feedback for an exploration."""
 
     @base.require_fully_signed_up
     def get(self, exploration_id):
         """Handles GET requests."""
         self.render_json({
-            'new_feedback': [
+            'open_feedback': [
                 feedback_message.to_dict()
                 for feedback_message in
-                feedback_services.get_new_messages_for_exp_id(exploration_id)]
+                feedback_services.get_most_recent_messages(exploration_id)]
         })
 
 

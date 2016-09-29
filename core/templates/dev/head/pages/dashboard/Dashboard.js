@@ -17,7 +17,7 @@
  */
 
 oppia.constant('EXPLORATION_DROPDOWN_STATS', {
-  NEW_FEEDBACK: 'new_feedback',
+  OPEN_FEEDBACK: 'open_feedback',
   TOP_UNRESOLVED_ANSWERS: 'top_unresolved_answers'
 });
 
