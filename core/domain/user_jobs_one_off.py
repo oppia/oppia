@@ -17,6 +17,7 @@
 import ast
 
 from core import jobs
+from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
@@ -250,6 +251,42 @@ class UserProfilePictureOneOffJob(jobs.BaseMapReduceJobManager):
             return
 
         user_services.generate_initial_profile_picture(item.id)
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        pass
+
+
+class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceJobManager):
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(user_model):
+        user_id = user_model.id
+        contributions = user_models.UserContributionsModel.get(user_id)
+
+        created_explorations = exp_services.get_multiple_explorations_by_id(
+            contributions.created_exploration_ids)
+        if created_explorations:
+            user_model.last_created_an_exploration = max(
+                [model.created_on for model in created_explorations.values()])
+
+        user_commits = (
+            exp_models.ExplorationCommitLogEntryModel.query(
+                exp_models.ExplorationCommitLogEntryModel.user_id == user_id).
+            order(-exp_models.ExplorationCommitLogEntryModel.created_on).
+            fetch())
+
+        for commit in user_commits:
+            if (commit.exploration_id not in created_explorations or
+                    commit.commit_type != 'create'):
+                user_model.last_edited_an_exploration = commit.created_on
+                break
+
+        user_model.put()
 
     @staticmethod
     def reduce(key, stringified_values):

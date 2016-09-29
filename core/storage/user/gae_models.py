@@ -45,10 +45,10 @@ class UserSettingsModel(base_models.BaseModel):
     last_logged_in = ndb.DateTimeProperty(default=None)
     # When the user last edited an exploration in. This may be out-of-date by up
     # to feconf.PROXIMAL_TIMEDELTA_SECS seconds.
-    last_exploration_edited_time = ndb.DateTimeProperty(default=None)
+    last_edited_an_exploration = ndb.DateTimeProperty(default=None)
     # When the user last created an exploration. This may be out-of-date by up
     # to feconf.PROXIMAL_TIMEDELTA_SECS seconds.
-    last_exploration_created_time = ndb.DateTimeProperty(default=None)
+    last_created_an_exploration = ndb.DateTimeProperty(default=None)
     # User uploaded profile picture as a dataURI string. May be None.
     profile_picture_data_url = ndb.TextProperty(default=None, indexed=False)
     # User specified biography (to be shown on their profile page).
