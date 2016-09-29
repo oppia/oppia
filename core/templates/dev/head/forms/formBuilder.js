@@ -935,7 +935,10 @@ oppia.directive('textAngularRte', [
           };
 
           $scope.stripFormatting = function(html) {
-            return $filter('sanitizeHtmlForRte')(html);
+            // Strip out anything between and including <>,
+            // unless it contains the RTE tags.
+            return html ? String(html)
+              .replace(/(?!.*(\"oppia-noninteractive-.))<[^>]+>/gm, '') : '';
           };
 
           $scope.init = function() {
