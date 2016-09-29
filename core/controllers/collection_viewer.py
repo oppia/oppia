@@ -80,6 +80,8 @@ class CollectionPage(base.BaseHandler):
 class CollectionDataHandler(base.BaseHandler):
     """Provides the data for a single collection."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     def get(self, collection_id):
         """Populates the data on the individual collection page."""
         allow_invalid_explorations = bool(

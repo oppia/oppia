@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends 'pages/base.html' %}
 
 {% block navbar_breadcrumb %}
 {% endblock navbar_breadcrumb %}
@@ -63,6 +63,6 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/error/Error.js"></script>
 {% endblock footer_js %}
 
-{% block footer%}
-  {% include 'footer.html' %}
+{% block footer %}
+  {% include 'pages/footer.html' %}
 {% endblock %}
