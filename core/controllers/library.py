@@ -188,7 +188,8 @@ class LibraryGroupIndexHandler(base.BaseHandler):
                 summary_dicts_by_category.append({
                     'activity_summary_dicts': recently_published_summary_dicts,
                     'categories': [],
-                    'header': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
+                    'header_i18n_id': (
+                        feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED),
                 })
 
         elif group_name == feconf.LIBRARY_GROUP_TOP_RATED:
@@ -200,7 +201,8 @@ class LibraryGroupIndexHandler(base.BaseHandler):
                 summary_dicts_by_category.append({
                     'activity_summary_dicts': top_rated_activity_summary_dicts,
                     'categories': [],
-                    'header': feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS,
+                    'header_i18n_id': (
+                        feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS),
                 })
         else:
             return self.PageNotFoundException
