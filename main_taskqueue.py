@@ -30,23 +30,19 @@ transaction_services = models.Registry.import_transaction_services()
 URLS = [
     main.get_redirect_route(
         r'%s' % feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS,
-        tasks.UnsentFeedbackEmailHandler,
-        'feedback_message_email_task_handler'),
+        tasks.UnsentFeedbackEmailHandler),
     main.get_redirect_route(
         r'%s' % feconf.TASK_URL_SUGGESTION_EMAILS,
-        tasks.SuggestionEmailHandler,
-        'suggestion_email_task_handler'),
+        tasks.SuggestionEmailHandler),
     main.get_redirect_route(
         r'%s' % feconf.TASK_URL_FLAG_EXPLORATION_EMAILS,
-        tasks.FlagExplorationEmailHandler, 'flag_exploration_email_handler'),
+        tasks.FlagExplorationEmailHandler),
     main.get_redirect_route(
         r'%s' % feconf.TASK_URL_INSTANT_FEEDBACK_EMAILS,
-        tasks.InstantFeedbackMessageEmailHandler,
-        'instant_feedback_message_email_task_handler'),
+        tasks.InstantFeedbackMessageEmailHandler),
     main.get_redirect_route(
         r'%s' % feconf.TASK_URL_FEEDBACK_STATUS_EMAILS,
-        tasks.FeedbackThreadStatusChangeEmailHandler,
-        'feedback_thread_status_change_email_task_handler'),
+        tasks.FeedbackThreadStatusChangeEmailHandler),
 ]
 
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name

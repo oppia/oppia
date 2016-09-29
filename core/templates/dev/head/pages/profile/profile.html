@@ -1,0 +1,147 @@
+{% extends 'pages/base.html' %}
+
+{% block maintitle %}
+  Profile - Oppia
+{% endblock maintitle %}
+
+{% block header_js %}
+  {{ super() }}
+  <script type="text/javascript">
+    GLOBALS.PROFILE_USERNAME = JSON.parse(
+      '{{PROFILE_USERNAME|js_string}}');
+  </script>
+
+  <style>
+    html, body {
+      background-color: #f2f2ee;
+    }
+  </style>
+{% endblock header_js %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      Profile
+      <span class="oppia-navbar-breadcrumb-separator" style="padding-left: 10px;"></span>
+      {{PROFILE_USERNAME}}
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <div class="oppia-profile-container" ng-controller="Profile">
+    <md-card class="oppia-profile-user-card">
+      <div class="oppia-profile-picture-container">
+        <div ng-if="profileIsOfCurrentUser" class="oppia-profile-picture">
+          <a href="/preferences">
+            <div class="oppia-profile-picture-mask">
+              <div class="oppia-profile-picture-edit-prompt">
+                Edit avatar
+                <i class="material-icons md-18" title="Edit Profile Picture">&#xE254;</i>
+              </div>
+            </div>
+          </a>
+          <img ng-src="<[profilePictureDataUrl]>" class="oppia-profile-picture-fullsize">
+        </div>
+
+        <img ng-if="!profileIsOfCurrentUser" ng-src="<[profilePictureDataUrl]>"
+             class="oppia-profile-picture-fullsize">
+      </div>
+
+      <h2 class="oppia-profile-username-large-screen">
+        <span popover-placement="right" ng-attr-popover="<[usernameIsLong ? username.helpText : undefined]>"
+            popover-append-to-body popover-trigger="mouseenter">
+          <strong><[username.value| truncate:16]></strong>
+        </span>
+      </h2>
+      <h2 class="oppia-profile-username-small-screen">
+        <span popover-placement="right" ng-attr-popover="<[username.helpText]>" popover-append-to-body popover-trigger="mouseenter">
+          <strong><[username.value| truncate:11]></strong>
+        </span>
+      </h2>
+
+      <p class="oppia-profile-first-contributed" ng-if="firstContributionMsec">
+        Contributing since: <[getLocaleDateString(firstContributionMsec)]>
+      </p>
+
+      <div class="oppia-profile-user-stat-container-large-screen">
+        <div ng-repeat="stat in userDisplayedStatistics" class="oppia-profile-user-stat">
+          <div popover-placement="right" ng-attr-popover="<[stat.helpText]>" popover-append-to-body popover-trigger="mouseenter">
+            <span style="font-size: 16px"><strong><[stat.value || 0]></strong></span>
+            <span><[stat.title]></span>
+          </div>
+        </div>
+      </div>
+
+      <p class="oppia-profile-user-bio">
+        <span ng-if="userBio" style="white-space: pre-wrap;"><[userBio]></span>
+        <span ng-if="!userBio">
+          <em>This user has not supplied a bio yet.</em>
+        </span>
+      </p>
+
+      <p class="oppia-profile-subject-interest-container">
+        Interests:
+        <span ng-if="subjectInterests.length > 0"><br>
+          <span ng-repeat="interest in subjectInterests track by $index">
+            <span class="oppia-profile-subject-interest"><[interest]></span>
+          </span>
+        </span>
+        <span ng-if="subjectInterests.length === 0" class="oppia-profile-no-interests-text">
+          <em>none specified</em>
+        </span>
+      </p>
+
+      <hr class="oppia-profile-stat-container-line-small-screen">
+      <div class="oppia-profile-user-stat-container-small-screen">
+        <div ng-repeat="stat in userDisplayedStatistics" class="oppia-profile-user-stat">
+          <div popover-placement="right" ng-attr-popover="<[stat.helpText]>" popover-append-to-body popover-trigger="mouseenter">
+            <span style="font-size: 16px"><strong><[stat.value || 0]></strong></span>
+            <span><[stat.title]></span>
+          </div>
+        </div>
+      </div>
+      <hr class="oppia-profile-stat-container-line-small-screen">
+    </md-card>
+
+    <md-card class="oppia-profile-content-card">
+      <strong>Portfolio</strong>
+      <md-content class="oppia-profile-portfolio-container">
+        <exploration-summary-tile ng-repeat="expl in getExplorationsToDisplay()"
+          exploration-id="expl.id"
+          exploration-title="expl.title"
+          last-updated-msec="expl.last_updated_msec"
+          objective="expl.objective"
+          category="expl.category"
+          ratings="expl.ratings"
+          thumbnail-icon-url="expl.thumbnail_icon_url"
+          thumbnail-bg-color="expl.thumbnail_bg_color"
+          num-views="expl.num_views"
+          is-community-editable="expl.community_editable"
+          mobile-cutoff-px="610">
+        </exploration-summary-tile>
+
+        <div ng-if="userEditedExplorations.length === 0">
+          <br><em>This user hasn't created or edited any explorations yet.</em>
+        </div>
+      </md-content>
+
+      <span class="oppia-profile-portfolio-pages" ng-if="numUserPortfolioExplorations > 6">
+        <i class="material-icons md-18" ng-disabled="currentPageNumber == 0"
+           ng-click="goToPreviousPage()">&#xE5C4;</i>
+        Showing <[currentPageNumber * PAGE_SIZE + 1]> - <[Math.min(numUserPortfolioExplorations, (currentPageNumber + 1) * PAGE_SIZE)]> of <[numUserPortfolioExplorations]>
+        <i class="material-icons md-18" ng-disabled="(currentPageNumber + 1) * PAGE_SIZE >= userEditedExplorations.length" ng-click="goToNextPage()">&#xE5C8;</i>
+      </span>
+    </md-card>
+  </div>
+{% endblock %}
+
+{% block footer %}
+  {% include 'pages/footer.html' %}
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/profile/Profile.js"></script>
+{% endblock footer_js %}

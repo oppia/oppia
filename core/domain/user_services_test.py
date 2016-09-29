@@ -696,3 +696,77 @@ class SubjectInterestsUnitTests(test_utils.GenericTestBase):
         user_services.update_subject_interests(self.user_id, [])
         user_services.update_subject_interests(
             self.user_id, ['singleword', 'has spaces'])
+
+
+class LastLoginIntegrationTest(test_utils.GenericTestBase):
+
+    def setUp(self):
+        """Create exploration with two versions"""
+        super(LastLoginIntegrationTest, self).setUp()
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+    def test_legacy_user(self):
+        """Test the case of a user who existed in the system before the
+        last-login check was introduced.
+        """
+        # Set up a 'previous-generation' user.
+        user_settings = user_services.get_user_settings(self.viewer_id)
+        user_settings.last_logged_in = None
+        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
+
+        self.assertIsNone(
+            user_services.get_user_settings(self.viewer_id).last_logged_in)
+        # After logging in and requesting a URL, the last_logged_in property is
+        # set.
+        self.login(self.VIEWER_EMAIL)
+        self.testapp.get(feconf.LIBRARY_INDEX_URL)
+        self.assertIsNotNone(
+            user_services.get_user_settings(self.viewer_id).last_logged_in)
+        self.logout()
+
+    def test_last_logged_in_only_updated_if_enough_time_has_elapsed(self):
+        # The last logged-in time has already been set when the user
+        # registered.
+        previous_last_logged_in_datetime = (
+            user_services.get_user_settings(self.viewer_id).last_logged_in)
+        self.assertIsNotNone(previous_last_logged_in_datetime)
+
+        original_datetime_type = datetime.datetime
+        current_datetime = datetime.datetime.utcnow()
+
+        # Without explicitly defining the type of the patched datetimes, NDB
+        # validation checks for datetime.datetime instances fail.
+        class PatchedDatetimeType(type):
+            def __instancecheck__(cls, other):
+                return isinstance(other, original_datetime_type)
+
+        class PatchedDatetime11Hours(datetime.datetime):
+            __metaclass__ = PatchedDatetimeType
+
+            @classmethod
+            def utcnow(cls):
+                return current_datetime + datetime.timedelta(hours=11)
+
+        class PatchedDatetime13Hours(datetime.datetime):
+            __metaclass__ = PatchedDatetimeType
+
+            @classmethod
+            def utcnow(cls):
+                return current_datetime + datetime.timedelta(hours=13)
+
+        with self.swap(datetime, 'datetime', PatchedDatetime11Hours):
+            self.login(self.VIEWER_EMAIL)
+            self.testapp.get(feconf.LIBRARY_INDEX_URL)
+            self.assertEqual(
+                user_services.get_user_settings(self.viewer_id).last_logged_in,
+                previous_last_logged_in_datetime)
+            self.logout()
+
+        with self.swap(datetime, 'datetime', PatchedDatetime13Hours):
+            self.login(self.VIEWER_EMAIL)
+            self.testapp.get(feconf.LIBRARY_INDEX_URL)
+            self.assertGreater(
+                user_services.get_user_settings(self.viewer_id).last_logged_in,
+                previous_last_logged_in_datetime)
+            self.logout()

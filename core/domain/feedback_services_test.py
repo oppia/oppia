@@ -153,7 +153,7 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
                        'generate_new_thread_id', self._generate_thread_id):
             feedback_services.create_suggestion(
                 self.EXP_ID2, self.user_id, 3, 'state_name',
-                'description', {'old_content': {}})
+                'description', {'type': 'text', 'value': ''})
         suggestion = feedback_services.get_suggestion(
             self.EXP_ID2, self.THREAD_ID1)
         thread = feedback_models.FeedbackThreadModel.get(
@@ -165,7 +165,7 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
             'exploration_version': 3,
             'state_name': 'state_name',
             'description': 'description',
-            'state_content': {'old_content': {}}
+            'state_content': {'type': 'text', 'value': ''}
         }
         self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_OPEN)
         self.assertDictEqual(expected_suggestion_dict, suggestion.to_dict())
@@ -815,7 +815,7 @@ class SuggestionEmailHandlerTest(test_utils.GenericTestBase):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_suggestion(
                 self.exploration.id, self.new_user_id, self.exploration.version,
-                'a state', 'simple description', {'content': {}})
+                'a state', 'simple description', {'type': 'text', 'value': ''})
 
             self.process_and_flush_pending_tasks()
 
@@ -892,7 +892,7 @@ class SuggestionEmailHandlerTest(test_utils.GenericTestBase):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_suggestion(
                 self.exploration.id, self.new_user_id, self.exploration.version,
-                'a state', 'simple description', {'content': {}})
+                'a state', 'simple description', {'type': 'text', 'value': ''})
 
             self.process_and_flush_pending_tasks()
 

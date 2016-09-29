@@ -58,7 +58,8 @@ def require_playable(handler):
     def test_can_play(self, exploration_id, **kwargs):
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             self.render_template(
-                'error/disabled_exploration.html', iframe_restriction=None)
+                'pages/error/disabled_exploration.html',
+                iframe_restriction=None)
             return
 
         # Checks if the user for the current session is logged in.
@@ -257,13 +258,17 @@ class ExplorationPage(base.BaseHandler):
 
         if is_iframed:
             self.render_template(
-                'player/exploration_player.html', iframe_restriction=None)
+                'pages/exploration_player/exploration_player.html',
+                iframe_restriction=None)
         else:
-            self.render_template('player/exploration_player.html')
+            self.render_template(
+                'pages/exploration_player/exploration_player.html')
 
 
 class ExplorationHandler(base.BaseHandler):
     """Provides the initial data for a single exploration."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self, exploration_id):
         """Populates the data on the individual exploration page."""
@@ -485,6 +490,8 @@ class RatingHandler(base.BaseHandler):
     exploration.
     """
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -516,6 +523,8 @@ class RecommendationsHandler(base.BaseHandler):
     If both are true, then the explorations are suggested from the collection,
     if there are upcoming explorations for the learner to complete.
     """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @require_playable
     def get(self, exploration_id):
