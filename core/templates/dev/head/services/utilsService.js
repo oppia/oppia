@@ -26,6 +26,11 @@ oppia.factory('utilsService', [function() {
         }
       }
       return true;
+    },
+
+    // http://stackoverflow.com/questions/203739
+    isString: function(input) {
+      return (typeof input === 'string' || input instanceof String);
     }
   };
   return utils;

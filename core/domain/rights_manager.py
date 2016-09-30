@@ -18,6 +18,7 @@
 
 import logging
 
+from core.domain import activity_services
 from core.domain import config_domain
 from core.domain import subscription_services
 from core.domain import user_services
@@ -44,9 +45,6 @@ CMD_UPDATE_FIRST_PUBLISHED_MSEC = 'update_first_published_msec'
 ACTIVITY_STATUS_PRIVATE = 'private'
 ACTIVITY_STATUS_PUBLIC = 'public'
 ACTIVITY_STATUS_PUBLICIZED = 'publicized'
-
-ACTIVITY_TYPE_EXPLORATION = 'exploration'
-ACTIVITY_TYPE_COLLECTION = 'collection'
 
 ROLE_OWNER = 'owner'
 ROLE_EDITOR = 'editor'
@@ -149,7 +147,7 @@ def _get_activity_rights_from_model(activity_rights_model, activity_type):
         community_owned=activity_rights_model.community_owned,
         cloned_from=(
             activity_rights_model.cloned_from
-            if activity_type == ACTIVITY_TYPE_EXPLORATION else None),
+            if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION else None),
         status=activity_rights_model.status,
         viewable_if_private=activity_rights_model.viewable_if_private,
         first_published_msec=activity_rights_model.first_published_msec
@@ -164,9 +162,9 @@ def _save_activity_rights(
     """
     activity_rights.validate()
 
-    if activity_type == ACTIVITY_TYPE_EXPLORATION:
+    if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION:
         model_cls = exp_models.ExplorationRightsModel
-    elif activity_type == ACTIVITY_TYPE_COLLECTION:
+    elif activity_type == feconf.ACTIVITY_TYPE_COLLECTION:
         model_cls = collection_models.CollectionRightsModel
     model = model_cls.get(activity_rights.id, strict=False)
 
@@ -197,9 +195,9 @@ def _update_collection_summary(activity_rights):
 
 
 def _update_activity_summary(activity_type, activity_rights):
-    if activity_type == ACTIVITY_TYPE_EXPLORATION:
+    if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION:
         _update_exploration_summary(activity_rights)
-    elif activity_type == ACTIVITY_TYPE_COLLECTION:
+    elif activity_type == feconf.ACTIVITY_TYPE_COLLECTION:
         _update_collection_summary(activity_rights)
 
 
@@ -248,7 +246,8 @@ def get_exploration_rights(exploration_id, strict=True):
         exploration_id, strict=strict)
     if model is None:
         return None
-    return _get_activity_rights_from_model(model, ACTIVITY_TYPE_EXPLORATION)
+    return _get_activity_rights_from_model(
+        model, feconf.ACTIVITY_TYPE_EXPLORATION)
 
 
 def is_exploration_private(exploration_id):
@@ -290,7 +289,8 @@ def get_collection_rights(collection_id, strict=True):
         collection_id, strict=strict)
     if model is None:
         return None
-    return _get_activity_rights_from_model(model, ACTIVITY_TYPE_COLLECTION)
+    return _get_activity_rights_from_model(
+        model, feconf.ACTIVITY_TYPE_COLLECTION)
 
 
 def is_collection_private(collection_id):
@@ -308,9 +308,9 @@ def _get_activity_rights(activity_type, activity_id):
     object for a given activity based on its type. If the activity_type value
     provided is unknown, an Exception is raised.
     """
-    if activity_type == ACTIVITY_TYPE_EXPLORATION:
+    if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION:
         return get_exploration_rights(activity_id, strict=False)
-    elif activity_type == ACTIVITY_TYPE_COLLECTION:
+    elif activity_type == feconf.ACTIVITY_TYPE_COLLECTION:
         return get_collection_rights(activity_id, strict=False)
     else:
         raise Exception(
@@ -501,8 +501,8 @@ def _assign_role(
     - new_role: str. The name of the new role: either 'owner', 'editor' or
         'viewer'.
     - activity_id: str. The ID of the exploration or collection.
-    - activity_type: str. One of ACTIVITY_TYPE_EXPLORATION or
-        ACTIVITY_TYPE_COLLECTION.
+    - activity_type: str. One of feconf.ACTIVITY_TYPE_EXPLORATION or
+        feconf.ACTIVITY_TYPE_COLLECTION.
     """
     if not Actor(committer_id).can_modify_roles(activity_type, activity_id):
         logging.error(
@@ -605,17 +605,17 @@ def _change_activity_status(
     - committer_id: str. The id of the user who is performing the update
         action.
     - activity_id: str. The id of the collection or activity.
-    - activity_type: str. One of ACTIVITY_TYPE_EXPLORATION or
-        ACTIVITY_TYPE_COLLECTION.
+    - activity_type: str. One of feconf.ACTIVITY_TYPE_EXPLORATION or
+        feconf.ACTIVITY_TYPE_COLLECTION.
     - new_status: str. The new status of the exploration.
     - commit_message: str. The human-written commit message for this change.
     """
     activity_rights = _get_activity_rights(activity_type, activity_id)
     old_status = activity_rights.status
     activity_rights.status = new_status
-    if activity_type == ACTIVITY_TYPE_EXPLORATION:
+    if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION:
         cmd_type = CMD_CHANGE_EXPLORATION_STATUS
-    elif activity_type == ACTIVITY_TYPE_COLLECTION:
+    elif activity_type == feconf.ACTIVITY_TYPE_COLLECTION:
         cmd_type = CMD_CHANGE_COLLECTION_STATUS
     commit_cmds = [{
         'cmd': cmd_type,
@@ -657,6 +657,8 @@ def _unpublish_activity(committer_id, activity_id, activity_type):
     _change_activity_status(
         committer_id, activity_id, activity_type, ACTIVITY_STATUS_PRIVATE,
         '%s unpublished.' % activity_type)
+
+    activity_services.remove_featured_activity(activity_type, activity_id)
 
 
 def _publicize_activity(committer_id, activity_id, activity_type):
@@ -703,7 +705,7 @@ def assign_role_for_exploration(
     """
     _assign_role(
         committer_id, assignee_id, new_role, exploration_id,
-        ACTIVITY_TYPE_EXPLORATION)
+        feconf.ACTIVITY_TYPE_EXPLORATION)
     if new_role in [ROLE_OWNER, ROLE_EDITOR]:
         subscription_services.subscribe_to_exploration(
             assignee_id, exploration_id)
@@ -715,7 +717,7 @@ def release_ownership_of_exploration(committer_id, exploration_id):
     Commits changes.
     """
     _release_ownership_of_activity(
-        committer_id, exploration_id, ACTIVITY_TYPE_EXPLORATION)
+        committer_id, exploration_id, feconf.ACTIVITY_TYPE_EXPLORATION)
 
 
 def set_private_viewability_of_exploration(
@@ -725,7 +727,7 @@ def set_private_viewability_of_exploration(
     to be viewed by anyone with the link.
     """
     if not Actor(committer_id).can_change_private_viewability(
-            ACTIVITY_TYPE_EXPLORATION, exploration_id):
+            feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
         logging.error(
             'User %s tried to change private viewability of exploration %s '
             'but was refused permission.' % (committer_id, exploration_id))
@@ -751,7 +753,7 @@ def set_private_viewability_of_exploration(
         'Made exploration viewable only to invited playtesters.')
 
     _save_activity_rights(
-        committer_id, exploration_rights, ACTIVITY_TYPE_EXPLORATION,
+        committer_id, exploration_rights, feconf.ACTIVITY_TYPE_EXPLORATION,
         commit_message, commit_cmds)
     _update_exploration_summary(exploration_rights)
 
@@ -764,13 +766,14 @@ def publish_exploration(committer_id, exploration_id):
     It is the responsibility of the caller to check that the exploration is
     valid prior to publication.
     """
-    _publish_activity(committer_id, exploration_id, ACTIVITY_TYPE_EXPLORATION)
+    _publish_activity(
+        committer_id, exploration_id, feconf.ACTIVITY_TYPE_EXPLORATION)
 
 
 def unpublish_exploration(committer_id, exploration_id):
     """Unpublishes an exploration. Commits changes."""
     _unpublish_activity(
-        committer_id, exploration_id, ACTIVITY_TYPE_EXPLORATION)
+        committer_id, exploration_id, feconf.ACTIVITY_TYPE_EXPLORATION)
 
 
 def publicize_exploration(committer_id, exploration_id):
@@ -780,13 +783,13 @@ def publicize_exploration(committer_id, exploration_id):
     valid prior to publicizing it.
     """
     _publicize_activity(
-        committer_id, exploration_id, ACTIVITY_TYPE_EXPLORATION)
+        committer_id, exploration_id, feconf.ACTIVITY_TYPE_EXPLORATION)
 
 
 def unpublicize_exploration(committer_id, exploration_id):
     """Unpublicizes an exploration. Commits changes."""
     _unpublicize_activity(
-        committer_id, exploration_id, ACTIVITY_TYPE_EXPLORATION)
+        committer_id, exploration_id, feconf.ACTIVITY_TYPE_EXPLORATION)
 
 
 # Rights functions for collections.
@@ -807,7 +810,7 @@ def assign_role_for_collection(
     """
     _assign_role(
         committer_id, assignee_id, new_role, collection_id,
-        ACTIVITY_TYPE_COLLECTION)
+        feconf.ACTIVITY_TYPE_COLLECTION)
     if new_role in [ROLE_OWNER, ROLE_EDITOR]:
         subscription_services.subscribe_to_collection(
             assignee_id, collection_id)
@@ -819,7 +822,7 @@ def release_ownership_of_collection(committer_id, collection_id):
     Commits changes.
     """
     _release_ownership_of_activity(
-        committer_id, collection_id, ACTIVITY_TYPE_COLLECTION)
+        committer_id, collection_id, feconf.ACTIVITY_TYPE_COLLECTION)
 
 
 def publish_collection(committer_id, collection_id):
@@ -830,12 +833,14 @@ def publish_collection(committer_id, collection_id):
     It is the responsibility of the caller to check that the collection is
     valid prior to publication.
     """
-    _publish_activity(committer_id, collection_id, ACTIVITY_TYPE_COLLECTION)
+    _publish_activity(
+        committer_id, collection_id, feconf.ACTIVITY_TYPE_COLLECTION)
 
 
 def unpublish_collection(committer_id, collection_id):
     """Unpublishes an collection. Commits changes."""
-    _unpublish_activity(committer_id, collection_id, ACTIVITY_TYPE_COLLECTION)
+    _unpublish_activity(
+        committer_id, collection_id, feconf.ACTIVITY_TYPE_COLLECTION)
 
 
 def publicize_collection(committer_id, collection_id):
@@ -844,10 +849,11 @@ def publicize_collection(committer_id, collection_id):
     It is the responsibility of the caller to check that the collection is
     valid prior to publicizing it.
     """
-    _publicize_activity(committer_id, collection_id, ACTIVITY_TYPE_COLLECTION)
+    _publicize_activity(
+        committer_id, collection_id, feconf.ACTIVITY_TYPE_COLLECTION)
 
 
 def unpublicize_collection(committer_id, collection_id):
     """Unpublicizes an collection. Commits changes."""
     _unpublicize_activity(
-        committer_id, collection_id, ACTIVITY_TYPE_COLLECTION)
+        committer_id, collection_id, feconf.ACTIVITY_TYPE_COLLECTION)

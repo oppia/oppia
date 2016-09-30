@@ -32,7 +32,11 @@ oppia.directive('oppiaNoninteractiveImage', [
         $scope.imageUrl = $sce.trustAsResourceUrl(
           '/imagehandler/' + explorationContextService.getExplorationId() +
           '/' + encodeURIComponent($scope.filepath));
-
+        $scope.imageCaption = '';
+        if ($attrs.captionWithValue) {
+          $scope.imageCaption = oppiaHtmlEscaper.escapedJsonToObj(
+            $attrs.captionWithValue);
+        }
         $scope.imageAltText = '';
         if ($attrs.altWithValue) {
           $scope.imageAltText = oppiaHtmlEscaper.escapedJsonToObj(

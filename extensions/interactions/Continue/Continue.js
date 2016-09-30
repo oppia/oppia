@@ -20,17 +20,23 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaInteractiveContinue', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'oppiaHtmlEscaper', 'continueRulesService',
+  function(oppiaHtmlEscaper, continueRulesService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        onSubmit: '&'
+      },
       templateUrl: 'interaction/Continue',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.buttonText = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.buttonTextWithValue);
 
         $scope.submitAnswer = function() {
-          $scope.$parent.$parent.submitAnswer('(' + $scope.buttonText + ')');
+          $scope.onSubmit({
+            answer: '(' + $scope.buttonText + ')',
+            rulesService: continueRulesService
+          });
         };
       }]
     };
@@ -59,4 +65,8 @@ oppia.directive('oppiaShortResponseContinue', [function() {
       $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
     }]
   };
+}]);
+
+oppia.factory('continueRulesService', [function() {
+  return {};
 }]);

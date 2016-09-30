@@ -17,10 +17,13 @@ describe('Expression type parser service', function() {
 
   var etps = null;
   var eps = null;
+  var ests = null;
+  var isString = null;
   beforeEach(inject(function($injector) {
     etps = $injector.get('expressionTypeParserService');
     eps = $injector.get('expressionParserService');
     ests = $injector.get('expressionSyntaxTreeService');
+    isString = $injector.get('utilsService').isString;
   }));
 
   var ENVS = [
@@ -76,8 +79,7 @@ describe('Expression type parser service', function() {
       // expected to be thrown.
       // 'expression' is either a string (in which case parsed) or an array
       // (representing a parse tree).
-      var parsed = typeof (expression) == 'string' ?
-          eps.parse(expression) : expression;
+      var parsed = isString(expression) ? eps.parse(expression) : expression;
       var parsedJson = JSON.stringify(parsed);
       var failed = false;
 
@@ -114,7 +116,7 @@ describe('Expression type parser service', function() {
       }
       expect(failed).toBe(false);
 
-      if (typeof (expression) != 'string') {
+      if (typeof (expression) !== 'string') {
         return;
       }
 

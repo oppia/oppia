@@ -2,7 +2,7 @@
   <div>
     <div ng-if="!someResultsExist" class="oppia-search-results-intro" ng-cloak>
       <div class="oppia-search-results-no-match">
-        <img src="/images/general/no_explorations_found.png" alt="No explorations found">
+        <img ng-src="<[noExplorationsImgUrl]>" alt="No explorations found">
         <p style="text-align: center;">
           <span translate="I18N_LIBRARY_NO_EXPLORATION_FOR_QUERY"></span><br><br>
           {% if not has_fully_registered %}

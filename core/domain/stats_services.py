@@ -46,6 +46,50 @@ def get_top_unresolved_answers_for_default_rule(exploration_id, state_name):
     }
 
 
+def get_exps_unresolved_answers_count_for_default_rule(exp_ids):
+    """Gets answer counts per exploration for the answer groups for default
+    rule across all states for explorations with ids in exp_ids.
+
+    Note that this method currently returns the counts only for the DEFAULT
+    rule. This should ideally handle all types of unresolved answers.
+
+    Returns:
+        A dict, keyed by the string '{exp_id}', whose values are the number of
+        unresolved answers that exploration has. Any exp_ids for explorations
+        that don't exist or that have been deleted will be ignored, and not
+        included in the return value.
+    """
+    explorations = exp_services.get_multiple_explorations_by_id(
+        exp_ids, strict=False)
+
+    # The variable `exploration_states_tuples` is a list of all
+    # (exp_id, state_name) tuples for the given exp_ids.
+    # E.g. - [
+    #   ('eid1', 'Introduction'),
+    #   ('eid1', 'End'),
+    #   ('eid2', 'Introduction'),
+    #   ('eid3', 'Introduction')
+    # ]
+    # when exp_ids = ['eid1', 'eid2', 'eid3'].
+    explorations_states_tuples = [
+        (exp_domain_object.id, state_key)
+        for exp_domain_object in explorations.values()
+        for state_key in exp_domain_object.states
+    ]
+    exploration_states_answers_list = get_top_state_rule_answers_multi(
+        explorations_states_tuples, [exp_domain.DEFAULT_RULESPEC_STR])
+    exps_answers_mapping = {}
+
+    for ind, statewise_answers in enumerate(exploration_states_answers_list):
+        for answer in statewise_answers:
+            exp_id = explorations_states_tuples[ind][0]
+            if exp_id not in exps_answers_mapping:
+                exps_answers_mapping[exp_id] = 0
+            exps_answers_mapping[exp_id] += answer['count']
+
+    return exps_answers_mapping
+
+
 def get_state_rules_stats(exploration_id, state_name):
     """Gets statistics for the answer groups and rules of this state.
 
@@ -125,27 +169,35 @@ def get_visualizations_info(exploration_id, exploration_version, state_name):
     return results_list
 
 
-def get_top_state_rule_answers(
-        exploration_id, state_name, rule_str_list, top_answer_count_per_rule):
+def get_top_state_rule_answers(exploration_id, state_name, rule_str_list):
     """Returns a list of top answers (by submission frequency) submitted to the
     given state in the given exploration which were mapped to any of the rules
-    listed in 'rule_str_list'. The number of answers returned is the number of
-    rule spec strings based in multiplied by top_answer_count_per_rule.
+    listed in 'rule_str_list'. All answers submitted to the specified state and
+    match the rule spec strings in rule_str_list are returned.
     """
-    answer_logs = stats_domain.StateRuleAnswerLog.get_multi(
-        exploration_id, [{
-            'state_name': state_name,
-            'rule_str': rule_str
-        } for rule_str in rule_str_list])
+    return get_top_state_rule_answers_multi(
+        [(exploration_id, state_name)], rule_str_list)[0]
 
-    all_top_answers = []
-    for answer_log in answer_logs:
-        top_answers = answer_log.get_top_answers(top_answer_count_per_rule)
-        all_top_answers += [
-            {'value': top_answer[0], 'count': top_answer[1]}
-            for top_answer in top_answers
-        ]
-    return all_top_answers
+
+def get_top_state_rule_answers_multi(exploration_state_list, rule_str_list):
+    """Returns a list of top answers (by submission frequency) submitted to the
+    given explorations and states which were mapped to any of the rules listed
+    in 'rule_str_list' for each exploration ID and state name tuple in
+    exploration_state_list.
+
+    For each exploration ID and state, all answers submitted that match any of
+    the rule spec strings in rule_str_list are returned.
+    """
+    answer_log_list = (
+        stats_domain.StateRuleAnswerLog.get_multi_by_multi_explorations(
+            exploration_state_list, rule_str_list))
+    return [[
+        {
+            'value': top_answer[0],
+            'count': top_answer[1]
+        }
+        for top_answer in answer_log.get_all_top_answers()
+    ] for answer_log in answer_log_list]
 
 
 def get_state_improvements(exploration_id, exploration_version):

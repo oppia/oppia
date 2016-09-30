@@ -43,7 +43,7 @@ oppia.directive('searchBar', [function() {
           function(languageItem) {
             return {
               id: languageItem.code,
-              text: i18nIdService.getLibraryId('languages', languageItem.code)
+              text: languageItem.name
             };
           });
 
@@ -136,7 +136,7 @@ oppia.directive('searchBar', [function() {
             $scope.searchQuery, $scope.selectionDetails.categories.selections,
             $scope.selectionDetails.languageCodes.selections
           );
-          if ($window.location.pathname == '/search/find') {
+          if ($window.location.pathname === '/search/find') {
             $location.url('/find?q=' + searchUrlQueryString);
           } else {
             $window.location.href = '/search/find?q=' + searchUrlQueryString;
@@ -150,7 +150,7 @@ oppia.directive('searchBar', [function() {
 
         $scope.onSearchQueryChange = function(evt) {
           // Query immediately when the enter or space key is pressed.
-          if (evt.keyCode == 13 || evt.keyCode == 32) {
+          if (evt.keyCode === 13 || evt.keyCode === 32) {
             onSearchQueryChangeExec();
           } else {
             oppiaDebouncer.debounce(onSearchQueryChangeExec, 650)();
@@ -158,6 +158,8 @@ oppia.directive('searchBar', [function() {
         };
 
         var updateSearchFieldsBasedOnUrlQuery = function() {
+          var oldQueryString = searchService.getCurrentUrlQueryString();
+
           $scope.selectionDetails.categories.selections = {};
           $scope.selectionDetails.languageCodes.selections = {};
 
@@ -167,7 +169,11 @@ oppia.directive('searchBar', [function() {
           updateSelectionDetails('categories');
           updateSelectionDetails('languageCodes');
 
-          onSearchQueryChangeExec();
+          var newQueryString = searchService.getCurrentUrlQueryString();
+
+          if (oldQueryString !== newQueryString) {
+            onSearchQueryChangeExec();
+          }
         };
 
         $scope.$on('$locationChangeSuccess', function() {
@@ -194,7 +200,7 @@ oppia.directive('searchBar', [function() {
               updateSearchFieldsBasedOnUrlQuery();
             }
 
-            if ($window.location.pathname == '/search/find') {
+            if ($window.location.pathname === '/search/find') {
               onSearchQueryChangeExec();
             }
 

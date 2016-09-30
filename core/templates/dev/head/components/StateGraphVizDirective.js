@@ -198,13 +198,13 @@ oppia.directive('stateGraphViz', [function() {
 
           for (var i = 0; i < $scope.augmentedLinks.length; i++) {
             var link = $scope.augmentedLinks[i];
-            if (link.source.label != link.target.label) {
+            if (link.source.label !== link.target.label) {
               var sourcex = link.source.xLabel;
               var sourcey = link.source.yLabel;
               var targetx = link.target.xLabel;
               var targety = link.target.yLabel;
 
-              if (sourcex == targetx && sourcey == targety) {
+              if (sourcex === targetx && sourcey === targety) {
                 // TODO(sll): Investigate why this happens.
                 return;
               }
@@ -264,8 +264,8 @@ oppia.directive('stateGraphViz', [function() {
             var currentNodeIsTerminal = (
               $scope.finalStateIds.indexOf(nodeId) !== -1);
             return (
-              nodeId == $scope.currentStateId() ? '3' :
-              (nodeId == $scope.initStateId2 || currentNodeIsTerminal) ? '2' :
+              nodeId === $scope.currentStateId() ? '3' :
+              (nodeId === $scope.initStateId2 || currentNodeIsTerminal) ? '2' :
               '1');
           };
 
@@ -301,7 +301,7 @@ oppia.directive('stateGraphViz', [function() {
           };
 
           $scope.onNodeDeletionClick = function(nodeId) {
-            if (nodeId != initStateId) {
+            if (nodeId !== initStateId) {
               $scope.onDeleteFunction(nodeId);
             }
           };
@@ -315,7 +315,7 @@ oppia.directive('stateGraphViz', [function() {
           };
 
           $scope.canNavigateToNode = function(nodeId) {
-            return nodeId != $scope.currentStateId();
+            return nodeId !== $scope.currentStateId();
           };
 
           $scope.getTruncatedLabel = function(nodeLabel) {
@@ -359,7 +359,7 @@ oppia.directive('stateGraphViz', [function() {
                 nodeData[nodeId].reachableFromEnd) ? 'bad-node' :
                                                      'normal-node');
 
-            nodeData[nodeId].canDelete = (nodeId != initStateId);
+            nodeData[nodeId].canDelete = (nodeId !== initStateId);
             $scope.nodeList.push(nodeData[nodeId]);
           }
 

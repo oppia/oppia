@@ -23,15 +23,19 @@ of the uploaded files to a deployment folder in the parent directory of the
 oppia/ folder. It then pushes this build to the production server.
 
 IMPORTANT NOTES:
-
 1.  You will need to first create a folder called ../deploy_data/[APP_NAME],
     where [APP_NAME] is the name of your app as defined in app.yaml. This
     folder should contain a folder called /images, which in turn should
     contain:
-    - one file: favicon.ico
     - four folders: /avatar, /general, /logo and /sidebar, containing
         images used for the avatar, general-purpose usage, logo and sidebar,
         respectively.
+    It should also contain a folder called /common, which should contain:
+    - favicon.ico and robots.txt.
+    - one folder images/general which contains:
+        - background.jpg
+        - icons-bg.png
+        - warning.png
 
 2.  Before running this script, you must install third-party dependencies by
     running
@@ -53,7 +57,9 @@ IMPORTANT NOTES:
 import argparse
 import datetime
 import os
+import random
 import shutil
+import string
 import subprocess
 # pylint: enable=wrong-import-order
 
@@ -84,8 +90,12 @@ LOG_FILE_PATH = os.path.join('..', 'deploy.log')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
 DEPLOY_DATA_PATH = os.path.join(os.getcwd(), '..', 'deploy_data', APP_NAME)
 
-IMAGE_FILES_AT_ROOT = ['favicon.ico']
+FILES_AT_ROOT_IN_COMMON = ['favicon.ico', 'robots.txt']
 IMAGE_DIRS = ['avatar', 'general', 'sidebar', 'logo']
+
+# Denotes length for cache slug used in production mode. It consists of
+# lowercase alphanumeric characters.
+CACHE_SLUG_PROD_LENGTH = 6
 
 
 def preprocess_release():
@@ -109,9 +119,10 @@ def preprocess_release():
         raise Exception(
             'Could not find deploy_data directory at %s' % DEPLOY_DATA_PATH)
 
-    for filename in IMAGE_FILES_AT_ROOT:
-        src = os.path.join(DEPLOY_DATA_PATH, 'images', filename)
-        dst = os.path.join(os.getcwd(), 'static', 'images', filename)
+    # Copies files in common folder to assets/common.
+    for filename in FILES_AT_ROOT_IN_COMMON:
+        src = os.path.join(DEPLOY_DATA_PATH, 'common', filename)
+        dst = os.path.join(os.getcwd(), 'assets', 'common', filename)
         if not os.path.exists(src):
             raise Exception(
                 'Could not find source path %s. Please check your deploy_data '
@@ -122,9 +133,10 @@ def preprocess_release():
                 'updated in the meantime?' % dst)
         shutil.copyfile(src, dst)
 
+    # Copies files in images to /assets/images
     for dir_name in IMAGE_DIRS:
         src_dir = os.path.join(DEPLOY_DATA_PATH, 'images', dir_name)
-        dst_dir = os.path.join(os.getcwd(), 'static', 'images', dir_name)
+        dst_dir = os.path.join(os.getcwd(), 'assets', 'images', dir_name)
 
         if not os.path.exists(src_dir):
             raise Exception(
@@ -174,21 +186,10 @@ def _execute_deployment():
         print 'Preprocessing release...'
         preprocess_release()
 
+        update_cache_slug()
         # Do a build; ensure there are no errors.
         print 'Building and minifying scripts...'
         subprocess.check_output(['python', 'scripts/build.py'])
-
-        # Run the tests; ensure there are no errors.
-        print 'Running tests...'
-        tests_proc = subprocess.Popen([
-            'bash', os.path.join('scripts', 'run_tests.sh')
-        ], stdout=subprocess.PIPE)
-        tests_stdout, tests_stderr = tests_proc.communicate()
-        print tests_stdout
-        print tests_stderr
-
-        if tests_proc.returncode != 0:
-            raise Exception('Tests failed. Halting deployment.')
 
         # Deploy to GAE.
         subprocess.check_output([APPCFG_PATH, 'update', '.', '--oauth2'])
@@ -204,6 +205,26 @@ def _execute_deployment():
         print 'Returning to oppia/ root directory.'
 
     print 'Done!'
+
+
+def get_unique_id():
+    """Returns a unique id."""
+    unique_id = ''.join(random.choice(string.ascii_lowercase + string.digits)
+                        for _ in range(CACHE_SLUG_PROD_LENGTH))
+    return unique_id
+
+
+def update_cache_slug():
+    """Updates the cache slug in cache_slug.yaml"""
+    cache_slug = get_unique_id()
+
+    # Change the cache slug in cache_slug.yaml.
+    with open('cache_slug.yaml', 'r') as f:
+        content = f.read()
+    os.remove('cache_slug.yaml')
+    content = content.replace('default', cache_slug)
+    with open('cache_slug.yaml', 'w+') as d:
+        d.write(content)
 
 
 if __name__ == '__main__':

@@ -318,6 +318,14 @@ def get_human_readable_time_string(time_msec):
     return time.strftime('%B %d %H:%M:%S', time.gmtime(time_msec / 1000.0))
 
 
+def are_datetimes_close(later_datetime, earlier_datetime):
+    """Given two datetimes, determines whether they are separated by less than
+    feconf.PROXIMAL_TIMEDELTA_SECS seconds.
+    """
+    difference_in_secs = (later_datetime - earlier_datetime).total_seconds()
+    return difference_in_secs < feconf.PROXIMAL_TIMEDELTA_SECS
+
+
 def generate_random_string(length):
     return base64.urlsafe_b64encode(os.urandom(length))
 
@@ -429,7 +437,8 @@ def get_thumbnail_icon_url_for_category(category):
         category if category in feconf.ALL_CATEGORIES
         else feconf.DEFAULT_THUMBNAIL_ICON)
     # Remove all spaces from the string.
-    return '/images/subjects/%s.svg' % icon_name.replace(' ', '')
+    return ('%s/assets/images/subjects/%s.svg'
+            % (get_asset_dir_prefix(), icon_name.replace(' ', '')))
 
 
 def _get_short_language_description(full_language_description):
@@ -453,3 +462,39 @@ def get_all_language_codes_and_names():
 def unescape_encoded_uri_component(escaped_string):
     """Unescape a string that is encoded with encodeURIComponent."""
     return urllib.unquote(escaped_string).decode('utf-8')
+
+
+_CACHE_SLUG = None
+def get_cache_slug():
+    """Returns cache slug depending whether dev or prod."""
+    global _CACHE_SLUG # pylint: disable=global-statement
+    if not _CACHE_SLUG:
+        _CACHE_SLUG = ''
+        if feconf.IS_MINIFIED or not feconf.DEV_MODE:
+            yaml_file_content = dict_from_yaml(
+                get_file_contents('cache_slug.yaml'))
+            _CACHE_SLUG = yaml_file_content['cache_slug']
+
+    return _CACHE_SLUG
+
+
+def get_asset_dir_prefix():
+    """Returns prefix for asset directory depending whether dev or prod.
+    It is used as a prefix in urls for images, css and script files.
+    """
+    asset_dir_prefix = ''
+    if feconf.IS_MINIFIED or not feconf.DEV_MODE:
+        cache_slug = get_cache_slug()
+        asset_dir_prefix = '/build/%s' % cache_slug
+
+    return asset_dir_prefix
+
+
+def get_template_dir_prefix():
+    """Returns prefix for template directory depending whether dev or prod.
+    It is used as a prefix in urls for js script files under the templates
+    directory.
+    """
+    template_path = ('/templates/head' if feconf.IS_MINIFIED
+                     or not feconf.DEV_MODE else '/templates/dev/head')
+    return '%s%s' % (get_asset_dir_prefix(), template_path)

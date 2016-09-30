@@ -20,10 +20,13 @@ from pipeline import pipeline
 
 from core import jobs
 from core.controllers import base
+from core.domain import email_manager
+from core.domain import exp_jobs_one_off
+from core.domain import recommendations_jobs_one_off
+from core.domain import user_jobs_one_off
 from core.platform import models
 import utils
 
-email_services = models.Registry.import_email_services()
 (job_models,) = models.Registry.import_models([models.NAMES.job])
 
 # The default retention time is 2 days.
@@ -83,7 +86,38 @@ class JobStatusMailerHandler(base.BaseHandler):
             email_subject = 'MapReduce status report'
             email_message = 'All MapReduce jobs are running fine.'
 
-        email_services.send_mail_to_admin(email_subject, email_message)
+        email_manager.send_mail_to_admin(email_subject, email_message)
+
+
+class CronDashboardStatsHandler(base.BaseHandler):
+    """Handler for appending dashboard stats to a list."""
+
+    @require_cron_or_superadmin
+    def get(self):
+        """Handles GET requests."""
+        user_jobs_one_off.DashboardStatsOneOffJob.enqueue(
+            user_jobs_one_off.DashboardStatsOneOffJob.create_new())
+
+
+class CronExplorationRecommendationsHandler(base.BaseHandler):
+    """Handler for computing exploration recommendations."""
+
+    @require_cron_or_superadmin
+    def get(self):
+        """Handles GET requests."""
+        job_class = (
+            recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob)
+        job_class.enqueue(job_class.create_new())
+
+
+class CronExplorationSearchRankHandler(base.BaseHandler):
+    """Handler for computing exploration search ranks."""
+
+    @require_cron_or_superadmin
+    def get(self):
+        """Handles GET requests."""
+        exp_jobs_one_off.IndexAllExplorationsJobManager.enqueue(
+            exp_jobs_one_off.IndexAllExplorationsJobManager.create_new())
 
 
 class CronMapreduceCleanupHandler(base.BaseHandler):

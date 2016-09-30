@@ -21,6 +21,7 @@ import os
 
 from extensions import domain
 import feconf
+import jinja_utils
 import schema_utils
 import utils
 
@@ -82,11 +83,9 @@ class BaseGadget(object):
         gadget. This contains everything needed to display the gadget
         once the necessary attributes are supplied.
         """
-        js_directives = utils.get_file_contents(os.path.join(
-            feconf.GADGETS_DIR, self.type, '%s.js' % self.type))
         html_templates = utils.get_file_contents(os.path.join(
             feconf.GADGETS_DIR, self.type, '%s.html' % self.type))
-        return '<script>%s</script>\n%s' % (js_directives, html_templates)
+        return jinja_utils.interpolate_cache_slug('%s' % html_templates)
 
     def validate(self, customization_args):
         """Subclasses may override to perform additional validation."""

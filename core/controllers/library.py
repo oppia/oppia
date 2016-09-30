@@ -34,11 +34,18 @@ current_user_services = models.Registry.import_current_user_services()
 
 def get_matching_activity_dicts(query_string, search_cursor):
     """Given a query string and a search cursor, returns a list of activity
-       dicts that satisfy the search query.
+    dicts that satisfy the search query.
     """
-    collection_ids, search_cursor = (
-        collection_services.get_collection_ids_matching_query(
-            query_string, cursor=search_cursor))
+    # We only populate collections in the initial load, since the current
+    # frontend search infrastructure is set up to only deal with one search
+    # cursor at a time.
+    # TODO(sll): Remove this special casing.
+    collection_ids = []
+    if not search_cursor:
+        collection_ids, _ = (
+            collection_services.get_collection_ids_matching_query(
+                query_string))
+
     exp_ids, new_search_cursor = (
         exp_services.get_exploration_ids_matching_query(
             query_string, cursor=search_cursor))
@@ -63,8 +70,6 @@ class LibraryPage(base.BaseHandler):
     for search results.
     """
 
-    PAGE_NAME_FOR_CSRF = 'library'
-
     def get(self):
         """Handles GET requests."""
         search_mode = 'search' in self.request.url
@@ -82,11 +87,13 @@ class LibraryPage(base.BaseHandler):
             'search_mode': search_mode,
             'SEARCH_DROPDOWN_CATEGORIES': feconf.SEARCH_DROPDOWN_CATEGORIES,
         })
-        self.render_template('library/library.html')
+        self.render_template('pages/library/library.html')
 
 
 class LibraryIndexHandler(base.BaseHandler):
     """Provides data for the default library index page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self):
         """Handles GET requests."""
@@ -99,7 +106,7 @@ class LibraryIndexHandler(base.BaseHandler):
             summary_services.get_top_rated_exploration_summary_dicts(
                 [feconf.DEFAULT_LANGUAGE_CODE]))
         featured_activity_summary_dicts = (
-            summary_services.get_featured_exploration_summary_dicts(
+            summary_services.get_featured_activity_summary_dicts(
                 [feconf.DEFAULT_LANGUAGE_CODE]))
 
         preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
@@ -111,19 +118,23 @@ class LibraryIndexHandler(base.BaseHandler):
             summary_dicts_by_category.insert(0, {
                 'activity_summary_dicts': recently_published_summary_dicts,
                 'categories': [],
-                'header': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
+                'header_i18n_id': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
+                'has_full_results_page': True,
             })
         if top_rated_activity_summary_dicts:
             summary_dicts_by_category.insert(0, {
                 'activity_summary_dicts': top_rated_activity_summary_dicts,
                 'categories': [],
-                'header': feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS,
+                'header_i18n_id': (
+                    feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS),
+                'has_full_results_page': True,
             })
         if featured_activity_summary_dicts:
             summary_dicts_by_category.insert(0, {
                 'activity_summary_dicts': featured_activity_summary_dicts,
                 'categories': [],
-                'header': feconf.LIBRARY_CATEGORY_FEATURED_EXPLORATIONS,
+                'header_i18n_id': feconf.LIBRARY_CATEGORY_FEATURED_ACTIVITIES,
+                'has_full_results_page': False,
             })
 
         self.values.update({
@@ -136,6 +147,8 @@ class LibraryIndexHandler(base.BaseHandler):
 
 class SearchHandler(base.BaseHandler):
     """Provides data for activity search results."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self):
         """Handles GET requests."""
@@ -179,6 +192,8 @@ class ExplorationSummariesHandler(base.BaseHandler):
     """Returns summaries corresponding to ids of public explorations. This
     controller supports returning private explorations for the given user.
     """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self):
         """Handles GET requests."""

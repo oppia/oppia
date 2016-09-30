@@ -415,6 +415,13 @@
         "url": "https://github.com/yui/yuicompressor/releases/download/v2.4.8",
         "files": ["yuicompressor-2.4.8.jar"],
         "targetDirPrefix": "yuicompressor-"
+      },
+      "browsermob-proxy": {
+        "version": "2.1.1",
+        "downloadFormat": "zip",
+        "url": "https://github.com/lightbody/browsermob-proxy/releases/download/browsermob-proxy-2.1.1/browsermob-proxy-2.1.1-bin.zip",
+        "rootDirPrefix": "browsermob-proxy-",
+        "targetDirPrefix": "browsermob-proxy-"
       }
     }
   }

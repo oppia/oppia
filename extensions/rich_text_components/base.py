@@ -20,6 +20,7 @@ import os
 
 from extensions import domain
 import feconf
+import jinja_utils
 import utils
 
 
@@ -84,11 +85,9 @@ class BaseRichTextComponent(object):
         necessary attributes are supplied. For rich-text components, this
         consists of a single directive/template pair.
         """
-        js_directives = utils.get_file_contents(os.path.join(
-            feconf.RTE_EXTENSIONS_DIR, self.id, '%s.js' % self.id))
         html_templates = utils.get_file_contents(os.path.join(
             feconf.RTE_EXTENSIONS_DIR, self.id, '%s.html' % self.id))
-        return '<script>%s</script>\n%s' % (js_directives, html_templates)
+        return jinja_utils.interpolate_cache_slug('%s' % html_templates)
 
     def to_dict(self):
         """Gets a dict representing this component. Only the default values for

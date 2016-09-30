@@ -30,7 +30,7 @@ oppia.factory('baseInteractionValidationService', [
         }
       }
       if (missingArgs.length > 0) {
-        if (missingArgs.length == 1) {
+        if (missingArgs.length === 1) {
           throw 'Expected customization arguments to have property: ' +
             missingArgs[0];
         } else {

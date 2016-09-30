@@ -169,6 +169,37 @@ describe('Pencil Code Editor rules service', function() {
     });
   });
 
+  describe('\'output roughly equals\' rule', function() {
+    var RULE_INPUT = {
+      x: '1\n      a W ? b\n'
+    };
+
+    it('should compare normalized output', function() {
+      expect(pcers.OutputRoughlyEquals({
+        output: '1\n   a   W ?   b'
+      }, RULE_INPUT)).toBe(true);
+      expect(pcers.OutputRoughlyEquals({
+        output: '\n1\na  w?B'
+      }, RULE_INPUT)).toBe(true);
+      expect(pcers.OutputRoughlyEquals({
+        output: '   1\n\na w?b    \n\n\n'
+      }, RULE_INPUT)).toBe(true);
+
+      expect(pcers.OutputRoughlyEquals({
+        output: '1 a w ? b'
+      }, RULE_INPUT)).toBe(false);
+      expect(pcers.OutputRoughlyEquals({
+        output: '1 \n a w b'
+      }, RULE_INPUT)).toBe(false);
+      expect(pcers.OutputRoughlyEquals({
+        output: 'b ? w a \n 1'
+      }, RULE_INPUT)).toBe(false);
+      expect(pcers.OutputRoughlyEquals({
+        output: 'bad output'
+      }, RULE_INPUT)).toBe(false);
+    });
+  });
+
   describe('\'results in error\' rule', function() {
     var RULE_INPUT = null;
 

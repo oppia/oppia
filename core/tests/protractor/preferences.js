@@ -33,6 +33,18 @@ describe('Preferences', function() {
     expect(checkbox.getAttribute('aria-checked')).toBe('false');
   });
 
+  it('should change feedback message email checkbox value', function() {
+    users.createUser('bob@preferences.com', 'bobPreferences');
+    users.login('bob@preferences.com');
+    browser.get('/preferences');
+    var checkbox = element(by.model('canReceiveFeedbackMessageEmail'));
+    expect(checkbox.getAttribute('aria-checked')).toBe('true');
+    checkbox.click();
+    expect(checkbox.getAttribute('aria-checked')).toBe('false');
+    browser.refresh();
+    expect(checkbox.getAttribute('aria-checked')).toBe('false');
+  });
+
   afterEach(function() {
     general.checkForConsoleErrors([]);
   });

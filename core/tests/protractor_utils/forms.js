@@ -495,7 +495,7 @@ var CodeMirrorChecker = function(elem) {
           .then(function(lineNumber) {
         // Note: the last line in codemirror will have an empty string for line
         // number and for text. This is to skip that line.
-        if (lineNumber == '') {
+        if (lineNumber === '') {
           return lineNumber;
         }
         if (!compareDict.hasOwnProperty(lineNumber)) {
@@ -511,7 +511,7 @@ var CodeMirrorChecker = function(elem) {
       });
     }).then(function(lineNumbers) {
       var largestLineNumber = lineNumbers[lineNumbers.length - 1];
-      if (largestLineNumber != currentLineNumber) {
+      if (largestLineNumber !== currentLineNumber) {
         _compareTextAndHighlightingFromLine(
           largestLineNumber,
           scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,

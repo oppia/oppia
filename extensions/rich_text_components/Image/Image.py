@@ -39,6 +39,13 @@ class Image(base.BaseRichTextComponent):
         },
         'default_value': '',
     }, {
+        'name': 'caption',
+        'description': ('Caption for image (optional)'),
+        'schema': {
+            'type': 'unicode',
+        },
+        'default_value': '',
+    }, {
         'name': 'alt',
         'description': 'Alternative text (for screen readers)',
         'schema': {

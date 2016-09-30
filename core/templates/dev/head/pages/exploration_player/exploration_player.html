@@ -1,0 +1,136 @@
+{% extends 'pages/base.html' %}
+
+{% block maintitle %}
+  {{ exploration_title }} - Oppia
+{% endblock maintitle %}
+
+{% block header_js %}
+  {{ super() }}
+  {% if exploration_version %}
+    <script type="text/javascript">
+      GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
+      GLOBALS.collectionTitle = JSON.parse('{{collection_title|js_string}}');
+      GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = JSON.parse(
+        '{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER|js_string}}');
+      GLOBALS.explorationVersion = JSON.parse(
+        '{{exploration_version|js_string}}');
+      GLOBALS.GADGET_SPECS = JSON.parse('{{GADGET_SPECS|js_string}}');
+      GLOBALS.INTERACTION_SPECS = JSON.parse(
+        '{{INTERACTION_SPECS|js_string}}');
+    </script>
+  {% endif %}
+
+  {{dependencies_html}}
+{% endblock header_js %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb" ng-controller="LearnerViewBreadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      <span class="protractor-test-exploration-header" itemprop="description">{{exploration_title}}</span>
+    </li>
+    <li ng-click="showInformationCard()" tooltip="<['I18N_PLAYER_INFO_TOOLTIP' | translate]>" tooltip-placement="bottom" style="cursor: pointer;" class="protractor-test-exploration-info-icon">
+      <i class="material-icons oppia-navbar-breadcrumb-icon" style="font-size: 20px;">&#xE88E;</i>
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
+{% block local_top_nav_options %}
+  <script type="text/ng-template" id="modals/learnerSuggestionSubmitted">
+    <div class="modal-header">
+      <h3>Thanks!</h3>
+    </div>
+
+    <div class="modal-body">
+      <p>
+        Your suggestion has been forwarded to the exploration author for review.
+      </p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-default" ng-click="close()">Close</button>
+    </div>
+  </script>
+  <script type="text/ng-template" id="modals/learnerViewSuggestion">
+    <div class="modal-header">
+      <h3>Suggest a Change</h3>
+    </div>
+
+    <div class="modal-body">
+      <text-angular-rte ng-show="showEditor" html-content="suggestionContent"></text-angular-rte>
+      <br>
+      Briefly describe your changes (required):
+      <input type="text" ng-model="description" style="width: 100%">
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-default" ng-click="cancelSuggestion()">Cancel</button>
+      <button class="btn btn-success" ng-click="submitSuggestion()" ng-disabled="(initContent == suggestionContent) || !description">
+        Submit Suggestion
+      </button>
+    </div>
+  </script>
+  {% include 'pages/exploration_player/learner_local_nav.html' %}
+{% endblock local_top_nav_options %}
+
+{% block content %}
+  <conversation-skin></conversation-skin>
+
+  <br><br><br>
+
+  {% if not iframed %}
+    <attribution-guide></attribution-guide>
+  {% endif %}
+
+  {% include 'components/attribution_guide/attribution_guide_directive.html' %}
+  {% include 'components/exploration_embed_button_modal.html' %}
+  {% include 'components/gadget_directive.html' %}
+  {% include 'components/gadget_panel_directive.html' %}
+  {% include 'components/profile_link_image_directive.html' %}
+  {% include 'components/sharing_links_directive.html' %}
+  {% include 'pages/exploration_player/answer_feedback_pair_directive.html' %}
+  {% include 'pages/exploration_player/conversation_skin_directive.html' %}
+  {% include 'pages/exploration_player/exploration_successfully_flagged_modal.html' %}
+  {% include 'pages/exploration_player/feedback_popup_directive.html' %}
+  {% include 'pages/exploration_player/flag_exploration_modal.html' %}
+  {% include 'pages/exploration_player/information_card_modal.html' %}
+  {% include 'pages/exploration_player/progress_dots_directive.html' %}
+
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/explorationServices.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/messengerService.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/attribution_guide/AttributionGuideDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/ExplorationEmbedButtonService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/GadgetDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/GadgetPanelDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/ProfileLinkImageDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/SharingLinksDirective.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ExplorationObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StateObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/StopwatchObjectFactory.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerClassificationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerFeedbackPairDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ConversationSkinDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationRecommendationsService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/FeedbackPopupDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerLocalNav.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerParamsService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerViewBreadcrumb.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerViewRatingService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerPositionService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerServices.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerTranscriptService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ProgressDotsDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/StatsReportingService.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionInterpolationService.js"></script>
+
+  {{ interaction_templates }}
+  {{ gadget_templates }}
+{% endblock footer_js %}

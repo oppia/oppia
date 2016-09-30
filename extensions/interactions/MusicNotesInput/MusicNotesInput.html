@@ -1,11 +1,13 @@
-<link rel="stylesheet" type="text/css" href="/extensions/interactions/MusicNotesInput/static/css/musicNotesInput.css">
+<script src="{{cache_slug}}/extensions/interactions/MusicNotesInput/MusicNotesInput.js"></script>
+<script src="{{cache_slug}}/extensions/interactions/MusicNotesInput/validator.js"></script>
 
 <script type="text/ng-template" id="interaction/MusicNotesInput">
+  <link rel="stylesheet" type="text/css" ng-href="<[getStaticResourceUrl('/extensions/interactions/MusicNotesInput/static/css/musicNotesInput.css')]>">
   <div class="music-notes-input-container">
     <div class="oppia-music-input-valid-note-area">
       <button type="button" class="btn btn-default oppia-music-input-btn oppia-music-input-play-btn"
             ng-click="playCurrentSequence()">
-        <span class="glyphicon glyphicon-play"></span>
+        <span><i class="material-icons">&#xE037;</i></span>
         <span translate="I18N_INTERACTIONS_MUSIC_PLAY"></span>
       </button>
       <div class="oppia-music-input-note-choices"></div>

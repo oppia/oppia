@@ -52,7 +52,7 @@ oppia.factory('CollectionValidationService', [
       }
 
       return collection.getExplorationIds().filter(function(explorationId) {
-        return completedExpIds.indexOf(explorationId) == -1;
+        return completedExpIds.indexOf(explorationId) === -1;
       });
     };
 
@@ -72,6 +72,33 @@ oppia.factory('CollectionValidationService', [
       });
     };
 
+    // Validates that the tags for the collection are in the proper format,
+    // returns true if all tags are in the correct format.
+    var validateTagFormat = function(tags) {
+      // Check to ensure that all tags follow the format specified in
+      // TAG_REGEX.
+      var tagRegex = new RegExp(GLOBALS.TAG_REGEX);
+      return tags.every(function(tag) {
+        return tag.match(tagRegex);
+      });
+    };
+
+    // Validates that the tags for the collection do not have duplicates,
+    // returns true if there are no duplicates.
+    var validateDuplicateTags = function(tags) {
+      return tags.every(function(tag, idx) {
+        return tags.indexOf(tag, idx + 1) === -1;
+      });
+    };
+
+    // Validates that the tags for the collection are normalized,
+    // returns true if all tags were normalized.
+    var validateTagsNormalized = function(tags) {
+      return tags.every(function(tag) {
+        return tag === tag.trim().replace(/\s+/g, ' ');
+      });
+    };
+
     var _validateCollection = function(collection, isPublic) {
       // NOTE TO DEVELOPERS: Please ensure that this validation logic is the
       // same as that in core.domain.collection_domain.Collection.validate().
@@ -84,7 +111,7 @@ oppia.factory('CollectionValidationService', [
       }
 
       var startingExpIds = _getStartingExplorationIds(collection);
-      if (collectionHasNodes && startingExpIds.length != 1) {
+      if (collectionHasNodes && startingExpIds.length !== 1) {
         issues.push(
           'There should be exactly 1 exploration initially available to the ' +
           'learner.');
@@ -101,14 +128,14 @@ oppia.factory('CollectionValidationService', [
       });
 
       var unreachableExpIds = _getUnreachableExplorationIds(collection);
-      if (unreachableExpIds.length != 0) {
+      if (unreachableExpIds.length !== 0) {
         issues.push(
           'The following exploration(s) are unreachable from the initial ' +
           'exploration(s): ' + unreachableExpIds.join(', '));
       }
 
       var nonexistentExpIds = _getNonexistentExplorationIds(collection);
-      if (nonexistentExpIds.length != 0) {
+      if (nonexistentExpIds.length !== 0) {
         issues.push(
           'The following exploration(s) either do not exist, or you do not ' +
           'have edit access to add them to this collection: ' +
@@ -117,7 +144,7 @@ oppia.factory('CollectionValidationService', [
 
       if (isPublic) {
         var privateExpIds = _getPrivateExplorationIds(collection);
-        if (privateExpIds.length != 0) {
+        if (privateExpIds.length !== 0) {
           issues.push(
             'Private explorations cannot be added to a public collection: ' +
             privateExpIds.join(', '));
@@ -142,7 +169,6 @@ oppia.factory('CollectionValidationService', [
             nextExpIds.join(', '));
         }
       }
-
       return issues;
     };
 
@@ -165,6 +191,14 @@ oppia.factory('CollectionValidationService', [
        */
       findValidationIssuesForPublicCollection: function(collection) {
         return _validateCollection(collection, true);
+      },
+
+      /**
+       * Returns false if the tags are not validate.
+       */
+      isTagValid: function(tags) {
+        return validateTagFormat(tags) && validateDuplicateTags(tags) &&
+          validateTagsNormalized(tags);
       }
     };
   }]);

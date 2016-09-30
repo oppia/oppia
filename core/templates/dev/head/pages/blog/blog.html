@@ -1,0 +1,25 @@
+{% extends 'pages/base.html' %}
+
+{% block maintitle %}
+  Blog - Oppia
+{% endblock maintitle %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      Blog
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <iframe width="100%" frameborder="0"
+          src="https://oppiablog.blogspot.com"
+          height="1300">
+  </iframe>
+{% endblock %}
+
+{% block footer %}
+  {% include 'pages/footer.html' %}
+{% endblock %}

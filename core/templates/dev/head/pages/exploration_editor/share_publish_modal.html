@@ -1,0 +1,60 @@
+<script type="text/ng-template" id="modals/shareExplorationAfterPublish">
+  <div class="modal-header oppia-share-publish-header">
+    <img ng-src="<[congratsImgUrl]>">
+    <h3>Awesome!</h3>
+  </div>
+
+  <div class="modal-body oppia-long-text oppia-share-publish-body">
+    <p>
+      Now that you're a published Oppia teacher, share your creation.
+    </p>
+    <sharing-links flex="100" layout-type="row"
+                   layout-align-type="center center"
+                   twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR"
+                   exploration-id="explorationId">
+    </sharing-links>
+    <button class="btn btn-default oppia-share-publish-close"
+            ng-click="close()">
+      Close
+    </button>
+  </div>
+</script>
+
+<style>
+  .oppia-share-publish-body,
+  .oppia-share-publish-body p {
+    text-align: center;
+  }
+
+  .oppia-share-publish-close {
+    background-color: #015c53;
+    border-radius: 0;
+    color: #fff;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 14px;
+    margin-top: 10px;
+    text-transform: uppercase;
+    width: 200px;
+    text-align: center;
+  }
+
+  .oppia-share-publish-close:hover {
+    background-color: #05beb2;
+    color: #fff;
+  }
+
+  .oppia-share-publish-header {
+    text-align: center;
+    background: #009688;
+    border-radius: 5px 5px 0 0;
+  }
+
+  .oppia-share-publish-header h3 {
+    color: #FFF;
+    font-size: 1.3em;
+  }
+
+  .oppia-share-publish-header img {
+    width: 40%;
+  }
+</style>

@@ -63,7 +63,7 @@ class ExplorationModel(base_models.VersionedModel):
     author_notes = ndb.TextProperty(default='', indexed=False)
     # Schema storing specifications of the contents of any gadget panels,
     # along with associated customizations for each gadget instance.
-    skin_customizations = ndb.JsonProperty(required=True, indexed=False)
+    skin_customizations = ndb.JsonProperty(indexed=False)
 
     # The version of the states blob schema.
     states_schema_version = ndb.IntegerProperty(
@@ -366,15 +366,6 @@ class ExpSummaryModel(base_models.BaseModel):
         """Returns an iterable with non-private exp summary models."""
         return ExpSummaryModel.query().filter(
             ExpSummaryModel.status != feconf.ACTIVITY_STATUS_PRIVATE
-        ).filter(
-            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-    @classmethod
-    def get_featured(cls):
-        """Returns an iterable with featured exp summary models."""
-        return ExpSummaryModel.query().filter(
-            ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLICIZED
         ).filter(
             ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)

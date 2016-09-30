@@ -18,7 +18,6 @@ import logging
 
 import jinja2
 
-from core import counters
 from core import jobs
 from core import jobs_registry
 from core.controllers import base
@@ -55,38 +54,9 @@ def require_super_admin(handler):
 
 class AdminPage(base.BaseHandler):
     """Admin page shown in the App Engine admin console."""
-
-    PAGE_NAME_FOR_CSRF = 'admin'
-
     @require_super_admin
     def get(self):
         """Handles GET requests."""
-        self.values['counters'] = [{
-            'name': counter.name,
-            'description': counter.description,
-            'value': counter.value
-        } for counter in counters.Registry.get_all_counters()]
-
-        if counters.HTML_RESPONSE_COUNT.value:
-            average_time = (
-                counters.HTML_RESPONSE_TIME_SECS.value /
-                counters.HTML_RESPONSE_COUNT.value)
-            self.values['counters'].append({
-                'name': 'average-html-response-time-secs',
-                'description': 'Average HTML response time in seconds',
-                'value': average_time
-            })
-
-        if counters.JSON_RESPONSE_COUNT.value:
-            average_time = (
-                counters.JSON_RESPONSE_TIME_SECS.value /
-                counters.JSON_RESPONSE_COUNT.value)
-            self.values['counters'].append({
-                'name': 'average-json-response-time-secs',
-                'description': 'Average JSON response time in seconds',
-                'value': average_time
-            })
-
         demo_exploration_ids = feconf.DEMO_EXPLORATIONS.keys()
 
         recent_job_data = jobs.get_data_for_recent_jobs()
@@ -137,13 +107,13 @@ class AdminPage(base.BaseHandler):
                 editor.get_value_generators_js()),
         })
 
-        self.render_template('admin/admin.html')
+        self.render_template('pages/admin/admin.html')
 
 
 class AdminHandler(base.BaseHandler):
     """Handler for the admin page."""
 
-    PAGE_NAME_FOR_CSRF = 'admin'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @require_super_admin
     def get(self):
@@ -226,7 +196,7 @@ class AdminHandler(base.BaseHandler):
 class AdminJobOutput(base.BaseHandler):
     """Retrieves job output to show on the admin page."""
 
-    PAGE_NAME_FOR_CSRF = 'admin'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @require_super_admin
     def get(self):

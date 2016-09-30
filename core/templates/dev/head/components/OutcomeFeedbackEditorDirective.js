@@ -43,7 +43,7 @@ oppia.directive('outcomeFeedbackEditor', [function() {
           if (feedbackStr) {
             nonemptyFeedback.push(feedbackStr);
           }
-          if (!feedbackStr && i == 0) {
+          if (!feedbackStr && i === 0) {
             // If the first feedback is empty, copy no more feedback after.
             break;
           }

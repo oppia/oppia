@@ -20,6 +20,7 @@ import copy
 import datetime
 import os
 
+
 # Whether to unconditionally log info messages.
 DEBUG = False
 
@@ -27,7 +28,18 @@ DEBUG = False
 # code in core/platform.
 PLATFORM = 'gae'
 
+# This should be string comparison, since all environment variables
+# are converted to string
+IS_MINIFIED = os.environ.get('MINIFICATION') == 'True'
+
 # Whether we should serve the development or production experience.
+# DEV_MODE should only be changed to False in the production environment.
+# To use minified resources in the development environment,
+# change the MINIFICATION env variable in app.yaml to True.
+# When DEV_MODE is True, this indicates that we are not running in
+# the production App Engine environment, which affects things like
+# login/logout URLs,as well as third-party libraries
+# that App Engine normally provides.
 if PLATFORM == 'gae':
     DEV_MODE = (
         not os.environ.get('SERVER_SOFTWARE')
@@ -35,22 +47,27 @@ if PLATFORM == 'gae':
 else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 
-
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 INTERACTIONS_DIR = os.path.join('extensions', 'interactions')
 GADGETS_DIR = os.path.join('extensions', 'gadgets')
 RTE_EXTENSIONS_DIR = os.path.join('extensions', 'rich_text_components')
-RULES_DIR = os.path.join('extensions', 'rules')
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
-TEMPLATES_DIR_PREFIX = 'dev' if DEV_MODE else 'prod'
+
+# Choose production template if minification flag is used or
+# if in production mode
+TEMPLATES_DIR_PREFIX = 'prod' if (IS_MINIFIED or not DEV_MODE) else 'dev'
 FRONTEND_TEMPLATES_DIR = os.path.join(
     'core', 'templates', TEMPLATES_DIR_PREFIX, 'head')
 DEPENDENCIES_TEMPLATES_DIR = os.path.join('extensions', 'dependencies')
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 VISUALIZATIONS_DIR = os.path.join('extensions', 'visualizations')
+OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
+    'extensions', 'interactions', 'object_defaults.json')
+RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
+    os.getcwd(), 'extensions', 'interactions', 'rules.json')
 
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
@@ -62,6 +79,11 @@ NUMBER_OF_TOP_RATED_EXPLORATIONS = 8
 # The maximum number of results to retrieve in a datastore query
 # for recently published explorations.
 RECENTLY_PUBLISHED_QUERY_LIMIT = 8
+
+# The current version of the dashboard stats blob schema. If any backward-
+# incompatible changes are made to the stats blob schema in the data store,
+# this version number must be changed.
+CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 
 # The current version of the exploration states blob schema. If any backward-
 # incompatible changes are made to the states blob schema in the data store,
@@ -95,7 +117,7 @@ DEFAULT_EXPLORATION_CATEGORY = ''
 DEFAULT_EXPLORATION_OBJECTIVE = ''
 
 # Default name for the initial state of an exploration.
-DEFAULT_INIT_STATE_NAME = 'First Card'
+DEFAULT_INIT_STATE_NAME = 'Introduction'
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
 
@@ -106,11 +128,6 @@ DEFAULT_COLLECTION_CATEGORY = ''
 # Default objective for a newly-minted collection.
 DEFAULT_COLLECTION_OBJECTIVE = ''
 
-# The threshold the truth value of an evaluated answer group must equal or
-# exceed in order to be considered a better classification than the default
-# group.
-DEFAULT_ANSWER_GROUP_CLASSIFICATION_THRESHOLD = 0.3
-
 # A dict containing the accepted image formats (as determined by the imghdr
 # module) and the corresponding allowed extensions in the filenames of uploaded
 # files.
@@ -118,18 +135,6 @@ ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
     'jpeg': ['jpg', 'jpeg'],
     'png': ['png'],
     'gif': ['gif']
-}
-
-# Static file url to path mapping
-PATH_MAP = {
-    '/css': os.path.join('core', 'templates', 'dev', 'head', 'css'),
-    '/extensions/gadgets': GADGETS_DIR,
-    '/extensions/interactions': INTERACTIONS_DIR,
-    '/extensions/rich_text_components': RTE_EXTENSIONS_DIR,
-    '/favicon.ico': os.path.join('static', 'images', 'favicon.ico'),
-    '/images': os.path.join('static', 'images'),
-    '/lib/static': os.path.join('lib', 'static'),
-    '/third_party/static': os.path.join('third_party', 'static'),
 }
 
 # A string containing the disallowed characters in state or exploration names.
@@ -165,24 +170,40 @@ def get_empty_ratings():
 # Empty scaled average rating as a float.
 EMPTY_SCALED_AVERAGE_RATING = 0.0
 
+# To use GAE email service.
+EMAIL_SERVICE_PROVIDER_GAE = 'gae_email_service'
+# To use mailgun email service.
+EMAIL_SERVICE_PROVIDER_MAILGUN = 'mailgun_email_service'
+# Use GAE email service by default.
+EMAIL_SERVICE_PROVIDER = EMAIL_SERVICE_PROVIDER_GAE
+# If the Mailgun email API is used, the "None" below should be replaced
+# with the Mailgun API key.
+MAILGUN_API_KEY = None
+# If the Mailgun email API is used, the "None" below should be replaced
+# with the Mailgun domain name (ending with mailgun.org).
+MAILGUN_DOMAIN_NAME = None
 # Committer id for system actions.
 SYSTEM_COMMITTER_ID = 'admin'
 SYSTEM_EMAIL_ADDRESS = 'system@example.com'
 ADMIN_EMAIL_ADDRESS = 'testadmin@example.com'
+NOREPLY_EMAIL_ADDRESS = 'noreply@example.com'
 # Ensure that SYSTEM_EMAIL_ADDRESS and ADMIN_EMAIL_ADDRESS are both valid and
 # correspond to owners of the app before setting this to True. If
 # SYSTEM_EMAIL_ADDRESS is not that of an app owner, email messages from this
-# address cannot be sent.
-CAN_SEND_EMAILS_TO_ADMIN = False
-# Ensure that SYSTEM_EMAIL_ADDRESS is valid and corresponds to an owner of the
-# app before setting this to True. Emails will be sent from
-# SYSTEM_EMAIL_ADDRESS. If SYSTEM_EMAIL_ADDRESS is not that of an app owner,
-# email messages from this user cannot be sent.
-CAN_SEND_EMAILS_TO_USERS = False
+# address cannot be sent. If True then emails can be sent to any user.
+CAN_SEND_EMAILS = False
 # If you want to turn on this facility please check the email templates in the
 # send_role_notification_email() function in email_manager.py and modify them
 # accordingly.
 CAN_SEND_EDITOR_ROLE_EMAILS = False
+# If enabled then emails will be sent to creators for feedback messages.
+CAN_SEND_FEEDBACK_MESSAGE_EMAILS = False
+# Time to wait before sending feedback message emails (currently set to 1
+# hour).
+DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS = 3600
+# Whether to send an email when new feedback message is received for
+# an exploration.
+DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE = True
 # Whether to send email updates to a user who has not specified a preference.
 DEFAULT_EMAIL_UPDATES_PREFERENCE = False
 # Whether to send an invitation email when the user is granted
@@ -192,12 +213,18 @@ DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE = True
 REQUIRE_EMAIL_ON_MODERATOR_ACTION = False
 # Whether to allow custom event reporting to Google Analytics.
 CAN_SEND_ANALYTICS_EVENTS = False
-# Timespan in minutes before allowing duplicate emails
+# Timespan in minutes before allowing duplicate emails.
 DUPLICATE_EMAIL_INTERVAL_MINS = 2
+# Number of digits after decimal to which the average ratings value in the
+# dashboard is rounded off to.
+AVERAGE_RATINGS_DASHBOARD_PRECISION = 2
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
 EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION = 'editor_role_notification'
+EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION = 'feedback_message_notification'
+EMAIL_INTENT_SUGGESTION_NOTIFICATION = 'suggestion_notification'
+EMAIL_INTENT_REPORT_BAD_CONTENT = 'report_bad_content'
 EMAIL_INTENT_MARKETING = 'marketing'
 EMAIL_INTENT_PUBLICIZE_EXPLORATION = 'publicize_exploration'
 EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
@@ -208,7 +235,8 @@ MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 DEFAULT_SALUTATION_HTML_FN = (
     lambda recipient_username: 'Hi %s,' % recipient_username)
 DEFAULT_SIGNOFF_HTML_FN = (
-    lambda sender_username: 'Thanks!<br>%s (Oppia moderator)' % sender_username)
+    lambda sender_username: (
+        'Thanks!<br>%s (Oppia moderator)' % sender_username))
 
 VALID_MODERATOR_ACTIONS = {
     MODERATOR_ACTION_PUBLICIZE_EXPLORATION: {
@@ -247,14 +275,16 @@ PANELS_PROPERTIES = {
 # When the site terms were last updated, in UTC.
 REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 14, 2, 40, 0)
 
+# Format of string for dashboard statistics logs.
+# NOTE TO DEVELOPERS: This format should not be changed, since it is used in
+# the existing storage models for UserStatsModel.
+DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
+
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
 
 # The default language code for an exploration.
 DEFAULT_LANGUAGE_CODE = 'en'
-
-# Whether to include the forum, terms and privacy pages.
-SHOW_CUSTOM_PAGES = True
 
 # The id of the default skin.
 # TODO(sll): Deprecate this; it is no longer used.
@@ -363,7 +393,7 @@ DEMO_EXPLORATIONS = {
     u'12': 'protractor_test_1.yaml',
     u'13': 'solar_system',
     u'14': 'about_oppia.yaml',
-    u'15': 'fuzzy_exploration.yaml',
+    u'15': 'classifier_demo_exploration.yaml',
     u'16': 'all_interactions',
 }
 
@@ -371,7 +401,32 @@ DEMO_COLLECTIONS = {
     u'0': 'welcome_to_collections.yaml'
 }
 
+# IDs of explorations which should not be displayable in either the learner or
+# editor views.
+DISABLED_EXPLORATION_IDS = ['5']
+
+# Google Group embed URL for the Forum page.
+EMBEDDED_GOOGLE_GROUP_URL = (
+    'https://groups.google.com/forum/embed/?place=forum/oppia')
+
+# Whether to allow YAML file uploads.
+ALLOW_YAML_FILE_UPLOAD = False
+
+# Prefix for all taskqueue-related URLs.
+TASKQUEUE_URL_PREFIX = '/task'
+TASK_URL_FEEDBACK_MESSAGE_EMAILS = (
+    '%s/email/batchfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX)
+TASK_URL_FEEDBACK_STATUS_EMAILS = (
+    '%s/email/feedbackthreadstatuschangeemailhandler' % TASKQUEUE_URL_PREFIX)
+TASK_URL_FLAG_EXPLORATION_EMAILS = (
+    '%s/email/flagexplorationemailhandler' % TASKQUEUE_URL_PREFIX)
+TASK_URL_INSTANT_FEEDBACK_EMAILS = (
+    '%s/email/instantfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX)
+TASK_URL_SUGGESTION_EMAILS = (
+    '%s/email/suggestionemailhandler' % TASKQUEUE_URL_PREFIX)
+
 # TODO(sll): Add all other URLs here.
+ADMIN_URL = '/admin'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_WRITABLE_DATA_URL_PREFIX = '/collection_editor_handler/data'
 COLLECTION_RIGHTS_PREFIX = '/collection_editor_handler/rights'
@@ -389,6 +444,8 @@ EXPLORATION_URL_PREFIX = '/explore'
 FEEDBACK_STATS_URL_PREFIX = '/feedbackstatshandler'
 FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
+FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
+FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 LIBRARY_INDEX_URL = '/library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
 LIBRARY_SEARCH_URL = '/search/find'
@@ -397,6 +454,7 @@ NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
+ROBOTS_TXT_URL = '/robots.txt'
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
@@ -408,16 +466,19 @@ UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 
 NAV_MODE_ABOUT = 'about'
+NAV_MODE_BLOG = 'blog'
+NAV_MODE_COLLECTION = 'collection'
+NAV_MODE_CONTACT = 'contact'
 NAV_MODE_CREATE = 'create'
 NAV_MODE_DASHBOARD = 'dashboard'
+NAV_MODE_DONATE = 'donate'
 NAV_MODE_EXPLORE = 'explore'
 NAV_MODE_LIBRARY = 'library'
-NAV_MODE_PARTICIPATE = 'participate'
 NAV_MODE_PROFILE = 'profile'
 NAV_MODE_SIGNUP = 'signup'
 NAV_MODE_SPLASH = 'splash'
 NAV_MODE_TEACH = 'teach'
-NAV_MODE_CONTACT = 'contact'
+NAV_MODE_THANKS = 'thanks'
 
 # Event types.
 EVENT_TYPE_STATE_HIT = 'state_hit'
@@ -425,6 +486,7 @@ EVENT_TYPE_ANSWER_SUBMITTED = 'answer_submitted'
 EVENT_TYPE_DEFAULT_ANSWER_RESOLVED = 'default_answer_resolved'
 EVENT_TYPE_NEW_THREAD_CREATED = 'feedback_thread_created'
 EVENT_TYPE_THREAD_STATUS_CHANGED = 'feedback_thread_status_changed'
+EVENT_TYPE_RATE_EXPLORATION = 'rate_exploration'
 # The values for these event types should be left as-is for backwards
 # compatibility.
 EVENT_TYPE_START_EXPLORATION = 'start'
@@ -445,6 +507,7 @@ COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
+# NOTE TO DEVELOPERS: This should be synchronized with base.js
 ENABLE_STRING_CLASSIFIER = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK = False
@@ -458,6 +521,10 @@ OUTPUT_FORMAT_ZIP = 'zip'
 UPDATE_TYPE_EXPLORATION_COMMIT = 'exploration_commit'
 UPDATE_TYPE_COLLECTION_COMMIT = 'collection_commit'
 UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
+
+# The time difference between which to consider two login events "close". This
+# is taken to be 12 hours.
+PROXIMAL_TIMEDELTA_SECS = 12 * 60 * 60
 
 DEFAULT_COLOR = '#a33f40'
 DEFAULT_THUMBNAIL_ICON = 'Lightbulb'
@@ -516,6 +583,11 @@ CATEGORIES_TO_COLORS = {
     'Welcome': '#992a2b',
 }
 
+# Types of activities that can be created with Oppia.
+ACTIVITY_TYPE_EXPLORATION = 'exploration'
+ACTIVITY_TYPE_COLLECTION = 'collection'
+ALL_ACTIVITY_TYPES = [ACTIVITY_TYPE_EXPLORATION, ACTIVITY_TYPE_COLLECTION]
+
 # A sorted list of default categories for which icons and background colours
 # exist.
 ALL_CATEGORIES = sorted(CATEGORIES_TO_COLORS.keys())
@@ -541,15 +613,16 @@ SEARCH_DROPDOWN_CATEGORIES = sorted([
     'History',
 ])
 
-# The header for the "Featured Explorations" category in the library index
-# page.
-LIBRARY_CATEGORY_FEATURED_EXPLORATIONS = 'Featured Explorations'
-# The header for the "Top Rated Explorations" category in the library index
-# page.
-LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = 'Top Rated Explorations'
-# The header for the "Recently Published" category in the library index
-# page.
-LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'Recently Published'
+# The i18n id for the header of the "Featured Activities" category in the
+# library index page.
+LIBRARY_CATEGORY_FEATURED_ACTIVITIES = 'I18N_LIBRARY_GROUPS_FEATURED_ACTIVITIES'
+# The i18n id for the header of the "Top Rated Explorations" category in the
+# library index page.
+LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = (
+    'I18N_LIBRARY_GROUPS_TOP_RATED_EXPLORATIONS')
+# The i18n id for the header of the "Recently Published" category in the
+# library index page.
+LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'I18N_LIBRARY_GROUPS_RECENTLY_PUBLISHED'
 
 # List of supported language codes. Each description has a
 # parenthetical part that may be stripped out to give a shorter
@@ -636,27 +709,48 @@ ALL_LANGUAGE_CODES = [{
 DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
 
-SUPPORTED_SITE_LANGUAGES = {
-    'en': 'English',
-    'es': 'Español'
-}
+# NOTE TO DEVELOPERS: While adding another language, please ensure that the
+# languages are in alphabetical order.
+SUPPORTED_SITE_LANGUAGES = [{
+    'id': 'id',
+    'text': 'Bahasa Indonesia'
+}, {
+    'id': 'en',
+    'text': 'English'
+}, {
+    'id': 'es',
+    'text': 'Español'
+}, {
+    'id': 'pt',
+    'text': 'Português'
+}, {
+    'id': 'vi',
+    'text': 'Tiếng Việt'
+}, {
+    'id': 'hi',
+    'text': 'हिन्दी'
+}]
 SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
-
-CSRF_PAGE_NAME_CREATE_EXPLORATION = 'create_exploration'
-CSRF_PAGE_NAME_I18N = 'i18n'
 
 # The following are all page descriptions for the meta tag.
 ABOUT_PAGE_DESCRIPTION = (
     'Oppia is an open source learning platform that connects a community of '
     'teachers and learners. You can use this site to create 1-1 learning '
     'scenarios for others.')
+BLOG_PAGE_DESCRIPTION = (
+    'Keep up to date with Oppia news and updates via our blog.')
+CONTACT_PAGE_DESCRIPTION = (
+    'Contact the Oppia team, submit feedback, and learn how to get involved '
+    'with the Oppia project.')
 CREATE_PAGE_DESCRIPTION = (
     'Help others learn new things. Create lessons through explorations and '
     'share your knowledge with the community.')
 DASHBOARD_PAGE_DESCRIPTION = (
     'Keep track of the lessons you have created, as well as feedback from '
     'learners.')
+DONATE_PAGE_DESCRIPTION = (
+    'Donate to The Oppia Foundation.')
 FORUM_PAGE_DESCRIPTION = (
     'Engage with the Oppia community by discussing questions, bugs and '
     'explorations in the forum.')
@@ -664,21 +758,28 @@ LIBRARY_PAGE_DESCRIPTION = (
     'Looking to learn something new? Find explorations created by professors, '
     'teachers and Oppia users in a subject you\'re interested in, and start '
     'exploring!')
-PARTICIPATE_PAGE_DESCRIPTION = (
-    'The Oppia library is full of user-created lessons called \'explorations\'.'
-    ' Read about how to participate in the community and begin creating '
-    'explorations.')
 PREFERENCES_PAGE_DESCRIPTION = (
     'Change your Oppia profile settings and preferences')
 SEARCH_PAGE_DESCRIPTION = (
     'Discover a new exploration to learn from, or help improve an existing '
     'one for the community.')
-SIGNUP_PAGE_DESCRIPTION = 'Sign up for Oppia and begin exploring a new subject.'
+SIGNUP_PAGE_DESCRIPTION = (
+    'Sign up for Oppia and begin exploring a new subject.')
 SPLASH_PAGE_DESCRIPTION = (
     'Oppia is a free site for sharing knowledge via interactive lessons '
     'called \'explorations\'. Learn from user-created explorations, or teach '
     'and create your own.')
+TEACH_PAGE_DESCRIPTION = (
+    'The Oppia library is full of user-created lessons called \'explorations\'.'
+    ' Read about how to participate in the community and begin creating '
+    'explorations.')
 TERMS_PAGE_DESCRIPTION = (
     'Oppia is a 501(c)(3) registered non-profit open-source e-learning '
     'platform. Learn about our terms and conditions for creating and '
     'distributing learning material.')
+THANKS_PAGE_DESCRIPTION = (
+    'Thank you for donating to The Oppia Foundation.')
+
+# The type of the response returned by a handler when an exception is raised.
+HANDLER_TYPE_HTML = 'html'
+HANDLER_TYPE_JSON = 'json'

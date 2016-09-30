@@ -72,7 +72,7 @@ describe('URL Interpolation Service', function() {
       '/test_url/<first_param>/<second_param>/<third_param>', {
         first_param: 'value1',
         second_param: 'value2',
-        third_param: new String('value3')
+        third_param: 'value3'
       })).toBe('/test_url/value1/value2/value3');
   });
 
@@ -205,4 +205,71 @@ describe('URL Interpolation Service', function() {
     })).toThrow(new Error(
       'Parameters passed into interpolateUrl must be strings.'));
   });
+
+  it('should interpolate correct path', function() {
+    expect(uis.getStaticResourceUrl('/test.css')).toBe(
+      GLOBALS.ASSET_DIR_PREFIX + '/test.css');
+    expect(uis.getStaticResourceUrl('/test_url/test.css')).toBe(
+      GLOBALS.ASSET_DIR_PREFIX + '/test_url/test.css');
+
+    expect(uis.getStaticImageUrl('/test.png')).toBe(
+      GLOBALS.ASSET_DIR_PREFIX + '/assets/images/test.png');
+    expect(uis.getStaticImageUrl('/test_url/test.png')).toBe(
+      GLOBALS.ASSET_DIR_PREFIX + '/assets/images/test_url/test.png');
+
+    expect(uis.getGadgetImgUrl('ScoreBar')).toBe(
+      GLOBALS.ASSET_DIR_PREFIX + '/extensions/gadgets/ScoreBar' +
+        '/static/images/ScoreBar.png');
+
+    expect(uis.getInteractionThumbnailImageUrl('LogicProof')).toBe(
+      GLOBALS.ASSET_DIR_PREFIX + '/extensions/interactions/LogicProof' +
+      '/static/LogicProof.png');
+  });
+
+  it('should throw an error for empty path', function() {
+    expect(uis.getStaticResourceUrl.bind(null, null)).toThrow(
+      new Error(
+        'Empty path passed in method.'));
+    expect(uis.getStaticResourceUrl.bind(null, '')).toThrow(
+      new Error(
+        'Empty path passed in method.'));
+
+    expect(uis.getStaticImageUrl.bind(null, null)).toThrow(
+      new Error(
+        'Empty path passed in method.'));
+    expect(uis.getStaticImageUrl.bind(null, '')).toThrow(
+      new Error(
+        'Empty path passed in method.'));
+
+    expect(uis.getGadgetImgUrl.bind(null, null)).toThrow(
+      new Error(
+        'Empty gadgetType passed in getGadgetImgUrl.'));
+    expect(uis.getGadgetImgUrl.bind(null, '')).toThrow(
+      new Error(
+        'Empty gadgetType passed in getGadgetImgUrl.'));
+
+    expect(uis.getInteractionThumbnailImageUrl.bind(null, null)).toThrow(
+      new Error(
+        'Empty interactionId passed in getInteractionThumbnailImageUrl.'));
+    expect(uis.getInteractionThumbnailImageUrl.bind(null, '')).toThrow(
+      new Error(
+        'Empty interactionId passed in getInteractionThumbnailImageUrl.'));
+  });
+
+  it('should throw an error for imagePath not beginning with forward slash',
+    function() {
+      expect(uis.getStaticResourceUrl.bind(null, 'test_css_fail.css')).toThrow(
+        new Error(
+          'Path must start with \'\/\': \'' + 'test_css_fail.css' + '\'.'));
+      expect(uis.getStaticResourceUrl.bind(null, 'test_url/fail.css')).toThrow(
+        new Error(
+          'Path must start with \'\/\': \'' + 'test_url/fail.css' + '\'.'));
+
+      expect(uis.getStaticImageUrl.bind(null, 'test_fail.png')).toThrow(
+        new Error(
+          'Path must start with \'\/\': \'' + 'test_fail.png' + '\'.'));
+      expect(uis.getStaticImageUrl.bind(null, 'test_url/fail.png')).toThrow(
+        new Error(
+          'Path must start with \'\/\': \'' + 'test_url/fail.png' + '\'.'));
+    });
 });

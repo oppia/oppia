@@ -31,6 +31,7 @@ oppia.directive('activityTilesInfinityGrid', [function() {
         $scope.$on(
           'initialSearchResultsLoaded', function(evt, activityList) {
             $scope.allActivitiesInOrder = activityList;
+            $scope.endOfPageIsReached = false;
           }
         );
 

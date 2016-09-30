@@ -27,7 +27,9 @@ oppia.directive('oppiaInteractiveImageClickInput', [
            imageClickInputRulesService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        onSubmit: '&'
+      },
       templateUrl: 'interaction/ImageClickInput',
       controller: [
         '$scope', '$element', '$attrs', function($scope, $element, $attrs) {
@@ -82,10 +84,13 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             }
           };
           $scope.onClickImage = function() {
-            $scope.$parent.submitAnswer({
-              clickPosition: [$scope.mouseX, $scope.mouseY],
-              clickedRegions: $scope.currentlyHoveredRegions
-            }, imageClickInputRulesService);
+            $scope.onSubmit({
+              answer: {
+                clickPosition: [$scope.mouseX, $scope.mouseY],
+                clickedRegions: $scope.currentlyHoveredRegions
+              },
+              rulesService: imageClickInputRulesService
+            });
           };
         }
       ]
@@ -129,7 +134,7 @@ oppia.directive('oppiaShortResponseImageClickInput', [
 oppia.factory('imageClickInputRulesService', [function() {
   return {
     IsInRegion: function(answer, inputs) {
-      return answer.clickedRegions.indexOf(inputs.x) != -1;
+      return answer.clickedRegions.indexOf(inputs.x) !== -1;
     }
   };
 }]);

@@ -140,6 +140,9 @@ describe('Code REPL rules service', function() {
         )
       }, RULE_INPUT)).toBe(false);
       expect(crrs.CodeDoesNotContain({
+        code: 'def x():\n'
+      }, RULE_INPUT)).toBe(false);
+      expect(crrs.CodeDoesNotContain({
         code: '    def x():\n'
       }, RULE_INPUT)).toBe(false);
       expect(crrs.CodeDoesNotContain({

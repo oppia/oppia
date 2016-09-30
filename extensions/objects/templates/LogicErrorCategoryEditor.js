@@ -29,7 +29,7 @@ oppia.directive('logicErrorCategoryEditor', [
     restrict: 'E',
     scope: true,
     template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: function($scope) {
+    controller: ['$scope', function($scope) {
       $scope.alwaysEditable = true;
       $scope.errorCategories = [{
         name: 'parsing',
@@ -69,6 +69,6 @@ oppia.directive('logicErrorCategoryEditor', [
       $scope.$watch('localValue.category', function() {
         $scope.$parent.value = $scope.localValue.category.name;
       });
-    }
+    }]
   };
 }]);
