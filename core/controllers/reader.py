@@ -257,9 +257,12 @@ class ExplorationPageEmbed(base.BaseHandler):
                     rights_manager.Actor(self.user_id).can_edit(
                         feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
 
-        # If the exploration does not exist, an Exception is raised.
-        exploration_data_values = _get_exploration_player_data(
-            exploration_id, version, collection_id, can_edit)
+        try:
+            # If the exploration does not exist, an Exception is raised.
+            exploration_data_values = _get_exploration_player_data(
+                exploration_id, version, collection_id, can_edit)
+        except Exception:
+            raise self.PageNotFoundException
 
         self.values.update(exploration_data_values)
         self.values['iframed'] = True
