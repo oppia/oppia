@@ -47,7 +47,7 @@ oppia.controller('Library', [
       $window.location.pathname.lastIndexOf('/') + 1);
 
     if ($scope.inGroupMode) {
-      $http.get('/librarygroupindexhandler', {
+      $http.get('/librarygrouphandler', {
         params: {
           group_name: $scope.groupName
         }
@@ -221,7 +221,10 @@ oppia.controller('Library', [
       }
     };
 
-    $scope.showAllResultsForCategories = function(categories, fullResultsUrl) {
+    // The following loads explorations belonging to a particular group. If
+    // fullResultsUrl is given it loads the page corresponding to the url. If
+    // not given it will initiate a search query based on categories.
+    $scope.showFullResultsPage = function(categories, fullResultsUrl) {
       if (fullResultsUrl) {
         $window.location.href = fullResultsUrl;
       } else {

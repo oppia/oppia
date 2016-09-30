@@ -45,59 +45,6 @@ class LibraryPageTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
         response.mustcontain('I18N_LIBRARY_PAGE_TITLE')
 
-    def test_group_pages(self):
-        """Test access to the top rated and recently published pages."""
-        response = self.testapp.get(feconf.LIBRARY_TOP_RATED_URL)
-        self.assertEqual(response.status_int, 200)
-
-        response = self.testapp.get(feconf.LIBRARY_RECENTLY_PUBLISHED_URL)
-        self.assertEqual(response.status_int, 200)
-
-    def test_library_handler_for_group_pages(self):
-        """Test library handler for top rated and recently published pages."""
-        response_dict = self.get_json(
-            feconf.LIBRARY_GROUP_INDEX_URL,
-            {'group_name': feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED})
-        self.assertEqual({
-            'is_admin': False,
-            'is_moderator': False,
-            'is_super_admin': False,
-            'activity_summary_dicts_by_category': [],
-            'preferred_language_codes': ['en'],
-            'profile_picture_data_url': None,
-            }, response_dict)
-
-        # Load a public demo exploration.
-        exp_services.load_demo('0')
-
-        response_dict = self.get_json(
-            feconf.LIBRARY_GROUP_INDEX_URL,
-            {'group_name': feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED})
-        self.assertDictContainsSubset({
-            'id': '0',
-            'category': 'Welcome',
-            'title': 'Welcome to Oppia!',
-            'language_code': 'en',
-            'objective': 'become familiar with Oppia\'s capabilities',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
-        }, response_dict['activity_summary_dicts_by_category'][0]['activity_summary_dicts'][0]) # pylint: disable=line-too-long
-
-        # Assign rating to exploration to test handler for top rated
-        # explorations page.
-        rating_services.assign_rating_to_exploration('user', '0', 2)
-
-        response_dict = self.get_json(
-            feconf.LIBRARY_GROUP_INDEX_URL,
-            {'group_name': feconf.LIBRARY_GROUP_TOP_RATED})
-        self.assertDictContainsSubset({
-            'id': '0',
-            'category': 'Welcome',
-            'title': 'Welcome to Oppia!',
-            'language_code': 'en',
-            'objective': 'become familiar with Oppia\'s capabilities',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
-        }, response_dict['activity_summary_dicts_by_category'][0]['activity_summary_dicts'][0]) # pylint: disable=line-too-long
-
     def test_library_handler_demo_exploration(self):
         """Test the library data handler on demo explorations."""
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
@@ -239,6 +186,62 @@ class LibraryPageTest(test_utils.GenericTestBase):
             'objective': 'Objective B',
             'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
         }, response_dict['activity_list'][0])
+
+
+class LibraryGroupPageTest(test_utils.GenericTestBase):
+
+    def test_library_group_pages(self):
+        """Test access to the top rated and recently published pages."""
+        response = self.testapp.get(feconf.LIBRARY_TOP_RATED_URL)
+        self.assertEqual(response.status_int, 200)
+
+        response = self.testapp.get(feconf.LIBRARY_RECENTLY_PUBLISHED_URL)
+        self.assertEqual(response.status_int, 200)
+
+    def test_handler_for_library_group_pages(self):
+        """Test library handler for top rated and recently published pages."""
+        response_dict = self.get_json(
+            feconf.LIBRARY_GROUP_DATA_URL,
+            {'group_name': feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED})
+        self.assertEqual({
+            'is_admin': False,
+            'is_moderator': False,
+            'is_super_admin': False,
+            'activity_summary_dicts_by_category': [],
+            'preferred_language_codes': ['en'],
+            'profile_picture_data_url': None,
+        }, response_dict)
+
+        # Load a public demo exploration.
+        exp_services.load_demo('0')
+
+        response_dict = self.get_json(
+            feconf.LIBRARY_GROUP_DATA_URL,
+            {'group_name': feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED})
+        self.assertDictContainsSubset({
+            'id': '0',
+            'category': 'Welcome',
+            'title': 'Welcome to Oppia!',
+            'language_code': 'en',
+            'objective': 'become familiar with Oppia\'s capabilities',
+            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+        }, response_dict['activity_summary_dicts_by_category'][0]['activity_summary_dicts'][0]) # pylint: disable=line-too-long
+
+        # Assign rating to exploration to test handler for top rated
+        # explorations page.
+        rating_services.assign_rating_to_exploration('user', '0', 2)
+
+        response_dict = self.get_json(
+            feconf.LIBRARY_GROUP_DATA_URL,
+            {'group_name': feconf.LIBRARY_GROUP_TOP_RATED})
+        self.assertDictContainsSubset({
+            'id': '0',
+            'category': 'Welcome',
+            'title': 'Welcome to Oppia!',
+            'language_code': 'en',
+            'objective': 'become familiar with Oppia\'s capabilities',
+            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+        }, response_dict['activity_summary_dicts_by_category'][0]['activity_summary_dicts'][0]) # pylint: disable=line-too-long
 
 
 class CategoryConfigTest(test_utils.GenericTestBase):

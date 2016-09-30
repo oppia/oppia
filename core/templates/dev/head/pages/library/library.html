@@ -44,7 +44,7 @@
         </div>
 
         <div class="oppia-exp-summary-tiles-container" ng-if="inGroupMode" style="margin-bottom: 20px;">
-          <div ng-if="libraryGroups.length == 0"
+          <div ng-if="libraryGroups.length === 0"
                style="font-size: 1.2em; padding-bottom: 40px; padding-top: 40px;">
               <p style="text-align: center;">
                 <span>Oops, there are no explorations to display.</span>
@@ -52,13 +52,12 @@
           </div>
 
           <div ng-if="libraryGroups.length > 0"
-               ng-repeat="group in libraryGroups track by $index"
                style="margin-right: auto; margin-left: auto; max-width: 856px;">
             <h2 class="oppia-group-page-header" style="font-size: 2em;">
-              <span translate="<[group.header_i18n_id]>"></span>
+              <span translate="<[libraryGroups[0].header_i18n_id]>"></span>
             </h2>
 
-            <div ng-repeat="tile in group.activity_summary_dicts" style="display: inline-block;">
+            <div ng-repeat="tile in libraryGroups[0].activity_summary_dicts" style="display: inline-block;">
               <exploration-summary-tile ng-if="tile.activity_type == 'exploration'"
                                         exploration-id="tile.id"
                                         exploration-title="tile.title"
@@ -92,19 +91,19 @@
             <div class="row oppia-library-group-header-container">
               <h2 class="oppia-library-group-header">
                 <a ng-if="group.has_full_results_page"
-                   ng-click="showAllResultsForCategories(group.categories, group.full_results_url)"
+                   ng-click="showFullResultsPage(group.categories, group.full_results_url)"
                    translate="<[group.header_i18n_id]>">
                 </a>
                 <span ng-if="!group.has_full_results_page" translate="<[group.header_i18n_id]>">
                 </span>
               </h2>
               <div class="pull-right" ng-if="group.has_full_results_page">
-                <button class="btn oppia-library-group-view-all-btn oppia-transition-200" ng-click="showAllResultsForCategories(group.categories, group.full_results_url)" translate="I18N_LIBRARY_VIEW_ALL">
+                <button class="btn oppia-library-group-view-all-btn oppia-transition-200" ng-click="showFullResultsPage(group.categories, group.full_results_url)" translate="I18N_LIBRARY_VIEW_ALL">
                 </button>
               </div>
             </div>
 
-            <!-- TODO(sll): Add card at end of the row that, when clicked, does showAllResultsForCategories(group.categories)" -->
+            <!-- TODO(sll): Add card at end of the row that, when clicked, does showFullResultsPage(group.categories)" -->
             <div ng-if="!libraryWindowIsNarrow">
               <md-button class="md-no-ink oppia-library-carousel-scroll-btn"
                          ng-click="scroll($index, true)"

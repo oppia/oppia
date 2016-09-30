@@ -154,7 +154,6 @@ class LibraryGroupPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        group_mode = True
 
         self.values.update({
             'meta_description': (
@@ -165,7 +164,7 @@ class LibraryGroupPage(base.BaseHandler):
                 user_services.has_fully_registered(self.user_id)),
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
-            'group_mode': group_mode,
+            'group_mode': True,
             'SEARCH_DROPDOWN_CATEGORIES': feconf.SEARCH_DROPDOWN_CATEGORIES,
         })
         self.render_template('pages/library/library.html')
