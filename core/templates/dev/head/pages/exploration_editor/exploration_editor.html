@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends 'pages/base.html' %}
 
 {% block maintitle %}
   {% if title %}
@@ -469,6 +469,7 @@
     </defs>
   </svg>
 
+  {% include 'components/attribution_guide/attribution_guide_directive.html' %}
   {% include 'components/answer_group_editor_directive.html' %}
   {% include 'components/exploration_embed_button_modal.html' %}
   {% include 'components/fallback_editor_directive.html' %}
@@ -531,6 +532,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ParameterMetadataService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/RouterServices.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/attribution_guide/AttributionGuideDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/AnswerGroupEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/BarChartDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/CodemirrorMergeviewDirective.js"></script>

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends 'pages/base.html' %}
 
 {% block maintitle %}
   Tests for the Form Builder - Oppia
@@ -115,5 +115,5 @@
   <script src="/third_party/static/ui-codemirror-0.1.2/src/ui-codemirror.js"></script>
   {{ super() }}
   <script src="{{TEMPLATE_DIR_PREFIX}}/filters.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/forms/formBuilderTests.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/tests/FormBuilderTestPage.js"></script>
 {% endblock footer_js %}

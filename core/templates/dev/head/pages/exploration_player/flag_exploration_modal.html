@@ -1,0 +1,45 @@
+<script type="text/ng-template" id="modals/flagExploration">
+  <div class="modal-header">
+    <h3>
+      <span><['I18N_PLAYER_REPORT_MODAL_HEADER' | translate]></span>
+    </h3>
+  </div>
+  <div class="modal-body oppia-long-text">
+    <h4>
+      <span><b><['I18N_PLAYER_REPORT_MODAL_BODY_HEADER' | translate]></b></span>
+    </h4>  
+    <form>
+      <div class="radio">
+        <label>
+          <input type="radio" value="ad" ng-model="flag" ng-change="showFlagMessageTextarea(flag)">
+          <['I18N_PLAYER_REPORT_MODAL_BODY_AD' | translate]>
+        </label>
+      </div>
+      <div class="radio">
+        <label>
+          <input type="radio" value="poor_experience" ng-model="flag" ng-change="showFlagMessageTextarea(flag)">
+          <['I18N_PLAYER_REPORT_MODAL_BODY_POOR_EXPERIENCE' | translate]>
+        </label>
+      </div>
+      <div class="radio">
+        <label>
+          <input type="radio" value="other" ng-model="flag" ng-change="showFlagMessageTextarea(flag)">
+          <['I18N_PLAYER_REPORT_MODAL_BODY_OTHER' | translate]>
+        </label>
+        <p ng-show="flagMessageTextareaIsShown">
+          <['I18N_PLAYER_REPORT_MODAL_BODY_ADDITIONAL_DETAILS' | translate]>
+          <textarea rows="3" cols="50" ng-model="flagMessage" class="form-control" focus-on="flagMessageTextarea">
+          </textarea>
+        </p>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">
+      <['I18N_PLAYER_REPORT_MODAL_FOOTER_CANCEL' | translate]>
+    </button>
+    <button class="btn btn-success" ng-click="submitReport()" ng-disabled="!flagMessage">
+      <['I18N_PLAYER_REPORT_MODAL_FOOTER_SUBMIT' | translate]>
+    </button>
+  </div>
+</script>

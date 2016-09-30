@@ -171,7 +171,7 @@ oppia.controller('Admin', [
     };
 
     $scope.clearSearchIndex = function() {
-      if ($scope.message.startsWith('Processing...')) {
+      if ($scope.message.indexOf('Processing...') === 0) {
         return;
       }
 
@@ -191,7 +191,7 @@ oppia.controller('Admin', [
     };
 
     $scope.reloadExploration = function(explorationId) {
-      if ($scope.message.startsWith('Processing...')) {
+      if ($scope.message.indexOf('Processing...') === 0) {
         return;
       }
 
@@ -212,7 +212,7 @@ oppia.controller('Admin', [
     };
 
     $scope.reloadAllExplorations = function() {
-      if ($scope.message.startsWith('Processing...')) {
+      if ($scope.message.indexOf('Processing...') === 0) {
         return;
       }
 
@@ -256,7 +256,7 @@ oppia.controller('Admin', [
     };
 
     $scope.reloadCollection = function(collectionId) {
-      if ($scope.message.startsWith('Processing...')) {
+      if ($scope.message.indexOf('Processing...') === 0) {
         return;
       }
 

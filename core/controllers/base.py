@@ -30,7 +30,6 @@ import jinja2
 import webapp2
 from google.appengine.api import users
 
-from core import counters
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import rights_manager
@@ -158,6 +157,9 @@ class BaseHandler(webapp2.RequestHandler):
     # not completed signup in to the signup page. This ensures that logged-in
     # users have agreed to the latest terms.
     REDIRECT_UNFINISHED_SIGNUPS = True
+
+    # What format the get method returns when exception raised, json or html
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
 
     @webapp2.cached_property
     def jinja2_env(self):
@@ -289,18 +291,10 @@ class BaseHandler(webapp2.RequestHandler):
         json_output = json.dumps(values, cls=utils.JSONEncoderForHTML)
         self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
 
-        # Calculate the processing time of this request.
-        duration = datetime.datetime.utcnow() - self.start_time
-        processing_time = duration.seconds + duration.microseconds / 1E6
-
-        counters.JSON_RESPONSE_TIME_SECS.inc(increment=processing_time)
-        counters.JSON_RESPONSE_COUNT.inc()
-
     def render_template(
-            self, filename, values=None, iframe_restriction='DENY',
+            self, filename, iframe_restriction='DENY',
             redirect_url_on_logout=None):
-        if values is None:
-            values = self.values
+        values = self.values
 
         scheme, netloc, path, _, _ = urlparse.urlsplit(self.request.uri)
 
@@ -348,6 +342,13 @@ class BaseHandler(webapp2.RequestHandler):
                 'Oppia is a free, open-source learning platform. Join the '
                 'community to create or try an exploration today!')
 
+        # nav_mode is used as part of the GLOBALS object in the frontend, but
+        # not every backend handler declares a nav_mode. Thus, the following
+        # code is a failsafe to ensure that the nav_mode key is added to all
+        # page requests.
+        if 'nav_mode' not in values:
+            values['nav_mode'] = ''
+
         if redirect_url_on_logout is None:
             redirect_url_on_logout = self.request.uri
         if self.user_id:
@@ -386,22 +387,19 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
 
-        self.response.write(self.jinja2_env.get_template(
-            filename).render(**values))
-
-        # Calculate the processing time of this request.
-        duration = datetime.datetime.utcnow() - self.start_time
-        processing_time = duration.seconds + duration.microseconds / 1E6
-
-        counters.HTML_RESPONSE_TIME_SECS.inc(increment=processing_time)
-        counters.HTML_RESPONSE_COUNT.inc()
+        self.response.write(
+            self.jinja2_env.get_template(filename).render(**values))
 
     def _render_exception(self, error_code, values):
         assert error_code in [400, 401, 404, 500]
         values['code'] = error_code
 
         # This checks if the response should be JSON or HTML.
-        if self.payload is not None:
+        # For GET requests, there is no payload, so we check against
+        # GET_HANDLER_ERROR_RETURN_TYPE.
+        # Otherwise, we check whether self.payload exists.
+        if (self.payload is not None or
+                self.GET_HANDLER_ERROR_RETURN_TYPE == feconf.HANDLER_TYPE_JSON):
             self.render_json(values)
         else:
             self.values.update(values)

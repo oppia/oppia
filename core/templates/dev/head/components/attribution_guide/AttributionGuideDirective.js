@@ -13,13 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for side nav.
+ * @fileoverview Directive for the attribution guide.
  */
 
-oppia.controller('SideNav', [
-  '$scope', 'UrlInterpolationService',
-  function(
-      $scope, UrlInterpolationService) {
-    $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-  }
-]);
+oppia.directive('attributionGuide', [function() {
+  return {
+    restrict: 'E',
+    templateUrl: 'components/attributionGuide'
+  };
+}]);

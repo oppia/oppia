@@ -3,8 +3,8 @@
   <head>
     <title>Oppia Admin Panel</title>
 
-    {% include 'header_css_libs.html' %}
-    {% include 'header_js_libs.html' %}
+    {% include 'pages/header_css_libs.html' %}
+    {% include 'pages/header_js_libs.html' %}
     <script>
       var GLOBALS = {
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
@@ -337,21 +337,6 @@
           </div>
         </md-card>
 
-        <md-card class="oppia-page-card oppia-long-text" style="max-width: 700px;" ng-if="currentTab === TAB_MISC">
-          <h3>Performance Counters</h3>
-          <ul>
-            {% for counter in counters %}
-              <li>
-                {{counter.description}} : {{counter.value}}
-              </li>
-            {% endfor %}
-          </ul>
-        </md-card>
-        <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_MISC" style="max-width: 700px">
-          <h3>Search Index</h3>
-
-          <button ng-click="clearSearchIndex()">Clear Search Index</button>
-        </md-card>
         <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_MISC" style="max-width: 700px">
           <h3>Topic Similarities</h3>
           <div>
@@ -362,6 +347,11 @@
             <button ng-click="downloadTopicSimilaritiesFile()">Download current topic similarities</button>
           </div>
         </md-card>
+
+        <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_MISC" style="max-width: 700px">
+          <h3>Search Index</h3>
+          <button ng-click="clearSearchIndex()">Clear Search Index</button>
+        </md-card>
       </div>
     </div>
 
@@ -371,21 +361,20 @@
       </div>
     {% endif %}
 
-    {% include 'forms/form_builder_templates.html' %}
-    {% include 'footer_js_libs.html' %}
+    {% include 'components/forms/form_builder_templates.html' %}
+    {% include 'pages/footer_js_libs.html' %}
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/app.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/base.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/Base.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/Admin.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/directives.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/alertsService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/explorationContextService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/utilsService.js"></script>
 
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/ObjectEditorDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/ValueGeneratorEditorDirective.js"></script>
-
-    <script src="{{TEMPLATE_DIR_PREFIX}}/forms/formBuilder.js"></script>
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionSyntaxTree.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/evaluator.js"></script>

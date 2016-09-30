@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends 'pages/base.html' %}
 
 {% block maintitle %}
   {{ exploration_title }} - Oppia
@@ -76,10 +76,10 @@
 {% block content %}
   <conversation-skin></conversation-skin>
   {% if not iframed %}
-    <br><br><br>
-    {% include 'attribution_guide.html' %}
+    <attribution-guide></attribution-guide>
   {% endif %}
 
+  {% include 'components/attribution_guide/attribution_guide_directive.html' %}
   {% include 'components/exploration_embed_button_modal.html' %}
   {% include 'components/gadget_directive.html' %}
   {% include 'components/gadget_panel_directive.html' %}
@@ -88,9 +88,12 @@
   {% include 'pages/exploration_player/answer_feedback_pair_directive.html' %}
   {% include 'pages/exploration_player/conversation_skin_directive.html' %}
   {% include 'pages/exploration_player/conversation_skin_embed_directive.html' %}
+  {% include 'pages/exploration_player/exploration_successfully_flagged_modal.html' %}
   {% include 'pages/exploration_player/feedback_popup_directive.html' %}
+  {% include 'pages/exploration_player/flag_exploration_modal.html' %}
   {% include 'pages/exploration_player/information_card_modal.html' %}
   {% include 'pages/exploration_player/progress_dots_directive.html' %}
+
 {% endblock %}
 
 {% block footer_js %}
@@ -98,6 +101,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/explorationServices.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/messengerService.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/attribution_guide/AttributionGuideDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/ExplorationEmbedButtonService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/GadgetDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/GadgetPanelDirective.js"></script>
