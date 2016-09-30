@@ -203,11 +203,11 @@ class LibraryGroupPageTest(test_utils.GenericTestBase):
         response_dict = self.get_json(
             feconf.LIBRARY_GROUP_DATA_URL,
             {'group_name': feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED})
-        self.assertEqual({
+        self.assertDictContainsSubset({
             'is_admin': False,
             'is_moderator': False,
             'is_super_admin': False,
-            'activity_summary_dicts_by_category': [],
+            'activity_list': [],
             'preferred_language_codes': ['en'],
             'profile_picture_data_url': None,
         }, response_dict)
@@ -225,7 +225,7 @@ class LibraryGroupPageTest(test_utils.GenericTestBase):
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
             'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
-        }, response_dict['activity_summary_dicts_by_category'][0]['activity_summary_dicts'][0]) # pylint: disable=line-too-long
+        }, response_dict['activity_list'][0])
 
         # Assign rating to exploration to test handler for top rated
         # explorations page.
@@ -241,7 +241,7 @@ class LibraryGroupPageTest(test_utils.GenericTestBase):
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
             'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
-        }, response_dict['activity_summary_dicts_by_category'][0]['activity_summary_dicts'][0]) # pylint: disable=line-too-long
+        }, response_dict['activity_list'][0])
 
 
 class CategoryConfigTest(test_utils.GenericTestBase):

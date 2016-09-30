@@ -176,20 +176,17 @@ class LibraryGroupIndexHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests for group pages."""
         # TODO(sll): Support index pages for other language codes.
-        summary_dicts_by_category = []
         group_name = self.request.get('group_name')
+        activity_list = []
+        header_i18n_id = ''
 
         if group_name == feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED:
             recently_published_summary_dicts = (
                 summary_services.get_recently_published_exp_summary_dicts(
                     feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE))
             if recently_published_summary_dicts:
-                summary_dicts_by_category.append({
-                    'activity_summary_dicts': recently_published_summary_dicts,
-                    'categories': [],
-                    'header_i18n_id': (
-                        feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED),
-                })
+                activity_list = recently_published_summary_dicts
+                header_i18n_id = feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED
 
         elif group_name == feconf.LIBRARY_GROUP_TOP_RATED:
             top_rated_activity_summary_dicts = (
@@ -197,12 +194,9 @@ class LibraryGroupIndexHandler(base.BaseHandler):
                     [feconf.DEFAULT_LANGUAGE_CODE],
                     feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE))
             if top_rated_activity_summary_dicts:
-                summary_dicts_by_category.append({
-                    'activity_summary_dicts': top_rated_activity_summary_dicts,
-                    'categories': [],
-                    'header_i18n_id': (
-                        feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS),
-                })
+                activity_list = top_rated_activity_summary_dicts
+                header_i18n_id = feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS
+
         else:
             return self.PageNotFoundException
 
@@ -212,8 +206,8 @@ class LibraryGroupIndexHandler(base.BaseHandler):
             preferred_language_codes = user_settings.preferred_language_codes
 
         self.values.update({
-            'activity_summary_dicts_by_category': (
-                summary_dicts_by_category),
+            'activity_list': activity_list,
+            'header_i18n_id': header_i18n_id,
             'preferred_language_codes': preferred_language_codes,
         })
         self.render_json(self.values)

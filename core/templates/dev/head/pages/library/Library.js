@@ -53,7 +53,9 @@ oppia.controller('Library', [
         }
       }).success(
       function(data) {
-        $scope.libraryGroups = data.activity_summary_dicts_by_category;
+        $scope.activityList = data.activity_list;
+
+        $scope.groupHeader = data.header_i18n_id;
 
         $rootScope.$broadcast(
           'preferredLanguageCodesLoaded', data.preferred_language_codes);
