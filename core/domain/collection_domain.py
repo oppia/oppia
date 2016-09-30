@@ -435,35 +435,51 @@ class Collection(object):
                 next_exp_ids.append(node.exploration_id)
         return next_exp_ids
 
-    def get_next_exploration_id_in_sequence(self, current_exploration):
+    def get_next_exploration_ids_in_sequence(self, current_exploration):
+        """Returns a list of exploration IDs that a logged-out user should
+        complete next based on the prerequisite skills they must have attained
+        by the time they completed the current exploration.  This recursively
+        compiles a list of 'learned skills' then, depending on the
+        'learned skills' and the current exploration's acquired skills,
+        returns either a list of exploration ids that have either just
+        unlocked or the user is qualified to explore.  If neither of these
+        lists can be generated a list of general exploration ids from the
+        collection are returned instead."""
         collection_node = self.get_node(current_exploration)
-        leading_skills_p = [list(collection_node.acquired_skills)]
-        result1 = []
-        result2 = []
-        result3 = []
+        learned_skills = [list(collection_node.acquired_skills)]
+        explorations_just_unlocked = []
+        explorations_qualified_for = []
+        explorations_in_general = []
 
-        def get_leading_skills(child_node):
+        def recursively_find_learned_skills(child_node):
+            """Finds the set of all skills the user must have
+            acquired by the time they've completed the current_exploration.
+            This set is then represented by learned_skills."""
             for node in self.nodes:
-                for skill in child_node.prerequisite_skills:
-                    if skill in node.acquired_skills:
-                        leading_skills_p[0] += node.prerequisite_skills
-                        get_leading_skills(node)
-        get_leading_skills(collection_node)
+                if node != child_node:
+                    for skill in child_node.prerequisite_skills:
+                        if skill in node.acquired_skills:
+                            learned_skills[0] += node.prerequisite_skills
+                            recursively_find_learned_skills(node)
+        recursively_find_learned_skills(collection_node)
         for node in self.nodes:
+            if node.exploration_id == current_exploration:
+                continue
+            explorations_in_general.append(node.exploration_id)
             for prereq_skill in node.prerequisite_skills:
-                if prereq_skill in leading_skills_p[0]:
+                if prereq_skill in learned_skills[0]:
                     if prereq_skill in collection_node.acquired_skills:
-                        result1.append(node.exploration_id)
+                        explorations_just_unlocked.append(node.exploration_id)
+                        explorations_in_general.remove(node.exploration_id)
                     else:
-                        result2.append(node.exploration_id)
-                else:
-                    result3.append(node.exploration_id)
-        if result1:
-            return result1
-        if result2:
-            return result2
+                        explorations_qualified_for.append(node.exploration_id)
+                        explorations_in_general.remove(node.exploration_id)
+        if explorations_just_unlocked:
+            return explorations_just_unlocked
+        if explorations_qualified_for:
+            return explorations_qualified_for
         else:
-            return result3
+            return explorations_in_general
 
     @classmethod
     def is_demo_collection_id(cls, collection_id):

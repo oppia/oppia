@@ -530,8 +530,6 @@ class RecommendationsHandler(base.BaseHandler):
     def get(self, exploration_id):
         """Handles GET requests."""
         collection_id = self.request.get('collection_id')
-        collection = collection_services.get_collection_by_id(
-            collection_id)
         include_system_recommendations = self.request.get(
             'include_system_recommendations')
         try:
@@ -549,8 +547,10 @@ class RecommendationsHandler(base.BaseHandler):
                 set(next_exp_ids_in_collection) -
                 set(author_recommended_exp_ids))
         elif collection_id:
+            collection = collection_services.get_collection_by_id(
+                collection_id)
             next_exp_ids_in_collection = (
-                collection.get_next_exploration_id_in_sequence(exploration_id))
+                collection.get_next_exploration_ids_in_sequence(exploration_id))
             auto_recommended_exp_ids = list(
                 set(next_exp_ids_in_collection) -
                 set(author_recommended_exp_ids))
