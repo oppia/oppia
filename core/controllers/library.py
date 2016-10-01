@@ -85,6 +85,7 @@ class LibraryPage(base.BaseHandler):
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
             'search_mode': search_mode,
+            'group_mode': False,
             'SEARCH_DROPDOWN_CATEGORIES': feconf.SEARCH_DROPDOWN_CATEGORIES,
         })
         self.render_template('pages/library/library.html')
