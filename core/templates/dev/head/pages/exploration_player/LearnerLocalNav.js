@@ -15,10 +15,14 @@
 /**
  * @fileoverview Controller for the local navigation in the learner view.
  */
+oppia.constant(
+  'FLAG_EXPLORATION_URL_TEMPLATE', '/flagexplorationhandler/<exploration_id>');
 
 oppia.controller('LearnerLocalNav', [
   '$scope', '$modal', '$http', 'oppiaPlayerService', 'alertsService',
-  function($scope, $modal, $http, oppiaPlayerService, alertsService) {
+  'UrlInterpolationService', 'focusService', 'FLAG_EXPLORATION_URL_TEMPLATE',
+  function($scope, $modal, $http, oppiaPlayerService, alertsService,
+    UrlInterpolationService, focusService, FLAG_EXPLORATION_URL_TEMPLATE) {
     $scope.explorationId = oppiaPlayerService.getExplorationId();
     $scope.showLearnerSuggestionModal = function() {
       $modal.open({
@@ -29,8 +33,8 @@ oppia.controller('LearnerLocalNav', [
           '$scope', '$modalInstance', '$timeout', 'playerPositionService',
           'oppiaPlayerService',
           function(
-            $scope, $modalInstance, $timeout, playerPositionService,
-            oppiaPlayerService) {
+              $scope, $modalInstance, $timeout, playerPositionService,
+              oppiaPlayerService) {
             var stateName = playerPositionService.getCurrentStateName();
             $scope.initContent = oppiaPlayerService.getStateContentHtml(
               stateName);
@@ -77,6 +81,67 @@ oppia.controller('LearnerLocalNav', [
             function($scope, $modalInstance) {
               $scope.close = function() {
                 $modalInstance.dismiss();
+              };
+            }
+          ]
+        });
+      });
+    };
+
+    $scope.showFlagExplorationModal = function() {
+      $modal.open({
+        templateUrl: 'modals/flagExploration',
+        backdrop: true,
+        controller: [
+            '$scope', '$modalInstance', 'playerPositionService',
+          function($scope, $modalInstance, playerPositionService) {
+            $scope.flagMessageTextareaIsShown = false;
+            var stateName = playerPositionService.getCurrentStateName();
+
+            $scope.showFlagMessageTextarea = function(value) {
+              if (value) {
+                $scope.flagMessageTextareaIsShown = true;
+                focusService.setFocus('flagMessageTextarea');
+              }
+            };
+
+            $scope.submitReport = function() {
+              if ($scope.flagMessage) {
+                $modalInstance.close({
+                  report_type: $scope.flag,
+                  report_text: $scope.flagMessage,
+                  state: stateName
+                });
+              }
+            };
+
+            $scope.cancel = function() {
+              $modalInstance.dismiss('cancel');
+            };
+          }
+        ]
+      }).result.then(function(result) {
+        var flagExplorationUrl = UrlInterpolationService.interpolateUrl(
+            FLAG_EXPLORATION_URL_TEMPLATE, {
+              exploration_id: $scope.explorationId
+            }
+        );
+        var report = (
+          '[' + result.state + '] (' + result.report_type + ') ' +
+          result.report_text);
+        $http.post(flagExplorationUrl, {
+          report_text: report
+        }).error(function(error) {
+          alertsService.addWarning(error);
+        });
+        $modal.open({
+          templateUrl: 'modals/explorationSuccessfullyFlagged',
+          backdrop: true,
+          controller: [
+            '$scope', '$modalInstance',
+            function($scope, $modalInstance) {
+              $scope.close = function() {
+                $modalInstance.dismiss('cancel');
               };
             }
           ]
