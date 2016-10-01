@@ -27,9 +27,7 @@ describe('Validators service', function() {
     }));
 
     it('should correctly validate entity names', function() {
-      GLOBALS = {
-        INVALID_NAME_CHARS: 'xyz'
-      };
+      GLOBALS.INVALID_NAME_CHARS = 'xyz';
 
       expect(vs.isValidEntityName('b')).toBe(true);
       expect(vs.isValidEntityName('b   ')).toBe(true);
@@ -44,9 +42,7 @@ describe('Validators service', function() {
     });
 
     it('should correctly validate exploration titles', function() {
-      GLOBALS = {
-        INVALID_NAME_CHARS: '#'
-      };
+      GLOBALS.INVALID_NAME_CHARS = '#';
 
       expect(vs.isValidExplorationTitle('b')).toBe(true);
       expect(vs.isValidExplorationTitle('abc def')).toBe(true);
@@ -169,11 +165,11 @@ describe('Code Normalization', function() {
     expect(cns.getNormalizedCode(
       '# This is a comment.\n' +
       '  # This is a comment with some spaces before it.\n' +
-      'def x():         # And a comment with some code before it.\n' +
-      '  y = \'#String with hashes#\''
+      'def x():   # And a comment with some code before it.\n' +
+      '  y = \'#string with hashes#\''
     )).toBe(
-      'def x():         # And a comment with some code before it.\n' +
-      '    y = \'#String with hashes#\''
+      'def x(): # And a comment with some code before it.\n' +
+      '    y = \'#string with hashes#\''
     );
   });
 
@@ -222,6 +218,18 @@ describe('Code Normalization', function() {
       'abc\n' +
       '    bcd\n' +
       'cde'
+    );
+  });
+
+  it('should normalize multiple spaces within a line', function() {
+    expect(cns.getNormalizedCode(
+      'abcdefg\n' +
+      '    hij    klm\n' +
+      '    ab "cde fgh"\n'
+    )).toBe(
+      'abcdefg\n' +
+      '    hij klm\n' +
+      '    ab "cde fgh"'
     );
   });
 });

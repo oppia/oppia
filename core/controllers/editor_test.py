@@ -23,12 +23,12 @@ from core import jobs_registry
 from core.controllers import dashboard
 from core.controllers import editor
 from core.domain import config_services
+from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
 from core.domain import stats_jobs_continuous_test
 from core.domain import rights_manager
-from core.domain import rule_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -99,8 +99,6 @@ class EditorTest(BaseEditorControllerTest):
         self.assert_can_edit(response.body)
         self.assertIn('Stats', response.body)
         self.assertIn('History', response.body)
-        # Test that the value generator JS is included.
-        self.assertIn('RandomSelector', response.body)
 
         self.logout()
 
@@ -121,8 +119,7 @@ class EditorTest(BaseEditorControllerTest):
 
         response = self.testapp.get(feconf.DASHBOARD_URL)
         self.assertEqual(response.status_int, 200)
-        csrf_token = self.get_csrf_token_from_response(
-            response, token_type=feconf.CSRF_PAGE_NAME_CREATE_EXPLORATION)
+        csrf_token = self.get_csrf_token_from_response(response)
         exp_id = self.post_json(
             feconf.NEW_EXPLORATION_URL, {}, csrf_token
         )[dashboard.EXPLORATION_ID_KEY]
@@ -215,16 +212,17 @@ class EditorTest(BaseEditorControllerTest):
             def _create_training_data(*arg):
                 return [_create_answer(value) for value in arg]
 
-            # Load the fuzzy rules demo exploration.
-            exp_services.load_demo('15')
+            # Load the string classifier demo exploration.
+            exp_id = '15'
+            exp_services.load_demo(exp_id)
             rights_manager.release_ownership_of_exploration(
-                feconf.SYSTEM_COMMITTER_ID, '15')
+                feconf.SYSTEM_COMMITTER_ID, exp_id)
 
             exploration_dict = self.get_json(
-                '%s/15' % feconf.EXPLORATION_INIT_URL_PREFIX)
+                '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
             self.assertEqual(
                 exploration_dict['exploration']['title'],
-                'Demonstrating fuzzy rules')
+                'Demonstrating string classifier')
 
             # This test uses the interaction which supports numeric input.
             state_name = 'text'
@@ -235,19 +233,30 @@ class EditorTest(BaseEditorControllerTest):
                 exploration_dict['exploration']['states'][state_name][
                     'interaction']['id'], 'TextInput')
 
+            answer_groups = exp_services.get_exploration_by_id('15').states[
+                state_name].interaction.answer_groups
+            explicit_rule_spec_string = (
+                answer_groups[0].rule_specs[0].stringify_classified_rule())
+            classifier_rule_spec_string = (
+                answer_groups[1].rule_specs[0].stringify_classified_rule())
+
             # Input happy since there is an explicit rule checking for that.
-            self.submit_answer('15', state_name, 'happy')
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, 1, state_name, explicit_rule_spec_string, 'happy')
 
             # Input text not at all similar to happy (default outcome).
-            self.submit_answer('15', state_name, 'sad')
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, 1, state_name, exp_domain.DEFAULT_RULESPEC_STR, 'sad')
 
             # Input cheerful: this is current training data and falls under the
-            # fuzzy rule.
-            self.submit_answer('15', state_name, 'cheerful')
+            # classifier.
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, 1, state_name, classifier_rule_spec_string, 'cheerful')
 
             # Input joyful: this is not training data but will be classified
-            # under the fuzzy rule.
-            self.submit_answer('15', state_name, 'joyful')
+            # under the classifier.
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, 1, state_name, classifier_rule_spec_string, 'joyful')
 
             # Perform answer summarization on the summarized answers.
             with self.swap(
@@ -261,12 +270,13 @@ class EditorTest(BaseEditorControllerTest):
 
             # Log in as an editor.
             self.login(self.EDITOR_EMAIL)
-            response = self.testapp.get('/create/15')
+            response = self.testapp.get('/create/%s' % exp_id)
             csrf_token = self.get_csrf_token_from_response(response)
-            url = str('/createhandler/training_data/15/%s' % state_name)
+            url = str(
+                '/createhandler/training_data/%s/%s' % (exp_id, state_name))
 
             exploration_dict = self.get_json(
-                '%s/15' % feconf.EXPLORATION_INIT_URL_PREFIX)
+                '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
 
             # Only two of the four submitted answers should be unhandled.
             response_dict = self.get_json(url)
@@ -276,7 +286,7 @@ class EditorTest(BaseEditorControllerTest):
 
             # If the confirmed unclassified answers is trained for one of the
             # values, it should no longer show up in unhandled answers.
-            self.put_json('/createhandler/data/15', {
+            self.put_json('/createhandler/data/%s' % exp_id, {
                 'change_list': [{
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': state_name,
@@ -293,18 +303,18 @@ class EditorTest(BaseEditorControllerTest):
                 _create_training_data('joyful'))
 
             exploration_dict = self.get_json(
-                '%s/15' % feconf.EXPLORATION_INIT_URL_PREFIX)
+                '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
 
-            # If one of the values is added to the training data of a fuzzy
-            # rule, then it should not be returned as an unhandled answer.
+            # If one of the values is added to the training data of the
+            # classifier, then it should not be returned as an unhandled answer.
             state = exploration_dict['exploration']['states'][state_name]
             answer_group = state['interaction']['answer_groups'][1]
             rule_spec = answer_group['rule_specs'][0]
             self.assertEqual(
-                rule_spec['rule_type'], rule_domain.FUZZY_RULE_TYPE)
+                rule_spec['rule_type'], exp_domain.CLASSIFIER_RULESPEC_STR)
             rule_spec['inputs']['training_data'].append('joyful')
 
-            self.put_json('/createhandler/data/15', {
+            self.put_json('/createhandler/data/%s' % exp_id, {
                 'change_list': [{
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': state_name,
@@ -327,11 +337,11 @@ class EditorTest(BaseEditorControllerTest):
                 _create_training_data('sad'))
 
             exploration_dict = self.get_json(
-                '%s/15' % feconf.EXPLORATION_INIT_URL_PREFIX)
+                '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
 
             # If both are classified, then nothing should be returned
             # unhandled.
-            self.put_json('/createhandler/data/15', {
+            self.put_json('/createhandler/data/%s' % exp_id, {
                 'change_list': [{
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': state_name,
@@ -346,9 +356,9 @@ class EditorTest(BaseEditorControllerTest):
             self.assertEqual(response_dict['unhandled_answers'], [])
 
             exploration_dict = self.get_json(
-                '%s/15' % feconf.EXPLORATION_INIT_URL_PREFIX)
+                '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
 
-            # If one of the existing training data elements in the fuzzy rule
+            # If one of the existing training data elements in the classifier
             # is removed (5 in this case), but it is not backed up by an
             # answer, it will not be returned as potential training data.
             state = exploration_dict['exploration']['states'][state_name]
@@ -528,8 +538,7 @@ param_changes: []
 
         self.logout()
 
-    def test_state_download_handler_for_default_exploration(self):
-
+    def test_state_yaml_handler(self):
         self.login(self.EDITOR_EMAIL)
         owner_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
@@ -543,22 +552,18 @@ param_changes: []
         exploration = exp_services.get_exploration_by_id(exp_id)
         exploration.add_states(['State A', 'State 2', 'State 3'])
         exploration.states['State A'].update_interaction_id('TextInput')
-        exploration.states['State 2'].update_interaction_id('TextInput')
-        exploration.states['State 3'].update_interaction_id('TextInput')
-        exploration.rename_state('State 2', 'State B')
-        exploration.delete_state('State 3')
-        exp_services._save_exploration(  # pylint: disable=protected-access
-            owner_id, exploration, '', [])
-        response = self.testapp.get('/create/%s' % exp_id)
 
-        # Check download state as YAML string
-        self.maxDiff = None
-        state_name = 'State%20A'
-        download_url = (
-            '/createhandler/download_state/%s?state=%s&width=50' %
-            (exp_id, state_name))
-        response = self.testapp.get(download_url)
-        self.assertEqual(self.SAMPLE_STATE_STRING, response.body)
+
+        response = self.testapp.get(
+            '%s/%s' % (feconf.EDITOR_URL_PREFIX, exp_id))
+        csrf_token = self.get_csrf_token_from_response(response)
+        response = self.post_json('/createhandler/state_yaml', {
+            'state_dict': exploration.states['State A'].to_dict(),
+            'width': 50,
+        }, csrf_token=csrf_token)
+        self.assertEqual({
+            'yaml': self.SAMPLE_STATE_STRING
+        }, response)
 
         self.logout()
 
@@ -984,7 +989,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
         with self.swap(
             feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
             ), self.swap(
-                feconf, 'CAN_SEND_EMAILS_TO_USERS', False):
+                feconf, 'CAN_SEND_EMAILS', False):
             # Log in as a moderator.
             self.login(self.MODERATOR_EMAIL)
 
@@ -1037,7 +1042,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
                 valid_payload, csrf_token, expect_errors=True,
                 expected_status_int=500)
 
-            with self.swap(feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
+            with self.swap(feconf, 'CAN_SEND_EMAILS', True):
                 # Now the email gets sent with no error.
                 self.put_json(
                     '/createhandler/moderatorrights/%s' % self.EXP_ID,
@@ -1050,7 +1055,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
         with self.swap(
             feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
             ), self.swap(
-                feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
+                feconf, 'CAN_SEND_EMAILS', True):
             # Log in as a moderator.
             self.login(self.MODERATOR_EMAIL)
 
@@ -1112,7 +1117,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
         with self.swap(
             feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
             ), self.swap(
-                feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
+                feconf, 'CAN_SEND_EMAILS', True):
             # Log in as a moderator.
             self.login(self.MODERATOR_EMAIL)
 
@@ -1174,7 +1179,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
         with self.swap(
             feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
             ), self.swap(
-                feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
+                feconf, 'CAN_SEND_EMAILS', True):
             # Log in as a non-moderator.
             self.login(self.EDITOR_EMAIL)
 

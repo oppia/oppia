@@ -39,11 +39,10 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        if isinstance(item, exp_models.ExplorationSnapshotMetadataModel):
-            yield (item.committer_id, {
-                'exploration_id': item.get_unversioned_instance_id(),
-                'version_string': item.get_version_string(),
-            })
+        yield (item.committer_id, {
+            'exploration_id': item.get_unversioned_instance_id(),
+            'version_string': item.get_version_string(),
+        })
 
     @staticmethod
     def reduce(key, version_and_exp_ids):
@@ -173,6 +172,23 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
                 subscription_services.subscribe_to_exploration(key, item['id'])
             elif item['type'] == 'collection':
                 subscription_services.subscribe_to_collection(key, item['id'])
+
+
+class DashboardStatsOneOffJob(jobs.BaseMapReduceJobManager):
+    """One-off job for populating weekly dashboard stats for all registered
+    users who have a non-None value of UserStatsModel.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(item):
+        user_services.update_dashboard_stats_log(item.id)
+
+    @staticmethod
+    def reduce(item):
+        pass
 
 
 class UserFirstContributionMsecOneOffJob(jobs.BaseMapReduceJobManager):

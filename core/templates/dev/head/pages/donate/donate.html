@@ -1,0 +1,90 @@
+{% extends 'pages/base.html' %}
+
+{% block maintitle %}
+  Donate - Oppia
+{% endblock maintitle %}
+
+{% block header_js %}
+  {{ super() }}
+
+  <style>
+    html, body {
+      background-color: #eee;
+    }
+  </style>
+{% endblock %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      Donate
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <div class="oppia-page-card oppia-about-content" ng-controller="Donate">
+    <div class="oppia-donation-card-content-wide">
+      <div class="oppia-donate-info">
+        <div style="height: 0; margin: 60px auto 0px auto; width: 70%; padding-bottom: 56.25%; position: relative;">
+          <iframe title="Meet Oppia's Contributors" width="100%"
+                  height="100%" src="https://www.youtube.com/embed/OConyxG7HaM"
+                  frameborder="0" allowfullscreen
+                  style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+          </iframe>
+        </div>
+        <h6 style="text-align: center;"><em>Hear from our Oppia community</em></h6>
+        <div style="margin: 0 auto; width: 70%;">
+          <p style="font-size: 0.825em;">
+            In 2012, Oppia started with a simple idea: to improve the education of
+            students around the world while improving the quality of teaching.
+            This vision has since turned into an educational platform with over
+            5,500 explorations that are used by approximately 145,000
+            users worldwide.
+          </p>
+          <p style="font-size: 0.825em;">
+            Please donate to The Oppia Foundation, a registered 501(c)(3) nonprofit,
+            and join us in bringing the joys of teaching and learning to people
+            everywhere.
+          </p>
+        </div>
+      </div>
+      <div class="oppia-donate-options">
+        <div ng-if="windowIsNarrow">
+          <h2 style="color: #fff; margin-top: 60px;">Donate to the</h2>
+          <h2 style="color: #fff; margin-top: 10px;">Oppia Foundation</h2>
+        </div>
+        <div ng-if="!windowIsNarrow">
+          <h2 style="color: #fff; margin-top: 60px;">Donate to</h2>
+          <h2 style="color: #fff; margin-top: 10px;">The Oppia Foundation</h2>
+        </div>
+        <div style="text-align: center;">
+          <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" ng-submit="onDonateThroughPayPal()">
+          <input type="hidden" name="cmd" value="_s-xclick">
+          <input type="hidden" name="hosted_button_id" value="UWKTY87SYU766">
+          <button class="btn oppia-donate-options-button">
+            PayPal
+          </button>
+        </div>
+        <div style="text-align: center;">
+          <div ng-click="onDonateThroughAmazon()" class="btn oppia-donate-options-button">Amazon Smile</div>
+        </div>
+        <h2 style="color: #fff; font-size: 20px; margin-bottom: 20px; margin-top: 20px;">
+          Your generous gift funds:</h2>
+        <div style="margin-bottom: 16px; text-align: center;">
+          <img ng-src="<[donateImgUrl]>">
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/donate/Donate.js"></script>
+{% endblock footer_js %}
+
+{% block footer %}
+  {% include 'pages/footer.html' %}
+{% endblock %}

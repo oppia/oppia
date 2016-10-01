@@ -45,7 +45,7 @@ oppia.factory('CollectionPlaythroughObjectFactory', [function() {
     };
 
     CollectionPlaythrough.hasFinishedCollection = function() {
-      return this._nextExplorationIds.length == 0;
+      return this._nextExplorationIds.length === 0;
     };
 
     // Returns a list of explorations completed that are related to this
@@ -60,7 +60,7 @@ oppia.factory('CollectionPlaythroughObjectFactory', [function() {
     };
 
     CollectionPlaythrough.prototype.hasStartedCollection = function() {
-      return this._completedExplorationIds.length != 0;
+      return this._completedExplorationIds.length !== 0;
     };
 
     // Static class methods. Note that "this" is not available in static

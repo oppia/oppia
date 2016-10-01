@@ -68,15 +68,26 @@ def get_visualizations_info(exploration_id, state_name):
             if visualization.calculation_id in calculation_ids_to_outputs]
 
 
-# TODO(bhenning): This needs to be thoroughly tested (similar to how the
+# TODO(bhenning): These need to be thoroughly tested (similar to how the
 # unresolved answers getter was before). It would be preferred if this were
 # tested on a branch alongside these changes, then used to verify that these
 # changes to do not change the contract of the function.
+
 def get_top_state_rule_answers(
-        exploration_id, state_name, classify_category_list,
-        top_answer_count_per_category):
+        exploration_id, state_name, classify_category_list):
     """Returns a list of top answers (by submission frequency) submitted to the
     given state in the given exploration which were mapped to any of the rule
+    classification categories listed in 'classify_category_list'. All answers
+    submitted to the specified state and match the rule spec strings in
+    rule_str_list are returned.
+    """
+    return get_top_state_rule_answers_multi(
+        [(exploration_id, state_name)], classify_category_list)[0]
+
+def get_top_state_rule_answers_multi(
+        exploration_state_list, classify_category_list):
+    """Returns a list of top answers (by submission frequency) submitted to the
+    given explorations and states which were mapped to any of the rule
     classification categories listed in 'classify_category_list'.
 
     NOTE TO DEVELOPERS: Classification categories are stored upon answer
@@ -89,17 +100,19 @@ def get_top_state_rule_answers(
     # data of soft rules, rank them by their frequency, then output them. This
     # output will have reasonably up-to-date answers which need to be resolved
     # by creators.
-    # pylint: disable=line-too-long
-    job_result = (
-        stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output(
-            exploration_id, state_name, 'TopAnswersByCategorization'))
-    if job_result:
-        calc_output = job_result.calculation_output
-        return list(itertools.chain.from_iterable(
-            calc_output[category][:top_answer_count_per_category]
-            for category in classify_category_list if category in calc_output))
-    else:
-        return []
+    answer_lists = []
+    for exploration_id, state_name in exploration_state_list:
+        # pylint: disable=line-too-long
+        job_result = (
+            stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output(
+                exploration_id, state_name, 'TopAnswersByCategorization'))
+        if job_result:
+            calc_output = job_result.calculation_output
+            answer_lists.append(list(itertools.chain.from_iterable(
+                calc_output[category]
+                for category in classify_category_list
+                if category in calc_output)))
+    return answer_lists
 
 
 def count_top_state_rule_answers(

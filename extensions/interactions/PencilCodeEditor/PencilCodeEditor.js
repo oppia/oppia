@@ -24,7 +24,9 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        onSubmit: '&'
+      },
       templateUrl: 'interaction/PencilCodeEditor',
       controller: [
         '$scope', '$attrs', '$element', '$timeout', 'focusService',
@@ -103,12 +105,15 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
               console.log('------');
 
               hasSubmittedAnswer = true;
-              $scope.$parent.submitAnswer({
-                code: normalizedCode,
-                output: output || '',
-                evaluation: '',
-                error: ''
-              }, pencilCodeEditorRulesService);
+              $scope.onSubmit({
+                answer: {
+                  code: normalizedCode,
+                  output: output || '',
+                  evaluation: '',
+                  error: ''
+                },
+                rulesService: pencilCodeEditorRulesService
+              });
             }, true);
           });
 
@@ -181,27 +186,34 @@ oppia.factory('pencilCodeEditorRulesService', [
         codeNormalizationService.getNormalizedCode(answer.code);
       var normalizedExpectedCode =
         codeNormalizationService.getNormalizedCode(inputs.x);
-      return normalizedCode == normalizedExpectedCode;
+      return normalizedCode === normalizedExpectedCode;
     },
     CodeContains: function(answer, inputs) {
       var normalizedCode =
         codeNormalizationService.getNormalizedCode(answer.code);
       var normalizedSnippet =
         codeNormalizationService.getNormalizedCode(inputs.x);
-      return normalizedCode.indexOf(normalizedSnippet) != -1;
+      return normalizedCode.indexOf(normalizedSnippet) !== -1;
     },
     CodeDoesNotContain: function(answer, inputs) {
       var normalizedCode =
         codeNormalizationService.getNormalizedCode(answer.code);
       var normalizedSnippet =
         codeNormalizationService.getNormalizedCode(inputs.x);
-      return normalizedCode.indexOf(normalizedSnippet) == -1;
+      return normalizedCode.indexOf(normalizedSnippet) === -1;
     },
     OutputEquals: function(answer, inputs) {
       var normalizedOutput = $filter('normalizeWhitespace')(answer.output);
       var normalizedExpectedOutput =
         $filter('normalizeWhitespace')(inputs.x);
-      return normalizedOutput == normalizedExpectedOutput;
+      return normalizedOutput === normalizedExpectedOutput;
+    },
+    OutputRoughlyEquals: function(answer, inputs) {
+      var normalizedOutput = $filter(
+        'normalizeWhitespacePunctuationAndCase')(answer.output);
+      var normalizedExpectedOutput =
+        $filter('normalizeWhitespacePunctuationAndCase')(inputs.x);
+      return normalizedOutput === normalizedExpectedOutput;
     },
     ResultsInError: function(answer) {
       return !!(answer.error.trim());
@@ -209,7 +221,7 @@ oppia.factory('pencilCodeEditorRulesService', [
     ErrorContains: function(answer, inputs) {
       var normalizedError = $filter('normalizeWhitespace')(answer.error);
       var normalizedSnippet = $filter('normalizeWhitespace')(inputs.x);
-      return normalizedError.indexOf(normalizedSnippet) != -1;
+      return normalizedError.indexOf(normalizedSnippet) !== -1;
     }
   };
 }]);

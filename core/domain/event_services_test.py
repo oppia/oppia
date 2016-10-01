@@ -58,8 +58,8 @@ class EventHandlerTaskQueueUnitTests(test_utils.GenericTestBase):
     def test_events_go_into_the_events_queue(self):
         self.assertEqual(self.count_jobs_in_taskqueue(), 0)
 
-        event_services.StartExplorationEventHandler.record(
-            'eid1', 1, 'sid1', 'session1', {}, feconf.PLAY_TYPE_NORMAL)
+        event_services.CompleteExplorationEventHandler.record(
+            'eid1', 1, 'sid1', 'session1', 100, {}, feconf.PLAY_TYPE_NORMAL)
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
         self.assertEqual(self.count_jobs_in_taskqueue(
             queue_name=taskqueue_services.QUEUE_NAME_EVENTS), 1)

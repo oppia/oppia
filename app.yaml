@@ -1,9 +1,9 @@
 application: oppiaserver
-version: 2-3-0
+version: 2-3-2
 runtime: python27
 api_version: 1
 threadsafe: false
-instance_class: F4
+instance_class: F2
 
 builtins:
 - appstats: on
@@ -15,37 +15,46 @@ inbound_services:
 
 handlers:
 - url: /favicon.ico
-  static_files: static/images/favicon.ico
-  upload: static/images/favicon.ico
+  static_files: assets/common/favicon.ico
+  upload: assets/common/favicon.ico
   secure: always
   http_headers:
     Cache-Control: 'public, max-age=2592000'
     Vary: Accept-Encoding
-- url: /images
-  static_dir: static/images
-  secure: always
-  http_headers:
-    Cache-Control: 'public, max-age=600'
-- url: /static/pages
-  static_dir: static/pages
-  secure: always
-  http_headers:
-    Cache-Control: 'public, max-age=600'
 - url: /robots.txt
-  static_files: static/pages/robots.txt
-  upload: static/pages/robots.txt
+  static_files: assets/common/robots.txt
+  upload: assets/common/robots.txt
   secure: always
   http_headers:
     Cache-Control: 'public, max-age=2592000'
     Vary: Accept-Encoding
-- url: /scripts
-  static_dir: static/scripts
+- url: /build
+  static_dir: build
   secure: always
   http_headers:
-    Cache-Control: 'no-cache'
+    Cache-Control: 'public, max-age=2592000'
+- url: /assets/common
+  static_dir: assets/common
+  secure: always
+  http_headers:
+    # WARNING TO DEVELOPERS: Files in this folder may be stale for
+    # up to 10 mins after a code release.
+    Cache-Control: 'public, max-age=600'
+- url: /assets
+  static_dir: assets
+  secure: always
+  http_headers:
+    Cache-Control: 'public, max-age=60'
 - url: /css
   # NB: not minified. TODO(sll): fix.
   static_dir: core/templates/dev/head/css
+  secure: always
+# Serve js scripts under core/templates/dev/head. This regex allows
+# us to recursively serve js scripts. "\1" inserts text captured by
+# the capture group in the URL pattern.
+- url: /templates/dev/head/(.*\.(js))$
+  static_files: core/templates/dev/head/\1
+  upload: core/templates/dev/head/(.*\.(js))$
   secure: always
 - url: /third_party/static
   static_dir: third_party/static
@@ -53,11 +62,6 @@ handlers:
   http_headers:
     Cache-Control: 'public, max-age=2592000'
     Vary: Accept-Encoding
-- url: /i18n
-  static_dir: i18n
-  secure: always
-  http_headers:
-    Cache-Control: 'no-cache'
 - url: /third_party/generated
   static_dir: third_party/generated
   secure: always
@@ -83,6 +87,14 @@ handlers:
   secure: always
   http_headers:
     Cache-Control: 'no-cache'
+# Serve js scripts for gadgets, interactions, rich_text_components and objects
+# under extensions in dev mode. This regex allows us to recursively serve js
+# scripts under the three specified directories. "\1" and "\2" insert capture
+# groups from the url pattern.
+- url: /extensions/(gadgets|interactions|rich_text_components|objects)/(.*\.(js))$
+  static_files: extensions/\1/\2
+  upload: extensions/(gadgets|interactions|rich_text_components|objects)/(.*\.(js))$
+  secure: always
 - url: /mapreduce/pipeline/images
   static_dir: third_party/gae-mapreduce-1.9.17.0/mapreduce/lib/pipeline/ui/images
   secure: always
@@ -98,6 +110,10 @@ handlers:
   login: admin
   script: main_cron.app
   secure: always
+- url: /task/.*
+  login: admin
+  script: main_taskqueue.app
+  secure: always
 - url: /.*
   script: main.app
   secure: always
@@ -109,3 +125,8 @@ libraries:
   version: '1.6.1'
 - name: webapp2
   version: '2.5.2'
+# This environmental variable is for serving minified resources
+# when set to true. It allows minified resources to be used when
+# running the server in the dev environment.
+env_variables:
+  MINIFICATION: false

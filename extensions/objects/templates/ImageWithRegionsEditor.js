@@ -32,7 +32,7 @@ oppia.directive('imageWithRegionsEditor', [
       restrict: 'E',
       scope: true,
       template: '<div ng-include="getTemplateUrl()"></div>',
-      controller: function($scope, $element) {
+      controller: ['$scope', '$element', function($scope, $element) {
         $scope.alwaysEditable = true;
 
         $scope.REGION_LABEL_OFFSET_X = 6;
@@ -235,7 +235,7 @@ oppia.directive('imageWithRegionsEditor', [
           $scope.userIsCurrentlyDragging = false;
           if ($scope.regionDrawMode) {
             $scope.regionDrawMode = false;
-            if ($scope.rectWidth != 0 && $scope.rectHeight != 0) {
+            if ($scope.rectWidth !== 0 && $scope.rectHeight !== 0) {
               var labels = $scope.$parent.value.labeledRegions.map(
                 function(region) {
                   return region.label;
@@ -319,7 +319,7 @@ oppia.directive('imageWithRegionsEditor', [
           $scope.$parent.value.labeledRegions.splice(index, 1);
           labelList.splice(index, 1);
         };
-      }
+      }]
     };
   }
 ]);

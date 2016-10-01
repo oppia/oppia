@@ -26,27 +26,29 @@ var admin = require('../protractor_utils/admin.js');
 var _selectLanguage = function(language) {
   element(by.css('.protractor-test-i18n-language-selector')).
     element(by.cssContainingText('option', language)).click();
+  // Wait for the language-change request to reach the backend.
+  general.waitForSystem();
 };
 
 describe('Site language', function() {
   beforeEach(function() {
     // Starting language is English
-    browser.get('/splash');
+    browser.get('/about');
     _selectLanguage('English');
-    expect(browser.getTitle()).toEqual('Home - Oppia');
+    expect(browser.getTitle()).toEqual('About us - Oppia');
   });
 
   afterEach(function() {
     // Reset language back to English
-    browser.get('/splash');
+    browser.get('/about');
     _selectLanguage('English');
   });
 
   it('should change after selecting a different language', function() {
-    browser.get('/splash');
+    browser.get('/about');
     _selectLanguage('Español');
     browser.get('/library');
-    expect(browser.getTitle()).toEqual('Oppia - Librería');
+    expect(browser.getTitle()).toEqual('Biblioteca - Oppia');
     general.ensurePageHasNoTranslationIds();
   });
 
@@ -58,7 +60,7 @@ describe('Site language', function() {
     var options = element.all(by.css('.select2-drop-active li div')).filter(
       function(elem) {
         return elem.getText().then(function(text) {
-          return text == 'Español';
+          return text === 'Español';
         });
       });
     options.first().click();
@@ -72,17 +74,18 @@ describe('Site language', function() {
       function() {
     users.createUser('feanor@example.com', 'Feanor');
     users.login('feanor@example.com');
-    browser.get('/splash');
+    browser.get('/about');
     _selectLanguage('Español');
     browser.get('/library');
-    expect(browser.getTitle()).toEqual('Oppia - Librería');
+    expect(browser.getTitle()).toEqual('Biblioteca - Oppia');
 
     // The preference page shows the last selected language
     browser.get('/preferences');
     language = element(by.css('.protractor-test-system-language-selector'))
       .element(by.css('.select2-chosen'));
     expect(language.getText(), 'Español');
-    expect(browser.getTitle()).toEqual('Preferencias - Oppia');
+    expect(browser.getTitle()).toEqual(
+      'Cambiar sus preferencias de perfil - Oppia');
     general.ensurePageHasNoTranslationIds();
     users.logout();
   });
@@ -90,16 +93,16 @@ describe('Site language', function() {
   it('should be used in titles of pages without controllers', function() {
     browser.get('/about');
     _selectLanguage('English');
-    expect(browser.getTitle()).toEqual('About - Oppia');
+    expect(browser.getTitle()).toEqual('About us - Oppia');
     _selectLanguage('Español');
-    expect(browser.getTitle()).toEqual('Acerca de - Oppia');
+    expect(browser.getTitle()).toEqual('Acerca de nosotros - Oppia');
     general.ensurePageHasNoTranslationIds();
   });
 
   it('should not change in an exploration', function() {
     users.createUser('mangue@example.com', 'Mangue');
     users.login('mangue@example.com', true);
-    browser.get('/splash');
+    browser.get('/about');
     _selectLanguage('Español');
     admin.reloadExploration('protractor_test_1.yaml');
     // Open exploration
@@ -110,5 +113,9 @@ describe('Site language', function() {
     expect(placeholder).toEqual('Ingresa un número');
     general.ensurePageHasNoTranslationIds();
     users.logout();
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
   });
 });

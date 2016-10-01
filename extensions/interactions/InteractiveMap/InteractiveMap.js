@@ -24,7 +24,9 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
   oppiaHtmlEscaper, interactiveMapRulesService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        onSubmit: '&'
+      },
       templateUrl: 'interaction/InteractiveMap',
       controller: [
         '$scope', '$attrs', '$timeout', function($scope, $attrs, $timeout) {
@@ -66,8 +68,10 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
               position: ll
             }));
 
-            $scope.$parent.submitAnswer(
-              [ll.lat(), ll.lng()], interactiveMapRulesService);
+            $scope.onSubmit({
+              answer: [ll.lat(), ll.lng()],
+              rulesService: interactiveMapRulesService
+            });
           };
 
           refreshMap();
@@ -143,25 +147,6 @@ oppia.factory('interactiveMapRulesService', function() {
     NotWithin: function(answer, inputs) {
       var actualDistance = getDistanceInKm(inputs.p, answer);
       return actualDistance > inputs.d;
-    },
-    FuzzyMatches: function(answer, inputs) {
-      // Returns true if answer is within FUZZY_RADIUS of any of the training
-      // points.
-
-      // TODO(wxy): Create a better classifier for this interaction. Currently,
-      // the frontend implementation of this rule returns a boolean value,
-      // checking if the answer is close to any point in the training data.
-      // If this fails, the answer should then go to a backend classifier that
-      // picks the answer group with the best matching answer group.
-
-      var FUZZY_RADIUS_KM = 5;
-
-      if (inputs.training_data.length === 0) {
-        return false;
-      }
-      return inputs.training_data.some(function(point) {
-        return (getDistanceInKm(answer, point) <= FUZZY_RADIUS_KM);
-      });
     }
   };
 });

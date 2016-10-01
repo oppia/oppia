@@ -33,13 +33,13 @@ oppia.directive('alertMessage', [function() {
     ],
     link: function(scope) {
       var message = scope.getMessage();
-      if (message.type == 'info') {
+      if (message.type === 'info') {
         scope.toastr.info(message.content, {
           onHidden: function() {
             scope.alertsService.deleteMessage(message);
           }
         });
-      } else if (message.type == 'success') {
+      } else if (message.type === 'success') {
         scope.toastr.success(message.content, {
           onHidden: function() {
             scope.alertsService.deleteMessage(message);

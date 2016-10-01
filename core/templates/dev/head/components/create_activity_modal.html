@@ -1,51 +1,26 @@
 <script type="text/ng-template" id="modals/createActivity">
   <div class="oppia-create-activity-modal">
     <div class="modal-body oppia-long-text protractor-test-creation-modal">
-        <div class="row">
-          {% if can_create_collections %}
-            <div class="col-sm-12">
-              <h1 translate="I18N_CREATE_ACTIVITY_TITLE"></h1>
-              <p translate="I18N_CREATE_ACTIVITY_QUESTION"></p>
-            </div>
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center">
-              <img src="/images/activity/exploration.svg" ng-click="chooseExploration()">
-              <button type="button" ng-click="chooseExploration()"
-                      class="btn oppia-transition-200 protractor-test-create-exploration">
-                <span translate="I18N_CREATE_EXPLORATION"></span>
-              </button>
-            </div>
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center">
-              <img src="/images/activity/collection.svg" ng-click="chooseCollection()">
-              <button type="button" ng-click="chooseCollection()"
-                      class="btn oppia-transition-200 protractor-test-create-collection">
-                <span translate="I18N_CREATE_COLLECTION"></span>
-              </button>
-            </div>
-            <div class="col-sm-12 col-xs-12 text-center">
-              <button type="button" ng-click="cancel()"
-                      class="btn oppia-transition-200 protractor-test-dismiss-creation-modal">
-                <span translate="I18N_CREATE_NEITHER_THANKS"></span>
-              </button>
-            </div>
-          </div>
-        {% else %}
-          <div class="col-sm-12">
-            <h1 translate="I18N_CREATE_EXPLORATION_TITLE"></h1>
-            <p translate="I18N_CREATE_EXPLORATION_QUESTION"></p>
-          </div>
-          <div class="col-sm-12 col-xs-12 text-center">
-            <img src="/images/activity/exploration.svg" ng-click="chooseExploration()">
-          </div>
+      <div class="row">
+        <div class="col-sm-12">
+          <h1 translate="I18N_CREATE_ACTIVITY_TITLE"></h1>
+          <p translate="I18N_CREATE_ACTIVITY_QUESTION"></p>
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center">
+          <img ng-src="<[explorationImgUrl]>" ng-click="chooseExploration()">
+          <button type="button" ng-click="chooseExploration()"
+                  class="btn oppia-transition-200 protractor-test-create-exploration">
+            <span translate="I18N_CREATE_EXPLORATION"></span>
+          </button>
+        </div>
+
+        {% if can_create_collections %}
           <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center">
-            <button type="button" ng-click="chooseExploration()"
-                    class="btn oppia-transition-200 protractor-test-create-exploration">
-              <span translate="I18N_CREATE_YES_PLEASE"></span>
-            </button>
-          </div>
-          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center">
-            <button type="button" ng-click="cancel()"
-                    class="btn oppia-transition-200 protractor-test-dismiss-creation-modal">
-              <span translate="I18N_CREATE_NO_THANKS"></span>
+            <img ng-src="<[collectionImgUrl]>" ng-click="chooseCollection()">
+            <button type="button" ng-click="chooseCollection()"
+                    class="btn oppia-transition-200 protractor-test-create-collection">
+              <span translate="I18N_CREATE_COLLECTION"></span>
             </button>
           </div>
         {% endif %}

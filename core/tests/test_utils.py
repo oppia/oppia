@@ -31,12 +31,11 @@ from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import rule_domain
 from core.domain import rights_manager
 from core.platform import models
 import feconf
-import jinja_utils
 import main
+import main_taskqueue
 import utils
 
 from google.appengine.api import apiproxy_stub
@@ -47,10 +46,6 @@ current_user_services = models.Registry.import_current_user_services()
 
 CSRF_REGEX = (
     r'csrf_token: JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\)')
-CSRF_I18N_REGEX = (
-    r'csrf_token_i18n: JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\)')
-CSRF_CREATE_EXPLORATION_REGEX = (
-    r'csrf_token_create_exploration: JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\)') # pylint: disable=line-too-long
 # Prefix to append to all lines printed by tests to the console.
 LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 
@@ -153,14 +148,6 @@ class TestBase(unittest.TestCase):
     def tearDown(self):
         raise NotImplementedError
 
-    def assertFuzzyTrue(self, value):  # pylint: disable=invalid-name
-        self.assertEqual(value, rule_domain.CERTAIN_TRUE_VALUE)
-        self.assertTrue(isinstance(value, float))
-
-    def assertFuzzyFalse(self, value):  # pylint: disable=invalid-name
-        self.assertEqual(value, rule_domain.CERTAIN_FALSE_VALUE)
-        self.assertTrue(isinstance(value, float))
-
     def _assert_validation_error(self, item, error_substring):
         """Checks that the given item passes default validation."""
         with self.assertRaisesRegexp(utils.ValidationError, error_substring):
@@ -240,13 +227,12 @@ class TestBase(unittest.TestCase):
 
         return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])
 
-    def get_json(self, url, params=None):
-        """Get a JSON response, transformed to a Python object. This method
-        does not support calling testapp.get() with errors expected in response
-        because testapp.get() in that case does not return a JSON object."""
-        json_response = self.testapp.get(url, params)
-        self.assertEqual(json_response.status_int, 200)
-        return self._parse_json_response(json_response, expect_errors=False)
+    def get_json(self, url, params=None, expect_errors=False):
+        """Get a JSON response, transformed to a Python object."""
+        json_response = self.testapp.get(
+            url, params, expect_errors=expect_errors)
+        return self._parse_json_response(
+            json_response, expect_errors=expect_errors)
 
     def post_json(self, url, payload, csrf_token=None, expect_errors=False,
                   expected_status_int=200, upload_files=None):
@@ -277,18 +263,9 @@ class TestBase(unittest.TestCase):
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
 
-    def get_csrf_token_from_response(self, response, token_type=None):
+    def get_csrf_token_from_response(self, response):
         """Retrieve the CSRF token from a GET response."""
-        if token_type is None:
-            regex = CSRF_REGEX
-        elif token_type == feconf.CSRF_PAGE_NAME_CREATE_EXPLORATION:
-            regex = CSRF_CREATE_EXPLORATION_REGEX
-        elif token_type == feconf.CSRF_PAGE_NAME_I18N:
-            regex = CSRF_I18N_REGEX
-        else:
-            raise Exception('Invalid CSRF token type: %s' % token_type)
-
-        return re.search(regex, response.body).group(1)
+        return re.search(CSRF_REGEX, response.body).group(1)
 
     def signup(self, email, username):
         """Complete the signup process for the user with the given username."""
@@ -476,64 +453,25 @@ class TestBase(unittest.TestCase):
                 obj_type, new_param_dict)
         return new_param_dict
 
-    def submit_answer(
-            self, exploration_id, state_name, answer,
-            params=None, unused_exploration_version=None,
-            session_id='dummy_session_id',
-            client_time_spent_in_secs=0.0):
-        """Submits an answer as an exploration player and returns the
-        corresponding dict. This function has strong parallels to code in
-        PlayerServices.js which has the non-test code to perform the same
-        functionality. This is replicated here so backend tests may utilize the
-        functionality of PlayerServices.js without being able to access it.
-
-        TODO(bhenning): Replicate this in an end-to-end Protractor test to
-        protect against code skew here.
+    def get_static_asset_filepath(self):
+        """Returns filepath for referencing static files on disk.
+        examples: '' or 'build/1234'
         """
-        if params is None:
-            params = {}
+        cache_slug_filepath = ''
+        if feconf.IS_MINIFIED or not feconf.DEV_MODE:
+            yaml_file_content = utils.dict_from_yaml(
+                utils.get_file_contents('cache_slug.yaml'))
+            cache_slug = yaml_file_content['cache_slug']
+            cache_slug_filepath = os.path.join('build', cache_slug)
 
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+        return cache_slug_filepath
 
-        # First, the answer must be classified.
-        classify_result = self.post_json(
-            '/explorehandler/classify/%s' % exploration_id, {
-                'old_state': exploration.states[state_name].to_dict(),
-                'params': params,
-                'answer': answer
-            }
-        )
-
-        # Next, ensure the submission is recorded.
-        self.post_json(
-            '/explorehandler/answer_submitted_event/%s' % exploration_id, {
-                'answer': answer,
-                'params': params,
-                'version': exploration.version,
-                'session_id': session_id,
-                'client_time_spent_in_secs': client_time_spent_in_secs,
-                'old_state_name': state_name,
-                'answer_group_index': classify_result['answer_group_index'],
-                'rule_spec_index': classify_result['rule_spec_index'],
-                'classification_categorization': (
-                    classify_result['classification_categorization'])
-            }
-        )
-
-        # Now the next state's data must be calculated.
-        outcome = classify_result['outcome']
-        new_state = exploration.states[outcome['dest']]
-        params['answer'] = answer
-        new_params = self.get_updated_param_dict(
-            params, new_state.param_changes, exploration.param_specs)
-
-        return {
-            'feedback_html': jinja_utils.parse_string(
-                utils.get_random_choice(outcome['feedback'])
-                if outcome['feedback'] else '', params),
-            'question_html': new_state.content[0].to_html(new_params),
-            'state_name': outcome['dest']
-        }
+    def get_static_asset_url(self, asset_suffix):
+        """Returns the relative path for the asset, appending it to the
+        corresponding cache slug. asset_suffix should have a leading
+        slash.
+        """
+        return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
 
     @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):
@@ -658,11 +596,17 @@ class AppEngineTestBase(TestBase):
         """Counts the jobs in the given queue. If queue_name is None,
         defaults to counting the jobs in all queues available.
         """
+        return len(self.get_pending_tasks(queue_name))
+
+    def get_pending_tasks(self, queue_name=None):
+        """Returns the jobs in the given queue. If queue_name is None,
+        defaults to returning the jobs in all queues available.
+        """
         if queue_name:
-            return len(self.taskqueue_stub.get_filtered_tasks(
-                queue_names=[queue_name]))
+            return self.taskqueue_stub.get_filtered_tasks(
+                queue_names=[queue_name])
         else:
-            return len(self.taskqueue_stub.get_filtered_tasks())
+            return self.taskqueue_stub.get_filtered_tasks()
 
     def process_and_flush_pending_tasks(self, queue_name=None):
         """Runs and flushes pending tasks. If queue_name is None, does so for
@@ -686,12 +630,18 @@ class AppEngineTestBase(TestBase):
                     from google.appengine.ext import deferred
                     deferred.run(task.payload)
                 else:
-                    # All other tasks are expected to be mapreduce ones.
+                    # All other tasks are expected to be mapreduce ones, or
+                    # Oppia-taskqueue-related ones.
                     headers = {
                         key: str(val) for key, val in task.headers.iteritems()
                     }
                     headers['Content-Length'] = str(len(task.payload or ''))
-                    response = self.testapp.post(
+
+                    app = (
+                        webtest.TestApp(main_taskqueue.app)
+                        if task.url.startswith('/task')
+                        else self.testapp)
+                    response = app.post(
                         url=str(task.url), params=(task.payload or ''),
                         headers=headers)
                     if response.status_code != 200:

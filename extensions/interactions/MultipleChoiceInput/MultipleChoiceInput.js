@@ -24,7 +24,9 @@ oppia.directive('oppiaInteractiveMultipleChoiceInput', [
   function(oppiaHtmlEscaper, multipleChoiceInputRulesService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        onSubmit: '&'
+      },
       templateUrl: 'interaction/MultipleChoiceInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.choices = oppiaHtmlEscaper.escapedJsonToObj(
@@ -33,7 +35,10 @@ oppia.directive('oppiaInteractiveMultipleChoiceInput', [
 
         $scope.submitAnswer = function(answer) {
           answer = parseInt(answer, 10);
-          $scope.$parent.submitAnswer(answer, multipleChoiceInputRulesService);
+          $scope.onSubmit({
+            answer: answer,
+            rulesService: multipleChoiceInputRulesService
+          });
         };
       }]
     };

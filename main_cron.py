@@ -28,11 +28,17 @@ transaction_services = models.Registry.import_transaction_services()
 # Register the URLs with the classes responsible for handling them.
 URLS = [
     main.get_redirect_route(
-        r'/cron/mail/admin/job_status', cron.JobStatusMailerHandler,
-        'job_failure_mailer'),
+        r'/cron/mail/admin/job_status', cron.JobStatusMailerHandler),
     main.get_redirect_route(
-        r'/cron/jobs/cleanup', cron.CronMapreduceCleanupHandler,
-        'job_cleanup_handler'),
+        r'/cron/users/dashboard_stats', cron.CronDashboardStatsHandler),
+    main.get_redirect_route(
+        r'/cron/explorations/recommendations',
+        cron.CronExplorationRecommendationsHandler),
+    main.get_redirect_route(
+        r'/cron/explorations/search_rank',
+        cron.CronExplorationSearchRankHandler),
+    main.get_redirect_route(
+        r'/cron/jobs/cleanup', cron.CronMapreduceCleanupHandler),
 ]
 
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name

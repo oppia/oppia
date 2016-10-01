@@ -45,7 +45,7 @@ oppia.directive('mathjaxBind', [function() {
         $scope.$watch($attrs.mathjaxBind, function(value) {
           var $script = angular.element(
             '<script type="math/tex">'
-          ).html(value == undefined ? '' : value);
+          ).html(value === undefined ? '' : value);
           $element.html('');
           $element.append($script);
           MathJax.Hub.Queue(['Reprocess', MathJax.Hub, $element[0]]);
@@ -64,18 +64,6 @@ oppia.directive('selectOnClick', [function() {
         this.select();
       });
     }
-  };
-}]);
-
-oppia.directive('whenScrolledToBottom', [function() {
-  return function(scope, elm, attr) {
-    var raw = elm[0];
-
-    elm.bind('scroll', function() {
-      if (raw.scrollTop + raw.offsetHeight >= raw.scrollHeight) {
-        scope.$apply(attr.whenScrolled);
-      }
-    });
   };
 }]);
 
@@ -136,49 +124,6 @@ oppia.directive('focusOn', [
     };
   }
 ]);
-
-oppia.directive('imageUploader', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      height: '@',
-      onFileChanged: '=',
-      width: '@'
-    },
-    templateUrl: 'components/imageUploader',
-    link: function(scope, elt) {
-      var onDragEnd = function(e) {
-        e.preventDefault();
-        $(elt).removeClass('image-uploader-is-active');
-      };
-
-      $(elt).bind('drop', function(e) {
-        onDragEnd(e);
-        scope.onFileChanged(
-          e.originalEvent.dataTransfer.files[0],
-          e.originalEvent.dataTransfer.files[0].name);
-      });
-
-      $(elt).bind('dragover', function(e) {
-        e.preventDefault();
-        $(elt).addClass('image-uploader-is-active');
-      });
-
-      $(elt).bind('dragleave', onDragEnd);
-
-      // We generate a random class name to distinguish this input from
-      // others in the DOM.
-      scope.fileInputClassName = (
-        'image-uploader-file-input' + Math.random().toString(36).substring(5));
-      angular.element(document).on(
-          'change', '.' + scope.fileInputClassName, function(evt) {
-        scope.onFileChanged(
-          evt.currentTarget.files[0],
-          evt.target.value.split(/(\\|\/)/g).pop());
-      });
-    }
-  };
-}]);
 
 oppia.directive('mobileFriendlyTooltip', ['$timeout', function($timeout) {
   return {

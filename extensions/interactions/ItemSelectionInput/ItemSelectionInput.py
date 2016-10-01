@@ -58,13 +58,14 @@ class ItemSelectionInput(base.BaseInteraction):
                 'type': 'html',
                 'ui_config': {
                     'hide_complex_extensions': True,
+                    'placeholder': 'Sample item answer',
                 },
             },
             'ui_config': {
                 'add_element_text': 'Add item for selection',
             }
         },
-        'default_value': ['Sample item answer'],
+        'default_value': [''],
     }]
 
     _auxiliary_calculation_ids = ['TopAnswersByCategorization']

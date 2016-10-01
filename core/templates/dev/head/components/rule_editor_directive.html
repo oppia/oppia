@@ -29,8 +29,8 @@
       </div>
 
       <div ng-if="rule.rule_type == 'FuzzyMatches'">
-        <fuzzy-rule-panel rule-inputs="rule.inputs" on-training-data-deletion="onDeleteTrainingDataEntry(index)">
-        </fuzzy-rule-panel>
+        <classifier-panel rule-inputs="rule.inputs" on-training-data-deletion="onDeleteTrainingDataEntry(index)">
+        </classifier-panel>
       </div>
     </form>
 

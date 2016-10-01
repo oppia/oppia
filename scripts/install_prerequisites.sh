@@ -33,4 +33,5 @@ sudo apt-get install python-setuptools
 sudo apt-get install python-dev
 sudo apt-get install python-pip
 sudo apt-get install unzip
+sudo apt-get install python-yaml
 sudo pip install --upgrade pip

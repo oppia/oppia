@@ -32,9 +32,9 @@ from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import gadget_registry
 from core.domain import interaction_registry
+from core.domain import obj_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
-from core.domain import rule_domain
 from core.domain import stats_services
 from core.domain import user_services
 from core.domain import value_generators_domain
@@ -128,7 +128,7 @@ def require_editor(handler):
             raise self.PageNotFoundException
 
         if not rights_manager.Actor(self.user_id).can_edit(
-                rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
+                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to edit this exploration.',
                 self.user_id)
@@ -149,9 +149,7 @@ def require_editor(handler):
 
 class EditorHandler(base.BaseHandler):
     """Base class for all handlers for the editor page."""
-
-    # The page name to use as a key for generating CSRF tokens.
-    PAGE_NAME_FOR_CSRF = 'editor'
+    pass
 
 
 class ExplorationPage(EditorHandler):
@@ -161,16 +159,17 @@ class ExplorationPage(EditorHandler):
 
     def get(self, exploration_id):
         """Handles GET requests."""
-        if exploration_id in base.DISABLED_EXPLORATIONS.value:
+        if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             self.render_template(
-                'error/disabled_exploration.html', iframe_restriction=None)
+                'pages/error/disabled_exploration.html',
+                iframe_restriction=None)
             return
 
         exploration = exp_services.get_exploration_by_id(
             exploration_id, strict=False)
         if (exploration is None or
                 not rights_manager.Actor(self.user_id).can_view(
-                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id)):
+                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id)):
             self.redirect('/')
             return
 
@@ -178,7 +177,7 @@ class ExplorationPage(EditorHandler):
             bool(self.user_id) and
             self.username not in config_domain.BANNED_USERNAMES.value and
             rights_manager.Actor(self.user_id).can_edit(
-                rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id))
+                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
 
         visualizations_html = visualization_registry.Registry.get_full_html()
 
@@ -196,9 +195,6 @@ class ExplorationPage(EditorHandler):
             rte_component_registry.Registry.get_html_for_all_components() +
             interaction_registry.Registry.get_interaction_html(
                 interaction_ids))
-        interaction_validators_html = (
-            interaction_registry.Registry.get_validators_html(
-                interaction_ids))
 
         gadget_types = gadget_registry.Registry.get_all_gadget_types()
         gadget_templates = (
@@ -208,39 +204,36 @@ class ExplorationPage(EditorHandler):
             'GADGET_SPECS': gadget_registry.Registry.get_all_specs(),
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'PANEL_SPECS': feconf.PANELS_PROPERTIES,
-            'DEFAULT_OBJECT_VALUES': rule_domain.get_default_object_values(),
-            'SHARING_OPTIONS': base.SHARING_OPTIONS.value,
+            'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
             'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR': (
                 DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR.value),
             'additional_angular_modules': additional_angular_modules,
             'can_delete': rights_manager.Actor(
                 self.user_id).can_delete(
-                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id),
+                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
             'can_edit': can_edit,
             'can_modify_roles': rights_manager.Actor(
                 self.user_id).can_modify_roles(
-                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id),
+                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
             'can_publicize': rights_manager.Actor(
                 self.user_id).can_publicize(
-                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id),
+                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
             'can_publish': rights_manager.Actor(
                 self.user_id).can_publish(
-                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id),
+                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
             'can_release_ownership': rights_manager.Actor(
                 self.user_id).can_release_ownership(
-                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id),
+                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
             'can_unpublicize': rights_manager.Actor(
                 self.user_id).can_unpublicize(
-                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id),
+                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
             'can_unpublish': rights_manager.Actor(
                 self.user_id).can_unpublish(
-                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id),
+                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
             'gadget_templates': jinja2.utils.Markup(gadget_templates),
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
-            'interaction_validators_html': jinja2.utils.Markup(
-                interaction_validators_html),
             'meta_description': feconf.CREATE_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_CREATE,
             'value_generators_js': jinja2.utils.Markup(
@@ -258,13 +251,14 @@ class ExplorationPage(EditorHandler):
             'TAG_REGEX': feconf.TAG_REGEX,
         })
 
-        self.render_template('exploration_editor/exploration_editor.html')
+        self.render_template(
+            'pages/exploration_editor/exploration_editor.html')
 
 
 class ExplorationHandler(EditorHandler):
     """Page with editor data for a single exploration."""
 
-    PAGE_NAME_FOR_CSRF = 'editor'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def _get_exploration_data(
             self, exploration_id, apply_draft=False, version=None):
@@ -319,7 +313,7 @@ class ExplorationHandler(EditorHandler):
     def get(self, exploration_id):
         """Gets the data for the exploration overview page."""
         if not rights_manager.Actor(self.user_id).can_view(
-                rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
+                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             raise self.PageNotFoundException
         # 'apply_draft' and 'v'(version) are optional parameters because the
         # exploration history tab also uses this handler, and these parameters
@@ -382,7 +376,7 @@ class ExplorationHandler(EditorHandler):
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
         can_delete = rights_manager.Actor(self.user_id).can_delete(
-            rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration.id)
+            feconf.ACTIVITY_TYPE_EXPLORATION, exploration.id)
         if not can_delete:
             raise self.UnauthorizedUserException(
                 'User %s does not have permissions to delete exploration %s' %
@@ -401,8 +395,6 @@ class ExplorationHandler(EditorHandler):
 class ExplorationRightsHandler(EditorHandler):
     """Handles management of exploration editing rights."""
 
-    PAGE_NAME_FOR_CSRF = 'editor'
-
     @require_editor
     def put(self, exploration_id):
         """Updates the editing rights for the given exploration."""
@@ -420,7 +412,7 @@ class ExplorationRightsHandler(EditorHandler):
         if new_member_username:
             if not rights_manager.Actor(
                     self.user_id).can_modify_roles(
-                        rights_manager.ACTIVITY_TYPE_EXPLORATION,
+                        feconf.ACTIVITY_TYPE_EXPLORATION,
                         exploration_id):
                 raise self.UnauthorizedUserException(
                     'Only an owner of this exploration can add or change '
@@ -496,8 +488,6 @@ class ExplorationRightsHandler(EditorHandler):
 class ExplorationModeratorRightsHandler(EditorHandler):
     """Handles management of exploration rights by moderators."""
 
-    PAGE_NAME_FOR_CSRF = 'editor'
-
     @base.require_moderator
     def put(self, exploration_id):
         """Updates the publication status of the given exploration, and sends
@@ -561,6 +551,8 @@ class UntrainedAnswersHandler(EditorHandler):
     """
     NUMBER_OF_TOP_ANSWERS_PER_RULE = 50
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     def get(self, exploration_id, escaped_state_name):
         """Handles GET requests."""
         try:
@@ -592,12 +584,12 @@ class UntrainedAnswersHandler(EditorHandler):
 
         # The total number of possible answers is 100 because it requests the
         # top 50 answers matched to the default rule and the top 50 answers
-        # matched to a fuzzy rule individually.
+        # matched to the classifier individually.
         answers = stats_services.get_top_state_rule_answers(
             exploration_id, state_name, [
                 exp_domain.DEFAULT_OUTCOME_CLASSIFICATION,
-                exp_domain.TRAINING_DATA_CLASSIFICATION],
-            self.NUMBER_OF_TOP_ANSWERS_PER_RULE)
+                exp_domain.TRAINING_DATA_CLASSIFICATION])[
+                    :self.NUMBER_OF_TOP_ANSWERS_PER_RULE]
 
         interaction = state.interaction
         unhandled_answers = []
@@ -615,7 +607,8 @@ class UntrainedAnswersHandler(EditorHandler):
                 trained_answers = set()
                 for answer_group in interaction.answer_groups:
                     for rule_spec in answer_group.rule_specs:
-                        if rule_spec.rule_type == rule_domain.FUZZY_RULE_TYPE:
+                        if (rule_spec.rule_type ==
+                                exp_domain.CLASSIFIER_RULESPEC_STR):
                             trained_answers.update(
                                 interaction_instance.normalize_answer(trained)
                                 for trained
@@ -646,6 +639,9 @@ class ExplorationDownloadHandler(EditorHandler):
     """Downloads an exploration as a zip file, or dict of YAML strings
     representing states.
     """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     def get(self, exploration_id):
         """Handles GET requests."""
         try:
@@ -654,7 +650,7 @@ class ExplorationDownloadHandler(EditorHandler):
             raise self.PageNotFoundException
 
         if not rights_manager.Actor(self.user_id).can_view(
-                rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
+                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             raise self.PageNotFoundException
 
         version = self.request.get('v', default_value=exploration.version)
@@ -679,37 +675,30 @@ class ExplorationDownloadHandler(EditorHandler):
                 'Unrecognized output format %s' % output_format)
 
 
-class StateDownloadHandler(EditorHandler):
-    """Downloads a state as a YAML string."""
+class StateYamlHandler(EditorHandler):
+    """Given a representation of a state, converts it to a YAML string.
 
-    def get(self, exploration_id):
-        """Handles GET requests."""
+    Note that this handler is stateless; it does not make use of the storage
+    layer.
+    """
+
+    def post(self):
+        """Handles POST requests."""
         try:
-            exploration = exp_services.get_exploration_by_id(exploration_id)
-        except:
+            state_dict = self.payload.get('state_dict')
+            width = self.payload.get('width')
+        except Exception:
             raise self.PageNotFoundException
 
-        if not rights_manager.Actor(self.user_id).can_view(
-                rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
-            raise self.PageNotFoundException
-
-        version = self.request.get('v', default_value=exploration.version)
-        width = int(self.request.get('width', default_value=80))
-
-        try:
-            state = self.request.get('state')
-        except:
-            raise self.InvalidInputException('State not found')
-
-        exploration_dict = exp_services.export_states_to_yaml(
-            exploration_id, version=version, width=width)
-        if state not in exploration_dict:
-            raise self.PageNotFoundException
-        self.response.write(exploration_dict[state])
+        self.render_json({
+            'yaml': exp_services.convert_state_dict_to_yaml(state_dict, width),
+        })
 
 
 class ExplorationResourcesHandler(EditorHandler):
     """Manages assets associated with an exploration."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @require_editor
     def get(self, exploration_id):
@@ -723,6 +712,8 @@ class ExplorationResourcesHandler(EditorHandler):
 
 class ExplorationSnapshotsHandler(EditorHandler):
     """Returns the exploration snapshot history."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -776,6 +767,8 @@ class ExplorationRevertHandler(EditorHandler):
 class ExplorationStatisticsHandler(EditorHandler):
     """Returns statistics for an exploration."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     def get(self, exploration_id, exploration_version):
         """Handles GET requests."""
         try:
@@ -789,6 +782,8 @@ class ExplorationStatisticsHandler(EditorHandler):
 
 class ExplorationStatsVersionsHandler(EditorHandler):
     """Returns statistics versions for an exploration."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -804,6 +799,8 @@ class ExplorationStatsVersionsHandler(EditorHandler):
 
 class StateRulesStatsHandler(EditorHandler):
     """Returns detailed learner answer statistics for a state."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self, exploration_id, escaped_state_name):
         """Handles GET requests."""
@@ -873,41 +870,6 @@ class ImageUploadHandler(EditorHandler):
         fs.commit(self.user_id, filepath, raw)
 
         self.render_json({'filepath': filepath})
-
-
-class ChangeListSummaryHandler(EditorHandler):
-    """Returns a summary of a changelist applied to a given exploration."""
-
-    @require_editor
-    def post(self, exploration_id):
-        """Handles POST requests."""
-        change_list = self.payload.get('change_list')
-        version = self.payload.get('version')
-        current_exploration = exp_services.get_exploration_by_id(
-            exploration_id)
-
-        if version != current_exploration.version:
-            # TODO(sll): Improve the handling of merge conflicts.
-            self.render_json({
-                'is_version_of_draft_valid': False
-            })
-        else:
-            utils.recursively_remove_key(change_list, '$$hashKey')
-
-            summary = exp_services.get_summary_of_change_list(
-                current_exploration, change_list)
-            updated_exploration = exp_services.apply_change_list(
-                exploration_id, change_list)
-            warning_message = ''
-            try:
-                updated_exploration.validate(strict=True)
-            except utils.ValidationError as e:
-                warning_message = unicode(e)
-
-            self.render_json({
-                'summary': summary,
-                'warning_message': warning_message
-            })
 
 
 class StartedTutorialEventHandler(EditorHandler):

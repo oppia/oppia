@@ -25,13 +25,29 @@ describe('Utils Service', function() {
   }));
 
   it('should check if an object is empty', function() {
-    var a = {
+    expect(utilsService.isEmpty({
       a: 'b'
-    };
-    var isEmpty = utilsService.isEmpty(a);
-    expect(isEmpty).toEqual(false);
-    var b = {};
-    isEmpty = utilsService.isEmpty(b);
-    expect(isEmpty).toEqual(true);
+    })).toEqual(false);
+
+    expect(utilsService.isEmpty({})).toEqual(true);
+
+    // Test against invalid inputs.
+    expect(utilsService.isEmpty(NaN)).toEqual(true);
+    expect(utilsService.isEmpty(undefined)).toEqual(true);
+    expect(utilsService.isEmpty(null)).toEqual(true);
+  });
+
+  it('should check if the input is a string', function() {
+    expect(utilsService.isString(12)).toEqual(false);
+
+    expect(utilsService.isString('')).toEqual(true);
+    expect(utilsService.isString('xyz')).toEqual(true);
+    expect(utilsService.isString(new String())).toEqual(true);
+
+    // Test against invalid inputs
+    expect(utilsService.isString(NaN)).toEqual(false);
+    expect(utilsService.isString(undefined)).toEqual(false);
+    expect(utilsService.isString(null)).toEqual(false);
+    expect(utilsService.isString({})).toEqual(false);
   });
 });

@@ -1,0 +1,147 @@
+<div ng-controller="StateInteraction" id="tutorialStateInteraction">
+  <md-card style="margin: 20px 0px; padding: 0px;" ng-if="!interactionId">
+    <div class="oppia-add-interaction-button-container">
+      <button type="button" class="btn btn-default btn-lg oppia-add-interaction-button protractor-test-open-add-interaction-modal" ng-click="openInteractionCustomizerModal()">
+        + Add Interaction / End Exploration
+      </button>
+    </div>
+  </md-card>
+
+  <div ng-if="interactionId">
+    <md-card class="oppia-editor-card-with-avatar">
+      <div class="oppia-editor-card-body" title="<[getCurrentInteractionName()]>">
+        <img ng-src="<[userBlueImgUrl]>" alt="" class="oppia-editor-card-avatar">
+        <div class="oppia-editor-card-section-container">
+          <div class="oppia-editor-card-section" style="height: 100%;">
+            <button type="button" class="protractor-test-delete-interaction oppia-delete-interaction-button oppia-transition-200" ng-click="deleteInteraction()" ng-if="editabilityService.isEditable()">
+              <i class="material-icons md-18">&#xE5CD;</i>
+            </button>
+
+            <div ng-if="hasLoaded" class="protractor-test-interaction" ng-class="{'oppia-editable-section': editabilityService.isEditable()}">
+              <div class="oppia-interaction-preview oppia-transition-200" style="position: absolute; width: 100%; height: 100%;" ng-click="openInteractionCustomizerModal()">
+              </div>
+              <div angular-html-bind="interactionPreviewHtml" style="padding: 5px; pointer-events: none;">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </md-card>
+  </div>
+</div>
+
+<script type="text/ng-template" id="modals/customizeInteraction">
+  <div class="modal-header" style="border-bottom: 0; padding-bottom: 0;">
+    <h3 ng-if="!stateInteractionIdService.displayed">
+      Choose Interaction
+    </h3>
+
+    <h3 ng-if="stateInteractionIdService.displayed">
+      Customize Interaction (<[INTERACTION_SPECS[stateInteractionIdService.displayed].name]>)
+    </h3>
+  </div>
+
+  <div class="modal-body">
+    <div ng-if="!stateInteractionIdService.displayed" ng-cloak>
+      <tabset>
+        <tab ng-repeat="category in ALLOWED_INTERACTION_CATEGORIES"
+             heading="<[category.name]>" active="category.active"
+             class="protractor-test-interaction-tab-<[category.name]>">
+          <br>
+          <div ng-repeat="interactionId in category.interaction_ids"
+               ng-click="onChangeInteractionId(interactionId)"
+               class="oppia-interaction-tile protractor-test-interaction-tile-<[interactionId]>">
+            <img ng-src="<[getInteractionThumbnailImageUrl(interactionId)]>">
+            <div class="oppia-interaction-tile-name">
+              <[INTERACTION_SPECS[interactionId].name]>
+            </div>
+          </div>
+        </tab>
+      </tabset>
+    </div>
+
+    <form ng-if="stateInteractionIdService.displayed" name="form.schemaForm" class="protractor-test-interaction-editor">
+      <div ng-if="customizationArgSpecs.length === 0">
+        <em>There are no customizations options available.<br><br>
+        To use this interaction, click 'Save Interaction'.</em>
+      </div>
+
+      <div ng-repeat="customizationArgSpec in customizationArgSpecs track by $index">
+        <div class="oppia-interaction-customization-label"><[customizationArgSpec.description]></div>
+        <div>
+          <schema-based-editor local-value="stateCustomizationArgsService.displayed[customizationArgSpec.name].value" schema="customizationArgSpec.schema">
+          </schema-based-editor>
+          <div style="margin-bottom: 15px;"></div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <!-- Do not show this button if an interaction is already selected. -->
+    <button class="btn btn-default" style="float: left;" ng-click="returnToInteractionSelector()" ng-if="stateInteractionIdService.displayed && !stateInteractionIdService.savedMemento">Change Interaction</button>
+
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-success protractor-test-save-interaction" ng-click="save()"
+            ng-disabled="!stateInteractionIdService.displayed || form.schemaForm.$invalid">
+      Save Interaction
+    </button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="modals/deleteInteraction">
+  <div class="modal-header">
+    <h3>Delete Interaction</h3>
+  </div>
+
+  <div class="modal-body">
+    <p>
+      Are you sure you want to delete this interaction? This will also clear
+      all its responses.
+    </p>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-danger protractor-test-confirm-delete-interaction"
+            ng-click="reallyDelete()">
+      Delete Interaction
+    </button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="teaching/testInteractionPanel">
+  <div class="form-inline" style="margin-bottom: 20px;">
+    <table class="preview-conversation-skin-card-row-container">
+      <tr class="preview-conversation-skin-card-row">
+        <td class="preview-conversation-skin-row-avatar" valign="top">
+          <img class="preview-conversation-skin-row-avatar-img" ng-src="<[userBlackImgUrl]>">
+        </td>
+        <td class="preview-conversation-skin-oppia-content">
+          <div angular-html-bind="stateContent()"></div>
+        </td>
+      </tr>
+    </table>
+    <div ng-if="interactionIsInline">
+      <div class="preview-conversation-skin-inline-interaction">
+        <table class="preview-conversation-skin-card-row-container" style="margin-bottom: 0;">
+          <tr class="preview-conversation-skin-card-row">
+            <td class="preview-conversation-skin-row-avatar" valign="top">
+              <img class="preview-conversation-skin-row-avatar-img img-circle" ng-src="<[userBlueImgUrl]>" >
+            </td>
+            <td class="preview-conversation-skin-learner-input" angular-html-bind="inputTemplate()">
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div class="preview-conversation-skin-supplemental-interaction" ng-if="!interactionIsInline">
+      <div>
+        <md-card class="preview-conversation-skin-supplemental-card">
+          <div angular-html-bind="inputTemplate()">
+          </div>
+        </md-card>
+      </div>
+    </div>
+  </div>
+</script>

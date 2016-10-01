@@ -29,8 +29,8 @@ oppia.constant('EDITOR_TAB_CONTEXT', {
 });
 
 oppia.factory('explorationContextService', [
-  '$window', 'PAGE_CONTEXT', 'EDITOR_TAB_CONTEXT',
-  function($window, PAGE_CONTEXT, EDITOR_TAB_CONTEXT) {
+  'currentLocationService', 'PAGE_CONTEXT', 'EDITOR_TAB_CONTEXT',
+  function(currentLocationService, PAGE_CONTEXT, EDITOR_TAB_CONTEXT) {
     var _pageContext = null;
     var _explorationId = null;
 
@@ -39,7 +39,7 @@ oppia.factory('explorationContextService', [
       // 'editor' or 'preview'), or null if the current tab is neither of these,
       // or the current page is not the editor.
       getEditorTabContext: function() {
-        var hash = $window.location.hash;
+        var hash = currentLocationService.getHash();
         if (hash.indexOf('#/gui') === 0) {
           return EDITOR_TAB_CONTEXT.EDITOR;
         } else if (hash.indexOf('#/preview') === 0) {
@@ -56,7 +56,7 @@ oppia.factory('explorationContextService', [
         if (_pageContext) {
           return _pageContext;
         } else {
-          var pathnameArray = $window.location.pathname.split('/');
+          var pathnameArray = currentLocationService.getPathname().split('/');
           for (var i = 0; i < pathnameArray.length; i++) {
             if (pathnameArray[i] === 'explore') {
               _pageContext = PAGE_CONTEXT.LEARNER;
@@ -72,8 +72,8 @@ oppia.factory('explorationContextService', [
       },
 
       isInExplorationContext: function() {
-        return (this.getPageContext() == PAGE_CONTEXT.EDITOR ||
-          this.getPageContext() == PAGE_CONTEXT.LEARNER);
+        return (this.getPageContext() === PAGE_CONTEXT.EDITOR ||
+          this.getPageContext() === PAGE_CONTEXT.LEARNER);
       },
 
       // Returns a string representing the explorationId (obtained from the
@@ -84,7 +84,7 @@ oppia.factory('explorationContextService', [
         } else {
           // The pathname should be one of /explore/{exploration_id} or
           // /create/{exploration_id} .
-          var pathnameArray = $window.location.pathname.split('/');
+          var pathnameArray = currentLocationService.getPathname().split('/');
           for (var i = 0; i < pathnameArray.length; i++) {
             if (pathnameArray[i] === 'explore' ||
                 pathnameArray[i] === 'create') {

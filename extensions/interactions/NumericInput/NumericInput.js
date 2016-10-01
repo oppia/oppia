@@ -22,7 +22,9 @@
 oppia.directive('oppiaInteractiveNumericInput', [function() {
   return {
     restrict: 'E',
-    scope: {},
+    scope: {
+      onSubmit: '&'
+    },
     templateUrl: 'interaction/NumericInput',
     controller: [
       '$scope', '$attrs', 'focusService', 'numericInputRulesService',
@@ -37,7 +39,10 @@ oppia.directive('oppiaInteractiveNumericInput', [function() {
 
         $scope.submitAnswer = function(answer) {
           if (answer !== undefined && answer !== null && answer !== '') {
-            $scope.$parent.submitAnswer(answer, numericInputRulesService);
+            $scope.onSubmit({
+              answer: answer,
+              rulesService: numericInputRulesService
+            });
           }
         };
       }

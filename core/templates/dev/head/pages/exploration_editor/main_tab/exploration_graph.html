@@ -1,0 +1,46 @@
+<div ng-controller="ExplorationGraph" ng-show="isGraphShown()" class="oppia-state-graph-animate-show">
+  <span style="font-size: 16px;">
+    <strong>Exploration Overview</strong>
+  </span>
+
+  <md-card style="background-color: white; margin: 20px 0px; padding: 8px;">
+    <div class="oppia-state-graph-container protractor-test-exploration-graph">
+      <div state-graph-viz graph-data="getGraphData()" current-state-id="getActiveStateName()" on-click-function="onClickStateInMinimap" on-delete-function="deleteState" on-maximize-function="openStateGraphModal" allow-panning="true" center-at-current-state="true" style="height: 100%;" is-editable="isEditable()" show-warning-sign="true">
+      </div>
+    </div>
+  </md-card>
+
+  <script type="text/ng-template" id="modals/stateGraph">
+    <div class="modal-header">
+      <h3>Exploration Overview</h3>
+    </div>
+
+    <div class="modal-body" style="overflow-y: hidden; padding-bottom: 0;">
+      <div state-graph-viz style="height: 300px;" graph-data="graphData" allow-panning="true" current-state-id="currentStateName" on-click-function="selectState" on-delete-function="deleteState" center-at-current-state="true" is-editable="isEditable">
+      </div>
+    </div>
+
+    <div class="modal-footer" style="margin-top: 0; text-align: inherit;">
+      <span class="pull-right">
+        <button class="btn btn-default" ng-click="cancel()">Close</button>
+      </span>
+    </div>
+  </script>
+
+  <script type="text/ng-template" id="modals/deleteState">
+    <div class="modal-header">
+      <h3>Delete Card</h3>
+    </div>
+
+    <div class="modal-body">
+      <p>
+        <[deleteStateWarningText]>
+      </p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+      <button class="btn btn-danger protractor-test-confirm-delete-state" ng-click="reallyDelete()">Delete Card</button>
+    </div>
+  </script>
+</div>

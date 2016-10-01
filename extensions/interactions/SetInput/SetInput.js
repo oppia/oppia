@@ -23,7 +23,9 @@
 oppia.directive('oppiaInteractiveSetInput', [function() {
   return {
     restrict: 'E',
-    scope: {},
+    scope: {
+      onSubmit: '&'
+    },
     templateUrl: 'interaction/SetInput',
     controller: ['$scope', '$attrs', '$translate', 'setInputRulesService',
         function($scope, $attrs, $translate, setInputRulesService) {
@@ -58,7 +60,10 @@ oppia.directive('oppiaInteractiveSetInput', [function() {
             'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
         } else {
           $scope.errorMessage = '';
-          $scope.$parent.submitAnswer(answer, setInputRulesService);
+          $scope.onSubmit({
+            answer: answer,
+            rulesService: setInputRulesService
+          });
         }
       };
     }]
@@ -97,7 +102,7 @@ oppia.directive('oppiaShortResponseSetInput', [
 oppia.factory('setInputRulesService', [function() {
   return {
     Equals: function(answer, inputs) {
-      return answer.length == inputs.x.length && inputs.x.every(function(val) {
+      return answer.length === inputs.x.length && inputs.x.every(function(val) {
         return answer.indexOf(val) >= 0;
       });
     },
@@ -118,17 +123,17 @@ oppia.factory('setInputRulesService', [function() {
     },
     HasElementsNotIn: function(answer, inputs) {
       return answer.some(function(val) {
-        return inputs.x.indexOf(val) == -1;
+        return inputs.x.indexOf(val) === -1;
       });
     },
     OmitsElementsIn: function(answer, inputs) {
       return inputs.x.some(function(val) {
-        return answer.indexOf(val) == -1;
+        return answer.indexOf(val) === -1;
       });
     },
     IsDisjointFrom: function(answer, inputs) {
       return inputs.x.every(function(val) {
-        return answer.indexOf(val) == -1;
+        return answer.indexOf(val) === -1;
       });
     }
   };

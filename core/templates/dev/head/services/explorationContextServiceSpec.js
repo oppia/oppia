@@ -25,9 +25,9 @@ describe('Exploration context service', function() {
 
     beforeEach(function() {
       module(function($provide) {
-        $provide.value('$window', {
-          location: {
-            pathname: '/explore/123'
+        $provide.value('currentLocationService', {
+          getPathname: function() {
+            return '/explore/123';
           }
         });
       });
@@ -53,9 +53,9 @@ describe('Exploration context service', function() {
 
     beforeEach(function() {
       module(function($provide) {
-        $provide.value('$window', {
-          location: {
-            pathname: '/create/123'
+        $provide.value('currentLocationService', {
+          getPathname: function() {
+            return '/create/123';
           }
         });
       });
@@ -79,9 +79,9 @@ describe('Exploration context service', function() {
 
     beforeEach(function() {
       module(function($provide) {
-        $provide.value('$window', {
-          location: {
-            pathname: '/about'
+        $provide.value('currentLocationService', {
+          getPathname: function() {
+            return '/about';
           }
         });
       });

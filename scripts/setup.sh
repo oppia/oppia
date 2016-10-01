@@ -61,6 +61,8 @@ function maybeInstallDependencies {
 
     install_node_module karma 0.12.16
     install_node_module karma-jasmine 0.1.0
+    install_node_module karma-jasmine-jquery 0.1.1
+    install_node_module karma-json-fixtures-preprocessor 0.0.6
     install_node_module karma-coverage 0.5.2
     install_node_module karma-ng-html2js-preprocessor 0.1.0
     install_node_module karma-chrome-launcher 0.1.4

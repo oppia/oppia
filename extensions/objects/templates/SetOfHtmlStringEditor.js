@@ -29,7 +29,7 @@ oppia.directive('setOfHtmlStringEditor', [
     restrict: 'E',
     scope: true,
     template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: function($scope) {
+    controller: ['$scope', function($scope) {
       $scope.SCHEMA = {
         type: 'list',
         items: {
@@ -42,18 +42,21 @@ oppia.directive('setOfHtmlStringEditor', [
       }
 
       $scope.choices = $scope.initArgs.choices;
-      $scope.choiceGroup = $scope.$parent.value;
+      $scope.selections = $scope.choices.map(function(choice) {
+        return $scope.$parent.value.indexOf(choice.id) !== -1;
+      });
 
       // The following function is necessary to insert elements into the answer
       // groups for the Item Selection Widget.
-      $scope.toggleSelection = function(choice) {
-        var index = $scope.$parent.value.indexOf(choice.id);
-        if (index > -1) {
-          $scope.$parent.value.splice(index, 1);
+      $scope.toggleSelection = function(choiceListIndex) {
+        var choiceHtml = $scope.choices[choiceListIndex].id;
+        var selectedChoicesIndex = $scope.$parent.value.indexOf(choiceHtml);
+        if (selectedChoicesIndex > -1) {
+          $scope.$parent.value.splice(selectedChoicesIndex, 1);
         } else {
-          $scope.$parent.value.push(choice.id);
+          $scope.$parent.value.push(choiceHtml);
         }
       };
-    }
+    }]
   };
 }]);

@@ -28,6 +28,7 @@ import datetime
 import logging
 import os
 
+from core.domain import activity_services
 from core.domain import collection_domain
 from core.domain import exp_services
 from core.domain import rights_manager
@@ -626,6 +627,10 @@ def delete_collection(committer_id, collection_id, force_deletion=False):
     # Delete the summary of the collection (regardless of whether
     # force_deletion is True or not).
     delete_collection_summary(collection_id)
+
+    # Remove the collection from the featured activity list, if necessary.
+    activity_services.remove_featured_activity(
+        feconf.ACTIVITY_TYPE_COLLECTION, collection_id)
 
 
 def get_collection_snapshots_metadata(collection_id):

@@ -196,7 +196,9 @@ var logicProofTeacher = (function() {
         content: ' has already been defined.'
       }]],
       parameters: {
-        function: {
+        // jscs:disable disallowQuotedKeysInObjects
+        'function': {
+          // jscs:enable disallowQuotedKeysInObjects
           format: 'string'
         }
       }

@@ -77,7 +77,7 @@ def require_editor(handler):
             raise self.PageNotFoundException
 
         if not rights_manager.Actor(self.user_id).can_edit(
-                rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id):
+                feconf.ACTIVITY_TYPE_COLLECTION, collection_id):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to edit this collection.',
                 self.user_id)
@@ -89,15 +89,11 @@ def require_editor(handler):
 
 class CollectionEditorHandler(base.BaseHandler):
     """Base class for all handlers for the collection editor page."""
-
-    # The page name to use as a key for generating CSRF tokens.
-    PAGE_NAME_FOR_CSRF = 'collection_editor'
+    pass
 
 
 class CollectionEditorPage(CollectionEditorHandler):
     """The editor page for a single collection."""
-
-    PAGE_HAS_CREATE_EXP_REQUEST = True
 
     # TODO(bhenning): Implement read-only version of the editor. Until that
     # exists, ensure the user has proper permission to edit this collection
@@ -111,7 +107,7 @@ class CollectionEditorPage(CollectionEditorHandler):
 
         if (collection is None or
                 not rights_manager.Actor(self.user_id).can_view(
-                    rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id)):
+                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id)):
             self.redirect('/')
             return
 
@@ -119,13 +115,13 @@ class CollectionEditorPage(CollectionEditorHandler):
             bool(self.user_id) and
             self.username not in config_domain.BANNED_USERNAMES.value and
             rights_manager.Actor(self.user_id).can_edit(
-                rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id))
+                feconf.ACTIVITY_TYPE_COLLECTION, collection_id))
 
         self.values.update({
             'can_edit': can_edit,
             'can_unpublish': rights_manager.Actor(
                 self.user_id).can_unpublish(
-                    rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id),
+                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id),
             'collection_id': collection.id,
             'is_private': rights_manager.is_collection_private(collection_id),
             'nav_mode': feconf.NAV_MODE_CREATE,
@@ -135,10 +131,11 @@ class CollectionEditorPage(CollectionEditorHandler):
             'SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK': (
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK),
             'SHOW_COLLECTION_NAVIGATION_TAB_STATS': (
-                feconf.SHOW_COLLECTION_NAVIGATION_TAB_STATS)
+                feconf.SHOW_COLLECTION_NAVIGATION_TAB_STATS),
+            'TAG_REGEX': feconf.TAG_REGEX,
         })
 
-        self.render_template('collection_editor/collection_editor.html')
+        self.render_template('pages/collection_editor/collection_editor.html')
 
 
 class WritableCollectionDataHandler(CollectionEditorHandler):
@@ -211,7 +208,7 @@ class CollectionRightsHandler(CollectionEditorHandler):
                 collection_services.index_collections_given_ids([
                     collection_id])
             elif rights_manager.Actor(self.user_id).can_unpublish(
-                    rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id):
+                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id):
                 rights_manager.unpublish_collection(self.user_id, collection_id)
                 collection_services.delete_documents_from_search_index([
                     collection_id])

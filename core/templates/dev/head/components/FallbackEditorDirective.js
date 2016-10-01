@@ -41,6 +41,8 @@ oppia.directive('fallbackEditor', [function() {
           }]
         };
 
+        $scope.displayFeedback = true;
+
         $scope.triggerMemento = null;
 
         $scope.openTriggerEditor = function() {

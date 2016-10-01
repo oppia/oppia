@@ -1,0 +1,35 @@
+<script type="text/ng-template" id="visualization/versionDiff">
+  <div ng-hide="diffGraphData" class="oppia-align-center">
+    Loading
+    <loading-dots></loading-dots>
+  </div>
+
+  <div state-graph-viz class="protractor-test-history-graph diff-graph"
+       graph-data="diffGraphData" node-colors="diffGraphNodeColors"
+       node-secondary-labels="diffGraphSecondaryLabels"
+       init-state-id2="v1InitStateId"
+       link-property-mapping="DIFF_GRAPH_LINK_PROPERTY_MAPPING"
+       on-click-function="onClickStateInDiffGraph">
+  </div>
+
+  <div class="legend-graph" ng-show="diffGraphData">
+    <h4>Exploration Graph Legend</h4>
+    <div state-graph-viz ng-disabled="true"
+         graph-data="legendGraph" node-colors="LEGEND_GRAPH_COLORS"
+         node-secondary-labels="LEGEND_GRAPH_SECONDARY_LABELS"
+         link-property-mapping="LEGEND_GRAPH_LINK_PROPERTY_MAPPING"
+         id="legend-graph">
+    </div>
+  </div>
+</script>
+
+<style>
+  .legend-graph .node rect {
+    pointer-events: none;
+  }
+  .legend-graph {
+    position: absolute;
+    right: -100px;
+    top: 10px;
+  }
+</style>

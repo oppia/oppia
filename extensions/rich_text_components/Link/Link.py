@@ -43,11 +43,4 @@ class Link(base.BaseRichTextComponent):
             'type': 'unicode',
         },
         'default_value': '',
-    }, {
-        'name': 'open_link_in_same_window',
-        'description': 'Open the link in the same window?',
-        'schema': {
-            'type': 'bool'
-        },
-        'default_value': False,
     }]

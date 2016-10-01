@@ -18,12 +18,16 @@ from core.controllers import base
 from core.controllers import editor
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.platform import models
+import feconf
 
+
+transaction_services = models.Registry.import_transaction_services()
 
 class ThreadListHandler(base.BaseHandler):
     """Handles operations relating to feedback thread lists."""
 
-    PAGE_NAME_FOR_CSRF = 'editor'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self, exploration_id):
         self.values.update({
@@ -55,7 +59,7 @@ class ThreadListHandler(base.BaseHandler):
 class ThreadHandler(base.BaseHandler):
     """Handles operations relating to feedback threads."""
 
-    PAGE_NAME_FOR_CSRF = 'editor'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self, exploration_id, thread_id):  # pylint: disable=unused-argument
         suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
@@ -95,6 +99,8 @@ class RecentFeedbackMessagesHandler(base.BaseHandler):
     explorations.
     """
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     @base.require_moderator
     def get(self):
         urlsafe_start_cursor = self.request.get('cursor')
@@ -116,9 +122,12 @@ class FeedbackStatsHandler(base.BaseHandler):
         - Number of total threads
     """
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     def get(self, exploration_id):
-        feedback_thread_analytics = feedback_services.get_thread_analytics(
-            exploration_id)
+        feedback_thread_analytics = (
+            feedback_services.get_thread_analytics(
+                exploration_id))
         self.values.update({
             'num_open_threads': (
                 feedback_thread_analytics.num_open_threads),
@@ -130,8 +139,6 @@ class FeedbackStatsHandler(base.BaseHandler):
 
 class SuggestionHandler(base.BaseHandler):
     """"Handles operations relating to learner suggestions."""
-
-    PAGE_NAME_FOR_CSRF = 'player'
 
     @base.require_user
     def post(self, exploration_id):
@@ -148,7 +155,6 @@ class SuggestionHandler(base.BaseHandler):
 class SuggestionActionHandler(base.BaseHandler):
     """"Handles actions performed on threads with suggestions."""
 
-    PAGE_NAME_FOR_CSRF = 'editor'
     _ACCEPT_ACTION = 'accept'
     _REJECT_ACTION = 'reject'
 
@@ -173,10 +179,11 @@ class SuggestionActionHandler(base.BaseHandler):
 class SuggestionListHandler(base.BaseHandler):
     """Handles operations relating to list of threads with suggestions."""
 
-    PAGE_NAME_FOR_CSRF = 'editor'
     _LIST_TYPE_OPEN = 'open'
     _LIST_TYPE_CLOSED = 'closed'
     _LIST_TYPE_ALL = 'all'
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def _string_to_bool(self, has_suggestion):
         if has_suggestion == 'true':
@@ -208,4 +215,19 @@ class SuggestionListHandler(base.BaseHandler):
             raise self.InvalidInputException('Invalid list type.')
 
         self.values.update({'threads': [t.to_dict() for t in threads]})
+        self.render_json(self.values)
+
+
+class FeedbackThreadViewEventHandler(base.BaseHandler):
+    """Records when the given user views a feedback thread, in order to clear
+    viewed feedback messages from emails that might be sent in future to this
+    user."""
+
+    @base.require_user
+    def post(self):
+        exploration_id = self.payload.get('exploration_id')
+        thread_id = self.payload.get('thread_id')
+        transaction_services.run_in_transaction(
+            feedback_services.clear_feedback_message_references, self.user_id,
+            exploration_id, thread_id)
         self.render_json(self.values)

@@ -27,15 +27,6 @@ oppia.directive('oppiaNoninteractiveLink', [
       templateUrl: 'richTextComponent/Link',
       controller: ['$scope', '$attrs', 'explorationContextService',
         function($scope, $attrs, explorationContextService) {
-          if (!$attrs.openLinkInSameWindowWithValue) {
-            // This is done for backward-compatibility.
-            $scope.target = '_blank';
-          } else {
-            $scope.target = (
-              oppiaHtmlEscaper.escapedJsonToObj(
-                $attrs.openLinkInSameWindowWithValue) ? '_top' : '_blank');
-          }
-
           var untrustedUrl = encodeURI(oppiaHtmlEscaper.escapedJsonToObj(
             $attrs.urlWithValue));
           if (untrustedUrl.indexOf('http://') !== 0 &&

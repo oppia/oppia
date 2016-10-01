@@ -25,12 +25,9 @@ oppia.directive('codemirrorMergeview', function() {
         throw new Error('CodeMirror not found.');
       }
 
-      var options, codeMirrorInstance;
-
-      options = scope.$eval(attrs.codemirrorMergeviewOptions);
-
+      var options = scope.$eval(attrs.options);
       // 'value', 'orig' are initial values of left and right pane respectively
-      codeMirrorInstance = new window.CodeMirror.MergeView(
+      var codeMirrorInstance = new window.CodeMirror.MergeView(
         element[0], angular.extend({
           value: ' ',
           orig: ' '

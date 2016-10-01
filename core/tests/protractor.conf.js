@@ -57,13 +57,16 @@ exports.config = {
   // with --suite=smoke, only the patterns matched by that suite will run.
   suites: {
     full: [
-      'protractor/*.js',
+      'protractor/*.js'
     ],
 
-    editor: [
+    mainEditor: [
       'protractor/editorAndPlayer.js',
+      'protractor/stateEditor.js'
+    ],
+
+    editorFeatures: [
       'protractor/gadgetEditor.js',
-      'protractor/stateEditor.js',
       'protractor/fallbacks.js',
       'protractor/historyTab.js'
     ],
@@ -82,7 +85,8 @@ exports.config = {
     misc: [
       'protractor/userManagement.js',
       'protractor/embedding.js',
-      'protractor/preferences.js'
+      'protractor/preferences.js',
+      'protractor/cacheSlugs.js'
     ],
 
     i18n: [
@@ -147,7 +151,7 @@ exports.config = {
         // Directory for screenshots
         baseDirectory: '../protractor-screenshots',
         // Function to build filenames of screenshots
-        pathBuilder: function pathBuilder(spec, descriptions, results, capabilities) {
+        pathBuilder: function(spec, descriptions, results, capabilities) {
           return descriptions[1] + ' ' + descriptions[0];
         },
         takeScreenShotsOnlyForFailedSpecs: true
@@ -162,7 +166,7 @@ exports.config = {
 
     // Set a wide enough window size for the navbar in the library pages to
     // display fully.
-    browser.driver.manage().window().setSize(1200, 1000);
+    browser.driver.manage().window().setSize(1240, 1000);
   },
 
   // The params object will be passed directly to the protractor instance,
@@ -188,7 +192,7 @@ exports.config = {
   //
   // See the full list at https://github.com/juliemr/minijasminenode
   jasmineNodeOpts: {
-    // onComplete will be called just before the driver quits.
+    // The onComplete method will be called just before the driver quits.
     onComplete: null,
     // If true, display spec names.
     isVerbose: false,

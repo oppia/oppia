@@ -83,7 +83,7 @@ describe('Expression parser service', function() {
         var parsed = eps.parse(expression);
         parsedJson = JSON.stringify(parsed);
         var expectedJson = JSON.stringify(expected);
-        if (expected === undefined || parsedJson != expectedJson) {
+        if (expected === undefined || parsedJson !== expectedJson) {
           console.error('input    : ' + expression);
           console.error('parsed   : ' + parsedJson);
           console.error('expected : ' + expectedJson);
