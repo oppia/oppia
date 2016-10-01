@@ -38,7 +38,7 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
     Args:
         user_id: str. The id of the user assigning the rating.
         exploration_id: str. The exploration that is assigned a rating.
-        new_rating: int. Value of assigned rating, should be between 
+        new_rating: int. Value of assigned rating, should be between
         1 and 5 inclusive.
 
     """
@@ -89,7 +89,7 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
 
 
 def get_user_specific_rating_for_exploration(user_id, exploration_id):
-    """Fetches a rating for the specified exploration from the specified user 
+    """Fetches a rating for the specified exploration from the specified user
     if one exists.
 
     Args:
@@ -97,7 +97,7 @@ def get_user_specific_rating_for_exploration(user_id, exploration_id):
         exploration_id: str. The specified exploration.
 
     Returns:
-        An integer between 1 and 5 inclusive, or None if there is no 
+        An integer between 1 and 5 inclusive, or None if there is no
         rating of this exploration by
         this user.
     """
@@ -117,7 +117,7 @@ def get_when_exploration_rated(user_id, exploration_id):
         exploration_id: str. The id of the specified exploration.
 
     Returns:
-        a date-time object specifying when the exploration was last 
+        a date-time object specifying when the exploration was last
         rated by the user.
     """
     exp_user_data_model = user_models.ExplorationUserDataModel.get(
@@ -133,8 +133,8 @@ def get_overall_ratings_for_exploration(exploration_id):
 
     Returns:
         a dict whose keys are '1', '2', '3', '4', '5' and whose
-        values are nonnegative integers representing frequency counts 
-        of each rating. 
+        values are nonnegative integers representing frequency counts
+        of each rating.
     """
     exp_summary = exp_services.get_exploration_summary_by_id(exploration_id)
     return exp_summary.ratings
