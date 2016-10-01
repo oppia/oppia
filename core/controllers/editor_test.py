@@ -212,6 +212,16 @@ class EditorTest(BaseEditorControllerTest):
             def _create_training_data(*arg):
                 return [_create_answer(value) for value in arg]
 
+            def _submit_answer(
+                    exp_id, state_name, answer_group_index, rule_spec_index,
+                    classification_categorization, answer, exp_version=1,
+                    session_id='dummy_session_id', time_spent_in_secs=0.0,
+                    params={}):
+                event_services.AnswerSubmissionEventHandler.record(
+                    exp_id, exp_version, state_name, answer_group_index,
+                    rule_spec_index, classification_categorization, session_id,
+                    time_spent_in_secs, params, answer)
+
             # Load the string classifier demo exploration.
             exp_id = '15'
             exp_services.load_demo(exp_id)
@@ -235,28 +245,28 @@ class EditorTest(BaseEditorControllerTest):
 
             answer_groups = exp_services.get_exploration_by_id('15').states[
                 state_name].interaction.answer_groups
-            explicit_rule_spec_string = (
-                answer_groups[0].rule_specs[0].stringify_classified_rule())
-            classifier_rule_spec_string = (
-                answer_groups[1].rule_specs[0].stringify_classified_rule())
 
             # Input happy since there is an explicit rule checking for that.
-            event_services.AnswerSubmissionEventHandler.record(
-                exp_id, 1, state_name, explicit_rule_spec_string, 'happy')
+            _submit_answer(
+                exp_id, state_name, 0, 0, exp_domain.EXPLICIT_CLASSIFICATION,
+                'happy')
 
             # Input text not at all similar to happy (default outcome).
-            event_services.AnswerSubmissionEventHandler.record(
-                exp_id, 1, state_name, exp_domain.DEFAULT_RULESPEC_STR, 'sad')
+            _submit_answer(
+                exp_id, state_name, 2, 0,
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION, 'sad')
 
             # Input cheerful: this is current training data and falls under the
             # classifier.
-            event_services.AnswerSubmissionEventHandler.record(
-                exp_id, 1, state_name, classifier_rule_spec_string, 'cheerful')
+            _submit_answer(
+                exp_id, state_name, 1, 0,
+                exp_domain.TRAINING_DATA_CLASSIFICATION, 'cheerful')
 
-            # Input joyful: this is not training data but will be classified
-            # under the classifier.
-            event_services.AnswerSubmissionEventHandler.record(
-                exp_id, 1, state_name, classifier_rule_spec_string, 'joyful')
+            # Input joyful: this is not training data but it will later be
+            # classified under the classifier.
+            _submit_answer(
+                exp_id, state_name, 2, 0,
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION, 'joyful')
 
             # Perform answer summarization on the summarized answers.
             with self.swap(

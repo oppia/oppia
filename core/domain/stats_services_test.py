@@ -113,7 +113,8 @@ class AnswerStatsTests(test_utils.GenericTestBase):
             self.exploration.init_state_name)
         self.assertEqual(state_answers.exploration_id, 'exp_id0')
         self.assertEqual(state_answers.exploration_version, 1)
-        self.assertEqual(state_answers.state_name, 'First Card')
+        self.assertEqual(
+            state_answers.state_name, feconf.DEFAULT_INIT_STATE_NAME)
         self.assertEqual(state_answers.interaction_id, 'TextInput')
         self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': 'some text',
@@ -160,7 +161,8 @@ class AnswerStatsTests(test_utils.GenericTestBase):
             self.exploration.init_state_name)
         self.assertEqual(state_answers.exploration_id, 'exp_id0')
         self.assertEqual(state_answers.exploration_version, 1)
-        self.assertEqual(state_answers.state_name, 'First Card')
+        self.assertEqual(
+            state_answers.state_name, feconf.DEFAULT_INIT_STATE_NAME)
         self.assertEqual(state_answers.interaction_id, 'TextInput')
         self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': 'first answer',
@@ -209,7 +211,8 @@ class AnswerStatsTests(test_utils.GenericTestBase):
             self.exploration.init_state_name)
         self.assertEqual(state_answers.exploration_id, 'exp_id0')
         self.assertEqual(state_answers.exploration_version, 1)
-        self.assertEqual(state_answers.state_name, 'First Card')
+        self.assertEqual(
+            state_answers.state_name, feconf.DEFAULT_INIT_STATE_NAME)
         self.assertEqual(state_answers.interaction_id, 'TextInput')
         self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': 'answer a',
@@ -283,7 +286,8 @@ class AnswerStatsTests(test_utils.GenericTestBase):
             self.exploration.init_state_name)
         self.assertEqual(state_answers.exploration_id, 'exp_id0')
         self.assertEqual(state_answers.exploration_version, 1)
-        self.assertEqual(state_answers.state_name, 'First Card')
+        self.assertEqual(
+            state_answers.state_name, feconf.DEFAULT_INIT_STATE_NAME)
         self.assertEqual(state_answers.interaction_id, 'TextInput')
         self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': '1 answer',
