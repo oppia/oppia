@@ -25,7 +25,6 @@ import re
 from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import rule_domain
 from core.domain import stats_jobs_continuous
 from core.domain import stats_domain
 from core.domain import stats_services
@@ -577,7 +576,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # order of a Python dict is implementation-dependent. Our stringified
         # string may not necessarily match the one stored a long time ago in
         # the data store.
-        if rule_spec.rule_type == rule_domain.FUZZY_RULE_TYPE:
+        if rule_spec.rule_type == exp_domain.CLASSIFIER_RULESPEC_STR:
             yield rule_spec.rule_type
         else:
             rule_spec_inputs = rule_spec.inputs.values()
