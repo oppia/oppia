@@ -25,6 +25,20 @@ from core.domain import rte_component_registry
 
 
 def filter_a(name, value):
+    """Filters the target value from the link.
+    
+    Args:
+        name: The link accepted from the user.
+        value: The value for splitting the link.
+        
+    Raises:
+        Logging error: Invalid URL found.
+    
+    Returns:
+        A Boolean value of True or False to 
+        check if the value is present in the
+        link.
+    """
     if name in ('title', 'target'):
         return True
     if name == 'href':
@@ -64,8 +78,14 @@ ATTRS_WHITELIST = {
 def clean(user_submitted_html):
     """Cleans a piece of user submitted HTML.
 
-    This only allows HTML from a restricted set of tags, attrs and styles. It
-    strips out unrecognized tags.
+    This only allows HTML from a restricted set of tags, attrs and styles.
+    
+    Args:
+        user_submitted_html: A HTML file submitted by user.
+    
+    Returns:
+        The HTML file submitted by user after cleaning out unrecognized
+        tags and attributes.
     """
     oppia_custom_tags = (
         rte_component_registry.Registry.get_tag_list_with_attrs())
@@ -81,5 +101,12 @@ def clean(user_submitted_html):
 
 
 def strip_html_tags(html):
-    """Strips all HTML markup from an HTML string."""
+    """Strips all HTML markup from an HTML string.
+    
+    Args:
+        html: An HTML file.
+    
+    Returns:
+        The HTML file after cleaning all tags and attributes.
+    """
     return bleach.clean(html, tags=[], attributes={}, strip=True)
