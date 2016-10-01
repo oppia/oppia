@@ -640,6 +640,18 @@ LIBRARY_GROUP_RECENTLY_PUBLISHED = 'recently_published'
 # The group name that appears at the end of the url for the top rated page.
 LIBRARY_GROUP_TOP_RATED = 'top_rated'
 
+# The LIBRARY_PAGE_MODE constants defined below should have the same value as
+# the ones defined in LIBRARY_PAGE_MODES in Library.js and LibraryFooter.js. For
+# example LIBRARY_PAGE_MODE_GROUP should have the same value as
+# LIBRARY_PAGE_MODES.GROUP
+# Page mode for the group pages such as top rated and recently published
+# explorations.
+LIBRARY_PAGE_MODE_GROUP = 'group'
+# Page mode for the main library page.
+LIBRARY_PAGE_MODE_INDEX = 'index'
+# Page mode for the search results page.
+LIBRARY_PAGE_MODE_SEARCH = 'search'
+
 # List of supported language codes. Each description has a
 # parenthetical part that may be stripped out to give a shorter
 # description.

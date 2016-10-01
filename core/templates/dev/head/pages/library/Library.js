@@ -16,13 +16,23 @@
  * @fileoverview Data and controllers for the Oppia contributors' library page.
  */
 
+// The constants defined below in LIBRARY_PAGE_MODES should be same as the
+// LIBRARY_PAGE_MODE constants defined in feconf.py and LibraryFooter.js. For
+// example LIBRARY_PAGE_MODES.GROUP should have the same value as
+// LIBRARY_PAGE_MODE_GROUP in feconf.py.
+oppia.constant('LIBRARY_PAGE_MODES', {
+  GROUP: 'group',
+  INDEX: 'index',
+  SEARCH: 'search'
+});
+
 oppia.controller('Library', [
   '$scope', '$http', '$rootScope', '$window', '$timeout', 'i18nIdService',
   'urlService', 'CATEGORY_LIST', 'searchService', 'windowDimensionsService',
-  'UrlInterpolationService', function(
+  'UrlInterpolationService', 'LIBRARY_PAGE_MODES', function(
       $scope, $http, $rootScope, $window, $timeout, i18nIdService,
       urlService, CATEGORY_LIST, searchService, windowDimensionsService,
-      UrlInterpolationService) {
+      UrlInterpolationService, LIBRARY_PAGE_MODES) {
     $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
     var possibleBannerFilenames = [
       'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
@@ -32,6 +42,8 @@ oppia.controller('Library', [
     $scope.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
       '/library/' + $scope.bannerImageFilename);
 
+    $scope.pageMode = GLOBALS.PAGE_MODE;
+    $scope.LIBRARY_PAGE_MODES = LIBRARY_PAGE_MODES;
     // Below is the width of each tile (width + margins), which can be found
     // in core/templates/dev/head/components/
     //         exploration_summary_tile_directive.html
@@ -40,11 +52,10 @@ oppia.controller('Library', [
     // Keeps track of the index of the left-most visible card of each group.
     $scope.leftmostCardIndices = [];
 
-    $scope.inGroupMode = GLOBALS.GROUP_MODE;
     var pathnameArray = $window.location.pathname.split('/');
     $scope.groupName = pathnameArray[2];
 
-    if ($scope.inGroupMode) {
+    if ($scope.pageMode === LIBRARY_PAGE_MODES.GROUP) {
       $http.get('/librarygrouphandler', {
         params: {
           group_name: $scope.groupName
@@ -60,7 +71,7 @@ oppia.controller('Library', [
 
         $rootScope.loadingMessage = '';
       });
-    } else if (!$scope.searchMode) {
+    } else {
       $http.get('/libraryindexhandler').success(
       function(data) {
         $scope.libraryGroups = data.activity_summary_dicts_by_category;
@@ -208,12 +219,10 @@ oppia.controller('Library', [
       $scope.$apply();
     });
 
-    // The following checks if the page is in search mode.
-    $scope.inSearchMode = ($window.location.pathname.indexOf('/search') === 0);
     var activateSearchMode = function() {
-      if (!$scope.inSearchMode) {
+      if ($scope.pageMode !== LIBRARY_PAGE_MODES.SEARCH) {
         $('.oppia-library-container').fadeOut(function() {
-          $scope.inSearchMode = true;
+          $scope.pageMode = LIBRARY_PAGE_MODES.SEARCH;
           $timeout(function() {
             $('.oppia-library-container').fadeIn();
           }, 50);

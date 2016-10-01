@@ -74,6 +74,11 @@ class LibraryPage(base.BaseHandler):
         """Handles GET requests."""
         search_mode = 'search' in self.request.url
 
+        if search_mode:
+            page_mode = feconf.LIBRARY_PAGE_MODE_SEARCH
+        else:
+            page_mode = feconf.LIBRARY_PAGE_MODE_INDEX
+
         self.values.update({
             'meta_description': (
                 feconf.SEARCH_PAGE_DESCRIPTION if search_mode
@@ -84,8 +89,7 @@ class LibraryPage(base.BaseHandler):
                 user_services.has_fully_registered(self.user_id)),
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
-            'search_mode': search_mode,
-            'group_mode': False,
+            'page_mode': page_mode,
             'SEARCH_DROPDOWN_CATEGORIES': feconf.SEARCH_DROPDOWN_CATEGORIES,
         })
         self.render_template('pages/library/library.html')
@@ -165,7 +169,7 @@ class LibraryGroupPage(base.BaseHandler):
                 user_services.has_fully_registered(self.user_id)),
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
-            'group_mode': True,
+            'page_mode': feconf.LIBRARY_PAGE_MODE_GROUP,
             'SEARCH_DROPDOWN_CATEGORIES': feconf.SEARCH_DROPDOWN_CATEGORIES,
         })
         self.render_template('pages/library/library.html')

@@ -1,7 +1,7 @@
 {% extends 'pages/base.html' %}
 
 {% block maintitle %}
-  {% if search_mode or group_mode %}
+  {% if page_mode in ['group', 'search'] %}
     Find explorations to learn from - Oppia
   {% else %}
     I18N_LIBRARY_PAGE_TITLE
@@ -26,7 +26,7 @@
       '{{LANGUAGE_CODES_AND_NAMES|js_string}}');
     GLOBALS.SEARCH_DROPDOWN_CATEGORIES = JSON.parse(
       '{{SEARCH_DROPDOWN_CATEGORIES|js_string}}');
-    GLOBALS.GROUP_MODE = JSON.parse('{{group_mode|js_string}}');
+    GLOBALS.PAGE_MODE = JSON.parse('{{page_mode|js_string}}');
   </script>
 
   <style>
@@ -40,11 +40,13 @@
   <div ng-controller="Library" class="oppia-library-container">
     <div style="position: relative; z-index: 3;">
       <div>
-        <div class="oppia-exp-summary-tiles-container" ng-if="inSearchMode">
+        <div class="oppia-exp-summary-tiles-container" ng-if="pageMode === LIBRARY_PAGE_MODES.SEARCH">
           <search-results></search-results>
         </div>
 
-        <div class="oppia-exp-summary-tiles-container" ng-if="inGroupMode" style="margin-bottom: 20px;">
+        <div class="oppia-exp-summary-tiles-container"
+             ng-if="pageMode === LIBRARY_PAGE_MODES.GROUP"
+             style="margin-bottom: 20px;">
           <div ng-if="activityList.length === 0"
                style="font-size: 1.2em; padding-bottom: 40px; padding-top: 40px;">
               <p style="text-align: center;">
@@ -75,7 +77,7 @@
           </div>
         </div>
 
-        <div class="oppia-exp-summary-tiles-container" ng-if="!inSearchMode && !inGroupMode">
+        <div class="oppia-exp-summary-tiles-container" ng-if="pageMode === LIBRARY_PAGE_MODES.INDEX">
           <img ng-src="<[bannerImageFileUrl]>" align="center"
                width="100%">
           <div style="text-align: center; width: 100%;">
@@ -203,7 +205,7 @@
 
 {% block footer %}
   <div ng-controller="LibraryFooter">
-    <div ng-if="!inSearchMode">
+    <div ng-if="pageMode !== LIBRARY_PAGE_MODES.SEARCH">
       {% include 'pages/footer.html' %}
     </div>
   </div>
