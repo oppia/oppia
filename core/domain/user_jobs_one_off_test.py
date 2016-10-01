@@ -875,21 +875,15 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
         user_settings.last_created_an_exploration = None
         user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
 
-        self.assertIsNone(
-            user_services.get_user_settings(self.owner_id).
-            last_created_an_exploration)
-        self.assertIsNone(
-            user_services.get_user_settings(self.owner_id).
-            last_edited_an_exploration)
+        owner_settings = user_services.get_user_settings(self.owner_id)
+        self.assertIsNone(owner_settings.last_created_an_exploration)
+        self.assertIsNone(owner_settings.last_edited_an_exploration)
 
         self._run_one_off_job()
 
-        self.assertIsNotNone(
-            user_services.get_user_settings(self.owner_id).
-            last_created_an_exploration)
-        self.assertIsNone(
-            user_services.get_user_settings(self.owner_id).
-            last_edited_an_exploration)
+        owner_settings = user_services.get_user_settings(self.owner_id)
+        self.assertIsNotNone(owner_settings.last_created_an_exploration)
+        self.assertIsNone(owner_settings.last_edited_an_exploration)
 
     def test_that_last_edited_time_is_updated(self):
         self.login(self.OWNER_EMAIL)
@@ -912,21 +906,17 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
         user_settings.last_edited_an_exploration = None
         user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
 
-        self.assertIsNone(
-            user_services.get_user_settings(self.editor_id).
-            last_created_an_exploration)
-        self.assertIsNone(
-            user_services.get_user_settings(self.editor_id).
-            last_edited_an_exploration)
+        editor_settings = user_services.get_user_settings(self.editor_id)
+
+        self.assertIsNone(editor_settings.last_created_an_exploration)
+        self.assertIsNone(editor_settings.last_edited_an_exploration)
 
         self._run_one_off_job()
 
-        self.assertIsNotNone(
-            user_services.get_user_settings(self.editor_id).
-            last_edited_an_exploration)
-        self.assertIsNone(
-            user_services.get_user_settings(self.editor_id).
-            last_created_an_exploration)
+        editor_settings = user_services.get_user_settings(self.editor_id)
+
+        self.assertIsNotNone(editor_settings.last_edited_an_exploration)
+        self.assertIsNone(editor_settings.last_created_an_exploration)
 
     def test_that_last_edited_and_created_time_both_updated(self):
         self.login(self.OWNER_EMAIL)
@@ -950,35 +940,42 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
         user_settings.last_created_an_exploration = None
         user_settings.last_edited_an_exploration = None
         user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
+
         user_settings = user_services.get_user_settings(self.editor_id)
         user_settings.last_edited_an_exploration = None
         user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
 
-        self.assertIsNone(
-            user_services.get_user_settings(self.owner_id).
-            last_created_an_exploration)
-        self.assertIsNone(
-            user_services.get_user_settings(self.owner_id).
-            last_edited_an_exploration)
-        self.assertIsNone(
-            user_services.get_user_settings(self.editor_id).
-            last_created_an_exploration)
-        self.assertIsNone(
-            user_services.get_user_settings(self.editor_id).
-            last_edited_an_exploration)
+        owner_settings = user_services.get_user_settings(self.owner_id)
+        editor_settings = user_services.get_user_settings(self.editor_id)
+
+        self.assertIsNone(owner_settings.last_created_an_exploration)
+        self.assertIsNone(owner_settings.last_edited_an_exploration)
+        self.assertIsNone(editor_settings.last_created_an_exploration)
+        self.assertIsNone(editor_settings.last_edited_an_exploration)
 
         self._run_one_off_job()
 
-        self.assertIsNotNone(
-            user_services.get_user_settings(self.owner_id).
-            last_edited_an_exploration)
-        self.assertIsNotNone(
-            user_services.get_user_settings(self.owner_id).
-            last_created_an_exploration)
-        self.assertIsNotNone(
-            user_services.get_user_settings(self.editor_id).
-            last_edited_an_exploration)
+        owner_settings = user_services.get_user_settings(self.owner_id)
+        editor_settings = user_services.get_user_settings(self.editor_id)
 
-        self.assertIsNone(
-            user_services.get_user_settings(self.editor_id).
-            last_created_an_exploration)
+        self.assertIsNotNone(owner_settings.last_edited_an_exploration)
+        self.assertIsNotNone(owner_settings.last_created_an_exploration)
+        self.assertIsNotNone(editor_settings.last_edited_an_exploration)
+        self.assertIsNone(editor_settings.last_created_an_exploration)
+
+    def test_that_last_edited_and_created_time_are_not_updated(self):
+        user_settings = user_services.get_user_settings(self.owner_id)
+        user_settings.last_created_an_exploration = None
+        user_settings.last_edited_an_exploration = None
+        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
+
+        owner_settings = user_services.get_user_settings(self.owner_id)
+
+        self.assertIsNone(owner_settings.last_created_an_exploration)
+        self.assertIsNone(owner_settings.last_edited_an_exploration)
+
+        self._run_one_off_job()
+
+        owner_settings = user_services.get_user_settings(self.owner_id)
+        self.assertIsNone(owner_settings.last_created_an_exploration)
+        self.assertIsNone(owner_settings.last_edited_an_exploration)

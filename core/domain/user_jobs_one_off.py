@@ -281,8 +281,7 @@ class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceJobManager):
             fetch())
 
         for commit in user_commits:
-            if (commit.exploration_id not in created_explorations or
-                    commit.commit_type != 'create'):
+            if commit.commit_type != 'create':
                 user_model.last_edited_an_exploration = commit.created_on
                 break
 
