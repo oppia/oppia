@@ -522,11 +522,10 @@ class StringClassifier(object):
         """Returns the predicted label from a doc's prediction report.
 
         Args:
-            d: int. A doc id from a prediction report (see example in
-                class docstring).
+            d: int. A doc id (see example in class docstring).
 
         Returns:
-            str. The corresponding label for the given doc.
+            str. The predicted label name of the given doc.
         """
         if (self._num_docs < self._DEFAULT_MIN_DOCS_TO_PREDICT or
                 self._num_labels < self._DEFAULT_MIN_LABELS_TO_PREDICT):
