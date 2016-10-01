@@ -18,6 +18,7 @@
 
 from core.domain import activity_services
 from core.domain import collection_services
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import stats_jobs_continuous
@@ -163,7 +164,7 @@ def get_displayable_collection_summary_dicts_matching_ids(collection_ids):
     return _get_displayable_collection_summary_dicts(collection_summaries)
 
 
-def get_collection_node_metadata_dicts(query_string, search_cursor, user_id):
+def get_exp_metadata_dicts_matching_query(query_string, search_cursor, user_id):
     """Given a query string and a search cursor, returns a list of exploration
     dicts that satisfy the search query.
 
@@ -224,27 +225,7 @@ def get_exploration_metadata_dicts(exploration_ids, editor_user_id=None):
 
         filtered_exploration_summaries.append(exploration_summary)
 
-    return to_metadata_dict(filtered_exploration_summaries)
-
-
-def to_metadata_dict(summaries):
-    """Given a list of exploration summaries, this method returns the list of
-     dict containing id, title and objective of an explorations.
-
-    Args:
-        summaries: A list of exploration summaries.
-    Returns:
-        A list of metadata dicts corresponding to the given exploration ids.
-        Each dict has three keys:
-            'id': the exploration id
-            'title': the exploration title
-            'objective': the exploration objective
-    """
-    return [{
-        'id': summary.id,
-        'title': summary.title,
-        'objective': summary.objective,
-    } for summary in summaries if summary]
+    return exp_domain.to_metadata_dict(filtered_exploration_summaries)
 
 
 def get_displayable_exp_summary_dicts_matching_ids(

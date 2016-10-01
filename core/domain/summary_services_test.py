@@ -905,70 +905,25 @@ class CollectionNodeMetadataDictsTest(
         self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
 
-        self.save_new_valid_exploration(self.EXP_ID1, self.albert_id)
+        self.save_new_valid_exploration(self.EXP_ID1, self.albert_id,
+                                        title='Exploration 1 Albert title',
+                                        objective='An objective 1')
 
-        exp_services.update_exploration(
-            self.albert_id, self.EXP_ID1, [{
-                'cmd': 'edit_exploration_property',
-                'property_name': 'title',
-                'new_value': 'Exploration 1 Albert title'
-            }, {
-                'cmd': 'edit_exploration_property',
-                'property_name': 'objective',
-                'new_value': 'An objective 1'
-            }], 'Changed title and objective.')
+        self.save_new_valid_exploration(self.EXP_ID2, self.albert_id,
+                                        title='Exploration 2 Albert title',
+                                        objective='An objective 2')
 
-        self.save_new_valid_exploration(self.EXP_ID2, self.albert_id)
+        self.save_new_valid_exploration(self.EXP_ID3, self.albert_id,
+                                        title='Exploration 3 Albert title',
+                                        objective='An objective 3')
 
-        exp_services.update_exploration(
-            self.albert_id, self.EXP_ID2, [{
-                'cmd': 'edit_exploration_property',
-                'property_name': 'title',
-                'new_value': 'Exploration 2 Albert title'
-            }, {
-                'cmd': 'edit_exploration_property',
-                'property_name': 'objective',
-                'new_value': 'An objective 2'
-            }], 'Changed title and objective.')
+        self.save_new_valid_exploration(self.EXP_ID4, self.bob_id,
+                                        title='Exploration 4 Bob title',
+                                        objective='An objective 4')
 
-        self.save_new_valid_exploration(self.EXP_ID3, self.albert_id)
-
-        exp_services.update_exploration(
-            self.albert_id, self.EXP_ID3, [{
-                'cmd': 'edit_exploration_property',
-                'property_name': 'title',
-                'new_value': 'Exploration 3 Albert title'
-            }, {
-                'cmd': 'edit_exploration_property',
-                'property_name': 'objective',
-                'new_value': 'An objective 3'
-            }], 'Changed title and objective.')
-
-        self.save_new_valid_exploration(self.EXP_ID4, self.bob_id)
-
-        exp_services.update_exploration(
-            self.bob_id, self.EXP_ID4, [{
-                'cmd': 'edit_exploration_property',
-                'property_name': 'title',
-                'new_value': 'Exploration 4 Bob title'
-            }, {
-                'cmd': 'edit_exploration_property',
-                'property_name': 'objective',
-                'new_value': 'An objective 4'
-            }], 'Changed title and objective.')
-
-        self.save_new_valid_exploration(self.EXP_ID5, self.albert_id)
-
-        exp_services.update_exploration(
-            self.albert_id, self.EXP_ID5, [{
-                'cmd': 'edit_exploration_property',
-                'property_name': 'title',
-                'new_value': 'Exploration 5 Albert title'
-            }, {
-                'cmd': 'edit_exploration_property',
-                'property_name': 'objective',
-                'new_value': 'An objective 5'
-            }], 'Changed title and objective.')
+        self.save_new_valid_exploration(self.EXP_ID5, self.albert_id,
+                                        title='Exploration 5 Albert title',
+                                        objective='An objective 5')
 
         rights_manager.publish_exploration(self.albert_id, self.EXP_ID1)
         rights_manager.publish_exploration(self.albert_id, self.EXP_ID2)
@@ -994,11 +949,11 @@ class CollectionNodeMetadataDictsTest(
             'objective': u'An objective 3',
             'title': u'Exploration 3 Albert title',
         }
-        self.assertDictContainsSubset(expected_summary1, summaries[0])
-        self.assertDictContainsSubset(expected_summary2, summaries[1])
-        self.assertDictContainsSubset(expected_summary3, summaries[2])
+        self.assertEqual(expected_summary1, summaries)
+        self.assertEqual(expected_summary2, summaries)
+        self.assertEqual(expected_summary3, summaries)
 
-    def test_user_validity(self):
+    def test_private_exps_of_another_user_are_not_returned(self):
         summaries = (summary_services.get_exploration_metadata_dicts(
             [self.EXP_ID5, self.EXP_ID4], self.bob_id))
 
@@ -1007,4 +962,47 @@ class CollectionNodeMetadataDictsTest(
             'objective': u'An objective 4',
             'title': u'Exploration 4 Bob title',
         }
-        self.assertDictContainsSubset(expected_summary, summaries[0])
+        self.assertEqual(expected_summary, summaries)
+
+    def test_public_exps_of_another_user_are_returned(self):
+        summaries = (summary_services.get_exploration_metadata_dicts(
+            [self.EXP_ID2, self.EXP_ID3, self.EXP_ID4], self.bob_id))
+
+        expected_summary = {
+            'id': self.EXP_ID2,
+            'objective': u'An objective 2',
+            'title': u'Exploration 2 Albert title',
+        }
+        self.assertEqual(expected_summary, summaries)
+
+    def test_deleted_exps_are_not_returned(self):
+        exp_services.delete_exploration(self.albert_id, self.EXP_ID_2)
+
+        summaries = (summary_services.get_exploration_metadata_dicts(
+            [self.EXP_ID2, self.EXP_ID3, self.EXP_ID4], self.bob_id))
+
+        expected_summary = {
+            'id': self.EXP_ID3,
+            'objective': u'An objective 3',
+            'title': u'Exploration 3 Albert title',
+        }
+        self.assertEqual(expected_summary, summaries[0])
+
+    def test_exp_metadata_dicts_matching_query(self):
+        summaries, _ = (
+            summary_services.get_exp_metadata_dicts_matching_query(
+                'Exploration 1 Albert title', None, self.albert_id))
+
+        expected_summary1 = {
+            'id': self.EXP_ID1,
+            'objective': u'An objective 1',
+            'title': u'Exploration 1 Albert title',
+        }
+        expected_summary2 = {
+            'id': self.EXP_ID2,
+            'objective': u'An objective 2',
+            'title': u'Exploration 2 Albert title',
+        }
+
+        self.assertEqual(expected_summary1, summaries)
+        self.assertEqual(expected_summary2, summaries)

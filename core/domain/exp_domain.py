@@ -88,6 +88,26 @@ DEFAULT_RULESPEC_STR = 'Default'
 CLASSIFIER_RULESPEC_STR = 'FuzzyMatches'
 
 
+def to_metadata_dict(summaries):
+    """Given a list of exploration summaries, this method returns the list of
+     dict containing id, title and objective of an explorations.
+
+    Args:
+        summaries: A list of exploration summaries.
+    Returns:
+        A list of metadata dicts corresponding to the given exploration ids.
+        Each dict has three keys:
+            'id': the exploration id
+            'title': the exploration title
+            'objective': the exploration objective
+    """
+    return [{
+        'id': summary.id,
+        'title': summary.title,
+        'objective': summary.objective,
+    } for summary in summaries if summary]
+
+
 def _get_full_customization_args(customization_args, ca_specs):
     """Populates the given customization_args dict with default values
     if any of the expected customization_args are missing.
