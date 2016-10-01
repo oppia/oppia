@@ -174,6 +174,8 @@ class DashboardHandler(base.BaseHandler):
             stats_services.get_exps_unresolved_answers_for_default_rule(
                 exploration_ids_subscribed_to))
 
+        total_unresolved_answers = 0
+
         for ind, exploration in enumerate(exp_summary_list):
             exploration.update(feedback_thread_analytics[ind].to_dict())
             exploration.update({
@@ -187,6 +189,7 @@ class DashboardHandler(base.BaseHandler):
                     [:feconf.TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD]
                 )
             })
+            total_unresolved_answers += exploration['num_unresolved_answers']
 
         exp_summary_list = sorted(
             exp_summary_list,
@@ -223,7 +226,8 @@ class DashboardHandler(base.BaseHandler):
                 self.user_id))
         dashboard_stats.update({
             'total_open_feedback': feedback_services.get_total_open_threads(
-                feedback_thread_analytics)
+                feedback_thread_analytics),
+            'total_unresolved_answers': total_unresolved_answers
         })
         if dashboard_stats and dashboard_stats.get('average_ratings'):
             dashboard_stats['average_ratings'] = (
