@@ -935,7 +935,19 @@ oppia.directive('textAngularRte', [
           };
 
           $scope.stripFormatting = function(html) {
-            return $filter('sanitizeHtmlForRte')(html);
+            var whitelistedTags = [
+              'oppia-noninteractive-collapsible',
+              'oppia-noninteractive-image',
+              'oppia-noninteractive-link',
+              'oppia-noninteractive-math',
+              'oppia-noninteractive-tabs',
+              'oppia-noninteractive-video'
+            ];
+            // Strip out anything between and including <>,
+            // unless it contains the RTE tags.
+            var regex = new RegExp('(?!.*(' + whitelistedTags.join('|') +
+                                    '))<[^>]+>', 'gm');
+            return html ? String(html).replace(regex, '') : '';
           };
 
           $scope.init = function() {
