@@ -80,6 +80,7 @@ oppia.controller('Admin', [
       $http.get(adminJobOutputUrl).then(function(response) {
         $scope.showJobOutput = true;
         $scope.jobOutput = response.data.output ? response.data.output : [];
+        $scope.jobOutput.sort();
         window.scrollTo(0, document.body.scrollHeight);
       });
     };
