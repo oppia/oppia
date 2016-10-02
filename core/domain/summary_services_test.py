@@ -896,6 +896,7 @@ class CollectionNodeMetadataDictsTest(
     EXP_ID3 = 'eid3'
     EXP_ID4 = 'eid4'
     EXP_ID5 = 'eid5'
+    INVALID_EXP_ID = 'invalid_exp_id'
 
     def setUp(self):
         super(CollectionNodeMetadataDictsTest, self).setUp()
@@ -953,22 +954,22 @@ class CollectionNodeMetadataDictsTest(
         summaries = (summary_services.get_exploration_metadata_dicts(
             [self.EXP_ID5, self.EXP_ID4], self.bob_id))
 
-        expected_summary = {
+        expected_summary = [{
             'id': self.EXP_ID4,
             'objective': u'An objective 4',
             'title': u'Exploration 4 Bob title',
-        }
+        }]
         self.assertEqual(expected_summary, summaries)
 
     def test_public_exps_of_another_user_are_returned(self):
         summaries = (summary_services.get_exploration_metadata_dicts(
             [self.EXP_ID2, self.EXP_ID3, self.EXP_ID4], self.bob_id))
 
-        expected_summary = {
+        expected_summary = [{
             'id': self.EXP_ID2,
             'objective': u'An objective 2',
             'title': u'Exploration 2 Albert title',
-        }
+        }]
         self.assertEqual(expected_summary, summaries)
 
     def test_deleted_exps_are_not_returned(self):
@@ -977,11 +978,11 @@ class CollectionNodeMetadataDictsTest(
         summaries = (summary_services.get_exploration_metadata_dicts(
             [self.EXP_ID2, self.EXP_ID3, self.EXP_ID4], self.bob_id))
 
-        expected_summary = {
+        expected_summary = [{
             'id': self.EXP_ID3,
             'objective': u'An objective 3',
             'title': u'Exploration 3 Albert title',
-        }
+        }]
         self.assertEqual(expected_summary, summaries)
 
     def test_exp_metadata_dicts_matching_query(self):
@@ -999,3 +1000,14 @@ class CollectionNodeMetadataDictsTest(
             'title': u'Exploration 2 Albert title',
         }]
         self.assertEqual(expected_summaries, summaries)
+
+    def test_invalid_exp_ids(self):
+        summaries = (summary_services.get_exploration_metadata_dicts(
+            [self.EXP_ID3, self.INVALID_EXP_ID], self.albert_id))
+
+        expected_summary = [{
+            'id': self.EXP_ID3,
+            'objective': u'An objective 3',
+            'title': u'Exploration 3 Albert title',
+        }]
+        self.assertEqual(expected_summary, summaries)
