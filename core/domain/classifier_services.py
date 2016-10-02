@@ -48,13 +48,13 @@ class StringClassifier(object):
     document's label.
 
         # A list of docs to classify.
-        prediction_examples = [
+        prediction_docs = [
             'i only eat fish and vegetables'
         ]
         classifier_dict = load_from_data_store()
         string_classifier = StringClassifier()
         string_classifier.from_dict(classifier_dict)
-        doc_ids = string_classifier.add_examples_for_predicting(
+        doc_ids = string_classifier.add_docs_for_predicting(
             prediction_examples)
         label = string_classifier.predict_label_for_doc(doc_ids[0])
         print label
@@ -174,7 +174,7 @@ class StringClassifier(object):
         # used when adding new training examples.
         self._training_iterations = self._DEFAULT_TRAINING_ITERATIONS
         # An int which represents the number of prediction iterations
-        # used when adding new predicting examples.
+        # used when adding new docs for prediction.
         self._prediction_iterations = self._DEFAULT_PREDICTION_ITERATIONS
         # A float which indicates the level of confidence required
         # in order to make a prediction.
@@ -450,7 +450,7 @@ class StringClassifier(object):
         """
         return self._add_examples(training_examples, self._training_iterations)
 
-    def add_examples_for_predicting(self, prediction_examples):
+    def add_docs_for_predicting(self, prediction_docs):
         """Adds examples to the classifier with _prediction_iterations number
         of iterations.
 
