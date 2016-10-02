@@ -357,6 +357,92 @@ class AnswersAudit2(jobs.BaseMapReduceJobManager):
             yield 'Internal error 2'
 
 
+class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
+
+    _MATCHED_RULE_TYPE = 'ResultsInError()'
+    _KEY_PRINT_TOTAL_COUNT = 'print_total_count'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.StateRuleAnswerLogModel]
+
+    @staticmethod
+    def map(item):
+        item_id = item.id
+
+        period_idx = item_id.index('.')
+        exp_id = item_id[:period_idx]
+
+        item_id = item_id[period_idx+1:]
+        handler_period_idx = item_id.index('submit') - 1
+        state_name = item_id[:handler_period_idx]
+
+        item_id = item_id[handler_period_idx+1:]
+        period_idx = item_id.index('.')
+        handler_name = item_id[:period_idx]
+
+        item_id = item_id[period_idx+1:]
+        rule_str = item_id
+
+        answers = item.answers
+        total_submission_count = 0
+        for _, count in answers.iteritems():
+            total_submission_count = total_submission_count + count
+
+        if rule_str == RuleTypeBreakdownAudit._MATCHED_RULE_TYPE:
+            yield (exp_id, { 'frequency': total_submission_count })
+            yield (RuleTypeBreakdownAudit._KEY_PRINT_TOTAL_COUNT, {
+                'frequency': total_submission_count
+            })
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        total_count = 0
+        for value_str in stringified_values:
+            value_dict = ast.literal_eval(value_str)
+            total_count = total_count + value_dict['frequency']
+
+        if key == RuleTypeBreakdownAudit._KEY_PRINT_TOTAL_COUNT:
+            yield 'Matching against rule type: %s (total answer count: %d)' % (
+                RuleTypeBreakdownAudit._MATCHED_RULE_TYPE, total_count)
+        else:
+            yield '%s has %s submitted answers' % (key, total_count)
+
+
+class RuleTypeBreakdownAudit2(jobs.BaseMapReduceJobManager):
+
+    _MATCHED_RULE_TYPE = 'ResultsInError()'
+    _KEY_PRINT_TOTAL_COUNT = 'print_total_count'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.StateAnswersModel]
+
+    @staticmethod
+    def map(item):
+        # Answers need to be collected one at a time in the new data store
+        for answer in item.submitted_answer_list:
+            rule_str = answer['rule_spec_str']
+            if rule_str == RuleTypeBreakdownAudit._MATCHED_RULE_TYPE:
+                yield (item.exploration_id, { 'frequency': 1 })
+                yield (RuleTypeBreakdownAudit._KEY_PRINT_TOTAL_COUNT, {
+                    'frequency': 1
+                })
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        total_count = 0
+        for value_str in stringified_values:
+            value_dict = ast.literal_eval(value_str)
+            total_count = total_count + value_dict['frequency']
+
+        if key == RuleTypeBreakdownAudit._KEY_PRINT_TOTAL_COUNT:
+            yield 'Matching against rule type: %s (total answer count: %d)' % (
+                RuleTypeBreakdownAudit._MATCHED_RULE_TYPE, total_count)
+        else:
+            yield '%s has %s submitted answers' % (key, total_count)
+
+
 class ClearMigratedAnswersJob(jobs.BaseMapReduceJobManager):
     """This job deletes all answers stored in the
     stats_models.StateAnswersModel and all book-keeping information stored in
@@ -711,6 +797,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # with the session_id to determine whether the empty string is the
         # special sentinel value.
 
+        # TODO(bhenning): Should something more significant (like None) be used
+        # for sentinel values for output/evaluation/error instead?
         if rule_spec.rule_type == 'OutputEquals':
             code_output = cls._get_plaintext(rule_spec.inputs['x'])
             if not answer_str:

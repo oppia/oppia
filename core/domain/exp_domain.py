@@ -367,15 +367,6 @@ class RuleSpec(object):
         self.rule_type = rule_type
         self.inputs = inputs
 
-    def stringify_classified_rule(self):
-        """Returns a string representation of a rule (for the stats log)."""
-        if self.rule_type == CLASSIFIER_RULESPEC_STR:
-            return self.rule_type
-        else:
-            param_list = [
-                utils.to_ascii(val) for val in self.inputs.values()]
-            return '%s(%s)' % (self.rule_type, ','.join(param_list))
-
     def validate(self, rule_params_list, exp_param_specs_dict):
         """Validates a RuleSpec value object. It ensures the inputs dict does
         not refer to any non-existent parameters and that it contains values

@@ -34,6 +34,8 @@ ONE_OFF_JOB_MANAGERS = [
     stats_jobs_one_off.StatisticsAudit,
     stats_jobs_one_off.AnswersAudit,
     stats_jobs_one_off.AnswersAudit2,
+    stats_jobs_one_off.RuleTypeBreakdownAudit,
+    stats_jobs_one_off.RuleTypeBreakdownAudit2,
     stats_jobs_one_off.ClearMigratedAnswersJob,
     stats_jobs_one_off.AnswerMigrationValidationJob,
     stats_jobs_one_off.AnswerMigrationJob,
