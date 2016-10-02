@@ -93,6 +93,8 @@ class LibraryPage(base.BaseHandler):
 class LibraryIndexHandler(base.BaseHandler):
     """Provides data for the default library index page."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     def get(self):
         """Handles GET requests."""
         # TODO(sll): Support index pages for other language codes.
@@ -146,6 +148,8 @@ class LibraryIndexHandler(base.BaseHandler):
 class SearchHandler(base.BaseHandler):
     """Provides data for activity search results."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     def get(self):
         """Handles GET requests."""
         query_string = utils.unescape_encoded_uri_component(
@@ -188,6 +192,8 @@ class ExplorationSummariesHandler(base.BaseHandler):
     """Returns summaries corresponding to ids of public explorations. This
     controller supports returning private explorations for the given user.
     """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self):
         """Handles GET requests."""

@@ -340,15 +340,16 @@
 
     {% include 'pages/footer_js_libs.html' %}
 
-    {% include 'components/activity_tiles_infinity_grid_directive.html' %}
-    {% include 'components/collection_summary_tile_directive.html' %}
-    {% include 'components/create_activity_button_directive.html' %}
-    {% include 'components/exploration_summary_tile_directive.html' %}
+    {% include 'components/create_button/create_activity_button_directive.html' %}
     {% include 'components/forms/form_builder_templates.html' %}
     {% include 'components/forms/image_uploader_directive.html' %}
-    {% include 'components/loading_dots_directive.html' %}
+    {% include 'components/loading/loading_dots_directive.html' %}
+    {% include 'components/summary_tile/circular_image_directive.html' %}
+    {% include 'components/summary_tile/collection_summary_tile_directive.html' %}
+    {% include 'components/summary_tile/exploration_summary_tile_directive.html' %}
+
     {% include 'components/rating_display.html' %}
-    {% include 'components/side_navigation_bar/side_navigation_bar.html' %}
+    {% include 'components/side_navigation_bar/side_navigation_bar_directive.html' %}
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/app.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/directives.js"></script>
@@ -363,21 +364,22 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/searchService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/utilsService.js"></script>
 
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/ActivityTilesInfinityGridDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/AlertMessageDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/CollectionCreationService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/CollectionSummaryTileDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/CreateActivityButtonDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/ExplorationCreationService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/ExplorationSummaryTileDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/alerts/AlertMessageDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/create_button/CreateActivityButtonDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/ImageUploaderDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/LoadingDotsDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/ObjectEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/ObjectEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/Select2DropdownDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/side_navigation_bar/SideNavigationBarDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CircularImageDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CollectionSummaryTileDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
+
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/CollectionCreationService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/ExplorationCreationService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingDisplayDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/Select2DropdownDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/side_navigation_bar/SideNavigationBar.js"></script>
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/UrlInterpolationService.js"></script>
 

@@ -268,6 +268,8 @@ class ExplorationPage(base.BaseHandler):
 class ExplorationHandler(base.BaseHandler):
     """Provides the initial data for a single exploration."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     def get(self, exploration_id):
         """Populates the data on the individual exploration page."""
         version = self.request.get('v')
@@ -488,6 +490,8 @@ class RatingHandler(base.BaseHandler):
     exploration.
     """
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -519,6 +523,8 @@ class RecommendationsHandler(base.BaseHandler):
     If both are true, then the explorations are suggested from the collection,
     if there are upcoming explorations for the learner to complete.
     """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @require_playable
     def get(self, exploration_id):
