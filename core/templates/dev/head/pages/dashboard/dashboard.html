@@ -61,6 +61,7 @@
           </a>
         </li>
         {% if not can_create_collections %}
+          <!-- A layout fix when the 'My Collections' tab is absent -->
           <li ng-if="collectionsList.length == 0"></li>
         {% endif %}
         {% if can_create_collections %}
@@ -226,7 +227,7 @@
             <div class="stat-block">
               <div class="heading-text"
                    ng-click="toggleSubDropdown(EXPLORATION_DROPDOWN_STATS.OPEN_FEEDBACK, $event)">
-                <[explorationStats[exploration.id] ? dashboardStats.total_open_feedback + ' Open Feedback': 'Retrieving Feedback Data ...']>
+                <[explorationStats[exploration.id] ? exploration.num_open_threads + ' Open Feedback': 'Retrieving Feedback Data ...']>
                 <span class="fa"
                       ng-if="explorationStats[exploration.id].open_feedback.length !==0 && !checkMobileView()"
                       ng-class="activeSubDropdown === EXPLORATION_DROPDOWN_STATS.OPEN_FEEDBACK ? 'fa-caret-up': 'fa-caret-down'">
@@ -238,15 +239,15 @@
                 <div ng-repeat="feedback in explorationStats[exploration.id].open_feedback">
                   <[feedback.text | truncate: 100]> (by <a ng-href="/create/<[exploration.id]>#/feedback"><[feedback.author_username || 'a learner']></a>)
                 </div>
-                <div ng-if="(dashboardStats.total_open_feedback - explorationStats[exploration.id].open_feedback.length) > 0">
-                  ... and <[dashboardStats.total_open_feedback - explorationStats[exploration.id].open_feedback.length]> more
+                <div ng-if="(exploration.num_open_threads - explorationStats[exploration.id].open_feedback.length) > 0">
+                  ... and <[exploration.num_open_threads - explorationStats[exploration.id].open_feedback.length]> more
                 </div>
               </div>
             </div>
             <div class="stat-block" ng-if="!checkMobileView()">
               <div class="heading-text"
                    ng-click="toggleSubDropdown(EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS, $event)">
-                <[explorationStats[exploration.id] ? dashboardStats.total_unresolved_answers + ' Unresolved Answers from users': 'Retrieving Answers Data ...']>
+                <[explorationStats[exploration.id] ? exploration.num_unresolved_answers + ' Unresolved Answers from users': 'Retrieving Answers Data ...']>
                 <span class="fa"
                       ng-if="exploration.top_unresolved_answers.length !== 0 && !checkMobileView()"
                       ng-class="activeSubDropdown === EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS ? 'fa-caret-up': 'fa-caret-down'">
@@ -258,8 +259,8 @@
                 <div ng-repeat="answer in exploration.top_unresolved_answers">
                   <[answer.value | truncate: 100]> (<[answer.count]> instances in <[answer.state]>)
                 </div>
-                <div ng-if="(dashboardStats.total_unresolved_answers - exploration.top_unresolved_answers.length) > 0">
-                  ... and <[dashboardStats.total_unresolved_answers - exploration.top_unresolved_answers.length]> more
+                <div ng-if="(exploration.num_unresolved_answers - topUnresolvedAnswersCount(exploration)) > 0">
+                  ... and <[exploration.num_unresolved_answers - topUnresolvedAnswersCount(exploration)]> more
                 </div>
               </div>
             </div>
