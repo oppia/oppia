@@ -20,7 +20,7 @@ oppia.directive('collectionMainTab', [function() {
   return {
     restrict: 'E',
     scope: {},
-    templateUrl: 'inline/collection_main_tab_directive',
+    templateUrl: 'collectionEditor/editorTab',
     controller: [
       '$scope', 'CollectionEditorStateService', 'CollectionLinearizerService',
       function(
