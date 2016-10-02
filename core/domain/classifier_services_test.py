@@ -106,7 +106,7 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         self._validate_instance()
 
     def test_add_test_examples(self):
-        self.string_classifier.add_docs_for_predicing(self._EXAMPLES_TEST)
+        self.string_classifier.add_docs_for_predicting(self._EXAMPLES_TEST)
         self.assertEquals(self.string_classifier._num_labels, 3)
         self.assertEquals(self.string_classifier._num_docs, 5)
         self.assertEquals(self.string_classifier._num_words, 34)
