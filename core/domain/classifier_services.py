@@ -466,8 +466,8 @@ class StringClassifier(object):
         """
         all_labels = self._label_to_id.keys()
         return self._add_examples(
-            zip(prediction_examples, [
-                copy.deepcopy(all_labels) for _ in prediction_examples]),
+            zip(prediction_docs, [
+                copy.deepcopy(all_labels) for _ in prediction_docs]),
             self._prediction_iterations)
 
     def load_examples(self, examples):
