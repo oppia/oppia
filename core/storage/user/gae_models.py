@@ -43,7 +43,7 @@ class UserSettingsModel(base_models.BaseModel):
     # When the user last logged in. This may be out-of-date by up to
     # feconf.PROXIMAL_TIMEDELTA_SECS seconds.
     last_logged_in = ndb.DateTimeProperty(default=None)
-    # When the user last edited an exploration in.
+    # When the user last edited an exploration.
     last_edited_an_exploration = ndb.DateTimeProperty(default=None)
     # When the user last created an exploration.
     last_created_an_exploration = ndb.DateTimeProperty(default=None)

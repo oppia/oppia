@@ -278,12 +278,10 @@ class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceJobManager):
             exp_models.ExplorationCommitLogEntryModel.query(
                 exp_models.ExplorationCommitLogEntryModel.user_id == user_id).
             order(-exp_models.ExplorationCommitLogEntryModel.created_on).
-            fetch())
+            fetch(1))
 
-        for commit in user_commits:
-            if commit.commit_type != 'create':
-                user_model.last_edited_an_exploration = commit.created_on
-                break
+        if user_commits:
+            user_model.last_edited_an_exploration = user_commits[0].created_on
 
         user_model.put()
 

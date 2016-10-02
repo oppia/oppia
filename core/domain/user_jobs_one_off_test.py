@@ -883,7 +883,7 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
 
         owner_settings = user_services.get_user_settings(self.owner_id)
         self.assertIsNotNone(owner_settings.last_created_an_exploration)
-        self.assertIsNone(owner_settings.last_edited_an_exploration)
+        self.assertIsNotNone(owner_settings.last_edited_an_exploration)
 
     def test_that_last_edited_time_is_updated(self):
         self.login(self.OWNER_EMAIL)
@@ -897,10 +897,6 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
             'new_value': 'the objective'
         }], 'Test edit')
         self.logout()
-
-        user_settings = user_services.get_user_settings(self.owner_id)
-        user_settings.last_created_an_exploration = None
-        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
 
         user_settings = user_services.get_user_settings(self.editor_id)
         user_settings.last_edited_an_exploration = None
