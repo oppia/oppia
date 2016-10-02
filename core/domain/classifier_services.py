@@ -486,8 +486,6 @@ class StringClassifier(object):
                     ['fish are pets', ['pets']],
                     ['my kitten eats fish', ['food', 'pets']]
                 ]
-
-
         """
         docs, labels_list = self._parse_examples(examples)
 
