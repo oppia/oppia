@@ -37,10 +37,10 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
 
     Args:
         user_id: str. The id of the user assigning the rating.
-        exploration_id: str. The exploration that is assigned a rating.
+        exploration_id: str. The id of the exploration that is
+            assigned a rating.
         new_rating: int. Value of assigned rating, should be between
-        1 and 5 inclusive.
-
+            1 and 5 inclusive.
     """
 
     if not isinstance(new_rating, int):
@@ -94,12 +94,11 @@ def get_user_specific_rating_for_exploration(user_id, exploration_id):
 
     Args:
         user_id: str. The id of the user.
-        exploration_id: str. The specified exploration.
+        exploration_id: str. The id of the exploration.
 
     Returns:
-        An integer between 1 and 5 inclusive, or None if there is no
-        rating of this exploration by
-        this user.
+        int or None. An integer between 1 and 5 inclusive, or None if the user
+        has not previously rated the exploration.
     """
     exp_user_data_model = user_models.ExplorationUserDataModel.get(
         user_id, exploration_id)
@@ -107,18 +106,19 @@ def get_user_specific_rating_for_exploration(user_id, exploration_id):
 
 
 def get_when_exploration_rated(user_id, exploration_id):
-    """Fetches the date-time the exploration was last rated by this user, or
+    """Fetches the datetime the exploration was last rated by this user, or
     None if no rating has been awarded.
 
     Currently this function is only used for testing purposes.
 
     Args:
         user_id: str. The id of the user.
-        exploration_id: str. The id of the specified exploration.
+        exploration_id: str. The id of the exploration.
 
     Returns:
-        a date-time object specifying when the exploration was last
-        rated by the user.
+        datetime.datetime or None. When the exploration was last
+        rated by the user, or None if the user has not previously
+        rated the exploration.
     """
     exp_user_data_model = user_models.ExplorationUserDataModel.get(
         user_id, exploration_id)
@@ -129,11 +129,11 @@ def get_overall_ratings_for_exploration(exploration_id):
     """Fetches all ratings for an exploration.
 
     Args:
-        exploration_id: str. The id of the specified exploration.
+        exploration_id: str. The id of the exploration.
 
     Returns:
         a dict whose keys are '1', '2', '3', '4', '5' and whose
-        values are nonnegative integers representing frequency counts
+        values are nonnegative integers representing the frequency counts
         of each rating.
     """
     exp_summary = exp_services.get_exploration_summary_by_id(exploration_id)
