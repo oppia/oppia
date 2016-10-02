@@ -86,7 +86,8 @@ class StringClassifier(object):
             assigned to it.
     """
 
-    # Internal learning rates.
+    # Internal learning rates. These are initialized to Wikipedia's
+    # recommendations. Do not change these unless you know what you're doing.
     _DEFAULT_ALPHA = 0.1
     _DEFAULT_BETA = 0.001
 
@@ -131,9 +132,7 @@ class StringClassifier(object):
         # There is nothing special about the value 4.
         numpy.random.seed(seed=4)
 
-        # Internal learning rates. These are initialized to Wikipedia's
-        # recommendations. Do not change these unless you know what you're
-        # doing.
+        # Internal learning rates.
         self._alpha = self._DEFAULT_ALPHA
         self._beta = self._DEFAULT_BETA
 
@@ -435,8 +434,10 @@ class StringClassifier(object):
         iterations.
 
         Args:
-            training_examples: list of examples. A single example is a doc
-                with a list of labels it should be matched to, e.g:
+            training_examples: list of 'examples'. Each example is represented
+                by a 2-element list. The first item of the list is a str
+                representing a doc, and the second item is a list of labels
+                that the doc should be matched to. E.g.:
 
                 training_examples = [
                     ['i eat fish and vegetables', ['food']],
@@ -475,13 +476,18 @@ class StringClassifier(object):
         number of iterations.
 
         Args:
-            examples: A list of examples.
+            examples: list of 'examples'. Each example is represented
+                by a 2-element list. The first item of the list is a str
+                representing a doc, and the second item is a list of labels
+                that the doc should be matched to. E.g.:
 
-            ['i eat fish and vegetables', ['food']]
+                training_examples = [
+                    ['i eat fish and vegetables', ['food']],
+                    ['fish are pets', ['pets']],
+                    ['my kitten eats fish', ['food', 'pets']]
+                ]
 
-            The list above represents a single example, in which the first
-            item is a doc, which is a str. And the second item is  a list
-            of labels (list of str). See class docstring for full example.
+
         """
         docs, labels_list = self._parse_examples(examples)
 
@@ -525,7 +531,7 @@ class StringClassifier(object):
             d: int. A doc id (see example in class docstring).
 
         Returns:
-            str. The predicted label name of the given doc.
+            str. The label predicted by the classifier for the given doc.
         """
         if (self._num_docs < self._DEFAULT_MIN_DOCS_TO_PREDICT or
                 self._num_labels < self._DEFAULT_MIN_LABELS_TO_PREDICT):
@@ -533,10 +539,10 @@ class StringClassifier(object):
         return self._get_prediction_report_for_doc(d)['prediction_label_name']
 
     def to_dict(self):
-        """Converts a classifier into a dict model.
+        """Returns a dict representing this StringClassifier.
 
         Returns:
-            dict. A representation of the state of the classifier (dict model).
+            dict. A representation of the state of the classifier.
         """
         model = {}
         model['_alpha'] = copy.deepcopy(self._alpha)
@@ -561,10 +567,11 @@ class StringClassifier(object):
         return model
 
     def from_dict(self, model):
-        """Converts a dict model into a classifier.
+        """Initializes the properties of this classifier from a dict
+        constructed using to_dict().
 
         Args:
-            model: A dict. The classifier dict model to load.
+            model: A dict representing a StringClassifier.
         """
         self._alpha = copy.deepcopy(model['_alpha'])
         self._beta = copy.deepcopy(model['_beta'])
