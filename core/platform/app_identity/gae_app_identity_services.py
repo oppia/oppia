@@ -19,4 +19,11 @@
 from google.appengine.api import app_identity
 
 def get_application_id():
+    """Return the application's ID (or Project ID).
+    Using this ID, an application can assert its identity to other Apps or
+    to make a runtime decision.
+
+    Returns:
+        str. The application ID.
+    """
     return app_identity.get_application_id()

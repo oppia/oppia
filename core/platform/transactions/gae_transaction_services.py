@@ -20,7 +20,24 @@ from google.appengine.ext import ndb
 
 
 def run_in_transaction(fn, *args, **kwargs):
-    """Run a function in a transaction."""
+    """Run a function in a transaction.
+    Either all of the operations in the transaction are applied,
+    or none of them are applied.
+    If an exception is raised, the transaction is likely not safe to
+    commit, since TransactionOptions.ALLOWED is used.
+
+    Args:
+        fn: A function (or callable) to be called.
+        *args: Variable length argument passed to the callable.
+        **kwargs: Arbitrary keyword arguments passed to the callable.
+
+    Returns:
+      Whatever fn() returns.
+
+    Raises:
+        Whatever fn() raises; datastore_errors.TransactionFailedError
+        if the transaction failed.
+    """
     return ndb.transaction(
         lambda: fn(*args, **kwargs),
         xg=True,
@@ -28,7 +45,14 @@ def run_in_transaction(fn, *args, **kwargs):
     )
 
 
-# The NDB toplevel() function. For more details, see
-#   https://developers.google.com/appengine/docs/python/ndb/async#intro
 def toplevel_wrapper(*args, **kwargs):
+    """Enables the handler (could be a WSGI Application or view functions)
+    to not exit until all its asynchronous requests have finished.
+    For more details, see
+    https://developers.google.com/appengine/docs/python/ndb/async#intro
+
+    Args:
+        *args: Variable length argument list.
+        **kwargs: Arbitrary keyword arguments.
+    """
     return ndb.toplevel(*args, **kwargs)
