@@ -60,8 +60,11 @@
              translate="I18N_DASHBOARD_MY_EXPLORATIONS">
           </a>
         </li>
-        {% if can_create_collections %}
+        {% if not can_create_collections %}
+          <!-- A layout fix when the 'My Collections' tab is absent -->
           <li ng-if="collectionsList.length == 0"></li>
+        {% endif %}
+        {% if can_create_collections %}
           <li ng-if="collectionsList.length > 0"
               ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myCollections'}">
             <a class="oppia-dashboard-tabs-text"
@@ -194,79 +197,139 @@
       </div>
 
       <div ng-if="myExplorationsView === 'card' && explorationsList.length > 0"
-           style="margin-top: 8px;">
-        <md-card ng-repeat="exploration in explorationsList track by exploration.id"
+           class="oppia-card-view-wrap">
+        <md-card ng-repeat="exploration in explorationsList | orderBy:sortByFunction:isCurrentSortDescending track by exploration.id"
                  class="oppia-activity-summary-tile oppia-dashboard-card-view-item"
-                 ng-click="showExplorationEditor(exploration.id)">
-            <div class="title-section" style="background-color: <[exploration.thumbnail_bg_color]>;">
-              <img class="thumbnail-image" ng-src="<[exploration.thumbnail_icon_url]>">
-              <h2 class="activity-title protractor-test-exp-summary-tile-title">
-                <span><[exploration.title || 'Untitled' | truncate:40]></span>
-              </h2>
-            </div>
+                 ng-class="{'dropdown-open': activeExplorationId === exploration.id}"
+                 scroll-on-click
+                 is-dropdown-open="activeExplorationId === exploration.id"
+                 is-private="exploration.status === 'private'"
+                 ng-click="openExploration(exploration.status, exploration.id)">
+          <div class="title-section"
+               ng-class="{'oppia-exp-arrow': activeExplorationId === exploration.id}"
+               style="background-color: <[exploration.thumbnail_bg_color]>;">
+            <img class="thumbnail-image"
+                 ng-src="<[exploration.thumbnail_icon_url]>"
+                 ng-hide="activeExplorationIdOnMobile(exploration.id)">
+            <span class="thumbnail-image caret-thumb fa fa-caret-up"
+                  ng-show="activeExplorationIdOnMobile(exploration.id)">
+            </span>
+            <h2 class="activity-title protractor-test-exp-summary-tile-title">
+              <span><[exploration.title || 'Untitled' | truncate:40]></span>
+            </h2>
+          </div>
+          <div class="mask-wrap">
             <div class="title-section-mask"></div>
-
-            <div ng-attr-section="'<['right-section']>">
-              <div ng-if="exploration.status === 'private'" class="exp-private-text">
-                <[publishText]>
+          </div>
+          <md-card class="oppia-exp-dropdown-stats"
+                   ng-click="$event.stopPropagation()"
+                   ng-if="exploration.status !=='private' && activeExplorationId === exploration.id">
+            <div class="stat-block">
+              <div class="heading-text"
+                   ng-click="toggleSubDropdown(EXPLORATION_DROPDOWN_STATS.OPEN_FEEDBACK, $event)">
+                <[explorationStats[exploration.id] ? exploration.num_open_threads + ' Open Feedback': 'Retrieving Feedback Data ...']>
+                <span class="fa"
+                      ng-if="explorationStats[exploration.id].open_feedback.length !==0 && !checkMobileView()"
+                      ng-class="activeSubDropdown === EXPLORATION_DROPDOWN_STATS.OPEN_FEEDBACK ? 'fa-caret-up': 'fa-caret-down'">
+                </span>
               </div>
-              <ul ng-if="exploration.status !== 'private'"
-                  layout="row"
-                  layout-wrap
-                  class="metrics"
-                  layout-align="space-between center">
-                <li flex="50">
-                  <span class="protractor-test-exp-summary-tile-rating">
-                    <span class="fa fa-star fa-lg"
-                          tooltip="<['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]>"
-                          tooltip-placement="top">
-                    </span>
-                    <span>
-                      <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
-                    </span>
-                  </span>
-                </li>
-
-                <li flex="50">
-                  <span class="fa fa-eye fa-lg"
-                        tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>"
-                        tooltip-placement="top">
-                  </span>
-                  <[exploration.num_views]>
-                </li>
-
-                <li flex="50">
-                  <span class="fa fa-clock-o fa-lg"
-                        tooltip="<['I18N_LIBRARY_LAST_UPDATED' | translate]>"
+              <div class="stat-block-values"
+                   ng-if="explorationStats[exploration.id].open_feedback.length !==0"
+                   ng-show="activeSubDropdown === EXPLORATION_DROPDOWN_STATS.OPEN_FEEDBACK || checkMobileView()">
+                <div ng-repeat="feedback in explorationStats[exploration.id].open_feedback">
+                  <[feedback.text | truncate: 100]> (by <a ng-href="/create/<[exploration.id]>#/feedback"><[feedback.author_username || 'a learner']></a>)
+                </div>
+                <div ng-if="(exploration.num_open_threads - explorationStats[exploration.id].open_feedback.length) > 0">
+                  ... and <[exploration.num_open_threads - explorationStats[exploration.id].open_feedback.length]> more
+                </div>
+              </div>
+            </div>
+            <div class="stat-block" ng-if="!checkMobileView()">
+              <div class="heading-text"
+                   ng-click="toggleSubDropdown(EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS, $event)">
+                <[explorationStats[exploration.id] ? exploration.num_unresolved_answers + ' Unresolved Answers from users': 'Retrieving Answers Data ...']>
+                <span class="fa"
+                      ng-if="exploration.top_unresolved_answers.length !== 0 && !checkMobileView()"
+                      ng-class="activeSubDropdown === EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS ? 'fa-caret-up': 'fa-caret-down'">
+                </span>
+              </div>
+              <div class="stat-block-values"
+                   ng-if="exploration.top_unresolved_answers.length !==0"
+                   ng-show="activeSubDropdown === EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS">
+                <div ng-repeat="answer in exploration.top_unresolved_answers">
+                  <[answer.value | truncate: 100]> (<[answer.count]> instances in <[answer.state]>)
+                </div>
+                <div ng-if="(exploration.num_unresolved_answers - topUnresolvedAnswersCount(exploration)) > 0">
+                  ... and <[exploration.num_unresolved_answers - topUnresolvedAnswersCount(exploration)]> more
+                </div>
+              </div>
+            </div>
+            <button class="btn open-in-editor-btn"
+                    ng-click="showExplorationEditor(exploration.id); $event.stopPropagation()">
+              Open In Editor
+            </button>
+          </md-card>
+          <div ng-attr-section="'<['right-section']>">
+            <div ng-if="exploration.status === 'private'" class="exp-private-text">
+              <[publishText]>
+            </div>
+            <ul ng-if="exploration.status !== 'private'"
+                layout="row"
+                layout-wrap
+                class="metrics"
+                layout-align="space-between center">
+              <li flex="50">
+                <span class="protractor-test-exp-summary-tile-rating">
+                  <span class="fa fa-star fa-lg"
+                        tooltip="<['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]>"
                         tooltip-placement="top">
                   </span>
                   <span>
-                    <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
+                    <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
                   </span>
-                </li>
+                </span>
+              </li>
 
-                <li flex="50">
-                  <span class="fa fa-comments fa-lg"
-                        tooltip="<['I18N_DASHBOARD_OPEN_FEEDBACK' | translate]>"
-                        tooltip-placement="top">
-                  </span>
-                  <[exploration.num_total_threads]>
-                  <a ng-if="exploration.num_open_threads != 0"
-                     ng-href="/create/<[exploration.id]>#/feedback">
-                      (<[exploration.num_open_threads]> new)
-                  </a>
-                </li>
-                <sharing-links ng-if="exploration.status !== 'private'"
-                               ng-click="$event.stopPropagation()"
-                               flex="100"
-                               class="dashboard-hide-mobile"
-                               layout-type="row"
-                               layout-align-type="center left"
-                               twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD"
-                               exploration-id="exploration.id">
-               </sharing-links>
-              </ul>
-            </div>
+              <li flex="50">
+                <span class="fa fa-eye fa-lg"
+                      tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>"
+                      tooltip-placement="top">
+                </span>
+                <[exploration.num_views]>
+              </li>
+
+              <li flex="50">
+                <span class="fa fa-clock-o fa-lg"
+                      tooltip="<['I18N_LIBRARY_LAST_UPDATED' | translate]>"
+                      tooltip-placement="top">
+                </span>
+                <span>
+                  <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
+                </span>
+              </li>
+
+              <li flex="50">
+                <span class="fa fa-comments fa-lg"
+                      tooltip="<['I18N_DASHBOARD_OPEN_FEEDBACK' | translate]>"
+                      tooltip-placement="top">
+                </span>
+                <[exploration.num_total_threads]>
+                <a ng-if="exploration.num_open_threads != 0"
+                   ng-href="/create/<[exploration.id]>#/feedback">
+                  (<[exploration.num_open_threads]> new)
+                </a>
+              </li>
+              <sharing-links ng-if="exploration.status !== 'private'"
+                             ng-click="$event.stopPropagation()"
+                             flex="100"
+                             class="dashboard-hide-mobile"
+                             layout-type="row"
+                             layout-align-type="center left"
+                             twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD"
+                             exploration-id="exploration.id">
+              </sharing-links>
+            </ul>
+          </div>
         </md-card>
       </div>
     </div>
@@ -339,6 +402,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/share/SharingLinksDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/dashboard/DashboardBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/dashboard/ScrollOnClickDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/dashboard/Dashboard.js"></script>
 {% endblock footer_js %}
