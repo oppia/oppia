@@ -1481,8 +1481,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         answer could have been submitted. This function guarantees the best
         possible migrated answer for the most recent exploration which is not
         newer than the answer. If the answer can successfully be migrated to two
-        different answer object types, this function will fail due to an
-        ambiguous migration result.
+        different object types, this function will prefer to pick whichever
+        corresponds to the newer exploration.
 
         Returns a tuple containing the migrated answer, the exploration that was
         used to migrate the answer, an an error. The error is None unless the
@@ -1514,17 +1514,12 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             elif not matched_answer:
                 matched_answer = answer
                 matched_exploration = exploration
-            elif type(answer.normalized_answer) != type(
-                    matched_answer.normalized_answer):
-                return (
-                    None,
-                    None,
-                    'Migrated answer \'%s\' can migrate to two types: %s (exp '
-                    'version: %d) and %s (exp version: %d)' % (
-                        answer_str.encode('utf-8'),
-                        type(matched_answer.normalized_answer),
-                        matched_exploration.version,
-                        type(answer.normalized_answer), exploration.version))
+
+                # Only pick the earliest matched answer. Any subsequent errors
+                # or similarly migrated values are useless at this point, as a
+                # successful migration has occurred.
+                break
+
         if matched_answer:
             first_error = None
         elif not first_error:

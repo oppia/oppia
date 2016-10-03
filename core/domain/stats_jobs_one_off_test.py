@@ -1340,6 +1340,117 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_str': 'OK.'
         }, submitted_answers)
 
+        self._verify_no_migration_validation_problems()
+
+    def test_migrate_answer_which_matches_multiple_states(self):
+        """Verifies the migration job, in the event of an answer perfectly
+        matching to two different versions of an exploration, picks the version
+        which comes later unconditionally. This represents cases observed in
+        production.
+        """
+        exploration = self.save_new_valid_exploration(
+            'exp_id0', self.owner_id, end_state_name='End')
+        state_name = exploration.init_state_name
+        initial_state = exploration.states[state_name]
+
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'NumericInput'
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': '2.5'
+                    }
+                }],
+                'outcome': {
+                    'dest': state_name,
+                    'feedback': [],
+                    'param_changes': []
+                }
+            }]
+        }], 'Create initial text input state')
+
+        # Submit an answer to this version of the exploration.
+        rule_spec_str = 'Equals(2.5)'
+        html_answer = '2.5'
+        self._record_old_answer(
+            state_name, rule_spec_str, html_answer, exploration_id='exp_id0')
+
+        # Update the explorations's interaction to be TextInput, allowing the
+        # old answer to perfectly match both states.
+
+        # Make a few more changes to the exploration.
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'TextInput'
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': '2.5'
+                    }
+                }],
+                'outcome': {
+                    'dest': state_name,
+                    'feedback': [],
+                    'param_changes': []
+                }
+            }]
+        }], 'Change to TextInput')
+
+        # Submit the same answer to this version of the exploration.
+        rule_spec_str = 'Equals(2.5)'
+        html_answer = '2.5'
+        self._record_old_answer(
+            state_name, rule_spec_str, html_answer, exploration_id='exp_id0')
+
+        # Verify the exploration is at version 3.
+        exploration = exp_services.get_exploration_by_id('exp_id0')
+        self.assertEqual(exploration.version, 3)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0')
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
+
+        # Both answers should be matched to version 3 of the exploration, even
+        # though one was submitted to version 2 and both correctly match to
+        # both.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0', exploration_version=3)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': '2.5',
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': exp_domain.EXPLICIT_CLASSIFICATION,
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'TextInput',
+            'params': {},
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }] * 2)
+        self.assertEqual(state_answers.exploration_id, 'exp_id0')
+        self.assertEqual(state_answers.exploration_version, 3)
+        self._verify_no_migration_validation_problems()
 
     def test_migrate_code_repl(self):
         state_name = 'Code Editor'
