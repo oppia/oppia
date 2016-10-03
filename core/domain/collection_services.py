@@ -72,8 +72,8 @@ def _migrate_collection_to_latest_schema(versioned_collection):
 
     Args:
         versioned_collection: A dict with two keys:
-          - schema_version: str. the schema version for the collection.
-          - nodes: the list of collection nodes comprising the collection.
+          - schema_version: str. The schema version for the collection.
+          - nodes: The list of collection nodes comprising the collection.
 
     Raises:
         Exception: The schema version of the collection is outside of what is
@@ -128,7 +128,8 @@ def get_collection_from_model(collection_model, run_conversion=True):
             changed otherwise.
 
     Returns:
-        Collection. A Collection domain object of the collection model.
+        Collection. A Collection domain object corresponding to the given
+        collection model.
     """
 
     # Ensure the original collection model does not get altered.
@@ -159,11 +160,10 @@ def get_collection_summary_from_model(collection_summary_model):
     collection summary model.
 
     Args:
-        collection_summary_model: CollectionSummaryModel. The collection summary
-            model.
+        collection_summary_model: CollectionSummaryModel.
 
     Returns:
-        CollectionSummary. A domain object of the collection summary model.
+        CollectionSummary.
     """
     return collection_domain.CollectionSummary(
         collection_summary_model.id, collection_summary_model.title,
@@ -188,9 +188,10 @@ def get_collection_by_id(collection_id, strict=True, version=None):
 
     Args:
         collection_id: str. ID of the collection.
-        strict: bool. Indicates whether to fail noisily if no
-            collection with the given id exists in the datastore.
-        version: str. The version number of the collection to be retrieved.
+        strict: bool. Whether to fail noisily if no collection with the given
+            id exists in the datastore.
+        version: str or None. The version number of the collection to be
+            retrieved. If it is None, the latest version will be retrieved.
 
     Returns:
         Collection. The domain object representing a collection with the given
@@ -221,7 +222,7 @@ def get_collection_summary_by_id(collection_id):
         collection_id: str. ID of the collection summary.
 
     Returns:
-        CollectionSummary. A domain object representing a collection summary of
+        CollectionSummary. The collection summary domain object corresponding to
         a collection with the given collection_id.
     """
     # TODO(msl): Maybe use memcache similarly to get_collection_by_id.
@@ -240,8 +241,9 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
     given ids as keys.
 
     Args:
-        collection_ids: A list of collection ids of collections to be retrieved.
-        strict: bool. Indicates whether to fail noisily if no
+        collection_ids: list(str). A list of collection ids of collections to
+            be retrieved.
+        strict: bool. Whether to fail noisily if no
             collection with a given id exists in the datastore.
 
     Returns:
@@ -249,8 +251,8 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
         keys.
 
     Raises:
-        ValueError: One or more collections with the given collection ids
-        cannot be found.
+        ValueError: Only if strict is True. One or more collections with the
+            given collection ids cannot be found.
     """
     collection_ids = set(collection_ids)
     result = {}
@@ -305,31 +307,13 @@ def get_new_collection_id():
     return collection_models.CollectionModel.get_new_id('')
 
 
-def is_collection_summary_editable(collection_summary, user_id=None):
-    """Checks if a given user may edit an collection by checking
-    the given domain object.
-
-    Args:
-        collection_summary: CollectionSummary. A collection summary domain
-            object that the user with the given id is editing.
-        user_id: str. User id of the user.
-
-    Returns:
-        bool. Indicates whether the given user may edit the collection.
-    """
-    return user_id is not None and (
-        user_id in collection_summary.editor_ids
-        or user_id in collection_summary.owner_ids
-        or collection_summary.community_owned)
-
-
 # Query methods.
 def get_collection_titles_and_categories(collection_ids):
     """Returns collection titles and categories for the given ids.
 
     Args:
-        collection_ids: Collection ids of the collection titles and categories
-        to be retrieved.
+        collection_ids: list(str). Collection ids of the collection titles and
+        categories to be retrieved.
 
     Returns:
         A dict with collection ids as keys. The corresponding values
@@ -358,18 +342,16 @@ def get_completed_exploration_ids(user_id, collection_id):
     """Returns a list of explorations the user has completed within the context
     of the provided collection.
 
-
     Args:
-        user_id: str. User id of the given user.
-        collection_id: str. Collection id of the collection.
+        user_id: str. ID of the given user.
+        collection_id: str. ID of the collection.
 
     Returns:
-        A list of explorations that the user with the given user id has
-        completed within the context of the provided collection with the given
-        collection id. Returns an empty list if the user has not yet completed
-        any explorations within the collection. Note that this function will
-        also return an empty list if either the collection and/or user do not
-        exist.
+        list(Exploration). A list of explorations that the user with the given
+        user id has completed within the context of the provided collection with
+        the given collection id. The list is empty if the user has not yet
+        completed any explorations within the collection, or if either the
+        collection and/or user do not exist.
 
         A progress model isn't added until the first exploration of a collection
         is completed, so, if a model is missing, there isn't enough information
@@ -384,23 +366,22 @@ def get_completed_exploration_ids(user_id, collection_id):
     return progress_model.completed_explorations if progress_model else []
 
 
-def get_valid_completed_exploration_ids(user_id, collection_id, collection):
+def get_valid_completed_exploration_ids(user_id, collection):
     """Returns a filtered version of the return value of
     get_completed_exploration_ids, where explorations not also found within the
     collection are removed from the returned list.
 
     Args:
-        user_id: str. User id of a given user.
-        collection_id: str. Collection id of a given collection.
+        user_id: str. ID of the given user.
         collection: Collection. Collection of the given collection id.
 
     Returns:
-        A filtered version of the return value of get_completed_exploration_ids,
-        where explorations not also found within the collection are removed
-        from the returned list.
+        A filtered version of the return value of get_completed_exploration_ids
+        which only includes explorations found within the current version of
+        the collection.
     """
     completed_exploration_ids = get_completed_exploration_ids(
-        user_id, collection_id)
+        user_id, collection.id)
     return [
         exp_id for exp_id in completed_exploration_ids
         if collection.get_node(exp_id)
@@ -416,14 +397,10 @@ def get_next_exploration_ids_to_complete_by_user(user_id, collection_id):
         collection_id: str. Collection id of a given collection.
 
     Returns:
-        A list of exploration IDs in the specified collection that the given
-        user has not attempted and has the prerequisite skills to play. Returns
-        the collection's initial explorations if the user has yet to complete
-        any explorations within the collection. Returns an empty list if the
-        user has completed all of the explorations within the collection.
-
-        See collection_domain.Collection.get_next_exploration_ids for more
-        information.
+        list(str). A list of exploration IDs in the specified collection that
+        the given user has not completed and has the prerequisite skills to
+        play. Returns the collection's initial explorations if the user has yet
+        to complete any explorations within the collection.
     """
     completed_exploration_ids = get_completed_exploration_ids(
         user_id, collection_id)
@@ -484,7 +461,8 @@ def get_collection_summaries_matching_ids(collection_ids):
         collection_ids: A list of collection ids.
 
     Returns:
-        A list with the corresponding summary domain objects.
+        list(CollectionSummary). A list with the corresponding summary domain
+        objects.
     """
     return [
         (get_collection_summary_from_model(model) if model else None)
@@ -503,11 +481,11 @@ def get_collection_ids_matching_query(query_string, cursor=None):
         query_string: str. The search query string.
 
     Returns:
-        A list with all collection ids matching the given search query string,
-        as well as a search cursor for future fetches. This method returns
-        exactly feconf.SEARCH_RESULTS_PAGE_SIZE results if there are at least
-        that many, otherwise it returns all remaining results. (If this
-        behaviour does not occur, an error will be logged.)
+        list(str). A list with all collection ids matching the given search
+        query string, as well as a search cursor for future fetches.
+        The list contains exactly feconf.SEARCH_RESULTS_PAGE_SIZE results
+        if there are at least that many, otherwise it contains all remaining
+        results. (If this behaviour does not occur, an error will be logged.)
     """
     returned_collection_ids = []
     search_cursor = cursor
@@ -550,8 +528,9 @@ def apply_change_list(collection_id, change_list):
 
     Args:
         collection_id: str. ID of the given collection.
-        change_list: A change list to be applied to the given collection. Each
-            entry in change_list is a dict that represents an CollectionChange.
+        change_list: list(dict). A change list to be applied to the given
+            collection. Each entry in change_list is a dict that represents an
+            CollectionChange.
     object.
 
     Returns:
@@ -619,8 +598,8 @@ def validate_exps_in_collection_are_public(collection):
         collection: Collection. Collection to be validated.
 
     Raises:
-        ValidationError: A private exploration is referenced within a public
-            collection.
+        ValidationError: The collection contains at least one private
+            exploration.
     """
     for exploration_id in collection.exploration_ids:
         if rights_manager.is_exploration_private(exploration_id):
@@ -630,7 +609,7 @@ def validate_exps_in_collection_are_public(collection):
 
 
 def _save_collection(committer_id, collection, commit_message, change_list):
-    """Validates an collection and commits it to persistent storage. If
+    """Validates a collection and commits it to persistent storage. If
     successful, increments the version number of the incoming collection domain
     object by 1.
 
@@ -638,14 +617,14 @@ def _save_collection(committer_id, collection, commit_message, change_list):
         committer_id: str. ID of the given committer.
         collection: Collection. The collection domain object to be saved.
         commit_message: str. The commit message.
-        change_list: List of changes applied to a collection. Each
-            entry in change_list is a dict that represents an CollectionChange.
+        change_list: list(dict). List of changes applied to a collection. Each
+            entry in change_list is a dict that represents a CollectionChange.
 
     Raises:
         ValidationError: An invalid exploration was referenced in the
             collection.
         Exception: The collection model and the incoming collection domain
-            object are of different versions.
+            object have different version numbers.
     """
     if not change_list:
         raise Exception(
@@ -723,7 +702,8 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
         committer_id: str. id of the committer.
         collection: Collection. collection domain object.
         commit_message: str. A description of changes made to the collection.
-        commit_cmds: a list of change commands made to the given collection.
+        commit_cmds: list(dict). A list of change commands made to the given
+            collection.
     """
     # This line is needed because otherwise a rights object will be created,
     # but the creation of an collection object will fail.
@@ -847,7 +827,7 @@ def publish_collection_and_update_user_profiles(committer_id, col_id):
 
 def update_collection(
         committer_id, collection_id, change_list, commit_message):
-    """Update an collection. Commits changes.
+    """Updates a collection. Commits changes.
 
     Args:
     - committer_id: str. The id of the user who is performing the update
@@ -877,7 +857,7 @@ def update_collection(
 
 
 def create_collection_summary(collection_id, contributor_id_to_add):
-    """Create summary of a collection and store in datastore.
+    """Creates and stores a summary of the given collection.
 
     Args:
         collection_id: str. ID of the collection.
@@ -911,7 +891,7 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
             collection summary.
 
     Returns:
-        A CollectionSummary domain object for a given Collection domain object.
+        CollectionSummary. The computed summary for the given collection.
     """
     collection_rights = collection_models.CollectionRightsModel.get_by_id(
         collection.id)
@@ -1032,7 +1012,7 @@ def delete_collection_summary(collection_id):
 
     Args:
         collection_id: str. ID of the collection whose collection summary is to
-            deleted.
+            be deleted.
     """
 
     collection_models.CollectionSummaryModel.get(collection_id).delete()
@@ -1044,7 +1024,7 @@ def save_new_collection_from_yaml(committer_id, yaml_content, collection_id):
     Args:
         committer_id: str. ID of the committer.
         yaml_content: str. The yaml content string specifying a collection.
-        collection_id: str. Collection ID of the saved collection.
+        collection_id: str. ID of the saved collection.
     """
     collection = collection_domain.Collection.from_yaml(
         collection_id, yaml_content)
@@ -1129,9 +1109,10 @@ def get_next_page_of_all_commits(
     """Returns a page of commits to all collections in reverse time order.
 
     Args:
-        page_size: int. Size of the page of commits to be returned.
-        urlsafe_start_cursor: Cursor pointing to the first page of commits.
-
+        page_size: int. Number of pages of commits to be returned.
+        urlsafe_start_cursor: str or None. If provided, the list of returned
+            commits starts from this datastore cursor. Otherwise, the returned
+            commits start from the beginning of the full list of commits.
     Returns:
         The return value is a triple (results, cursor, more) as described in
         fetch_page() at:
@@ -1156,11 +1137,12 @@ def get_next_page_of_all_non_private_commits(
     order.
 
     Args:
-        page_size: int. Size of the page of commits to be returned.
-        urlsafe_start_cursor: Cursor pointing to the first page of non-private
-            commits.
+        page_size: int. Number of pages of commits to be returned.
+        urlsafe_start_cursor: str or None. If provided, the list of returned
+            commits starts from this datastore cursor. Otherwise, the returned
+            commits start from the beginning of the full list of commits.
         max_age: The maximum age of a non-private commit to be included in the
-        return page. It should be a datetime.timedelta instance.
+            return page. It should be a datetime.timedelta instance.
 
     Returns:
         The return value is a triple (results, cursor, more) as described in
@@ -1184,10 +1166,11 @@ def get_next_page_of_all_non_private_commits(
 
 
 def _collection_rights_to_search_dict(rights):
-    """Allow searches like "is:featured".
+    """Returns a search dict with information about the collection rights. This
+    allows searches like "is:featured".
 
     Args:
-        rights: Collection rights of a collection
+        rights: ActivityRights. Collection rights of a collection.
     """
 
     doc = {}
@@ -1200,8 +1183,7 @@ def _should_index(collection):
     """Checks if a particular collection should be indexed.
 
     Args:
-        collection: Collection. The collection domain object to be checked if
-        it should be indexed.
+        collection: Collection.
     """
     rights = rights_manager.get_collection_rights(collection.id)
     return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
@@ -1209,8 +1191,9 @@ def _should_index(collection):
 
 def _get_search_rank(collection_id):
     """Gets the search rank of a given collection.
+
     Args:
-        collection_id: str. ID of the collection whose rank is to be retrieved
+        collection_id: str. ID of the collection whose rank is to be retrieved.
 
     Returns:
         int. An integer determining the document's rank in search.
@@ -1232,10 +1215,10 @@ def _collection_to_search_dict(collection):
     """Converts a collection domain object to a search dict.
 
     Args:
-        collection: Collection. the collection domain object to be converted
+        collection: Collection. The collection domain object to be converted
 
     Returns:
-        The search dict of the collection domain object
+        The search dict of the collection domain object.
     """
     rights = rights_manager.get_collection_rights(collection.id)
     doc = {
@@ -1261,10 +1244,10 @@ def clear_search_index():
 
 
 def index_collections_given_ids(collection_ids):
-    """Indexes collections of given collection_ids.
+    """Adds the given collections to the search index.
 
     Args:
-        collection_ids: List of collection ids whose collections are
+        collection_ids: list(str). List of collection ids whose collections are
             to be indexed.
     """
     # We pass 'strict=False' so as not to index deleted collections.
@@ -1282,10 +1265,8 @@ def patch_collection_search_document(collection_id, update):
     from the 'update' dictionary.
 
     Args:
-        collection_id: str. Collection ID of the collection whose collection
-            is to be patched.
-        update: dictionary whose values of the same key are to replace the
-            current search document.
+        collection_id: str. ID of the collection to be patched.
+        update: dict. Key-value pairs to patch the current search document with.
     """
     doc = search_services.get_document_from_index(
         collection_id, SEARCH_INDEX_COLLECTIONS)
@@ -1294,11 +1275,10 @@ def patch_collection_search_document(collection_id, update):
 
 
 def update_collection_status_in_search(collection_id):
-    """Updates the collection status of a collection in the search index.
+    """Updates the status field of a collection in the search index.
 
     Args:
-        collection_id: str. ID of the collection whose collection status is
-            to be updated.
+        collection_id: str. ID of the collection.
     """
     rights = rights_manager.get_collection_rights(collection_id)
     if rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
@@ -1309,11 +1289,11 @@ def update_collection_status_in_search(collection_id):
 
 
 def delete_documents_from_search_index(collection_ids):
-    """Removes collections of given collection_ids from the search index
+    """Removes the given collections from the search index.
 
     Args:
-        collection_ids: List of IDs of the collections to be removed from the
-            search index
+        collection_ids: list(str). List of IDs of the collections to be removed
+            from the search index.
     """
     search_services.delete_documents_from_index(
         collection_ids, SEARCH_INDEX_COLLECTIONS)
@@ -1322,24 +1302,25 @@ def delete_documents_from_search_index(collection_ids):
 def search_collections(query, limit, sort=None, cursor=None):
     """Searches through the available collections.
 
-    args:
-      - query_string: str. the query string to search for.
-      - sort: str. This indicates how to sort results. This should be a string
-          of space separated values. Each value should start with a '+' or a
-          '-' character indicating whether to sort in ascending or descending
-          order respectively. This character should be followed by a field name
-          to sort on. When this is None, results are based on 'rank'. See
-          _get_search_rank to see how rank is determined.
-      - limit: int. the maximum number of results to return.
-      - cursor: A cursor, used to get the next page of results.
-          If there are more documents that match the query than 'limit', this
-          function will return a cursor to get the next page.
+    Args:
+        query_string: str. the query string to search for.
+        sort: str. This indicates how to sort results. This should be a string
+            of space separated values. Each value should start with a '+' or a
+            '-' character indicating whether to sort in ascending or descending
+            order respectively. This character should be followed by a field
+            name to sort on. When this is None, results are based on 'rank'. See
+            _get_search_rank to see how rank is determined.
+        limit: int. the maximum number of results to return.
+        cursor: A cursor, used to get the next page of results.
+            If there are more documents that match the query than 'limit', this
+            function will return a cursor to get the next page.
 
-    returns: a tuple:
-      - a list of collection ids that match the query.
-      - a cursor if there are more matching collections to fetch, None
-          otherwise. If a cursor is returned, it will be a web-safe string that
-          can be used in URLs.
+    Returns:
+        A tuple:
+            - A list of collection ids that match the query.
+            - A cursor if there are more matching collections to fetch, None
+              otherwise. If a cursor is returned, it will be a web-safe string
+              that can be used in URLs.
     """
     return search_services.search(
         query, SEARCH_INDEX_COLLECTIONS, cursor, limit, sort, ids_only=True)

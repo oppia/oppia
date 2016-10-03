@@ -107,7 +107,7 @@ def get_learner_collection_dict_by_id(
     if user_id:
         completed_exp_ids = (
             collection_services.get_valid_completed_exploration_ids(
-                user_id, collection_id, collection))
+                user_id, collection))
         next_exploration_ids = collection.get_next_exploration_ids(
             completed_exp_ids)
     else:
