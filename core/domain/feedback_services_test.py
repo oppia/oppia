@@ -246,6 +246,18 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             0)
         self.process_and_flush_pending_tasks()
 
+    def test_get_threads_single_exploration(self):
+        threads = feedback_services.get_threads(self.EXP_ID_1)
+        self.assertEqual(len(threads), 0)
+        feedback_services.create_thread(
+            self.EXP_ID_1, self.EXPECTED_THREAD_DICT['state_name'], None,
+            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
+
+        threads = feedback_services.get_threads(self.EXP_ID_1)
+        self.assertEqual(1, len(threads))
+        self.assertDictContainsSubset(self.EXPECTED_THREAD_DICT,
+                                      threads[0].to_dict())
+
     def test_get_all_threads(self):
         # Create an anonymous feedback thread
         feedback_services.create_thread(

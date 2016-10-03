@@ -102,7 +102,7 @@ def classify_string_classifier_rule(state, normalized_answer):
                 for doc in classifier_rule_spec.inputs['training_data']])
     if len(training_examples) > 0:
         sc.load_examples(training_examples)
-        doc_ids = sc.add_examples_for_predicting([normalized_answer])
+        doc_ids = sc.add_docs_for_predicting([normalized_answer])
         predicted_label = sc.predict_label_for_doc(doc_ids[0])
         if (predicted_label !=
                 classifier_services.StringClassifier.DEFAULT_LABEL):
