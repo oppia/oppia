@@ -25,10 +25,17 @@ var player = require('../protractor_utils/player.js');
 
 describe('Embedding', function() {
   it('should display and play embedded explorations', function() {
-    var TEST_PAGES = [
-      'embedding_tests_dev_0.0.1.min.html',
-      'embedding_tests_jsdelivr_0.0.1.min.html',
-      'embedding_tests_dev_0.0.2.min.html'];
+    var TEST_PAGES = [{
+      filename: 'embedding_tests_dev_0.0.1.min.html',
+      isVersion1: true
+    }, {
+      filename: 'embedding_tests_jsdelivr_0.0.1.min.html',
+      isVersion1: true
+    }, {
+      filename: 'embedding_tests_dev_0.0.2.min.html',
+      isVersion1: false
+    }];
+
     // The length of time the page waits before confirming an exploration
     // cannot be loaded.
     var LOADING_TIMEOUT = 10000;
@@ -73,44 +80,52 @@ describe('Embedding', function() {
       // for the same reason.
       var driver = browser.driver;
       driver.get(
-        general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE + TEST_PAGES[i]);
+        general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE +
+        TEST_PAGES[i].filename);
 
-      // Test of standard loading (new version)
+      // Test of standard loading (new and old versions)
       browser.switchTo().frame(
         driver.findElement(
           by.xpath("//div[@class='protractor-test-standard']/iframe")));
       playCountingExploration(2);
       browser.switchTo().defaultContent();
 
-      // Test of deferred loading (old version)
-      driver.findElement(
-        by.xpath(
-          "//div[@class='protractor-test-deferred']/oppia/div/button")).click();
+      if (TEST_PAGES[i].isVersion1) {
+        // Test of deferred loading (old version)
+        driver.findElement(
+          by.xpath(
+            "//div[@class='protractor-test-old-version']/oppia/div/button")
+        ).click();
+      }
+
       browser.switchTo().frame(
         driver.findElement(
-          by.xpath("//div[@class='protractor-test-deferred']/iframe")));
+          by.xpath("//div[@class='protractor-test-old-version']/iframe")));
       playCountingExploration(1);
       browser.switchTo().defaultContent();
 
-      // Tests of failed loading
-      var missingIdElement = driver.findElement(
-        by.xpath("//div[@class='protractor-test-missing-id']/div/span"));
-      expect(missingIdElement.getText()).toMatch(
-        'This Oppia exploration could not be loaded because no oppia-id ' +
-        'attribute was specified in the HTML tag.');
-      driver.findElement(
-        by.xpath(
-          "//div[@class='protractor-test-invalid-id-deferred']/oppia/div/button"
-        )).click();
-      browser.sleep(LOADING_TIMEOUT);
-      expect(
+      if (TEST_PAGES[i].isVersion1) {
+        // Tests of failed loading (old version)
+        var missingIdElement = driver.findElement(
+          by.xpath("//div[@class='protractor-test-missing-id']/div/span"));
+        expect(missingIdElement.getText()).toMatch(
+          'This Oppia exploration could not be loaded because no oppia-id ' +
+          'attribute was specified in the HTML tag.');
+        var buttonXPath = '/oppia/div/button';
         driver.findElement(
-          by.xpath("//div[@class='protractor-test-invalid-id']/div/div/span")
-        ).getText()).toMatch('This exploration could not be loaded.');
-      expect(
-        driver.findElement(
-          by.xpath("//div[@class='protractor-test-invalid-id']/div/div/span")
-        ).getText()).toMatch('This exploration could not be loaded.');
+          by.xpath(
+            "//div[@class='protractor-test-invalid-id-deferred']" + buttonXPath
+          )).click();
+        browser.sleep(LOADING_TIMEOUT);
+        expect(
+          driver.findElement(
+            by.xpath("//div[@class='protractor-test-invalid-id']/div/div/span")
+          ).getText()).toMatch('This exploration could not be loaded.');
+        expect(
+          driver.findElement(
+            by.xpath("//div[@class='protractor-test-invalid-id']/div/div/span")
+          ).getText()).toMatch('This exploration could not be loaded.');
+      }
     }
 
     // Certain events in the exploration playthroughs should trigger hook
@@ -133,8 +148,23 @@ describe('Embedding', function() {
 
       // We played the exploration twice for each test page.
       var expectedLogs = [];
-      for (var i = 0; i < TEST_PAGES.length * 2; i++) {
-        expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS);
+      for (var i = 0; i < TEST_PAGES.length; i++) {
+        if (TEST_PAGES[i].isVersion1) {
+          expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS);
+          expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS);
+        } else {
+          // The two loading events are fired first ...
+          expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[0]);
+          expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[0]);
+          // ... followed by the rest of the events, as each playthrough
+          // occurs.
+          expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[1]);
+          expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[2]);
+          expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[3]);
+          expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[1]);
+          expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[2]);
+          expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[3]);
+        }
       }
       expect(embeddingLogs).toEqual(expectedLogs);
     });
