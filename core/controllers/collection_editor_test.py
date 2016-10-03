@@ -137,14 +137,20 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
 
     def test_editable_collection_handler_put_cannot_access(self):
         """Check that non-editors cannot access editable put handler"""
-        whitelisted_usernames = [self.EDITOR_USERNAME]
+        whitelisted_usernames = [self.EDITOR_USERNAME, self.VIEWER_USERNAME]
         self.set_config_property(
             config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES,
             whitelisted_usernames)
 
-        # Check that Non_whitelisted users cannot access the put method
-        # from the editable_collection_data_handler.
-        self.login(self.OWNER_EMAIL)
+        # Assign viewer role to collection.
+        rights_manager.create_new_collection_rights(
+            self.COLLECTION_ID, self.owner_id)
+        rights_manager.assign_role_for_collection(
+            self.admin_id, self.COLLECTION_ID, self.viewer_id,
+            rights_manager.ROLE_VIEWER)
+        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+
+        self.login(self.VIEWER_EMAIL)
 
         # Call get handler to return the csrf token.
         response = self.testapp.get(
@@ -152,6 +158,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
                        self.COLLECTION_ID))
         csrf_token = self.get_csrf_token_from_response(response)
 
+        # Ensure viewers do not have access to the PUT Handler.
         json_response = self.put_json(
             '%s/%s' % (feconf.EDITABLE_COLLECTION_DATA_URL_PREFIX,
                        self.COLLECTION_ID),
@@ -159,16 +166,22 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
             csrf_token=csrf_token, expected_status_int=401)
 
         self.assertEqual(json_response['code'], 401)
+        self.logout()
 
     def test_editable_collection_handler_put_can_access(self):
-        """Check that editors can access editable put handler"""
-        whitelisted_usernames = [self.EDITOR_USERNAME]
+        """Check that editors can access put handler"""
+        whitelisted_usernames = [self.EDITOR_USERNAME, self.VIEWER_USERNAME]
         self.set_config_property(
             config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES,
             whitelisted_usernames)
 
-        # Check that Non_whitelisted users cannot access the put method
-        # from the editable_collection_data_handler.
+        rights_manager.create_new_collection_rights(
+            self.COLLECTION_ID, self.owner_id)
+        rights_manager.assign_role_for_collection(
+            self.admin_id, self.COLLECTION_ID, self.editor_id,
+            rights_manager.ROLE_EDITOR)
+        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+
         self.login(self.EDITOR_EMAIL)
 
         # Call get handler to return the csrf token.

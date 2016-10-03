@@ -179,7 +179,7 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
             summary_services.get_learner_collection_dict_by_id(
                 collection_id, self.user_id, allow_invalid_explorations=True))
 
-        # Return updated collection.
+        # Send the updated collection back to the frontend.
         self.values.update({
             'collection': collection_dict
         })
