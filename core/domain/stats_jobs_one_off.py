@@ -969,9 +969,17 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 r'\[(?P<x>-?\d+\.?\d*), (?P<y>-?\d+\.?\d*)\]')
             match = pattern.match(answer_str)
             if not match:
-                return (
-                    None, 'Bad answer string in InteractiveMap %s rule.' % (
-                        rule_spec.rule_type))
+                # Prior to #d60ccb on 16 March 2014, the answers were stored as
+                # strings based on how they were represented in the frontend, as
+                # this commit predates the creation of schema_utils. The pattern
+                # is different than the other two cases.
+                pattern = re.compile(
+                    r'(?P<x>-?\d+\.?\d*),(?P<y>-?\d+\.?\d*)')
+                match = pattern.match(answer_str)
+                if not match:
+                    return (
+                        None, 'Bad answer string in InteractiveMap %s rule.' % (
+                            rule_spec.rule_type))
         coord_two_dim_list = [
             float(match.group('x')), float(match.group('y'))
         ]

@@ -1457,7 +1457,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
     def test_answer_submitted_before_reused_exp_id_should_be_ignored(self):
         """This is testing for when an answer is submitted to an exploration,
         the exploration is permanently deleted, then a new exploration is added
-        with the exact same ID.
+        with the exact same ID. This test is meant to fix a problem theorized to
+        plague answers observed in production.
         """
         state_name = feconf.DEFAULT_INIT_STATE_NAME
 
@@ -1668,6 +1669,46 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'Within(100.0,[19.228176737766262, -99.13993835449219])')
         html_answer = '%s' % (
             objects.CoordTwoDim.normalize([18.979026, -99.316406]))
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
+
+        # The answer should have been properly migrated to the new storage
+        # model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': [18.979026, -99.316406],
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 2,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'InteractiveMap',
+            'params': {},
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+        self._verify_no_migration_validation_problems()
+
+    def test_migrate_interactive_map_with_much_old_answer_html_formatting(self):
+        """Similar
+        to test_migrate_interactive_map_with_old_answer_html_formatting, except
+        in this case schema_utils was yet to be created, so answers were stored
+        based on how they were represented in the frontend interaction
+        implementation. This happened prior to commit #d60ccb. This test is
+        based on an exploration found in production.
+        """
+        state_name = 'World Map'
+
+        rule_spec_str = (
+            'Within(100.0,[19.228176737766262, -99.13993835449219])')
+        html_answer = '18.979026,-99.316406'
         self._record_old_answer(state_name, rule_spec_str, html_answer)
 
         # There should be no answers in the new data storage model.
