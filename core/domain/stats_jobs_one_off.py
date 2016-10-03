@@ -498,6 +498,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     """
     _ERROR_KEY = 'Answer Migration ERROR'
     _ALREADY_MIGRATED_KEY = 'Answer ALREADY MIGRATED'
+    _TEMPORARY_SPECIAL_RULE_PARAMETER = '__answermigrationjobparamindicator'
 
     _DEFAULT_RULESPEC_STR = 'Default'
 
@@ -596,13 +597,55 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             return None
 
     @classmethod
+    def _force_rule_spec_subjects_to_answer(cls, exp_model):
+        for state_dict in exp_model.states.values():
+            # Only MultipleChoiceInput interactions with non-answer subjects are
+            # supported for migration.
+            if state_dict['interaction']['id'] != 'MultipleChoiceInput':
+                continue
+            for handler_dict in state_dict['interaction']['handlers']:
+                for rule_spec_dict in handler_dict['rule_specs']:
+                    definition_dict = rule_spec_dict['definition']
+                    param_changes = (
+                        rule_spec_dict['param_changes']
+                        if 'param_changes' in rule_spec_dict else [])
+                    if (AnswerMigrationJob._TEMPORARY_SPECIAL_RULE_PARAMETER in
+                            param_changes):
+                        continue
+                    if ('subject' in definition_dict and
+                            definition_dict['subject'] != 'answer'):
+                        # RandomSelector is used as the generator because one
+                        # must be provided. param_changes is used to provide the
+                        # old subject to a later part of the migration job.
+                        param_changes.append({
+                            'name': (
+                                AnswerMigrationJob._TEMPORARY_SPECIAL_RULE_PARAMETER),
+                            'generator_id': 'RandomSelector',
+                            'customization_args': {
+                                'subject': definition_dict['subject']
+                            }
+                        })
+                        definition_dict['subject'] = 'answer'
+
+    @classmethod
     def _get_explorations_from_models(cls, exp_models_by_versions):
         try:
             return (list([
                 exp_services.get_exploration_from_model(exp_model)
                 for exp_model in exp_models_by_versions
             ]), False)
-        except utils.ExplorationConversionError:
+        except utils.ExplorationConversionError as error:
+            if 'Error: Can only convert rules with an \'answer\'' in str(error):
+                # Try to fix a failed migration due to a non-answer subject.
+                for exp_model in exp_models_by_versions:
+                    cls._force_rule_spec_subjects_to_answer(exp_model)
+                try:
+                    return (list([
+                        exp_services.get_exploration_from_model(exp_model)
+                        for exp_model in exp_models_by_versions
+                    ]), False)
+                except utils.ExplorationConversionError as error:
+                    return (None, True)
             return (None, True)
 
     @classmethod
@@ -781,7 +824,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _cb_reconstitute_code_evaluation(
-            cls, interaction, rule_spec, rule_str, answer_str):
+            cls, state, answer_group_index, rule_spec, rule_str, answer_str):
         # The Jinja representation for CodeEvaluation answer strings is:
         #   {{answer.code}}
 
@@ -829,7 +872,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _cb_reconstitute_continue(
-            cls, interaction, rule_spec, rule_str, answer_str):
+            cls, state, answer_group_index, rule_spec, rule_str, answer_str):
         # The Jinja representation for CodeEvaluation answer strings is blank.
         if not rule_spec and not answer_str and (
                 rule_str == cls._DEFAULT_RULESPEC_STR):
@@ -842,14 +885,14 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _cb_reconstitute_end_exploration(
-            cls, interaction, rule_spec, rule_str, answer_str):
+            cls, state, answer_group_index, rule_spec, rule_str, answer_str):
         return (
             None,
             'There should be no answers submitted for the end exploration.')
 
     @classmethod
     def _cb_reconstitute_graph_input(
-            cls, interaction, rule_spec, rule_str, answer_str):
+            cls, state, answer_group_index, rule_spec, rule_str, answer_str):
         # pylint: disable=line-too-long
         # The Jinja representation for Graph answer strings is:
         #   ({% for vertex in answer.vertices -%}
@@ -871,8 +914,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             rule_str, answer_str))
 
     @classmethod
-    def _cb_reconstitute_image_click_input(cls, interaction, rule_spec,
-                                           rule_str, answer_str):
+    def _cb_reconstitute_image_click_input(
+            cls, state, answer_group_index, rule_spec, rule_str, answer_str):
         # pylint: disable=line-too-long
         # The Jinja representation for ClickOnImage answer strings is:
         #   ({{'%0.3f' | format(answer.clickPosition[0]|float)}}, {{'%0.3f'|format(answer.clickPosition[1]|float)}})
@@ -903,7 +946,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _cb_reconstitute_interactive_map(
-            cls, interaction, rule_spec, rule_str, answer_str):
+            cls, state, answer_group_index, rule_spec, rule_str, answer_str):
         # pylint: disable=line-too-long
         # The Jinja representation for CoordTwoDim answer strings is:
         #   ({{'%0.6f' | format(answer[0]|float)}}, {{'%0.6f'|format(answer[1]|float)}})
@@ -937,7 +980,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _cb_reconstitute_item_selection_input(
-            cls, interaction, rule_spec, rule_str, answer_str):
+            cls, state, answer_group_index, rule_spec, rule_str, answer_str):
         # The Jinja representation for SetOfHtmlString answer strings is:
         #   {{ answer }}
         supported_rule_types = [
@@ -958,7 +1001,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _cb_reconstitute_logic_proof(
-            cls, interaction, rule_spec, rule_str, answer_str):
+            cls, state, answer_group_index, rule_spec, rule_str, answer_str):
+        interaction = state.interaction
         if rule_spec.rule_type == 'Correct':
             # The Jinja representation of the answer is:
             #   {{answer.proof_string}}
@@ -1015,7 +1059,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _cb_reconstitute_math_expression_input(
-            cls, interaction, rule_spec, rule_str, answer_str):
+            cls, state, answer_group_index, rule_spec, rule_str, answer_str):
         if rule_spec.rule_type == 'IsMathematicallyEquivalentTo':
             math_expression_dict = eval(answer_str)
             if not isinstance(math_expression_dict, dict):
@@ -1032,26 +1076,47 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _cb_reconstitute_multiple_choice_input(
-            cls, interaction, rule_spec, rule_str, answer_str):
+            cls, state, answer_group_index, rule_spec, rule_str, answer_str):
         # The Jinja representation for NonnegativeInt answer strings is:
         #   {{ choices[answer|int] }}
+        interaction = state.interaction
         if rule_spec.rule_type == 'Equals':
-            # Extract the clicked index from the rule string.
-            clicked_index = int(rule_str[len(rule_spec.rule_type) + 1:-1])
             customization_args = interaction.customization_args
             choices = customization_args['choices']['value']
-            if clicked_index >= len(choices):
-                return (
-                    None,
-                    'Clicked index %d is out of bounds for corresponding '
-                    'choices in the exploration: %s (len=%d)' % (
-                        clicked_index, choices, len(choices)))
-            if answer_str != choices[clicked_index]:
-                return (
-                    None,
-                    'Clicked index %d and submitted answer \'%s\' does not '
-                    'match corresponding choice in the exploration: \'%s\'' % (
-                        clicked_index, answer_str, choices[clicked_index]))
+
+            outcome = interaction.answer_groups[answer_group_index].outcome
+            temporary_special_param = next(
+                (param_change for param_change in outcome.param_changes
+                if param_change.name == (
+                    AnswerMigrationJob._TEMPORARY_SPECIAL_RULE_PARAMETER)),
+                None)
+            # If the subject type is not an answer, then the index is extracted
+            # by matching the answer_str against possible choices in the
+            # interaction customization args. The index was not stored in the
+            # rule spec string.
+            if temporary_special_param:
+                if answer_str not in choices:
+                    return (
+                        None,
+                        'Answer \'%s\' was not found among the choices in the '
+                        'exploration: %s', answer_str, choices)
+                clicked_index = choices.index(answer_str)
+            else:
+                # Extract the clicked index from the rule string.
+                clicked_index = int(rule_str[len(rule_spec.rule_type) + 1:-1])
+                if clicked_index >= len(choices):
+                    return (
+                        None,
+                        'Clicked index %d is out of bounds for corresponding '
+                        'choices in the exploration: %s (len=%d)' % (
+                            clicked_index, choices, len(choices)))
+                if answer_str != choices[clicked_index]:
+                    return (
+                        None,
+                        'Clicked index %d and submitted answer \'%s\' does not '
+                        'match corresponding choice in the exploration: '
+                        '\'%s\'' % (
+                            clicked_index, answer_str, choices[clicked_index]))
             return cls._normalize_raw_answer_object(
                 objects.NonnegativeInt, clicked_index, answer_str)
         return (
@@ -1061,7 +1126,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _cb_reconstitute_music_notes_input(
-            cls, interaction, rule_spec, rule_str, answer_str):
+            cls, state, answer_group_index, rule_spec, rule_str, answer_str):
         # The format of serialized answers is based on the following Jinja:
         #   {% if (answer | length) == 0 -%}
         #     No answer given.
@@ -1107,7 +1172,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _cb_reconstitute_numeric_input(
-            cls, interaction, rule_spec, rule_str, answer_str):
+            cls, state, answer_group_index, rule_spec, rule_str, answer_str):
         supported_rule_types = [
             'Equals', 'IsLessThan', 'IsGreaterThan', 'IsLessThanOrEqualTo',
             'IsGreaterThanOrEqualTo', 'IsInclusivelyBetween',
@@ -1124,7 +1189,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _cb_reconstitute_pencil_code_editor(
-            cls, interaction, rule_spec, rule_str, answer_str):
+            cls, state, answer_group_index, rule_spec, rule_str, answer_str):
         if rule_spec.rule_type == 'OutputEquals':
             # Luckily, Pencil Code answers stored the actual dict rather than
             # just the code; it's easier to reconstitute.
@@ -1140,7 +1205,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _cb_reconstitute_set_input(
-            cls, interaction, rule_spec, rule_str, answer_str):
+            cls, state, answer_group_index, rule_spec, rule_str, answer_str):
         supported_rule_types = [
             'Equals', 'IsSubsetOf', 'IsSupersetOf', 'HasElementsIn',
             'HasElementsNotIn', 'OmitsElementsIn', 'IsDisjointFrom'
@@ -1159,7 +1224,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _cb_reconstitute_text_input(
-            cls, interaction, rule_spec, rule_str, answer_str):
+            cls, state, answer_group_index, rule_spec, rule_str, answer_str):
         supported_rule_types = [
             'Equals', 'CaseSensitiveEquals', 'StartsWith', 'Contains',
             'FuzzyEquals'
@@ -1174,7 +1239,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _reconstitute_answer_object(
-            cls, state, rule_spec, rule_str, answer_str):
+            cls, state, answer_group_index, rule_spec, rule_str, answer_str):
         interaction_id = state.interaction.id
         if interaction_id in cls._RECONSTITUTION_FUNCTION_MAP:
             # Check for default outcome.
@@ -1185,7 +1250,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             reconstitute = getattr(
                 cls, cls._RECONSTITUTION_FUNCTION_MAP[interaction_id])
             return reconstitute(
-                state.interaction, rule_spec, rule_str, answer_str)
+                state, answer_group_index, rule_spec, rule_str, answer_str)
         return (
             None,
             'Cannot reconstitute unsupported interaction ID: %s' %
@@ -1492,7 +1557,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
         # Params were, unfortunately, never stored. They cannot be trivially
         # recovered.
-        params = []
+        params = {}
 
         # These are values which cannot be reconstituted; use special sentinel
         # values for them, instead.
@@ -1536,9 +1601,27 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             # Major point of failure is if answer returns None; the error
             # variable will contain why the reconstitution failed.
             (answer, error) = AnswerMigrationJob._reconstitute_answer_object(
-                state, rule_spec, rule_str, answer_str)
+                state, answer_group_index, rule_spec, rule_str, answer_str)
             if error:
                 return (None, error)
+
+            if answer_group_index != len(answer_groups):
+                outcome = (
+                    state.interaction.answer_groups[answer_group_index].outcome)
+                temporary_special_param = next(
+                   (param_change for param_change in outcome.param_changes
+                    if param_change.name == (
+                        AnswerMigrationJob._TEMPORARY_SPECIAL_RULE_PARAMETER)),
+                    None)
+                # If this answer corresponds to a rule_spec with a non-answer
+                # subject type, then retain the value of that subject in the
+                # params part of the answer object.
+                if temporary_special_param:
+                    subject_name = (
+                        temporary_special_param.customization_args['subject'])
+                    subject_value = rule_str[len(rule_spec.rule_type) + 1:-1]
+                    params[subject_name] = subject_value
+
 
             return (stats_domain.SubmittedAnswer(
                 answer, state.interaction.id, answer_group_index,

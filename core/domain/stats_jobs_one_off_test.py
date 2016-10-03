@@ -21,6 +21,7 @@ import logging
 from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import rights_manager
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import stats_jobs_one_off
@@ -28,7 +29,8 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 from extensions.objects.models import objects
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+(stats_models,exp_models) = models.Registry.import_models([
+    models.NAMES.statistics, models.NAMES.exploration])
 
 
 # TODO(bhenning): Implement tests for multiple answers submitted to the same
@@ -141,7 +143,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'MusicNotesInput',
-            'params': [],
+            'params': {},
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
@@ -174,7 +176,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'TextInput',
-            'params': [],
+            'params': {},
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
@@ -220,7 +222,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': (
                 stats_domain.MIGRATED_STATE_ANSWER_MISSING_EXPLORATION_INTERACTION_ID), # pylint: disable=line-too-long
-            'params': [],
+            'params': {},
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
@@ -613,7 +615,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'NumericInput',
-            'params': [],
+            'params': {},
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
@@ -693,7 +695,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'Continue',
-            'params': [],
+            'params': {},
             'rule_spec_str': 'Default',
             'answer_str': ''
         }])
@@ -800,7 +802,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'classification_categorization': exp_domain.EXPLICIT_CLASSIFICATION,
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'TextInput',
-            'params': [],
+            'params': {},
             'rule_spec_str': rule_spec_str_text_input,
             'answer_str': html_answer_text_input
         }])
@@ -818,7 +820,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'Continue',
-            'params': [],
+            'params': {},
             'rule_spec_str': rule_spec_str_continue,
             'answer_str': html_answer_continue
         }])
@@ -946,7 +948,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'classification_categorization': exp_domain.EXPLICIT_CLASSIFICATION,
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'MultipleChoiceInput',
-            'params': [],
+            'params': {},
             'rule_spec_str': rule_spec_str0,
             'answer_str': html_answer0
         }])
@@ -963,7 +965,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'classification_categorization': exp_domain.EXPLICIT_CLASSIFICATION,
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'MultipleChoiceInput',
-            'params': [],
+            'params': {},
             'rule_spec_str': rule_spec_str1,
             'answer_str': html_answer1
         }])
@@ -1081,7 +1083,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'classification_categorization': exp_domain.EXPLICIT_CLASSIFICATION,
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'TextInput',
-            'params': [],
+            'params': {},
             'rule_spec_str': rule_spec_str0,
             'answer_str': html_answer0
         }, submitted_answer_list)
@@ -1093,13 +1095,251 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'classification_categorization': exp_domain.EXPLICIT_CLASSIFICATION,
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'TextInput',
-            'params': [],
+            'params': {},
             'rule_spec_str': rule_spec_str1,
             'answer_str': html_answer1
         }, submitted_answer_list)
         self.assertEqual(state_answers.exploration_id, 'exp_id0')
         self.assertEqual(state_answers.exploration_version, 4)
         self._verify_no_migration_validation_problems()
+
+    def test_answer_migration_with_exploration_that_cannot_be_migrated(self):
+        """Some explorations (like cities) cannot be migrated to the latest
+        schema version, so any answers submitted to them in the past cannot be
+        recovered since the explorations fail to load during answer migration.
+        This test is to verify answer migration job properly handles these
+        answers and still successfully migrates them.
+        """
+        # Based on test_utils.save_new_exp_with_states_schema_v0, create a new
+        # exploration (a subset of cities) with a non-answer subject and save it
+        # directly to the data store (to circumvent the exploration migration
+        # pipeline).
+        exp_id = 'eid0'
+        exp_model = exp_models.ExplorationModel(
+            id=exp_id,
+            category='category',
+            title='title',
+            objective='objective',
+            language_code='en',
+            tags=[],
+            blurb='',
+            author_notes='',
+            skin_customizations={'panels_contents': {}},
+            states_schema_version=0,
+            init_state_name='PickCity',
+            states={
+                'AbuDhabi': {
+                    'content': [{'type': 'text', 'value': 'Find {{CityName}}'}],
+                    'interaction': {
+                        'customization_args': {
+                            'latitude': { 'value': 0 },
+                            'longitude': { 'value': 0 },
+                            'zoom': { 'value': 3 }
+                        },
+                        'id': 'InteractiveMap',
+                        'handlers': [{
+                            'name': 'submit',
+                            'rule_specs': [{
+                                'dest': 'PickCity',
+                                'feedback': [
+                                    'Yes, that\'s where {{CityName}} is!'],
+                                'param_changes': [],
+                                'definition': {
+                                    'inputs': {
+                                      'd': 11.0,
+                                      'p': [24.467, 54.367]
+                                    },
+                                    'name': 'Within',
+                                    'rule_type': 'atomic',
+                                    'subject': 'answer'
+                                }
+                            }]
+                        }]
+                    },
+                    'param_changes': []
+                },
+                'PickCity': {
+                    'content': [{
+                        'type': 'text',
+                        'value': 'Let\s find {{CityName}}?'
+                    }],
+                    'interaction': {
+                        'customization_args': {
+                            'choices': {
+                                'value': [
+                                    'OK.',
+                                    'No, I want to try a different city.',
+                                    'Exit. I know enough cities.'
+                                ]
+                            }
+                        },
+                        'handlers': [{
+                            'name': 'submit',
+                            'rule_specs': [{
+                                'definition': {
+                                    'inputs': { 'x': 1 },
+                                    'name': 'Equals',
+                                    'rule_type': 'atomic',
+                                    'subject': 'answer'
+                                },
+                                'dest': 'PickCity',
+                                'feedback': ['Let us pick another city.'],
+                                'param_changes': []
+                            }, {
+                                'definition': {
+                                    'inputs': { 'x': 2 },
+                                    'name': 'Equals',
+                                    'rule_type': 'atomic',
+                                    'subject': 'answer'
+                                },
+                                'dest': 'END',
+                                'feedback': ['OK, bye.'],
+                                'param_changes': []
+                            }, {
+                                'definition': {
+                                    'inputs': { 'x': 'Abu Dhabi' },
+                                    'name': 'Equals',
+                                    'rule_type': 'atomic',
+                                    'subject': 'CityName'
+                                },
+                                'dest': 'AbuDhabi',
+                                'feedback': [],
+                                'param_changes': []
+                            }]
+                        }],
+                        'id': 'MultipleChoiceInput'
+                    },
+                    'param_changes': [{
+                        'customization_args': {
+                            'list_of_values': ['Abu Dhabi']
+                        },
+                        'generator_id': 'RandomSelector',
+                        'name': 'CityName'
+                    }]
+                }
+            },
+            param_specs={
+                'CityName': {
+                    'obj_type': 'UnicodeString'
+                }
+            },
+            param_changes=[]
+        )
+        rights_manager.create_new_exploration_rights(exp_id, self.owner_id)
+        exp_model.commit(self.owner_id, 'Create unmigratable exp', [{
+            'cmd': 'create_new',
+            'title': 'title',
+            'category': 'category',
+        }])
+
+        # Start off picking another city.
+        state_name = 'PickCity'
+        rule_spec_str = 'Equals(1)'
+        html_answer = 'No, I want to try a different city.'
+        self._record_old_answer(
+            state_name, rule_spec_str, html_answer, exploration_id=exp_id)
+
+        # Select Abu Dhabi.
+        rule_spec_str = 'Equals(Abu Dhabi)'
+        html_answer = 'OK.'
+        self._record_old_answer(
+            state_name, rule_spec_str, html_answer, exploration_id=exp_id)
+
+        # Send the right location.
+        state_name = 'AbuDhabi'
+        rule_spec_str = 'Within(11.0,[24.467, 54.367])'
+        html_answer = '(27.28934, 50.99873)'
+        self._record_old_answer(
+            state_name, rule_spec_str, html_answer, exploration_id=exp_id)
+
+        # Select to exit the exploration.
+        state_name = 'PickCity'
+        rule_spec_str = 'Equals(2)'
+        html_answer = 'Exit. I know enough cities.'
+        self._record_old_answer(
+            state_name, rule_spec_str, html_answer, exploration_id=exp_id)
+
+        # There should be no answers in the new data storage model.
+        self.assertIsNone(self._get_state_answers(
+            'PickCity', exploration_id=exp_id))
+        self.assertIsNone(self._get_state_answers(
+            'AbuDhabi', exploration_id=exp_id))
+
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
+
+        # The answers should have been properly migrated to the new storage
+        # model.
+        state_answers0 = self._get_state_answers(
+            'PickCity', exploration_id=exp_id)
+        state_answers1 = self._get_state_answers(
+            'AbuDhabi', exploration_id=exp_id)
+
+        # Verify the answer submitted to AbuDhabi.
+        self.assertEqual(state_answers1.get_submitted_answer_dict_list(), [{
+            'answer': [27.28934, 50.99873],
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'InteractiveMap',
+            'params': {},
+            'rule_spec_str': 'Within(11.0,[24.467, 54.367])',
+            'answer_str': '(27.28934, 50.99873)'
+        }])
+
+        # Verify the answers submitted to PickCity.
+        submitted_answers = state_answers0.get_submitted_answer_dict_list()
+        self.assertEqual(len(submitted_answers), 3)
+        self.assertIn({
+            'answer': 1,
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'MultipleChoiceInput',
+            'params': {},
+            'rule_spec_str': 'Equals(1)',
+            'answer_str': 'No, I want to try a different city.'
+        }, submitted_answers)
+        self.assertIn({
+            'answer': 2,
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 1,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'MultipleChoiceInput',
+            'params': {},
+            'rule_spec_str': 'Equals(2)',
+            'answer_str': 'Exit. I know enough cities.'
+        }, submitted_answers)
+
+        # This is the answer corresponding to a rule spec with a non-answer
+        # subject. The answer is changed in the migration to properly correspond
+        # to the multiple choice index. Between the answer and answer_str, it is
+        # indistinguishable from a standard MC submission. However, params is
+        # set here, since the parameter that was present when the answer was
+        # submitted is fully recoverable.
+        self.assertIn({
+            'answer': 0,
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 2,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'MultipleChoiceInput',
+            'params': { 'CityName': 'Abu Dhabi' },
+            'rule_spec_str': 'Equals(Abu Dhabi)',
+            'answer_str': 'OK.'
+        }, submitted_answers)
+
 
     def test_migrate_code_repl(self):
         state_name = 'Code Editor'
@@ -1132,7 +1372,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'CodeRepl',
-            'params': [],
+            'params': {},
             'rule_spec_str': rule_spec_str,
             'answer_str': code_answer
         }])
@@ -1161,7 +1401,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'Continue',
-            'params': [],
+            'params': {},
             'rule_spec_str': 'Default',
             'answer_str': ''
         }])
@@ -1196,7 +1436,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'ImageClickInput',
-            'params': [],
+            'params': {},
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
@@ -1229,7 +1469,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'InteractiveMap',
-            'params': [],
+            'params': {},
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
@@ -1267,7 +1507,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'InteractiveMap',
-            'params': [],
+            'params': {},
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
@@ -1301,7 +1541,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'ItemSelectionInput',
-            'params': [],
+            'params': {},
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
@@ -1338,7 +1578,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'LogicProof',
-            'params': [],
+            'params': {},
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
@@ -1375,7 +1615,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'MathExpressionInput',
-            'params': [],
+            'params': {},
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
@@ -1407,7 +1647,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'MultipleChoiceInput',
-            'params': [],
+            'params': {},
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
@@ -1447,7 +1687,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'MusicNotesInput',
-            'params': [],
+            'params': {},
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
@@ -1479,7 +1719,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'NumericInput',
-            'params': [],
+            'params': {},
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
@@ -1520,7 +1760,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'PencilCodeEditor',
-            'params': [],
+            'params': {},
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
@@ -1553,7 +1793,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'SetInput',
-            'params': [],
+            'params': {},
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
@@ -1586,7 +1826,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'SetInput',
-            'params': [],
+            'params': {},
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
@@ -1618,7 +1858,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'TextInput',
-            'params': [],
+            'params': {},
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
@@ -1654,7 +1894,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'TextInput',
-            'params': [],
+            'params': {},
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
