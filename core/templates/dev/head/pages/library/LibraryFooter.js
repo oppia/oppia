@@ -16,10 +16,6 @@
  * @fileoverview Data and controllers for the Oppia library footer.
  */
 
-// The constants defined below in LIBRARY_PAGE_MODES should be same as the
-// LIBRARY_PAGE_MODE constants defined in feconf.py and Library.js. For
-// example LIBRARY_PAGE_MODES.GROUP should have the same value as
-// LIBRARY_PAGE_MODE_GROUP in feconf.py.
 oppia.constant('LIBRARY_PAGE_MODES', {
   GROUP: 'group',
   INDEX: 'index',
@@ -27,8 +23,7 @@ oppia.constant('LIBRARY_PAGE_MODES', {
 });
 
 oppia.controller('LibraryFooter', [
-  '$scope', '$window', 'LIBRARY_PAGE_MODES', function(
-      $scope, $window, LIBRARY_PAGE_MODES) {
+  '$scope', 'LIBRARY_PAGE_MODES', function($scope, LIBRARY_PAGE_MODES) {
     $scope.pageMode = GLOBALS.PAGE_MODE;
     $scope.LIBRARY_PAGE_MODES = LIBRARY_PAGE_MODES;
   }

@@ -16,9 +16,9 @@
  * @fileoverview Data and controllers for the Oppia contributors' library page.
  */
 
-// The constants defined below in LIBRARY_PAGE_MODES should be same as the
-// LIBRARY_PAGE_MODE constants defined in feconf.py and LibraryFooter.js. For
-// example LIBRARY_PAGE_MODES.GROUP should have the same value as
+// NOTE TO DEVELOPERS: The constants defined below in LIBRARY_PAGE_MODES should
+// be same as the LIBRARY_PAGE_MODE constants defined in feconf.py. For example
+// LIBRARY_PAGE_MODES.GROUP should have the same value as
 // LIBRARY_PAGE_MODE_GROUP in feconf.py.
 oppia.constant('LIBRARY_PAGE_MODES', {
   GROUP: 'group',
@@ -52,10 +52,10 @@ oppia.controller('Library', [
     // Keeps track of the index of the left-most visible card of each group.
     $scope.leftmostCardIndices = [];
 
-    var pathnameArray = $window.location.pathname.split('/');
-    $scope.groupName = pathnameArray[2];
-
     if ($scope.pageMode === LIBRARY_PAGE_MODES.GROUP) {
+      var pathnameArray = $window.location.pathname.split('/');
+      $scope.groupName = pathnameArray[2];
+
       $http.get('/librarygrouphandler', {
         params: {
           group_name: $scope.groupName
@@ -64,7 +64,7 @@ oppia.controller('Library', [
       function(data) {
         $scope.activityList = data.activity_list;
 
-        $scope.groupHeader = data.header_i18n_id;
+        $scope.groupHeaderI18nId = data.header_i18n_id;
 
         $rootScope.$broadcast(
           'preferredLanguageCodesLoaded', data.preferred_language_codes);
@@ -72,8 +72,7 @@ oppia.controller('Library', [
         $rootScope.loadingMessage = '';
       });
     } else {
-      $http.get('/libraryindexhandler').success(
-      function(data) {
+      $http.get('/libraryindexhandler').success(function(data) {
         $scope.libraryGroups = data.activity_summary_dicts_by_category;
 
         $rootScope.$broadcast(
@@ -231,8 +230,9 @@ oppia.controller('Library', [
     };
 
     // The following loads explorations belonging to a particular group. If
-    // fullResultsUrl is given it loads the page corresponding to the url. If
-    // not given it will initiate a search query based on categories.
+    // fullResultsUrl is given it loads the page corresponding to the url.
+    // Otherwise, it will initiate a search query for the given list of
+    // categories.
     $scope.showFullResultsPage = function(categories, fullResultsUrl) {
       if (fullResultsUrl) {
         $window.location.href = fullResultsUrl;
