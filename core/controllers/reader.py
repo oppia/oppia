@@ -63,8 +63,10 @@ def require_playable(handler):
             return
 
         # This check is needed in order to show the correct page when a 404
-        # error is raised.
-        if feconf.EXPLORATION_URL_EMBED_PREFIX in self.request.uri:
+        # error is raised. The second part of the check is needed for backwards
+        # compatibility with older versions of the embedding script.
+        if (feconf.EXPLORATION_URL_EMBED_PREFIX in self.request.uri or
+                self.request.get('iframed')):
             self.values['iframed'] = True
 
         # Checks if the user for the current session is logged in.
