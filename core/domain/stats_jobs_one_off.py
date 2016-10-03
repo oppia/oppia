@@ -1389,11 +1389,14 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 rule_str, last_updated)
 
             for error in migration_errors:
-                yield (
-                    'Item ID: %s, last updated: %s, state name: %s, '
-                    'exp id: %s, error: %s' % (
-                        item_id, last_updated, state_name.encode('utf-8'),
-                        exploration_id, error))
+                if error.startswith('Expected failure'):
+                    yield error
+                else:
+                    yield (
+                        'Item ID: %s, last updated: %s, state name: %s, '
+                        'exp id: %s, error: %s' % (
+                            item_id, last_updated, state_name.encode('utf-8'),
+                            exploration_id, error))
 
     @classmethod
     def _migrate_answers(cls, item_id, explorations, exploration_id, state_name,
@@ -1430,6 +1433,18 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                         remaining_answers)
 
                 migrated_answer_count = migrated_answer_count + 1
+            elif error.startswith('Expected failure'):
+                # Expected failures are considered migrations. These are rare
+                # cases where it doesn't make sense to migrate the answer since
+                # there is no meaningful exploration or state to which the
+                # answer matches.
+                migrated_answer_count = migrated_answer_count + 1
+                yield '%s (answer freq: %d)' % (error, answer_frequency)
+
+                # Mark the answer as migrated so it does not fail post-migration
+                # validation.
+                stats_models.MigratedAnswerModel.finish_migrating_answer(
+                    item_id, exploration_id, -1, state_name)
             else:
                 yield error
 
@@ -1495,6 +1510,12 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             answer, error = cls._migrate_answer(
                 answer_str, rule_str, None, state_name)
             return (answer, None, error)
+
+        if last_updated < explorations[-1].created_on:
+            return (
+                None, None,
+                'Expected failure: Cannot match answer to an exploration which '
+                'was created after it was last submitted.')
 
         matched_answer = None
         first_error = None

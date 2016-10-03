@@ -32,6 +32,8 @@ from extensions.objects.models import objects
 (stats_models,exp_models) = models.Registry.import_models([
     models.NAMES.statistics, models.NAMES.exploration])
 
+import feconf
+
 
 # TODO(bhenning): Implement tests for multiple answers submitted to the same
 # rule. Implement tests for multiple identical rules being submitted. Test
@@ -1425,7 +1427,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
 
         # There should be no answers in the new data storage model.
         state_answers = self._get_state_answers(
-            state_name, exploration_id='exp_id0')
+            state_name, exploration_id='exp_id0', exploration_version=3)
         self.assertIsNone(state_answers)
 
         job_output = self._run_migration_job()
@@ -1450,6 +1452,75 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         }] * 2)
         self.assertEqual(state_answers.exploration_id, 'exp_id0')
         self.assertEqual(state_answers.exploration_version, 3)
+        self._verify_no_migration_validation_problems()
+
+    def test_answer_submitted_before_reused_exp_id_should_be_ignored(self):
+        """This is testing for when an answer is submitted to an exploration,
+        the exploration is permanently deleted, then a new exploration is added
+        with the exact same ID.
+        """
+        state_name = feconf.DEFAULT_INIT_STATE_NAME
+
+        rule_spec_str = 'Contains(ate)'
+        html_answer = 'appreciate'
+
+        # Create a valid exploration.
+        self.save_new_valid_exploration(
+            'exp_id0', self.owner_id, end_state_name='End')
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'TextInput'
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'Contains',
+                    'inputs': {
+                        'x': 'ate'
+                    }
+                }],
+                'outcome': {
+                    'dest': state_name,
+                    'feedback': [],
+                    'param_changes': []
+                }
+            }]
+        }], 'Create initial text input state')
+
+        # Record the answer to an exploration, then delete it since it will be
+        # replaced by another exploration of the same ID.
+        self._record_old_answer(
+            state_name, rule_spec_str, html_answer, exploration_id='exp_id0')
+        exp_services.delete_exploration(
+            self.owner_id, 'exp_id0', force_deletion=True)
+
+        # Create a new exploration with the same ID as the deleted one, but with
+        # states that don't match the previous answer.
+        self.save_new_valid_exploration(
+            'exp_id0', self.owner_id, end_state_name='End')
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0', exploration_version=2)
+        self.assertIsNone(state_answers)
+
+        # An answer should be lost since it's older than the current exploration
+        # of the matched ID.
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [
+            'Expected failure: Cannot match answer to an exploration which was '
+            'created after it was last submitted. (answer freq: 1)'])
+
+        # The answer should not be migrated to the new storage model.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0', exploration_version=2)
+        self.assertIsNone(state_answers)
+
         self._verify_no_migration_validation_problems()
 
     def test_migrate_code_repl(self):

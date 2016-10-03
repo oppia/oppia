@@ -866,6 +866,14 @@ class MigratedAnswerModel(base_models.BaseModel):
             raise utils.ValidationError(
                 'Answers not migrated: %s' % state_rule_answer_log_model.id)
         state_answer_models_list = []
+
+        # A version of -1 is a special sentinel value to silence the
+        # validation on this answer bucket. It typically represents an
+        # answer which cannot be migrated for a known reason. These answers
+        # should not be validated, since they were never migrated.
+        if migrated_answer_model.exploration_versions == [-1]:
+            return
+
         for exploration_version in migrated_answer_model.exploration_versions:
             state_answer_models = StateAnswersModel.get_all_models(
                 migrated_answer_model.exploration_id, exploration_version,
