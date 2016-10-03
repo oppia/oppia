@@ -665,6 +665,7 @@ def save_new_exploration(committer_id, exploration):
     }])
     user_services.add_created_exploration_id(committer_id, exploration.id)
     user_services.add_edited_exploration_id(committer_id, exploration.id)
+    user_services.record_user_created_an_exploration(committer_id)
 
 
 def delete_exploration(committer_id, exploration_id, force_deletion=False):
@@ -804,6 +805,7 @@ def update_exploration(
     # Update summary of changed exploration.
     update_exploration_summary(exploration.id, committer_id)
     user_services.add_edited_exploration_id(committer_id, exploration.id)
+    user_services.record_user_edited_an_exploration(committer_id)
 
     if not rights_manager.is_exploration_private(exploration.id):
         user_services.update_first_contribution_msec_if_not_set(
