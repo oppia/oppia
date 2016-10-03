@@ -163,10 +163,11 @@
     </div>
   </div>
 
-  {% include 'components/circular_image_directive.html' %}
-  {% include 'components/profile_link_image_directive.html' %}
-  {% include 'components/search_bar_directive.html' %}
-  {% include 'components/search_results_directive.html' %}
+  {% include 'components/profile_link/profile_link_image_directive.html' %}
+
+  {% include 'pages/library/activity_tiles_infinity_grid_directive.html' %}
+  {% include 'pages/library/search_bar_directive.html' %}
+  {% include 'pages/library/search_results_directive.html' %}
 {% endblock %}
 
 {% block footer %}
@@ -179,11 +180,12 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/CircularImageDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/ProfileLinkImageDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/SearchBarDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/SearchResultsDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/profile_link/ProfileLinkImageDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/library/Library.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/library/LibraryFooter.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/library/ActivityTilesInfinityGridDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/library/SearchBarDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/library/SearchResultsDirective.js"></script>
 {% endblock footer_js %}

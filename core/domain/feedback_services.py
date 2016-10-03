@@ -366,6 +366,31 @@ def _get_thread_from_model(thread_model):
         thread_model.created_on, thread_model.last_updated)
 
 
+def get_most_recent_messages(exp_id):
+    """Fetch the most recently updated feedback threads for a given exploration,
+    and then get the latest feedback message out of each thread.
+
+    Args:
+        exp_id: str.
+
+    Returns:
+       A list of FeedbackMessage.
+    """
+    thread_models = (
+        feedback_models.FeedbackThreadModel.get_threads(
+            exp_id, limit=feconf.OPEN_FEEDBACK_COUNT_DASHBOARD))
+
+    message_models = []
+    for thread_model in thread_models:
+        message_models.append(
+            feedback_models.FeedbackMessageModel.get_most_recent_message(
+                exp_id, thread_model.thread_id))
+
+    return [
+        _get_message_from_model(message_model)
+        for message_model in message_models]
+
+
 def get_threads(exploration_id):
     """Fetches all the threads for the given exploration id.
 
@@ -415,6 +440,7 @@ def get_open_threads(exploration_id, has_suggestion):
                 thread.status == feedback_models.STATUS_CHOICES_OPEN):
             open_threads.append(thread)
     return open_threads
+
 
 def get_closed_threads(exploration_id, has_suggestion):
     """Fetches all closed threads of the given exploration id.
