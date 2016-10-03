@@ -97,7 +97,7 @@ def classify_string_classifier_rule(state, normalized_answer):
                 for doc in classifier_rule_spec.inputs['training_data']])
     if len(training_examples) > 0:
         sc.load_examples(training_examples)
-        doc_ids = sc.add_examples_for_predicting([normalized_answer])
+        doc_ids = sc.add_docs_for_predicting([normalized_answer])
         predicted_label = sc.predict_label_for_doc(doc_ids[0])
         if (predicted_label !=
                 classifier_services.StringClassifier.DEFAULT_LABEL):
@@ -267,6 +267,8 @@ class ExplorationPage(base.BaseHandler):
 
 class ExplorationHandler(base.BaseHandler):
     """Provides the initial data for a single exploration."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self, exploration_id):
         """Populates the data on the individual exploration page."""
@@ -488,6 +490,8 @@ class RatingHandler(base.BaseHandler):
     exploration.
     """
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -519,6 +523,8 @@ class RecommendationsHandler(base.BaseHandler):
     If both are true, then the explorations are suggested from the collection,
     if there are upcoming explorations for the learner to complete.
     """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @require_playable
     def get(self, exploration_id):

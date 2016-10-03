@@ -41,12 +41,12 @@ oppia.directive('oppiaInteractiveCodeRepl', [
         // Make sure $scope.preCode ends with a newline:
         if ($scope.preCode.trim().length === 0) {
           $scope.preCode = '';
-        } else if (!$scope.preCode.endsWith('\n')) {
+        } else if (!$scope.preCode.slice(-1) === '\n') {
           $scope.preCode += '\n';
         }
 
         // Make sure $scope.placeholder ends with a newline.
-        if (!$scope.placeholder.endsWith('\n')) {
+        if (!$scope.placeholder.slice(-1) === '\n') {
           $scope.placeholder += '\n';
         }
 

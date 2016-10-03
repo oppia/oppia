@@ -33,8 +33,7 @@ oppia.controller('Library', [
       '/library/' + $scope.bannerImageFilename);
 
     // Below is the width of each tile (width + margins), which can be found
-    // in core/templates/dev/head/components/
-    //         exploration_summary_tile_directive.html
+    // in components/summary_tile/exploration_summary_tile_directive.html
     var tileDisplayWidth = 0;
 
     // Keeps track of the index of the left-most visible card of each group.

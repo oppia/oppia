@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends 'pages/base.html' %}
 
 {% block maintitle %}
   {{ collection_title }} - Oppia
@@ -92,7 +92,9 @@
     </div>
   </div>
 
-  {% include 'attribution_guide.html' %}
+  <attribution-guide></attribution-guide>
+
+  {% include 'components/attribution_guide/attribution_guide_directive.html' %}
   {% include 'pages/collection_player/collection_node_list_directive.html' %}
 {% endblock %}
 
@@ -106,4 +108,6 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionPlaythroughObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/SkillListObjectFactory.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/attribution_guide/AttributionGuideDirective.js"></script>
 {% endblock footer_js %}

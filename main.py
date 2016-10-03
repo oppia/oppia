@@ -176,6 +176,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.DASHBOARD_DATA_URL, dashboard.DashboardHandler),
     get_redirect_route(
+        r'%s/<exploration_id>' % feconf.DASHBOARD_EXPLORATION_STATS_PREFIX,
+        dashboard.ExplorationDashboardStatsHandler),
+    get_redirect_route(
         r'%s' % feconf.NEW_EXPLORATION_URL, dashboard.NewExploration),
     get_redirect_route(
         r'%s' % feconf.NEW_COLLECTION_URL, dashboard.NewCollection),

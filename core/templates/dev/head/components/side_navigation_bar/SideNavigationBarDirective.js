@@ -13,13 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for side nav.
+ * @fileoverview Directive for the side navigation bar.
  */
 
-oppia.controller('SideNav', [
-  '$scope', 'UrlInterpolationService',
-  function(
-      $scope, UrlInterpolationService) {
-    $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-  }
-]);
+oppia.directive('sideNavigationBar', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    templateUrl: 'components/sideNavigationBar',
+    controller: ['$scope', '$timeout', 'UrlInterpolationService', function(
+        $scope, $timeout, UrlInterpolationService) {
+      $scope.NAV_MODE = GLOBALS.NAV_MODE;
+      $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+    }]
+  };
+}]);

@@ -13,13 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the feedback tab of the collection editor.
+ * @fileoverview Directive for the attribution guide.
  */
 
-oppia.directive('collectionFeedbackTab', [function() {
+oppia.directive('attributionGuide', [function() {
   return {
     restrict: 'E',
-    templateUrl: 'inline/collection_feedback_tab_directive',
-    controller: [function() {}]
+    templateUrl: 'components/attributionGuide'
   };
 }]);
