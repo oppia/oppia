@@ -498,7 +498,7 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
         # exploration as a recommendation.  The last exploration should
         # return an empty list.
         collection.add_node('exp_id_3')
-        
+
         collection_node2 = collection.get_node('exp_id_2')
         collection_node3 = collection.get_node('exp_id_3')
 

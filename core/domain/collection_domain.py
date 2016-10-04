@@ -455,7 +455,7 @@ class Collection(object):
             learned_skills we can assume the user has already acquired. The
             function adds node's acquired skills to learned_skills then calls
             itself on any nodes in the collection whose prerequisite skills
-            match node's acquired skills. 
+            match node's acquired skills.
             Finds the set of all skills the user must have
             acquired by the time they've completed the current_exploration.
             This set is then represented by learned_skills."""
@@ -465,7 +465,8 @@ class Collection(object):
                     for skill in node.prerequisite_skills:
                         if skill in other_node.acquired_skills:
                             learned_skills += other_node.prerequisite_skills
-                            recursively_find_learned_skills(other_node, list(learned_skills))
+                            recursively_find_learned_skills(
+                                other_node, list(learned_skills))
         recursively_find_learned_skills(collection_node, list(learned_skills))
         for node in self.nodes:
             if node.exploration_id == current_exploration:
@@ -474,8 +475,9 @@ class Collection(object):
                 if prereq_skill in learned_skills:
                     if prereq_skill in collection_node.acquired_skills:
                         explorations_just_unlocked.append(node.exploration_id)
-                    elif set(node.prerequisite_skills).issubset(set(learned_skills)):
-                        explorations_qualified_for.append(node.exploration_id)
+                    elif set(node.prerequisite_skills).issubset(set(learned_skills)): # pylint: disable=line-too-long
+                        explorations_qualified_for.append(
+                            node.exploration_id)
         if explorations_just_unlocked:
             return explorations_just_unlocked
         elif explorations_qualified_for:
