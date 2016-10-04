@@ -19,7 +19,6 @@ import ast
 import datetime
 
 from core import jobs
-from core.domain import exp_services
 from core.domain import rights_manager
 from core.platform import models
 
@@ -27,6 +26,7 @@ from core.platform import models
     models.Registry.import_models(
         [models.NAMES.user, models.NAMES.exploration]))
 
+# pylint: disable=too-many-return-statements
 
 class UserQueryOneOffJob(jobs.BaseMapReduceJobManager):
     """One-off job for excuting query with given query parameters.
@@ -50,34 +50,28 @@ class UserQueryOneOffJob(jobs.BaseMapReduceJobManager):
                 rights_manager.Actor(user_id).is_moderator()):
             return
 
+        if query_model.login_in_last_n_days is not None:
+            if user_settings_model.last_logged_in:
+                difference = (
+                    datetime.datetime.utcnow() -
+                    user_settings_model.last_logged_in).days
+                if difference > query_model.login_in_last_n_days:
+                    return
+
         if query_model.active_in_last_n_days is not None:
-            days = query_model.active_in_last_n_days
-            created_n_explorations = False
-            edited_n_explorations = False
-
-            created_explorations = exp_services.get_multiple_explorations_by_id(
-                user_contributions.created_exploration_ids)
-
-            edited_explorations = (
-                exp_models.ExplorationCommitLogEntryModel.query(
-                    exp_models.ExplorationCommitLogEntryModel.user_id ==
-                    user_id).fetch())
-
-            for exp in created_explorations.values():
-                days_since_created = (
-                    datetime.datetime.utcnow() - exp.created_on).days
-                if days_since_created <= days:
-                    created_n_explorations = True
-                    break
-
-            for exp in edited_explorations:
-                days_since_updated = (
-                    datetime.datetime.utcnow() - exp.last_updated).days
-                if days_since_updated <= days:
-                    edited_n_explorations = True
-                    break
-
-            if not (created_n_explorations or edited_n_explorations):
+            if user_settings_model.last_created_an_exploration:
+                difference = (
+                    datetime.datetime.utcnow() -
+                    user_settings_model.last_created_an_exploration).days
+                if difference > query_model.active_in_last_n_days:
+                    return
+            elif user_settings_model.last_edited_an_exploration:
+                difference = (
+                    datetime.datetime.utcnow() -
+                    user_settings_model.last_edited_an_exploration).days
+                if difference > query_model.active_in_last_n_days:
+                    return
+            else:
                 return
 
         if query_model.created_at_least_n_exps is not None:

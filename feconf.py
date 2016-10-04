@@ -526,7 +526,9 @@ UPDATE_TYPE_EXPLORATION_COMMIT = 'exploration_commit'
 UPDATE_TYPE_COLLECTION_COMMIT = 'collection_commit'
 UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
 
-# User query status.
+# Possible values for user query status.
+# Valid status transitions are: processing --> completed --> archived
+# Or processing --> failed.
 USER_QUERY_STATUS_PROCESSING = 'processing'
 USER_QUERY_STATUS_COMPLETED = 'completed'
 USER_QUERY_STATUS_ARCHIVED = 'archived'

@@ -16,9 +16,12 @@
 
 """Tests for query MR job."""
 
+import datetime
+
 from core.domain import exp_services
 from core.domain import user_query_jobs_one_off
 from core.domain import user_query_services
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -29,6 +32,7 @@ taskqueue_services = models.Registry.import_taskqueue_services()
 class UserQueryJobOneOffTests(test_utils.GenericTestBase):
     EXP_ID_1 = 'exp_id_1'
     EXP_ID_2 = 'exp_id_2'
+    EXP_ID_3 = 'exp_id_3'
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
     USER_B_EMAIL = 'b@example.com'
@@ -37,6 +41,8 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
     USER_C_USERNAME = 'c'
     USER_D_EMAIL = 'd@example.com'
     USER_D_USERNAME = 'd'
+    USER_E_EMAIL = 'e@example.com'
+    USER_E_USERNAME = 'e'
     USER_SUBMITTER_EMAIL = 'submit@example.com'
     USER_SUBMITTER_USERNAME = 'submit'
 
@@ -59,8 +65,7 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
         # User B has one created exploration
         # User C has one edited exploration
         # User D has created an exploration and then edited it.
-        # (This is used to check that there are no duplicate
-        # entries in the contribution lists.)
+        # User E has created an exploration 10 days before.
         # Submitter is the user who submits the query.
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
@@ -70,6 +75,8 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
         self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
         self.signup(self.USER_D_EMAIL, self.USER_D_USERNAME)
         self.user_d_id = self.get_user_id_from_email(self.USER_D_EMAIL)
+        self.signup(self.USER_E_EMAIL, self.USER_E_USERNAME)
+        self.user_e_id = self.get_user_id_from_email(self.USER_E_EMAIL)
         self.signup(self.USER_SUBMITTER_EMAIL, self.USER_SUBMITTER_USERNAME)
         self.submitter_id = self.get_user_id_from_email(
             self.USER_SUBMITTER_EMAIL)
@@ -92,8 +99,66 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
             'new_value': 'the objective'
         }], 'Test edit')
 
-        # set tmpsuperadm1n as admin in ADMIN_USERNAMES config property.
+        self.save_new_valid_exploration(
+            self.EXP_ID_3, self.user_e_id, end_state_name='End')
+        user_settings = user_services.get_user_settings(self.user_e_id)
+        user_settings.last_created_an_exploration = (
+            user_settings.last_created_an_exploration -
+            datetime.timedelta(days=10))
+        # Last edited time also changes when user creates an explorationan.
+        user_settings.last_edited_an_exploration = (
+            datetime.datetime.utcnow() - datetime.timedelta(days=10))
+        user_settings.last_logged_in = (
+            user_settings.last_logged_in - datetime.timedelta(days=10))
+        user_services._save_user_settings(user_settings) # pylint: disable=protected-access
+
+        # Set tmpsuperadm1n as admin in ADMIN_USERNAMES config property.
         self.set_admins(['tmpsuperadm1n'])
+
+
+    def test_user_has_logged_in_last_n_days(self):
+        query_id = user_query_services.save_new_query_model(
+            self.submitter_id, login_in_last_n_days=3)
+        self._run_one_off_job(query_id)
+
+        query = user_models.UserQueryModel.get(query_id)
+        qualifying_user_ids = (
+            [self.user_a_id, self.user_b_id, self.user_c_id, self.user_d_id])
+
+        # List of users logged_in in last 3 days.
+        self.assertEqual(len(query.user_ids), 4)
+        self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
+
+        query_id = user_query_services.save_new_query_model(
+            self.submitter_id, login_in_last_n_days=12)
+        self._run_one_off_job(query_id)
+
+        query = user_models.UserQueryModel.get(query_id)
+        qualifying_user_ids = (
+            [self.user_a_id, self.user_b_id, self.user_c_id, self.user_d_id,
+             self.user_e_id])
+
+        # List of users logged_in in last 12 days.
+        self.assertEqual(len(query.user_ids), 5)
+        self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
+
+        # Test for legacy user.
+        user_settings = user_services.get_user_settings(self.user_a_id)
+        user_settings.last_logged_in = None
+        user_services._save_user_settings(user_settings) # pylint: disable=protected-access
+
+        query_id = user_query_services.save_new_query_model(
+            self.submitter_id, login_in_last_n_days=12)
+        self._run_one_off_job(query_id)
+
+        query = user_models.UserQueryModel.get(query_id)
+        qualifying_user_ids = (
+            [self.user_a_id, self.user_b_id, self.user_c_id, self.user_d_id,
+             self.user_e_id])
+
+        # Make sure that legacy user is included in qualified user's list.
+        self.assertEqual(len(query.user_ids), 5)
+        self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
 
     def test_user_is_active_in_last_n_days(self):
         query_id = user_query_services.save_new_query_model(
@@ -102,7 +167,21 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
 
         query = user_models.UserQueryModel.get(query_id)
         qualifying_user_ids = [self.user_b_id, self.user_c_id, self.user_d_id]
+
+        # List of users who were active in last 3 days.
         self.assertEqual(len(query.user_ids), 3)
+        self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
+
+        query_id = user_query_services.save_new_query_model(
+            self.submitter_id, active_in_last_n_days=12)
+        self._run_one_off_job(query_id)
+
+        query = user_models.UserQueryModel.get(query_id)
+        qualifying_user_ids = (
+            [self.user_b_id, self.user_c_id, self.user_d_id, self.user_e_id])
+
+        # List of users who were active in last 12 days.
+        self.assertEqual(len(query.user_ids), 4)
         self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
 
     def test_user_has_created_at_least_n_exps(self):
@@ -111,8 +190,8 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
         self._run_one_off_job(query_id)
 
         query = user_models.UserQueryModel.get(query_id)
-        qualifying_user_ids = [self.user_b_id, self.user_d_id]
-        self.assertEqual(len(query.user_ids), 2)
+        qualifying_user_ids = [self.user_b_id, self.user_d_id, self.user_e_id]
+        self.assertEqual(len(query.user_ids), 3)
         self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
 
     def test_user_has_created_fewer_than_n_exps(self):
@@ -131,8 +210,9 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
         self._run_one_off_job(query_id)
 
         query = user_models.UserQueryModel.get(query_id)
-        qualifying_user_ids = [self.user_b_id, self.user_c_id, self.user_d_id]
-        self.assertEqual(len(query.user_ids), 3)
+        qualifying_user_ids = (
+            [self.user_b_id, self.user_c_id, self.user_d_id, self.user_e_id])
+        self.assertEqual(len(query.user_ids), 4)
         self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
 
     def test_user_has_edited_fewer_than_n_exps(self):
@@ -146,12 +226,38 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
         self.assertEqual(query.user_ids, qualifying_user_ids)
 
     def test_combination_of_query_params(self):
-        query_id = user_query_services.save_new_query_model(
-            self.submitter_id, created_fewer_than_n_exps=3,
-            edited_fewer_than_n_exps=1)
-        self._run_one_off_job(query_id)
+        query_a_id = user_query_services.save_new_query_model(
+            self.submitter_id, created_at_least_n_exps=1)
+        self._run_one_off_job(query_a_id)
 
-        query = user_models.UserQueryModel.get(query_id)
-        qualifying_user_ids = [self.user_a_id]
-        self.assertEqual(len(query.user_ids), 1)
-        self.assertEqual(query.user_ids, qualifying_user_ids)
+        query_b_id = user_query_services.save_new_query_model(
+            self.submitter_id, edited_at_least_n_exps=1)
+        self._run_one_off_job(query_b_id)
+
+        query_combined_id = user_query_services.save_new_query_model(
+            self.submitter_id, created_at_least_n_exps=1,
+            edited_at_least_n_exps=1)
+        self._run_one_off_job(query_combined_id)
+
+        qualifying_user_ids_a = [self.user_b_id, self.user_d_id, self.user_e_id]
+        qualifying_user_ids_b = (
+            [self.user_b_id, self.user_c_id, self.user_d_id, self.user_e_id])
+        qualifying_user_ids_combined = (
+            [self.user_b_id, self.user_d_id, self.user_e_id])
+
+        query_a = user_models.UserQueryModel.get(query_a_id)
+        query_b = user_models.UserQueryModel.get(query_b_id)
+        query_combined = user_models.UserQueryModel.get(query_combined_id)
+
+        self.assertEqual(len(query_a.user_ids), 3)
+        self.assertEqual(
+            sorted(query_a.user_ids), sorted(qualifying_user_ids_a))
+
+        self.assertEqual(len(query_b.user_ids), 4)
+        self.assertEqual(
+            sorted(query_b.user_ids), sorted(qualifying_user_ids_b))
+
+        self.assertEqual(len(query_combined.user_ids), 3)
+        self.assertEqual(
+            sorted(query_combined.user_ids),
+            sorted(qualifying_user_ids_combined))
