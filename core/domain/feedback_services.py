@@ -743,8 +743,7 @@ def _send_batch_emails(recipient_list, feedback_message_reference):
                 feedback_message_reference)
 
 
-def _send_instant_emails(
-        recipient_list, feedback_message_reference):
+def _send_instant_emails(recipient_list, feedback_message_reference):
     """Adds the given FeedbackMessageReference to each of the
     recipient's email buffers. The collected messages will be
     sent out immediately.
@@ -755,12 +754,13 @@ def _send_instant_emails(
         feedback_message_reference: FeedbackMessageReference.
     """
     for recipient_id in recipient_list:
-        recipient_preferences = (
-            user_services.get_email_preferences(recipient_id))
-        if recipient_preferences['can_receive_feedback_message_email']:
-            transaction_services.run_in_transaction(
-                enqueue_feedback_message_instant_email_task, recipient_id,
-                feedback_message_reference)
+        if user_services.is_user_registered(recipient_id):
+            recipient_preferences = (
+                user_services.get_email_preferences(recipient_id))
+            if recipient_preferences['can_receive_feedback_message_email']:
+                transaction_services.run_in_transaction(
+                    enqueue_feedback_message_instant_email_task, recipient_id,
+                    feedback_message_reference)
 
 
 def _send_feedback_thread_status_change_emails(
@@ -774,12 +774,14 @@ def _send_feedback_thread_status_change_emails(
         new_status: str, one of STATUS_CHOICES
     """
     for recipient_id in recipient_list:
-        recipient_preferences = (
-            user_services.get_email_preferences(recipient_id))
-        if recipient_preferences['can_receive_feedback_message_email']:
-            transaction_services.run_in_transaction(
-                _enqueue_feedback_thread_status_change_email_task, recipient_id,
-                feedback_message_reference, old_status, new_status)
+        if user_services.is_user_registered(recipient_id):
+            recipient_preferences = (
+                user_services.get_email_preferences(recipient_id))
+            if recipient_preferences['can_receive_feedback_message_email']:
+                transaction_services.run_in_transaction(
+                    _enqueue_feedback_thread_status_change_email_task,
+                    recipient_id, feedback_message_reference,
+                    old_status, new_status)
 
 
 def _add_message_to_email_buffer(
