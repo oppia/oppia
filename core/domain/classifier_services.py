@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Classifier for free-form text answers."""
+
 import copy
 
 import numpy
@@ -46,13 +48,13 @@ class StringClassifier(object):
     document's label.
 
         # A list of docs to classify.
-        prediction_examples = [
+        prediction_docs = [
             'i only eat fish and vegetables'
         ]
         classifier_dict = load_from_data_store()
         string_classifier = StringClassifier()
         string_classifier.from_dict(classifier_dict)
-        doc_ids = string_classifier.add_examples_for_predicting(
+        doc_ids = string_classifier.add_docs_for_predicting(
             prediction_examples)
         label = string_classifier.predict_label_for_doc(doc_ids[0])
         print label
@@ -75,41 +77,17 @@ class StringClassifier(object):
         word instance in the doc.
     example - A doc with a list of labels it should be matched to.
 
-    This class uses index notation with the format "_V_XY", where V is the
-    element of an array, and X and Y are the indices used to measure V.
-    https://en.wikipedia.org/wiki/Index_notation
-
-    The following maps index notation letters to their meanings:
-    b - boolean value for whether Y is set in X
-    c - count of Y's in X
-    p - position of a value V in X
-    l - label id
-    w - word id
-    d - doc id
-
-    Internal model representation:
-    _w_dp - lists of word ids, where each list represents a doc
-    _b_dl - lists of booleans, where each boolean represents whether a
-        label is contained within a doc.
-    _l_dp - lists of label ids, where each list represents what label
-        is assigned to a word instance.
-    _c_dl - lists of counts, where each list represents the number of
-        word instances assigned to each label in a doc.
-    _c_lw - lists of counts, where each list represents the number of
-        word instances assigned to each label for a given word id (aggregated
-        across all docs).
-    _c_l - a list of counts, where each count is the number of times
-        a label was assigned (aggregated over all word instances in all docs).
-
-    There are two internal learning rates, _DEFAULT_ALPHA and _DEFAULT_BETA.
-    These are initialized to Wikipedia's recommendations. Do not change these
-    unless you know what you're doing.
-
     It is possible for a word instance in a doc to not have an explicit label
     assigned to it. This is characterized by assigning DEFAULT_LABEL to the
     word instance.
+
+    Attributes:
+        DEFAULT_LABEL: str. The label used to characterize a word with no label
+            assigned to it.
     """
 
+    # Internal learning rates. These are initialized to Wikipedia's
+    # recommendations. Do not change these unless you know what you're doing.
     _DEFAULT_ALPHA = 0.1
     _DEFAULT_BETA = 0.001
 
@@ -118,19 +96,18 @@ class StringClassifier(object):
 
     _DEFAULT_PREDICTION_THRESHOLD = 0.5
 
-    """Classifiers built with less than _DEFAULT_MIN_DOCS_TO_PREDICT will
-    likely not be useful for predicting as there are not enough examples to
-    build a generalized model. The value 20 was chosen as a balance between a
-    reasonable number of data to learn from and a low entry barrier to using
-    the classifier.
-    """
+    # Classifiers built with less than _DEFAULT_MIN_DOCS_TO_PREDICT will
+    # likely not be useful for predicting as there are not enough examples to
+    # build a generalized model. The value 20 was chosen as a balance between a
+    # reasonable number of data to learn from and a low entry barrier to using
+    # the classifier.
     _DEFAULT_MIN_DOCS_TO_PREDICT = 20
-    """Because prediction uses Prob(the doc should be assigned this label | the
-    doc is not assigned DEFAULT_LABEL), if there are only two labels (the
-    default label and one other) then the one other label will always be
-    predicted. Therefore, a minimum of 3 labels are needed to perform a valid
-    prediction.
-    """
+
+    # Because prediction uses Prob(the doc should be assigned this label | the
+    # doc is not assigned DEFAULT_LABEL), if there are only two labels (the
+    # default label and one other) then the one other label will always be
+    # predicted. Therefore, a minimum of 3 labels are needed to perform a valid
+    # prediction.
     _DEFAULT_MIN_LABELS_TO_PREDICT = 3
 
     DEFAULT_LABEL = '_default'
@@ -138,31 +115,69 @@ class StringClassifier(object):
     def __init__(self):
         """Initializes constants for the classifier.
 
-        Setting a seed ensures that results are deterministic. There is nothing
-        special about the value 4. These should not be changed unless you know
-        what you're doing.
+        This class uses index notation with the format "_V_XY", where V is the
+        element of an array, and X and Y are the indices used to measure V.
+        https://en.wikipedia.org/wiki/Index_notation
+
+        The following maps index notation letters to their meanings:
+            b - boolean value for whether Y is set in X
+            c - count of Y's in X
+            p - position of a value V in X
+            l - label id
+            w - word id
+            d - doc id
         """
+
+        # Setting a seed ensures that results are deterministic.
+        # There is nothing special about the value 4.
         numpy.random.seed(seed=4)
 
+        # Internal learning rates.
         self._alpha = self._DEFAULT_ALPHA
         self._beta = self._DEFAULT_BETA
 
-        # These should be initialized in load_examples() or from_dict().
+        # Internal model representation. These private attributes should be
+        # initialized in load_examples() or from_dict().
+
+        # Lists of booleans, where each boolean represents whether a
+        # label is contained within a doc.
         self._b_dl = None
+        # Lists of counts, where each list represents the number of
+        # word instances assigned to each label in a doc.
         self._c_dl = None
+        # A list of counts, where each count is the number of times a label
+        # was assigned (aggregated over all word instances in all docs).
         self._c_l = None
+        # Lists of counts, where each list represents the number of
+        # word instances assigned to each label for a given word id (aggregated
+        # across all docs).
         self._c_lw = None
+        # Lists of label ids, where each list represents what label
+        # is assigned to a word instance.
         self._l_dp = None
+        # Lists of word ids, where each list represents a doc.
         self._w_dp = None
+
+        # A dict which maps labels to their ids.
         self._label_to_id = None
+        # A dict which maps words to their ids.
         self._word_to_id = None
+
+        # An int which holds the number of docs in the classifier.
         self._num_docs = None
+        # An int which holds the number of labels in the classifier.
         self._num_labels = None
+        # An int which holds the number of words in the classifier.
         self._num_words = None
 
+        # An int which represents the number of training iterations
+        # used when adding new training examples.
         self._training_iterations = self._DEFAULT_TRAINING_ITERATIONS
+        # An int which represents the number of prediction iterations
+        # used when adding new docs for prediction.
         self._prediction_iterations = self._DEFAULT_PREDICTION_ITERATIONS
-
+        # A float which indicates the level of confidence required
+        # in order to make a prediction.
         self._prediction_threshold = self._DEFAULT_PREDICTION_THRESHOLD
 
     def _get_word_id(self, word):
@@ -417,23 +432,60 @@ class StringClassifier(object):
     def add_examples_for_training(self, training_examples):
         """Adds examples to the classifier with _training_iterations number of
         iterations.
+
+        Args:
+            training_examples: list of 'examples'. Each example is represented
+                by a 2-element list. The first item of the list is a str
+                representing a doc, and the second item is a list of labels
+                that the doc should be matched to. E.g.:
+
+                training_examples = [
+                    ['i eat fish and vegetables', ['food']],
+                    ['fish are pets', ['pets']],
+                    ['my kitten eats fish', ['food', 'pets']]
+                ]
+
+        Returns:
+            xrange. An iterator over the ids of the docs just added.
         """
         return self._add_examples(training_examples, self._training_iterations)
 
-    def add_examples_for_predicting(self, prediction_examples):
+    def add_docs_for_predicting(self, prediction_docs):
         """Adds examples to the classifier with _prediction_iterations number
         of iterations.
+
+        Args:
+            prediction_examples: list of str. A list of docs.
+
+                prediction_examples = [
+                    'i only eat fish and vegetables'
+                ]
+
+        Returns:
+            xrange. An iterator over the ids of the docs just added.
         """
         all_labels = self._label_to_id.keys()
         return self._add_examples(
-            zip(prediction_examples, [
-                copy.deepcopy(all_labels) for _ in prediction_examples]),
+            zip(prediction_docs, [
+                copy.deepcopy(all_labels) for _ in prediction_docs]),
             self._prediction_iterations)
 
     def load_examples(self, examples):
         """Sets the internal state of the classifier, assigns random initial
         labels to the docs, and runs Gibbs sampling for _training_iterations
         number of iterations.
+
+        Args:
+            examples: list of 'examples'. Each example is represented
+                by a 2-element list. The first item of the list is a str
+                representing a doc, and the second item is a list of labels
+                that the doc should be matched to. E.g.:
+
+                training_examples = [
+                    ['i eat fish and vegetables', ['food']],
+                    ['fish are pets', ['pets']],
+                    ['my kitten eats fish', ['food', 'pets']]
+                ]
         """
         docs, labels_list = self._parse_examples(examples)
 
@@ -472,6 +524,12 @@ class StringClassifier(object):
 
     def predict_label_for_doc(self, d):
         """Returns the predicted label from a doc's prediction report.
+
+        Args:
+            d: int. A doc id (see example in class docstring).
+
+        Returns:
+            str. The label predicted by the classifier for the given doc.
         """
         if (self._num_docs < self._DEFAULT_MIN_DOCS_TO_PREDICT or
                 self._num_labels < self._DEFAULT_MIN_LABELS_TO_PREDICT):
@@ -479,7 +537,11 @@ class StringClassifier(object):
         return self._get_prediction_report_for_doc(d)['prediction_label_name']
 
     def to_dict(self):
-        """Converts a classifier into a dict model."""
+        """Returns a dict representing this StringClassifier.
+
+        Returns:
+            dict. A representation of the state of the classifier.
+        """
         model = {}
         model['_alpha'] = copy.deepcopy(self._alpha)
         model['_beta'] = copy.deepcopy(self._beta)
@@ -503,7 +565,12 @@ class StringClassifier(object):
         return model
 
     def from_dict(self, model):
-        """Converts a dict model into a classifier."""
+        """Initializes the properties of this classifier from a dict
+        constructed using to_dict().
+
+        Args:
+            model: A dict representing a StringClassifier.
+        """
         self._alpha = copy.deepcopy(model['_alpha'])
         self._beta = copy.deepcopy(model['_beta'])
         self._prediction_threshold = copy.deepcopy(

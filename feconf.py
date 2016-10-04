@@ -72,12 +72,20 @@ RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
 DEFAULT_QUERY_LIMIT = 1000
 
 # The maximum number of results to retrieve in a datastore query
-# for top rated published explorations.
-NUMBER_OF_TOP_RATED_EXPLORATIONS = 8
+# for top rated published explorations in /library page.
+NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE = 8
 
 # The maximum number of results to retrieve in a datastore query
-# for recently published explorations.
-RECENTLY_PUBLISHED_QUERY_LIMIT = 8
+# for recently published explorations in /library page.
+RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE = 8
+
+# The maximum number of results to retrieve in a datastore query
+# for top rated published explorations in /library/top_rated page.
+NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE = 20
+
+# The maximum number of results to retrieve in a datastore query
+# for recently published explorations in /library/recently_published page.
+RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 
 # The current version of the dashboard stats blob schema. If any backward-
 # incompatible changes are made to the stats blob schema in the data store,
@@ -427,13 +435,14 @@ TASK_URL_SUGGESTION_EMAILS = (
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
-COLLECTION_WRITABLE_DATA_URL_PREFIX = '/collection_editor_handler/data'
+EDITABLE_COLLECTION_DATA_URL_PREFIX = '/collection_editor_handler/data'
 COLLECTION_RIGHTS_PREFIX = '/collection_editor_handler/rights'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
 DASHBOARD_URL = '/dashboard'
 DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % DASHBOARD_URL
 DASHBOARD_DATA_URL = '/dashboardhandler/data'
+DASHBOARD_EXPLORATION_STATS_PREFIX = '/dashboardhandler/explorationstats'
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
@@ -445,10 +454,13 @@ FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
+LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
 LIBRARY_INDEX_URL = '/library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
+LIBRARY_RECENTLY_PUBLISHED_URL = '/library/recently_published'
 LIBRARY_SEARCH_URL = '/search/find'
 LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
+LIBRARY_TOP_RATED_URL = '/library/top_rated'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
@@ -506,10 +518,14 @@ COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
+# Number of unresolved answers to be displayed in the dashboard for each
+# exploration.
+TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
+# Number of open feedback to be displayed in the dashboard for each exploration.
+OPEN_FEEDBACK_COUNT_DASHBOARD = 3
 # NOTE TO DEVELOPERS: This should be synchronized with base.js
 ENABLE_STRING_CLASSIFIER = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
-SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK = False
 SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
 
 # Output formats of downloaded explorations.
@@ -528,9 +544,9 @@ PROXIMAL_TIMEDELTA_SECS = 12 * 60 * 60
 DEFAULT_COLOR = '#a33f40'
 DEFAULT_THUMBNAIL_ICON = 'Lightbulb'
 
-# List of supported default categories. For now, each category has
-# a specific color associated with it. Each category also has a thumbnail icon
-# whose filename is "{{CategoryName}}.svg".
+# List of supported default categories. For now, each category has a specific
+# color associated with it. Each category also has a thumbnail icon whose
+# filename is "{{CategoryName}}.svg".
 CATEGORIES_TO_COLORS = {
     'Mathematics': '#cd672b',
     'Algebra': '#cd672b',
@@ -622,6 +638,24 @@ LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = (
 # The i18n id for the header of the "Recently Published" category in the
 # library index page.
 LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'I18N_LIBRARY_GROUPS_RECENTLY_PUBLISHED'
+
+# The group name that appears at the end of the url for the recently published
+# page.
+LIBRARY_GROUP_RECENTLY_PUBLISHED = 'recently_published'
+# The group name that appears at the end of the url for the top rated page.
+LIBRARY_GROUP_TOP_RATED = 'top_rated'
+
+# NOTE TO DEVELOPERS: The LIBRARY_PAGE_MODE constants defined below should have
+# the same value as the ones defined in LIBRARY_PAGE_MODES in Library.js. For
+# example LIBRARY_PAGE_MODE_GROUP should have the same value as
+# LIBRARY_PAGE_MODES.GROUP.
+# Page mode for the group pages such as top rated and recently published
+# explorations.
+LIBRARY_PAGE_MODE_GROUP = 'group'
+# Page mode for the main library page.
+LIBRARY_PAGE_MODE_INDEX = 'index'
+# Page mode for the search results page.
+LIBRARY_PAGE_MODE_SEARCH = 'search'
 
 # List of supported language codes. Each description has a
 # parenthetical part that may be stripped out to give a shorter
@@ -753,6 +787,10 @@ DONATE_PAGE_DESCRIPTION = (
 FORUM_PAGE_DESCRIPTION = (
     'Engage with the Oppia community by discussing questions, bugs and '
     'explorations in the forum.')
+LIBRARY_GROUP_PAGE_DESCRIPTION = (
+    'Discover top-rated or recently-published explorations on Oppia. Learn '
+    'from these explorations or help improve an existing one for the '
+    'community.')
 LIBRARY_PAGE_DESCRIPTION = (
     'Looking to learn something new? Find explorations created by professors, '
     'teachers and Oppia users in a subject you\'re interested in, and start '

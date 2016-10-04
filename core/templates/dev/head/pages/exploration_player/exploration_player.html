@@ -83,11 +83,12 @@
   {% endif %}
 
   {% include 'components/attribution_guide/attribution_guide_directive.html' %}
-  {% include 'components/exploration_embed_button_modal.html' %}
-  {% include 'components/gadget_directive.html' %}
-  {% include 'components/gadget_panel_directive.html' %}
-  {% include 'components/profile_link_image_directive.html' %}
-  {% include 'components/sharing_links_directive.html' %}
+  {% include 'components/embed_modal/embed_exploration_modal_directive.html' %}
+  {% include 'components/gadget/gadget_directive.html' %}
+  {% include 'components/gadget/gadget_panel_directive.html' %}
+  {% include 'components/profile_link/profile_link_image_directive.html' %}
+  {% include 'components/share/sharing_links_directive.html' %}
+
   {% include 'pages/exploration_player/answer_feedback_pair_directive.html' %}
   {% include 'pages/exploration_player/conversation_skin_directive.html' %}
   {% include 'pages/exploration_player/exploration_successfully_flagged_modal.html' %}
@@ -104,11 +105,11 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/messengerService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/attribution_guide/AttributionGuideDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/ExplorationEmbedButtonService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/GadgetDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/GadgetPanelDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/ProfileLinkImageDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/SharingLinksDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/embed_modal/ExplorationEmbedButtonService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/gadget/GadgetDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/gadget/GadgetPanelDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/profile_link/ProfileLinkImageDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/share/SharingLinksDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ExplorationObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StateObjectFactory.js"></script>

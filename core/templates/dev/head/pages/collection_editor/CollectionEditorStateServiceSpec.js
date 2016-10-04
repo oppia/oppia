@@ -20,10 +20,10 @@ describe('Collection editor state service', function() {
   var CollectionEditorStateService = null;
   var CollectionObjectFactory = null;
   var CollectionUpdateService = null;
-  var fakeWritableCollectionBackendApiService = null;
+  var fakeEditableCollectionBackendApiService = null;
 
   // TODO(bhenning): Consider moving this to a more shareable location.
-  var FakeWritableCollectionBackendApiService = function() {
+  var FakeEditableCollectionBackendApiService = function() {
     var self = {};
 
     var _fetchOrUpdateCollection = function() {
@@ -38,7 +38,7 @@ describe('Collection editor state service', function() {
 
     self.newBackendCollectionObject = {};
     self.failure = null;
-    self.fetchWritableCollection = _fetchOrUpdateCollection;
+    self.fetchCollection = _fetchOrUpdateCollection;
     self.updateCollection = _fetchOrUpdateCollection;
 
     return self;
@@ -47,11 +47,11 @@ describe('Collection editor state service', function() {
   beforeEach(module('oppia'));
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
   beforeEach(module('oppia', function($provide) {
-    fakeWritableCollectionBackendApiService = (
-      new FakeWritableCollectionBackendApiService());
+    fakeEditableCollectionBackendApiService = (
+      new FakeEditableCollectionBackendApiService());
     $provide.value(
-      'WritableCollectionBackendApiService',
-      fakeWritableCollectionBackendApiService);
+      'EditableCollectionBackendApiService',
+      fakeEditableCollectionBackendApiService);
   }));
 
   beforeEach(inject(function($injector) {
@@ -63,7 +63,7 @@ describe('Collection editor state service', function() {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
 
-    fakeWritableCollectionBackendApiService.newBackendCollectionObject = {
+    fakeEditableCollectionBackendApiService.newBackendCollectionObject = {
       id: '0',
       title: 'Collection Under Test',
       category: 'Test',
@@ -99,11 +99,11 @@ describe('Collection editor state service', function() {
 
   it('should request to load the collection from the backend', function() {
     spyOn(
-      fakeWritableCollectionBackendApiService,
-      'fetchWritableCollection').andCallThrough();
+      fakeEditableCollectionBackendApiService,
+      'fetchCollection').andCallThrough();
 
     CollectionEditorStateService.loadCollection(5);
-    expect(fakeWritableCollectionBackendApiService.fetchWritableCollection)
+    expect(fakeEditableCollectionBackendApiService.fetchCollection)
       .toHaveBeenCalled();
   });
 
@@ -146,7 +146,7 @@ describe('Collection editor state service', function() {
   it('should indicate a collection is no longer loading after an error',
       function() {
     expect(CollectionEditorStateService.isLoadingCollection()).toBe(false);
-    fakeWritableCollectionBackendApiService.failure = 'Internal 500 error';
+    fakeEditableCollectionBackendApiService.failure = 'Internal 500 error';
 
     CollectionEditorStateService.loadCollection(5);
     expect(CollectionEditorStateService.isLoadingCollection()).toBe(true);
@@ -188,7 +188,7 @@ describe('Collection editor state service', function() {
   it('should return the last collection loaded as the same object', function() {
     var previousCollection = CollectionEditorStateService.getCollection();
     var expectedCollection = CollectionObjectFactory.create(
-      fakeWritableCollectionBackendApiService.newBackendCollectionObject);
+      fakeEditableCollectionBackendApiService.newBackendCollectionObject);
     expect(previousCollection).not.toEqual(expectedCollection);
 
     CollectionEditorStateService.loadCollection(5);
@@ -259,7 +259,7 @@ describe('Collection editor state service', function() {
 
   it('should be able to save the collection and pending changes', function() {
     spyOn(
-      fakeWritableCollectionBackendApiService,
+      fakeEditableCollectionBackendApiService,
       'updateCollection').andCallThrough();
 
     CollectionEditorStateService.loadCollection(0);
@@ -275,7 +275,7 @@ describe('Collection editor state service', function() {
     var expectedVersion = '1';
     var expectedCommitMessage = 'Commit message';
     var updateCollectionSpy = (
-      fakeWritableCollectionBackendApiService.updateCollection);
+      fakeEditableCollectionBackendApiService.updateCollection);
     expect(updateCollectionSpy).toHaveBeenCalledWith(
       expectedId, expectedVersion, expectedCommitMessage, jasmine.any(Object));
   });
@@ -316,7 +316,7 @@ describe('Collection editor state service', function() {
     $rootScope.$apply();
 
     expect(CollectionEditorStateService.isSavingCollection()).toBe(false);
-    fakeWritableCollectionBackendApiService.failure = 'Internal 500 error';
+    fakeEditableCollectionBackendApiService.failure = 'Internal 500 error';
 
     CollectionEditorStateService.saveCollection('Commit message');
     expect(CollectionEditorStateService.isSavingCollection()).toBe(true);
