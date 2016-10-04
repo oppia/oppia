@@ -366,8 +366,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<collection_id>' % feconf.COLLECTION_EDITOR_URL_PREFIX,
         collection_editor.CollectionEditorPage),
     get_redirect_route(
-        r'%s/<collection_id>' % feconf.COLLECTION_WRITABLE_DATA_URL_PREFIX,
-        collection_editor.WritableCollectionDataHandler),
+        r'%s/<collection_id>' % feconf.EDITABLE_COLLECTION_DATA_URL_PREFIX,
+        collection_editor.EditableCollectionDataHandler),
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_RIGHTS_PREFIX,
         collection_editor.CollectionRightsHandler),
