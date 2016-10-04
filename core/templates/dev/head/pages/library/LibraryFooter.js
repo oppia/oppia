@@ -16,12 +16,6 @@
  * @fileoverview Data and controllers for the Oppia library footer.
  */
 
-oppia.constant('LIBRARY_PAGE_MODES', {
-  GROUP: 'group',
-  INDEX: 'index',
-  SEARCH: 'search'
-});
-
 oppia.controller('LibraryFooter', [
   '$scope', 'LIBRARY_PAGE_MODES', function($scope, LIBRARY_PAGE_MODES) {
     $scope.pageMode = GLOBALS.PAGE_MODE;
