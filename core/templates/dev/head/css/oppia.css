@@ -1036,7 +1036,7 @@ textarea {
   }
 }
 
-.oppia-library-group-header a, .oppia-library-group-header span {
+.oppia-library-group-header a, .oppia-library-group-header span, .oppia-group-page-header {
   color: #2c4841;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
 }

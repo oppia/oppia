@@ -28,20 +28,19 @@
 // Discuss and decide whether this is a good approach and then remove this TODO
 // after deciding and acting upon the decision (which would mean implementing
 // it if it's agreed upon).
-oppia.factory('WritableCollectionBackendApiService', [
+oppia.factory('EditableCollectionBackendApiService', [
     '$http', '$q', 'COLLECTION_DATA_URL_TEMPLATE',
-    'WRITABLE_COLLECTION_DATA_URL_TEMPLATE', 'UrlInterpolationService',
-    'CollectionBackendApiService',
+    'EDITABLE_COLLECTION_DATA_URL_TEMPLATE', 'UrlInterpolationService',
+    'ReadOnlyCollectionBackendApiService',
     function($http, $q, COLLECTION_DATA_URL_TEMPLATE,
-      WRITABLE_COLLECTION_DATA_URL_TEMPLATE, UrlInterpolationService,
-      CollectionBackendApiService) {
-      var _fetchWritableCollection = function(
+      EDITABLE_COLLECTION_DATA_URL_TEMPLATE, UrlInterpolationService,
+      ReadOnlyCollectionBackendApiService) {
+      var _fetchCollection = function(
           collectionId, successCallback, errorCallback) {
         var collectionDataUrl = UrlInterpolationService.interpolateUrl(
-          COLLECTION_DATA_URL_TEMPLATE, {
+          EDITABLE_COLLECTION_DATA_URL_TEMPLATE, {
             collection_id: collectionId
           });
-        collectionDataUrl += '?allow_invalid_explorations=true';
 
         $http.get(collectionDataUrl).then(function(response) {
           var collection = angular.copy(response.data.collection);
@@ -58,8 +57,8 @@ oppia.factory('WritableCollectionBackendApiService', [
       var _updateCollection = function(
           collectionId, collectionVersion, commitMessage, changeList,
           successCallback, errorCallback) {
-        var writableCollectionDataUrl = UrlInterpolationService.interpolateUrl(
-          WRITABLE_COLLECTION_DATA_URL_TEMPLATE, {
+        var editableCollectionDataUrl = UrlInterpolationService.interpolateUrl(
+          EDITABLE_COLLECTION_DATA_URL_TEMPLATE, {
             collection_id: collectionId
           });
 
@@ -68,13 +67,14 @@ oppia.factory('WritableCollectionBackendApiService', [
           commit_message: commitMessage,
           change_list: changeList
         };
-        $http.put(writableCollectionDataUrl, putData).then(function(response) {
+        $http.put(editableCollectionDataUrl, putData).then(function(response) {
           // The returned data is an updated collection dict.
           var collection = angular.copy(response.data);
 
-          // Update the CollectionBackendApiService's cache with the new
+          // Update the ReadOnlyCollectionBackendApiService's cache with the new
           // collection.
-          CollectionBackendApiService.cacheCollection(collectionId, collection);
+          ReadOnlyCollectionBackendApiService.cacheCollection(
+            collectionId, collection);
 
           if (successCallback) {
             successCallback(collection);
@@ -87,9 +87,9 @@ oppia.factory('WritableCollectionBackendApiService', [
       };
 
       return {
-        fetchWritableCollection: function(collectionId) {
+        fetchCollection: function(collectionId) {
           return $q(function(resolve, reject) {
-            _fetchWritableCollection(collectionId, resolve, reject);
+            _fetchCollection(collectionId, resolve, reject);
           });
         },
 

@@ -198,7 +198,14 @@ URLS = MAPREDUCE_HANDLERS + [
         resources.ValueGeneratorHandler),
 
     get_redirect_route(r'%s' % feconf.LIBRARY_INDEX_URL, library.LibraryPage),
-    get_redirect_route(r'/libraryindexhandler', library.LibraryIndexHandler),
+    get_redirect_route(r'%s' % feconf.LIBRARY_INDEX_DATA_URL,
+                       library.LibraryIndexHandler),
+    get_redirect_route(r'%s' % feconf.LIBRARY_RECENTLY_PUBLISHED_URL,
+                       library.LibraryGroupPage),
+    get_redirect_route(r'%s' % feconf.LIBRARY_TOP_RATED_URL,
+                       library.LibraryGroupPage),
+    get_redirect_route(r'%s' % feconf.LIBRARY_GROUP_DATA_URL,
+                       library.LibraryGroupIndexHandler),
     get_redirect_route(r'%s' % feconf.LIBRARY_SEARCH_URL, library.LibraryPage),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_SEARCH_DATA_URL, library.SearchHandler),
@@ -359,8 +366,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<collection_id>' % feconf.COLLECTION_EDITOR_URL_PREFIX,
         collection_editor.CollectionEditorPage),
     get_redirect_route(
-        r'%s/<collection_id>' % feconf.COLLECTION_WRITABLE_DATA_URL_PREFIX,
-        collection_editor.WritableCollectionDataHandler),
+        r'%s/<collection_id>' % feconf.EDITABLE_COLLECTION_DATA_URL_PREFIX,
+        collection_editor.EditableCollectionDataHandler),
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_RIGHTS_PREFIX,
         collection_editor.CollectionRightsHandler),

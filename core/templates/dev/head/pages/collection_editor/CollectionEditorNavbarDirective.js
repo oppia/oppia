@@ -24,14 +24,14 @@ oppia.directive('collectionEditorNavbar', [function() {
       '$scope', '$modal', 'alertsService', 'routerService', 'UndoRedoService',
       'CollectionEditorStateService', 'CollectionValidationService',
       'CollectionRightsBackendApiService',
-      'WritableCollectionBackendApiService',
+      'EditableCollectionBackendApiService',
       'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
       'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
       function(
           $scope, $modal, alertsService, routerService, UndoRedoService,
           CollectionEditorStateService, CollectionValidationService,
           CollectionRightsBackendApiService,
-          WritableCollectionBackendApiService,
+          EditableCollectionBackendApiService,
           EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED,
           EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
         $scope.collectionId = GLOBALS.collectionId;

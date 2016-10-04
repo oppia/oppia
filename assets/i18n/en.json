@@ -142,6 +142,7 @@
   "I18N_LIBRARY_LOADING": "Loading",
   "I18N_LIBRARY_MAIN_HEADER": "Imagine what you could learn today...",
   "I18N_LIBRARY_N/A": "N/A",
+  "I18N_LIBRARY_NO_EXPLORATIONS": "Oops, there are no explorations to display.",
   "I18N_LIBRARY_NO_EXPLORATION_FOR_QUERY": "Oops, it looks like your search didn't match any explorations.",
   "I18N_LIBRARY_NO_EXPLORATION_GROUPS": "There are no groups of explorations available to display.",
   "I18N_LIBRARY_NO_OBJECTIVE": "No objective specified.",
