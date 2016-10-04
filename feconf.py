@@ -72,12 +72,20 @@ RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
 DEFAULT_QUERY_LIMIT = 1000
 
 # The maximum number of results to retrieve in a datastore query
-# for top rated published explorations.
-NUMBER_OF_TOP_RATED_EXPLORATIONS = 8
+# for top rated published explorations in /library page.
+NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE = 8
 
 # The maximum number of results to retrieve in a datastore query
-# for recently published explorations.
-RECENTLY_PUBLISHED_QUERY_LIMIT = 8
+# for recently published explorations in /library page.
+RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE = 8
+
+# The maximum number of results to retrieve in a datastore query
+# for top rated published explorations in /library/top_rated page.
+NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE = 20
+
+# The maximum number of results to retrieve in a datastore query
+# for recently published explorations in /library/recently_published page.
+RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 
 # The current version of the dashboard stats blob schema. If any backward-
 # incompatible changes are made to the stats blob schema in the data store,
@@ -446,10 +454,13 @@ FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
+LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
 LIBRARY_INDEX_URL = '/library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
+LIBRARY_RECENTLY_PUBLISHED_URL = '/library/recently_published'
 LIBRARY_SEARCH_URL = '/search/find'
 LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
+LIBRARY_TOP_RATED_URL = '/library/top_rated'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
@@ -628,6 +639,24 @@ LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = (
 # library index page.
 LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'I18N_LIBRARY_GROUPS_RECENTLY_PUBLISHED'
 
+# The group name that appears at the end of the url for the recently published
+# page.
+LIBRARY_GROUP_RECENTLY_PUBLISHED = 'recently_published'
+# The group name that appears at the end of the url for the top rated page.
+LIBRARY_GROUP_TOP_RATED = 'top_rated'
+
+# NOTE TO DEVELOPERS: The LIBRARY_PAGE_MODE constants defined below should have
+# the same value as the ones defined in LIBRARY_PAGE_MODES in Library.js. For
+# example LIBRARY_PAGE_MODE_GROUP should have the same value as
+# LIBRARY_PAGE_MODES.GROUP.
+# Page mode for the group pages such as top rated and recently published
+# explorations.
+LIBRARY_PAGE_MODE_GROUP = 'group'
+# Page mode for the main library page.
+LIBRARY_PAGE_MODE_INDEX = 'index'
+# Page mode for the search results page.
+LIBRARY_PAGE_MODE_SEARCH = 'search'
+
 # List of supported language codes. Each description has a
 # parenthetical part that may be stripped out to give a shorter
 # description.
@@ -758,6 +787,10 @@ DONATE_PAGE_DESCRIPTION = (
 FORUM_PAGE_DESCRIPTION = (
     'Engage with the Oppia community by discussing questions, bugs and '
     'explorations in the forum.')
+LIBRARY_GROUP_PAGE_DESCRIPTION = (
+    'Discover top-rated or recently-published explorations on Oppia. Learn '
+    'from these explorations or help improve an existing one for the '
+    'community.')
 LIBRARY_PAGE_DESCRIPTION = (
     'Looking to learn something new? Find explorations created by professors, '
     'teachers and Oppia users in a subject you\'re interested in, and start '

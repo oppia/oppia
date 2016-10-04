@@ -366,20 +366,20 @@ def get_non_private_exploration_summaries():
         exp_models.ExpSummaryModel.get_non_private())
 
 
-def get_top_rated_exploration_summaries():
+def get_top_rated_exploration_summaries(limit):
     """Returns a dict with top rated exploration summary domain objects,
     keyed by their id.
     """
     return _get_exploration_summaries_from_models(
-        exp_models.ExpSummaryModel.get_top_rated())
+        exp_models.ExpSummaryModel.get_top_rated(limit))
 
 
-def get_recently_published_exploration_summaries():
+def get_recently_published_exp_summaries(limit):
     """Returns a dict with all featured exploration summary domain objects,
     keyed by their id.
     """
     return _get_exploration_summaries_from_models(
-        exp_models.ExpSummaryModel.get_recently_published())
+        exp_models.ExpSummaryModel.get_recently_published(limit))
 
 
 def get_all_exploration_summaries():

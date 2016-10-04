@@ -1,7 +1,7 @@
 {% extends 'pages/base.html' %}
 
 {% block maintitle %}
-  {% if search_mode %}
+  {% if page_mode in ['group', 'search'] %}
     Find explorations to learn from - Oppia
   {% else %}
     I18N_LIBRARY_PAGE_TITLE
@@ -26,6 +26,7 @@
       '{{LANGUAGE_CODES_AND_NAMES|js_string}}');
     GLOBALS.SEARCH_DROPDOWN_CATEGORIES = JSON.parse(
       '{{SEARCH_DROPDOWN_CATEGORIES|js_string}}');
+    GLOBALS.PAGE_MODE = JSON.parse('{{page_mode|js_string}}');
   </script>
 
   <style>
@@ -39,11 +40,44 @@
   <div ng-controller="Library" class="oppia-library-container">
     <div style="position: relative; z-index: 3;">
       <div>
-        <div class="oppia-exp-summary-tiles-container" ng-if="inSearchMode">
+        <div class="oppia-exp-summary-tiles-container" ng-if="pageMode === LIBRARY_PAGE_MODES.SEARCH">
           <search-results></search-results>
         </div>
 
-        <div class="oppia-exp-summary-tiles-container" ng-if="!inSearchMode">
+        <div class="oppia-exp-summary-tiles-container"
+             ng-if="pageMode === LIBRARY_PAGE_MODES.GROUP"
+             style="margin-bottom: 20px;">
+          <div ng-if="activityList.length === 0"
+               style="font-size: 1.2em; padding-bottom: 40px; padding-top: 40px;">
+              <p style="text-align: center;">
+                <span translate="I18N_LIBRARY_NO_EXPLORATIONS"></span>
+              </p>
+          </div>
+
+          <div ng-if="activityList.length > 0"
+               style="margin-right: auto; margin-left: auto; max-width: 856px;">
+            <h2 class="oppia-group-page-header" style="font-size: 2em;">
+              <span translate="<[groupHeaderI18nId]>"></span>
+            </h2>
+
+            <div ng-repeat="tile in activityList" style="display: inline-block;">
+              <exploration-summary-tile ng-if="tile.activity_type == 'exploration'"
+                                        exploration-id="tile.id"
+                                        exploration-title="tile.title"
+                                        last-updated-msec="tile.last_updated_msec"
+                                        objective="tile.objective"
+                                        category="tile.category"
+                                        ratings="tile.ratings"
+                                        num-views="tile.num_views"
+                                        thumbnail-icon-url="tile.thumbnail_icon_url"
+                                        thumbnail-bg-color="tile.thumbnail_bg_color"
+                                        class="protractor-test-exp-summary-tile">
+              </exploration-summary-tile>
+            </div>
+          </div>
+        </div>
+
+        <div class="oppia-exp-summary-tiles-container" ng-if="pageMode === LIBRARY_PAGE_MODES.INDEX">
           <img ng-src="<[bannerImageFileUrl]>" align="center"
                width="100%">
           <div style="text-align: center; width: 100%;">
@@ -60,19 +94,19 @@
             <div class="row oppia-library-group-header-container">
               <h2 class="oppia-library-group-header">
                 <a ng-if="group.has_full_results_page"
-                   ng-click="showAllResultsForCategories(group.categories)"
+                   ng-click="showFullResultsPage(group.categories, group.full_results_url)"
                    translate="<[group.header_i18n_id]>">
                 </a>
                 <span ng-if="!group.has_full_results_page" translate="<[group.header_i18n_id]>">
                 </span>
               </h2>
               <div class="pull-right" ng-if="group.has_full_results_page">
-                <button class="btn oppia-library-group-view-all-btn oppia-transition-200" ng-click="showAllResultsForCategories(group.categories)" translate="I18N_LIBRARY_VIEW_ALL">
+                <button class="btn oppia-library-group-view-all-btn oppia-transition-200" ng-click="showFullResultsPage(group.categories, group.full_results_url)" translate="I18N_LIBRARY_VIEW_ALL">
                 </button>
               </div>
             </div>
 
-            <!-- TODO(sll): Add card at end of the row that, when clicked, does showAllResultsForCategories(group.categories)" -->
+            <!-- TODO(sll): Add card at end of the row that, when clicked, does showFullResultsPage(group.categories)" -->
             <div ng-if="!libraryWindowIsNarrow">
               <md-button class="md-no-ink oppia-library-carousel-scroll-btn"
                          ng-click="scroll($index, true)"
@@ -172,7 +206,7 @@
 
 {% block footer %}
   <div ng-controller="LibraryFooter">
-    <div ng-if="!inSearchMode">
+    <div ng-if="pageMode !== LIBRARY_PAGE_MODES.SEARCH">
       {% include 'pages/footer.html' %}
     </div>
   </div>
