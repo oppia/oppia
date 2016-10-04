@@ -1198,18 +1198,22 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     @classmethod
     def _cb_reconstitute_pencil_code_editor(
             cls, state, answer_group_index, rule_spec, rule_str, answer_str):
-        if rule_spec.rule_type == 'OutputEquals':
-            # Luckily, Pencil Code answers stored the actual dict rather than
-            # just the code; it's easier to reconstitute.
-            code_evaluation_dict = eval(cls._get_plaintext(answer_str))
-            if not isinstance(code_evaluation_dict, dict):
-                return (None, 'Failed to recover pencil code: %s' % answer_str)
-            return cls._normalize_raw_answer_object(
-                objects.CodeEvaluation, code_evaluation_dict, answer_str)
-        return (
-            None,
-            'Cannot reconstitute a CodeEvaluation object without an '
-            'OutputEquals rule.')
+        supported_rule_types = [
+            'CodeEquals', 'CodeContains', 'CodeDoesNotContain', 'OutputEquals',
+            'OutputRoughlyEquals', 'ResultsInError', 'ErrorContains'
+        ]
+        if rule_spec.rule_type not in supported_rule_types:
+            return (
+                None,
+                'Unsupported rule type encountered while attempting to '
+                'reconstitute CodeEvaluation object: %s' % rule_spec.rule_type)
+        # Luckily, Pencil Code answers stored the actual dict rather than just
+        # the code; it's easier to reconstitute.
+        code_evaluation_dict = eval(cls._get_plaintext(answer_str))
+        if not isinstance(code_evaluation_dict, dict):
+            return (None, 'Failed to recover pencil code: %s' % answer_str)
+        return cls._normalize_raw_answer_object(
+            objects.CodeEvaluation, code_evaluation_dict, answer_str)
 
     @classmethod
     def _cb_reconstitute_set_input(

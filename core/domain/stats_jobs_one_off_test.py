@@ -1989,6 +1989,76 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         }])
         self._verify_no_migration_validation_problems()
 
+    def test_migrate_pencil_code_editor_with_code_contains_rule_type(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id0', self.owner_id, end_state_name='End')
+        state_name = exploration.init_state_name
+        initial_state = exploration.states[state_name]
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'PencilCodeEditor',
+            'old_value': initial_state.interaction.id
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'CodeContains',
+                    'inputs': {
+                        'x': 'test'
+                    }
+                }],
+                'outcome': {
+                    'dest': 'End',
+                    'feedback': ['Yes'],
+                    'param_changes': []
+                }
+            }]
+        }], 'Initialize pencil code exploration')
+
+        rule_spec_str = 'CodeContains(test)'
+        html_answer = (
+            '{\'error\': u\'Error\', \'evaluation\': u\'\', \'code\': u"# Test '
+            'comment.\\n", \'output\': u\'\'}')
+        self._record_old_answer(
+            state_name, rule_spec_str, html_answer, exploration_id='exp_id0')
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0', exploration_version=2)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
+
+        # The answer should have been properly migrated to the new storage
+        # model.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0', exploration_version=2)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': {
+                'error': 'Error',
+                'evaluation': '',
+                'code': '# Test comment.\n',
+                'output': ''
+            },
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'PencilCodeEditor',
+            'params': {},
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+        self._verify_no_migration_validation_problems()
+
     def test_migrate_set_input(self):
         state_name = 'Set Input'
 
