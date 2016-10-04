@@ -1,0 +1,12 @@
+<script type="text/ng-template" id="collectionEditor/newNodeCreator">
+  <h2>Add Exploration</h2>
+  <form class="form-inline" ng-submit="createNewExploration()">
+    <input class="form-control" ng-model="newExplorationTitle" type="text" placeholder="New exploration title">
+    <button class="btn btn-success" type="submit" ng-disabled="!newExplorationTitle">Add New Exploration</button>
+  </form>
+  or
+  <form ng-submit="addExploration()">
+    <input ng-model="newExplorationId" type="text" placeholder="New exploration ID">
+    <button type="submit" ng-disabled="!newExplorationId">Add Existing Exploration</button>
+  </form>
+</script>

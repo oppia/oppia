@@ -19,11 +19,15 @@ from core.controllers import editor
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.platform import models
+import feconf
+
 
 transaction_services = models.Registry.import_transaction_services()
 
 class ThreadListHandler(base.BaseHandler):
     """Handles operations relating to feedback thread lists."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self, exploration_id):
         self.values.update({
@@ -54,6 +58,8 @@ class ThreadListHandler(base.BaseHandler):
 
 class ThreadHandler(base.BaseHandler):
     """Handles operations relating to feedback threads."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self, exploration_id, thread_id):  # pylint: disable=unused-argument
         suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
@@ -93,6 +99,8 @@ class RecentFeedbackMessagesHandler(base.BaseHandler):
     explorations.
     """
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     @base.require_moderator
     def get(self):
         urlsafe_start_cursor = self.request.get('cursor')
@@ -113,6 +121,8 @@ class FeedbackStatsHandler(base.BaseHandler):
         - Number of open threads
         - Number of total threads
     """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self, exploration_id):
         feedback_thread_analytics = (
@@ -172,6 +182,8 @@ class SuggestionListHandler(base.BaseHandler):
     _LIST_TYPE_OPEN = 'open'
     _LIST_TYPE_CLOSED = 'closed'
     _LIST_TYPE_ALL = 'all'
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def _string_to_bool(self, has_suggestion):
         if has_suggestion == 'true':
