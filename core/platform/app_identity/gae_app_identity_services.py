@@ -23,7 +23,7 @@ def get_application_id():
     """Returns the application's App Engine ID.
 
     For more information, see
-    https://cloud.google.com/appengine/docs/python/appidentity/"
+    https://cloud.google.com/appengine/docs/python/appidentity/
 
     Returns:
         str. The application ID.
