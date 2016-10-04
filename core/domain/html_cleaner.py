@@ -25,8 +25,8 @@ from core.domain import rte_component_registry
 
 
 def filter_a(name, value):
-    """Returns whether the given attribute of an 
-    anchor ('a') tag should be whitelisted.
+    """Returns whether the given attribute of an anchor ('a') 
+    tag should be whitelisted.
     
     Args:
         name: The name of the attribute.
@@ -73,9 +73,8 @@ ATTRS_WHITELIST = {
 
 
 def clean(user_submitted_html):
-    """Cleans a piece of user submitted HTML.
-
-    This only allows HTML from a restricted set of tags, attrs and styles.
+    """Cleans a piece of user submitted HTML.This only allows HTML from a 
+    restricted set of tags, attrs and styles.
     
     Args:
         user_submitted_html: str.A HTML string submitted by user.
