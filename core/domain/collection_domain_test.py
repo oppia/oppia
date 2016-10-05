@@ -472,13 +472,13 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             collection.get_next_exploration_ids_in_sequence(exploration_id), [])
 
-        # If the current exploration has no acquired skills, a blank list
-        # should be returned.
+        # If the current exploration has no acquired skills, a list of all
+        # explorations with no prerequisite skills should be returned.
         collection.add_node('exp_id_1')
         collection.add_node('exp_id_2')
         self.assertEqual(
             collection.get_next_exploration_ids_in_sequence(exploration_id),
-            [])
+            ['exp_id_1', 'exp_id_2'])
 
         # If only one exploration in the collection has a prerequisite skill
         # that is included in the user's learned skills, only that exploration
@@ -505,7 +505,7 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
         collection_node1.update_acquired_skills(['skill2a'])
         collection_node2.update_acquired_skills(['skill3a'])
 
-        collection_node0.update_prerequisite_skills(['skill1a'])
+        collection_node0.update_prerequisite_skills([])
         collection_node2.update_prerequisite_skills(['skill2a'])
         collection_node3.update_prerequisite_skills(['skill3a'])
 

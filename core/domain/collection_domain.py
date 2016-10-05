@@ -444,40 +444,43 @@ class Collection(object):
         returns either a list of exploration ids that have either just
         unlocked or the user is qualified to explore.  If neither of these
         lists can be generated a blank list is returned instead."""
-        collection_node = self.get_node(current_exploration)
-        learned_skills = collection_node.acquired_skills
-        explorations_just_unlocked = []
-        explorations_qualified_for = []
-        nodes_already_recursed = [collection_node]
+        skills_learned_by_exp_id = {}
 
-        def recursively_find_learned_skills(node, learned_skills):
-            """Takes a node to recurse into and a running list of
-            learned_skills we can assume the user has already acquired. The
-            function adds node's acquired skills to learned_skills then calls
-            itself on any nodes in the collection whose prerequisite skills
-            match node's acquired skills.
-            Finds the set of all skills the user must have
-            acquired by the time they've completed the current_exploration.
-            This set is then represented by learned_skills."""
+        def _recursively_find_learned_skills(node):
+            """Given a node, returns the skills that the user must have
+            acquired by the time they've completed it."""
+            if node.exploration_id in skills_learned_by_exp_id:
+                return skills_learned_by_exp_id[node.exploration_id]
+
+            skills_learned = set(node.acquired_skills)
             for other_node in self.nodes:
-                if other_node not in nodes_already_recursed:
-                    nodes_already_recursed.append(other_node)
+                if other_node.exploration_id not in skills_learned_by_exp_id:
                     for skill in node.prerequisite_skills:
                         if skill in other_node.acquired_skills:
-                            learned_skills += other_node.prerequisite_skills
-                            recursively_find_learned_skills(
-                                other_node, list(learned_skills))
-        recursively_find_learned_skills(collection_node, list(learned_skills))
+                            skills_learned = skills_learned.union(
+                                _recursively_find_learned_skills(other_node))
+
+            skills_learned_by_exp_id[node.exploration_id] = skills_learned
+            return skills_learned
+
+        explorations_just_unlocked = []
+        explorations_qualified_for = []
+
+        collection_node = self.get_node(current_exploration)
+        collected_skills = _recursively_find_learned_skills(collection_node)
+
         for node in self.nodes:
-            if node.exploration_id == current_exploration:
+            if node.exploration_id in skills_learned_by_exp_id:
                 continue
-            for prereq_skill in node.prerequisite_skills:
-                if prereq_skill in learned_skills:
-                    if prereq_skill in collection_node.acquired_skills:
-                        explorations_just_unlocked.append(node.exploration_id)
-                    elif set(node.prerequisite_skills).issubset(set(learned_skills)): # pylint: disable=line-too-long
-                        explorations_qualified_for.append(
-                            node.exploration_id)
+
+            if set(node.prerequisite_skills).issubset(set(collected_skills)):
+                if (any([
+                        skill in collection_node.acquired_skills
+                        for skill in node.prerequisite_skills])):
+                    explorations_just_unlocked.append(node.exploration_id)
+                else:
+                    explorations_qualified_for.append(node.exploration_id)
+
         if explorations_just_unlocked:
             return explorations_just_unlocked
         elif explorations_qualified_for:
