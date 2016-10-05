@@ -24,15 +24,19 @@ oppia.directive('oppiaInteractiveContinue', [
   function(oppiaHtmlEscaper, continueRulesService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        onSubmit: '&'
+      },
       templateUrl: 'interaction/Continue',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.buttonText = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.buttonTextWithValue);
 
         $scope.submitAnswer = function() {
-          $scope.$parent.$parent.submitAnswer(
-            '(' + $scope.buttonText + ')', continueRulesService);
+          $scope.onSubmit({
+            answer: '(' + $scope.buttonText + ')',
+            rulesService: continueRulesService
+          });
         };
       }]
     };

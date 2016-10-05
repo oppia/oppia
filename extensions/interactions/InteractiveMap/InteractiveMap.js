@@ -24,7 +24,9 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
   oppiaHtmlEscaper, interactiveMapRulesService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        onSubmit: '&'
+      },
       templateUrl: 'interaction/InteractiveMap',
       controller: [
         '$scope', '$attrs', '$timeout', function($scope, $attrs, $timeout) {
@@ -66,8 +68,10 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
               position: ll
             }));
 
-            $scope.$parent.submitAnswer(
-              [ll.lat(), ll.lng()], interactiveMapRulesService);
+            $scope.onSubmit({
+              answer: [ll.lat(), ll.lng()],
+              rulesService: interactiveMapRulesService
+            });
           };
 
           refreshMap();

@@ -1,0 +1,78 @@
+<script type="text/ng-template" id="components/sharingLinks">
+  <ul class="oppia-sharing-links" layout="<[layoutType]>" layout-align="<[layoutAlignType]>">
+    <li>
+      <a ng-href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>" onclick="return !window.open(this.href, '', 'height=600, width=600, menubar=no, toolbar=no, resizable=yes, scrollbars=yes')" ng-click="registerShareExplorationEvent('gplus')" target="_window">
+        <img class="share-option-img" ng-src="<[gplusUrl]>" alt="Google+">
+      </a>
+    </li>
+
+    <li>
+      <a ng-href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u=<[serverName]>/explore/<[explorationId]>&display=popup&ref=plugin&src=share_button" onclick="return !window.open(this.href, '', 'height=336, width=640')" ng-click="registerShareExplorationEvent('facebook')" target="_window">
+        <img class="share-option-img" ng-src="<[fbUrl]>" alt="Facebook">
+      </a>
+    </li>
+
+    <li>
+      <a ng-href="https://twitter.com/share?text=<[escapedTwitterText]>&url=<[serverName]>/explore/<[explorationId]>" onclick="return !window.open(this.href, '', 'height=460, width=640')" target="_window">
+        <img class="share-option-img" ng-src="<[twitterUrl]>" ng-click="registerShareExplorationEvent('twitter')" alt="Twitter">
+      </a>
+    </li>
+
+    <li>
+      <a href="" ng-click="showEmbedExplorationModal(explorationId)" tooltip="Embed" tooltip-placement="top">
+        <i class="material-icons md-48 embed-link">&#xE86F;</i>
+      </a>
+    </li>
+  </ul>
+</script>
+
+<style>
+  .oppia-sharing-links .embed-link {
+    color: white;
+    background: #009688;
+    border-radius: 2px;
+    height: 40px;
+    margin: 3px;
+    padding-top: -webkit-calc(50% - 15px);
+    padding-top: -moz-calc(50% - 15px);
+    padding-top: -o-calc(50% - 15px);
+    padding-top: calc(50% - 15px);
+    text-align: center;
+    width: 40px;
+  }
+
+  .oppia-sharing-links .share-option-img {
+    border-radius: 2px;
+    height: 100%;
+    margin: 3px;
+    width: 40px;
+  }
+
+  .oppia-sharing-links-small {
+    float: left;
+  }
+
+  .oppia-sharing-links-small ul {
+    margin-bottom: 0;
+  }
+
+  .oppia-sharing-links-small li:first-child a img {
+    margin-left: 0;
+  }
+
+  .oppia-sharing-links-small ul .share-option-img,
+  .oppia-sharing-links-small ul .embed-link {
+    font-size: 14px;
+    height: 16px;
+    width: 16px;
+  }
+
+  .oppia-sharing-links-small ul .embed-link {
+    padding-top: 0;
+  }
+
+  ul.oppia-sharing-links {
+    list-style: none;
+    padding: 0;
+  }
+</style>

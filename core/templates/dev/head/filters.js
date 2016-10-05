@@ -119,23 +119,25 @@ oppia.filter('truncateAtFirstEllipsis', [function() {
   };
 }]);
 
-oppia.filter('wrapTextWithEllipsis', ['$filter', function($filter) {
-  return function(input, characterCount) {
-    if (typeof input === 'string' || input instanceof String) {
-      input = $filter('normalizeWhitespace')(input);
-      if (input.length <= characterCount || characterCount < 3) {
-        // String fits within the criteria; no wrapping is necessary.
+oppia.filter('wrapTextWithEllipsis', [
+  '$filter', 'utilsService', function($filter, utilsService) {
+    return function(input, characterCount) {
+      if (utilsService.isString(input)) {
+        input = $filter('normalizeWhitespace')(input);
+        if (input.length <= characterCount || characterCount < 3) {
+          // String fits within the criteria; no wrapping is necessary.
+          return input;
+        }
+
+        // Replace characters counting backwards from character count with an
+        // ellipsis, then trim the string.
+        return input.substr(0, characterCount - 3).trim() + '...';
+      } else {
         return input;
       }
-
-      // Replace characters counting backwards from character count with an
-      // ellipsis, then trim the string.
-      return input.substr(0, characterCount - 3).trim() + '...';
-    } else {
-      return input;
-    }
-  };
-}]);
+    };
+  }
+]);
 
 // Filter that returns true iff an outcome has a self-loop and no feedback.
 oppia.filter('isOutcomeConfusing', [function() {
@@ -254,14 +256,58 @@ oppia.filter('parameterizeRuleDescription', [
 
 // Filter that removes whitespace from the beginning and end of a string, and
 // replaces interior whitespace with a single space character.
-oppia.filter('normalizeWhitespace', [function() {
+oppia.filter('normalizeWhitespace', ['utilsService', function(utilsService) {
   return function(input) {
-    if (typeof input === 'string' || input instanceof String) {
+    if (utilsService.isString(input)) {
       // Remove whitespace from the beginning and end of the string, and
       // replace interior whitespace with a single space character.
       input = input.trim();
       input = input.replace(/\s{2,}/g, ' ');
       return input;
+    } else {
+      return input;
+    }
+  };
+}]);
+
+// Filter that takes a string, trims and normalizes spaces within each
+// line, and removes blank lines. Note that any spaces whose removal does not
+// result in two alphanumeric "words" being joined together are also removed,
+// so "hello ? " becomes "hello?".
+oppia.filter('normalizeWhitespacePunctuationAndCase', [function() {
+  return function(input) {
+    if (typeof input === 'string' || input instanceof String) {
+      var isAlphanumeric = function(character) {
+        return 'qwertyuiopasdfghjklzxcvbnm0123456789'.indexOf(
+          character.toLowerCase()) !== -1;
+      };
+
+      input = input.trim();
+      var inputLines = input.split('\n');
+      var resultLines = [];
+      for (var i = 0; i < inputLines.length; i++) {
+        var result = '';
+
+        var inputLine = inputLines[i].trim().replace(/\s{2,}/g, ' ');
+        for (var j = 0; j < inputLine.length; j++) {
+          var currentChar = inputLine.charAt(j).toLowerCase();
+          if (currentChar === ' ') {
+            if (j > 0 && j < inputLine.length - 1 &&
+                isAlphanumeric(inputLine.charAt(j - 1)) &&
+                isAlphanumeric(inputLine.charAt(j + 1))) {
+              result += currentChar;
+            }
+          } else {
+            result += currentChar;
+          }
+        }
+
+        if (result) {
+          resultLines.push(result);
+        }
+      }
+
+      return resultLines.join('\n');
     } else {
       return input;
     }

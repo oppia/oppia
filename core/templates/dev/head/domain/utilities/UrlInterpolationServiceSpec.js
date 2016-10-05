@@ -72,7 +72,7 @@ describe('URL Interpolation Service', function() {
       '/test_url/<first_param>/<second_param>/<third_param>', {
         first_param: 'value1',
         second_param: 'value2',
-        third_param: new String('value3')
+        third_param: 'value3'
       })).toBe('/test_url/value1/value2/value3');
   });
 
@@ -260,20 +260,16 @@ describe('URL Interpolation Service', function() {
     function() {
       expect(uis.getStaticResourceUrl.bind(null, 'test_css_fail.css')).toThrow(
         new Error(
-          'Path must start with \'\/\': \'' + new String('test_css_fail.css') +
-          '\'.'));
+          'Path must start with \'\/\': \'' + 'test_css_fail.css' + '\'.'));
       expect(uis.getStaticResourceUrl.bind(null, 'test_url/fail.css')).toThrow(
         new Error(
-          'Path must start with \'\/\': \'' + new String('test_url/fail.css') +
-          '\'.'));
+          'Path must start with \'\/\': \'' + 'test_url/fail.css' + '\'.'));
 
       expect(uis.getStaticImageUrl.bind(null, 'test_fail.png')).toThrow(
         new Error(
-          'Path must start with \'\/\': \'' + new String('test_fail.png') +
-          '\'.'));
+          'Path must start with \'\/\': \'' + 'test_fail.png' + '\'.'));
       expect(uis.getStaticImageUrl.bind(null, 'test_url/fail.png')).toThrow(
         new Error(
-          'Path must start with \'\/\': \'' + new String('test_url/fail.png') +
-          '\'.'));
+          'Path must start with \'\/\': \'' + 'test_url/fail.png' + '\'.'));
     });
 });

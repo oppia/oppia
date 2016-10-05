@@ -21,22 +21,24 @@ var logicProofConversion = (function() {
   // NOTE: the 'old' values must all be single characters
   var REPLACEMENT_PAIRS = [{
     old: '&',
-    new: '\u2227'
+    // jscs:disable disallowQuotedKeysInObjects
+    'new': '\u2227'
   }, {
     old: '|',
-    new: '\u2228'
+    'new': '\u2228'
   }, {
     old: '@',
-    new: '\u2200'
+    'new': '\u2200'
   }, {
     old: '$',
-    new: '\u2203'
+    'new': '\u2203'
   }, {
     old: '^',
-    new: '\u2227'
+    'new': '\u2227'
   }, {
     old: '\u0009',
-    new: '  '
+    'new': '  '
+    // jscs:enable disallowQuotedKeysInObjects
   }];
 
   var convertToLogicCharacters = function(oldString) {
@@ -44,7 +46,7 @@ var logicProofConversion = (function() {
     for (var i = 0; i < REPLACEMENT_PAIRS.length; i++) {
       // We don't use .replace() as it only affects the first instance
       replacedString = replacedString.split(
-        REPLACEMENT_PAIRS[i].old).join(REPLACEMENT_PAIRS[i].new);
+        REPLACEMENT_PAIRS[i].old).join(REPLACEMENT_PAIRS[i]['new']);
     }
     return replacedString;
   };

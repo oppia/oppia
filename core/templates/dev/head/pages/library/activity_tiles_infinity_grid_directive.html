@@ -1,0 +1,59 @@
+<script type="text/ng-template" id="components/activityTilesInfinityGrid">
+  <div class="oppia-activities-infinity-grid-container" infinite-scroll="
+       showMoreActivities()" infinite-scroll-distance="1"
+       infinite-scroll-disabled="endOfPageIsReached || searchResultsAreLoading">
+    <div ng-repeat="activity in allActivitiesInOrder track by $index" style="display: inline-block;">
+      <collection-summary-tile ng-if="activity.activity_type === 'collection'"
+                               collection-id="activity.id"
+                               collection-title="activity.title"
+                               last-updated-msec="activity.last_updated_msec"
+                               node-count="activity.node_count"
+                               objective="activity.objective"
+                               thumbnail-icon-url="activity.thumbnail_icon_url"
+                               thumbnail-bg-color="activity.thumbnail_bg_color"
+                               style="margin-right: 3px;">
+      </collection-summary-tile>
+      <exploration-summary-tile ng-if="activity.activity_type === 'exploration'"
+                                exploration-id="activity.id"
+                                exploration-title="activity.title"
+                                last-updated-msec="activity.last_updated_msec"
+                                objective="activity.objective"
+                                category="activity.category"
+                                ratings="activity.ratings"
+                                thumbnail-icon-url="activity.thumbnail_icon_url"
+                                thumbnail-bg-color="activity.thumbnail_bg_color"
+                                num-views="activity.num_views"
+                                contributors-summary="activity.human_readable_contributors_summary"
+                                is-community-owned="activity.community_owned"
+                                is-community-editable="activity.community_editable"
+                                class="protractor-test-exp-summary-tile">
+      </exploration-summary-tile>
+    </div>
+  </div>
+  <div class="oppia-search-results-loading-message"
+       ng-if="searchResultsAreLoading">
+    Loading more results
+    <loading-dots></loading-dots>
+  </div>
+</script>
+
+<style>
+  .oppia-activities-infinity-grid-container {
+    max-width: 856px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .oppia-search-results-loading-message {
+    background-color: #e9e9e9;
+    bottom: 0;
+    color: #000;
+    height: 30px;
+    margin-top: 15px;
+    opacity: 0.9;
+    padding-top: 5px;
+    text-align: center;
+    width: 100%;
+    z-index: 50;
+  }
+</style>

@@ -130,6 +130,9 @@
     "OutputEquals": {
       "description": "has output equal to {{x|CodeString}}"
     },
+    "OutputRoughlyEquals": {
+      "description": "has output equal to {{x|CodeString}}, ignoring spacing and case"
+    },
     "ResultsInError": {
       "description": "results in an error when run"
     },

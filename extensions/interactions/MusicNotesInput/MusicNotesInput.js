@@ -84,7 +84,9 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
       UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        onSubmit: '&'
+      },
       templateUrl: 'interaction/MusicNotesInput',
       link: function(scope, element, attrs) {
         // This is needed in order for the scope to be retrievable during Karma
@@ -754,8 +756,10 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
               _convertNoteToReadableNote(scope.noteSequence[i].note));
           }
           readableSequence = _makeAllNotesHaveDurationOne(readableSequence);
-          scope.$parent.submitAnswer(
-            readableSequence, musicNotesInputRulesService);
+          scope.onSubmit({
+            answer: readableSequence,
+            rulesService: musicNotesInputRulesService
+          });
         };
 
         /*******************************************************************

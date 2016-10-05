@@ -25,7 +25,9 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
       oppiaHtmlEscaper, itemSelectionInputRulesService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        onSubmit: '&'
+      },
       templateUrl: 'interaction/ItemSelectionInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.choices = oppiaHtmlEscaper.escapedJsonToObj(
@@ -79,7 +81,10 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
             }
           );
 
-          $scope.$parent.submitAnswer(answers, itemSelectionInputRulesService);
+          $scope.onSubmit({
+            answer: answers,
+            rulesService: itemSelectionInputRulesService
+          });
         };
       }]
     };

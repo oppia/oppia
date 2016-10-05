@@ -106,7 +106,7 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         self._validate_instance()
 
     def test_add_test_examples(self):
-        self.string_classifier.add_examples_for_predicting(self._EXAMPLES_TEST)
+        self.string_classifier.add_docs_for_predicting(self._EXAMPLES_TEST)
         self.assertEquals(self.string_classifier._num_labels, 3)
         self.assertEquals(self.string_classifier._num_docs, 5)
         self.assertEquals(self.string_classifier._num_words, 34)
@@ -143,7 +143,7 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
 
         # When the model is updated, check that the dictionary remains
         # unchanged.
-        self.string_classifier.add_examples_for_predicting(self._EXAMPLES_TEST)
+        self.string_classifier.add_docs_for_predicting(self._EXAMPLES_TEST)
         self.assertEquals(
             self.string_classifier._num_docs,
             len(self._EXAMPLES_TRAIN) + len(self._EXAMPLES_TEST))
@@ -220,7 +220,7 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         self.string_classifier._DEFAULT_MIN_DOCS_TO_PREDICT = 0
         self.string_classifier._DEFAULT_MIN_LABELS_TO_PREDICT = 0
 
-        doc_ids = self.string_classifier.add_examples_for_predicting(
+        doc_ids = self.string_classifier.add_docs_for_predicting(
             self._EXAMPLES_TEST)
         predicted_label = self.string_classifier.predict_label_for_doc(
             doc_ids[0])

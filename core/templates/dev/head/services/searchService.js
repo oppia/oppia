@@ -64,8 +64,8 @@ oppia.factory('searchService', [
     return _searchCursor === null;
   };
 
-  var updateSearchFields = function(itemsType, urlComponent,
-                                    selectionDetails) {
+  var updateSearchFields = function(
+      itemsType, urlComponent, selectionDetails) {
     var itemCodeGroup = urlComponent.match(/=\("[A-Za-z%20" ]+"\)/);
     var itemCodes = itemCodeGroup ? itemCodeGroup[0] : null;
 
@@ -185,6 +185,10 @@ oppia.factory('searchService', [
 
       return decodeURIComponent(querySegments[0]);
     },
+    getCurrentUrlQueryString: function() {
+      return this.getSearchUrlQueryString(
+        _lastQuery, _lastSelectedCategories, _lastSelectedLanguageCodes);
+    },
     loadMoreData: function(successCallback, failureCallback) {
       // If a new query is still being sent, or the end of the page has been
       // reached, do not fetch more results.
@@ -193,9 +197,7 @@ oppia.factory('searchService', [
         return;
       }
 
-      var queryUrl = getQueryUrl(
-        this.getSearchUrlQueryString(
-          _lastQuery, _lastSelectedCategories, _lastSelectedLanguageCodes));
+      var queryUrl = getQueryUrl(this.getCurrentUrlQueryString());
 
       if (_searchCursor) {
         queryUrl += '&cursor=' + _searchCursor;

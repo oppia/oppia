@@ -18,7 +18,6 @@
 
 import datetime
 import imghdr
-import json
 import logging
 
 import jinja2
@@ -162,7 +161,8 @@ class ExplorationPage(EditorHandler):
         """Handles GET requests."""
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             self.render_template(
-                'error/disabled_exploration.html', iframe_restriction=None)
+                'pages/error/disabled_exploration.html',
+                iframe_restriction=None)
             return
 
         exploration = exp_services.get_exploration_by_id(
@@ -192,9 +192,6 @@ class ExplorationPage(EditorHandler):
         interaction_templates = (
             rte_component_registry.Registry.get_html_for_all_components() +
             interaction_registry.Registry.get_interaction_html(
-                interaction_ids))
-        interaction_validators_html = (
-            interaction_registry.Registry.get_validators_html(
                 interaction_ids))
 
         gadget_types = gadget_registry.Registry.get_all_gadget_types()
@@ -235,8 +232,6 @@ class ExplorationPage(EditorHandler):
             'gadget_templates': jinja2.utils.Markup(gadget_templates),
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
-            'interaction_validators_html': jinja2.utils.Markup(
-                interaction_validators_html),
             'meta_description': feconf.CREATE_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_CREATE,
             'value_generators_js': jinja2.utils.Markup(
@@ -253,11 +248,14 @@ class ExplorationPage(EditorHandler):
             'TAG_REGEX': feconf.TAG_REGEX,
         })
 
-        self.render_template('exploration_editor/exploration_editor.html')
+        self.render_template(
+            'pages/exploration_editor/exploration_editor.html')
 
 
 class ExplorationHandler(EditorHandler):
     """Page with editor data for a single exploration."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def _get_exploration_data(
             self, exploration_id, apply_draft=False, version=None):
@@ -573,6 +571,8 @@ class UntrainedAnswersHandler(EditorHandler):
     """
     NUMBER_OF_TOP_ANSWERS_PER_RULE = 50
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     def get(self, exploration_id, escaped_state_name):
         """Handles GET requests."""
         try:
@@ -659,6 +659,9 @@ class ExplorationDownloadHandler(EditorHandler):
     """Downloads an exploration as a zip file, or dict of YAML strings
     representing states.
     """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     def get(self, exploration_id):
         """Handles GET requests."""
         try:
@@ -699,11 +702,11 @@ class StateYamlHandler(EditorHandler):
     layer.
     """
 
-    def get(self):
-        """Handles GET requests."""
+    def post(self):
+        """Handles POST requests."""
         try:
-            state_dict = json.loads(self.request.get('stringified_state'))
-            width = json.loads(self.request.get('stringified_width'))
+            state_dict = self.payload.get('state_dict')
+            width = self.payload.get('width')
         except Exception:
             raise self.PageNotFoundException
 
@@ -714,6 +717,8 @@ class StateYamlHandler(EditorHandler):
 
 class ExplorationResourcesHandler(EditorHandler):
     """Manages assets associated with an exploration."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @require_editor
     def get(self, exploration_id):
@@ -727,6 +732,8 @@ class ExplorationResourcesHandler(EditorHandler):
 
 class ExplorationSnapshotsHandler(EditorHandler):
     """Returns the exploration snapshot history."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -780,6 +787,8 @@ class ExplorationRevertHandler(EditorHandler):
 class ExplorationStatisticsHandler(EditorHandler):
     """Returns statistics for an exploration."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     def get(self, exploration_id, exploration_version):
         """Handles GET requests."""
         try:
@@ -793,6 +802,8 @@ class ExplorationStatisticsHandler(EditorHandler):
 
 class ExplorationStatsVersionsHandler(EditorHandler):
     """Returns statistics versions for an exploration."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -808,6 +819,8 @@ class ExplorationStatsVersionsHandler(EditorHandler):
 
 class StateRulesStatsHandler(EditorHandler):
     """Returns detailed learner answer statistics for a state."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self, exploration_id, escaped_state_name):
         """Handles GET requests."""

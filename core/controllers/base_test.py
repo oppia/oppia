@@ -30,6 +30,7 @@ import feconf
 import main
 import utils
 
+
 import webapp2
 import webtest
 
@@ -72,7 +73,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
             response = self.testapp.get(url, expect_errors=True)
             self.log_line(
                 'Fetched %s with status code %s' % (url, response.status_int))
-            self.assertIn(response.status_int, [200, 302, 404])
+            self.assertIn(response.status_int, [200, 302, 401, 404])
 
         # TODO(sll): Add similar tests for POST, PUT, DELETE.
         # TODO(sll): Set a self.payload attr in the BaseHandler for
@@ -166,7 +167,7 @@ class EscapingTest(test_utils.GenericTestBase):
 
         def get(self):
             """Handles GET requests."""
-            self.render_template('pages/contact.html')
+            self.render_template('pages/tests/jinja_escaping.html')
 
         def post(self):
             """Handles POST requests."""
@@ -269,8 +270,49 @@ class I18nDictsTest(test_utils.GenericTestBase):
                     self.log_line('- %s' % key)
                 self.log_line('')
 
+    def test_alphabetic_i18n_keys(self):
+        """Tests that the keys of all i18n json files are arranged in
+        alphabetical order."""
+        filenames = os.listdir(
+            os.path.join(os.getcwd(), self.get_static_asset_filepath(),
+                         'assets', 'i18n'))
+        for filename in filenames:
+            with open(os.path.join(os.getcwd(), 'assets', 'i18n', filename),
+                      mode='r') as f:
+                lines = f.readlines()
+                self.assertEqual(lines[0], '{\n')
+                self.assertEqual(lines[-1], '}\n')
+                lines = lines[1:-1]
+
+                key_list = [line[:line.find(':')].strip() for line in lines]
+                for key in key_list:
+                    self.assertTrue(key.startswith('"I18N_'))
+                self.assertEqual(sorted(key_list), key_list)
+
     def test_keys_match_en_qqq(self):
         """Tests that en.json and qqq.json have the exact same set of keys."""
         en_key_list = self._extract_keys_from_json_file('en.json')
         qqq_key_list = self._extract_keys_from_json_file('qqq.json')
         self.assertEqual(en_key_list, qqq_key_list)
+
+
+class GetHandlerTypeIfExceptionRaisedTest(test_utils.GenericTestBase):
+
+    class FakeHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        def get(self):
+            raise self.InternalErrorException('fake exception')
+
+    def test_error_response_for_get_request_of_type_json_has_json_format(self):
+        fake_urls = []
+        fake_urls.append(main.get_redirect_route(r'/fake', self.FakeHandler))
+        fake_urls.append(main.URLS[-1])
+        with self.swap(main, 'URLS', fake_urls):
+            transaction_services = models.Registry.import_transaction_services()
+            app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
+                webapp2.WSGIApplication(main.URLS, debug=feconf.DEBUG))
+            self.testapp = webtest.TestApp(app)
+
+            response = self.get_json('/fake', expect_errors=True)
+            self.assertTrue(isinstance(response, dict))
+            self.assertEqual(500, response['code'])

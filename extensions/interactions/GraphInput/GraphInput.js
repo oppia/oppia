@@ -27,7 +27,9 @@ oppia.directive('oppiaInteractiveGraphInput', [
   oppiaHtmlEscaper, graphInputRulesService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        onSubmit: '&'
+      },
       templateUrl: 'interaction/GraphInput',
       controller: ['$scope', '$element', '$attrs',
           function($scope, $element, $attrs) {
@@ -42,8 +44,10 @@ oppia.directive('oppiaInteractiveGraphInput', [
 
         $scope.submitGraph = function() {
           // Here, angular.copy is needed to strip $$hashkey from the graph.
-          $scope.$parent.submitAnswer(
-            angular.copy($scope.graph), graphInputRulesService);
+          $scope.onSubmit({
+            answer: angular.copy($scope.graph),
+            rulesService: graphInputRulesService
+          });
         };
         $scope.resetGraph = function() {
           updateGraphFromJSON($attrs.graphWithValue);
