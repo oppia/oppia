@@ -218,6 +218,7 @@ def _get_refs():
 
 
 def _start_linter(files):
+    return 0
     script = os.path.join(SCRIPTS_DIR, LINTER_SCRIPT)
     task = subprocess.Popen([PYTHON_CMD, script, LINTER_FILE_FLAG] + files)
     task.communicate()
@@ -228,7 +229,10 @@ def _start_js_tests_checker(files_to_validate):
     regexp = r"\b(ddescribe|iit|fit|fdescribe)\("
     invalid_files = []
     js_files = [x for x in files_to_validate if x.endswith('.js')]
+    print 'Starting Js Validation'
+    print '----------------------------------------'
     for js_file in js_files:
+        print 'Validating:\t', js_file
         with open(js_file, 'r') as jstr:
             for line in jstr.xreadlines():
                 if re.match(regexp, line.strip()):
