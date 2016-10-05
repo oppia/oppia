@@ -636,8 +636,9 @@ class TopRatedExplorationDisplayableSummariesTest(
             self.bob_id, self.EXP_ID_1, 1)
 
         top_rated_exploration_summaries = (
-            summary_services.get_top_rated_exploration_summary_dicts([
-                feconf.DEFAULT_LANGUAGE_CODE]))
+            summary_services.get_top_rated_exploration_summary_dicts(
+                [feconf.DEFAULT_LANGUAGE_CODE],
+                feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE))
         expected_summary = {
             'status': u'public',
             'thumbnail_bg_color': '#a33f40',
@@ -673,8 +674,9 @@ class TopRatedExplorationDisplayableSummariesTest(
             self.bob_id, self.EXP_ID_2, 5)
 
         top_rated_exploration_summaries = (
-            summary_services.get_top_rated_exploration_summary_dicts([
-                feconf.DEFAULT_LANGUAGE_CODE]))
+            summary_services.get_top_rated_exploration_summary_dicts(
+                [feconf.DEFAULT_LANGUAGE_CODE],
+                feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE))
 
         expected_summary = {
             'status': u'public',
@@ -757,7 +759,8 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         """
 
         recently_published_exploration_summaries = (
-            summary_services.get_recently_published_exploration_summary_dicts())
+            summary_services.get_recently_published_exp_summary_dicts(
+                feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE))
         test_summary_1 = {
             'status': 'public',
             'thumbnail_bg_color': '#a33f40',
@@ -821,7 +824,8 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             }], 'Changed title.')
 
         recently_published_exploration_summaries = (
-            summary_services.get_recently_published_exploration_summary_dicts())
+            summary_services.get_recently_published_exp_summary_dicts(
+                feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE))
         self.assertEqual(
             recently_published_exploration_summaries[1]['title'], 'New title')
         self.assertDictContainsSubset(

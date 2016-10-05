@@ -73,7 +73,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
             response = self.testapp.get(url, expect_errors=True)
             self.log_line(
                 'Fetched %s with status code %s' % (url, response.status_int))
-            self.assertIn(response.status_int, [200, 302, 404])
+            self.assertIn(response.status_int, [200, 302, 401, 404])
 
         # TODO(sll): Add similar tests for POST, PUT, DELETE.
         # TODO(sll): Set a self.payload attr in the BaseHandler for

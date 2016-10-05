@@ -90,12 +90,16 @@ class FeedbackThreadModel(base_models.BaseModel):
     def generate_full_thread_id(cls, exploration_id, thread_id):
         return '.'.join([exploration_id, thread_id])
 
+    @property
+    def thread_id(self):
+        return self.id.split('.')[1]
+
     @classmethod
     def create(cls, exploration_id, thread_id):
         """Creates a new FeedbackThreadModel entry.
 
-        Throws an exception if a thread with the given exploration ID and
-        thread ID combination exists already.
+        Throws an exception if a thread with the given exploration ID and thread
+        ID combination exists already.
         """
         instance_id = cls.generate_full_thread_id(exploration_id, thread_id)
         if cls.get_by_id(instance_id):
@@ -112,14 +116,17 @@ class FeedbackThreadModel(base_models.BaseModel):
             exploration_id, thread_id))
 
     @classmethod
-    def get_threads(cls, exploration_id):
-        """Returns an array of threads associated to the exploration.
+    def get_threads(cls, exploration_id, limit=feconf.DEFAULT_QUERY_LIMIT):
+        """Returns a list of threads associated to the exploration, ordered by
+        their last updated field. The number of entities fetched is limited by
+        the `limit` argument to this method, whose default value is equal to the
+        the default query limit.
 
         Does not include the deleted entries.
         """
         return cls.get_all().filter(
             cls.exploration_id == exploration_id).order(
-                cls.last_updated).fetch(feconf.DEFAULT_QUERY_LIMIT)
+                cls.last_updated).fetch(limit)
 
 
 class FeedbackMessageModel(base_models.BaseModel):
@@ -188,8 +195,10 @@ class FeedbackMessageModel(base_models.BaseModel):
 
         Does not include the deleted entries.
         """
-        full_thread_id = FeedbackThreadModel.generate_full_thread_id(
-            exploration_id, thread_id)
+        full_thread_id = (
+            FeedbackThreadModel.generate_full_thread_id(
+                exploration_id, thread_id))
+
         return cls.get_all().filter(
             cls.thread_id == full_thread_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
 

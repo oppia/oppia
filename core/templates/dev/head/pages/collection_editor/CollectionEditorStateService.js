@@ -25,12 +25,12 @@ oppia.constant('EVENT_COLLECTION_REINITIALIZED', 'collectionReinitialized');
 oppia.factory('CollectionEditorStateService', [
   '$rootScope', 'alertsService', 'CollectionObjectFactory',
   'SkillListObjectFactory', 'UndoRedoService',
-  'WritableCollectionBackendApiService', 'EVENT_COLLECTION_INITIALIZED',
+  'EditableCollectionBackendApiService', 'EVENT_COLLECTION_INITIALIZED',
   'EVENT_COLLECTION_REINITIALIZED', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
   function(
       $rootScope, alertsService, CollectionObjectFactory,
       SkillListObjectFactory, UndoRedoService,
-      WritableCollectionBackendApiService, EVENT_COLLECTION_INITIALIZED,
+      EditableCollectionBackendApiService, EVENT_COLLECTION_INITIALIZED,
       EVENT_COLLECTION_REINITIALIZED, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
     var _collection = CollectionObjectFactory.createEmptyCollection();
     var _collectionSkillList = SkillListObjectFactory.create([]);
@@ -72,7 +72,7 @@ oppia.factory('CollectionEditorStateService', [
        */
       loadCollection: function(collectionId) {
         _isLoadingCollection = true;
-        WritableCollectionBackendApiService.fetchWritableCollection(
+        EditableCollectionBackendApiService.fetchCollection(
           collectionId).then(
           function(newBackendCollectionObject) {
             _updateCollection(newBackendCollectionObject);
@@ -143,7 +143,7 @@ oppia.factory('CollectionEditorStateService', [
           return false;
         }
         _isSavingCollection = true;
-        WritableCollectionBackendApiService.updateCollection(
+        EditableCollectionBackendApiService.updateCollection(
           _collection.getId(), _collection.getVersion(),
           commitMessage, UndoRedoService.getCommittableChangeList()).then(
           function(collectionBackendObject) {

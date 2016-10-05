@@ -38,8 +38,7 @@ oppia.directive('collectionEditorNavbarBreadcrumb', [function() {
           preview: 'Preview',
           settings: 'Settings',
           stats: 'Statistics',
-          history: 'History',
-          feedback: 'Feedback'
+          history: 'History'
         };
 
         $scope.collection = CollectionEditorStateService.getCollection();
