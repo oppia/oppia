@@ -117,7 +117,9 @@ describe('Expression evaluator service', function() {
       ['num100_001 / 0', Infinity],
       ['abs(-3)', 3],
       ['pow(num100_001, numZero)', 1],
-      ['log(9, 3)', 2],
+      // This is to test log(9, 3) but the rounding is needed to prevent
+      // floating-point errors when running on MacOS.
+      ['floor(log(9, 3) * 10000.25)', 20000],
       ['numZero + numOne', ests.ExprUndefinedVarError],
       [['+', 10, 20, 30], ests.ExprWrongNumArgsError],
       [['==', true], ests.ExprWrongNumArgsError],
