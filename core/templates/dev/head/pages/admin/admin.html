@@ -129,7 +129,7 @@
             <ul class="nav oppia-navbar-tabs oppia-navbar-tabs-admin">
               <li class="oppia-clickable-navbar-element pull-right">
                 <a class="oppia-navbar-tab"
-                   ng-href="<[::ADMIN_TAB_URLS.MISC]>"
+                   ng-href="<[ADMIN_TAB_URLS.MISC]>"
                    tooltip="Miscellaneous"
                    tooltip-placement="bottom">
                   Misc
@@ -137,7 +137,7 @@
               </li>
               <li class="oppia-clickable-navbar-element pull-right">
                 <a class="oppia-navbar-tab protractor-test-admin-config-tab"
-                   ng-href="<[::ADMIN_TAB_URLS.CONFIG]>"
+                   ng-href="<[ADMIN_TAB_URLS.CONFIG]>"
                    tooltip="Config"
                    tooltip-placement="bottom">
                   Config
@@ -145,7 +145,7 @@
               </li>
               <li class="oppia-clickable-navbar-element pull-right">
                 <a class="oppia-navbar-tab"
-                   ng-href="<[::ADMIN_TAB_URLS.JOBS]>"
+                   ng-href="<[ADMIN_TAB_URLS.JOBS]>"
                    tooltip="Jobs"
                    tooltip-placement="bottom">
                   Jobs
@@ -153,7 +153,7 @@
               </li>
               <li class="dropdown oppia-navbar-clickable-dropdown pull-right">
                 <a class="oppia-navbar-tab"
-                   ng-href="<[::ADMIN_TAB_URLS.ACTIVITIES]>"
+                   ng-href="<[ADMIN_TAB_URLS.ACTIVITIES]>"
                    tooltip="Activities"
                    tooltip-placement="bottom">
                   Activities
@@ -428,7 +428,9 @@
           </div>
         </md-card>
 
-        <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_MISC" style="max-width: 700px">
+        <md-card class="oppia-page-card oppia-long-text"
+                 ng-if="currentTab === ADMIN_TAB_URLS.MISC"
+                 style="max-width: 700px">
           <h3>Search Index</h3>
           <button ng-click="clearSearchIndex()">Clear Search Index</button>
         </md-card>
