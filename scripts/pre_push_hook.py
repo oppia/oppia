@@ -235,8 +235,9 @@ def _start_js_tests_checker(files_to_validate):
         print 'Validating:\t', js_file
         with open(js_file, 'r') as jstr:
             for line in jstr.xreadlines():
-                if re.match(regexp, line.strip()):
-                    invalid_files.append(js_file)
+                res = re.match(regexp, line.strip())
+                if res:
+                    invalid_files.append((js_file, res.string))
     return invalid_files
 
 
@@ -308,8 +309,8 @@ def main():
                 if len(js_test_files) != 0:
                     print ('Push failed, please correct the validation issues '
                            'in the following files:')
-                    for js_test_file in js_test_files:
-                        print "\t", js_test_file
+                    for js_test_file, error in js_test_files:
+                        print "\t %s (%s)" % (js_test_file, error)
                     print
                     sys.exit(1)
             frontend_status = _start_sh_script(FRONTEND_TEST_SCRIPT)
