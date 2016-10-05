@@ -214,7 +214,7 @@ def send_mail_to_admin(email_subject, email_body):
 
     email_services.send_mail(
         feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS, email_subject,
-        body, None, bcc_admin=False)
+        body, body.replace('\n', '<br/>'), bcc_admin=False)
 
 
 def send_post_signup_email(user_id):
