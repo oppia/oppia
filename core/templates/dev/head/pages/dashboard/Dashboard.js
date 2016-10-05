@@ -163,7 +163,8 @@ oppia.controller('Dashboard', [
       var value = entity[$scope.currentSortType];
       var DEFAULT_TEXT_EMPTY_TITLE = 'Untitled';
       if (entity.status === 'private') {
-        if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.TITLE) {
+        if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.TITLE &&
+            value === '') {
           return DEFAULT_TEXT_EMPTY_TITLE;
         } else if ($scope.currentSortType !==
                    EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED) {
