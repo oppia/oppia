@@ -187,7 +187,7 @@
 
       <div class="col-lg-12 col-md-12 col-sm-12" style="margin-top: -30px; margin-bottom: -30px">
         <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_JOBS" style="max-width: 900px">
-          <h4>Continuous computations</h4>
+          <h3>Continuous computations</h3>
           <table class="table">
             <tr>
               <th>Type</th>
@@ -224,9 +224,8 @@
         </md-card>
 
         <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_JOBS" style="max-width: 900px">
-          <h3>Jobs</h3>
+          <h3>One-off jobs</h3>
           <h4>Current time: {{human_readable_current_time}}</h4>
-          <h4>One-off jobs</h4>
           <table class="table table-striped">
             {% for job_spec in one_off_job_specs %}
               <tr>
@@ -249,7 +248,7 @@
         </md-card>
 
         <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_JOBS" style="max-width: 900px">
-          <h4>Unfinished jobs</h4>
+          <h3>Unfinished jobs</h3>
           <em>Note: This table may be stale; refresh to see the latest state.</em>
           <table class="table">
             <tr>
@@ -278,7 +277,7 @@
         </md-card>
 
         <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_JOBS" style="max-width: 900px">
-          <h4>Recent jobs</h4>
+          <h3>Recent jobs</h3>
           <em>Note: This table may be stale; refresh to see the latest state.</em>
           <table class="table">
             <tr>
