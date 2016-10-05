@@ -218,7 +218,6 @@ def _get_refs():
 
 
 def _start_linter(files):
-    return 0
     script = os.path.join(SCRIPTS_DIR, LINTER_SCRIPT)
     task = subprocess.Popen([PYTHON_CMD, script, LINTER_FILE_FLAG] + files)
     task.communicate()
@@ -311,7 +310,6 @@ def main():
                            'in the following files:')
                     for js_test_file, error in js_test_files:
                         print "\t %s --> %s" % (js_test_file, error)
-                    print
                     sys.exit(1)
             frontend_status = _start_sh_script(FRONTEND_TEST_SCRIPT)
             if frontend_status != 0:
