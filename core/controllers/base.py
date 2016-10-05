@@ -405,10 +405,9 @@ class BaseHandler(webapp2.RequestHandler):
             self.values.update(values)
             if 'iframed' in self.values and self.values['iframed']:
                 self.render_template(
-                    'error/error_iframed.html', iframe_restriction=None)
+                    'pages/error/error_iframed.html', iframe_restriction=None)
             else:
-                self.render_template(
-                    'pages/error/error.html')
+                self.render_template('pages/error/error.html')
 
 
     def handle_exception(self, exception, unused_debug_mode):

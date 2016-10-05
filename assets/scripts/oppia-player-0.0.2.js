@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2016 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
 /**
  * Insert this script at the bottom of your web page. It will take all the
  * <oppia> tags and render them as iframes of Oppia explorations.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 

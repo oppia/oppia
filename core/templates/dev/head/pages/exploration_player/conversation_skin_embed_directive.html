@@ -153,9 +153,12 @@
       </nav>
     </footer>
   </div>
-  <style type="text/css">
-    html,
-    body {
+
+  <!-- The styles here need to be embedded within the directive script tags,
+  since otherwise they will interfere with the non-iframed conversation skin
+  directive. -->
+  <style>
+    html, body {
       background: url('/assets/common/images/general/background.jpg') no-repeat center center fixed;
       background-color: #eee;
       background-size: cover;

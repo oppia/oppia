@@ -59,7 +59,8 @@ oppia.factory('explorationContextService', [
           var pathnameArray = currentLocationService.getPathname().split('/');
           for (var i = 0; i < pathnameArray.length; i++) {
             if (pathnameArray[i] === 'explore' ||
-                pathnameArray[i] === 'embed') {
+                (pathnameArray[i] === 'embed' &&
+                 pathnameArray[i + 1] === 'exploration')) {
               pageContext = PAGE_CONTEXT.LEARNER;
               return PAGE_CONTEXT.LEARNER;
             } else if (pathnameArray[i] === 'create') {

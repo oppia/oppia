@@ -63,8 +63,9 @@ def require_playable(handler):
             return
 
         # This check is needed in order to show the correct page when a 404
-        # error is raised. The second part of the check is needed for backwards
-        # compatibility with older versions of the embedding script.
+        # error is raised. The self.request.get('iframed') part of the check is
+        # needed for backwards compatibility with older versions of the
+        # embedding script.
         if (feconf.EXPLORATION_URL_EMBED_PREFIX in self.request.uri or
                 self.request.get('iframed')):
             self.values['iframed'] = True
@@ -130,7 +131,6 @@ def classify_string_classifier_rule(state, normalized_answer):
 
 def _get_exploration_player_data(
         exploration_id, version, collection_id, can_edit):
-
     try:
         exploration = exp_services.get_exploration_by_id(
             exploration_id, version=version)
@@ -160,12 +160,12 @@ def _get_exploration_player_data(
 
     gadget_templates = (
         gadget_registry.Registry.get_gadget_html(gadget_types))
-
     interaction_templates = (
         rte_component_registry.Registry.get_html_for_all_components() +
         interaction_registry.Registry.get_interaction_html(
             interaction_ids))
-    exploration_data_values = {
+
+    return {
         'GADGET_SPECS': gadget_registry.Registry.get_all_specs(),
         'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
         'DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER': (
@@ -189,7 +189,6 @@ def _get_exploration_player_data(
         'meta_description': utils.capitalize_string(exploration.objective),
         'nav_mode': feconf.NAV_MODE_EXPLORE,
     }
-    return exploration_data_values
 
 
 def classify(state, answer):
@@ -254,13 +253,14 @@ class ExplorationPageEmbed(base.BaseHandler):
         # Note: this is an optional argument and will be None when the
         # exploration is being played outside the context of a collection.
         collection_id = self.request.get('collection_id')
-        can_edit = (bool(self.username) and self.username not in
-                    config_domain.BANNED_USERNAMES.value and
-                    rights_manager.Actor(self.user_id).can_edit(
-                        feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
+        can_edit = (
+            bool(self.username) and
+            self.username not in config_domain.BANNED_USERNAMES.value and
+            rights_manager.Actor(self.user_id).can_edit(
+                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
 
         try:
-            # If the exploration does not exist, an Exception is raised.
+            # If the exploration does not exist, a 404 error is raised.
             exploration_data_values = _get_exploration_player_data(
                 exploration_id, version, collection_id, can_edit)
         except Exception:
@@ -268,7 +268,6 @@ class ExplorationPageEmbed(base.BaseHandler):
 
         self.values.update(exploration_data_values)
         self.values['iframed'] = True
-
         self.render_template(
             'pages/exploration_player/exploration_player.html',
             iframe_restriction=None)
@@ -293,11 +292,11 @@ class ExplorationPage(base.BaseHandler):
         # Note: this is an optional argument and will be None when the
         # exploration is being played outside the context of a collection.
         collection_id = self.request.get('collection_id')
-
-        can_edit = (bool(self.username) and self.username not in
-                    config_domain.BANNED_USERNAMES.value and
-                    rights_manager.Actor(self.user_id).can_edit(
-                        feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
+        can_edit = (
+            bool(self.username) and
+            self.username not in config_domain.BANNED_USERNAMES.value and
+            rights_manager.Actor(self.user_id).can_edit(
+                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
 
         try:
             # If the exploration does not exist, a 404 error is raised.
@@ -308,7 +307,8 @@ class ExplorationPage(base.BaseHandler):
 
         self.values.update(exploration_data_values)
         self.values['iframed'] = False
-        self.render_template('pages/exploration_player/exploration_player.html')
+        self.render_template(
+            'pages/exploration_player/exploration_player.html')
 
 
 
