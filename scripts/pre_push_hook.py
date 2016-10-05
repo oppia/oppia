@@ -310,7 +310,7 @@ def main():
                     print ('Push failed, please correct the validation issues '
                            'in the following files:')
                     for js_test_file, error in js_test_files:
-                        print "\t %s (%s)" % (js_test_file, error)
+                        print "\t %s --> %s" % (js_test_file, error)
                     print
                     sys.exit(1)
             frontend_status = _start_sh_script(FRONTEND_TEST_SCRIPT)
