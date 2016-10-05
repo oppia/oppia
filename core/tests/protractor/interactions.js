@@ -24,7 +24,7 @@ var player = require('../protractor_utils/player.js');
 var workflow = require('../protractor_utils/workflow.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 
-describe('Interactions', function() {
+ddescribe('Interactions', function() {
   it('should pass their own test suites', function() {
     users.createUser('user@interactions.com', 'userInteractions');
     users.login('user@interactions.com');
