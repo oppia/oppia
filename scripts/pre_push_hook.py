@@ -284,7 +284,6 @@ def main():
         _install_hook()
         sys.exit(0)
     refs = _get_refs()
-    print refs
     collected_files = _collect_files_being_pushed(refs, remote)
     # only interfere if we actually have something to lint (prevents
     # annoyances)
