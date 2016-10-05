@@ -60,6 +60,7 @@ GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
 
 
 class ChangedBranch(object):
+
     def __init__(self, new_branch):
         get_branch_cmd = 'git symbolic-ref -q --short HEAD'.split()
         self.old_branch = subprocess.check_output(get_branch_cmd).strip()
@@ -196,7 +197,8 @@ def _collect_files_being_pushed(ref_list, remote):
         files_to_validate = _extract_files_to_validate(modified_files)
         collected_files[branch] = (modified_files, files_to_validate)
 
-    for branch, (modified_files, files_to_validate) in collected_files.iteritems():
+    for branch, (modified_files, files_to_validate) in \
+            collected_files.iteritems():
         if modified_files:
             print '\nModified files in %s:' % branch
             pprint.pprint(modified_files)
@@ -223,19 +225,13 @@ def _start_linter(files):
 
 
 def _start_js_tests_checker(files_to_validate):
-    regexp =  r"\b(ddescribe|iit|fit|fdescribe)\("
+    regexp = r"\b(ddescribe|iit|fit|fdescribe)\("
     invalid_files = []
-    js_files = filter(lambda x: x.endswith('.js'), files_to_validate)
+    js_files = [x for x in files_to_validate if x.endswith('.js')]
     for js_file in js_files:
-        print "*" * 10
-        print "check file",  js_file
         with open(js_file, 'r') as jstr:
             for line in jstr.xreadlines():
                 if re.match(regexp, line.strip()):
-                    print "\n\n\n"
-                    print line
-                    print "found invalid file",  js_file
-                    print "\n\n\n"
                     invalid_files.append(js_file)
     return invalid_files
 
@@ -273,7 +269,8 @@ def _install_hook():
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('remote', nargs='?', help='provided by git before push')
+    parser.add_argument('remote', nargs='?',
+                        help='provided by git before push')
     parser.add_argument('url', nargs='?', help='provided by git before push')
     parser.add_argument('--install', action='store_true', default=False,
                         help='Install pre_push_hook to the .git/hooks dir')
@@ -285,35 +282,31 @@ def main():
     refs = _get_refs()
     print refs
     collected_files = _collect_files_being_pushed(refs, remote)
-    # only interfere if we actually have something to lint (prevents annoyances)
-    """
+    # only interfere if we actually have something to lint (prevents
+    # annoyances)
     if collected_files and _has_uncommitted_files():
         print ('Your repo is in a dirty state which prevents the linting from'
                ' working.\nStash your changes or commit them.\n')
         sys.exit(1)
-    """
-    for branch, (modified_files, files_to_validate) in collected_files.iteritems():
+    for branch, (modified_files, files_to_validate) in \
+            collected_files.iteritems():
         with ChangedBranch(branch):
             if not modified_files and not files_to_validate:
                 continue
             if files_to_validate:
                 # Linter
-                """
                 lint_status = _start_linter(files_to_validate)
                 if lint_status != 0:
                     print 'Push failed, please correct the linting issues above'
                     sys.exit(1)
-                """
                 # Js-tests-validator
                 js_test_files = _start_js_tests_checker(files_to_validate)
-                print "*" * 10
-                print js_test_files
-                print "*" * 10
                 if len(js_test_files) != 0:
                     print ('Push failed, please correct the validation issues '
-                          'in the following files:')
-                    for file in js_test_files:
-                        print "\t", file
+                           'in the following files:')
+                    for js_test_file in js_test_files:
+                        print "\t", js_test_file
+                    print
                     sys.exit(1)
             frontend_status = _start_sh_script(FRONTEND_TEST_SCRIPT)
             if frontend_status != 0:
