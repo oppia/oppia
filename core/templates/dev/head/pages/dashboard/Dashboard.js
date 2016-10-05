@@ -84,14 +84,8 @@ oppia.controller('Dashboard', [
       $scope.activeTab = newActiveTabName;
     };
 
-    $scope.showExplorationEditor = function(explorationId) {
-      $window.location = '/create/' + explorationId;
-    };
-
-    $scope.openExploration = function(status, explorationId) {
-      if (status === 'private') {
-        $scope.showExplorationEditor(explorationId);
-      } else {
+    $scope.getStatsForPrivateExp = function(status, explorationId) {
+      if (status !== 'private') {
         DashboardBackendApiService.fetchExplorationStats(explorationId).then(
           function(response) {
             $scope.explorationStats[explorationId] = response.data;
