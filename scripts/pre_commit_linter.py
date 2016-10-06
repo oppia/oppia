@@ -53,13 +53,13 @@ Note that the root folder MUST be named 'oppia'.
 # pylint: disable=wrong-import-order
 import argparse
 import fnmatch
+import json
 import multiprocessing
 import os
-import json
+import re
 import subprocess
 import sys
 import time
-import re
 # pylint: enable=wrong-import-order
 
 _PARSER = argparse.ArgumentParser()
@@ -111,8 +111,14 @@ BAD_PATTERNS_JS = {
 
 BAD_PATTERNS_JS_REGEXP = [
     {
-        'regexp': r"\b(ddescribe|iit|fit|fdescribe)\(",
-        'message': 'Please do not use focused tests in this file.',
+        'regexp': r"\b(ddescribe|fdescribe)\(",
+        'message': "In tests, please use 'describe' instead of 'ddescribe'"
+                   "or 'fdescribe'",
+        'excluded_files': ()
+    },
+    {
+        'regexp': r"\b(iit|fit)\(",
+        'message': "In tests, please use 'it' instead of 'iit' or 'fit'",
         'excluded_files': ()
     }
 ]
