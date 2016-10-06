@@ -3590,6 +3590,12 @@ md-card.preview-conversation-skin-supplemental-card {
     text-decoration: underline;
 }
 
+.oppia-dashboard-list-summary {
+  display:inline-block;
+  text-decoration: none !important;
+  width: 100%;
+}
+
 .oppia-activity-summary-tile:hover {
   /*
     This is based on the levels defined on the following page:
