@@ -3584,15 +3584,11 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-dashboard-container a:active,
 .oppia-dashboard-container a:visited {
   color: inherit;
-}
-
-.oppia-dashboard-container a:hover {
-    text-decoration: underline;
+  text-decoration: none;
 }
 
 .oppia-dashboard-list-summary {
   display:inline-block;
-  text-decoration: none !important;
   width: 100%;
 }
 
