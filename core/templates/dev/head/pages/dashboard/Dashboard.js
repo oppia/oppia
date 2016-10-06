@@ -84,7 +84,7 @@ oppia.controller('Dashboard', [
       $scope.activeTab = newActiveTabName;
     };
 
-    $scope.getStatsForPrivateExp = function(status, explorationId) {
+    $scope.getStatsForPublishedExp = function(status, explorationId) {
       if (status !== 'private') {
         DashboardBackendApiService.fetchExplorationStats(explorationId).then(
           function(response) {

@@ -25,7 +25,7 @@
       background-color: #f2f2ee;
     }
 
-    .oppia-dashboard-container-exp {
+    .oppia-dashboard-list-summary {
       text-decoration: none !important;
       width: 100%;
       display:inline-block;
@@ -166,7 +166,7 @@
             <tr ng-repeat="exploration in explorationsList | orderBy:sortByFunction:isCurrentSortDescending track by exploration.id"
                 class="exploration-list-item">
               <td>
-                <a ng-href="/create/<[exploration.id]>" class="oppia-dashboard-container-exp">
+                <a ng-href="/create/<[exploration.id]>" class="oppia-dashboard-list-summary">
                   <[exploration.title || 'Untitled']>
                   <span ng-if="exploration.status === 'publicized'"
                         class="featured-badge">
@@ -177,22 +177,22 @@
               <td colspan="4"
                   ng-if="exploration.status === 'private'"
                   class="exp-private-text">
-                <a ng-href="/create/<[exploration.id]>" class="oppia-dashboard-container-exp">
+                <a ng-href="/create/<[exploration.id]>" class="oppia-dashboard-list-summary">
                   <[publishText]>
                 </a>
               </td>
               <td ng-if="exploration.status !== 'private'">
-                <a ng-href="/create/<[exploration.id]>" class="oppia-dashboard-container-exp">
+                <a ng-href="/create/<[exploration.id]>" class="oppia-dashboard-list-summary">
                   <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
                 </a>
               </td>
               <td ng-if="exploration.status !== 'private'">
-                <a ng-href="/create/<[exploration.id]>" class="oppia-dashboard-container-exp">
+                <a ng-href="/create/<[exploration.id]>" class="oppia-dashboard-list-summary">
                   <[exploration.num_views]>
                 </a>
               </td>
               <td ng-if="exploration.status !== 'private'">
-                <a ng-href="/create/<[exploration.id]>" class="oppia-dashboard-container-exp">
+                <a ng-href="/create/<[exploration.id]>" class="oppia-dashboard-list-summary">
                   <[exploration.num_total_threads]>
                 </a>
                 <a ng-if="exploration.num_open_threads != 0"
@@ -202,12 +202,12 @@
                 </a>
               </td>
               <td ng-if="exploration.status !== 'private'">
-                <a ng-href="/create/<[exploration.id]>" class="oppia-dashboard-container-exp">
+                <a ng-href="/create/<[exploration.id]>" class="oppia-dashboard-list-summary">
                   <[exploration.num_unresolved_answers]>
                 </a>
               </td>
               <td>
-                <a ng-href="/create/<[exploration.id]>" class="oppia-dashboard-container-exp">
+                <a ng-href="/create/<[exploration.id]>" class="oppia-dashboard-list-summary">
                   <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
                 </a>
               </td>
@@ -224,8 +224,8 @@
                  scroll-on-click
                  is-dropdown-open="activeExplorationId === exploration.id"
                  is-private="exploration.status === 'private'"
-                 ng-click="getStatsForPrivateExp(exploration.status, exploration.id)">
-          <div ng-if="exploration.status !=='private'">
+                 ng-click="getStatsForPublishedExp(exploration.status, exploration.id)">
+          <div ng-if="exploration.status !== 'private'">
             <div class="title-section"
                  ng-class="{'oppia-exp-arrow': activeExplorationId === exploration.id}"
                  style="background-color: <[exploration.thumbnail_bg_color]>;">
@@ -243,7 +243,7 @@
               <div class="title-section-mask"></div>
             </div>
           </div>
-          <div ng-if="exploration.status ==='private'">
+          <div ng-if="exploration.status === 'private'">
             <a ng-href="/create/<[exploration.id]>">
               <div class="title-section"
                    ng-class="{'oppia-exp-arrow': activeExplorationId === exploration.id}"
