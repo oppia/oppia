@@ -39,6 +39,7 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UserFirstContributionMsecOneOffJob,
     exp_jobs_one_off.ExplorationMigrationJobManager,
     exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob,
+    exp_jobs_one_off.ViewableExplorationsAuditJob,
     email_jobs_one_off.EmailHashRegenerationOneOffJob,
     user_jobs_one_off.UserProfilePictureOneOffJob,
     exp_jobs_one_off.ItemSelectionInteractionOneOffJob,
