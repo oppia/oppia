@@ -494,7 +494,8 @@ def get_all_thread_participants(exploration_id, thread_id):
     Returns:
         set(str). A set containing all author_ids of participants in the thread.
     """
-    return set([m.author_id for m in get_messages(exploration_id, thread_id)])
+    return set([m.author_id for m in get_messages(exploration_id, thread_id)
+                if user_services.is_user_registered(m.author_id)])
 
 
 def enqueue_feedback_message_batch_email_task(user_id):
@@ -719,10 +720,6 @@ def _get_all_recipient_ids(exploration_id, thread_id, author_id):
 
     batch_recipient_ids = owner_ids - sender_id
     other_recipient_ids = participant_ids - batch_recipient_ids - sender_id
-
-    # Remove anonymous users from recipient list.
-    batch_recipient_ids = batch_recipient_ids - set([None])
-    other_recipient_ids = other_recipient_ids - set([None])
 
     return (batch_recipient_ids, other_recipient_ids)
 
