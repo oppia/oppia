@@ -34,7 +34,8 @@ describe('Testing filters', function() {
     'summarizeAnswerGroup',
     'summarizeDefaultOutcome',
     'summarizeNonnegativeNumber',
-    'truncateAndCapitalize'
+    'truncateAndCapitalize',
+    'stripFormatting'
   ];
 
   beforeEach(angular.mock.module('oppia'));
@@ -263,5 +264,75 @@ describe('Testing filters', function() {
     // return whole objective.
     expect(filter('please do not test empty string', 100)).toEqual(
       'Please do not test empty string');
+  }));
+
+  it('should strip out all tags unless they contain the RTE tags',
+      inject(function($filter) {
+    var LINK_HTML = ('<li><a href="/wiki/1800" title="1800">1800</a></li>');
+    var OPPIA_TABS = ('<img src="data:image/png;base64,' +
+    'iVBORw0KGgoAAAANSUhEUgAABNQAAAFgCAIAAAD8SbMaAAAM' +
+    'FWlDQ1BJQ0MgUHJvZmlsZQAASImV%0AlwdUk8kWx" ' +
+    'class="oppia-noninteractive-tabs block-element" ' +
+    'tab_contents-with-value="[{&amp;quot;title&amp;quot;:&amp;quot;' +
+    'Hint introduction&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;' +
+    'This set of tabs shows some hints.' +
+    ' Click on the other tabs to display the relevant hints.&amp;quot;},' +
+    '{&amp;quot;title&amp;quot;:&amp;quot;Hint 1&amp;quot;,'+
+    '&amp;quot;content&amp;quot;:&amp;quot;This is a first hint.&amp;quot;},'+
+    '{&amp;quot;title&amp;quot;:&amp;quot;Hint 2&amp;quot;,'+
+    '&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;' +
+    'Stuff and things&amp;lt;/p&amp;gt;&amp;quot;}]" ' +
+    'exploration-id-with-value="&amp;quot');
+    var OPPIA_IMG = ('<img src="image.png" ' +
+    'class="oppia-noninteractive-image block-element" ' +
+    'alt-with-value="&amp;quot;&amp;quot;" ' +
+    'caption-with-value="&amp;quot;&amp;quot;" ' +
+    'filepath-with-value="&amp;quot;DearIDPodcast_sm.png&amp;quot;" ' +
+    'exploration-id-with-value="&amp;quot;5WWM85JODA2X&amp;quot;">');
+    var OPPIA_VIDEO= ('<img ' +
+    'src="https://img.youtube.com/vi/JcPwIQ6GCj8/hqdefault.jpg" ' +
+    'class="oppia-noninteractive-video block-element" ' +
+    'video_id-with-value="" start-with-value="0" end-with-value="0" ' +
+    'autoplay-with-value="false" exploration-id-with-value="">');
+    var IMG_HTML = ('<a ' +
+    'href="https://en.wikipedia.org/wiki/File:The_Purloined_Letter.jpg" ' +
+    'class="image"><img alt="The Purloined Letter.jpg" ' +
+    'src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/' +
+    'The_Purloined_Letter.jpg/220px-The_Purloined_Letter.jpg" width="220" ' +
+    'height="178"></a>');
+    var DANGEROUS_SCRIPT_IMG = ('<img src="w3javascript.gif" ' +
+    'onload="loadImage()" width="100" height="132">');
+    var DANGEROUS_NESTED_SCRIPT = ('<scr<script>ipt>alert(42);' +
+    '</scr</script>ipt>');
+    var whitelistedTags = [
+      "oppia-noninteractive-collapsible",
+      "oppia-noninteractive-image",
+      "oppia-noninteractive-link",
+      "oppia-noninteractive-math",
+      "oppia-noninteractive-tabs",
+      "oppia-noninteractive-video"
+    ];
+
+    expect(
+      $filter('stripFormatting')(LINK_HTML, whitelistedTags)
+    ).toEqual('1800');
+    expect(
+      $filter('stripFormatting')(IMG_HTML, whitelistedTags)
+    ).toEqual('');
+    expect(
+      $filter('stripFormatting')(OPPIA_TABS, whitelistedTags)
+    ).toEqual(OPPIA_TABS);
+    expect(
+      $filter('stripFormatting')(OPPIA_IMG, whitelistedTags)
+    ).toEqual(OPPIA_IMG);
+    expect(
+      $filter('stripFormatting')(OPPIA_VIDEO, whitelistedTags)
+    ).toEqual(OPPIA_VIDEO);
+    expect(
+      $filter('stripFormatting')(DANGEROUS_SCRIPT_IMG, whitelistedTags)
+    ).toEqual('');
+    expect(
+      $filter('stripFormatting')(DANGEROUS_NESTED_SCRIPT, whitelistedTags)
+    ).toEqual('ipt>alert(42);ipt>');
   }));
 });

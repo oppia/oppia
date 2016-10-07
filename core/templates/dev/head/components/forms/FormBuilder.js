@@ -914,6 +914,7 @@ oppia.directive('textAngularRte', [
             ['ol', 'ul', 'pre', 'indent', 'outdent'],
             []
           ];
+          var whitelistedTags = [];
 
           if ($scope.uiConfig() && $scope.uiConfig().placeholder) {
             $scope.placeholderText = $scope.uiConfig().placeholder;
@@ -926,6 +927,9 @@ oppia.directive('textAngularRte', [
                     componentDefn.isComplex)) {
                 toolbarOptions[2].push(componentDefn.name);
               }
+              var tagName = 'oppia-noninteractive-';
+              tagName += componentDefn.name;
+              whitelistedTags.push(tagName);
             }
           );
           $scope.toolbarOptionsJson = JSON.stringify(toolbarOptions);
@@ -935,19 +939,8 @@ oppia.directive('textAngularRte', [
           };
 
           $scope.stripFormatting = function(html) {
-            var whitelistedTags = [
-              'oppia-noninteractive-collapsible',
-              'oppia-noninteractive-image',
-              'oppia-noninteractive-link',
-              'oppia-noninteractive-math',
-              'oppia-noninteractive-tabs',
-              'oppia-noninteractive-video'
-            ];
-            // Strip out anything between and including <>,
-            // unless it contains the RTE tags.
-            var regex = new RegExp('(?!.*(' + whitelistedTags.join('|') +
-                                    '))<[^>]+>', 'gm');
-            return html ? String(html).replace(regex, '') : '';
+            console.log(html);
+            return $filter('stripFormatting')(html, whitelistedTags);
           };
 
           $scope.init = function() {
