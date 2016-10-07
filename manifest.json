@@ -304,11 +304,11 @@
         "targetDir": "midi-js-2ef687"
       },
       "ngJoyride": {
-        "version": "58e93cdda3e3c94ad55c64ef9d0e4b6f9df17a61",
+        "version": "5b25d076405c9a787db602d2a8ff49919228f4fc",
         "downloadFormat": "zip",
-        "url": "https://github.com/seanlip/ng-joyride/archive/58e93cdda3e3c94ad55c64ef9d0e4b6f9df17a61.zip",
+        "url": "https://github.com/seanlip/ng-joyride/archive/5b25d076405c9a787db602d2a8ff49919228f4fc.zip",
         "rootDirPrefix": "ng-joyride-",
-        "targetDir": "ng-joyride-58e93c",
+        "targetDir": "ng-joyride-5b25d0",
         "bundle": {
           "css": ["ng-joyride.css"],
           "js": ["ng-joyride.js"]
