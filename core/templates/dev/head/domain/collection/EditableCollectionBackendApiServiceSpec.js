@@ -107,7 +107,7 @@ describe('Editable collection backend API service', function() {
 
     collection.title = 'New Title';
     collection.version = '2';
-    collectionWrapper = {
+    var collectionWrapper = {
       collection: collection
     };
 
