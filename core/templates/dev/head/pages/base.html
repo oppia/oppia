@@ -338,6 +338,18 @@
       {% endif %}
     {% endif %}
 
+    {% if nav_mode in ['explore'] %}
+  <footer class="oppia-footer">
+    <div class="oppia-footer-container">
+      <div class="row">
+        <div class="col-sm-3">
+        HELPY ME
+        </div>
+      </div>
+    </div>
+  </footer>
+    {% endif %}
+
     {% include 'pages/footer_js_libs.html' %}
 
     {% include 'components/create_button/create_activity_button_directive.html' %}
