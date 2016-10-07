@@ -50,26 +50,26 @@ class UserQueryOneOffJob(jobs.BaseMapReduceJobManager):
                 rights_manager.Actor(user_id).is_moderator()):
             return
 
-        if query_model.login_in_last_n_days is not None:
+        if query_model.has_not_logged_in_for_n_days is not None:
             if user_settings_model.last_logged_in:
                 difference = (
                     datetime.datetime.utcnow() -
                     user_settings_model.last_logged_in).days
-                if difference > query_model.login_in_last_n_days:
+                if difference < query_model.has_not_logged_in_for_n_days:
                     return
 
-        if query_model.active_in_last_n_days is not None:
+        if query_model.inactive_in_last_n_days is not None:
             if user_settings_model.last_created_an_exploration:
                 difference = (
                     datetime.datetime.utcnow() -
                     user_settings_model.last_created_an_exploration).days
-                if difference > query_model.active_in_last_n_days:
+                if difference < query_model.inactive_in_last_n_days:
                     return
             elif user_settings_model.last_edited_an_exploration:
                 difference = (
                     datetime.datetime.utcnow() -
                     user_settings_model.last_edited_an_exploration).days
-                if difference > query_model.active_in_last_n_days:
+                if difference < query_model.inactive_in_last_n_days:
                     return
             else:
                 return
@@ -100,5 +100,5 @@ class UserQueryOneOffJob(jobs.BaseMapReduceJobManager):
     def reduce(query_model_id, stringified_user_ids):
         query_model = user_models.UserQueryModel.get(query_model_id)
         user_ids = [ast.literal_eval(v) for v in stringified_user_ids]
-        query_model.user_ids = [str(user) for user in user_ids]
+        query_model.user_ids = [str(user_id) for user_id in user_ids]
         query_model.put()

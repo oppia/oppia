@@ -22,13 +22,14 @@ import feconf
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 def save_new_query_model(
-        submitter_id, active_in_last_n_days=None, login_in_last_n_days=None,
-        created_at_least_n_exps=None, created_fewer_than_n_exps=None,
-        edited_at_least_n_exps=None, edited_fewer_than_n_exps=None):
+        submitter_id, inactive_in_last_n_days=None,
+        has_not_logged_in_for_n_days=None, created_at_least_n_exps=None,
+        created_fewer_than_n_exps=None, edited_at_least_n_exps=None,
+        edited_fewer_than_n_exps=None):
     query_id = user_models.UserQueryModel.get_new_id('')
     user_models.UserQueryModel(
-        id=query_id, active_in_last_n_days=active_in_last_n_days,
-        login_in_last_n_days=login_in_last_n_days,
+        id=query_id, inactive_in_last_n_days=inactive_in_last_n_days,
+        has_not_logged_in_for_n_days=has_not_logged_in_for_n_days,
         created_at_least_n_exps=created_at_least_n_exps,
         created_fewer_than_n_exps=created_fewer_than_n_exps,
         edited_at_least_n_exps=edited_at_least_n_exps,

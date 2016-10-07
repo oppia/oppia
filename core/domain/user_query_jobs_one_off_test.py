@@ -112,34 +112,36 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
             user_settings.last_logged_in - datetime.timedelta(days=10))
         user_services._save_user_settings(user_settings) # pylint: disable=protected-access
 
+        user_settings = user_services.get_user_settings(self.user_a_id)
+        user_settings.last_logged_in = (
+            user_settings.last_logged_in - datetime.timedelta(days=3))
+        user_services._save_user_settings(user_settings) # pylint: disable=protected-access
+
         # Set tmpsuperadm1n as admin in ADMIN_USERNAMES config property.
         self.set_admins(['tmpsuperadm1n'])
 
-
     def test_user_has_logged_in_last_n_days(self):
         query_id = user_query_services.save_new_query_model(
-            self.submitter_id, login_in_last_n_days=3)
+            self.submitter_id, has_not_logged_in_for_n_days=6)
         self._run_one_off_job(query_id)
 
         query = user_models.UserQueryModel.get(query_id)
-        qualifying_user_ids = (
-            [self.user_a_id, self.user_b_id, self.user_c_id, self.user_d_id])
 
-        # List of users logged_in in last 3 days.
-        self.assertEqual(len(query.user_ids), 4)
+        # List of users who has not logged_in in last 3 days.
+        qualifying_user_ids = [self.user_e_id]
+        self.assertEqual(len(query.user_ids), 1)
         self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
 
         query_id = user_query_services.save_new_query_model(
-            self.submitter_id, login_in_last_n_days=12)
+            self.submitter_id, has_not_logged_in_for_n_days=2)
         self._run_one_off_job(query_id)
 
         query = user_models.UserQueryModel.get(query_id)
-        qualifying_user_ids = (
-            [self.user_a_id, self.user_b_id, self.user_c_id, self.user_d_id,
-             self.user_e_id])
 
-        # List of users logged_in in last 12 days.
-        self.assertEqual(len(query.user_ids), 5)
+        # List of users logged_in in last 2 days.
+        qualifying_user_ids = (
+            [self.user_a_id, self.user_e_id])
+        self.assertEqual(len(query.user_ids), 2)
         self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
 
         # Test for legacy user.
@@ -148,40 +150,26 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
         user_services._save_user_settings(user_settings) # pylint: disable=protected-access
 
         query_id = user_query_services.save_new_query_model(
-            self.submitter_id, login_in_last_n_days=12)
+            self.submitter_id, has_not_logged_in_for_n_days=6)
         self._run_one_off_job(query_id)
 
         query = user_models.UserQueryModel.get(query_id)
-        qualifying_user_ids = (
-            [self.user_a_id, self.user_b_id, self.user_c_id, self.user_d_id,
-             self.user_e_id])
+        qualifying_user_ids = ([self.user_a_id, self.user_e_id])
 
         # Make sure that legacy user is included in qualified user's list.
-        self.assertEqual(len(query.user_ids), 5)
+        self.assertEqual(len(query.user_ids), 2)
         self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
 
     def test_user_is_active_in_last_n_days(self):
         query_id = user_query_services.save_new_query_model(
-            self.submitter_id, active_in_last_n_days=3)
+            self.submitter_id, inactive_in_last_n_days=3)
         self._run_one_off_job(query_id)
 
         query = user_models.UserQueryModel.get(query_id)
-        qualifying_user_ids = [self.user_b_id, self.user_c_id, self.user_d_id]
 
-        # List of users who were active in last 3 days.
-        self.assertEqual(len(query.user_ids), 3)
-        self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
-
-        query_id = user_query_services.save_new_query_model(
-            self.submitter_id, active_in_last_n_days=12)
-        self._run_one_off_job(query_id)
-
-        query = user_models.UserQueryModel.get(query_id)
-        qualifying_user_ids = (
-            [self.user_b_id, self.user_c_id, self.user_d_id, self.user_e_id])
-
-        # List of users who were active in last 12 days.
-        self.assertEqual(len(query.user_ids), 4)
+        # List of users who were not active in last 3 days.
+        qualifying_user_ids = [self.user_e_id]
+        self.assertEqual(len(query.user_ids), 1)
         self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
 
     def test_user_has_created_at_least_n_exps(self):

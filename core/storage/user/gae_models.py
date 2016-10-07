@@ -332,10 +332,10 @@ class UserQueryModel(base_models.BaseModel):
     # Options for a query specified by query submitter.
     # Query option to specify whether user has created or edited one or more
     # explorations in last n days.
-    active_in_last_n_days = ndb.IntegerProperty(default=None)
+    inactive_in_last_n_days = ndb.IntegerProperty(default=None)
     # Query option to check whether given user has logged in
     # since last n days.
-    login_in_last_n_days = ndb.IntegerProperty(default=None)
+    has_not_logged_in_for_n_days = ndb.IntegerProperty(default=None)
     # Query option to check whether user has created at least
     # n explorations.
     created_at_least_n_exps = ndb.IntegerProperty(default=None)
