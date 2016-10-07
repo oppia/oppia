@@ -302,3 +302,29 @@ class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def reduce(key, values):
         yield (key, values)
+
+
+class ViewableExplorationsAuditJob(jobs.BaseMapReduceJobManager):
+    """Job that outputs a list of private explorations which are viewable."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration_rights = rights_manager.get_exploration_rights(
+            item.id, strict=False)
+        if exploration_rights is None:
+            return
+
+        if (exploration_rights.status == feconf.ACTIVITY_STATUS_PRIVATE
+                and exploration_rights.viewable_if_private):
+            yield (item.id, item.title.encode('utf-8'))
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
