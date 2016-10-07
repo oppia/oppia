@@ -39,8 +39,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response = self.testapp.get('/admin')
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
-            'Performance Counters',
-            'Total processing time for all JSON responses',
             'Configuration',
             'Reload a single exploration',
             'three_balls')

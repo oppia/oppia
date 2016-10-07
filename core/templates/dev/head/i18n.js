@@ -74,10 +74,10 @@ oppia.config([
     function($translateProvider, DEFAULT_TRANSLATIONS) {
   var availableLanguageKeys = [];
   var availableLanguageKeysMap = {};
-  for (var prop in GLOBALS.SUPPORTED_SITE_LANGUAGES) {
-    availableLanguageKeys.push(prop);
-    availableLanguageKeysMap[prop + '*'] = prop;
-  }
+  GLOBALS.SUPPORTED_SITE_LANGUAGES.forEach(function(language) {
+    availableLanguageKeys.push(language.id);
+    availableLanguageKeysMap[language.id + '*'] = language.id;
+  });
   availableLanguageKeysMap['*'] = 'en';
 
   $translateProvider

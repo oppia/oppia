@@ -842,3 +842,136 @@ class UserProfilePictureOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             new_user_settings.profile_picture_data_url,
             'manually_added_data_url')
+
+
+class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(UserLastExplorationActivityOneOffJobTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.exp_id = 'exp'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.UserLastExplorationActivityOneOffJob.create_new())
+        user_jobs_one_off.UserLastExplorationActivityOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
+        self.process_and_flush_pending_tasks()
+
+    def test_that_last_created_time_is_updated(self):
+        self.login(self.OWNER_EMAIL)
+        self.save_new_valid_exploration(
+            self.exp_id, self.owner_id, end_state_name='End')
+        self.logout()
+
+        user_settings = user_services.get_user_settings(self.owner_id)
+        user_settings.last_created_an_exploration = None
+        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
+
+        owner_settings = user_services.get_user_settings(self.owner_id)
+        self.assertIsNone(owner_settings.last_created_an_exploration)
+        self.assertIsNone(owner_settings.last_edited_an_exploration)
+
+        self._run_one_off_job()
+
+        owner_settings = user_services.get_user_settings(self.owner_id)
+        self.assertIsNotNone(owner_settings.last_created_an_exploration)
+        self.assertIsNotNone(owner_settings.last_edited_an_exploration)
+
+    def test_that_last_edited_time_is_updated(self):
+        self.login(self.OWNER_EMAIL)
+        self.save_new_valid_exploration(
+            self.exp_id, self.owner_id, end_state_name='End')
+        self.logout()
+        self.login(self.EDITOR_EMAIL)
+        exp_services.update_exploration(self.editor_id, self.exp_id, [{
+            'cmd': 'edit_exploration_property',
+            'property_name': 'objective',
+            'new_value': 'the objective'
+        }], 'Test edit')
+        self.logout()
+
+        user_settings = user_services.get_user_settings(self.editor_id)
+        user_settings.last_edited_an_exploration = None
+        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
+
+        editor_settings = user_services.get_user_settings(self.editor_id)
+
+        self.assertIsNone(editor_settings.last_created_an_exploration)
+        self.assertIsNone(editor_settings.last_edited_an_exploration)
+
+        self._run_one_off_job()
+
+        editor_settings = user_services.get_user_settings(self.editor_id)
+
+        self.assertIsNotNone(editor_settings.last_edited_an_exploration)
+        self.assertIsNone(editor_settings.last_created_an_exploration)
+
+    def test_that_last_edited_and_created_time_both_updated(self):
+        self.login(self.OWNER_EMAIL)
+        self.save_new_valid_exploration(
+            self.exp_id, self.owner_id, end_state_name='End')
+        exp_services.update_exploration(self.owner_id, self.exp_id, [{
+            'cmd': 'edit_exploration_property',
+            'property_name': 'objective',
+            'new_value': 'the objective'
+        }], 'Test edit')
+        self.logout()
+        self.login(self.EDITOR_EMAIL)
+        exp_services.update_exploration(self.editor_id, self.exp_id, [{
+            'cmd': 'edit_exploration_property',
+            'property_name': 'objective',
+            'new_value': 'new objective'
+        }], 'Test edit new')
+        self.logout()
+
+        user_settings = user_services.get_user_settings(self.owner_id)
+        user_settings.last_created_an_exploration = None
+        user_settings.last_edited_an_exploration = None
+        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
+
+        user_settings = user_services.get_user_settings(self.editor_id)
+        user_settings.last_edited_an_exploration = None
+        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
+
+        owner_settings = user_services.get_user_settings(self.owner_id)
+        editor_settings = user_services.get_user_settings(self.editor_id)
+
+        self.assertIsNone(owner_settings.last_created_an_exploration)
+        self.assertIsNone(owner_settings.last_edited_an_exploration)
+        self.assertIsNone(editor_settings.last_created_an_exploration)
+        self.assertIsNone(editor_settings.last_edited_an_exploration)
+
+        self._run_one_off_job()
+
+        owner_settings = user_services.get_user_settings(self.owner_id)
+        editor_settings = user_services.get_user_settings(self.editor_id)
+
+        self.assertIsNotNone(owner_settings.last_edited_an_exploration)
+        self.assertIsNotNone(owner_settings.last_created_an_exploration)
+        self.assertIsNotNone(editor_settings.last_edited_an_exploration)
+        self.assertIsNone(editor_settings.last_created_an_exploration)
+
+    def test_that_last_edited_and_created_time_are_not_updated(self):
+        user_settings = user_services.get_user_settings(self.owner_id)
+        user_settings.last_created_an_exploration = None
+        user_settings.last_edited_an_exploration = None
+        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
+
+        owner_settings = user_services.get_user_settings(self.owner_id)
+
+        self.assertIsNone(owner_settings.last_created_an_exploration)
+        self.assertIsNone(owner_settings.last_edited_an_exploration)
+
+        self._run_one_off_job()
+
+        owner_settings = user_services.get_user_settings(self.owner_id)
+        self.assertIsNone(owner_settings.last_created_an_exploration)
+        self.assertIsNone(owner_settings.last_edited_an_exploration)

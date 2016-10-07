@@ -384,7 +384,9 @@ oppia.factory('urlService', ['$window', function($window) {
       return params;
     },
     isIframed: function() {
-      return !!(this.getUrlParams().iframed);
+      var pathname = this.getPathname();
+      var urlParts = pathname.split('/');
+      return urlParts[1] === 'embed';
     },
     getPathname: function() {
       return window.location.pathname;
@@ -452,6 +454,13 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
     registerClickBrowseLibraryButtonEvent: function() {
       _sendEventToGoogleAnalytics(
         'BrowseLibraryButton', 'click', $window.location.pathname);
+    },
+    registerGoToDonationSiteEvent: function(donationSiteName) {
+      _sendEventToGoogleAnalytics(
+        'GoToDonationSite', 'click', donationSiteName);
+    },
+    registerApplyToTeachWithOppiaEvent: function() {
+      _sendEventToGoogleAnalytics('ApplyToTeachWithOppia', 'click', '');
     },
     registerClickCreateExplorationButtonEvent: function() {
       _sendEventToGoogleAnalytics(
@@ -562,6 +571,10 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
     registerPublishExplorationEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
         'PublishExploration', 'click', explorationId);
+    },
+    registerVisitOppiaFromIframeEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'VisitOppiaFromIframe', 'click', explorationId);
     }
   };
 }]);
@@ -602,6 +615,19 @@ oppia.factory('oppiaDebouncer', [function() {
         }
         return result;
       };
+    }
+  };
+}]);
+
+// Shim service for functions on $window that allows these functions to be
+// mocked in unit tests.
+oppia.factory('currentLocationService', ['$window', function($window) {
+  return {
+    getHash: function() {
+      return $window.location.hash;
+    },
+    getPathname: function() {
+      return $window.location.pathname;
     }
   };
 }]);

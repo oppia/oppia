@@ -29,7 +29,7 @@ oppia.directive('codeStringEditor', [
     restrict: 'E',
     scope: true,
     template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: function($scope) {
+    controller: ['$scope', function($scope) {
       $scope.alwaysEditable = $scope.$parent.alwaysEditable;
 
       $scope.getWarningText = function() {
@@ -50,6 +50,6 @@ oppia.directive('codeStringEditor', [
       $scope.$watch('localValue.label', function(newValue) {
         $scope.$parent.value = newValue;
       });
-    }
+    }]
   };
 }]);

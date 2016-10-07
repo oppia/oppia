@@ -44,17 +44,20 @@ class UserSettings(object):
     """Value object representing a user's settings."""
     def __init__(
             self, user_id, email, username=None, last_agreed_to_terms=None,
-            last_started_state_editor_tutorial=None,
-            profile_picture_data_url=None, user_bio='', subject_interests=None,
-            first_contribution_msec=None,
-            preferred_language_codes=None,
-            preferred_site_language_code=None):
+            last_started_state_editor_tutorial=None, last_logged_in=None,
+            last_created_an_exploration=None,
+            last_edited_an_exploration=None, profile_picture_data_url=None,
+            user_bio='', subject_interests=None, first_contribution_msec=None,
+            preferred_language_codes=None, preferred_site_language_code=None):
         self.user_id = user_id
         self.email = email
         self.username = username
         self.last_agreed_to_terms = last_agreed_to_terms
         self.last_started_state_editor_tutorial = (  # pylint: disable=invalid-name
             last_started_state_editor_tutorial)
+        self.last_logged_in = last_logged_in
+        self.last_edited_an_exploration = last_edited_an_exploration
+        self.last_created_an_exploration = last_created_an_exploration
         self.profile_picture_data_url = profile_picture_data_url
         self.user_bio = user_bio
         self.subject_interests = (
@@ -193,8 +196,7 @@ def get_users_settings(user_ids):
                 feconf.SYSTEM_COMMITTER_ID,
                 email=feconf.SYSTEM_EMAIL_ADDRESS,
                 username='admin',
-                last_agreed_to_terms=datetime.datetime.utcnow(),
-                last_started_state_editor_tutorial=None,
+                last_agreed_to_terms=datetime.datetime.utcnow()
             ))
         elif model:
             result.append(UserSettings(
@@ -202,6 +204,10 @@ def get_users_settings(user_ids):
                 last_agreed_to_terms=model.last_agreed_to_terms,
                 last_started_state_editor_tutorial=(
                     model.last_started_state_editor_tutorial),
+                last_logged_in=model.last_logged_in,
+                last_edited_an_exploration=model.last_edited_an_exploration,
+                last_created_an_exploration=(
+                    model.last_created_an_exploration),
                 profile_picture_data_url=model.profile_picture_data_url,
                 user_bio=model.user_bio,
                 subject_interests=model.subject_interests,
@@ -293,6 +299,10 @@ def _save_user_settings(user_settings):
         last_agreed_to_terms=user_settings.last_agreed_to_terms,
         last_started_state_editor_tutorial=(
             user_settings.last_started_state_editor_tutorial),
+        last_logged_in=user_settings.last_logged_in,
+        last_edited_an_exploration=user_settings.last_edited_an_exploration,
+        last_created_an_exploration=(
+            user_settings.last_created_an_exploration),
         profile_picture_data_url=user_settings.profile_picture_data_url,
         user_bio=user_settings.user_bio,
         subject_interests=user_settings.subject_interests,
@@ -474,6 +484,26 @@ def record_user_started_state_editor_tutorial(user_id):
     user_settings.last_started_state_editor_tutorial = (
         datetime.datetime.utcnow())
     _save_user_settings(user_settings)
+
+
+def record_user_logged_in(user_id):
+    user_settings = get_user_settings(user_id, strict=True)
+    user_settings.last_logged_in = datetime.datetime.utcnow()
+    _save_user_settings(user_settings)
+
+
+def record_user_edited_an_exploration(user_id):
+    user_settings = get_user_settings(user_id)
+    if user_settings:
+        user_settings.last_edited_an_exploration = datetime.datetime.utcnow()
+        _save_user_settings(user_settings)
+
+
+def record_user_created_an_exploration(user_id):
+    user_settings = get_user_settings(user_id)
+    if user_settings:
+        user_settings.last_created_an_exploration = datetime.datetime.utcnow()
+        _save_user_settings(user_settings)
 
 
 def update_email_preferences(

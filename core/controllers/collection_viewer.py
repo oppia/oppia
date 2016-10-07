@@ -74,22 +74,23 @@ class CollectionPage(base.BaseHandler):
             'meta_description': utils.capitalize_string(collection.objective)
         })
 
-        self.render_template('collection_player/collection_player.html')
+        self.render_template('pages/collection_player/collection_player.html')
 
 
 class CollectionDataHandler(base.BaseHandler):
     """Provides the data for a single collection."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @require_collection_playable
     def get(self, collection_id):
         """Populates the data on the individual collection page."""
-        allow_invalid_explorations = bool(
-            self.request.get('allow_invalid_explorations'))
 
         try:
             collection_dict = (
                 summary_services.get_learner_collection_dict_by_id(
                     collection_id, self.user_id,
-                    allow_invalid_explorations=allow_invalid_explorations))
+                    allow_invalid_explorations=False))
         except Exception as e:
             raise self.PageNotFoundException(e)
 

@@ -31,6 +31,7 @@ from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import gadget_registry
 from core.domain import interaction_registry
+from core.domain import moderator_services
 from core.domain import rating_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
@@ -57,8 +58,17 @@ def require_playable(handler):
     def test_can_play(self, exploration_id, **kwargs):
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             self.render_template(
-                'error/disabled_exploration.html', iframe_restriction=None)
+                'pages/error/disabled_exploration.html',
+                iframe_restriction=None)
             return
+
+        # This check is needed in order to show the correct page when a 404
+        # error is raised. The self.request.get('iframed') part of the check is
+        # needed for backwards compatibility with older versions of the
+        # embedding script.
+        if (feconf.EXPLORATION_URL_EMBED_PREFIX in self.request.uri or
+                self.request.get('iframed')):
+            self.values['iframed'] = True
 
         # Checks if the user for the current session is logged in.
         if rights_manager.Actor(self.user_id).can_play(
@@ -95,7 +105,7 @@ def classify_string_classifier_rule(state, normalized_answer):
                 for doc in classifier_rule_spec.inputs['training_data']])
     if len(training_examples) > 0:
         sc.load_examples(training_examples)
-        doc_ids = sc.add_examples_for_predicting([normalized_answer])
+        doc_ids = sc.add_docs_for_predicting([normalized_answer])
         predicted_label = sc.predict_label_for_doc(doc_ids[0])
         if (predicted_label !=
                 classifier_services.StringClassifier.DEFAULT_LABEL):
@@ -117,6 +127,68 @@ def classify_string_classifier_rule(state, normalized_answer):
             return None
 
     return None
+
+
+def _get_exploration_player_data(
+        exploration_id, version, collection_id, can_edit):
+    try:
+        exploration = exp_services.get_exploration_by_id(
+            exploration_id, version=version)
+    except Exception:
+        raise Exception
+
+    collection_title = None
+    if collection_id:
+        try:
+            collection = collection_services.get_collection_by_id(
+                collection_id)
+            collection_title = collection.title
+        except Exception:
+            raise Exception
+
+    version = exploration.version
+
+    # TODO(sll): Cache these computations.
+    gadget_types = exploration.get_gadget_types()
+    interaction_ids = exploration.get_interaction_ids()
+    dependency_ids = (
+        interaction_registry.Registry.get_deduplicated_dependency_ids(
+            interaction_ids))
+    dependencies_html, additional_angular_modules = (
+        dependency_registry.Registry.get_deps_html_and_angular_modules(
+            dependency_ids))
+
+    gadget_templates = (
+        gadget_registry.Registry.get_gadget_html(gadget_types))
+    interaction_templates = (
+        rte_component_registry.Registry.get_html_for_all_components() +
+        interaction_registry.Registry.get_interaction_html(
+            interaction_ids))
+
+    return {
+        'GADGET_SPECS': gadget_registry.Registry.get_all_specs(),
+        'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
+        'DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER': (
+            DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER.value),
+        'additional_angular_modules': additional_angular_modules,
+        'can_edit': can_edit,
+        'dependencies_html': jinja2.utils.Markup(
+            dependencies_html),
+        'exploration_title': exploration.title,
+        'exploration_version': version,
+        'collection_id': collection_id,
+        'collection_title': collection_title,
+        'gadget_templates': jinja2.utils.Markup(gadget_templates),
+        'interaction_templates': jinja2.utils.Markup(
+            interaction_templates),
+        'is_private': rights_manager.is_exploration_private(
+            exploration_id),
+        # Note that this overwrites the value in base.py.
+        'meta_name': exploration.title,
+        # Note that this overwrites the value in base.py.
+        'meta_description': utils.capitalize_string(exploration.objective),
+        'nav_mode': feconf.NAV_MODE_EXPLORE,
+    }
 
 
 def classify(state, answer):
@@ -169,8 +241,8 @@ def classify(state, answer):
         'exploration owner.')
 
 
-class ExplorationPage(base.BaseHandler):
-    """Page describing a single exploration."""
+class ExplorationPageEmbed(base.BaseHandler):
+    """Page describing a single embedded exploration."""
 
     @require_playable
     def get(self, exploration_id):
@@ -181,88 +253,69 @@ class ExplorationPage(base.BaseHandler):
         # Note: this is an optional argument and will be None when the
         # exploration is being played outside the context of a collection.
         collection_id = self.request.get('collection_id')
+        can_edit = (
+            bool(self.username) and
+            self.username not in config_domain.BANNED_USERNAMES.value and
+            rights_manager.Actor(self.user_id).can_edit(
+                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
 
         try:
-            exploration = exp_services.get_exploration_by_id(
-                exploration_id, version=version)
-        except Exception as e:
-            raise self.PageNotFoundException(e)
-
-        collection_title = None
-        if collection_id:
-            try:
-                collection = collection_services.get_collection_by_id(
-                    collection_id)
-                collection_title = collection.title
-            except Exception as e:
-                raise self.PageNotFoundException(e)
-
-        version = exploration.version
-
-        if not rights_manager.Actor(self.user_id).can_view(
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
+            # If the exploration does not exist, a 404 error is raised.
+            exploration_data_values = _get_exploration_player_data(
+                exploration_id, version, collection_id, can_edit)
+        except Exception:
             raise self.PageNotFoundException
 
-        is_iframed = (self.request.get('iframed') == 'true')
+        self.values.update(exploration_data_values)
+        self.values['iframed'] = True
+        self.render_template(
+            'pages/exploration_player/exploration_player.html',
+            iframe_restriction=None)
 
-        # TODO(sll): Cache these computations.
-        gadget_types = exploration.get_gadget_types()
-        interaction_ids = exploration.get_interaction_ids()
-        dependency_ids = (
-            interaction_registry.Registry.get_deduplicated_dependency_ids(
-                interaction_ids))
-        dependencies_html, additional_angular_modules = (
-            dependency_registry.Registry.get_deps_html_and_angular_modules(
-                dependency_ids))
 
-        gadget_templates = (
-            gadget_registry.Registry.get_gadget_html(gadget_types))
+class ExplorationPage(base.BaseHandler):
+    """Page describing a single exploration."""
 
-        interaction_templates = (
-            rte_component_registry.Registry.get_html_for_all_components() +
-            interaction_registry.Registry.get_interaction_html(
-                interaction_ids))
+    @require_playable
+    def get(self, exploration_id):
+        """Handles GET requests."""
+        version_str = self.request.get('v')
+        version = int(version_str) if version_str else None
 
-        self.values.update({
-            'GADGET_SPECS': gadget_registry.Registry.get_all_specs(),
-            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
-            'DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER': (
-                DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER.value),
-            'additional_angular_modules': additional_angular_modules,
-            'can_edit': (
-                bool(self.username) and
-                self.username not in config_domain.BANNED_USERNAMES.value and
-                rights_manager.Actor(self.user_id).can_edit(
-                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id)
-            ),
-            'dependencies_html': jinja2.utils.Markup(
-                dependencies_html),
-            'exploration_title': exploration.title,
-            'exploration_version': version,
-            'collection_id': collection_id,
-            'collection_title': collection_title,
-            'gadget_templates': jinja2.utils.Markup(gadget_templates),
-            'iframed': is_iframed,
-            'interaction_templates': jinja2.utils.Markup(
-                interaction_templates),
-            'is_private': rights_manager.is_exploration_private(
-                exploration_id),
-            # Note that this overwrites the value in base.py.
-            'meta_name': exploration.title,
-            # Note that this overwrites the value in base.py.
-            'meta_description': utils.capitalize_string(exploration.objective),
-            'nav_mode': feconf.NAV_MODE_EXPLORE,
-        })
+        if self.request.get('iframed'):
+            redirect_url = '/embed/exploration/%s' % exploration_id
+            if version_str:
+                redirect_url += '?v=%s' % version_str
+            self.redirect(redirect_url)
+            return
 
-        if is_iframed:
-            self.render_template(
-                'player/exploration_player.html', iframe_restriction=None)
-        else:
-            self.render_template('player/exploration_player.html')
+        # Note: this is an optional argument and will be None when the
+        # exploration is being played outside the context of a collection.
+        collection_id = self.request.get('collection_id')
+        can_edit = (
+            bool(self.username) and
+            self.username not in config_domain.BANNED_USERNAMES.value and
+            rights_manager.Actor(self.user_id).can_edit(
+                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
+
+        try:
+            # If the exploration does not exist, a 404 error is raised.
+            exploration_data_values = _get_exploration_player_data(
+                exploration_id, version, collection_id, can_edit)
+        except Exception:
+            raise self.PageNotFoundException
+
+        self.values.update(exploration_data_values)
+        self.values['iframed'] = False
+        self.render_template(
+            'pages/exploration_player/exploration_player.html')
+
 
 
 class ExplorationHandler(base.BaseHandler):
     """Provides the initial data for a single exploration."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self, exploration_id):
         """Populates the data on the individual exploration page."""
@@ -484,6 +537,8 @@ class RatingHandler(base.BaseHandler):
     exploration.
     """
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -516,6 +571,8 @@ class RecommendationsHandler(base.BaseHandler):
     if there are upcoming explorations for the learner to complete.
     """
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -536,20 +593,44 @@ class RecommendationsHandler(base.BaseHandler):
             auto_recommended_exp_ids = list(
                 set(next_exp_ids_in_collection) -
                 set(author_recommended_exp_ids))
-        elif include_system_recommendations:
-            system_chosen_exp_ids = (
-                recommendations_services.get_exploration_recommendations(
-                    exploration_id))
-            filtered_exp_ids = list(
-                set(system_chosen_exp_ids) -
-                set(author_recommended_exp_ids))
-            auto_recommended_exp_ids = random.sample(
-                filtered_exp_ids,
-                min(MAX_SYSTEM_RECOMMENDATIONS, len(filtered_exp_ids)))
+        else:
+            next_exp_ids_in_collection = []
+            if collection_id:
+                collection = collection_services.get_collection_by_id(
+                    collection_id)
+                next_exp_ids_in_collection = (
+                    collection.get_next_exploration_ids_in_sequence(
+                        exploration_id))
+            if next_exp_ids_in_collection:
+                auto_recommended_exp_ids = list(
+                    set(next_exp_ids_in_collection) -
+                    set(author_recommended_exp_ids))
+            elif include_system_recommendations:
+                system_chosen_exp_ids = (
+                    recommendations_services.get_exploration_recommendations(
+                        exploration_id))
+                filtered_exp_ids = list(
+                    set(system_chosen_exp_ids) -
+                    set(author_recommended_exp_ids))
+                auto_recommended_exp_ids = random.sample(
+                    filtered_exp_ids,
+                    min(MAX_SYSTEM_RECOMMENDATIONS, len(filtered_exp_ids)))
 
         self.values.update({
             'summaries': (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
                     author_recommended_exp_ids + auto_recommended_exp_ids)),
         })
+        self.render_json(self.values)
+
+
+class FlagExplorationHandler(base.BaseHandler):
+    """Handles operations relating to learner flagging of explorations."""
+
+    @base.require_user
+    def post(self, exploration_id):
+        moderator_services.enqueue_flag_exploration_email_task(
+            exploration_id,
+            self.payload.get('report_text'),
+            self.user_id)
         self.render_json(self.values)

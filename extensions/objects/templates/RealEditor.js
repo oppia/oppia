@@ -25,7 +25,7 @@ oppia.directive('realEditor', [
     restrict: 'E',
     scope: true,
     template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: function($scope) {
+    controller: ['$scope', function($scope) {
       $scope.schema = {
         type: 'float'
       };
@@ -40,6 +40,6 @@ oppia.directive('realEditor', [
       if ($scope.$parent.value === '') {
         $scope.$parent.value = 0.0;
       }
-    }
+    }]
   };
 }]);

@@ -1,0 +1,90 @@
+{% extends 'pages/base.html' %}
+
+{% block subtitle %}
+  Contact
+{% endblock subtitle %}
+
+{% block header_js %}
+  {{ super() }}
+
+  <style>
+    html, body {
+      background-color: #eee;
+    }
+  </style>
+{% endblock %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      Contact
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <div class="oppia-page-card oppia-about-content">
+    <div class="oppia-about-card-content-wide">
+      <h2>Get involved!</h2>
+      <p>
+        Oppia is an open commons for education. And, true to this ethos,
+        it is an open-source website created through the hard work and
+        creativity of people like you! To get involved in the Oppia
+        project and help us bring about our mission of free, high-quality
+        universal education, reach out via our
+        <a href="https://groups.google.com/forum/#!forum/oppia-dev">oppia-dev@</a> Google Group, or contact us at
+        <a href="mailto:admin@oppia.org" class="inline-links">admin@oppia.org</a>.
+        We're excited to hear from you!
+      </p>
+
+      <p>
+        Also, if you have any feedback for us, please don't hesitate to let us know via our <a href="{{SITE_FEEDBACK_FORM_URL}}">feedback form</a> &mdash; we read all the feedback we receive. Thanks in advance!
+      </p>
+
+      <div>
+        <p>
+          For all other enquiries, please use one of the following forums or email addresses:
+        </p>
+
+        <ul style="padding-left: 25px;">
+          <li>
+            <p>
+              <strong>General questions about the site</strong>:
+              please post your question to the <a href="/forum" class="inline-links">Oppia forum</a>.
+            </p>
+          </li>
+          <li>
+            <p>
+              <strong>Security issues</strong>:
+              please contact <a href="mailto:admin@oppia.org" class="inline-links">admin@oppia.org</a>.
+            </p>
+          </li>
+          <li>
+            <p>
+              <strong>Press enquiries</strong>:
+              please contact <a href="mailto:press@oppia.org" class="inline-links">press@oppia.org</a>.
+            </p>
+          </li>
+          <li>
+            <p>
+              <strong>Partnership enquiries</strong>:
+              please contact <a href="mailto:partnerships@oppia.org" class="inline-links">partnerships@oppia.org</a>.<br>
+              We're particularly interested in meeting partners who can help bring lessons to a large audience, or who'd like to create lessons on topics that students find difficult. If you're an individual creator, you might also be interested in our <a href="/teach">Teach with Oppia</a> program.
+            </p>
+          </li>
+          <li>
+            <p>
+              <strong>All other enquiries</strong>:
+              please contact <a href="mailto:admin@oppia.org" class="inline-links">admin@oppia.org</a>.
+            </p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block footer%}
+  {% include 'pages/footer.html' %}
+{% endblock %}
