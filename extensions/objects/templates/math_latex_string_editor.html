@@ -7,7 +7,7 @@
 
 <div ng-if="active || alwaysEditable">
   <div>
-    <textarea ng-model="localValue.label" placeholder="\frac{x}{y}"></textarea>
+    <textarea ng-model="localValue.label" placeholder="\frac{x}{y}" autofocus></textarea>
   </div>
   Preview: <span ng-if="localValue.label" mathjax-bind="localValue.label"></span>
            <span ng-if="!localValue.label" mathjax-bind="placeholderText" style="color: #808080;"></span>
