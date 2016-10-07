@@ -107,7 +107,9 @@ describe('Editable collection backend API service', function() {
 
     collection.title = 'New Title';
     collection.version = '2';
-    collectionWrapper = {"collection" : collection}
+    collectionWrapper = {
+      collection: collection
+    };
 
     $httpBackend.expect('PUT', '/collection_editor_handler/data/0').respond(
       collectionWrapper);
