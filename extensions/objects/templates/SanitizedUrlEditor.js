@@ -29,26 +29,23 @@ oppia.directive('sanitizedUrlEditor', [
     scope: true,
     template: '<span ng-include="getTemplateUrl()"></span>',
     controller: ['$scope', function($scope) {
-      $scope.$watch('$parent.initArgs', function(newValue) {
+      $scope.alwaysEditable = true;
+
+      var cleanup1 = $scope.$watch('$parent.initArgs', function(newValue) {
         $scope.largeInput = false;
         if (newValue && newValue.largeInput) {
           $scope.largeInput = newValue.largeInput;
         }
       });
-
-      $scope.$watch('$parent.value', function(newValue) {
+      var cleanup2 = $scope.$watch('$parent.value', function(newValue) {
         $scope.localValue = {
           label: String(newValue) || ''
         };
       }, true);
-
-      $scope.alwaysEditable = true;
-
-      $scope.$watch('localValue.label', function(newValue) {
+      var cleanup3 = $scope.$watch('localValue.label', function(newValue) {
         $scope.$parent.value = newValue;
       });
-
-      $scope.$on('externalSave', function() {
+      var cleanup4 = $scope.$on('externalSave', function() {
         var currentValue = String($scope.localValue.label);
         if ($scope.active) {
           $scope.replaceValue(currentValue);
@@ -57,6 +54,10 @@ oppia.directive('sanitizedUrlEditor', [
           $scope.$apply();
         }
       });
+      $scope.$on('$destroy', cleanup1);
+      $scope.$on('$destroy', cleanup2);
+      $scope.$on('$destroy', cleanup3);
+      $scope.$on('$destroy', cleanup4);
     }]
   };
 }]);

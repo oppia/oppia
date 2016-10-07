@@ -56,9 +56,10 @@ oppia.directive('graphPropertyEditor', [
         }
       }
 
-      $scope.$watch('localValue.property', function() {
+      var cleanup = $scope.$watch('localValue.property', function() {
         $scope.$parent.value = $scope.localValue.property.name;
       });
+      $scope.$on('$destroy', cleanup);
     }]
   };
 }]);

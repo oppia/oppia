@@ -39,7 +39,7 @@ oppia.controller('StatisticsTab', [
     };
 
     $scope.hasTabLoaded = false;
-    $scope.$on('refreshStatisticsTab', function() {
+    var cleanup = $scope.$on('refreshStatisticsTab', function() {
       $scope.refreshExplorationStatistics(_EXPLORATION_STATS_VERSION_ALL);
       $scope.explorationVersionUrl = (
         '/createhandler/statisticsversion/' + explorationData.explorationId);
@@ -48,6 +48,7 @@ oppia.controller('StatisticsTab', [
         $scope.currentVersion = _EXPLORATION_STATS_VERSION_ALL;
       });
     });
+    $scope.$on('$destroy', cleanup);
 
     $scope.hasExplorationBeenVisited = false;
     $scope.refreshExplorationStatistics = function(version) {

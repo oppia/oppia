@@ -30,12 +30,13 @@ oppia.directive('realEditor', [
         type: 'float'
       };
 
-      $scope.$watch('$parent.value', function() {
+      var cleanup = $scope.$watch('$parent.value', function() {
         if ($scope.$parent.value === '') {
           // A new rule
           $scope.$parent.value = 0.0;
         }
       });
+      $scope.$on('$destroy', cleanup);
 
       if ($scope.$parent.value === '') {
         $scope.$parent.value = 0.0;

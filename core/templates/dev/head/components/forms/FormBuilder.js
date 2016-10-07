@@ -330,13 +330,15 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', function($modal) {
 
       var rteContentMemento = $scope._convertUnicodeToRte($scope.localValue);
       $scope.currentlyEditing = false;
-      $scope.$watch('localValue', function() {
+
+      var cleanup = $scope.$watch('localValue', function() {
         if (!$scope.currentlyEditing) {
           // This is an external change.
           rteContentMemento = $scope._convertUnicodeToRte($scope.localValue);
           $(rteNode).wysiwyg('setContent', rteContentMemento);
         }
       }, true);
+      $scope.$on('$destroy', cleanup);
 
       $scope._normalizeRteContent = function(content) {
         // TODO(sll): Write this method to validate rather than just normalize.
@@ -944,7 +946,7 @@ oppia.directive('textAngularRte', [
 
           $scope.init();
 
-          $scope.$watch('tempContent', function(newVal) {
+          var cleanup1 = $scope.$watch('tempContent', function(newVal) {
             // Sanitizing while a modal is open would delete the markers that
             // save and restore the cursor's position in the RTE.
             var displayedContent = $scope.isCustomizationModalOpen ? newVal :
@@ -952,14 +954,16 @@ oppia.directive('textAngularRte', [
             $scope.htmlContent = rteHelperService.convertRteToHtml(
               displayedContent);
           });
+          $scope.$on('$destroy', cleanup1);
 
           // It is possible for the content of the RTE to be changed externally,
           // e.g. if there are several RTEs in a list, and one is deleted.
-          $scope.$on('externalHtmlContentChange', function() {
+          var cleanup2 = $scope.$on('externalHtmlContentChange', function() {
             $timeout(function() {
               $scope.tempContent = _convertHtmlToRte($scope.htmlContent);
             });
           });
+          $scope.$on('$destroy', cleanup2);
         }]
       };
     }
@@ -1231,9 +1235,10 @@ oppia.directive('schemaBasedBoolEditor', [function() {
           $scope.paramNames = parameterSpecsService.getAllParamsOfType('bool');
           $scope.expressionMode = angular.isString($scope.localValue);
 
-          $scope.$watch('localValue', function(newValue) {
+          var cleanup = $scope.$watch('localValue', function(newValue) {
             $scope.expressionMode = angular.isString(newValue);
           });
+          $scope.$on('$destroy', cleanup);
 
           $scope.toggleExpressionMode = function() {
             $scope.expressionMode = !$scope.expressionMode;
@@ -1276,9 +1281,10 @@ oppia.directive('schemaBasedIntEditor', [function() {
           $scope.paramNames = parameterSpecsService.getAllParamsOfType('int');
           $scope.expressionMode = angular.isString($scope.localValue);
 
-          $scope.$watch('localValue', function(newValue) {
+          var cleanup = $scope.$watch('localValue', function(newValue) {
             $scope.expressionMode = angular.isString(newValue);
           });
+          $scope.$on('$destroy', cleanup);
 
           $scope.toggleExpressionMode = function() {
             $scope.expressionMode = !$scope.expressionMode;
@@ -1371,9 +1377,10 @@ oppia.directive('schemaBasedFloatEditor', [function() {
           $scope.paramNames = parameterSpecsService.getAllParamsOfType('float');
           $scope.expressionMode = angular.isString($scope.localValue);
 
-          $scope.$watch('localValue', function(newValue) {
+          var cleanup = $scope.$watch('localValue', function(newValue) {
             $scope.expressionMode = angular.isString(newValue);
           });
+          $scope.$on('$destroy', cleanup);
 
           $scope.toggleExpressionMode = function() {
             $scope.expressionMode = !$scope.expressionMode;
@@ -1459,11 +1466,12 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
         // When the form view is opened, flip the status flag. The
         // timeout seems to be needed for the line numbers etc. to display
         // properly.
-        $scope.$on('schemaBasedFormsShown', function() {
+        var cleanup = $scope.$on('schemaBasedFormsShown', function() {
           setTimeout(function() {
             $scope.codemirrorStatus = !$scope.codemirrorStatus;
           }, 200);
         });
+        $scope.$on('$destroy', cleanup);
       }
 
       $scope.onKeypress = function(evt) {
@@ -1672,11 +1680,15 @@ oppia.directive('schemaBasedListEditor', [
             evt.stopPropagation();
           };
 
-          $scope.$on('submittedSchemaBasedIntForm', $scope._onChildFormSubmit);
-          $scope.$on(
+          var cleanup1 = $scope.$on(
+            'submittedSchemaBasedIntForm', $scope._onChildFormSubmit);
+          var cleanup2 = $scope.$on(
             'submittedSchemaBasedFloatForm', $scope._onChildFormSubmit);
-          $scope.$on(
+          var cleanup3 = $scope.$on(
             'submittedSchemaBasedUnicodeForm', $scope._onChildFormSubmit);
+          $scope.$on('$destroy', cleanup1);
+          $scope.$on('$destroy', cleanup2);
+          $scope.$on('$destroy', cleanup3);
 
           $scope.deleteElement = function(index) {
             // Need to let the RTE know that HtmlContent has been changed.

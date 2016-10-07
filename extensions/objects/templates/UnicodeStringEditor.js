@@ -33,25 +33,28 @@ oppia.directive('unicodeStringEditor', [
       $scope.alwaysEditable = $scope.$parent.alwaysEditable;
       $scope.largeInput = false;
 
-      $scope.$watch('$parent.initArgs', function(newValue) {
+      var cleanup1 = $scope.$watch('$parent.initArgs', function(newValue) {
         $scope.largeInput = false;
         if (newValue && newValue.largeInput) {
           $scope.largeInput = newValue.largeInput;
         }
       });
+      $scope.$on('$destroy', cleanup1);
 
       // Reset the component each time the value changes (e.g. if this is part
       // of an editable list).
-      $scope.$watch('$parent.value', function() {
+      var cleanup2 = $scope.$watch('$parent.value', function() {
         $scope.localValue = {
           label: $scope.$parent.value || ''
         };
       }, true);
+      $scope.$on('$destroy', cleanup2);
 
       if ($scope.alwaysEditable) {
-        $scope.$watch('localValue.label', function(newValue) {
+        var cleanup3 = $scope.$watch('localValue.label', function(newValue) {
           $scope.$parent.value = newValue;
         });
+        $scope.$on('$destroy', cleanup1);
       } else {
         $scope.openEditor = function() {
           $scope.active = true;
@@ -69,7 +72,7 @@ oppia.directive('unicodeStringEditor', [
           $scope.closeEditor();
         };
 
-        $scope.$on('externalSave', function() {
+        var cleanup4 = $scope.$on('externalSave', function() {
           if ($scope.active) {
             $scope.replaceValue($scope.localValue.label);
             // The $scope.$apply() call is needed to propagate the replaced
@@ -77,6 +80,7 @@ oppia.directive('unicodeStringEditor', [
             $scope.$apply();
           }
         });
+        $scope.$on('$destroy', cleanup4);
 
         $scope.closeEditor();
       }

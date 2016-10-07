@@ -69,9 +69,10 @@ oppia.directive('ratingDisplay', [function() {
       };
 
       displayValue($scope.ratingValue);
-      $scope.$watch('ratingValue', function() {
+      var cleanup = $scope.$watch('ratingValue', function() {
         displayValue($scope.ratingValue);
       });
+      $scope.$on('$destroy', cleanup);
 
       $scope.clickStar = function(starValue) {
         if ($scope.isEditable && $scope.status === STATUS_ACTIVE) {

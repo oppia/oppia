@@ -35,9 +35,10 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
             oppiaHtmlEscaper.escapedJsonToObj($attrs.longitudeWithValue)];
           $scope.zoom = oppiaHtmlEscaper.escapedJsonToObj($attrs.zoomWithValue);
 
-          $scope.$on('showInteraction', function() {
+          var cleanup = $scope.$on('showInteraction', function() {
             refreshMap();
           });
+          $scope.$on('$destroy', cleanup);
 
           $scope.mapMarkers = [];
 

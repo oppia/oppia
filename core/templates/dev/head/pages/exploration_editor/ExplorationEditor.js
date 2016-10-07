@@ -78,11 +78,6 @@ oppia.controller('ExplorationEditor', [
         !$scope.areExplorationWarningsVisible);
     };
 
-    $scope.$on('refreshGraph', function() {
-      graphDataService.recompute();
-      explorationWarningsService.updateWarnings();
-    });
-
     $scope.getExplorationUrl = function(explorationId) {
       return explorationId ? ('/explore/' + explorationId) : '';
     };
@@ -180,10 +175,6 @@ oppia.controller('ExplorationEditor', [
     };
 
     $scope.initExplorationPage();
-
-    $scope.$on('initExplorationPage', function(unusedEvtData, successCallback) {
-      $scope.initExplorationPage(successCallback);
-    });
 
     var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
     var _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
@@ -390,9 +381,21 @@ oppia.controller('ExplorationEditor', [
       });
     };
 
-    $scope.$on(
+    var cleanup1 = $scope.$on('refreshGraph', function() {
+      graphDataService.recompute();
+      explorationWarningsService.updateWarnings();
+    });
+    var cleanup2 = $scope.$on(
+        'initExplorationPage', function(unusedEvtData, successCallback) {
+      $scope.initExplorationPage(successCallback);
+    });
+    var cleanup3 = $scope.$on(
       'enterEditorForTheFirstTime', $scope.showWelcomeExplorationModal);
-    $scope.$on('openEditorTutorial', $scope.startTutorial);
+    var cleanup4 = $scope.$on('openEditorTutorial', $scope.startTutorial);
+    $scope.$on('$destroy', cleanup1);
+    $scope.$on('$destroy', cleanup2);
+    $scope.$on('$destroy', cleanup3);
+    $scope.$on('$destroy', cleanup4);
   }
 ]);
 
@@ -410,12 +413,13 @@ oppia.controller('EditorNavigation', [
     explorationContextService) {
     $scope.postTutorialHelpPopoverIsShown = false;
 
-    $scope.$on('openPostTutorialHelpPopover', function() {
+    var cleanup = $scope.$on('openPostTutorialHelpPopover', function() {
       $scope.postTutorialHelpPopoverIsShown = true;
       $timeout(function() {
         $scope.postTutorialHelpPopoverIsShown = false;
       }, 5000);
     });
+    $scope.$on('$destroy', cleanup);
 
     // This method is here because the trigger for the tutorial is in the site
     // navbar. It broadcasts an event to tell the exploration editor to open the
@@ -483,7 +487,7 @@ oppia.controller('EditorNavbarBreadcrumb', [
       $scope, explorationTitleService, routerService, focusService,
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
     $scope.navbarTitle = null;
-    $scope.$on('explorationPropertyChanged', function() {
+    var cleanup = $scope.$on('explorationPropertyChanged', function() {
       var _MAX_TITLE_LENGTH = 20;
       $scope.navbarTitle = explorationTitleService.savedMemento;
       if ($scope.navbarTitle.length > _MAX_TITLE_LENGTH) {
@@ -491,6 +495,7 @@ oppia.controller('EditorNavbarBreadcrumb', [
           $scope.navbarTitle.substring(0, _MAX_TITLE_LENGTH - 3) + '...');
       }
     });
+    $scope.$on('$destroy', cleanup);
 
     $scope.editTitle = function() {
       routerService.navigateToSettingsTab();

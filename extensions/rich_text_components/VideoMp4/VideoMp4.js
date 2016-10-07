@@ -37,9 +37,10 @@ oppia.directive('oppiaNoninteractiveVideoMp4', [
         //
         // See W3C spec 4.7.10.18
         // Ref: https://www.w3.org/TR/html5/embedded-content-0.html
-        $scope.$on(EVENT_HTML_CHANGED, function() {
+        var cleanup = $scope.$on(EVENT_HTML_CHANGED, function() {
           $scope.videoUrl = '';
         });
+        $scope.$on('$destroy', cleanup);
       }]
     };
   }

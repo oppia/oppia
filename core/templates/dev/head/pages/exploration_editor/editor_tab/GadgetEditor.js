@@ -25,15 +25,16 @@ oppia.controller('GadgetEditor', [
       explorationGadgetsService, GADGET_SPECS) {
     $scope.GADGET_SPECS = GADGET_SPECS;
 
-    $scope.$on('gadgetsChangedOrInitialized', function() {
+    var cleanup1 = $scope.$on('gadgetsChangedOrInitialized', function() {
       $scope.refreshGadgetsInfo();
     });
-
-    $scope.$watch(function() {
+    var cleanup2 = $scope.$watch(function() {
       return editorContextService.getActiveStateName();
     }, function(currentStateName) {
       $scope.activeStateName = currentStateName;
     });
+    $scope.$on('$destroy', cleanup1);
+    $scope.$on('$destroy', cleanup2);
 
     $scope.refreshGadgetsInfo = function() {
       $scope.gadgets = explorationGadgetsService.getGadgets();

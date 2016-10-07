@@ -496,7 +496,7 @@ oppia.controller('StateResponses', [
       }
     };
 
-    $scope.$on('initializeAnswerGroups', function(evt, data) {
+    var cleanup1 = $scope.$on('initializeAnswerGroups', function(evt, data) {
       responsesService.init(data);
       $scope.answerGroups = responsesService.getAnswerGroups();
       $scope.defaultOutcome = responsesService.getDefaultOutcome();
@@ -516,7 +516,8 @@ oppia.controller('StateResponses', [
       $rootScope.$broadcast('externalSave');
     });
 
-    $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
+    var cleanup2 = $scope.$on(
+        'onInteractionIdChanged', function(evt, newInteractionId) {
       $rootScope.$broadcast('externalSave');
       responsesService.onInteractionIdChanged(newInteractionId, function() {
         $scope.answerGroups = responsesService.getAnswerGroups();
@@ -546,16 +547,22 @@ oppia.controller('StateResponses', [
       }
     });
 
-    $scope.$on('answerGroupChanged', function() {
+    var cleanup3 = $scope.$on('answerGroupChanged', function() {
       $scope.answerGroups = responsesService.getAnswerGroups();
       $scope.defaultOutcome = responsesService.getDefaultOutcome();
       $scope.activeAnswerGroupIndex = (
         responsesService.getActiveAnswerGroupIndex());
     });
 
-    $scope.$on('updateAnswerChoices', function(evt, newAnswerChoices) {
+    var cleanup4 = $scope.$on(
+        'updateAnswerChoices', function(evt, newAnswerChoices) {
       responsesService.updateAnswerChoices(newAnswerChoices);
     });
+
+    $scope.$on('$destroy', cleanup1);
+    $scope.$on('$destroy', cleanup2);
+    $scope.$on('$destroy', cleanup3);
+    $scope.$on('$destroy', cleanup4);
 
     $scope.openTeachOppiaModal = function() {
       alertsService.clearWarnings();

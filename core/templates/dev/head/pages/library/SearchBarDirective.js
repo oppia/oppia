@@ -176,13 +176,14 @@ oppia.directive('searchBar', [function() {
           }
         };
 
-        $scope.$on('$locationChangeSuccess', function() {
+        var cleanup1 = $scope.$on('$locationChangeSuccess', function() {
           if (urlService.getUrlParams().hasOwnProperty('q')) {
             updateSearchFieldsBasedOnUrlQuery();
           }
         });
+        $scope.$on('$destroy', cleanup1);
 
-        $scope.$on(
+        var cleanup2 = $scope.$on(
           'preferredLanguageCodesLoaded',
           function(evt, preferredLanguageCodesList) {
             preferredLanguageCodesList.forEach(function(languageCode) {
@@ -207,6 +208,7 @@ oppia.directive('searchBar', [function() {
             refreshSearchBarLabels();
           }
         );
+        $scope.$on('$destroy', cleanup2);
 
         var refreshSearchBarLabels = function() {
           // If you translate these strings in the html, then you must use a

@@ -55,11 +55,12 @@ oppia.directive('paramChangesEditor', [function() {
           }
         };
 
-        $scope.$on('externalSave', function() {
+        var cleanup = $scope.$on('externalSave', function() {
           if ($scope.isParamChangesEditorOpen) {
             $scope.saveParamChanges();
           }
         });
+        $scope.$on('$destroy', cleanup);
 
         var getDefaultParameterChange = function(name) {
           return angular.copy({

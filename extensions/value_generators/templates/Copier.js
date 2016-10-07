@@ -27,21 +27,26 @@ oppia.directive('copier', ['$compile', function($compile) {
     scope: true,
     template: '<span ng-include="getTemplateUrl()"></span>',
     controller: function($scope) {
-      $scope.$watch('$parent.initArgs', function() {
+      var cleanup1 = $scope.$watch('$parent.initArgs', function() {
         $scope.initArgs = $scope.$parent.initArgs;
       }, true);
 
-      $scope.$watch('$parent.objType', function() {
+      var cleanup2 = $scope.$watch('$parent.objType', function() {
         $scope.objType = $scope.$parent.objType;
       }, true);
 
-      $scope.$watch('$parent.customizationArgs', function() {
+      var cleanup3 = $scope.$watch('$parent.customizationArgs', function() {
         $scope.customizationArgs = $scope.$parent.customizationArgs;
       }, true);
 
-      $scope.$watch('customizationArgs', function() {
+      var cleanup4 = $scope.$watch('customizationArgs', function() {
         $scope.$parent.customizationArgs = $scope.customizationArgs;
       }, true);
+
+      $scope.$on('$destroy', cleanup1);
+      $scope.$on('$destroy', cleanup2);
+      $scope.$on('$destroy', cleanup3);
+      $scope.$on('$destroy', cleanup4);
     }
   };
 }]);

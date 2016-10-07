@@ -41,15 +41,16 @@ oppia.directive('codeStringEditor', [
 
       // Reset the component each time the value changes (e.g. if this is part
       // of an editable list).
-      $scope.$watch('$parent.value', function() {
+      var cleanup1 = $scope.$watch('$parent.value', function() {
         $scope.localValue = {
           label: $scope.$parent.value || ''
         };
       }, true);
-
-      $scope.$watch('localValue.label', function(newValue) {
+      var cleanup2 = $scope.$watch('localValue.label', function(newValue) {
         $scope.$parent.value = newValue;
       });
+      $scope.$on('$destroy', cleanup1);
+      $scope.$on('$destroy', cleanup2);
     }]
   };
 }]);

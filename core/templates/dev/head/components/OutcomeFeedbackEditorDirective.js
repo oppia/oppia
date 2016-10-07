@@ -28,7 +28,7 @@ oppia.directive('outcomeFeedbackEditor', [function() {
         type: 'html'
       };
 
-      $scope.$on('saveOutcomeFeedbackDetails', function() {
+      var cleanup = $scope.$on('saveOutcomeFeedbackDetails', function() {
         // Remove null feedback. If the first element of the feedback is null or
         // empty, clear the entire feedback array. This is so that if the first
         // feedback is removed all feedback is thereby removed. Only the first
@@ -50,6 +50,7 @@ oppia.directive('outcomeFeedbackEditor', [function() {
         }
         $scope.outcome.feedback = nonemptyFeedback;
       });
+      $scope.$on('$destroy', cleanup);
     }]
   };
 }]);

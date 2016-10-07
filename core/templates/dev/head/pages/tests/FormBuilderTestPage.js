@@ -28,9 +28,10 @@ oppia.directive('formOverlay', ['recursionHelper', function(recursionHelper) {
     restrict: 'E',
     compile: recursionHelper.compile,
     controller: ['$scope', function($scope) {
-      $scope.$watch('savedValue', function() {
+      var cleanup = $scope.$watch('savedValue', function() {
         $scope.localValue = angular.copy($scope.savedValue);
       });
+      $scope.$on('$destroy', cleanup);
 
       $scope.submitValue = function() {
         $scope.savedValue = angular.copy($scope.localValue);

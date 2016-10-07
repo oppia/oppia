@@ -30,12 +30,13 @@ oppia.directive('searchResults', [function() {
 
         // Called when the first batch of search results is retrieved from the
         // server.
-        $scope.$on(
+        var cleanup = $scope.$on(
           'initialSearchResultsLoaded', function(evt, activityList) {
             $scope.someResultsExist = activityList.length > 0;
             $rootScope.loadingMessage = '';
           }
         );
+        $scope.$on('$destroy', cleanup);
 
         $scope.onRedirectToLogin = function(destinationUrl) {
           siteAnalyticsService.registerStartLoginEvent('noSearchResults');

@@ -32,18 +32,8 @@ oppia.directive('outcomeDestinationEditor', [function() {
           $scope, editorContextService, explorationStatesService,
           StateGraphLayoutService, PLACEHOLDER_OUTCOME_DEST, focusService,
           editorFirstTimeEventsService) {
-        $scope.$on('saveOutcomeDestDetails', function() {
-          // Create new state if specified.
-          if ($scope.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
-            editorFirstTimeEventsService.registerFirstCreateSecondStateEvent();
-
-            var newStateName = $scope.outcome.newStateName;
-            $scope.outcome.dest = newStateName;
-            delete $scope.outcome.newStateName;
-
-            explorationStatesService.addState(newStateName, null);
-          }
-        });
+        $scope.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
+        $scope.destChoices = [];
 
         $scope.onDestSelectorChange = function() {
           if ($scope.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
@@ -55,9 +45,22 @@ oppia.directive('outcomeDestinationEditor', [function() {
           return outcome.dest === PLACEHOLDER_OUTCOME_DEST;
         };
 
-        $scope.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
-        $scope.destChoices = [];
-        $scope.$watch(explorationStatesService.getStates, function() {
+        var cleanup1 = $scope.$on('saveOutcomeDestDetails', function() {
+          // Create new state if specified.
+          if ($scope.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
+            editorFirstTimeEventsService.registerFirstCreateSecondStateEvent();
+
+            var newStateName = $scope.outcome.newStateName;
+            $scope.outcome.dest = newStateName;
+            delete $scope.outcome.newStateName;
+
+            explorationStatesService.addState(newStateName, null);
+          }
+        });
+        $scope.$on('$destroy', cleanup1);
+
+        var cleanup2 = $scope.$watch(
+            explorationStatesService.getStates, function() {
           var currentStateName = editorContextService.getActiveStateName();
 
           // This is a list of objects, each with an ID and name. These
@@ -120,6 +123,7 @@ oppia.directive('outcomeDestinationEditor', [function() {
             text: 'A New Card Called...'
           });
         }, true);
+        $scope.$on('$destroy', cleanup2);
       }
     ]
   };

@@ -39,7 +39,7 @@ oppia.controller('Admin', [
 
     $scope.currentTab = $scope.TAB_ACTIVITIES;
 
-    $scope.$watch(function() {
+    var cleanup = $scope.$watch(function() {
       return window.location.hash;
     }, function(newHash) {
       switch (newHash) {
@@ -57,6 +57,7 @@ oppia.controller('Admin', [
           break;
       }
     });
+    $scope.$on('$destroy', cleanup);
 
     $scope.showActivitiesTab = function() {
       $scope.currentTab = $scope.TAB_ACTIVITIES;

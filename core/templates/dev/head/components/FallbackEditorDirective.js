@@ -64,12 +64,13 @@ oppia.directive('fallbackEditor', [function() {
           $scope.triggerEditorIsOpen = false;
         };
 
-        $scope.$on('externalSave', function() {
+        var cleanup = $scope.$on('externalSave', function() {
           if ($scope.triggerEditorIsOpen &&
               $scope.editFallbackForm.editTriggerForm.$valid) {
             $scope.saveThisTrigger();
           }
         });
+        $scope.$on('$destroy', cleanup);
       }
     ]
   };

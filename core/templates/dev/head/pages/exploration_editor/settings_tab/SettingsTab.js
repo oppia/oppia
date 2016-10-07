@@ -104,7 +104,8 @@ oppia.controller('SettingsTab', [
       }
     };
 
-    $scope.$on('refreshSettingsTab', $scope.refreshSettingsTab);
+    var cleanup = $scope.$on('refreshSettingsTab', $scope.refreshSettingsTab);
+    $scope.$on('$destroy', cleanup);
 
     $scope.initSettingsTab();
 

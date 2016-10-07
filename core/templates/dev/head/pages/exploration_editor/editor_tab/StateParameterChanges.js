@@ -22,9 +22,11 @@ oppia.controller('StateParamChangesEditor', [
   function($scope, editorContextService, stateParamChangesService) {
     $scope.stateParamChangesService = stateParamChangesService;
 
-    $scope.$on('stateEditorInitialized', function(evt, stateData) {
+    var cleanup = $scope.$on(
+        'stateEditorInitialized', function(evt, stateData) {
       stateParamChangesService.init(
         editorContextService.getActiveStateName(), stateData.param_changes);
     });
+    $scope.$on('$destroy', cleanup);
   }
 ]);
