@@ -277,9 +277,9 @@ describe('Testing filters', function() {
     'Hint introduction&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;' +
     'This set of tabs shows some hints.' +
     ' Click on the other tabs to display the relevant hints.&amp;quot;},' +
-    '{&amp;quot;title&amp;quot;:&amp;quot;Hint 1&amp;quot;,'+
-    '&amp;quot;content&amp;quot;:&amp;quot;This is a first hint.&amp;quot;},'+
-    '{&amp;quot;title&amp;quot;:&amp;quot;Hint 2&amp;quot;,'+
+    '{&amp;quot;title&amp;quot;:&amp;quot;Hint 1&amp;quot;,' +
+    '&amp;quot;content&amp;quot;:&amp;quot;This is a first hint.&amp;quot;},' +
+    '{&amp;quot;title&amp;quot;:&amp;quot;Hint 2&amp;quot;,' +
     '&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;' +
     'Stuff and things&amp;lt;/p&amp;gt;&amp;quot;}]" ' +
     'exploration-id-with-value="&amp;quot');
@@ -289,7 +289,7 @@ describe('Testing filters', function() {
     'caption-with-value="&amp;quot;&amp;quot;" ' +
     'filepath-with-value="&amp;quot;DearIDPodcast_sm.png&amp;quot;" ' +
     'exploration-id-with-value="&amp;quot;5WWM85JODA2X&amp;quot;">');
-    var OPPIA_VIDEO= ('<img ' +
+    var OPPIA_VIDEO = ('<img ' +
     'src="https://img.youtube.com/vi/JcPwIQ6GCj8/hqdefault.jpg" ' +
     'class="oppia-noninteractive-video block-element" ' +
     'video_id-with-value="" start-with-value="0" end-with-value="0" ' +
@@ -305,12 +305,12 @@ describe('Testing filters', function() {
     var DANGEROUS_NESTED_SCRIPT = ('<scr<script>ipt>alert(42);' +
     '</scr</script>ipt>');
     var whitelistedTags = [
-      "oppia-noninteractive-collapsible",
-      "oppia-noninteractive-image",
-      "oppia-noninteractive-link",
-      "oppia-noninteractive-math",
-      "oppia-noninteractive-tabs",
-      "oppia-noninteractive-video"
+      'oppia-noninteractive-collapsible',
+      'oppia-noninteractive-image',
+      'oppia-noninteractive-link',
+      'oppia-noninteractive-math',
+      'oppia-noninteractive-tabs',
+      'oppia-noninteractive-video'
     ];
 
     expect(

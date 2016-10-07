@@ -443,14 +443,12 @@ oppia.filter('removeDuplicatesInArray', [function() {
 }]);
 
 oppia.filter('stripFormatting', [function() {
-  return function(html, whitelistedTags){
+  return function(html, whitelistedTags) {
     // Strip out anything between and including <>,
     // unless it contains the RTE tags.
     var regex = new RegExp('(?!.*(' + whitelistedTags.join('|') +
                             '))<[^>]+>', 'gm');
     var strippedText = html ? String(html).replace(regex, '') : '';
-    console.log(html);
-    console.log(strippedText);
     return strippedText;
   };
 }]);
