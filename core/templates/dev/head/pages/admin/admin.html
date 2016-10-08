@@ -129,6 +129,7 @@
             <ul class="nav oppia-navbar-tabs oppia-navbar-tabs-admin">
               <li class="oppia-clickable-navbar-element pull-right">
                 <a class="oppia-navbar-tab"
+                   ng-click="showTab(ADMIN_TAB_URLS.MISC)"
                    ng-href="<[::ADMIN_TAB_URLS.MISC]>"
                    tooltip="Miscellaneous"
                    tooltip-placement="bottom">
@@ -137,6 +138,7 @@
               </li>
               <li class="oppia-clickable-navbar-element pull-right">
                 <a class="oppia-navbar-tab protractor-test-admin-config-tab"
+                   ng-click="showTab(ADMIN_TAB_URLS.CONFIG)"
                    ng-href="<[::ADMIN_TAB_URLS.CONFIG]>"
                    tooltip="Config"
                    tooltip-placement="bottom">
@@ -145,6 +147,7 @@
               </li>
               <li class="oppia-clickable-navbar-element pull-right">
                 <a class="oppia-navbar-tab"
+                   ng-click="showTab(ADMIN_TAB_URLS.JOBS)"
                    ng-href="<[::ADMIN_TAB_URLS.JOBS]>"
                    tooltip="Jobs"
                    tooltip-placement="bottom">
@@ -153,6 +156,7 @@
               </li>
               <li class="dropdown oppia-navbar-clickable-dropdown pull-right">
                 <a class="oppia-navbar-tab"
+                   ng-click="showTab(ADMIN_TAB_URLS.ACTIVITIES)"
                    ng-href="<[::ADMIN_TAB_URLS.ACTIVITIES]>"
                    tooltip="Activities"
                    tooltip-placement="bottom">

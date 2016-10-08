@@ -41,16 +41,20 @@ oppia.controller('Admin', [
 
     $scope.$watch(function() {
       return window.location.hash;
-    }, function(newHash, oldHash) {
-      if (newHash !== oldHash) {
-        for (var url in $scope.ADMIN_TAB_URLS) {
-          if ($scope.ADMIN_TAB_URLS[url] === newHash) {
-            $scope.currentTab = newHash;
-            break;
-          }
+    }, function(newHash) {
+      for (var url in $scope.ADMIN_TAB_URLS) {
+        if ($scope.ADMIN_TAB_URLS[url] === newHash) {
+          $scope.currentTab = newHash;
+          break;
         }
       }
     });
+
+    $scope.showTab = function(hash) {
+      if (hash !== window.location.hash) {
+        $scope.currentTab = hash;
+      }
+    };
 
     $scope.showJobOutput = false;
     $scope.getJobOutput = function(jobId) {
