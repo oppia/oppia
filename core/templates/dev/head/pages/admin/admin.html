@@ -129,7 +129,7 @@
             <ul class="nav oppia-navbar-tabs oppia-navbar-tabs-admin">
               <li class="oppia-clickable-navbar-element pull-right">
                 <a class="oppia-navbar-tab"
-                   ng-href="<[ADMIN_TAB_URLS.MISC]>"
+                   ng-href="<[::ADMIN_TAB_URLS.MISC]>"
                    tooltip="Miscellaneous"
                    tooltip-placement="bottom">
                   Misc
@@ -137,7 +137,7 @@
               </li>
               <li class="oppia-clickable-navbar-element pull-right">
                 <a class="oppia-navbar-tab protractor-test-admin-config-tab"
-                   ng-href="<[ADMIN_TAB_URLS.CONFIG]>"
+                   ng-href="<[::ADMIN_TAB_URLS.CONFIG]>"
                    tooltip="Config"
                    tooltip-placement="bottom">
                   Config
@@ -145,7 +145,7 @@
               </li>
               <li class="oppia-clickable-navbar-element pull-right">
                 <a class="oppia-navbar-tab"
-                   ng-href="<[ADMIN_TAB_URLS.JOBS]>"
+                   ng-href="<[::ADMIN_TAB_URLS.JOBS]>"
                    tooltip="Jobs"
                    tooltip-placement="bottom">
                   Jobs
@@ -153,7 +153,7 @@
               </li>
               <li class="dropdown oppia-navbar-clickable-dropdown pull-right">
                 <a class="oppia-navbar-tab"
-                   ng-href="<[ADMIN_TAB_URLS.ACTIVITIES]>"
+                   ng-href="<[::ADMIN_TAB_URLS.ACTIVITIES]>"
                    tooltip="Activities"
                    tooltip-placement="bottom">
                   Activities
@@ -275,9 +275,8 @@
         <md-card class="oppia-page-card oppia-long-text"
                  ng-if="currentTab === ADMIN_TAB_URLS.JOBS"
                  style="max-width: 900px">
-          <h3>Jobs</h3>
-          <h4>Current time: {{human_readable_current_time}}</h4>
           <h4>One-off jobs</h4>
+          <h4>Current time: {{human_readable_current_time}}</h4>
           <table class="table table-striped">
             {% for job_spec in one_off_job_specs %}
               <tr>

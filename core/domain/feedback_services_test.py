@@ -1128,3 +1128,23 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.GenericTestBase):
             self.assertEqual(
                 messages[1].body.decode(),
                 expected_email_text_body_message)
+
+    def test_that_emails_are_not_sent_to_anonymous_user(self):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            # Create thread as anonoymous user.
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name',
+                None, 'a subject', 'some text')
+            self.process_and_flush_pending_tasks()
+
+            threadlist = feedback_services.get_all_threads(
+                self.exploration.id, False)
+            thread_id = threadlist[0].get_thread_id()
+
+            feedback_services.create_message(
+                self.exploration.id, thread_id, self.editor_id,
+                feedback_models.STATUS_CHOICES_FIXED, None, 'editor message')
+            self.process_and_flush_pending_tasks()
+
+            messages = self.mail_stub.get_sent_messages()
+            self.assertEqual(len(messages), 0)
