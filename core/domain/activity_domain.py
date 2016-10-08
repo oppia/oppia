@@ -27,8 +27,11 @@ class ActivityReference(object):
     collections.
 
     Attributes:
-        activity_type: A string indicating the activity type.
-        activity_id: A string indicating the activity id.
+        get_hash(): Generates unique fingerprint for ActivityReference instance.
+        validate(): Checks for the validity of the arguments of an 
+        ActivityReference instances.
+        to_dict(): Returns a dictionary containing arguments for an 
+        ActivityReference instance
     """
 
     def __init__(self, activity_type, activity_id):
