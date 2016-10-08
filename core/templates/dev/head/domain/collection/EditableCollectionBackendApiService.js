@@ -69,7 +69,7 @@ oppia.factory('EditableCollectionBackendApiService', [
         };
         $http.put(editableCollectionDataUrl, putData).then(function(response) {
           // The returned data is an updated collection dict.
-          var collection = angular.copy(response.data);
+          var collection = angular.copy(response.data.collection);
 
           // Update the ReadOnlyCollectionBackendApiService's cache with the new
           // collection.
