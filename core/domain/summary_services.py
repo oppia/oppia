@@ -166,7 +166,7 @@ def get_displayable_collection_summary_dicts_matching_ids(collection_ids):
 
 def get_exp_metadata_dicts_matching_query(query_string, search_cursor, user_id):
     """Given a query string and a search cursor, returns a list of exploration
-    dicts that satisfy the search query.
+    metadata dicts that satisfy the search query.
 
     Args:
         query_string: str. The search query for which the search is to be
@@ -174,10 +174,12 @@ def get_exp_metadata_dicts_matching_query(query_string, search_cursor, user_id):
         search_cursor: str or None. The cursor location to start the search
             from. If None, the returned values are from the beginning
             of the results list.
-        user_id: str. The user id of editor.
+        user_id: str. The user id affect the result by restricting the results
+            to explorations which are accessible by the user.
+
     Returns:
-        exploration_list: A list of metadata dicts of the exploration ids
-            for the query_string.
+        exploration_list: A list of metadata dicts for explorations matching
+            the query.
         new_search_cursor: New search cursor location.
     """
     exp_ids, new_search_cursor = (
@@ -225,7 +227,9 @@ def get_exploration_metadata_dicts(exploration_ids, editor_user_id=None):
 
         filtered_exploration_summaries.append(exploration_summary)
 
-    return exp_domain.to_metadata_dict(filtered_exploration_summaries)
+    return [
+        exp_domain.to_metadata_dict(summary)
+        for summary in filtered_exploration_summaries]
 
 
 def get_displayable_exp_summary_dicts_matching_ids(

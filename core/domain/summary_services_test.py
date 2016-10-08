@@ -936,10 +936,10 @@ class CollectionNodeMetadataDictsTest(
             self.EXP_ID4])
 
     def test_get_exploration_metadata_dicts(self):
-        summaries = (summary_services.get_exploration_metadata_dicts(
+        metadata_dicts = (summary_services.get_exploration_metadata_dicts(
             [self.EXP_ID1, self.EXP_ID2, self.EXP_ID3], self.albert_id))
 
-        expected_summaries = [{
+        expected_metadata_dicts = [{
             'id': self.EXP_ID1,
             'objective': u'An objective 1',
             'title': u'Exploration 1 Albert title',
@@ -952,24 +952,24 @@ class CollectionNodeMetadataDictsTest(
             'objective': u'An objective 3',
             'title': u'Exploration 3 Albert title',
         }]
-        self.assertEqual(expected_summaries, summaries)
+        self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
     def test_private_exps_of_another_user_are_not_returned(self):
-        summaries = (summary_services.get_exploration_metadata_dicts(
+        metadata_dicts = (summary_services.get_exploration_metadata_dicts(
             [self.EXP_ID5, self.EXP_ID4], self.bob_id))
 
-        expected_summary = [{
+        expected_metadata_dict = [{
             'id': self.EXP_ID4,
             'objective': u'An objective 4',
             'title': u'Exploration 4 Bob title',
         }]
-        self.assertEqual(expected_summary, summaries)
+        self.assertEqual(expected_metadata_dict, metadata_dicts)
 
     def test_public_exps_of_another_user_are_returned(self):
-        summaries = (summary_services.get_exploration_metadata_dicts(
+        metadata_dicts = (summary_services.get_exploration_metadata_dicts(
             [self.EXP_ID2, self.EXP_ID3, self.EXP_ID4], self.bob_id))
 
-        expected_summaries = [{
+        expected_metadata_dicts = [{
             'id': self.EXP_ID2,
             'objective': u'An objective 2',
             'title': u'Exploration 2 Albert title',
@@ -982,15 +982,15 @@ class CollectionNodeMetadataDictsTest(
             'objective': u'An objective 4',
             'title': u'Exploration 4 Bob title',
         }]
-        self.assertEqual(expected_summaries, summaries)
+        self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
     def test_deleted_exps_are_not_returned(self):
         exp_services.delete_exploration(self.albert_id, self.EXP_ID2)
 
-        summaries = (summary_services.get_exploration_metadata_dicts(
+        metadata_dicts = (summary_services.get_exploration_metadata_dicts(
             [self.EXP_ID2, self.EXP_ID3, self.EXP_ID4], self.bob_id))
 
-        expected_summaries = [{
+        expected_metadata_dicts = [{
             'id': self.EXP_ID3,
             'objective': u'An objective 3',
             'title': u'Exploration 3 Albert title',
@@ -999,27 +999,27 @@ class CollectionNodeMetadataDictsTest(
             'objective': u'An objective 4',
             'title': u'Exploration 4 Bob title',
         }]
-        self.assertEqual(expected_summaries, summaries)
+        self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
     def test_exp_metadata_dicts_matching_query(self):
-        summaries, _ = (
+        metadata_dicts, _ = (
             summary_services.get_exp_metadata_dicts_matching_query(
                 'Exploration 1', None, self.albert_id))
 
-        expected_summary = [{
+        expected_metadata_dict = [{
             'id': self.EXP_ID1,
             'objective': u'An objective 1',
             'title': u'Exploration 1 Albert title',
         }]
-        self.assertEqual(expected_summary, summaries)
+        self.assertEqual(expected_metadata_dict, metadata_dicts)
 
     def test_invalid_exp_ids(self):
-        summaries = (summary_services.get_exploration_metadata_dicts(
+        metadata_dicts = (summary_services.get_exploration_metadata_dicts(
             [self.EXP_ID3, self.INVALID_EXP_ID], self.albert_id))
 
-        expected_summary = [{
+        expected_metadata_dict = [{
             'id': self.EXP_ID3,
             'objective': u'An objective 3',
             'title': u'Exploration 3 Albert title',
         }]
-        self.assertEqual(expected_summary, summaries)
+        self.assertEqual(expected_metadata_dict, metadata_dicts)
