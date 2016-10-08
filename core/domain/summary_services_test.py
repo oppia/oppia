@@ -931,6 +931,10 @@ class CollectionNodeMetadataDictsTest(
         rights_manager.publish_exploration(self.albert_id, self.EXP_ID3)
         rights_manager.publish_exploration(self.bob_id, self.EXP_ID4)
 
+        exp_services.index_explorations_given_ids([
+            self.EXP_ID1, self.EXP_ID2, self.EXP_ID3,
+            self.EXP_ID4])
+
     def test_get_exploration_metadata_dicts(self):
         summaries = (summary_services.get_exploration_metadata_dicts(
             [self.EXP_ID1, self.EXP_ID2, self.EXP_ID3], self.albert_id))
