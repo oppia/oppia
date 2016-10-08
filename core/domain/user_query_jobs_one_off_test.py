@@ -101,33 +101,33 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
 
         self.save_new_valid_exploration(
             self.EXP_ID_3, self.user_e_id, end_state_name='End')
-        user_settings = user_services.get_user_settings(self.user_e_id)
-        user_settings.last_created_an_exploration = (
-            user_settings.last_created_an_exploration -
+        user_e_settings = user_services.get_user_settings(self.user_e_id)
+        user_e_settings.last_created_an_exploration = (
+            user_e_settings.last_created_an_exploration -
             datetime.timedelta(days=10))
         # Last edited time also changes when user creates an explorationan.
-        user_settings.last_edited_an_exploration = (
+        user_e_settings.last_edited_an_exploration = (
             datetime.datetime.utcnow() - datetime.timedelta(days=10))
-        user_settings.last_logged_in = (
-            user_settings.last_logged_in - datetime.timedelta(days=10))
-        user_services._save_user_settings(user_settings) # pylint: disable=protected-access
+        user_e_settings.last_logged_in = (
+            user_e_settings.last_logged_in - datetime.timedelta(days=10))
+        user_services._save_user_settings(user_e_settings) # pylint: disable=protected-access
 
-        user_settings = user_services.get_user_settings(self.user_a_id)
-        user_settings.last_logged_in = (
-            user_settings.last_logged_in - datetime.timedelta(days=3))
-        user_services._save_user_settings(user_settings) # pylint: disable=protected-access
+        user_a_settings = user_services.get_user_settings(self.user_a_id)
+        user_a_settings.last_logged_in = (
+            user_a_settings.last_logged_in - datetime.timedelta(days=3))
+        user_services._save_user_settings(user_a_settings) # pylint: disable=protected-access
 
         # Set tmpsuperadm1n as admin in ADMIN_USERNAMES config property.
         self.set_admins(['tmpsuperadm1n'])
 
-    def test_user_has_logged_in_last_n_days(self):
+    def test_user_has_not_logged_in_last_n_days(self):
         query_id = user_query_services.save_new_query_model(
             self.submitter_id, has_not_logged_in_for_n_days=6)
         self._run_one_off_job(query_id)
 
         query = user_models.UserQueryModel.get(query_id)
 
-        # List of users who has not logged_in in last 3 days.
+        # List of users who has not logged_in in last 6 days.
         qualifying_user_ids = [self.user_e_id]
         self.assertEqual(len(query.user_ids), 1)
         self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
@@ -160,7 +160,7 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
         self.assertEqual(len(query.user_ids), 2)
         self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
 
-    def test_user_is_active_in_last_n_days(self):
+    def test_user_is_inactive_in_last_n_days(self):
         query_id = user_query_services.save_new_query_model(
             self.submitter_id, inactive_in_last_n_days=3)
         self._run_one_off_job(query_id)

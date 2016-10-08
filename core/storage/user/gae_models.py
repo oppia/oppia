@@ -331,7 +331,8 @@ class UserQueryModel(base_models.BaseModel):
     """
     # Options for a query specified by query submitter.
     # Query option to specify whether user has created or edited one or more
-    # explorations in last n days.
+    # explorations in last n days. This only returns users who have ever
+    # created or edited at least one exploration.
     inactive_in_last_n_days = ndb.IntegerProperty(default=None)
     # Query option to check whether given user has logged in
     # since last n days.
@@ -349,9 +350,9 @@ class UserQueryModel(base_models.BaseModel):
     # List of all user_ids who satisfy all parameters given in above query.
     # This list will be empty initially. Once query has completed its execution
     # this list will be populated with all qualifying user ids.
-    user_ids = ndb.StringProperty(repeated=True)
+    user_ids = ndb.StringProperty(indexed=True, repeated=True)
     # Id of the user who submitted the query.
-    submitter_id = ndb.StringProperty(indexed=True)
+    submitter_id = ndb.StringProperty(indexed=True, required=True)
     # Current status of the query.
     query_status = ndb.StringProperty(
         indexed=True,
