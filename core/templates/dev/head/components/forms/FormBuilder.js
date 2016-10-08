@@ -939,8 +939,12 @@ oppia.directive('textAngularRte', [
           };
 
           $scope.stripFormatting = function(html) {
-            console.log(html);
-            return $filter('stripFormatting')(html, whitelistedTags);
+            var safeHtml = $filter('stripFormatting')(html, whitelistedTags);
+            // The '.' default is needed, otherwise some tags are not stripped
+            // properly. To reproduce, copy the image from this page
+            // (https://en.wikipedia.org/wiki/C._Auguste_Dupin) and paste it
+            // into the RTE.
+            return safeHtml || '.';
           };
 
           $scope.init = function() {

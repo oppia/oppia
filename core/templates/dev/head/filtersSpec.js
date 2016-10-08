@@ -300,6 +300,9 @@ describe('Testing filters', function() {
     'src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/' +
     'The_Purloined_Letter.jpg/220px-The_Purloined_Letter.jpg" width="220" ' +
     'height="178"></a>');
+    var OTHER_TAG_LINK = ('<a href=""><img src="linkimage.jpg" ' +
+    'class="other-tag"></a>');
+    var INVALID_TAG_LINK = ('<a href="example.com" class="invalid-tag"></a>');
     var DANGEROUS_SCRIPT_IMG = ('<img src="w3javascript.gif" ' +
     'onload="loadImage()" width="100" height="132">');
     var DANGEROUS_NESTED_SCRIPT = ('<scr<script>ipt>alert(42);' +
@@ -310,7 +313,8 @@ describe('Testing filters', function() {
       'oppia-noninteractive-link',
       'oppia-noninteractive-math',
       'oppia-noninteractive-tabs',
-      'oppia-noninteractive-video'
+      'oppia-noninteractive-video',
+      'other-tag'
     ];
 
     expect(
@@ -330,6 +334,12 @@ describe('Testing filters', function() {
     ).toEqual(OPPIA_VIDEO);
     expect(
       $filter('stripFormatting')(DANGEROUS_SCRIPT_IMG, whitelistedTags)
+    ).toEqual('');
+    expect(
+      $filter('stripFormatting')(OTHER_TAG_LINK, whitelistedTags)
+    ).toEqual('<a href=""><img src="linkimage.jpg" class="other-tag">');
+    expect(
+      $filter('stripFormatting')(INVALID_TAG_LINK, whitelistedTags)
     ).toEqual('');
     expect(
       $filter('stripFormatting')(DANGEROUS_NESTED_SCRIPT, whitelistedTags)
