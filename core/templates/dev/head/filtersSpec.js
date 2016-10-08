@@ -266,7 +266,7 @@ describe('Testing filters', function() {
       'Please do not test empty string');
   }));
 
-  it('should strip out all tags unless they contain the RTE tags',
+  it('should remove all tags except img tags with the whitelisted classes',
       inject(function($filter) {
     var LINK_HTML = ('<li><a href="/wiki/1800" title="1800">1800</a></li>');
     var OPPIA_TABS = ('<img src="data:image/png;base64,' +
@@ -307,7 +307,11 @@ describe('Testing filters', function() {
     'onload="loadImage()" width="100" height="132">');
     var DANGEROUS_NESTED_SCRIPT = ('<scr<script>ipt>alert(42);' +
     '</scr</script>ipt>');
-    var whitelistedTags = [
+    var NO_TAG = ('The quick brown fox jumps over the lazy dog.');
+    var NON_IMAGE = ('<a href="example.com" ' +
+    'class="oppia-noninteractive-link">Example.com</a>');
+    var IMAGE_INVALID = ('<img src="linkimage.jpg" class="invalid-tag">');
+    var whitelistedImgClasses = [
       'oppia-noninteractive-collapsible',
       'oppia-noninteractive-image',
       'oppia-noninteractive-link',
@@ -318,31 +322,40 @@ describe('Testing filters', function() {
     ];
 
     expect(
-      $filter('stripFormatting')(LINK_HTML, whitelistedTags)
+      $filter('stripFormatting')(LINK_HTML, whitelistedImgClasses)
     ).toEqual('1800');
     expect(
-      $filter('stripFormatting')(IMG_HTML, whitelistedTags)
+      $filter('stripFormatting')(IMG_HTML, whitelistedImgClasses)
     ).toEqual('');
     expect(
-      $filter('stripFormatting')(OPPIA_TABS, whitelistedTags)
+      $filter('stripFormatting')(OPPIA_TABS, whitelistedImgClasses)
     ).toEqual(OPPIA_TABS);
     expect(
-      $filter('stripFormatting')(OPPIA_IMG, whitelistedTags)
+      $filter('stripFormatting')(OPPIA_IMG, whitelistedImgClasses)
     ).toEqual(OPPIA_IMG);
     expect(
-      $filter('stripFormatting')(OPPIA_VIDEO, whitelistedTags)
+      $filter('stripFormatting')(OPPIA_VIDEO, whitelistedImgClasses)
     ).toEqual(OPPIA_VIDEO);
     expect(
-      $filter('stripFormatting')(DANGEROUS_SCRIPT_IMG, whitelistedTags)
+      $filter('stripFormatting')(DANGEROUS_SCRIPT_IMG, whitelistedImgClasses)
     ).toEqual('');
     expect(
-      $filter('stripFormatting')(OTHER_TAG_LINK, whitelistedTags)
-    ).toEqual('<a href=""><img src="linkimage.jpg" class="other-tag">');
+      $filter('stripFormatting')(OTHER_TAG_LINK, whitelistedImgClasses)
+    ).toEqual('<img src="linkimage.jpg" class="other-tag">');
     expect(
-      $filter('stripFormatting')(INVALID_TAG_LINK, whitelistedTags)
+      $filter('stripFormatting')(INVALID_TAG_LINK, whitelistedImgClasses)
     ).toEqual('');
     expect(
-      $filter('stripFormatting')(DANGEROUS_NESTED_SCRIPT, whitelistedTags)
+      $filter('stripFormatting')(DANGEROUS_NESTED_SCRIPT, whitelistedImgClasses)
     ).toEqual('ipt>alert(42);ipt>');
+    expect(
+      $filter('stripFormatting')(NO_TAG, whitelistedImgClasses)
+    ).toEqual(NO_TAG);
+    expect(
+      $filter('stripFormatting')(NON_IMAGE, whitelistedImgClasses)
+    ).toEqual('Example.com');
+    expect(
+      $filter('stripFormatting')(IMAGE_INVALID, whitelistedImgClasses)
+    ).toEqual('');
   }));
 });

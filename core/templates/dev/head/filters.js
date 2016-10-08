@@ -443,11 +443,12 @@ oppia.filter('removeDuplicatesInArray', [function() {
 }]);
 
 oppia.filter('stripFormatting', [function() {
-  return function(html, whitelistedTags) {
+  return function(html, whitelistedImgClasses) {
     // Strip out anything between and including <>,
-    // unless it contains the RTE tags.
-    var regex = new RegExp('(?!.*(' + whitelistedTags.join('|') +
-                            '))<[^>]+>', 'gm');
+    // unless it is an img whose class includes one of the whitelisted classes.
+    var regex = new RegExp(
+      '(?!<img.*class=".*(' + whitelistedImgClasses.join('|') +
+      ').*>)<[^>]+>', 'gm');
     var strippedText = html ? String(html).replace(regex, '') : '';
     return strippedText;
   };
