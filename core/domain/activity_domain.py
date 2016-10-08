@@ -27,11 +27,8 @@ class ActivityReference(object):
     collections.
 
     Attributes:
-        get_hash(): Generates unique fingerprint for ActivityReference instance.
-        validate(): Checks for the validity of the arguments of an 
-        ActivityReference instances.
-        to_dict(): Returns a dictionary containing arguments for an 
-        ActivityReference instance
+        type: A string denoting type of activity.
+        id: A string denoting activity id.
     """
 
     def __init__(self, activity_type, activity_id):
@@ -59,7 +56,12 @@ class ActivityReference(object):
             raise Exception('Invalid activity type: %s' % self.type)
 
     def to_dict(self):
-        """Returns a dict representing this ActivityReference domain object."""
+        """Returns a dict representing this ActivityReference domain object.
+
+        Returns:
+            A dict, mapping activity_type and activity_id of a ActivityReference
+            instance to corresponding keys 'type' and 'id'.
+        """
         return {
             'type': self.type,
             'id': self.id,
