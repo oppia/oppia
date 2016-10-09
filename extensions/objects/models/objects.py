@@ -334,7 +334,7 @@ class SanitizedUrl(BaseObject):
     """HTTP or HTTPS url string class."""
 
     description = 'An HTTP or HTTPS url.'
-    edit_html_filename = 'unicode_string_editor'
+    edit_html_filename = 'sanitized_url_editor'
     edit_js_filename = 'SanitizedUrlEditor'
 
     SCHEMA = {
