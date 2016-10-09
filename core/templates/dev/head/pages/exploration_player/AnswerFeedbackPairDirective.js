@@ -21,6 +21,7 @@ oppia.directive('answerFeedbackPair', [function() {
     restrict: 'E',
     scope: {
       data: '=',
+      card: '=',
       oppiaAvatarImageUrl: '&',
       profilePicture: '&'
     },
@@ -53,6 +54,28 @@ oppia.directive('answerFeedbackPair', [function() {
         $scope.getShortAnswerHtml = function() {
           var interaction = oppiaPlayerService.getInteraction(
             playerPositionService.getCurrentStateName());
+          var shortAnswerHtml = '';
+          if ($scope.data && interaction.id &&
+              INTERACTION_SPECS[interaction.id].needs_summary) {
+            shortAnswerHtml = (
+              oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
+                $scope.data.learnerAnswer, interaction.id,
+                interaction.customization_args));
+          }
+          return shortAnswerHtml;
+        };
+
+        $scope.getAnswerHtmlByStateName = function(stateName) {
+          var interaction = oppiaPlayerService.getInteraction(stateName);
+          if ($scope.data) {
+            return oppiaExplorationHtmlFormatterService.getAnswerHtml(
+              $scope.data.learnerAnswer, interaction.id,
+              interaction.customization_args);
+          }
+        };
+
+        $scope.getShortAnswerHtmlByStateName = function(stateName) {
+          var interaction = oppiaPlayerService.getInteraction(stateName);
           var shortAnswerHtml = '';
           if ($scope.data && interaction.id &&
               INTERACTION_SPECS[interaction.id].needs_summary) {

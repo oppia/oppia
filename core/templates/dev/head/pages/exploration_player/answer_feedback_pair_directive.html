@@ -1,14 +1,14 @@
 <script type="text/ng-template" id="components/answerFeedbackPair">
   <div class="conversation-skin-learner-answer-container">
     <img class="conversation-skin-user-avatar img-circle" ng-src="<[profilePicture()]>" alt="">
-    <div ng-if="getShortAnswerHtml()" class="conversation-skin-learner-answer-content"
+    <div ng-if="getShortAnswerHtmlByStateName(card.stateName)" class="conversation-skin-learner-answer-content"
          popover-placement="bottom" popover-template="'popover/answer'"
          popover-trigger="click" style="cursor: pointer;">
-      <div class="conversation-skin-learner-answer" angular-html-bind="getShortAnswerHtml()">
+      <div class="conversation-skin-learner-answer" angular-html-bind="getShortAnswerHtmlByStateName(card.stateName)">
       </div>
     </div>
-    <div class="conversation-skin-learner-answer-content" ng-if="!getShortAnswerHtml()">
-      <div class="conversation-skin-learner-answer" angular-html-bind="getAnswerHtml()">
+    <div class="conversation-skin-learner-answer-content" ng-if="!getShortAnswerHtmlByStateName(card.stateName)">
+      <div class="conversation-skin-learner-answer" angular-html-bind="getAnswerHtmlByStateName(card.stateName)">
       </div>
     </div>
   </div>
