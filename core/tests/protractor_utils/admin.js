@@ -32,8 +32,6 @@ var editConfigProperty = function(
   general.waitForSystem();
   browser.get(general.ADMIN_URL_SUFFIX);
   element(by.css('.protractor-test-admin-config-tab')).click();
-  general.waitForSystem();
-  browser.waitForAngular();
   element.all(by.css('.protractor-test-config-property')).
       map(function(configProperty) {
     return configProperty.element(by.css('.protractor-test-config-title')).
