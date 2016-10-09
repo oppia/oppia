@@ -522,7 +522,7 @@ def send_flag_exploration_email(
         'grounds: <br>'
         '%s .<br>'
         'You can modify the exploration by clicking '
-        '<a href="https://www.oppia.org/create/%s">here</a>.<br>'
+        '<a href="https://www.oppia.org/create/%s#/feedback">here</a>.<br>'
         '<br>'
         'Thanks!<br>'
         '- The Oppia Team<br>'
