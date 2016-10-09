@@ -74,27 +74,29 @@ class UserQueryModelTests(test_utils.GenericTestBase):
     def test_instance_stores_correct_data(self):
         submitter_id = 'submitter'
         query_id = 'qid'
-        active_in_last_n_days = 5
+        inactive_in_last_n_days = 5
         created_at_least_n_exps = 1
         created_fewer_than_n_exps = 3
         edited_at_least_n_exps = 2
         edited_fewer_than_n_exps = 5
-        login_in_last_n_days = 10
+        has_not_logged_in_for_n_days = 10
         user_models.UserQueryModel(
             id=query_id,
-            active_in_last_n_days=active_in_last_n_days,
+            inactive_in_last_n_days=inactive_in_last_n_days,
             created_at_least_n_exps=created_at_least_n_exps,
             created_fewer_than_n_exps=created_fewer_than_n_exps,
             edited_at_least_n_exps=edited_at_least_n_exps,
             edited_fewer_than_n_exps=edited_fewer_than_n_exps,
-            login_in_last_n_days=login_in_last_n_days,
+            has_not_logged_in_for_n_days=has_not_logged_in_for_n_days,
             submitter_id=submitter_id).put()
 
         query_model = user_models.UserQueryModel.get(query_id)
         self.assertEqual(query_model.submitter_id, submitter_id)
         self.assertEqual(
-            query_model.active_in_last_n_days, active_in_last_n_days)
-        self.assertEqual(query_model.login_in_last_n_days, login_in_last_n_days)
+            query_model.inactive_in_last_n_days, inactive_in_last_n_days)
+        self.assertEqual(
+            query_model.has_not_logged_in_for_n_days,
+            has_not_logged_in_for_n_days)
         self.assertEqual(
             query_model.created_at_least_n_exps, created_at_least_n_exps)
         self.assertEqual(
