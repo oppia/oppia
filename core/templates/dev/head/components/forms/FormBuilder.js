@@ -914,6 +914,7 @@ oppia.directive('textAngularRte', [
             ['ol', 'ul', 'pre', 'indent', 'outdent'],
             []
           ];
+          var whitelistedImgClasses = [];
 
           if ($scope.uiConfig() && $scope.uiConfig().placeholder) {
             $scope.placeholderText = $scope.uiConfig().placeholder;
@@ -926,6 +927,8 @@ oppia.directive('textAngularRte', [
                     componentDefn.isComplex)) {
                 toolbarOptions[2].push(componentDefn.name);
               }
+              var imgClassName = 'oppia-noninteractive-' + componentDefn.name;
+              whitelistedImgClasses.push(imgClassName);
             }
           );
           $scope.toolbarOptionsJson = JSON.stringify(toolbarOptions);
@@ -935,7 +938,14 @@ oppia.directive('textAngularRte', [
           };
 
           $scope.stripFormatting = function(html) {
-            return $filter('sanitizeHtmlForRte')(html);
+            var safeHtml = $filter(
+              'stripFormatting'
+            )(html, whitelistedImgClasses);
+            // The '.' default is needed, otherwise some tags are not stripped
+            // properly. To reproduce, copy the image from this page
+            // (https://en.wikipedia.org/wiki/C._Auguste_Dupin) and paste it
+            // into the RTE.
+            return safeHtml || '.';
           };
 
           $scope.init = function() {
