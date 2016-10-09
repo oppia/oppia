@@ -481,7 +481,7 @@ def send_instant_feedback_message_email(
     email_body_template = (
         'Hi %s,<br><br>'
         'New update to thread "%s" on '
-        '<a href="https://www.oppia.org/create/%s">%s</a>:<br>'
+        '<a href="https://www.oppia.org/create/%s#/feedback">%s</a>:<br>'
         '<ul><li>%s: %s<br></li></ul>'
         '(You received this message because you are a '
         'participant in this thread.)<br><br>'
@@ -522,7 +522,7 @@ def send_flag_exploration_email(
         'grounds: <br>'
         '%s .<br>'
         'You can modify the exploration by clicking '
-        '<a href="https://www.oppia.org/create/%s#/feedback">here</a>.<br>'
+        '<a href="https://www.oppia.org/create/%s">here</a>.<br>'
         '<br>'
         'Thanks!<br>'
         '- The Oppia Team<br>'
