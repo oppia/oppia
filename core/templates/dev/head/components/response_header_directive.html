@@ -3,8 +3,8 @@
     <div class="oppia-response-header">
       <span ng-if="!isActive()" ng-attr-title="<[getSummary()]>">
         <[getShortSummary()]>
-        <span ng-if="extraRules() > 0" class="label label-primary" style="position: relative; bottom: 4px;">
-          +<[extraRules()]>
+        <span ng-if="getNumRules() > 1" class="label label-primary" style="position: relative; bottom: 4px;">
+          +<[getNumRules() - 1]>
         </span>
       </span>
       <span ng-if="isActive()">&nbsp;</span>

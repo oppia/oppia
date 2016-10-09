@@ -26,7 +26,7 @@ oppia.directive('responseHeader', [function() {
       getShortSummary: '&shortSummary',
       isActive: '&isActive',
       getOnDeleteFn: '&onDeleteFn',
-      extraRules: '&extraRules'
+      getNumRules: '&numRules'
     },
     templateUrl: 'components/responseHeader',
     controller: [
