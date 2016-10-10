@@ -2826,6 +2826,10 @@ div#ng-curtain {
   top: 6px;
 }
 
+.oppia-notification-type i {
+  color: black;
+}
+
 .oppia-notification-last-updated {
   float: right;
 }
