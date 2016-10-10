@@ -57,6 +57,7 @@ class SentEmailModel(base_models.BaseModel):
         feconf.EMAIL_INTENT_PUBLICIZE_EXPLORATION,
         feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION,
         feconf.EMAIL_INTENT_DELETE_EXPLORATION,
+        feconf.EMAIL_INTENT_REPORT_BAD_CONTENT,
     ])
     # The subject line of the email.
     subject = ndb.TextProperty(required=True)

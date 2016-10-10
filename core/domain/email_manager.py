@@ -140,6 +140,8 @@ SENDER_VALIDATORS = {
         lambda x: rights_manager.Actor(x).is_admin()),
     feconf.EMAIL_INTENT_DELETE_EXPLORATION: (
         lambda x: rights_manager.Actor(x).is_moderator()),
+    feconf.EMAIL_INTENT_REPORT_BAD_CONTENT: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
 }
 
 
@@ -212,7 +214,7 @@ def send_mail_to_admin(email_subject, email_body):
 
     email_services.send_mail(
         feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS, email_subject,
-        body, None, bcc_admin=False)
+        body, body.replace('\n', '<br/>'), bcc_admin=False)
 
 
 def send_post_signup_email(user_id):
@@ -479,7 +481,7 @@ def send_instant_feedback_message_email(
     email_body_template = (
         'Hi %s,<br><br>'
         'New update to thread "%s" on '
-        '<a href="https://www.oppia.org/%s">%s</a>:<br>'
+        '<a href="https://www.oppia.org/create/%s#/feedback">%s</a>:<br>'
         '<ul><li>%s: %s<br></li></ul>'
         '(You received this message because you are a '
         'participant in this thread.)<br><br>'
@@ -508,3 +510,36 @@ def send_instant_feedback_message_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION, email_subject,
             email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_flag_exploration_email(
+        exploration_title, exploration_id, reporter_id, report_text):
+    email_subject = 'Exploration flagged by user: "%s"' % exploration_title
+
+    email_body_template = (
+        'Hello Moderator,<br>'
+        '%s has flagged exploration "%s" on the following '
+        'grounds: <br>'
+        '%s .<br>'
+        'You can modify the exploration by clicking '
+        '<a href="https://www.oppia.org/create/%s">here</a>.<br>'
+        '<br>'
+        'Thanks!<br>'
+        '- The Oppia Team<br>'
+        '<br>%s')
+
+    if not feconf.CAN_SEND_EMAILS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    email_body = email_body_template % (
+        user_services.get_user_settings(reporter_id).username,
+        exploration_title, report_text, exploration_id,
+        EMAIL_FOOTER.value)
+
+    recipient_list = config_domain.MODERATOR_IDS.value
+    for recipient_id in recipient_list:
+        _send_email(
+            recipient_id, feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_REPORT_BAD_CONTENT,
+            email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)

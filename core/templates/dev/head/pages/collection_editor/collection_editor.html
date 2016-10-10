@@ -1,0 +1,113 @@
+{% extends 'pages/base.html' %}
+
+{% block maintitle %}
+  {% if title %}
+    {{ title }} - Oppia Editor
+  {% else %}
+    Untitled Collection - Oppia Editor
+  {% endif %}
+{% endblock maintitle %}
+
+{% block header_js %}
+  {{ super() }}
+  <script type="text/javascript">
+    GLOBALS.canEdit = JSON.parse('{{can_edit|js_string}}');
+    GLOBALS.canUnpublish = JSON.parse('{{can_unpublish|js_string}}');
+    GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
+    GLOBALS.collectionTitle = JSON.parse('{{title|js_string}}');
+    GLOBALS.isPrivate = JSON.parse('{{is_private|js_string}}');
+    GLOBALS.TAG_REGEX = JSON.parse('{{TAG_REGEX|js_string}}');
+  </script>
+
+  <style>
+    html, body {
+      background-color: #eee;
+    }
+  </style>
+
+  {{dependencies_html}}
+{% endblock header_js %}
+
+{% block navbar_breadcrumb %}
+  <collection-editor-navbar-breadcrumb>
+  </collection-editor-navbar-breadcrumb>
+{% endblock navbar_breadcrumb %}
+
+{% block local_top_nav_options %}
+  <collection-editor-navbar>
+  </collection-editor-navbar>
+{% endblock local_top_nav_options %}
+
+{% block content %}
+  <div ng-controller="CollectionEditor">
+    <div ng-if="getTabStatuses().active === 'main'">
+      <collection-main-tab></collection-main-tab>
+    </div>
+
+    <div ng-show="getTabStatuses().active === 'settings'">
+      <collection-settings-tab></collection-settings-tab>
+    </div>
+
+    <div ng-show="getTabStatuses().active === 'history'">
+      <collection-history-tab></collection-history-tab>
+    </div>
+
+    <div ng-show="getTabStatuses().active === 'stats'">
+      <collection-statistics-tab></collection-statistics-tab>
+    </div>
+  </div>
+
+  {% include 'pages/collection_editor/collection_editor_navbar_breadcrumb_directive.html' %}
+  {% include 'pages/collection_editor/collection_editor_navbar_directive.html' %}
+  {% include 'pages/collection_editor/collection_editor_pre_publish_modal_directive.html' %}
+  {% include 'pages/collection_editor/collection_editor_save_modal_directive.html' %}
+
+  {% include 'pages/collection_editor/editor_tab/collection_editor_tab_directive.html' %}
+  {% include 'pages/collection_editor/editor_tab/collection_node_creator_directive.html' %}
+  {% include 'pages/collection_editor/editor_tab/collection_node_editor_directive.html' %}
+  {% include 'pages/collection_editor/editor_tab/collection_skill_list_directive.html' %}
+
+  {% include 'pages/collection_editor/history_tab/collection_history_tab_directive.html' %}
+
+  {% include 'pages/collection_editor/settings_tab/collection_details_editor_directive.html' %}
+  {% include 'pages/collection_editor/settings_tab/collection_settings_tab_directive.html' %}
+
+  {% include 'pages/collection_editor/statistics_tab/collection_statistics_tab_directive.html' %}
+{% endblock content %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/CollectionEditor.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/CollectionEditorNavbarBreadcrumbDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/CollectionEditorNavbarDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/CollectionEditorStateService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/editor_tab/CollectionEditorTabDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/editor_tab/CollectionLinearizerService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/editor_tab/CollectionNodeCreatorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/editor_tab/CollectionNodeEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/editor_tab/CollectionSkillListDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/history_tab/CollectionHistoryTabDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/settings_tab/CollectionDetailsEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/settings_tab/CollectionSettingsTabDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/statistics_tab/CollectionStatisticsTabDirective.js"></script>
+
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionNodeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionRightsBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionUpdateService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionValidationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/EditableCollectionBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/ReadOnlyCollectionBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/SkillListObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/ChangeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/UndoRedoService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/summary/ExplorationSummaryBackendApiService.js"></script>
+
+  {# TODO(bhenning): Remove these once RouterServices is decoupled from the exploration editor #}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorServices.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationEditor.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/GadgetValidationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/RouterServices.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionInterpolationService.js"></script>
+{% endblock footer_js %}

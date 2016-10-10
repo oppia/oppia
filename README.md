@@ -1,4 +1,4 @@
-# Oppia [![Build Status](https://api.travis-ci.org/oppia/oppia.svg?branch=develop)](https://travis-ci.org/oppia/oppia) [![Code Coverage](https://codecov.io/github/oppia/oppia/coverage.svg?branch=develop)](https://codecov.io/github/oppia/oppia/?branch=develop) [![Join the chat at https://gitter.im/oppia/oppia-chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/oppia/oppia-chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+# [Oppia](https://www.oppia.org) [![Build Status](https://api.travis-ci.org/oppia/oppia.svg?branch=develop)](https://travis-ci.org/oppia/oppia) [![Code Coverage](https://codecov.io/github/oppia/oppia/coverage.svg?branch=develop)](https://codecov.io/github/oppia/oppia/?branch=develop) [![Join the chat at https://gitter.im/oppia/oppia-chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/oppia/oppia-chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Oppia is an online learning tool that enables anyone to easily create and share interactive activities (called 'explorations'). These activities simulate a one-on-one conversation with a tutor, making it possible for students to learn by doing and get feedback.
 
@@ -41,7 +41,7 @@ Please refer to the [developer wiki](https://github.com/oppia/oppia/wiki) for fu
 The Oppia project is built by the community for the community. We welcome contributions from everyone, especially new contributors.
 
 You can help with Oppia's development in many ways, including art, coding, design and documentation.
-  * **Developers**: please see the [CONTRIBUTING](CONTRIBUTING.md) file for instructions on how to set things up and commit changes.
+  * **Developers**: please see [this wiki page](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up) for instructions on how to set things up and commit changes.
   * **All other contributors**: please see our [general contributor guidelines](https://github.com/oppia/oppia/wiki/Contributing-to-Oppia).
 
 In addition, if you'd like to make contributions to the codebase, please follow [these instructions](https://github.com/oppia/oppia/blob/develop/CONTRIBUTING.md#setting-things-up), which will walk you through setting things up, signing the CLA, and joining the developer mailing list. Thanks!

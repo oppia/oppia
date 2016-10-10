@@ -58,11 +58,13 @@ class ProfilePage(base.BaseHandler):
             'nav_mode': feconf.NAV_MODE_PROFILE,
             'PROFILE_USERNAME': user_settings.username,
         })
-        self.render_template('profile/profile.html')
+        self.render_template('pages/profile/profile.html')
 
 
 class ProfileHandler(base.BaseHandler):
     """Provides data for the profile page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self, username):
         """Handles GET requests."""
@@ -117,11 +119,13 @@ class PreferencesPage(base.BaseHandler):
                 utils.get_all_language_codes_and_names()),
         })
         self.render_template(
-            'profile/preferences.html', redirect_url_on_logout='/')
+            'pages/preferences/preferences.html', redirect_url_on_logout='/')
 
 
 class PreferencesHandler(base.BaseHandler):
     """Provides data for the preferences page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @base.require_user
     def get(self):
@@ -178,6 +182,8 @@ class ProfilePictureHandler(base.BaseHandler):
     """Provides the dataURI of the user's profile picture, or none if no user
     picture is uploaded."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     @base.require_user
     def get(self):
         """Handles GET requests."""
@@ -191,6 +197,9 @@ class ProfilePictureHandler(base.BaseHandler):
 class ProfilePictureHandlerByUsername(base.BaseHandler):
     """ Provides the dataURI of the profile picture of the specified user,
     or None if no user picture is uploaded for the user with that ID."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     def get(self, username):
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
@@ -223,13 +232,15 @@ class SignupPage(base.BaseHandler):
             'nav_mode': feconf.NAV_MODE_SIGNUP,
             'CAN_SEND_EMAILS': feconf.CAN_SEND_EMAILS,
         })
-        self.render_template('profile/signup.html')
+        self.render_template('pages/signup/signup.html')
 
 
 class SignupHandler(base.BaseHandler):
     """Provides data for the editor prerequisites page."""
 
     REDIRECT_UNFINISHED_SIGNUPS = False
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @require_user_id_else_redirect_to_homepage
     def get(self):

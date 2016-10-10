@@ -17,23 +17,19 @@
  * backend.
  */
 
-oppia.factory('DashboardBackendApiService', [
-    '$http', '$q', function($http, $q) {
+oppia.factory('DashboardBackendApiService', ['$http', function($http) {
   var _fetchDashboardData = function() {
-    return $q(function(resolve, reject) {
-      $http.get('/dashboardhandler/data').then(function(response) {
-        if (resolve) {
-          resolve(angular.copy(response.data));
-        }
-      }, function(errorResponse) {
-        if (reject) {
-          reject(errorResponse.status);
-        }
-      });
+    return $http.get('/dashboardhandler/data');
+  };
+
+  var _fetchExplorationStats = function(explorationId) {
+    return $http.get('/dashboardhandler/explorationstats/' + explorationId, {
+      cache: true
     });
   };
 
   return {
-    fetchDashboardData: _fetchDashboardData
+    fetchDashboardData: _fetchDashboardData,
+    fetchExplorationStats: _fetchExplorationStats
   };
 }]);

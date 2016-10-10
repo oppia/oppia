@@ -26,33 +26,33 @@ import feconf
 import utils
 
 _LIBRARY_INDEX_GROUPS = [{
-    'header': 'Mathematics & Statistics',
+    'header_i18n_id': 'I18N_LIBRARY_GROUPS_MATHEMATICS_&_STATISTICS',
     'search_categories': [
         'Mathematics', 'Algebra', 'Arithmetic', 'Calculus', 'Combinatorics',
         'Geometry', 'Graph Theory', 'Logic', 'Probability', 'Statistics',
         'Trigonometry',
     ],
 }, {
-    'header': 'Computing',
+    'header_i18n_id': 'I18N_LIBRARY_GROUPS_COMPUTING',
     'search_categories': ['Algorithms', 'Computing', 'Programming'],
 }, {
-    'header': 'Science',
+    'header_i18n_id': 'I18N_LIBRARY_GROUPS_SCIENCE',
     'search_categories': [
         'Astronomy', 'Biology', 'Chemistry', 'Engineering', 'Environment',
         'Medicine', 'Physics',
     ],
 }, {
-    'header': 'Humanities',
+    'header_i18n_id': 'I18N_LIBRARY_GROUPS_HUMANITIES',
     'search_categories': [
         'Architecture', 'Art', 'Music', 'Philosophy', 'Poetry'
     ],
 }, {
-    'header': 'Languages',
+    'header_i18n_id': 'I18N_LIBRARY_GROUPS_LANGUAGES',
     'search_categories': [
         'Languages', 'Reading', 'English', 'Latin', 'Spanish', 'Gaulish'
     ],
 }, {
-    'header': 'Social Science',
+    'header_i18n_id': 'I18N_LIBRARY_GROUPS_SOCIAL_SCIENCE',
     'search_categories': [
         'Business', 'Economics', 'Geography', 'Government', 'History', 'Law'
     ],
@@ -284,11 +284,11 @@ def get_library_groups(language_codes):
     # Collect all collection ids so that the summary details can be retrieved
     # with a single get_multi() call.
     all_collection_ids = []
-    header_to_collection_ids = {}
+    header_id_to_collection_ids = {}
     for group in _LIBRARY_INDEX_GROUPS:
         collection_ids = collection_services.search_collections(
             _generate_query(group['search_categories']), 8)[0]
-        header_to_collection_ids[group['header']] = collection_ids
+        header_id_to_collection_ids[group['header_i18n_id']] = collection_ids
         all_collection_ids += collection_ids
 
     collection_summaries = [
@@ -309,7 +309,7 @@ def get_library_groups(language_codes):
     for group in _LIBRARY_INDEX_GROUPS:
         exp_ids = exp_services.search_explorations(
             _generate_query(group['search_categories']), 8)[0]
-        header_to_exp_ids[group['header']] = exp_ids
+        header_to_exp_ids[group['header_i18n_id']] = exp_ids
         all_exp_ids += exp_ids
 
     exp_summaries = [
@@ -325,13 +325,14 @@ def get_library_groups(language_codes):
     results = []
     for group in _LIBRARY_INDEX_GROUPS:
         summary_dicts = []
-        collection_ids_to_display = header_to_collection_ids[group['header']]
+        collection_ids_to_display = (
+            header_id_to_collection_ids[group['header_i18n_id']])
         summary_dicts = [
             collection_summary_dicts[collection_id]
             for collection_id in collection_ids_to_display
             if collection_id in collection_summary_dicts]
 
-        exp_ids_to_display = header_to_exp_ids[group['header']]
+        exp_ids_to_display = header_to_exp_ids[group['header_i18n_id']]
         summary_dicts += [
             exp_summary_dicts[exp_id] for exp_id in exp_ids_to_display
             if exp_id in exp_summary_dicts]
@@ -340,9 +341,11 @@ def get_library_groups(language_codes):
             continue
 
         results.append({
-            'header': group['header'],
+            'header_i18n_id': group['header_i18n_id'],
             'categories': group['search_categories'],
             'activity_summary_dicts': summary_dicts,
+            'has_full_results_page': True,
+            'full_results_url': None,
         })
 
     return results
@@ -413,32 +416,32 @@ def get_featured_activity_summary_dicts(language_codes):
     return featured_summary_dicts
 
 
-def get_top_rated_exploration_summary_dicts(language_codes):
+def get_top_rated_exploration_summary_dicts(language_codes, limit):
     """Returns a list of top rated explorations with the given language code.
 
     The return value is sorted in decreasing order of average rating.
     """
     filtered_exp_summaries = [
         exp_summary for exp_summary in
-        exp_services.get_top_rated_exploration_summaries().values()
+        exp_services.get_top_rated_exploration_summaries(limit).values()
         if exp_summary.language_code in language_codes and
         sum(exp_summary.ratings.values()) > 0]
 
     sorted_exp_summaries = sorted(
         filtered_exp_summaries,
         key=lambda exp_summary: exp_summary.scaled_average_rating,
-        reverse=True)[:feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS]
+        reverse=True)
 
     return get_displayable_exp_summary_dicts(sorted_exp_summaries)
 
 
-def get_recently_published_exploration_summary_dicts():
+def get_recently_published_exp_summary_dicts(limit):
     """Returns a list of recently published explorations
      with the given language code.
     """
     recently_published_exploration_summaries = [
         exp_summary for exp_summary in
-        exp_services.get_recently_published_exploration_summaries().values()]
+        exp_services.get_recently_published_exp_summaries(limit).values()]
 
     # Arranging recently published exploration summaries with respect to time.
     # sorted() is used to sort the random list of recently published summaries.

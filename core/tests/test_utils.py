@@ -227,13 +227,12 @@ class TestBase(unittest.TestCase):
 
         return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])
 
-    def get_json(self, url, params=None):
-        """Get a JSON response, transformed to a Python object. This method
-        does not support calling testapp.get() with errors expected in response
-        because testapp.get() in that case does not return a JSON object."""
-        json_response = self.testapp.get(url, params)
-        self.assertEqual(json_response.status_int, 200)
-        return self._parse_json_response(json_response, expect_errors=False)
+    def get_json(self, url, params=None, expect_errors=False):
+        """Get a JSON response, transformed to a Python object."""
+        json_response = self.testapp.get(
+            url, params, expect_errors=expect_errors)
+        return self._parse_json_response(
+            json_response, expect_errors=expect_errors)
 
     def post_json(self, url, payload, csrf_token=None, expect_errors=False,
                   expected_status_int=200, upload_files=None):

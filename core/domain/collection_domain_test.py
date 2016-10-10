@@ -460,6 +460,68 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
             collection.get_next_exploration_ids(
                 ['exp_id_0', 'exp_id_1', 'exp_id_2', 'exp_id_3']), [])
 
+    def test_next_explorations_in_sequence(self):
+
+        collection = collection_domain.Collection.create_default_collection(
+            'collection_id')
+        exploration_id = 'exp_id_0'
+        collection.add_node(exploration_id)
+
+        # Completing the only exploration of the collection should lead to no
+        # available explorations thereafter.
+        self.assertEqual(
+            collection.get_next_exploration_ids_in_sequence(exploration_id), [])
+
+        # If the current exploration has no acquired skills, a list of all
+        # explorations with no prerequisite skills should be returned.
+        collection.add_node('exp_id_1')
+        collection.add_node('exp_id_2')
+        self.assertEqual(
+            collection.get_next_exploration_ids_in_sequence(exploration_id),
+            ['exp_id_1', 'exp_id_2'])
+
+        # If only one exploration in the collection has a prerequisite skill
+        # that is included in the user's learned skills, only that exploration
+        # should be returned.
+        collection_node0 = collection.get_node('exp_id_0')
+        collection_node1 = collection.get_node('exp_id_1')
+
+        collection_node0.update_acquired_skills(['skill1a'])
+        collection_node1.update_prerequisite_skills(['skill1a'])
+        self.assertEqual(
+            collection.get_next_exploration_ids_in_sequence(exploration_id),
+            ['exp_id_1'])
+
+        # Given a chain of explorations in a collections where each
+        # exploration's acquired skills are the following exploration's
+        # prerequisite skills, each exploration should return the following
+        # exploration as a recommendation.  The last exploration should
+        # return an empty list.
+        collection.add_node('exp_id_3')
+
+        collection_node2 = collection.get_node('exp_id_2')
+        collection_node3 = collection.get_node('exp_id_3')
+
+        collection_node1.update_acquired_skills(['skill2a'])
+        collection_node2.update_acquired_skills(['skill3a'])
+
+        collection_node0.update_prerequisite_skills([])
+        collection_node2.update_prerequisite_skills(['skill2a'])
+        collection_node3.update_prerequisite_skills(['skill3a'])
+
+        self.assertEqual(
+            collection.get_next_exploration_ids_in_sequence('exp_id_0'),
+            ['exp_id_1'])
+        self.assertEqual(
+            collection.get_next_exploration_ids_in_sequence('exp_id_1'),
+            ['exp_id_2'])
+        self.assertEqual(
+            collection.get_next_exploration_ids_in_sequence('exp_id_2'),
+            ['exp_id_3'])
+        self.assertEqual(
+            collection.get_next_exploration_ids_in_sequence('exp_id_3'),
+            [])
+
     def test_next_explorations_with_invalid_exploration_ids(self):
         collection = collection_domain.Collection.create_default_collection(
             'collection_id')
