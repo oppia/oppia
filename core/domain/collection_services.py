@@ -73,7 +73,8 @@ def _migrate_collection_to_latest_schema(versioned_collection):
     Args:
         versioned_collection: A dict with two keys:
           - schema_version: str. The schema version for the collection.
-          - nodes: The list of collection nodes comprising the collection.
+          - nodes: list(CollectionNode). The list of collection nodes comprising
+            the collection.
 
     Raises:
         Exception: The schema version of the collection is outside of what is
@@ -99,7 +100,7 @@ def _get_collection_memcache_key(collection_id, version=None):
 
     Args:
         collection_id: str. ID of the collection.
-        version: str. schema version of the collection.
+        version: str. Schema version of the collection.
 
     Returns:
         str. The memcache key of the collection.
@@ -194,8 +195,8 @@ def get_collection_by_id(collection_id, strict=True, version=None):
             retrieved. If it is None, the latest version will be retrieved.
 
     Returns:
-        Collection. The domain object representing a collection with the given
-        id, or None if it does not exist.
+        Collection or None. The domain object representing a collection with the
+        given id, or None if it does not exist.
     """
     collection_memcache_key = _get_collection_memcache_key(
         collection_id, version=version)
@@ -243,16 +244,16 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
     Args:
         collection_ids: list(str). A list of collection ids of collections to
             be retrieved.
-        strict: bool. Whether to fail noisily if no
-            collection with a given id exists in the datastore.
+        strict: bool. Whether to fail noisily if no collection with a given id
+            exists in the datastore.
 
     Returns:
         A dict of domain objects representing collections with the given ids as
         keys.
 
     Raises:
-        ValueError: Only if strict is True. One or more collections with the
-            given collection ids cannot be found.
+        ValueError: 'strict' is True, and one or more of the given collection
+            ids are invalid.
     """
     collection_ids = set(collection_ids)
     result = {}
@@ -312,8 +313,8 @@ def get_collection_titles_and_categories(collection_ids):
     """Returns collection titles and categories for the given ids.
 
     Args:
-        collection_ids: list(str). Collection ids of the collection titles and
-        categories to be retrieved.
+        collection_ids: list(str). IDs of the collections whose titles and
+            categories are to be retrieved.
 
     Returns:
         A dict with collection ids as keys. The corresponding values
@@ -368,12 +369,12 @@ def get_completed_exploration_ids(user_id, collection_id):
 
 def get_valid_completed_exploration_ids(user_id, collection):
     """Returns a filtered version of the return value of
-    get_completed_exploration_ids, where explorations not also found within the
-    collection are removed from the returned list.
+    get_completed_exploration_ids, which only includes explorations found within
+    the current version of the collection.
 
     Args:
         user_id: str. ID of the given user.
-        collection: Collection. Collection of the given collection id.
+        collection: Collection.
 
     Returns:
         A filtered version of the return value of get_completed_exploration_ids
@@ -393,8 +394,8 @@ def get_next_exploration_ids_to_complete_by_user(user_id, collection_id):
     given user has not yet attempted and has the prerequisite skills to play.
 
     Args:
-        user_id: str. User id of a given user.
-        collection_id: str. Collection id of a given collection.
+        user_id: str. ID of the user.
+        collection_id: str. ID of the collection.
 
     Returns:
         list(str). A list of exploration IDs in the specified collection that
@@ -479,13 +480,18 @@ def get_collection_ids_matching_query(query_string, cursor=None):
 
     Args:
         query_string: str. The search query string.
+        cursor: Cursor or None. Cursor pointing to the start of the collection
+            to be searched.
 
     Returns:
-        list(str). A list with all collection ids matching the given search
-        query string, as well as a search cursor for future fetches.
-        The list contains exactly feconf.SEARCH_RESULTS_PAGE_SIZE results
-        if there are at least that many, otherwise it contains all remaining
-        results. (If this behaviour does not occur, an error will be logged.)
+        2-tuple of (returned_collection_ids, search_cursor), where:
+            returned_collection_ids : list(str). A list with all collection ids
+                matching the given search query string, as well as a search
+                cursor for future fetches. The list contains exactly
+                feconf.SEARCH_RESULTS_PAGE_SIZE results if there are at least
+                that many, otherwise it contains all remaining results. (If this
+                behaviour does not occur, an error will be logged.)
+            search_cursor: Cursor. Search cursor for future fetches.
     """
     returned_collection_ids = []
     search_cursor = cursor
@@ -699,7 +705,7 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
     object being present to tell it whether to do strict validation or not.
 
     Args:
-        committer_id: str. id of the committer.
+        committer_id: str. ID of the committer.
         collection: Collection. collection domain object.
         commit_message: str. A description of changes made to the collection.
         commit_cmds: list(dict). A list of change commands made to the given
@@ -805,7 +811,7 @@ def get_collection_snapshots_metadata(collection_id):
         collection_id, version_nums)
 
 
-def publish_collection_and_update_user_profiles(committer_id, col_id):
+def publish_collection_and_update_user_profiles(committer_id, collection_id):
     """Publishes the collection with publish_collection() function in
     rights_manager.py, as well as updates first_contribution_msec.
 
@@ -814,11 +820,11 @@ def publish_collection_and_update_user_profiles(committer_id, col_id):
 
     Args:
         committer_id: str. ID of the committer.
-        col_id: str. ID of the collection to be published.
+        collection_id: str. ID of the collection to be published.
     """
-    rights_manager.publish_collection(committer_id, col_id)
+    rights_manager.publish_collection(committer_id, collection_id)
     contribution_time_msec = utils.get_current_time_in_millisecs()
-    collection_summary = get_collection_summary_by_id(col_id)
+    collection_summary = get_collection_summary_by_id(collection_id)
     contributor_ids = collection_summary.contributor_ids
     for contributor in contributor_ids:
         user_services.update_first_contribution_msec_if_not_set(
@@ -980,7 +986,7 @@ def save_collection_summary(collection_summary):
 
     Args:
         collection_summary: The collection summary object to be saved in the
-            datastore
+            datastore.
     """
     collection_summary_model = collection_models.CollectionSummaryModel(
         id=collection_summary.id,
@@ -1066,7 +1072,7 @@ def load_demo(collection_id):
     creation and one for its subsequent modification.)
 
     Args:
-        collection_id: str. Collection ID of the collection to be loaded.
+        collection_id: str. ID of the collection to be loaded.
     """
     delete_demo(collection_id)
 
@@ -1114,8 +1120,7 @@ def get_next_page_of_all_commits(
             commits starts from this datastore cursor. Otherwise, the returned
             commits start from the beginning of the full list of commits.
     Returns:
-        The return value is a triple (results, cursor, more) as described in
-        fetch_page() at:
+        3-tuple of (results, cursor, more) as described in fetch_page() at:
         https://developers.google.com/appengine/docs/python/ndb/queryclass
     """
     results, new_urlsafe_start_cursor, more = (
@@ -1141,12 +1146,12 @@ def get_next_page_of_all_non_private_commits(
         urlsafe_start_cursor: str or None. If provided, the list of returned
             commits starts from this datastore cursor. Otherwise, the returned
             commits start from the beginning of the full list of commits.
-        max_age: The maximum age of a non-private commit to be included in the
-            return page. It should be a datetime.timedelta instance.
+        max_age: datetime.timedelta. The maximum age of a non-private commit to
+            be included in the return page. It should be a datetime.timedelta
+            instance.
 
     Returns:
-        The return value is a triple (results, cursor, more) as described in
-        fetch_page() at:
+        3-tuple of (results, cursor, more) as described in fetch_page() at:
         https://developers.google.com/appengine/docs/python/ndb/queryclass
     """
     if max_age is not None and not isinstance(max_age, datetime.timedelta):
@@ -1170,7 +1175,7 @@ def _collection_rights_to_search_dict(rights):
     allows searches like "is:featured".
 
     Args:
-        rights: ActivityRights. Collection rights of a collection.
+        rights: ActivityRights. Rights object for a collection.
     """
 
     doc = {}
@@ -1215,7 +1220,7 @@ def _collection_to_search_dict(collection):
     """Converts a collection domain object to a search dict.
 
     Args:
-        collection: Collection. The collection domain object to be converted
+        collection: Collection. The collection domain object to be converted.
 
     Returns:
         The search dict of the collection domain object.
@@ -1311,12 +1316,12 @@ def search_collections(query, limit, sort=None, cursor=None):
             name to sort on. When this is None, results are based on 'rank'. See
             _get_search_rank to see how rank is determined.
         limit: int. the maximum number of results to return.
-        cursor: A cursor, used to get the next page of results.
+        cursor: Cursor. A cursor, used to get the next page of results.
             If there are more documents that match the query than 'limit', this
             function will return a cursor to get the next page.
 
     Returns:
-        A tuple:
+        A 2-tuple:
             - A list of collection ids that match the query.
             - A cursor if there are more matching collections to fetch, None
               otherwise. If a cursor is returned, it will be a web-safe string
