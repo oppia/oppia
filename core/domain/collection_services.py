@@ -1119,6 +1119,7 @@ def get_next_page_of_all_commits(
         urlsafe_start_cursor: str or None. If provided, the list of returned
             commits starts from this datastore cursor. Otherwise, the returned
             commits start from the beginning of the full list of commits.
+    
     Returns:
         3-tuple of (results, cursor, more) as described in fetch_page() at:
         https://developers.google.com/appengine/docs/python/ndb/queryclass
