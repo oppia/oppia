@@ -3583,12 +3583,13 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-dashboard-container a:hover,
 .oppia-dashboard-container a:active,
 .oppia-dashboard-container a:visited {
-  color: inherit;
-  text-decoration: none;
+  color: #009688;
 }
 
 .oppia-dashboard-list-summary {
   display: block;
+  color: inherit !important;
+  text-decoration: none;
 }
 
 .oppia-activity-summary-tile:hover {
