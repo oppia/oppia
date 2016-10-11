@@ -3586,6 +3586,10 @@ md-card.preview-conversation-skin-supplemental-card {
   color: #009688;
 }
 
+.oppia-dashboard-container a:hover {
+    text-decoration: underline;
+}
+
 .oppia-dashboard-list-summary {
   display: block;
   color: inherit !important;
