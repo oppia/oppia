@@ -1274,7 +1274,7 @@ class FeedbackMessageInstantEmailTests(test_utils.GenericTestBase):
         expected_email_html_body = (
             'Hi newuser,<br><br>'
             'New update to thread "a subject" on '
-            '<a href="https://www.oppia.org/A">Title</a>:<br>'
+            '<a href="https://www.oppia.org/create/A#/feedback">Title</a>:<br>'
             '<ul><li>editor: editor message<br></li></ul>'
             '(You received this message because you are a '
             'participant in this thread.)<br><br>'

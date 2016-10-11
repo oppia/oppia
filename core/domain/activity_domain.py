@@ -27,8 +27,8 @@ class ActivityReference(object):
     collections.
 
     Attributes:
-        activity_type: A string indicating the activity type.
-        activity_id: A string indicating the activity id.
+        type: str. The activity type.
+        id: str. The activity id.
     """
 
     def __init__(self, activity_type, activity_id):
@@ -56,7 +56,12 @@ class ActivityReference(object):
             raise Exception('Invalid activity type: %s' % self.type)
 
     def to_dict(self):
-        """Returns a dict representing this ActivityReference domain object."""
+        """Returns a dict representing this ActivityReference domain object.
+
+        Returns:
+            A dict, mapping type and id of a ActivityReference
+            instance to corresponding keys 'type' and 'id'.
+        """
         return {
             'type': self.type,
             'id': self.id,

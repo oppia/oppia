@@ -53,9 +53,10 @@ Note that the root folder MUST be named 'oppia'.
 # pylint: disable=wrong-import-order
 import argparse
 import fnmatch
+import json
 import multiprocessing
 import os
-import json
+import re
 import subprocess
 import sys
 import time
@@ -107,6 +108,20 @@ BAD_PATTERNS_JS = {
             'core/templates/dev/head/expressions/evaluatorSpec.js',
             'core/templates/dev/head/expressions/typeParserSpec.js')}
 }
+
+BAD_PATTERNS_JS_REGEXP = [
+    {
+        'regexp': r"\b(ddescribe|fdescribe)\(",
+        'message': "In tests, please use 'describe' instead of 'ddescribe'"
+                   "or 'fdescribe'",
+        'excluded_files': ()
+    },
+    {
+        'regexp': r"\b(iit|fit)\(",
+        'message': "In tests, please use 'it' instead of 'iit' or 'fit'",
+        'excluded_files': ()
+    }
+]
 
 BAD_PATTERNS_APP_YAML = {
     'MINIFICATION: true': {
@@ -441,8 +456,6 @@ def _check_bad_patterns(all_files):
     all_files = [
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
-    all_js_files = [
-        filename for filename in all_files if filename.endswith('.js')]
     failed = False
     for filename in all_files:
         with open(filename) as f:
@@ -455,7 +468,7 @@ def _check_bad_patterns(all_files):
                     print '%s --> %s' % (
                         filename, BAD_PATTERNS[pattern]['message'])
                     total_error_count += 1
-            if filename in all_js_files:
+            if filename.endswith('.js'):
                 for pattern in BAD_PATTERNS_JS:
                     if filename not in (
                             BAD_PATTERNS_JS[pattern]['excluded_files']):
@@ -464,6 +477,15 @@ def _check_bad_patterns(all_files):
                             print '%s --> %s' % (
                                 filename,
                                 BAD_PATTERNS_JS[pattern]['message'])
+                            total_error_count += 1
+                for regexp in BAD_PATTERNS_JS_REGEXP:
+                    regexp_pattern = regexp['regexp']
+                    if filename not in regexp['excluded_files']:
+                        if re.search(regexp_pattern, content):
+                            failed = True
+                            print '%s --> %s' % (
+                                filename,
+                                regexp['message'])
                             total_error_count += 1
             if filename == 'app.yaml':
                 for pattern in BAD_PATTERNS_APP_YAML:

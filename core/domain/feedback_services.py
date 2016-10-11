@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2016 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -494,7 +494,8 @@ def get_all_thread_participants(exploration_id, thread_id):
     Returns:
         set(str). A set containing all author_ids of participants in the thread.
     """
-    return set([m.author_id for m in get_messages(exploration_id, thread_id)])
+    return set([m.author_id for m in get_messages(exploration_id, thread_id)
+                if user_services.is_user_registered(m.author_id)])
 
 
 def enqueue_feedback_message_batch_email_task(user_id):
@@ -743,8 +744,7 @@ def _send_batch_emails(recipient_list, feedback_message_reference):
                 feedback_message_reference)
 
 
-def _send_instant_emails(
-        recipient_list, feedback_message_reference):
+def _send_instant_emails(recipient_list, feedback_message_reference):
     """Adds the given FeedbackMessageReference to each of the
     recipient's email buffers. The collected messages will be
     sent out immediately.
@@ -778,8 +778,9 @@ def _send_feedback_thread_status_change_emails(
             user_services.get_email_preferences(recipient_id))
         if recipient_preferences['can_receive_feedback_message_email']:
             transaction_services.run_in_transaction(
-                _enqueue_feedback_thread_status_change_email_task, recipient_id,
-                feedback_message_reference, old_status, new_status)
+                _enqueue_feedback_thread_status_change_email_task,
+                recipient_id, feedback_message_reference,
+                old_status, new_status)
 
 
 def _add_message_to_email_buffer(

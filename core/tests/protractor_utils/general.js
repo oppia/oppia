@@ -39,11 +39,7 @@ var scrollToTop = function() {
 
 // We will report all console logs of level greater than this.
 var CONSOLE_LOG_THRESHOLD = 900;
-var CONSOLE_ERRORS_TO_IGNORE = [
-  // This error arises when a logout event takes place before a page has fully
-  // loaded.
-  'http://localhost:9001/third_party/static/angularjs-1.4.7/angular.js 12477:24'
-];
+var CONSOLE_ERRORS_TO_IGNORE = [];
 
 var checkForConsoleErrors = function(errorsToIgnore) {
   var irrelevantErrors = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
@@ -72,6 +68,7 @@ var EDITOR_URL_SLICE = '/create/';
 var PLAYER_URL_SLICE = '/explore/';
 var LOGIN_URL_SUFFIX = '/_ah/login';
 var ADMIN_URL_SUFFIX = '/admin';
+var MODERATOR_URL_SUFFIX = '/moderator';
 // Note that this only works in dev, due to the use of cache slugs in prod.
 var SCRIPTS_URL_SLICE = '/assets/scripts/';
 var EXPLORATION_ID_LENGTH = 12;
@@ -154,6 +151,7 @@ exports.SERVER_URL_PREFIX = SERVER_URL_PREFIX;
 exports.LIBRARY_URL_SUFFIX = LIBRARY_URL_SUFFIX;
 exports.EDITOR_URL_SLICE = EDITOR_URL_SLICE;
 exports.LOGIN_URL_SUFFIX = LOGIN_URL_SUFFIX;
+exports.MODERATOR_URL_SUFFIX = MODERATOR_URL_SUFFIX;
 exports.ADMIN_URL_SUFFIX = ADMIN_URL_SUFFIX;
 exports.SCRIPTS_URL_SLICE = SCRIPTS_URL_SLICE;
 exports.FIRST_STATE_DEFAULT_NAME = FIRST_STATE_DEFAULT_NAME;

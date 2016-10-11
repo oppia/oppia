@@ -3,6 +3,49 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://github.com/oppia/oppia/commits/master
 
 
+v2.3.4 (10 Oct 2016)
+-------------------
+Embedded explorations:
+* Have a dedicated URL for iframed explorations.
+* Make the embedding script minimal.
+
+Creator Dashboard:
+* Display top unresolved answers and new feedback for dashboard explorations in a dropdown.
+* Make collection tiles in dashboard similar as in library.
+
+Emails and notifications:
+* Add a MR job for executing queries.
+* Fix bugs relating to emails.
+
+Player and editor:
+* Add functionality to report explorations.
+* Add collection recommendation for logged out users.
+* Strip formatting when text is pasted into the RTE.
+* Add check for objective length before publishing an exploration.
+* Show multiple rules for an answer group.
+* Fix placeholder for math input.
+
+Code health:
+* Major refactor of frontend code.
+* Update docstrings.
+* Delete duplicate angular filters.
+* Add e2e test for visiting moderator page.
+* Make 'ddescribe' and 'iit' forbidden strings.
+* Add an argument to show verbose log for backend tests.
+
+Infrastructure:
+* Upgrade jQuery to v3.0.0. Update AngularJS to v1.5.8.
+* Install requests package in third_party so that it is available to the deployed application.
+
+Library, collections and other pages:
+* Sort explorations in Top Rated and Recently Published pages.
+* Remove View all button and link for featured explorations.
+* Modified UI for adding a new exploration in collection.
+* Improve collection node list UI.
+* Remove splash page A/B tests.
+* Embed the Oppia blog on the main site.
+
+
 v2.3.3 (9 Sep 2016)
 -------------------
 Splash, About and Donation pages:

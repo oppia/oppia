@@ -449,6 +449,7 @@ EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
 EXPLORATION_SUMMARIES_DATA_URL = '/explorationsummarieshandler/data'
 EXPLORATION_URL_PREFIX = '/explore'
+EXPLORATION_URL_EMBED_PREFIX = '/embed/exploration'
 FEEDBACK_STATS_URL_PREFIX = '/feedbackstatshandler'
 FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
@@ -536,6 +537,14 @@ OUTPUT_FORMAT_ZIP = 'zip'
 UPDATE_TYPE_EXPLORATION_COMMIT = 'exploration_commit'
 UPDATE_TYPE_COLLECTION_COMMIT = 'collection_commit'
 UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
+
+# Possible values for user query status.
+# Valid status transitions are: processing --> completed --> archived
+# Or processing --> failed.
+USER_QUERY_STATUS_PROCESSING = 'processing'
+USER_QUERY_STATUS_COMPLETED = 'completed'
+USER_QUERY_STATUS_ARCHIVED = 'archived'
+USER_QUERY_STATUS_FAILED = 'failed'
 
 # The time difference between which to consider two login events "close". This
 # is taken to be 12 hours.
@@ -756,6 +765,9 @@ SUPPORTED_SITE_LANGUAGES = [{
 }, {
     'id': 'pt',
     'text': 'Português'
+}, {
+    'id': 'pt-br',
+    'text': 'Português (Brasil)'
 }, {
     'id': 'vi',
     'text': 'Tiếng Việt'

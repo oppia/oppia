@@ -134,7 +134,9 @@ var generatedJsTargetDir = path.join(generatedTargetDir, 'js');
 gulp.task('collectDependencyFilepaths', function() {
   for (var dependencyId in frontendDependencies) {
     var dependency = frontendDependencies[dependencyId];
-    var dependencyDir = dependency.targetDirPrefix + dependency.version;
+    var dependencyDir = (
+      dependency.targetDir ? dependency.targetDir :
+      dependency.targetDirPrefix + dependency.version);
     if (dependency.hasOwnProperty('bundle')) {
       if (dependency.bundle.hasOwnProperty('css')) {
         dependency.bundle.css.forEach(function(cssFiles) {
