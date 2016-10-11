@@ -212,3 +212,23 @@ oppia.controller('Dashboard', [
     );
   }
 ]);
+
+oppia.directive('explorationTitle', function($compile) {
+  return {
+    restrict: 'E',
+    scope: {
+      exploration: '='
+    },
+    link: function(scope, element, attrs) {
+      var titleSection = '';
+      if (scope.exploration.status !== 'private') {
+        titleSection = element.html();
+      } else if (scope.exploration.status === 'private') {
+        titleSection = '<a ng-href="/create/<[exploration.id]>">' +
+                          element.html() +
+                       '</a>';
+      }
+      element.replaceWith($compile(titleSection)(scope));
+    }
+  };
+});

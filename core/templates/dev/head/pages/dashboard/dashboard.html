@@ -219,7 +219,7 @@
                  is-dropdown-open="activeExplorationId === exploration.id"
                  is-private="exploration.status === 'private'"
                  ng-click="getStatsForNonPrivateExp(exploration.status, exploration.id)">
-          <div ng-if="exploration.status !== 'private'">
+          <exploration-title exploration="exploration">
             <div class="title-section"
                  ng-class="{'oppia-exp-arrow': activeExplorationId === exploration.id}"
                  style="background-color: <[exploration.thumbnail_bg_color]>;">
@@ -236,27 +236,7 @@
             <div class="mask-wrap">
               <div class="title-section-mask"></div>
             </div>
-          </div>
-          <div ng-if="exploration.status === 'private'">
-            <a ng-href="<[createExplorationUrl(exploration.id)]>">
-              <div class="title-section"
-                   ng-class="{'oppia-exp-arrow': activeExplorationId === exploration.id}"
-                   style="background-color: <[exploration.thumbnail_bg_color]>;">
-                <img class="thumbnail-image"
-                     ng-src="<[exploration.thumbnail_icon_url]>"
-                     ng-hide="activeExplorationIdOnMobile(exploration.id)">
-                <span class="thumbnail-image caret-thumb fa fa-caret-up"
-                      ng-show="activeExplorationIdOnMobile(exploration.id)">
-                </span>
-                <h2 class="activity-title protractor-test-exp-summary-tile-title">
-                  <span><[exploration.title || 'Untitled' | truncate:40]></span>
-                </h2>
-              </div>
-              <div class="mask-wrap">
-                <div class="title-section-mask"></div>
-              </div>
-            </a>
-          </div>
+          </exploration-title>
           <md-card class="oppia-exp-dropdown-stats"
                    ng-click="$event.stopPropagation()"
                    ng-if="exploration.status !=='private' && activeExplorationId === exploration.id">
