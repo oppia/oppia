@@ -239,6 +239,6 @@ WHITELISTED_COLLECTION_EDITOR_USERNAMES = ConfigProperty(
     'Names of users allowed to use the collection editor',
     [])
 
-AUTHORIZED_QUERY_USERS = ConfigProperty(
-    'authorized_query_users', SET_OF_STRINGS_SCHEMA,
-    'Authorized users who can execute query', [])
+AUTHORISED_QUERY_USERS = ConfigProperty(
+    'authorised_query_users', SET_OF_STRINGS_SCHEMA,
+    'Authorised users who can execute query', [])
