@@ -73,8 +73,8 @@ def _migrate_collection_to_latest_schema(versioned_collection):
     Args:
         versioned_collection: A dict with two keys:
           - schema_version: str. The schema version for the collection.
-          - nodes: list(CollectionNode). The list of collection nodes comprising
-            the collection.
+          - nodes: list(dict). The list of collection node dicts comprising the
+                collection.
 
     Raises:
         Exception: The schema version of the collection is outside of what is
@@ -480,7 +480,7 @@ def get_collection_ids_matching_query(query_string, cursor=None):
 
     Args:
         query_string: str. The search query string.
-        cursor: Cursor or None. Cursor pointing to the start of the collection
+        cursor: str or None. Cursor pointing to the start of the collection
             to be searched.
 
     Returns:
@@ -491,7 +491,7 @@ def get_collection_ids_matching_query(query_string, cursor=None):
                 feconf.SEARCH_RESULTS_PAGE_SIZE results if there are at least
                 that many, otherwise it contains all remaining results. (If this
                 behaviour does not occur, an error will be logged.)
-            search_cursor: Cursor. Search cursor for future fetches.
+            search_cursor: str. Search cursor for future fetches.
     """
     returned_collection_ids = []
     search_cursor = cursor
@@ -1122,7 +1122,13 @@ def get_next_page_of_all_commits(
 
     Returns:
         3-tuple of (results, cursor, more) as described in fetch_page() at:
-        https://developers.google.com/appengine/docs/python/ndb/queryclass
+        https://developers.google.com/appengine/docs/python/ndb/queryclass,
+        where:
+            results: list(CollectionCommitLogEntry). List of query results.
+            cursor: str or None. A query cursor pointing to the next batch of
+                results. If there are no more results, this will be None.
+            more: bool. Whether there are more results after this
+                batch.
     """
     results, new_urlsafe_start_cursor, more = (
         collection_models.CollectionCommitLogEntryModel.get_all_commits(
@@ -1153,7 +1159,13 @@ def get_next_page_of_all_non_private_commits(
 
     Returns:
         3-tuple of (results, cursor, more) as described in fetch_page() at:
-        https://developers.google.com/appengine/docs/python/ndb/queryclass
+        https://developers.google.com/appengine/docs/python/ndb/queryclass,
+        where:
+            results: list(CollectionCommitLogEntry). List of query results.
+            cursor: str or None. A query cursor pointing to the next batch of
+                results. If there are no more results, this will be None.
+            more: bool. Whether there are more results after this
+                batch.
     """
     if max_age is not None and not isinstance(max_age, datetime.timedelta):
         raise ValueError(
@@ -1317,12 +1329,12 @@ def search_collections(query, limit, sort=None, cursor=None):
             name to sort on. When this is None, results are based on 'rank'. See
             _get_search_rank to see how rank is determined.
         limit: int. the maximum number of results to return.
-        cursor: Cursor. A cursor, used to get the next page of results.
+        cursor: str. A cursor, used to get the next page of results.
             If there are more documents that match the query than 'limit', this
             function will return a cursor to get the next page.
 
     Returns:
-        A 2-tuple:
+        A 2-tuple with the following elements:
             - A list of collection ids that match the query.
             - A cursor if there are more matching collections to fetch, None
               otherwise. If a cursor is returned, it will be a web-safe string
