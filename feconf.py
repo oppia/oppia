@@ -766,6 +766,9 @@ SUPPORTED_SITE_LANGUAGES = [{
     'id': 'pt',
     'text': 'Português'
 }, {
+    'id': 'pt-br',
+    'text': 'Português (Brasil)'
+}, {
     'id': 'vi',
     'text': 'Tiếng Việt'
 }, {
