@@ -3588,8 +3588,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-dashboard-list-summary {
-  display:inline-block;
-  width: 100%;
+  display: block;
 }
 
 .oppia-activity-summary-tile:hover {
