@@ -160,7 +160,7 @@
             <tr ng-repeat="exploration in explorationsList | orderBy:sortByFunction:isCurrentSortDescending track by exploration.id"
                 class="exploration-list-item">
               <td>
-                <a ng-href="<[createExplorationLink(exploration.id)]>" class="oppia-dashboard-list-summary">
+                <a ng-href="<[getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
                   <[exploration.title || 'Untitled']>
                   <span ng-if="exploration.status === 'publicized'"
                         class="featured-badge">
@@ -171,22 +171,22 @@
               <td colspan="4"
                   ng-if="exploration.status === 'private'"
                   class="exp-private-text">
-                <a ng-href="<[createExplorationLink(exploration.id)]>" class="oppia-dashboard-list-summary">
+                <a ng-href="<[getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
                   <[publishText]>
                 </a>
               </td>
               <td ng-if="exploration.status !== 'private'">
-                <a ng-href="<[createExplorationLink(exploration.id)]>" class="oppia-dashboard-list-summary">
+                <a ng-href="<[getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
                   <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
                 </a>
               </td>
               <td ng-if="exploration.status !== 'private'">
-                <a ng-href="<[createExplorationLink(exploration.id)]>" class="oppia-dashboard-list-summary">
+                <a ng-href="<[getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
                   <[exploration.num_views]>
                 </a>
               </td>
               <td ng-if="exploration.status !== 'private'">
-                <a ng-href="<[createExplorationLink(exploration.id)]>" class="oppia-dashboard-list-summary">
+                <a ng-href="<[getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
                   <[exploration.num_total_threads]>
                 </a>
                 <a ng-if="exploration.num_open_threads != 0"
@@ -195,12 +195,12 @@
                 </a>
               </td>
               <td ng-if="exploration.status !== 'private'">
-                <a ng-href="<[createExplorationLink(exploration.id)]>" class="oppia-dashboard-list-summary">
+                <a ng-href="<[getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
                   <[exploration.num_unresolved_answers]>
                 </a>
               </td>
               <td>
-                <a ng-href="<[createExplorationLink(exploration.id)]>" class="oppia-dashboard-list-summary">
+                <a ng-href="<[getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
                   <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
                 </a>
               </td>
@@ -218,7 +218,7 @@
                  is-dropdown-open="activeExplorationId === exploration.id"
                  is-private="exploration.status === 'private'"
                  ng-click="getStatsForNonPrivateExp(exploration.status, exploration.id)">
-          <exploration-title exploration="exploration">
+          <exploration-title-section exploration="exploration">
             <div class="title-section"
                  ng-class="{'oppia-exp-arrow': activeExplorationId === exploration.id}"
                  style="background-color: <[exploration.thumbnail_bg_color]>;">
@@ -235,7 +235,7 @@
             <div class="mask-wrap">
               <div class="title-section-mask"></div>
             </div>
-          </exploration-title>
+          </exploration-title-section>
           <md-card class="oppia-exp-dropdown-stats"
                    ng-click="$event.stopPropagation()"
                    ng-if="exploration.status !=='private' && activeExplorationId === exploration.id">
@@ -279,16 +279,16 @@
                 </div>
               </div>
             </div>
-            <a ng-href="<[createExplorationLink(exploration.id)]>">
+            <a ng-href="<[getExplorationUrl(exploration.id)]>">
               <button class="btn open-in-editor-btn">
                 Open In Editor
               </button>
             </a>
           </md-card>
           <div ng-attr-section="'<['right-section']>">
-            <a ng-href="<[createExplorationLink(exploration.id)]>"
+            <a ng-href="<[getExplorationUrl(exploration.id)]>"
                ng-if="exploration.status === 'private'"
-               style="text-decoration: none; display: inline-block; height: 88px">
+               style="text-decoration: none; display: block; height: 88px">
               <div class="exp-private-text">
                 <[publishText]>
               </div>
@@ -372,7 +372,7 @@
                    style="background-color: <[collection.thumbnail_bg_color]>;">
               </div>
               <md-card class="oppia-activity-summary-tile top-card">
-                <a ng-href="/collection_editor/create/<[collection.id]>">
+                <a ng-href="<[getCollectionUrl(collection.id)]>">
                   <div class="title-section"
                        style="background-color: <[collection.thumbnail_bg_color]>;">
                     <img class="thumbnail-image" ng-src="<[collection.thumbnail_icon_url]>">
@@ -423,6 +423,7 @@
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/dashboard/DashboardBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/dashboard/ScrollOnClickDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/dashboard/ShowExplorationTitleSection.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/dashboard/Dashboard.js"></script>
 {% endblock footer_js %}

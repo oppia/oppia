@@ -84,8 +84,12 @@ oppia.controller('Dashboard', [
       $scope.activeTab = newActiveTabName;
     };
 
-    $scope.createExplorationLink = function(explorationId) {
+    $scope.getExplorationUrl = function(explorationId) {
       return '/create/' + explorationId;
+    };
+
+    $scope.getCollectionUrl = function(collectionId) {
+      return '/collection_editor/create/' + collectionId;
     };
 
     $scope.getStatsForNonPrivateExp = function(status, explorationId) {
@@ -209,23 +213,3 @@ oppia.controller('Dashboard', [
     );
   }
 ]);
-
-oppia.directive('explorationTitle', function($compile) {
-  return {
-    restrict: 'E',
-    scope: {
-      exploration: '='
-    },
-    link: function(scope, element) {
-      var titleSection = '';
-      if (scope.exploration.status !== 'private') {
-        titleSection = element.html();
-      } else if (scope.exploration.status === 'private') {
-        titleSection = '<a ng-href="/create/<[exploration.id]>">' +
-                          element.html() +
-                       '</a>';
-      }
-      element.replaceWith($compile(titleSection)(scope));
-    }
-  };
-});

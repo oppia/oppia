@@ -3591,9 +3591,9 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-dashboard-list-summary {
-  display: block;
   color: inherit !important;
-  text-decoration: none;
+  display: block;
+  text-decoration: none !important;
 }
 
 .oppia-activity-summary-tile:hover {
