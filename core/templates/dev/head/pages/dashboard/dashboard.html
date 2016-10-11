@@ -154,9 +154,11 @@
                 </span>
               </th>
             </tr>
+            <!--my region of interest-->
             <tr ng-repeat="exploration in explorationsList | orderBy:sortByFunction:isCurrentSortDescending track by exploration.id"
                 ng-click="showExplorationEditor(exploration.id)"
                 class="exploration-list-item">
+              <!--
               <td>
                 <[exploration.title || 'Untitled']>
                 <span ng-if="exploration.status === 'publicized'"
@@ -164,10 +166,34 @@
                   featured
                 </span>
               </td>
+              -->
+              <!--code added by me-->
+              <td>
+                <span ng-if="exploration.status === 'private'"
+                      class="exp-private-text">
+                  <['Untitled']>
+                </span>
+              </td>
               <td colspan="4"
                   ng-if="exploration.status === 'private'"
                   class="exp-private-text">
                 <[publishText]>
+              </td>
+              <td ng-if="exploration.status === 'private'">
+                <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
+              </td>
+              <!--code added by me-->
+            </tr>
+
+            <tr ng-repeat="exploration in explorationsList | orderBy:sortByFunction:isCurrentSortDescending track by exploration.id"
+                ng-click="showExplorationEditor(exploration.id)"
+                class="exploration-list-item">
+
+              <td ng-if="exploration.status === 'publicized'">
+                <[exploration.title]>
+                <span class="featured-badge">
+                    featured
+                </span>
               </td>
               <td ng-if="exploration.status !== 'private'">
                 <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
@@ -192,7 +218,7 @@
           </table>
         </md-card>
       </div>
-
+      <!--my region of interest-->
       <div ng-if="myExplorationsView === 'card' && explorationsList.length > 0"
            style="margin-top: 8px;">
         <md-card ng-repeat="exploration in explorationsList track by exploration.id"
