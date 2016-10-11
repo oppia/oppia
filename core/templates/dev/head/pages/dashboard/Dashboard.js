@@ -86,7 +86,7 @@ oppia.controller('Dashboard', [
 
     $scope.createExplorationLink = function(explorationId) {
       return '/create/' + explorationId;
-    }
+    };
 
     $scope.getStatsForNonPrivateExp = function(status, explorationId) {
       if (status !== 'private') {
@@ -216,7 +216,7 @@ oppia.directive('explorationTitle', function($compile) {
     scope: {
       exploration: '='
     },
-    link: function(scope, element, attrs) {
+    link: function(scope, element) {
       var titleSection = '';
       if (scope.exploration.status !== 'private') {
         titleSection = element.html();
