@@ -480,8 +480,8 @@ def get_collection_ids_matching_query(query_string, cursor=None):
 
     Args:
         query_string: str. The search query string.
-        cursor: str or None. Cursor pointing to the start of the collection
-            to be searched.
+        cursor: str or None. Cursor indicating where, in the list of
+            collections, to start the search from.
 
     Returns:
         2-tuple of (returned_collection_ids, search_cursor), where:
