@@ -235,7 +235,10 @@ BANNED_USERNAMES = ConfigProperty(
     [])
 
 WHITELISTED_COLLECTION_EDITOR_USERNAMES = ConfigProperty(
-    'collection_editor_whitelist',
-    SET_OF_STRINGS_SCHEMA,
+    'collection_editor_whitelist', SET_OF_STRINGS_SCHEMA,
     'Names of users allowed to use the collection editor',
     [])
+
+AUTHORIZED_QUERY_USERS = ConfigProperty(
+    'authorized_query_users', SET_OF_STRINGS_SCHEMA,
+    'Authorized users who can execute query', [])
