@@ -84,7 +84,7 @@ oppia.controller('Dashboard', [
       $scope.activeTab = newActiveTabName;
     };
 
-    $scope.createExplorationUrl = function(explorationId) {
+    $scope.createExplorationLink = function(explorationId) {
       return '/create/' + explorationId;
     }
 
