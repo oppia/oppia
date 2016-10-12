@@ -2,7 +2,8 @@ oppia.directive('explorationTitleSection', function($compile) {
   return {
     restrict: 'E',
     scope: {
-      exploration: '='
+      exploration: '=',
+      activeExplorationId: '='
     },
     link: function(scope, element) {
       var titleSection = (

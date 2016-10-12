@@ -218,7 +218,7 @@
                  is-dropdown-open="activeExplorationId === exploration.id"
                  is-private="exploration.status === 'private'"
                  ng-click="getStatsForNonPrivateExp(exploration.status, exploration.id)">
-          <exploration-title-section exploration="exploration">
+          <exploration-title-section exploration="exploration" active-exploration-id="activeExplorationId">
             <div class="title-section"
                  ng-class="{'oppia-exp-arrow': activeExplorationId === exploration.id}"
                  style="background-color: <[exploration.thumbnail_bg_color]>;">
