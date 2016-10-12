@@ -114,14 +114,14 @@ oppia.controller('Dashboard', [
           return DEFAULT_TEXT_EMPTY_TITLE;
         }
       } else if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED) {
-        if (!value) {
+          if (!value) {
           return (
             $scope.isCurrentSortDescending ?
               (-1 * $scope.explorationsList.indexOf(entity)) :
               $scope.explorationsList.indexOf(entity));
         }
         return value;
-      } 
+      }
       return value;
     };
 
