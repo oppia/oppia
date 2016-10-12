@@ -135,7 +135,7 @@
                     <a ng-if="windowIsNarrow" ng-click="openSidebar()" class="navbar-brand oppia-navbar-menu oppia-transition-200">
                       <i class="material-icons oppia-navbar-menu-icon">&#xE5D2;</i>
                     </a>
-                    <a class="oppia-navbar-brand-name oppia-transition-200" href="/" focus-on="<[LABEL_FOR_CLEARING_FOCUS]>">
+                    <a class="oppia-navbar-brand-name oppia-transition-200" href="/" focus-on="<[::LABEL_FOR_CLEARING_FOCUS]>">
                       <img ng-src="<[getStaticImageUrl('/logo/288x128_logo_white.png')]>" class="oppia-logo" ng-class="windowIsNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'">
                     </a>
                     <!-- This is needed for the correct image to appear when an exploration is shared using G+. -->
@@ -149,7 +149,7 @@
                     <div ng-cloak class="navbar-header pull-right">
                       <ul class="nav oppia-navbar-nav oppia-navbar-profile">
                         {% if username %}
-                          <li class="dropdown pull-right">
+                          <li class="dropdown pull-right protractor-test-profile-dropdown">
                             <a class="dropdown-toggle oppia-navbar-dropdown-toggle" data-toggle="dropdown" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
                               <div class="oppia-navbar-profile-picture-container" ng-cloak>
                                 {% if profile_picture_data_url %}
@@ -185,18 +185,18 @@
 
                             <ul class="dropdown-menu ng-cloak oppia-navbar-dropdown" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)" ng-show="profileDropdownIsActive">
                               <li>
-                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/profile/{{username}}">
+                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/profile/{{username}}" class="protractor-test-profile-link">
                                   <strong>{{username}}</strong>
                                 </a>
                               </li>
                               <hr class="oppia-top-right-menu-item-separator">
                               <li>
-                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/dashboard">
+                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/dashboard" class="protractor-test-dashboard-link">
                                   <span translate="I18N_TOPNAV_DASHBOARD"></span>
                                 </a>
                               </li>
                               <li>
-                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/notifications_dashboard">
+                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/notifications_dashboard" class="protractor-test-notifications-link">
                                   <span translate="I18N_TOPNAV_NOTIFICATIONS"></span>
                                   <span ng-if="numUnseenNotifications > 0">
                                     (<[numUnseenNotifications]>)
@@ -204,7 +204,7 @@
                                 </a>
                               </li>
                               <li>
-                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/preferences">
+                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/preferences" class="protractor-test-preferences-link">
                                   <span translate="I18N_TOPNAV_PREFERENCES"></span>
                                 </a>
                               </li>
@@ -265,17 +265,18 @@
                               </div>
                             </li>
 
-                            <li class="dropdown oppia-navbar-clickable-dropdown pull-right">
+                            <li class="dropdown oppia-navbar-clickable-dropdown pull-right protractor-test-about-oppia-list-item">
                               <a class="oppia-navbar-tab">
                                 <span translate="I18N_TOPNAV_ABOUT"></span>
                                 <span class="caret"></span>
                               </a>
                               <ul class="dropdown-menu oppia-navbar-dropdown" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
-                                <li><a href="/about" translate="I18N_TOPNAV_ABOUT_OPPIA"></a></li>
-                                <li><a href="/teach" translate="I18N_TOPNAV_TEACH_WITH_OPPIA"></a></li>
+                                <li><a class="protractor-test-about-link"
+                                       href="/about" translate="I18N_TOPNAV_ABOUT_OPPIA"></a></li>
+                                <li><a class="protractor-test-teach-link" href="/teach"   translate="I18N_TOPNAV_TEACH_WITH_OPPIA"></a></li>
                                 <li><a href="/blog" translate="I18N_TOPNAV_BLOG"></a></li>
                                 <li><a href="/forum" translate="I18N_TOPNAV_FORUM"></a></li>
-                                <li><a href="/contact" translate="I18N_TOPNAV_CONTACT_US"></a></li>
+                                <li><a class="protractor-test-contact-link" href="/contact" translate="I18N_TOPNAV_CONTACT_US"></a></li>
                               </ul>
                             </li>
                             <li class="oppia-clickable-navbar-element pull-right">

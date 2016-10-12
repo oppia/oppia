@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2016 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,15 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to retrieve information about collections from the
- * backend.
+ * @fileoverview Service to retrieve read only information
+ * about collections from the backend.
  */
 
 // TODO(bhenning): For preview mode, this service should be replaced by a
 // separate CollectionDataService implementation which returns a local copy of
 // the collection instead. This file should not be included on the page in that
 // scenario.
-oppia.factory('CollectionBackendApiService', [
+oppia.factory('ReadOnlyCollectionBackendApiService', [
     '$http', '$q', 'COLLECTION_DATA_URL_TEMPLATE', 'UrlInterpolationService',
     function($http, $q, COLLECTION_DATA_URL_TEMPLATE, UrlInterpolationService) {
   // Maps previously loaded collections to their IDs.

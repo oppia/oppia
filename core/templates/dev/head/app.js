@@ -384,7 +384,9 @@ oppia.factory('urlService', ['$window', function($window) {
       return params;
     },
     isIframed: function() {
-      return !!(this.getUrlParams().iframed);
+      var pathname = this.getPathname();
+      var urlParts = pathname.split('/');
+      return urlParts[1] === 'embed';
     },
     getPathname: function() {
       return window.location.pathname;
@@ -569,6 +571,10 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
     registerPublishExplorationEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
         'PublishExploration', 'click', explorationId);
+    },
+    registerVisitOppiaFromIframeEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'VisitOppiaFromIframe', 'click', explorationId);
     }
   };
 }]);

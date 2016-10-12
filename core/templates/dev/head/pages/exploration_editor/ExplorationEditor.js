@@ -786,6 +786,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
                 return Boolean(
                   explorationTitleService.displayed &&
                   explorationObjectiveService.displayed &&
+                  explorationObjectiveService.displayed.length >= 15 &&
                   explorationCategoryService.displayed &&
                   explorationLanguageCodeService.displayed);
               };
