@@ -239,6 +239,6 @@ WHITELISTED_COLLECTION_EDITOR_USERNAMES = ConfigProperty(
     'Names of users allowed to use the collection editor',
     [])
 
-WHITELISTED_EMAIL_SENDER = ConfigProperty(
-    'whitelisted_email_sender', SET_OF_STRINGS_SCHEMA,
+WHITELISTED_EMAIL_SENDERS = ConfigProperty(
+    'whitelisted_email_senders', SET_OF_STRINGS_SCHEMA,
     'Names of users allowed to send emails via the query interface.', [])
