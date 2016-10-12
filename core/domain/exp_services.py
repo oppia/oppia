@@ -1911,8 +1911,8 @@ def discard_draft(exp_id, user_id):
     """Discard the draft for the given user and exploration.
 
     Args:
-        exp_id: str. ID of the exploration.
-        user_id: str. ID of the user.
+        exp_id: str. The id of the exploration.
+        user_id: str. The id of the user.
     """
 
     exp_user_data = user_models.ExplorationUserDataModel.get(
