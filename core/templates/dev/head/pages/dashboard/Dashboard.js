@@ -120,6 +120,7 @@ oppia.controller('Dashboard', [
               (-1 * $scope.explorationsList.indexOf(entity)) :
               $scope.explorationsList.indexOf(entity));
         }
+        return value;
       } 
       return null;
     };
