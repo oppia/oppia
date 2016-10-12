@@ -122,7 +122,7 @@ oppia.controller('Dashboard', [
         }
         return value;
       } 
-      return null;
+      return value;
     };
 
     $scope.sortByFunction = function(entity) {
