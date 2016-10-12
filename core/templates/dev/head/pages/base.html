@@ -149,7 +149,7 @@
                     <div ng-cloak class="navbar-header pull-right">
                       <ul class="nav oppia-navbar-nav oppia-navbar-profile">
                         {% if username %}
-                          <li class="dropdown pull-right">
+                          <li class="dropdown pull-right protractor-test-profile-dropdown">
                             <a class="dropdown-toggle oppia-navbar-dropdown-toggle" data-toggle="dropdown" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
                               <div class="oppia-navbar-profile-picture-container" ng-cloak>
                                 {% if profile_picture_data_url %}
@@ -185,18 +185,18 @@
 
                             <ul class="dropdown-menu ng-cloak oppia-navbar-dropdown" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)" ng-show="profileDropdownIsActive">
                               <li>
-                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/profile/{{username}}">
+                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/profile/{{username}}" class="protractor-test-profile-link">
                                   <strong>{{username}}</strong>
                                 </a>
                               </li>
                               <hr class="oppia-top-right-menu-item-separator">
                               <li>
-                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/dashboard">
+                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/dashboard" class="protractor-test-dashboard-link">
                                   <span translate="I18N_TOPNAV_DASHBOARD"></span>
                                 </a>
                               </li>
                               <li>
-                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/notifications_dashboard">
+                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/notifications_dashboard" class="protractor-test-notifications-link">
                                   <span translate="I18N_TOPNAV_NOTIFICATIONS"></span>
                                   <span ng-if="numUnseenNotifications > 0">
                                     (<[numUnseenNotifications]>)
@@ -204,7 +204,7 @@
                                 </a>
                               </li>
                               <li>
-                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/preferences">
+                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/preferences" class="protractor-test-preferences-link">
                                   <span translate="I18N_TOPNAV_PREFERENCES"></span>
                                 </a>
                               </li>
