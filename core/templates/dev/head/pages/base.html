@@ -265,17 +265,18 @@
                               </div>
                             </li>
 
-                            <li class="dropdown oppia-navbar-clickable-dropdown pull-right">
+                            <li class="dropdown oppia-navbar-clickable-dropdown pull-right protractor-test-about-oppia-list-item">
                               <a class="oppia-navbar-tab">
                                 <span translate="I18N_TOPNAV_ABOUT"></span>
                                 <span class="caret"></span>
                               </a>
                               <ul class="dropdown-menu oppia-navbar-dropdown" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
-                                <li><a href="/about" translate="I18N_TOPNAV_ABOUT_OPPIA"></a></li>
-                                <li><a href="/teach" translate="I18N_TOPNAV_TEACH_WITH_OPPIA"></a></li>
+                                <li><a class="protractor-test-about-link"
+                                       href="/about" translate="I18N_TOPNAV_ABOUT_OPPIA"></a></li>
+                                <li><a class="protractor-test-teach-link" href="/teach"   translate="I18N_TOPNAV_TEACH_WITH_OPPIA"></a></li>
                                 <li><a href="/blog" translate="I18N_TOPNAV_BLOG"></a></li>
                                 <li><a href="/forum" translate="I18N_TOPNAV_FORUM"></a></li>
-                                <li><a href="/contact" translate="I18N_TOPNAV_CONTACT_US"></a></li>
+                                <li><a class="protractor-test-contact-link" href="/contact" translate="I18N_TOPNAV_CONTACT_US"></a></li>
                               </ul>
                             </li>
                             <li class="oppia-clickable-navbar-element pull-right">
