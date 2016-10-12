@@ -19,10 +19,6 @@
 oppia.controller('DashboardNotifications', [
     '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
     function($scope, $http, $rootScope, oppiaDatetimeFormatter) {
-  $scope.navigateToItem = function(activityId, notificationType) {
-    window.location.href = $scope.getItemUrl(activityId, notificationType);
-  };
-
   $scope.getItemUrl = function(activityId, notificationType) {
     return (
       '/create/' + activityId + (

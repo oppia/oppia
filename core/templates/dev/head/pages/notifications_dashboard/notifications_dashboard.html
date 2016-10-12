@@ -33,8 +33,7 @@
 
       <div ng-if="recentNotifications.length > 0">
         <md-card ng-repeat="notification in recentNotifications" class="oppia-dashboard-row"
-                 ng-class="{'oppia-dashboard-row-recent': lastSeenMsec && lastSeenMsec < notification.last_updated_ms && notification.author_username !== currentUsername}"
-                 style="position: relative;">
+                 ng-class="{'oppia-dashboard-row-recent': lastSeenMsec && lastSeenMsec < notification.last_updated_ms && notification.author_username !== currentUsername}">
           <a ng-href="<[getItemUrl(notification.activity_id, notification.type)]>"
              class="oppia-notification-clickable">
             <div class="oppia-notification-content">
@@ -49,7 +48,7 @@
                 </span>
               </span>
               <span class="oppia-notification-author-username">
-                <strong style="margin-left: 15px;">
+                <strong>
                   <a ng-if="notification.author_username" ng-click="navigateToProfile($event, notification.author_username)"><[notification.author_username]></a>
                   <span ng-if="!notification.author_username">
                     Anonymous

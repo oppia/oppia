@@ -2150,7 +2150,9 @@ oppia-parameter {
   cursor: pointer;
   margin-bottom: -5px;
   overflow: auto;
+  position: relative;
 }
+
 .oppia-dashboard-row:hover {
   background: #eee;
 }
@@ -2811,6 +2813,8 @@ div#ng-curtain {
 
 .oppia-notification-content {
   display: inline-block;
+  padding-left: 25px;
+  padding-right: 25px;
 }
 
 .oppia-notification-clickable {
