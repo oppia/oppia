@@ -2814,7 +2814,7 @@ div#ng-curtain {
 .oppia-notification-content {
   display: inline-block;
   padding-left: 25px;
-  padding-right: 25px;
+  float: left;
 }
 
 .oppia-notification-clickable {
@@ -2832,6 +2832,7 @@ div#ng-curtain {
 
 .oppia-notification-type i {
   color: black;
+  margin-left: 5px;
 }
 
 .oppia-notification-last-updated {
