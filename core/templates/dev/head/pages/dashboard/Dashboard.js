@@ -113,7 +113,8 @@ oppia.controller('Dashboard', [
         if (!value) {
           return DEFAULT_TEXT_EMPTY_TITLE;
         }
-      } else if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED) {
+      } else if ($scope.currentSortType === 
+              EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED) {
         if (!value) {
           return (
             $scope.isCurrentSortDescending ?
