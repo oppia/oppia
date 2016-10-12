@@ -156,13 +156,13 @@
             </tr>
             <!--my region of interest-->
             <!--For the private explorations-->
-            <tr ng-repeat="exploration in explorationsList | orderBy:sortByFunction:isCurrentSortDescending track by exploration.id"
+            <tr ng-repeat="exploration in explorationsList | orderBy:sortByFunctionPrivate:isCurrentSortDescending track by exploration.id"
                 ng-click="showExplorationEditor(exploration.id)"
                 class="exploration-list-item">
               <td>
                 <span ng-if="exploration.status === 'private'"
                       class="exp-private-text">
-                  <['Untitled']>
+                  <[exploration.title] | ['Untitled']>
                 </span>
               </td>
               <td colspan="4"
@@ -173,15 +173,15 @@
               <td ng-if="exploration.status === 'private'">
                 <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
               </td>
-              <!--code added by me-->
             </tr>
+            <!--code added by me-->
             <!--For the public explorations-->
             <tr ng-repeat="exploration in explorationsList | orderBy:sortByFunction:isCurrentSortDescending track by exploration.id"
                 ng-click="showExplorationEditor(exploration.id)"
                 class="exploration-list-item">
 
               <td ng-if="exploration.status === 'publicized'">
-                <[exploration.title]>
+                <[exploration.title] | 'Untitled'>
                 <span class="featured-badge">
                     featured
                 </span>
