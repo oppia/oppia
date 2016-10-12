@@ -104,27 +104,6 @@ oppia.controller('Dashboard', [
       }
     };
 
-    /*$scope.sortByFunctionPrivate = function(entity) {
-      // This function is passed as a custom comparator function to `orderBy`,
-      // so that special cases can be handled while sorting explorations.
-      var value = entity[$scope.currentSortType];
-      var DEFAULT_TEXT_EMPTY_TITLE = 'Untitled';
-      if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.TITLE) {
-        if (!value) {
-          return DEFAULT_TEXT_EMPTY_TITLE;
-        }
-      } else if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED) {
-        if (!value) {
-          return (
-            $scope.isCurrentSortDescending ?
-              (-1 * $scope.explorationsList.indexOf(entity)) :
-              $scope.explorationsList.indexOf(entity));
-        }
-        return value;
-      }
-      return value;
-    };*/
-
     $scope.sortByFunction = function(entity) {
       // This function is passed as a custom comparator function to `orderBy`,
       // so that special cases can be handled while sorting explorations.
