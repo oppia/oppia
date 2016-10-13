@@ -167,7 +167,7 @@ class FeedbackThreadModel(base_models.BaseModel):
         """
         return cls.get_all().filter(
             cls.exploration_id == exploration_id).order(
-                    cls.last_updated).fetch(limit)
+                cls.last_updated).fetch(limit)
 
 
 class FeedbackMessageModel(base_models.BaseModel):
@@ -248,8 +248,8 @@ class FeedbackMessageModel(base_models.BaseModel):
             strict: bool
 
         Returns:
-            If the message id is valid and it is not marked as deleted, returns the
-            message instance. Otherwise:
+            If the message id is valid and it is not marked as deleted,
+            returns the message instance. Otherwise:
             - if strict is True, raises EntityNotFoundError
             - if strict is False, returns None.
         """
@@ -319,9 +319,9 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
 
     The key of each instance is the exploration id.
     """
-    # The number of open feedback threads filed against this exploration.
+    # The number of open feedback threads for this exploration.
     num_open_threads = ndb.IntegerProperty(default=None, indexed=True)
-    # Total number of feedback threads filed against this exploration.
+    # Total number of feedback threads for this exploration.
     num_total_threads = ndb.IntegerProperty(default=None, indexed=True)
 
     @classmethod
@@ -329,9 +329,9 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
         """Creates a new FeedbackAnalyticsModel entry.
 
         Args:
-            num_open_threads: int, number of open feedback threads filed against
+            num_open_threads: int, number of open feedback threads for
             this exploration
-            num_total_threads: int, total number of feedback threads filed against
+            num_total_threads: int, total number of feedback threads for
             this exploration
         """
         cls(
