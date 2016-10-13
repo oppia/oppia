@@ -834,23 +834,37 @@ class MigratedAnswerModel(base_models.BaseModel):
     exploration_id = ndb.StringProperty(indexed=True, required=True)
     state_name = ndb.StringProperty(indexed=True, required=True)
     exploration_versions = ndb.IntegerProperty(indexed=False, repeated=True)
+    started_migration = ndb.BooleanProperty(indexed=False, default=False)
+    finished_migration = ndb.BooleanProperty(indexed=False, default=False)
+
+    @classmethod
+    def start_migrating_answer_bucket(
+        cls, state_answer_log_model_item_id, exploration_id, state_name):
+        model = cls.get(state_answer_log_model_item_id, strict=False)
+        if model:
+            raise Exception(
+                'Expected to not have started migrating answer bucket: %s' % (
+                    state_answer_log_model_item_id))
+        model = cls(
+            id=state_answer_log_model_item_id, exploration_id=exploration_id,
+            state_name=state_name, exploration_versions=[],
+            started_migration=True)
+        model.put()
 
     @classmethod
     def finish_migrating_answer(
             cls, state_answer_log_model_item_id, exploration_id,
             exploration_version, state_name):
-        model = cls.get(state_answer_log_model_item_id, strict=False)
-        if not model:
-            model = cls(
-                id=state_answer_log_model_item_id,
-                exploration_id=exploration_id, state_name=state_name,
-                exploration_versions=set([exploration_version]))
-        else:
-            # Avoid an unnecessary put if the given version is already recorded
-            if exploration_version in model.exploration_versions:
-                return
-            model.exploration_versions = set(
-                model.exploration_versions + [exploration_version])
+        model = cls.get(state_answer_log_model_item_id)
+        # Avoid an unnecessary put if the given version is already recorded
+        if exploration_version not in model.exploration_versions:
+            model.exploration_versions.append(exploration_version)
+            model.put()
+
+    @classmethod
+    def finish_migration_answer_bucket(cls, state_answer_log_model_item_id):
+        model = cls.get(state_answer_log_model_item_id)
+        model.finished_migration = True
         model.put()
 
     @classmethod

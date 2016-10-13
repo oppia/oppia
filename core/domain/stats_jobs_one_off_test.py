@@ -16,7 +16,9 @@
 
 """Tests for statistics one-off jobs."""
 
+from collections import defaultdict
 import logging
+import random
 
 from core import jobs
 from core.domain import exp_domain
@@ -35,9 +37,6 @@ from extensions.objects.models import objects
 import feconf
 
 
-# TODO(bhenning): Implement tests for multiple answers submitted to the same
-# rule. Implement tests for multiple identical rules being submitted. Test
-# submissions to answer groups and rules other than the default.
 class AnswerMigrationJobTests(test_utils.GenericTestBase):
     """Tests for the answer migration job."""
 
@@ -60,11 +59,77 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             logging.error(e)
 
     def _run_migration_job(self):
-        # Start migration job on sample answers.
+        """Start the AnswerMigrationJob to migrate answers submitted to
+        StateRuleAnswerLogModel.
+        """
         job_id = stats_jobs_one_off.AnswerMigrationJob.create_new()
         stats_jobs_one_off.AnswerMigrationJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
         return jobs.get_job_output(job_id)
+
+    def _run_migration_job_internal(self, fail_predicate=None, retry_count=0):
+        """Runs the map/reduce pipeline of the AnswerMigrationJob locally, with
+        optional retrying capabilities. If fail_predicate is provided, it will
+        be called everytime insert_submitted_answers is called in the migration
+        job. The predicate function is passed the exploration ID, state_name,
+        and submitted answer dict list being saved. If the function returns
+        True, the current emulated shard of the map/reduce pipeline will fail
+        and will immediately be retried.
+
+        This function also guarantees predictability in running the job (unlike
+        standard map reduce frameworks). The items from the data store are
+        passed to the map function deterministically (they are sorted by
+        timestamp) and the randomness used by the job to vary mapping
+        assignments to shards are collapsed.
+        """
+        orig_insert_submitted_answers = (
+            stats_models.StateAnswersModel.insert_submitted_answers)
+        def proxy_insert_submitted_answers(
+                cls, exploration_id, exploration_version, state_name,
+                interaction_id, submitted_answer_dict_list):
+            if fail_predicate and fail_predicate(
+                    exploration_id, state_name, submitted_answer_dict_list):
+                raise Exception('Induced shard failure')
+            return orig_insert_submitted_answers(
+                exploration_id, exploration_version, state_name, interaction_id,
+                submitted_answer_dict_list)
+
+        state_rule_answer_logs = list(
+            stats_models.StateRuleAnswerLogModel.get_all())
+        state_rule_answer_logs.sort(key=lambda item: item.created_on)
+        answer_migration_job = stats_jobs_one_off.AnswerMigrationJob()
+        # http://stackoverflow.com/a/261677
+        output = []
+        with self.swap(
+                stats_models.StateAnswersModel, 'insert_submitted_answers',
+                classmethod(proxy_insert_submitted_answers)):
+            reductions = defaultdict(list)
+            for state_rule_answer_log in state_rule_answer_logs:
+                while True:
+                    try:
+                        with self.swap(random, 'randint', lambda x, y: 0):
+                            mappings = list(
+                                answer_migration_job.map(state_rule_answer_log))
+                        break
+                    except Exception as ex:
+                        if retry_count == 0:
+                            raise ex
+                        retry_count = retry_count - 1
+                for key, value in mappings:
+                    reductions[key].append('%s' % value)
+            for key, stringified_values in reductions.iteritems():
+                while True:
+                    try:
+                        results = list(
+                            answer_migration_job.reduce(
+                                key, stringified_values))
+                        break
+                    except Exception as ex:
+                        if retry_count == 0:
+                            raise ex
+                        retry_count = retry_count - 1
+                output.extend(results)
+        return sorted(output)
 
     def _run_migration_validation_job(self):
         job_id = stats_jobs_one_off.AnswerMigrationValidationJob.create_new()
@@ -77,6 +142,12 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
 
     def _verify_migration_validation_problems(self, count):
         self.assertEqual(len(self._run_migration_validation_job()), count)
+
+    def _run_migration_cleanup_job(self):
+        job_id = stats_jobs_one_off.AnswerMigrationCleanupJob.create_new()
+        stats_jobs_one_off.AnswerMigrationCleanupJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+        return jobs.get_job_output(job_id)
 
     def _get_state_answers(
             self, state_name, exploration_id=DEMO_EXP_ID,
@@ -1522,6 +1593,246 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             state_name, exploration_id='exp_id0', exploration_version=2)
         self.assertIsNone(state_answers)
 
+        self._verify_no_migration_validation_problems()
+
+    def test_reduce_shard_failure(self):
+        """If a shard executing the reduce portion of the job fails to execute,
+        the shard may be automatically restarted by the mapreduce pipeline. In
+        this situation, answers that have started execution may be remigrated.
+        This has theoretically been observed in production, but it shouldn't be
+        allowed regardless. This test help verifies the job is resilient to
+        random shard failures.
+
+        This test covers both a reduce failing mid-migration (meaning some of
+        the items covered by that reduce shard successfully migrate) and a
+        specific item failing mid-answer (meaning some of the answers of that
+        item's bucket successfully migrated before the failure).
+        """
+        exploration = self.save_new_valid_exploration(
+            'exp_id0', self.owner_id, end_state_name='End')
+        state_name = exploration.init_state_name
+        initial_state = exploration.states[state_name]
+
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'NumericInput'
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': '2.5'
+                    }
+                }],
+                'outcome': {
+                    'dest': state_name,
+                    'feedback': [],
+                    'param_changes': []
+                }
+            }]
+        }], 'Create initial text input state')
+
+        rule_spec_str0 = 'Equals(2.5)'
+        html_answer0 = '2.5'
+        self._record_old_answer(
+            state_name, rule_spec_str0, html_answer0, exploration_id='exp_id0')
+
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'TextInput'
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'Contains',
+                    'inputs': {
+                        'x': 'ate'
+                    }
+                }],
+                'outcome': {
+                    'dest': state_name,
+                    'feedback': [],
+                    'param_changes': []
+                }
+            }]
+        }], 'Change to TextInput')
+
+        rule_spec_str1 = 'Contains(ate)'
+        html_answer1 = 'appreciate'
+        html_answer2 = 'fate'
+        self._record_old_answer(
+            state_name, rule_spec_str1, html_answer1, exploration_id='exp_id0')
+        self._record_old_answer(
+            state_name, rule_spec_str1, html_answer1, exploration_id='exp_id0')
+        self._record_old_answer(
+            state_name, rule_spec_str1, html_answer2, exploration_id='exp_id0')
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0', exploration_version=2)
+        self.assertIsNone(state_answers)
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0', exploration_version=3)
+        self.assertIsNone(state_answers)
+
+        class FailedJobState(object):
+            pass
+
+        FailedJobState.failed = False
+        def fail_predicate(
+                exploration_id, state_name, submitted_answer_dict_list):
+            if not FailedJobState.failed and (
+                    len(submitted_answer_dict_list) == 1) and (
+                    submitted_answer_dict_list[0]['answer_str'] == (
+                        html_answer2)):
+                FailedJobState.failed = True
+                return True
+            return False
+
+        # The first job run has a failure which leads to retrying the shard.
+        # Swap out random.randint() so that all of the answers are handled by
+        # the same reduce() function.
+        job_output = self._run_migration_job_internal(
+            fail_predicate=fail_predicate, retry_count=1)
+        self.assertEqual(job_output, [
+            'Encountered a submitted answer which has already been migrated '
+            '(is this due to a shard retry?)'])
+
+        # The first answer submissions should have been properly migrated, since
+        # the shard failure happened later on. The answers matched to the
+        # earlier version of the exploration should also match.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0', exploration_version=2)
+        submitted_answer_list = state_answers.get_submitted_answer_dict_list()
+        self.assertEqual(sorted(submitted_answer_list), [{
+            'answer': 2.5,
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'NumericInput',
+            'params': {},
+            'rule_spec_str': rule_spec_str0,
+            'answer_str': html_answer0
+        }])
+
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0', exploration_version=3)
+        submitted_answer_list = state_answers.get_submitted_answer_dict_list()
+        self.assertEqual(len(submitted_answer_list), 2)
+        self.assertEqual(sorted(submitted_answer_list), [{
+            'answer': 'appreciate',
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'TextInput',
+            'params': {},
+            'rule_spec_str': rule_spec_str1,
+            'answer_str': html_answer1
+        }, {
+            'answer': 'appreciate',
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'TextInput',
+            'params': {},
+            'rule_spec_str': rule_spec_str1,
+            'answer_str': html_answer1
+        }])
+
+        # There should be a validation issue because one answer bucket was not
+        # properly migrated.
+        self._verify_migration_validation_problems(1)
+
+        # Run the cleaner job to remove the "dirty" answer bucket which didn't
+        # finish being migrated.
+        self.assertEqual(sorted(self._run_migration_cleanup_job()), [
+            'Total answers removed: 1',
+            'Total buckets removed: 1'
+        ])
+
+        # Run the job again. Some answers do not need to be re-migrated.
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [
+            'Encountered a submitted answer which has already been migrated'])
+
+        # All answers should now be properly migrated.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0', exploration_version=2)
+        submitted_answer_list = state_answers.get_submitted_answer_dict_list()
+        self.assertEqual(sorted(submitted_answer_list), [{
+            'answer': 2.5,
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'NumericInput',
+            'params': {},
+            'rule_spec_str': rule_spec_str0,
+            'answer_str': html_answer0
+        }])
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0', exploration_version=3)
+        submitted_answer_list = state_answers.get_submitted_answer_dict_list()
+        self.assertEqual(len(submitted_answer_list), 3)
+        self.assertEqual(sorted(submitted_answer_list), [{
+            'answer': 'appreciate',
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'TextInput',
+            'params': {},
+            'rule_spec_str': rule_spec_str1,
+            'answer_str': html_answer1
+        }, {
+            'answer': 'appreciate',
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'TextInput',
+            'params': {},
+            'rule_spec_str': rule_spec_str1,
+            'answer_str': html_answer1
+        }, {
+            'answer': 'fate',
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'TextInput',
+            'params': {},
+            'rule_spec_str': rule_spec_str1,
+            'answer_str': html_answer2
+        }])
         self._verify_no_migration_validation_problems()
 
     def test_migrate_code_repl(self):

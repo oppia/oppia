@@ -492,6 +492,38 @@ class AnswerMigrationValidationJob(jobs.BaseMapReduceJobManager):
                 yield value
 
 
+class AnswerMigrationCleanupJob(jobs.BaseMapReduceJobManager):
+    """This job performs a cleanup of the bookkeeping model for the answer
+    migration job. It removes all "dirty" entries (which correspond to answer
+    buckets which started being migrated, but failed for some reason). It also
+    deletes any answers which have been submitted to the new data model which
+    correspond to the dirty entry.
+    """
+    _TOTAL_ANSWERS_REMOVED_KEY = 'Total answers removed'
+    _TOTAL_BUCKETS_REMOVED_KEY = 'Total buckets removed'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.MigratedAnswerModel]
+
+    @staticmethod
+    def map(item):
+        if not item.finished_migration:
+            for exp_version in item.exploration_versions:
+                for state_answer_model in (
+                        stats_models.StateAnswersModel.get_all_models(
+                            item.exploration_id, exp_version, item.state_name)):
+                    state_answer_model.delete()
+                    yield (
+                        AnswerMigrationCleanupJob._TOTAL_ANSWERS_REMOVED_KEY, 1)
+            item.delete()
+            yield (AnswerMigrationCleanupJob._TOTAL_BUCKETS_REMOVED_KEY, 1)
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        yield '%s: %d' % (key, len(stringified_values))
+
+
 class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     """This job is responsible for migrating all answers stored within
     stats_models.StateRuleAnswerLogModel to stats_models.StateAnswersModel
@@ -1301,7 +1333,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        # If this answer has alerady been migrated, skip it.
+        # If this answer bucket has already been migrated, skip it.
         if stats_models.MigratedAnswerModel.is_marked_as_migrated(item.id):
             yield (
                 AnswerMigrationJob._ALREADY_MIGRATED_KEY,
@@ -1396,6 +1428,13 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             rule_str = value_dict['rule_str']
             last_updated = value_dict['last_updated']
 
+            # If this answer bucket has already been migrated, skip it.
+            if stats_models.MigratedAnswerModel.is_marked_as_migrated(item_id):
+                yield (
+                    'Encountered a submitted answer which has already been '
+                    'migrated (is this due to a shard retry?)')
+                return
+
             migration_errors = AnswerMigrationJob._migrate_answers(
                 item_id, explorations, exploration_id, state_name, item.answers,
                 rule_str, last_updated)
@@ -1413,6 +1452,12 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     @classmethod
     def _migrate_answers(cls, item_id, explorations, exploration_id, state_name,
                          answers, rule_str, last_updated):
+        # Begin migrating the answer bucket; this might fail due to some of the
+        # answers failing to migrate or a major shard failure (such as due to an
+        # out of memory error).
+        stats_models.MigratedAnswerModel.start_migrating_answer_bucket(
+            item_id, exploration_id, state_name)
+
         migrated_answers = []
         matched_explorations = []
         answer_strings = []
@@ -1497,6 +1542,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
             stats_models.MigratedAnswerModel.finish_migrating_answer(
                 item_id, exploration_id, exploration_version, state_name)
+        stats_models.MigratedAnswerModel.finish_migration_answer_bucket(item_id)
 
     @classmethod
     def _try_migrate_answer(cls, answer_str, rule_str, last_updated,
