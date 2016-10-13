@@ -98,25 +98,6 @@ fi
 trap cleanup EXIT
 
 
-$NODE_MODULE_DIR/.bin/webdriver-manager update
-
-# WARNING: THIS IS A HACK WHICH SHOULD BE REMOVED AT THE EARLIEST OPPORTUNITY,
-# PROBABLY WHEN PROTRACTOR IS UPGRADED BEYOND v4.0.9.
-# Chromedriver v2.22 fails on Travis with an "unexpected alert open" error.
-# Attempt to replace it with v2.24, but rename it to 2.22 so as not to trigger
-# a version check error.
-if [ ${OS} == "Linux" ]; then
-  if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-    echo "  Replacing chromedriver with a newer version..."
-    curl --silent https://chromedriver.storage.googleapis.com/2.24/chromedriver_linux64.zip -o chromedriver_2.22linux64.zip
-    mv -f chromedriver_2.22linux64.zip $NODE_MODULE_DIR/protractor/node_modules/webdriver-manager/selenium
-    rm $NODE_MODULE_DIR/protractor/node_modules/webdriver-manager/selenium/chromedriver_2.22
-    unzip -q $NODE_MODULE_DIR/protractor/node_modules/webdriver-manager/selenium/chromedriver_2.22linux64.zip -d $NODE_MODULE_DIR/protractor/node_modules/webdriver-manager/selenium
-    mv $NODE_MODULE_DIR/protractor/node_modules/webdriver-manager/selenium/chromedriver $NODE_MODULE_DIR/protractor/node_modules/webdriver-manager/selenium/chromedriver_2.22
-    ls $NODE_MODULE_DIR/protractor/node_modules/webdriver-manager/selenium
-  fi
-fi
-
 # Argument passed to gulpfile.js to help build with minification.
 MINIFICATION=false
 for arg in "$@"; do

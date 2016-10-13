@@ -62,8 +62,8 @@ describe('Embedding', function() {
     var PLAYTHROUGH_LOGS = [
       'Exploration loaded',
       'Transitioned from state Intro via answer 6 to state correct but why',
-      'Transitioned from state correct but why via answer "factorial" to ' +
-        'state END',
+      'Transitioned from state correct but why via answer \\"factorial\\" ' +
+        'to state END',
       'Exploration completed'
     ];
 
