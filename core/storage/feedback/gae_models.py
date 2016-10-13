@@ -79,8 +79,8 @@ class FeedbackThreadModel(base_models.BaseModel):
             exploration_id: str, ID associated with each exploration
 
         Returns:
-            thread_id: str, Thread ID is expressed as a sum of current time in milliseconds and a random integer, or none if
-            thread with same ID already exists
+            thread_id: str, Thread ID is expressed as a sum of current time in milliseconds and a
+            random integer, or none if thread with same ID already exists
 
         Raises:
             Exception: Thread with same ID already exists
@@ -108,7 +108,8 @@ class FeedbackThreadModel(base_models.BaseModel):
 
     @property
     def thread_id(self):
-        """Splits the full thread id generated in generate_full_thread_id method to get thread id within exploration
+        """Splits the full thread id generated in generate_full_thread_id method to get thread id
+            within exploration
 
         Returns: thread id
         """
@@ -163,8 +164,8 @@ class FeedbackThreadModel(base_models.BaseModel):
             List of threads, it does not include the deleted entries.
         """
         return cls.get_all().filter(
-            cls.exploration_id == exploration_id).order(
-            cls.last_updated).fetch(limit)
+                cls.exploration_id == exploration_id).order(
+                cls.last_updated).fetch(limit)
 
 
 class FeedbackMessageModel(base_models.BaseModel):
@@ -225,8 +226,8 @@ class FeedbackMessageModel(base_models.BaseModel):
             FeedbackMessageModel: str
 
         Raises:
-            Throws an exception if a message with the given thread ID and message
-            ID combination exists already.
+            Throws an exception if a message with the given
+            thread ID and message ID combination exists already.
         """
         instance_id = cls._generate_id(
             exploration_id, thread_id, message_id)
