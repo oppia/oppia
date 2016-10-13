@@ -136,12 +136,12 @@ describe('Embedding', function() {
       for (var i = 0; i < browserLogs.length; i++) {
         // We ignore all logs that are not of the desired form.
         try {
-          var message = JSON.parse(browserLogs[i].message).message.
-            parameters[0].value;
+          var message = browserLogs[i].message;
           var EMBEDDING_PREFIX = 'Embedding test: ';
-          if (message.substring(0, EMBEDDING_PREFIX.length) ===
-              EMBEDDING_PREFIX) {
-            embeddingLogs.push(message.substring(EMBEDDING_PREFIX.length));
+          if (message.indexOf(EMBEDDING_PREFIX) !== -1) {
+            var index = message.indexOf(EMBEDDING_PREFIX);
+            embeddingLogs.push(
+              message.substring(index + EMBEDDING_PREFIX.length));
           }
         } catch (err) {}
       }
