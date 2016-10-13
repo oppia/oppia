@@ -74,13 +74,14 @@ class FeedbackThreadModel(base_models.BaseModel):
     @classmethod
     def generate_new_thread_id(cls, exploration_id):
         """Generates a new thread ID which is unique within the exploration.
-        
+
         Args:
             exploration_id: str, ID associated with each exploration
 
         Returns:
-            thread_id: str, Thread ID is expressed as a sum of current time in milliseconds and a
-            random integer, or none if thread with same ID already exists
+            thread_id: str, Thread ID is expressed as a sum of current time in
+            milliseconds and a random integer, or none if thread with same ID
+            already exists
 
         Raises:
             Exception: Thread with same ID already exists
@@ -108,8 +109,8 @@ class FeedbackThreadModel(base_models.BaseModel):
 
     @property
     def thread_id(self):
-        """Splits the full thread id generated in generate_full_thread_id method to get thread id
-            within exploration
+        """Splits the full thread id generated in generate_full_thread_id method
+            to get thread id within exploration
 
         Returns: thread id
         """
@@ -127,8 +128,8 @@ class FeedbackThreadModel(base_models.BaseModel):
             instance_id: str
 
         Raises:
-            Throws an exception if a thread with the given exploration ID and thread
-            ID combination exists already.
+            Throws an exception if a thread with the given exploration ID
+            and thread ID combination exists already.
         """
         instance_id = cls.generate_full_thread_id(exploration_id, thread_id)
         if cls.get_by_id(instance_id):
@@ -144,7 +145,8 @@ class FeedbackThreadModel(base_models.BaseModel):
             thread_id: str
 
         Returns:
-            FeedBackThreadModel or none if the thread is not found or is already deleted.
+            FeedBackThreadModel or none if the thread is not found or is
+            already deleted.
         """
         return cls.get_by_id(cls.generate_full_thread_id(
             exploration_id, thread_id))
@@ -164,8 +166,8 @@ class FeedbackThreadModel(base_models.BaseModel):
             List of threads, it does not include the deleted entries.
         """
         return cls.get_all().filter(
-                cls.exploration_id == exploration_id).order(
-                cls.last_updated).fetch(limit)
+            cls.exploration_id == exploration_id).order(
+                    cls.last_updated).fetch(limit)
 
 
 class FeedbackMessageModel(base_models.BaseModel):
@@ -291,7 +293,8 @@ class FeedbackMessageModel(base_models.BaseModel):
 
     @classmethod
     def get_message_count(cls, exploration_id, thread_id):
-        """Returns the number of messages in the thread.Includes the deleted entries.
+        """Returns the number of messages in the thread.Includes the
+        deleted entries.
 
         Args:
             exploration_id: str
@@ -326,8 +329,10 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
         """Creates a new FeedbackAnalyticsModel entry.
 
         Args:
-            num_open_threads: int, number of open feedback threads filed against this exploration
-            num_total_threads: int, total number of feedback threads filed against this exploration
+            num_open_threads: int, number of open feedback threads filed against
+            this exploration
+            num_total_threads: int, total number of feedback threads filed against
+            this exploration
         """
         cls(
             id=model_id,
@@ -368,7 +373,8 @@ class SuggestionModel(base_models.BaseModel):
             state_name: str, ID of the state the thread is for
             description: str, Learner provided description of suggestions.
             state_content: JSON, state's content after suggested edits.
-            exploration_version: exploration version for which suggestions were made
+            exploration_version: exploration version for which suggestions
+            were made
 
         Raises:
             Exception if a suggestion with the given thread id already
@@ -398,7 +404,8 @@ class SuggestionModel(base_models.BaseModel):
             thread_id: ID of corresponding thread
 
         Returns:
-            Suggestion related to given exploration and thread id, or none if it doesn't match anything.
+            Suggestion related to given exploration and thread id, or none
+            if it doesn't match anything.
         """
 
         return cls.get_by_id(cls._get_instance_id(exploration_id, thread_id))
