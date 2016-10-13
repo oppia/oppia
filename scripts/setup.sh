@@ -69,8 +69,6 @@ function maybeInstallDependencies {
     install_node_module protractor 4.0.9
     install_node_module protractor-screenshot-reporter 0.0.5
     install_node_module jasmine-spec-reporter 2.2.2
-
-    $NODE_MODULE_DIR/.bin/webdriver-manager update
   fi
 
   if [ "$RUN_MINIFIED_TESTS" = "true" ]; then
