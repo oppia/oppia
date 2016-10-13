@@ -103,6 +103,7 @@ oppia.controller('Dashboard', [
         $scope.currentSortType = sortType;
       }
     };
+    /*
     $scope.sortByFunctionPrivate = function(entity) {
       // This function is passed as a custom comparator function to `orderBy`,
       // so that special cases can be handled while sorting explorations.
@@ -120,10 +121,10 @@ oppia.controller('Dashboard', [
         return ($scope.isCurrentSortDescending ?
                 (-1 * $scope.explorationsList.indexOf(entity)) :
                 $scope.explorationsList.indexOf(entity));
-      }*/
+      }
       return null;
     };
-
+    */
     $scope.sortByFunction = function(entity) {
       // This function is passed as a custom comparator function to `orderBy`,
       // so that special cases can be handled while sorting explorations.
