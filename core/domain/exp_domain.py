@@ -88,26 +88,6 @@ DEFAULT_RULESPEC_STR = 'Default'
 CLASSIFIER_RULESPEC_STR = 'FuzzyMatches'
 
 
-def to_metadata_dict(summary):
-    """Given an exploration summary, this method returns a dict containing id,
-    title and objective of the exploration.
-
-    Args:
-        summary: Summary of an exploration.
-    Returns:
-        A metadata dict for the given exploration summary.
-        The metadict has three keys:
-            'id': the exploration id
-            'title': the exploration title
-            'objective': the exploration objective
-    """
-    return {
-        'id': summary.id,
-        'title': summary.title,
-        'objective': summary.objective,
-    }
-
-
 def _get_full_customization_args(customization_args, ca_specs):
     """Populates the given customization_args dict with default values
     if any of the expected customization_args are missing.
@@ -2622,3 +2602,21 @@ class ExplorationSummary(object):
         self.exploration_model_created_on = exploration_model_created_on
         self.exploration_model_last_updated = exploration_model_last_updated
         self.first_published_msec = first_published_msec
+
+
+    def to_metadata_dict(self):
+        """Given an exploration summary, this method returns a dict containing
+        id, title and objective of the exploration.
+
+        Returns:
+            A metadata dict for the given exploration summary.
+            The metadict has three keys:
+                'id': the exploration id
+                'title': the exploration title
+                'objective': the exploration objective
+        """
+        return {
+            'id': self.id,
+            'title': self.title,
+            'objective': self.objective,
+        }

@@ -18,7 +18,6 @@
 
 from core.domain import activity_services
 from core.domain import collection_services
-from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import stats_jobs_continuous
@@ -174,8 +173,8 @@ def get_exp_metadata_dicts_matching_query(query_string, search_cursor, user_id):
         search_cursor: str or None. The cursor location to start the search
             from. If None, the returned values are from the beginning
             of the results list.
-        user_id: str. The user id affect the result by restricting the results
-            to explorations which are accessible by the user.
+        user_id: str or None. If not None, private explorations that are
+            editable by this user are also returned.
 
     Returns:
         exploration_list: A list of metadata dicts for explorations matching
@@ -202,6 +201,7 @@ def get_exploration_metadata_dicts(exploration_ids, editor_user_id=None):
             metadata dicts are to be returned.
         editor_user_id: str or None. If not None, private explorations that are
             editable by this user are also returned.
+
     Returns:
         A list of metadata dicts corresponding to the given exploration ids.
         Each dict has three keys:
@@ -228,7 +228,7 @@ def get_exploration_metadata_dicts(exploration_ids, editor_user_id=None):
         filtered_exploration_summaries.append(exploration_summary)
 
     return [
-        exp_domain.to_metadata_dict(summary)
+        summary.to_metadata_dict()
         for summary in filtered_exploration_summaries]
 
 
