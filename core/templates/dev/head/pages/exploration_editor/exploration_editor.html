@@ -1,5 +1,9 @@
 {% extends 'pages/base.html' %}
 
+{% block dynamic_title %}
+  <div ng-controller="DynamicTitleEditor"></div>
+{% endblock dynamic_title %}
+
 {% block header_js %}
   {{ super() }}
   <script type="text/javascript">
