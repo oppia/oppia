@@ -958,12 +958,12 @@ class CollectionNodeMetadataDictsTest(
         metadata_dicts = (summary_services.get_exploration_metadata_dicts(
             [self.EXP_ID5, self.EXP_ID4], self.bob_id))
 
-        expected_metadata_list = [{
+        expected_metadata_dicts = [{
             'id': self.EXP_ID4,
             'objective': u'An objective 4',
             'title': u'Exploration 4 Bob title',
         }]
-        self.assertEqual(expected_metadata_list, metadata_dicts)
+        self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
     def test_public_exps_of_another_user_are_returned(self):
         metadata_dicts = (summary_services.get_exploration_metadata_dicts(
@@ -1006,20 +1006,20 @@ class CollectionNodeMetadataDictsTest(
             summary_services.get_exp_metadata_dicts_matching_query(
                 'Exploration 1', None, self.albert_id))
 
-        expected_metadata_list = [{
+        expected_metadata_dicts = [{
             'id': self.EXP_ID1,
             'objective': u'An objective 1',
             'title': u'Exploration 1 Albert title',
         }]
-        self.assertEqual(expected_metadata_list, metadata_dicts)
+        self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
     def test_invalid_exp_ids(self):
         metadata_dicts = (summary_services.get_exploration_metadata_dicts(
             [self.EXP_ID3, self.INVALID_EXP_ID], self.albert_id))
 
-        expected_metadata_list = [{
+        expected_metadata_dicts = [{
             'id': self.EXP_ID3,
             'objective': u'An objective 3',
             'title': u'Exploration 3 Albert title',
         }]
-        self.assertEqual(expected_metadata_list, metadata_dicts)
+        self.assertEqual(expected_metadata_dicts, metadata_dicts)
