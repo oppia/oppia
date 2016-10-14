@@ -584,7 +584,7 @@ class BaseMapReduceJobManager(BaseJobManager):
 
 
 class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
-    _ENTITY_KINDS_PARAM = 'entity_kinds'
+    _ENTITY_KINDS_PARAM = MAPPER_PARAM_KEY_ENTITY_KINDS
     _READER_LIST_PARAM = 'readers'
 
     def __init__(self, reader_list):
@@ -609,18 +609,18 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
         params = mapper_spec.params
         entity_kinds = params.get(cls._ENTITY_KINDS_PARAM)
 
-        splits = []
+        readers_list = []
         for entity_kind in entity_kinds:
             new_mapper_spec = copy.deepcopy(mapper_spec)
             new_mapper_spec.params['entity_kind'] = entity_kind
-            splits.append(
+            readers_list.append(
                 input_readers.DatastoreInputReader.split_input(
                     new_mapper_spec))
 
         inputs = []
-        for split in splits:
-            for item in split:
-                inputs.append(MultipleDatastoreEntitiesInputReader(item))
+        for reader_list in readers_list:
+            for reader in reader_list:
+                inputs.append(MultipleDatastoreEntitiesInputReader(reader))
         return inputs
 
     @classmethod

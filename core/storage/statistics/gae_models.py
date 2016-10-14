@@ -868,7 +868,7 @@ class MigratedAnswerModel(base_models.BaseModel):
         model.put()
 
     @classmethod
-    def is_marked_as_migrated(cls, state_answer_log_model_item_id):
+    def has_started_being_migrated(cls, state_answer_log_model_item_id):
         model = cls.get(state_answer_log_model_item_id, strict=False)
         return model is not None
 

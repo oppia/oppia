@@ -1350,10 +1350,10 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def map(item):
         # If this answer bucket has already been migrated, skip it.
-        if stats_models.MigratedAnswerModel.is_marked_as_migrated(item.id):
+        if stats_models.MigratedAnswerModel.has_started_being_migrated(item.id):
             yield (
                 AnswerMigrationJob._ALREADY_MIGRATED_KEY,
-                'Encountered a submitted answer which has already been '
+                'Encountered a submitted answer bucket which has already been '
                 'migrated')
             return
 
@@ -1444,13 +1444,6 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             rule_str = value_dict['rule_str']
             last_updated = value_dict['last_updated']
 
-            # If this answer bucket has already been migrated, skip it.
-            if stats_models.MigratedAnswerModel.is_marked_as_migrated(item_id):
-                yield (
-                    'Encountered a submitted answer which has already been '
-                    'migrated (is this due to a shard retry?)')
-                return
-
             migration_errors = AnswerMigrationJob._migrate_answers(
                 item_id, explorations, exploration_id, state_name, item.answers,
                 rule_str, last_updated)
@@ -1468,11 +1461,27 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     @classmethod
     def _migrate_answers(cls, item_id, explorations, exploration_id, state_name,
                          answers, rule_str, last_updated):
+        # If this answer bucket has already been migrated, skip it.
+        if stats_models.MigratedAnswerModel.has_started_being_migrated(
+                item_id):
+            yield (
+                'Encountered a submitted answer bucket which has already been '
+                'migrated (is this due to a shard retry?)')
+            return
+
         # Begin migrating the answer bucket; this might fail due to some of the
         # answers failing to migrate or a major shard failure (such as due to an
         # out of memory error).
         stats_models.MigratedAnswerModel.start_migrating_answer_bucket(
             item_id, exploration_id, state_name)
+
+        if len(item_id) == 490 and item_id[-1] != ')':
+            # Mark the answer as migrated so it does not fail post-migration
+            # validation.
+            stats_models.MigratedAnswerModel.finish_migrating_answer(
+                item_id, exploration_id, -1, state_name)
+            yield 'Expected failure: Encountered truncated item ID.'
+            return
 
         migrated_answers = []
         matched_explorations = []
