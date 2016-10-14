@@ -824,7 +824,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 concat_with_previous = open_group_count != 0
 
             try:
-                param_list = [eval(param_str) for param_str in param_str_list]
+                param_list = [
+                    ast.literal_eval(param_str) for param_str in param_str_list]
                 for answer_group_index, answer_group in enumerate(
                         answer_groups):
                     rule_specs = answer_group.rule_specs
@@ -1043,7 +1044,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             'Equals', 'ContainsAtLeastOneOf', 'DoesNotContainAtLeastOneOf'
         ]
         if rule_spec.rule_type in supported_rule_types:
-            option_list = eval(answer_str)
+            option_list = ast.literal_eval(answer_str)
             if not isinstance(option_list, list):
                 return (
                     None,
@@ -1117,7 +1118,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     def _cb_reconstitute_math_expression_input(
             cls, state, answer_group_index, rule_spec, rule_str, answer_str):
         if rule_spec.rule_type == 'IsMathematicallyEquivalentTo':
-            math_expression_dict = eval(answer_str)
+            math_expression_dict = ast.literal_eval(answer_str)
             if not isinstance(math_expression_dict, dict):
                 return (
                     None,
@@ -1257,7 +1258,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 'reconstitute CodeEvaluation object: %s' % rule_spec.rule_type)
         # Luckily, Pencil Code answers stored the actual dict rather than just
         # the code; it's easier to reconstitute.
-        code_evaluation_dict = eval(answer_str)
+        code_evaluation_dict = ast.literal_eval(answer_str)
         if not isinstance(code_evaluation_dict, dict):
             return (None, 'Failed to recover pencil code: %s' % answer_str)
         return cls._normalize_raw_answer_object(
@@ -1276,7 +1277,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 'Unsupported rule type encountered while attempting to '
                 'reconstitute SetInput object: %s' % rule_spec.rule_type)
 
-        unicode_string_list = eval(answer_str)
+        unicode_string_list = ast.literal_eval(answer_str)
         if not isinstance(unicode_string_list, list):
             return (None, 'Failed to recover set: %s' % answer_str)
         return cls._normalize_raw_answer_object(
