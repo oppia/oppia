@@ -680,7 +680,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             return (list([
                 exp_services.get_exploration_from_model(exp_model)
                 for exp_model in exp_models_by_versions
-            ]), False)
+            ]), False, None)
         except utils.ExplorationConversionError as error:
             if 'Error: Can only convert rules with an \'answer\'' in str(error):
                 # Try to fix a failed migration due to a non-answer subject.
@@ -699,10 +699,10 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                         return (list([
                             exp_services.get_exploration_from_model(exp_model)
                             for exp_model in exp_models_by_versions
-                        ]), False)
+                        ]), False, None)
                     except utils.ExplorationConversionError as error:
-                        return (None, True)
-            return (None, True)
+                        return (None, True, error)
+            return (None, True, None)
 
     @classmethod
     def _get_all_exploration_versions(cls, exp_id):
@@ -722,16 +722,16 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         latest_exp_model = exp_models.ExplorationModel.get_by_id(exp_id)
         if not latest_exp_model:
             # The exploration may have been permanently deleted.
-            return []
+            return ([], None)
 
         versions = list(reversed(xrange(1, latest_exp_model.version + 1)))
         exp_models_by_versions = cls._get_exploration_models_by_versions(
             exp_id, versions)
         if not exp_models_by_versions:
-            return []
-        exps, failed_migration = cls._get_explorations_from_models(
-            exp_models_by_versions)
-        return None if failed_migration else exps
+            return ([], None)
+        exps, failed_migration, migration_error = (
+            cls._get_explorations_from_models(exp_models_by_versions))
+        return (None, migration_error) if failed_migration else (exps, None)
 
     # This function comes from extensions.answer_summarizers.models.
     @classmethod
@@ -1423,14 +1423,14 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
         # One major point of failure is the exploration not existing. Another
         # major point of failure comes from the time matching.
-        explorations = AnswerMigrationJob._get_all_exploration_versions(
-            exploration_id)
+        explorations, migration_error = (
+            AnswerMigrationJob._get_all_exploration_versions(exploration_id))
 
         if explorations is None:
             yield (
                 'Encountered exploration (exp ID: %s) which cannot be '
-                'converted to the latest states schema version. Cannot '
-                'recover.' % (exploration_id))
+                'converted to the latest states schema version. Error: %s '
+                'Cannot recover.' % (exploration_id, migration_error))
             return
         elif len(explorations) == 0:
             yield (
