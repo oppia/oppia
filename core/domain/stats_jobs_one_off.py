@@ -1263,7 +1263,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 'reconstitute CodeEvaluation object: %s' % rule_spec.rule_type)
         # Luckily, Pencil Code answers stored the actual dict rather than just
         # the code; it's easier to reconstitute.
-        code_evaluation_dict = eval(cls._get_plaintext(answer_str))
+        code_evaluation_dict = eval(answer_str)
         if not isinstance(code_evaluation_dict, dict):
             return (None, 'Failed to recover pencil code: %s' % answer_str)
         return cls._normalize_raw_answer_object(
