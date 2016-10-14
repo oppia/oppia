@@ -140,8 +140,9 @@ describe('Embedding', function() {
           var EMBEDDING_PREFIX = 'Embedding test: ';
           if (message.indexOf(EMBEDDING_PREFIX) !== -1) {
             var index = message.indexOf(EMBEDDING_PREFIX);
-            embeddingLogs.push(
-              message.substring(index + EMBEDDING_PREFIX.length));
+            // The "-1" in substring() removes the trailing quotation mark.
+            embeddingLogs.push(message.substring(
+              index + EMBEDDING_PREFIX.length, message.length - 1));
           }
         } catch (err) {}
       }
