@@ -79,8 +79,8 @@ class FeedbackThreadModel(base_models.BaseModel):
             exploration_id: str. The ID of the exploration.
 
         Returns:
-            thread_id: str. A thread ID that is different from the IDs of all the
-                existing threads within the given exploration.
+            thread_id: str. A thread ID that is different from the IDs of all
+                the existing threads within the given exploration.
 
         Raises:
            Exception: There were too many collisions with existing thread IDs
@@ -110,7 +110,8 @@ class FeedbackThreadModel(base_models.BaseModel):
 
     @property
     def thread_id(self):
-        """Returns the thread_id (not including the exploration_id) for this model instance.
+        """Returns the thread_id (not including the exploration_id) for this
+            model instance.
 
         Returns:
             str. thread_id for this model instance.
@@ -155,14 +156,15 @@ class FeedbackThreadModel(base_models.BaseModel):
 
     @classmethod
     def get_threads(cls, exploration_id, limit=feconf.DEFAULT_QUERY_LIMIT):
-        """Returns a list of threads associated to the exploration, ordered by
-            their last updated field. The number of entities fetched is limited by
-            the `limit` argument to this method, whose default value is equal to the
-                the default query limit.
+        """Returns a list of threads associated to the exploration, ordered
+            by their last updated field. The number of entities fetched is limited
+            by the `limit` argument to this method, whose default value is equal
+            to the the default query limit.
 
         Args:
             exploration_id: str.
-            limit: int. Default query limit which is set to feconf.DEFAULT_QUERY_LIMIT.
+            limit: int. Default query limit which is set to
+                feconf.DEFAULT_QUERY_LIMIT.
 
         Returns:
             List of threads, it does not include the deleted entries.
@@ -242,7 +244,7 @@ class FeedbackMessageModel(base_models.BaseModel):
     @classmethod
     def get(cls, exploration_id, thread_id, message_id, strict=True):
         """Gets the FeedbackMessageModel entry for the given ID. Raises error if
-               no undeleted messages are found and strict == True.
+            no undeleted messages are found and strict == True.
 
         Args:
             exploration_id: str. ID of the exploration
@@ -266,7 +268,7 @@ class FeedbackMessageModel(base_models.BaseModel):
     @classmethod
     def get_messages(cls, exploration_id, thread_id):
         """Returns an array of messages in the thread within the default
-               query limit. Doesn't include deleted messages.
+            query limit. Doesn't include deleted messages.
 
         Args:
             exploration_id: str. ID of the exploration.
@@ -302,7 +304,7 @@ class FeedbackMessageModel(base_models.BaseModel):
     @classmethod
     def get_message_count(cls, exploration_id, thread_id):
         """Returns the number of messages in the thread.Includes the
-               deleted entries.
+            deleted entries.
 
         Args:
             exploration_id: str. ID of exploration.
