@@ -157,9 +157,9 @@ class FeedbackThreadModel(base_models.BaseModel):
     @classmethod
     def get_threads(cls, exploration_id, limit=feconf.DEFAULT_QUERY_LIMIT):
         """Returns a list of threads associated to the exploration, ordered
-            by their last updated field. The number of entities fetched is limited
-            by the `limit` argument to this method, whose default value is equal
-            to the the default query limit.
+            by their last updated field. The number of entities fetched is
+            limited by the `limit` argument to this method, whose default
+            value is equal to the the default query limit.
 
         Args:
             exploration_id: str.
