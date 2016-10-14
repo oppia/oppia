@@ -511,9 +511,11 @@ class AnswerMigrationCleanupJob(jobs.BaseMapReduceJobManager):
     def map(item):
         if not item.finished_migration:
             for exp_version in item.exploration_versions:
-                for state_answer_model in (
-                        stats_models.StateAnswersModel.get_all_models(
-                            item.exploration_id, exp_version, item.state_name)):
+                all_models = stats_models.StateAnswersModel.get_all_models(
+                    item.exploration_id, exp_version, item.state_name)
+                if not all_models:
+                    continue
+                for state_answer_model in all_models:
                     state_answer_model.delete()
                     yield (
                         AnswerMigrationCleanupJob._TOTAL_ANSWERS_REMOVED_KEY, 1)
@@ -854,14 +856,6 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             return exp_domain.EXPLICIT_CLASSIFICATION
 
     @classmethod
-    def _get_plaintext(cls, str_value):
-        # TODO(bhenning): Convert HTML to plaintext (should just involve
-        # stripping <p> tags).
-        if '<' in str_value or '>' in str_value:
-            return None
-        return str_value
-
-    @classmethod
     def _normalize_raw_answer_object(
             cls, answer_object, raw_answer, answer_str):
         try:
@@ -897,7 +891,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # TODO(bhenning): Should something more significant (like None) be used
         # for sentinel values for output/evaluation/error instead?
         if rule_spec.rule_type == 'OutputEquals':
-            code_output = cls._get_plaintext(rule_spec.inputs['x'])
+            code_output = rule_spec.inputs['x']
             if not answer_str:
                 return (None, 'Failed to recover code: %s' % answer_str)
             code_evaluation_dict = {
@@ -1245,7 +1239,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 None,
                 'Unsupported rule type encountered while attempting to '
                 'reconstitute NumericInput object: %s' % rule_spec.rule_type)
-        input_value = float(cls._get_plaintext(answer_str))
+        input_value = float(answer_str)
         return cls._normalize_raw_answer_object(
             objects.Real, input_value, answer_str)
 
