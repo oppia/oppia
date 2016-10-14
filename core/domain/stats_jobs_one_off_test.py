@@ -385,7 +385,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         state_answers = self._get_state_answers(state_name)
         self.assertEqual(len(state_answers.submitted_answer_list), 3)
         self.assertEqual(job_output, [
-            'Encountered a submitted answer which has already been migrated'])
+            'Encountered a submitted answer bucket which has already been '
+            'migrated'])
         self._verify_no_migration_validation_problems()
 
     def test_migration_results_can_be_validated(self):
@@ -1702,12 +1703,20 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
 
         # The first job run has a failure which leads to retrying the shard.
         # Swap out random.randint() so that all of the answers are handled by
-        # the same reduce() function.
+        # the same reduce() function. Note that the reduce is trying multiple
+        # answer buckets, so there are multiple retry errors that are emitted
+        # from the job.
         job_output = self._run_migration_job_internal(
             fail_predicate=fail_predicate, retry_count=1)
-        self.assertEqual(job_output, [
-            'Encountered a submitted answer which has already been migrated '
-            '(is this due to a shard retry?)'])
+        self.assertEqual(len(job_output), 2)
+        self.assertIn(
+            'Encountered a submitted answer bucket which has already been '
+            'migrated (is this due to a shard retry?)', job_output[0])
+        self.assertIn(rule_spec_str1, job_output[0])
+        self.assertIn(
+            'Encountered a submitted answer bucket which has already been '
+            'migrated (is this due to a shard retry?)', job_output[1])
+        self.assertIn(rule_spec_str0, job_output[1])
 
         # The first answer submissions should have been properly migrated, since
         # the shard failure happened later on. The answers matched to the
@@ -1773,7 +1782,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # Run the job again. Some answers do not need to be re-migrated.
         job_output = self._run_migration_job()
         self.assertEqual(job_output, [
-            'Encountered a submitted answer which has already been migrated'])
+            'Encountered a submitted answer bucket which has already been '
+            'migrated'])
 
         # All answers should now be properly migrated.
         state_answers = self._get_state_answers(
