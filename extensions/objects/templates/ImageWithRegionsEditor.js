@@ -130,8 +130,8 @@ oppia.directive('imageWithRegionsEditor', [
           if (newVal !== '') {
             // Loads the image in hanging <img> tag so as to get the
             // width and height
-            $('<img/>').attr('src', $scope.getPreviewUrl(newVal)).load(
-              function() {
+            $('<img/>').attr('src', $scope.getPreviewUrl(newVal)).on(
+              'load', function() {
                 $scope.originalImageWidth = this.width;
                 $scope.originalImageHeight = this.height;
                 $scope.$apply();
