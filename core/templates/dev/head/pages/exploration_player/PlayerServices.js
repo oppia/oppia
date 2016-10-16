@@ -271,7 +271,11 @@ oppia.factory('oppiaPlayerService', [
               classificationResult.ruleSpecIndex);
           }
 
-          var outcome = classificationResult.outcome;
+          // Use Object.assign to clone the object
+          // since classificationResult.outcome points
+          // at oldState.interaction.default_outcome
+          var outcome = Object.assign({}, classificationResult.outcome);
+
           // If this is a return to the same state, and the resubmission trigger
           // kicks in, replace the dest, feedback and param changes with that
           // of the trigger.
@@ -295,6 +299,7 @@ oppia.factory('oppiaPlayerService', [
           // Compute the data for the next state.
           var oldParams = LearnerParamsService.getAllParams();
           oldParams.answer = answer;
+
           var feedbackHtml = makeFeedback(outcome.feedback, [oldParams]);
           if (feedbackHtml === null) {
             answerIsBeingProcessed = false;
