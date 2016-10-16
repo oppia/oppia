@@ -78,5 +78,13 @@ var reloadExploration = function(name) {
   });
 };
 
+var reloadAllExplorations = function() {
+  browser.get(general.ADMIN_URL_SUFFIX);
+  element(by.css('.protractor-test-reload-all-explorations-button')).click();
+  browser.driver.switchTo().alert().accept();
+  browser.waitForAngular();
+};
+
 exports.editConfigProperty = editConfigProperty;
 exports.reloadExploration = reloadExploration;
+exports.reloadAllExplorations = reloadAllExplorations;

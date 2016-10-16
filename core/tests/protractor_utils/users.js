@@ -82,10 +82,16 @@ var createAdmin = function(email, username) {
   logout();
 };
 
+var createAndLoginAdminUser = function(email, username) {
+  login(email, true);
+  _completeSignup(username);
+};
+
 exports.login = login;
 exports.logout = logout;
 exports.createUser = createUser;
 exports.createAndLoginUser = createAndLoginUser;
 exports.createModerator = createModerator;
 exports.createAdmin = createAdmin;
+exports.createAndLoginAdminUser = createAndLoginAdminUser;
 

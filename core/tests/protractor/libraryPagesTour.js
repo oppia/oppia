@@ -1,0 +1,76 @@
+// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview End-to-end tests to check for console errors in
+ * library related pages
+ */
+
+var general = require('../protractor_utils/general.js');
+var admin = require('../protractor_utils/admin.js');
+var library = require('../protractor_utils/library.js');
+var player = require('../protractor_utils/player.js');
+var users = require('../protractor_utils/users.js');
+
+describe('Library pages tour', function() {
+  var EXPLORATION_TITLE = 'About Oppia';
+  var EXPLORATION_RATING = 4;
+  var SEARCH_TERM = 'python';
+  var visitLibraryPage = function() {
+    browser.get(general.LIBRARY_URL_SUFFIX);
+  };
+
+  it('adds a rating to an existing exploration', function() {
+    users.createAndLoginAdminUser('randomuser@gmail.com', 'r4nd0m');
+    var profileDropdown = element(by.css('.protractor-test-profile-dropdown'));
+    browser.actions().mouseMove(profileDropdown).perform();
+    profileDropdown.element(by.css('.protractor-test-admin-link')).click();
+    admin.reloadAllExplorations();
+
+    visitLibraryPage();
+    element(by.css('.protractor-test-gallery-recently-published')).click();
+    library.playExploration(EXPLORATION_TITLE);
+
+    // Play through the exploration
+    player.submitAnswer('Continue');
+    element.all(by.css('.protractor-test-multiple-choice-option'))
+      .last().click();
+    player.submitAnswer('Continue');
+
+    player.rateExploration(EXPLORATION_RATING);
+  });
+
+  it('visits the library index page', function() {
+    visitLibraryPage();
+  });
+
+  it('visits the top rated page', function() {
+    visitLibraryPage();
+    element(by.css('.protractor-test-gallery-top-rated')).click();
+  });
+
+  it('visits the recent explorations page', function() {
+    visitLibraryPage();
+    element(by.css('.protractor-test-gallery-recently-published')).click();
+  });
+
+  it('visits the search page', function() {
+    visitLibraryPage();
+    element(by.css('.protractor-test-search-input')).sendKeys(SEARCH_TERM);
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
+  });
+});

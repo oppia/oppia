@@ -53,6 +53,14 @@ oppia.controller('Library', [
     // Keeps track of the index of the left-most visible card of each group.
     $scope.leftmostCardIndices = [];
 
+    $scope.pageType = function(pageName) {
+      if (/top_rated$/.test(pageName)) {
+        return 'top_rated';
+      } else if (/recently_published$/.test(pageName)) {
+        return 'recently_published';
+      }
+    };
+
     if ($scope.pageMode === LIBRARY_PAGE_MODES.GROUP) {
       var pathnameArray = $window.location.pathname.split('/');
       $scope.groupName = pathnameArray[2];
