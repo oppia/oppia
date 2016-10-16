@@ -16,7 +16,6 @@
 
 import ast
 import collections
-import contextlib
 import datetime
 import itertools
 import os
@@ -644,8 +643,10 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                     param_changes = (
                         rule_spec_dict['param_changes']
                         if 'param_changes' in rule_spec_dict else [])
-                    if (AnswerMigrationJob._TEMPORARY_SPECIAL_RULE_PARAMETER in
-                            param_changes):
+                    special_rule_param = (
+                        AnswerMigrationJob._TEMPORARY_SPECIAL_RULE_PARAMETER)
+                    if any(param_change for param_change in param_changes
+                           if param_change['name'] == special_rule_param):
                         continue
                     if ('subject' in definition_dict and
                             definition_dict['subject'] != 'answer'):
@@ -661,18 +662,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                             }
                         })
                         definition_dict['subject'] = 'answer'
-
-    @classmethod
-    @contextlib.contextmanager
-    def _swap(cls, obj, attr, newvalue):
-        """Copied from test_utils.swap()."""
-
-        original = getattr(obj, attr)
-        setattr(obj, attr, newvalue)
-        try:
-            yield
-        finally:
-            setattr(obj, attr, original)
+        return states_dict
 
     @classmethod
     def _get_explorations_from_models(cls, exp_models_by_versions):
@@ -684,24 +674,16 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         except utils.ExplorationConversionError as error:
             if 'Error: Can only convert rules with an \'answer\'' in str(error):
                 # Try to fix a failed migration due to a non-answer subject.
-                convert_v0_to_v1 = (
-                    exp_domain.Exploration._convert_states_v0_dict_to_v1_dict)
-                def proxy_convert(_, states_dict):
-                    states_dict = convert_v0_to_v1(states_dict)
-                    cls._force_rule_spec_subjects_to_answer(states_dict)
-                    return states_dict
-
-                with cls._swap(
-                        exp_domain.Exploration,
-                        '_convert_states_v0_dict_to_v1_dict',
-                        classmethod(proxy_convert)):
-                    try:
-                        return (list([
-                            exp_services.get_exploration_from_model(exp_model)
-                            for exp_model in exp_models_by_versions
-                        ]), False, None)
-                    except utils.ExplorationConversionError as error:
-                        return (None, True, error)
+                try:
+                    return (list([
+                        exp_services.get_exploration_from_model(
+                            exp_model,
+                            pre_v4_states_conversion_func=(
+                                cls._force_rule_spec_subjects_to_answer))
+                        for exp_model in exp_models_by_versions
+                    ]), False, None)
+                except utils.ExplorationConversionError as error:
+                    return (None, True, error)
             return (None, True, None)
 
     @classmethod
