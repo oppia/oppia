@@ -359,88 +359,127 @@ class AnswersAudit2(jobs.BaseMapReduceJobManager):
 
 class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
 
-    _MATCHED_RULE_TYPE = 'ResultsInError()'
     _KEY_PRINT_TOTAL_COUNT = 'print_total_count'
+    _OLD_ANSWER_MODEL_TYPE = 'StateRuleAnswerLogModel'
+    _NEW_ANSWER_MODEL_TYPE = 'StateAnswersModel'
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [stats_models.StateRuleAnswerLogModel]
+        return [
+            stats_models.StateRuleAnswerLogModel, stats_models.StateAnswersModel
+        ]
 
     @staticmethod
     def map(item):
-        item_id = item.id
+        if isinstance(item, stats_models.StateRuleAnswerLogModel):
+            item_id = item.id
 
-        period_idx = item_id.index('.')
-        exp_id = item_id[:period_idx]
+            period_idx = item_id.index('.')
+            exp_id = item_id[:period_idx]
 
-        item_id = item_id[period_idx+1:]
-        handler_period_idx = item_id.index('submit') - 1
-        state_name = item_id[:handler_period_idx]
+            item_id = item_id[period_idx+1:]
+            handler_period_idx = item_id.index('submit') - 1
+            state_name = item_id[:handler_period_idx]
 
-        item_id = item_id[handler_period_idx+1:]
-        period_idx = item_id.index('.')
-        handler_name = item_id[:period_idx]
+            item_id = item_id[handler_period_idx+1:]
+            period_idx = item_id.index('.')
+            handler_name = item_id[:period_idx]
 
-        item_id = item_id[period_idx+1:]
-        rule_str = item_id
+            item_id = item_id[period_idx+1:]
+            rule_str = item_id
 
-        answers = item.answers
-        total_submission_count = 0
-        for _, count in answers.iteritems():
-            total_submission_count = total_submission_count + count
+            if '(' in rule_str:
+                rule_name = rule_str[:rule_str.index('(')]
+            else:
+                rule_name = rule_str
 
-        if rule_str == RuleTypeBreakdownAudit._MATCHED_RULE_TYPE:
-            yield (exp_id, { 'frequency': total_submission_count })
-            yield (RuleTypeBreakdownAudit._KEY_PRINT_TOTAL_COUNT, {
-                'frequency': total_submission_count
+            answers = item.answers
+            total_submission_count = 0
+            for _, count in answers.iteritems():
+                total_submission_count = total_submission_count + count
+
+            yield ('%s-%s' % (exp_id, rule_name), {
+                'frequency': total_submission_count,
+                'type': RuleTypeBreakdownAudit._OLD_ANSWER_MODEL_TYPE,
+                'exploration_id': exp_id,
+                'rule_name': rule_name
             })
-
-    @staticmethod
-    def reduce(key, stringified_values):
-        total_count = 0
-        for value_str in stringified_values:
-            value_dict = ast.literal_eval(value_str)
-            total_count = total_count + value_dict['frequency']
-
-        if key == RuleTypeBreakdownAudit._KEY_PRINT_TOTAL_COUNT:
-            yield 'Matching against rule type: %s (total answer count: %d)' % (
-                RuleTypeBreakdownAudit._MATCHED_RULE_TYPE, total_count)
+            aggregation_key = '%s-%s' % (
+                RuleTypeBreakdownAudit._KEY_PRINT_TOTAL_COUNT, rule_name)
+            yield (aggregation_key, {
+                'frequency': total_submission_count,
+                'type': RuleTypeBreakdownAudit._OLD_ANSWER_MODEL_TYPE,
+                'rule_name': rule_name
+            })
         else:
-            yield '%s has %s submitted answers' % (key, total_count)
-
-
-class RuleTypeBreakdownAudit2(jobs.BaseMapReduceJobManager):
-
-    _MATCHED_RULE_TYPE = 'ResultsInError()'
-    _KEY_PRINT_TOTAL_COUNT = 'print_total_count'
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [stats_models.StateAnswersModel]
-
-    @staticmethod
-    def map(item):
-        # Answers need to be collected one at a time in the new data store
-        for answer in item.submitted_answer_list:
-            rule_str = answer['rule_spec_str']
-            if rule_str == RuleTypeBreakdownAudit._MATCHED_RULE_TYPE:
-                yield (item.exploration_id, { 'frequency': 1 })
-                yield (RuleTypeBreakdownAudit._KEY_PRINT_TOTAL_COUNT, {
-                    'frequency': 1
+            # Answers need to be collected one at a time in the new data store
+            for answer in item.submitted_answer_list:
+                rule_str = answer['rule_spec_str']
+                if '(' in rule_str:
+                    rule_name = rule_str[:rule_str.index('(')]
+                else:
+                    rule_name = rule_str
+                yield ('%s-%s' % (item.exploration_id, rule_name), {
+                    'frequency': 1,
+                    'type': RuleTypeBreakdownAudit._NEW_ANSWER_MODEL_TYPE,
+                    'exploration_id': item.exploration_id,
+                    'rule_name': rule_name
+                })
+                aggregation_key = '%s-%s' % (
+                    RuleTypeBreakdownAudit._KEY_PRINT_TOTAL_COUNT, rule_name)
+                yield (aggregation_key, {
+                    'frequency': 1,
+                    'type': RuleTypeBreakdownAudit._NEW_ANSWER_MODEL_TYPE,
+                    'rule_name': rule_name
                 })
 
     @staticmethod
     def reduce(key, stringified_values):
-        total_count = 0
+        value_dict_list = [
+            ast.literal_eval(stringified_value)
+            for stringified_value in stringified_values]
+
+        # The first dict can be used to extract exploration_id and rule_name
+        # since they will be the same for all results managed by this call to
+        # reduce(). Note that the exploration_id is only available for
+        # non-aggregation results.
+        first_value_dict = value_dict_list[0]
+        rule_name = first_value_dict['rule_name']
+
+        old_total_count = 0
+        new_total_count = 0
         for value_str in stringified_values:
             value_dict = ast.literal_eval(value_str)
-            total_count = total_count + value_dict['frequency']
+            if value_dict['type'] == (
+                    RuleTypeBreakdownAudit._OLD_ANSWER_MODEL_TYPE):
+                old_total_count = old_total_count + value_dict['frequency']
+            else:
+                new_total_count = new_total_count + value_dict['frequency']
 
-        if key == RuleTypeBreakdownAudit._KEY_PRINT_TOTAL_COUNT:
-            yield 'Matching against rule type: %s (total answer count: %d)' % (
-                RuleTypeBreakdownAudit._MATCHED_RULE_TYPE, total_count)
+        if key.startswith(RuleTypeBreakdownAudit._KEY_PRINT_TOTAL_COUNT):
+            if old_total_count != new_total_count:
+                over_migrated = new_total_count > old_total_count
+                yield (
+                    '%s aggregation: old data model has %d answers submitted '
+                    'and new data model only has %d answers submitted (%d '
+                    'answers %s)' % (
+                        rule_name, old_total_count, new_total_count,
+                        abs(new_total_count - old_total_count),
+                        'over migrated' if over_migrated else 'missing'))
         else:
-            yield '%s has %s submitted answers' % (key, total_count)
+            # Only output the exploration ID if the counts differ to avoid
+            # large amounts of output.
+            if old_total_count != new_total_count:
+                exp_id = first_value_dict['exploration_id']
+                yield (
+                    '%s: %s has %d submitted answers in the old model and %d in '
+                    'the new model' % (
+                        rule_name, exp_id, old_total_count, new_total_count))
+            else:
+                # This output will be aggregated and acts as a sanity check.
+                yield (
+                    '%s: Exploration has the same number of answers in both '
+                    'models' % rule_name)
 
 
 class ClearMigratedAnswersJob(jobs.BaseMapReduceJobManager):
