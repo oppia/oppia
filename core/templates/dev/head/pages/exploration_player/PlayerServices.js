@@ -271,7 +271,7 @@ oppia.factory('oppiaPlayerService', [
               classificationResult.ruleSpecIndex);
           }
 
-          // Use Object.assign to clone the object
+          // Use angular.copy() to clone the object
           // since classificationResult.outcome points
           // at oldState.interaction.default_outcome
           var outcome = angular.copy(classificationResult.outcome);
