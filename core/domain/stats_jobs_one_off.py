@@ -625,10 +625,10 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 for version in versions]
             exp_models_by_versions = [
                 exp_models.ExplorationModel(id=exp_id) for _ in versions]
-            return exp_models.ExplorationModel._reconstitute_multi_from_models(
-                zip(snapshot_ids, exp_models_by_versions))
-        except Exception:
-            return None
+            return (exp_models.ExplorationModel._reconstitute_multi_from_models(
+                zip(snapshot_ids, exp_models_by_versions)), None)
+        except Exception as error:
+            return (None, error)
 
     @classmethod
     def _force_rule_spec_subjects_to_answer(cls, states_dict):
@@ -684,10 +684,10 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                     ]), False, None)
                 except utils.ExplorationConversionError as error:
                     return (None, True, error)
-            return (None, True, None)
+            return (None, True, error)
 
     @classmethod
-    def _get_all_exploration_versions(cls, exp_id):
+    def _get_all_exploration_versions(cls, exp_id, max_version):
         """Return all exploration versions for the given exploration ID in
         descending order by version, or an empty list if none could be found
         (such as if the exploration was permanently deleted). This function can
@@ -699,18 +699,11 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # not a lot that can be done about this since it's not possible to
         # demultiplex the stream of answers and identify which session they are
         # associated with.
-
-        # Use get_by_id so that deleted explorations may be retrieved.
-        latest_exp_model = exp_models.ExplorationModel.get_by_id(exp_id)
-        if not latest_exp_model:
-            # The exploration may have been permanently deleted.
-            return ([], None)
-
-        versions = list(reversed(xrange(1, latest_exp_model.version + 1)))
-        exp_models_by_versions = cls._get_exploration_models_by_versions(
-            exp_id, versions)
+        versions = list(reversed(xrange(1, max_version + 1)))
+        exp_models_by_versions, migration_error = (
+            cls._get_exploration_models_by_versions(exp_id, versions))
         if not exp_models_by_versions:
-            return ([], None)
+            return ([], migration_error)
         exps, failed_migration, migration_error = (
             cls._get_explorations_from_models(exp_models_by_versions))
         return (None, migration_error) if failed_migration else (exps, None)
@@ -1370,14 +1363,29 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 AnswerMigrationJob._ERROR_KEY,
                 'Encountered submitted answer without the standard \'submit\' '
                 'handler: %s' % item.id)
+            return
+
+        # Use get_by_id so that deleted explorations may be retrieved.
+        latest_exp_model = exp_models.ExplorationModel.get_by_id(exp_id)
+        if not latest_exp_model:
+            yield (
+                AnswerMigrationJob._ERROR_KEY,
+                'Exploration referenced by answer bucket is permanently '
+                'missing: %s. Continuing with missing exploration and '
+                'state.' % item.id)
+            max_version = 0
+        else:
+            max_version = latest_exp_model.version
 
         # Split up the answers across multiple shards (10) so that they may be
         # more randomly distributed.
         random.seed('%s.%s.%s' % (
             item.id, datetime.datetime.utcnow(), os.urandom(64)))
-        yield ('%s.%s.%s' % (exp_id, state_name, random.randint(0, 9)), {
+        entropy = random.randint(0, 9)
+        yield ('%s.%s.%s.%s' % (exp_id, max_version, state_name, entropy), {
             'item_id': item.id,
             'exploration_id': exp_id,
+            'exploration_max_version': max_version,
             'state_name': state_name,
             'rule_str': rule_str,
             'last_updated': item.last_updated
@@ -1402,24 +1410,31 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # condition since the order of value_dict_list is not deterministic.
         first_value_dict = value_dict_list[0]
         exploration_id = first_value_dict['exploration_id']
+        max_version = int(first_value_dict['exploration_max_version'])
         state_name = first_value_dict['state_name'].decode('utf-8')
 
         # One major point of failure is the exploration not existing. Another
         # major point of failure comes from the time matching.
-        explorations, migration_error = (
-            AnswerMigrationJob._get_all_exploration_versions(exploration_id))
+        if max_version > 0:
+            explorations, migration_error = (
+                AnswerMigrationJob._get_all_exploration_versions(
+                    exploration_id, max_version))
 
-        if explorations is None:
-            yield (
-                'Encountered exploration (exp ID: %s) which cannot be '
-                'converted to the latest states schema version. Error: %s '
-                'Cannot recover.' % (exploration_id, migration_error))
-            return
-        elif len(explorations) == 0:
-            yield (
-                'Encountered permanently missing exploration referenced to by '
-                'submitted answers. Migrating with missing exploration and '
-                'state.')
+            if explorations is None:
+                yield (
+                    'Encountered exploration (exp ID: %s) which cannot be '
+                    'converted to the latest states schema version. Error: %s '
+                    'Cannot recover.' % (exploration_id, migration_error))
+                return
+            elif len(explorations) == 0:
+                yield (
+                    'Failed to retrieve history for exploration %s due to '
+                    'error: %s. Migrating with missing exploration and '
+                    'state.' % (exploration_id, migration_error))
+        else:
+            # Continue with no explorations since the exploration could not be
+            # retrieved during map().
+            explorations = []
 
         for value_dict in value_dict_list:
             item_id = value_dict['item_id']

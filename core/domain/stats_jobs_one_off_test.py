@@ -300,9 +300,10 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_str': html_answer
         }])
 
-        self.assertEqual(job_output, [
-            'Encountered permanently missing exploration referenced to by '
-            'submitted answers. Migrating with missing exploration and state.'])
+        self.assertEqual(len(job_output), 1)
+        self.assertIn(
+            'Exploration referenced by answer bucket is permanently missing',
+            job_output[0])
         self._verify_no_migration_validation_problems()
 
     def test_rule_parameter_evaluation_with_invalid_characters(self):
