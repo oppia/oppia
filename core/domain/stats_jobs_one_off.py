@@ -25,10 +25,12 @@ import re
 from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import interaction_registry
 from core.domain import stats_jobs_continuous
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.platform import models
+from extensions.interactions import base
 from extensions.objects.models import objects
 
 import feconf
@@ -652,6 +654,56 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     # to be reconstituted.
     _NOTE_DURATION_FRACTION_PART = 1
 
+    # A modern version of
+    # https://github.com/oppia/oppia/blob/94df0f/extensions/widgets/interactive/FileReadInput/FileReadInput.py.
+    class FileReadInput(base.BaseInteraction):
+        """Interaction for uploading a file."""
+
+        name = 'File upload'
+        description = 'A widget for uploading files.'
+        display_mode = base.DISPLAY_MODE_INLINE
+        _dependency_ids = []
+        answer_type = 'UnicodeString'
+        instructions = None
+        narrow_instructions = None
+        needs_summary = False
+        _customization_arg_specs = []
+
+    # A modern version of
+    # https://github.com/oppia/oppia/blob/94df0f/extensions/widgets/interactive/TarFileReadInput/TarFileReadInput.py.
+    class TarFileReadInput(base.BaseInteraction):
+        """Interaction for uploading a file."""
+
+        name = 'Tar file upload'
+        description = 'A widget for uploading tar files.'
+        display_mode = base.DISPLAY_MODE_INLINE
+        _dependency_ids = []
+        answer_type = 'TarFileString'
+        instructions = None
+        narrow_instructions = None
+        needs_summary = False
+        _customization_arg_specs = []
+
+    @classmethod
+    def _ensure_removed_interactions_are_in_registry(cls):
+        """Checks if the FileReadInput or TarFileReadInput deleted interactions
+        are present in the interaction_registry. If they are not, placeholder
+        versions of them will be injected for the purposes of migrating answers
+        from explorations that used to contain them.
+        """
+        interactions = interaction_registry.Registry.get_all_interactions()
+        interaction_names = [
+            type(interaction).__name__ for interaction in interactions]
+        if 'FileReadInput' not in interaction_names:
+            interaction_registry.Registry._interactions['FileReadInput'] = (
+                cls.FileReadInput())
+        if 'TarFileReadInput' not in interaction_names:
+            interaction_registry.Registry._interactions['TarFileReadInput'] = (
+                cls.TarFileReadInput())
+
+        interaction_registry.Registry.get_interaction_by_id('FileReadInput')
+        interaction_registry.Registry.get_interaction_by_id('TarFileReadInput')
+
     @classmethod
     def _get_exploration_models_by_versions(cls, exp_id, versions):
         """Similar to VersionedModel.get_version(), except this allows retrieval
@@ -705,6 +757,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _get_explorations_from_models(cls, exp_models_by_versions):
+        cls._ensure_removed_interactions_are_in_registry()
         try:
             return (list([
                 exp_services.get_exploration_from_model(exp_model)
@@ -1182,12 +1235,26 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                         'choices in the exploration: %s (len=%d)' % (
                             clicked_index, choices, len(choices)))
                 if answer_str != choices[clicked_index]:
-                    return (
-                        None,
-                        'Clicked index %d and submitted answer \'%s\' does not '
-                        'match corresponding choice in the exploration: '
-                        '\'%s\'' % (
-                            clicked_index, answer_str, choices[clicked_index]))
+                    rte_latex_start= (
+                        '<oppia-noninteractive-math '
+                        'raw_latex-with-value="&amp;quot;')
+                    rte_latex_end = '&amp;quot;"></oppia-noninteractive-math>'
+                    expected_answer = choices[clicked_index]
+                    if (not answer_str.startswith('$') or
+                            not answer_str.endswith('$') or
+                            not expected_answer.startswith(rte_latex_start) or
+                            not expected_answer.endswith(rte_latex_end)):
+                        stripped_answer_str = answer_str[1:-1]
+                        stripped_expected_answer = expected_answer[
+                            len(rte_latex_start):-len(rte_latex_end)]
+                        if stripped_answer_str != stripped_expected_answer:
+                            return (
+                                None,
+                                'Clicked index %d and submitted answer \'%s\' '
+                                'does not match corresponding choice in the '
+                                'exploration: \'%s\'' % (
+                                    clicked_index, answer_str,
+                                    choices[clicked_index]))
             return cls._normalize_raw_answer_object(
                 objects.NonnegativeInt, clicked_index, answer_str)
         return (
@@ -1508,7 +1575,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         if len(item_id) == 490 and item_id[-1] != ')':
             # Mark the answer as migrated so it does not fail post-migration
             # validation.
-            yield 'Encountered truncated item ID: %s' % item_id
+            yield 'Encountered truncated item ID'
             return
 
         # Begin migrating the answer bucket; this might fail due to some of the
