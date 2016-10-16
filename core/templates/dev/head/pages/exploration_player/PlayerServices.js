@@ -274,7 +274,7 @@ oppia.factory('oppiaPlayerService', [
           // Use Object.assign to clone the object
           // since classificationResult.outcome points
           // at oldState.interaction.default_outcome
-          var outcome = Object.assign({}, classificationResult.outcome);
+          var outcome = angular.copy(classificationResult.outcome);
 
           // If this is a return to the same state, and the resubmission trigger
           // kicks in, replace the dest, feedback and param changes with that
