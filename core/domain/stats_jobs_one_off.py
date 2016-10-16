@@ -1410,8 +1410,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             yield (
                 AnswerMigrationJob._ERROR_KEY,
                 'Exploration referenced by answer bucket is permanently '
-                'missing: %s. Continuing with missing exploration and '
-                'state.' % item.id)
+                'missing. Continuing with missing exploration and state.')
             max_version = 0
         else:
             max_version = latest_exp_model.version
@@ -1506,19 +1505,17 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 'migrated (is this due to a shard retry?)')
             return
 
+        if len(item_id) == 490 and item_id[-1] != ')':
+            # Mark the answer as migrated so it does not fail post-migration
+            # validation.
+            yield 'Encountered truncated item ID: %s' % item_id
+            return
+
         # Begin migrating the answer bucket; this might fail due to some of the
         # answers failing to migrate or a major shard failure (such as due to an
         # out of memory error).
         stats_models.MigratedAnswerModel.start_migrating_answer_bucket(
             item_id, exploration_id, state_name)
-
-        if len(item_id) == 490 and item_id[-1] != ')':
-            # Mark the answer as migrated so it does not fail post-migration
-            # validation.
-            stats_models.MigratedAnswerModel.finish_migrating_answer(
-                item_id, exploration_id, -1, state_name)
-            yield 'Expected failure: Encountered truncated item ID.'
-            return
 
         migrated_answers = []
         matched_explorations = []
@@ -1564,6 +1561,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 # validation.
                 stats_models.MigratedAnswerModel.finish_migrating_answer(
                     item_id, exploration_id, -1, state_name)
+                stats_models.MigratedAnswerModel.finish_migration_answer_bucket(
+                    item_id)
             else:
                 yield error
 
