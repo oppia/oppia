@@ -262,7 +262,6 @@ oppia.factory('oppiaPlayerService', [
         AnswerClassificationService.getMatchingClassificationResult(
           _explorationId, oldState, answer, false, interactionRulesService
         ).then(function(classificationResult) {
-
           if (!_editorPreviewMode) {
             StatsReportingService.recordAnswerSubmitted(
               playerTranscriptService.getLastStateName(),
@@ -273,7 +272,8 @@ oppia.factory('oppiaPlayerService', [
           }
 
           // Use Object.assign to clone the object
-          // since classificationResult.outcome points at oldState.interaction.default_outcome
+          // since classificationResult.outcome points
+          // at oldState.interaction.default_outcome
           var outcome = Object.assign({}, classificationResult.outcome);
 
           // If this is a return to the same state, and the resubmission trigger
