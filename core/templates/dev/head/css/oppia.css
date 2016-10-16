@@ -2812,9 +2812,9 @@ div#ng-curtain {
 }
 
 .oppia-notification-content {
+  color: black;
   display: inline-block;
   float: left;
-  color: black;
 }
 
 .oppia-notification-last-updated {
