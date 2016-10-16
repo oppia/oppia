@@ -2813,26 +2813,8 @@ div#ng-curtain {
 
 .oppia-notification-content {
   display: inline-block;
-  padding-left: 25px;
   float: left;
-}
-
-.oppia-notification-clickable {
-  height: 100%;
-  left: 0;
-  position: absolute;
-  top: 0;
-  width: 100%;
-}
-
-.oppia-notification-type {
-  position: relative;
-  top: 6px;
-}
-
-.oppia-notification-type i {
   color: black;
-  margin-left: 5px;
 }
 
 .oppia-notification-last-updated {
