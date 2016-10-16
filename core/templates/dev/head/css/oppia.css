@@ -3590,10 +3590,13 @@ md-card.preview-conversation-skin-supplemental-card {
     text-decoration: underline;
 }
 
-.oppia-dashboard-list-summary {
-  color: inherit !important;
+.oppia-dashboard-container .oppia-dashboard-list-summary,
+.oppia-dashboard-container .oppia-dashboard-list-summary:hover,
+.oppia-dashboard-container .oppia-dashboard-list-summary:active,
+.oppia-dashboard-container .oppia-dashboard-list-summary:visited {
+  color: inherit;
   display: block;
-  text-decoration: none !important;
+  text-decoration: none;
 }
 
 .oppia-activity-summary-tile:hover {
