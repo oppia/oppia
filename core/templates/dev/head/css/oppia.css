@@ -4345,6 +4345,10 @@ md-card.preview-conversation-skin-supplemental-card {
   .oppia-about-extra-info {
     height: 400px;
   }
+
+  .oppia-about-three-cols-layout {
+    width: 100%;
+  }
 }
 
 .oppia-save-exploration-wide-modal .modal-dialog {
