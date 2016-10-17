@@ -58,7 +58,7 @@
           ng-attr-y1="<[graph.vertices[edge.src].y]>"
           ng-attr-x2="<[graph.vertices[edge.dst].x - GRAPH_INPUT_LEFT_MARGIN]>"
           ng-attr-y2="<[graph.vertices[edge.dst].y]>"
-          ng-attr-style="stroke: black; stroke-width: <[EDGE_WIDTH]>;">
+          ng-attr-style="stroke: black; stroke-width: <[::EDGE_WIDTH]>;">
         </line>
         <polygon ng-if="graph.isDirected"
           ng-attr-points="<[getDirectedEdgeArrowPoints($index)]>"
@@ -81,7 +81,7 @@
         </text>
         <circle cx="0"
           cy="0"
-          ng-attr-r="<[VERTEX_RADIUS]>">
+          ng-attr-r="<[::VERTEX_RADIUS]>">
         </circle>
       </g>
     </svg>
@@ -165,7 +165,7 @@
         ng-attr-y1="<[graph.vertices[state.addEdgeVertex].y]>"
         ng-attr-x2="<[state.mouseX]>"
         ng-attr-y2="<[state.mouseY]>"
-        style="stroke: black; stroke-width: <[EDGE_WIDTH]>;">
+        style="stroke: black; stroke-width: <[::EDGE_WIDTH]>;">
       </line>
       <g ng-repeat="edge in graph.edges">
         <line
@@ -176,7 +176,7 @@
           ng-attr-y1="<[graph.vertices[edge.src].y]>"
           ng-attr-x2="<[graph.vertices[edge.dst].x]>"
           ng-attr-y2="<[graph.vertices[edge.dst].y]>"
-          ng-attr-style="stroke: <[getEdgeColor($index)]>; stroke-width: <[EDGE_WIDTH]>;">
+          ng-attr-style="stroke: <[getEdgeColor($index)]>; stroke-width: <[::EDGE_WIDTH]>;">
         </line>
         <polygon
           ng-if="graph.isDirected"
@@ -219,7 +219,7 @@
           ng-attr-style="fill: <[getVertexColor($index)]>;"
           cx="0"
           cy="0"
-          ng-attr-r="<[VERTEX_RADIUS]>">
+          ng-attr-r="<[::VERTEX_RADIUS]>">
         </circle>
       </g>
     </svg>

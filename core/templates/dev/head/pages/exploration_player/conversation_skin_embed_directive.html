@@ -29,7 +29,7 @@
               isCurrentSupplementalCardNonempty()}">
           <div class="conversation-skin-tutor-card-content conversation-skin-animate-card-contents" ng-class="{'animate-card-change': startCardChangeAnimation}">
             <div class="conversation-skin-tutor-card-top-section">
-              <img class="conversation-skin-oppia-avatar" ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt="">
+              <img class="conversation-skin-oppia-avatar" ng-src="<[::OPPIA_AVATAR_IMAGE_URL]>" alt="">
               <div class="conversation-skin-tutor-card-top-content protractor-test-conversation-content" angular-html-bind="activeCard.contentHtml" focus-on="<[getContentFocusLabel($index)]>">
               </div>
             </div>
@@ -103,20 +103,20 @@
             class="conversation-skin-supplemental-card-container">
           <img class="conversation-skin-oppia-avatar show-tutor-card"
               ng-if="isScreenNarrowAndShowingSupplementalCard() && isCurrentSupplementalCardNonempty()"
-              ng-src="<[OPPIA_AVATAR_IMAGE_URL]>"
+              ng-src="<[::OPPIA_AVATAR_IMAGE_URL]>"
               ng-click="showTutorCardIfScreenIsNarrow()"
               alt="">
           <div ng-if="isScreenNarrowAndShowingTutorCard()"
               class="supplemental-mask"></div>
           <div ng-class="{'conversation-skin-help-card help-card-standard': !isWindowTall(),
               'conversation-skin-help-card help-card-tall': isWindowTall()}" ng-if="helpCardHtml">
-            <img class="conversation-skin-oppia-avatar" ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt="">
+            <img class="conversation-skin-oppia-avatar" ng-src="<[::OPPIA_AVATAR_IMAGE_URL]>" alt="">
             <button type="button" class="conversation-skin-close-help-card-button" ng-click="clearHelpCard()" ng-if="!helpCardHasContinueButton">
               <i class="material-icons md-18">&#xE5CD;</i>
             </button>
             <div class="conversation-skin-help-card-content" angular-html-bind="helpCardHtml"></div>
             <br>
-            <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button" focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>" ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)" ng-if="helpCardHasContinueButton" style="margin-top: 12px;" translate="I18N_PLAYER_CONTINUE_NEXT_CARD">
+            <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button" focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>" ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)" ng-if="helpCardHasContinueButton" style="margin-top: 12px;" translate="I18N_PLAYER_CONTINUE_NEXT_CARD">
             </md-button>
           </div>
           <div class="protractor-test-conversation-input" angular-html-bind="activeCard.interactionHtml">
@@ -128,7 +128,7 @@
       <nav class="bottom-nav-row">
         <div class="col-1-4 bottom-nav-left">
           <div ng-if="activeCard.destStateName && activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].oppiaFeedbackHtml && !helpCardHasContinueButton">
-            <md-button aria-label="" class="oppia-learner-continue-button protractor-test-continue-to-next-card-button" focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>" ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)" translate="I18N_PLAYER_CONTINUE_BUTTON">
+            <md-button aria-label="" class="oppia-learner-continue-button protractor-test-continue-to-next-card-button" focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>" ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)" translate="I18N_PLAYER_CONTINUE_BUTTON">
             </md-button>
           </div>
           <div ng-if="isOnTerminalCard()" class="nav-bar-bottom-replay-content">
