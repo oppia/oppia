@@ -2,6 +2,25 @@ This file contains a summary of changes to the Oppia code base. For a full chang
 
     https://github.com/oppia/oppia/commits/master
 
+v2.3.5 (17 Oct 2016)
+--------------------
+Infrastructure and tests:
+* Upgrade protractor to v4.0.9
+* Add protractor tests to visit static pages and for logged-in flow
+* Fix .load() method breakage due to jQuery upgrade
+* Use one-time bindings for admin page
+* Remove mail validation checks from mailgun email API
+* Add docstrings to collection_services.py
+
+I18N:
+* Add Portuguese (Brazil) translation
+
+UI fixes:
+* Make notifications right-clickable
+* Fix fallbacks triggering at the wrong time
+* Don't allow 'featured' label to break into 2 lines
+* Fix About page display on mobile
+
 
 v2.3.4 (10 Oct 2016)
 -------------------
