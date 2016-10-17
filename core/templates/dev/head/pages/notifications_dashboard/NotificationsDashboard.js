@@ -19,9 +19,10 @@
 oppia.controller('DashboardNotifications', [
     '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
     function($scope, $http, $rootScope, oppiaDatetimeFormatter) {
-  $scope.navigateToItem = function(activityId, notificationType) {
-    window.location.href = '/create/' + activityId + (
-      notificationType === 'feedback_thread' ? '#/feedback' : '');
+  $scope.getItemUrl = function(activityId, notificationType) {
+    return (
+      '/create/' + activityId + (
+        notificationType === 'feedback_thread' ? '#/feedback' : ''));
   };
 
   $scope.navigateToProfile = function($event, username) {
