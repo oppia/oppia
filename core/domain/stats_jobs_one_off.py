@@ -821,6 +821,26 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             return value
 
     @classmethod
+    def _permute_index(cls, value_list, idx):
+        if idx == len(value_list):
+            yield value_list
+            return
+        for permuted_value in cls._get_permutations_of_value(value_list[idx]):
+            new_list = value_list[:idx] + [permuted_value] + value_list[idx+1:]
+            for permuted_new_list in cls._permute_index(new_list, idx + 1):
+                yield permuted_new_list
+
+    @classmethod
+    def _get_permutations_of_value(cls, value):
+        if isinstance(value, list):
+            for permuted_list in itertools.permutations(value):
+                for permuted_inner_list in cls._permute_index(
+                        list(permuted_list), 0):
+                    yield permuted_inner_list
+        else:
+            yield value
+
+    @classmethod
     def _stringify_classified_rule(cls, rule_spec):
         # This is based on the original
         # exp_domain.RuleSpec.stringify_classified_rule, however it returns a
@@ -832,8 +852,9 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             yield rule_spec.rule_type
         else:
             rule_spec_inputs = rule_spec.inputs.values()
-            for permuted_input in itertools.permutations(rule_spec_inputs):
-                param_list = [utils.to_ascii(val) for val in permuted_input]
+            for permuted_inputs in cls._get_permutations_of_value(
+                    rule_spec_inputs):
+                param_list = [utils.to_ascii(val) for val in permuted_inputs]
                 yield '%s(%s)' % (rule_spec.rule_type, ','.join(param_list))
 
     @classmethod
@@ -908,6 +929,21 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 return (
                     None, None,
                     'failing to evaluate param string: %s' % param_str_list)
+        elif '(' in rule_str:
+            # If the rule_str has an open parenthesis but not a closing one,
+            # then the rule_str is likely incomplete due to a truncation. A less
+            # accurate method needs to be used to track down which answer group
+            # and rule spec associate with the given rule.
+            paren_index = rule_str.index('(')
+            rule_type = rule_str[:paren_index]
+            for answer_group_index, answer_group in enumerate(answer_groups):
+                rule_specs = answer_group.rule_specs
+                for rule_spec_index, rule_spec in enumerate(rule_specs):
+                    possible_stringified_rules = list(
+                        cls._stringify_classified_rule(rule_spec))
+                    for possible_stringified_rule in possible_stringified_rules:
+                        if possible_stringified_rule.startswith(rule_str):
+                            return (answer_group_index, rule_spec_index, None)
 
         return (None, None, 'Failed to match rule string')
 
@@ -1572,7 +1608,11 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 'migrated (is this due to a shard retry?)')
             return
 
-        if len(item_id) == 490 and item_id[-1] != ')':
+        # If the item ID has been truncated, the answer might not be abel to be
+        # migrated. Some answers have been confirmed to still work even with
+        # truncated item IDs.
+        if len(item_id) == 490 and item_id[-1] != ')' and (
+                'ContainsAtLeastOneOf' not in item_id):
             # Mark the answer as migrated so it does not fail post-migration
             # validation.
             yield 'Encountered truncated item ID'
