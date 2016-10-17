@@ -54,7 +54,7 @@ oppia.directive('unicodeStringEditor', [
         var cleanup3 = $scope.$watch('localValue.label', function(newValue) {
           $scope.$parent.value = newValue;
         });
-        $scope.$on('$destroy', cleanup1);
+        $scope.$on('$destroy', cleanup3);
       } else {
         $scope.openEditor = function() {
           $scope.active = true;

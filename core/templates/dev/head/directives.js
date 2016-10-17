@@ -97,10 +97,8 @@ oppia.directive('customPopover', ['$sce', function($sce) {
         $scope.isShown = false;
       });
 
-      $scope.$on('$destroy', function() {
-        // De-register all event handlers.
-        $element.off();
-      });
+      // De-register all event handlers when the component is destroyed.
+      $scope.$on('$destroy', $element.off);
 
       $scope.showPopover = function() {
         if (!$scope.isShown) {
@@ -166,10 +164,8 @@ oppia.directive('mobileFriendlyTooltip', ['$timeout', function($timeout) {
         });
       };
 
-      scope.$on('$destroy', function() {
-        // De-register all event handlers.
-        element.off();
-      });
+      // De-register all event handlers when the component is destroyed.
+      scope.$on('$destroy', element.off);
     }
   };
 }]);

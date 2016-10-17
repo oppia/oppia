@@ -33,11 +33,11 @@ oppia.directive('answerGroupEditor', [function() {
     controller: [
       '$scope', 'stateInteractionIdService', 'responsesService',
       'editorContextService', 'alertsService', 'INTERACTION_SPECS',
-      'CLASSIFIER_RULESPEC_STR',
+      'CLASSIFIER_RULESPEC_STR', 'CleanupService',
       function(
           $scope, stateInteractionIdService, responsesService,
           editorContextService, alertsService, INTERACTION_SPECS,
-          CLASSIFIER_RULESPEC_STR) {
+          CLASSIFIER_RULESPEC_STR, CleanupService) {
         $scope.rulesMemento = null;
         $scope.activeRuleIndex = responsesService.getActiveRuleIndex();
         $scope.editAnswerGroupForm = {};
@@ -229,27 +229,23 @@ oppia.directive('answerGroupEditor', [function() {
         // the rules for multiple choice need to refer to the multiple choice
         // interaction's customization arguments.
         // TODO(sll): Remove the need for this watcher, or make it less ad hoc.
-        var cleanup1 = $scope.$on('updateAnswerChoices', function() {
+        CleanupService.registerOn($scope, 'updateAnswerChoices', function() {
           $scope.answerChoices = $scope.getAnswerChoices();
         });
 
-        var cleanup2 = $scope.$on('externalSave', function() {
+        CleanupService.registerOn($scope, 'externalSave', function() {
           if ($scope.isRuleEditorOpen()) {
             $scope.saveRules();
           }
         });
 
-        var cleanup3 = $scope.$on('onInteractionIdChanged', function() {
+        CleanupService.registerOn($scope, 'onInteractionIdChanged', function() {
           if ($scope.isRuleEditorOpen()) {
             $scope.saveRules();
           }
           $scope.$broadcast('updateAnswerGroupInteractionId');
           $scope.answerChoices = $scope.getAnswerChoices();
         });
-
-        $scope.$on('$destroy', cleanup1);
-        $scope.$on('$destroy', cleanup2);
-        $scope.$on('$destroy', cleanup3);
       }
     ]
   };
