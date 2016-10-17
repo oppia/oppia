@@ -80,7 +80,7 @@ class FeedbackThreadModel(base_models.BaseModel):
             exploration_id: str. The ID of the exploration.
 
         Returns:
-            thread_id: str. A thread ID that is different from the IDs of all
+            str. A thread ID that is different from the IDs of all
                 the existing threads within the given exploration.
 
         Raises:
@@ -115,7 +115,7 @@ class FeedbackThreadModel(base_models.BaseModel):
         model instance.
 
         Returns:
-            str. thread_id for this model instance.
+            str. thread_id for this FeedbackThreadModel instance.
         """
         return self.id.split('.')[1]
 
@@ -128,9 +128,9 @@ class FeedbackThreadModel(base_models.BaseModel):
             thread_id: str. Thread ID of the newly-created thread.
 
         Returns:
-            instance_id: str. The full thread ID for the newly-created
-                FeedbackThreadModel instance. (This ID includes the exploration ID
-                as a prefix.)
+            str. The full thread ID for the newly-created FeedbackThreadModel
+                instance. (This ID includes the exploration ID as a
+                prefix.)
 
         Raises:
             Exception: A thread with the given exploration ID
@@ -165,7 +165,8 @@ class FeedbackThreadModel(base_models.BaseModel):
 
         Args:
             exploration_id: str.
-            limit: int. Query limit, limits the number of thread fetched.
+            limit: int. Query limit, maximum possible number of items
+                in the returned list.
 
         Returns:
             list(FeedbackThreadModel). List of threads associated with the
@@ -206,9 +207,11 @@ class FeedbackMessageModel(base_models.BaseModel):
         ID and message ID.
 
         Args:
-            exploration_id:str. Exploration ID associated with message.
-            thread_id: str. Thread ID of the thread.
-            message_id: int. Message ID of the thread.
+            exploration_id: str. ID of the exploration to which the message
+                belongs.
+            thread_id: str. Thread ID of the thread to which the message
+                belongs.
+            message_id: int. Message ID of the message.
 
         Returns:
             str. Full message ID.
@@ -281,8 +284,8 @@ class FeedbackMessageModel(base_models.BaseModel):
             thread_id: str. ID of the thread.
 
         Returns:
-            list(FeedbackMessageModel). A list of the messages limited default
-                query limit.
+            list(FeedbackMessageModel). A list of the messages limited by
+                default query limit.
 
         """
         full_thread_id = (
@@ -319,7 +322,7 @@ class FeedbackMessageModel(base_models.BaseModel):
             thread_id: str. ID of the thread.
 
         Returns:
-            Number of messages in thread.
+            int. Number of messages in the thread.
         """
         full_thread_id = FeedbackThreadModel.generate_full_thread_id(
             exploration_id, thread_id)
@@ -335,7 +338,7 @@ class FeedbackMessageModel(base_models.BaseModel):
 class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
     """Model for storing feedback thread analytics for an exploration.
 
-    The key of each instance is the exploration id.
+    The key of each instance is the exploration ID.
     """
     # The number of open feedback threads for this exploration.
     num_open_threads = ndb.IntegerProperty(default=None, indexed=True)
@@ -425,8 +428,8 @@ class SuggestionModel(base_models.BaseModel):
              thread_id: str. ID of the thread.
 
          Returns:
-             Full thread ID. Full thread ID with exploration ID as
-                a prefix.
+             str. Returns the full thread ID corresponding to
+                the given exploration ID and thread ID.
         """
         return '.'.join([exploration_id, thread_id])
 
@@ -435,7 +438,8 @@ class SuggestionModel(base_models.BaseModel):
         """Gets a suggestion by the corresponding exploration and thread id's.
 
         Args:
-            exploration_id: str. ID of the exploration.
+            exploration_id: str. ID of the exploration to which
+                SuggestionModel belongs.
             thread_id: str. ID of the thread.
 
         Returns:
