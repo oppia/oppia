@@ -303,7 +303,8 @@ class FeedbackMessageModel(base_models.BaseModel):
         by their "last updated" field.
 
         Args:
-            exploration_id: str. ID of the exploration that the thread belongs to.
+            exploration_id: str. ID of the exploration that the thread
+                belongs to.
             thread_id: str. ID of the thread.
 
         Returns:
