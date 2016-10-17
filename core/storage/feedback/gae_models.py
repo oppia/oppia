@@ -98,7 +98,8 @@ class FeedbackThreadModel(base_models.BaseModel):
 
     @classmethod
     def generate_full_thread_id(cls, exploration_id, thread_id):
-        """Generates a full thread ID, given the exploration ID and the thread ID.
+        """Generates a full thread ID, given the exploration ID and
+        the thread ID.
 
         Args:
             exploration_id: str. The exploration ID the thread belongs to.
@@ -261,9 +262,10 @@ class FeedbackMessageModel(base_models.BaseModel):
                 entry is found for the given IDs.
 
         Returns:
-            FeedbackMessageModel or None. If strict == False and no undeleted message
-                with the given message_id exists in the datastore. Otherwise the
-                FeedbackMessageModel instance that corresponds to the given ID.
+            FeedbackMessageModel or None. If strict == False and no undeleted
+                message with the given message_id exists in the datastore.
+                Otherwise the FeedbackMessageModel instance that corresponds
+                to the given ID.
 
         Raises:
             EntityNotFoundError: If strict == True and message ID is not valid
@@ -275,8 +277,8 @@ class FeedbackMessageModel(base_models.BaseModel):
 
     @classmethod
     def get_messages(cls, exploration_id, thread_id):
-        """Returns a list of messages in the given thread. The number of messages
-        returned is capped by feconf.DEFAULT_QUERY_LIMIT.
+        """Returns a list of messages in the given thread. The number of
+        messages returned is capped by feconf.DEFAULT_QUERY_LIMIT.
 
         Args:
             exploration_id: str. ID of the exploration the thread
@@ -297,8 +299,8 @@ class FeedbackMessageModel(base_models.BaseModel):
 
     @classmethod
     def get_most_recent_message(cls, exploration_id, thread_id):
-        """Returns the most recent messages from the given thread, ordered by
-        their "last updated" field.
+        """Returns the most recent messages from the given thread, ordered
+        by their "last updated" field.
 
         Args:
             exploration_id: str. ID of the exploration that the thread belongs to.
@@ -318,7 +320,8 @@ class FeedbackMessageModel(base_models.BaseModel):
         deleted entries.
 
         Args:
-            exploration_id: str. ID of the exploration that the thread belongs to.
+            exploration_id: str. ID of the exploration that the thread
+                belongs to.
             thread_id: str. ID of the thread.
 
         Returns:
@@ -443,8 +446,9 @@ class SuggestionModel(base_models.BaseModel):
             thread_id: str. ID of the thread.
 
         Returns:
-            SuggestionModel or None. Suggestion related to the given exploration and
-                thread id, or None if it doesn't match anything.
+            SuggestionModel or None. Suggestion related to the given
+                exploration and thread id, or None if it doesn't match
+                anything.
         """
 
         return cls.get_by_id(cls._get_instance_id(exploration_id, thread_id))
