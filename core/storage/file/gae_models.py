@@ -45,19 +45,35 @@ class FileMetadataModel(base_models.VersionedModel):
 
     @classmethod
     def get_new_id(cls, entity_name):
+        """Raise an exception if an id is not created.
+
+        Args:
+            entity_name: An entity name that is tied to the created id.
+        """
         raise NotImplementedError
 
     @classmethod
     def get_undeleted(cls):
+        """Retrieve values that have not been deleted in the file metadata
+        model.
+
+        Returns:
+            A list of undeleted items from the query.
+        """
         return cls.get_all().filter(cls.deleted == False).fetch(  # pylint: disable=singleton-comparison
             feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def _construct_id(cls, exploration_id, filepath):
+        """ Accesses the location for the id to be generated.
+
+        Returns:
+            The location of the id to be generated."""
         return utils.vfs_construct_path('/', exploration_id, filepath)
 
     @classmethod
     def create(cls, exploration_id, filepath):
+        """ Generates the id."""
         model_id = cls._construct_id(exploration_id, filepath)
         return cls(id=model_id, deleted=False)
 
