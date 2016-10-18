@@ -48,7 +48,7 @@ class FileMetadataModel(base_models.VersionedModel):
         """Raise an exception if an id is not created.
 
         Args:
-            entity_name: An entity name that is tied to the created id.
+            entity_name: str. An entity name that is tied to the created id.
         """
         raise NotImplementedError
 
@@ -65,30 +65,76 @@ class FileMetadataModel(base_models.VersionedModel):
 
     @classmethod
     def _construct_id(cls, exploration_id, filepath):
-        """ Accesses the location for the id to be generated.
+        """ Builds the path for the id to be generated.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+            filepath: str. The path to the exploration file.
 
         Returns:
-            The location of the id to be generated."""
+            The path of the id to be generated.
+        """
         return utils.vfs_construct_path('/', exploration_id, filepath)
 
     @classmethod
     def create(cls, exploration_id, filepath):
-        """ Generates the id."""
+        """ Creates a new file meta data model entry.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+            filepath: str. The path to the exploration file.
+
+        Returns:
+            str. Instance of the new file meta data model entry.
+        """
         model_id = cls._construct_id(exploration_id, filepath)
         return cls(id=model_id, deleted=False)
 
     @classmethod
     def get_model(cls, exploration_id, filepath, strict=False):
+        """ Gets the model of an exploration by id.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+            filepath: str. The path to the exploration file.
+            strict: bool. Not raise an error if FileMetadataModel
+            entry is not found.
+
+        Returns:
+            FileMetaDataModel instance that corresponds to the given ID.
+        """
         model_id = cls._construct_id(exploration_id, filepath)
         return super(FileMetadataModel, cls).get(model_id, strict=strict)
 
     @classmethod
     def get_version(cls, exploration_id, filepath, version_number):
+        """ Gets a VersionedModel instance representing a given version
+        in VersionedModel.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+            filepath: str. The path to the exploration file.
+            version_number: str. Version number from the instance of versioned
+            Model.
+
+        Returns:
+            A VersionedModel instance representing a model id from
+            FilemetadataModel.
+        """
         model_id = cls._construct_id(exploration_id, filepath)
         return super(FileMetadataModel, cls).get_version(
             model_id, version_number)
 
     def commit(self, committer_id, commit_cmds):
+        """ Saves a version snapshot and updates the model.
+
+        Args:
+            committer_id: ID of the user saving the snapshot.
+            commit_cmds: Information on how to reconstruct the commit.
+
+        Returns:
+            A version snapshot from the FileMetadataModel.
+        """
         return super(FileMetadataModel, self).commit(
             committer_id, '', commit_cmds)
 
