@@ -15,20 +15,10 @@
 # limitations under the License.
 
 """Provides mailgun api to send email."""
+
 import requests
 
 import feconf
-
-MAILGUN_PUBLIC_DOMAIN_URL = "https://api.mailgun.net/v3/address/validate"
-MAILGUN_PUBLIC_API_KEY = "pubkey-5ogiflzbnjrljiky49qxsiozqef5jxp7"
-def is_email_valid(email):
-    """ Check whether recipient and sender email address are valid or not.
-    Mailgun uses public api key and public domain url to do this check. """
-    response = (
-        requests.get(
-            MAILGUN_PUBLIC_DOMAIN_URL, auth=("api", MAILGUN_PUBLIC_API_KEY),
-            params={"address": email}))
-    return response.json()['is_valid']
 
 
 def send_mail(
@@ -52,8 +42,6 @@ def send_mail(
     Raises:
       Exception: if the configuration in feconf.py forbids emails from being
         sent.
-      ValueError: if 'sender_email' or 'recipient_email' is invalid, according
-        to App Engine.
       Exception: if mailgun api key is not stored in feconf.MAILGUN_API_KEY.
       Exception: if mailgun domain name is not stored in
         feconf.MAILGUN_DOMAIN_NAME.
@@ -70,13 +58,6 @@ def send_mail(
 
     if not feconf.CAN_SEND_EMAILS:
         raise Exception('This app cannot send emails to users.')
-
-    if not is_email_valid(sender_email):
-        raise ValueError('Malformed sender email address: %s' % sender_email)
-
-    if not is_email_valid(recipient_email):
-        raise ValueError(
-            'Malformed recipient email address: %s' % recipient_email)
 
     data = {
         'from': sender_email,

@@ -604,11 +604,16 @@ oppia.factory('rteHelperService', [
       createRteElement: function(componentDefn, customizationArgsDict) {
         var el = $('<img/>');
         if (explorationContextService.isInExplorationContext()) {
-          customizationArgsDict = angular.extend(customizationArgsDict,
-            {
-              explorationId: explorationContextService.getExplorationId()
-            }
-          );
+          // TODO(sll): This extra key was introduced in commit
+          // 19a934ce20d592a3fc46bd97a2f05f41d33e3d66 in order to retrieve an
+          // image for RTE previews. However, it has had the unfortunate side-
+          // effect of adding an extra tag to the exploration RTE tags stored
+          // in the datastore. We are now removing this key in
+          // convertRteToHtml(), but we need to find a less invasive way to
+          // handle previews.
+          customizationArgsDict = angular.extend(customizationArgsDict, {
+            explorationId: explorationContextService.getExplorationId()
+          });
         }
         var interpolatedUrl = $interpolate(
           componentDefn.previewUrlTemplate, false, null, true)(
@@ -681,7 +686,11 @@ oppia.factory('rteHelperService', [
             var jQueryElt = $('<' + tagNameMatch[2] + '/>');
             for (var i = 0; i < this.attributes.length; i++) {
               var attr = this.attributes[i];
-              if (attr.name !== 'class' && attr.name !== 'src') {
+              // The exploration-id-with-value attribute was added in
+              // createRteElement(), and should be stripped. See commit
+              // 19a934ce20d592a3fc46bd97a2f05f41d33e3d66.
+              if (attr.name !== 'class' && attr.name !== 'src' &&
+                  attr.name !== 'exploration-id-with-value') {
                 jQueryElt.attr(attr.name, attr.value);
               }
             }

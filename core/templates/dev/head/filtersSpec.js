@@ -281,14 +281,12 @@ describe('Testing filters', function() {
     '&amp;quot;content&amp;quot;:&amp;quot;This is a first hint.&amp;quot;},' +
     '{&amp;quot;title&amp;quot;:&amp;quot;Hint 2&amp;quot;,' +
     '&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;' +
-    'Stuff and things&amp;lt;/p&amp;gt;&amp;quot;}]" ' +
-    'exploration-id-with-value="&amp;quot');
+    'Stuff and things&amp;lt;/p&amp;gt;&amp;quot;}]">');
     var OPPIA_IMG = ('<img src="image.png" ' +
     'class="oppia-noninteractive-image block-element" ' +
     'alt-with-value="&amp;quot;&amp;quot;" ' +
     'caption-with-value="&amp;quot;&amp;quot;" ' +
-    'filepath-with-value="&amp;quot;DearIDPodcast_sm.png&amp;quot;" ' +
-    'exploration-id-with-value="&amp;quot;5WWM85JODA2X&amp;quot;">');
+    'filepath-with-value="&amp;quot;DearIDPodcast_sm.png&amp;quot;">');
     var OPPIA_VIDEO = ('<img ' +
     'src="https://img.youtube.com/vi/JcPwIQ6GCj8/hqdefault.jpg" ' +
     'class="oppia-noninteractive-video block-element" ' +
