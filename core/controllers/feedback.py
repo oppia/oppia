@@ -14,20 +14,20 @@
 
 """Controllers for the feedback thread page."""
 
-import json
-
 from core.controllers import base
 from core.controllers import editor
-from core.domain import email_manager
 from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import rights_manager
 from core.platform import models
+import feconf
+
 
 transaction_services = models.Registry.import_transaction_services()
 
 class ThreadListHandler(base.BaseHandler):
     """Handles operations relating to feedback thread lists."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self, exploration_id):
         self.values.update({
@@ -58,6 +58,8 @@ class ThreadListHandler(base.BaseHandler):
 
 class ThreadHandler(base.BaseHandler):
     """Handles operations relating to feedback threads."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self, exploration_id, thread_id):  # pylint: disable=unused-argument
         suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
@@ -97,6 +99,8 @@ class RecentFeedbackMessagesHandler(base.BaseHandler):
     explorations.
     """
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     @base.require_moderator
     def get(self):
         urlsafe_start_cursor = self.request.get('cursor')
@@ -117,6 +121,8 @@ class FeedbackStatsHandler(base.BaseHandler):
         - Number of open threads
         - Number of total threads
     """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def get(self, exploration_id):
         feedback_thread_analytics = (
@@ -177,6 +183,8 @@ class SuggestionListHandler(base.BaseHandler):
     _LIST_TYPE_CLOSED = 'closed'
     _LIST_TYPE_ALL = 'all'
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     def _string_to_bool(self, has_suggestion):
         if has_suggestion == 'true':
             return True
@@ -210,47 +218,6 @@ class SuggestionListHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class UnsentFeedbackEmailHandler(base.BaseHandler):
-    """Handler task of sending emails of feedback messages."""
-
-    def post(self):
-        payload = json.loads(self.request.body)
-        user_id = payload['user_id']
-        references = feedback_services.get_feedback_message_references(user_id)
-        if not references:
-            # Model may not exist if user has already attended to the feedback.
-            return
-
-        transaction_services.run_in_transaction(
-            feedback_services.update_feedback_email_retries, user_id)
-
-        messages = {}
-        for reference in references:
-            message = feedback_services.get_message(
-                reference.exploration_id, reference.thread_id,
-                reference.message_id)
-
-            exploration = exp_services.get_exploration_by_id(
-                reference.exploration_id)
-
-            message_text = message.text
-            if len(message_text) > 200:
-                message_text = message_text[:200] + '...'
-
-            if exploration.id in messages:
-                messages[exploration.id]['messages'].append(message_text)
-            else:
-                messages[exploration.id] = {
-                    'title': exploration.title,
-                    'messages': [message_text]
-                }
-
-        email_manager.send_feedback_message_email(user_id, messages)
-        transaction_services.run_in_transaction(
-            feedback_services.pop_feedback_message_references, user_id,
-            len(references))
-
-
 class FeedbackThreadViewEventHandler(base.BaseHandler):
     """Records when the given user views a feedback thread, in order to clear
     viewed feedback messages from emails that might be sent in future to this
@@ -264,69 +231,3 @@ class FeedbackThreadViewEventHandler(base.BaseHandler):
             feedback_services.clear_feedback_message_references, self.user_id,
             exploration_id, thread_id)
         self.render_json(self.values)
-
-
-class SuggestionEmailHandler(base.BaseHandler):
-    """Handler task of sending email of suggestion."""
-
-    def post(self):
-        payload = json.loads(self.request.body)
-        exploration_id = payload['exploration_id']
-        thread_id = payload['thread_id']
-
-        exploration_rights = (
-            rights_manager.get_exploration_rights(exploration_id))
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-        suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
-
-        email_manager.send_suggestion_email(
-            exploration.title, exploration.id, suggestion.author_id,
-            exploration_rights.owner_ids)
-
-
-class InstantFeedbackMessageEmailHandler(base.BaseHandler):
-    """Handles task of sending feedback message emails instantly."""
-
-    def post(self):
-        payload = json.loads(self.request.body)
-        user_id = payload['user_id']
-        reference_dict = payload['reference_dict']
-
-        message = feedback_services.get_message(
-            reference_dict['exploration_id'], reference_dict['thread_id'],
-            reference_dict['message_id'])
-        exploration = exp_services.get_exploration_by_id(
-            reference_dict['exploration_id'])
-        thread = feedback_services.get_thread(
-            reference_dict['exploration_id'], reference_dict['thread_id'])
-
-        subject = 'New Oppia message in "%s"' % thread.subject
-        email_manager.send_instant_feedback_message_email(
-            user_id, message.author_id, message.text, subject,
-            exploration.title, reference_dict['exploration_id'], thread.subject)
-
-
-class FeedbackThreadStatusChangeEmailHandler(base.BaseHandler):
-    """Handles task of sending email instantly when feedback thread status is
-    changed."""
-
-    def post(self):
-        payload = json.loads(self.request.body)
-        user_id = payload['user_id']
-        reference_dict = payload['reference_dict']
-        old_status = payload['old_status']
-        new_status = payload['new_status']
-
-        message = feedback_services.get_message(
-            reference_dict['exploration_id'], reference_dict['thread_id'],
-            reference_dict['message_id'])
-        exploration = exp_services.get_exploration_by_id(
-            reference_dict['exploration_id'])
-        thread = feedback_services.get_thread(
-            reference_dict['exploration_id'], reference_dict['thread_id'])
-
-        text = 'changed status from %s to %s' % (old_status, new_status)
-        subject = 'Oppia thread status change: "%s"' % thread.subject
-        email_manager.send_instant_feedback_message_email(
-            user_id, message.author_id, text, subject, exploration.title,
-            reference_dict['exploration_id'], thread.subject)

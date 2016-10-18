@@ -30,6 +30,7 @@ oppia.directive('mathLatexStringEditor', [
       scope: true,
       template: '<span ng-include="getTemplateUrl()"></span>',
       controller: ['$scope', function($scope) {
+        $scope.placeholderText = '\\frac{x}{y}';
         $scope.alwaysEditable = $scope.$parent.alwaysEditable;
 
         // Reset the component each time the value changes (e.g. if this is part

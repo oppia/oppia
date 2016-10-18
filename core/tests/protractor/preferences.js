@@ -26,11 +26,11 @@ describe('Preferences', function() {
     users.login('alice@preferences.com');
     browser.get('/preferences');
     var checkbox = element(by.model('canReceiveEditorRoleEmail'));
-    expect(checkbox.getAttribute('aria-checked')).toBe('true');
+    expect(checkbox.isSelected()).toBe(true);
     checkbox.click();
-    expect(checkbox.getAttribute('aria-checked')).toBe('false');
+    expect(checkbox.isSelected()).toBe(false);
     browser.refresh();
-    expect(checkbox.getAttribute('aria-checked')).toBe('false');
+    expect(checkbox.isSelected()).toBe(false);
   });
 
   it('should change feedback message email checkbox value', function() {
@@ -38,11 +38,11 @@ describe('Preferences', function() {
     users.login('bob@preferences.com');
     browser.get('/preferences');
     var checkbox = element(by.model('canReceiveFeedbackMessageEmail'));
-    expect(checkbox.getAttribute('aria-checked')).toBe('true');
+    expect(checkbox.isSelected()).toBe(true);
     checkbox.click();
-    expect(checkbox.getAttribute('aria-checked')).toBe('false');
+    expect(checkbox.isSelected()).toBe(false);
     browser.refresh();
-    expect(checkbox.getAttribute('aria-checked')).toBe('false');
+    expect(checkbox.isSelected()).toBe(false);
   });
 
   afterEach(function() {
