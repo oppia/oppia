@@ -1488,7 +1488,7 @@ def get_number_of_ratings(ratings):
     object.
 
         Args:
-            ratings: list(float). List of value of ratings.
+            ratings: list(int). List of value of ratings.
 
         Returns:
             int. The total number of ratings given.
@@ -1501,7 +1501,7 @@ def get_average_rating(ratings):
     If there are no ratings, it will return 0.
 
     Args:
-        ratings: list(float). List of values of rating.
+        ratings: list(int). List of values of rating.
 
     Returns:
         float. The average of the all the rating given, or 0
@@ -1524,7 +1524,7 @@ def get_scaled_average_rating(ratings):
     no ratings, it will return 0. The confidence of this result is 95%.
 
     Args:
-        ratings: list(float). List of value of rating.
+        ratings: list(int). List of value of rating.
 
     Returns:
         float. The lower bound wilson score of the ratings.
