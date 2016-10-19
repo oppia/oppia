@@ -908,9 +908,9 @@ def get_email_preferences(user_id):
         a dict representing whether the user has chosen to receive
         email updates. The format of returned value:
         {
-                'can_receive_email_updates': (value),
-                'can_receive_editor_role_email': (value),
-                'can_receive_feedback_message_email': (value)
+            'can_receive_email_updates': (value),
+            'can_receive_editor_role_email': (value),
+            'can_receive_feedback_message_email': (value)
         }
     """
 
