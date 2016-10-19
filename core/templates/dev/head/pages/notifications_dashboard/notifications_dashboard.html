@@ -1,0 +1,83 @@
+{% extends 'pages/base.html' %}
+
+{% block maintitle %}
+  Notifications - Oppia
+{% endblock maintitle %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      Notifications
+    </li>
+  </ul>
+
+  <style>
+    html, body {
+      background-color: #eee;
+    }
+  </style>
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <div class="oppia-dashboard-container" ng-controller="DashboardNotifications">
+    <h2 class="oppia-page-heading">Notifications</h2>
+    <div class="oppia-page-heading-subtext" ng-if="jobQueuedMsec">
+      Last updated: <[getLocaleAbbreviatedDatetimeString(jobQueuedMsec)]>
+    </div>
+
+    <div>
+      <md-card ng-if="recentNotifications.length === 0" class="oppia-page-card oppia-notifications-dashboard-card">
+        <em>No recent notifications.</em>
+      </md-card>
+
+      <div ng-if="recentNotifications.length > 0">
+        <a ng-href="<[getItemUrl(notification.activity_id, notification.type)]>"
+           ng-repeat="notification in recentNotifications">
+          <md-card class="oppia-dashboard-row"
+                   ng-class="{'oppia-dashboard-row-recent': lastSeenMsec && lastSeenMsec < notification.last_updated_ms && notification.author_username !== currentUsername}">
+            <div class="oppia-notification-content">
+              <span>
+                <span ng-if="notification.type === 'feedback_thread'"
+                      title="Feedback thread">
+                  <i class="material-icons">&#xE0B9;</i>
+                </span>
+                <span ng-if="notification.type === 'exploration_commit'"
+                      title="Exploration commit">
+                  <i class="material-icons">&#xE150;</i>
+                </span>
+              </span>
+              <span class="oppia-notification-author-username">
+                <strong>
+                  <span>
+                    <[notification.author_username]>
+                  </span>
+                  <span ng-if="!notification.author_username">
+                    Anonymous
+                  </span>
+                </strong>
+                <span ng-if="notification.type === 'exploration_commit'">
+                  made a new commit to
+                </span>
+                <span ng-if="notification.type === 'feedback_thread'">
+                  left a comment on
+                </span>
+                <span class="oppia-notification-activity-title">
+                  <[notification.activity_title]>
+                </span>
+              </span>
+            </div>
+            <div class="oppia-notification-last-updated">
+              <[getLocaleAbbreviatedDatetimeString(notification.last_updated_ms)]>
+            </div>
+          </md-card>
+        </a>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/notifications_dashboard/NotificationsDashboard.js"></script>
+{% endblock footer_js %}

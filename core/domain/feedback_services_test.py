@@ -153,7 +153,7 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
                        'generate_new_thread_id', self._generate_thread_id):
             feedback_services.create_suggestion(
                 self.EXP_ID2, self.user_id, 3, 'state_name',
-                'description', {'old_content': {}})
+                'description', {'type': 'text', 'value': ''})
         suggestion = feedback_services.get_suggestion(
             self.EXP_ID2, self.THREAD_ID1)
         thread = feedback_models.FeedbackThreadModel.get(
@@ -165,7 +165,7 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
             'exploration_version': 3,
             'state_name': 'state_name',
             'description': 'description',
-            'state_content': {'old_content': {}}
+            'state_content': {'type': 'text', 'value': ''}
         }
         self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_OPEN)
         self.assertDictEqual(expected_suggestion_dict, suggestion.to_dict())
@@ -245,6 +245,18 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
                 queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
             0)
         self.process_and_flush_pending_tasks()
+
+    def test_get_threads_single_exploration(self):
+        threads = feedback_services.get_threads(self.EXP_ID_1)
+        self.assertEqual(len(threads), 0)
+        feedback_services.create_thread(
+            self.EXP_ID_1, self.EXPECTED_THREAD_DICT['state_name'], None,
+            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
+
+        threads = feedback_services.get_threads(self.EXP_ID_1)
+        self.assertEqual(1, len(threads))
+        self.assertDictContainsSubset(self.EXPECTED_THREAD_DICT,
+                                      threads[0].to_dict())
 
     def test_get_all_threads(self):
         # Create an anonymous feedback thread
@@ -815,7 +827,7 @@ class SuggestionEmailHandlerTest(test_utils.GenericTestBase):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_suggestion(
                 self.exploration.id, self.new_user_id, self.exploration.version,
-                'a state', 'simple description', {'content': {}})
+                'a state', 'simple description', {'type': 'text', 'value': ''})
 
             self.process_and_flush_pending_tasks()
 
@@ -892,7 +904,7 @@ class SuggestionEmailHandlerTest(test_utils.GenericTestBase):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_suggestion(
                 self.exploration.id, self.new_user_id, self.exploration.version,
-                'a state', 'simple description', {'content': {}})
+                'a state', 'simple description', {'type': 'text', 'value': ''})
 
             self.process_and_flush_pending_tasks()
 
@@ -938,7 +950,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.GenericTestBase):
         expected_email_html_body = (
             'Hi newuser,<br><br>'
             'New update to thread "a subject" on '
-            '<a href="https://www.oppia.org/A">Title</a>:<br>'
+            '<a href="https://www.oppia.org/create/A#/feedback">Title</a>:<br>'
             '<ul><li>editor: editor message<br></li></ul>'
             '(You received this message because you are a '
             'participant in this thread.)<br><br>'
@@ -989,7 +1001,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.GenericTestBase):
         expected_email_html_body = (
             'Hi newuser,<br><br>'
             'New update to thread "a subject" on '
-            '<a href="https://www.oppia.org/A">Title</a>:<br>'
+            '<a href="https://www.oppia.org/create/A#/feedback">Title</a>:<br>'
             '<ul><li>editor: changed status from open to fixed<br></li></ul>'
             '(You received this message because you are a '
             'participant in this thread.)<br><br>'
@@ -1039,7 +1051,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.GenericTestBase):
         expected_email_html_body_message = (
             'Hi newuser,<br><br>'
             'New update to thread "a subject" on '
-            '<a href="https://www.oppia.org/A">Title</a>:<br>'
+            '<a href="https://www.oppia.org/create/A#/feedback">Title</a>:<br>'
             '<ul><li>editor: editor message<br></li></ul>'
             '(You received this message because you are a '
             'participant in this thread.)<br><br>'
@@ -1065,7 +1077,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.GenericTestBase):
         expected_email_html_body_status = (
             'Hi newuser,<br><br>'
             'New update to thread "a subject" on '
-            '<a href="https://www.oppia.org/A">Title</a>:<br>'
+            '<a href="https://www.oppia.org/create/A#/feedback">Title</a>:<br>'
             '<ul><li>editor: changed status from open to fixed<br></li></ul>'
             '(You received this message because you are a '
             'participant in this thread.)<br><br>'
@@ -1116,3 +1128,23 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.GenericTestBase):
             self.assertEqual(
                 messages[1].body.decode(),
                 expected_email_text_body_message)
+
+    def test_that_emails_are_not_sent_to_anonymous_user(self):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            # Create thread as anonoymous user.
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name',
+                None, 'a subject', 'some text')
+            self.process_and_flush_pending_tasks()
+
+            threadlist = feedback_services.get_all_threads(
+                self.exploration.id, False)
+            thread_id = threadlist[0].get_thread_id()
+
+            feedback_services.create_message(
+                self.exploration.id, thread_id, self.editor_id,
+                feedback_models.STATUS_CHOICES_FIXED, None, 'editor message')
+            self.process_and_flush_pending_tasks()
+
+            messages = self.mail_stub.get_sent_messages()
+            self.assertEqual(len(messages), 0)

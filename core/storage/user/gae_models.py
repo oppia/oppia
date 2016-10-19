@@ -40,6 +40,13 @@ class UserSettingsModel(base_models.BaseModel):
     last_agreed_to_terms = ndb.DateTimeProperty(default=None)
     # When the user last started the state editor tutorial. May be None.
     last_started_state_editor_tutorial = ndb.DateTimeProperty(default=None)  # pylint: disable=invalid-name
+    # When the user last logged in. This may be out-of-date by up to
+    # feconf.PROXIMAL_TIMEDELTA_SECS seconds.
+    last_logged_in = ndb.DateTimeProperty(default=None)
+    # When the user last edited an exploration.
+    last_edited_an_exploration = ndb.DateTimeProperty(default=None)
+    # When the user last created an exploration.
+    last_created_an_exploration = ndb.DateTimeProperty(default=None)
     # User uploaded profile picture as a dataURI string. May be None.
     profile_picture_data_url = ndb.TextProperty(default=None, indexed=False)
     # User specified biography (to be shown on their profile page).
@@ -59,9 +66,8 @@ class UserSettingsModel(base_models.BaseModel):
         choices=[lc['code'] for lc in feconf.ALL_LANGUAGE_CODES])
     # System language preference (for I18N).
     preferred_site_language_code = ndb.StringProperty(
-        default=None,
-        choices=[language['id'] for language in feconf.SUPPORTED_SITE_LANGUAGES]
-        )
+        default=None, choices=[
+            language['id'] for language in feconf.SUPPORTED_SITE_LANGUAGES])
 
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):
@@ -315,3 +321,44 @@ class CollectionProgressModel(base_models.BaseModel):
             return instance_model
         else:
             return cls.create(user_id, collection_id)
+
+
+class UserQueryModel(base_models.BaseModel):
+    """Model for storing result of queries.
+
+    The id of each instance of this model is alphanumeric id of length 12
+    unique to each model instance.
+    """
+    # Options for a query specified by query submitter.
+    # Query option to specify whether user has created or edited one or more
+    # explorations in last n days. This only returns users who have ever
+    # created or edited at least one exploration.
+    inactive_in_last_n_days = ndb.IntegerProperty(default=None)
+    # Query option to check whether given user has logged in
+    # since last n days.
+    has_not_logged_in_for_n_days = ndb.IntegerProperty(default=None)
+    # Query option to check whether user has created at least
+    # n explorations.
+    created_at_least_n_exps = ndb.IntegerProperty(default=None)
+    # Query option to check whether user has created fewer than
+    # n explorations.
+    created_fewer_than_n_exps = ndb.IntegerProperty(default=None)
+    # Query option to check if user has edited at least n explorations.
+    edited_at_least_n_exps = ndb.IntegerProperty(default=None)
+    # Query option to check if user has edited fewer than n explorations.
+    edited_fewer_than_n_exps = ndb.IntegerProperty(default=None)
+    # List of all user_ids who satisfy all parameters given in above query.
+    # This list will be empty initially. Once query has completed its execution
+    # this list will be populated with all qualifying user ids.
+    user_ids = ndb.StringProperty(indexed=True, repeated=True)
+    # Id of the user who submitted the query.
+    submitter_id = ndb.StringProperty(indexed=True, required=True)
+    # Current status of the query.
+    query_status = ndb.StringProperty(
+        indexed=True,
+        choices=[
+            feconf.USER_QUERY_STATUS_PROCESSING,
+            feconf.USER_QUERY_STATUS_COMPLETED,
+            feconf.USER_QUERY_STATUS_ARCHIVED,
+            feconf.USER_QUERY_STATUS_FAILED
+        ])

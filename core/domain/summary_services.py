@@ -26,33 +26,33 @@ import feconf
 import utils
 
 _LIBRARY_INDEX_GROUPS = [{
-    'header': 'Mathematics & Statistics',
+    'header_i18n_id': 'I18N_LIBRARY_GROUPS_MATHEMATICS_&_STATISTICS',
     'search_categories': [
         'Mathematics', 'Algebra', 'Arithmetic', 'Calculus', 'Combinatorics',
         'Geometry', 'Graph Theory', 'Logic', 'Probability', 'Statistics',
         'Trigonometry',
     ],
 }, {
-    'header': 'Computing',
+    'header_i18n_id': 'I18N_LIBRARY_GROUPS_COMPUTING',
     'search_categories': ['Algorithms', 'Computing', 'Programming'],
 }, {
-    'header': 'Science',
+    'header_i18n_id': 'I18N_LIBRARY_GROUPS_SCIENCE',
     'search_categories': [
         'Astronomy', 'Biology', 'Chemistry', 'Engineering', 'Environment',
         'Medicine', 'Physics',
     ],
 }, {
-    'header': 'Humanities',
+    'header_i18n_id': 'I18N_LIBRARY_GROUPS_HUMANITIES',
     'search_categories': [
         'Architecture', 'Art', 'Music', 'Philosophy', 'Poetry'
     ],
 }, {
-    'header': 'Languages',
+    'header_i18n_id': 'I18N_LIBRARY_GROUPS_LANGUAGES',
     'search_categories': [
         'Languages', 'Reading', 'English', 'Latin', 'Spanish', 'Gaulish'
     ],
 }, {
-    'header': 'Social Science',
+    'header_i18n_id': 'I18N_LIBRARY_GROUPS_SOCIAL_SCIENCE',
     'search_categories': [
         'Business', 'Economics', 'Geography', 'Government', 'History', 'Law'
     ],
@@ -107,7 +107,7 @@ def get_learner_collection_dict_by_id(
     if user_id:
         completed_exp_ids = (
             collection_services.get_valid_completed_exploration_ids(
-                user_id, collection_id, collection))
+                user_id, collection))
         next_exploration_ids = collection.get_next_exploration_ids(
             completed_exp_ids)
     else:
@@ -161,6 +161,75 @@ def get_displayable_collection_summary_dicts_matching_ids(collection_ids):
         collection_services.get_collection_summaries_matching_ids(
             collection_ids))
     return _get_displayable_collection_summary_dicts(collection_summaries)
+
+
+def get_exp_metadata_dicts_matching_query(query_string, search_cursor, user_id):
+    """Given a query string and a search cursor, returns a list of exploration
+    metadata dicts that satisfy the search query.
+
+    Args:
+        query_string: str. The search query for which the search is to be
+            performed.
+        search_cursor: str or None. The cursor location to start the search
+            from. If None, the returned values are from the beginning
+            of the results list.
+        user_id: str or None. If not None, private explorations that are
+            editable by this user are also returned.
+
+    Returns:
+        exploration_list: A list of metadata dicts for explorations matching
+            the query.
+        new_search_cursor: New search cursor location.
+    """
+    exp_ids, new_search_cursor = (
+        exp_services.get_exploration_ids_matching_query(
+            query_string, cursor=search_cursor))
+
+    exploration_list = get_exploration_metadata_dicts(exp_ids, user_id)
+
+    return exploration_list, new_search_cursor
+
+
+def get_exploration_metadata_dicts(exploration_ids, editor_user_id=None):
+    """Given a list of exploration ids, optionally filters the list for
+    explorations that are currently non-private and not deleted, and returns a
+    list of dicts of the corresponding exploration summaries for collection
+    node search.
+
+    Args:
+        exploration_ids: A list of exploration ids for which exploration
+            metadata dicts are to be returned.
+        editor_user_id: str or None. If not None, private explorations that are
+            editable by this user are also returned.
+
+    Returns:
+        A list of metadata dicts corresponding to the given exploration ids.
+        Each dict has three keys:
+            'id': the exploration id
+            'title': the exploration title
+            'objective': the exploration objective
+    """
+    exploration_summaries = (
+        exp_services.get_exploration_summaries_matching_ids(exploration_ids))
+
+    filtered_exploration_summaries = []
+    for exploration_summary in exploration_summaries:
+        if exploration_summary is None:
+            continue
+        if exploration_summary.status == (
+                rights_manager.ACTIVITY_STATUS_PRIVATE):
+            if editor_user_id is None:
+                continue
+            if not rights_manager.Actor(editor_user_id).can_edit(
+                    feconf.ACTIVITY_TYPE_EXPLORATION,
+                    exploration_summary.id):
+                continue
+
+        filtered_exploration_summaries.append(exploration_summary)
+
+    return [
+        summary.to_metadata_dict()
+        for summary in filtered_exploration_summaries]
 
 
 def get_displayable_exp_summary_dicts_matching_ids(
@@ -284,11 +353,11 @@ def get_library_groups(language_codes):
     # Collect all collection ids so that the summary details can be retrieved
     # with a single get_multi() call.
     all_collection_ids = []
-    header_to_collection_ids = {}
+    header_id_to_collection_ids = {}
     for group in _LIBRARY_INDEX_GROUPS:
         collection_ids = collection_services.search_collections(
             _generate_query(group['search_categories']), 8)[0]
-        header_to_collection_ids[group['header']] = collection_ids
+        header_id_to_collection_ids[group['header_i18n_id']] = collection_ids
         all_collection_ids += collection_ids
 
     collection_summaries = [
@@ -309,7 +378,7 @@ def get_library_groups(language_codes):
     for group in _LIBRARY_INDEX_GROUPS:
         exp_ids = exp_services.search_explorations(
             _generate_query(group['search_categories']), 8)[0]
-        header_to_exp_ids[group['header']] = exp_ids
+        header_to_exp_ids[group['header_i18n_id']] = exp_ids
         all_exp_ids += exp_ids
 
     exp_summaries = [
@@ -325,13 +394,14 @@ def get_library_groups(language_codes):
     results = []
     for group in _LIBRARY_INDEX_GROUPS:
         summary_dicts = []
-        collection_ids_to_display = header_to_collection_ids[group['header']]
+        collection_ids_to_display = (
+            header_id_to_collection_ids[group['header_i18n_id']])
         summary_dicts = [
             collection_summary_dicts[collection_id]
             for collection_id in collection_ids_to_display
             if collection_id in collection_summary_dicts]
 
-        exp_ids_to_display = header_to_exp_ids[group['header']]
+        exp_ids_to_display = header_to_exp_ids[group['header_i18n_id']]
         summary_dicts += [
             exp_summary_dicts[exp_id] for exp_id in exp_ids_to_display
             if exp_id in exp_summary_dicts]
@@ -340,9 +410,11 @@ def get_library_groups(language_codes):
             continue
 
         results.append({
-            'header': group['header'],
+            'header_i18n_id': group['header_i18n_id'],
             'categories': group['search_categories'],
             'activity_summary_dicts': summary_dicts,
+            'has_full_results_page': True,
+            'full_results_url': None,
         })
 
     return results
@@ -413,32 +485,32 @@ def get_featured_activity_summary_dicts(language_codes):
     return featured_summary_dicts
 
 
-def get_top_rated_exploration_summary_dicts(language_codes):
+def get_top_rated_exploration_summary_dicts(language_codes, limit):
     """Returns a list of top rated explorations with the given language code.
 
     The return value is sorted in decreasing order of average rating.
     """
     filtered_exp_summaries = [
         exp_summary for exp_summary in
-        exp_services.get_top_rated_exploration_summaries().values()
+        exp_services.get_top_rated_exploration_summaries(limit).values()
         if exp_summary.language_code in language_codes and
         sum(exp_summary.ratings.values()) > 0]
 
     sorted_exp_summaries = sorted(
         filtered_exp_summaries,
         key=lambda exp_summary: exp_summary.scaled_average_rating,
-        reverse=True)[:feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS]
+        reverse=True)
 
     return get_displayable_exp_summary_dicts(sorted_exp_summaries)
 
 
-def get_recently_published_exploration_summary_dicts():
+def get_recently_published_exp_summary_dicts(limit):
     """Returns a list of recently published explorations
      with the given language code.
     """
     recently_published_exploration_summaries = [
         exp_summary for exp_summary in
-        exp_services.get_recently_published_exploration_summaries().values()]
+        exp_services.get_recently_published_exp_summaries(limit).values()]
 
     # Arranging recently published exploration summaries with respect to time.
     # sorted() is used to sort the random list of recently published summaries.

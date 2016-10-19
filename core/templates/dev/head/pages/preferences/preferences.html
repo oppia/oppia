@@ -1,0 +1,236 @@
+{% extends 'pages/base.html' %}
+
+{% block maintitle %}
+  I18N_PREFERENCES_PAGE_TITLE
+{% endblock maintitle %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      <span translate="I18N_PREFERENCES_BREADCRUMB"></span>
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
+{% block header_js %}
+  {{ super() }}
+  <script type="text/javascript">
+    GLOBALS.LANGUAGE_CODES_AND_NAMES = JSON.parse(
+      '{{LANGUAGE_CODES_AND_NAMES|js_string}}');
+  </script>
+
+  <style>
+    html, body {
+      background-color: #eee;
+    }
+  </style>
+{% endblock header_js %}
+
+{% block content %}
+  <div class="oppia-dashboard-container ng-scope" ng-controller="Preferences">
+    <h2 class="oppia-page-heading protractor-test-preferences-title"
+        translate="I18N_PREFERENCES_HEADING"></h2>
+    <div class="oppia-page-heading-subtext" translate="I18N_PREFERENCES_HEADING_SUBTEXT"></div>
+    <md-card class="oppia-page-card">
+      <div class="row">
+        <div role="form" class="form-horizontal">
+          <div class="form-group">
+            <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_USERNAME"></label>
+            <div class="col-lg-10 col-md-10 col-sm-10">
+              {% if username %}
+                <a href="/profile/{{username}}">{{username}}</a>
+              {% else %}
+                <em translate="I18N_PREFERENCES_USERNAME_NOT_SELECTED"></em>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div role="form" class="form-horizontal">
+          <div class="form-group">
+            <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_PICTURE"></label>
+            <div class="col-lg-10 col-md-10 col-sm-10">
+              <div class="oppia-editable-section" title="<['I18N_PREFERENCES_CHANGE_PICTURE' | translate]>" style="height: 150px; width: 150px">
+                <div class="oppia-click-to-start-editing" ng-click="showEditProfilePictureModal()"></div>
+                <i class="material-icons oppia-editor-edit-icon" style="top: 8px; right: 8px;">&#xE254;</i>
+                <img ng-if="profilePictureDataUrl" ng-src="<[profilePictureDataUrl]>" class="img-thumbnail">
+                <img ng-if="!profilePictureDataUrl" ng-src="<[getStaticImageUrl('/general/no_profile_picture.png')]>" class="img-thumbnail">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div role="form" class="form-horizontal">
+          <div class="form-group">
+            <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_BIO"></label>
+            <div class="col-lg-10 col-md-10 col-sm-10">
+              <textarea ng-model="userBio" ng-blur="saveUserBio(userBio)" rows="5"></textarea>
+              <span class="help-block" style="font-size: smaller" translate="I18N_PREFERENCES_BIO_EXPLAIN_TEXT"></span>
+            </div>
+          </div>
+        </div>
+
+        <div role="form" class="form-horizontal">
+          <div class="form-group">
+            <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_SUBJECT_INTERESTS"></label>
+            <div class="col-lg-10 col-md-10 col-sm-10">
+              <div ng-if="hasPageLoaded && select2DropdownIsShown">
+                <select2-dropdown
+                  item="$parent.subjectInterests"
+                  ng-model="subjectInterests"
+                  tag-mode="true" allow-multiple-choices="true"
+                  new-choice-regex="<[::TAG_REGEX_STRING]>" width="100%"
+                  placeholder="<['I18N_PREFERENCES_SUBJECT_INTERESTS_PLACEHOLDER' | translate]>"
+                  ng-change="onSubjectInterestsSelectionChange($parent.subjectInterests)"
+                  invalid-search-term-message="<['I18N_PREFERENCES_SUBJECT_INTERESTS_INVALID_SEARCH' | translate]>"
+                  on-selection-change="onSubjectInterestsSelectionChange($parent.subjectInterests)">
+                </select2-dropdown>
+              </div>
+              <span class="help-block" style="font-size: smaller" translate="I18N_PREFERENCES_SUBJECT_INTERESTS_HELP_BLOCK"></span>
+              <div style="height: 18px; width: 550px;">
+                <span style="color: red; font-size: 0.8em;" aria-live="assertive" ng-show="changedAtLeastOnce">
+                  <[subjectInterestsWarningText]>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div role="form" class="form-horizontal">
+          <div class="form-group">
+            <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE"></label>
+            <div class="col-lg-10 col-md-10 col-sm-10">
+              <!--
+                If the ng-if is omitted, the select2-dropdown directive won't be
+                updated after the initial page load.
+              -->
+              <div ng-if="hasPageLoaded">
+                <select2-dropdown choices="LANGUAGE_CHOICES"
+                  item="$parent.preferredLanguageCodes" allow-multiple-choices="true"
+                  new-choice-regex=".^" width="100%"
+                  placeholder="<['I18N_PREFERENCES_SELECT_EXPLORATION_LANGUAGE' | translate]>"
+                  on-selection-change="savePreferredLanguageCodes($parent.preferredLanguageCodes)">
+                </select2-dropdown>
+              </div>
+              <span class="help-block" style="font-size: smaller" translate="I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_EXPLAIN">
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div role="form" class="form-horizontal">
+          <div class="form-group">
+            <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE"></label>
+            <div class="col-lg-10 col-md-10 col-sm-10">
+              <!--
+                If the ng-if is omitted, the select2-dropdown directive won't be
+                updated after the initial page load.
+              -->
+              <div ng-if="hasPageLoaded && select2DropdownIsShown">
+                <select2-dropdown choices="SITE_LANGUAGE_CHOICES"
+                  class="protractor-test-system-language-selector"
+                  item="$parent.preferredSiteLanguageCode"
+                  allow-multiple-choices="false"
+                  new-choice-regex=".^" width="100%"
+                  placeholder="<['I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE_PLACEHOLDER' | translate]>"
+                  on-selection-change="savePreferredSiteLanguageCodes($parent.preferredSiteLanguageCode)">
+                </select2-dropdown>
+              </div>
+              <span class="help-block" style="font-size: smaller" translate="I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE_EXPLAIN"></span>
+            </div>
+          </div>
+        </div>
+
+
+        <hr>
+
+        <div role="form" class="form-horizontal">
+          <div class="form-group">
+            <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_EMAIL"></label>
+            <div class="col-lg-10 col-md-10 col-sm-10">
+              {{user_email}}
+              <span class="help-block" style="font-size: smaller" translate="I18N_PREFERENCES_EMAIL_EXPLAIN"></span>
+            </div>
+          </div>
+        </div>
+
+        <div role="form" class="form-horizontal">
+          <div class="form-group">
+            <label class="col-lg-2 col-md-2 col-sm-2"></label>
+            <div class="col-lg-10 col-md-10 col-sm-10">
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" ng-model="canReceiveEmailUpdates" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail)">
+                  <span translate="I18N_PREFERENCES_EMAIL_RECEIVE_NEWS"></span>
+                </label>
+              </div>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" ng-model="canReceiveEditorRoleEmail" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail)">
+                  Receive emails when someone gives you edit rights to an exploration
+                </label>
+              </div>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" ng-model="canReceiveFeedbackMessageEmail" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail)">
+                  Receive emails when someone sends you feedback on an exploration
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script type="text/ng-template" id="modals/editProfilePicture">
+        <div class="modal-header">
+          <h3 translate="I18N_PREFERENCES_PROFILE_PICTURE_UPLOAD"></h3>
+        </div>
+
+        <div class="modal-body" style="min-height: 300px;">
+          <div class="oppia-profile-image-uploader">
+            <div ng-hide="uploadedImage">
+              <image-uploader on-file-changed="onFileChanged">
+              </image-uploader>
+            </div>
+
+            <div class="oppia-form-error" ng-if="invalidImageWarningIsShown" style="margin-top: 15px;" translate="I18N_PREFERENCES_PROFILE_PICTURE_ERROR"></div>
+
+            <div ng-show="uploadedImage">
+              <span translate="I18N_PREFERENCES_PROFILE_PICTURE_DRAG"></span>
+              <div class="oppia-profile-picture-crop-area" ng-show="uploadedImage">
+                <button class="btn btn-default oppia-profile-picture-reset-button" ng-click="reset()">
+                  <i class="material-icons oppia-vcenter">&#xE14C;</i>
+                </button>
+                <img-crop image="uploadedImage" result-image="croppedImageDataUrl"
+                          area-type="square" result-image-size="150"
+                          on-load-error="onInvalidImageLoaded()"
+                          result-image-format="image/png">
+                </img-crop>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-default" ng-click="cancel()" translate="I18N_PREFERENCES_CANCEL_BUTTON"></button>
+          <!--
+            The two checks for ng-disabled are necessary. The former is needed because
+            img-crop loads a default white image even when nothing is uploaded. The latter
+            is needed to prevent the saving of invalid files.
+          -->
+          <button class="btn btn-success" ng-click="confirm()" ng-disabled="!uploadedImage || !croppedImageDataUrl" translate="I18N_PREFERENCES_PROFILE_PICTURE_ADD"></button>
+        </div>
+      </script>
+    </md-card>
+  </div>
+{% endblock %}
+
+{% block footer %}
+  {% include 'pages/footer.html' %}
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/preferences/Preferences.js"></script>
+{% endblock footer_js %}

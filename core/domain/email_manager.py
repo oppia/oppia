@@ -214,7 +214,7 @@ def send_mail_to_admin(email_subject, email_body):
 
     email_services.send_mail(
         feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS, email_subject,
-        body, None, bcc_admin=False)
+        body, body.replace('\n', '<br/>'), bcc_admin=False)
 
 
 def send_post_signup_email(user_id):
@@ -481,7 +481,7 @@ def send_instant_feedback_message_email(
     email_body_template = (
         'Hi %s,<br><br>'
         'New update to thread "%s" on '
-        '<a href="https://www.oppia.org/%s">%s</a>:<br>'
+        '<a href="https://www.oppia.org/create/%s#/feedback">%s</a>:<br>'
         '<ul><li>%s: %s<br></li></ul>'
         '(You received this message because you are a '
         'participant in this thread.)<br><br>'
