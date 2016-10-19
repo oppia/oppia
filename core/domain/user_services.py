@@ -41,7 +41,32 @@ DEFAULT_IDENTICON_DATA_URL = (
 
 
 class UserSettings(object):
-    """Value object representing a user's settings."""
+    """Value object representing a user's settings.
+
+    Attributes:
+        user_id: str. The user id.
+        email: str. The user email.
+        username: str or None. Identifiable username to display in the UI.
+        last_agreed_to_terms: datetime.datetime or None. When the user last
+            agreed to the terms of the site.
+        last_started_state_editor_tutorial: datetime.datetime or None. When
+            the user last started the state editor tutorial.
+        last_logged_in: datetime.datetime or None. When the user last logged in.
+        last_created_an_exploration: datetime.datetime or None. When the user
+            last created an exploration.
+        last_edited_an_exploration: datetime.datetime or None. When the user
+            last edited an exploration.
+        profile_picture_data_url: str or None. User uploaded profile picture as
+            a dataURI string.
+        user_bio: str or None. User specified biography.
+        subject_interests: str or None. Subject interests specified by the user.
+        first_contribution_msec: float or None. The time in milliseconds when
+            the user first contributed to Oppia.
+        preferred_language_codes: str or None. Exploration language preferences
+            specified by the user.
+        preferred_site_language_code: str or None. System language preference.
+    """
+
     def __init__(
             self, user_id, email, username=None, last_agreed_to_terms=None,
             last_started_state_editor_tutorial=None, last_logged_in=None,
@@ -49,6 +74,35 @@ class UserSettings(object):
             last_edited_an_exploration=None, profile_picture_data_url=None,
             user_bio='', subject_interests=None, first_contribution_msec=None,
             preferred_language_codes=None, preferred_site_language_code=None):
+        """Constructs a UserSettings domain object.
+
+        Args:
+            user_id: str. The user id.
+            email: str. The user email.
+            username: str or None. Identifiable username to display in the UI.
+            last_agreed_to_terms: datetime.datetime or None. When the user
+                last agreed to the terms of the site.
+            last_started_state_editor_tutorial: datetime.datetime or None. When
+                the user last started the state editor tutorial.
+            last_logged_in: datetime.datetime or None. When the user last
+                logged in.
+            last_created_an_exploration: datetime.datetime or None. When the
+                user last created an exploration.
+            last_edited_an_exploration: datetime.datetime or None. When the
+                user last edited an exploration.
+            profile_picture_data_url: str or None. User uploaded profile
+                picture as a dataURI string.
+            user_bio: str or None. User specified biography.
+            subject_interests: str or None. Subject interests specified by
+                the user.
+            first_contribution_msec: float or None. The time in milliseconds
+                when the user first contributed to Oppia.
+            preferred_language_codes: str or None. Exploration language
+                preferences specified by the user.
+            preferred_site_language_code: str or None. System language
+                preference.
+        """
+
         self.user_id = user_id
         self.email = email
         self.username = username
@@ -68,6 +122,14 @@ class UserSettings(object):
         self.preferred_site_language_code = preferred_site_language_code
 
     def validate(self):
+        """Checks that user_id and email fields of this UserSettings domain
+        object are valid.
+
+        Raises:
+            ValidationError: If either user_id or email are not str,
+                or if email is invalid.
+        """
+
         if not isinstance(self.user_id, basestring):
             raise utils.ValidationError(
                 'Expected user_id to be a string, received %s' % self.user_id)
@@ -86,6 +148,13 @@ class UserSettings(object):
 
     @property
     def truncated_email(self):
+        """Returns truncated email by padding last two characters before @.
+
+        Returns:
+            A str representing truncated email for this UserSettings
+            domain object.
+        """
+
         first_part = self.email[: self.email.find('@')]
         last_part = self.email[self.email.find('@'):]
         if len(first_part) <= 1:
@@ -98,19 +167,55 @@ class UserSettings(object):
 
     @property
     def is_known_user(self):
-        # If this does not always return True, something has gone wrong.
+        """Returns bool based on whether or not UserSettings domain
+        object contains an email property.
+
+        Returns:
+            A bool based on whether or not UserSettings domain object
+            contains an email property. True if email exists, otherwise False.
+            If this does not always return True, something has gone wrong.
+        """
+
         return bool(self.email)
 
     @property
     def normalized_username(self):
+        """Returns username in lowercase or None if it does not exist.
+
+        Returns:
+            A str representing normalized username if it exists in this
+            UserSettings domain object. Otherwise None.
+        """
+
         return self.normalize_username(self.username)
 
     @classmethod
     def normalize_username(cls, username):
+        """Returns username in lowercase or None if it does not exist.
+
+        Args:
+            username: str. Identifiable username to display in the UI.
+        Returns:
+            A str representing normalized username if it exists in this
+            UserSettings domain object. Otherwise None.
+        """
+
         return username.lower() if username else None
 
     @classmethod
     def require_valid_username(cls, username):
+        """Checks if username passed is valid or not.
+
+        Args:
+            username: str. Identifiable username to display in the UI.
+
+        Raises:
+            ValidationError: If either empty username is supplied,
+                or username exceeds maximum number of characters allowed,
+                or username contains charcters other than numbers/alphabets,
+                or username is among reserved users(admin/oppia).
+        """
+
         if not username:
             raise utils.ValidationError('Empty username supplied.')
         elif len(username) > MAX_USERNAME_LENGTH:
@@ -129,7 +234,16 @@ class UserSettings(object):
 
 
 def is_username_taken(username):
-    """Checks if the given username is taken."""
+    """Tells whether a given normalized_username is taken.
+
+    Args:
+        username: str. Identifiable username to display in the UI.
+
+    Returns:
+        A bool based on whether a given normalized_username is taken or not.
+        True if username is available, else False.
+    """
+
     return user_models.UserSettingsModel.is_normalized_username_taken(
         UserSettings.normalize_username(username))
 
@@ -137,8 +251,16 @@ def is_username_taken(username):
 def get_email_from_user_id(user_id):
     """Gets the email from a given user_id.
 
-    Raises an Exception if the user is not found.
+    Args:
+        user_id: str. The user id.
+
+    Returns:
+        A str representing user_email corresponding to given user_id.
+
+    Raises:
+        Exception: If the user is not found.
     """
+
     user_settings = get_user_settings(user_id)
     return user_settings.email
 
@@ -146,8 +268,14 @@ def get_email_from_user_id(user_id):
 def get_email_from_username(username):
     """Gets the email for a given username.
 
-    Returns None if the user is not found.
+    Args:
+        username: str. Identifiable username to display in the UI.
+
+    Returns:
+        A str representing user_email corresponding to given username.
+        None if the user is not found.
     """
+
     user_model = user_models.UserSettingsModel.get_by_normalized_username(
         UserSettings.normalize_username(username))
     if user_model is None:
@@ -159,8 +287,14 @@ def get_email_from_username(username):
 def get_user_id_from_username(username):
     """Gets the user_id for a given username.
 
-    Returns None if the user is not found.
+    Args:
+        username: str. Identifiable username to display in the UI.
+
+    Returns:
+        A str representing user_id corresponding to given username.
+        None if the user is not found.
     """
+
     user_model = user_models.UserSettingsModel.get_by_normalized_username(
         UserSettings.normalize_username(username))
     if user_model is None:
@@ -172,8 +306,14 @@ def get_user_id_from_username(username):
 def get_user_settings_from_username(username):
     """Gets the user settings for a given username.
 
-    Returns None if the user is not found.
+    Args:
+        username: str. Identifiable username to display in the UI.
+
+    Returns:
+        A UserSettingsModel instance based on given username.
+        None if user_model not found.
     """
+
     user_model = user_models.UserSettingsModel.get_by_normalized_username(
         UserSettings.normalize_username(username))
     if user_model is None:
@@ -185,9 +325,15 @@ def get_user_settings_from_username(username):
 def get_users_settings(user_ids):
     """Gets domain objects representing the settings for the given user_ids.
 
-    If the given user_id does not exist, the corresponding entry in the
-    returned list is None.
+    Args:
+        user_ids: list. Containing multiple user_id.
+
+    Returns:
+        A list containing UserSettings domain instances based on given user_ids.
+        If the given user_id does not exist, the corresponding entry in the
+        returned list is None.
     """
+
     user_settings_models = user_models.UserSettingsModel.get_multi(user_ids)
     result = []
     for ind, model in enumerate(user_settings_models):
@@ -222,26 +368,45 @@ def get_users_settings(user_ids):
 
 
 def generate_initial_profile_picture(user_id):
-    """Generates a profile picture for a new user."""
+    """Generates a profile picture for a new user.
+
+    Args:
+        user_id: str. The user id.
+    """
+
     user_email = get_email_from_user_id(user_id)
     user_gravatar = fetch_gravatar(user_email)
     update_profile_picture_data_url(user_id, user_gravatar)
 
 
 def get_gravatar_url(email):
-    """Returns the gravatar url for the specified email."""
+    """Returns the gravatar url for the specified email.
+
+    Args:
+        email: str. The user email.
+
+    Returns:
+        A str representing gravatar url for the specified email.
+    """
+
     return (
         'https://www.gravatar.com/avatar/%s?d=identicon&s=%s' %
         (hashlib.md5(email).hexdigest(), GRAVATAR_SIZE_PX))
 
 
 def fetch_gravatar(email):
-    """Returns the gravatar corresponding to the user's email,
-    or an identicon generated from the email if the gravatar doesn't exist.
+    """Returns the gravatar corresponding to the user's email, or an
+    identicon generated from the email if the gravatar doesn't exist.
 
-    Note: if the call to the gravatar service fails,
-    this returns DEFAULT_IDENTICON_DATA_URL and logs an error.
+    Args:
+        email: str. The user email.
+
+    Returns:
+        The gravatar corresponding to the user's email. If the call to the
+        gravatar service fails, this returns DEFAULT_IDENTICON_DATA_URL
+        and logs an error.
     """
+
     gravatar_url = get_gravatar_url(email)
     try:
         result = urlfetch.fetch(
@@ -266,9 +431,15 @@ def get_profile_pictures_by_user_ids(user_ids):
     """Gets the profile_picture_data_url from the domain objects
     representing the settings for the given user_ids.
 
-    If the given user_id does not exist, the corresponding entry in the
-    returned list is None.
+    Args:
+        user_ids: list. Containing multiple user_id.
+
+    Returns:
+        A dict containing profile_picture_data_url for given user_ids.
+        If the user_id does not exist, corresponding entry in the returned
+        dict is None.
     """
+
     user_settings_models = user_models.UserSettingsModel.get_multi(user_ids)
     result = {}
     for model in user_settings_models:
@@ -280,7 +451,20 @@ def get_profile_pictures_by_user_ids(user_ids):
 
 
 def get_user_settings(user_id, strict=False):
-    """Return the user settings for a single user."""
+    """Return the user settings for a single user.
+
+    Args:
+        user_id: str. The user id.
+        strict: bool. Defaults to False.
+
+    Returns:
+        A UserSettings domain instance based on given user_id.
+        None if the given user_id does not exist and strict is False.
+
+    Raises:
+        Exception: If strict is True and given user_id does not exist.
+    """
+
     user_settings = get_users_settings([user_id])[0]
     if strict and user_settings is None:
         logging.error('Could not find user with id %s' % user_id)
@@ -289,7 +473,12 @@ def get_user_settings(user_id, strict=False):
 
 
 def _save_user_settings(user_settings):
-    """Commits a user settings object to the datastore."""
+    """Commits a user settings object to the datastore.
+
+    Args:
+        user_settings: UserSettings domain object.
+    """
+
     user_settings.validate()
     user_models.UserSettingsModel(
         id=user_settings.user_id,
@@ -314,6 +503,15 @@ def _save_user_settings(user_settings):
 
 
 def is_user_registered(user_id):
+    """Checks if a user is registered with given user_id.
+
+    Args:
+        user_id: str. The user id.
+
+    Returns:
+        A bool based on whether a user is registered with given user_id or not.
+    """
+
     if user_id is None:
         return False
     user_settings = user_models.UserSettingsModel.get(user_id, strict=False)
@@ -321,11 +519,29 @@ def is_user_registered(user_id):
 
 
 def has_ever_registered(user_id):
+    """Checks if a user has ever been registered with given user_id.
+
+    Args:
+        user_id: str. The user id.
+
+    Returns:
+        A bool based on whether a user has ever been registered or not.
+    """
+
     user_settings = get_user_settings(user_id, strict=True)
     return bool(user_settings.username and user_settings.last_agreed_to_terms)
 
 
 def has_fully_registered(user_id):
+    """Checks if a user has fully registered.
+
+    Args:
+        user_id: str. The user id.
+
+    Returns:
+        A bool representing whether a user has fully registered or not.
+    """
+
     if user_id is None:
         return False
 
@@ -336,7 +552,19 @@ def has_fully_registered(user_id):
 
 
 def _create_user(user_id, email):
-    """Creates a new user. Returns the user_settings object."""
+    """Creates a new user.
+
+    Args:
+        user_id: str. The user id.
+        email: str. The user email.
+
+    Returns:
+        A UserSettings domain object.
+
+    Raises:
+        Exception: If the User with given user_id already exists.
+    """
+
     user_settings = get_user_settings(user_id, strict=False)
     if user_settings is not None:
         raise Exception('User %s already exists.' % user_id)
@@ -350,10 +578,17 @@ def _create_user(user_id, email):
 
 
 def get_or_create_user(user_id, email):
-    """If the given User model does not exist, creates it.
+    """Returns a User model with given user_id and email. If user does not
+    exist, it creates a new one.
 
-    Returns the resulting UserSettings domain object.
+    Args:
+        user_id: str. The user id.
+        email: str. The user email.
+
+    Returns:
+        UserSettings domain object.
     """
+
     user_settings = get_user_settings(user_id, strict=False)
     if user_settings is None:
         user_settings = _create_user(user_id, email)
@@ -361,6 +596,15 @@ def get_or_create_user(user_id, email):
 
 
 def get_username(user_id):
+    """Gets username corresponding to the given user_id.
+
+    Args:
+        user_id: str. The user id.
+
+    Returns:
+        A str representing username corresponding to the given user_id.
+    """
+
     if user_id == feconf.MIGRATION_BOT_USER_ID:
         return feconf.MIGRATION_BOT_USERNAME
     else:
@@ -368,6 +612,17 @@ def get_username(user_id):
 
 
 def get_usernames(user_ids):
+    """Gets usernames corresponding to the given user_ids
+
+    Args:
+        user_ids: list. Containing multiple user_ids.
+
+    Returns:
+        A list containing usernames based on given user_ids.
+        If the given user_id does not exist, the corresponding entry in the
+        returned list is None.
+    """
+
     users_settings = get_users_settings(user_ids)
     return [us.username if us else None for us in users_settings]
 
@@ -375,6 +630,16 @@ def get_usernames(user_ids):
 # NB: If we ever allow usernames to change, update the
 # config_domain.BANNED_USERNAMES property.
 def set_username(user_id, new_username):
+    """Sets username to new_username of User with given user_id.
+
+    Args:
+        user_id: str. The user id.
+        new_username: str. The new username to set.
+
+    Raises:
+        ValidationError: If the new_username supplied is already taken.
+    """
+
     user_settings = get_user_settings(user_id, strict=True)
 
     UserSettings.require_valid_username(new_username)
@@ -387,25 +652,51 @@ def set_username(user_id, new_username):
 
 
 def record_agreement_to_terms(user_id):
-    """Records that the user has agreed to the license terms."""
+    """Records that the user with given user_id has agreed to the license terms.
+
+    Args:
+        user_id: str. The user id.
+    """
+
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.last_agreed_to_terms = datetime.datetime.utcnow()
     _save_user_settings(user_settings)
 
 
 def update_profile_picture_data_url(user_id, profile_picture_data_url):
+    """Updates profile_picture_data_url of user with given user_id.
+
+    Args:
+        user_id: str. The user id.
+        profile_picture_data_url: str. New profile picture url to be set.
+    """
+
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.profile_picture_data_url = profile_picture_data_url
     _save_user_settings(user_settings)
 
 
 def update_user_bio(user_id, user_bio):
+    """Updates user_bio of user with given user_id.
+
+    Args:
+        user_id: str. The user id.
+        user_bio: str. New user biography to be set.
+    """
+
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.user_bio = user_bio
     _save_user_settings(user_settings)
 
 
 def update_subject_interests(user_id, subject_interests):
+    """Updates subject_interests of user with given user_id.
+
+    Args:
+        user_id: str. The user id.
+        subject_interests: str. New subject interests to be set.
+    """
+
     if not isinstance(subject_interests, list):
         raise utils.ValidationError('Expected subject_interests to be a list.')
     else:
@@ -431,12 +722,28 @@ def update_subject_interests(user_id, subject_interests):
 
 
 def _update_first_contribution_msec(user_id, first_contribution_msec):
+    """Updates first_contribution_msec of user with given user_id.
+
+    Args:
+        user_id: str. The user id.
+        first_contribution_msec: str. New time to set in milliseconds
+            representing user's first contribution to Oppia.
+    """
+
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.first_contribution_msec = first_contribution_msec
     _save_user_settings(user_settings)
 
 
 def update_first_contribution_msec_if_not_set(user_id, first_contribution_msec):
+    """Updates first_contribution_msec of user with given user_id
+    if it is set to None.
+
+    Args:
+        user_id: str. The user id.
+        first_contribution_msec: str. New time to set in milliseconds
+            representing user's first contribution to Oppia.
+    """
     user_settings = get_user_settings(user_id, strict=True)
     if user_settings.first_contribution_msec is None:
         _update_first_contribution_msec(
@@ -444,12 +751,28 @@ def update_first_contribution_msec_if_not_set(user_id, first_contribution_msec):
 
 
 def update_preferred_language_codes(user_id, preferred_language_codes):
+    """Updates preferred_language_codes of user with given user_id.
+
+    Args:
+        user_id: str. The user id.
+        preferred_language_codes: str. New exploration language preferences
+            to set.
+    """
+
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.preferred_language_codes = preferred_language_codes
     _save_user_settings(user_settings)
 
 
 def update_preferred_site_language_code(user_id, preferred_site_language_code):
+    """Updates preferred_site_language_code of user with given user_id.
+
+    Args:
+        user_id: str. The user id.
+        preferred_site_language_code: str. New system language preference
+            to set.
+    """
+
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.preferred_site_language_code = (
         preferred_site_language_code)
@@ -458,9 +781,21 @@ def update_preferred_site_language_code(user_id, preferred_site_language_code):
 
 def get_human_readable_user_ids(user_ids):
     """Converts the given ids to usernames, or truncated email addresses.
-
     Requires all users to be known.
+
+    Args:
+        user_ids: list. Containing multiple user_ids.
+
+    Returns:
+        A list containing usernames based on given user_ids.
+        If the given username does not exist, the corresponding entry in the
+        returned list is truncated email address.
+
+    Raises:
+        Exception: If User is not found for any user_id in user_ids list.
+            Also logs a corresponding error.
     """
+
     users_settings = get_users_settings(user_ids)
     usernames = []
     for ind, user_settings in enumerate(users_settings):
@@ -480,6 +815,13 @@ def get_human_readable_user_ids(user_ids):
 
 
 def record_user_started_state_editor_tutorial(user_id):
+    """Updates last_started_state_editor_tutorial time for the user
+    with given user_id.
+
+    Args:
+        user_id: str. The user id.
+    """
+
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.last_started_state_editor_tutorial = (
         datetime.datetime.utcnow())
@@ -487,12 +829,24 @@ def record_user_started_state_editor_tutorial(user_id):
 
 
 def record_user_logged_in(user_id):
+    """Updates last_logged_in time for the user with given user_id.
+
+    Args:
+        user_id: str. The user id.
+    """
+
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.last_logged_in = datetime.datetime.utcnow()
     _save_user_settings(user_settings)
 
 
 def record_user_edited_an_exploration(user_id):
+    """Updates last_edited_an_exploration for the user with given user_id.
+
+    Args:
+        user_id: str. The user id.
+    """
+
     user_settings = get_user_settings(user_id)
     if user_settings:
         user_settings.last_edited_an_exploration = datetime.datetime.utcnow()
@@ -500,6 +854,12 @@ def record_user_edited_an_exploration(user_id):
 
 
 def record_user_created_an_exploration(user_id):
+    """Updates last_created_an_exploration for the user with given user_id.
+
+    Args:
+        user_id: str. The user id.
+    """
+
     user_settings = get_user_settings(user_id)
     if user_settings:
         user_settings.last_created_an_exploration = datetime.datetime.utcnow()
@@ -513,7 +873,17 @@ def update_email_preferences(
 
     If no UserEmailPreferencesModel exists for this user, a new one will
     be created.
+
+    Args:
+        user_id: str. The user id.
+        can_receive_email_updates: bool. Indicates whether or not User should
+            receive email updates.
+        can_receive_editor_role_email: bool. Indicates whether or not User
+            should receive editor role email.
+        can_receive_feedback_email: bool. Indicates whether or not User should
+            receive feedback email.
     """
+
     email_preferences_model = user_models.UserEmailPreferencesModel.get(
         user_id, strict=False)
     if email_preferences_model is None:
@@ -529,9 +899,21 @@ def update_email_preferences(
 
 
 def get_email_preferences(user_id):
-    """Returns a boolean representing whether the user has chosen to receive
-    email updates.
+    """Gives email preferences of user with given user_id.
+
+    Args:
+        user_id: str. The user id.
+
+    Returns:
+        a dict representing whether the user has chosen to receive
+        email updates. The format of returned value:
+        {
+                'can_receive_email_updates': (value),
+                'can_receive_editor_role_email': (value),
+                'can_receive_feedback_message_email': (value)
+        }
     """
+
     email_preferences_model = user_models.UserEmailPreferencesModel.get(
         user_id, strict=False)
     return {
@@ -551,14 +933,41 @@ def get_email_preferences(user_id):
 
 
 class UserContributions(object):
-    """Value object representing a user's contributions."""
+    """Value object representing a user's contributions.
+
+    Attributes:
+        user_id: str. The user id.
+        created_exploration_ids: list. Containing ids of explorations created.
+        edited_exploration_ids: list. Containing ids of explorations edited.
+    """
+
     def __init__(
             self, user_id, created_exploration_ids, edited_exploration_ids):
+        """Constructs a UserContributions domain object.
+
+        Args:
+            user_id: str. The user id.
+            created_exploration_ids: list. Containing ids of explorations
+                created.
+            edited_exploration_ids: list. Containing ids of explorations edited.
+        """
         self.user_id = user_id
         self.created_exploration_ids = created_exploration_ids
         self.edited_exploration_ids = edited_exploration_ids
 
     def validate(self):
+        """Checks that user_id, created_exploration_ids and
+        edited_exploration_ids fields of this UserContributions
+        domain object are valid.
+
+        Raises:
+            ValidationError: If either user_id is not str,
+                or if created_exploration_ids is not a list,
+                or if exploration_id in created_exploration_ids is not str,
+                or if edited_exploration_ids is not a list,
+                or if exploration_id in edited_exploration_ids is not str.
+        """
+
         if not isinstance(self.user_id, basestring):
             raise utils.ValidationError(
                 'Expected user_id to be a string, received %s' % self.user_id)
@@ -591,8 +1000,15 @@ class UserContributions(object):
 def get_user_contributions(user_id, strict=False):
     """Gets domain object representing the contributions for the given user_id.
 
-    If the given user_id does not exist, returns None.
+    Args:
+        user_id: str. The user id.
+        strict: bool. Defaults to False.
+
+    Returns:
+        A UserContributions domain object based on given user_id,
+        or None if the given user_id does not exist.
     """
+
     model = user_models.UserContributionsModel.get(user_id, strict=strict)
     if model is not None:
         result = UserContributions(
@@ -605,7 +1021,20 @@ def get_user_contributions(user_id, strict=False):
 
 def create_user_contributions(
         user_id, created_exploration_ids, edited_exploration_ids):
-    """Creates a new UserContributionsModel and returns the domain object."""
+    """Creates a new UserContributionsModel and returns the domain object.
+
+    Args:
+        user_id: str. The user id.
+        created_exploration_ids: list. Containing ids of explorations created.
+        edited_exploration_ids: list. Containing ids of explorations edited.
+
+    Returns:
+        A UserContributions domain object based on given user_id.
+
+    Raises:
+        Exception: If UserContributionsModel for given user_id already exists.
+    """
+
     user_contributions = get_user_contributions(user_id, strict=False)
     if user_contributions:
         raise Exception(
@@ -620,7 +1049,16 @@ def create_user_contributions(
 def update_user_contributions(user_id, created_exploration_ids,
                               edited_exploration_ids):
     """Updates an existing UserContributionsModel with new calculated
-    contributions"""
+    contributions
+
+    Args:
+        user_id: str. The user id.
+        created_exploration_ids: list. Containing ids of explorations created.
+        edited_exploration_ids: list. Containing ids of explorations edited.
+
+    Raises:
+        Exception: If UserContributionsModel for given user_id does not exist.
+    """
 
     user_contributions = get_user_contributions(user_id, strict=False)
     if not user_contributions:
@@ -635,7 +1073,12 @@ def update_user_contributions(user_id, created_exploration_ids,
 
 def add_created_exploration_id(user_id, exploration_id):
     """Adds an exploration_id to a user_id's UserContributionsModel collection
-    of created explorations."""
+    of created explorations.
+
+    Args:
+        user_id: str. The user id.
+        exploration_id: str. The exploration id.
+    """
 
     user_contributions = get_user_contributions(user_id, strict=False)
 
@@ -649,7 +1092,12 @@ def add_created_exploration_id(user_id, exploration_id):
 
 def add_edited_exploration_id(user_id, exploration_id):
     """Adds an exploration_id to a user_id's UserContributionsModel collection
-    of edited explorations."""
+    of edited explorations.
+
+    Args:
+        user_id: str. The user id.
+        exploration_id: str. The exploration id.
+    """
 
     user_contributions = get_user_contributions(user_id, strict=False)
 
@@ -663,7 +1111,12 @@ def add_edited_exploration_id(user_id, exploration_id):
 
 
 def _save_user_contributions(user_contributions):
-    """Commits a user contributions object to the datastore."""
+    """Commits a user contributions object to the datastore.
+
+    Args:
+        user_contributions: UserContributions. Value object representing
+            a user's contributions.
+    """
 
     user_contributions.validate()
     user_models.UserContributionsModel(
@@ -674,7 +1127,15 @@ def _save_user_contributions(user_contributions):
 
 
 def _migrate_dashboard_stats_to_latest_schema(versioned_dashboard_stats):
-    """Holds responsibility of updating the structure of dashboard stats"""
+    """Holds responsibility of updating the structure of dashboard stats.
+
+    Args:
+        versioned_dashboard_stats: UserStatsModel. Value object representing
+            User-specific statistics.
+
+    Raises:
+        Exception: If schema_version <= CURRENT_DASHBOARD_STATS_SCHEMA_VERSION.
+    """
 
     stats_schema_version = versioned_dashboard_stats.schema_version
     if not (1 <= stats_schema_version
@@ -685,12 +1146,26 @@ def _migrate_dashboard_stats_to_latest_schema(versioned_dashboard_stats):
 
 
 def get_current_date_as_string():
-    """Returns current date as a string of format 'YYYY-MM-DD'"""
+    """Gets current date.
+
+    Returns:
+        Returns current date as a string of format 'YYYY-MM-DD'.
+    """
+
     return datetime.datetime.utcnow().strftime(
         feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
 
 
 def parse_date_from_string(datetime_str):
+    """Gives parsed date from a string.
+
+    Args:
+        datetime_str: str. String representing datetime.
+
+    Returns:
+        A dict representing date with year, month and day as keys.
+    """
+
     datetime_obj = datetime.datetime.strptime(
         datetime_str, feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
     return {
@@ -701,7 +1176,16 @@ def parse_date_from_string(datetime_str):
 
 
 def get_user_impact_score(user_id):
-    """Returns user impact score associated with user_id"""
+    """Gets user impact score.
+
+    Args:
+        user_id: str. The user id.
+
+    Returns:
+        A float representing user impact score associated with given user_id.
+        Otherwise returns 0 if UserStatsModel does not exist for a given
+        user_id.
+    """
 
     model = user_models.UserStatsModel.get(user_id, strict=False)
 
@@ -712,32 +1196,38 @@ def get_user_impact_score(user_id):
 
 
 def get_weekly_dashboard_stats(user_id):
-    """Returns a list which contains the dashboard stats of a user,
-    keyed by a datetime string.
-    The stats currently being saved are:
-      - 'average ratings': Average of ratings across all explorations of a
-        user.
-      - 'total plays': Sum total of number of plays across all explorations of
-        a user.
+    """Gets weekly dashboard stats for a given user_id.
 
-    The format of returned value:
-    [
-        {
-            {{datetime_string_1}}: {
-                'num_ratings': (value),
-                'average_ratings': (value),
-                'total_plays': (value)
+    Args:
+        user_id: str. The user id.
+
+    Returns:
+        A list which contains the dashboard stats of a user,
+        keyed by a datetime string.
+        The stats currently being saved are:
+            - 'average ratings': Average of ratings across all explorations of a
+                user.
+            - 'total plays': Sum total of number of plays across all explorations
+                of a user.
+
+        The format of returned value:
+        [
+            {
+                {{datetime_string_1}}: {
+                    'num_ratings': (value),
+                    'average_ratings': (value),
+                    'total_plays': (value)
+                }
+            },
+            {
+                {{datetime_string_2}}: {
+                    'num_ratings': (value),
+                    'average_ratings': (value),
+                    'total_plays': (value)
+                }
             }
-        },
-        {
-            {{datetime_string_2}}: {
-                'num_ratings': (value),
-                'average_ratings': (value),
-                'total_plays': (value)
-            }
-        }
-    ]
-    If the user doesn't exist, then this method returns None.
+        ]
+        If the user doesn't exist, then this method returns None.
     """
 
     model = user_models.UserStatsModel.get(user_id, strict=False)
@@ -749,6 +1239,17 @@ def get_weekly_dashboard_stats(user_id):
 
 
 def get_last_week_dashboard_stats(user_id):
+    """Gets last week's dashboard stats for a given user_id.
+
+    Args:
+        user_id: str. The user id.
+
+    Returns:
+        A list which contains the dashboard stats of a user, keyed by
+        a datetime string. If the user doesn't exist, then
+        this method returns None.
+    """
+
     weekly_dashboard_stats = get_weekly_dashboard_stats(user_id)
     if weekly_dashboard_stats:
         return weekly_dashboard_stats[-1]
@@ -759,7 +1260,11 @@ def get_last_week_dashboard_stats(user_id):
 def update_dashboard_stats_log(user_id):
     """Save statistics for creator dashboard of a user by appending to a list
     keyed by a datetime string.
+
+    Args:
+        user_id: str. The user id.
     """
+
     model = user_models.UserStatsModel.get_or_create(user_id)
 
     if model.schema_version != feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION:
