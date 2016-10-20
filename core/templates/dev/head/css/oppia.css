@@ -2150,7 +2150,9 @@ oppia-parameter {
   cursor: pointer;
   margin-bottom: -5px;
   overflow: auto;
+  position: relative;
 }
+
 .oppia-dashboard-row:hover {
   background: #eee;
 }
@@ -2246,8 +2248,8 @@ md-card.oppia-dashboard-tile {
   background-color: #009688;
   border-radius: 5px;
   color: white;
+  display: inline-block;
   font-size: 10px;
-  margin-left: 3px;
   padding: 4px 6px;
   text-transform: uppercase;
   vertical-align: middle;
@@ -2810,7 +2812,9 @@ div#ng-curtain {
 }
 
 .oppia-notification-content {
+  color: black;
   display: inline-block;
+  float: left;
 }
 
 .oppia-notification-last-updated {
@@ -4344,6 +4348,10 @@ md-card.preview-conversation-skin-supplemental-card {
   }
   .oppia-about-extra-info {
     height: 400px;
+  }
+
+  .oppia-about-three-cols-layout {
+    width: 100%;
   }
 }
 
