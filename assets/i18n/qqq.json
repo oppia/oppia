@@ -142,6 +142,7 @@
   "I18N_LIBRARY_LOADING": "Text displayed in the middle of the page while the content is being loaded.",
   "I18N_LIBRARY_MAIN_HEADER": "Main title of the library page. - The library page shows all the explorations and collections available. It should be a single phrase and fit in one line.",
   "I18N_LIBRARY_N/A": "Text displayed inside the exploration card in the library - It's shown when the exploration has no rating. It should be very small as it's replacing a two digit number.",
+  "I18N_LIBRARY_NO_EXPLORATIONS": "Text displayed in the center of the library group page - It's shown when there are no explorations to display on a group page such as top rated or recently published explorations.",
   "I18N_LIBRARY_NO_EXPLORATION_FOR_QUERY": "Text displayed in the center of the page - It's displayed when the user has applied a filter or made a search query using the search bar, but no exploration match the criteria used. It has a very informal language.",
   "I18N_LIBRARY_NO_EXPLORATION_GROUPS": "There are no groups of explorations available to display.",
   "I18N_LIBRARY_NO_OBJECTIVE": "Text displayed inside the exploration card in the library - It's shown under the title when the exploration has no description available.",

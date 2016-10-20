@@ -321,21 +321,6 @@
       <em>Last updated: 7 December 2015</em>
     </md-card>
   </div>
-
-  <script>
-    // This scrolls the page to the anchor clicked on in the quick links menu.
-    $('a[href*=#]:not([href=#])').click(function() {
-      if (location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '')) {
-        var target = $('[name=' + this.hash.slice(1) +']');
-        if (target.length) {
-          $('html,body').animate({
-            scrollTop: target.offset().top
-          }, 1000);
-          return false;
-        }
-      }
-    });
-  </script>
 {% endblock %}
 
 {% block footer %}

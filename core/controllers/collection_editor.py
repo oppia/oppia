@@ -95,9 +95,6 @@ class CollectionEditorHandler(base.BaseHandler):
 class CollectionEditorPage(CollectionEditorHandler):
     """The editor page for a single collection."""
 
-    # TODO(bhenning): Implement read-only version of the editor. Until that
-    # exists, ensure the user has proper permission to edit this collection
-    # before seeing the editor.
     @require_editor
     def get(self, collection_id):
         """Handles GET requests."""
@@ -105,20 +102,8 @@ class CollectionEditorPage(CollectionEditorHandler):
         collection = collection_services.get_collection_by_id(
             collection_id, strict=False)
 
-        if (collection is None or
-                not rights_manager.Actor(self.user_id).can_view(
-                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id)):
-            self.redirect('/')
-            return
-
-        can_edit = (
-            bool(self.user_id) and
-            self.username not in config_domain.BANNED_USERNAMES.value and
-            rights_manager.Actor(self.user_id).can_edit(
-                feconf.ACTIVITY_TYPE_COLLECTION, collection_id))
-
         self.values.update({
-            'can_edit': can_edit,
+            'can_edit': True,
             'can_unpublish': rights_manager.Actor(
                 self.user_id).can_unpublish(
                     feconf.ACTIVITY_TYPE_COLLECTION, collection_id),
@@ -128,8 +113,6 @@ class CollectionEditorPage(CollectionEditorHandler):
             'title': collection.title,
             'SHOW_COLLECTION_NAVIGATION_TAB_HISTORY': (
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_HISTORY),
-            'SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK': (
-                feconf.SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK),
             'SHOW_COLLECTION_NAVIGATION_TAB_STATS': (
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_STATS),
             'TAG_REGEX': feconf.TAG_REGEX,
@@ -138,7 +121,7 @@ class CollectionEditorPage(CollectionEditorHandler):
         self.render_template('pages/collection_editor/collection_editor.html')
 
 
-class WritableCollectionDataHandler(CollectionEditorHandler):
+class EditableCollectionDataHandler(CollectionEditorHandler):
     """A data handler for collections which supports writing."""
 
     def _require_valid_version(self, version_from_payload, collection_version):
@@ -153,6 +136,25 @@ class WritableCollectionDataHandler(CollectionEditorHandler):
                 'Trying to update version %s of collection from version %s, '
                 'which is too old. Please reload the page and try again.'
                 % (collection_version, version_from_payload))
+
+    @require_editor
+    def get(self, collection_id):
+        """Populates the data on the individual collection page."""
+
+        try:
+            # Try to retrieve collection
+            collection_dict = (
+                summary_services.get_learner_collection_dict_by_id(
+                    collection_id, self.user_id,
+                    allow_invalid_explorations=True))
+        except Exception as e:
+            raise self.PageNotFoundException(e)
+
+        self.values.update({
+            'collection': collection_dict
+        })
+
+        self.render_json(self.values)
 
     @require_editor
     def put(self, collection_id):
@@ -171,13 +173,15 @@ class WritableCollectionDataHandler(CollectionEditorHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        # Retrieve the updated collection.
         collection_dict = (
             summary_services.get_learner_collection_dict_by_id(
                 collection_id, self.user_id, allow_invalid_explorations=True))
 
         # Send the updated collection back to the frontend.
-        self.values.update(collection_dict)
+        self.values.update({
+            'collection': collection_dict
+        })
+
         self.render_json(self.values)
 
 
@@ -220,3 +224,24 @@ class CollectionRightsHandler(CollectionEditorHandler):
             'rights': rights_manager.get_collection_rights(
                 collection_id).to_dict()
         })
+
+
+class ExplorationMetadataSearchHandler(base.BaseHandler):
+    """Provides data for exploration search."""
+
+    def get(self):
+        """Handles GET requests."""
+        query_string = self.request.get('q')
+
+        search_cursor = self.request.get('cursor', None)
+
+        collection_node_metadata_list, new_search_cursor = (
+            summary_services.get_exp_metadata_dicts_matching_query(
+                query_string, search_cursor, self.user_id))
+
+        self.values.update({
+            'collection_node_metadata_list': collection_node_metadata_list,
+            'search_cursor': new_search_cursor,
+        })
+
+        self.render_json(self.values)
