@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Models for Oppia feedback threads and messages."""
+
 from core.platform import models
 import feconf
 import utils
@@ -43,7 +44,6 @@ _RAND_RANGE = 127 * 127
 
 
 class FeedbackThreadModel(base_models.BaseModel):
-
     """Threads for each exploration.
 
     The id/key of instances of this class has the form
@@ -73,7 +73,6 @@ class FeedbackThreadModel(base_models.BaseModel):
 
     @classmethod
     def generate_new_thread_id(cls, exploration_id):
-
         """Generates a new thread ID which is unique within the exploration.
 
         Args:
@@ -125,7 +124,8 @@ class FeedbackThreadModel(base_models.BaseModel):
         """Creates a new FeedbackThreadModel entry.
 
         Args:
-            exploration_id: str. The exploration ID the thread belongs to.
+            exploration_id: str. The ID of the exploration the thread
+                belongs to.
             thread_id: str. Thread ID of the newly-created thread.
 
         Returns:
@@ -166,7 +166,7 @@ class FeedbackThreadModel(base_models.BaseModel):
 
         Args:
             exploration_id: str.
-            limit: int. Query limit, maximum possible number of items
+            limit: int. The maximum possible number of items
                 in the returned list.
 
         Returns:
@@ -237,7 +237,8 @@ class FeedbackMessageModel(base_models.BaseModel):
             message_id: int. ID of the message.
 
         Returns:
-            str. instance of the new FeedbackMessageModel entry.
+            FeedbackMessageModel. Instance of the new FeedbackMessageModel
+                entry.
 
         Raises:
             Exception: A message with the same ID already exists
@@ -251,8 +252,9 @@ class FeedbackMessageModel(base_models.BaseModel):
 
     @classmethod
     def get(cls, exploration_id, thread_id, message_id, strict=True):
-        """Gets the FeedbackMessageModel entry for the given ID. Raises error if
-        no undeleted messages are found and strict == True.
+        """Gets the FeedbackMessageModel entry for the given ID. Raises an
+        error if no undeleted message with the given ID is found and
+        strict == True.
 
         Args:
             exploration_id: str. ID of the exploration.
@@ -263,14 +265,14 @@ class FeedbackMessageModel(base_models.BaseModel):
 
         Returns:
             FeedbackMessageModel or None. If strict == False and no undeleted
-                message with the given message_id exists in the datastore.
-                Otherwise the FeedbackMessageModel instance that corresponds
-                to the given ID.
+                message with the given message_id exists in the datastore, then
+                returns None. Otherwise, returns the FeedbackMessageModel
+                instance that corresponds to the given ID.
 
         Raises:
             EntityNotFoundError: If strict == True and message ID is not valid
-                and it is not marked as deleted. No error will be raised if
-                message is deleted.
+                or message is marked as deleted. No error will be raised if
+                strict == False.
         """
         instance_id = cls._generate_id(exploration_id, thread_id, message_id)
         return super(FeedbackMessageModel, cls).get(instance_id, strict=strict)
@@ -286,8 +288,9 @@ class FeedbackMessageModel(base_models.BaseModel):
             thread_id: str. ID of the thread.
 
         Returns:
-            list(FeedbackMessageModel). A list of the messages limited by
-                default query limit.
+            list(FeedbackMessageModel). A list of messages in the
+            given thread, up to a maximum of feconf.DEFAULT_QUERY_LIMIT
+            messages.
 
         """
         full_thread_id = (
@@ -299,8 +302,7 @@ class FeedbackMessageModel(base_models.BaseModel):
 
     @classmethod
     def get_most_recent_message(cls, exploration_id, thread_id):
-        """Returns the most recent messages from the given thread, ordered
-        by their "last updated" field.
+        """Returns the last message in the thread.
 
         Args:
             exploration_id: str. ID of the exploration that the thread
@@ -308,7 +310,7 @@ class FeedbackMessageModel(base_models.BaseModel):
             thread_id: str. ID of the thread.
 
         Returns:
-            list(FeedbackMessageModel). List of recent messages.
+            FeedbackMessageModel. Last message in the thread.
         """
         full_thread_id = FeedbackThreadModel.generate_full_thread_id(
             exploration_id, thread_id)
@@ -382,7 +384,7 @@ class SuggestionModel(base_models.BaseModel):
     exploration_version = ndb.IntegerProperty(required=True, indexed=True)
     # Name of the corresponding state.
     state_name = ndb.StringProperty(required=True, indexed=True)
-    # Learner-provided description of suggestions.
+    # Learner-provided description of suggestion.
     description = ndb.TextProperty(required=True, indexed=False)
     # The state's content after the suggested edits.
     # Contains keys 'type' (always 'text') and 'value' (the actual content).
@@ -397,14 +399,14 @@ class SuggestionModel(base_models.BaseModel):
             exploration_id: str. ID of the corresponding exploration.
             thread_id: str. ID of the corresponding thread.
             author_id: str. ID of the user who submitted the suggestion.
-            state_name: str. ID of the state the thread is for.
+            state_name: str. ID of the state the suggestion is for.
             description: str. Learner-provided description of suggestion.
             state_content: dict. Contains two keys, "type" and "value". For
                 historical reasons, the value of "type" is always "text"
                 while the value of "value" is the actual suggestion made
                 by learner in the form of html content.
-            exploration_version: int. exploration version for which suggestions
-                were made.
+            exploration_version: int. exploration version for which the
+                suggestion was made.
 
         Raises:
             Exception: There is already a feedback thread with the same
@@ -439,17 +441,17 @@ class SuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_by_exploration_and_thread_id(cls, exploration_id, thread_id):
-        """Gets a suggestion by the corresponding exploration and thread id's.
+        """Gets a suggestion by the corresponding exploration and thread IDs.
 
         Args:
-            exploration_id: str. ID of the exploration to which
-                SuggestionModel belongs.
-            thread_id: str. ID of the thread.
+            exploration_id: str. ID of the exploration to which the
+                suggestion belongs.
+            thread_id: str. Thread ID of the suggestion thread.
 
         Returns:
             SuggestionModel or None. Suggestion related to the given
-                exploration and thread id, or None if it doesn't match
-                anything.
+                exploration and thread IDs, or None if no such SuggestionModel
+                exists.
         """
 
         return cls.get_by_id(cls._get_instance_id(exploration_id, thread_id))
