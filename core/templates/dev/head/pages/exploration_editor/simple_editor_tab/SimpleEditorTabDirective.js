@@ -20,9 +20,8 @@
 oppia.directive('simpleEditorTab', [function() {
   return {
     restrict: 'E',
+    scope: {},
     templateUrl: 'editor/simpleEditorTab',
-    controller: ['$scope', function($scope) {
-      $scope.message = 'Simple Editor';
-    }]
+    controller: [function() {}]
   };
 }]);

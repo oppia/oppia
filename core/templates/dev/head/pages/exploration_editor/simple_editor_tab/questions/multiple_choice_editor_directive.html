@@ -1,0 +1,107 @@
+<script type="text/ng-template" id="simpleEditorQuestions/MultipleChoiceInput">
+  <div class="header">
+    Select the choices
+  </div>
+  <div style="width: 100%; margin-top: 20px; background-color: #f0f0f0;">
+    <ul>
+      <li ng-repeat="choice in getChoices() track by $index" style="border-bottom: 1px; width: 100%;">
+        <button ng-click="deleteChoice($index)" style="border: 0; float: right;"
+                ng-if="getChoices().length > 1">
+          X
+        </button>
+        <editor-html-field original-value="choice"
+                           on-finish-editing="saveChoice($index, newValue)"
+                           field-id="<[getFieldId($index)]>">
+        </editor-html-field>
+      </li>
+    </ul>
+
+    <button ng-click="addChoice()" style="border: 0; margin-left: 20px;">
+      + &nbsp;&nbsp;&nbsp; Add option
+    </button>
+  </div>
+
+  <div class="header">
+    Pick the correct answer
+  </div>
+  <div style="width: 100%; margin-top: 20px; background-color: #f0f0f0;">
+    <div class="multiple-choice-editor-option-container" ng-repeat="choice in getChoices() track by $index">
+      <button class="multiple-choice-editor-option" ng-click="selectCorrectAnswer($index)"
+              ng-class="{'multiple-choice-editor-selected': isCorrectAnswer($index)}">
+        <div class="multiple-choice-editor-radio-button-container">
+          <span class="multiple-choice-editor-outer-radio-button">
+            <span class="multiple-choice-editor-inner-radio-button"></span>
+          </span>
+        </div>
+        <div class="multiple-choice-editor-content-container">
+          <span angular-html-bind="choice"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <div ng-if="answerGroups.length > 0">
+    <div class="header">
+      Provide additional explanation for the right answer
+    </div>
+    <div style="width: 100%; margin-top: 20px; background-color: #f0f0f0;">
+      <editor-html-field original-value="answerGroups[0].outcome.feedback[0]"
+                         on-finish-editing="saveCorrectAnswerFeedback(newValue)">
+      </editor-html-field>
+    </div>
+  </div>
+
+  <div class="header">
+    Provide a hint for all other answers
+  </div>
+  <editor-html-field original-value="getDefaultOutcome().feedback[0]"
+                     on-finish-editing="saveDefaultFeedback(newValue)"
+                     placeholder="Type something">
+  </editor-html-field>
+
+</script>
+
+<style>
+  .multiple-choice-editor-option-container {
+    padding: 4px 0;
+  }
+
+  .multiple-choice-editor-option {
+    background: none;
+    border: none;
+    color: #0D48A1;
+    text-align: left;
+    /* This is needed so that images stay bounded by the container in Firefox. */
+    width: 100%;
+  }
+
+  .multiple-choice-editor-radio-button-container,
+  .multiple-choice-editor-content-container {
+    display: table-cell;
+  }
+
+  .multiple-choice-editor-outer-radio-button {
+    border: 2px solid #0D48A1;
+    border-radius: 50%;
+    display: inline-block;
+    height: 16px;
+    margin-bottom: -2px;
+    margin-right: 12px;
+    width: 16px;
+  }
+
+  .multiple-choice-editor-option:hover .multiple-choice-editor-inner-radio-button,
+  .multiple-choice-editor-selected .multiple-choice-editor-inner-radio-button {
+    background-color: #115FD4;
+    border-radius: 50%;
+    display: block;
+    height: 8px;
+    margin: 2px;
+    width: 8px;
+  }
+
+  .multiple-choice-editor-option:hover .multiple-choice-editor-outer-radio-button,
+  .multiple-choice-editor-selected .multiple-choice-editor-outer-radio-button {
+    border-color: #115FD4;
+  }
+</style>

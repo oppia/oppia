@@ -177,8 +177,14 @@ oppia.controller('ExplorationEditor', [
           successCallback();
         }
 
-        SimpleEditorQuestionsDataService.init(
-          EditorModeService.setModeToSimple);
+        SimpleEditorQuestionsDataService.init(function() {
+          // TODO(sll): This should only fire once, on the initial page load.
+          EditorModeService.setModeToSimple();
+          // TODO(sll): The $broadcast should also fire anytime the main tab is
+          // switched to (e.g. if the creator goes to the settings tab and
+          // updates the title).
+          $scope.$broadcast('simpleEditorLoaded');
+        });
       });
     };
 

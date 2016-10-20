@@ -405,12 +405,17 @@
       </div>
     </script>
 
-    <div class="container-fluid oppia-editor-page-container" ng-joy-ride="tutorialInProgress" config="EDITOR_TUTORIAL_OPTIONS" on-finish="onFinishTutorial()" on-skip="onSkipTutorial()">
-      <div class="row" ng-if="explorationRightsService.isCloned()">
-        <div class="col-lg-12 col-md-12 col-sm-12">
-          <div class="oppia-align-center alert alert-warning" style="padding: 2px; width: 90%;">
-            <strong>Note:</strong> This is a private, unpublishable copy of a
-            <a ng-href="<[getExplorationUrl(explorationRightsService.clonedFrom())]>" target="_blank">public exploration</a>.
+    <div ng-joy-ride="tutorialInProgress"
+         config="EDITOR_TUTORIAL_OPTIONS"
+         on-finish="onFinishTutorial()"
+         on-skip="onSkipTutorial()">
+      <div class="container-fluid">
+        <div class="row" ng-if="explorationRightsService.isCloned()">
+          <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="oppia-align-center alert alert-warning" style="padding: 2px; width: 90%;">
+              <strong>Note:</strong> This is a private, unpublishable copy of a
+              <a ng-href="<[getExplorationUrl(explorationRightsService.clonedFrom())]>" target="_blank">public exploration</a>.
+            </div>
           </div>
         </div>
       </div>
@@ -497,7 +502,12 @@
 
   {% include 'pages/exploration_editor/editor_tab/state_graph_visualization_directive.html' %}
 
-{% include 'pages/exploration_editor/simple_editor_tab/simple_editor_tab_directive.html' %}
+  {% include 'pages/exploration_editor/simple_editor_tab/simple_editor_tab_directive.html' %}
+  {% include 'pages/exploration_editor/simple_editor_tab/simple_editor_body_directive.html' %}
+  {% include 'pages/exploration_editor/simple_editor_tab/simple_editor_sidebar_directive.html' %}
+  {% include 'pages/exploration_editor/simple_editor_tab/fields/editor_html_field_directive.html' %}
+  {% include 'pages/exploration_editor/simple_editor_tab/fields/editor_plaintext_field_directive.html' %}
+  {% include 'pages/exploration_editor/simple_editor_tab/questions/multiple_choice_editor_directive.html' %}
 
   {% include 'pages/exploration_player/answer_feedback_pair_directive.html' %}
   {% include 'pages/exploration_player/conversation_skin_directive.html' %}
@@ -582,6 +592,11 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateStatistics.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/simple_editor_tab/SimpleEditorTabDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/simple_editor_tab/SimpleEditorBodyDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/simple_editor_tab/SimpleEditorSidebarDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/simple_editor_tab/fields/EditorHtmlFieldDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/simple_editor_tab/fields/EditorPlaintextFieldDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/simple_editor_tab/questions/MultipleChoiceEditorDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/preview_tab/PreviewTab.js"></script>
 

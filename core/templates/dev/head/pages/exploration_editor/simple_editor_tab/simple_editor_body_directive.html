@@ -1,0 +1,84 @@
+<script type="text/ng-template" id="simpleEditor/body">
+  <div class="main">
+    <div class="content">
+      <h2>What would you like to teach?</h2>
+      <editor-plaintext-field original-value="explorationTitleService.savedMemento"
+                              on-finish-editing="saveTitle(newValue)"
+                              placeholder="Type the title of your exploration.">
+      </editor-plaintext-field>
+
+      <h2>Introduction</h2>
+      <editor-html-field original-value="initialState.content[0].value"
+                         on-finish-editing="saveIntroduction(newValue)">
+      </editor-html-field>
+
+      <div ng-repeat="question in questions track by $index">
+        <h2>Question <[$index + 1]></h2>
+
+        <multiple-choice-editor ng-if="question.interactionId === 'MultipleChoiceInput'"
+                                state-name="question.stateName"
+                                customization-args="question.interactionCustomizationArgs"
+                                answer-groups="question.answerGroups"
+                                default-outcome="question.defaultOutcome"
+                                save-customization-args="saveCustomizationArgs(question.stateName, newValue)"
+                                save-answer-groups="saveAnswerGroups(question.stateName, newValue)"
+                                save-default-outcome="saveDefaultOutcome(question.stateName, newValue)">
+        </multiple-choice-editor>
+
+        <!-- TODO(sll): Update this condition when control of individual field visibility is added. -->
+        <div ng-if="!$last">
+          <div class="header">
+            Bridge Text
+          </div>
+          <editor-html-field original-value="questions[$index].bridgeContent[0].value"
+                             on-finish-editing="saveBridgeText(questions[$index + 1].stateName, newValue)">
+          </editor-html-field>
+        </div>
+      </div>
+    </div>
+
+    <button ng-if="canAddNewQuestion()" type="button"
+            class="btn btn-default advance-btn" ng-click="addNewQuestion()">
+      <i class="material-icons md-24">&#xE5CF;</i>
+    </button>
+  </div>
+</script>
+
+<style>
+  simple-editor-body .main {
+    background-color: #fff;
+    height: 100%;
+    /* This must match the 'width' of the .main class. */
+    margin-left: 220px;
+    position: relative;
+    text-align: center;
+    width: calc(100% - 220px);
+  }
+  simple-editor-body .content {
+    height: 100%;
+    margin: 0 auto;
+    max-width: 700px;
+    min-height: 2000px;
+    padding-top: 100px;
+    position: relative;
+    text-align: left;
+    width: calc(100% - 40px);
+  }
+  simple-editor-body .content .header {
+    color: #000;
+    margin-bottom: 40px;
+    margin-top: 80px;
+  }
+
+  simple-editor-body .advance-btn {
+    border: 1px solid #888;
+    border-radius: 50%;
+    bottom: 50px;
+    height: 50px;
+    position: fixed;
+    width: 50px;
+  }
+  simple-editor-body .advance-btn i {
+    margin: 6px auto;
+  }
+</style>
