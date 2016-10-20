@@ -85,7 +85,7 @@ class FileMetadataModel(base_models.VersionedModel):
             filepath: str. The path to the exploration file.
 
         Returns:
-            str. Instance of the new file meta data model entry.
+            int. Instance of the new file meta data model entry.
         """
         model_id = cls._construct_id(exploration_id, filepath)
         return cls(id=model_id, deleted=False)
@@ -101,7 +101,7 @@ class FileMetadataModel(base_models.VersionedModel):
             entry is not found.
 
         Returns:
-            FileMetaDataModel instance that corresponds to the given ID.
+            The FileMetaDataModel instance that corresponds to the given ID.
         """
         model_id = cls._construct_id(exploration_id, filepath)
         return super(FileMetadataModel, cls).get(model_id, strict=strict)
@@ -114,8 +114,8 @@ class FileMetadataModel(base_models.VersionedModel):
         Args:
             exploration_id: str. The ID of the exploration.
             filepath: str. The path to the exploration file.
-            version_number: str. Version number from the instance of versioned
-            Model.
+            version_number: str. The version number of the filemetadata model
+            to retrieve.
 
         Returns:
             A VersionedModel instance representing a model id from
@@ -129,11 +129,11 @@ class FileMetadataModel(base_models.VersionedModel):
         """ Saves a version snapshot and updates the model.
 
         Args:
-            committer_id: ID of the user saving the snapshot.
-            commit_cmds: Information on how to reconstruct the commit.
+            committer_id: int. ID of the user saving the snapshot.
+            commit_cmds: str. Information on how to reconstruct the commit.
 
         Returns:
-            A version snapshot from the FileMetadataModel.
+           str. A version snapshot from the FileMetadataModel.
         """
         return super(FileMetadataModel, self).commit(
             committer_id, '', commit_cmds)
