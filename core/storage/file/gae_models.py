@@ -45,11 +45,6 @@ class FileMetadataModel(base_models.VersionedModel):
 
     @classmethod
     def get_new_id(cls, entity_name):
-        """Raise an exception if an id is not created.
-
-        Args:
-            entity_name: str. An entity name that is tied to the created id.
-        """
         raise NotImplementedError
 
     @classmethod
@@ -65,7 +60,7 @@ class FileMetadataModel(base_models.VersionedModel):
 
     @classmethod
     def _construct_id(cls, exploration_id, filepath):
-        """ Builds the path for the id to be generated.
+        """Builds the path for the id to be generated.
 
         Args:
             exploration_id: str. The ID of the exploration.
@@ -78,7 +73,7 @@ class FileMetadataModel(base_models.VersionedModel):
 
     @classmethod
     def create(cls, exploration_id, filepath):
-        """ Creates a new file meta data model entry.
+        """Creates a new file meta data model entry.
 
         Args:
             exploration_id: str. The ID of the exploration.
@@ -92,7 +87,7 @@ class FileMetadataModel(base_models.VersionedModel):
 
     @classmethod
     def get_model(cls, exploration_id, filepath, strict=False):
-        """ Gets the model of an exploration by id.
+        """Gets the model of an exploration by id.
 
         Args:
             exploration_id: str. The ID of the exploration.
@@ -108,7 +103,7 @@ class FileMetadataModel(base_models.VersionedModel):
 
     @classmethod
     def get_version(cls, exploration_id, filepath, version_number):
-        """ Gets a VersionedModel instance representing a given version
+        """Gets a VersionedModel instance representing a given version
         in VersionedModel.
 
         Args:
@@ -126,7 +121,7 @@ class FileMetadataModel(base_models.VersionedModel):
             model_id, version_number)
 
     def commit(self, committer_id, commit_cmds):
-        """ Saves a version snapshot and updates the model.
+        """Saves a version snapshot and updates the model.
 
         Args:
             committer_id: int. ID of the user saving the snapshot.
