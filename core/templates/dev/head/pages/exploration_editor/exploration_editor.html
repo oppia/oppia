@@ -421,10 +421,10 @@
       </div>
 
       <div ng-show="getTabStatuses().active === 'main'">
-        <div ng-show="getEditorMode() === 'simple'">
+        <div ng-show="isEditorInSimpleMode()">
           <simple-editor-tab></simple-editor-tab>
         </div>
-        <div ng-show="getEditorMode() === 'full'">
+        <div ng-show="isEditorInFullMode()">
           {% include 'pages/exploration_editor/editor_tab/editor_tab.html' %}
         </div>
       </div>
@@ -615,6 +615,7 @@
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ExplorationObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StateObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/QuestionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/SimpleEditorQuestionsDataService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/StopwatchObjectFactory.js"></script>
 

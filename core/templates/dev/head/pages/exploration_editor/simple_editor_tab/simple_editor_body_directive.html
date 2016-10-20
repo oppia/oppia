@@ -15,14 +15,14 @@
       <div ng-repeat="question in questions track by $index">
         <h2>Question <[$index + 1]></h2>
 
-        <multiple-choice-editor ng-if="question.interactionId === 'MultipleChoiceInput'"
-                                state-name="question.stateName"
-                                customization-args="question.interactionCustomizationArgs"
-                                answer-groups="question.answerGroups"
-                                default-outcome="question.defaultOutcome"
-                                save-customization-args="saveCustomizationArgs(question.stateName, newValue)"
-                                save-answer-groups="saveAnswerGroups(question.stateName, newValue)"
-                                save-default-outcome="saveDefaultOutcome(question.stateName, newValue)">
+        <multiple-choice-editor ng-if="question.getInteractionId() === 'MultipleChoiceInput'"
+                                state-name="question.getStateName()"
+                                customization-args="question.getInteractionCustomizationArgs()"
+                                answer-groups="question.getAnswerGroups()"
+                                default-outcome="question.getDefaultOutcome()"
+                                save-customization-args="saveCustomizationArgs(question.getStateName(), newValue)"
+                                save-answer-groups="saveAnswerGroups(question.getStateName(), newValue)"
+                                save-default-outcome="saveDefaultOutcome(question.getStateName(), newValue)">
         </multiple-choice-editor>
 
         <!-- TODO(sll): Update this condition when control of individual field visibility is added. -->
@@ -30,8 +30,8 @@
           <div class="header">
             Bridge Text
           </div>
-          <editor-html-field original-value="questions[$index].bridgeContent[0].value"
-                             on-finish-editing="saveBridgeText(questions[$index + 1].stateName, newValue)">
+          <editor-html-field original-value="questions[$index].getBridgeContent()[0].value"
+                             on-finish-editing="saveBridgeText(questions[$index + 1].getStateName(), newValue)">
           </editor-html-field>
         </div>
       </div>

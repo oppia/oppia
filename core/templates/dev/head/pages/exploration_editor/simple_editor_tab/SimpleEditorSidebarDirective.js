@@ -14,7 +14,6 @@
 
 /**
  * @fileoverview Directive for the sidebar of the simple editor.
- * editor.
  */
 
 oppia.directive('simpleEditorSidebar', [function() {

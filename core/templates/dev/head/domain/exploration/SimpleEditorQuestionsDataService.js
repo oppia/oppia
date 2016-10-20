@@ -14,15 +14,15 @@
 
 /**
  * @fileoverview Service for storing information about the current exploration
- *   in the form of question fields.
+ * in the form of question fields.
  */
 
 oppia.factory('SimpleEditorQuestionsDataService', [
   'explorationData', 'explorationInitStateNameService',
-  'explorationStatesService',
+  'explorationStatesService', 'QuestionObjectFactory',
   function(
       explorationData, explorationInitStateNameService,
-      explorationStatesService) {
+      explorationStatesService, QuestionObjectFactory) {
     var questions = null;
 
     var SUPPORTED_INTERACTION_TYPES = [{
@@ -98,15 +98,10 @@ oppia.factory('SimpleEditorQuestionsDataService', [
           bridgeContent = destinationState.content;
         }
 
-        questionData.push({
-          stateName: currentStateName,
-          interactionId: interactionId,
-          interactionCustomizationArgs: angular.copy(
-            stateData.interaction.customization_args),
-          answerGroups: angular.copy(stateData.interaction.answer_groups),
-          defaultOutcome: angular.copy(stateData.interaction.default_outcome),
-          bridgeContent: bridgeContent
-        });
+        questionData.push(
+          QuestionObjectFactory.create(
+            currentStateName, stateData.interaction, bridgeContent)
+        );
 
         currentStateName = destinationStateNames[0];
       }

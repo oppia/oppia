@@ -55,7 +55,8 @@ oppia.controller('ExplorationEditor', [
 
     $scope.areGadgetsEnabled = (
       explorationAdvancedFeaturesService.areGadgetsEnabled);
-    $scope.getEditorMode = EditorModeService.getMode;
+    $scope.isEditorInSimpleMode = EditorModeService.isEditorInSimpleMode;
+    $scope.isEditorInFullMode = EditorModeService.isEditorInFullMode;
 
     /**********************************************************
      * Called on initial load of the exploration editor page.

@@ -14,7 +14,6 @@
 
 /**
  * @fileoverview Directive for the body of the simple editor.
- * editor.
  */
 
 oppia.directive('simpleEditorBody', [function() {
@@ -88,8 +87,8 @@ oppia.directive('simpleEditorBody', [function() {
           if ($scope.questions.length === 0) {
             return true;
           } else {
-            var lastQuestion = $scope.questions[$scope.questions.length - 1];
-            return lastQuestion.answerGroups.length > 0;
+            return $scope.questions[
+              $scope.questions.length - 1].hasAnswerGroups();
           }
         };
 
@@ -99,8 +98,10 @@ oppia.directive('simpleEditorBody', [function() {
           var lastStateName = (
             $scope.questions.length > 0 ?
             $scope.questions[
-              $scope.questions.length - 1].answerGroups[0].outcome.dest :
+              $scope.questions.length - 1].getDestinationStateName() :
             explorationInitStateNameService.savedMemento);
+
+          // TODO(sll): Abstract these default values into constants.
           explorationStatesService.saveInteractionId(
             lastStateName, 'MultipleChoiceInput');
           explorationStatesService.saveInteractionCustomizationArgs(
@@ -118,7 +119,8 @@ oppia.directive('simpleEditorBody', [function() {
           // any effect.
           $timeout(function() {
             $scope.$broadcast('newQuestionAdded', {
-              stateName: $scope.questions[$scope.questions.length - 1].stateName
+              stateName: (
+                $scope.questions[$scope.questions.length - 1].getStateName())
             });
           });
         };

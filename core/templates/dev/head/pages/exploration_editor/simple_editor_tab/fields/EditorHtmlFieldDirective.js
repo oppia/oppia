@@ -14,7 +14,6 @@
 
 /**
  * @fileoverview Directive for an HTML field in the simple editor.
- * editor.
  */
 
 oppia.directive('editorHtmlField', [function() {

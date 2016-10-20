@@ -2,9 +2,6 @@
   <div ng-show="!inEditMode" ng-click="startEditing()" class="view-mode">
     <span angular-html-bind="getOriginalValue()"></span>
     <!-- TODO(sll): This should also show if getOriginalValue() normalizes to an empty string. -->
-    <span ng-if="!getOriginalValue()" style="opacity: 0.6;">
-      <[placeholder]>
-    </span>
     <i class="material-icons edit-icon" title="Edit HTML">&#xE254;</i>
   </div>
 

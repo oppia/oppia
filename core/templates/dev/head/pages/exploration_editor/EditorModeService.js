@@ -23,8 +23,11 @@ oppia.factory('EditorModeService', [function() {
   var mode = EDITOR_MODE_FULL;
 
   return {
-    getMode: function() {
-      return mode;
+    isEditorInSimpleMode: function() {
+      return mode === EDITOR_MODE_SIMPLE;
+    },
+    isEditorInFullMode: function() {
+      return mode === EDITOR_MODE_FULL;
     },
     setModeToSimple: function() {
       mode = EDITOR_MODE_SIMPLE;

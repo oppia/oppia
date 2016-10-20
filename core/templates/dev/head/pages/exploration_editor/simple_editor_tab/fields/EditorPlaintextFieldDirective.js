@@ -14,7 +14,6 @@
 
 /**
  * @fileoverview Directive for a plain-text field in the simple editor.
- * editor.
  */
 
 oppia.directive('editorPlaintextField', [function() {
