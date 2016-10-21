@@ -31,6 +31,7 @@ from core.controllers import profile
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
+from core.controllers import user_query
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -374,6 +375,10 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_RIGHTS_PREFIX,
         collection_editor.CollectionRightsHandler),
+    get_redirect_route(
+        r'/query', user_query.QueryPage),
+    get_redirect_route(
+        r'/querydatahandler', user_query.QueryDataHandler),
 
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),

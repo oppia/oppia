@@ -102,3 +102,13 @@ class UserQueryOneOffJob(jobs.BaseMapReduceJobManager):
         user_ids = [ast.literal_eval(v) for v in stringified_user_ids]
         query_model.user_ids = [str(user_id) for user_id in user_ids]
         query_model.put()
+
+    @classmethod
+    def _post_completed_hook(cls, job_id):
+        # TODO: change query status in query model to completed.
+        pass
+
+    @classmethod
+    def _post_failure_hook(cls, job_id):
+        # TODO: change query status in query model to failed.
+        pass
