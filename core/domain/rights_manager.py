@@ -339,7 +339,8 @@ class Actor(object):
 
     def is_moderator(self):
         if self._is_moderator is None:
-            self._is_moderator = (self.is_admin() or
+            self._is_moderator = (
+                self.is_admin() or
                 self.user_id in config_domain.MODERATOR_IDS.value)
         return self._is_moderator
 
