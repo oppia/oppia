@@ -37,6 +37,8 @@ oppia.directive('multipleChoiceEditor', [function() {
     },
     templateUrl: 'simpleEditorQuestions/MultipleChoiceInput',
     controller: ['$scope', '$timeout', function($scope, $timeout) {
+      // Note that a questionId generated in this way may contain spaces,
+      // since it is just the state name.
       $scope.questionId = $scope.getUniqueId();
       $scope.getFieldId = function(index) {
         return $scope.questionId + '.' + index;
