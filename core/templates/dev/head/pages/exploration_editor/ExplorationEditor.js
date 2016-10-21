@@ -36,7 +36,7 @@ oppia.controller('ExplorationEditor', [
   'explorationWarningsService', '$templateCache', 'explorationContextService',
   'explorationAdvancedFeaturesService', 'changeListService',
   'autosaveInfoModalsService', 'EditorModeService', 'siteAnalyticsService',
-  'SimpleEditorQuestionsDataService',
+  'SimpleEditorManagerService',
   function(
       $scope, $http, $window, $modal, $rootScope, $log, $timeout,
       explorationData, editorContextService, explorationTitleService,
@@ -49,7 +49,7 @@ oppia.controller('ExplorationEditor', [
       explorationWarningsService, $templateCache, explorationContextService,
       explorationAdvancedFeaturesService, changeListService,
       autosaveInfoModalsService, EditorModeService, siteAnalyticsService,
-      SimpleEditorQuestionsDataService) {
+      SimpleEditorManagerService) {
     $scope.editabilityService = editabilityService;
     $scope.editorContextService = editorContextService;
 
@@ -178,14 +178,16 @@ oppia.controller('ExplorationEditor', [
           successCallback();
         }
 
-        SimpleEditorQuestionsDataService.init(function() {
+        var simpleEditorInitSuccessful = SimpleEditorManagerService.tryToInit();
+        if (simpleEditorInitSuccessful) {
           // TODO(sll): This should only fire once, on the initial page load.
           EditorModeService.setModeToSimple();
           // TODO(sll): The $broadcast should also fire anytime the main tab is
           // switched to (e.g. if the creator goes to the settings tab and
-          // updates the title).
+          // updates the title). A re-initialization should also happen in this
+          // scenario.
           $scope.$broadcast('simpleEditorLoaded');
-        });
+        }
       });
     };
 

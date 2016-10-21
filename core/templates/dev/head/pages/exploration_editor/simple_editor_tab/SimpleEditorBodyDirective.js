@@ -22,105 +22,34 @@ oppia.directive('simpleEditorBody', [function() {
     scope: {},
     templateUrl: 'simpleEditor/body',
     controller: [
-      '$scope', '$rootScope', '$timeout', 'SimpleEditorQuestionsDataService',
-      'explorationTitleService', 'explorationInitStateNameService',
-      'explorationStatesService',
-      function(
-          $scope, $rootScope, $timeout, SimpleEditorQuestionsDataService,
-          explorationTitleService, explorationInitStateNameService,
-          explorationStatesService) {
-        $scope.explorationTitleService = explorationTitleService;
-        $scope.questions = [];
-
+      '$scope', '$timeout', 'SimpleEditorManagerService',
+      function($scope, $timeout, SimpleEditorManagerService) {
+        $scope.data = {};
         $scope.$on('simpleEditorLoaded', function() {
-          $scope.questions = (
-              SimpleEditorQuestionsDataService.getQuestionsInOrder());
-          $scope.initialState = explorationStatesService.getState(
-            explorationInitStateNameService.savedMemento);
+          $scope.data = SimpleEditorManagerService.getData();
         });
 
-        $scope.saveTitle = function(newTitle) {
-          explorationTitleService.displayed = newTitle;
-          explorationTitleService.saveDisplayedValue();
-        };
-        $scope.saveIntroduction = function(newHtml) {
-          var initStateName = explorationInitStateNameService.savedMemento;
-          explorationStatesService.saveStateContent(initStateName, [{
-            type: 'text',
-            value: newHtml
-          }]);
-          // We reload the initialState because a fresh copy of the state is
-          // created in the states dict on every update.
-          $scope.initialState = explorationStatesService.getState(
-            explorationInitStateNameService.savedMemento);
-        };
-
-        $scope.saveCustomizationArgs = function(
-            stateName, newCustomizationArgs) {
-          explorationStatesService.saveInteractionCustomizationArgs(
-            stateName, newCustomizationArgs);
-        };
-        $scope.saveAnswerGroups = function(stateName, newAnswerGroups) {
-          explorationStatesService.saveInteractionAnswerGroups(
-            stateName, newAnswerGroups);
-        };
-        $scope.saveDefaultOutcome = function(stateName, newDefaultOutcome) {
-          explorationStatesService.saveInteractionDefaultOutcome(
-            stateName, newDefaultOutcome);
-        };
-        $scope.saveBridgeText = function(stateName, newHtml) {
-          explorationStatesService.saveStateContent(stateName, [{
-            type: 'text',
-            value: newHtml
-          }]);
-          // We reload the questions because a fresh copy of the state is
-          // created in the states dict on every update.
-          // TODO(sll): Pass this back to the questions data service? But we
-          // need a way to update the questions here...
-          $scope.questions = (
-              SimpleEditorQuestionsDataService.getQuestionsInOrder());
-        };
-
-        // Requirement: for the last question in the list, there should be at
-        // least one answer group.
-        $scope.canAddNewQuestion = function() {
-          if ($scope.questions.length === 0) {
-            return true;
-          } else {
-            return $scope.questions[
-              $scope.questions.length - 1].hasAnswerGroups();
-          }
-        };
+        $scope.saveTitle = SimpleEditorManagerService.saveTitle;
+        $scope.saveIntroductionHtml = (
+          SimpleEditorManagerService.saveIntroductionHtml);
+        $scope.saveCustomizationArgs = (
+          SimpleEditorManagerService.saveCustomizationArgs);
+        $scope.saveAnswerGroups = SimpleEditorManagerService.saveAnswerGroups;
+        $scope.saveDefaultOutcome = (
+          SimpleEditorManagerService.saveDefaultOutcome);
+        $scope.saveBridgeHtml = SimpleEditorManagerService.saveBridgeHtml;
+        $scope.canAddNewQuestion = SimpleEditorManagerService.canAddNewQuestion;
+        $scope.addState = SimpleEditorManagerService.addState;
 
         $scope.addNewQuestion = function() {
-          // Add a new multiple-choice interaction to the latest state, and
-          // re-calculate the list of questions.
-          var lastStateName = (
-            $scope.questions.length > 0 ?
-            $scope.questions[
-              $scope.questions.length - 1].getDestinationStateName() :
-            explorationInitStateNameService.savedMemento);
-
-          // TODO(sll): Abstract these default values into constants.
-          explorationStatesService.saveInteractionId(
-            lastStateName, 'MultipleChoiceInput');
-          explorationStatesService.saveInteractionCustomizationArgs(
-            lastStateName, {
-              choices: {
-                value: ['']
-              }
-            }
-          );
-          $scope.questions = (
-              SimpleEditorQuestionsDataService.getQuestionsInOrder());
-          $rootScope.$broadcast('updateSimpleEditorSidebar');
+          SimpleEditorManagerService.addNewQuestion();
 
           // The new question needs to be loaded before this broadcast can have
           // any effect.
           $timeout(function() {
             $scope.$broadcast('newQuestionAdded', {
-              stateName: (
-                $scope.questions[$scope.questions.length - 1].getStateName())
+              targetId: $scope.data.questions[
+                $scope.data.questions.length - 1].getStateName()
             });
           });
         };

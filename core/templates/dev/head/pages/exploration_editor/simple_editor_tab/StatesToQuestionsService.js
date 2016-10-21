@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2016 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,18 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for storing information about the current exploration
- * in the form of question fields.
+ * @fileoverview Stateless service that contains methods for translating a
+ * list of states to a list of questions, or determining that this is not
+ * possible.
  */
 
-oppia.factory('SimpleEditorQuestionsDataService', [
-  'explorationData', 'explorationInitStateNameService',
-  'explorationStatesService', 'QuestionObjectFactory',
-  function(
-      explorationData, explorationInitStateNameService,
-      explorationStatesService, QuestionObjectFactory) {
-    var questions = null;
-
+oppia.factory('StatesToQuestionsService', [
+  'SimpleEditorShimService', 'QuestionObjectFactory',
+  function(SimpleEditorShimService, QuestionObjectFactory) {
     var SUPPORTED_INTERACTION_TYPES = [{
       id: 'MultipleChoiceInput',
       name: 'Multiple choice'
@@ -36,12 +32,10 @@ oppia.factory('SimpleEditorQuestionsDataService', [
       }
     );
 
-    // Attempts to convert the exploration into a set of fields. If this is
-    // successful, returns the extracted fields, otherwise returns null.
     var getQuestions = function() {
       var stateNamesInOrder = [];
-      var currentStateName = explorationInitStateNameService.savedMemento;
-      var questionData = [];
+      var currentStateName = SimpleEditorShimService.getInitStateName();
+      var questions = [];
 
       var iterations = 0;
       while (currentStateName) {
@@ -56,7 +50,7 @@ oppia.factory('SimpleEditorQuestionsDataService', [
         }
         stateNamesInOrder.push(currentStateName);
 
-        var stateData = explorationStatesService.getState(currentStateName);
+        var stateData = SimpleEditorShimService.getState(currentStateName);
         var interactionId = stateData.interaction.id;
         if (!interactionId) {
           break;
@@ -90,18 +84,15 @@ oppia.factory('SimpleEditorQuestionsDataService', [
           return null;
         }
 
-        var bridgeContent = null;
+        var bridgeHtml = null;
         if (destinationStateNames.length === 1) {
-          var destinationStateName = destinationStateNames[0];
-          var destinationState = explorationStatesService.getState(
-            destinationStateName);
-          bridgeContent = destinationState.content;
+          bridgeHtml = SimpleEditorShimService.getContentHtml(
+            destinationStateNames[0]);
         }
 
-        questionData.push(
-          QuestionObjectFactory.create(
-            currentStateName, stateData.interaction, bridgeContent)
-        );
+        var question = QuestionObjectFactory.create(
+          currentStateName, stateData.interaction, bridgeHtml);
+        questions.push(question);
 
         currentStateName = destinationStateNames[0];
       }
@@ -109,36 +100,15 @@ oppia.factory('SimpleEditorQuestionsDataService', [
       // TODO(sll): Check that stateNamesInOrder accounts for all the states.
       // TODO(sll): Do additional verification (e.g. content should be valid).
 
-      return questionData;
+      return questions;
     };
 
     return {
-      // Attempts to convert the exploration into a linear set of questions.
-      // If this is successful, runs successCallback.
-      init: function(successCallback) {
-        explorationData.getData().then(function() {
-          questions = getQuestions();
-          if (questions) {
-            successCallback();
-          }
-        });
-      },
-      // Returns a list of the question fields.
-      getQuestionsInOrder: function() {
-        questions = getQuestions();
-        return questions;
-      },
-      getNewStateName: function() {
-        questions = getQuestions();
-        var allStateNames = questions.map(function(question) {
-          return question.stateName;
-        });
-        var minimumStateNumber = questions.length + 1;
-        while (allStateNames.indexOf('Question ' + minimumStateNumber) !== -1) {
-          minimumStateNumber++;
-        }
-
-        return 'Question ' + minimumStateNumber;
+      // Returns an array of questions derived from the current set of states
+      // of the exploration, or null if it is not possible to convert the
+      // current set of states to a list of questions.
+      getQuestions: function() {
+        return getQuestions();
       }
     };
   }

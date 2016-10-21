@@ -21,20 +21,15 @@ oppia.directive('simpleEditorSidebar', [function() {
     restrict: 'E',
     templateUrl: 'simpleEditor/sidebar',
     controller: [
-        '$scope', 'EditorModeService', 'SimpleEditorQuestionsDataService',
-        function($scope, EditorModeService, SimpleEditorQuestionsDataService) {
+        '$scope', 'EditorModeService', 'SimpleEditorManagerService',
+        function($scope, EditorModeService, SimpleEditorManagerService) {
       $scope.SUBFIELD_LABELS = [
         'Multiple choice', 'Correct answer', 'Hints', 'Bridge text'];
 
       $scope.setEditorModeToFull = EditorModeService.setModeToFull;
 
       $scope.$on('simpleEditorLoaded', function() {
-        $scope.questions = (
-            SimpleEditorQuestionsDataService.getQuestionsInOrder());
-      });
-      $scope.$on('updateSimpleEditorSidebar', function() {
-        $scope.questions = (
-            SimpleEditorQuestionsDataService.getQuestionsInOrder());
+        $scope.questions = SimpleEditorManagerService.getQuestions();
       });
     }]
   };

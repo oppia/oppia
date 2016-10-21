@@ -2,27 +2,28 @@
   <div class="main">
     <div class="content">
       <h2>What would you like to teach?</h2>
-      <editor-plaintext-field original-value="explorationTitleService.savedMemento"
+      <editor-plaintext-field original-value="data.title"
                               on-finish-editing="saveTitle(newValue)"
                               placeholder="Type the title of your exploration.">
       </editor-plaintext-field>
 
       <h2>Introduction</h2>
-      <editor-html-field original-value="initialState.content[0].value"
-                         on-finish-editing="saveIntroduction(newValue)">
+      <editor-html-field original-value="data.introductionHtml"
+                         on-finish-editing="saveIntroductionHtml(newValue)">
       </editor-html-field>
 
-      <div ng-repeat="question in questions track by $index">
+      <div ng-repeat="question in data.questions track by $index">
         <h2>Question <[$index + 1]></h2>
 
         <multiple-choice-editor ng-if="question.getInteractionId() === 'MultipleChoiceInput'"
-                                state-name="question.getStateName()"
+                                unique-id="question.getStateName()"
                                 customization-args="question.getInteractionCustomizationArgs()"
                                 answer-groups="question.getAnswerGroups()"
                                 default-outcome="question.getDefaultOutcome()"
                                 save-customization-args="saveCustomizationArgs(question.getStateName(), newValue)"
                                 save-answer-groups="saveAnswerGroups(question.getStateName(), newValue)"
-                                save-default-outcome="saveDefaultOutcome(question.getStateName(), newValue)">
+                                save-default-outcome="saveDefaultOutcome(question.getStateName(), newValue)"
+                                add-state="addState()">
         </multiple-choice-editor>
 
         <!-- TODO(sll): Update this condition when control of individual field visibility is added. -->
@@ -30,8 +31,8 @@
           <div class="header">
             Bridge Text
           </div>
-          <editor-html-field original-value="questions[$index].getBridgeContent()[0].value"
-                             on-finish-editing="saveBridgeText(questions[$index + 1].getStateName(), newValue)">
+          <editor-html-field original-value="question.getBridgeHtml()"
+                             on-finish-editing="saveBridgeHtml(question.getStateName(), newValue)">
           </editor-html-field>
         </div>
       </div>

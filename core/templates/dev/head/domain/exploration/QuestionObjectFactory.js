@@ -20,13 +20,13 @@
 oppia.factory('QuestionObjectFactory', [function() {
   var Question = function(
       stateName, interactionId, interactionCustomizationArgs, answerGroups,
-      defaultOutcome, bridgeContent) {
+      defaultOutcome, bridgeHtml) {
     this._stateName = stateName;
     this._interactionId = interactionId;
     this._interactionCustomizationArgs = interactionCustomizationArgs;
     this._answerGroups = answerGroups;
     this._defaultOutcome = defaultOutcome;
-    this._bridgeContent = bridgeContent;
+    this._bridgeHtml = bridgeHtml;
   };
 
   // Instance methods.
@@ -54,8 +54,25 @@ oppia.factory('QuestionObjectFactory', [function() {
     return this._answerGroups[0].outcome.dest;
   };
 
-  Question.prototype.getBridgeContent = function() {
-    return this._bridgeContent;
+  Question.prototype.getBridgeHtml = function() {
+    return this._bridgeHtml;
+  };
+
+  Question.prototype.setCustomizationArgs = function(
+      newCustomizationArgs) {
+    this._interactionCustomizationArgs = newCustomizationArgs;
+  };
+
+  Question.prototype.setAnswerGroups = function(newAnswerGroups) {
+    this._answerGroups = newAnswerGroups;
+  };
+
+  Question.prototype.setDefaultOutcome = function(newDefaultOutcome) {
+    this._defaultOutcome = newDefaultOutcome;
+  };
+
+  Question.prototype.setBridgeHtml = function(newHtml) {
+    this._bridgeHtml = newHtml;
   };
 
   Question.prototype.hasAnswerGroups = function() {
@@ -64,14 +81,14 @@ oppia.factory('QuestionObjectFactory', [function() {
 
   // Static class methods. Note that "this" is not available in
   // static contexts.
-  Question.create = function(stateName, interactionDict, nextStateContent) {
+  Question.create = function(stateName, interactionDict, nextStateContentHtml) {
     return new Question(
       stateName,
       interactionDict.id,
       interactionDict.customization_args,
       interactionDict.answer_groups,
       interactionDict.default_outcome,
-      nextStateContent);
+      nextStateContentHtml);
   };
 
   return Question;
