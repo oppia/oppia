@@ -37,7 +37,7 @@ oppia.directive('multipleChoiceEditor', [function() {
     },
     templateUrl: 'simpleEditorQuestions/MultipleChoiceInput',
     controller: ['$scope', '$timeout', function($scope, $timeout) {
-      $scope.questionId = Math.random().toString(36).slice(2);
+      $scope.questionId = $scope.getUniqueId();
       $scope.getFieldId = function(index) {
         return $scope.questionId + '.' + index;
       };
