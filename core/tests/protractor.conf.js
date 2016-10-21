@@ -111,6 +111,10 @@ exports.config = {
           accept_languages: 'en-EN'
         }
       }
+    },
+    loggingPrefs: {
+      driver: 'INFO',
+      browser: 'INFO'
     }
   },
 

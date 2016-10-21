@@ -375,10 +375,13 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_RIGHTS_PREFIX,
         collection_editor.CollectionRightsHandler),
+
+    get_redirect_route(r'/query', user_query.QueryPage),
+    get_redirect_route(r'/querydatahandler', user_query.QueryDataHandler),
+
     get_redirect_route(
-        r'/query', user_query.QueryPage),
-    get_redirect_route(
-        r'/querydatahandler', user_query.QueryDataHandler),
+        r'%s' % feconf.EXPLORATION_METADATA_SEARCH_URL,
+        collection_editor.ExplorationMetadataSearchHandler),
 
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),
