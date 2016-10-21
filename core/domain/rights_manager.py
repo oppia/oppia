@@ -324,9 +324,12 @@ class Actor(object):
     def __init__(self, user_id):
         # Note that this may be None.
         self.user_id = user_id
+        self._is_admin = None
 
     def is_admin(self):
-        return self.user_id in config_domain.ADMIN_IDS.value
+        if self._is_admin is None:
+            self._is_admin = self.user_id in config_domain.ADMIN_IDS.value
+        return self._is_admin
 
     def is_moderator(self):
         return (self.is_admin() or
