@@ -1027,6 +1027,17 @@ textarea {
   min-width: 126px;
 }
 
+.oppia-library-group-header-active {
+  color: #04857c;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  display: inline-block;
+  font-size: 2em;
+  margin-bottom: 24px;
+  margin-left: 44px;
+  min-width: 126px;
+}
+
+
 @media(max-width: 720px) {
   .oppia-library-group-header {
     width: -webkit-calc(80% - 120px);
