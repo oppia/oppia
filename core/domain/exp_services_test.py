@@ -924,6 +924,17 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'param_changes': []
         }
 
+    def test_add_state_name(self):
+        """Test adding of state"""
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
+            'cmd': 'add_state',
+            'state_name': 'new state',
+        }], 'Add state name')
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertIn('new state', exploration.states)
+        
     def test_update_state_name(self):
         """Test updating of state name."""
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
