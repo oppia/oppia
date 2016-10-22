@@ -47,8 +47,10 @@ class StateRuleAnswerLog(object):
         Returns:
             int. A int specifying the total number of answers for this rule that
             have not been resolved.
+
+        Todo:
+            ssl: Cache this computed property.
         """
-        # TODO(sll): Cache this computed property.
         return sum(self.answers.values())
 
     @classmethod
@@ -70,8 +72,10 @@ class StateRuleAnswerLog(object):
             exploration_state_list. The number of answers in each
             StateRuleAnswerLog object depends on the number of answers matched
             against each rule spec strings specified in rule_str_list.
+
+        Todo:
+            ssl: Should each rule_str be unicode instead?
         """
-        # TODO(sll): Should each rule_str be unicode instead?
         answer_log_models_list = (
             stats_models.StateRuleAnswerLogModel.get_or_create_multi_for_multi_explorations( # pylint: disable=line-too-long
                 exploration_state_list, rule_str_list))
@@ -99,10 +103,12 @@ class StateRuleAnswerLog(object):
         Returns:
             list. Returns a list of StateRuleAnswerLog objects corresponding to
             a given rule data and exploration_id.
+
+        Todo:
+            ssl: Should each rule_str be unicode instead?
+            bhenning: Combine this with get_multi_by_multi_explorations as part
+                of the answer migration project.
         """
-        # TODO(sll): Should each rule_str be unicode instead?
-        # TODO(bhenning): Combine this with get_multi_by_multi_explorations as
-        # part of the answer migration project.
         answer_log_models = (
             stats_models.StateRuleAnswerLogModel.get_or_create_multi(
                 exploration_id, rule_data))
@@ -124,8 +130,10 @@ class StateRuleAnswerLog(object):
             StateRuleAnswerLog object. Get the StateRuleAnswerLog object
             corresponding to a given exploration_id-state_name and the
             given rule spec string.
+
+        Todo:
+            ssl: Deprecate this method.
         """
-        # TODO(sll): Deprecate this method.
         return cls.get_multi_by_multi_explorations(
             [(exploration_id, state_name)], [rule_str])[0]
 
