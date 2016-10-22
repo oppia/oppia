@@ -934,7 +934,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertIn('new state', exploration.states)
-        
+
     def test_update_state_name(self):
         """Test updating of state name."""
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
