@@ -30,15 +30,24 @@ class StateRuleAnswerLog(object):
     specific storage model used.
     """
     def __init__(self, answers):
-        # This dict represents a log of answers that hit this rule and that
-        # have not been resolved. The keys of this dict are the answers encoded
-        # as HTML strings, and the values are integer counts representing how
-        # many times the answer has been entered.
+        """Initializes answers dictionary with answers that hit this rule
+        and have not been resolved.
+
+        Args:
+            answers: dict. The keys of the dict are the answers encoded as HTML
+                strings, and the values are integer counts representing how
+                many times the answer has been entered.
+        """
         self.answers = copy.deepcopy(answers)
 
     @property
     def total_answer_count(self):
-        """Total count of answers for this rule that have not been resolved."""
+        """Total count of answers for this rule that have not been resolved.
+
+        Returns:
+            int. A int specifying the total number of answers for this rule that
+            have not been resolved.
+        """
         # TODO(sll): Cache this computed property.
         return sum(self.answers.values())
 
@@ -48,17 +57,19 @@ class StateRuleAnswerLog(object):
         """Gets domain objects given a list of exploration and state tuples.
 
         Args:
-            exploration_state_list: a list of exploration ID and state name
-                tuples
-            rule_str_list: a list of rule spec strings which are used to filter
-                the answers matched to the provided explorations and states
+            exploration_state_list: list(tuple). A list of exploration ID and
+                state name tuples.
+            rule_str_list: list. A list of rule spec strings which are used to
+                filter the answers matched to the provided explorations and
+                states.
 
-        Returns a list of StateRuleAnswerLog objects containing answers matched
-        to each exploration ID-state name. The number of elements returned is
-        the same as the number of elements passed in exploration_state_list. The
-        number of answers in each StateRuleAnswerLog object depends on the
-        number of answers matched against each rule spec strings specified in
-        rule_str_list.
+        Returns:
+            list. A list of StateRuleAnswerLog objects containing answers
+            matched to each exploration ID-state name. The number of elements
+            returned is the same as the number of elements passed in
+            exploration_state_list. The number of answers in each
+            StateRuleAnswerLog object depends on the number of answers matched
+            against each rule spec strings specified in rule_str_list.
         """
         # TODO(sll): Should each rule_str be unicode instead?
         answer_log_models_list = (
@@ -79,10 +90,15 @@ class StateRuleAnswerLog(object):
     @classmethod
     def get_multi(cls, exploration_id, rule_data):
         """Gets domain objects corresponding to the given rule data.
+
         Args:
-            exploration_id: the exploration id
-            rule_data: a list of dicts, each with the following keys:
-                (state_name, rule_str).
+            exploration_id: str. The id of the exploration.
+            rule_data: list(dict). A list of dicts, each with the following
+                keys: (state_name, rule_str).
+
+        Returns:
+            list. Returns a list of StateRuleAnswerLog objects corresponding to
+            a given rule data and exploration_id.
         """
         # TODO(sll): Should each rule_str be unicode instead?
         # TODO(bhenning): Combine this with get_multi_by_multi_explorations as
@@ -95,25 +111,43 @@ class StateRuleAnswerLog(object):
 
     @classmethod
     def get(cls, exploration_id, state_name, rule_str):
+        """Gets domain object corresponding to given rule spec strings and
+        state_name.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+            state_name: str. The current state(card) of the exploration.
+            rule_str: str. Rule spec string which is used to filter the answers
+                based on exploration id and state name.
+
+        Returns:
+            StateRuleAnswerLog object. Get the StateRuleAnswerLog object
+            corresponding to a given exploration_id-state_name and the
+            given rule spec string.
+        """
         # TODO(sll): Deprecate this method.
         return cls.get_multi_by_multi_explorations(
             [(exploration_id, state_name)], [rule_str])[0]
 
     def get_all_top_answers(self):
-        """Returns a list of (answer, count) sorted by count."""
+        """Returns all the answers sorted by count.
 
+        Returns:
+            list. A list of (answer, count) sorted by count.
+        """
         return sorted(
             self.answers.iteritems(), key=operator.itemgetter(1),
             reverse=True)
 
     def get_top_answers(self, num_answers_to_return):
-        """Returns the top `num_answers_to_return` answers.
+        """Returns the top `num_answers_to_return` answers after
+        fetching all top answers from get_all_top_answers().
 
         Args:
             num_answers_to_return: the maximum number of answers to return.
 
         Returns:
-            A list of (answer, count) tuples for the `num_answers_to_return`
+            list. A list of (answer, count) tuples for the `num_answers_to_return`
             answers with the highest counts.
         """
         return self.get_all_top_answers()[:num_answers_to_return]
