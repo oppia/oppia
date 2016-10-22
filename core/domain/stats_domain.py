@@ -147,7 +147,7 @@ class StateRuleAnswerLog(object):
             num_answers_to_return: the maximum number of answers to return.
 
         Returns:
-            list. A list of (answer, count) tuples for the `num_answers_to_return`
-            answers with the highest counts.
+            list. A list of (answer, count) tuples for the
+            `num_answers_to_return` answers with the highest counts.
         """
         return self.get_all_top_answers()[:num_answers_to_return]
