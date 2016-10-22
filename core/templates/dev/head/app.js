@@ -334,6 +334,15 @@ oppia.factory('validatorsService', [
   };
 }]);
 
+// Service for generating random IDs.
+oppia.factory('IdGenerationService', [function() {
+  return {
+    generateNewId: function() {
+      return Math.random().toString(36).slice(2);
+    }
+  };
+}]);
+
 oppia.constant('LABEL_FOR_CLEARING_FOCUS', 'labelForClearingFocus');
 
 // Service for setting focus. This broadcasts a 'focusOn' event which sets
@@ -342,7 +351,10 @@ oppia.constant('LABEL_FOR_CLEARING_FOCUS', 'labelForClearingFocus');
 // page.
 oppia.factory('focusService', [
   '$rootScope', '$timeout', 'deviceInfoService', 'LABEL_FOR_CLEARING_FOCUS',
-  function($rootScope, $timeout, deviceInfoService, LABEL_FOR_CLEARING_FOCUS) {
+  'IdGenerationService',
+  function(
+      $rootScope, $timeout, deviceInfoService, LABEL_FOR_CLEARING_FOCUS,
+      IdGenerationService) {
     var _nextLabelToFocusOn = null;
     return {
       clearFocus: function() {
@@ -366,7 +378,7 @@ oppia.factory('focusService', [
       },
       // Generates a random string (to be used as a focus label).
       generateFocusLabel: function() {
-        return Math.random().toString(36).slice(2);
+        return IdGenerationService.generateNewId();
       }
     };
   }
