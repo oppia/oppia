@@ -92,11 +92,11 @@
 
           <div class="oppia-library-group" ng-repeat="group in libraryGroups track by $index" ng-mouseenter="setActiveGroup($index)" ng-mouseleave="clearActiveGroup()">
             <div class="row oppia-library-group-header-container">
-              <h2 ng-class="{'oppia-library-group-header-active': activeGroup === true, 'oppia-library-group-header': activeGroup === false }">
-                <span ng-if="group.has_full_results_page"
-                   translate="<[group.header_i18n_id]>">
+              <h2 ng-class="{'oppia-library-group-header-active': activeGroupIndex === $index, 'oppia-library-group-header': activeGroupIndex != $index }">
+                <span ng-if="group.has_full_results_page" translate="<[group.header_i18n_id]>"
+                  ng-click="showFullResultsPage(group.categories, group.full_results_url)">
                 </span>
-                <span ng-show="activeGroupIndex === $index"><i class="material-icons md-40">&#xE315;</i></span>
+                <span ng-show="activeGroupIndex === $index"><i class="material-icons md-32">&#xE315;</i></span>
                 <span ng-if="!group.has_full_results_page" translate="<[group.header_i18n_id]>">
                 </span>
               </h2>
