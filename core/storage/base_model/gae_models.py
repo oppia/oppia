@@ -496,7 +496,7 @@ class VersionedModel(BaseModel):
             version_number: int.
 
         Returns:
-
+            VersionModel.
 
         Raises:
             Exception: If this model instance has been deleted.
@@ -520,7 +520,7 @@ class VersionedModel(BaseModel):
             version: int. Version we want to get. Default is None.
 
         Returns:
-
+            VersionModel.
         """
         if version is None:
             return super(VersionedModel, cls).get(entity_id, strict=strict)
@@ -542,7 +542,7 @@ class VersionedModel(BaseModel):
             allow_deleted: bool. If is False, an error is raised if the current
                 model has been deleted. Default is False.
 
-        Return:
+        Returns:
             List of dicts, each dict representing a model snapshot.
 
         Raises:
