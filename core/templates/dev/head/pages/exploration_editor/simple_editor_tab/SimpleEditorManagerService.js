@@ -142,11 +142,20 @@ oppia.factory('SimpleEditorManagerService', [
           lastStateName, stateData.interaction, ''));
       },
       canAddNewQuestion: function() {
-        // Requirement: for the last question in the list, there should be at
-        // least one answer group.
-        return data.questions && (
-          data.questions.length === 0 ||
-          data.questions[data.questions.length - 1].hasAnswerGroups());
+        if (!data.questions) {
+          return false;
+        }
+
+        // Requirements:
+        // - If this is the first question, there must already be an
+        //   introduction.
+        // - Otherwise, the requirement is that, for the last question in the
+        //   list, there is at least one answer group.
+        if (data.questions.length === 0) {
+          return Boolean(data.introductionHtml);
+        } else {
+          return data.questions[data.questions.length - 1].hasAnswerGroups();
+        }
       },
       addState: function() {
         var newStateName = getNewStateName();

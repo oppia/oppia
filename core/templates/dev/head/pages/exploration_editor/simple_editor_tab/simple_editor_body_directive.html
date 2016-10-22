@@ -1,19 +1,20 @@
 <script type="text/ng-template" id="simpleEditor/body">
   <div class="main">
     <div class="content">
-      <h2>What would you like to teach?</h2>
+      <h3>What would you like to teach?</h3>
       <editor-plaintext-field original-value="data.title"
                               on-finish-editing="saveTitle(newValue)"
                               placeholder="Type the title of your exploration.">
       </editor-plaintext-field>
 
-      <h2>Introduction</h2>
+      <h3>Introduction</h3>
       <editor-html-field original-value="data.introductionHtml"
-                         on-finish-editing="saveIntroductionHtml(newValue)">
+                         on-finish-editing="saveIntroductionHtml(newValue)"
+                         placeholder="Type an introduction.">
       </editor-html-field>
 
       <div ng-repeat="question in data.questions track by $index">
-        <h2>Question <[$index + 1]></h2>
+        <h3>Question <[$index + 1]></h3>
 
         <multiple-choice-editor ng-if="question.getInteractionId() === 'MultipleChoiceInput'"
                                 unique-id="question.getStateName()"
@@ -38,14 +39,20 @@
       </div>
     </div>
 
-    <button ng-if="canAddNewQuestion()" type="button"
-            class="btn btn-default advance-btn" ng-click="addNewQuestion()">
-      <i class="material-icons md-24">&#xE5CF;</i>
-    </button>
+    <div class="advance-btn-container">
+      <button ng-disabled="!canAddNewQuestion()" type="button"
+              class="btn btn-default advance-btn" ng-click="addNewQuestion()">
+        <i class="material-icons md-30">&#xE5CF;</i>
+      </button>
+    </div>
   </div>
 </script>
 
 <style>
+  simple-editor-body h3 {
+    margin-top: 50px;
+  }
+
   simple-editor-body .main {
     background-color: #fff;
     height: 100%;
@@ -53,6 +60,9 @@
     margin-left: 220px;
     position: relative;
     text-align: center;
+    width: -webkit-calc(100% - 220px);
+    width: -moz-calc(100% - 220px);
+    width: -o-calc(100% - 220px);
     width: calc(100% - 220px);
   }
   simple-editor-body .content {
@@ -63,6 +73,9 @@
     padding-top: 100px;
     position: relative;
     text-align: left;
+    width: -webkit-calc(100% - 40px);
+    width: -moz-calc(100% - 40px);
+    width: -o-calc(100% - 40px);
     width: calc(100% - 40px);
   }
   simple-editor-body .content .header {
@@ -71,15 +84,31 @@
     margin-top: 80px;
   }
 
-  simple-editor-body .advance-btn {
-    border: 1px solid #888;
-    border-radius: 50%;
+  simple-editor-body .advance-btn-container {
     bottom: 50px;
-    height: 50px;
     position: fixed;
+    width: -webkit-calc(100% - 220px);
+    width: -moz-calc(100% - 220px);
+    width: -o-calc(100% - 220px);
+    width: calc(100% - 220px);
+  }
+  simple-editor-body .advance-btn {
+    border: 1px solid #009688;
+    border-radius: 50%;
+    color: #009688;
+    height: 50px;
+    position: relative;
     width: 50px;
   }
+  simple-editor-body .advance-btn:hover {
+    background-color: #009688;
+    color: white;
+  }
+  simple-editor-body .advance-btn[disabled] {
+    border-color: #ccc;
+    color: #aaa;
+  }
   simple-editor-body .advance-btn i {
-    margin: 6px auto;
+    margin: 3px -2px;
   }
 </style>

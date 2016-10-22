@@ -1,7 +1,9 @@
 <script type="text/ng-template" id="simpleEditorFields/html">
   <div ng-show="!inEditMode" ng-click="startEditing()" class="view-mode">
     <span angular-html-bind="getOriginalValue()"></span>
-    <!-- TODO(sll): This should also show if getOriginalValue() normalizes to an empty string. -->
+    <span ng-if="!getOriginalValue() && placeholder" class="placeholder">
+      <[placeholder]>
+    </span>
     <i class="material-icons edit-icon" title="Edit HTML">&#xE254;</i>
   </div>
 
@@ -18,8 +20,7 @@
 <style>
   editor-html-field .view-mode {
     background-color: #f0f0f0;
-    border-radius: 5px;
-    padding: 10px 20px;
+    padding: 30px 20px;
   }
   editor-html-field .view-mode:hover {
     background-color: #d6d6d6;
@@ -32,12 +33,15 @@
     right: 20px;
     top: 25px;
   }
+  editor-html-field .view-mode .placeholder {
+    color: rgba(0, 0, 0, 0.5);
+  }
 
   editor-html-field .edit-mode [text-angular] {
     border: none;
+    border-radius: 0;
     box-shadow: 0 2px 2px 0 rgba(0,0,0,0.25);
     outline: 0;
-    padding: 0 20px;
     width: 100%;
   }
   editor-html-field .edit-mode .bar {

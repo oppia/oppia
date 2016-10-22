@@ -44,8 +44,8 @@ oppia.directive('simpleEditorBody', [function() {
         $scope.addNewQuestion = function() {
           SimpleEditorManagerService.addNewQuestion();
 
-          // The new question needs to be loaded before this broadcast can have
-          // any effect.
+          // The directive for the new question needs to be loaded before this
+          // broadcast can have any effect.
           $timeout(function() {
             $scope.$broadcast('newQuestionAdded', {
               targetId: $scope.data.questions[

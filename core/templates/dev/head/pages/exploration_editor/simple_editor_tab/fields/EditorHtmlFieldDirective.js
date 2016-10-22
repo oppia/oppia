@@ -22,7 +22,8 @@ oppia.directive('editorHtmlField', [function() {
     scope: {
       fieldId: '@',
       getOriginalValue: '&originalValue',
-      onFinishEditing: '&'
+      onFinishEditing: '&',
+      placeholder: '@'
     },
     templateUrl: 'simpleEditorFields/html',
     controller: ['$scope', 'focusService', function($scope, focusService) {

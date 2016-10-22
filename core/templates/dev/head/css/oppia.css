@@ -72,11 +72,14 @@ button.md-button.md-default-theme.oppia-learner-continue-button:hover {
 .material-icons.md-18 {
   font-size: 18px;
 }
-.material-icons.md-100 {
-  font-size: 100px;
+.material-icons.md-30 {
+  font-size: 30px;
 }
 .material-icons.md-40 {
   font-size: 40px;
+}
+.material-icons.md-100 {
+  font-size: 100px;
 }
 .material-icons.md-dark {
   color: rgba(0, 0, 0, 0.54);

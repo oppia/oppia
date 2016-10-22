@@ -2,8 +2,9 @@
   <div ng-show="!inEditMode" ng-click="startEditing()"
        class="view-mode">
     <span ng-if="getOriginalValue()"><[getOriginalValue()]></span>
-    <span ng-if="!getOriginalValue() && placeholder"
-          class="placeholder"><[placeholder]></span>
+    <span ng-if="!getOriginalValue() && placeholder" class="placeholder">
+      <[placeholder]>
+    </span>
     <i class="material-icons edit-icon" title="Edit plain text">&#xE254;</i>
   </div>
 
@@ -61,6 +62,7 @@
 
   editor-plaintext-field .edit-mode .bar {
     display: block;
+    padding-bottom: 3px;
     position: relative;
     width: 100%;
   }
