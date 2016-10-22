@@ -37,6 +37,9 @@ oppia.factory('SimpleEditorShimService', [
       getInitStateName: function() {
         return explorationInitStateNameService.savedMemento;
       },
+      getAllStateNames: function() {
+        return Object.keys(explorationStatesService.getStates());
+      },
       getState: function(stateName) {
         return angular.copy(explorationStatesService.getState(stateName));
       },
