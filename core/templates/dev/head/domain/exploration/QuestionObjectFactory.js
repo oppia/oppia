@@ -58,7 +58,7 @@ oppia.factory('QuestionObjectFactory', [function() {
     return this._bridgeHtml;
   };
 
-  Question.prototype.setCustomizationArgs = function(
+  Question.prototype.setInteractionCustomizationArgs = function(
       newCustomizationArgs) {
     this._interactionCustomizationArgs = newCustomizationArgs;
   };

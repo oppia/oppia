@@ -106,7 +106,7 @@ oppia.factory('SimpleEditorManagerService', [
       saveCustomizationArgs: function(stateName, newCustomizationArgs) {
         SimpleEditorShimService.saveCustomizationArgs(
           stateName, newCustomizationArgs);
-        getBindableQuestion(stateName).setCustomizationArgs(
+        getBindableQuestion(stateName).setInteractionCustomizationArgs(
           newCustomizationArgs);
       },
       saveAnswerGroups: function(stateName, newAnswerGroups) {
