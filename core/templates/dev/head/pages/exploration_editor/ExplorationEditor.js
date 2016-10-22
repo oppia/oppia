@@ -178,15 +178,13 @@ oppia.controller('ExplorationEditor', [
           successCallback();
         }
 
+        // TODO(sll): Any time the main tab is switched to (e.g. if the creator
+        // goes to the settings tab and updates the title), a re-initialization
+        // should happen.
         var simpleEditorInitSuccessful = SimpleEditorManagerService.tryToInit();
         if (simpleEditorInitSuccessful) {
           // TODO(sll): This should only fire once, on the initial page load.
           EditorModeService.setModeToSimple();
-          // TODO(sll): The $broadcast should also fire anytime the main tab is
-          // switched to (e.g. if the creator goes to the settings tab and
-          // updates the title). A re-initialization should also happen in this
-          // scenario.
-          $scope.$broadcast('simpleEditorLoaded');
         }
       });
     };

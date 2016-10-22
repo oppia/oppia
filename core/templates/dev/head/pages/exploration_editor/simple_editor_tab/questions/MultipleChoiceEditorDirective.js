@@ -50,7 +50,7 @@ oppia.directive('multipleChoiceEditor', [function() {
         });
       };
 
-      $scope.$on('newQuestionAdded', function(evt, data) {
+      $scope.$on('newInteractionIdSelected', function(evt, data) {
         if (data.targetId === $scope.getUniqueId()) {
           openChoiceEditor(0);
         }

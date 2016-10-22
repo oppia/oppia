@@ -36,7 +36,7 @@ oppia.factory('SimpleEditorManagerService', [
       ID: 'MultipleChoiceInput',
       CUSTOMIZATION_ARGS: {
         choices: {
-          value: ['']
+          value: ['Option 1']
         }
       }
     };
@@ -142,10 +142,6 @@ oppia.factory('SimpleEditorManagerService', [
           lastStateName, stateData.interaction, ''));
       },
       canAddNewQuestion: function() {
-        if (!data.questions) {
-          return false;
-        }
-
         // Requirements:
         // - If this is the first question, there must already be an
         //   introduction.

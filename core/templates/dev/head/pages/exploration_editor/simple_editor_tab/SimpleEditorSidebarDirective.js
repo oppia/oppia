@@ -25,12 +25,8 @@ oppia.directive('simpleEditorSidebar', [function() {
         function($scope, EditorModeService, SimpleEditorManagerService) {
       $scope.SUBFIELD_LABELS = [
         'Multiple choice', 'Correct answer', 'Hints', 'Bridge text'];
-
       $scope.setEditorModeToFull = EditorModeService.setModeToFull;
-
-      $scope.$on('simpleEditorLoaded', function() {
-        $scope.questions = SimpleEditorManagerService.getQuestions();
-      });
+      $scope.questions = SimpleEditorManagerService.getQuestions();
     }]
   };
 }]);

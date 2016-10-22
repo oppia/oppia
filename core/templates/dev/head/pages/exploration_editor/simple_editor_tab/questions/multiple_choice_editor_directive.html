@@ -1,107 +1,132 @@
 <script type="text/ng-template" id="simpleEditorQuestions/MultipleChoiceInput">
-  <div class="header">
-    Select the choices
-  </div>
-  <div style="width: 100%; margin-top: 20px; background-color: #f0f0f0;">
-    <ul>
-      <li ng-repeat="choice in getChoices() track by $index" style="border-bottom: 1px; width: 100%;">
-        <button ng-click="deleteChoice($index)" style="border: 0; float: right;"
+  <h3>Multiple choice</h3>
+  <div class="options-container">
+    <ul style="margin-bottom: 0;">
+      <li ng-repeat="choice in getChoices() track by $index" class="option" style="list-style-type: disc;">
+        <button ng-click="deleteChoice($index)" class="btn-delete-option"
                 ng-if="getChoices().length > 1">
-          X
+          <i class="material-icons md-18">&#xE5CD;</i>
         </button>
-        <editor-html-field original-value="choice"
+        <editor-html-field class="option-text"
+                           original-value="choice"
                            on-finish-editing="saveChoice($index, newValue)"
                            field-id="<[getFieldId($index)]>">
         </editor-html-field>
       </li>
     </ul>
 
-    <button ng-click="addChoice()" style="border: 0; margin-left: 20px;">
-      + &nbsp;&nbsp;&nbsp; Add option
+    <button ng-click="addChoice()" class="btn-add-option">
+      <i class="material-icons md-18 btn-add-option-icon">&#xE145;</i>
+      Add option
     </button>
   </div>
 
-  <div class="header">
-    Pick the correct answer
-  </div>
-  <div style="width: 100%; margin-top: 20px; background-color: #f0f0f0;">
-    <div class="multiple-choice-editor-option-container" ng-repeat="choice in getChoices() track by $index">
-      <button class="multiple-choice-editor-option" ng-click="selectCorrectAnswer($index)"
-              ng-class="{'multiple-choice-editor-selected': isCorrectAnswer($index)}">
-        <div class="multiple-choice-editor-radio-button-container">
-          <span class="multiple-choice-editor-outer-radio-button">
-            <span class="multiple-choice-editor-inner-radio-button"></span>
-          </span>
-        </div>
-        <div class="multiple-choice-editor-content-container">
-          <span angular-html-bind="choice"></span>
-        </div>
-      </button>
-    </div>
+  <h3>Pick the correct answer</h3>
+  <div class="correct-answer-picker-container">
+    <button class="correct-answer-option"
+            ng-repeat="choice in getChoices() track by $index"
+            ng-click="selectCorrectAnswer($index)"
+            ng-class="{'correct-answer-option-selected': isCorrectAnswer($index)}">
+      <div class="correct-answer-radio-button-container">
+        <span class="correct-answer-outer-radio-button">
+          <span class="correct-answer-inner-radio-button"></span>
+        </span>
+      </div>
+      <div class="correct-answer-content-container">
+        <span angular-html-bind="choice"></span>
+      </div>
+    </button>
   </div>
 
-  <div ng-if="answerGroups.length > 0">
-    <div class="header">
-      Provide additional explanation for the right answer
-    </div>
+  <div ng-if="getAnswerGroups().length > 0">
+    <h3>Provide additional explanation for the correct answer</h3>
     <div style="width: 100%; margin-top: 20px; background-color: #f0f0f0;">
-      <editor-html-field original-value="answerGroups[0].outcome.feedback[0]"
-                         on-finish-editing="saveCorrectAnswerFeedback(newValue)">
+      <editor-html-field original-value="getAnswerGroups()[0].outcome.feedback[0]"
+                         on-finish-editing="saveCorrectAnswerFeedback(newValue)"
+                         placeholder="Type something">
       </editor-html-field>
     </div>
   </div>
 
-  <div class="header">
-    Provide a hint for all other answers
-  </div>
+  <h3>Provide a hint for all other answers</h3>
   <editor-html-field original-value="getDefaultOutcome().feedback[0]"
                      on-finish-editing="saveDefaultFeedback(newValue)"
                      placeholder="Type something">
   </editor-html-field>
-
+  <md-checkbox>Provide different hints for each choice</md-checkbox>
 </script>
 
 <style>
-  .multiple-choice-editor-option-container {
-    padding: 4px 0;
+  multiple-choice-editor .options-container {
+    background-color: #f0f0f0;
+    margin-top: 20px;
+    width: 100%;
   }
-
-  .multiple-choice-editor-option {
+  multiple-choice-editor .option {
+    margin-left: 20px;
+  }
+  multiple-choice-editor .option-text {
+    width: 90%;
+  }
+  multiple-choice-editor .option-text .view-mode {
+    padding: 10px;
+  }
+  multiple-choice-editor .option-text .edit-mode {
+    width: 85%;
+  }
+  multiple-choice-editor .btn-delete-option {
     background: none;
     border: none;
-    color: #0D48A1;
+    float: right;
+    margin-right: 20px;
+    margin-top: 7px;
+    width: 10%;
+  }
+  multiple-choice-editor .btn-add-option {
+    background: none;
+    border: none;
+    color: #888;
+    height: 40px;
+    margin-left: 35px;
+  }
+  multiple-choice-editor .btn-add-option-icon {
+    margin-left: -3px;
+    margin-right: 12px;
+    vertical-align: text-bottom;
+  }
+
+  multiple-choice-editor .correct-answer-picker-container {
+    background-color: #f0f0f0;
+  }
+  multiple-choice-editor .correct-answer-option {
+    background: none;
+    border: none;
+    margin: 10px 0;
     text-align: left;
     /* This is needed so that images stay bounded by the container in Firefox. */
     width: 100%;
   }
-
-  .multiple-choice-editor-radio-button-container,
-  .multiple-choice-editor-content-container {
+  multiple-choice-editor .correct-answer-radio-button-container,
+  multiple-choice-editor .correct-answer-content-container {
     display: table-cell;
+    vertical-align: bottom;
   }
-
-  .multiple-choice-editor-outer-radio-button {
-    border: 2px solid #0D48A1;
+  multiple-choice-editor .correct-answer-outer-radio-button {
+    border: 2px solid rgba(0,0,0,0.87);
     border-radius: 50%;
     display: inline-block;
     height: 16px;
-    margin-bottom: -2px;
-    margin-right: 12px;
+    margin-left: 35px;
+    margin-right: 20px;
     width: 16px;
   }
-
-  .multiple-choice-editor-option:hover .multiple-choice-editor-inner-radio-button,
-  .multiple-choice-editor-selected .multiple-choice-editor-inner-radio-button {
-    background-color: #115FD4;
+  multiple-choice-editor .correct-answer-option:hover .correct-answer-inner-radio-button,
+  multiple-choice-editor .correct-answer-option-selected .correct-answer-inner-radio-button {
+    background-color: rgba(0,0,0,0.87);
     border-radius: 50%;
     display: block;
     height: 8px;
     margin: 2px;
     width: 8px;
-  }
-
-  .multiple-choice-editor-option:hover .multiple-choice-editor-outer-radio-button,
-  .multiple-choice-editor-selected .multiple-choice-editor-outer-radio-button {
-    border-color: #115FD4;
   }
 </style>

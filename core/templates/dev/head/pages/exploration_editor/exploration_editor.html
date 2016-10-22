@@ -421,7 +421,7 @@
       </div>
 
       <div ng-show="getTabStatuses().active === 'main'">
-        <div ng-show="isEditorInSimpleMode()">
+        <div ng-if="isEditorInSimpleMode()">
           <simple-editor-tab></simple-editor-tab>
         </div>
         <div ng-show="isEditorInFullMode()">

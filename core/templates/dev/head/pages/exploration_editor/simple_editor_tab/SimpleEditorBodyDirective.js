@@ -22,12 +22,9 @@ oppia.directive('simpleEditorBody', [function() {
     scope: {},
     templateUrl: 'simpleEditor/body',
     controller: [
-      '$scope', '$timeout', 'SimpleEditorManagerService',
-      function($scope, $timeout, SimpleEditorManagerService) {
-        $scope.data = {};
-        $scope.$on('simpleEditorLoaded', function() {
-          $scope.data = SimpleEditorManagerService.getData();
-        });
+      '$scope', 'SimpleEditorManagerService',
+      function($scope, SimpleEditorManagerService) {
+        $scope.data = SimpleEditorManagerService.getData();
 
         $scope.saveTitle = SimpleEditorManagerService.saveTitle;
         $scope.saveIntroductionHtml = (
@@ -40,19 +37,7 @@ oppia.directive('simpleEditorBody', [function() {
         $scope.saveBridgeHtml = SimpleEditorManagerService.saveBridgeHtml;
         $scope.canAddNewQuestion = SimpleEditorManagerService.canAddNewQuestion;
         $scope.addState = SimpleEditorManagerService.addState;
-
-        $scope.addNewQuestion = function() {
-          SimpleEditorManagerService.addNewQuestion();
-
-          // The directive for the new question needs to be loaded before this
-          // broadcast can have any effect.
-          $timeout(function() {
-            $scope.$broadcast('newQuestionAdded', {
-              targetId: $scope.data.questions[
-                $scope.data.questions.length - 1].getStateName()
-            });
-          });
-        };
+        $scope.addNewQuestion = SimpleEditorManagerService.addNewQuestion;
       }
     ]
   };

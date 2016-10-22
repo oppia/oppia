@@ -29,9 +29,7 @@
 
         <!-- TODO(sll): Update this condition when control of individual field visibility is added. -->
         <div ng-if="!$last">
-          <div class="header">
-            Bridge Text
-          </div>
+          <h3>Bridge Text</h3>
           <editor-html-field original-value="question.getBridgeHtml()"
                              on-finish-editing="saveBridgeHtml(question.getStateName(), newValue)">
           </editor-html-field>
@@ -39,12 +37,10 @@
       </div>
     </div>
 
-    <div class="advance-btn-container">
-      <button ng-disabled="!canAddNewQuestion()" type="button"
-              class="btn btn-default advance-btn" ng-click="addNewQuestion()">
-        <i class="material-icons md-30">&#xE5CF;</i>
-      </button>
-    </div>
+    <button ng-disabled="!canAddNewQuestion()" type="button"
+            class="btn btn-default advance-btn" ng-click="addNewQuestion()">
+      <i class="material-icons md-30">&#xE5CF;</i>
+    </button>
   </div>
 </script>
 
@@ -84,20 +80,14 @@
     margin-top: 80px;
   }
 
-  simple-editor-body .advance-btn-container {
-    bottom: 50px;
-    position: fixed;
-    width: -webkit-calc(100% - 220px);
-    width: -moz-calc(100% - 220px);
-    width: -o-calc(100% - 220px);
-    width: calc(100% - 220px);
-  }
   simple-editor-body .advance-btn {
     border: 1px solid #009688;
     border-radius: 50%;
+    bottom: 50px;
     color: #009688;
     height: 50px;
-    position: relative;
+    margin-left: -25px;
+    position: fixed;
     width: 50px;
   }
   simple-editor-body .advance-btn:hover {
