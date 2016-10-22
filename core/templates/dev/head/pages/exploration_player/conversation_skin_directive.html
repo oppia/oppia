@@ -210,10 +210,18 @@
                                 is-community-owned="exp.community_owned"
                                 ng-attr-open-in-new-window="<[isIframed ? 'true' : undefined]>">
       </exploration-summary-tile>
-
+      <collection-summary-tile ng-if="collectionId"
+                               collection-id="collectionSummary.id"
+                               collection-title="collectionSummary.title"
+                               last-updated-msec="collectionSummary.last_updated_msec"
+                               node-count="collectionSummary.node_count"
+                               objective="collectionSummary.objective"
+                               thumbnail-icon-url="collectionSummary.thumbnail_icon_url"
+                               thumbnail-bg-color="collectionSummary.thumbnail_bg_color"
+                               style="margin-right: 3px;">
+      </collection-summary-tile>
     </div>
   </div>
-
   <!-- The styles here need to be embedded within the directive script tags,
   since otherwise they will interfere with the iframed conversation skin
   directive. -->
