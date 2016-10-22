@@ -785,11 +785,11 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
         $scope.collectionId = GLOBALS.collectionId;
         $scope.collectionTitle = GLOBALS.collectionTitle;
 
-        if($scope.collectionId) {
+        if ($scope.collectionId) {
           $scope.collectionDataUrl = UrlInterpolationService.interpolateUrl(
             COLLECTION_DATA_URL_TEMPLATE, {
               collection_id: $scope.collectionId
-          });
+            });
           $http.get($scope.collectionDataUrl).then(
             function(response) {
               $scope.collectionSummary = response.data.collection_summary[0];
@@ -797,9 +797,9 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
             function() {
               alertsService.addWarning(
                 'There was an error while fetching the collection summary.');
-              }
+            }
             );
-          }
+        }
 
         $scope.onNavigateFromIframe = function() {
           siteAnalyticsService.registerVisitOppiaFromIframeEvent(

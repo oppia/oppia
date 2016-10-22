@@ -93,7 +93,9 @@ class CollectionDataHandler(base.BaseHandler):
                     allow_invalid_explorations=False))
         except Exception as e:
             raise self.PageNotFoundException(e)
-        collection_summary = summary_services.get_displayable_collection_summary_dicts_matching_ids(collection_id)
+        collection_summary = \
+        summary_services.get_displayable_collection_summary_dicts_matching_ids(
+            collection_id)
 
         self.values.update({
             'can_edit': (
