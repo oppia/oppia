@@ -104,6 +104,7 @@ oppia.controller('Moderator', [
         featured_activity_reference_dicts: activityReferencesToSave
       }).then(function() {
         $scope.lastSavedFeaturedActivityReferences = activityReferencesToSave;
+        alertsService.addSuccessMessage('Featured activities saved.');
       });
     };
   }
