@@ -76,6 +76,18 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
 
     @classmethod
     def _handle_incoming_event(cls, active_realtime_layer, event_type, *args):
+        """Records incoming events in the given realtime layer.
+
+        Args:
+            active_realtime_layer: int. Currently active realtime datastore
+                layer.
+            event_type: str. The event triggered by a student. For example, when
+                a student starts an exploration, event of type `start` is
+                triggered. If he/she completes an exploration, event of type
+                `complete` is triggered.
+            *args: Variable length argument list. The first element of *args
+                corresponds to the id of the exploration currently being played.
+        """
         exp_id = args[0]
 
         def _increment_visit_counter():
@@ -116,25 +128,31 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
     # Public query method.
     @classmethod
     def get_statistics(cls, exploration_id, exploration_version):
-        """
-        Args:
-          - exploration_id: id of the exploration to get statistics for
-          - exploration_version: str. Which version of the exploration to get
-              statistics for; this can be a version number, the string 'all',
-              or the string 'none'.
+        """Gets the statistics for the specified exploration and it's version.
 
-        Returns a dict with the following keys:
-        - 'start_exploration_count': # of times exploration was started
-        - 'complete_exploration_count': # of times exploration was completed
-        - 'state_hit_counts': a dict containing the hit counts for the states
-           in the exploration. It is formatted as follows:
-            {
-                state_name: {
-                    'first_entry_count': # of sessions which hit this state
-                    'total_entry_count': # of total hits for this state
-                    'no_answer_count': # of hits with no answer for this state
-                }
-            }
+        Args:
+            exploration_id: str. The id of the exploration to get statistics.
+            exploration_version: str or int. Which version of the exploration to
+                get statistics for. This can be a version number, the string
+                'all', or the string 'none'.
+
+        Returns:
+            dict. The keys of the dict are:
+                'start_exploration_count': # of times exploration was started.
+                'complete_exploration_count': # of times exploration was
+                    completed.
+                'state_hit_counts': a dict containing the hit counts for the
+                    states in the exploration. It is formatted as follows:
+                        {
+                            state_name: {
+                                'first_entry_count': # of sessions which hit
+                                    this state.
+                                'total_entry_count': # of total hits for this
+                                    state.
+                                'no_answer_count': # of hits with no answer for
+                                    this state.
+                            }
+                        }
         """
         num_starts = 0
         num_completions = 0
@@ -166,9 +184,16 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
 
     @classmethod
     def get_views_multi(cls, exploration_ids):
-        """Given a list of exploration ids, returns a list of view counts
-        for the explorations therein. If any of the exploration_ids are
-        None, the corresponding return value is 0.
+        """Generated the view counts for given exploration id.
+
+        Args:
+            exploration_ids: list(str). The list of exploration ids for which
+                this function generates the number of times each exploration
+                has been viewed (view counts).
+
+        Returns:
+            list(int). The number of times each exploration in exploration_ids
+                has been viewed.
         """
         entity_ids = [stats_models.ExplorationAnnotationsModel.get_entity_id(
             exploration_id, VERSION_ALL) for exploration_id in exploration_ids]
