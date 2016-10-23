@@ -36,7 +36,7 @@ oppia.factory('SimpleEditorManagerService', [
       ID: 'MultipleChoiceInput',
       CUSTOMIZATION_ARGS: {
         choices: {
-          value: ['Option 1']
+          value: ['<p>Option 1</p>']
         }
       }
     };

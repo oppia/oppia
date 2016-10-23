@@ -28,7 +28,9 @@ oppia.filter('MultipleChoiceInputChecker', [function() {
     // - Each answer group has exactly one rule_spec, and that rule_spec is for
     //   an "Equals" rule. The argument for each of these rules matches a
     //   choice in customizationArgs.
+    // - Each answer group corresponds to a different choice.
     var numChoices = customizationArgs.choices.value.length;
+    var coveredChoices = [];
     for (var i = 0; i < answerGroups.length; i++) {
       var ruleSpecs = answerGroups[i].rule_specs;
       if (ruleSpecs.length !== 1 ||
@@ -36,6 +38,10 @@ oppia.filter('MultipleChoiceInputChecker', [function() {
           ruleSpecs[0].inputs.x >= numChoices) {
         return false;
       }
+      if (coveredChoices.indexOf(ruleSpecs[0].inputs.x) !== -1) {
+        return false;
+      }
+      coveredChoices.push(ruleSpecs[0].inputs.x);
     }
     return true;
   };

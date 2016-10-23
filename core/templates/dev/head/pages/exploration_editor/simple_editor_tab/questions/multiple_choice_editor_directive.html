@@ -10,7 +10,8 @@
         <editor-html-field class="option-text"
                            original-value="choice"
                            on-finish-editing="saveChoice($index, newValue)"
-                           field-id="<[getFieldId($index)]>">
+                           field-id="<[getFieldId($index)]>"
+                           validator="isChoiceValid($index, newValue)">
         </editor-html-field>
       </li>
     </ul>
@@ -40,12 +41,11 @@
 
   <div ng-if="getAnswerGroups().length > 0">
     <h3>Provide additional explanation for the correct answer</h3>
-    <div style="width: 100%; margin-top: 20px; background-color: #f0f0f0;">
-      <editor-html-field original-value="getAnswerGroups()[0].outcome.feedback[0]"
-                         on-finish-editing="saveCorrectAnswerFeedback(newValue)"
-                         placeholder="Type something">
-      </editor-html-field>
-    </div>
+    <editor-html-field original-value="getAnswerGroups()[0].outcome.feedback[0]"
+                       on-finish-editing="saveCorrectAnswerFeedback(newValue)"
+                       placeholder="Type something"
+                       field-id="<[getFieldId('correct-response')]>">
+    </editor-html-field>
   </div>
 
   <h3>Provide a hint for all other answers</h3>
@@ -53,7 +53,6 @@
                      on-finish-editing="saveDefaultFeedback(newValue)"
                      placeholder="Type something">
   </editor-html-field>
-  <md-checkbox>Provide different hints for each choice</md-checkbox>
 </script>
 
 <style>

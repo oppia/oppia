@@ -13,7 +13,10 @@
     </schema-based-editor>
     <span class="bar"></span>
 
-    <button type="button" ng-click="finishEditing()">Save</button>
+    <button type="button" ng-click="finishEditing()" ng-disabled="!canSave()"
+            class="btn btn-default">
+      Save
+    </button>
   </div>
 </script>
 
