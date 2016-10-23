@@ -63,7 +63,7 @@ class StateRuleAnswerLog(object):
                 string is a string representation of a rule. All answers that
                 are submitted to each of the specified
                 (exploration ID, state name) and also match one or more of the
-                rule spec string in rule_str_list are returned.
+                rule spec strings in rule_str_list are returned.
 
         Returns:
             list(StateRuleAnswerLog). A list of StateRuleAnswerLog objects
@@ -119,7 +119,7 @@ class StateRuleAnswerLog(object):
     @classmethod
     def get(cls, exploration_id, state_name, rule_str):
         """Gets the StateRuleAnswerLog domain object corresponding to the
-        corresponding to given rule spec string and state_name.
+        given rule spec string and state_name.
 
         Args:
             exploration_id: str. The id of the exploration.
