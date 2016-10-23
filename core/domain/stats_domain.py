@@ -45,12 +45,10 @@ class StateRuleAnswerLog(object):
         """Total count of answers for this rule that have not been resolved.
 
         Returns:
-            int. A int specifying the total number of answers for this rule that
-            have not been resolved.
-
-        Todo:
-            ssl: Cache this computed property.
+            int. The total number of answers for this rule that
+                have not been resolved.
         """
+        # TODO(sll): Cache this computed property.
         return sum(self.answers.values())
 
     @classmethod
@@ -59,23 +57,24 @@ class StateRuleAnswerLog(object):
         """Gets domain objects given a list of exploration and state tuples.
 
         Args:
-            exploration_state_list: list(tuple). A list of exploration ID and
-                state name tuples.
-            rule_str_list: list. A list of rule spec strings which are used to
-                filter the answers matched to the provided explorations and
-                states.
+            exploration_state_list: list(tuple). A list of 2-tuples in the form
+                (exploration_id, state_name).
+            rule_str_list: list(str). A list of rule spec strings. A rule spec
+                string is a string representation of a rule. All answers that
+                are submitted to each of the specified
+                (exploration ID, state name) and also match one or more of the
+                rule spec string in rule_str_list are returned.
 
         Returns:
-            list. A list of StateRuleAnswerLog objects containing answers
-            matched to each exploration ID-state name. The number of elements
-            returned is the same as the number of elements passed in
-            exploration_state_list. The number of answers in each
-            StateRuleAnswerLog object depends on the number of answers matched
-            against each rule spec strings specified in rule_str_list.
-
-        Todo:
-            ssl: Should each rule_str be unicode instead?
+            list(StateRuleAnswerLog). A list of StateRuleAnswerLog objects
+                containing answers matched to each (exploration ID, state name).
+                The number of elements returned is the same as the number of
+                elements in exploration_state_list. The number of answers in
+                each passed StateRuleAnswerLog object is same as the number of
+                answers matched against each rule spec string specified in
+                rule_str_list.
         """
+        # TODO(sll): Should each rule_str be unicode instead?
         answer_log_models_list = (
             stats_models.StateRuleAnswerLogModel.get_or_create_multi_for_multi_explorations( # pylint: disable=line-too-long
                 exploration_state_list, rule_str_list))
@@ -89,6 +88,7 @@ class StateRuleAnswerLog(object):
                     else:
                         combined_answers[answer] = frequency
             answer_log_list.append(cls(combined_answers))
+
         return answer_log_list
 
     @classmethod
@@ -98,17 +98,18 @@ class StateRuleAnswerLog(object):
         Args:
             exploration_id: str. The id of the exploration.
             rule_data: list(dict). A list of dicts, each with the following
-                keys: (state_name, rule_str).
+                keys: (state_name, rule_str). `state_name`, a string, is the
+                name of the state whose answer log is to be fetched. `rule_str`
+                is a string representation of the rule. Only the answers that
+                match this rule are returned.
 
         Returns:
-            list. Returns a list of StateRuleAnswerLog objects corresponding to
-            a given rule data and exploration_id.
-
-        Todo:
-            ssl: Should each rule_str be unicode instead?
-            bhenning: Combine this with get_multi_by_multi_explorations as part
-                of the answer migration project.
+            list(StateRuleAnswerLog). Returns a list of StateRuleAnswerLog
+                objects corresponding to a given rule data and exploration_id.
         """
+        # TODO(sll): Should each rule_str be unicode instead?
+        # TODO(bhenning): Combine this with get_multi_by_multi_explorations as
+        # part of the answer migration project.
         answer_log_models = (
             stats_models.StateRuleAnswerLogModel.get_or_create_multi(
                 exploration_id, rule_data))
@@ -117,23 +118,21 @@ class StateRuleAnswerLog(object):
 
     @classmethod
     def get(cls, exploration_id, state_name, rule_str):
-        """Gets domain object corresponding to given rule spec strings and
-        state_name.
+        """Gets the StateRuleAnswerLog domain object corresponding to the
+        corresponding to given rule spec string and state_name.
 
         Args:
             exploration_id: str. The id of the exploration.
-            state_name: str. The current state(card) of the exploration.
-            rule_str: str. Rule spec string which is used to filter the answers
-                based on exploration id and state name.
+            state_name: str. The name of the state whose answer log is to be
+                fetched.
+            rule_str: str. A string representation of a rule. Only the answers
+                that match this rule are returned.
 
         Returns:
-            StateRuleAnswerLog object. Get the StateRuleAnswerLog object
-            corresponding to a given exploration_id-state_name and the
-            given rule spec string.
-
-        Todo:
-            ssl: Deprecate this method.
+            StateRuleAnswerLog. The answer log domain object corresponding to
+                the given exploration id, state name, and rule spec string.
         """
+        # TODO(sll): Deprecate this method.
         return cls.get_multi_by_multi_explorations(
             [(exploration_id, state_name)], [rule_str])[0]
 
@@ -141,21 +140,26 @@ class StateRuleAnswerLog(object):
         """Returns all the answers sorted by count.
 
         Returns:
-            list. A list of (answer, count) sorted by count.
+            list(tuple). A list of 2-tuples in the form (answer, count) sorted
+                by count. `answer` is a string that represents a answer
+                submitted to that state of the exploration. `count` of type int,
+                is the number of times that answer has been given.
         """
         return sorted(
             self.answers.iteritems(), key=operator.itemgetter(1),
             reverse=True)
 
     def get_top_answers(self, num_answers_to_return):
-        """Returns the top `num_answers_to_return` answers after
-        fetching all top answers from get_all_top_answers().
+        """Returns the top `num_answers_to_return` answers.
 
         Args:
             num_answers_to_return: the maximum number of answers to return.
 
         Returns:
-            list. A list of (answer, count) tuples for the
-            `num_answers_to_return` answers with the highest counts.
+            list(tuple). A list of (answer, count) tuples for the
+                `num_answers_to_return` answers with the highest counts.
+                `answer` is a string that represents a answer submitted to that
+                state of the exploration. `count` of type int, is the number of
+                times that answer has been given.
         """
         return self.get_all_top_answers()[:num_answers_to_return]
