@@ -179,15 +179,6 @@ class EscapingTest(test_utils.GenericTestBase):
         # Update a config property that shows in all pages.
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.testapp.get('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json('/adminhandler', {
-            'action': 'save_config_properties',
-            'new_config_property_values': {
-                base.SITE_FEEDBACK_FORM_URL.name: (
-                    '<[angular_tag]> x{{51 * 3}}y'),
-            }
-        }, csrf_token)
 
         # Modify the testapp to use the fake handler.
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -199,7 +190,6 @@ class EscapingTest(test_utils.GenericTestBase):
         response = self.testapp.get('/fake')
         self.assertEqual(response.status_int, 200)
 
-        self.assertIn('&lt;[angular_tag]&gt;', response.body)
         self.assertNotIn('<[angular_tag]>', response.body)
 
         self.assertIn('x{{51 * 3}}y', response.body)

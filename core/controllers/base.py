@@ -208,8 +208,9 @@ class BaseHandler(webapp2.RequestHandler):
                             user_settings.last_logged_in)):
                     user_services.record_user_logged_in(self.user_id)
 
-        self.is_moderator = self.user.is_moderator() if self.user else False
-        self.is_admin = self.user.is_admin() if self.user else False
+        rights_mgr_user = rights_manager.Actor(self.user_id)
+        self.is_moderator = rights_mgr_user.is_moderator()
+        self.is_admin = rights_mgr_user.is_admin()
         self.is_super_admin = (
             current_user_services.is_current_user_super_admin())
 
