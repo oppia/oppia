@@ -187,13 +187,16 @@ class EscapingTest(test_utils.GenericTestBase):
         ))
 
     def test_jinja_autoescaping(self):
-        response = self.testapp.get('/fake')
-        self.assertEqual(response.status_int, 200)
+        form_url = '<[angular_tag]> x{{51 * 3}}y'
+        with self.swap(feconf, 'SITE_FEEDBACK_FORM_URL', form_url):
+            response = self.testapp.get('/fake')
+            self.assertEqual(response.status_int, 200)
 
-        self.assertNotIn('<[angular_tag]>', response.body)
+            self.assertIn('&lt;[angular_tag]&gt;', response.body)
+            self.assertNotIn('<[angular_tag]>', response.body)
 
-        self.assertIn('x{{51 * 3}}y', response.body)
-        self.assertNotIn('x153y', response.body)
+            self.assertIn('x{{51 * 3}}y', response.body)
+            self.assertNotIn('x153y', response.body)
 
     def test_special_char_escaping(self):
         response = self.testapp.post('/fake', {})
