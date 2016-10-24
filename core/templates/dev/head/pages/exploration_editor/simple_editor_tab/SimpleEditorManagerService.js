@@ -41,6 +41,13 @@ oppia.factory('SimpleEditorManagerService', [
       }
     };
 
+    var END_EXPLORATION_INTERACTION = {
+      ID: 'EndExploration',
+      CUSTOMIZATION_ARGS: {
+        recommendedExplorationIds: []
+      }
+    };
+
     var getNewStateName = function() {
       var allStateNames = data.questions.map(function(question) {
         return question.stateName;
@@ -136,6 +143,11 @@ oppia.factory('SimpleEditorManagerService', [
           lastStateName, DEFAULT_INTERACTION.ID);
         SimpleEditorShimService.saveCustomizationArgs(
           lastStateName, DEFAULT_INTERACTION.CUSTOMIZATION_ARGS);
+        SimpleEditorShimService.saveDefaultOutcome(lastStateName, {
+          dest: lastStateName,
+          feedback: [''],
+          param_changes: []
+        });
 
         var stateData = SimpleEditorShimService.getState(lastStateName);
         data.questions.push(QuestionObjectFactory.create(
@@ -153,9 +165,17 @@ oppia.factory('SimpleEditorManagerService', [
           return data.questions[data.questions.length - 1].hasAnswerGroups();
         }
       },
+      canTryToPublish: function() {
+        return this.canAddNewQuestion() && data.questions.length > 2;
+      },
       addState: function() {
         var newStateName = getNewStateName();
         SimpleEditorShimService.addState(newStateName);
+        SimpleEditorShimService.saveInteractionId(
+          newStateName, END_EXPLORATION_INTERACTION.ID);
+        SimpleEditorShimService.saveCustomizationArgs(
+          newStateName, END_EXPLORATION_INTERACTION.CUSTOMIZATION_ARGS);
+        SimpleEditorShimService.saveDefaultOutcome(newStateName, null);
         return newStateName;
       }
     };

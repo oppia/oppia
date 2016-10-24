@@ -41,6 +41,11 @@
             class="btn btn-default advance-btn" ng-click="addNewQuestion()">
       <i class="material-icons md-30">&#xE5CF;</i>
     </button>
+    <button ng-if="canTryToPublish()" type="button"
+            class="btn btn-default advance-btn end-exploration-btn"
+            ng-click="tryToPublishExploration()">
+      <i class="material-icons md-30">&#xE047;</i>
+    </button>
   </div>
 </script>
 
@@ -100,5 +105,8 @@
   }
   simple-editor-body .advance-btn i {
     margin: 3px -2px;
+  }
+  simple-editor-body .advance-btn.end-exploration-btn {
+    margin-left: 40px;
   }
 </style>
