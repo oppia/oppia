@@ -14,6 +14,8 @@
 
 """Controller for user query related pages and handlers."""
 
+from google.appengine.datastore.datastore_query import Cursor
+
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import user_query_services
@@ -41,79 +43,59 @@ def require_valid_sender(handler):
     return test_user
 
 
-class QueryPage(base.BaseHandler):
+class EmailDashboardPage(base.BaseHandler):
     """Page to submit query and show past queries."""
 
     @require_valid_sender
     def get(self):
         """Handles GET requests."""
-        self.render_template('pages/query/query.html')
+        self.render_template('pages/email_dashboard/email_dashboard.html')
 
 
-class QueryDataHandler(base.BaseHandler):
+class EmailDashboardDataHandler(base.BaseHandler):
     """Query data handler."""
+
+    QUERIES_PER_PAGE = 10
 
     @require_valid_sender
     def get(self):
-        offset = (
-            int(self.request.get('offset')) if self.request.get('offset') != ''
-            else 0)
-        base_offset = (
-            int(self.request.get('base_offset'))
-            if self.request.get('base_offset') != '' else 0)
+        cursor = Cursor(urlsafe=self.request.get('cursor'))
 
-        query_models = (
+        query_models, next_cursor, more = (
             user_models.UserQueryModel.query().
             order(-user_models.UserQueryModel.created_on).
-            fetch(base_offset, offset=offset))
-        queries_list = []
+            fetch_page(self.QUERIES_PER_PAGE, start_cursor=cursor))
 
-        for model in query_models:
-            query = {}
-            query['id'] = model.id
-            query['submitter_id'] = user_services.get_username(
-                model.submitter_id)
-            query['created_on'] = model.created_on.strftime("%d-%m-%y %H:%M:%S")
-            query['status'] = model.query_status
-            query['qualified_users'] = len(model.user_ids)
-            queries_list.append(query)
+        submitters_settings = user_services.get_users_settings(
+            [model.submitter_id for model in query_models])
 
-        self.render_json({
+        submitter_details = {
+            submitter.user_id: submitter.username
+            for submitter in submitters_settings
+        }
+
+        queries_list = [{
+            'id': model.id,
+            'submitter_id': submitter_details[model.submitter_id],
+            'created_on': model.created_on.strftime('%d-%m-%y %H:%M:%S'),
+            'status': model.query_status,
+            'num_qualified_users': len(model.user_ids)
+        } for model in query_models]
+
+        data = {
             'recent_queries': queries_list
-        })
+        }
+        if more and next_cursor:
+            data['cursor'] = next_cursor.urlsafe()
+
+        self.render_json(data)
 
     @require_valid_sender
     def post(self):
         """Post handler for query."""
         data = self.payload['data']
-        kwargs = {}
-        if 'inactive_in_last_n_days' in data:
-            if data['inactive_in_last_n_days'] != '':
-                kwargs['inactive_in_last_n_days'] = (
-                    int(data['inactive_in_last_n_days']))
-        if 'has_not_logged_in_for_n_days' in data:
-            if data['has_not_logged_in_for_n_days'] != '':
-                kwargs['has_not_logged_in_for_n_days'] = (
-                    int(data['has_not_logged_in_for_n_days']))
-        if 'created_at_least_n_exps' in data:
-            if data['created_at_least_n_exps'] != '':
-                kwargs['created_at_least_n_exps'] = (
-                    int(data['created_at_least_n_exps']))
-        if 'created_fewer_than_n_exps' in data:
-            if data['created_fewer_than_n_exps'] != '':
-                kwargs['created_fewer_than_n_exps'] = (
-                    int(data['created_fewer_than_n_exps']))
-        if 'edited_at_least_n_exps' in data:
-            if data['edited_at_least_n_exps'] != '':
-                kwargs['edited_at_least_n_exps'] = (
-                    int(data['edited_at_least_n_exps']))
-        if 'edited_fewer_than_n_exps'in data:
-            if data['edited_fewer_than_n_exps'] != '':
-                kwargs['edited_fewer_than_n_exps'] = (
-                    int(data['edited_fewer_than_n_exps']))
-
         query_id = user_query_services.save_new_query_model(
-            self.user_id, **kwargs)
+            self.user_id, **data)
 
         # Start MR job in background.
         job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()

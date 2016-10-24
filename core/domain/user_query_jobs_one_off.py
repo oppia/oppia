@@ -22,9 +22,11 @@ from core import jobs
 from core.domain import rights_manager
 from core.platform import models
 
-(user_models, exp_models) = (
+import feconf
+
+(user_models, exp_models, job_models) = (
     models.Registry.import_models(
-        [models.NAMES.user, models.NAMES.exploration]))
+        [models.NAMES.user, models.NAMES.exploration, models.NAMES.job]))
 
 # pylint: disable=too-many-return-statements
 
@@ -105,10 +107,18 @@ class UserQueryOneOffJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _post_completed_hook(cls, job_id):
-        # TODO: change query status in query model to completed.
-        pass
+        # TODO: send email to submitter upon completion.
+        job_model = job_models.JobModel.get(job_id)
+        query_id = job_model.additional_job_params['query_id']
+        query_model = user_models.UserQueryModel.get(query_id)
+        query_model.query_status = feconf.USER_QUERY_STATUS_COMPLETED
+        query_model.put()
 
     @classmethod
     def _post_failure_hook(cls, job_id):
-        # TODO: change query status in query model to failed.
-        pass
+        # TODO: send email to admin and submitter upon failure.
+        job_model = job_models.JobModel.get(job_id)
+        query_id = job_model.additional_job_params['query_id']
+        query_model = user_models.UserQueryModel.get(query_id)
+        query_model.query_status = feconf.USER_QUERY_STATUS_FAILED
+        query_model.put()

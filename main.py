@@ -22,6 +22,7 @@ from core.controllers import base
 from core.controllers import collection_editor
 from core.controllers import collection_viewer
 from core.controllers import dashboard
+from core.controllers import email_dashboard
 from core.controllers import editor
 from core.controllers import feedback
 from core.controllers import library
@@ -31,7 +32,6 @@ from core.controllers import profile
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
-from core.controllers import user_query
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -376,8 +376,10 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<collection_id>' % feconf.COLLECTION_RIGHTS_PREFIX,
         collection_editor.CollectionRightsHandler),
 
-    get_redirect_route(r'/query', user_query.QueryPage),
-    get_redirect_route(r'/querydatahandler', user_query.QueryDataHandler),
+    get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
+    get_redirect_route(
+        r'/emaildashboarddatahandler',
+        email_dashboard.EmailDashboardDataHandler),
 
     get_redirect_route(
         r'%s' % feconf.EXPLORATION_METADATA_SEARCH_URL,

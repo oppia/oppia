@@ -23,14 +23,14 @@ from core.tests import test_utils
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
-class QueryDataHandlerTests(test_utils.GenericTestBase):
+class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
 
     SUBMITTER_EMAIL = 'submit@example.com'
     SUBMITTER_USERNAME = 'submit'
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
     def setUp(self):
-        super(QueryDataHandlerTests, self).setUp()
+        super(EmailDashboardDataHandlerTests, self).setUp()
         self.signup(self.SUBMITTER_EMAIL, self.SUBMITTER_USERNAME)
         self.submitter_id = self.get_user_id_from_email(
             self.SUBMITTER_EMAIL)
@@ -45,15 +45,15 @@ class QueryDataHandlerTests(test_utils.GenericTestBase):
         """Test the About page."""
         self.login(self.SUBMITTER_EMAIL)
         csrf_token = self.get_csrf_token_from_response(
-            self.testapp.get('/query'))
+            self.testapp.get('/emaildashboard'))
         self.post_json(
-            '/querydatahandler', {
+            '/emaildashboarddatahandler', {
                 'data': {
                     'has_not_logged_in_for_n_days': 2,
                     'inactive_in_last_n_days': 5,
                     'created_at_least_n_exps': 1,
-                    'created_fewer_than_n_exps': '',
-                    'edited_at_least_n_exps': '',
+                    'created_fewer_than_n_exps': None,
+                    'edited_at_least_n_exps': None,
                     'edited_fewer_than_n_exps': 2
                 }}, csrf_token)
         self.logout()
@@ -79,16 +79,9 @@ class QueryDataHandlerTests(test_utils.GenericTestBase):
                 queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 1)
         self.process_and_flush_pending_tasks()
 
-    def test_that_page_is_accessible_to_authorized_users_only(self):
+    def test_that_page_is_accessible_to_authorised_users_only(self):
+        # Make sure that only authorised users can access query pages.
+        self.login(self.USER_A_EMAIL)
         with self.assertRaisesRegexp(Exception, '401 Unauthorized'):
-            self.login(self.USER_A_EMAIL)
-            csrf_token = self.get_csrf_token_from_response(
-                self.testapp.get('/query'))
-            self.post_json(
-                '/querydatahandler', {
-                    'data': {
-                        'has_not_logged_in_for_n_days': 2,
-                        'inactive_in_last_n_days': 5
-                    }
-                }, csrf_token)
+            self.testapp.get('/emaildashboard')
             self.logout()
