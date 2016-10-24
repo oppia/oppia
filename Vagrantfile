@@ -12,6 +12,7 @@ $script = <<SCRIPT
 cd /home/vagrant/oppia
 bash ./scripts/install_prerequisites.sh
 bash ./scripts/start.sh
+touch /etc/is_vagrant_vm
 SCRIPT
 
 Vagrant.configure(2) do |config|
