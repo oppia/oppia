@@ -89,6 +89,7 @@ class BaseModel(ndb.Model):
         return entity
 
     def put(self):
+        """Stores this entity's data"""
         super(BaseModel, self).put()
 
     @classmethod
@@ -96,14 +97,15 @@ class BaseModel(ndb.Model):
         """Gets list of entities by list of ids.
 
         Args:
-            entity_ids: list of str.
-            include_deleted: bool. Whether to include deleted entities into
+            entity_ids: list(str).
+            include_deleted: bool. Whether to include deleted entities in the
                 return list. Default is False.
 
-        Return:
-            List of entity instances corresponding to endity_id, if instance was
-            not found or instace has been deleted, and include_deleted is False
-            then entry is None.
+        Returns:
+            list(*|None). A list that contains model instances that match
+            the corresponding entity_ids in the input list. If an instance is
+            not found, or it has been deleted and include_deleted is False,
+            then the corresponding entry is None.
         """
         entity_keys = [ndb.Key(cls, entity_id) for entity_id in entity_ids]
         entities = ndb.get_multi(entity_keys)
@@ -115,32 +117,34 @@ class BaseModel(ndb.Model):
 
     @classmethod
     def put_multi(cls, entities):
-        """Stores sequence of entities.
+        """Stores the given ndb.Model instances.
 
         Args:
-            entities: sequence.
+            entities: list(ndb.Model).
 
-        Return:
-            list with the stored keys.
+        Returns:
+            list(ndb.Key). Each Key is referencing according Model instance.
+            Key contains id.
         """
         return ndb.put_multi(entities)
 
     def delete(self):
+        """Deletes this instance."""
         super(BaseModel, self).key.delete()
 
     @classmethod
-    def get_all(cls, include_deleted_entities=False):
+    def get_all(cls, include_deleted=False):
         """Gets iterable of all entities of this class.
 
         Args:
-            include_deleted_entities: bool. If is True then entities that have
-            been marked deleted are returned as well. Default False.
+            include_deleted: bool. If is True then entities that have
+                been marked deleted are returned as well. Default False.
 
-        Return:
-            Filterable iterable of all entities of this class.
+        Returns:
+            iterable. Filterable iterable of all entities of this class.
         """
         query = cls.query()
-        if not include_deleted_entities:
+        if not include_deleted:
             query = query.filter(cls.deleted == False)  # pylint: disable=singleton-comparison
         return query
 
@@ -156,10 +160,10 @@ class BaseModel(ndb.Model):
                 string. Defaults to ''.
 
         Returns:
-            New unique id for this entity class as str.
+            str. New unique id for this entity class.
 
         Raises:
-            Exception: If an id cannot be generated within a reasonable number
+            Exception: An ID cannot be generated within a reasonable number
                 of attempts.
         """
         try:
@@ -179,11 +183,12 @@ class BaseModel(ndb.Model):
     @classmethod
     def _fetch_page_sorted_by_last_updated(
             cls, query, page_size, urlsafe_start_cursor):
-        """Fetches page of entities sorted by last updated.
+        """Fetches a page of entities sorted by their last_updated attribute in
+        descending order (newly updated first).
 
         Args:
             query: ndb.Query.
-            page_size: int. Number of pages of commits to be returned.
+            page_size: int. Number of entities to be returned at max.
             urlsafe_start_cursor: str or None. If provided, the list of returned
                 entities starts from this datastore cursor. Otherwise,
                 the returned entities start from the beginning of the full
@@ -193,10 +198,10 @@ class BaseModel(ndb.Model):
             3-tuple of (results, cursor, more) as described in fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
-                results: List of query results.
+                results: list(List of query results.
                 cursor: str or None. A query cursor pointing to the next batch
                     of results. If there are no more results, this will be None.
-                more: bool. Whether there are more (likely) more results after
+                more: bool. Whether there are (likely) more results after
                     this batch.
         """
         if urlsafe_start_cursor:
@@ -270,7 +275,7 @@ class VersionedModel(BaseModel):
         return self
 
     def _reconstitute_from_snapshot_id(self, snapshot_id):
-        """Gets instance in a reconstituted state according to the given
+        """Gets a reconstituted instance of this model class, based on the given
         snapshot id.
 
         Args:
@@ -295,34 +300,35 @@ class VersionedModel(BaseModel):
 
     @classmethod
     def _get_snapshot_id(cls, instance_id, version_number):
-        """Gets snapshot id.
+        """Gets unique id for this instance and version.
 
         Args:
-            instance_id: int.
-            version_number: str.
+            instance_id: str.
+            version_number: int.
 
         Returns:
-            str.
+            str. Combination of instance_id, delimiter and version_number.
         """
         return '%s%s%s' % (
             instance_id, _VERSION_DELIMITER, version_number)
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
-        """Main function for all commit types.
+        """Evaluates and executes commit. Main function for all commit types.
 
         Args:
-            committer_id: str.
-            commit_type: str.
+            committer_id: str. The user_id of the user who committed the change.
+            commit_type: str. Unique identifier of commit type. Possible values
+                    are in COMMIT_TYPE_CHOICES.
             commit_message: str.
-            commit_cmds: list of dicts. Should give sufficient information to
+            commit_cmds: list(dicts). A list of commands, describing changes
+                made in this model, should give sufficient information to
                 reconstruct the commit.
 
         Raises:
-            Exception:
-                If no snapshot metadata class has been defined.
-                If no snapshot content class has been defined.
-                If commit_cmds is something else than a list of dicts.
+            Exception: No snapshot metadata class has been defined.
+            Exception: No snapshot content class has been defined.
+            Exception: commit_cmds is not a list of dicts.
         """
         if self.SNAPSHOT_METADATA_CLASS is None:
             raise Exception('No snapshot metadata class defined.')
@@ -354,16 +360,17 @@ class VersionedModel(BaseModel):
             [snapshot_metadata_instance, snapshot_content_instance, self])
 
     def delete(self, committer_id, commit_message, force_deletion=False):
-        """Deletes this model.
+        """Deletes this model instance.
 
         Args:
+            committer_id: str. The user_id of the user who committed the change.
             commit_message: str.
             force_deletion: bool. If True this model is deleted
                 completely from storage, otherwise it is only marked as deleted.
                 Default is False.
 
         Raises:
-            Exception: If this model instance has been already deleted.
+            Exception: Model instance has been already deleted.
         """
         if force_deletion:
             current_version = self.version
@@ -404,15 +411,15 @@ class VersionedModel(BaseModel):
         """Saves a version snapshot and updates the model.
 
         Args:
-            committer_id: str.
+            committer_id: str. The user_id of the user who committed the change.
             commit_message: str.
-            commit_cmds: list of dict. Should give sufficient information
-                to reconstruct the commit.
+            commit_cmds: list(dicts). A list of commands, describing changes
+                made in this model, should give sufficient information to
+                reconstruct the commit.
 
         Raises:
-            Exception:
-                If this model instance has been deleted.
-                If commit_cmd is in invalid format.
+            Exception: Model instance has been already deleted.
+            Exception: commit_cmd is in invalid format.
         """
         self._require_not_marked_deleted()
 
@@ -438,14 +445,13 @@ class VersionedModel(BaseModel):
 
         Args:
             model: VersionedModel.
-            committer_id: str.
+            committer_id: str. The user_id of the user who committed the change.
             commit_message: str.
-            version_number: str. Version to revert to.
+            version_number: int. Version to revert to.
 
         Raises:
-            Exception:
-                If model instance has been deleted.
-                If reverting is not allowed on this model.
+            Exception: Model instance has been deleted.
+            Exception: Reverting is not allowed on this model.
         """
         model._require_not_marked_deleted()  # pylint: disable=protected-access
 
@@ -485,33 +491,33 @@ class VersionedModel(BaseModel):
         # pylint: enable=protected-access
 
     @classmethod
-    def get_version(cls, model_instance_id, version_number):
-        """Returns a model instance representing the given version.
+    def get_version(cls, entity_id, version_number):
+        """Gets model instance representing the given version.
 
         The snapshot content is used to populate this model instance. The
         snapshot metadata is not used.
 
         Args:
-            model_instance_id: str.
+            entity_id: str.
             version_number: int.
 
         Returns:
-            VersionModel.
+            VersionedModel. Model instance representing given version.
 
         Raises:
             Exception: If this model instance has been deleted.
         """
         # pylint: disable=protected-access
-        cls.get(model_instance_id)._require_not_marked_deleted()
+        cls.get(entity_id)._require_not_marked_deleted()
 
-        snapshot_id = cls._get_snapshot_id(model_instance_id, version_number)
-        return cls(id=model_instance_id)._reconstitute_from_snapshot_id(
+        snapshot_id = cls._get_snapshot_id(entity_id, version_number)
+        return cls(id=entity_id)._reconstitute_from_snapshot_id(
             snapshot_id)
         # pylint: enable=protected-access
 
     @classmethod
     def get(cls, entity_id, strict=True, version=None):
-        """Gets an entity by id.
+        """Gets model instance.
 
         Args:
             entity_id: str.
@@ -520,7 +526,8 @@ class VersionedModel(BaseModel):
             version: int. Version we want to get. Default is None.
 
         Returns:
-            VersionModel.
+            VersionedModel. If version is None get the newest version, otherwise
+            specified version.
         """
         if version is None:
             return super(VersionedModel, cls).get(entity_id, strict=strict)
@@ -537,16 +544,17 @@ class VersionedModel(BaseModel):
         error is raised.
 
         Args:
-            model_instance_id: Id of requested model.
-            version_numbers: List of version numbers.
+            model_instance_id: str. Id of requested model.
+            version_numbers: list(int). List of version numbers.
             allow_deleted: bool. If is False, an error is raised if the current
                 model has been deleted. Default is False.
 
         Returns:
-            List of dicts, each dict representing a model snapshot.
+            list(dics). Each dict representing a model snapshot.
 
         Raises:
-            Exception: If any of version numbers does not exist.
+            Exception: There is no model instance corresponding to at least one
+                of the given version numbers.
         """
         # pylint: disable=protected-access
         if not allow_deleted:
