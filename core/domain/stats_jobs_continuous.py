@@ -132,7 +132,7 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
 
         Args:
             exploration_id: str. The id of the exploration to get statistics.
-            exploration_version: str or int. Which version of the exploration to
+            exploration_version: str. Which version of the exploration to
                 get statistics for. This can be a version number, the string
                 'all', or the string 'none'.
 
@@ -143,16 +143,16 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
                     completed.
                 'state_hit_counts': a dict containing the hit counts for the
                     states in the exploration. It is formatted as follows:
-                        {
-                            state_name: {
-                                'first_entry_count': # of sessions which hit
-                                    this state.
-                                'total_entry_count': # of total hits for this
-                                    state.
-                                'no_answer_count': # of hits with no answer for
-                                    this state.
-                            }
+                    {
+                        state_name: {
+                            'first_entry_count': # of sessions which hit
+                                this state.
+                            'total_entry_count': # of total hits for this
+                                state.
+                            'no_answer_count': # of hits with no answer for
+                                this state.
                         }
+                    }
         """
         num_starts = 0
         num_completions = 0
@@ -237,6 +237,25 @@ class StatisticsMRJobManager(
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+
+        Args:
+            item: StartExplorationEventLogEntryModel or
+                MaybeLeaveExplorationEventLogEntryModel or
+                CompleteExplorationEventLogEntryModel or
+                StateHitEventLogEntryModel or StateCounterModel. If item is of
+                type StateCounterModel the information returned corresponds to
+                the various counts related to the exploration. If it is of any
+                LogEntryModel type the information returned corresponds to the
+                type of the event and other details related to the exploration.
+
+        Yields:
+            tuple. 2-tuple in the form ('exploration_id:version', value).
+                `exploration_id` corresponds to the id of the exploration.
+                `version` corresponds to the version of the exploration. `value`
+                returns the information associated with the state_name of the
+                exploration.
+        """
         if StatisticsMRJobManager._entity_created_before_job_queued(item):
             if isinstance(item, stats_models.StateCounterModel):
                 first_dot_index = item.id.find('.')
@@ -275,6 +294,19 @@ class StatisticsMRJobManager(
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Implements the reduce function. Must be declared @staticmethod.
+
+        Args:
+            key: str. A key value as emitted from the map() function, above. It
+                gets the exploration id and version of the exploration in the
+                form of 'exploration_id:version'.
+            stringified_values: list(str). A list of stringified values
+                associated with the given key. It includes information depending
+                on the type of event. For example if the type is 'event'
+                stringified values will contain the event type, exploration id,
+                state name, version of the exploration, when the exploration was
+                created and session id.
+        """
         exploration = None
         exp_id, version = key.split(':')
         try:
