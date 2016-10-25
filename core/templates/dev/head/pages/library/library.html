@@ -90,20 +90,17 @@
                translate="I18N_LIBRARY_NO_EXPLORATION_GROUPS">
           </div>
 
-          <div class="oppia-library-group" ng-repeat="group in libraryGroups track by $index">
+          <div class="oppia-library-group" ng-repeat="group in libraryGroups track by $index" ng-mouseenter="setActiveGroup($index)" ng-mouseleave="clearActiveGroup()">
             <div class="row oppia-library-group-header-container">
-              <h2 class="oppia-library-group-header">
+              <h2 ng-class="{'active': activeGroupIndex === $index}" class="oppia-library-group-header">
                 <a ng-if="group.has_full_results_page"
-                   ng-click="showFullResultsPage(group.categories, group.full_results_url)"
-                   translate="<[group.header_i18n_id]>">
+                  ng-click="showFullResultsPage(group.categories, group.full_results_url)">
+                  <span translate="<[group.header_i18n_id]>"></span>
+                  <span ng-show="activeGroupIndex === $index"><i class="material-icons md-32">&#xE315;</i></span>
                 </a>
                 <span ng-if="!group.has_full_results_page" translate="<[group.header_i18n_id]>">
                 </span>
               </h2>
-              <div class="pull-right" ng-if="group.has_full_results_page">
-                <button class="btn oppia-library-group-view-all-btn oppia-transition-200" ng-click="showFullResultsPage(group.categories, group.full_results_url)" translate="I18N_LIBRARY_VIEW_ALL">
-                </button>
-              </div>
             </div>
 
             <!-- TODO(sll): Add card at end of the row that, when clicked, does showFullResultsPage(group.categories)" -->
