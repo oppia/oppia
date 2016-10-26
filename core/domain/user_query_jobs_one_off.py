@@ -107,7 +107,7 @@ class UserQueryOneOffJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _post_completed_hook(cls, job_id):
-        # TODO: send email to submitter upon completion.
+        # TODO(prasanna08): send email to submitter upon completion.
         job_model = job_models.JobModel.get(job_id)
         query_id = job_model.additional_job_params['query_id']
         query_model = user_models.UserQueryModel.get(query_id)
@@ -116,7 +116,7 @@ class UserQueryOneOffJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _post_failure_hook(cls, job_id):
-        # TODO: send email to admin and submitter upon failure.
+        # TODO(prasanna08): send email to admin and submitter upon failure.
         job_model = job_models.JobModel.get(job_id)
         query_id = job_model.additional_job_params['query_id']
         query_model = user_models.UserQueryModel.get(query_id)

@@ -13,24 +13,109 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for oppia email dashboard page.
+ * @fileoverview Controller and factory for oppia email dashboard page.
  */
 
-oppia.controller('EmailDashboard', [
-  '$scope', '$http', function($scope, $http) {
+oppia.factory('EmailDashboardDataService', [
+  '$http', function($http) {
     var QUERY_DATA_URL = '/emaildashboarddatahandler';
+    var QUERY_STATUS_CHECK_URL = '/querystatuscheck';
 
-    // Store current cursor.
-    $scope.currentCursor = null;
-    // List containing all of the previous cursors.
-    $scope.prevCursors = [];
-    // Store next cursor.
-    $scope.nextCursor = null;
+    // No. of query results to display on a single page.
+    var QUERIES_PER_PAGE = 10;
+    // Store latest cursor value for fetching next query page.
+    var latestCursor = null;
+    // Cache all fetched queries.
+    var queries = [];
+    // Index of currently showing page of query results.
+    var currentPageIndex = -1;
 
-    // Store all querie results fetched so far.
-    // Query results are keyed on value of currentCursor at the time of fetching
-    // results. Each query result stores query result and nextCursor value.
-    var totalFetchedQueries = {};
+    var fetchQueries = function() {
+      return $http.get(QUERY_DATA_URL, {
+        params: {
+          cursor: latestCursor
+        }
+      }).then(function(response) {
+        return response.data;
+      });
+    };
+
+    return {
+      submitQuery: function(data, callback) {
+        $http.post(QUERY_DATA_URL, {
+          data: data
+        });
+
+        var startQueryIndex = (currentPageIndex) * QUERIES_PER_PAGE;
+        var endQueryIndex = (currentPageIndex + 1) * QUERIES_PER_PAGE;
+        fetchQueries().then(function(data) {
+          newQueries = [data.recent_queries[0]];
+          queries = newQueries.concat(queries);
+          callback(queries.slice(startQueryIndex, endQueryIndex));
+        });
+      },
+
+      getNextQueries: function(callback) {
+        var startQueryIndex = (currentPageIndex + 1) * QUERIES_PER_PAGE;
+        var endQueryIndex = (currentPageIndex + 2) * QUERIES_PER_PAGE;
+        currentPageIndex = currentPageIndex + 1;
+
+        if (queries.length > startQueryIndex) {
+          callback(queries.slice(startQueryIndex, endQueryIndex));
+        } else {
+          fetchQueries().then(function(data) {
+            queries = queries.concat(data.recent_queries);
+            latestCursor = data.cursor;
+            callback(queries.slice(startQueryIndex, endQueryIndex));
+          });
+        }
+      },
+
+      getPreviousQueries: function() {
+        var startQueryIndex = (currentPageIndex - 1) * QUERIES_PER_PAGE;
+        var endQueryIndex = (currentPageIndex) * QUERIES_PER_PAGE;
+        currentPageIndex = currentPageIndex - 1;
+        return queries.slice(startQueryIndex, endQueryIndex);
+      },
+
+      isNextPageAvailable: function() {
+        var nextQueryIndex = (currentPageIndex + 1) * QUERIES_PER_PAGE;
+        return !(queries.length <= nextQueryIndex) || Boolean(latestCursor);
+      },
+
+      isPreviousPageAvailable: function() {
+        return (currentPageIndex > 0);
+      },
+
+      recheckQueryStatus: function(index, callback) {
+        var queryIndex = (currentPageIndex) * QUERIES_PER_PAGE + index;
+        var query = queries[queryIndex];
+        $http.get(QUERY_STATUS_CHECK_URL, {
+          params: {
+            query_id: query.id
+          }
+        }).then(function(response) {
+          var data = response.data;
+          query = data.query;
+          callback(index, query);
+        });
+      }
+    };
+  }
+]);
+
+oppia.controller('EmailDashboard', [
+  '$scope', '$http', 'EmailDashboardDataService',
+  function($scope, $http, EmailDashboardDataService) {
+    $scope.recentQueries = [];
+
+    var updateRecentQueries = function(queries) {
+      $scope.recentQueries = queries;
+    };
+
+    var setQueryStatus = function(index, query) {
+      $scope.recentQueries[index] = query;
+    };
 
     $scope.resetForm = function() {
       $scope.has_not_logged_in_for_n_days = null;
@@ -39,38 +124,6 @@ oppia.controller('EmailDashboard', [
       $scope.created_fewer_than_n_exps = null;
       $scope.edited_at_least_n_exps = null;
       $scope.edited_fewer_than_n_exps = null;
-    };
-
-    // Update cursor forward when fetching next set of query results.
-    var updateCursorForward = function(cursor) {
-      var oldCursor = $scope.currentCursor;
-      $scope.currentCursor = $scope.nextCursor;
-      if ($scope.currentCursor !== null) {
-        $scope.prevCursors.push(oldCursor);
-      }
-      $scope.nextCursor = cursor;
-    };
-
-    var fetchRecentQueries = function(cursor, cursorUpdater) {
-      $http.get(QUERY_DATA_URL, {
-        params: {
-          cursor: cursor
-        }
-      }).then(function(response) {
-        var data = response.data;
-        if (data.recent_queries.length > 0) {
-          $scope.recentQueries = data.recent_queries;
-          if (cursorUpdater !== null) {
-            cursorUpdater(data.cursor);
-          }
-
-          // Cache query results.
-          totalFetchedQueries[cursor] = {
-            queries: data.recent_queries,
-            nextCursor: data.cursor
-          };
-        }
-      });
     };
 
     $scope.submitQuery = function() {
@@ -82,40 +135,34 @@ oppia.controller('EmailDashboard', [
         edited_at_least_n_exps: $scope.edited_at_least_n_exps,
         edited_fewer_than_n_exps: $scope.edited_fewer_than_n_exps
       };
-
-      $http.post(QUERY_DATA_URL, {
-        data: data
-      });
+      EmailDashboardDataService.submitQuery(data, updateRecentQueries);
       $scope.resetForm();
       $scope.showSuccessMessage = true;
     };
 
-    $scope.refreshRecentQueries = function() {
-      // Do not update cursors if reloading current query page.
-      fetchRecentQueries($scope.currentCursor);
-      $scope.showSuccessMessage = false;
-    };
-
     $scope.getNextRecentQueries = function() {
-      var cursor = $scope.nextCursor;
-      if (cursor in totalFetchedQueries) {
-        // Load query results from cache if available.
-        $scope.recentQueries = totalFetchedQueries[cursor].queries;
-        updateCursorForward(totalFetchedQueries[cursor].nextCursor);
-      } else {
-        fetchRecentQueries($scope.nextCursor, updateCursorForward);
+      if (EmailDashboardDataService.isNextPageAvailable()) {
+        EmailDashboardDataService.getNextQueries(updateRecentQueries);
       }
     };
 
     $scope.getPreviousRecentQueries = function() {
-      // Load past query results from cache.
-      if ($scope.prevCursors.length > 0) {
-        var prevCursor = $scope.prevCursors.pop();
-        $scope.recentQueries = totalFetchedQueries[prevCursor].queries;
-        $scope.currentCursor = prevCursor;
-        $scope.nextCursor = totalFetchedQueries[prevCursor].nextCursor;
+      if (EmailDashboardDataService.isPreviousPageAvailable()) {
+        $scope.recentQueries = EmailDashboardDataService.getPreviousQueries();
       }
     };
-    $scope.getNextRecentQueries();
+
+    $scope.showNextButton = function() {
+      return EmailDashboardDataService.isNextPageAvailable();
+    };
+
+    $scope.showPreviousButton = function() {
+      return EmailDashboardDataService.isPreviousPageAvailable();
+    };
+
+    $scope.recheckStatus = function(index) {
+      EmailDashboardDataService.recheckQueryStatus(index, setQueryStatus);
+    };
+    EmailDashboardDataService.getNextQueries(updateRecentQueries);
   }
 ]);

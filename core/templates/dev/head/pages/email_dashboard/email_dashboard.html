@@ -46,7 +46,7 @@
       <input type="submit" value="submit query">
       <input type="reset" value="reset" ng-click="resetForm()">
     </form>
-    <p class="success" ng-if="showSuccessMessage">Query has been submitted. Please reload recent queries to see its status.</p>
+    <p class="success" ng-if="showSuccessMessage">Query has been submitted successfully. Check recent queries below.</p>
     <div class="oppia-recent-queries">
       <p>Recent queries:</p>
       <table class="table" ng-if="recentQueries.length > 0">
@@ -66,12 +66,12 @@
             <td><[q.submitter_id]></td>
             <td><[q.status]></td>
             <td><[q.num_qualified_users]></td>
+            <td><button ng-click="recheckStatus($index)">Re-check status</button></td>
           </tr>
         </tbody>
       </table>
-      <button ng-if="prevCursors.length > 0" ng-click="getPreviousRecentQueries()">Previous</button>
-      <button ng-click="refreshRecentQueries()">Reload</button>
-      <button ng-if="nextCursor != null" ng-click="getNextRecentQueries()">Next</button>
+      <button ng-if="showPreviousButton()" ng-click="getPreviousRecentQueries()">Previous</button>
+      <button ng-if="showNextButton()" ng-click="getNextRecentQueries()">Next</button>
     </div>
   </div>
 {% endblock %}

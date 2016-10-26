@@ -14,8 +14,6 @@
 
 """Controller for user query related pages and handlers."""
 
-from google.appengine.datastore.datastore_query import Cursor
-
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import user_query_services
@@ -26,6 +24,7 @@ from core.platform import models
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 current_user_services = models.Registry.import_current_user_services()
+cursor_services = models.Registry.import_cursor_services()
 
 def require_valid_sender(handler):
     """Decorator that checks if the current user is a authorized sender."""
@@ -59,7 +58,8 @@ class EmailDashboardDataHandler(base.BaseHandler):
 
     @require_valid_sender
     def get(self):
-        cursor = Cursor(urlsafe=self.request.get('cursor'))
+        cursor = cursor_services.get_cursor_from_urlsafe(
+            self.request.get('cursor'))
 
         query_models, next_cursor, more = (
             user_models.UserQueryModel.query().
@@ -67,7 +67,7 @@ class EmailDashboardDataHandler(base.BaseHandler):
             fetch_page(self.QUERIES_PER_PAGE, start_cursor=cursor))
 
         submitters_settings = user_services.get_users_settings(
-            [model.submitter_id for model in query_models])
+            list(set([model.submitter_id for model in query_models])))
 
         submitter_details = {
             submitter.user_id: submitter.username
@@ -83,10 +83,9 @@ class EmailDashboardDataHandler(base.BaseHandler):
         } for model in query_models]
 
         data = {
-            'recent_queries': queries_list
+            'recent_queries': queries_list,
+            'cursor': next_cursor.urlsafe() if (next_cursor and more) else None
         }
-        if more and next_cursor:
-            data['cursor'] = next_cursor.urlsafe()
 
         self.render_json(data)
 
@@ -94,8 +93,11 @@ class EmailDashboardDataHandler(base.BaseHandler):
     def post(self):
         """Post handler for query."""
         data = self.payload['data']
+        kwargs = {key: data[key] for key in data if data[key] is not None}
+        self.validate(kwargs)
+
         query_id = user_query_services.save_new_query_model(
-            self.user_id, **data)
+            self.user_id, **kwargs)
 
         # Start MR job in background.
         job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
@@ -104,3 +106,37 @@ class EmailDashboardDataHandler(base.BaseHandler):
             job_id, additional_job_params=params)
 
         self.render_json({})
+
+    def validate(self, data):
+        """Validator for data obtained from fontend."""
+        possible_keys = [
+            'has_not_logged_in_for_n_days', 'inactive_in_last_n_days',
+            'created_at_least_n_exps', 'created_fewer_than_n_exps',
+            'edited_at_least_n_exps', 'edited_fewer_than_n_exps']
+
+        for key, value in data.iteritems():
+            if key not in possible_keys or not isinstance(value, int):
+                # Raise exception if key is not one of the allowed keys or
+                # correspoding value is not of type integer.
+                raise self.InvalidInputException('400 Invalid input for query.')
+
+
+class QueryStatusCheck(base.BaseHandler):
+    """Handler for checking status of individual queries."""
+    def get(self):
+        query_id = self.request.get('query_id')
+        query_model = user_models.UserQueryModel.get(query_id)
+        query_data = {
+            'id': query_model.id,
+            'submitter_id': (
+                user_services.get_username(query_model.submitter_id)),
+            'created_on': query_model.created_on.strftime('%d-%m-%y %H:%M:%S'),
+            'status': query_model.query_status,
+            'num_qualified_users': len(query_model.user_ids)
+        }
+
+        data = {
+            'query': query_data
+        }
+
+        self.render_json(data)
