@@ -267,7 +267,7 @@ class StatisticsMRJobManager(
                             session,
                         'resolved_answer_count': Number of times an answer
                             submitted for this state was subsequently resolved
-                            by an exploration admin and removed from the answer
+                            by an exploration editor and removed from the answer
                             logs,
                         'active_answer_count': Number of times an answer was
                             entered for this state and was not subsequently
@@ -321,7 +321,9 @@ class StatisticsMRJobManager(
 
     @staticmethod
     def reduce(key, stringified_values):
-        """Implements the reduce function. Must be declared @staticmethod.
+        """Updates statistics for the given (exploration, version) and list of
+        events and creates batch model(ExplorationAnnotationsModel) for storing
+        this output.
 
         Args:
             key: str. The exploration id and version of the exploration in the
