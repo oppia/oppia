@@ -128,10 +128,11 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
     # Public query method.
     @classmethod
     def get_statistics(cls, exploration_id, exploration_version):
-        """Gets the statistics for the specified exploration and it's version.
+        """Gets the statistics for the specified exploration and version.
 
         Args:
-            exploration_id: str. The id of the exploration to get statistics.
+            exploration_id: str. The id of the exploration to get statistics
+                for.
             exploration_version: str. Which version of the exploration to
                 get statistics for. This can be a version number, the string
                 'all', or the string 'none'.
@@ -184,12 +185,11 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
 
     @classmethod
     def get_views_multi(cls, exploration_ids):
-        """Generated the view counts for given exploration id.
+        """Generates the view counts for the given exploration IDs.
 
         Args:
-            exploration_ids: list(str). The list of exploration ids for which
-                this function generates the number of times each exploration
-                has been viewed (view counts).
+            exploration_ids: list(str). The list of exploration IDs to get view
+                counts for.
 
         Returns:
             list(int). The number of times each exploration in exploration_ids
@@ -244,17 +244,43 @@ class StatisticsMRJobManager(
                 MaybeLeaveExplorationEventLogEntryModel or
                 CompleteExplorationEventLogEntryModel or
                 StateHitEventLogEntryModel or StateCounterModel. If item is of
-                type StateCounterModel the information returned corresponds to
+                type StateCounterModel the information yielded corresponds to
                 the various counts related to the exploration. If it is of any
-                LogEntryModel type the information returned corresponds to the
+                LogEntryModel type the information yielded corresponds to the
                 type of the event and other details related to the exploration.
 
         Yields:
             tuple. 2-tuple in the form ('exploration_id:version', value).
                 `exploration_id` corresponds to the id of the exploration.
-                `version` corresponds to the version of the exploration. `value`
-                returns the information associated with the state_name of the
-                exploration.
+                `version` corresponds to the version of the exploration.
+                `value`: If item is of type StateCounterModel, the value
+                    yielded is:
+                    {
+                        'type': 'counter',
+                        'exploration_id': The ID of the exploration,
+                        'version': Version of the exploration,
+                        'state_name': Name of current state,
+                        'first_entry_count': Number of times the state was entered
+                            for the first time in a reader session,
+                        'subsequent_entries_count': Number of times the state was
+                            entered for the second time or later in a reader
+                            session,
+                        'resolved_answer_count': Number of times an answer
+                            submitted for this state was subsequently resolved by
+                            an exploration admin and removed from the answer logs,
+                        'active_answer_count': Number of times an answer was entered
+                            for this state and was not subsequently resolved by an
+                            exploration admin}
+                    If item is of LogEntryModel type, value yielded is:
+                    {
+                        'type': 'event',
+                        'event_type': Type of event triggered,
+                        'session_id': ID of current student's session,
+                        'state_name': Name of current state,
+                        'created_on': How many milliseconds ago the exploration was
+                            created,
+                        'exploration_id': The ID of the exploration,
+                        'version': Version of exploration}
         """
         if StatisticsMRJobManager._entity_created_before_job_queued(item):
             if isinstance(item, stats_models.StateCounterModel):
@@ -297,15 +323,39 @@ class StatisticsMRJobManager(
         """Implements the reduce function. Must be declared @staticmethod.
 
         Args:
-            key: str. A key value as emitted from the map() function, above. It
-                gets the exploration id and version of the exploration in the
-                form of 'exploration_id:version'.
+            key: str. The exploration id and version of the exploration in the
+                form 'exploration_id.version'.
             stringified_values: list(str). A list of stringified values
                 associated with the given key. It includes information depending
-                on the type of event. For example if the type is 'event'
-                stringified values will contain the event type, exploration id,
-                state name, version of the exploration, when the exploration was
-                created and session id.
+                on the type of event. If type of event is 'event',
+                an element of stringified_values would be:
+                '{
+                    'type': 'event',
+                    'event_type': Type of event triggered,
+                    'session_id': ID of current student's session,
+                    'state_name': Name of current state,
+                    'created_on': How many milliseconds ago the exploration was
+                        created,
+                    'exploration_id': The ID of the exploration,
+                    'version': Version of exploration}'
+                If type is 'counter', then an element of stringified_values
+                would be of the form:
+                '{
+                    'type': 'counter',
+                    'exploration_id': The ID of the exploration,
+                    'version': Version of the exploration,
+                    'state_name': Name of current state,
+                    'first_entry_count': Number of times the state was entered
+                        for the first time in a reader session,
+                    'subsequent_entries_count': Number of times the state was
+                        entered for the second time or later in a reader
+                        session,
+                    'resolved_answer_count': Number of times an answer
+                        submitted for this state was subsequently resolved by
+                        an exploration admin and removed from the answer logs,
+                    'active_answer_count': Number of times an answer was entered
+                        for this state and was not subsequently resolved by an
+                        exploration admin}'
         """
         exploration = None
         exp_id, version = key.split(':')
