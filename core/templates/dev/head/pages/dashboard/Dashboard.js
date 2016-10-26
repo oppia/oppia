@@ -115,8 +115,6 @@ oppia.controller('Dashboard', [
         }
       } else if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.RATING) {
         if (!$scope.getAverageRating(value)) {
-          console.log($scope.explorationsList.indexOf(entity));
-          console.log('Hey this is me');
           return (
             $scope.isCurrentSortDescending ?
               (-1 * $scope.explorationsList.indexOf(entity)) :
