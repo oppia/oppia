@@ -260,25 +260,26 @@ class StatisticsMRJobManager(
                         'exploration_id': The ID of the exploration,
                         'version': Version of the exploration,
                         'state_name': Name of current state,
-                        'first_entry_count': Number of times the state was entered
-                            for the first time in a reader session,
-                        'subsequent_entries_count': Number of times the state was
-                            entered for the second time or later in a reader
+                        'first_entry_count': Number of times the state was
+                            entered for the first time in a reader session,
+                        'subsequent_entries_count': Number of times the state
+                            was entered for the second time or later in a reader
                             session,
                         'resolved_answer_count': Number of times an answer
-                            submitted for this state was subsequently resolved by
-                            an exploration admin and removed from the answer logs,
-                        'active_answer_count': Number of times an answer was entered
-                            for this state and was not subsequently resolved by an
-                            exploration admin}
+                            submitted for this state was subsequently resolved
+                            by an exploration admin and removed from the answer
+                            logs,
+                        'active_answer_count': Number of times an answer was
+                            entered for this state and was not subsequently
+                            resolved by an exploration admin}
                     If item is of LogEntryModel type, value yielded is:
                     {
                         'type': 'event',
                         'event_type': Type of event triggered,
                         'session_id': ID of current student's session,
                         'state_name': Name of current state,
-                        'created_on': How many milliseconds ago the exploration was
-                            created,
+                        'created_on': How many milliseconds ago the exploration
+                            was created,
                         'exploration_id': The ID of the exploration,
                         'version': Version of exploration}
         """
