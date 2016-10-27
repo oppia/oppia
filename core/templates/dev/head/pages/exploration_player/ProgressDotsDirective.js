@@ -35,7 +35,7 @@ oppia.directive('progressDots', [function() {
           $scope.dots.push({});
         }
 
-        $scope.$watch(function() {
+        var cleanup = $scope.$watch(function() {
           return $scope.getNumDots();
         }, function(newValue) {
           var oldValue = $scope.dots.length;
@@ -58,6 +58,7 @@ oppia.directive('progressDots', [function() {
               newValue);
           }
         });
+        $scope.$on('$destroy', cleanup);
 
         $scope.changeActiveDot = function(index) {
           playerPositionService.setActiveCardIndex(index);

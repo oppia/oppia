@@ -149,16 +149,20 @@ oppia.controller('PreviewTab', [
       $scope.loadPreviewState(explorationInitStateNameService.savedMemento, []);
     };
 
+    $scope.allParams = {};
+
+    var cleanup1 = $scope.$on('playerStateChange', function() {
+      $scope.allParams = LearnerParamsService.getAllParams();
+    });
     // This allows the active state to be kept up-to-date whilst navigating in
     // preview mode, ensuring that the state does not change when toggling
     // between editor and preview.
-    $scope.$on('updateActiveStateIfInEditor', function(evt, stateName) {
+    var cleanup2 = $scope.$on(
+        'updateActiveStateIfInEditor', function(evt, stateName) {
       editorContextService.setActiveStateName(stateName);
     });
 
-    $scope.allParams = {};
-    $scope.$on('playerStateChange', function() {
-      $scope.allParams = LearnerParamsService.getAllParams();
-    });
+    $scope.$on('$destroy', cleanup1);
+    $scope.$on('$destroy', cleanup2);
   }
 ]);

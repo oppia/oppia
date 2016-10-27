@@ -76,8 +76,12 @@ oppia.directive('collectionDetailsEditor', [function() {
           }
         };
 
-        $scope.$on(EVENT_COLLECTION_INITIALIZED, refreshSettingsTab);
-        $scope.$on(EVENT_COLLECTION_REINITIALIZED, refreshSettingsTab);
+        var cleanup1 = $scope.$on(
+          EVENT_COLLECTION_INITIALIZED, refreshSettingsTab);
+        var cleanup2 = $scope.$on(
+          EVENT_COLLECTION_REINITIALIZED, refreshSettingsTab);
+        $scope.$on('$destroy', cleanup1);
+        $scope.$on('$destroy', cleanup2);
 
         $scope.updateCollectionTitle = function() {
           CollectionUpdateService.setCollectionTitle(

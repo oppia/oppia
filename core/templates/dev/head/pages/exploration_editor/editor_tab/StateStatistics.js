@@ -45,6 +45,7 @@ oppia.controller('StateStatistics', [
 
       $scope.trainingDataButtonContentsList = [];
 
+      // TODO(sll): Try and get rid of use of $rootScope broadcast.
       $rootScope.$on('updatedTrainingData', function() {
         $scope.trainingDataButtonContentsList = [];
 
@@ -63,11 +64,12 @@ oppia.controller('StateStatistics', [
       });
     };
 
-    $scope.$on('refreshStateEditor', function() {
+    var cleanup = $scope.$on('refreshStateEditor', function() {
       $scope.stateName = editorContextService.getActiveStateName();
       var stateData = explorationStatesService.getState($scope.stateName);
       $scope.initStateStatistics(stateData);
     });
+    $scope.$on('$destroy', cleanup);
 
     $scope.generateUnresolvedAnswersList = function() {
       $scope.unresolvedAnswersList = [];

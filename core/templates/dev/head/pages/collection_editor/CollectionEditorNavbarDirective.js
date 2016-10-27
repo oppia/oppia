@@ -79,10 +79,15 @@ oppia.directive('collectionEditorNavbar', [function() {
             });
         };
 
-        $scope.$on(
+        var cleanup1 = $scope.$on(
           EVENT_COLLECTION_INITIALIZED, _validateCollection);
-        $scope.$on(EVENT_COLLECTION_REINITIALIZED, _validateCollection);
-        $scope.$on(EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateCollection);
+        var cleanup2 = $scope.$on(
+          EVENT_COLLECTION_REINITIALIZED, _validateCollection);
+        var cleanup3 = $scope.$on(
+          EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateCollection);
+        $scope.$on('$destroy', cleanup1);
+        $scope.$on('$destroy', cleanup2);
+        $scope.$on('$destroy', cleanup3);
 
         $scope.getWarningsCount = function() {
           return $scope.validationIssues.length;

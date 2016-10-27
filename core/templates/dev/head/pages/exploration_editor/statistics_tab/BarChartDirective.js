@@ -55,7 +55,9 @@ oppia.directive('barChart', [function() {
         });
       };
 
-      $scope.$watch('data()', redrawChart);
+      var cleanup = $scope.$watch('data()', redrawChart);
+      $scope.$on('$destroy', cleanup);
+
       $(window).resize(redrawChart);
     }]
   };

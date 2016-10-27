@@ -126,7 +126,8 @@ oppia.directive('imageWithRegionsEditor', [
 
         // Called when the image is changed to calculate the required
         // width and height, especially for large images
-        $scope.$watch('$parent.value.imagePath', function(newVal) {
+        var cleanup = $scope.$watch(
+            '$parent.value.imagePath', function(newVal) {
           if (newVal !== '') {
             // Loads the image in hanging <img> tag so as to get the
             // width and height
@@ -139,6 +140,7 @@ oppia.directive('imageWithRegionsEditor', [
             );
           }
         });
+        $scope.$on('$destroy', cleanup);
 
         var hasDuplicates = function(originalArray) {
           var array = originalArray.slice(0).sort();

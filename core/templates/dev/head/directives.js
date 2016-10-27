@@ -42,7 +42,7 @@ oppia.directive('mathjaxBind', [function() {
     restrict: 'A',
     controller: [
       '$scope', '$element', '$attrs', function($scope, $element, $attrs) {
-        $scope.$watch($attrs.mathjaxBind, function(value) {
+        var cleanup = $scope.$watch($attrs.mathjaxBind, function(value) {
           var $script = angular.element(
             '<script type="math/tex">'
           ).html(value === undefined ? '' : value);
@@ -50,6 +50,7 @@ oppia.directive('mathjaxBind', [function() {
           $element.append($script);
           MathJax.Hub.Queue(['Reprocess', MathJax.Hub, $element[0]]);
         });
+        $scope.$on('$destroy', cleanup);
       }
     ]
   };
@@ -95,6 +96,9 @@ oppia.directive('customPopover', ['$sce', function($sce) {
       $element.on('hidden.bs.popover', function() {
         $scope.isShown = false;
       });
+
+      // De-register all event handlers when the component is destroyed.
+      $scope.$on('$destroy', $element.off);
 
       $scope.showPopover = function() {
         if (!$scope.isShown) {
@@ -159,6 +163,9 @@ oppia.directive('mobileFriendlyTooltip', ['$timeout', function($timeout) {
           scope.$apply();
         });
       };
+
+      // De-register all event handlers when the component is destroyed.
+      scope.$on('$destroy', element.off);
     }
   };
 }]);

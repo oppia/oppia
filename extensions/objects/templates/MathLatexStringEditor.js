@@ -35,16 +35,18 @@ oppia.directive('mathLatexStringEditor', [
 
         // Reset the component each time the value changes (e.g. if this is part
         // of an editable list).
-        $scope.$watch('$parent.value', function() {
+        var cleanup1 = $scope.$watch('$parent.value', function() {
           $scope.localValue = {
             label: $scope.$parent.value || ''
           };
         }, true);
+        $scope.$on('$destroy', cleanup1);
 
         if ($scope.alwaysEditable) {
-          $scope.$watch('localValue.label', function(newValue) {
+          var cleanup2 = $scope.$watch('localValue.label', function(newValue) {
             $scope.$parent.value = newValue;
           });
+          $scope.$on('$destroy', cleanup2);
         } else {
           $scope.openEditor = function() {
             $scope.active = true;
@@ -62,7 +64,7 @@ oppia.directive('mathLatexStringEditor', [
             $scope.closeEditor();
           };
 
-          $scope.$on('externalSave', function() {
+          var cleanup3 = $scope.$on('externalSave', function() {
             if ($scope.active) {
               $scope.replaceValue($scope.localValue.label);
               // The $scope.$apply() call is needed to propagate the replaced
@@ -70,6 +72,7 @@ oppia.directive('mathLatexStringEditor', [
               $scope.$apply();
             }
           });
+          $scope.$on('$destroy', cleanup3);
 
           $scope.closeEditor();
         }

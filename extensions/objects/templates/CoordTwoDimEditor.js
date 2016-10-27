@@ -54,7 +54,8 @@ oppia.directive('coordTwoDimEditor', [
         }, 10);
       };
 
-      $scope.$watch('$parent.value', function(newValue, oldValue) {
+      var cleanup = $scope.$watch(
+          '$parent.value', function(newValue, oldValue) {
         // A new rule has just been created.
         if ($scope.$parent.value === '') {
           $scope.$parent.value = [0.0, 0.0];
@@ -64,6 +65,7 @@ oppia.directive('coordTwoDimEditor', [
           updateMarker(newValue[0], newValue[1]);
         }
       });
+      $scope.$on('$destroy', cleanup);
 
       // A new rule has just been created.
       if ($scope.$parent.value === '') {

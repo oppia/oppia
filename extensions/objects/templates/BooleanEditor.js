@@ -21,15 +21,16 @@ oppia.directive('booleanEditor', [
     controller: ['$scope', function($scope) {
       // Reset the component each time the value changes (e.g. if this is part
       // of an editable list).
-      $scope.$watch('$parent.value', function(newValue) {
+      var cleanup1 = $scope.$watch('$parent.value', function(newValue) {
         $scope.localValue = {
           label: newValue || false
         };
       }, true);
-
-      $scope.$watch('localValue.label', function(newValue) {
+      var cleanup2 = $scope.$watch('localValue.label', function(newValue) {
         $scope.$parent.value = newValue;
       });
+      $scope.$on('$destroy', cleanup1);
+      $scope.$on('$destroy', cleanup2);
     }],
     link: function(scope, element) {
       scope.getTemplateUrl = function() {

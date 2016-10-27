@@ -37,7 +37,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
 
           var labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
-          $scope.$on('focusOn', function(e, name) {
+          var cleanup = $scope.$on('focusOn', function(e, name) {
             if (!labelForFocusTarget) {
               return;
             }
@@ -48,6 +48,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
               guppyInstance.deactivate();
             }
           });
+          $scope.$on('$destroy', cleanup);
 
           guppyInstance.done_callback = function() {
             $scope.submitAnswer();

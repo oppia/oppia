@@ -33,20 +33,13 @@ oppia.directive('filepathEditor', [
       controller: ['$scope', function($scope) {
         // Reset the component each time the value changes (e.g. if this is part
         // of an editable list).
-        $scope.$watch('$parent.value', function(newValue) {
+        var cleanup1 = $scope.$watch('$parent.value', function(newValue) {
           $scope.localValue = {
             label: newValue || ''
           };
           $scope.imageUploaderIsActive = false;
         });
-
-        $scope.explorationId = explorationContextService.getExplorationId();
-
-        $scope.validate = function(localValue) {
-          return localValue.label && localValue.label.length > 0;
-        };
-
-        $scope.$watch('localValue.label', function(newValue) {
+        var cleanup2 = $scope.$watch('localValue.label', function(newValue) {
           if (newValue) {
             alertsService.clearWarnings();
             $scope.localValue = {
@@ -55,6 +48,14 @@ oppia.directive('filepathEditor', [
             $scope.$parent.value = newValue;
           }
         });
+        $scope.$on('$destroy', cleanup1);
+        $scope.$on('$destroy', cleanup2);
+
+        $scope.explorationId = explorationContextService.getExplorationId();
+
+        $scope.validate = function(localValue) {
+          return localValue.label && localValue.label.length > 0;
+        };
 
         $scope.getPreviewUrl = function(filepath) {
           var encodedFilepath = window.encodeURIComponent(filepath);

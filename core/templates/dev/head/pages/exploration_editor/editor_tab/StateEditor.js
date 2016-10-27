@@ -48,21 +48,24 @@ oppia.controller('StateEditor', [
         explorationInitStateNameService.savedMemento);
     };
 
-    $scope.$on('refreshStateEditor', function() {
+    var cleanup1 = $scope.$on('refreshStateEditor', function() {
       $scope.initStateEditor();
     });
-
-    $scope.$on('refreshStateContent', function() {
+    var cleanup2 = $scope.$on('refreshStateContent', function() {
       $scope.content = explorationStatesService.getStateContentMemento(
         editorContextService.getActiveStateName());
     });
-
-    $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
+    var cleanup3 = $scope.$on(
+        'onInteractionIdChanged', function(evt, newInteractionId) {
       $scope.isInteractionIdSet = Boolean(newInteractionId);
       $scope.isCurrentStateTerminal = (
         $scope.isInteractionIdSet && INTERACTION_SPECS[
           newInteractionId].is_terminal);
     });
+
+    $scope.$on('$destroy', cleanup1);
+    $scope.$on('$destroy', cleanup2);
+    $scope.$on('$destroy', cleanup3);
 
     $scope.contentEditorIsOpen = false;
 
@@ -85,11 +88,12 @@ oppia.controller('StateEditor', [
           $scope.isInteractionShown = true;
         }
 
-        $scope.$on('externalSave', function() {
+        var cleanup4 = $scope.$on('externalSave', function() {
           if ($scope.contentEditorIsOpen) {
             $scope.saveTextContent();
           }
         });
+        $scope.$on('$destroy', cleanup4);
 
         $rootScope.loadingMessage = '';
       }
@@ -429,7 +433,9 @@ oppia.directive('trainingPanel', [function() {
               stateCustomizationArgsService.savedMemento));
         };
 
-        $scope.$watch('answer', _updateAnswerTemplate);
+        var cleanup = $scope.$watch('answer', _updateAnswerTemplate);
+        $scope.$on('$destroy', cleanup);
+
         _updateAnswerTemplate();
 
         $scope.getCurrentStateName = function() {

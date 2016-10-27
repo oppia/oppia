@@ -52,7 +52,7 @@ oppia.controller('HistoryTab', [
     var versionTreeParents = null;
     var nodesData = null;
 
-    $scope.$on('refreshVersionHistory', function(evt, data) {
+    var cleanup = $scope.$on('refreshVersionHistory', function(evt, data) {
       // Uncheck all checkboxes when page is refreshed
       angular.forEach($scope.versionCheckboxArray, function(versionCheckbox) {
         versionCheckbox.selected = false;
@@ -61,6 +61,7 @@ oppia.controller('HistoryTab', [
         $scope.refreshVersionHistory();
       }
     });
+    $scope.$on('$destroy', cleanup);
 
     // Compares the two selected versions and displays the comparison results.
     $scope.compareSelectedVersions = function() {

@@ -85,15 +85,19 @@ oppia.directive('stateGraphViz', [function() {
           }
         };
 
-        $scope.$on('redrawGraph', function() {
+        var cleanup1 = $scope.$on('redrawGraph', function() {
           redrawGraph();
         });
-
-        $scope.$watch('graphData()', redrawGraph, true);
-        $scope.$watch('currentStateId()', redrawGraph);
+        var cleanup2 = $scope.$watch('graphData()', redrawGraph, true);
+        var cleanup3 = $scope.$watch('currentStateId()', redrawGraph);
         // If statistics for a different version of the exploration are loaded,
         // this may change the opacities of the nodes.
-        $scope.$watch('opacityMap', redrawGraph);
+        var cleanup4 = $scope.$watch('opacityMap', redrawGraph);
+        $scope.$on('$destroy', cleanup1);
+        $scope.$on('$destroy', cleanup2);
+        $scope.$on('$destroy', cleanup3);
+        $scope.$on('$destroy', cleanup4);
+
         $(window).resize(redrawGraph);
 
         // A rough upper bound for the width of a single letter, in pixels, to

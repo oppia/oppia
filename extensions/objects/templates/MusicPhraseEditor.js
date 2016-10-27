@@ -51,7 +51,7 @@ oppia.directive('musicPhraseEditor', [
 
       // Reset the component each time the value changes (e.g. if this is part
       // of an editable list).
-      $scope.$watch('$parent.value', function(newValue) {
+      var cleanup1 = $scope.$watch('$parent.value', function(newValue) {
         // TODO(sll): Check that $scope.$parent.value is a list.
         $scope.localValue = [];
         if (newValue) {
@@ -60,8 +60,9 @@ oppia.directive('musicPhraseEditor', [
           }
         }
       }, true);
+      $scope.$on('$destroy', cleanup1);
 
-      $scope.$watch('localValue', function(newValue, oldValue) {
+      var cleanup2 = $scope.$watch('localValue', function(newValue, oldValue) {
         if (newValue && oldValue) {
           if (newValue.length > _MAX_NOTES_IN_PHRASE) {
             alertsService.addWarning('There are too many notes on the staff.');
@@ -80,6 +81,7 @@ oppia.directive('musicPhraseEditor', [
           }
         }
       }, true);
+      $scope.$on('$destroy', cleanup2);
     }]
   };
 }]);

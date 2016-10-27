@@ -685,9 +685,10 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
         $scope.submitUserRating = function(ratingValue) {
           LearnerViewRatingService.submitUserRating(ratingValue);
         };
-        $scope.$on('ratingUpdated', function() {
+        var cleanup = $scope.$on('ratingUpdated', function() {
           $scope.userRating = LearnerViewRatingService.getUserRating();
         });
+        $scope.$on('$destroy', cleanup);
 
         $window.addEventListener('beforeunload', function(e) {
           if (hasInteractedAtLeastOnce && !$scope.isInPreviewMode &&

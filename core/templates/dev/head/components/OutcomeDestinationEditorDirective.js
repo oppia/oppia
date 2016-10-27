@@ -27,12 +27,25 @@ oppia.directive('outcomeDestinationEditor', [function() {
     controller: [
       '$scope', 'editorContextService', 'explorationStatesService',
       'StateGraphLayoutService', 'PLACEHOLDER_OUTCOME_DEST', 'focusService',
-      'editorFirstTimeEventsService',
+      'editorFirstTimeEventsService', 'CleanupService',
       function(
           $scope, editorContextService, explorationStatesService,
           StateGraphLayoutService, PLACEHOLDER_OUTCOME_DEST, focusService,
-          editorFirstTimeEventsService) {
-        $scope.$on('saveOutcomeDestDetails', function() {
+          editorFirstTimeEventsService, CleanupService) {
+        $scope.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
+        $scope.destChoices = [];
+
+        $scope.onDestSelectorChange = function() {
+          if ($scope.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
+            focusService.setFocus('newStateNameInputField');
+          }
+        };
+
+        $scope.isCreatingNewState = function(outcome) {
+          return outcome.dest === PLACEHOLDER_OUTCOME_DEST;
+        };
+
+        CleanupService.registerOn($scope, 'saveOutcomeDestDetails', function() {
           // Create new state if specified.
           if ($scope.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
             editorFirstTimeEventsService.registerFirstCreateSecondStateEvent();
@@ -45,81 +58,72 @@ oppia.directive('outcomeDestinationEditor', [function() {
           }
         });
 
-        $scope.onDestSelectorChange = function() {
-          if ($scope.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
-            focusService.setFocus('newStateNameInputField');
-          }
-        };
+        CleanupService.registerWatch(
+          $scope, explorationStatesService.getStates, function() {
+            var currentStateName = editorContextService.getActiveStateName();
 
-        $scope.isCreatingNewState = function(outcome) {
-          return outcome.dest === PLACEHOLDER_OUTCOME_DEST;
-        };
+            // This is a list of objects, each with an ID and name. These
+            // represent all states, as well as an option to create a
+            // new state.
+            $scope.destChoices = [{
+              id: currentStateName,
+              text: '(try again)'
+            }];
 
-        $scope.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
-        $scope.destChoices = [];
-        $scope.$watch(explorationStatesService.getStates, function() {
-          var currentStateName = editorContextService.getActiveStateName();
+            // Arrange the remaining states based on their order in the state
+            // graph.
+            var lastComputedArrangement = (
+              StateGraphLayoutService.getLastComputedArrangement());
+            var allStateNames = Object.keys(
+              explorationStatesService.getStates());
 
-          // This is a list of objects, each with an ID and name. These
-          // represent all states, as well as an option to create a
-          // new state.
-          $scope.destChoices = [{
-            id: currentStateName,
-            text: '(try again)'
-          }];
-
-          // Arrange the remaining states based on their order in the state
-          // graph.
-          var lastComputedArrangement = (
-            StateGraphLayoutService.getLastComputedArrangement());
-          var allStateNames = Object.keys(explorationStatesService.getStates());
-
-          var maxDepth = 0;
-          var maxOffset = 0;
-          for (var stateName in lastComputedArrangement) {
-            maxDepth = Math.max(
-              maxDepth, lastComputedArrangement[stateName].depth);
-            maxOffset = Math.max(
-              maxOffset, lastComputedArrangement[stateName].offset);
-          }
-
-          // Higher scores come later.
-          var allStateScores = {};
-          var unarrangedStateCount = 0;
-          for (var i = 0; i < allStateNames.length; i++) {
-            var stateName = allStateNames[i];
-            if (lastComputedArrangement.hasOwnProperty(stateName)) {
-              allStateScores[stateName] = (
-                lastComputedArrangement[stateName].depth * (maxOffset + 1) +
-                lastComputedArrangement[stateName].offset);
-            } else {
-              // States that have just been added in the rule 'create new'
-              // modal are not yet included as part of lastComputedArrangement,
-              // so we account for them here.
-              allStateScores[stateName] = (
-                (maxDepth + 1) * (maxOffset + 1) + unarrangedStateCount);
-              unarrangedStateCount++;
+            var maxDepth = 0;
+            var maxOffset = 0;
+            for (var stateName in lastComputedArrangement) {
+              maxDepth = Math.max(
+                maxDepth, lastComputedArrangement[stateName].depth);
+              maxOffset = Math.max(
+                maxOffset, lastComputedArrangement[stateName].offset);
             }
-          }
 
-          var stateNames = allStateNames.sort(function(a, b) {
-            return allStateScores[a] - allStateScores[b];
-          });
-
-          for (var i = 0; i < stateNames.length; i++) {
-            if (stateNames[i] !== currentStateName) {
-              $scope.destChoices.push({
-                id: stateNames[i],
-                text: stateNames[i]
-              });
+            // Higher scores come later.
+            var allStateScores = {};
+            var unarrangedStateCount = 0;
+            for (var i = 0; i < allStateNames.length; i++) {
+              var stateName = allStateNames[i];
+              if (lastComputedArrangement.hasOwnProperty(stateName)) {
+                allStateScores[stateName] = (
+                  lastComputedArrangement[stateName].depth * (maxOffset + 1) +
+                  lastComputedArrangement[stateName].offset);
+              } else {
+                // States that have just been added in the rule 'create new'
+                // modal are not yet included as part of
+                // lastComputedArrangement, so we account for them here.
+                allStateScores[stateName] = (
+                  (maxDepth + 1) * (maxOffset + 1) + unarrangedStateCount);
+                unarrangedStateCount++;
+              }
             }
-          }
 
-          $scope.destChoices.push({
-            id: PLACEHOLDER_OUTCOME_DEST,
-            text: 'A New Card Called...'
-          });
-        }, true);
+            var stateNames = allStateNames.sort(function(a, b) {
+              return allStateScores[a] - allStateScores[b];
+            });
+
+            for (var i = 0; i < stateNames.length; i++) {
+              if (stateNames[i] !== currentStateName) {
+                $scope.destChoices.push({
+                  id: stateNames[i],
+                  text: stateNames[i]
+                });
+              }
+            }
+
+            $scope.destChoices.push({
+              id: PLACEHOLDER_OUTCOME_DEST,
+              text: 'A New Card Called...'
+            });
+          }, true
+        );
       }
     ]
   };

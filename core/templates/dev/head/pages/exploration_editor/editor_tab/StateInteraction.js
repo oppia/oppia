@@ -92,7 +92,8 @@ oppia.controller('StateInteraction', [
         stateInteractionIdService.savedMemento, interactionCustomizationArgs);
     };
 
-    $scope.$on('stateEditorInitialized', function(evt, stateData) {
+    var cleanup = $scope.$on(
+        'stateEditorInitialized', function(evt, stateData) {
       $scope.hasLoaded = false;
 
       interactionDetailsCache.reset();
@@ -115,6 +116,7 @@ oppia.controller('StateInteraction', [
       _updateInteractionPreviewAndAnswerChoices();
       $scope.hasLoaded = true;
     });
+    $scope.$on('$destroy', cleanup);
 
     // If a terminal interaction is selected for a state with no content, this
     // function sets the content to DEFAULT_TERMINAL_STATE_CONTENT.

@@ -28,12 +28,13 @@ oppia.directive('activityTilesInfinityGrid', [function() {
 
         // Called when the first batch of search results is retrieved from the
         // server.
-        $scope.$on(
+        var cleanup = $scope.$on(
           'initialSearchResultsLoaded', function(evt, activityList) {
             $scope.allActivitiesInOrder = activityList;
             $scope.endOfPageIsReached = false;
           }
         );
+        $scope.$on('$destroy', cleanup);
 
         $scope.showMoreActivities = function() {
           if (!$rootScope.loadingMessage && !$scope.endOfPageIsReached) {

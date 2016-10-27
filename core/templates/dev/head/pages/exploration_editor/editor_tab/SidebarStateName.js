@@ -28,9 +28,6 @@ oppia.controller('SidebarStateName', [
 
     var _stateNameMemento = null;
     $scope.stateNameEditorIsShown = false;
-    $scope.$on('stateEditorInitialized', function() {
-      $scope.initStateNameEditor();
-    });
 
     $scope.initStateNameEditor = function() {
       _stateNameMemento = null;
@@ -65,11 +62,16 @@ oppia.controller('SidebarStateName', [
       }
     };
 
-    $scope.$on('externalSave', function() {
+    var cleanup1 = $scope.$on('stateEditorInitialized', function() {
+      $scope.initStateNameEditor();
+    });
+    var cleanup2 = $scope.$on('externalSave', function() {
       if ($scope.stateNameEditorIsShown) {
         $scope.saveStateName($scope.tmpStateName);
       }
     });
+    $scope.$on('$destroy', cleanup1);
+    $scope.$on('$destroy', cleanup2);
 
     $scope._getNormalizedStateName = function(newStateName) {
       return $filter('normalizeWhitespace')(newStateName);

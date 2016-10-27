@@ -69,13 +69,14 @@ oppia.directive('outcomeEditor', [function() {
           }
         };
 
-        $scope.$on('externalSave', function() {
+        var cleanup1 = $scope.$on('externalSave', function() {
           onExternalSave();
         });
-
-        $scope.$on('onInteractionIdChanged', function() {
+        var cleanup2 = $scope.$on('onInteractionIdChanged', function() {
           onExternalSave();
         });
+        $scope.$on('$destroy', cleanup1);
+        $scope.$on('$destroy', cleanup2);
 
         $scope.isSelfLoop = function(outcome) {
           return (

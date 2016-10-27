@@ -137,10 +137,11 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           return ruleDescription;
         };
 
-        $scope.$on('updateAnswerGroupInteractionId', function(
+        var cleanup = $scope.$on('updateAnswerGroupInteractionId', function(
             evt, newInteractionId) {
           $scope.currentInteractionId = newInteractionId;
         });
+        $scope.$on('$destroy', cleanup);
 
         $scope.onSelectNewRuleType = function(newRuleType) {
           var oldRuleInputs = angular.copy($scope.rule.inputs) || {};

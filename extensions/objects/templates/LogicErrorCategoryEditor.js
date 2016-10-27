@@ -66,9 +66,10 @@ oppia.directive('logicErrorCategoryEditor', [
         }
       }
 
-      $scope.$watch('localValue.category', function() {
+      var cleanup = $scope.$watch('localValue.category', function() {
         $scope.$parent.value = $scope.localValue.category.name;
       });
+      $scope.$on('$destroy', cleanup);
     }]
   };
 }]);

@@ -33,13 +33,15 @@ oppia.controller('StateFallbacks', [
     $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/general/drag_dots.png');
 
-    $scope.$on('stateEditorInitialized', function(evt, stateData) {
+    var cleanup = $scope.$on(
+        'stateEditorInitialized', function(evt, stateData) {
       stateFallbacksService.init(
         editorContextService.getActiveStateName(),
         stateData.interaction.fallbacks);
 
       $scope.activeFallbackIndex = null;
     });
+    $scope.$on('$destroy', cleanup);
 
     $scope.getFallbackSummary = function(fallback) {
       var numSubmits = fallback.trigger.customization_args.num_submits.value;

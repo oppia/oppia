@@ -25,7 +25,9 @@ oppia.constant('ADMIN_TAB_URLS', {
 
 oppia.controller('Admin', [
   '$scope', '$http', 'UrlInterpolationService', 'ADMIN_TAB_URLS',
-  function($scope, $http, UrlInterpolationService, ADMIN_TAB_URLS) {
+  'CleanupService',
+  function(
+      $scope, $http, UrlInterpolationService, ADMIN_TAB_URLS, CleanupService) {
     var ADMIN_JOB_OUTPUT_URL_PREFIX = '/adminjoboutput';
     var ADMIN_HANDLER_URL = '/adminhandler';
     var ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL = (
@@ -39,7 +41,7 @@ oppia.controller('Admin', [
     $scope.logoWhiteImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/logo/288x128_logo_white.png');
 
-    $scope.$watch(function() {
+    CleanupService.registerWatch($scope, function() {
       return window.location.hash;
     }, function(newHash) {
       for (var url in $scope.ADMIN_TAB_URLS) {
