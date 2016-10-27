@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for a plain-text field in the simple editor.
+ * @fileoverview Directive for a plain-text content field in the simple editor.
  */
 
 oppia.directive('editorPlaintextField', [function() {

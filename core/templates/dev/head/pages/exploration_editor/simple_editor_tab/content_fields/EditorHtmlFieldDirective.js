@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for an HTML field in the simple editor.
+ * @fileoverview Directive for an HTML content field in the simple editor.
  */
 
 oppia.directive('editorHtmlField', [function() {

@@ -2,15 +2,15 @@
   <div class="sidebar">
     <ul>
       <li class="sidebar-item">
-        Title
+        <strong>Title</strong>
       </li>
 
       <li class="sidebar-item">
-        Introduction
+        <strong>Introduction</strong>
       </li>
 
       <li class="sidebar-item" ng-repeat="question in questions track by $index">
-        Question <[$index + 1]>
+        <strong>Question <[$index + 1]></strong>
 
         <ul>
           <li class="sidebar-item sidebar-item-indented"
@@ -41,7 +41,6 @@
   }
   simple-editor-sidebar ul {
     font-size: 1.0em;
-    font-weight: bold;
     line-height: 2.5em;
     list-style: none;
     margin-left: 0;
