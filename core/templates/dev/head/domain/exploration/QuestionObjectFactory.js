@@ -81,7 +81,7 @@ oppia.factory('QuestionObjectFactory', [function() {
 
   // Static class methods. Note that "this" is not available in
   // static contexts.
-  Question.create = function(stateName, interactionDict, nextStateContentHtml) {
+  Question.create = function(stateName, interactionDict, bridgeHtml) {
     var copyOfInteractionDict = angular.copy(interactionDict);
 
     return new Question(
@@ -90,7 +90,7 @@ oppia.factory('QuestionObjectFactory', [function() {
       copyOfInteractionDict.customization_args,
       copyOfInteractionDict.answer_groups,
       copyOfInteractionDict.default_outcome,
-      nextStateContentHtml);
+      bridgeHtml);
   };
 
   return Question;

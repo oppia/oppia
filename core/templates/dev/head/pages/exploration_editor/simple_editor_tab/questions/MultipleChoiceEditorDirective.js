@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the a multiple choice question in the simple
- * editor.
+ * @fileoverview Directive for a multiple choice question in the simple editor.
  */
 
 // NOTE TO DEVELOPERS: This is meant to be a reusable directive, so its only
@@ -94,6 +93,10 @@ oppia.directive('multipleChoiceEditor', [function() {
             }
           }
 
+          if (foundEmptyField) {
+            return;
+          }
+
           var newChoiceIndex = choiceNames.length;
           // This is the human-readable number in the choice name.
           var newChoiceNumber = choiceNames.length + 1;
@@ -126,6 +129,7 @@ oppia.directive('multipleChoiceEditor', [function() {
         $scope.saveChoice = function(index, newChoiceValue) {
           if (!newChoiceValue) {
             alertsService.addWarning('Cannot save an empty choice.');
+            return;
           }
 
           var newCustomizationArgs = $scope.getCustomizationArgs();
@@ -139,6 +143,7 @@ oppia.directive('multipleChoiceEditor', [function() {
           if (choiceNames.indexOf('newChoiceValue') !== -1) {
             alertsService.addWarning(
               'Cannot save: this duplicates an existing choice.');
+            return;
           }
 
           newCustomizationArgs.choices.value[index] = newChoiceValue;
