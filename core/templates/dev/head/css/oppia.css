@@ -497,6 +497,11 @@ textarea {
   opacity: 1.0;
   text-decoration: none;
 }
+@media (max-width: 1100px) {
+  .oppia-site-feedback span {
+    display: none;
+  }
+}
 
 /*
   Styles for the global navigation sidebar menu.
