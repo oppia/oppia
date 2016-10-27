@@ -72,11 +72,14 @@ button.md-button.md-default-theme.oppia-learner-continue-button:hover {
 .material-icons.md-18 {
   font-size: 18px;
 }
-.material-icons.md-100 {
-  font-size: 100px;
+.material-icons.md-30 {
+  font-size: 30px;
 }
 .material-icons.md-40 {
   font-size: 40px;
+}
+.material-icons.md-100 {
+  font-size: 100px;
 }
 .material-icons.md-32 {
   font-size: 32px;
@@ -1551,10 +1554,6 @@ md-card.oppia-dashboard-tile {
   border-bottom-left-radius: 5px;
   margin: 2px 7px;
   padding: 6px;
-}
-
-.oppia-editor-page-container {
-  margin-bottom: 60px;
 }
 
 .oppia-editor-header {

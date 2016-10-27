@@ -1,0 +1,66 @@
+<script type="text/ng-template" id="simpleEditor/sidebar">
+  <div class="sidebar">
+    <ul>
+      <li class="sidebar-item">
+        <strong>Title</strong>
+      </li>
+
+      <li class="sidebar-item">
+        <strong>Introduction</strong>
+      </li>
+
+      <li class="sidebar-item" ng-repeat="question in questions track by $index">
+        <strong>Question <[$index + 1]></strong>
+
+        <ul>
+          <li class="sidebar-item sidebar-item-indented"
+              ng-repeat="subfieldLabel in SUBFIELD_LABELS track by $index">
+            <span>
+              <a><[subfieldLabel]></a>
+            </span>
+          </li>
+        </ul>
+      </li>
+    </ul>
+
+    <button type="button" class="btn btn-default full-editor-btn" ng-click="setEditorModeToFull()">
+      Use Advanced Editor
+    </button>
+  </div>
+</script>
+
+<style>
+  simple-editor-sidebar {
+    background-color: #f3fbf1;
+    height: 100%;
+    left: 0;
+    padding: 30px;
+    position: fixed;
+    /* This must match the 'margin-left' of the simple-editor-body class. */
+    width: 220px;
+  }
+  simple-editor-sidebar ul {
+    font-size: 1.0em;
+    line-height: 2.5em;
+    list-style: none;
+    margin-left: 0;
+    padding-left: 0;
+  }
+  simple-editor-sidebar a {
+    color: #333;
+  }
+  simple-editor-sidebar .sidebar-item-disabled {
+    color: #ccc;
+  }
+
+  simple-editor-sidebar li.sidebar-item a.active,
+  simple-editor-sidebar li.sidebar-item a.active:hover {
+    text-decoration: underline;
+  }
+  simple-editor-sidebar li.sidebar-item a:hover {
+    text-decoration: none;
+  }
+  simple-editor-sidebar li.sidebar-item-indented {
+    margin-left: 25px;
+  }
+</style>

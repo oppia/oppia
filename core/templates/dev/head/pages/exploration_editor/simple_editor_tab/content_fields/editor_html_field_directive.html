@@ -1,0 +1,75 @@
+<script type="text/ng-template" id="simpleEditorFields/html">
+  <div ng-show="!inEditMode" ng-click="startEditing()" class="view-mode">
+    <span angular-html-bind="getOriginalValue()"></span>
+    <span ng-if="!getOriginalValue() && placeholder" class="placeholder">
+      <[placeholder]>
+    </span>
+    <i class="material-icons edit-icon" title="Edit HTML">&#xE254;</i>
+  </div>
+
+  <div ng-if="inEditMode" class="edit-mode">
+    <schema-based-editor schema="SCHEMA" local-value="data.valueBeingEdited"
+                         label-for-focus-target="focusLabel">
+    </schema-based-editor>
+    <span class="bar"></span>
+
+    <button type="button" ng-click="finishEditing()" ng-disabled="!canSave()"
+            class="btn btn-default">
+      Save
+    </button>
+  </div>
+</script>
+
+<style>
+  editor-html-field .view-mode {
+    background-color: #f0f0f0;
+    padding: 30px 20px;
+    position: relative;
+  }
+  editor-html-field .view-mode:hover {
+    background-color: #d6d6d6;
+    color: #444;
+  }
+  editor-html-field .view-mode .edit-icon {
+    font-size: 18px;
+    opacity: 0;
+    position: absolute;
+    right: 20px;
+    top: 30%;
+  }
+  editor-html-field .view-mode:hover .edit-icon {
+    opacity: 1.0;
+  }
+  editor-html-field .view-mode .placeholder {
+    color: rgba(0, 0, 0, 0.5);
+  }
+
+  editor-html-field .edit-mode [text-angular] {
+    border: none;
+    border-radius: 0;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.25);
+    outline: 0;
+    width: 100%;
+  }
+  editor-html-field .edit-mode .bar {
+    display: block;
+    position: relative;
+    width: 100%;
+  }
+  editor-html-field .edit-mode .bar:before,
+  editor-html-field .edit-mode .bar:after {
+    background: #66bb6a;
+    bottom: 1px;
+    content: '';
+    height: 2px;
+    position: absolute;
+    transition: 0.2s ease all;
+    width: 0;
+  }
+  editor-html-field .edit-mode .bar:before {
+    left: 50%;
+  }
+  editor-html-field .edit-mode .bar:after {
+    right: 50%;
+  }
+</style>
