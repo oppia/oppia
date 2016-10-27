@@ -499,6 +499,10 @@ textarea {
 }
 
 @media (max-width: 1100px) {
+  .oppia-site-feedback {
+    background-color: transparent;
+    opacity: 1;
+  }
   .oppia-site-feedback span {
     display: none;
   }
