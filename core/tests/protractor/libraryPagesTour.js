@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview End-to-end tests to check for console errors in
- * library related pages
+ * library related pages.
  */
 
 var general = require('../protractor_utils/general.js');
@@ -32,14 +32,11 @@ describe('Library pages tour', function() {
   };
 
   it('adds a rating to an existing exploration', function() {
-    users.createAndLoginAdminUser('randomuser@gmail.com', 'r4nd0m');
-    var profileDropdown = element(by.css('.protractor-test-profile-dropdown'));
-    browser.actions().mouseMove(profileDropdown).perform();
-    profileDropdown.element(by.css('.protractor-test-admin-link')).click();
+    users.createAndLoginAdminUser('random@gmail.com', 'random');
     admin.reloadAllExplorations();
 
     visitLibraryPage();
-    element(by.css('.protractor-test-gallery-recently-published')).click();
+    element(by.css('.protractor-test-library-recently-published')).click();
     library.playExploration(EXPLORATION_TITLE);
 
     // Play through the exploration
@@ -57,20 +54,29 @@ describe('Library pages tour', function() {
 
   it('visits the top rated page', function() {
     visitLibraryPage();
-    element(by.css('.protractor-test-gallery-top-rated')).click();
+    element(by.css('.protractor-test-library-top-rated')).click();
+    expect(browser.getCurrentUrl()).toContain('library/top_rated');
   });
 
   it('visits the recent explorations page', function() {
     visitLibraryPage();
-    element(by.css('.protractor-test-gallery-recently-published')).click();
+    element(by.css('.protractor-test-library-recently-published')).click();
+    expect(browser.getCurrentUrl()).toContain('library/recently_published');
   });
 
   it('visits the search page', function() {
     visitLibraryPage();
     element(by.css('.protractor-test-search-input')).sendKeys(SEARCH_TERM);
+    browser.driver.wait(function() {
+      return browser.getCurrentUrl().then(function(url) {
+        return /search/.test(url);
+      });
+    });
+    expect(browser.getCurrentUrl()).toContain('search/find?q=python');
   });
 
   afterEach(function() {
     general.checkForConsoleErrors([]);
+    users.logout();
   });
 });
