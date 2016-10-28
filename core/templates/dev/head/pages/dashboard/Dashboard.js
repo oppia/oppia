@@ -107,58 +107,52 @@ oppia.controller('Dashboard', [
     $scope.sortByFunction =function(entity) {
       // This function is passed as a custom comparator function to `orderBy`,
       // so that special cases can be handled while sorting explorations.
-      var value=entity[$scope.currentSortType];
-      var DEFAULT_TEXT_EMPTY_TITLE='Untitled';
-      var array=[];
-      if ($scope.currentSortType!==EXPLORATIONS_SORT_BY_KEYS.TITLE && 
-        $scope.currentSortType!==EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED){
-        for (var i=0;i<$scope.explorationsList.length;i++){
-
-          if ($scope.currentSortType!==EXPLORATIONS_SORT_BY_KEYS.RATING){
-            if ($scope.explorationsList[i].status!=='private'){
+      var value = entity[$scope.currentSortType];
+      var DEFAULT_TEXT_EMPTY_TITLE = 'Untitled';
+      var array = [];
+      if ($scope.currentSortType !== EXPLORATIONS_SORT_BY_KEYS.TITLE && 
+        $scope.currentSortType !== EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED) {
+        for (var i = 0 ; i < $scope.explorationsList.length; i++) {
+          if ($scope.currentSortType !== EXPLORATIONS_SORT_BY_KEYS.RATING) {
+            if ($scope.explorationsList[i].status !== 'private') {
               array.push($scope.explorationsList[i][$scope.currentSortType]);
             }
-          }
-          else if ($scope.getAverageRating($scope.explorationsList[i][$scope.currentSortType]!==undefined)){
+          } else if ($scope.getAverageRating($scope.explorationsList[i][$scope.currentSortType] !== undefined)) {
             array.push($scope.getAverageRating($scope.explorationsList[i][$scope.currentSortType]));
           }
         }         
       }
-      var max_array=Math.max.apply(null,array);
-      if ($scope.currentSortType===EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED){
+      var max_array = Math.max.apply(null,array);
+      if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED) {
         return value;
-      }
-      else if ($scope.currentSortType===EXPLORATIONS_SORT_BY_KEYS.RATING){
-        if (entity.status==='private'){
-          if (max_array!==-Infinity && max_array!==NaN){
-            return ($scope.isCurrentSortDescending?
-                (-1*$scope.explorationsList.indexOf(entity)-$scope.explorationsList.length):
-                ($scope.explorationsList.indexOf(entity)+max_array));
+      } else if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.RATING) {
+        if (entity.status === 'private') {
+          if (max_array !== -Infinity && max_array !== NaN) {
+            return ($scope.isCurrentSortDescending ?
+                (-1 * $scope.explorationsList.indexOf(entity) - $scope.explorationsList.length):
+                ($scope.explorationsList.indexOf(entity) + max_array));
           }
-          return ($scope.isCurrentSortDescending?
-            (-1*$scope.explorationsList.indexOf(entity)-$scope.explorationsList.length):
-            ($scope.explorationsList.indexOf(entity)+$scope.explorationsList.length));
-        }
-        else if (!$scope.getAverageRating(value)){
-          return  (-1*$scope.explorationsList.indexOf(entity));     
+          return ($scope.isCurrentSortDescending ?
+            (-1 * $scope.explorationsList.indexOf(entity) - $scope.explorationsList.length):
+            ($scope.explorationsList.indexOf(entity) + $scope.explorationsList.length));
+        } else if (!$scope.getAverageRating(value)) {
+          return  (-1 * $scope.explorationsList.indexOf(entity));     
         }
         return value;
-      }
-      else if ($scope.currentSortType!==EXPLORATIONS_SORT_BY_KEYS.TITLE){
-        if (entity.status==='private'){
-          if (max_array!==-Infinity && max_array!==NaN){
-            return ($scope.isCurrentSortDescending?
-                (-1*$scope.explorationsList.indexOf(entity)-$scope.explorationsList.length):
-                ($scope.explorationsList.indexOf(entity)+max_array));
+      } else if ($scope.currentSortType !== EXPLORATIONS_SORT_BY_KEYS.TITLE) {
+        if (entity.status === 'private') {
+          if (max_array !== -Infinity && max_array !== NaN) {
+            return ($scope.isCurrentSortDescending ?
+                (-1 * $scope.explorationsList.indexOf(entity) - $scope.explorationsList.length):
+                ($scope.explorationsList.indexOf(entity) + max_array));
           }
-          return ($scope.isCurrentSortDescending?
-              (-1*$scope.explorationsList.indexOf(entity)-$scope.explorationsList.length):
-              ($scope.explorationsList.indexOf(entity)+$scope.explorationsList.length));
+          return ($scope.isCurrentSortDescending ?
+              (-1 * $scope.explorationsList.indexOf(entity) - $scope.explorationsList.length):
+              ($scope.explorationsList.indexOf(entity) + $scope.explorationsList.length));
         }
         return value;
-      }
-      else if (!value){
-        return (-1*$scope.explorationsList.indexOf(entity));
+      } else if (!value) {
+        return (-1 * $scope.explorationsList.indexOf(entity));
       }
       return value;
     }
