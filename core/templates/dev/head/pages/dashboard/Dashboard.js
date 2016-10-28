@@ -131,12 +131,15 @@ oppia.controller('Dashboard', [
         if (entity.status === 'private') {
           if (max_array !== -Infinity && max_array !== NaN) {
             return ($scope.isCurrentSortDescending ?
-                (-1 * $scope.explorationsList.indexOf(entity) - $scope.explorationsList.length):
+                (-1 * $scope.explorationsList.indexOf(entity) - 
+                  $scope.explorationsList.length):
                 ($scope.explorationsList.indexOf(entity) + max_array));
           }
           return ($scope.isCurrentSortDescending ?
-            (-1 * $scope.explorationsList.indexOf(entity) - $scope.explorationsList.length):
-            ($scope.explorationsList.indexOf(entity) + $scope.explorationsList.length));
+            (-1 * $scope.explorationsList.indexOf(entity) -
+             $scope.explorationsList.length):
+            ($scope.explorationsList.indexOf(entity) +
+              $scope.explorationsList.length));
         } else if (!$scope.getAverageRating(value)) {
           return  (-1 * $scope.explorationsList.indexOf(entity));     
         }
@@ -145,12 +148,15 @@ oppia.controller('Dashboard', [
         if (entity.status === 'private') {
           if (max_array !== -Infinity && max_array !== NaN) {
             return ($scope.isCurrentSortDescending ?
-                (-1 * $scope.explorationsList.indexOf(entity) - $scope.explorationsList.length):
+                (-1 * $scope.explorationsList.indexOf(entity) -
+                  $scope.explorationsList.length):
                 ($scope.explorationsList.indexOf(entity) + max_array));
           }
           return ($scope.isCurrentSortDescending ?
-              (-1 * $scope.explorationsList.indexOf(entity) - $scope.explorationsList.length):
-              ($scope.explorationsList.indexOf(entity) + $scope.explorationsList.length));
+              (-1 * $scope.explorationsList.indexOf(entity) -
+                $scope.explorationsList.length):
+              ($scope.explorationsList.indexOf(entity) +
+                $scope.explorationsList.length));
         }
         return value;
       } else if (!value) {
