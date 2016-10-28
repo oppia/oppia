@@ -177,7 +177,6 @@ class BaseHandler(webapp2.RequestHandler):
         self.has_seen_editor_tutorial = False
         self.partially_logged_in = False
         self.values['profile_picture_data_url'] = None
-        self.values['username'] = None
         self.preferred_site_language_code = None
 
         if self.user_id:
@@ -328,6 +327,7 @@ class BaseHandler(webapp2.RequestHandler):
                 self.username and self.username in
                 config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value
             ),
+            'username': self.username,
             'user_is_logged_in': user_services.has_fully_registered(
                 self.user_id),
             'preferred_site_language_code': self.preferred_site_language_code
