@@ -1779,7 +1779,7 @@ pre.oppia-pre-wrapped-text {
   position: relative;
 }
 .oppia-collection-player-tiles-container .oppia-page-heading {
-  color: #fff;
+  color: #005048;
 }
 
 .oppia-collection-player-tile-section {
@@ -1787,7 +1787,7 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-collection-player-small-text {
-  color: #fff;
+  color: #005048;
   font-style: italic;
   font-size: 1em;
   margin-top: 12px;
