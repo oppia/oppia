@@ -109,22 +109,22 @@ oppia.controller('Dashboard', [
       // so that special cases can be handled while sorting explorations.
       var value = entity[$scope.currentSortType];
       var DEFAULT_TEXT_EMPTY_TITLE = 'Untitled';
-      var array = [];
+      var ARRAY = [];
       if ($scope.currentSortType !== EXPLORATIONS_SORT_BY_KEYS.TITLE &&
         $scope.currentSortType !== EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED) {
         for (var i = 0; i < $scope.explorationsList.length; i++) {
           if ($scope.currentSortType !== EXPLORATIONS_SORT_BY_KEYS.RATING) {
             if ($scope.explorationsList[i].status !== 'private') {
-              array.push($scope.explorationsList[i][$scope.currentSortType]);
+              ARRAY.push($scope.explorationsList[i][$scope.currentSortType]);
             }
           } else if ($scope.getAverageRating(
             $scope.explorationsList[i][$scope.currentSortType] !== undefined)) {
-            array.push($scope.getAverageRating(
+            ARRAY.push($scope.getAverageRating(
               $scope.explorationsList[i][$scope.currentSortType]));
           }
         }
       }
-      var MAX_ARRAY = Math.max.apply(null, array);
+      var MAX_ARRAY = Math.max.apply(null, ARRAY);
       if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED) {
         return value;
       } else if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.RATING) {
