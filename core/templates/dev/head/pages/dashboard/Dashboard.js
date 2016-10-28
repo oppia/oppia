@@ -110,7 +110,7 @@ oppia.controller('Dashboard', [
       var value = entity[$scope.currentSortType];
       var DEFAULT_TEXT_EMPTY_TITLE = 'Untitled';
       var array = [];
-      if ($scope.currentSortType !== EXPLORATIONS_SORT_BY_KEYS.TITLE && 
+      if ($scope.currentSortType !== EXPLORATIONS_SORT_BY_KEYS.TITLE &&
         $scope.currentSortType !== EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED) {
         for (var i = 0; i < $scope.explorationsList.length; i++) {
           if ($scope.currentSortType !== EXPLORATIONS_SORT_BY_KEYS.RATING) {
@@ -122,9 +122,9 @@ oppia.controller('Dashboard', [
             array.push($scope.getAverageRating(
               $scope.explorationsList[i][$scope.currentSortType]));
           }
-        }         
+        }
       }
-      var MAX_ARRAY = Math.max.apply(null , array);
+      var MAX_ARRAY = Math.max.apply(null, array);
       if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED) {
         return value;
       } else if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.RATING) {
@@ -141,7 +141,7 @@ oppia.controller('Dashboard', [
             ($scope.explorationsList.indexOf(entity) +
               $scope.explorationsList.length));
         } else if (!$scope.getAverageRating(value)) {
-          return (-1 * $scope.explorationsList.indexOf(entity)); 
+          return (-1 * $scope.explorationsList.indexOf(entity));
         }
         return value;
       } else if ($scope.currentSortType !== EXPLORATIONS_SORT_BY_KEYS.TITLE) {
@@ -163,7 +163,7 @@ oppia.controller('Dashboard', [
         return (-1 * $scope.explorationsList.indexOf(entity));
       }
       return value;
-    }
+    };
 
     $rootScope.loadingMessage = 'Loading';
     DashboardBackendApiService.fetchDashboardData().then(
