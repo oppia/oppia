@@ -104,7 +104,7 @@ oppia.controller('Dashboard', [
       }
     };
 
-    $scope.sortByFunction =function(entity) {
+    $scope.sortByFunction = function(entity) {
       // This function is passed as a custom comparator function to `orderBy`,
       // so that special cases can be handled while sorting explorations.
       var value = entity[$scope.currentSortType];
@@ -124,37 +124,37 @@ oppia.controller('Dashboard', [
           }
         }         
       }
-      var max_array = Math.max.apply(null,array);
+      var MAX_ARRAY = Math.max.apply(null , array);
       if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED) {
         return value;
       } else if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.RATING) {
         if (entity.status === 'private') {
-          if (max_array !== -Infinity && max_array !== NaN) {
+          if (MAX_ARRAY !== -Infinity && MAX_ARRAY !== NaN) {
             return ($scope.isCurrentSortDescending ?
-                (-1 * $scope.explorationsList.indexOf(entity) - 
-                  $scope.explorationsList.length):
-                ($scope.explorationsList.indexOf(entity) + max_array));
+                (-1 * $scope.explorationsList.indexOf(entity) -
+                  $scope.explorationsList.length) :
+                ($scope.explorationsList.indexOf(entity) + MAX_ARRAY));
           }
           return ($scope.isCurrentSortDescending ?
             (-1 * $scope.explorationsList.indexOf(entity) -
-             $scope.explorationsList.length):
+             $scope.explorationsList.length) :
             ($scope.explorationsList.indexOf(entity) +
               $scope.explorationsList.length));
         } else if (!$scope.getAverageRating(value)) {
-          return  (-1 * $scope.explorationsList.indexOf(entity));     
+          return (-1 * $scope.explorationsList.indexOf(entity)); 
         }
         return value;
       } else if ($scope.currentSortType !== EXPLORATIONS_SORT_BY_KEYS.TITLE) {
         if (entity.status === 'private') {
-          if (max_array !== -Infinity && max_array !== NaN) {
+          if (MAX_ARRAY !== -Infinity && MAX_ARRAY !== NaN) {
             return ($scope.isCurrentSortDescending ?
                 (-1 * $scope.explorationsList.indexOf(entity) -
-                  $scope.explorationsList.length):
-                ($scope.explorationsList.indexOf(entity) + max_array));
+                  $scope.explorationsList.length) :
+                ($scope.explorationsList.indexOf(entity) + MAX_ARRAY));
           }
           return ($scope.isCurrentSortDescending ?
               (-1 * $scope.explorationsList.indexOf(entity) -
-                $scope.explorationsList.length):
+                $scope.explorationsList.length) :
               ($scope.explorationsList.indexOf(entity) +
                 $scope.explorationsList.length));
         }
