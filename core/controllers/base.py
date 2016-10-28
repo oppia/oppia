@@ -177,6 +177,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.has_seen_editor_tutorial = False
         self.partially_logged_in = False
         self.values['profile_picture_data_url'] = None
+        self.values['username'] = None
         self.preferred_site_language_code = None
 
         if self.user_id:
@@ -350,6 +351,7 @@ class BaseHandler(webapp2.RequestHandler):
         if redirect_url_on_logout is None:
             redirect_url_on_logout = self.request.uri
         if self.user_id:
+            values['login_url'] = None
             values['logout_url'] = (
                 current_user_services.create_logout_url(
                     redirect_url_on_logout))
@@ -359,6 +361,7 @@ class BaseHandler(webapp2.RequestHandler):
                 else self.request.uri)
             values['login_url'] = (
                 current_user_services.create_login_url(target_url))
+            values['logout_url'] = None
 
         # Create a new csrf token for inclusion in HTML responses. This assumes
         # that tokens generated in one handler will be sent back to a handler

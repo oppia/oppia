@@ -13,7 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the top navigation bar.
+ * @fileoverview Directive for the top navigation bar. This excludes the part
+ * of the navbar that is used for local navigation (such as the various tabs in
+ * the editor pages).
  */
 
 oppia.directive('topNavigationBar', [function() {
@@ -29,16 +31,34 @@ oppia.directive('topNavigationBar', [function() {
           $scope, $http, $window, $timeout, UrlInterpolationService,
           SidebarStatusService, LABEL_FOR_CLEARING_FOCUS,
           siteAnalyticsService, windowDimensionsService) {
+        var NAV_MODE_SIGNUP = 'signup';
+        var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
+          'create', 'explore', 'collection'];
         $scope.NAV_MODE = GLOBALS.NAV_MODE;
         $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
         $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
-        $scope.onLoginButtonClicked = function(loginUrl) {
+        $scope.username = GLOBALS.username;
+        $scope.profilePictureDataUrl = GLOBALS.profilePictureDataUrl;
+        $scope.isAdmin = GLOBALS.isAdmin;
+        $scope.isModerator = GLOBALS.isModerator;
+        $scope.isSuperAdmin = GLOBALS.isSuperAdmin;
+        $scope.logoutUrl = GLOBALS.logoutUrl;
+        if ($scope.username) {
+          $scope.profilePageUrl = UrlInterpolationService.interpolateUrl(
+            '/profile/<username>', {
+              username: $scope.username
+            });
+        }
+        $scope.userMenuIsShown = ($scope.NAV_MODE !== NAV_MODE_SIGNUP);
+        $scope.standardNavIsShown = (
+          NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf($scope.NAV_MODE) === -1);
+
+        $scope.onLoginButtonClicked = function() {
           siteAnalyticsService.registerStartLoginEvent('loginButton');
           $timeout(function() {
-            $window.location = loginUrl;
+            $window.location = GLOBALS.loginUrl;
           }, 150);
-          return false;
         };
 
         $scope.profileDropdownIsActive = false;
@@ -83,22 +103,6 @@ oppia.directive('topNavigationBar', [function() {
         });
 
         $scope.toggleSidebar = SidebarStatusService.toggleSidebar;
-
-        // TODO(sll): Sort out (Jinja):
-        // - username
-        // - profile_picture_data_url
-        // - is_admin
-        // - is_moderator
-        // - is_super_admin
-        // - logout_url
-        // - login_url
-
-        // This method is here because the trigger for the tutorial is in the
-        // site navbar. It broadcasts an event to tell the exploration editor
-        // to open the editor tutorial.
-        $scope.openEditorTutorial = function() {
-          $scope.$broadcast('openEditorTutorial');
-        };
       }
     ]
   };

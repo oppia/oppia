@@ -22,29 +22,35 @@ oppia.factory('SidebarStatusService', [
     var pendingSidebarClick = false;
     var sidebarIsShown = false;
 
+    var _openSidebar = function() {
+      if (windowDimensionsService.isWindowNarrow() && !sidebarIsShown) {
+        sidebarIsShown = true;
+        pendingSidebarClick = true;
+      }
+    };
+
+    var _closeSidebar = function() {
+      if (sidebarIsShown) {
+        sidebarIsShown = false;
+        pendingSidebarClick = false;
+      }
+    };
+
     return {
       isSidebarShown: function() {
         return sidebarIsShown;
       },
-      toggleSidebar: function() {
-        if (!sidebarIsShown) {
-          sidebarIsShown = true;
-          pendingSidebarClick = true;
-        } else {
-          sidebarIsShown = false;
-          pendingSidebarClick = false;
-        }
-      },
       openSidebar: function() {
-        if (windowDimensionsService.isWindowNarrow() && !sidebarIsShown) {
-          sidebarIsShown = true;
-          pendingSidebarClick = true;
-        }
+        _openSidebar();
       },
       closeSidebar: function() {
-        if (sidebarIsShown) {
-          sidebarIsShown = false;
-          pendingSidebarClick = false;
+        _closeSidebar();
+      },
+      toggleSidebar: function() {
+        if (!sidebarIsShown) {
+          _openSidebar();
+        } else {
+          _closeSidebar();
         }
       },
       onDocumentClick: function() {

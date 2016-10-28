@@ -32,7 +32,7 @@ var oppia = angular.module(
 
 // TODO(sll): Get this to read from a common JSON file; it's replicated in
 // feconf.
-oppia.constant('CATEGORY_LIST', GLOBALS.ALL_CATEGORIES || []);
+oppia.constant('CATEGORY_LIST', GLOBALS.ALL_CATEGORIES);
 
 // We use a slash because this character is forbidden in a state name.
 oppia.constant('PLACEHOLDER_OUTCOME_DEST', '/');
@@ -461,11 +461,16 @@ oppia.factory('windowDimensionsService', ['$window', function($window) {
       onResizeHooks.push(hookFn);
     },
     isWindowNarrow: function() {
+      var NAVBAR_WITH_SEARCH_CUTOFF_WIDTH_PX = 1171;
+      var NORMAL_NAVBAR_CUTOFF_WIDTH_PX = 800;
       var navbarHasSearchBar = (
         $window.location.pathname.indexOf('/search') === 0 ||
         $window.location.pathname.indexOf('/library') === 0);
 
-      var navbarCutoffWidthPx = navbarHasSearchBar ? 1171 : 800;
+      var navbarCutoffWidthPx = (
+        navbarHasSearchBar ?
+        NAVBAR_WITH_SEARCH_CUTOFF_WIDTH_PX :
+        NORMAL_NAVBAR_CUTOFF_WIDTH_PX);
       return this.getWidth() <= navbarCutoffWidthPx;
     }
   };
