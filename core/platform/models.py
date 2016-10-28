@@ -89,11 +89,6 @@ class _Gae(_Platform):
         return gae_current_user_services
 
     @classmethod
-    def import_cursor_services(cls):
-        from core.platform.cursor import gae_cursor_services
-        return gae_cursor_services
-
-    @classmethod
     def import_app_identity_services(cls):
         from core.platform.app_identity import gae_app_identity_services
         return gae_app_identity_services
@@ -146,10 +141,6 @@ class Registry(object):
     @classmethod
     def import_current_user_services(cls):
         return cls._get().import_current_user_services()
-
-    @classmethod
-    def import_cursor_services(cls):
-        return cls._get().import_cursor_services()
 
     @classmethod
     def import_transaction_services(cls):

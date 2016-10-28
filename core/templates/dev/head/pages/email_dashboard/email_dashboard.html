@@ -49,7 +49,7 @@
     <p class="success" ng-if="showSuccessMessage">Query has been submitted successfully. Check recent queries below.</p>
     <div class="oppia-recent-queries">
       <p>Recent queries:</p>
-      <table class="table" ng-if="recentQueries.length > 0">
+      <table class="table" ng-if="currentPageOfQueries.length > 0">
         <thead>
           <tr>
             <td>Query id</td>
@@ -60,7 +60,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="q in recentQueries">
+          <tr ng-repeat="q in currentPageOfQueries track by $index">
             <td><[q.id]></td>
             <td><[q.created_on]></td>
             <td><[q.submitter_id]></td>
@@ -70,8 +70,8 @@
           </tr>
         </tbody>
       </table>
-      <button ng-if="showPreviousButton()" ng-click="getPreviousRecentQueries()">Previous</button>
-      <button ng-if="showNextButton()" ng-click="getNextRecentQueries()">Next</button>
+      <button ng-if="showPreviousButton()" ng-click="getPreviousPageOfQueries()">Previous</button>
+      <button ng-if="showNextButton()" ng-click="getNextPageOfQueries()">Next</button>
     </div>
   </div>
 {% endblock %}
@@ -82,4 +82,5 @@
 {% block footer_js %}
   {{ super() }}
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/email_dashboard/EmailDashboard.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/email_dashboard/EmailDashboardServices.js"></script>
 {% endblock footer_js %}
