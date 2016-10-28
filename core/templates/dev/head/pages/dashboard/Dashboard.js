@@ -112,13 +112,15 @@ oppia.controller('Dashboard', [
       var array = [];
       if ($scope.currentSortType !== EXPLORATIONS_SORT_BY_KEYS.TITLE && 
         $scope.currentSortType !== EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED) {
-        for (var i = 0 ; i < $scope.explorationsList.length; i++) {
+        for (var i = 0; i < $scope.explorationsList.length; i++) {
           if ($scope.currentSortType !== EXPLORATIONS_SORT_BY_KEYS.RATING) {
             if ($scope.explorationsList[i].status !== 'private') {
               array.push($scope.explorationsList[i][$scope.currentSortType]);
             }
-          } else if ($scope.getAverageRating($scope.explorationsList[i][$scope.currentSortType] !== undefined)) {
-            array.push($scope.getAverageRating($scope.explorationsList[i][$scope.currentSortType]));
+          } else if ($scope.getAverageRating(
+            $scope.explorationsList[i][$scope.currentSortType] !== undefined)) {
+            array.push($scope.getAverageRating(
+              $scope.explorationsList[i][$scope.currentSortType]));
           }
         }         
       }
