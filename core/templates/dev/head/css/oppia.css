@@ -78,6 +78,9 @@ button.md-button.md-default-theme.oppia-learner-continue-button:hover {
 .material-icons.md-40 {
   font-size: 40px;
 }
+.material-icons.md-32 {
+  font-size: 32px;
+}
 .material-icons.md-dark {
   color: rgba(0, 0, 0, 0.54);
 }
@@ -493,6 +496,11 @@ textarea {
   color: rgba(0,0,0,0.87);
   opacity: 1.0;
   text-decoration: none;
+}
+@media (max-width: 1100px) {
+  .oppia-site-feedback span {
+    display: none;
+  }
 }
 
 /*
@@ -1027,6 +1035,12 @@ textarea {
   min-width: 126px;
 }
 
+.oppia-library-group-header.active {
+  color: #04857c;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+}
+
+
 @media(max-width: 720px) {
   .oppia-library-group-header {
     width: -webkit-calc(80% - 120px);
@@ -1036,38 +1050,21 @@ textarea {
   }
 }
 
-.oppia-library-group-header a, .oppia-library-group-header span, .oppia-group-page-header {
+.oppia-library-group-header a, .oppia-library-group-header span {
+  color: inherit;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+}
+
+.oppia-group-page-header {
   color: #2c4841;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
 }
+
 .oppia-library-group-header a:hover {
-  color: #0844aa;
+  color: #04857c;
+  text-decoration: none;
 }
 
-.oppia-library-group-view-all-btn {
-  background-color: rgba(1,120,109,1);
-  color: rgba(255,255,255,1.0);
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 14px;
-  margin-right: 48px;
-  margin-top: 30px;
-  position: absolute;
-  text-transform: uppercase;
-}
-
-.oppia-library-group-view-all-btn:hover,
-.oppia-library-group-view-all-btn:focus,
-.oppia-library-group-view-all-btn:active {
-  background-color: rgba(5, 190, 178, 1);
-  color: rgba(255,255,255,1);
-}
-
-@media (max-width: 992px) {
-  .oppia-library-group-view-all-btn {
-    margin-top: 18px;
-    position: inherit;
-  }
-}
 
 @media (max-width: 720px) {
   .oppia-library-group-header {
@@ -1782,7 +1779,7 @@ pre.oppia-pre-wrapped-text {
   position: relative;
 }
 .oppia-collection-player-tiles-container .oppia-page-heading {
-  color: #fff;
+  color: #005048;
 }
 
 .oppia-collection-player-tile-section {
@@ -1790,7 +1787,7 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-collection-player-small-text {
-  color: #fff;
+  color: #005048;
   font-style: italic;
   font-size: 1em;
   margin-top: 12px;
@@ -3592,6 +3589,15 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-dashboard-container a:hover {
     text-decoration: underline;
+}
+
+.oppia-dashboard-container .oppia-dashboard-list-summary,
+.oppia-dashboard-container .oppia-dashboard-list-summary:hover,
+.oppia-dashboard-container .oppia-dashboard-list-summary:active,
+.oppia-dashboard-container .oppia-dashboard-list-summary:visited {
+  color: inherit;
+  display: block;
+  text-decoration: none;
 }
 
 .oppia-activity-summary-tile:hover {

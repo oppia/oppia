@@ -1539,10 +1539,10 @@ oppia.directive('schemaBasedHtmlEditor', [function() {
 
 oppia.directive('schemaBasedListEditor', [
   'schemaDefaultValueService', 'recursionHelper', 'focusService',
-  'schemaUndefinedLastElementService',
+  'schemaUndefinedLastElementService', 'IdGenerationService',
   function(
     schemaDefaultValueService, recursionHelper, focusService,
-    schemaUndefinedLastElementService) {
+    schemaUndefinedLastElementService, IdGenerationService) {
     return {
       scope: {
         localValue: '=',
@@ -1564,7 +1564,7 @@ oppia.directive('schemaBasedListEditor', [
       controller: ['$scope', function($scope) {
         var baseFocusLabel = (
           $scope.labelForFocusTarget() ||
-          Math.random().toString(36).slice(2) + '-');
+          IdGenerationService.generateNewId() + '-');
         $scope.getFocusLabel = function(index) {
           // Treat the first item in the list as a special case -- if this list
           // is contained in another list, and the outer list is opened with a
@@ -1731,18 +1731,21 @@ oppia.directive('schemaBasedDictEditor', [
       templateUrl: 'schemaBasedEditor/dict',
       restrict: 'E',
       compile: recursionHelper.compile,
-      controller: ['$scope', function($scope) {
-        $scope.getHumanReadablePropertyDescription = function(property) {
-          return property.description || '[' + property.name + ']';
-        };
+      controller: [
+        '$scope', 'IdGenerationService',
+        function($scope, IdGenerationService) {
+          $scope.getHumanReadablePropertyDescription = function(property) {
+            return property.description || '[' + property.name + ']';
+          };
 
-        $scope.fieldIds = {};
-        for (var i = 0; i < $scope.propertySchemas().length; i++) {
-          // Generate random IDs for each field.
-          $scope.fieldIds[$scope.propertySchemas()[i].name] = (
-            Math.random().toString(36).slice(2));
+          $scope.fieldIds = {};
+          for (var i = 0; i < $scope.propertySchemas().length; i++) {
+            // Generate random IDs for each field.
+            $scope.fieldIds[$scope.propertySchemas()[i].name] = (
+              IdGenerationService.generateNewId());
+          }
         }
-      }]
+      ]
     };
   }
 ]);

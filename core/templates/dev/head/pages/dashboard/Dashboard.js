@@ -84,14 +84,16 @@ oppia.controller('Dashboard', [
       $scope.activeTab = newActiveTabName;
     };
 
-    $scope.showExplorationEditor = function(explorationId) {
-      $window.location = '/create/' + explorationId;
+    $scope.getExplorationUrl = function(explorationId) {
+      return '/create/' + explorationId;
     };
 
-    $scope.openExploration = function(status, explorationId) {
-      if (status === 'private') {
-        $scope.showExplorationEditor(explorationId);
-      } else {
+    $scope.getCollectionUrl = function(collectionId) {
+      return '/collection_editor/create/' + collectionId;
+    };
+
+    $scope.getStatsForNonPrivateExp = function(status, explorationId) {
+      if (status !== 'private') {
         DashboardBackendApiService.fetchExplorationStats(explorationId).then(
           function(response) {
             $scope.explorationStats[explorationId] = response.data;
@@ -106,10 +108,6 @@ oppia.controller('Dashboard', [
         $scope.activeExplorationId = (
           ($scope.activeExplorationId === explorationId) ? '' : explorationId);
       }
-    };
-
-    $scope.showCollectionEditor = function(collectionId) {
-      $window.location = '/collection_editor/create/' + collectionId;
     };
 
     $scope.myExplorationsView = 'card';
