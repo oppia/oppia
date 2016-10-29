@@ -218,7 +218,6 @@ oppia.controller('Dashboard', [
       return value;
     };
 
-
     $scope.topUnresolvedAnswersCount = function(exploration) {
       var topUnresolvedAnswersCount = 0;
       exploration.top_unresolved_answers.forEach(function(answer) {
