@@ -164,7 +164,17 @@
 
               <div class="oppia-library-carousel">
                 <div class="oppia-library-carousel-tiles">
-                  <exploration-summary-tile
+                  <collection-summary-tile ng-if="group.activity_summary_dicts[leftmostCardIndices[$index]].activity_type == 'collection'"
+                      collection-id="group.activity_summary_dicts[leftmostCardIndices[$index]].id"
+                      collection-title="group.activity_summary_dicts[leftmostCardIndices[$index]].title"
+                      last-updated-msec="group.activity_summary_dicts[leftmostCardIndices[$index]].last_updated_msec"
+                      objective="group.activity_summary_dicts[leftmostCardIndices[$index]].objective"
+                      node-count="group.activity_summary_dicts[leftmostCardIndices[$index]].node_count"
+                      category="group.activity_summary_dicts[leftmostCardIndices[$index]].category"
+                      thumbnail-icon-url="group.activity_summary_dicts[leftmostCardIndices[$index]].thumbnail_icon_url"
+                      thumbnail-bg-color="group.activity_summary_dicts[leftmostCardIndices[$index]].thumbnail_bg_color">
+                  </collection-summary-tile>
+                  <exploration-summary-tile ng-if="group.activity_summary_dicts[leftmostCardIndices[$index]].activity_type == 'exploration'"
                       exploration-id="group.activity_summary_dicts[leftmostCardIndices[$index]].id"
                       exploration-title="group.activity_summary_dicts[leftmostCardIndices[$index]].title"
                       last-updated-msec="group.activity_summary_dicts[leftmostCardIndices[$index]].last_updated_msec"
