@@ -567,12 +567,11 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       if (confirmDiscard) {
         alertsService.clearWarnings();
         $rootScope.$broadcast('externalSave');
-        $scope.loading = true;
         $scope.isDiscardInProgress = true;
         $modal.open({
           templateUrl: 'modals/loading',
-          backdrop: true,
           backdrop: 'static',
+          keyboard: false,
           windowClass: 'oppia-loading'
         });
         changeListService.discardAllChanges();
