@@ -44,9 +44,9 @@ function cleanup {
   # Send a kill signal to the dev server.
   kill `ps aux | grep "[Dd]ev_appserver.py --host=0.0.0.0 --port=9001" | awk '{print $2}'`
 
-  # The [Pp] is to avoid the grep finding the 'grep protractor/selenium' process
+  # The [Pp] is to avoid the grep finding the 'grep protractor/node_modules/webdriver-manager/selenium' process
   # as well. The awk command gets just the process ID from the grepped line.
-  kill `ps aux | grep [Pp]rotractor/selenium | awk '{print $2}'`
+  kill `ps aux | grep [Pp]rotractor/node_modules/webdriver-manager/selenium | awk '{print $2}'`
 
   # Wait for the servers to go down; suppress "connection refused" error output
   # from nc since that is exactly what we are expecting to happen.
@@ -97,23 +97,6 @@ fi
 # the top of the file is run.
 trap cleanup EXIT
 
-# WARNING: THIS IS A HACK WHICH SHOULD BE REMOVED AT THE EARLIEST OPPORTUNITY,
-# PROBABLY WHEN PROTRACTOR IS UPGRADED BEYOND v3.3.0.
-# Chromedriver v2.21 fails on Travis with an "unexpected alert open" error.
-# Attempt to replace it with v2.22, but rename it to 2.21 so as not to trigger
-# a version check error.
-# See https://bugs.chromium.org/p/chromedriver/issues/detail?id=1224
-if [ ${OS} == "Linux" ]; then
-  if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-    echo "  Replacing chromedriver with a newer version..."
-    curl --silent https://chromedriver.storage.googleapis.com/2.22/chromedriver_linux64.zip -o chromedriver_2.21linux64.zip
-    mv -f chromedriver_2.21linux64.zip $NODE_MODULE_DIR/protractor/selenium
-    rm $NODE_MODULE_DIR/protractor/selenium/chromedriver_2.21
-    unzip -q $NODE_MODULE_DIR/protractor/selenium/chromedriver_2.21linux64.zip -d $NODE_MODULE_DIR/protractor/selenium
-    mv $NODE_MODULE_DIR/protractor/selenium/chromedriver $NODE_MODULE_DIR/protractor/selenium/chromedriver_2.21
-    ls $NODE_MODULE_DIR/protractor/selenium
-  fi
-fi
 
 # Argument passed to gulpfile.js to help build with minification.
 MINIFICATION=false

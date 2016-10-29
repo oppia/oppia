@@ -1689,18 +1689,18 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
     COLLECTION_ID_1 = 'cid1'
     COLLECTION_ID_2 = 'cid2'
 
-    def test_is_collection_summary_editable(self):
+    def test_is_editable_by(self):
         self.save_new_default_collection(self.COLLECTION_ID, self.owner_id)
 
         # Check that only the owner may edit.
         collection_summary = collection_services.get_collection_summary_by_id(
             self.COLLECTION_ID)
-        self.assertTrue(collection_services.is_collection_summary_editable(
-            collection_summary, user_id=self.owner_id))
-        self.assertFalse(collection_services.is_collection_summary_editable(
-            collection_summary, user_id=self.editor_id))
-        self.assertFalse(collection_services.is_collection_summary_editable(
-            collection_summary, user_id=self.viewer_id))
+        self.assertTrue(collection_summary.is_editable_by(
+            user_id=self.owner_id))
+        self.assertFalse(collection_summary.is_editable_by(
+            user_id=self.editor_id))
+        self.assertFalse(collection_summary.is_editable_by(
+            user_id=self.viewer_id))
 
         # Owner makes viewer a viewer and editor an editor.
         rights_manager.assign_role_for_collection(
@@ -1713,12 +1713,12 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         # Check that owner and editor may edit, but not viewer.
         collection_summary = collection_services.get_collection_summary_by_id(
             self.COLLECTION_ID)
-        self.assertTrue(collection_services.is_collection_summary_editable(
-            collection_summary, user_id=self.owner_id))
-        self.assertTrue(collection_services.is_collection_summary_editable(
-            collection_summary, user_id=self.editor_id))
-        self.assertFalse(collection_services.is_collection_summary_editable(
-            collection_summary, user_id=self.viewer_id))
+        self.assertTrue(collection_summary.is_editable_by(
+            user_id=self.owner_id))
+        self.assertTrue(collection_summary.is_editable_by(
+            user_id=self.editor_id))
+        self.assertFalse(collection_summary.is_editable_by(
+            user_id=self.viewer_id))
 
     def test_contributor_ids(self):
         # Sign up two users.

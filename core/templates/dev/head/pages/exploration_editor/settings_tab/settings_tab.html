@@ -8,7 +8,7 @@
             <div class="form-group" ng-class="{'has-error': !explorationTitleService.displayed}">
               <label for="explorationTitle" class="col-lg-2 col-md-2 col-sm-2">Title</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
-                <input id="explorationTitle" type="text" class="form-control protractor-test-exploration-title-input" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()" placeholder="Choose a title for your exploration." focus-on="<[EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>" maxlength="40">
+                <input id="explorationTitle" type="text" class="form-control protractor-test-exploration-title-input" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()" placeholder="Choose a title for your exploration." focus-on="<[::EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>" maxlength="40">
                 <span class="help-block" style="font-size: smaller">
                   <em>Please use at most 40 characters, so that this fits in the summary card.</em>
                 </span>
@@ -75,7 +75,7 @@
                     item="$parent.explorationTagsService.displayed"
                     tag-mode="true" allow-multiple-choices="true"
                     invalid-search-term-message="Add a new tag (using lowercase letters and spaces)..."
-                    new-choice-regex="<[TAG_REGEX]>" width="100%"
+                    new-choice-regex="<[::TAG_REGEX]>" width="100%"
                     placeholder="Skills, concepts, topics, ..."
                     on-selection-change="saveExplorationTags()">
                   </select2-dropdown>

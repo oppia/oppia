@@ -28,7 +28,8 @@
                                short-summary="answerGroup | summarizeAnswerGroup : getCurrentInteractionId():getAnswerChoices():true"
                                is-active="$index === activeAnswerGroupIndex"
                                on-delete-fn="deleteAnswerGroup"
-                               outcome="answerGroup.outcome">
+                               outcome="answerGroup.outcome"
+                               num-rules="answerGroup.rule_specs.length">
               </response-header>
             </a>
 

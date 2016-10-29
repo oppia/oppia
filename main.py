@@ -176,6 +176,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.DASHBOARD_DATA_URL, dashboard.DashboardHandler),
     get_redirect_route(
+        r'%s/<exploration_id>' % feconf.DASHBOARD_EXPLORATION_STATS_PREFIX,
+        dashboard.ExplorationDashboardStatsHandler),
+    get_redirect_route(
         r'%s' % feconf.NEW_EXPLORATION_URL, dashboard.NewExploration),
     get_redirect_route(
         r'%s' % feconf.NEW_COLLECTION_URL, dashboard.NewCollection),
@@ -195,7 +198,14 @@ URLS = MAPREDUCE_HANDLERS + [
         resources.ValueGeneratorHandler),
 
     get_redirect_route(r'%s' % feconf.LIBRARY_INDEX_URL, library.LibraryPage),
-    get_redirect_route(r'/libraryindexhandler', library.LibraryIndexHandler),
+    get_redirect_route(r'%s' % feconf.LIBRARY_INDEX_DATA_URL,
+                       library.LibraryIndexHandler),
+    get_redirect_route(r'%s' % feconf.LIBRARY_RECENTLY_PUBLISHED_URL,
+                       library.LibraryGroupPage),
+    get_redirect_route(r'%s' % feconf.LIBRARY_TOP_RATED_URL,
+                       library.LibraryGroupPage),
+    get_redirect_route(r'%s' % feconf.LIBRARY_GROUP_DATA_URL,
+                       library.LibraryGroupIndexHandler),
     get_redirect_route(r'%s' % feconf.LIBRARY_SEARCH_URL, library.LibraryPage),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_SEARCH_DATA_URL, library.SearchHandler),
@@ -234,6 +244,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
         reader.ExplorationPage),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.EXPLORATION_URL_EMBED_PREFIX,
+        reader.ExplorationPageEmbed),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_INIT_URL_PREFIX,
         reader.ExplorationHandler),
@@ -356,11 +369,14 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<collection_id>' % feconf.COLLECTION_EDITOR_URL_PREFIX,
         collection_editor.CollectionEditorPage),
     get_redirect_route(
-        r'%s/<collection_id>' % feconf.COLLECTION_WRITABLE_DATA_URL_PREFIX,
-        collection_editor.WritableCollectionDataHandler),
+        r'%s/<collection_id>' % feconf.EDITABLE_COLLECTION_DATA_URL_PREFIX,
+        collection_editor.EditableCollectionDataHandler),
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_RIGHTS_PREFIX,
         collection_editor.CollectionRightsHandler),
+    get_redirect_route(
+        r'%s' % feconf.EXPLORATION_METADATA_SEARCH_URL,
+        collection_editor.ExplorationMetadataSearchHandler),
 
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),

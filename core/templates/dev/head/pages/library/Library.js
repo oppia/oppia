@@ -16,13 +16,23 @@
  * @fileoverview Data and controllers for the Oppia contributors' library page.
  */
 
+// NOTE TO DEVELOPERS: The constants defined below in LIBRARY_PAGE_MODES should
+// be same as the LIBRARY_PAGE_MODE constants defined in feconf.py. For example
+// LIBRARY_PAGE_MODES.GROUP should have the same value as
+// LIBRARY_PAGE_MODE_GROUP in feconf.py.
+oppia.constant('LIBRARY_PAGE_MODES', {
+  GROUP: 'group',
+  INDEX: 'index',
+  SEARCH: 'search'
+});
+
 oppia.controller('Library', [
   '$scope', '$http', '$rootScope', '$window', '$timeout', 'i18nIdService',
   'urlService', 'CATEGORY_LIST', 'searchService', 'windowDimensionsService',
-  'UrlInterpolationService', function(
+  'UrlInterpolationService', 'LIBRARY_PAGE_MODES', function(
       $scope, $http, $rootScope, $window, $timeout, i18nIdService,
       urlService, CATEGORY_LIST, searchService, windowDimensionsService,
-      UrlInterpolationService) {
+      UrlInterpolationService, LIBRARY_PAGE_MODES) {
     $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
     var possibleBannerFilenames = [
       'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
@@ -32,42 +42,74 @@ oppia.controller('Library', [
     $scope.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
       '/library/' + $scope.bannerImageFilename);
 
+    $scope.activeGroupIndex = null;
+
+    $scope.pageMode = GLOBALS.PAGE_MODE;
+    $scope.LIBRARY_PAGE_MODES = LIBRARY_PAGE_MODES;
     // Below is the width of each tile (width + margins), which can be found
-    // in core/templates/dev/head/components/
-    //         exploration_summary_tile_directive.html
+    // in components/summary_tile/exploration_summary_tile_directive.html
     var tileDisplayWidth = 0;
 
     // Keeps track of the index of the left-most visible card of each group.
     $scope.leftmostCardIndices = [];
 
-    $http.get('/libraryindexhandler').success(function(data) {
-      $scope.libraryGroups = data.activity_summary_dicts_by_category;
+    if ($scope.pageMode === LIBRARY_PAGE_MODES.GROUP) {
+      var pathnameArray = $window.location.pathname.split('/');
+      $scope.groupName = pathnameArray[2];
 
-      $rootScope.$broadcast(
-        'preferredLanguageCodesLoaded', data.preferred_language_codes);
+      $http.get('/librarygrouphandler', {
+        params: {
+          group_name: $scope.groupName
+        }
+      }).success(
+      function(data) {
+        $scope.activityList = data.activity_list;
 
-      $rootScope.loadingMessage = '';
+        $scope.groupHeaderI18nId = data.header_i18n_id;
 
-      // Pause is necessary to ensure all elements have loaded, same for
-      // initCarousels.
-      // TODO(sll): On small screens, the tiles do not have a defined width.
-      // The use of 214 here is a hack, and the underlying problem of the tiles
-      // not having a defined width on small screens needs to be fixed.
-      $timeout(function() {
-        tileDisplayWidth = $('exploration-summary-tile').width() || 214;
-      }, 20);
+        $rootScope.$broadcast(
+          'preferredLanguageCodesLoaded', data.preferred_language_codes);
 
-      // Initialize the carousel(s) on the library index page.
-      $timeout(initCarousels, 390);
+        $rootScope.loadingMessage = '';
+      });
+    } else {
+      $http.get('/libraryindexhandler').success(function(data) {
+        $scope.libraryGroups = data.activity_summary_dicts_by_category;
 
-      // The following initializes the tracker to have all
-      // elements flush left.
-      // Transforms the group names into translation ids
-      $scope.leftmostCardIndices = [];
-      for (i = 0; i < $scope.libraryGroups.length; i++) {
-        $scope.leftmostCardIndices.push(0);
-      }
-    });
+        $rootScope.$broadcast(
+          'preferredLanguageCodesLoaded', data.preferred_language_codes);
+
+        $rootScope.loadingMessage = '';
+
+        // Pause is necessary to ensure all elements have loaded, same for
+        // initCarousels.
+        // TODO(sll): On small screens, the tiles do not have a defined width.
+        // The use of 214 here is a hack, and the underlying problem of the
+        // tiles not having a defined width on small screens needs to be fixed.
+        $timeout(function() {
+          tileDisplayWidth = $('exploration-summary-tile').width() || 214;
+        }, 20);
+
+        // Initialize the carousel(s) on the library index page.
+        $timeout(initCarousels, 390);
+
+        // The following initializes the tracker to have all
+        // elements flush left.
+        // Transforms the group names into translation ids
+        $scope.leftmostCardIndices = [];
+        for (i = 0; i < $scope.libraryGroups.length; i++) {
+          $scope.leftmostCardIndices.push(0);
+        }
+      });
+    }
+
+    $scope.setActiveGroup = function(groupIndex) {
+      $scope.activeGroupIndex = groupIndex;
+    };
+
+    $scope.clearActiveGroup = function() {
+      $scope.activeGroupIndex = null;
+    };
 
     // If the value below is changed, the following CSS values in oppia.css
     // must be changed:
@@ -185,12 +227,10 @@ oppia.controller('Library', [
       $scope.$apply();
     });
 
-    // The following checks if the page is in search mode.
-    $scope.inSearchMode = ($window.location.pathname.indexOf('/search') === 0);
     var activateSearchMode = function() {
-      if (!$scope.inSearchMode) {
+      if ($scope.pageMode !== LIBRARY_PAGE_MODES.SEARCH) {
         $('.oppia-library-container').fadeOut(function() {
-          $scope.inSearchMode = true;
+          $scope.pageMode = LIBRARY_PAGE_MODES.SEARCH;
           $timeout(function() {
             $('.oppia-library-container').fadeIn();
           }, 50);
@@ -198,15 +238,23 @@ oppia.controller('Library', [
       }
     };
 
-    $scope.showAllResultsForCategories = function(categories) {
-      var selectedCategories = {};
-      for (i = 0; i < categories.length; i++) {
-        selectedCategories[categories[i]] = true;
-      }
+    // The following loads explorations belonging to a particular group. If
+    // fullResultsUrl is given it loads the page corresponding to the url.
+    // Otherwise, it will initiate a search query for the given list of
+    // categories.
+    $scope.showFullResultsPage = function(categories, fullResultsUrl) {
+      if (fullResultsUrl) {
+        $window.location.href = fullResultsUrl;
+      } else {
+        var selectedCategories = {};
+        for (i = 0; i < categories.length; i++) {
+          selectedCategories[categories[i]] = true;
+        }
 
-      var targetSearchQueryUrl = searchService.getSearchUrlQueryString(
-        '', selectedCategories, {});
-      $window.location.href = '/search/find?q=' + targetSearchQueryUrl;
+        var targetSearchQueryUrl = searchService.getSearchUrlQueryString(
+          '', selectedCategories, {});
+        $window.location.href = '/search/find?q=' + targetSearchQueryUrl;
+      }
     };
 
     var libraryWindowCutoffPx = 530;

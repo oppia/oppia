@@ -334,6 +334,15 @@ oppia.factory('validatorsService', [
   };
 }]);
 
+// Service for generating random IDs.
+oppia.factory('IdGenerationService', [function() {
+  return {
+    generateNewId: function() {
+      return Math.random().toString(36).slice(2);
+    }
+  };
+}]);
+
 oppia.constant('LABEL_FOR_CLEARING_FOCUS', 'labelForClearingFocus');
 
 // Service for setting focus. This broadcasts a 'focusOn' event which sets
@@ -342,7 +351,10 @@ oppia.constant('LABEL_FOR_CLEARING_FOCUS', 'labelForClearingFocus');
 // page.
 oppia.factory('focusService', [
   '$rootScope', '$timeout', 'deviceInfoService', 'LABEL_FOR_CLEARING_FOCUS',
-  function($rootScope, $timeout, deviceInfoService, LABEL_FOR_CLEARING_FOCUS) {
+  'IdGenerationService',
+  function(
+      $rootScope, $timeout, deviceInfoService, LABEL_FOR_CLEARING_FOCUS,
+      IdGenerationService) {
     var _nextLabelToFocusOn = null;
     return {
       clearFocus: function() {
@@ -366,7 +378,7 @@ oppia.factory('focusService', [
       },
       // Generates a random string (to be used as a focus label).
       generateFocusLabel: function() {
-        return Math.random().toString(36).slice(2);
+        return IdGenerationService.generateNewId();
       }
     };
   }
@@ -384,7 +396,9 @@ oppia.factory('urlService', ['$window', function($window) {
       return params;
     },
     isIframed: function() {
-      return !!(this.getUrlParams().iframed);
+      var pathname = this.getPathname();
+      var urlParts = pathname.split('/');
+      return urlParts[1] === 'embed';
     },
     getPathname: function() {
       return window.location.pathname;
@@ -569,6 +583,10 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
     registerPublishExplorationEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
         'PublishExploration', 'click', explorationId);
+    },
+    registerVisitOppiaFromIframeEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'VisitOppiaFromIframe', 'click', explorationId);
     }
   };
 }]);

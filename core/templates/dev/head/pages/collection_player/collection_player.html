@@ -14,7 +14,7 @@
 
     <style>
       html, body {
-        background: url("/assets/common/images/general/background.jpg") no-repeat center center fixed;
+        background: #afd2eb no-repeat center center fixed;
         background-size: cover;
       }
     </style>
@@ -102,11 +102,10 @@
   {{ super() }}
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_player/CollectionPlayer.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_player/CollectionNodeListDirective.js"></script>
-
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionNodeObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionPlaythroughObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/ReadOnlyCollectionBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/SkillListObjectFactory.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/attribution_guide/AttributionGuideDirective.js"></script>

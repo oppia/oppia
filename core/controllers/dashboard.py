@@ -175,17 +175,25 @@ class DashboardHandler(base.BaseHandler):
                 exploration_ids_subscribed_to))
 
         unresolved_answers_dict = (
-            stats_services.get_exps_unresolved_answers_count_for_default_rule(
+            stats_services.get_exps_unresolved_answers_for_default_rule(
                 exploration_ids_subscribed_to))
+
+        total_unresolved_answers = 0
 
         for ind, exploration in enumerate(exp_summary_list):
             exploration.update(feedback_thread_analytics[ind].to_dict())
             exploration.update({
                 'num_unresolved_answers': (
-                    unresolved_answers_dict[exploration['id']]
+                    unresolved_answers_dict[exploration['id']]['count']
                     if exploration['id'] in unresolved_answers_dict else 0
+                ),
+                'top_unresolved_answers': (
+                    unresolved_answers_dict[exploration['id']]
+                    ['unresolved_answers']
+                    [:feconf.TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD]
                 )
             })
+            total_unresolved_answers += exploration['num_unresolved_answers']
 
         exp_summary_list = sorted(
             exp_summary_list,
@@ -222,7 +230,8 @@ class DashboardHandler(base.BaseHandler):
                 self.user_id))
         dashboard_stats.update({
             'total_open_feedback': feedback_services.get_total_open_threads(
-                feedback_thread_analytics)
+                feedback_thread_analytics),
+            'total_unresolved_answers': total_unresolved_answers
         })
         if dashboard_stats and dashboard_stats.get('average_ratings'):
             dashboard_stats['average_ratings'] = (
@@ -265,6 +274,20 @@ class NotificationsHandler(base.BaseHandler):
 
         self.render_json({
             'num_unseen_notifications': num_unseen_notifications,
+        })
+
+
+class ExplorationDashboardStatsHandler(base.BaseHandler):
+    """Returns the most recent open feedback for an exploration."""
+
+    @base.require_fully_signed_up
+    def get(self, exploration_id):
+        """Handles GET requests."""
+        self.render_json({
+            'open_feedback': [
+                feedback_message.to_dict()
+                for feedback_message in
+                feedback_services.get_most_recent_messages(exploration_id)]
         })
 
 
