@@ -18,44 +18,46 @@
  */
 
 var general = require('../protractor_utils/general.js');
-var admin = require('../protractor_utils/admin.js');
 var library = require('../protractor_utils/library.js');
 var player = require('../protractor_utils/player.js');
 var users = require('../protractor_utils/users.js');
+var workflow = require('../protractor_utils/workflow.js');
 
 describe('Library pages tour', function() {
-  var EXPLORATION_TITLE = 'About Oppia';
+  var EXPLORATION_TITLE = 'Test Exploration';
+  var EXPLORATION_OBJECTIVE = 'To learn testing';
+  var EXPLORATION_CATEGORY = 'Random';
+  var EXPLORATION_LANGUAGE = 'English';
   var EXPLORATION_RATING = 4;
   var SEARCH_TERM = 'python';
   var visitLibraryPage = function() {
     browser.get(general.LIBRARY_URL_SUFFIX);
   };
 
-  it('adds a rating to an existing exploration', function() {
-    users.createAndLoginAdminUser('random@gmail.com', 'random');
-    admin.reloadAllExplorations();
-
-    visitLibraryPage();
-    element(by.css('.protractor-test-library-recently-published')).click();
-    library.playExploration(EXPLORATION_TITLE);
-
-    // Play through the exploration
-    player.submitAnswer('Continue');
-    element.all(by.css('.protractor-test-multiple-choice-option'))
-      .last().click();
-    player.submitAnswer('Continue');
-
-    player.rateExploration(EXPLORATION_RATING);
-  });
-
   it('visits the library index page', function() {
     visitLibraryPage();
   });
 
   it('visits the top rated page', function() {
+    // To visit the top rated page, atleast an
+    // exploration has to be rated by the user
+    users.createAndLoginAdminUser('random@gmail.com', 'random');
+    workflow.createAndPublishExploration(
+      EXPLORATION_TITLE,
+      EXPLORATION_CATEGORY,
+      EXPLORATION_OBJECTIVE,
+      EXPLORATION_LANGUAGE
+    );
+    visitLibraryPage();
+    library.playExploration(EXPLORATION_TITLE);
+
+    player.submitAnswer('Continue');
+    player.rateExploration(EXPLORATION_RATING);
+
     visitLibraryPage();
     element(by.css('.protractor-test-library-top-rated')).click();
     expect(browser.getCurrentUrl()).toContain('library/top_rated');
+    users.logout();
   });
 
   it('visits the recent explorations page', function() {
@@ -77,6 +79,5 @@ describe('Library pages tour', function() {
 
   afterEach(function() {
     general.checkForConsoleErrors([]);
-    users.logout();
   });
 });
