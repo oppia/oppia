@@ -3591,6 +3591,15 @@ md-card.preview-conversation-skin-supplemental-card {
     text-decoration: underline;
 }
 
+.oppia-dashboard-container .oppia-dashboard-list-summary,
+.oppia-dashboard-container .oppia-dashboard-list-summary:hover,
+.oppia-dashboard-container .oppia-dashboard-list-summary:active,
+.oppia-dashboard-container .oppia-dashboard-list-summary:visited {
+  color: inherit;
+  display: block;
+  text-decoration: none;
+}
+
 .oppia-activity-summary-tile:hover {
   /*
     This is based on the levels defined on the following page:
