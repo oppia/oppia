@@ -23,6 +23,8 @@ oppia.factory('ExplorationObjectFactory', [
   function(
       INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE, StateObjectFactory,
       UrlInterpolationService) {
+    var currentExploration = null;
+
     var Exploration = function(
         initStateName, paramChanges, paramSpecs, skinCustomizations, states,
         title, languageCode) {
@@ -124,7 +126,7 @@ oppia.factory('ExplorationObjectFactory', [
     // Static class methods. Note that "this" is not available in
     // static contexts.
     Exploration.create = function(explorationDict) {
-      return new Exploration(
+      currentExploration = new Exploration(
         explorationDict.init_state_name,
         explorationDict.param_changes,
         explorationDict.param_specs,
@@ -132,6 +134,11 @@ oppia.factory('ExplorationObjectFactory', [
         explorationDict.states,
         explorationDict.title,
         explorationDict.language_code);
+      return currentExploration;
+    };
+
+    Exploration.get = function() {
+      return currentExploration;
     };
 
     return Exploration;

@@ -23,25 +23,6 @@ var TIME_HEIGHT_CHANGE_MSEC = 500;
 var TIME_FADEIN_MSEC = 100;
 var TIME_NUM_CARDS_CHANGE_MSEC = 500;
 
-oppia.animation('.conversation-skin-responses-animate-slide', function() {
-  return {
-    removeClass: function(element, className, done) {
-      if (className !== 'ng-hide') {
-        done();
-        return;
-      }
-      element.hide().slideDown(400, done);
-    },
-    addClass: function(element, className, done) {
-      if (className !== 'ng-hide') {
-        done();
-        return;
-      }
-      element.slideUp(400, done);
-    }
-  };
-});
-
 oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
   var tutorCardLeft, tutorCardWidth, tutorCardHeight, oppiaAvatarLeft;
   var tutorCardAnimatedLeft, tutorCardAnimatedWidth;
@@ -51,7 +32,8 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
       done();
       return;
     }
-    var tutorCard = element;
+
+    var tutorCard = $('.conversation-skin-main-tutor-card');
     var supplementalCard = $('.conversation-skin-supplemental-card-container');
     var oppiaAvatar = $('.conversation-skin-oppia-avatar.show-tutor-card');
     oppiaAvatarLeft = supplementalCard.position().left +
@@ -69,7 +51,6 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
       tutorCardAnimatedLeft = oppiaAvatarLeft;
       tutorCardAnimatedWidth = 0;
     }
-
     oppiaAvatar.hide();
     tutorCard.css({
       'min-width': 0
@@ -97,7 +78,7 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
       done();
       return;
     }
-    var tutorCard = element;
+    var tutorCard = $('.conversation-skin-main-tutor-card');
     $('.conversation-skin-oppia-avatar.show-tutor-card').hide(0, function() {
       tutorCard.css({
         left: tutorCardAnimatedLeft,
@@ -206,47 +187,6 @@ oppia.animation('.conversation-skin-animate-cards', function() {
   };
 });
 
-oppia.animation('.conversation-skin-animate-card-contents', function() {
-  var animateCardChange = function(element, className, done) {
-    if (className !== 'animate-card-change') {
-      return;
-    }
-
-    var currentHeight = element.height();
-    var expectedNextHeight = $(
-      '.conversation-skin-future-tutor-card ' +
-      '.conversation-skin-tutor-card-content'
-    ).height();
-
-    // Fix the current card height, so that it does not change during the
-    // animation, even though its contents might.
-    element.css('height', currentHeight);
-
-    jQuery(element).animate({
-      opacity: 0
-    }, TIME_FADEOUT_MSEC).animate({
-      height: expectedNextHeight
-    }, TIME_HEIGHT_CHANGE_MSEC).animate({
-      opacity: 1
-    }, TIME_FADEIN_MSEC, function() {
-      element.css('height', '');
-      done();
-    });
-
-    return function(cancel) {
-      if (cancel) {
-        element.css('opacity', '1.0');
-        element.css('height', '');
-        element.stop();
-      }
-    };
-  };
-
-  return {
-    addClass: animateCardChange
-  };
-});
-
 oppia.directive('conversationSkin', ['urlService', function(urlService) {
   return {
     restrict: 'E',
@@ -305,7 +245,6 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
 
         $scope.activeCard = null;
         $scope.numProgressDots = 0;
-        $scope.arePreviousResponsesShown = false;
 
         $scope.upcomingStateName = null;
         $scope.upcomingContentHtml = null;
@@ -381,9 +320,10 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
         // Navigates to the currently-active card, and resets the 'show previous
         // responses' setting.
         var _navigateToActiveCard = function() {
+          $scope.$broadcast('activeCardChanged');
+
           var index = playerPositionService.getActiveCardIndex();
           $scope.activeCard = playerTranscriptService.getCard(index);
-          $scope.arePreviousResponsesShown = false;
           $scope.clearHelpCard();
           tutorCardIsDisplayedIfNarrow = true;
           if (_nextFocusLabel && playerTranscriptService.isLastCard(index)) {
@@ -466,10 +406,6 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
           }
         };
 
-        $scope.toggleShowPreviousResponses = function() {
-          $scope.arePreviousResponsesShown = !$scope.arePreviousResponsesShown;
-        };
-
         $scope.initializePage = function() {
           $scope.waitingForOppiaFeedback = false;
           hasInteractedAtLeastOnce = false;
@@ -478,7 +414,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
           playerPositionService.init(_navigateToActiveCard);
           oppiaPlayerService.init(function(exploration, initHtml, newParams) {
             $scope.exploration = exploration;
-
+            $scope.$broadcast('explorationAvailable');
             $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
             _nextFocusLabel = focusService.generateFocusLabel();
 
@@ -584,6 +520,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
                   $scope.upcomingParams = newParams;
                   $scope.upcomingContentHtml = (
                     contentHtml + oppiaPlayerService.getRandomSuffix());
+
                   var _isNextInteractionInline = (
                     $scope.exploration.isInteractionInline(newStateName));
                   $scope.upcomingInlineInteractionHtml = (
@@ -591,6 +528,14 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
                     oppiaPlayerService.getInteractionHtml(
                       newStateName, _nextFocusLabel
                     ) + oppiaPlayerService.getRandomSuffix() : '');
+
+                  $scope.$broadcast('destinationCardAvailable', {
+                    upcomingStateName: $scope.upcomingStateName,
+                    upcomingParams: $scope.upcomingParams,
+                    upcomingContentHtml: $scope.upcomingContentHtml,
+                    upcomingInlineInteractionHtml:
+                        $scope.upcomingInlineInteractionHtml
+                  });
 
                   if (feedbackHtml) {
                     playerTranscriptService.addNewFeedback(feedbackHtml);
@@ -651,6 +596,12 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
           },
           TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC + TIME_FADEIN_MSEC +
           TIME_PADDING_MSEC);
+        };
+
+        $scope.showUpcomingCard = function() {
+          $scope.showPendingCard(
+            $scope.upcomingStateName, $scope.upcomingParams,
+            $scope.upcomingContentHtml);
         };
 
         var scrollToBottom = function() {

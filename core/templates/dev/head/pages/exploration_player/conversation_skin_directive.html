@@ -1,25 +1,4 @@
 <script type="text/ng-template" id="skins/Conversation">
-  <!--
-    Off-screen preview of the next card in order to pre-determine the target
-    height for the card content transition animation.
-  -->
-  <div class="conversation-skin-future-tutor-card" aria-hidden="true">
-    <div class="conversation-skin-tutor-card-content">
-      <div class="conversation-skin-tutor-card-top-section">
-        <div class="conversation-skin-tutor-card-top-content"
-             angular-html-bind="upcomingContentHtml">
-        </div>
-      </div>
-
-      <div ng-if="upcomingInlineInteractionHtml">
-        <div class="conversation-skin-inline-interaction">
-          <div angular-html-bind="upcomingInlineInteractionHtml">
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div role="main" style="margin: 0 auto; position: relative;" ng-if="hasFullyLoaded">
     <progress-dots num-dots="numProgressDots"
                    class="conversation-skin-progress-dots"
@@ -28,6 +7,15 @@
 
     <div class="conversation-skin-cards-container conversation-skin-animate-cards"
          ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
+      <tutor-card
+                  ng-show="!isViewportNarrow() || isScreenNarrowAndShowingTutorCard()"
+                  show-next-card="showUpcomingCard()"
+                  show-supplemental-card="showSupplementalCardIfScreenIsNarrow()"
+                  start-card-change-animation="startCardChangeAnimation"
+                  ng-class="{ 'conversation-skin-animate-tutor-card-on-narrow': isViewportNarrow() && isCurrentSupplementalCardNonempty()}">
+      </tutor-card>
+
+<!--
       <div ng-show='!isViewportNarrow() || isScreenNarrowAndShowingTutorCard()'
            class="conversation-skin-main-tutor-card"
            ng-class="{'animate-card-width': startCardChangeAnimation,
@@ -71,7 +59,7 @@
             </div>
           </div>
 
-          <!-- If the interaction is inline, always show the most recent response pair, if there is one. -->
+           If the interaction is inline, always show the most recent response pair, if there is one.
           <div class="conversation-skin-tutor-card-bottom-section" ng-if="exploration.isInteractionInline(activeCard.stateName) && activeCard.answerFeedbackPairs.length > 0">
             <answer-feedback-pair data="activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1]"
                                   profile-picture="profilePicture"
@@ -79,7 +67,7 @@
             </answer-feedback-pair>
           </div>
 
-          <!--
+
             Show the interaction (if it is inline), the interaction instructions
             (if the interaction is supplemental), or a continuation button (if
             Oppia has given feedback and the learner is being asked to move on
@@ -87,7 +75,7 @@
 
             In addition, if the exploration is iframed, the terminal card will
             have no learner input section, so we do not show it.
-          -->
+
           <div ng-if="exploration.isInteractionInline(activeCard.stateName) && !waitingForOppiaFeedback &&
           ((activeCard.interactionHtml && !activeCard.destStateName) || activeCard.destStateName) &&
           (!isOnTerminalCard() || !isIframed || activeCard.destStateName) && isCurrentCardAtEndOfTranscript()">
@@ -128,7 +116,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
 
       <div ng-if="isCurrentSupplementalCardNonempty()"
            class="conversation-skin-supplemental-card-container">
@@ -270,56 +258,13 @@
       left: -20px;
     }
 
-    .conversation-skin-tutor-card-top-section .conversation-skin-oppia-avatar {
-      height: 48px;
-      left: -28px;
-      width: 48px;
-    }
-
-    .conversation-skin-inline-interaction .conversation-skin-user-avatar {
-      left: -20px;
-      top: 14px;
-    }
 
     .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
       right: -20px;
     }
 
-    .conversation-skin-tutor-card-middle-section .conversation-skin-user-avatar,
-    .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-avatar {
-      display: none;
-    }
 
-    .conversation-skin-responses-dropdown-icon {
-      -moz-transition: all 0.2s;
-      -o-transition: all 0.2s;
-      -webkit-transition: all 0.2s;
-      font-size: 10px;
-      margin-bottom: -4px;
-      transition: 0.2s;
-    }
 
-    .conversation-skin-responses-dropdown-icon-rotated {
-      -moz-transform: rotate(90deg);
-      -o-transform: rotate(90deg);
-      -webkit-transform: rotate(90deg);
-      transform: rotate(90deg);
-    }
-
-    .conversation-skin-responses-dropdown-container {
-      border-bottom: 1px solid #ccc;
-      cursor: pointer;
-      line-height: 0.1em;
-      margin: 8px 20px 20px 20px;
-      text-align: center;
-    }
-
-    .conversation-skin-responses-dropdown-text {
-      background-color: #fff;
-      color: #888;
-      font-size: 0.8em;
-      padding: 0 10px;
-    }
 
     .conversation-skin-bottom-gadget-panel {
       bottom: 4px;
@@ -419,24 +364,12 @@
       z-index: 200;
     }
 
-    .conversation-skin-main-tutor-card.animate-card-width {
-      -webkit-transition: width 500ms;
-      transition: width 500ms;
-    }
-
-    .conversation-skin-future-tutor-card {
-      left: -30000px;
-      position: absolute;
-      top: -30000px;
-    }
-
-    .conversation-skin-tutor-card-top-section,
+    /* TODO: do need it? ;*/
     .conversation-skin-oppia-feedback-container,
     .conversation-skin-learner-answer-container {
       position: relative;
     }
 
-    .conversation-skin-tutor-card-top-section,
     .conversation-skin-oppia-feedback-container,
     .conversation-skin-learner-answer-container {
       padding: 0 20px;
@@ -447,7 +380,6 @@
          .form-control.oppia-rte-content > div > p' selectors specifying
         the same line-height, margin-top and margin-bottom attributes)
     */
-    .conversation-skin-tutor-card-top-content > p,
     .conversation-skin-oppia-feedback-content > p,
     .conversation-skin-learner-answer-content > p,
     .conversation-skin-help-card-content > p {
@@ -485,9 +417,6 @@
       margin-bottom: 12px;
     }
 
-    .conversation-skin-tutor-card-top-content {
-      width: 100%;
-    }
 
     .conversation-skin-tutor-card-top-content,
     .conversation-skin-help-card-content {
@@ -520,13 +449,6 @@
       text-align: right;
     }
 
-    .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content {
-      background-color: rgba(236,239,241,0.4);
-    }
-
-    .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-feedback-content {
-      background-color: rgba(224,242,241,0.4);
-    }
 
     .conversation-skin-tutor-card-top-content::before,
     .conversation-skin-oppia-feedback-content::before,
@@ -546,20 +468,6 @@
       position: absolute;
       right: -8px;
       top: 0;
-    }
-
-    .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-feedback-content::before,
-    .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content::before {
-      display: none;
-    }
-
-    .conversation-skin-inline-interaction {
-      background-color: rgba(236,239,241,1);
-      border-bottom-left-radius: 2px;
-      border-bottom-right-radius: 2px;
-      margin-top: 8px;
-      padding: 16px 20px;
-      position: relative;
     }
 
     .conversation-skin-learner-answer,
@@ -632,24 +540,12 @@
       transition: all ease-out 0.4s;
     }
 
-    .conversation-skin-main-tutor-card.ng-hide {
-      opacity: 0;
-      transform: translateX(-1000px);
-    }
 
     .conversation-skin-supplemental-card.ng-hide {
       opacity: 0;
       transform: translateX(1000px);
     }
 
-    .conversation-skin-main-tutor-card .instructions-button {
-        background: inherit;
-        border: none;
-    }
-
-    .conversation-skin-tutor-card-content {
-      word-wrap: break-word;
-    }
 
     @media screen and (max-width: 959px) {
       .conversation-skin-cards-container {
@@ -660,16 +556,13 @@
       }
 
       .conversation-skin-main-tutor-card {
+        position: absolute;
         left: 0px;
         margin: 0 auto;
         right: 0px;
         top: 40px;
         width: 100%;
         z-index: 15;
-      }
-
-      .has-shadow {
-        box-shadow: 0 10px 10px rgba(0,0,0,0.24), 0 10px 10px rgba(0,0,0,0.24);
       }
 
       .conversation-skin-supplemental-card-container {
@@ -690,17 +583,6 @@
         top: 0px;
         width: 100%;
         z-index: 14;
-      }
-
-      .conversation-skin-main-tutor-card .instructions-button {
-        background-color: #0D48A1;
-        color: #ffffff;
-        padding: 6px 12px;
-      }
-
-      .conversation-skin-main-tutor-card button.md-button.md-default-theme.instructions-button:focus,
-      .conversation-skin-main-tutor-card button.md-button.md-default-theme.instructions-button:hover {
-        background-color: #115FD4;
       }
 
       .conversation-skin-user-avatar,
