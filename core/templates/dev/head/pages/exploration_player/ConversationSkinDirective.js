@@ -253,16 +253,8 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
         $scope.helpCardHtml = null;
         $scope.helpCardHasContinueButton = false;
 
-        $scope.profilePicture = (
-          UrlInterpolationService.getStaticImageUrl(
-          '/avatar/user_blue_72px.png'));
-
         $scope.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER =
           GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER;
-
-        oppiaPlayerService.getUserProfileImage().then(function(result) {
-          $scope.profilePicture = result;
-        });
 
         $scope.clearHelpCard = function() {
           $scope.helpCardHtml = null;
@@ -494,6 +486,10 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
                       !$scope.exploration.isInteractionInline(
                         $scope.activeCard.stateName)) {
                     $scope.helpCardHtml = feedbackHtml;
+                    $scope.$broadcast('helpCardAvailable', {
+                      helpCardHtml: feedbackHtml,
+                      hasContinueButton: false
+                    });
                   }
                   if (refreshInteraction) {
                     // Replace the previous interaction with another of the
@@ -544,6 +540,10 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
                           $scope.activeCard.stateName)) {
                       $scope.helpCardHtml = feedbackHtml;
                       $scope.helpCardHasContinueButton = true;
+                      $scope.$broadcast('helpCardAvailable', {
+                        helpCardHtml: feedbackHtml,
+                        hasContinueButton: true
+                      });
                     }
 
                     _nextFocusLabel = $scope.CONTINUE_BUTTON_FOCUS_LABEL;

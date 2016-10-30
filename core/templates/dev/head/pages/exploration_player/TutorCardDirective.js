@@ -111,12 +111,12 @@ oppia.directive('tutorCard', ['$compile', function($compile) {
 
       $scope.arePreviousResponsesShown = false;
 
-      $scope.profilePicture = (UrlInterpolationService.getStaticImageUrl(
-          '/avatar/user_blue_72px.png'));
-
       $scope.OPPIA_AVATAR_IMAGE_URL = (
         UrlInterpolationService.getStaticImageUrl(
           '/avatar/oppia_black_72px.png'));
+
+      $scope.profilePicture = (UrlInterpolationService.getStaticImageUrl(
+          '/avatar/user_blue_72px.png'));
 
       oppiaPlayerService.getUserProfileImage().then(function(result) {
         $scope.profilePicture = result;

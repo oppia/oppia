@@ -127,6 +127,10 @@
              ng-click="showTutorCardIfScreenIsNarrow()" alt="">
 
         <div ng-if="isScreenNarrowAndShowingTutorCard()" class="supplemental-mask"></div>
+
+        <supplemental-card show-next-card="showUpcomingCard()"></supplemental-card>
+<!--
+        <div ng-if="isScreenNarrowAndShowingTutorCard()" class="supplemental-mask"></div>
         <div ng-class="{'conversation-skin-help-card help-card-standard': !isWindowTall(),
                         'conversation-skin-help-card help-card-tall': isWindowTall()}" ng-if="helpCardHtml">
           <img class="conversation-skin-oppia-avatar"
@@ -148,7 +152,7 @@
 
         <div class="protractor-test-conversation-input"
              angular-html-bind="activeCard.interactionHtml">
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
