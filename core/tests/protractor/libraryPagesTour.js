@@ -39,7 +39,7 @@ describe('Library pages tour', function() {
   });
 
   it('visits the top rated page', function() {
-    // To visit the top rated page, atleast an
+    // To visit the top rated page, at least one
     // exploration has to be rated by the user
     users.createAndLoginAdminUser('random@gmail.com', 'random');
     workflow.createAndPublishExploration(
