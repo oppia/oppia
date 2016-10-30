@@ -1,0 +1,124 @@
+<script type="text/ng-template" id="pages/admin/jobs_tab_directive">
+  <md-card class="oppia-page-card oppia-long-text" style="max-width: 900px">
+    <h3>Continuous computations</h3>
+    <table class="table">
+      <tr>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Last started</th>
+        <th>Last stop signal sent</th>
+        <th>Last finished</th>
+        <th>Active realtime layer</th>
+        <th>Controls</th>
+      </tr>
+      {% for computation in continuous_computations_data %}
+        <tr>
+          <td>{{computation.computation_type}}</td>
+          <td>{{computation.status_code}}</td>
+          <td>{{computation.human_readable_last_started}}</td>
+          <td>{{computation.human_readable_last_stopped}}</td>
+          <td>{{computation.human_readable_last_finished}}</td>
+          <td>{{computation.active_realtime_layer_index}}</td>
+          <td>
+        {% if computation.is_startable %}
+          <button ng-click="startComputation('{{computation.computation_type}}')">
+            Start
+          </button>
+        {% endif %}
+        {% if computation.is_stoppable %}
+          <button ng-click="stopComputation('{{computation.computation_type}}')">
+            Stop
+          </button>
+        {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  </md-card>
+
+  <md-card class="oppia-page-card oppia-long-text" style="max-width: 900px">
+    <h3>One-off jobs</h3>
+    <h4>Current time: {{human_readable_current_time}}</h4>
+    <table class="table table-striped">
+      {% for job_spec in one_off_job_specs %}
+        <tr>
+          <td>
+            {{job_spec.job_type}}
+          </td>
+          <td>
+            <button class="pull-right" ng-click="startNewJob('{{job_spec.job_type}}')">
+              Start new job
+            </button>
+            {% if job_spec.is_queued_or_running %}
+              <span class="oppia-serious-warning-text">
+                <strong>(warning: an instance of this job type is already running)</strong>
+              </span>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  </md-card>
+
+  <md-card class="oppia-page-card oppia-long-text" style="max-width: 900px">
+    <h3>Unfinished jobs</h3>
+    <em>Note: This table may be stale; refresh to see the latest state.</em>
+    <table class="table">
+      <tr>
+        <th>Job ID</th>
+        <th>Status</th>
+        <th>Time started</th>
+        <th>Time finished</th>
+        <th></th>
+      </tr>
+      {% for job in unfinished_job_data %}
+        <tr>
+          <td>{{job.id}}</td>
+          <td>{{job.status_code}}</td>
+          <td>{{job.human_readable_time_started}}</td>
+          <td>{{job.human_readable_time_finished}}</td>
+          <td>
+            {% if job.can_be_canceled %}
+              <button ng-click="cancelJob('{{job['id']}}', '{{job['job_type']}}')">
+                Cancel
+              </button>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  </md-card>
+
+  <md-card class="oppia-page-card oppia-long-text" style="max-width: 900px">
+    <h3>Recent jobs</h3>
+    <em>Note: This table may be stale; refresh to see the latest state.</em>
+    <table class="table">
+      <tr>
+        <th>Job ID</th>
+        <th>Status</th>
+        <th>Time started</th>
+        <th>Time finished</th>
+        <th></th>
+      </tr>
+      {% for job in recent_job_data %}
+        <tr>
+          <td>{{job.id}}</td>
+          <td>{{job.status_code}}</td>
+          <td>{{job.human_readable_time_started}}</td>
+          <td>{{job.human_readable_time_finished}}</td>
+          <td>
+            <button ng-click="showJobOutput('{{job['id']}}')">
+              View Output
+            </button>
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+    <div ng-show="showingJobOutput" id="job-output">
+      <h4>Job Output</h4>
+      <p>
+        <[jobOutput]>
+      </p>
+    </div>
+  </md-card>
+</script>
