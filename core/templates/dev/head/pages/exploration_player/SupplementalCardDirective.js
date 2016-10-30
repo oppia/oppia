@@ -46,6 +46,7 @@ oppia.directive('supplementalCard', [function() {
       };
 
       $scope.submitAnswer = function(answer, interactionRulesService) {
+        $scope.clearHelpCard();
         $scope.$parent.submitAnswer(answer, interactionRulesService);
       };
 

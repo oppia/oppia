@@ -6,14 +6,17 @@
     </progress-dots>
 
     <div class="conversation-skin-cards-container conversation-skin-animate-cards"
+
          ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
-      <tutor-card
-                  ng-show="!isViewportNarrow() || isScreenNarrowAndShowingTutorCard()"
+      <div class="conversation-skin-tutor-card-container"
+          ng-show="!isViewportNarrow() || isScreenNarrowAndShowingTutorCard()"
+          ng-class="{ 'conversation-skin-animate-tutor-card-on-narrow': isViewportNarrow() && isCurrentSupplementalCardNonempty()}">
+        <tutor-card
                   show-next-card="showUpcomingCard()"
                   show-supplemental-card="showSupplementalCardIfScreenIsNarrow()"
-                  start-card-change-animation="startCardChangeAnimation"
-                  ng-class="{ 'conversation-skin-animate-tutor-card-on-narrow': isViewportNarrow() && isCurrentSupplementalCardNonempty()}">
-      </tutor-card>
+                  start-card-change-animation="startCardChangeAnimation">
+        </tutor-card>
+      </div>
 
 <!--
       <div ng-show='!isViewportNarrow() || isScreenNarrowAndShowingTutorCard()'
@@ -291,7 +294,7 @@
       width: 100%;
     }
 
-    .conversation-skin-main-tutor-card,
+    .conversation-skin-tutor-card-container,
     .conversation-skin-future-tutor-card {
       background: #fff;
       border-radius: 2px;
@@ -504,7 +507,7 @@
         width: 100%;
       }
 
-      .conversation-skin-main-tutor-card {
+      .conversation-skin-tutor-card-container {
         position: absolute;
         left: 0px;
         margin: 0 auto;

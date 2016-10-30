@@ -33,7 +33,7 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
       return;
     }
 
-    var tutorCard = $('.conversation-skin-main-tutor-card');
+    var tutorCard = $('.conversation-skin-tutor-card-container');
     var supplementalCard = $('.conversation-skin-supplemental-card-container');
     var oppiaAvatar = $('.conversation-skin-oppia-avatar.show-tutor-card');
     oppiaAvatarLeft = supplementalCard.position().left +
@@ -78,7 +78,7 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
       done();
       return;
     }
-    var tutorCard = $('.conversation-skin-main-tutor-card');
+    var tutorCard = $('.conversation-skin-tutor-card-container');
     $('.conversation-skin-oppia-avatar.show-tutor-card').hide(0, function() {
       tutorCard.css({
         left: tutorCardAnimatedLeft,
@@ -250,16 +250,8 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
         $scope.upcomingContentHtml = null;
         $scope.upcomingInlineInteractionHtml = null;
 
-        $scope.helpCardHtml = null;
-        $scope.helpCardHasContinueButton = false;
-
         $scope.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER =
           GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER;
-
-        $scope.clearHelpCard = function() {
-          $scope.helpCardHtml = null;
-          $scope.helpCardHasContinueButton = false;
-        };
 
         $scope.getContentFocusLabel = function(index) {
           return CONTENT_FOCUS_LABEL_PREFIX + index;
@@ -316,7 +308,6 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
 
           var index = playerPositionService.getActiveCardIndex();
           $scope.activeCard = playerTranscriptService.getCard(index);
-          $scope.clearHelpCard();
           tutorCardIsDisplayedIfNarrow = true;
           if (_nextFocusLabel && playerTranscriptService.isLastCard(index)) {
             focusService.setFocusIfOnDesktop(_nextFocusLabel);
@@ -450,8 +441,6 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
             return;
           }
 
-          $scope.clearHelpCard();
-
           _answerIsBeingProcessed = true;
           hasInteractedAtLeastOnce = true;
           $scope.waitingForOppiaFeedback = true;
@@ -485,7 +474,6 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
                   if (feedbackHtml &&
                       !$scope.exploration.isInteractionInline(
                         $scope.activeCard.stateName)) {
-                    $scope.helpCardHtml = feedbackHtml;
                     $scope.$broadcast('helpCardAvailable', {
                       helpCardHtml: feedbackHtml,
                       hasContinueButton: false
@@ -538,8 +526,6 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
 
                     if (!$scope.exploration.isInteractionInline(
                           $scope.activeCard.stateName)) {
-                      $scope.helpCardHtml = feedbackHtml;
-                      $scope.helpCardHasContinueButton = true;
                       $scope.$broadcast('helpCardAvailable', {
                         helpCardHtml: feedbackHtml,
                         hasContinueButton: true

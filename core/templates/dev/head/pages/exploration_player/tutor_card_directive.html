@@ -20,7 +20,7 @@
     </div>
   </div>
 
-  <div class="conversation-skin-main-tutor-card"
+  <div class="conversation-skin-main-tutor-card-edit"
        ng-class="{'animate-card-width': startCardChangeAnimation,
                   'has-shadow': isViewportNarrow() && !isInteractionInline}">
     <div class="conversation-skin-tutor-card-content conversation-skin-animate-card-contents"
@@ -134,19 +134,19 @@
       display: none;
     }
 
-    .conversation-skin-main-tutor-card .instructions-button {
+    .conversation-skin-main-tutor-card-edit .instructions-button {
         background: inherit;
         border: none;
     }
 
-    .conversation-skin-main-tutor-card.animate-card-width {
+    .conversation-skin-main-tutor-card-edit.animate-card-width {
       -webkit-transition: width 500ms;
       transition: width 500ms;
     }
 
     .conversation-skin-future-tutor-card {
       left: -30000px;
-      position: absolute;
+      position: fixed;
       top: -30000px;
     }
 
@@ -182,7 +182,7 @@
       display: none;
     }
 
-    .conversation-skin-main-tutor-card.ng-hide {
+    .conversation-skin-main-tutor-card-edit.ng-hide {
       opacity: 0;
       transform: translateX(-1000px);
     }
@@ -238,7 +238,7 @@
     }
 
     @media screen and (max-width: 959px) {
-      .conversation-skin-main-tutor-card .instructions-button {
+      .conversation-skin-main-tutor-card-edit .instructions-button {
         background-color: #0D48A1;
         color: #ffffff;
         padding: 6px 12px;
@@ -248,8 +248,8 @@
         box-shadow: 0 10px 10px rgba(0,0,0,0.24), 0 10px 10px rgba(0,0,0,0.24);
       }
 
-      .conversation-skin-main-tutor-card button.md-button.md-default-theme.instructions-button:focus,
-      .conversation-skin-main-tutor-card button.md-button.md-default-theme.instructions-button:hover {
+      .conversation-skin-main-tutor-card-edit button.md-button.md-default-theme.instructions-button:focus,
+      .conversation-skin-main-tutor-card-edit button.md-button.md-default-theme.instructions-button:hover {
         background-color: #115FD4;
       }
     }
