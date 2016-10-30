@@ -25,8 +25,8 @@ from core.domain import rte_component_registry
 
 
 def filter_a(name, value):
-    """Returns whether the given attribute of an anchor ('a') tag should be 
-    whitelisted.
+    """Returns whether the given attribute of an anchor ('a') tag should be whit
+    elisted.
 
     Args:
         name: The name of the attribute.
@@ -72,15 +72,15 @@ ATTRS_WHITELIST = {
 
 
 def clean(user_submitted_html):
-    """Cleans a piece of user submitted HTML. This only allows HTML from a rest-
-    -ricted set of tags, attrs and styles.
+    """Cleans a piece of user submitted HTML. This only allows HTML from a restr
+    icted set of tags, attrs and styles.
 
     Args:
         user_submitted_html: str. An HTML string submitted by a user.
 
     Returns:
-        str. The HTML string submitted by the user, after stripping out unrecog-
-        nized tags and attributes.
+        str. The HTML string submitted by the user, after stripping out unrecogn
+        ized tags and attributes.
     """
     oppia_custom_tags = (
         rte_component_registry.Registry.get_tag_list_with_attrs())
