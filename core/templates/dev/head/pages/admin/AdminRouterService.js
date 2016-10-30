@@ -29,9 +29,6 @@ oppia.factory('AdminRouterService', [
   function(ADMIN_TAB_URLS) {
     var currentTabHash = ADMIN_TAB_URLS.ACTIVITIES;
 
-    var _showTab = function(tabHash) {
-      currentTabHash = tabHash;
-    };
     var getTabNameByHash = function(tabHash) {
       for (var tabName in ADMIN_TAB_URLS) {
         if (ADMIN_TAB_URLS[tabName] === tabHash) {
@@ -47,15 +44,8 @@ oppia.factory('AdminRouterService', [
        */
       showTab: function(tabHash) {
         if (getTabNameByHash(tabHash)) {
-          _showTab(tabHash);
+          currentTabHash = tabHash;
         }
-      },
-
-      /**
-       * Returns the current tab
-       */
-      getCurrentTab: function() {
-        return getTabNameByHash(currentTabHash);
       },
 
       /**
