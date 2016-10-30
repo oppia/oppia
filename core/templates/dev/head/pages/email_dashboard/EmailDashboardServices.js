@@ -17,7 +17,7 @@
  */
 
 oppia.factory('EmailDashboardDataService', [
-  '$http', '$timeout', function($http, $timeout) {
+  '$http', '$q', function($http, $q) {
     var QUERY_DATA_URL = '/emaildashboarddatahandler';
     var QUERY_STATUS_CHECK_URL = '/querystatuscheck';
     // No. of query results to display on a single page.
@@ -32,7 +32,7 @@ oppia.factory('EmailDashboardDataService', [
     var fetchQueriesPage = function(pageSize, cursor) {
       return $http.get(QUERY_DATA_URL, {
         params: {
-          num_of_queries_per_page: pageSize,
+          num_queries_to_fetch: pageSize,
           cursor: cursor
         }
       }).then(function(response) {
@@ -53,66 +53,70 @@ oppia.factory('EmailDashboardDataService', [
         return latestCursor;
       },
 
-      submitQuery: function(data, callback) {
-        var startQueryIndex = (currentPageIndex) * QUERIES_PER_PAGE;
+      submitQuery: function(data) {
+        var startQueryIndex = currentPageIndex * QUERIES_PER_PAGE;
         var endQueryIndex = (currentPageIndex + 1) * QUERIES_PER_PAGE;
 
-        $http.post(QUERY_DATA_URL, {
+        return $http.post(QUERY_DATA_URL, {
           data: data
-        }).success(function() {
-          // Wait for 500ms and then fetch details of newly submitted query.
-          $timeout(function() {
-            fetchQueriesPage(1, null).then(function(data) {
-              var newQueries = [data.recent_queries[0]];
-              queries = newQueries.concat(queries);
-              callback(queries.slice(startQueryIndex, endQueryIndex));
-            });
-          }, 500);
+        }).then(function(response) {
+          var data = response.data;
+          var newQueries = [data.query];
+          queries = newQueries.concat(queries);
+          return queries.slice(startQueryIndex, endQueryIndex);
         });
       },
 
-      getNextQueries: function(callback) {
+      getNextQueries: function() {
         var startQueryIndex = (currentPageIndex + 1) * QUERIES_PER_PAGE;
         var endQueryIndex = (currentPageIndex + 2) * QUERIES_PER_PAGE;
-        currentPageIndex = currentPageIndex + 1;
 
-        if (queries.length > endQueryIndex) {
-          callback(queries.slice(startQueryIndex, endQueryIndex));
+        if (queries.length >= endQueryIndex ||
+            (latestCursor === null && currentPageIndex !== -1)) {
+          currentPageIndex = currentPageIndex + 1;
+          return $q(function(resolver) {
+            resolver(queries.slice(startQueryIndex, endQueryIndex));
+          });
         } else {
-          fetchQueriesPage(QUERIES_PER_PAGE, latestCursor).then(function(data) {
+          currentPageIndex = currentPageIndex + 1;
+          return fetchQueriesPage(QUERIES_PER_PAGE, latestCursor)
+          .then(function(data) {
             queries = queries.concat(data.recent_queries);
             latestCursor = data.cursor;
-            callback(queries.slice(startQueryIndex, endQueryIndex));
+            return queries.slice(startQueryIndex, endQueryIndex);
           });
         }
       },
 
       getPreviousQueries: function() {
         var startQueryIndex = (currentPageIndex - 1) * QUERIES_PER_PAGE;
-        var endQueryIndex = (currentPageIndex) * QUERIES_PER_PAGE;
+        var endQueryIndex = currentPageIndex * QUERIES_PER_PAGE;
         currentPageIndex = currentPageIndex - 1;
         return queries.slice(startQueryIndex, endQueryIndex);
       },
 
       isNextPageAvailable: function() {
         var nextQueryIndex = (currentPageIndex + 1) * QUERIES_PER_PAGE;
-        return !(queries.length <= nextQueryIndex) || Boolean(latestCursor);
+        return (queries.length > nextQueryIndex) || Boolean(latestCursor);
       },
 
       isPreviousPageAvailable: function() {
         return (currentPageIndex > 0);
       },
 
-      recheckQueryStatus: function(index, callback) {
-        var queryIndex = (currentPageIndex) * QUERIES_PER_PAGE + index;
-        $http.get(QUERY_STATUS_CHECK_URL, {
+      fetchQuery: function(queryId) {
+        return $http.get(QUERY_STATUS_CHECK_URL, {
           params: {
-            query_id: queries[queryIndex].id
+            query_id: queryId
           }
         }).then(function(response) {
           var data = response.data;
-          queries[queryIndex] = data.query;
-          callback(index, data.query);
+          queries.forEach(function(query, index, queries) {
+            if (query.id === queryId) {
+              queries[index] = data.query;
+            }
+          });
+          return data.query;
         });
       }
     };

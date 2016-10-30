@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for query handler."""
+"""Tests for email dashboard handler."""
 
 from core.domain import config_services
 from core.platform import models
@@ -42,7 +42,6 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
             [self.SUBMITTER_USERNAME])
 
     def test_that_handler_works_correctly(self):
-        """Test the About page."""
         self.login(self.SUBMITTER_EMAIL)
         csrf_token = self.get_csrf_token_from_response(
             self.testapp.get('/emaildashboard'))
@@ -84,6 +83,8 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.login(self.USER_A_EMAIL)
         with self.assertRaisesRegexp(Exception, '401 Unauthorized'):
             self.testapp.get('/emaildashboard')
+        with self.assertRaisesRegexp(Exception, '401 Unauthorized'):
+            self.testapp.get('/querystatuscheck')
         self.logout()
 
     def test_that_exception_is_raised_for_invalid_input(self):
@@ -102,6 +103,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
                         'fake_key': 2
                     }}, csrf_token)
 
+        with self.assertRaisesRegexp(Exception, '400 Invalid input for query.'):
             self.post_json(
                 '/emaildashboarddatahandler', {
                     'data': {

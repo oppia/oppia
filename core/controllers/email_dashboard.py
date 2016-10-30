@@ -35,7 +35,8 @@ def require_valid_sender(handler):
             return
         if self.username not in config_domain.WHITELISTED_EMAIL_SENDERS.value:
             raise self.UnauthorizedUserException(
-                '%s is not a authorized user of this application', self.user_id)
+                '%s is not an authorized user of this application',
+                self.user_id)
         return handler(self, **kwargs)
 
     return test_user
@@ -56,16 +57,16 @@ class EmailDashboardDataHandler(base.BaseHandler):
     @require_valid_sender
     def get(self):
         cursor = self.request.get('cursor')
-        queries_per_page = self.request.get('num_of_queries_per_page')
+        num_queries_to_fetch = self.request.get('num_queries_to_fetch')
 
-        # queries_per_page should be convertible to int type and positive.
-        if not queries_per_page.isdigit():
+        # num_queries_to_fetch should be convertible to int type and positive.
+        if not num_queries_to_fetch.isdigit():
             raise self.InvalidInputException(
                 '400 Invalid input for query results.')
 
         query_models, next_cursor, more = (
             user_models.UserQueryModel.fetch_page(
-                int(queries_per_page), cursor))
+                int(num_queries_to_fetch), cursor))
 
         submitters_settings = user_services.get_users_settings(
             list(set([model.submitter_id for model in query_models])))
@@ -95,7 +96,7 @@ class EmailDashboardDataHandler(base.BaseHandler):
         """Post handler for query."""
         data = self.payload['data']
         kwargs = {key: data[key] for key in data if data[key] is not None}
-        self.validate(kwargs)
+        self._validate(kwargs)
 
         query_id = user_query_services.save_new_query_model(
             self.user_id, **kwargs)
@@ -106,9 +107,22 @@ class EmailDashboardDataHandler(base.BaseHandler):
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
             job_id, additional_job_params=params)
 
-        self.render_json({})
+        query_model = user_models.UserQueryModel.get(query_id)
+        query_data = {
+            'id': query_model.id,
+            'submitter_id': (
+                user_services.get_username(query_model.submitter_id)),
+            'created_on': query_model.created_on.strftime('%d-%m-%y %H:%M:%S'),
+            'status': query_model.query_status,
+            'num_qualified_users': len(query_model.user_ids)
+        }
 
-    def validate(self, data):
+        data = {
+            'query': query_data
+        }
+        self.render_json(data)
+
+    def _validate(self, data):
         """Validator for data obtained from fontend."""
         possible_keys = [
             'has_not_logged_in_for_n_days', 'inactive_in_last_n_days',
@@ -119,12 +133,13 @@ class EmailDashboardDataHandler(base.BaseHandler):
             if (key not in possible_keys or not isinstance(value, int) or
                     value < 0):
                 # Raise exception if key is not one of the allowed keys or
-                # correspoding value is not of type integer.
+                # corresponding value is not of type integer..
                 raise self.InvalidInputException('400 Invalid input for query.')
 
 
 class QueryStatusCheck(base.BaseHandler):
     """Handler for checking status of individual queries."""
+    @require_valid_sender
     def get(self):
         query_id = self.request.get('query_id')
         query_model = user_models.UserQueryModel.get(query_id)

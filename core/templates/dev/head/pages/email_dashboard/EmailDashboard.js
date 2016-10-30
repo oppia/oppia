@@ -17,17 +17,9 @@
  */
 
 oppia.controller('EmailDashboard', [
-  '$scope', '$http', 'EmailDashboardDataService',
-  function($scope, $http, EmailDashboardDataService) {
+  '$scope', 'EmailDashboardDataService',
+  function($scope, EmailDashboardDataService) {
     $scope.currentPageOfQueries = [];
-
-    var updateCurrentPageOfQueries = function(queries) {
-      $scope.currentPageOfQueries = queries;
-    };
-
-    var setQueryStatus = function(index, query) {
-      $scope.currentPageOfQueries[index] = query;
-    };
 
     $scope.resetForm = function() {
       $scope.has_not_logged_in_for_n_days = null;
@@ -47,14 +39,18 @@ oppia.controller('EmailDashboard', [
         edited_at_least_n_exps: $scope.edited_at_least_n_exps,
         edited_fewer_than_n_exps: $scope.edited_fewer_than_n_exps
       };
-      EmailDashboardDataService.submitQuery(data, updateCurrentPageOfQueries);
+      EmailDashboardDataService.submitQuery(data).then(function(queries) {
+        $scope.currentPageOfQueries = queries;
+      });
       $scope.resetForm();
       $scope.showSuccessMessage = true;
     };
 
     $scope.getNextPageOfQueries = function() {
       if (EmailDashboardDataService.isNextPageAvailable()) {
-        EmailDashboardDataService.getNextQueries(updateCurrentPageOfQueries);
+        EmailDashboardDataService.getNextQueries().then(function(queries) {
+          $scope.currentPageOfQueries = queries;
+        });
       }
     };
 
@@ -74,8 +70,13 @@ oppia.controller('EmailDashboard', [
     };
 
     $scope.recheckStatus = function(index) {
-      EmailDashboardDataService.recheckQueryStatus(index, setQueryStatus);
+      var queryId = $scope.currentPageOfQueries[index].id;
+      EmailDashboardDataService.fetchQuery(queryId).then(function(query) {
+        $scope.currentPageOfQueries[index] = query;
+      });
     };
-    EmailDashboardDataService.getNextQueries(updateCurrentPageOfQueries);
+    EmailDashboardDataService.getNextQueries().then(function(queries) {
+      $scope.currentPageOfQueries = queries;
+    });
   }
 ]);
