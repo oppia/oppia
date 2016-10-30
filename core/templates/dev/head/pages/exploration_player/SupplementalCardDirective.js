@@ -41,6 +41,7 @@ oppia.directive('supplementalCard', [function() {
       $scope.isViewportNarrow = function() {
         return windowDimensionsService.getWidth() < TWO_CARD_THRESHOLD_PX;
       };
+
       $scope.isWindowTall = function() {
         return document.body.scrollHeight > $window.innerHeight;
       };
