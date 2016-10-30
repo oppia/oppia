@@ -17,7 +17,7 @@ oppia.animation('.conversation-skin-responses-animate-slide', function() {
   };
 });
 
-oppia.animation('.conversation-skin-animate-card-contents', function() {
+oppia.animation('.conversation-skin-animate-tutor-card-content', function() {
   var animateCardChange = function(element, className, done) {
     if (className !== 'animate-card-change') {
       return;

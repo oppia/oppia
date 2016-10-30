@@ -23,7 +23,7 @@
   <div class="conversation-skin-main-tutor-card-edit"
        ng-class="{'animate-card-width': startCardChangeAnimation,
                   'has-shadow': isViewportNarrow() && !isInteractionInline}">
-    <div class="conversation-skin-tutor-card-content conversation-skin-animate-card-contents"
+    <div class="conversation-skin-tutor-card-content conversation-skin-animate-tutor-card-content"
          ng-class="{'animate-card-change': startCardChangeAnimation}">
       <div class="conversation-skin-tutor-card-top-section">
         <img class="conversation-skin-oppia-avatar"
@@ -139,6 +139,7 @@
         border: none;
     }
 
+    /*TODO: do we need?*/
     .conversation-skin-main-tutor-card-edit.animate-card-width {
       -webkit-transition: width 500ms;
       transition: width 500ms;
@@ -167,6 +168,14 @@
 
     .conversation-skin-tutor-card-top-content {
       width: 100%;
+    }
+
+    .conversation-skin-main-tutor-card-edit,
+    .conversation-skin-future-tutor-card {
+      background: #fff;
+       border-radius: 2px;
+       padding-top: 20px;
+       text-align: left;
     }
 
     .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content {
