@@ -76,6 +76,8 @@ class JobModel(base_models.BaseModel):
     # Whether the datastore models associated with this job have been cleaned
     # up (i.e., deleted).
     has_been_cleaned_up = ndb.BooleanProperty(default=False, indexed=True)
+    # Store additional params passed with job.
+    additional_job_params = ndb.JsonProperty(default=None)
 
     @property
     def is_cancelable(self):

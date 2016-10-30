@@ -159,8 +159,7 @@
   directive. -->
   <style>
     html, body {
-      background: url('/assets/common/images/general/background.jpg') no-repeat center center fixed;
-      background-color: #eee;
+      background: #afd2eb no-repeat center center fixed;
       background-size: cover;
       color: rgba(0, 0, 0, 0.87);
       font-family: 'Roboto', Arial, sans-serif;
@@ -171,10 +170,6 @@
       bottom:0;
       width:100%;
       overflow-y:auto;
-    }
-
-    .oppia-loading-fullpage {
-      color: #fff;
     }
 
     .oppia-progress-dot {
@@ -284,7 +279,6 @@
       Additional CSS for the conversation_v1 skin.
       All classes below should start with .conversation-skin
     */
-    /* Overwrite the default color for the 'Loading...' message. */
 
     .conversation-skin-progress-dots {
       left: 0;
@@ -391,6 +385,7 @@
     .conversation-skin-future-tutor-card {
       background: #fff;
       border-radius: 2px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.12);
       flex-shrink: 10000;
       max-width: 560px;
       min-width: 360px;
@@ -404,6 +399,7 @@
     .conversation-skin-future-tutor-card-embed {
       background: #fff;
       border-radius: 2px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.12);
       flex-shrink: 10000;
       min-width: 360px;
       padding-top: 20px;
@@ -415,6 +411,7 @@
     }
 
     .conversation-skin-supplemental-card-container {
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.12);
       flex-shrink: 1;
       margin-left: 12px;
       max-width: 1000px;
@@ -613,7 +610,6 @@
     }
 
     .conversation-skin-inline-interaction {
-      background-color: rgba(236, 239, 241, 1);
       border-bottom-left-radius: 2px;
       border-bottom-right-radius: 2px;
       margin-top: 8px;
