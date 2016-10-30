@@ -58,7 +58,7 @@ oppia.animation('.conversation-skin-animate-tutor-card-content', function() {
   };
 });
 
-oppia.directive('tutorCard', ['$compile', function($compile) {
+oppia.directive('tutorCard', [function() {
   return {
     restrict: 'E',
     scope: {
@@ -67,23 +67,6 @@ oppia.directive('tutorCard', ['$compile', function($compile) {
       showSupplementalCard: '&'
     },
     templateUrl: 'components/TutorCard',
-    compile: function() {
-      return {
-        pre: function(scope, iElement) {
-         /* var attributes = $(iElement).prop('attributes');
-          var tutorCard = $(iElement).find(
-            '.conversation-skin-main-tutor-card');
-          $.each(attributes, function() {
-            if (this.name === 'class' || this.name === 'ng-class' ||
-                this.name === 'style' || this.name == 'ng-style') {
-              tutorCard.attr(this.name, this.value);
-              $(iElement).removeAttr(this.name, null);
-            }
-          });
-          $compile(tutorCard)(scope);*/
-        }
-      };
-    },
     controller: [
     '$scope', 'oppiaPlayerService', 'UrlInterpolationService',
     'playerPositionService', 'playerTranscriptService',

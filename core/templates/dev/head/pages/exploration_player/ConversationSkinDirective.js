@@ -361,14 +361,14 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
           var nextSupplementalCardIsNonempty = isSupplementalCardNonempty(
             playerTranscriptService.getLastCard());
 
-          if (totalNumCards > 1 && $scope.canWindowFitTwoCards() &&
+          if (totalNumCards > 1 && !$scope.isViewportNarrow() &&
               !previousSupplementalCardIsNonempty &&
               nextSupplementalCardIsNonempty) {
             playerPositionService.setActiveCardIndex(
                 $scope.numProgressDots - 1);
             animateToTwoCards(function() {});
           } else if (
-              totalNumCards > 1 && $scope.canWindowFitTwoCards() &&
+              totalNumCards > 1 && !$scope.isViewportNarrow() &&
               previousSupplementalCardIsNonempty &&
               !nextSupplementalCardIsNonempty) {
             animateToOneCard(function() {
@@ -674,16 +674,8 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
           }
         };
 
-        $scope.canWindowFitTwoCards = function() {
-          return $scope.windowWidth >= TWO_CARD_THRESHOLD_PX;
-        };
-
         $scope.isViewportNarrow = function() {
           return $scope.windowWidth < TWO_CARD_THRESHOLD_PX;
-        };
-
-        $scope.isWindowTall = function() {
-          return document.body.scrollHeight > $window.innerHeight;
         };
 
         $scope.isScreenNarrowAndShowingTutorCard = function() {
