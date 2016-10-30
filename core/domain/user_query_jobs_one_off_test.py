@@ -26,6 +26,7 @@ from core.platform import models
 from core.tests import test_utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
+
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
