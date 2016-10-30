@@ -30,14 +30,14 @@ oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 // and audit it to ensure it behaves differently for learner mode and editor
 // mode. Add tests to ensure this.
 oppia.factory('oppiaPlayerService', [
-  '$http', '$rootScope', '$q', 'LearnerParamsService',
+  '$http', '$rootScope', '$timeout', '$q', 'LearnerParamsService',
   'alertsService', 'AnswerClassificationService', 'explorationContextService',
   'PAGE_CONTEXT', 'oppiaExplorationHtmlFormatterService',
   'playerTranscriptService', 'ExplorationObjectFactory',
   'expressionInterpolationService', 'StatsReportingService',
   'UrlInterpolationService',
   function(
-      $http, $rootScope, $q, LearnerParamsService,
+      $http, $rootScope, $timeout, $q, LearnerParamsService,
       alertsService, AnswerClassificationService, explorationContextService,
       PAGE_CONTEXT, oppiaExplorationHtmlFormatterService,
       playerTranscriptService, ExplorationObjectFactory,
@@ -120,7 +120,7 @@ oppia.factory('oppiaPlayerService', [
           exploration.initStateName, newParams);
       }
 
-      $rootScope.$broadcast('playerStateChange');
+      $rootScope.$broadcast('playerStateChange', initialState.name);
       successCallback(exploration, questionHtml, newParams);
     };
 
@@ -143,6 +143,15 @@ oppia.factory('oppiaPlayerService', [
 
       LearnerParamsService.init(startingParams);
     };
+
+    // Ensure the transition to a terminal state properly logs the end of the
+    // exploration.
+    $rootScope.$on('playerStateChange', function(event, newStateName) {
+      if (!_editorPreviewMode && exploration.isStateTerminal(newStateName)) {
+        StatsReportingService.recordExplorationCompleted(
+          newStateName, LearnerParamsService.getAllParams());
+      }
+    });
 
     return {
       // This should only be used in editor preview mode. It sets the
@@ -338,15 +347,10 @@ oppia.factory('oppiaPlayerService', [
             StatsReportingService.recordStateTransition(
               oldStateName, newStateName, answer,
               LearnerParamsService.getAllParams());
-
-            if (exploration.isStateTerminal(newStateName)) {
-              StatsReportingService.recordExplorationCompleted(
-                newStateName, LearnerParamsService.getAllParams());
-            }
           }
 
           $rootScope.$broadcast('updateActiveStateIfInEditor', newStateName);
-          $rootScope.$broadcast('playerStateChange');
+          $rootScope.$broadcast('playerStateChange', newStateName);
           successCallback(
             newStateName, refreshInteraction, feedbackHtml, questionHtml,
             newParams);
