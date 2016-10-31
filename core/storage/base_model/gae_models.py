@@ -558,7 +558,8 @@ class VersionedModel(BaseModel):
                 model has been deleted. Default is False.
 
         Returns:
-            list(dict). Each dict contains a snapshot metadata:
+            list(dict). Each dict contains metadata for a particular snapshot.
+            It has the following keys:
                 committer_id: str. The user_id of the user who committed the
                     change.
                 commit_message: str.
