@@ -78,7 +78,9 @@
         In addition, if the exploration is iframed, the terminal card will
         have no learner input section, so we do not show it.
       -->
-    <!--  TODO: <div ng-if="isInteractionInline && !waitingForOppiaFeedback &&
+      <!--
+        TODO(madiyar): ng-if check might need to cover these logics as well
+       <div ng-if="isInteractionInline && !waitingForOppiaFeedback &&
       ((activeCard.interactionHtml && !activeCard.destStateName) || activeCard.destStateName) &&
       (!isOnTerminalCard() || !isIframed || activeCard.destStateName) && isCurrentCardAtEndOfTranscript()"> -->
       <div ng-if="isInteractionInline">

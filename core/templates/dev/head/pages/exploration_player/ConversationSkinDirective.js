@@ -32,8 +32,7 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
       done();
       return;
     }
-
-    var tutorCard = $('.conversation-skin-tutor-card-container');
+    var tutorCard = element;
     var supplementalCard = $('.conversation-skin-supplemental-card-container');
     var oppiaAvatar = $('.conversation-skin-oppia-avatar.show-tutor-card');
     oppiaAvatarLeft = supplementalCard.position().left +
