@@ -89,7 +89,7 @@ class BaseModel(ndb.Model):
         return entity
 
     def put(self):
-        """Stores this entity's data"""
+        """Stores this entity's data."""
         super(BaseModel, self).put()
 
     @classmethod
@@ -121,12 +121,8 @@ class BaseModel(ndb.Model):
 
         Args:
             entities: list(ndb.Model).
-
-        Returns:
-            list(ndb.Key). Each Key is referencing according Model instance.
-            Key contains id.
         """
-        return ndb.put_multi(entities)
+        ndb.put_multi(entities)
 
     def delete(self):
         """Deletes this instance."""
@@ -137,8 +133,8 @@ class BaseModel(ndb.Model):
         """Gets iterable of all entities of this class.
 
         Args:
-            include_deleted: bool. If is True then entities that have
-                been marked deleted are returned as well. Default False.
+            include_deleted: bool. If True, then entities that have been marked
+                deleted are returned as well. Defaults to False.
 
         Returns:
             iterable. Filterable iterable of all entities of this class.
@@ -188,7 +184,7 @@ class BaseModel(ndb.Model):
 
         Args:
             query: ndb.Query.
-            page_size: int. Number of entities to be returned at max.
+            page_size: int. The maximum number of entities to be returned.
             urlsafe_start_cursor: str or None. If provided, the list of returned
                 entities starts from this datastore cursor. Otherwise,
                 the returned entities start from the beginning of the full
@@ -198,10 +194,11 @@ class BaseModel(ndb.Model):
             3-tuple of (results, cursor, more) as described in fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
-                results: list(List of query results.
+                results: List of query results.
                 cursor: str or None. A query cursor pointing to the next batch
                     of results. If there are no more results, this will be None.
-                more: bool. Whether there are (likely) more results after
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results after
                     this batch.
         """
         if urlsafe_start_cursor:
@@ -300,14 +297,15 @@ class VersionedModel(BaseModel):
 
     @classmethod
     def _get_snapshot_id(cls, instance_id, version_number):
-        """Gets unique id for this instance and version.
+        """Gets a unique snapshot id for this instance and version.
 
         Args:
             instance_id: str.
             version_number: int.
 
         Returns:
-            str. Combination of instance_id, delimiter and version_number.
+            str. The unique snapshot id corresponding to the given instance and
+            version.
         """
         return '%s%s%s' % (
             instance_id, _VERSION_DELIMITER, version_number)
@@ -319,11 +317,16 @@ class VersionedModel(BaseModel):
         Args:
             committer_id: str. The user_id of the user who committed the change.
             commit_type: str. Unique identifier of commit type. Possible values
-                    are in COMMIT_TYPE_CHOICES.
+                are in COMMIT_TYPE_CHOICES.
             commit_message: str.
-            commit_cmds: list(dicts). A list of commands, describing changes
+            commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, should give sufficient information to
-                reconstruct the commit.
+                reconstruct the commit. Dict always contains:
+                    cmd: str. Unique command.
+                And then additional arguments for that command. For example:
+
+                {'cmd': 'AUTO_revert_version_number'
+                 'version_number': 4}
 
         Raises:
             Exception: No snapshot metadata class has been defined.
@@ -370,7 +373,7 @@ class VersionedModel(BaseModel):
                 Default is False.
 
         Raises:
-            Exception: Model instance has been already deleted.
+            Exception: This model instance has been already deleted.
         """
         if force_deletion:
             current_version = self.version
@@ -413,12 +416,17 @@ class VersionedModel(BaseModel):
         Args:
             committer_id: str. The user_id of the user who committed the change.
             commit_message: str.
-            commit_cmds: list(dicts). A list of commands, describing changes
+            commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, should give sufficient information to
-                reconstruct the commit.
+                reconstruct the commit. Dict always contains:
+                    cmd: str. Unique command.
+                And then additional arguments for that command. For example:
+
+                {'cmd': 'AUTO_revert_version_number'
+                 'version_number': 4}
 
         Raises:
-            Exception: Model instance has been already deleted.
+            Exception: This model instance has been already deleted.
             Exception: commit_cmd is in invalid format.
         """
         self._require_not_marked_deleted()
@@ -450,7 +458,7 @@ class VersionedModel(BaseModel):
             version_number: int. Version to revert to.
 
         Raises:
-            Exception: Model instance has been deleted.
+            Exception: This model instance has been deleted.
             Exception: Reverting is not allowed on this model.
         """
         model._require_not_marked_deleted()  # pylint: disable=protected-access
@@ -505,7 +513,7 @@ class VersionedModel(BaseModel):
             VersionedModel. Model instance representing given version.
 
         Raises:
-            Exception: If this model instance has been deleted.
+            Exception: This model instance has been deleted.
         """
         # pylint: disable=protected-access
         cls.get(entity_id)._require_not_marked_deleted()
@@ -526,8 +534,8 @@ class VersionedModel(BaseModel):
             version: int. Version we want to get. Default is None.
 
         Returns:
-            VersionedModel. If version is None get the newest version, otherwise
-            specified version.
+            VersionedModel. If version is None, get the newest version of the
+            model. Otherwise, get the specified version.
         """
         if version is None:
             return super(VersionedModel, cls).get(entity_id, strict=strict)
@@ -550,7 +558,24 @@ class VersionedModel(BaseModel):
                 model has been deleted. Default is False.
 
         Returns:
-            list(dics). Each dict representing a model snapshot.
+            list(dict). Each dict contains a snapshot metadata:
+                committer_id: str. The user_id of the user who committed the
+                    change.
+                commit_message: str.
+                commit_cmds: list(dict). A list of commands, describing changes
+                    made in this model, should give sufficient information to
+                    reconstruct the commit. Dict always contains:
+                        cmd: str. Unique command.
+                    And then additional arguments for that command. For example:
+
+                    {'cmd': 'AUTO_revert_version_number'
+                     'version_number': 4}
+
+                commit_type: str. Unique identifier of commit type. Possible
+                    values are in COMMIT_TYPE_CHOICES.
+                version_number: int.
+                created_on_ms: float. Snapshot creation time in milliseconds
+                    since the Epoch.
 
         Raises:
             Exception: There is no model instance corresponding to at least one
@@ -602,12 +627,20 @@ class BaseSnapshotMetadataModel(BaseModel):
     # Represented as a list of dicts.
     commit_cmds = ndb.JsonProperty(indexed=False)
 
-    # Get the instance id from the versioned id (see
-    # _get_snapshot_id in VersionedModel)
     def get_unversioned_instance_id(self):
+        """Gets the instance id from the snapshot id.
+
+        Returns:
+            str. Instance id part of snapshot id.
+        """
         return self.id[:self.id.rfind(_VERSION_DELIMITER)]
 
     def get_version_string(self):
+        """Gets the version number from the snapshot id.
+
+        Returns:
+            str. Version number part of snapshot id.
+        """
         return self.id[self.id.rfind(_VERSION_DELIMITER) + 1:]
 
 
@@ -620,12 +653,20 @@ class BaseSnapshotContentModel(BaseModel):
     # The snapshot content, as a JSON blob.
     content = ndb.JsonProperty(indexed=False)
 
-    # Get the instance id from the versioned id (see
-    # _get_snapshot_id in VersionedModel)
     def get_unversioned_instance_id(self):
+        """Gets the instance id from the snapshot id.
+
+        Returns:
+            str. Instance id part of snapshot id.
+        """
         return self.id[:self.id.rfind(_VERSION_DELIMITER)]
 
     def get_version_string(self):
+        """Gets the version number from the snapshot id.
+
+        Returns:
+            str. Version number part of snapshot id.
+        """
         return self.id[self.id.rfind(_VERSION_DELIMITER) + 1:]
 
 
