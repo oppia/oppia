@@ -78,7 +78,7 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
       done();
       return;
     }
-    var tutorCard = $('.conversation-skin-tutor-card-container');
+    var tutorCard = element;
     $('.conversation-skin-oppia-avatar.show-tutor-card').hide(0, function() {
       tutorCard.css({
         left: tutorCardAnimatedLeft,
@@ -204,7 +204,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
       'playerTranscriptService', 'LearnerParamsService',
       'playerPositionService', 'explorationRecommendationsService',
       'StatsReportingService', 'UrlInterpolationService',
-      'siteAnalyticsService',
+      'siteAnalyticsService', 'explorationStateService',
       function(
           $scope, $timeout, $rootScope, $window, $translate,
           messengerService, oppiaPlayerService, urlService, focusService,
@@ -212,7 +212,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
           playerTranscriptService, LearnerParamsService,
           playerPositionService, explorationRecommendationsService,
           StatsReportingService, UrlInterpolationService,
-          siteAnalyticsService) {
+          siteAnalyticsService, explorationStateService) {
         $scope.CONTINUE_BUTTON_FOCUS_LABEL = 'continueButton';
         // The exploration domain object.
         $scope.exploration = null;
@@ -397,6 +397,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
           playerPositionService.init(_navigateToActiveCard);
           oppiaPlayerService.init(function(exploration, initHtml, newParams) {
             $scope.exploration = exploration;
+            explorationStateService.setExploration(exploration);
             $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
             _nextFocusLabel = focusService.generateFocusLabel();
 

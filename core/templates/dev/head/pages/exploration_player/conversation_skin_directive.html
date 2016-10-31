@@ -11,10 +11,10 @@
       <div class="conversation-skin-tutor-card-container"
           ng-show="!isViewportNarrow() || isScreenNarrowAndShowingTutorCard()"
           ng-class="{ 'conversation-skin-animate-tutor-card-on-narrow': isViewportNarrow() && isCurrentSupplementalCardNonempty()}">
-        <tutor-card
-                  show-next-card="showUpcomingCard()"
-                  show-supplemental-card="showSupplementalCardIfScreenIsNarrow()"
-                  start-card-change-animation="startCardChangeAnimation">
+        <tutor-card show-next-card="showUpcomingCard()"
+                    show-supplemental-card="showSupplementalCardIfScreenIsNarrow()"
+                    start-card-change-animation="startCardChangeAnimation"
+                    on-submit-answer="submitAnswer(answer, rulesService)">
         </tutor-card>
       </div>
 
@@ -26,7 +26,9 @@
              ng-click="showTutorCardIfScreenIsNarrow()" alt="">
 
         <div ng-if="isScreenNarrowAndShowingTutorCard()" class="supplemental-mask"></div>
-        <supplemental-card show-next-card="showUpcomingCard()"></supplemental-card>
+        <supplemental-card show-next-card="showUpcomingCard()"
+                           on-submit-answer="submitAnswer(answer, rulesService)">
+        </supplemental-card>
       </div>
 
     </div>
@@ -178,7 +180,7 @@
     }
 
 
-    /* TODO: do need it? ;*/
+    /* TODO(maitbayev): do need it? ;*/
     .conversation-skin-oppia-feedback-container,
     .conversation-skin-learner-answer-container {
       position: relative;
@@ -346,7 +348,7 @@
       opacity: 1;
     }
 
-    /*TODO: do we need?*/
+    /*TODO(maitbayev): do we need?*/
     .conversation-skin-main-tutor-card.ng-hide-add.ng-hide-add-active,
     .conversation-skin-main-tutor-card.ng-hide-remove.ng-hide-remove-active,
     .conversation-skin-supplemental-card.ng-hide-add.ng-hide-add-active,
@@ -354,13 +356,6 @@
       -webkit-transition: all ease-out 0.4s;
       transition: all ease-out 0.4s;
     }
-
-    /* TODO: do we need it;
-    conversation-skin-supplemental-card.ng-hide {
-      opacity: 0;
-      transform: translateX(1000px);
-    }*/
-
 
     @media screen and (max-width: 959px) {
       .conversation-skin-cards-container {

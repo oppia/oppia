@@ -1,3 +1,21 @@
+// Copyright 2016 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Controller for the Tutor Card.
+ */
+
 oppia.animation('.conversation-skin-responses-animate-slide', function() {
   return {
     removeClass: function(element, className, done) {
@@ -64,15 +82,16 @@ oppia.directive('tutorCard', [function() {
     scope: {
       startCardChangeAnimation: '=',
       showNextCard: '&',
-      showSupplementalCard: '&'
+      showSupplementalCard: '&',
+      onSubmitAnswer: '&'
     },
     templateUrl: 'components/TutorCard',
     controller: [
     '$scope', 'oppiaPlayerService', 'UrlInterpolationService',
     'playerPositionService', 'playerTranscriptService',
-    'ExplorationObjectFactory', 'windowDimensionsService',
+    'explorationStateService', 'windowDimensionsService',
     function($scope, oppiaPlayerService, UrlInterpolationService,
-      playerPositionService, playerTranscriptService, explorationObjectFactory,
+      playerPositionService, playerTranscriptService, explorationStateService,
       windowDimensionsService) {
       var CONTENT_FOCUS_LABEL_PREFIX = 'content-focus-label-';
       var TWO_CARD_THRESHOLD_PX = 960;
@@ -83,13 +102,16 @@ oppia.directive('tutorCard', [function() {
           return;
         }
 
-        var exploration = explorationObjectFactory.get();
         $scope.arePreviousResponsesShown = false;
         $scope.activeCard = playerTranscriptService.getCard(index);
-        $scope.isInteractionInline = exploration.isInteractionInline(
-          $scope.activeCard.stateName);
-        $scope.interactionInstructions = exploration.getInteractionInstructions(
-          $scope.activeCard.stateName);
+
+        $scope.isInteractionInline = (
+          explorationStateService.isInteractionInline(
+            $scope.activeCard.stateName));
+
+        $scope.interactionInstructions = (
+          explorationStateService.getInteractionInstructions(
+            $scope.activeCard.stateName));
       };
 
       $scope.arePreviousResponsesShown = false;
@@ -118,7 +140,10 @@ oppia.directive('tutorCard', [function() {
       };
 
       $scope.submitAnswer = function(answer, interactionRulesService) {
-        $scope.$parent.submitAnswer(answer, interactionRulesService);
+        $scope.onSubmitAnswer({
+          answer: answer,
+          rulesService: interactionRulesService
+        });
       };
 
       $scope.$on('activeCardChanged', function() {

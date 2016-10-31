@@ -1,17 +1,36 @@
+// Copyright 2016 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Controller for the supplemental card.
+ */
+
 oppia.directive('supplementalCard', [function() {
   return {
     restrict: 'E',
     scope: {
-      showNextCard: '&'
+      showNextCard: '&',
+      onSubmitAnswer: '&'
     },
     templateUrl: 'components/SupplementalCard',
     controller: [
-    '$scope', 'oppiaPlayerService', 'UrlInterpolationService',
+    '$scope', '$window', 'oppiaPlayerService', 'UrlInterpolationService',
     'playerPositionService', 'playerTranscriptService',
-    'ExplorationObjectFactory', 'windowDimensionsService', '$window',
-    function($scope, oppiaPlayerService, UrlInterpolationService,
+    'ExplorationObjectFactory', 'windowDimensionsService',
+    function($scope, $window, oppiaPlayerService, UrlInterpolationService,
       playerPositionService, playerTranscriptService, explorationObjectFactory,
-      windowDimensionsService, $window) {
+      windowDimensionsService) {
       var CONTENT_FOCUS_LABEL_PREFIX = 'content-focus-label-';
       var TWO_CARD_THRESHOLD_PX = 960;
 
@@ -48,7 +67,10 @@ oppia.directive('supplementalCard', [function() {
 
       $scope.submitAnswer = function(answer, interactionRulesService) {
         $scope.clearHelpCard();
-        $scope.$parent.submitAnswer(answer, interactionRulesService);
+        $scope.onSubmitAnswer({
+          answer: answer,
+          rulesService: interactionRulesService
+        });
       };
 
       $scope.$on('activeCardChanged', function() {
@@ -61,7 +83,6 @@ oppia.directive('supplementalCard', [function() {
       });
 
       updateActiveCard();
-    }
-    ]
+    }]
   };
 }]);
