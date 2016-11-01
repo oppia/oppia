@@ -16,20 +16,20 @@
  * @fileoverview Service that maintains state of the current exploration.
  */
 
-oppia.factory('explorationStateService', [function() {
-  var _exploration = null;
+oppia.factory('ExplorationPlayerStateService', [function() {
+  var exploration = null;
   return {
-    setExploration: function(exploration) {
-      _exploration = exploration;
+    setExploration: function(newExploration) {
+      exploration = newExploration;
     },
     getExploration: function() {
-      return _exploration;
+      return exploration;
     },
     isInteractionInline: function(stateName) {
-      return _exploration.isInteractionInline(stateName);
+      return exploration.isInteractionInline(stateName);
     },
     getInteractionInstructions: function(stateName) {
-      return _exploration.getInteractionInstructions(stateName);
+      return exploration.getInteractionInstructions(stateName);
     }
   };
 }]);

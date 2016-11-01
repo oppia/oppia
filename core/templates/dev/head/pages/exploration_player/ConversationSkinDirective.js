@@ -203,7 +203,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
       'playerTranscriptService', 'LearnerParamsService',
       'playerPositionService', 'explorationRecommendationsService',
       'StatsReportingService', 'UrlInterpolationService',
-      'siteAnalyticsService', 'explorationStateService',
+      'siteAnalyticsService', 'ExplorationPlayerStateService',
       function(
           $scope, $timeout, $rootScope, $window, $translate,
           messengerService, oppiaPlayerService, urlService, focusService,
@@ -211,7 +211,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
           playerTranscriptService, LearnerParamsService,
           playerPositionService, explorationRecommendationsService,
           StatsReportingService, UrlInterpolationService,
-          siteAnalyticsService, explorationStateService) {
+          siteAnalyticsService, ExplorationPlayerStateService) {
         $scope.CONTINUE_BUTTON_FOCUS_LABEL = 'continueButton';
         // The exploration domain object.
         $scope.exploration = null;
@@ -396,7 +396,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
           playerPositionService.init(_navigateToActiveCard);
           oppiaPlayerService.init(function(exploration, initHtml, newParams) {
             $scope.exploration = exploration;
-            explorationStateService.setExploration(exploration);
+            ExplorationPlayerStateService.setExploration(exploration);
             $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
             _nextFocusLabel = focusService.generateFocusLabel();
 

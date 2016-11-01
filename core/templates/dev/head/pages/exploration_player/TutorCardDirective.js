@@ -87,79 +87,79 @@ oppia.directive('tutorCard', [function() {
     },
     templateUrl: 'components/TutorCard',
     controller: [
-    '$scope', 'oppiaPlayerService', 'UrlInterpolationService',
-    'playerPositionService', 'playerTranscriptService',
-    'explorationStateService', 'windowDimensionsService',
-    function($scope, oppiaPlayerService, UrlInterpolationService,
-      playerPositionService, playerTranscriptService, explorationStateService,
-      windowDimensionsService) {
-      var CONTENT_FOCUS_LABEL_PREFIX = 'content-focus-label-';
-      var TWO_CARD_THRESHOLD_PX = 960;
+      '$scope', 'oppiaPlayerService', 'UrlInterpolationService',
+      'playerPositionService', 'playerTranscriptService',
+      'ExplorationPlayerStateService', 'windowDimensionsService',
+      function(
+        $scope, oppiaPlayerService, UrlInterpolationService,
+        playerPositionService, playerTranscriptService,
+        ExplorationPlayerStateService, windowDimensionsService) {
+        var CONTENT_FOCUS_LABEL_PREFIX = 'content-focus-label-';
+        var TWO_CARD_THRESHOLD_PX = 960;
 
-      var updateActiveCard = function() {
-        var index = playerPositionService.getActiveCardIndex();
-        if (index === null) {
-          return;
-        }
+        var updateActiveCard = function() {
+          var index = playerPositionService.getActiveCardIndex();
+          if (index === null) {
+            return;
+          }
+
+          $scope.arePreviousResponsesShown = false;
+          $scope.activeCard = playerTranscriptService.getCard(index);
+
+          $scope.isInteractionInline = (
+            ExplorationPlayerStateService.isInteractionInline(
+              $scope.activeCard.stateName));
+
+          $scope.interactionInstructions = (
+            ExplorationPlayerStateService.getInteractionInstructions(
+              $scope.activeCard.stateName));
+        };
 
         $scope.arePreviousResponsesShown = false;
-        $scope.activeCard = playerTranscriptService.getCard(index);
 
-        $scope.isInteractionInline = (
-          explorationStateService.isInteractionInline(
-            $scope.activeCard.stateName));
+        $scope.OPPIA_AVATAR_IMAGE_URL = (
+          UrlInterpolationService.getStaticImageUrl(
+            '/avatar/oppia_black_72px.png'));
 
-        $scope.interactionInstructions = (
-          explorationStateService.getInteractionInstructions(
-            $scope.activeCard.stateName));
-      };
+        $scope.profilePicture = (UrlInterpolationService.getStaticImageUrl(
+            '/avatar/user_blue_72px.png'));
 
-      $scope.arePreviousResponsesShown = false;
-
-      $scope.OPPIA_AVATAR_IMAGE_URL = (
-        UrlInterpolationService.getStaticImageUrl(
-          '/avatar/oppia_black_72px.png'));
-
-      $scope.profilePicture = (UrlInterpolationService.getStaticImageUrl(
-          '/avatar/user_blue_72px.png'));
-
-      oppiaPlayerService.getUserProfileImage().then(function(result) {
-        $scope.profilePicture = result;
-      });
-
-      $scope.getContentFocusLabel = function(index) {
-        return CONTENT_FOCUS_LABEL_PREFIX + index;
-      };
-
-      $scope.toggleShowPreviousResponses = function() {
-        $scope.arePreviousResponsesShown = !$scope.arePreviousResponsesShown;
-      };
-
-      $scope.isViewportNarrow = function() {
-        return windowDimensionsService.getWidth() < TWO_CARD_THRESHOLD_PX;
-      };
-
-      $scope.submitAnswer = function(answer, interactionRulesService) {
-        $scope.onSubmitAnswer({
-          answer: answer,
-          rulesService: interactionRulesService
+        oppiaPlayerService.getUserProfileImage().then(function(result) {
+          $scope.profilePicture = result;
         });
-      };
 
-      $scope.$on('activeCardChanged', function() {
+        $scope.getContentFocusLabel = function(index) {
+          return CONTENT_FOCUS_LABEL_PREFIX + index;
+        };
+
+        $scope.toggleShowPreviousResponses = function() {
+          $scope.arePreviousResponsesShown = !$scope.arePreviousResponsesShown;
+        };
+
+        $scope.isViewportNarrow = function() {
+          return windowDimensionsService.getWidth() < TWO_CARD_THRESHOLD_PX;
+        };
+
+        $scope.submitAnswer = function(answer, interactionRulesService) {
+          $scope.onSubmitAnswer({
+            answer: answer,
+            rulesService: interactionRulesService
+          });
+        };
+
+        $scope.$on('activeCardChanged', function() {
+          updateActiveCard();
+        });
+
+        $scope.$on('destinationCardAvailable', function(event, card) {
+          $scope.upcomingContentHtml = card.upcomingContentHtml;
+          $scope.upcomingParams = card.upcomingParams;
+          $scope.upcomingStateName = card.upcomingStateName;
+          $scope.upcomingInlineInteractionHtml = (
+            card.upcomingInlineInteractionHtml);
+        });
+
         updateActiveCard();
-      });
-
-      $scope.$on('destinationCardAvailable', function(event, card) {
-        $scope.upcomingContentHtml = card.upcomingContentHtml;
-        $scope.upcomingParams = card.upcomingParams;
-        $scope.upcomingStateName = card.upcomingStateName;
-        $scope.upcomingInlineInteractionHtml = (
-          card.upcomingInlineInteractionHtml);
-      });
-
-      updateActiveCard();
-    }
-    ]
+      }]
   };
 }]);
