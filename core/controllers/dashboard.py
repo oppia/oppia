@@ -25,7 +25,7 @@ from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import stats_services
 from core.domain import subscription_services
-from core.domain import summary_services
+from core.domain import summary_tile_services
 from core.domain import user_jobs_continuous
 from core.domain import user_services
 import feconf
@@ -166,7 +166,7 @@ class DashboardHandler(base.BaseHandler):
                 subscription_services.get_collection_ids_subscribed_to(
                     self.user_id))))
 
-        exp_summary_list = summary_services.get_displayable_exp_summary_dicts(
+        exp_summary_list = summary_tile_services.get_displayable_exploration_summary_dicts( #pylint: disable=line-too-long
             subscribed_exploration_summaries)
         collection_summary_list = []
 

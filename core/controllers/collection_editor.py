@@ -20,7 +20,7 @@ from core.controllers import base
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import rights_manager
-from core.domain import summary_services
+from core.domain import summary_tile_services
 from core.platform import models
 import feconf
 import utils
@@ -144,7 +144,7 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
         try:
             # Try to retrieve collection
             collection_dict = (
-                summary_services.get_learner_collection_dict_by_id(
+                summary_tile_services.get_learner_collection_dict_by_id(
                     collection_id, self.user_id,
                     allow_invalid_explorations=True))
         except Exception as e:
@@ -174,7 +174,7 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
             raise self.InvalidInputException(e)
 
         collection_dict = (
-            summary_services.get_learner_collection_dict_by_id(
+            summary_tile_services.get_learner_collection_dict_by_id(
                 collection_id, self.user_id, allow_invalid_explorations=True))
 
         # Send the updated collection back to the frontend.
@@ -236,7 +236,7 @@ class ExplorationMetadataSearchHandler(base.BaseHandler):
         search_cursor = self.request.get('cursor', None)
 
         collection_node_metadata_list, new_search_cursor = (
-            summary_services.get_exp_metadata_dicts_matching_query(
+            summary_tile_services.get_exploration_metadata_dicts_matching_query(
                 query_string, search_cursor, self.user_id))
 
         self.values.update({

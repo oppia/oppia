@@ -327,6 +327,7 @@ class BaseHandler(webapp2.RequestHandler):
                 self.username and self.username in
                 config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value
             ),
+            'username': self.username,
             'user_is_logged_in': user_services.has_fully_registered(
                 self.user_id),
             'preferred_site_language_code': self.preferred_site_language_code
@@ -350,6 +351,7 @@ class BaseHandler(webapp2.RequestHandler):
         if redirect_url_on_logout is None:
             redirect_url_on_logout = self.request.uri
         if self.user_id:
+            values['login_url'] = None
             values['logout_url'] = (
                 current_user_services.create_logout_url(
                     redirect_url_on_logout))
@@ -359,6 +361,7 @@ class BaseHandler(webapp2.RequestHandler):
                 else self.request.uri)
             values['login_url'] = (
                 current_user_services.create_login_url(target_url))
+            values['logout_url'] = None
 
         # Create a new csrf token for inclusion in HTML responses. This assumes
         # that tokens generated in one handler will be sent back to a handler
