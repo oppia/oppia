@@ -30,6 +30,42 @@ var oppia = angular.module(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
                    : []));
 
+// TODO(sll): Get this to read from a common JSON file; it's replicated in
+// feconf.
+oppia.constant('CATEGORY_LIST', GLOBALS.ALL_CATEGORIES);
+
+// We use a slash because this character is forbidden in a state name.
+oppia.constant('PLACEHOLDER_OUTCOME_DEST', '/');
+oppia.constant('INTERACTION_DISPLAY_MODE_INLINE', 'inline');
+oppia.constant('DEFAULT_RULE_NAME', 'Default');
+oppia.constant('CLASSIFIER_RULESPEC_STR', 'FuzzyMatches');
+oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');
+// Feature still in development.
+// NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
+oppia.constant('ENABLE_STRING_CLASSIFIER', false);
+oppia.constant('DEFAULT_CLASSIFIER_RULE_SPEC', {
+  rule_type: 'FuzzyMatches',
+  inputs: {
+    training_data: []
+  }
+});
+oppia.constant('PARAMETER_TYPES', {
+  REAL: 'Real',
+  UNICODE_STRING: 'UnicodeString'
+});
+
+oppia.constant('EVENT_HTML_CHANGED', 'htmlChanged');
+
+// The maximum number of nodes to show in a row of the state graph.
+oppia.constant('MAX_NODES_PER_ROW', 4);
+// The following variable must be at least 3. It represents the maximum length,
+// in characters, for the name of each node label in the state graph.
+oppia.constant('MAX_NODE_LABEL_LENGTH', 15);
+
+// If an $http request fails with the following error codes, a warning is
+// displayed.
+oppia.constant('FATAL_ERROR_CODES', [400, 401, 404, 500]);
+
 oppia.config([
   '$compileProvider', '$httpProvider', '$interpolateProvider',
   '$locationProvider',
@@ -423,6 +459,19 @@ oppia.factory('windowDimensionsService', ['$window', function($window) {
     },
     registerOnResizeHook: function(hookFn) {
       onResizeHooks.push(hookFn);
+    },
+    isWindowNarrow: function() {
+      var NAVBAR_WITH_SEARCH_CUTOFF_WIDTH_PX = 1171;
+      var NORMAL_NAVBAR_CUTOFF_WIDTH_PX = 800;
+      var navbarHasSearchBar = (
+        $window.location.pathname.indexOf('/search') === 0 ||
+        $window.location.pathname.indexOf('/library') === 0);
+
+      var navbarCutoffWidthPx = (
+        navbarHasSearchBar ?
+        NAVBAR_WITH_SEARCH_CUTOFF_WIDTH_PX :
+        NORMAL_NAVBAR_CUTOFF_WIDTH_PX);
+      return this.getWidth() <= navbarCutoffWidthPx;
     }
   };
 }]);
