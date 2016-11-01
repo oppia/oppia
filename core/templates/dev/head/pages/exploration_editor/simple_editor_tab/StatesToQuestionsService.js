@@ -19,8 +19,8 @@
  */
 
 oppia.factory('StatesToQuestionsService', [
-  '$log', '$filter', 'SimpleEditorShimService', 'QuestionObjectFactory',
-  function($log, $filter, SimpleEditorShimService, QuestionObjectFactory) {
+  '$log', '$injector', 'SimpleEditorShimService', 'QuestionObjectFactory',
+  function($log, $injector, SimpleEditorShimService, QuestionObjectFactory) {
     var SUPPORTED_INTERACTION_TYPES = [{
       id: 'MultipleChoiceInput',
       name: 'Multiple choice'
@@ -101,8 +101,8 @@ oppia.factory('StatesToQuestionsService', [
 
         // Check that the customization_args and the rule_specs for each answer
         // group are valid.
-        var filterName = interactionId + 'Checker';
-        if (!$filter(filterName)(
+        var checkerService = $injector.get(interactionId + 'CheckerService');
+        if (!checkerService.isValid(
             interactionData.customization_args,
             interactionData.answer_groups)) {
           return null;
