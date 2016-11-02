@@ -266,12 +266,12 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
 
             expected_email_html_body = (
                 'Hi submit,<br>'
-                'Your query with %s id has succesfully completed its '
+                'Your query with id %s has succesfully completed its '
                 'execution. Visit the result page '
                 '<a href="https://www.oppia.org/emaildashboardresult/%s">'
                 'here</a> '
                 'to see result of your query.<br><br>'
-                'Thanks, and happy collaborating!<br>'
+                'Thanks<br>'
                 '<br>'
                 'Best wishes,<br>'
                 'The Oppia Team<br>'
@@ -282,10 +282,10 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
 
             expected_email_text_body = (
                 'Hi submit,\n'
-                'Your query with %s id has succesfully completed its '
+                'Your query with id %s has succesfully completed its '
                 'execution. Visit the result page here '
                 'to see result of your query.\n\n'
-                'Thanks, and happy collaborating!\n'
+                'Thanks\n'
                 '\n'
                 'Best wishes,\n'
                 'The Oppia Team\n'

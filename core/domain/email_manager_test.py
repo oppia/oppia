@@ -1468,14 +1468,14 @@ class QueryStatusNotificationEmailTests(test_utils.GenericTestBase):
 
     def test_that_correct_completion_email_is_sent(self):
         query_id = 'qid'
-        expected_email_subject = 'Query qid has successully completed'
+        expected_email_subject = 'Query qid has successfully completed'
         expected_email_html_body = (
             'Hi submit,<br>'
-            'Your query with qid id has succesfully completed its '
+            'Your query with id qid has succesfully completed its '
             'execution. Visit the result page '
             '<a href="https://www.oppia.org/emaildashboardresult/qid">here</a> '
             'to see result of your query.<br><br>'
-            'Thanks, and happy collaborating!<br>'
+            'Thanks<br>'
             '<br>'
             'Best wishes,<br>'
             'The Oppia Team<br>'
@@ -1485,10 +1485,10 @@ class QueryStatusNotificationEmailTests(test_utils.GenericTestBase):
 
         expected_email_text_body = (
             'Hi submit,\n'
-            'Your query with qid id has succesfully completed its '
+            'Your query with id qid has succesfully completed its '
             'execution. Visit the result page here '
             'to see result of your query.\n\n'
-            'Thanks, and happy collaborating!\n'
+            'Thanks\n'
             '\n'
             'Best wishes,\n'
             'The Oppia Team\n'
@@ -1536,10 +1536,10 @@ class QueryStatusNotificationEmailTests(test_utils.GenericTestBase):
 
         expected_email_html_body = (
             'Hi submit,<br>'
-            'Your query with qid id has failed due to error '
+            'Your query with id qid has failed due to error '
             'during execution. '
-            'Please check query parameters and submit query again.<br><br>'
-            'Thanks, and happy collaborating!<br>'
+            'Please check the query and submit query again.<br><br>'
+            'Thanks<br>'
             '<br>'
             'Best wishes,<br>'
             'The Oppia Team<br>'
@@ -1549,10 +1549,10 @@ class QueryStatusNotificationEmailTests(test_utils.GenericTestBase):
 
         expected_email_text_body = (
             'Hi submit,\n'
-            'Your query with qid id has failed due to error '
+            'Your query with id qid has failed due to error '
             'during execution. '
-            'Please check query parameters and submit query again.\n\n'
-            'Thanks, and happy collaborating!\n'
+            'Please check the query and submit query again.\n\n'
+            'Thanks\n'
             '\n'
             'Best wishes,\n'
             'The Oppia Team\n'

@@ -548,15 +548,15 @@ def send_flag_exploration_email(
 
 
 def send_query_completion_email(recipient_id, query_id):
-    email_subject = 'Query %s has successully completed' % query_id
+    email_subject = 'Query %s has successfully completed' % query_id
 
     email_body_template = (
         'Hi %s,<br>'
-        'Your query with %s id has succesfully completed its '
+        'Your query with id %s has succesfully completed its '
         'execution. Visit the result page '
         '<a href="https://www.oppia.org/emaildashboardresult/%s">here</a> '
         'to see result of your query.<br><br>'
-        'Thanks, and happy collaborating!<br>'
+        'Thanks<br>'
         '<br>'
         'Best wishes,<br>'
         'The Oppia Team<br>'
@@ -577,10 +577,10 @@ def send_query_failure_email(recipient_id, query_id, query_params):
 
     email_body_template = (
         'Hi %s,<br>'
-        'Your query with %s id has failed due to error '
+        'Your query with id %s has failed due to error '
         'during execution. '
-        'Please check query parameters and submit query again.<br><br>'
-        'Thanks, and happy collaborating!<br>'
+        'Please check the query and submit query again.<br><br>'
+        'Thanks<br>'
         '<br>'
         'Best wishes,<br>'
         'The Oppia Team<br>'
