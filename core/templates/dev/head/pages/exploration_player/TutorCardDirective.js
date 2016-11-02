@@ -156,6 +156,12 @@ oppia.directive('tutorCard', [function() {
             playerPositionService.getActiveCardIndex());
         };
 
+        $scope.isOnTerminalCard = function() {
+          return $scope.activeCard &&
+            ExplorationPlayerStateService.isStateTerminal(
+              $scope.activeCard.stateName);
+        };
+
         $scope.$on('activeCardChanged', function() {
           updateActiveCard();
         });
