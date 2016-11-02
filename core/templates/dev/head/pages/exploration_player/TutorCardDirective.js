@@ -151,6 +151,11 @@ oppia.directive('tutorCard', [function() {
           });
         };
 
+        $scope.isCurrentCardAtEndOfTranscript = function() {
+          return playerTranscriptService.isLastCard(
+            playerPositionService.getActiveCardIndex());
+        };
+
         $scope.$on('activeCardChanged', function() {
           updateActiveCard();
         });

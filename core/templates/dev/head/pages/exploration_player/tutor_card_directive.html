@@ -83,7 +83,7 @@
        <div ng-if="isInteractionInline && !waitingForOppiaFeedback &&
       ((activeCard.interactionHtml && !activeCard.destStateName) || activeCard.destStateName) &&
       (!isOnTerminalCard() || !isIframed || activeCard.destStateName) && isCurrentCardAtEndOfTranscript()"> -->
-      <div ng-if="isInteractionInline">
+      <div ng-if="isInteractionInline && isCurrentCardAtEndOfTranscript()">
         <div class="conversation-skin-inline-interaction">
           <div ng-if="activeCard.destStateName && activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].oppiaFeedbackHtml">
             <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
