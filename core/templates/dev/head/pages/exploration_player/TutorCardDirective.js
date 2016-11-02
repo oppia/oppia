@@ -90,10 +90,12 @@ oppia.directive('tutorCard', [function() {
       '$scope', 'oppiaPlayerService', 'UrlInterpolationService',
       'playerPositionService', 'playerTranscriptService',
       'ExplorationPlayerStateService', 'windowDimensionsService',
+      'urlService',
       function(
         $scope, oppiaPlayerService, UrlInterpolationService,
         playerPositionService, playerTranscriptService,
-        ExplorationPlayerStateService, windowDimensionsService) {
+        ExplorationPlayerStateService, windowDimensionsService,
+        urlService) {
         var CONTENT_FOCUS_LABEL_PREFIX = 'content-focus-label-';
         var TWO_CARD_THRESHOLD_PX = 960;
 
@@ -116,6 +118,8 @@ oppia.directive('tutorCard', [function() {
         };
 
         $scope.arePreviousResponsesShown = false;
+
+        $scope.isIframed = urlService.isIframed();
 
         $scope.OPPIA_AVATAR_IMAGE_URL = (
           UrlInterpolationService.getStaticImageUrl(

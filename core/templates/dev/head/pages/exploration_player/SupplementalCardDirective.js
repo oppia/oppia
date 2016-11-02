@@ -63,7 +63,7 @@ oppia.directive('supplementalCard', [function() {
         };
 
         $scope.isWindowTall = function() {
-          return $(document).height() >= $window.innerHeight;
+          return $(document).height() > $window.innerHeight;
         };
 
         $scope.submitAnswer = function(answer, interactionRulesService) {
