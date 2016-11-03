@@ -18,6 +18,8 @@ from core.domain import config_services
 from core.platform import models
 from core.tests import test_utils
 
+import feconf
+
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 taskqueue_services = models.Registry.import_taskqueue_services()
@@ -76,7 +78,8 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 1)
-        self.process_and_flush_pending_tasks()
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            self.process_and_flush_pending_tasks()
 
     def test_that_page_is_accessible_to_authorised_users_only(self):
         # Make sure that only authorised users can access query pages.
