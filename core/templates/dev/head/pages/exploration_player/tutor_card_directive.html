@@ -78,12 +78,7 @@
         In addition, if the exploration is iframed, the terminal card will
         have no learner input section, so we do not show it.
       -->
-      <!--
-        TODO(madiyar): ng-if check might need to cover these logics as well
-       <div ng-if="isInteractionInline && !waitingForOppiaFeedback &&
-      ((activeCard.interactionHtml && !activeCard.destStateName) || activeCard.destStateName) &&
-      (!isOnTerminalCard() || !isIframed || activeCard.destStateName) && isCurrentCardAtEndOfTranscript()"> -->
-      <div ng-if="isInteractionInline && isCurrentCardAtEndOfTranscript() &&
+      <div ng-if="isInteractionInline && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback &&
       ((activeCard.interactionHtml && !activeCard.destStateName) || activeCard.destStateName) &&
       (!isOnTerminalCard() || !isIframed || activeCard.destStateName)">
         <div class="conversation-skin-inline-interaction">
@@ -144,7 +139,6 @@
         border: none;
     }
 
-    /*TODO(maitbayev): do we need?*/
     .conversation-skin-tutor-card.animate-card-width {
       -webkit-transition: width 500ms;
       transition: width 500ms;

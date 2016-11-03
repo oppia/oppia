@@ -389,13 +389,11 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
         };
 
         $scope.initializePage = function() {
-          $scope.waitingForOppiaFeedback = false;
           hasInteractedAtLeastOnce = false;
           $scope.recommendedExplorationSummaries = [];
 
           playerPositionService.init(_navigateToActiveCard);
           oppiaPlayerService.init(function(exploration, initHtml, newParams) {
-            $scope.exploration = exploration;
             ExplorationPlayerStateService.setExploration(exploration);
             $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
             _nextFocusLabel = focusService.generateFocusLabel();
@@ -442,7 +440,6 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
 
           _answerIsBeingProcessed = true;
           hasInteractedAtLeastOnce = true;
-          $scope.waitingForOppiaFeedback = true;
 
           var _oldStateName = playerTranscriptService.getLastCard().stateName;
           playerTranscriptService.addNewAnswer(answer);
@@ -463,7 +460,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
                 1.0));
 
               $timeout(function() {
-                $scope.waitingForOppiaFeedback = false;
+                $scope.$broadcast('oppiaFeedbackAvailable');
                 var pairs = (
                   playerTranscriptService.getLastCard().answerFeedbackPairs);
                 var lastAnswerFeedbackPair = pairs[pairs.length - 1];

@@ -116,6 +116,8 @@ oppia.directive('tutorCard', [function() {
 
         $scope.arePreviousResponsesShown = false;
 
+        $scope.waitingForOppiaFeedback = false;
+
         $scope.isIframed = urlService.isIframed();
 
         $scope.OPPIA_AVATAR_IMAGE_URL = (
@@ -142,6 +144,7 @@ oppia.directive('tutorCard', [function() {
         };
 
         $scope.submitAnswer = function(answer, interactionRulesService) {
+          $scope.waitingForOppiaFeedback = true;
           $scope.onSubmitAnswer({
             answer: answer,
             rulesService: interactionRulesService
@@ -169,6 +172,10 @@ oppia.directive('tutorCard', [function() {
           $scope.upcomingStateName = card.upcomingStateName;
           $scope.upcomingInlineInteractionHtml = (
             card.upcomingInlineInteractionHtml);
+        });
+
+        $scope.$on('oppiaFeedbackAvailable', function() {
+          $scope.waitingForOppiaFeedback = false;
         });
 
         updateActiveCard();
