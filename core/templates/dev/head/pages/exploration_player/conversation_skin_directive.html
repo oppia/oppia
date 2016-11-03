@@ -33,7 +33,8 @@
     </div>
   </div>
 
-  <oppia-gadget-panel panel-contents="getExplorationGadgetPanelsContents().bottom"
+  <oppia-gadget-panel ng-if="activeCard"
+                      panel-contents="getExplorationGadgetPanelsContents().bottom"
                       class="conversation-skin-bottom-gadget-panel"
                       current-state-name="activeCard.stateName">
   </oppia-gadget-panel>

@@ -28,13 +28,12 @@ oppia.directive('supplementalCard', [function() {
       '$scope', '$window', 'oppiaPlayerService', 'UrlInterpolationService',
       'playerPositionService', 'playerTranscriptService',
       'ExplorationObjectFactory', 'windowDimensionsService',
+      'CONTENT_FOCUS_LABEL_PREFIX', 'TWO_CARD_THRESHOLD_PX',
       function(
         $scope, $window, oppiaPlayerService, UrlInterpolationService,
         playerPositionService, playerTranscriptService,
-        ExplorationObjectFactory, windowDimensionsService) {
-        var CONTENT_FOCUS_LABEL_PREFIX = 'content-focus-label-';
-        var TWO_CARD_THRESHOLD_PX = 960;
-
+        ExplorationObjectFactory, windowDimensionsService,
+        CONTENT_FOCUS_LABEL_PREFIX, TWO_CARD_THRESHOLD_PX) {
         var updateActiveCard = function() {
           var index = playerPositionService.getActiveCardIndex();
           if (index === null) {

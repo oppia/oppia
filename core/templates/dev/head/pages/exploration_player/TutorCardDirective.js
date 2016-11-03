@@ -90,15 +90,12 @@ oppia.directive('tutorCard', [function() {
       '$scope', 'oppiaPlayerService', 'UrlInterpolationService',
       'playerPositionService', 'playerTranscriptService',
       'ExplorationPlayerStateService', 'windowDimensionsService',
-      'urlService',
+      'urlService', 'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX',
       function(
         $scope, oppiaPlayerService, UrlInterpolationService,
         playerPositionService, playerTranscriptService,
         ExplorationPlayerStateService, windowDimensionsService,
-        urlService) {
-        var CONTENT_FOCUS_LABEL_PREFIX = 'content-focus-label-';
-        var TWO_CARD_THRESHOLD_PX = 960;
-
+        urlService, TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX) {
         var updateActiveCard = function() {
           var index = playerPositionService.getActiveCardIndex();
           if (index === null) {

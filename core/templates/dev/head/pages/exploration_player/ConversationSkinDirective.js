@@ -204,6 +204,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
       'playerPositionService', 'explorationRecommendationsService',
       'StatsReportingService', 'UrlInterpolationService',
       'siteAnalyticsService', 'ExplorationPlayerStateService',
+      'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX',
       function(
           $scope, $timeout, $rootScope, $window, $translate,
           messengerService, oppiaPlayerService, urlService, focusService,
@@ -211,15 +212,14 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
           playerTranscriptService, LearnerParamsService,
           playerPositionService, explorationRecommendationsService,
           StatsReportingService, UrlInterpolationService,
-          siteAnalyticsService, ExplorationPlayerStateService) {
+          siteAnalyticsService, ExplorationPlayerStateService,
+          TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX) {
         $scope.CONTINUE_BUTTON_FOCUS_LABEL = 'continueButton';
         // The minimum width, in pixels, needed to be able to show two cards
         // side-by-side.
-        var TWO_CARD_THRESHOLD_PX = 960;
         var TIME_PADDING_MSEC = 250;
         var TIME_SCROLL_MSEC = 600;
         var MIN_CARD_LOADING_DELAY_MSEC = 950;
-        var CONTENT_FOCUS_LABEL_PREFIX = 'content-focus-label-';
 
         var hasInteractedAtLeastOnce = false;
         var _answerIsBeingProcessed = false;
@@ -380,7 +380,8 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
 
           if (ExplorationPlayerStateService.isStateTerminal(stateName)) {
             explorationRecommendationsService.getRecommendedSummaryDicts(
-              ExplorationPlayerStateService.getAuthorRecommendedExpIds(stateName),
+              ExplorationPlayerStateService.getAuthorRecommendedExpIds(
+                stateName),
               function(summaries) {
                 $scope.recommendedExplorationSummaries = summaries;
               });
