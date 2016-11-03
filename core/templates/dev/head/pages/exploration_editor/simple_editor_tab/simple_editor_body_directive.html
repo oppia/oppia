@@ -37,15 +37,23 @@
       </div>
     </div>
 
-    <button ng-disabled="!canAddNewQuestion()" type="button"
-            class="btn btn-default advance-btn" ng-click="addNewQuestion()">
-      <i class="material-icons md-30">&#xE5CF;</i>
-    </button>
-    <button ng-if="canTryToPublish()" type="button"
-            class="btn btn-default advance-btn end-exploration-btn"
-            ng-click="tryToPublishExploration()">
-      <i class="material-icons md-30">&#xE047;</i>
-    </button>
+    <div class="advance-btn-wrapper">
+      <span class="advance-btn-description" ng-show="advBtnHovered">Add new question</span>
+      <button ng-disabled="!canAddNewQuestion()" type="button"
+              class="btn btn-default advance-btn" ng-click="addNewQuestion(); advBtnHovered = false"
+              ng-mouseenter="advBtnHovered = true" ng-mouseleave="advBtnHovered = false">
+        <i class="material-icons md-30">&#xE5CF;</i>
+      </button>
+    </div>
+    <div class="advance-btn-wrapper end-exploration-btn-wrapper">
+      <span class="advance-btn-description" ng-show="finishBtnHovered">Finish exploration</span>
+      <button ng-show="canTryToPublish()" type="button"
+              class="btn btn-default advance-btn"
+              ng-click="tryToPublishExploration(); finishBtnHovered = false"
+              ng-mouseenter="finishBtnHovered = true" ng-mouseleave="finishBtnHovered = false">
+        <i class="material-icons md-30">&#xE047;</i>
+      </button>
+    </div>
   </div>
 </script>
 
@@ -85,14 +93,19 @@
     margin-top: 80px;
   }
 
+  simple-editor-body .advance-btn-wrapper {
+    bottom: 50px;
+    display: inline-block;
+    margin-left: -25px;
+    position: fixed;
+    width: 50px;
+    white-space: nowrap;
+  }
   simple-editor-body .advance-btn {
     border: 1px solid #009688;
     border-radius: 50%;
-    bottom: 50px;
     color: #009688;
     height: 50px;
-    margin-left: -25px;
-    position: fixed;
     width: 50px;
   }
   simple-editor-body .advance-btn:hover {
@@ -106,7 +119,16 @@
   simple-editor-body .advance-btn i {
     margin: 3px -2px;
   }
-  simple-editor-body .advance-btn.end-exploration-btn {
+  simple-editor-body .end-exploration-btn-wrapper {
     margin-left: 40px;
+  }
+  simple-editor-body .advance-btn-description {
+    color: #009688;
+    display: block;
+    margin-bottom: 5px;
+    margin-left: -100%;
+    margin-right: -100%;
+    text-align: center;
+    text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
   }
 </style>
