@@ -13,7 +13,7 @@
                          placeholder="Type an introduction.">
       </editor-html-field>
 
-      <div ng-repeat="question in data.questions track by $index">
+      <div ng-repeat="question in data.questionList.getQuestions() track by $index">
         <h3>Question <[$index + 1]></h3>
 
         <multiple-choice-editor ng-if="question.getInteractionId() === 'MultipleChoiceInput'"

@@ -22,14 +22,14 @@
 
 oppia.factory('SimpleEditorManagerService', [
   'StatesToQuestionsService', 'SimpleEditorShimService',
-  'QuestionObjectFactory',
+  'QuestionObjectFactory', 'QuestionListObjectFactory',
   function(
       StatesToQuestionsService, SimpleEditorShimService,
-      QuestionObjectFactory) {
+      QuestionObjectFactory, QuestionListObjectFactory) {
     var data = {
       title: null,
       introductionHtml: null,
-      questions: null
+      questionList: null
     };
 
     var DEFAULT_INTERACTION = {
@@ -49,46 +49,29 @@ oppia.factory('SimpleEditorManagerService', [
     };
 
     var getNewStateName = function() {
-      var allStateNames = data.questions.map(function(question) {
-        return question.stateName;
-      });
-      var minimumStateNumber = data.questions.length + 1;
+      var allStateNames = data.questionList.getAllStateNames();
+
+      var minimumStateNumber = data.questionList.getQuestionCount();
       while (allStateNames.indexOf('Question ' + minimumStateNumber) !== -1) {
         minimumStateNumber++;
       }
-
       return 'Question ' + minimumStateNumber;
-    };
-
-    var getNextStateName = function(stateName) {
-      for (var i = 0; i < data.questions.length; i++) {
-        if (data.questions[i].getStateName() === stateName) {
-          return data.questions[i + 1].getStateName();
-        }
-      }
-    };
-
-    // Returns a question object whose properties can be edited without
-    // breaking the references in data.questions.
-    var getBindableQuestion = function(stateName) {
-      for (var i = 0; i < data.questions.length; i++) {
-        if (data.questions[i].getStateName() === stateName) {
-          return data.questions[i];
-        }
-      }
-      throw Error(
-        'Cannot find question corresponding to state named: ' + stateName);
     };
 
     return {
       // Attempts to initialize the local data variables. Returns true if
       // the initialization is successful (judged by the success of
-      // initializing data.questions), and false otherwise.
+      // initializing the question list), and false otherwise.
       tryToInit: function() {
         data.title = SimpleEditorShimService.getTitle();
         data.introductionHtml = SimpleEditorShimService.getIntroductionHtml();
-        data.questions = StatesToQuestionsService.getQuestions();
-        return Boolean(data.questions);
+        var questions = StatesToQuestionsService.getQuestions();
+        if (!questions) {
+          return false;
+        }
+
+        data.questionList = QuestionListObjectFactory.create(questions);
+        return true;
       },
       getData: function() {
         return data;
@@ -99,8 +82,8 @@ oppia.factory('SimpleEditorManagerService', [
       getIntroductionHtml: function() {
         return data.introductionHtml;
       },
-      getQuestions: function() {
-        return data.questions;
+      getQuestionList: function() {
+        return data.questionList;
       },
       saveTitle: function(newTitle) {
         SimpleEditorShimService.saveTitle(newTitle);
@@ -113,31 +96,34 @@ oppia.factory('SimpleEditorManagerService', [
       saveCustomizationArgs: function(stateName, newCustomizationArgs) {
         SimpleEditorShimService.saveCustomizationArgs(
           stateName, newCustomizationArgs);
-        getBindableQuestion(stateName).setInteractionCustomizationArgs(
-          newCustomizationArgs);
+        data.questionList.getBindableQuestion(
+          stateName).setInteractionCustomizationArgs(newCustomizationArgs);
       },
       saveAnswerGroups: function(stateName, newAnswerGroups) {
         SimpleEditorShimService.saveAnswerGroups(stateName, newAnswerGroups);
-        getBindableQuestion(stateName).setAnswerGroups(newAnswerGroups);
+        data.questionList.getBindableQuestion(
+          stateName).setAnswerGroups(newAnswerGroups);
       },
       saveDefaultOutcome: function(stateName, newDefaultOutcome) {
         SimpleEditorShimService.saveDefaultOutcome(
           stateName, newDefaultOutcome);
-        getBindableQuestion(stateName).setDefaultOutcome(newDefaultOutcome);
+        data.questionList.getBindableQuestion(
+          stateName).setDefaultOutcome(newDefaultOutcome);
       },
       saveBridgeHtml: function(stateName, newHtml) {
         // This is actually the content HTML for the *next* state.
         SimpleEditorShimService.saveBridgeHtml(
-          getNextStateName(stateName), newHtml);
-        getBindableQuestion(stateName).setBridgeHtml(newHtml);
+          data.questionList.getNextStateName(stateName), newHtml);
+        data.questionList.getBindableQuestion(
+          stateName).setBridgeHtml(newHtml);
       },
       addNewQuestion: function() {
         // This effectively adds a new multiple-choice interaction to the
         // latest state in the chain.
         var lastStateName = (
-          data.questions.length > 0 ?
-          data.questions[data.questions.length - 1].getDestinationStateName() :
-          SimpleEditorShimService.getInitStateName());
+          data.questionList.isEmpty() ?
+          SimpleEditorShimService.getInitStateName() :
+          data.questionList.getLastQuestion().getDestinationStateName());
 
         SimpleEditorShimService.saveInteractionId(
           lastStateName, DEFAULT_INTERACTION.ID);
@@ -150,7 +136,7 @@ oppia.factory('SimpleEditorManagerService', [
         });
 
         var stateData = SimpleEditorShimService.getState(lastStateName);
-        data.questions.push(QuestionObjectFactory.create(
+        data.questionList.addQuestion(QuestionObjectFactory.create(
           lastStateName, stateData.interaction, ''));
       },
       canAddNewQuestion: function() {
@@ -159,14 +145,16 @@ oppia.factory('SimpleEditorManagerService', [
         //   introduction.
         // - Otherwise, the requirement is that, for the last question in the
         //   list, there is at least one answer group.
-        if (data.questions.length === 0) {
+        if (data.questionList.isEmpty()) {
           return Boolean(data.introductionHtml);
         } else {
-          return data.questions[data.questions.length - 1].hasAnswerGroups();
+          return data.questionList.getLastQuestion().hasAnswerGroups();
         }
       },
       canTryToPublish: function() {
-        return this.canAddNewQuestion() && data.questions.length > 2;
+        return (
+          this.canAddNewQuestion() &&
+          data.questionList.getQuestionCount() > 2);
       },
       addState: function() {
         var newStateName = getNewStateName();

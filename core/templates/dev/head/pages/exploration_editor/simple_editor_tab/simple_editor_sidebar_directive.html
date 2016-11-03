@@ -9,7 +9,7 @@
         <strong>Introduction</strong>
       </li>
 
-      <li class="sidebar-item" ng-repeat="question in questions track by $index">
+      <li class="sidebar-item" ng-repeat="question in questionList.getQuestions() track by $index">
         <strong>Question <[$index + 1]></strong>
 
         <ul>
