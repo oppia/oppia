@@ -122,11 +122,16 @@
   }
   multiple-choice-editor .correct-answer-option:hover .correct-answer-inner-radio-button,
   multiple-choice-editor .correct-answer-option-selected .correct-answer-inner-radio-button {
-    background-color: rgba(0,0,0,0.87);
     border-radius: 50%;
     display: block;
     height: 8px;
     margin: 2px;
     width: 8px;
+  }
+  multiple-choice-editor .correct-answer-option:hover:not(.correct-answer-option-selected) .correct-answer-inner-radio-button {
+    background-color: #5cb85c;
+  }
+  multiple-choice-editor .correct-answer-option-selected .correct-answer-inner-radio-button {
+    background-color: rgba(0,0,0,0.87);
   }
 </style>
