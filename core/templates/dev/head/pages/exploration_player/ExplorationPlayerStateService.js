@@ -37,6 +37,14 @@ oppia.factory('ExplorationPlayerStateService', [function() {
 
     isStateTerminal: function(stateName) {
       return exploration.isStateTerminal(stateName);
+    },
+
+    getAuthorRecommendedExpIds: function(stateName) {
+      return exploration.getAuthorRecommendedExpIds(stateName);
+    },
+
+    getGadgetPanelsContents: function() {
+      return exploration.getGadgetPanelsContents();
     }
   };
 }]);

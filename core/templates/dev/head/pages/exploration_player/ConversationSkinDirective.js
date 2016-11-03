@@ -213,9 +213,6 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
           StatsReportingService, UrlInterpolationService,
           siteAnalyticsService, ExplorationPlayerStateService) {
         $scope.CONTINUE_BUTTON_FOCUS_LABEL = 'continueButton';
-        // The exploration domain object.
-        $scope.exploration = null;
-
         // The minimum width, in pixels, needed to be able to show two cards
         // side-by-side.
         var TWO_CARD_THRESHOLD_PX = 960;
@@ -288,11 +285,13 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
 
         $scope.isOnTerminalCard = function() {
           return $scope.activeCard &&
-            $scope.exploration.isStateTerminal($scope.activeCard.stateName);
+            ExplorationPlayerStateService.isStateTerminal(
+              $scope.activeCard.stateName);
         };
 
         var isSupplementalCardNonempty = function(card) {
-          return !$scope.exploration.isInteractionInline(card.stateName);
+          return !ExplorationPlayerStateService.isInteractionInline(
+            card.stateName);
         };
 
         $scope.isCurrentSupplementalCardNonempty = function() {
@@ -379,9 +378,9 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
               $scope.numProgressDots - 1);
           }
 
-          if ($scope.exploration.isStateTerminal(stateName)) {
+          if (ExplorationPlayerStateService.isStateTerminal(stateName)) {
             explorationRecommendationsService.getRecommendedSummaryDicts(
-              $scope.exploration.getAuthorRecommendedExpIds(stateName),
+              ExplorationPlayerStateService.getAuthorRecommendedExpIds(stateName),
               function(summaries) {
                 $scope.recommendedExplorationSummaries = summaries;
               });
@@ -456,7 +455,8 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
               // Do not wait if the interaction is supplemental -- there's
               // already a delay bringing in the help card.
               var millisecsLeftToWait = (
-                !$scope.exploration.isInteractionInline(_oldStateName) ? 1.0 :
+                !ExplorationPlayerStateService.isInteractionInline(
+                  _oldStateName) ? 1.0 :
                 Math.max(MIN_CARD_LOADING_DELAY_MSEC - (
                   new Date().getTime() - timeAtServerCall),
                 1.0));
@@ -471,7 +471,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
                   // Stay on the same card.
                   playerTranscriptService.addNewFeedback(feedbackHtml);
                   if (feedbackHtml &&
-                      !$scope.exploration.isInteractionInline(
+                      !ExplorationPlayerStateService.isInteractionInline(
                         $scope.activeCard.stateName)) {
                     $scope.$broadcast('helpCardAvailable', {
                       helpCardHtml: feedbackHtml,
@@ -505,7 +505,8 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
                     contentHtml + oppiaPlayerService.getRandomSuffix());
 
                   var _isNextInteractionInline = (
-                    $scope.exploration.isInteractionInline(newStateName));
+                    ExplorationPlayerStateService.isInteractionInline(
+                      newStateName));
                   $scope.upcomingInlineInteractionHtml = (
                     _isNextInteractionInline ?
                     oppiaPlayerService.getInteractionHtml(
@@ -523,7 +524,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
                   if (feedbackHtml) {
                     playerTranscriptService.addNewFeedback(feedbackHtml);
 
-                    if (!$scope.exploration.isInteractionInline(
+                    if (!ExplorationPlayerStateService.isInteractionInline(
                           $scope.activeCard.stateName)) {
                       $scope.$broadcast('helpCardAvailable', {
                         helpCardHtml: feedbackHtml,
@@ -627,7 +628,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
 
         $window.addEventListener('beforeunload', function(e) {
           if (hasInteractedAtLeastOnce && !$scope.isInPreviewMode &&
-              !$scope.exploration.isStateTerminal(
+              !ExplorationPlayerStateService.isStateTerminal(
                 playerTranscriptService.getLastCard().stateName)) {
             StatsReportingService.recordMaybeLeaveEvent(
               playerTranscriptService.getLastStateName(),
@@ -713,6 +714,10 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
         $scope.onNavigateFromIframe = function() {
           siteAnalyticsService.registerVisitOppiaFromIframeEvent(
             $scope.explorationId);
+        };
+
+        $scope.getExplorationGadgetPanelsContents = function() {
+          return ExplorationPlayerStateService.getGadgetPanelsContents();
         };
       }
     ]
