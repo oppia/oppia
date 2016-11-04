@@ -1,0 +1,30 @@
+<script type="text/ng-template" id="components/explorationFooter">
+  <div class="footer navbar-fixed-bottom oppia-exploration-footer">
+    <div class="row">
+        <div class="col-sm-7">
+          <img ng-src="<[getStaticImageUrl('/general/apple.svg')]>" itemprop="image"
+             style="height: 60px; width: 60px; float:left; margin: -25px 0px 0px 10px;"/>
+          <div class="dropup">
+            <a id="dropdownMenu2" class="dropdown-toggle" data-toggle="dropdown" style="color:#fff" 
+               ng-if="contributorNames.length>0">
+              <h4 translate="I18N_FOOTER_AUTHOR_PROFILE"></h4>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenu2" role="menu" style="margin-left: 60px; float: left;">
+              <li ng-repeat="name in contributorNames | limitTo: 5" style="color:black;padding-top:10px;">
+                <[name]>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-sm-5">
+        <h4 translate="I18N_PLAYER_SHARE_EXPLORATION_UPPER" style="float:left; margin-left:30px; padding-right:10px;"></h4>
+          <sharing-links ng-if="explorationStatus !== 'private'"
+                        ng-click="$event.stopPropagation()"
+                        twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER"
+                        exploration-id="explorationId"
+                        layout-type="row" class="oppia-footer-sharing-links">
+          </sharing-links>
+        </div>
+    </div>
+  </div>
+</script>
