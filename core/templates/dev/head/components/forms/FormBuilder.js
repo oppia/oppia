@@ -900,19 +900,23 @@ oppia.config(['$provide', function($provide) {
 }]);
 
 oppia.directive('textAngularRte', [
-    '$filter', 'oppiaHtmlEscaper', 'rteHelperService', '$timeout',
+    '$filter', '$timeout', 'oppiaHtmlEscaper', 'rteHelperService',
+    'textAngularManager',
     function(
-      $filter, oppiaHtmlEscaper, rteHelperService, $timeout) {
+        $filter, $timeout, oppiaHtmlEscaper, rteHelperService,
+        textAngularManager) {
       return {
         restrict: 'E',
         scope: {
           htmlContent: '=',
-          uiConfig: '&'
+          uiConfig: '&',
+          labelForFocusTarget: '&'
         },
         template: (
           '<div text-angular="" ta-toolbar="<[toolbarOptionsJson]>" ' +
           '     ta-paste="stripFormatting($html)" ng-model="tempContent"' +
-          '     placeholder="<[placeholderText]>">' +
+          '     placeholder="<[placeholderText]>"' +
+          '     name="<[labelForFocusTarget()]>">' +
           '</div>'),
         controller: ['$scope', function($scope) {
           // Currently, operations affecting the filesystem are allowed only in
@@ -962,6 +966,15 @@ oppia.directive('textAngularRte', [
           };
 
           $scope.init();
+
+          $scope.$on('focusOn', function(evt, label) {
+            if (label === $scope.labelForFocusTarget()) {
+              var editorScope = textAngularManager.retrieveEditor(label).scope;
+              $timeout(function() {
+                editorScope.displayElements.text[0].focus();
+              });
+            }
+          });
 
           $scope.$watch('tempContent', function(newVal) {
             // Sanitizing while a modal is open would delete the markers that
