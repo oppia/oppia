@@ -663,16 +663,47 @@ textarea {
   bottom: 0;
   color: #fff;
   font-size: 13px;
-  line-height: 20px;
-  position: absolute;
+  line-height: 10px;
+  margin-top: 250px;
   width: 100%;
+}
+
+.oppia-exploration-footer {
+  background-color: #094142;
+  bottom: 0;
+  color: #fff;
+  font-size: 13px;
+  line-height: 10px;
+  width: 100%;
+  margin-top: 30px;
+  height: 42px;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
 }
 
 .oppia-footer-container {
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
-  padding: 30px 80px;
+  padding: 3px 80px;
+}
+
+.oppia-exploration-footer-container {
+  max-width: 800px;
+  color: #fff;
+}
+
+.oppia-sharing-footer {
+  margin: -25px 0px 0px 10px;
+}
+
+.oppia-footer-sharing-links ul {
+    margin: -8px;
+    display: block;
+    float: left;
+}
+
+.oppia-footer-sharing-links li {
+  float: left;
 }
 
 .oppia-footer-container a {

@@ -30,6 +30,9 @@ var oppia = angular.module(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
                    : []));
 
+oppia.constant(
+  'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', '/explorationsummarieshandler/data');
+
 oppia.config([
   '$compileProvider', '$httpProvider', '$interpolateProvider',
   '$locationProvider',
