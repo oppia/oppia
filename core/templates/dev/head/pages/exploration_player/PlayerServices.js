@@ -146,7 +146,7 @@ oppia.factory('oppiaPlayerService', [
 
     // Ensure the transition to a terminal state properly logs the end of the
     // exploration.
-    $rootScope.$on('playerStateChange', function(event, newStateName) {
+    $rootScope.$on('playerStateChange', function(evt, newStateName) {
       if (!_editorPreviewMode && exploration.isStateTerminal(newStateName)) {
         StatsReportingService.recordExplorationCompleted(
           newStateName, LearnerParamsService.getAllParams());
