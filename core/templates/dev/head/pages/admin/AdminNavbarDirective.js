@@ -32,7 +32,7 @@ oppia.directive('adminNavbar', [
         isSuperAdmin: '&isSuperAdmin',
         getLogoutUrl: '&logoutUrl'
       },
-      templateUrl: 'pages/admin/navbar',
+      templateUrl: 'admin/navbar',
       controller: ['$scope', function($scope) {
         $scope.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
         $scope.showTab = AdminRouterService.showTab;

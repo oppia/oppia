@@ -17,17 +17,17 @@
  */
 
 oppia.directive('adminMiscTab', [
-  '$http', 'AdminTaskManagerService', 'ADMIN_HANDLER_URL',
+  '$http', '$window', 'AdminTaskManagerService', 'ADMIN_HANDLER_URL',
   'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL',
   function(
-      $http, AdminTaskManagerService, ADMIN_HANDLER_URL,
+      $http, $window, AdminTaskManagerService, ADMIN_HANDLER_URL,
       ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL) {
     return {
       restrict: 'E',
       scope: {
         setStatusMessage: '='
       },
-      templateUrl: 'pages/admin/misc_tab_directive',
+      templateUrl: 'admin/miscTab',
       controller: ['$scope', function($scope) {
         $scope.clearSearchIndex = function() {
           if (AdminTaskManagerService.isTaskRunning()) {
@@ -72,7 +72,7 @@ oppia.directive('adminMiscTab', [
         };
 
         $scope.downloadTopicSimilaritiesFile = function() {
-          window.location.href = ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL;
+          $window.location.href = ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL;
         };
       }]
     };

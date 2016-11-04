@@ -21,7 +21,7 @@ oppia.directive('adminProdModeActivitiesTab', [
   function() {
     return {
       restrict: 'E',
-      templateUrl: 'pages/admin/prod_mode_activities_tab_directive'
+      templateUrl: 'admin/activitiesTabProdMode'
     };
   }
 ]);

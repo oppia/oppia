@@ -27,8 +27,16 @@ oppia.directive('adminJobsTab', [
       scope: {
         setStatusMessage: '='
       },
-      templateUrl: 'pages/admin/jobs_tab_directive',
+      templateUrl: 'admin/jobsTab',
       controller: ['$scope', function($scope) {
+        $scope.HUMAN_READABLE_CURRENT_TIME = (
+          GLOBALS.HUMAN_READABLE_CURRENT_TIME);
+        $scope.CONTINUOUS_COMPUTATIONS_DATA = (
+          GLOBALS.CONTINUOUS_COMPUTATIONS_DATA);
+        $scope.ONE_OFF_JOB_SPECS = GLOBALS.ONE_OFF_JOB_SPECS;
+        $scope.UNFINISHED_JOB_DATA = GLOBALS.UNFINISHED_JOB_DATA;
+        $scope.RECENT_JOB_DATA = GLOBALS.RECENT_JOB_DATA;
+
         $scope.showingJobOutput = false;
         $scope.showJobOutput = function(jobId) {
           var adminJobOutputUrl = UrlInterpolationService.interpolateUrl(

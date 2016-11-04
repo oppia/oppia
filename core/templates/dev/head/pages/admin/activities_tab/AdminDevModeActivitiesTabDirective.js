@@ -25,7 +25,7 @@ oppia.directive('adminDevModeActivitiesTab', [
       scope: {
         setStatusMessage: '='
       },
-      templateUrl: 'pages/admin/dev_mode_activities_tab_directive',
+      templateUrl: 'admin/activitiesTabDevMode',
       controller: ['$scope', function($scope) {
         $scope.reloadExploration = function(explorationId) {
           if (AdminTaskManagerService.isTaskRunning()) {
@@ -50,6 +50,9 @@ oppia.directive('adminDevModeActivitiesTab', [
             AdminTaskManagerService.finishTask();
           });
         };
+
+        $scope.DEMO_EXPLORATIONS = GLOBALS.DEMO_EXPLORATIONS;
+        $scope.DEMO_COLLECTIONS = GLOBALS.DEMO_COLLECTIONS;
 
         $scope.reloadAllExplorations = function() {
           if (AdminTaskManagerService.isTaskRunning()) {
