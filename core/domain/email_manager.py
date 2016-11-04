@@ -136,6 +136,8 @@ SENDER_VALIDATORS = {
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_MARKETING: (
         lambda x: rights_manager.Actor(x).is_admin()),
     feconf.EMAIL_INTENT_DELETE_EXPLORATION: (
@@ -543,3 +545,62 @@ def send_flag_exploration_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_REPORT_BAD_CONTENT,
             email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_query_completion_email(recipient_id, query_id):
+    email_subject = 'Query %s has successfully completed' % query_id
+
+    email_body_template = (
+        'Hi %s,<br>'
+        'Your query with id %s has succesfully completed its '
+        'execution. Visit the result page '
+        '<a href="https://www.oppia.org/emaildashboardresult/%s">here</a> '
+        'to see result of your query.<br><br>'
+        'Thanks!<br>'
+        '<br>'
+        'Best wishes,<br>'
+        'The Oppia Team<br>'
+        '<br>%s')
+
+    recipient_user_settings = user_services.get_user_settings(recipient_id)
+    email_body = email_body_template % (
+        recipient_user_settings.username, query_id, query_id,
+        EMAIL_FOOTER.value)
+    _send_email(
+        recipient_id, feconf.SYSTEM_COMMITTER_ID,
+        feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION, email_subject,
+        email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_query_failure_email(recipient_id, query_id, query_params):
+    email_subject = 'Query %s has failed' % query_id
+
+    email_body_template = (
+        'Hi %s,<br>'
+        'Your query with id %s has failed due to error '
+        'during execution. '
+        'Please check the query parameters and submit query again.<br><br>'
+        'Thanks!<br>'
+        '<br>'
+        'Best wishes,<br>'
+        'The Oppia Team<br>'
+        '<br>%s')
+
+    recipient_user_settings = user_services.get_user_settings(recipient_id)
+    email_body = email_body_template % (
+        recipient_user_settings.username, query_id, EMAIL_FOOTER.value)
+    _send_email(
+        recipient_id, feconf.SYSTEM_COMMITTER_ID,
+        feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION, email_subject,
+        email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+
+    admin_email_subject = 'Query job has failed.'
+    admin_email_body_template = (
+        'Query job with %s query id has failed in its execution.\n'
+        'Query parameters:\n\n')
+
+    for key in sorted(query_params):
+        admin_email_body_template += '%s: %s\n' % (key, query_params[key])
+
+    admin_email_body = admin_email_body_template % query_id
+    send_mail_to_admin(admin_email_subject, admin_email_body)

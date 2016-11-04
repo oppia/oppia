@@ -525,13 +525,13 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
         self.assertIn(self.COLLECTION_ID, [
             collection.id
             for collection in collection_models.CollectionModel.get_all(
-                include_deleted_entities=True)])
+                include_deleted=True)])
 
         # The collection summary is deleted, however.
         self.assertNotIn(self.COLLECTION_ID, [
             collection.id
             for collection in collection_models.CollectionSummaryModel.get_all(
-                include_deleted_entities=True)])
+                include_deleted=True)])
 
     def test_hard_deletion_of_collections(self):
         """Test that hard deletion of collections works correctly."""
@@ -553,7 +553,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
         self.assertNotIn(self.COLLECTION_ID, [
             collection.id
             for collection in collection_models.CollectionModel.get_all(
-                include_deleted_entities=True)])
+                include_deleted=True)])
 
     def test_summaries_of_hard_deleted_collections(self):
         """Test that summaries of hard deleted collections are
@@ -574,7 +574,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
         self.assertNotIn(self.COLLECTION_ID, [
             collection.id
             for collection in collection_models.CollectionSummaryModel.get_all(
-                include_deleted_entities=True)])
+                include_deleted=True)])
 
     def test_collections_are_removed_from_index_when_deleted(self):
         """Tests that deleted collections are removed from the search index."""

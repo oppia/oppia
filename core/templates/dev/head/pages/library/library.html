@@ -93,8 +93,7 @@
           <div class="oppia-library-group" ng-repeat="group in libraryGroups track by $index" ng-mouseenter="setActiveGroup($index)" ng-mouseleave="clearActiveGroup()">
             <div class="row oppia-library-group-header-container">
               <h2 ng-class="{'active': activeGroupIndex === $index}" class="oppia-library-group-header">
-                <a ng-if="group.has_full_results_page"
-                  ng-click="showFullResultsPage(group.categories, group.full_results_url)">
+                <a ng-if="group.has_full_results_page" class="protractor-test-library-<[group.protractor_id]>" ng-click="showFullResultsPage(group.categories, group.full_results_url)">
                   <span translate="<[group.header_i18n_id]>"></span>
                   <span ng-show="activeGroupIndex === $index"><i class="material-icons md-32">&#xE315;</i></span>
                 </a>

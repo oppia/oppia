@@ -19,6 +19,7 @@
 from core.platform import models
 import feconf
 
+from google.appengine.datastore.datastore_query import Cursor
 from google.appengine.ext import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
@@ -362,3 +363,12 @@ class UserQueryModel(base_models.BaseModel):
             feconf.USER_QUERY_STATUS_ARCHIVED,
             feconf.USER_QUERY_STATUS_FAILED
         ])
+
+    @classmethod
+    def fetch_page(cls, page_size, cursor):
+        cursor = Cursor(urlsafe=cursor)
+        query_models, next_cursor, more = (
+            cls.query().order(-cls.created_on).
+            fetch_page(page_size, start_cursor=cursor))
+        next_cursor = next_cursor.urlsafe() if (next_cursor and more) else None
+        return query_models, next_cursor, more
