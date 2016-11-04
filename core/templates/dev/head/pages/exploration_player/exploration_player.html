@@ -92,6 +92,8 @@
     {% include 'pages/exploration_player/conversation_skin_directive.html' %}
   {% endif %}
 
+  {% include 'pages/exploration_player/tutor_card_directive.html' %}
+  {% include 'pages/exploration_player/supplemental_card_directive.html' %}
   {% include 'pages/exploration_player/answer_feedback_pair_directive.html' %}
   {% include 'pages/exploration_player/exploration_successfully_flagged_modal.html' %}
   {% include 'pages/exploration_player/feedback_popup_directive.html' %}
@@ -120,6 +122,10 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StateObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/StopwatchObjectFactory.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/TutorCardDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/SupplementalCardDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationPlayerStateService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerConstants.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerClassificationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerFeedbackPairDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ConversationSkinDirective.js"></script>
