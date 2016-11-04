@@ -280,8 +280,7 @@ oppia.controller('Admin', [
         }
         $scope.message = (
           'Reloaded ' + GLOBALS.DEMO_COLLECTION_IDS.length +
-          ' collection' + (GLOBALS.DEMO_COLLECTION_IDS.length == 1 ? '' : 's') +
-          ': ' + numSucceeded + ' succeeded, ' + numFailed +
+          ' collections: ' + numSucceeded + ' succeeded, ' + numFailed +
           ' failed.');
       };
 

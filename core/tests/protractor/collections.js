@@ -29,7 +29,8 @@ describe('Collections', function() {
     browser.driver.switchTo().alert().accept();
     browser.waitForAngular();
     admin.editConfigProperty(
-        'Names of users allowed to use the collection editor', 'List', function(listEditor) {
+        'Names of users allowed to use the collection editor', 'List', function(
+          listEditor) {
       listEditor.addItem('Unicode').setValue(USERNAME);
     });
   });
