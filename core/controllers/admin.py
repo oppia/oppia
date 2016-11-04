@@ -57,6 +57,7 @@ class AdminPage(base.BaseHandler):
     @require_super_admin
     def get(self):
         """Handles GET requests."""
+        demo_collection_ids = feconf.DEMO_COLLECTIONS.keys()
         demo_exploration_ids = feconf.DEMO_EXPLORATIONS.keys()
 
         recent_job_data = jobs.get_data_for_recent_jobs()
@@ -93,6 +94,7 @@ class AdminPage(base.BaseHandler):
         self.values.update({
             'continuous_computations_data': continuous_computations_data,
             'demo_collections': sorted(feconf.DEMO_COLLECTIONS.iteritems()),
+            'demo_collection_ids': demo_collection_ids,
             'demo_explorations': sorted(feconf.DEMO_EXPLORATIONS.iteritems()),
             'demo_exploration_ids': demo_exploration_ids,
             'human_readable_current_time': (
