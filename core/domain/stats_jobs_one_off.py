@@ -400,10 +400,11 @@ class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
             for _, count in answers.iteritems():
                 total_submission_count = total_submission_count + count
 
-            yield ('%s-%s' % (exp_id, rule_name), {
+            yield ('%s-%s-%s' % (exp_id, state_name, rule_name), {
                 'frequency': total_submission_count,
                 'type': RuleTypeBreakdownAudit._OLD_ANSWER_MODEL_TYPE,
                 'exploration_id': exp_id,
+                'state_name': state_name,
                 'rule_name': rule_name
             })
             aggregation_key = '%s-%s' % (
@@ -416,15 +417,18 @@ class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
         else:
             # Answers need to be collected one at a time in the new data store
             for answer in item.submitted_answer_list:
+                exp_id = item.exploration_id
+                state_name = item.state_name
                 rule_str = answer['rule_spec_str']
                 if '(' in rule_str:
                     rule_name = rule_str[:rule_str.index('(')]
                 else:
                     rule_name = rule_str
-                yield ('%s-%s' % (item.exploration_id, rule_name), {
+                yield ('%s-%s-%s' % (exp_id, state_name, rule_name), {
                     'frequency': 1,
                     'type': RuleTypeBreakdownAudit._NEW_ANSWER_MODEL_TYPE,
-                    'exploration_id': item.exploration_id,
+                    'exploration_id': exp_id,
+                    'state_name': state_name,
                     'rule_name': rule_name
                 })
                 aggregation_key = '%s-%s' % (
@@ -473,10 +477,12 @@ class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
             # large amounts of output.
             if old_total_count != new_total_count:
                 exp_id = first_value_dict['exploration_id']
+                state_name = first_value_dict['state_name']
                 yield (
-                    '%s: %s has %d submitted answers in the old model and %d in '
-                    'the new model' % (
-                        rule_name, exp_id, old_total_count, new_total_count))
+                    '%s: \'%s.%s\' has %d submitted answers in the old model '
+                    'and %d in the new model' % (
+                        rule_name, exp_id, state_name, old_total_count,
+                        new_total_count))
             else:
                 # This output will be aggregated and acts as a sanity check.
                 yield (
