@@ -392,7 +392,8 @@ oppia.filter('stripFormatting', [function() {
       '(?!<img.*class=".*(' + whitelistedImgClasses.join('|') +
       ').*".*>)(?!<b>|<\/b>|<i>|<\/i>)<[^>]+>', 'gm');
     var strippedText = html ? String(html).replace(styleRegex, '') : '';
-    strippedText = strippedText ? String(strippedText).replace(tagRegex, '') : '';
+    strippedText = strippedText ? String(strippedText).replace(
+      tagRegex, '') : '';
     return strippedText;
   };
 }]);
