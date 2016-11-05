@@ -144,6 +144,21 @@ SENDER_VALIDATORS = {
         lambda x: rights_manager.Actor(x).is_moderator()),
     feconf.EMAIL_INTENT_REPORT_BAD_CONTENT: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.BULK_EMAIL_INTENT_MARKETING: (
+        lambda x: user_services.get_username(x) in
+        config_domain.WHITELISTED_EMAIL_SENDERS.value),
+    feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION: (
+        lambda x: user_services.get_username(x) in
+        config_domain.WHITELISTED_EMAIL_SENDERS.value),
+    feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION: (
+        lambda x: user_services.get_username(x) in
+        config_domain.WHITELISTED_EMAIL_SENDERS.value),
+    feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT: (
+        lambda x: user_services.get_username(x) in
+        config_domain.WHITELISTED_EMAIL_SENDERS.value),
+    feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT: (
+        lambda x: user_services.get_username(x) in
+        config_domain.WHITELISTED_EMAIL_SENDERS.value)
 }
 
 
@@ -207,6 +222,44 @@ def _send_email(
             email_subject, cleaned_html_body, datetime.datetime.utcnow())
 
     return transaction_services.run_in_transaction(_send_email_in_transaction)
+
+
+def _send_bulk_mail(
+        recipient_ids, sender_id, intent, email_subject, email_html_body,
+        sender_email, sender_name, instance_id=None):
+    """Sends an email to all given recipients."""
+    _require_sender_id_is_valid(intent, sender_id)
+
+    recipients_settings = user_services.get_users_settings(recipient_ids)
+    recipient_emails = [user.email for user in recipients_settings]
+
+    cleaned_html_body = html_cleaner.clean(email_html_body)
+    if cleaned_html_body != email_html_body:
+        log_new_error(
+            'Original email HTML body does not match cleaned HTML body:\n'
+            'Original:\n%s\n\nCleaned:\n%s\n' %
+            (email_html_body, cleaned_html_body))
+        return
+
+    raw_plaintext_body = cleaned_html_body.replace('<br/>', '\n').replace(
+        '<br>', '\n').replace('<li>', '<li>- ').replace('</p><p>', '</p>\n<p>')
+    cleaned_plaintext_body = html_cleaner.strip_html_tags(raw_plaintext_body)
+
+    def _send_bulk_mail_in_transaction(instance_id=None):
+        sender_name_email = '%s <%s>' % (sender_name, sender_email)
+
+        email_services.send_bulk_mail(
+            sender_name_email, recipient_emails, email_subject,
+            cleaned_plaintext_body, cleaned_html_body)
+
+        if instance_id is None:
+            instance_id = email_models.BulkEmailModel.get_new_id('')
+        email_models.BulkEmailModel.create(
+            instance_id, recipient_ids, sender_id, sender_name_email, intent,
+            email_subject, cleaned_html_body, datetime.datetime.utcnow())
+
+    return transaction_services.run_in_transaction(
+        _send_bulk_mail_in_transaction, instance_id)
 
 
 def send_mail_to_admin(email_subject, email_body):
