@@ -112,7 +112,7 @@
               Add new message
               <span ng-if="editabilityService.isEditable() && !activeThread.suggestion">(and/or change status)</span>
             </label>
-            <textarea class="form-control" ng-model="tmpMessage.text"
+            <textarea class="form-control protractor-test-feedback-response-textarea" ng-model="tmpMessage.text"
                       id="tmpMessageText" rows="6"
                       ng-disabled="messageSendingInProgress">
             </textarea>
@@ -129,7 +129,7 @@
           </div>
 
           <div>
-            <button class="btn btn-success" style="margin-top: 10px;"
+            <button class="btn btn-success protractor-test-oppia-feedback-response-send-btn" style="margin-top: 10px;"
                     ng-click="addNewMessage(activeThread.thread_id, tmpMessage.text, tmpMessage.status)"
                     ng-disabled="messageSendingInProgress || (!tmpMessage.text && activeThread.status === tmpMessage.status)">
               <span ng-if="messageSendingInProgress">Sending...</span>
