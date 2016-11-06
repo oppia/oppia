@@ -44,8 +44,8 @@ oppia.directive('explorationFooter', [function() {
                 summaryBackendObject = summaries[0];
                 $scope.contributorNames = (
                   Object.keys(
-                    summaryBackendObject.human_readable_contributors_summary 
-                    || {}));
+                    summaryBackendObject.human_readable_contributors_summary ||
+                    {}));
               }
             });
       }
