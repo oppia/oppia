@@ -122,8 +122,8 @@ oppia.factory('mathExpressionInputRulesService', [function() {
   return {
     IsMathematicallyEquivalentTo: function(answer, inputs) {
       return (
-        MathExpression.fromText(answer.ascii).equals(
-          MathExpression.fromText(inputs.x)));
+        MathExpression.fromLatex(answer.latex).equals(
+          MathExpression.fromLatex(inputs.x)));
     }
   };
 }]);
