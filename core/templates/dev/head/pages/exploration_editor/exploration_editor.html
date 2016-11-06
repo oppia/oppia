@@ -261,7 +261,7 @@
             Add a goal: what does the exploration help people to do?
             <input name="objectiveInput" type="text" class="form-control" ng-model="explorationObjectiveService.displayed"
                    placeholder="Learn how to ...">
-            <span class="help-block" ng-show="(objectiveForm.objectiveInput.$touched || objectiveHasBeenPreviouslyEdited) && explorationObjectiveService.displayed.length < 15" style="font-size: smaller; color: #a94442">Please provide a descriptive goal to help people understand what this exploration is about.</span>
+            <span class="help-block" ng-show="(objectiveForm.objectiveInput.$touched || objectiveHasBeenPreviouslyEdited) && explorationObjectiveService.displayed.length < 15" style="font-size: smaller; color: #a94442">Please provide a complete sentence that describes what this exploration is about.</span>
           </p>
         </form>
         <p ng-if="requireCategoryToBeSpecified">
