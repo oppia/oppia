@@ -15,9 +15,7 @@
 """Tests for the admin page."""
 
 from core.controllers import base
-from core.domain import config_domain
 from core.tests import test_utils
-import feconf
 
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
@@ -112,57 +110,3 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         response = self.testapp.get('/about')
         self.assertIn(new_config_value, response.body)
-
-    def test_change_rights(self):
-        """Test that the correct role indicators show up on app pages."""
-
-        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.signup('superadmin@example.com', 'superadm1n')
-        self.signup(
-            BOTH_MODERATOR_AND_ADMIN_EMAIL, BOTH_MODERATOR_AND_ADMIN_USERNAME)
-
-        # Navigate to any page. The role is not set.
-        self.testapp.get(feconf.LIBRARY_INDEX_URL).mustcontain(
-            no=['/moderator', '/admin'])
-
-        # Log in as a superadmin. This gives access to /admin.
-        self.login('superadmin@example.com', is_super_admin=True)
-        self.testapp.get(feconf.LIBRARY_INDEX_URL).mustcontain(
-            '/admin', no=['/moderator'])
-
-        # Add a moderator, an admin, and a person with both roles, then log
-        # out.
-        response = self.testapp.get('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json('/adminhandler', {
-            'action': 'save_config_properties',
-            'new_config_property_values': {
-                config_domain.ADMIN_USERNAMES.name: [
-                    self.ADMIN_USERNAME,
-                    BOTH_MODERATOR_AND_ADMIN_USERNAME],
-                config_domain.MODERATOR_USERNAMES.name: [
-                    self.MODERATOR_USERNAME,
-                    BOTH_MODERATOR_AND_ADMIN_USERNAME],
-            }
-        }, csrf_token)
-        self.logout()
-
-        # Log in as a moderator.
-        self.login(self.MODERATOR_EMAIL)
-        self.testapp.get(feconf.LIBRARY_INDEX_URL).mustcontain(
-            '/moderator', no=['/admin'])
-        self.logout()
-
-        # Log in as an admin.
-        self.login(self.ADMIN_EMAIL)
-        self.testapp.get(feconf.LIBRARY_INDEX_URL).mustcontain(
-            '/moderator', no=['/admin'])
-        self.logout()
-
-        # Log in as a both-moderator-and-admin.
-        # Only '(Admin)' is shown in the navbar.
-        self.login(BOTH_MODERATOR_AND_ADMIN_EMAIL)
-        self.assertEqual(self.testapp.get('/').status_int, 302)
-        self.testapp.get(feconf.LIBRARY_INDEX_URL).mustcontain(
-            '/moderator', no=['/admin'])
-        self.logout()

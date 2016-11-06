@@ -86,7 +86,10 @@ exports.config = {
       'protractor/userManagement.js',
       'protractor/embedding.js',
       'protractor/preferences.js',
-      'protractor/cacheSlugs.js'
+      'protractor/cacheSlugs.js',
+      'protractor/staticPagesTour.js',
+      'protractor/loginFlow.js',
+      'protractor/libraryPagesTour.js'
     ],
 
     i18n: [
@@ -109,6 +112,10 @@ exports.config = {
           accept_languages: 'en-EN'
         }
       }
+    },
+    loggingPrefs: {
+      driver: 'INFO',
+      browser: 'INFO'
     }
   },
 

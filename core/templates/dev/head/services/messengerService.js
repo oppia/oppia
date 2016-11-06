@@ -98,10 +98,11 @@ oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
         }
       }
 
-      // Only send a message to the parent if the oppia window is iframed.
-      if ($window.parent !== $window &&
+      // Only send a message to the parent if the oppia window is iframed and
+      // a hash is passed in.
+      var rawHash = $window.location.hash.substring(1);
+      if ($window.parent !== $window && rawHash &&
           MESSAGE_VALIDATORS.hasOwnProperty(messageTitle)) {
-        var rawHash = $window.location.hash.substring(1);
         // Protractor tests may prepend a / to this hash, which we remove:
         var hash = (rawHash.charAt(0) === '/') ? rawHash.substring(1) : rawHash;
         var hashParts = hash.split('&');
@@ -122,7 +123,8 @@ oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
           return;
         }
 
-        if (hashDict.version === '0.0.0' || hashDict.version === '0.0.1') {
+        if (hashDict.version === '0.0.0' || hashDict.version === '0.0.1' ||
+            hashDict.version === '0.0.2') {
           $log.info('Posting message to parent: ' + messageTitle);
 
           var payload = getPayload[messageTitle](messageData);

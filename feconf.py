@@ -236,6 +236,7 @@ EMAIL_INTENT_MARKETING = 'marketing'
 EMAIL_INTENT_PUBLICIZE_EXPLORATION = 'publicize_exploration'
 EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 EMAIL_INTENT_DELETE_EXPLORATION = 'delete_exploration'
+EMAIL_INTENT_QUERY_STATUS_NOTIFICATION = 'query_status_notification'
 
 MODERATOR_ACTION_PUBLICIZE_EXPLORATION = 'publicize_exploration'
 MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
@@ -446,9 +447,11 @@ DASHBOARD_EXPLORATION_STATS_PREFIX = '/dashboardhandler/explorationstats'
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
+EXPLORATION_METADATA_SEARCH_URL = '/exploration/metadata_search'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
 EXPLORATION_SUMMARIES_DATA_URL = '/explorationsummarieshandler/data'
 EXPLORATION_URL_PREFIX = '/explore'
+EXPLORATION_URL_EMBED_PREFIX = '/embed/exploration'
 FEEDBACK_STATS_URL_PREFIX = '/feedbackstatshandler'
 FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
@@ -466,6 +469,7 @@ NEW_EXPLORATION_URL = '/contributehandler/create_new'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 ROBOTS_TXT_URL = '/robots.txt'
+SITE_FEEDBACK_FORM_URL = ''
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
@@ -536,6 +540,14 @@ OUTPUT_FORMAT_ZIP = 'zip'
 UPDATE_TYPE_EXPLORATION_COMMIT = 'exploration_commit'
 UPDATE_TYPE_COLLECTION_COMMIT = 'collection_commit'
 UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
+
+# Possible values for user query status.
+# Valid status transitions are: processing --> completed --> archived
+# Or processing --> failed.
+USER_QUERY_STATUS_PROCESSING = 'processing'
+USER_QUERY_STATUS_COMPLETED = 'completed'
+USER_QUERY_STATUS_ARCHIVED = 'archived'
+USER_QUERY_STATUS_FAILED = 'failed'
 
 # The time difference between which to consider two login events "close". This
 # is taken to be 12 hours.
@@ -757,6 +769,9 @@ SUPPORTED_SITE_LANGUAGES = [{
     'id': 'pt',
     'text': 'Português'
 }, {
+    'id': 'pt-br',
+    'text': 'Português (Brasil)'
+}, {
     'id': 'vi',
     'text': 'Tiếng Việt'
 }, {
@@ -816,6 +831,7 @@ TERMS_PAGE_DESCRIPTION = (
     'distributing learning material.')
 THANKS_PAGE_DESCRIPTION = (
     'Thank you for donating to The Oppia Foundation.')
+SITE_NAME = 'Oppia.org'
 
 # The type of the response returned by a handler when an exception is raised.
 HANDLER_TYPE_HTML = 'html'

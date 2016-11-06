@@ -224,3 +224,24 @@ class CollectionRightsHandler(CollectionEditorHandler):
             'rights': rights_manager.get_collection_rights(
                 collection_id).to_dict()
         })
+
+
+class ExplorationMetadataSearchHandler(base.BaseHandler):
+    """Provides data for exploration search."""
+
+    def get(self):
+        """Handles GET requests."""
+        query_string = self.request.get('q')
+
+        search_cursor = self.request.get('cursor', None)
+
+        collection_node_metadata_list, new_search_cursor = (
+            summary_services.get_exp_metadata_dicts_matching_query(
+                query_string, search_cursor, self.user_id))
+
+        self.values.update({
+            'collection_node_metadata_list': collection_node_metadata_list,
+            'search_cursor': new_search_cursor,
+        })
+
+        self.render_json(self.values)
