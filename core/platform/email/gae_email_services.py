@@ -79,7 +79,6 @@ def send_bulk_mail(
       - plaintext_body: str. The plaintext body of the email.
       - html_body: str. The HTML body of the email. Must fit in a datastore
           entity.
-      - bcc_admin: bool. Whether to bcc feconf.ADMIN_EMAIL_ADDRESS on the email.
 
     Raises:
       Exception: if the configuration in feconf.py forbids emails from being
