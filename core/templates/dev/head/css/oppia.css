@@ -3520,11 +3520,11 @@ md-card.preview-conversation-skin-supplemental-card {
       z-index: 10;
   }
   .oppia-splash-button-heading {
-      position: relative;
       left: -webkit-calc(-70px + 15%);
       left: -moz-calc(-70px + 15%);
       left: -o-calc(-70px + 15%);
       left: calc(-70px + 15%);
+      position: relative;
   }
 
   .oppia-splash-section-two-content {
