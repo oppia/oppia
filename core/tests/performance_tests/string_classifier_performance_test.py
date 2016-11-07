@@ -25,16 +25,19 @@ def benchmark(func):
         start = time.time()
         result = func(obj, num)
         end = time.time()
-        print '%s spent %f seconds for %d instances' % (func.__name__, end - start, num)
+        print '%s spent %f seconds for %d instances' % (func.__name__,
+                                                        end - start, num)
         return result
     return time_taken
 
 class StringClassifierPerformanceTest(object):
     def __init__(self):
-        yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../data/string_classifier_test.yaml")
+        yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                                 "../data/string_classifier_test.yaml")
         yaml_dict = yaml.load(file(yaml_path, "r"))
         doc_to_label = {}
-        for interaction in yaml_dict['states']['Home']['interaction']['answer_groups'][1:]:
+        interactions = yaml_dict['states']['Home']['interaction']
+        for interaction in interactions['answer_groups'][1:]:
             label = interaction["outcome"]["feedback"][0]
             for rule in interaction["rule_specs"]:
                 if "inputs" in rule and "training_data" in rule["inputs"]:
@@ -44,6 +47,7 @@ class StringClassifierPerformanceTest(object):
                         doc_to_label[doc].append(label)
         self.examples = [[doc, doc_to_label[doc]] for doc in doc_to_label]
         self.predict_docs = [doc[0] for doc in self.examples]
+        self.classifier = None
 
     @benchmark
     def train(self, num):
@@ -66,12 +70,13 @@ class StringClassifierPerformanceTest(object):
         doc_ids = string_classifier.add_docs_for_predicting(
             self.predict_docs[:num])
         for i in xrange(len(doc_ids)):
-            string_classifier.predict_label_for_doc(doc_ids[0])
+            string_classifier.predict_label_for_doc(doc_ids[i])
 
     def benchmark_on_predict(self):
         self.classifier = self.train(len(self.examples))
         for num in xrange(100, len(self.predict_docs), 100):
             self.predict(num)
+
 
 if __name__ == '__main__':
     test = StringClassifierPerformanceTest()
