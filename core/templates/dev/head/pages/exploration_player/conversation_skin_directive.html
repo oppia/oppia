@@ -10,7 +10,10 @@
 
       <div class="conversation-skin-tutor-card-container"
           ng-show="!isViewportNarrow() || isScreenNarrowAndShowingTutorCard()"
-          ng-class="{ 'conversation-skin-animate-tutor-card-on-narrow': isViewportNarrow() && isCurrentSupplementalCardNonempty()}">
+          ng-class="{ 'conversation-skin-animate-tutor-card-on-narrow':
+                        isViewportNarrow() && isCurrentSupplementalCardNonempty(),
+                      'conversation-skin-tutor-card-alone':
+                        isViewportNarrow() && !isCurrentSupplementalCardNonempty()}">
         <tutor-card show-next-card="showUpcomingCard()"
                     show-supplemental-card="showSupplementalCardIfScreenIsNarrow()"
                     start-card-change-animation="startCardChangeAnimation"
@@ -336,12 +339,18 @@
       }
 
       .conversation-skin-tutor-card-container {
+        position: absolute;
         left: 0px;
         margin: 0 auto;
         right: 0px;
         top: 40px;
         width: 100%;
         z-index: 15;
+      }
+
+      .conversation-skin-tutor-card-alone {
+        position: relative;
+        top: 0px;
       }
 
       .conversation-skin-supplemental-card-container {
