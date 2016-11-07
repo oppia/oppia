@@ -79,6 +79,6 @@ class StringClassifierPerformanceTest(object):
 
 
 if __name__ == '__main__':
-    test_obj = StringClassifierPerformanceTest()
-    test_obj.benchmark_on_train()
-    test_obj.benchmark_on_predict()
+    TEST = StringClassifierPerformanceTest()
+    TEST.benchmark_on_train()
+    TEST.benchmark_on_predict()
