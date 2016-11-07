@@ -677,9 +677,8 @@ textarea {
 }
 
 .oppia-exploration-footer {
+  color: #FFF;
   background-color: #094142;
-  bottom: 0;
-  color: #fff;
   font-size: 13px;
   line-height: 10px;
   width: 100%;
@@ -695,9 +694,32 @@ textarea {
   padding: 3px 80px;
 }
 
+.author-profile {
+  color: #fff;
+}
+
+.oppia-exploration-footer .author-profile .hover-link {
+  background-color: #094142;
+  width: 28%;
+}
+
+.oppia-exploration-footer .author-profile .hover-link a {
+  cursor: pointer;
+  color: #fff;
+}
+
+.oppia-exploration-footer .author-profile .hovered-text h4 {
+  color: #094142 !important;
+}
+
+.oppia-exploration-footer .author-profile .hover-link:hover,
+.oppia-exploration-footer .author-profile .hover-link:focus {
+  background-color: #fff;
+  color: #094142;
+}
+
 .oppia-exploration-footer-container {
   max-width: 800px;
-  color: #fff;
 }
 
 .oppia-sharing-footer {
