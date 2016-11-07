@@ -15,8 +15,8 @@
 """Performance tests for the library page."""
 
 import os
-import yaml
 import time
+import yaml
 
 from core.domain.classifier_services import StringClassifier
 
@@ -79,6 +79,6 @@ class StringClassifierPerformanceTest(object):
 
 
 if __name__ == '__main__':
-    test = StringClassifierPerformanceTest()
-    test.benchmark_on_train()
-    test.benchmark_on_predict()
+    test_obj = StringClassifierPerformanceTest()
+    test_obj.benchmark_on_train()
+    test_obj.benchmark_on_predict()
