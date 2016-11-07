@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Performance tests for the library page."""
+"""Performance tests for string classifier."""
 
 import os
 import time
