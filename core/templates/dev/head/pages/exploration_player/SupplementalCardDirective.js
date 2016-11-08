@@ -62,7 +62,11 @@ oppia.directive('supplementalCard', [function() {
         };
 
         $scope.isWindowTall = function() {
-          return $(document).height() > $window.innerHeight;
+          var supplemental = $('.conversation-skin-supplemental-card');
+          var scrollBottom = $(window).scrollTop() + $(window).height();
+          var supplementalBottom = supplemental.offset().top +
+                                   supplemental.height();
+          return scrollBottom - supplementalBottom > 50;
         };
 
         $scope.submitAnswer = function(answer, interactionRulesService) {
