@@ -3467,12 +3467,12 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-splash-button-container {
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 500px;
-    transform: translate(-150px, 10px);
-    position: relative;
-    width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 500px;
+  transform: translate(-150px, 10px);
+  position: relative;
+  width: 100%;
 }
 
 @media (min-width: 768px) {
@@ -3491,6 +3491,14 @@ md-card.preview-conversation-skin-supplemental-card {
     left: -o-calc(50% - -200px);
     left: calc(50% - -200px);
   }
+  .oppia-splash-button-heading {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 500px;
+    transform: translate(-150px, 10px);
+    position: relative;
+    width: 100%; 
+  }
 
   .oppia-splash-section-two-content {
     padding-top: 80px;
@@ -3505,11 +3513,18 @@ md-card.preview-conversation-skin-supplemental-card {
     margin-top: 50px;
   }
   .oppia-splash-button-container {
-      max-width: none;
-      position: absolute;
-      transform: translate(0, 0);
-      width: 100%;
-      z-index: 10;
+    max-width: none;
+    position: absolute;
+    transform: translate(0, 0);
+    width: 100%;
+    z-index: 10;
+  }
+  .oppia-splash-button-heading {
+    left: -webkit-calc(-70px + 15%);
+    left: -moz-calc(-70px + 15%);
+    left: -o-calc(-70px + 15%);
+    left: calc(-70px + 15%);
+    position: relative;
   }
 
   .oppia-splash-section-two-content {
