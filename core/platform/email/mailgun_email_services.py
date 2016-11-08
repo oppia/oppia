@@ -114,17 +114,17 @@ def send_bulk_mail(
     # post data. Maximum limit of recipients per request is 1000.
     # For more detail check following link:
     # https://documentation.mailgun.com/user_manual.html#batch-sending
-    recipient_emails = [
+    recipient_email_sets = [
         recipient_emails[i:i+1000]
         for i in xrange(0, len(recipient_emails), 1000)]
 
-    for emails in recipient_emails:
+    for email_set in recipient_email_sets:
         # 'recipient-variable' in post data forces mailgun to send individual
         # email to each recipient (This is intended to be a workaround for
         # sending individual emails).
         data = {
             'from': sender_email,
-            'to': emails,
+            'to': email_set,
             'subject': subject,
             'text': plaintext_body,
             'html': html_body,
