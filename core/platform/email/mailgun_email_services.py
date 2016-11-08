@@ -110,13 +110,26 @@ def send_bulk_mail(
     if not feconf.CAN_SEND_EMAILS:
         raise Exception('This app cannot send emails to users.')
 
-    data = {
-        'from': sender_email,
-        'to': recipient_emails,
-        'subject': subject,
-        'text': plaintext_body,
-        'html': html_body}
+    # To send bulk emails we pass list of recipients in 'to' paarameter of
+    # post data. Maximum limit of recipients per request is 1000.
+    # For more detail check following link:
+    # https://documentation.mailgun.com/user_manual.html#batch-sending
+    recipient_emails = [
+        recipient_emails[i:i+1000]
+        for i in xrange(0, len(recipient_emails), 1000)]
 
-    requests.post(
-        mailgun_domain_name, auth=('api', feconf.MAILGUN_API_KEY),
-        data=data)
+    for emails in recipient_emails:
+        # 'recipient-variable' in post data forces mailgun to send individual
+        # email to each recipient (This is intended to be a workaround for
+        # sending individual emails).
+        data = {
+            'from': sender_email,
+            'to': emails,
+            'subject': subject,
+            'text': plaintext_body,
+            'html': html_body,
+            'recipient-variables': '{}'}
+
+        requests.post(
+            mailgun_domain_name, auth=('api', feconf.MAILGUN_API_KEY),
+            data=data)

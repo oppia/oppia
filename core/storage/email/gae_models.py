@@ -178,7 +178,7 @@ class BulkEmailModel(base_models.BaseModel):
     id/key of instances of this model is randomly generated string of length 12.
     """
 
-    # The user IDs of the email recipient.
+    # The user IDs of the email recipients.
     recipient_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user ID of the email sender. For site-generated emails this is equal
     # to feconf.SYSTEM_COMMITTER_ID.
@@ -204,7 +204,7 @@ class BulkEmailModel(base_models.BaseModel):
     def create(
             cls, instance_id, recipient_ids, sender_id, sender_email,
             intent, subject, html_body, sent_datetime):
-        """Creates a new SentEmailModel entry."""
+        """Creates a new BulkEmailModel entry."""
         email_model_instance = cls(
             id=instance_id, recipient_ids=recipient_ids, sender_id=sender_id,
             sender_email=sender_email, intent=intent, subject=subject,
@@ -213,6 +213,5 @@ class BulkEmailModel(base_models.BaseModel):
 
     @classmethod
     def get_number_of_emails_sent_to_user(cls, recipient_id, intent):
-        sent_emails = cls.query(ndb.AND(
-            cls.recipient_ids == recipient_id, cls.intent == intent)).fetch()
-        return len(sent_emails)
+        return cls.query(ndb.AND(
+            cls.recipient_ids == recipient_id, cls.intent == intent)).count()
