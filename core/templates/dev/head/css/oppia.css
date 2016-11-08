@@ -671,69 +671,17 @@ textarea {
   bottom: 0;
   color: #fff;
   font-size: 13px;
-  line-height: 10px;
+  line-height: 20px
   margin-top: 250px;
+  position: absolute;
   width: 100%;
-}
-
-.oppia-exploration-footer {
-  color: #FFF;
-  background-color: #094142;
-  font-size: 13px;
-  line-height: 10px;
-  width: 100%;
-  margin-top: 30px;
-  height: 42px;
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
 }
 
 .oppia-footer-container {
-  max-width: 800px;
   margin-left: auto;
   margin-right: auto;
-  padding: 3px 80px;
-}
-
-.author-profile {
-  color: #fff;
-}
-
-.oppia-exploration-footer .author-profile .hover-link {
-  background-color: #094142;
-  width: 28%;
-}
-
-.oppia-exploration-footer .author-profile .hover-link a {
-  cursor: pointer;
-  color: #fff;
-}
-
-.oppia-exploration-footer .author-profile .hovered-text h4 {
-  color: #094142 !important;
-}
-
-.oppia-exploration-footer .author-profile .hover-link:hover,
-.oppia-exploration-footer .author-profile .hover-link:focus {
-  background-color: #fff;
-  color: #094142;
-}
-
-.oppia-exploration-footer-container {
   max-width: 800px;
-}
-
-.oppia-sharing-footer {
-  margin: -25px 0px 0px 10px;
-}
-
-.oppia-footer-sharing-links ul {
-    margin: -8px;
-    display: block;
-    float: left;
-}
-
-.oppia-footer-sharing-links li {
-  float: left;
+  padding: 30px 80px;
 }
 
 .oppia-footer-container a {

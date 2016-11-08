@@ -13,15 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for showing search results.
+ * @fileoverview Directive for showing author/share footer
+ * in exploration player.
  */
 
 oppia.directive('explorationFooter', [function() {
   return {
     restrict: 'E',
     scope: {
-      oppiaAvatarImageUrl: '&',
-      profilePicture: '&'
+      twitterText: '@'
     },
     templateUrl: 'components/explorationFooter',
     controller: [
@@ -36,16 +36,25 @@ oppia.directive('explorationFooter', [function() {
 
         $scope.contributorNames = [];
 
+        $scope.getTwitterText = function() {
+          return $scope.twitterText;
+        };
+
         ExplorationSummaryBackendApiService
           .loadPublicAndPrivateExplorationSummaries(
                 [$scope.explorationId]).then(function(summaries) {
               var summaryBackendObject = null;
-              if (summaries.length !== 0) {
-                summaryBackendObject = summaries[0];
+              if (summaries.length > 0) {
                 $scope.contributorNames = (
                   Object.keys(
-                    summaryBackendObject.human_readable_contributors_summary ||
-                    {}));
+                    summaries[0].human_readable_contributors_summary).sort(
+                      function(contributorUsername1, contributorUsername2) {
+                        var commitsOfContributor1 = dict[
+                          contributorUsername1].num_commits;
+                        var commitsOfContributor2 = dict[
+                          contributorUsername2].num_commits;
+                        return commitsOfContributor2 - commitsOfContributor1;
+                      }));
               }
             });
       }

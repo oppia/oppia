@@ -1,48 +1,134 @@
 <script type="text/ng-template" id="components/explorationFooter">
   <div class="footer navbar-fixed-bottom oppia-exploration-footer">
     <div class="row">
-        <div class="col-sm-6">
-          <ul style="list-style-type: none; display: inline;" class="author-profile">
-            <li style="float: left">
-              <img ng-src="<[getStaticImageUrl('/general/apple.svg')]>" itemprop="image"
-                 style="height: 60px; width: 60px; margin: -25px 0px 0px 10px;"/>
-            </li>
-            <li class="hover-link" style="float: left"
-                  ng-mouseenter="hovering=true"
-                  ng-mouseleave="hovering=false">
-              <div class="dropup" ng-class="{'open':hovering}">
-                <a id="dropdownMenu2" class="dropdown-toggle" ng-class="{'hovered-text':hovering}" data-toggle="dropdown"
-                   ng-if="contributorNames.length>0">
-                  <h4 translate="I18N_FOOTER_AUTHOR_PROFILE" style="padding-left: 4px"></h4>
-                </a>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenu2" role="menu" style="margin:0 0 16px -1px; float: left;border-radius: 0;">
-                  <li ng-repeat="name in contributorNames | limitTo: 5" style="color:black;padding: 10px 0 5px 5px; width: 28%;">
-                    <[name]>
-                  </li>
-                </ul>
-              </div>
+      <div class="col-sm-6">
+        <ul class="author-profile">
+          <li>
+            <img ng-src="<[getStaticImageUrl('/general/apple.svg')]>" class="exploration-footer-img">
+          </li>
+          <li class="hover-link"
+              ng-mouseenter="hovering=true"
+              ng-mouseleave="hovering=false">
+            <div class="dropup" ng-class="{'open':hovering}">
+              <a id="dropdownMenu2" class="dropdown-toggle" ng-class="{'hovered-text':hovering}" data-toggle="dropdown"
+                 ng-if="contributorNames.length > 0">
+                <h4 translate="I18N_FOOTER_AUTHOR_PROFILE" class="author-profile-text"></h4>
+              </a>
+              <ul class="author-profile-dropdown-menu dropdown-menu" aria-labelledby="dropdownMenu2" role="menu">
+                <li ng-repeat="name in contributorNames | limitTo: 5" style=>
+                  <[name]>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li></li>
+        </ul>
+      </div>
+      <div class="col-sm-6">
+        <div class="pull-right">
+          <ul class="author-profile">
+            <li>
+              <h4 translate="I18N_PLAYER_SHARE_THIS_EXPLORATION" class="share-exploration-footer"></h4>
             </li>
             <li>
+              <sharing-links ng-if="explorationStatus !== 'private'"
+                             ng-click="$event.stopPropagation()"
+                             twitter-text="getTwitterText()"
+                             exploration-id="explorationId"
+                             layout-type="row" 
+                             class="oppia-exploration-footer-sharing-links">
+              </sharing-links>
             </li>
           </ul>
         </div>
-        <div class="col-sm-6">
-          <div class="pull-right">
-            <ul style="list-style-type: none; display: inline;">
-              <li style="float: left">
-                <h4 translate="I18N_PLAYER_SHARE_EXPLORATION_SIMPLE" style="padding-right:10px;text-transform: uppercase;"></h4>
-              </li>
-              <li style="float: left">
-                <sharing-links ng-if="explorationStatus !== 'private'"
-                              ng-click="$event.stopPropagation()"
-                              twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER"
-                              exploration-id="explorationId"
-                              layout-type="row" class="oppia-footer-sharing-links">
-                </sharing-links>
-              </li>
-            </ul>
-          </div>
-        </div>
+      </div>
     </div>
   </div>
 </script>
+
+<style>
+
+.oppia-exploration-footer {
+  background-color: #094142;
+  color: #FFF;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 13px;
+  height: 42px;
+  line-height: 10px;
+  margin-top: 30px;
+  width: 100%;
+}
+
+.exploration-footer-img {
+  height: 60px;
+  width: 60px;
+  margin: -25px 0px 0px 10px;
+}
+
+.author-profile {
+  color: #fff;
+  list-style-type: none; 
+  display: inline;
+}
+
+.author-profile li {
+  float: left;
+}
+
+.oppia-exploration-footer .author-profile .hover-link {
+  background-color: #094142;
+  width: 28%;
+}
+
+.oppia-exploration-footer .author-profile .hover-link a {
+  cursor: default;
+  color: #fff;
+}
+
+.oppia-exploration-footer .author-profile .hovered-text h4 {
+  color: #094142 !important;
+}
+
+.oppia-exploration-footer .author-profile .hover-link:hover,
+.oppia-exploration-footer .author-profile .hover-link:focus {
+  background-color: #fff;
+  color: #094142;
+}
+
+.dropdown-menu.author-profile-dropdown-menu {
+  margin:0 0 16px -1px;
+  float: left;
+  border-radius: 0;
+  list-style-type: none; 
+
+}
+
+.author-profile-dropdown-menu li {
+  color:#094142;
+  padding: 10px 0 5px 5px;
+  width: 28%;
+}
+
+.author-profile-text {
+  padding-left: 4px;
+}
+
+.share-exploration-footer {
+  padding-right:10px;
+  text-transform: uppercase;
+}
+
+.oppia-exploration-footer-container {
+  max-width: 800px;
+}
+
+.oppia-exploration-footer-sharing-links ul {
+  display: block;
+  float: left;
+  margin: -8px;
+}
+
+.oppia-exploration-footer-sharing-links li {
+  float: left;
+}
+</style>

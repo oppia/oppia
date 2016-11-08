@@ -19,7 +19,6 @@
 
 // A service that provides a number of utility functions useful to both the
 // editor and player.
-
 oppia.factory('oppiaExplorationHtmlFormatterService', [
   '$filter', 'extensionTagAssemblerService', 'oppiaHtmlEscaper',
   function($filter, extensionTagAssemblerService, oppiaHtmlEscaper) {
