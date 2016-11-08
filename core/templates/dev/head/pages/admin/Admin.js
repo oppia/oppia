@@ -258,50 +258,6 @@ oppia.controller('Admin', [
       });
     };
 
-    $scope.reloadAllCollections = function() {
-      if ($scope.message.indexOf('Processing...') === 0) {
-        return;
-      }
-
-      if (!confirm('This action is irreversible. Are you sure?')) {
-        return;
-      }
-
-      var numSucceeded = 0;
-      var numFailed = 0;
-      var numTried = 0;
-      $scope.message = 'Processing...';
-      var printResult = function() {
-        if (numTried < GLOBALS.DEMO_COLLECTION_IDS.length) {
-          $scope.message = (
-            'Processing...' + numTried + '/' +
-            GLOBALS.DEMO_COLLECTION_IDS.length);
-          return;
-        }
-        $scope.message = (
-          'Reloaded ' + GLOBALS.DEMO_COLLECTION_IDS.length +
-          ' collections: ' + numSucceeded + ' succeeded, ' + numFailed +
-          ' failed.');
-      };
-
-      for (var i = 0; i < GLOBALS.DEMO_COLLECTION_IDS.length; ++i) {
-        var collectionId = GLOBALS.DEMO_COLLECTION_IDS[i];
-
-        $http.post(ADMIN_HANDLER_URL, {
-          action: 'reload_collection',
-          collection_id: collectionId
-        }).then(function() {
-          ++numSucceeded;
-          ++numTried;
-          printResult();
-        }, function() {
-          ++numFailed;
-          ++numTried;
-          printResult();
-        });
-      }
-    };
-
     $scope.startNewJob = function(jobType) {
       $scope.message = 'Starting new job...';
 

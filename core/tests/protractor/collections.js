@@ -25,7 +25,8 @@ describe('Collections', function() {
     var USERNAME = 'aliceCollections';
     users.createAndLoginAdminUser('alice@collections.com', USERNAME);
     browser.get(general.ADMIN_URL_SUFFIX);
-    element(by.css('.protractor-test-reload-all-collections-button')).click();
+    element.all(by.css(
+      '.protractor-test-reload-collection-button')).first().click();
     browser.driver.switchTo().alert().accept();
     browser.waitForAngular();
     admin.editConfigProperty(
@@ -34,11 +35,21 @@ describe('Collections', function() {
       listEditor.addItem('Unicode').setValue(USERNAME);
     });
   });
-  it('should visit the collection editor', function() {
-    browser.get('/collection_editor/create/0#/');
-    browser.waitForAngular();
+
+  beforeEach(function() {
+    browser.get(general.SERVER_URL_PREFIX);
   });
-  it('should visit the collection player', function() {
+
+  it('visits the collection editor', function() {
+    var dropdown = element(by.css('.protractor-test-profile-dropdown'));
+    browser.actions().mouseMove(dropdown).perform();
+    dropdown.element(by.css('.protractor-test-dashboard-link')).click();
+    browser.waitForAngular();
+    element(by.css('.protractor-test-create-activity')).click();
+    element(by.css('.protractor-test-create-collection')).click();
+  });
+
+  it('visits the collection player', function() {
     browser.get('/collection/0');
     browser.waitForAngular();
   });

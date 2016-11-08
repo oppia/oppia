@@ -9,7 +9,6 @@
       var GLOBALS = {
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
         ASSET_DIR_PREFIX: JSON.parse('{{ASSET_DIR_PREFIX|js_string}}'),
-        DEMO_COLLECTION_IDS: JSON.parse('{{demo_collection_ids|js_string}}'),
         DEMO_EXPLORATION_IDS: JSON.parse('{{demo_exploration_ids|js_string}}')
       }
     </script>
@@ -224,11 +223,6 @@
                   </span>
                 </div>
               {% endfor %}
-              <button type="button"
-                      class="btn btn-default protractor-test-reload-all-collections-button"
-                      ng-click="reloadAllCollections()">
-                Reload All Collections
-              </button>
             </div>
           </md-card>
         </div><br><br>
