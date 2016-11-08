@@ -1,7 +1,7 @@
 <script type="text/ng-template" id="components/SupplementalCard">
   <div class="conversation-skin-supplemental-card">
     <div ng-if="helpCardHtml" class="conversation-skin-help-card"
-         ng-class="{'help-card-standard': !isWindowTall(), 'help-card-tall': isWindowTall()}" >
+         ng-class="{'help-card-standard': isWindowTall(), 'help-card-fixed': !isWindowTall()}" >
       <img class="conversation-skin-oppia-avatar"
            ng-src="<[::OPPIA_AVATAR_IMAGE_URL]>" alt="">
       <button type="button" class="conversation-skin-close-help-card-button"
@@ -52,7 +52,7 @@
       position: absolute;
     }
 
-    .help-card-tall {
+    .help-card-fixed {
       bottom: 50px;
       position: fixed;
     }
