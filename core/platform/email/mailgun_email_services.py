@@ -72,3 +72,64 @@ def send_mail(
     requests.post(
         mailgun_domain_name, auth=('api', feconf.MAILGUN_API_KEY),
         data=data)
+
+
+def send_bulk_mail(
+        sender_email, recipient_emails, subject, plaintext_body, html_body):
+    """Sends an email using mailgun api.
+
+    In general this function should only be called from
+    email_manager._send_email().
+
+    Args:
+      - sender_email: str. the email address of the sender. This should be in
+          the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>'.
+      - recipient_emails: list. list of the email addresses of recipients.
+      - subject: str. The subject line of the email.
+      - plaintext_body: str. The plaintext body of the email.
+      - html_body: str. The HTML body of the email. Must fit in a datastore
+          entity.
+
+    Raises:
+      Exception: if the configuration in feconf.py forbids emails from being
+        sent.
+      Exception: if mailgun api key is not stored in feconf.MAILGUN_API_KEY.
+      Exception: if mailgun domain name is not stored in
+        feconf.MAILGUN_DOMAIN_NAME.
+      (and possibly other exceptions, due to mail.send_mail() failures)
+    """
+    if not feconf.MAILGUN_API_KEY:
+        raise Exception('Mailgun API key is not available.')
+
+    if not feconf.MAILGUN_DOMAIN_NAME:
+        raise Exception('Mailgun domain name is not set.')
+
+    mailgun_domain_name = (
+        'https://api.mailgun.net/v3/%s/messages' % feconf.MAILGUN_DOMAIN_NAME)
+
+    if not feconf.CAN_SEND_EMAILS:
+        raise Exception('This app cannot send emails to users.')
+
+    # To send bulk emails we pass list of recipients in 'to' paarameter of
+    # post data. Maximum limit of recipients per request is 1000.
+    # For more detail check following link:
+    # https://documentation.mailgun.com/user_manual.html#batch-sending
+    recipient_email_sets = [
+        recipient_emails[i:i+1000]
+        for i in xrange(0, len(recipient_emails), 1000)]
+
+    for email_set in recipient_email_sets:
+        # 'recipient-variable' in post data forces mailgun to send individual
+        # email to each recipient (This is intended to be a workaround for
+        # sending individual emails).
+        data = {
+            'from': sender_email,
+            'to': email_set,
+            'subject': subject,
+            'text': plaintext_body,
+            'html': html_body,
+            'recipient-variables': '{}'}
+
+        requests.post(
+            mailgun_domain_name, auth=('api', feconf.MAILGUN_API_KEY),
+            data=data)

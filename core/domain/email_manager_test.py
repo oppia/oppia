@@ -1602,3 +1602,102 @@ class QueryStatusNotificationEmailTests(test_utils.GenericTestBase):
             self.assertEqual(len(admin_messages), 1)
             self.assertEqual(
                 admin_messages[0].body.decode(), expected_admin_email_text_body)
+
+
+class BulkEmailsTests(test_utils.GenericTestBase):
+    SENDER_EMAIL = 'sender@example.com'
+    SENDER_USERNAME = 'sender'
+    FAKE_SENDER_EMAIL = 'fake@example.com'
+    FAKE_SENDER_USERNAME = 'fake'
+    RECIPIENT_A_EMAIL = 'a@example.com'
+    RECIPIENT_A_USERNAME = 'usera'
+    RECIPIENT_B_EMAIL = 'b@example.com'
+    RECIPIENT_B_USERNAME = 'userb'
+    def setUp(self):
+        super(BulkEmailsTests, self).setUp()
+        # SENDER is authorised sender.
+        # FAKE_SENDER is unauthorised sender.
+        # A and B are recipients.
+        self.signup(self.SENDER_EMAIL, self.SENDER_USERNAME)
+        self.sender_id = self.get_user_id_from_email(self.SENDER_EMAIL)
+        self.signup(self.FAKE_SENDER_EMAIL, self.FAKE_SENDER_USERNAME)
+        self.fake_sender_id = self.get_user_id_from_email(
+            self.FAKE_SENDER_EMAIL)
+        self.signup(self.RECIPIENT_A_EMAIL, self.RECIPIENT_A_USERNAME)
+        self.signup(self.RECIPIENT_B_EMAIL, self.RECIPIENT_B_USERNAME)
+        self.recipient_a_id = self.get_user_id_from_email(
+            self.RECIPIENT_A_EMAIL)
+        self.recipient_b_id = self.get_user_id_from_email(
+            self.RECIPIENT_B_EMAIL)
+        self.recipient_ids = [self.recipient_a_id, self.recipient_b_id]
+
+        config_services.set_property(
+            self.sender_id, 'whitelisted_email_senders',
+            [self.SENDER_USERNAME])
+        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+
+    def test_that_correct_email_is_sent(self):
+        email_subject = 'Dummy subject'
+        email_html_body = 'Dummy email body.<br>'
+        email_text_body = 'Dummy email body.\n'
+
+        with self.can_send_emails_ctx:
+            # pylint: disable=protected-access
+            email_manager._send_bulk_mail(
+                self.recipient_ids, self.sender_id,
+                feconf.BULK_EMAIL_INTENT_MARKETING, email_subject,
+                email_html_body, self.SENDER_EMAIL, self.SENDER_USERNAME)
+            # pylint: enable=protected-access
+
+        messages_a = self.mail_stub.get_sent_messages(to=self.RECIPIENT_A_EMAIL)
+        self.assertEqual(len(messages_a), 1)
+        self.assertEqual(
+            messages_a[0].html.decode(), email_html_body)
+        self.assertEqual(
+            messages_a[0].body.decode(), email_text_body)
+
+        messages_b = self.mail_stub.get_sent_messages(to=self.RECIPIENT_B_EMAIL)
+        self.assertEqual(len(messages_b), 1)
+        self.assertEqual(
+            messages_b[0].html.decode(), email_html_body)
+        self.assertEqual(
+            messages_b[0].body.decode(), email_text_body)
+
+        # Make sure correct email model is stored.
+        all_models = email_models.BulkEmailModel.get_all().fetch()
+        self.assertEqual(len(all_models), 1)
+        sent_email_model = all_models[0]
+        self.assertEqual(
+            sent_email_model.subject, email_subject)
+        self.assertEqual(
+            sent_email_model.html_body, email_html_body)
+        self.assertEqual(
+            sent_email_model.recipient_ids, self.recipient_ids)
+        self.assertEqual(
+            sent_email_model.sender_id, self.sender_id)
+        self.assertEqual(
+            sent_email_model.sender_email,
+            '%s <%s>' % (self.SENDER_USERNAME, self.SENDER_EMAIL))
+        self.assertEqual(
+            sent_email_model.intent,
+            feconf.BULK_EMAIL_INTENT_MARKETING)
+
+    def test_that_exception_is_raised_for_unauthorised_sender(self):
+        with self.can_send_emails_ctx, self.assertRaisesRegexp(
+            Exception, 'Invalid sender_id for email'):
+            # pylint: disable=protected-access
+            email_manager._send_bulk_mail(
+                self.recipient_ids, self.fake_sender_id,
+                feconf.BULK_EMAIL_INTENT_MARKETING, 'email_subject',
+                'email_html_body', self.FAKE_SENDER_EMAIL,
+                self.FAKE_SENDER_USERNAME)
+            # pylint: enable=protected-access
+
+        messages_a = self.mail_stub.get_sent_messages(to=self.RECIPIENT_A_EMAIL)
+        self.assertEqual(len(messages_a), 0)
+
+        messages_b = self.mail_stub.get_sent_messages(to=self.RECIPIENT_B_EMAIL)
+        self.assertEqual(len(messages_b), 0)
+
+        all_models = email_models.BulkEmailModel.get_all().fetch()
+        self.assertEqual(len(all_models), 0)
