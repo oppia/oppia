@@ -29,8 +29,8 @@ def filter_a(name, value):
     whitelisted.
 
     Args:
-        name: The name of the attribute.
-        value: The value of the attribute.
+        name: str. The name of the attribute.
+        value: str. The value of the attribute.
 
     Returns:
         bool: Whether the given attribute should be whitelisted.
@@ -74,10 +74,10 @@ ATTRS_WHITELIST = {
 def clean(user_submitted_html):
     """Cleans a piece of user submitted HTML. This only allows HTML from a 
     restricted set of tags, attrs and styles.
-
+    
     Args:
         user_submitted_html: str. An HTML string submitted by a user.
-
+    
     Returns:
         str. The HTML string submitted by the user, after stripping out 
         unrecognized tags and attributes.
@@ -97,10 +97,8 @@ def clean(user_submitted_html):
 
 def strip_html_tags(html):
     """Strips all HTML markup from an HTML string.
-    
     Args:
         html: str. An HTML string.
-    
     Returns:
         str. The HTML string, with all the tags and attributes stripped out.
     """
