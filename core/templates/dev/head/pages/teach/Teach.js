@@ -24,6 +24,15 @@ oppia.controller('Teach', [
       UrlInterpolationService) {
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
+    var possibleBackgroundFilenames = [
+      'icon_bannerA.svg', 'icon_bannerB.svg',
+      'icon_bannerC.svg', 'icon_bannerD.svg'];
+    $scope.backgroundImageFilename = possibleBackgroundFilenames[
+      Math.floor(Math.random() * possibleBackgroundFilenames.length)];
+
+    $scope.backgroundImageFileUrl = UrlInterpolationService.getStaticImageUrl(
+      '/backgrounds/' + $scope.backgroundImageFilename);
+
     $scope.onApplyToTeachWithOppia = function() {
       siteAnalyticsService.registerApplyToTeachWithOppiaEvent();
       $timeout(function() {

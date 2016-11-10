@@ -42,6 +42,15 @@ oppia.controller('Library', [
     $scope.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
       '/library/' + $scope.bannerImageFilename);
 
+    var possibleBackgroundFilenames = [
+      'icon_bannerA.svg', 'icon_bannerB.svg',
+      'icon_bannerC.svg', 'icon_bannerD.svg'];
+    $scope.backgroundImageFilename = possibleBackgroundFilenames[
+      Math.floor(Math.random() * possibleBackgroundFilenames.length)];
+
+    $scope.backgroundImageFileUrl = UrlInterpolationService.getStaticImageUrl(
+      '/backgrounds/' + $scope.backgroundImageFilename);
+
     $scope.activeGroupIndex = null;
 
     $scope.pageMode = GLOBALS.PAGE_MODE;
