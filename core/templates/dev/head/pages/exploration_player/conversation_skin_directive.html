@@ -43,20 +43,20 @@
   </oppia-gadget-panel>
 
   <div ng-if="isOnTerminalCard() && isLoggedIn && !isInPreviewMode && !isIframed && isCurrentCardAtEndOfTranscript()" class="conversation-skin-final-ratings">
-    <div style="color: #eee; margin-bottom: 20px;" translate="I18N_PLAYER_SHARE_EXPLORATION">
+    <div style="color: #064b46; margin-bottom: 20px;" translate="I18N_PLAYER_SHARE_EXPLORATION">
     </div>
     <sharing-links layout-type="row"
                    class="conversation-skin-sharing-links"
                    twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER"
                    exploration-id="explorationId">
     </sharing-links>
-    <div style="color: #eee; margin: 20px 0;" translate="I18N_PLAYER_RATE_EXPLORATION">
+    <div style="color: #064b46; margin: 20px 0;" translate="I18N_PLAYER_RATE_EXPLORATION">
     </div>
     <div popover-placement="bottom" popover-template="'popover/feedback'" popover-trigger="click">
       <rating-display rating-value="userRating"
                       is-editable="true"
                       on-edit="submitUserRating"
-                      style="letter-spacing: 10px; color: #eee;">
+                      style="letter-spacing: 10px; color: #064b46;">
       </rating-display>
     </div>
   </div>
