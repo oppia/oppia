@@ -303,3 +303,24 @@ class ExplorationSummariesHandler(base.BaseHandler):
             'summaries': summaries
         })
         self.render_json(self.values)
+
+
+class CollectionSummariesHandler(base.BaseHandler):
+    """Returns Collection summaries corresponding to Collection ids.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    def get(self):
+        """Handles GET requests."""
+        try:
+            coll_ids = json.loads(self.request.get('stringified_coll_ids'))
+        except Exception:
+            raise self.PageNotFoundException
+        summaries = (
+            summary_services.get_displayable_collection_summary_dicts_matching_ids(
+                coll_ids))
+        self.values.update({
+            'summaries': summaries
+        })
+        self.render_json(self.values)

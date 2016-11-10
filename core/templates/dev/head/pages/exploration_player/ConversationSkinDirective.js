@@ -23,9 +23,6 @@ var TIME_HEIGHT_CHANGE_MSEC = 500;
 var TIME_FADEIN_MSEC = 100;
 var TIME_NUM_CARDS_CHANGE_MSEC = 500;
 
-oppia.constant(
-  'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
-
 oppia.animation('.conversation-skin-responses-animate-slide', function() {
   return {
     removeClass: function(element, className, done) {
@@ -267,7 +264,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
       'playerTranscriptService', 'LearnerParamsService',
       'playerPositionService', 'explorationRecommendationsService',
       'StatsReportingService', 'UrlInterpolationService',
-      'siteAnalyticsService', 'alertsService', 'COLLECTION_DATA_URL_TEMPLATE',
+      'siteAnalyticsService', 'alertsService',
       function(
           $scope, $timeout, $rootScope, $window, $translate, $http,
           messengerService, oppiaPlayerService, urlService, focusService,
@@ -275,7 +272,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
           playerTranscriptService, LearnerParamsService,
           playerPositionService, explorationRecommendationsService,
           StatsReportingService, UrlInterpolationService,
-          siteAnalyticsService, alertsService, COLLECTION_DATA_URL_TEMPLATE) {
+          siteAnalyticsService, alertsService) {
         $scope.CONTINUE_BUTTON_FOCUS_LABEL = 'continueButton';
         // The exploration domain object.
         $scope.exploration = null;
@@ -786,19 +783,19 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
         $scope.collectionTitle = GLOBALS.collectionTitle;
 
         if ($scope.collectionId) {
-          $scope.collectionDataUrl = UrlInterpolationService.interpolateUrl(
-            COLLECTION_DATA_URL_TEMPLATE, {
-              collection_id: $scope.collectionId
-            });
-          $http.get($scope.collectionDataUrl).then(
+          $http.get('/collectionsummarieshandler/data', {
+            params: {
+            stringified_coll_ids: JSON.stringify([$scope.collectionId])
+          }
+          }).then(
             function(response) {
-              $scope.collectionSummary = response.data.collection_summary[0];
+              $scope.collectionSummary = response.data.summaries[0];
             },
             function() {
               alertsService.addWarning(
                 'There was an error while fetching the collection summary.');
             }
-            );
+          );
         }
 
         $scope.onNavigateFromIframe = function() {
