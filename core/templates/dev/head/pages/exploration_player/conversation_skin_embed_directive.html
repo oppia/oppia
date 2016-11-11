@@ -50,8 +50,7 @@
       <nav class="bottom-nav-row">
         <div class="col-1-4 bottom-nav-left">
           <div ng-if="activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].oppiaFeedbackHtml &&
-                      !isCurrentSupplementalCardNonempty() && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback &&
-                      ((activeCard.interactionHtml && !activeCard.destStateName) || activeCard.destStateName) &&
+                      !isCurrentSupplementalCardNonempty() && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback && activeCard.destStateName &&
                       !isOnTerminalCard()">
             <md-button aria-label="" class="oppia-learner-continue-button protractor-test-continue-to-next-card-button" focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>" ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)" translate="I18N_PLAYER_CONTINUE_BUTTON">
             </md-button>
