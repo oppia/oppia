@@ -1,0 +1,82 @@
+<script type="text/ng-template" id="components/SupplementalCard">
+  <div class="conversation-skin-supplemental-card">
+    <div ng-if="helpCardHtml" class="conversation-skin-help-card"
+         ng-class="{'help-card-standard': isWindowTall(), 'help-card-fixed': !isWindowTall()}" >
+      <img class="conversation-skin-oppia-avatar"
+           ng-src="<[::OPPIA_AVATAR_IMAGE_URL]>" alt="">
+      <button type="button" class="conversation-skin-close-help-card-button"
+              ng-click="clearHelpCard()" ng-if="!helpCardHasContinueButton">
+        <i class="material-icons md-18">&#xE5CD;</i>
+      </button>
+      <div class="conversation-skin-help-card-content" angular-html-bind="helpCardHtml"></div>
+      <br>
+      <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
+                 focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
+                 ng-click="showNextCard()"
+                 ng-if="helpCardHasContinueButton"
+                 style="margin-top: 12px;"
+                 translate="I18N_PLAYER_CONTINUE_NEXT_CARD">
+      </md-button>
+    </div>
+
+    <div class="protractor-test-conversation-input"
+         angular-html-bind="activeCard.interactionHtml">
+    </div>
+  </div>
+
+  <style>
+    .conversation-skin-help-card {
+      background: #fff;
+      border-radius: 2px;
+      /* We move the help card lower so that it does not block
+         the terminal output in the CodeRepl interaction.
+      */
+      box-shadow: 0 1px 2px rgba(0,0,0,0.24), 0 1px 3px rgba(0,0,0,0.12);
+      min-height: 50px;
+      opacity: 1;
+      padding: 12px;
+      right: 12px;
+      text-align: left;
+      transition: all 350ms;
+      z-index: 500;
+    }
+
+    .conversation-skin-help-card.ng-enter,
+    .conversation-skin-help-card.ng-leave-active {
+      opacity: 0;
+      transform: translateX(200px);
+    }
+
+    .help-card-standard {
+      bottom: -50px;
+      position: absolute;
+    }
+
+    .help-card-fixed {
+      bottom: 50px;
+      position: fixed;
+    }
+
+    .conversation-skin-help-card .conversation-skin-oppia-avatar {
+      top: 12px;
+    }
+
+    .conversation-skin-help-card-content {
+      width: 270px;
+    }
+
+    .conversation-skin-close-help-card-button {
+      background: none;
+      border: 0;
+      color: #000;
+      cursor: pointer;
+      height: 24px;
+      opacity: 0.5;
+      position: absolute;
+      right: 2px;
+      top: 2px;
+      width: 24px;
+      z-index: 200;
+    }
+  </style>
+</script>

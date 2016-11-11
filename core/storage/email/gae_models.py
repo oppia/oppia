@@ -58,6 +58,7 @@ class SentEmailModel(base_models.BaseModel):
         feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION,
         feconf.EMAIL_INTENT_DELETE_EXPLORATION,
         feconf.EMAIL_INTENT_REPORT_BAD_CONTENT,
+        feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION
     ])
     # The subject line of the email.
     subject = ndb.TextProperty(required=True)
@@ -168,3 +169,49 @@ class SentEmailModel(base_models.BaseModel):
                 return True
 
         return False
+
+
+class BulkEmailModel(base_models.BaseModel):
+    """Records the content of an email sent from Oppia to multiple users.
+
+    This model is read-only; entries cannot be modified once created. The
+    id/key of instances of this model is randomly generated string of length 12.
+    """
+
+    # The user IDs of the email recipients.
+    recipient_ids = ndb.StringProperty(indexed=True, repeated=True)
+    # The user ID of the email sender. For site-generated emails this is equal
+    # to feconf.SYSTEM_COMMITTER_ID.
+    sender_id = ndb.StringProperty(required=True)
+    # The email address used to send the notification.
+    sender_email = ndb.StringProperty(required=True)
+    # The intent of the email.
+    intent = ndb.StringProperty(required=True, indexed=True, choices=[
+        feconf.BULK_EMAIL_INTENT_MARKETING,
+        feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION,
+        feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION,
+        feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT,
+        feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT
+    ])
+    # The subject line of the email.
+    subject = ndb.TextProperty(required=True)
+    # The HTML content of the email body.
+    html_body = ndb.TextProperty(required=True)
+    # The datetime the email was sent, in UTC.
+    sent_datetime = ndb.DateTimeProperty(required=True, indexed=True)
+
+    @classmethod
+    def create(
+            cls, instance_id, recipient_ids, sender_id, sender_email,
+            intent, subject, html_body, sent_datetime):
+        """Creates a new BulkEmailModel entry."""
+        email_model_instance = cls(
+            id=instance_id, recipient_ids=recipient_ids, sender_id=sender_id,
+            sender_email=sender_email, intent=intent, subject=subject,
+            html_body=html_body, sent_datetime=sent_datetime)
+        email_model_instance.put()
+
+    @classmethod
+    def get_number_of_emails_sent_to_user(cls, recipient_id, intent):
+        return cls.query(ndb.AND(
+            cls.recipient_ids == recipient_id, cls.intent == intent)).count()
