@@ -354,6 +354,8 @@ class UserQueryModel(base_models.BaseModel):
     user_ids = ndb.StringProperty(indexed=True, repeated=True)
     # Id of the user who submitted the query.
     submitter_id = ndb.StringProperty(indexed=True, required=True)
+    # Id of the email model having information of sent emails.
+    sent_email_model_id = ndb.StringProperty(default=None, indexed=True)
     # Current status of the query.
     query_status = ndb.StringProperty(
         indexed=True,

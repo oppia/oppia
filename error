@@ -1,0 +1,43 @@
+Checking if node.js is installed in /home/prasanna/opensource/oppia_tools
+Generating list of installed node modules...
+Generation completed.
+Checking whether Google App Engine is installed in /home/prasanna/opensource/oppia_tools/google_appengine_1.9.19/google_appengine
+Environment setup completed.
+Installing third-party JS libraries and zip files.
+Checking whether gulp is installed
+Checking whether through2 is installed
+Checking whether yargs is installed
+Checking whether gulp-concat is installed
+Checking whether gulp-clean-css is installed
+Checking whether gulp-util is installed
+Checking whether jscs is installed
+Checking whether gulp-sourcemaps is installed
+Checking whether gulp-minify is installed
+Checking whether Skulpt is installed in third_party
+Checking if pip is installed on the local machine
+Checking if numpy is installed in /home/prasanna/opensource/oppia_tools/pip_packages
+Checking if pylint is installed in /home/prasanna/opensource/oppia_tools/pip_packages
+Checking if webtest is installed in third_party
+Checking if browsermob-proxy is installed in /home/prasanna/opensource/oppia_tools/pip_packages
+Checking if selenium is installed in /home/prasanna/opensource/oppia_tools/pip_packages
+Installing pre-push hook for git
+Symlink already exists
+----------------------------------------
+Tasks still running:
+  core.controllers.email_dashboard_test.EmailDashboardResultTests.test_that_valid_exceptions_are_raised (started 07:39:29)
+----------------------------------------
+02:09:36 FINISHED core.controllers.email_dashboard_test.EmailDashboardResultTests.test_that_valid_exceptions_are_raised: 6.5 secs
+----------------------------------------
+----------------------------------------
+
++------------------+
+| SUMMARY OF TESTS |
++------------------+
+
+SUCCESS   core.controllers.email_dashboard_test.EmailDashboardResultTests.test_that_valid_exceptions_are_raised: 1 tests (5.8 secs)
+
+Ran 1 test in 1 test class.
+All tests passed.
+
+Done!
+

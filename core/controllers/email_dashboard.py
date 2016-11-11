@@ -14,12 +14,16 @@
 
 """Controller for user query related pages and handlers."""
 
+import logging
+
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import user_query_jobs_one_off
 from core.domain import user_query_services
 from core.domain import user_services
 from core.platform import models
+
+import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -157,3 +161,40 @@ class QueryStatusCheck(base.BaseHandler):
         }
 
         self.render_json(data)
+
+
+class EmailDashboardResult(base.BaseHandler):
+    """Handler for email dashboard result page."""
+    @require_valid_sender
+    def get(self, query_id):
+        query_model = user_models.UserQueryModel.get(query_id, strict=False)
+        if (query_model is None or
+                query_model.query_status != feconf.USER_QUERY_STATUS_COMPLETED
+                or query_model.submitter_id != self.user_id):
+            raise self.InvalidInputException('400 Invalid query id.')
+
+        self.values.update({
+            'query_id': query_id,
+        })
+        self.render_template(
+            'pages/email_dashboard/email_dashboard_result.html')
+
+    @require_valid_sender
+    def post(self, query_id):
+        query_model = user_models.UserQueryModel.get(query_id, strict=False)
+        if (query_model is None or
+                query_model.query_status != feconf.USER_QUERY_STATUS_COMPLETED
+                or query_model.submitter_id != self.user_id):
+            raise self.InvalidInputException('400 Invalid query id.')
+
+        data = self.payload['data']
+        logging.info(data)
+        email_subject = data['email_subject']
+        email_body = data['email_body']
+        email_option = data['email_option']
+        num_of_users_to_send = data['num_of_users_to_send']
+        email_intent = data['email_intent']
+        user_query_services.send_email_to_qualified_users(
+            query_id, email_subject, email_body, email_intent, email_option,
+            num_of_users_to_send)
+        self.render_json({})

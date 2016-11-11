@@ -198,7 +198,7 @@ NOREPLY_EMAIL_ADDRESS = 'noreply@example.com'
 # correspond to owners of the app before setting this to True. If
 # SYSTEM_EMAIL_ADDRESS is not that of an app owner, email messages from this
 # address cannot be sent. If True then emails can be sent to any user.
-CAN_SEND_EMAILS = False
+CAN_SEND_EMAILS = True
 # If you want to turn on this facility please check the email templates in the
 # send_role_notification_email() function in email_manager.py and modify them
 # accordingly.
@@ -554,7 +554,10 @@ USER_QUERY_STATUS_PROCESSING = 'processing'
 USER_QUERY_STATUS_COMPLETED = 'completed'
 USER_QUERY_STATUS_ARCHIVED = 'archived'
 USER_QUERY_STATUS_FAILED = 'failed'
-
+# Possible email option for sending emails using query.
+USER_QUERY_EMAIL_OPTION_ALL = 'all'
+USER_QUERY_EMAIL_OPTION_CUSTOM = 'custom'
+USER_QUERY_EMAIL_OPTION_CANCEL = 'cancel'
 # The time difference between which to consider two login events "close". This
 # is taken to be 12 hours.
 PROXIMAL_TIMEDELTA_SECS = 12 * 60 * 60

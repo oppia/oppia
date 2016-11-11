@@ -16,7 +16,9 @@
 
 """Domain object for a parameters of a query."""
 
+from core.domain import email_manager
 from core.platform import models
+
 import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
@@ -38,3 +40,30 @@ def save_new_query_model(
         query_status=feconf.USER_QUERY_STATUS_PROCESSING,
         user_ids=[]).put()
     return query_id
+
+
+def send_email_to_qualified_users(
+        query_id, email_subject, email_body, email_intent, email_option,
+        num_of_users_to_send):
+    """Send email to maximum 'num_of_users_to_send' qualified users."""
+    query_model = user_models.UserQueryModel.get(query_id)
+    query_model.query_status = feconf.USER_QUERY_STATUS_ARCHIVED
+
+    if email_option == feconf.USER_QUERY_EMAIL_OPTION_ALL:
+        bulk_email_model_id = email_manager.send_user_query_email(
+            query_model.submitter_id, query_model.user_ids, email_subject,
+            email_body, email_intent)
+        query_model.sent_email_model_id = bulk_email_model_id
+        query_model.put()
+    elif email_option == feconf.USER_QUERY_EMAIL_OPTION_CUSTOM:
+        recipient_ids = query_model.user_ids[:num_of_users_to_send]
+        bulk_email_model_id = email_manager.send_user_query_email(
+            query_model.submitter_id, recipient_ids, email_subject,
+            email_body, email_intent)
+        query_model.sent_email_model_id = bulk_email_model_id
+        query_model.put()
+    elif email_option == feconf.USER_QUERY_EMAIL_OPTION_CANCEL:
+        query_model.query_status = feconf.USER_QUERY_STATUS_ARCHIVED
+        query_model.put()
+    else:
+        raise Exception('Invalid email option.')

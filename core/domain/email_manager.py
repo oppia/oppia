@@ -657,3 +657,14 @@ def send_query_failure_email(recipient_id, query_id, query_params):
 
     admin_email_body = admin_email_body_template % query_id
     send_mail_to_admin(admin_email_subject, admin_email_body)
+
+
+def send_user_query_email(
+        sender_id, recipient_ids, email_subject, email_body, email_intent):
+    bulk_email_model_id = email_models.BulkEmailModel.get_new_id('')
+    sender_name = user_services.get_username(sender_id)
+    sender_email = user_services.get_email_from_user_id(sender_id)
+    _send_bulk_mail(
+        recipient_ids, sender_id, email_intent, email_subject, email_body,
+        sender_email, sender_name, bulk_email_model_id)
+    return bulk_email_model_id

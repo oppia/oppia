@@ -383,6 +383,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/querystatuscheck', email_dashboard.QueryStatusCheck),
     get_redirect_route(
+        r'/emaildashboardresult/<query_id>',
+        email_dashboard.EmailDashboardResult),
+    get_redirect_route(
         r'%s' % feconf.EXPLORATION_METADATA_SEARCH_URL,
         collection_editor.ExplorationMetadataSearchHandler),
 
