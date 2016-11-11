@@ -400,11 +400,10 @@ class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
             for _, count in answers.iteritems():
                 total_submission_count = total_submission_count + count
 
-            yield ('%s-%s-%s' % (exp_id, state_name, rule_name), {
+            yield (item.id, {
                 'frequency': total_submission_count,
                 'type': RuleTypeBreakdownAudit._OLD_ANSWER_MODEL_TYPE,
-                'exploration_id': exp_id,
-                'state_name': state_name,
+                'item_id': item.id,
                 'rule_name': rule_name
             })
             aggregation_key = '%s-%s' % (
@@ -420,16 +419,16 @@ class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
                 exp_id = item.exploration_id
                 state_name = item.state_name
                 rule_str = answer['rule_spec_str']
+                old_item_id = u'%s.%s.%s.%s' % (
+                    exp_id, state_name, 'submit', rule_str)
                 if '(' in rule_str:
                     rule_name = rule_str[:rule_str.index('(')]
                 else:
                     rule_name = rule_str
-                new_answer_key = u'%s-%s-%s' % (exp_id, state_name, rule_name)
-                yield (new_answer_key.encode('utf-8'), {
+                yield (old_item_id.encode('utf-8'), {
                     'frequency': 1,
                     'type': RuleTypeBreakdownAudit._NEW_ANSWER_MODEL_TYPE,
-                    'exploration_id': exp_id,
-                    'state_name': state_name.encode('utf-8'),
+                    'item_id': old_item_id.encode('utf-8'),
                     'rule_name': rule_name
                 })
                 aggregation_key = '%s-%s' % (
@@ -446,10 +445,9 @@ class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
             ast.literal_eval(stringified_value)
             for stringified_value in stringified_values]
 
-        # The first dict can be used to extract exploration_id and rule_name
-        # since they will be the same for all results managed by this call to
-        # reduce(). Note that the exploration_id is only available for
-        # non-aggregation results.
+        # The first dict can be used to extract item_id and rule_name since they
+        # will be the same for all results managed by this call to reduce().
+        # Note that the item_id is only available for non-aggregation results.
         first_value_dict = value_dict_list[0]
         rule_name = first_value_dict['rule_name']
 
@@ -477,13 +475,11 @@ class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
             # Only output the exploration ID if the counts differ to avoid
             # large amounts of output.
             if old_total_count != new_total_count:
-                exp_id = first_value_dict['exploration_id']
-                state_name = first_value_dict['state_name'].decode('utf-8')
+                item_id = first_value_dict['item_id'].decode('utf-8')
                 yield (
-                    '%s: \'%s.%s\' has %d submitted answers in the old model '
+                    '%s: \'%s\' has %d submitted answers in the old model '
                     'and %d in the new model' % (
-                        rule_name, exp_id, state_name.encode('utf-8'),
-                        old_total_count, new_total_count))
+                        rule_name, item_id, old_total_count, new_total_count))
             else:
                 # This output will be aggregated and acts as a sanity check.
                 yield (
