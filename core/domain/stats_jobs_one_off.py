@@ -418,17 +418,18 @@ class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
             # Answers need to be collected one at a time in the new data store
             for answer in item.submitted_answer_list:
                 exp_id = item.exploration_id
-                state_name_utf8 = item.state_name.encode('utf-8')
+                state_name = item.state_name
                 rule_str = answer['rule_spec_str']
                 if '(' in rule_str:
                     rule_name = rule_str[:rule_str.index('(')]
                 else:
                     rule_name = rule_str
-                yield ('%s-%s-%s' % (exp_id, state_name_utf8, rule_name), {
+                new_answer_key = u'%s-%s-%s' % (exp_id, state_name, rule_name)
+                yield (new_answer_key.encode('utf-8'), {
                     'frequency': 1,
                     'type': RuleTypeBreakdownAudit._NEW_ANSWER_MODEL_TYPE,
                     'exploration_id': exp_id,
-                    'state_name': state_name_utf8,
+                    'state_name': state_name.encode('utf-8'),
                     'rule_name': rule_name
                 })
                 aggregation_key = '%s-%s' % (
