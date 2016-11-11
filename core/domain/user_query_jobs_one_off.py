@@ -19,12 +19,15 @@ import ast
 import datetime
 
 from core import jobs
+from core.domain import email_manager
 from core.domain import rights_manager
 from core.platform import models
 
-(user_models, exp_models) = (
+import feconf
+
+(user_models, exp_models, job_models) = (
     models.Registry.import_models(
-        [models.NAMES.user, models.NAMES.exploration]))
+        [models.NAMES.user, models.NAMES.exploration, models.NAMES.job]))
 
 # pylint: disable=too-many-return-statements
 
@@ -102,3 +105,33 @@ class UserQueryOneOffJob(jobs.BaseMapReduceJobManager):
         user_ids = [ast.literal_eval(v) for v in stringified_user_ids]
         query_model.user_ids = [str(user_id) for user_id in user_ids]
         query_model.put()
+
+    @classmethod
+    def _post_completed_hook(cls, job_id):
+        job_model = job_models.JobModel.get(job_id)
+        query_id = job_model.additional_job_params['query_id']
+        query_model = user_models.UserQueryModel.get(query_id)
+        query_model.query_status = feconf.USER_QUERY_STATUS_COMPLETED
+        query_model.put()
+        email_manager.send_query_completion_email(
+            query_model.submitter_id, query_id)
+
+    @classmethod
+    def _post_failure_hook(cls, job_id):
+        job_model = job_models.JobModel.get(job_id)
+        query_id = job_model.additional_job_params['query_id']
+        query_model = user_models.UserQueryModel.get(query_id)
+        query_model.query_status = feconf.USER_QUERY_STATUS_FAILED
+        query_model.put()
+
+        query_params = {
+            'inactive_in_last_n_days': query_model.inactive_in_last_n_days,
+            'has_not_logged_in_for_n_days': (
+                query_model.has_not_logged_in_for_n_days),
+            'created_at_least_n_exps': query_model.created_at_least_n_exps,
+            'created_fewer_than_n_exps': query_model.created_fewer_than_n_exps,
+            'edited_at_least_n_exps': query_model.edited_at_least_n_exps,
+            'edited_fewer_than_n_exps': query_model.edited_fewer_than_n_exps
+        }
+        email_manager.send_query_failure_email(
+            query_model.submitter_id, query_id, query_params)

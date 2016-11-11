@@ -1,0 +1,44 @@
+<script type="text/ng-template" id="admin/activitiesTabDevMode">
+  <md-card class="oppia-page-card oppia-long-text" style="max-width: 700px">
+    <div class="container" style="margin-left: 0;">
+      <h3>Reload a single exploration</h3>
+      <div ng-repeat="exploration in DEMO_EXPLORATIONS"
+           class="row protractor-test-reload-exploration-row">
+        <span class="col-lg-4 col-md-4 col-sm-4 protractor-test-reload-exploration-title">
+          <[exploration[1]]>
+        </span>
+        <span class="col-lg-2 col-md-2 col-sm-2">
+          <button type="button"
+                  class="btn btn-default protractor-test-reload-exploration-button pull-right"
+                  ng-click="reloadExploration(exploration[0])">
+          Reload
+          </button>
+        </span>
+      </div>
+      <button type="button"
+              class="btn btn-default protractor-test-reload-all-explorations-button"
+              ng-click="reloadAllExplorations()">
+        Reload All Explorations
+      </button>
+    </div>
+  </md-card>
+
+  <md-card class="oppia-page-card oppia-long-text" style="max-width: 700px">
+    <div class="container" style="margin-left: 0;">
+      <h3>Reload a single collection</h3>
+      <div ng-repeat="collection in DEMO_COLLECTIONS"
+           class="row protractor-test-reload-collection-row">
+        <span class="col-lg-4 col-md-4 col-sm-4 protractor-test-reload-collection-title">
+          <[collection[1]]>
+        </span>
+        <span class="col-lg-2 col-md-2 col-sm-2">
+          <button type="button"
+                  class="btn btn-default protractor-test-reload-collection-button pull-right"
+                  ng-click="reloadCollection(collection[0])">
+            Reload
+          </button>
+        </span>
+      </div>
+    </div>
+  </md-card>
+</script>

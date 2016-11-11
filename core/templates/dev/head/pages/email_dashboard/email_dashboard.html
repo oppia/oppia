@@ -1,0 +1,86 @@
+{% extends 'pages/base.html' %}
+
+{% block maintitle %}
+  Email Dashboard - Oppia
+{% endblock maintitle %}
+
+{% block header_js %}
+  {{ super() }}
+  <style>
+    html, body {
+      background-color: #f2f2ee;
+    }
+    .success {
+      color: #0000ff;
+    }
+    .oppia-query-form {
+      text-align: center;
+    }
+  </style>
+{% endblock header_js %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      Email Dashboard
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <div class="oppia-query-form" ng-controller="EmailDashboard">
+    <form class="form" ng-submit="submitQuery()">
+      Has not logged in for n days: <input type="number" min="0" ng-model="has_not_logged_in_for_n_days">
+      <br/>
+      Inactive in last n days: <input type="number" min="0" ng-model="inactive_in_last_n_days">
+      <br/>
+      Has created at least n exps: <input type="number" min="0" ng-model="created_at_least_n_exps">
+      <br/>
+      Has created fewer than n exps: <input type="number" min="0" ng-model="created_fewer_than_n_exps">
+      <br/>
+      Has edited at least n exps: <input type="number" min="0" ng-model="edited_at_least_n_exps">
+      <br/>
+      Has edited fewer than n exps: <input type="number" min="0" ng-model="edited_fewer_than_n_exps">
+      <br/>
+      <input type="submit" value="submit query">
+      <input type="reset" value="reset" ng-click="resetForm()">
+    </form>
+    <p class="success" ng-if="showSuccessMessage">Query has been submitted successfully. Check recent queries below.</p>
+    <div class="oppia-recent-queries">
+      <p>Recent queries:</p>
+      <table class="table" ng-if="currentPageOfQueries.length > 0">
+        <thead>
+          <tr>
+            <td>Query id</td>
+            <td>Submitted on</td>
+            <td>Submitted by</td>
+            <td>Status</td>
+            <td>No. of qualified users</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="q in currentPageOfQueries track by $index">
+            <td><[q.id]></td>
+            <td><[q.created_on]></td>
+            <td><[q.submitter_id]></td>
+            <td><[q.status]></td>
+            <td><[q.num_qualified_users]></td>
+            <td><button ng-click="recheckStatus($index)">Re-check status</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <button ng-if="showPreviousButton()" ng-click="getPreviousPageOfQueries()">Previous</button>
+      <button ng-if="showNextButton()" ng-click="getNextPageOfQueries()">Next</button>
+    </div>
+  </div>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/email_dashboard/EmailDashboard.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/email_dashboard/EmailDashboardServices.js"></script>
+{% endblock footer_js %}

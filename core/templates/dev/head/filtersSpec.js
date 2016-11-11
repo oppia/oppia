@@ -309,6 +309,23 @@ describe('Testing filters', function() {
     var NON_IMAGE = ('<a href="example.com" ' +
     'class="oppia-noninteractive-link">Example.com</a>');
     var IMAGE_INVALID = ('<img src="linkimage.jpg" class="invalid-tag">');
+    var BOLD_TEXT = ('In baseball, the Chicago Cubs defeat the Cleveland ' +
+    'Indians to win the <b style="box-sizing: border-box; font-weight: bold;' +
+    'color: rgb(85, 85, 85); font-family: Roboto, Arial, sans-serif; ' +
+    'font-size: 16px; font-style: normal; font-variant-ligatures: normal; ' +
+    'font-variant-caps: normal; letter-spacing: normal; orphans: 2; ' +
+    'text-align: left; text-indent: 0px; text-transform: none; ' +
+    'white-space: normal; widows: 2; word-spacing: 0px; ' +
+    '-webkit-text-stroke-width: 0px; background-color: rgb(255, 255, 255);">' +
+    'World Series</b> for the first time since 1908.');
+    var ITALIC_TEXT = ('<i style="box-sizing: border-box; ' +
+    'color: rgb(85, 85, 85); font-family: Roboto, Arial, sans-serif; ' +
+    'font-size: 16px; font-variant-ligatures: normal; ' +
+    'font-variant-caps: normal; font-weight: normal; letter-spacing: normal; ' +
+    'orphans: 2; text-align: left; text-indent: 0px; text-transform: none; ' +
+    'white-space: normal; widows: 2; word-spacing: 0px; ' +
+    '-webkit-text-stroke-width: 0px; background-color: rgb(255, 255, 255);">' +
+    'MVP Ben Zobrist pictured</i>');
     var whitelistedImgClasses = [
       'oppia-noninteractive-collapsible',
       'oppia-noninteractive-image',
@@ -355,5 +372,12 @@ describe('Testing filters', function() {
     expect(
       $filter('stripFormatting')(IMAGE_INVALID, whitelistedImgClasses)
     ).toEqual('');
+    expect(
+      $filter('stripFormatting')(BOLD_TEXT, whitelistedImgClasses)
+    ).toEqual('In baseball, the Chicago Cubs defeat the Cleveland Indians to ' +
+    'win the <b>World Series</b> for the first time since 1908.');
+    expect(
+      $filter('stripFormatting')(ITALIC_TEXT, whitelistedImgClasses)
+    ).toEqual('<i>MVP Ben Zobrist pictured</i>');
   }));
 });

@@ -283,11 +283,11 @@
         "targetDirPrefix": "jquery-ui-touch-punch-"
       },
       "mathExpressions": {
-        "version": "762ffd0effea1525b21a882624074322fa7aad26",
+        "version": "10186afeb160aa48ed94b20afd6353759c059dee",
         "downloadFormat": "zip",
-        "url": "https://github.com/kisonecat/math-expressions/archive/762ffd0effea1525b21a882624074322fa7aad26.zip",
+        "url": "https://github.com/kisonecat/math-expressions/archive/10186afeb160aa48ed94b20afd6353759c059dee.zip",
         "rootDirPrefix": "math-expressions-",
-        "targetDir": "math-expressions-762ffd"
+        "targetDir": "math-expressions-10186a"
       },
       "mathJax": {
         "version": "2.6.0",

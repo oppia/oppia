@@ -128,6 +128,7 @@ class LibraryIndexHandler(base.BaseHandler):
                 'header_i18n_id': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
                 'has_full_results_page': True,
                 'full_results_url': feconf.LIBRARY_RECENTLY_PUBLISHED_URL,
+                'protractor_id': 'recently-published',
             })
         if top_rated_activity_summary_dicts:
             summary_dicts_by_category.insert(0, {
@@ -137,6 +138,7 @@ class LibraryIndexHandler(base.BaseHandler):
                     feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS),
                 'has_full_results_page': True,
                 'full_results_url': feconf.LIBRARY_TOP_RATED_URL,
+                'protractor_id': 'top-rated',
             })
         if featured_activity_summary_dicts:
             summary_dicts_by_category.insert(0, {

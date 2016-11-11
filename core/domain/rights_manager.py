@@ -59,6 +59,7 @@ class ActivityRights(object):
     """Domain object for the rights/publication status of an activity (an
     exploration or a collection).
     """
+
     def __init__(self, exploration_id, owner_ids, editor_ids, viewer_ids,
                  community_owned=False, cloned_from=None,
                  status=ACTIVITY_STATUS_PRIVATE,
@@ -324,13 +325,24 @@ class Actor(object):
     def __init__(self, user_id):
         # Note that this may be None.
         self.user_id = user_id
+        # Value of None is a placeholder. This property gets initialized
+        # when the first call to `is_admin()` is made.
+        self._is_admin = None
+        # Value of None is a placeholder. This property gets initialized
+        # when the first call to `is_moderator()` is made.
+        self._is_moderator = None
 
     def is_admin(self):
-        return self.user_id in config_domain.ADMIN_IDS.value
+        if self._is_admin is None:
+            self._is_admin = self.user_id in config_domain.ADMIN_IDS.value
+        return self._is_admin
 
     def is_moderator(self):
-        return (self.is_admin() or
+        if self._is_moderator is None:
+            self._is_moderator = (
+                self.is_admin() or
                 self.user_id in config_domain.MODERATOR_IDS.value)
+        return self._is_moderator
 
     def _is_owner(self, rights_object):
         return (
@@ -533,7 +545,7 @@ def _assign_role(
     elif new_role == ROLE_EDITOR:
         if Actor(assignee_id)._has_editing_rights(activity_rights):  # pylint: disable=protected-access
             raise Exception(
-                'This user already can edit this %s.'  % activity_type)
+                'This user already can edit this %s.' % activity_type)
 
         if activity_rights.community_owned:
             raise Exception(
