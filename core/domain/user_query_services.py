@@ -38,3 +38,14 @@ def save_new_query_model(
         query_status=feconf.USER_QUERY_STATUS_PROCESSING,
         user_ids=[]).put()
     return query_id
+
+
+def send_email_to_qualified_users(
+    query_id, email_subject, email_body, email_option, num_of_users_to_send):
+    """Send email to maximum 'num_of_users_to_send' qualified users."""
+    query_model = user_models.UserQueryModel.get(query_id)
+
+    if email_option is 'all':
+        email_manager.send_user_query_email(
+            query_model.submitter_id, query_model.user_ids, email_subject,
+            email_body)

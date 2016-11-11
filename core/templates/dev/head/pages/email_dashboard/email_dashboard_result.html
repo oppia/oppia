@@ -1,0 +1,66 @@
+{% extends 'pages/base.html' %}
+
+{% block maintitle %}
+  Email Dashboard Result - Oppia
+{% endblock maintitle %}
+
+{% block header_js %}
+  {{ super() }}
+  <style>
+    html, body {
+      background-color: #f2f2ee;
+    }
+    .success {
+      color: #0000ff;
+    }
+    .oppia-email-form {
+      text-align: center;
+      margin-top: 2%;
+    }
+
+    textarea {
+      margin-bottom: 1%;
+      border-radius: 10px;
+    }
+  </style>
+{% endblock header_js %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      Email Dashboard
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <div class="oppia-email-form" ng-controller="EmailDashboardResult">
+    <p ng-if="invalid.subject" class="invalid-input">Please enter valid email subject</p>
+    <p ng-if="invalid.body" class="invalid-input">Please enter valid email body</p>
+    <p ng-if="invalid.num_users" class="invalid-input">Please enter valid no. of recipients</p>
+    <form class="form" ng-submit="submitEmail()">
+      Email subject: <textarea rows="2" cols="10" placeholder="Enter email subject here..." ng-model="email_subject"></textarea>
+      <br>
+      Email body: <textarea rows="10" cols="20" placeholder="Enter email body here..." ng-model="email_body"></textarea>
+      <br>
+      <input type="radio" name="email" ng-model="email_option" value="all" checked> Send to all<br>
+      <input type="radio" name="email" ng-model="email_option" value="custom"> Send to max N users:
+      <input type="number" ng-model="num_of_users_to_send" min="0" placeholder="Enter number of users..."><br>
+      <input type="radio" name="email" ng-model="email_option" value="cancel"> Cancel<br>
+      <input type="submit" value="submit email">
+      <input type="reset" value="reset" ng-click="resetEmail()">
+    </form>
+  </div>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script type="text/javascript">
+    GLOBALS.queryId = JSON.parse('{{query_id|js_string}}')
+  </script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/email_dashboard/EmailDashboardResult.js"></script>
+{% endblock footer_js %}

@@ -157,3 +157,36 @@ class QueryStatusCheck(base.BaseHandler):
         }
 
         self.render_json(data)
+
+
+class EmailDashboardResult(base.BaseHandler):
+    """Handler for email dashboard result page."""
+    @require_valid_sender
+    def get(self, query_id):
+        query_model = user_models.UserQueryModel.get(query_id)
+        if (not query_model or
+            query_model.query_status is feconf.USER_QUERY_STATUS_ARCHIVED):
+            self.InvalidInputException('400 Invalid query.')
+
+        self.values.update({
+            'query_id': query_id,
+        })
+        self.render_template(
+            'pages/email_dashboard/email_dashboard_result.html')
+
+    @require_valid_sender
+    def post(self, query_id):
+        query_model = user_models.UserQueryModel.get(query_id)
+        if (not query_model or
+            query_model.query_status is feconf.USER_QUERY_STATUS_ARCHIVED):
+            self.InvalidInputException('400 Invalid query.')
+
+        data = self.payload['data']
+        email_subject = data['email_subject']
+        email_body = data['email_body']
+        email_option = data['email_option']
+        num_of_users_to_send = data['num_of_users_to_send']
+
+        user_query_services.send_email_to_qualified_users(
+            query_id, email_subject, email_body, email_option,
+            num_of_users_to_send)
