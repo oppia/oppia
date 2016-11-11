@@ -671,7 +671,7 @@ textarea {
   bottom: 0;
   color: #fff;
   font-size: 13px;
-  line-height: 20px
+  line-height: 20px;
   margin-top: 250px;
   position: absolute;
   width: 100%;
@@ -1454,7 +1454,7 @@ md-card.oppia-dashboard-tile {
 }
 
 .oppia-cc-icon {
-  bottom: 0;
+  bottom: 28px;
   opacity: 0.4;
   position: fixed;
   right: 25px;

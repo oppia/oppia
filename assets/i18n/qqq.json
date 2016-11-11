@@ -38,7 +38,7 @@
   "I18N_ERROR_PAGE_TITLE_500": "Title of the page displayed when a 500 type error occurred because the server failed to process the request.",
   "I18N_FOOTER_ABOUT": "Text shown in the footer. - Link to the about page. See I18N_ABOUT_PAGE_TITLE",
   "I18N_FOOTER_ABOUT_ALL_CAPS": "Text shown in the footer. - Title of the about section. Must be in capital letters.",
-  "I18N_FOOTER_AUTHOR_PROFILE": "Text shown in the exploration footer. - A link that opens up a dropdown menu of authors that contributed to this exploration.",
+  "I18N_FOOTER_AUTHOR_PROFILES": "Text shown in the exploration footer. - A link that opens up a dropdown menu of authors that contributed to this exploration.",
   "I18N_FOOTER_BROWSE_LIBRARY": "Text shown in the footer. - Link to the library page.",
   "I18N_FOOTER_CONTACT_US": "Text shown in the footer. - Link to the contact page.",
   "I18N_FOOTER_CONTRIBUTE_ALL_CAPS": "Text shown in the footer. - Title of the contribute section. Must be in capital letters. This section has links to pages where people can contribute to Oppia.",

@@ -103,9 +103,11 @@
 {% endblock %}
 
 {% block footer %}
-  {% include 'pages/exploration_player/exploration_footer_directive.html' %}
-  {% include 'components/share/sharing_links_directive.html' %}
-  <exploration-footer twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></exploration-footer>
+  {% if not iframed %}
+    {% include 'pages/exploration_player/exploration_footer_directive.html' %}
+    {% include 'components/share/sharing_links_directive.html' %}
+    <exploration-footer twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></exploration-footer>
+  {% endif %}
 {% endblock %}
 
 {% block footer_js %}
