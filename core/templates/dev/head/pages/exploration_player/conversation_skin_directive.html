@@ -43,13 +43,6 @@
   </oppia-gadget-panel>
 
   <div ng-if="isOnTerminalCard() && isLoggedIn && !isInPreviewMode && !isIframed && isCurrentCardAtEndOfTranscript()" class="conversation-skin-final-ratings">
-    <div style="color: #064b46; margin-bottom: 20px;" translate="I18N_PLAYER_SHARE_EXPLORATION">
-    </div>
-    <sharing-links layout-type="row"
-                   class="conversation-skin-sharing-links"
-                   twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER"
-                   exploration-id="explorationId">
-    </sharing-links>
     <div style="color: #064b46; margin: 20px 0;" translate="I18N_PLAYER_RATE_EXPLORATION">
     </div>
     <div popover-placement="bottom" popover-template="'popover/feedback'" popover-trigger="click">
@@ -95,7 +88,7 @@
       mode.
     */
     html, body {
-      background: #afd2eb no-repeat center center fixed;
+      background: #eee no-repeat center center fixed;
       background-size: cover;
       color: rgba(0,0,0,0.87);
       font-family: 'Roboto', Arial, sans-serif;
@@ -156,7 +149,7 @@
       justify-content: center;
       margin: 0 auto;
       max-width: 1400px;
-      padding: 40px 14px;
+      padding: 56px 14px;
       width: 100%;
     }
 
@@ -245,27 +238,6 @@
     .conversation-skin-oppia-feedback-content,
     .conversation-skin-help-card-content {
       border-top-left-radius: 0;
-    }
-
-
-    .conversation-skin-tutor-card-top-content::before,
-    .conversation-skin-oppia-feedback-content::before,
-    .conversation-skin-help-card-content::before {
-      border-left: 8px solid transparent;
-      border-top: 12px solid rgba(224,242,241,1);
-      content: " ";
-      left: -8px;
-      position: absolute;
-      top: 0;
-    }
-
-    .conversation-skin-learner-answer-content::before {
-      border-right: 8px solid transparent;
-      border-top: 12px solid rgba(236,239,241,1);
-      content: " ";
-      position: absolute;
-      right: -8px;
-      top: 0;
     }
 
     .conversation-skin-learner-answer,

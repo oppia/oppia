@@ -74,10 +74,17 @@
 {% endblock local_top_nav_options %}
 
 {% block content %}
-  <conversation-skin></conversation-skin>
-  {% if not iframed %}
-    <attribution-guide></attribution-guide>
-  {% endif %}
+  <div ng-controller="ExplorationPlayer">
+    <div style="position: absolute; width: 100%; background-color: #aed2e9; text-align: center;">
+      <img ng-src="<[bannerImageFileUrl]>" align="center"
+           style="width: 3000px; top: 65px; max-width: 3000px;">
+    </div>
+
+    <conversation-skin></conversation-skin>
+    {% if not iframed %}
+      <attribution-guide></attribution-guide>
+    {% endif %}
+  </div>
 
   {% include 'components/attribution_guide/attribution_guide_directive.html' %}
   {% include 'components/embed_modal/embed_exploration_modal_directive.html' %}
@@ -130,6 +137,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerFeedbackPairDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ConversationSkinDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationRecommendationsService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationPlayer.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/FeedbackPopupDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerLocalNav.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerParamsService.js"></script>
