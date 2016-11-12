@@ -45,7 +45,7 @@ oppia.directive('explorationFooter', [function() {
                 [$scope.explorationId]).then(function(summaries) {
               var summaryBackendObject = null;
               if (summaries.length > 0) {
-                contributorSummary = (
+                var contributorSummary = (
                   summaries[0].human_readable_contributors_summary);
                 $scope.contributorNames = (
                   Object.keys(contributorSummary).sort(
