@@ -487,6 +487,7 @@ UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 
 NAV_MODE_ABOUT = 'about'
+NAV_MODE_GET_STARTED = 'get_started'
 NAV_MODE_BLOG = 'blog'
 NAV_MODE_COLLECTION = 'collection'
 NAV_MODE_CONTACT = 'contact'
@@ -792,6 +793,8 @@ ABOUT_PAGE_DESCRIPTION = (
     'Oppia is an open source learning platform that connects a community of '
     'teachers and learners. You can use this site to create 1-1 learning '
     'scenarios for others.')
+GET_STARTED_PAGE_DESCRIPTION = (
+    'Learn how to get started using Oppia.')
 BLOG_PAGE_DESCRIPTION = (
     'Keep up to date with Oppia news and updates via our blog.')
 CONTACT_PAGE_DESCRIPTION = (
