@@ -296,6 +296,10 @@ def get_displayable_exp_summary_dicts(exploration_summaries):
             'last_updated_msec': utils.get_time_in_millisecs(
                 exploration_summary.exploration_model_last_updated
             ),
+            'human_readable_contributors_summary': (
+                get_human_readable_contributors_summary(
+                    exploration_summary.contributors_summary)
+            ),
             'status': exploration_summary.status,
             'ratings': exploration_summary.ratings,
             'community_owned': exploration_summary.community_owned,

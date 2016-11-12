@@ -672,14 +672,15 @@ textarea {
   color: #fff;
   font-size: 13px;
   line-height: 20px;
+  margin-top: 250px;
   position: absolute;
   width: 100%;
 }
 
 .oppia-footer-container {
-  max-width: 800px;
   margin-left: auto;
   margin-right: auto;
+  max-width: 800px;
   padding: 30px 80px;
 }
 
@@ -1453,7 +1454,7 @@ md-card.oppia-dashboard-tile {
 }
 
 .oppia-cc-icon {
-  bottom: 0;
+  bottom: 34px;
   opacity: 0.4;
   position: fixed;
   right: 25px;

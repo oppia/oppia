@@ -91,7 +91,6 @@
   {% include 'components/gadget/gadget_directive.html' %}
   {% include 'components/gadget/gadget_panel_directive.html' %}
   {% include 'components/profile_link/profile_link_image_directive.html' %}
-  {% include 'components/share/sharing_links_directive.html' %}
 
   {% if iframed %}
     {% include 'pages/exploration_player/conversation_skin_embed_directive.html' %}
@@ -108,6 +107,14 @@
   {% include 'pages/exploration_player/information_card_modal.html' %}
   {% include 'pages/exploration_player/progress_dots_directive.html' %}
 
+{% endblock %}
+
+{% block footer %}
+  {% if not iframed %}
+    {% include 'pages/exploration_player/exploration_footer_directive.html' %}
+    {% include 'components/share/sharing_links_directive.html' %}
+    <exploration-footer twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></exploration-footer>
+  {% endif %}
 {% endblock %}
 
 {% block footer_js %}
@@ -127,6 +134,7 @@
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ExplorationObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StateObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/summary/ExplorationSummaryBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/StopwatchObjectFactory.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/TutorCardDirective.js"></script>
@@ -136,6 +144,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerClassificationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerFeedbackPairDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ConversationSkinDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationFooterDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationRecommendationsService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationPlayer.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/FeedbackPopupDirective.js"></script>
