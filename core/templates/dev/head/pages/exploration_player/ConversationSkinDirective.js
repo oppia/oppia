@@ -23,25 +23,6 @@ var TIME_HEIGHT_CHANGE_MSEC = 500;
 var TIME_FADEIN_MSEC = 100;
 var TIME_NUM_CARDS_CHANGE_MSEC = 500;
 
-oppia.animation('.conversation-skin-responses-animate-slide', function() {
-  return {
-    removeClass: function(element, className, done) {
-      if (className !== 'ng-hide') {
-        done();
-        return;
-      }
-      element.hide().slideDown(400, done);
-    },
-    addClass: function(element, className, done) {
-      if (className !== 'ng-hide') {
-        done();
-        return;
-      }
-      element.slideUp(400, done);
-    }
-  };
-});
-
 oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
   var tutorCardLeft, tutorCardWidth, tutorCardHeight, oppiaAvatarLeft;
   var tutorCardAnimatedLeft, tutorCardAnimatedWidth;
@@ -203,47 +184,6 @@ oppia.animation('.conversation-skin-animate-cards', function() {
 
   return {
     addClass: animateCards
-  };
-});
-
-oppia.animation('.conversation-skin-animate-card-contents', function() {
-  var animateCardChange = function(element, className, done) {
-    if (className !== 'animate-card-change') {
-      return;
-    }
-
-    var currentHeight = element.height();
-    var expectedNextHeight = $(
-      '.conversation-skin-future-tutor-card ' +
-      '.conversation-skin-tutor-card-content'
-    ).height();
-
-    // Fix the current card height, so that it does not change during the
-    // animation, even though its contents might.
-    element.css('height', currentHeight);
-
-    jQuery(element).animate({
-      opacity: 0
-    }, TIME_FADEOUT_MSEC).animate({
-      height: expectedNextHeight
-    }, TIME_HEIGHT_CHANGE_MSEC).animate({
-      opacity: 1
-    }, TIME_FADEIN_MSEC, function() {
-      element.css('height', '');
-      done();
-    });
-
-    return function(cancel) {
-      if (cancel) {
-        element.css('opacity', '1.0');
-        element.css('height', '');
-        element.stop();
-      }
-    };
-  };
-
-  return {
-    addClass: animateCardChange
   };
 });
 
@@ -773,8 +713,8 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
         if ($scope.collectionId) {
           $http.get('/collectionsummarieshandler/data', {
             params: {
-            stringified_coll_ids: JSON.stringify([$scope.collectionId])
-          }
+              stringified_collection_ids: JSON.stringify([$scope.collectionId])
+            }
           }).then(
             function(response) {
               $scope.collectionSummary = response.data.summaries[0];
