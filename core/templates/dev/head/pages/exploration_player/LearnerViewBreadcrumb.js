@@ -19,7 +19,9 @@
 
 oppia.controller('LearnerViewBreadcrumb', [
   '$scope', '$modal', '$http', '$log', 'explorationContextService',
-  function($scope, $modal, $http, $log, explorationContextService) {
+  'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
+  function($scope, $modal, $http, $log, explorationContextService,
+    EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
     var explorationId = explorationContextService.getExplorationId();
     var expInfo = null;
 

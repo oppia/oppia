@@ -45,13 +45,14 @@ oppia.directive('explorationFooter', [function() {
                 [$scope.explorationId]).then(function(summaries) {
               var summaryBackendObject = null;
               if (summaries.length > 0) {
+                contributorSummary = (
+                  summaries[0].human_readable_contributors_summary);
                 $scope.contributorNames = (
-                  Object.keys(
-                    summaries[0].human_readable_contributors_summary).sort(
+                  Object.keys(contributorSummary).sort(
                       function(contributorUsername1, contributorUsername2) {
-                        var commitsOfContributor1 = dict[
+                        var commitsOfContributor1 = contributorSummary[
                           contributorUsername1].num_commits;
-                        var commitsOfContributor2 = dict[
+                        var commitsOfContributor2 = contributorSummary[
                           contributorUsername2].num_commits;
                         return commitsOfContributor2 - commitsOfContributor1;
                       }));
