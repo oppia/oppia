@@ -2949,6 +2949,35 @@ class ClearInconsistentAnswersJobTests(test_utils.GenericTestBase):
             include_deleted_entities=True).count()
         self.assertEqual(answer_entity_count, 2)
 
+    def test_answers_which_are_too_long(self):
+        state_name = self.text_input_state_name
+
+        rule_spec_str = (
+            'IsIsomorphicTo({u\'isWeighted\': False, '
+            'u\'isDirected\': True, u\'edges\': [{u\'src\': 1, u\'dst\': 0, '
+            'u\'weight\': 1}, {u\'src\': 2, u\'dst\': 0, u\'weight\': 1}, '
+            '{u\'src\': 5, u\'dst\': 2, u\'weight\': 1}, {u\'src\': 4, '
+            'u\'dst\': 1, u\'weight\': 1}, {u\'src\': 3, u\'dst\': 1, '
+            'u\'weight\': 1}], u\'isLabeled\': True, u\'vertices\': [{u\'y\': '
+            '43, u\'x\': 156.59375, u\'label\': u\'Irene\'}, {u\'y\': 99, '
+            'u\'x\': 126.59375, u\'label\': u\'John\'}, {u\'y\': 92, u\'x\': '
+            '220.59375, u\'label\': u\'George\'}, {u\'y\': 163, u\'x\': 103')
+        self._record_old_answer(state_name, rule_spec_str, 'graph')
+
+        answer_entity_count = stats_models.StateRuleAnswerLogModel.get_all(
+            include_deleted_entities=True).count()
+        self.assertEqual(answer_entity_count, 1)
+
+        job_output = self._run_clear_answers_job()
+        self.assertEqual(sorted(job_output), [
+            'Removed 1 answer(s) whose rule specs were too long',
+            'Removed a total of 1 answer(s)'
+        ])
+
+        answer_entity_count = stats_models.StateRuleAnswerLogModel.get_all(
+            include_deleted_entities=True).count()
+        self.assertEqual(answer_entity_count, 0)
+
     def test_answers_referring_to_deleted_exploration(self):
         state_name = self.text_input_state_name
 

@@ -516,6 +516,8 @@ class ClearInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
     """
     _AGGREGATION_KEY = 'aggregation_key'
     _REMOVED_INVALID_HANDLER = 'rem_invalid_handler'
+    _REMOVED_INVALID_FUZZY_RULE = 'rem_invalid_fuzzy_rule'
+    _REMOVED_RULE_SPEC_TOO_LONG = 'rem_rule_spec_too_long'
     _REMOVED_PERM_DELETED_EXP = 'rem_perm_deleted_exp'
     _REMOVED_DELETED_EXP = 'rem_deleted_exp'
     _REMOVED_IMPOSSIBLE_AGE = 'rem_impossible_age'
@@ -545,8 +547,22 @@ class ClearInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
         period_idx = item_id.index('.')
         handler_name = item_id[:period_idx]
 
+        item_id = item_id[period_idx+1:]
+        rule_str = item_id
+
         if handler_name != 'submit':
             yield (ClearInconsistentAnswersJob._REMOVED_INVALID_HANDLER, {})
+            yield (ClearInconsistentAnswersJob._AGGREGATION_KEY, {})
+            item.delete()
+            return
+
+        if rule_str == 'FuzzyMatches':
+            yield (ClearInconsistentAnswersJob._REMOVED_INVALID_FUZZY_RULE, {})
+            yield (ClearInconsistentAnswersJob._AGGREGATION_KEY, {})
+            item.delete()
+            return
+        elif rule_str != 'Default' and rule_str[-1] != ')':
+            yield (ClearInconsistentAnswersJob._REMOVED_RULE_SPEC_TOO_LONG, {})
             yield (ClearInconsistentAnswersJob._AGGREGATION_KEY, {})
             item.delete()
             return
@@ -579,6 +595,11 @@ class ClearInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
             yield 'Removed a total of %d answer(s)' % removed_count
         elif key == ClearInconsistentAnswersJob._REMOVED_INVALID_HANDLER:
             yield 'Removed %d answer(s) that did not have a submit handler' % (
+                removed_count)
+        elif key == ClearInconsistentAnswersJob._REMOVED_INVALID_FUZZY_RULE:
+            yield 'Removed %d fuzzy answer(s)' % removed_count
+        elif key == ClearInconsistentAnswersJob._REMOVED_RULE_SPEC_TOO_LONG:
+            yield 'Removed %d answer(s) whose rule specs were too long' % (
                 removed_count)
         elif key == ClearInconsistentAnswersJob._REMOVED_PERM_DELETED_EXP:
             yield (
