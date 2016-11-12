@@ -561,7 +561,7 @@ class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
             yield (PurgeInconsistentAnswersJob._AGGREGATION_KEY, {})
             item.delete()
             return
-        elif rule_str != 'Default' and rule_str[-1] != ')':
+        if rule_str != 'Default' and rule_str[-1] != ')':
             yield (PurgeInconsistentAnswersJob._REMOVED_RULE_SPEC_TOO_LONG, {})
             yield (PurgeInconsistentAnswersJob._AGGREGATION_KEY, {})
             item.delete()
@@ -573,7 +573,7 @@ class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
             yield (PurgeInconsistentAnswersJob._AGGREGATION_KEY, {})
             item.delete()
             return
-        elif exp_model.deleted:
+        if exp_model.deleted:
             # TODO(bhenning): Decide if we actually want to omit these answers.
             # They might be useful in case the corresponding exploration is ever
             # undeleted. If it never will be, it's safe to remove these answers
@@ -582,7 +582,7 @@ class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
             yield (PurgeInconsistentAnswersJob._AGGREGATION_KEY, {})
             item.delete()
             return
-        elif item.last_updated < exp_model.created_on:
+        if item.last_updated < exp_model.created_on:
             yield (PurgeInconsistentAnswersJob._REMOVED_IMPOSSIBLE_AGE, {})
             yield (PurgeInconsistentAnswersJob._AGGREGATION_KEY, {})
             item.delete()
