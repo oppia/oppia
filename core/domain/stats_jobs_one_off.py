@@ -509,7 +509,7 @@ class ClearMigratedAnswersJob(jobs.BaseMapReduceJobManager):
         yield 'Deleted %d answers' % len(stringified_values)
 
 
-class ClearInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
+class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
     """This job deletes all answers stored in
     stats_models.StateRuleAnswerLogModel which do not or cannot correspond to an
     existing, accessible exploration.
@@ -531,8 +531,8 @@ class ClearInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
         item_id = item.id
 
         if 'submit' not in item_id:
-            yield (ClearInconsistentAnswersJob._REMOVED_INVALID_HANDLER, {})
-            yield (ClearInconsistentAnswersJob._AGGREGATION_KEY, {})
+            yield (PurgeInconsistentAnswersJob._REMOVED_INVALID_HANDLER, {})
+            yield (PurgeInconsistentAnswersJob._AGGREGATION_KEY, {})
             item.delete()
             return
 
@@ -551,26 +551,26 @@ class ClearInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
         rule_str = item_id
 
         if handler_name != 'submit':
-            yield (ClearInconsistentAnswersJob._REMOVED_INVALID_HANDLER, {})
-            yield (ClearInconsistentAnswersJob._AGGREGATION_KEY, {})
+            yield (PurgeInconsistentAnswersJob._REMOVED_INVALID_HANDLER, {})
+            yield (PurgeInconsistentAnswersJob._AGGREGATION_KEY, {})
             item.delete()
             return
 
         if rule_str == 'FuzzyMatches':
-            yield (ClearInconsistentAnswersJob._REMOVED_INVALID_FUZZY_RULE, {})
-            yield (ClearInconsistentAnswersJob._AGGREGATION_KEY, {})
+            yield (PurgeInconsistentAnswersJob._REMOVED_INVALID_FUZZY_RULE, {})
+            yield (PurgeInconsistentAnswersJob._AGGREGATION_KEY, {})
             item.delete()
             return
         elif rule_str != 'Default' and rule_str[-1] != ')':
-            yield (ClearInconsistentAnswersJob._REMOVED_RULE_SPEC_TOO_LONG, {})
-            yield (ClearInconsistentAnswersJob._AGGREGATION_KEY, {})
+            yield (PurgeInconsistentAnswersJob._REMOVED_RULE_SPEC_TOO_LONG, {})
+            yield (PurgeInconsistentAnswersJob._AGGREGATION_KEY, {})
             item.delete()
             return
 
         exp_model = exp_models.ExplorationModel.get_by_id(exp_id)
         if not exp_model:
-            yield (ClearInconsistentAnswersJob._REMOVED_PERM_DELETED_EXP, {})
-            yield (ClearInconsistentAnswersJob._AGGREGATION_KEY, {})
+            yield (PurgeInconsistentAnswersJob._REMOVED_PERM_DELETED_EXP, {})
+            yield (PurgeInconsistentAnswersJob._AGGREGATION_KEY, {})
             item.delete()
             return
         elif exp_model.deleted:
@@ -578,38 +578,38 @@ class ClearInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
             # They might be useful in case the corresponding exploration is ever
             # undeleted. If it never will be, it's safe to remove these answers
             # permanently.
-            yield (ClearInconsistentAnswersJob._REMOVED_DELETED_EXP, {})
-            yield (ClearInconsistentAnswersJob._AGGREGATION_KEY, {})
+            yield (PurgeInconsistentAnswersJob._REMOVED_DELETED_EXP, {})
+            yield (PurgeInconsistentAnswersJob._AGGREGATION_KEY, {})
             item.delete()
             return
         elif item.last_updated < exp_model.created_on:
-            yield (ClearInconsistentAnswersJob._REMOVED_IMPOSSIBLE_AGE, {})
-            yield (ClearInconsistentAnswersJob._AGGREGATION_KEY, {})
+            yield (PurgeInconsistentAnswersJob._REMOVED_IMPOSSIBLE_AGE, {})
+            yield (PurgeInconsistentAnswersJob._AGGREGATION_KEY, {})
             item.delete()
             return
 
     @staticmethod
     def reduce(key, stringified_values):
         removed_count = len(stringified_values)
-        if key == ClearInconsistentAnswersJob._AGGREGATION_KEY:
+        if key == PurgeInconsistentAnswersJob._AGGREGATION_KEY:
             yield 'Removed a total of %d answer(s)' % removed_count
-        elif key == ClearInconsistentAnswersJob._REMOVED_INVALID_HANDLER:
+        elif key == PurgeInconsistentAnswersJob._REMOVED_INVALID_HANDLER:
             yield 'Removed %d answer(s) that did not have a submit handler' % (
                 removed_count)
-        elif key == ClearInconsistentAnswersJob._REMOVED_INVALID_FUZZY_RULE:
+        elif key == PurgeInconsistentAnswersJob._REMOVED_INVALID_FUZZY_RULE:
             yield 'Removed %d fuzzy answer(s)' % removed_count
-        elif key == ClearInconsistentAnswersJob._REMOVED_RULE_SPEC_TOO_LONG:
+        elif key == PurgeInconsistentAnswersJob._REMOVED_RULE_SPEC_TOO_LONG:
             yield 'Removed %d answer(s) whose rule specs were too long' % (
                 removed_count)
-        elif key == ClearInconsistentAnswersJob._REMOVED_PERM_DELETED_EXP:
+        elif key == PurgeInconsistentAnswersJob._REMOVED_PERM_DELETED_EXP:
             yield (
                 'Removed %d answer(s) referring to permanently deleted '
                 'explorations' % removed_count)
-        elif key == ClearInconsistentAnswersJob._REMOVED_DELETED_EXP:
+        elif key == PurgeInconsistentAnswersJob._REMOVED_DELETED_EXP:
             yield (
                 'Removed %s answer(s) referring to deleted explorations' % (
                     removed_count))
-        elif key == ClearInconsistentAnswersJob._REMOVED_IMPOSSIBLE_AGE:
+        elif key == PurgeInconsistentAnswersJob._REMOVED_IMPOSSIBLE_AGE:
             yield (
                 'Removed %d answer(s) submitted before its exploration was '
                 'created' % removed_count)

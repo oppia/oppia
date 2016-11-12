@@ -2891,8 +2891,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self._verify_no_migration_validation_problems()
 
 
-class ClearInconsistentAnswersJobTests(test_utils.GenericTestBase):
-    """Tests for the job for clearing inconsistent answers."""
+class PurgeInconsistentAnswersJobTests(test_utils.GenericTestBase):
+    """Tests for the job for purging inconsistent answers."""
 
     DEMO_EXP_ID = '16'
     DEFAULT_RULESPEC_STR = 'Default'
@@ -2913,15 +2913,15 @@ class ClearInconsistentAnswersJobTests(test_utils.GenericTestBase):
             logging.error(e)
 
     def _run_clear_answers_job(self):
-        """Start the ClearInconsistentAnswersJob."""
+        """Start the PurgeInconsistentAnswersJob."""
 
-        job_id = stats_jobs_one_off.ClearInconsistentAnswersJob.create_new()
-        stats_jobs_one_off.ClearInconsistentAnswersJob.enqueue(job_id)
+        job_id = stats_jobs_one_off.PurgeInconsistentAnswersJob.create_new()
+        stats_jobs_one_off.PurgeInconsistentAnswersJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
         return jobs.get_job_output(job_id)
 
     def setUp(self):
-        super(ClearInconsistentAnswersJobTests, self).setUp()
+        super(PurgeInconsistentAnswersJobTests, self).setUp()
         exp_services.load_demo(self.DEMO_EXP_ID)
         self.exploration = exp_services.get_exploration_by_id(self.DEMO_EXP_ID)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
