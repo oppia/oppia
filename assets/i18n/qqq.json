@@ -56,6 +56,7 @@
   "I18N_FORMS_TYPE_NUMBER_AT_LEAST": "Text displayed in a number interaction. - This text is shown in red when the user introduces a number that is less than <[minValue]>.",
   "I18N_FORMS_TYPE_NUMBER_AT_MOST": "Text displayed in a number interaction. - This text is shown in red when the user introduces a number that is greater than <[maxValue]>.",
   "I18N_FORMS_TYPE_NUMBER_INVALID_DECIMAL": "Text displayed in a number interaction. - This text is shown in red when the user introduces something that can't be interpreted as a number.",
+  "I18N_GET_STARTED_PAGE_TITLE": "Get Started",
   "I18N_INTERACTIONS_GRAPH_ADD_EDGE": "Text displayed in a button in a graph interaction inside the graph editor - When the user clicks the button, he can add a new line (edge) to the graph.",
   "I18N_INTERACTIONS_GRAPH_ADD_NODE": "Text displayed in a button in a graph interaction inside the graph editor - When the user clicks the button, he can add a new dot (node) to the graph.",
   "I18N_INTERACTIONS_GRAPH_DELETE": "Text displayed in a button in a graph interaction inside the graph editor - When the user clicks the button, he can move then select an element of the graph and delete it.",
