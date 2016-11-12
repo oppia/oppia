@@ -321,7 +321,7 @@ class CollectionSummariesHandler(base.BaseHandler):
         except Exception:
             raise self.PageNotFoundException
         summaries = (
-            summary_services.get_displayable_collection_summary_dicts_matching_ids(
+            summary_services.get_displayable_collection_summary_dicts_matching_ids( # pylint: disable=line-too-long
                 collection_ids))
         self.values.update({
             'summaries': summaries
