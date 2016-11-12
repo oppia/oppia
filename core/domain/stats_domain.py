@@ -40,15 +40,6 @@ import feconf
 MIGRATED_STATE_ANSWER_SESSION_ID = 'migrated_state_answer_session_id'
 MIGRATED_STATE_ANSWER_TIME_SPENT_IN_SEC = 0.0
 
-# These sentinel values are used when the exploration an answer was submitted to
-# has been permanently deleted and cannot be used to recover the answer. The
-# answer is still migrated, but with nearly all of its information missing.
-# TODO(bhenning): Try a bruteforce migration technique with these answers in the
-# future by matching the answer HTML against produced HTML from interactions.
-MIGRATED_STATE_ANSWER_MISSING_EXPLORATION_ANSWER = None
-MIGRATED_STATE_ANSWER_MISSING_EXPLORATION_VERSION = 0
-MIGRATED_STATE_ANSWER_MISSING_EXPLORATION_INTERACTION_ID = 'Unknown'
-
 
 # TODO(bhenning): Remove this.
 class StateRuleAnswerLog(object):
@@ -194,9 +185,7 @@ class StateAnswers(object):
                     self.interaction_id)
 
             # Verify interaction_id is valid.
-            if (self.interaction_id != (
-                    MIGRATED_STATE_ANSWER_MISSING_EXPLORATION_INTERACTION_ID)
-                    and self.interaction_id not in
+            if (self.interaction_id not in
                     interaction_registry.Registry.get_all_interaction_ids()):
                 raise utils.ValidationError(
                     'Unknown interaction id %s' % self.interaction_id)

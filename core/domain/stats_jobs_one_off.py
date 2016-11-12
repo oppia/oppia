@@ -490,8 +490,7 @@ class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
 class ClearMigratedAnswersJob(jobs.BaseMapReduceJobManager):
     """This job deletes all answers stored in the
     stats_models.StateAnswersModel and all book-keeping information stored in
-    stats_models.MigratedAnswerModel. As an extra precaution, this job is a
-    no-op unless feconf.DELETE_ANSWERS_AFTER_MIGRATION is enabled.
+    stats_models.MigratedAnswerModel.
     """
     _DELETE_KEY = 'Migrated Answer Cleared'
 
@@ -502,13 +501,97 @@ class ClearMigratedAnswersJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        if feconf.DELETE_ANSWERS_AFTER_MIGRATION:
-            item.delete()
-            yield (ClearMigratedAnswersJob._DELETE_KEY, 'Deleted answer.')
+        item.delete()
+        yield (ClearMigratedAnswersJob._DELETE_KEY, 'Deleted answer.')
 
     @staticmethod
     def reduce(key, stringified_values):
         yield 'Deleted %d answers' % len(stringified_values)
+
+
+class ClearInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
+    """This job deletes all answers stored in
+    stats_models.StateRuleAnswerLogModel which do not or cannot correspond to an
+    existing, accessible exploration.
+    """
+    _AGGREGATION_KEY = 'aggregation_key'
+    _REMOVED_INVALID_HANDLER = 'rem_invalid_handler'
+    _REMOVED_PERM_DELETED_EXP = 'rem_perm_deleted_exp'
+    _REMOVED_DELETED_EXP = 'rem_deleted_exp'
+    _REMOVED_IMPOSSIBLE_AGE = 'rem_impossible_age'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.StateRuleAnswerLogModel]
+
+    @staticmethod
+    def map(item):
+        item_id = item.id
+
+        if 'submit' not in item_id:
+            yield (ClearInconsistentAnswersJob._REMOVED_INVALID_HANDLER, {})
+            yield (ClearInconsistentAnswersJob._AGGREGATION_KEY, {})
+            item.delete()
+            return
+
+        period_idx = item_id.index('.')
+        exp_id = item_id[:period_idx]
+
+        item_id = item_id[period_idx+1:]
+        handler_period_idx = item_id.index('submit') - 1
+        state_name = item_id[:handler_period_idx]
+
+        item_id = item_id[handler_period_idx+1:]
+        period_idx = item_id.index('.')
+        handler_name = item_id[:period_idx]
+
+        if handler_name != 'submit':
+            yield (ClearInconsistentAnswersJob._REMOVED_INVALID_HANDLER, {})
+            yield (ClearInconsistentAnswersJob._AGGREGATION_KEY, {})
+            item.delete()
+            return
+
+        exp_model = exp_models.ExplorationModel.get_by_id(exp_id)
+        if not exp_model:
+            yield (ClearInconsistentAnswersJob._REMOVED_PERM_DELETED_EXP, {})
+            yield (ClearInconsistentAnswersJob._AGGREGATION_KEY, {})
+            item.delete()
+            return
+        elif exp_model.deleted:
+            # TODO(bhenning): Decide if we actually want to omit these answers.
+            # They might be useful in case the corresponding exploration is ever
+            # undeleted. If it never will be, it's safe to remove these answers
+            # permanently.
+            yield (ClearInconsistentAnswersJob._REMOVED_DELETED_EXP, {})
+            yield (ClearInconsistentAnswersJob._AGGREGATION_KEY, {})
+            item.delete()
+            return
+        elif item.last_updated < exp_model.created_on:
+            yield (ClearInconsistentAnswersJob._REMOVED_IMPOSSIBLE_AGE, {})
+            yield (ClearInconsistentAnswersJob._AGGREGATION_KEY, {})
+            item.delete()
+            return
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        removed_count = len(stringified_values)
+        if key == ClearInconsistentAnswersJob._AGGREGATION_KEY:
+            yield 'Removed a total of %d answer(s)' % removed_count
+        elif key == ClearInconsistentAnswersJob._REMOVED_INVALID_HANDLER:
+            yield 'Removed %d answer(s) that did not have a submit handler' % (
+                removed_count)
+        elif key == ClearInconsistentAnswersJob._REMOVED_PERM_DELETED_EXP:
+            yield (
+                'Removed %d answer(s) referring to permanently deleted '
+                'explorations' % removed_count)
+        elif key == ClearInconsistentAnswersJob._REMOVED_DELETED_EXP:
+            yield (
+                'Removed %s answer(s) referring to deleted explorations' % (
+                    removed_count))
+        elif key == ClearInconsistentAnswersJob._REMOVED_IMPOSSIBLE_AGE:
+            yield (
+                'Removed %d answer(s) submitted before its exploration was '
+                'created' % removed_count)
 
 
 class AnswerMigrationValidationJob(jobs.BaseMapReduceJobManager):
@@ -527,7 +610,9 @@ class AnswerMigrationValidationJob(jobs.BaseMapReduceJobManager):
         try:
             stats_models.MigratedAnswerModel.validate_answers_are_migrated(item)
         except utils.ValidationError as e:
-            yield (AnswerMigrationValidationJob._ERROR_KEY, e)
+            yield (
+                AnswerMigrationValidationJob._ERROR_KEY,
+                unicode(e).encode('utf-8'))
 
     @staticmethod
     def reduce(key, stringified_values):
@@ -1166,8 +1251,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         if rule_spec.rule_type not in supported_rule_types:
             return (
                 None,
-                'Cannot reconstitute ItemSelectionInput object without an Equals '
-                'rule.')
+                'Cannot reconstitute ItemSelectionInput object without an '
+                'Equals rule.')
         option_list = ast.literal_eval(answer_str)
         if not isinstance(option_list, list):
             return (
@@ -1559,16 +1644,16 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             yield (
                 AnswerMigrationJob._ERROR_KEY,
                 'Exploration referenced by answer bucket is permanently '
-                'missing. Continuing with missing exploration and state.')
-            max_version = 0
+                'missing. Cannot recover.')
+            return
         else:
             max_version = latest_exp_model.version
 
-        # Split up the answers across multiple shards (10) so that they may be
+        # Split up the answers across multiple shards (64) so that they may be
         # more randomly distributed.
         random.seed('%s.%s.%s' % (
             item.id, datetime.datetime.utcnow(), os.urandom(64)))
-        entropy = random.randint(0, 9)
+        entropy = random.randint(0, 63)
         yield ('%s.%s.%s.%s' % (exp_id, max_version, state_name, entropy), {
             'item_id': item.id,
             'exploration_id': exp_id,
@@ -1616,12 +1701,14 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             elif len(explorations) == 0:
                 yield (
                     'Failed to retrieve history for exploration %s due to '
-                    'error: %s. Migrating with missing exploration and '
-                    'state.' % (exploration_id, migration_error))
+                    'error: %s. Cannot recover.' % (
+                        exploration_id, migration_error))
+                return
         else:
-            # Continue with no explorations since the exploration could not be
-            # retrieved during map().
-            explorations = []
+            yield (
+                'Expected non-zero max version when migrating exploration '
+                '%s' % exploration_id)
+            return
 
         for value_dict in value_dict_list:
             item_id = value_dict['item_id']
@@ -1730,32 +1817,13 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             # store to replicate frequency.
             submitted_answer_list = [answer] * answer_frequency
 
-            if exploration:
-                stats_services.record_answers(
-                    exploration, state_name, submitted_answer_list)
-                exploration_version = exploration.version
-            else:
-                exploration_version = (
-                    stats_domain.MIGRATED_STATE_ANSWER_MISSING_EXPLORATION_VERSION) # pylint: disable=line-too-long
-                interaction_id = (
-                    stats_domain.MIGRATED_STATE_ANSWER_MISSING_EXPLORATION_INTERACTION_ID) # pylint: disable=line-too-long
-
-                # NOTE(bhenning): This has code skew with
-                # stats_services.record_answer(), however this approach allows
-                # the answer to be recorded without a loaded exploration or
-                # state objects.
-                state_answers = stats_domain.StateAnswers(
-                    exploration_id, exploration_version, state_name,
-                    interaction_id, submitted_answer_list)
-                state_answers.validate()
-                stats_models.StateAnswersModel.insert_submitted_answers(
-                    state_answers.exploration_id,
-                    state_answers.exploration_version, state_answers.state_name,
-                    state_answers.interaction_id,
-                    state_answers.get_submitted_answer_dict_list())
+            stats_services.record_answers(
+                exploration, state_name, submitted_answer_list)
+            exploration_version = exploration.version
 
             stats_models.MigratedAnswerModel.finish_migrating_answer(
                 item_id, exploration_id, exploration_version, state_name)
+
         stats_models.MigratedAnswerModel.finish_migration_answer_bucket(item_id)
 
     @classmethod
@@ -1778,16 +1846,11 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # TODO(bhenning): Consider outputting the results of running this
         # matching procedure (e.g. how many versions were skipped with errors
         # before a matching answer was found).
-        if not explorations:
-            answer, error = cls._migrate_answer(
-                answer_str, rule_str, None, state_name)
-            return (answer, None, error)
-
         if last_updated < explorations[-1].created_on:
             return (
                 None, None,
-                'Expected failure: Cannot match answer to an exploration which '
-                'was created after it was last submitted.')
+                'Cannot match answer to an exploration which was created after '
+                'it was last submitted. Cannot recover.')
 
         matched_answer = None
         first_error = None
@@ -1825,7 +1888,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     def _migrate_answer(cls, answer_str, rule_str, exploration, state_name):
         # Another point of failure is the state not matching due to an
         # incorrect exploration version selection.
-        if exploration and state_name not in exploration.states:
+        if state_name not in exploration.states:
             return (
                 None,
                 'Failed to match answer \'%s\' to exploration snapshots '
@@ -1864,67 +1927,57 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         answer_group = None
         rule_spec = None
 
-        if exploration:
-            state = exploration.states[state_name]
-            (answer_group_index, rule_spec_index, error_string) = (
-                cls._infer_which_answer_group_and_rule_match_answer(
-                    state, rule_str))
+        state = exploration.states[state_name]
+        (answer_group_index, rule_spec_index, error_string) = (
+            cls._infer_which_answer_group_and_rule_match_answer(
+                state, rule_str))
 
-            # Major point of failure: answer_group_index or rule_spec_index may
-            # return none when it's not a default result.
-            if answer_group_index is None or rule_spec_index is None:
-                return (
-                    None,
-                    'Failed to match rule string: \'%s\' because of %s '
-                    '(state=%s)' % (
-                        rule_str.encode('utf-8'),
-                        error_string.encode('utf-8'),
-                        state.to_dict()))
+        # Major point of failure: answer_group_index or rule_spec_index may
+        # return none when it's not a default result.
+        if answer_group_index is None or rule_spec_index is None:
+            return (
+                None,
+                'Failed to match rule string: \'%s\' because of %s '
+                '(state=%s)' % (
+                    rule_str.encode('utf-8'),
+                    error_string.encode('utf-8'),
+                    state.to_dict()))
 
-            answer_groups = state.interaction.answer_groups
-            if answer_group_index != len(answer_groups):
-                answer_group = answer_groups[answer_group_index]
-                rule_spec = answer_group.rule_specs[rule_spec_index]
+        answer_groups = state.interaction.answer_groups
+        if answer_group_index != len(answer_groups):
+            answer_group = answer_groups[answer_group_index]
+            rule_spec = answer_group.rule_specs[rule_spec_index]
 
-            # Major point of failure is if answer returns None; the error
-            # variable will contain why the reconstitution failed.
-            (answer, error) = AnswerMigrationJob._reconstitute_answer_object(
-                state, answer_group_index, rule_spec, rule_str, answer_str)
-            if error:
-                return (None, error)
+        # Major point of failure is if answer returns None; the error
+        # variable will contain why the reconstitution failed.
+        (answer, error) = AnswerMigrationJob._reconstitute_answer_object(
+            state, answer_group_index, rule_spec, rule_str, answer_str)
+        if error:
+            return (None, error)
 
-            if answer_group_index != len(answer_groups):
-                outcome = (
-                    state.interaction.answer_groups[answer_group_index].outcome)
-                temporary_special_param = next(
-                   (param_change for param_change in outcome.param_changes
-                    if param_change.name == (
-                        AnswerMigrationJob._TEMPORARY_SPECIAL_RULE_PARAMETER)),
-                    None)
-                # If this answer corresponds to a rule_spec with a non-answer
-                # subject type, then retain the value of that subject in the
-                # params part of the answer object.
-                if temporary_special_param:
-                    subject_name = (
-                        temporary_special_param.customization_args['subject'])
-                    subject_value = rule_str[len(rule_spec.rule_type) + 1:-1]
-                    params[subject_name] = subject_value
+        if answer_group_index != len(answer_groups):
+            outcome = (
+                state.interaction.answer_groups[answer_group_index].outcome)
+            temporary_special_param = next(
+               (param_change for param_change in outcome.param_changes
+                if param_change.name == (
+                    AnswerMigrationJob._TEMPORARY_SPECIAL_RULE_PARAMETER)),
+                None)
+            # If this answer corresponds to a rule_spec with a non-answer
+            # subject type, then retain the value of that subject in the
+            # params part of the answer object.
+            if temporary_special_param:
+                subject_name = (
+                    temporary_special_param.customization_args['subject'])
+                subject_value = rule_str[len(rule_spec.rule_type) + 1:-1]
+                params[subject_name] = subject_value
 
 
-            return (stats_domain.SubmittedAnswer(
-                answer, state.interaction.id, answer_group_index,
-                rule_spec_index, classification_categorization, params,
-                session_id, time_spent_in_sec, rule_spec_str=rule_str,
-                answer_str=answer_str), None)
-        else:
-            return (stats_domain.SubmittedAnswer(
-                stats_domain.MIGRATED_STATE_ANSWER_MISSING_EXPLORATION_ANSWER,
-                stats_domain.MIGRATED_STATE_ANSWER_MISSING_EXPLORATION_INTERACTION_ID, # pylint: disable=line-too-long
-                answer_group_index, rule_spec_index,
-                classification_categorization, params, session_id,
-                time_spent_in_sec, rule_spec_str=rule_str,
-                answer_str=answer_str), None)
-
+        return (stats_domain.SubmittedAnswer(
+            answer, state.interaction.id, answer_group_index,
+            rule_spec_index, classification_categorization, params,
+            session_id, time_spent_in_sec, rule_spec_str=rule_str,
+            answer_str=answer_str), None)
 
 
     # Following are helpers and constants related to reconstituting the

@@ -878,7 +878,7 @@ class MigratedAnswerModel(base_models.BaseModel):
             state_rule_answer_log_model.id, strict=False)
         if not migrated_answer_model:
             raise utils.ValidationError(
-                'Answers not migrated: %s' % state_rule_answer_log_model.id)
+                u'Answers not migrated: %s' % state_rule_answer_log_model.id)
         state_answer_models_list = []
 
         # A version of -1 is a special sentinel value to silence the
@@ -894,7 +894,7 @@ class MigratedAnswerModel(base_models.BaseModel):
                 migrated_answer_model.state_name)
             if not state_answer_models:
                 raise utils.ValidationError(
-                    'Inconsistency: previous mentioned answers were migrated '
+                    u'Inconsistency: previous mentioned answers were migrated '
                     'for exploration %s (version=%s) state name %s, but none '
                     'found' % (
                         migrated_answer_model.exploration_id,
@@ -908,7 +908,7 @@ class MigratedAnswerModel(base_models.BaseModel):
             observed_count = answer_str_list.count(answer_str)
             if expected_count != observed_count:
                 raise utils.ValidationError(
-                    'Expected \'%s\' answer string %d time(s) in new data '
+                    u'Expected \'%s\' answer string %d time(s) in new data '
                     'model, but found it %d time(s)' % (
                         answer_str, expected_count, observed_count))
 
@@ -920,6 +920,7 @@ class MigratedAnswerModel(base_models.BaseModel):
             for state_answer_model in state_answer_models:
                 for submitted_answer_dict in (
                         state_answer_model.submitted_answer_list):
-                    answer_str_list.append(submitted_answer_dict['answer_str'])
+                    answer_str_list.append(
+                        submitted_answer_dict.get('answer_str'))
         return answer_str_list
 

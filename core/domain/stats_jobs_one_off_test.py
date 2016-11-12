@@ -257,7 +257,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self.assertEqual(len(job_output), 0)
         self._verify_no_migration_validation_problems()
 
-    def test_migrated_answer_from_fully_deleted_exploration_is_migrated(self):
+    def test_migrated_answer_from_perm_deleted_exp_is_not_migrated(self):
         state_name = self.text_input_state_name
 
         rule_spec_str = 'Contains(ate)'
@@ -272,39 +272,13 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             self.owner_id, self.DEMO_EXP_ID, force_deletion=True)
 
         job_output = self._run_migration_job()
+        self.assertEqual(job_output, [
+            'Exploration referenced by answer bucket is permanently missing. '
+            'Cannot recover.'])
 
-        # There should still be no answers in the new data storage model.
-        state_answers = self._get_state_answers(
-            state_name, exploration_version=(
-                stats_domain.MIGRATED_STATE_ANSWER_MISSING_EXPLORATION_VERSION))
-
-        self.assertEqual(state_answers.exploration_id, self.DEMO_EXP_ID)
-        self.assertEqual(state_answers.exploration_version, (
-            stats_domain.MIGRATED_STATE_ANSWER_MISSING_EXPLORATION_VERSION))
-        self.assertEqual(state_answers.state_name, state_name)
-        self.assertEqual(state_answers.interaction_id, (
-            stats_domain.MIGRATED_STATE_ANSWER_MISSING_EXPLORATION_INTERACTION_ID)) # pylint: disable=line-too-long
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
-            'answer': (
-                stats_domain.MIGRATED_STATE_ANSWER_MISSING_EXPLORATION_ANSWER),
-            'time_spent_in_sec': 0.0,
-            'answer_group_index': None,
-            'rule_spec_index': None,
-            'classification_categorization': (
-                exp_domain.EXPLICIT_CLASSIFICATION),
-            'session_id': 'migrated_state_answer_session_id',
-            'interaction_id': (
-                stats_domain.MIGRATED_STATE_ANSWER_MISSING_EXPLORATION_INTERACTION_ID), # pylint: disable=line-too-long
-            'params': {},
-            'rule_spec_str': rule_spec_str,
-            'answer_str': html_answer
-        }])
-
-        self.assertEqual(len(job_output), 1)
-        self.assertIn(
-            'Exploration referenced by answer bucket is permanently missing',
-            job_output[0])
-        self._verify_no_migration_validation_problems()
+        stae_answers_model_count = stats_models.StateAnswersModel.get_all(
+            include_deleted_entities=True).count()
+        self.assertEqual(stae_answers_model_count, 0)
 
     def test_rule_parameter_evaluation_with_invalid_characters(self):
         exploration = self.save_new_valid_exploration(
@@ -1586,16 +1560,19 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # An answer should be lost since it's older than the current exploration
         # of the matched ID.
         job_output = self._run_migration_job()
-        self.assertEqual(job_output, [
-            'Expected failure: Cannot match answer to an exploration which was '
-            'created after it was last submitted. (answer freq: 1)'])
+        self.assertEqual(len(job_output), 2)
+        self.assertIn(
+            'Cannot match answer to an exploration which was created after it '
+            'was last submitted. Cannot recover.', sorted(job_output)[0])
 
         # The answer should not be migrated to the new storage model.
         state_answers = self._get_state_answers(
             state_name, exploration_id='exp_id0', exploration_version=2)
         self.assertIsNone(state_answers)
 
-        self._verify_no_migration_validation_problems()
+        # Since the mismatched time is an unexpected error, it will result in a
+        # validation problem.
+        self._verify_migration_validation_problems(1)
 
     def test_reduce_shard_failure(self):
         """If a shard executing the reduce portion of the job fails to execute,
@@ -2912,3 +2889,227 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_str': html_answer
         }])
         self._verify_no_migration_validation_problems()
+
+
+class ClearInconsistentAnswersJobTests(test_utils.GenericTestBase):
+    """Tests for the job for clearing inconsistent answers."""
+
+    DEMO_EXP_ID = '16'
+    DEFAULT_RULESPEC_STR = 'Default'
+
+    # This is based on the old stats_models.process_submitted_answer().
+    def _record_old_answer(
+            self, state_name, rule_spec_str, answer_html_str,
+            exploration_id=DEMO_EXP_ID, submitted_answer_count=1):
+        answer_log = stats_models.StateRuleAnswerLogModel.get_or_create(
+            exploration_id, state_name, rule_spec_str)
+        if answer_html_str in answer_log.answers:
+            answer_log.answers[answer_html_str] += submitted_answer_count
+        else:
+            answer_log.answers[answer_html_str] = submitted_answer_count
+        try:
+            answer_log.put()
+        except Exception as e:
+            logging.error(e)
+
+    def _run_clear_answers_job(self):
+        """Start the ClearInconsistentAnswersJob."""
+
+        job_id = stats_jobs_one_off.ClearInconsistentAnswersJob.create_new()
+        stats_jobs_one_off.ClearInconsistentAnswersJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+        return jobs.get_job_output(job_id)
+
+    def setUp(self):
+        super(ClearInconsistentAnswersJobTests, self).setUp()
+        exp_services.load_demo(self.DEMO_EXP_ID)
+        self.exploration = exp_services.get_exploration_by_id(self.DEMO_EXP_ID)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        user_services.get_or_create_user(self.owner_id, self.OWNER_EMAIL)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.text_input_state_name = self.exploration.init_state_name
+
+    def test_clean_answers_are_not_removed(self):
+        state_name = self.text_input_state_name
+
+        rule_spec_str = 'Contains(ate)'
+        self._record_old_answer(state_name, rule_spec_str, 'appreciate')
+        self._record_old_answer(state_name, rule_spec_str, 'deviate')
+        self._record_old_answer(state_name, self.DEFAULT_RULESPEC_STR, 'other')
+
+        answer_entity_count = stats_models.StateRuleAnswerLogModel.get_all(
+            include_deleted_entities=True).count()
+        self.assertEqual(answer_entity_count, 2)
+
+        job_output = self._run_clear_answers_job()
+        self.assertEqual(job_output, [])
+
+        answer_entity_count = stats_models.StateRuleAnswerLogModel.get_all(
+            include_deleted_entities=True).count()
+        self.assertEqual(answer_entity_count, 2)
+
+    def test_answers_referring_to_deleted_exploration(self):
+        state_name = self.text_input_state_name
+
+        rule_spec_str = 'Contains(ate)'
+        html_answer = 'appreciate'
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        answer_entity_count = stats_models.StateRuleAnswerLogModel.get_all(
+            include_deleted_entities=True).count()
+        self.assertEqual(answer_entity_count, 1)
+
+        exp_services.delete_exploration(self.owner_id, self.DEMO_EXP_ID)
+
+        job_output = self._run_clear_answers_job()
+        self.assertEqual(sorted(job_output), [
+            'Removed 1 answer(s) referring to deleted explorations',
+            'Removed a total of 1 answer(s)'
+        ])
+
+        answer_entity_count = stats_models.StateRuleAnswerLogModel.get_all(
+            include_deleted_entities=True).count()
+        self.assertEqual(answer_entity_count, 0)
+
+    def test_answers_referring_to_permanently_deleted_exploration(self):
+        state_name = self.text_input_state_name
+
+        rule_spec_str = 'Contains(ate)'
+        html_answer = 'appreciate'
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        answer_entity_count = stats_models.StateRuleAnswerLogModel.get_all(
+            include_deleted_entities=True).count()
+        self.assertEqual(answer_entity_count, 1)
+
+        exp_services.delete_exploration(
+            self.owner_id, self.DEMO_EXP_ID, force_deletion=True)
+
+        job_output = self._run_clear_answers_job()
+        self.assertEqual(sorted(job_output), [
+            'Removed 1 answer(s) referring to permanently deleted explorations',
+            'Removed a total of 1 answer(s)'
+        ])
+
+        answer_entity_count = stats_models.StateRuleAnswerLogModel.get_all(
+            include_deleted_entities=True).count()
+        self.assertEqual(answer_entity_count, 0)
+
+    def test_answers_older_than_their_explorations(self):
+        state_name = feconf.DEFAULT_INIT_STATE_NAME
+
+        rule_spec_str = 'Contains(ate)'
+        html_answer = 'appreciate'
+
+        # Create a valid exploration.
+        self.save_new_valid_exploration(
+            'exp_id0', self.owner_id, end_state_name='End')
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'TextInput'
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'Contains',
+                    'inputs': {
+                        'x': 'ate'
+                    }
+                }],
+                'outcome': {
+                    'dest': state_name,
+                    'feedback': [],
+                    'param_changes': []
+                }
+            }]
+        }], 'Create initial text input state')
+
+        # Record the answer to an exploration, then delete it since it will be
+        # replaced by another exploration of the same ID.
+        self._record_old_answer(
+            state_name, rule_spec_str, html_answer, exploration_id='exp_id0')
+        exp_services.delete_exploration(
+            self.owner_id, 'exp_id0', force_deletion=True)
+
+        # Create a new exploration with the same ID as the deleted one, but with
+        # states that don't match the previous answer.
+        self.save_new_valid_exploration(
+            'exp_id0', self.owner_id, end_state_name='End')
+
+        answer_entity_count = stats_models.StateRuleAnswerLogModel.get_all(
+            include_deleted_entities=True).count()
+        self.assertEqual(answer_entity_count, 1)
+
+        job_output = self._run_clear_answers_job()
+        self.assertEqual(sorted(job_output), [
+            'Removed 1 answer(s) submitted before its exploration was created',
+            'Removed a total of 1 answer(s)'
+        ])
+
+        answer_entity_count = stats_models.StateRuleAnswerLogModel.get_all(
+            include_deleted_entities=True).count()
+        self.assertEqual(answer_entity_count, 0)
+
+    def test_only_bad_answers_are_removed(self):
+        rule_spec_str = 'Contains(ate)'
+        html_answer = 'appreciate'
+
+        # Create a valid exploration.
+        self.save_new_valid_exploration(
+            'exp_id0', self.owner_id, end_state_name='End')
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'TextInput'
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'Contains',
+                    'inputs': {
+                        'x': 'ate'
+                    }
+                }],
+                'outcome': {
+                    'dest': feconf.DEFAULT_INIT_STATE_NAME,
+                    'feedback': [],
+                    'param_changes': []
+                }
+            }]
+        }], 'Create initial text input state')
+
+        # Record the answer to an exploration, then delete it since it will be
+        # replaced by another exploration of the same ID.
+        self._record_old_answer(
+            feconf.DEFAULT_INIT_STATE_NAME, rule_spec_str, html_answer,
+            exploration_id='exp_id0')
+        exp_services.delete_exploration(
+            self.owner_id, 'exp_id0', force_deletion=True)
+
+        state_name = self.text_input_state_name
+
+        rule_spec_str = 'Contains(ate)'
+        self._record_old_answer(state_name, rule_spec_str, 'appreciate')
+        self._record_old_answer(state_name, rule_spec_str, 'deviate')
+        self._record_old_answer(state_name, self.DEFAULT_RULESPEC_STR, 'other')
+
+        answer_entity_count = stats_models.StateRuleAnswerLogModel.get_all(
+            include_deleted_entities=True).count()
+        self.assertEqual(answer_entity_count, 3)
+
+        job_output = self._run_clear_answers_job()
+        self.assertEqual(len(job_output), 2)
+
+        answer_entity_count = stats_models.StateRuleAnswerLogModel.get_all(
+            include_deleted_entities=True).count()
+        self.assertEqual(answer_entity_count, 2)
