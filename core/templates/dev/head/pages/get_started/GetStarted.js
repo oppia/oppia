@@ -20,7 +20,7 @@ oppia.controller('GetStarted', [
   '$scope', 'UrlInterpolationService',
   function($scope, UrlInterpolationService) {
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-    $scope.getStartedPageMascotImgUrl = UrlInterpolationService.getStaticImageUrl(
-      '/general/get_started_page_mascot.png');
+    $scope.aboutPageMascotImgUrl = UrlInterpolationService.getStaticImageUrl(
+      '/general/about_page_mascot.png');
   }
 ]);
