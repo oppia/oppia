@@ -139,12 +139,12 @@
   </div>
 
   <div ng-if="answer.length === 1">
-    <span angular-html-bind="answer[0]"></span>
+    <div angular-html-bind="answer[0]"></div>
   </div>
 
   <ul ng-if="answer.length > 1">
     <li ng-repeat="response in answer track by $index">
-      <span angular-html-bind="response"></span>
+      <div angular-html-bind="response"></div>
     </li>
   </ul>
 </script>
