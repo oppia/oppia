@@ -1073,7 +1073,7 @@ textarea {
   }
 }
 
-.oppia-library-carousel-scroll-btn {
+.oppia-library-carousel-scroller {
   color: #2c4841;
   cursor: default;
   float: left;
@@ -1084,7 +1084,10 @@ textarea {
   position: relative;
   width: 10vw;
 }
-.oppia-library-carousel-scroll-btn i {
+.md-button.oppia-library-carousel-scroller {
+  cursor: pointer;
+}
+.oppia-library-carousel-scroller i {
   font-size: 36px;
   margin: 0;
   padding: 0;
@@ -3498,7 +3501,7 @@ md-card.preview-conversation-skin-supplemental-card {
     max-width: 500px;
     transform: translate(-150px, 10px);
     position: relative;
-    width: 100%; 
+    width: 100%;
   }
 
   .oppia-splash-section-two-content {
