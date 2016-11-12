@@ -997,33 +997,37 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
         # TODO(bhenning): Should something more significant (like None) be used
         # for sentinel values for output/evaluation/error instead?
-        if rule_spec.rule_type == 'OutputEquals':
-            code_output = rule_spec.inputs['x']
-            if not answer_str:
-                return (None, 'Failed to recover code: %s' % answer_str)
-            code_evaluation_dict = {
-                'code': answer_str,
-                'output': code_output,
-                'evaluation': '',
-                'error': ''
-            }
-            return cls._normalize_raw_answer_object(
-                objects.CodeEvaluation, code_evaluation_dict, answer_str)
-        elif rule_spec.rule_type in rule_types_without_output:
-            if not answer_str:
-                return (None, 'Failed to recover code: %s' % answer_str)
-            code_evaluation_dict = {
-                'code': answer_str,
-                'output': '',
-                'evaluation': '',
-                'error': ''
-            }
-            return cls._normalize_raw_answer_object(
-                objects.CodeEvaluation, code_evaluation_dict, answer_str)
-        return (
-            None,
-            'Cannot reconstitute a CodeEvaluation object without OutputEquals, '
-            'CodeContains, CodeDoesNotContain, or ResultsInError rules.')
+        if not answer_str:
+            return (None, 'Failed to recover code: %s' % answer_str)
+        if rule_str != cls._DEFAULT_RULESPEC_STR:
+            if rule_spec.rule_type != 'OutputEquals' and (
+                    rule_spec.rule_type not in rule_types_without_output):
+                return (
+                    None,
+                    'Cannot reconstitute a CodeEvaluation object without '
+                    'OutputEquals, CodeContains, CodeDoesNotContain, or '
+                    'ResultsInError rules.')
+            if rule_spec.rule_type == 'OutputEquals':
+                code_output = rule_spec.inputs['x']
+                code_evaluation_dict = {
+                    'code': answer_str,
+                    'output': code_output,
+                    'evaluation': '',
+                    'error': ''
+                }
+                return cls._normalize_raw_answer_object(
+                    objects.CodeEvaluation, code_evaluation_dict, answer_str)
+
+        # Otherwise the answer is a default answer, or the rule type is one of
+        # CodeContains, CodeDoesNotContain, or ResultsInError.
+        code_evaluation_dict = {
+            'code': answer_str,
+            'output': '',
+            'evaluation': '',
+            'error': ''
+        }
+        return cls._normalize_raw_answer_object(
+            objects.CodeEvaluation, code_evaluation_dict, answer_str)
 
     @classmethod
     def _cb_reconstitute_continue(
@@ -1043,7 +1047,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             cls, state, answer_group_index, rule_spec, rule_str, answer_str):
         return (
             None,
-            'There should be no answers submitted for the end exploration.')
+            'There should be no answers submitted for EndExploration.')
 
     @classmethod
     def _cb_reconstitute_graph_input(
@@ -1074,30 +1078,34 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # pylint: disable=line-too-long
         # The Jinja representation for ClickOnImage answer strings is:
         #   ({{'%0.3f' | format(answer.clickPosition[0]|float)}}, {{'%0.3f'|format(answer.clickPosition[1]|float)}})
-        if rule_spec.rule_type == 'IsInRegion':
-            # Extract the region clicked on from the rule string.
-            region_name = rule_str[len(rule_spec.rule_type) + 1:-1]
-
-            # Match the pattern: '(real, real)' to extract the coordinates.
-            pattern = re.compile(
-                r'\((?P<x>\d+\.?\d*), (?P<y>\d+\.?\d*)\)')
-            match = pattern.match(answer_str)
-            if not match:
+        if rule_str != cls._DEFAULT_RULESPEC_STR:
+            if rule_spec.rule_type != 'IsInRegion':
                 return (
                     None,
-                    'Bad answer string in ImageClickInput IsInRegion rule.')
-            click_on_image_dict = {
-                'clickPosition': [
-                    float(match.group('x')), float(match.group('y'))
-                ],
-                'clickedRegions': [region_name]
-            }
-            return cls._normalize_raw_answer_object(
-                objects.ClickOnImage, click_on_image_dict, answer_str)
-        return (
-            None,
-            'Cannot reconstitute ImageClickInput object without an IsInRegion '
-            'rule.')
+                    'Cannot reconstitute ImageClickInput object without an IsInRegion '
+                    'rule.')
+            # Extract the region clicked on from the rule string.
+            clicked_regions = [rule_str[len(rule_spec.rule_type) + 1:-1]]
+        else:
+            # If the default outcome happened, then no regions were clicked on
+            clicked_regions = []
+
+        # Match the pattern: '(real, real)' to extract the coordinates.
+        pattern = re.compile(
+            r'\((?P<x>\d+\.?\d*), (?P<y>\d+\.?\d*)\)')
+        match = pattern.match(answer_str)
+        if not match:
+            return (
+                None,
+                'Bad answer string in ImageClickInput IsInRegion rule.')
+        click_on_image_dict = {
+            'clickPosition': [
+                float(match.group('x')), float(match.group('y'))
+            ],
+            'clickedRegions': clicked_regions
+        }
+        return cls._normalize_raw_answer_object(
+            objects.ClickOnImage, click_on_image_dict, answer_str)
 
     @classmethod
     def _cb_reconstitute_interactive_map(
@@ -1106,11 +1114,12 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # The Jinja representation for CoordTwoDim answer strings is:
         #   ({{'%0.6f' | format(answer[0]|float)}}, {{'%0.6f'|format(answer[1]|float)}})
         supported_rule_types = ['Within', 'NotWithin']
-        if rule_spec.rule_type not in supported_rule_types:
-            return (
-                None,
-                'Unsupported rule type encountered while attempting to '
-                'reconstitute CoordTwoDim object: %s' % rule_spec.rule_type)
+        if rule_str != cls._DEFAULT_RULESPEC_STR:
+            if rule_spec.rule_type not in supported_rule_types:
+                return (
+                    None,
+                    'Unsupported rule type encountered while attempting to '
+                    'reconstitute CoordTwoDim object: %s' % rule_spec.rule_type)
 
         # Match the pattern: '(real, real)' to extract the coordinates.
         pattern = re.compile(
@@ -1133,8 +1142,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 match = pattern.match(answer_str)
                 if not match:
                     return (
-                        None, 'Bad answer string in InteractiveMap %s rule.' % (
-                            rule_spec.rule_type))
+                        None, 'Bad answer string in InteractiveMap rule.')
         coord_two_dim_list = [
             float(match.group('x')), float(match.group('y'))
         ]
@@ -1144,104 +1152,135 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     @classmethod
     def _cb_reconstitute_item_selection_input(
             cls, state, answer_group_index, rule_spec, rule_str, answer_str):
+        if rule_str == cls._DEFAULT_RULESPEC_STR:
+            return (
+                None,
+                'ItemSelectionInput cannot have default answers: %s' % (
+                    answer_str))
+
         # The Jinja representation for SetOfHtmlString answer strings is:
         #   {{ answer }}
         supported_rule_types = [
             'Equals', 'ContainsAtLeastOneOf', 'DoesNotContainAtLeastOneOf'
         ]
-        if rule_spec.rule_type in supported_rule_types:
-            option_list = ast.literal_eval(answer_str)
-            if not isinstance(option_list, list):
-                return (
-                    None,
-                    'Bad answer string in ItemSelectionInput Equals rule.')
-            return cls._normalize_raw_answer_object(
-                objects.SetOfHtmlString, option_list, answer_str)
-        return (
-            None,
-            'Cannot reconstitute ItemSelectionInput object without an Equals '
-            'rule.')
+        if rule_spec.rule_type not in supported_rule_types:
+            return (
+                None,
+                'Cannot reconstitute ItemSelectionInput object without an Equals '
+                'rule.')
+        option_list = ast.literal_eval(answer_str)
+        if not isinstance(option_list, list):
+            return (
+                None,
+                'Bad answer string in ItemSelectionInput Equals rule.')
+        return cls._normalize_raw_answer_object(
+            objects.SetOfHtmlString, option_list, answer_str)
 
     @classmethod
     def _cb_reconstitute_logic_proof(
             cls, state, answer_group_index, rule_spec, rule_str, answer_str):
         interaction = state.interaction
-        if rule_spec.rule_type == 'Correct':
-            # The Jinja representation of the answer is:
-            #   {{answer.proof_string}}
-
-            # Because the rule implies the proof was correct, half of the
-            # CheckedProof structure does not need to be saved. The remaining
-            # structure consists of three strings: assumptions_string,
-            # target_string, and proof_string. The latter is already available
-            # as the answer_str.
-            if not answer_str:
+        if rule_str != cls._DEFAULT_RULESPEC_STR:
+            if rule_spec.rule_type != 'Correct':
                 return (
                     None,
-                    'Failed to recover CheckedProof answer: %s' % answer_str)
+                    'Cannot reconstitute CheckedProof object without a Correct '
+                    'rule.')
+        # The Jinja representation of the answer is:
+        #   {{answer.proof_string}}
 
-            # assumptions_string and target_string come from the assumptions and
-            # results customized to this particular LogicProof instance.
-            question_details = (
-                interaction.customization_args['question']['value'])
-            assumptions = question_details['assumptions']
-            results = question_details['results']
+        # Because the rule implies the proof was correct, half of the
+        # CheckedProof structure does not need to be saved. The remaining
+        # structure consists of three strings: assumptions_string,
+        # target_string, and proof_string. The latter is already available
+        # as the answer_str.
+        if not answer_str:
+            return (
+                None,
+                'Failed to recover CheckedProof answer: %s' % answer_str)
 
-            expressions = []
-            top_types = []
-            for assumption in assumptions:
-                expressions.append(assumption)
-                top_types.append('boolean')
-            expressions.append(results[0])
+        # assumptions_string and target_string come from the assumptions and
+        # results customized to this particular LogicProof instance.
+        question_details = (
+            interaction.customization_args['question']['value'])
+        assumptions = question_details['assumptions']
+        results = question_details['results']
+
+        expressions = []
+        top_types = []
+        for assumption in assumptions:
+            expressions.append(assumption)
             top_types.append('boolean')
-            operators = AnswerMigrationJob._BASE_STUDENT_LANGUAGE['operators']
+        expressions.append(results[0])
+        top_types.append('boolean')
+        operators = AnswerMigrationJob._BASE_STUDENT_LANGUAGE['operators']
 
-            if len(assumptions) <= 1:
-                assumptions_string = (
-                    AnswerMigrationJob._display_expression_array(
-                        assumptions, operators))
-            else:
-                assumptions_string = '%s and %s' % (
-                    AnswerMigrationJob._display_expression_array(
-                        assumptions[0:-1], operators),
-                    AnswerMigrationJob._display_expression_helper(
-                        assumptions[-1], operators, 0))
+        if len(assumptions) <= 1:
+            assumptions_string = (
+                AnswerMigrationJob._display_expression_array(
+                    assumptions, operators))
+        else:
+            assumptions_string = '%s and %s' % (
+                AnswerMigrationJob._display_expression_array(
+                    assumptions[0:-1], operators),
+                AnswerMigrationJob._display_expression_helper(
+                    assumptions[-1], operators, 0))
 
-            target_string = AnswerMigrationJob._display_expression_helper(
-                results[0], operators, 0)
+        target_string = AnswerMigrationJob._display_expression_helper(
+            results[0], operators, 0)
 
+        # The resulting answer is only 'Correct' if it is not a default answer,
+        # since if it were correct then it would have been matched to the
+        # 'Correct' rule type.
+        correct = rule_str != cls._DEFAULT_RULESPEC_STR
+        if correct:
             return cls._normalize_raw_answer_object(objects.CheckedProof, {
                 'assumptions_string': assumptions_string,
                 'target_string': target_string,
                 'proof_string': answer_str,
                 'correct': True
             }, answer_str)
-        return (
-            None,
-            'Cannot reconstitute CheckedProof object without a Correct rule.')
+        else:
+            return cls._normalize_raw_answer_object(objects.CheckedProof, {
+                'assumptions_string': assumptions_string,
+                'target_string': target_string,
+                'proof_string': answer_str,
+                'correct': False,
+                'error_category': '',
+                'error_code': '',
+                'error_message': '',
+                'error_line_number': -1
+            }, answer_str)
 
     @classmethod
     def _cb_reconstitute_math_expression_input(
             cls, state, answer_group_index, rule_spec, rule_str, answer_str):
-        if rule_spec.rule_type == 'IsMathematicallyEquivalentTo':
-            math_expression_dict = ast.literal_eval(answer_str)
-            if not isinstance(math_expression_dict, dict):
+        if rule_str != cls._DEFAULT_RULESPEC_STR:
+            if rule_spec.rule_type != 'IsMathematicallyEquivalentTo':
                 return (
                     None,
-                    'Bad answer string in MathExpressionInput '
+                    'Cannot reconstitute MathExpressionInput object without an '
                     'IsMathematicallyEquivalentTo rule.')
-            return cls._normalize_raw_answer_object(
-                objects.MathExpression, math_expression_dict, answer_str)
-        return (
-            None,
-            'Cannot reconstitute MathExpressionInput object without an '
-            'IsMathematicallyEquivalentTo rule.')
+        math_expression_dict = ast.literal_eval(answer_str)
+        if not isinstance(math_expression_dict, dict):
+            return (
+                None,
+                'Bad answer string in MathExpressionInput '
+                'IsMathematicallyEquivalentTo rule.')
+        return cls._normalize_raw_answer_object(
+            objects.MathExpression, math_expression_dict, answer_str)
 
     @classmethod
     def _cb_reconstitute_multiple_choice_input(
             cls, state, answer_group_index, rule_spec, rule_str, answer_str):
         # The Jinja representation for NonnegativeInt answer strings is:
         #   {{ choices[answer|int] }}
+        if rule_str == cls._DEFAULT_RULESPEC_STR:
+            return (
+                None,
+                'MultipleChoiceInput cannot have default answers: %s' % (
+                    answer_str))
+
         interaction = state.interaction
         if rule_spec.rule_type == 'Equals':
             customization_args = interaction.customization_args
@@ -1315,16 +1354,17 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         #       {% if not loop.last -%},{% endif -%}
         #     {% endfor -%}]
         #   {% endif -%}
-        supported_rule_types = [
-            'Equals', 'IsLongerThan', 'HasLengthInclusivelyBetween',
-            'IsEqualToExceptFor', 'IsTranspositionOf',
-            'IsTranspositionOfExceptFor'
-        ]
-        if rule_spec.rule_type not in supported_rule_types:
-            return (
-                None,
-                'Unsupported rule type encountered while attempting to '
-                'reconstitute MusicPhrase object: %s' % rule_spec.rule_type)
+        if rule_str != cls._DEFAULT_RULESPEC_STR:
+            supported_rule_types = [
+                'Equals', 'IsLongerThan', 'HasLengthInclusivelyBetween',
+                'IsEqualToExceptFor', 'IsTranspositionOf',
+                'IsTranspositionOfExceptFor'
+            ]
+            if rule_spec.rule_type not in supported_rule_types:
+                return (
+                    None,
+                    'Unsupported rule type encountered while attempting to '
+                    'reconstitute MusicPhrase object: %s' % rule_spec.rule_type)
         answer_str = answer_str.rstrip()
         if answer_str == 'No answer given.':
             return cls._normalize_raw_answer_object(
@@ -1350,16 +1390,18 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     @classmethod
     def _cb_reconstitute_numeric_input(
             cls, state, answer_group_index, rule_spec, rule_str, answer_str):
-        supported_rule_types = [
-            'Equals', 'IsLessThan', 'IsGreaterThan', 'IsLessThanOrEqualTo',
-            'IsGreaterThanOrEqualTo', 'IsInclusivelyBetween',
-            'IsWithinTolerance'
-        ]
-        if rule_spec.rule_type not in supported_rule_types:
-            return (
-                None,
-                'Unsupported rule type encountered while attempting to '
-                'reconstitute NumericInput object: %s' % rule_spec.rule_type)
+        if rule_str != cls._DEFAULT_RULESPEC_STR:
+            supported_rule_types = [
+                'Equals', 'IsLessThan', 'IsGreaterThan', 'IsLessThanOrEqualTo',
+                'IsGreaterThanOrEqualTo', 'IsInclusivelyBetween',
+                'IsWithinTolerance'
+            ]
+            if rule_spec.rule_type not in supported_rule_types:
+                return (
+                    None,
+                    'Unsupported rule type encountered while attempting to '
+                    'reconstitute NumericInput object: %s' % (
+                        rule_spec.rule_type))
         input_value = float(answer_str)
         return cls._normalize_raw_answer_object(
             objects.Real, input_value, answer_str)
@@ -1367,15 +1409,18 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     @classmethod
     def _cb_reconstitute_pencil_code_editor(
             cls, state, answer_group_index, rule_spec, rule_str, answer_str):
-        supported_rule_types = [
-            'CodeEquals', 'CodeContains', 'CodeDoesNotContain', 'OutputEquals',
-            'OutputRoughlyEquals', 'ResultsInError', 'ErrorContains'
-        ]
-        if rule_spec.rule_type not in supported_rule_types:
-            return (
-                None,
-                'Unsupported rule type encountered while attempting to '
-                'reconstitute CodeEvaluation object: %s' % rule_spec.rule_type)
+        if rule_str != cls._DEFAULT_RULESPEC_STR:
+            supported_rule_types = [
+                'CodeEquals', 'CodeContains', 'CodeDoesNotContain',
+                'OutputEquals', 'OutputRoughlyEquals', 'ResultsInError',
+                'ErrorContains'
+            ]
+            if rule_spec.rule_type not in supported_rule_types:
+                return (
+                    None,
+                    'Unsupported rule type encountered while attempting to '
+                    'reconstitute CodeEvaluation object: %s' % (
+                        rule_spec.rule_type))
         # Luckily, Pencil Code answers stored the actual dict rather than just
         # the code; it's easier to reconstitute.
         code_evaluation_dict = ast.literal_eval(answer_str)
@@ -1387,16 +1432,16 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     @classmethod
     def _cb_reconstitute_set_input(
             cls, state, answer_group_index, rule_spec, rule_str, answer_str):
-        supported_rule_types = [
-            'Equals', 'IsSubsetOf', 'IsSupersetOf', 'HasElementsIn',
-            'HasElementsNotIn', 'OmitsElementsIn', 'IsDisjointFrom'
-        ]
-        if rule_spec.rule_type not in supported_rule_types:
-            return (
-                None,
-                'Unsupported rule type encountered while attempting to '
-                'reconstitute SetInput object: %s' % rule_spec.rule_type)
-
+        if rule_str != cls._DEFAULT_RULESPEC_STR:
+            supported_rule_types = [
+                'Equals', 'IsSubsetOf', 'IsSupersetOf', 'HasElementsIn',
+                'HasElementsNotIn', 'OmitsElementsIn', 'IsDisjointFrom'
+            ]
+            if rule_spec.rule_type not in supported_rule_types:
+                return (
+                    None,
+                    'Unsupported rule type encountered while attempting to '
+                    'reconstitute SetInput object: %s' % rule_spec.rule_type)
         unicode_string_list = ast.literal_eval(answer_str)
         if not isinstance(unicode_string_list, list):
             return (None, 'Failed to recover set: %s' % answer_str)
@@ -1406,15 +1451,16 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     @classmethod
     def _cb_reconstitute_text_input(
             cls, state, answer_group_index, rule_spec, rule_str, answer_str):
-        supported_rule_types = [
-            'Equals', 'CaseSensitiveEquals', 'StartsWith', 'Contains',
-            'FuzzyEquals'
-        ]
-        if rule_spec.rule_type not in supported_rule_types:
-            return (
-                None,
-                'Unsupported rule type encountered while attempting to '
-                'reconstitute TextInput object: %s' % rule_spec.rule_type)
+        if rule_str != cls._DEFAULT_RULESPEC_STR:
+            supported_rule_types = [
+                'Equals', 'CaseSensitiveEquals', 'StartsWith', 'Contains',
+                'FuzzyEquals'
+            ]
+            if rule_spec.rule_type not in supported_rule_types:
+                return (
+                    None,
+                    'Unsupported rule type encountered while attempting to '
+                    'reconstitute TextInput object: %s' % rule_spec.rule_type)
         return cls._normalize_raw_answer_object(
             objects.NormalizedString, answer_str, answer_str)
 
@@ -1423,13 +1469,10 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             cls, state, answer_group_index, rule_spec, rule_str, answer_str):
         interaction_id = state.interaction.id
         if interaction_id in cls._RECONSTITUTION_FUNCTION_MAP:
-            # Check for default outcome.
-            if (interaction_id != 'Continue'
-                    and not rule_spec
-                    and rule_str == cls._DEFAULT_RULESPEC_STR):
-                return (None, None)
             reconstitute = getattr(
                 cls, cls._RECONSTITUTION_FUNCTION_MAP[interaction_id])
+            # If the answer is a default answer, then rule_spec will not be
+            # defined.
             return reconstitute(
                 state, answer_group_index, rule_spec, rule_str, answer_str)
         return (

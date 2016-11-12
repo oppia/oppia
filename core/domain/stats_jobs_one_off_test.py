@@ -1883,6 +1883,45 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         }])
         self._verify_no_migration_validation_problems()
 
+    def test_migrate_code_repl_with_default_value(self):
+        state_name = 'Code Editor'
+
+        rule_spec_str = 'Default'
+        code_answer = '# Type your code here.\nprint \'Bye Oppia\''
+        self._record_old_answer(state_name, rule_spec_str, code_answer)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
+
+        # The answer should have been properly migrated to the new storage
+        # model.
+        state_answers = self._get_state_answers(state_name)
+
+        # The output cannot be known for default answers.
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': {
+                'code': code_answer,
+                'output': '',
+                'evaluation': '',
+                'error': ''
+            },
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 1,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'CodeRepl',
+            'params': {},
+            'rule_spec_str': rule_spec_str,
+            'answer_str': code_answer
+        }])
+        self._verify_no_migration_validation_problems()
+
     def test_migrate_continue(self):
         state_name = 'Continue'
         self._record_old_answer(state_name, self.DEFAULT_RULESPEC_STR, '')
@@ -1939,6 +1978,41 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_index': 0,
             'classification_categorization': (
                 exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'ImageClickInput',
+            'params': {},
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+        self._verify_no_migration_validation_problems()
+
+    def test_migrate_image_click_input_with_default_value(self):
+        state_name = 'Image Region'
+
+        rule_spec_str = 'Default'
+        html_answer = '(0.007, 0.271)'
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
+
+        # The answer should have been properly migrated to the new storage
+        # model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': {
+                'clickPosition': [0.007, 0.271],
+                'clickedRegions': []
+            },
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 5,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'ImageClickInput',
             'params': {},
@@ -2058,6 +2132,38 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         }])
         self._verify_no_migration_validation_problems()
 
+    def test_migrate_interactive_map_with_default_value(self):
+        state_name = 'World Map'
+
+        rule_spec_str = 'Default'
+        html_answer = '(900.979026, 909.316406)'
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
+
+        # The answer should have been properly migrated to the new storage
+        # model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': [900.979026, 909.316406],
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 3,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'InteractiveMap',
+            'params': {},
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+        self._verify_no_migration_validation_problems()
+
     def test_migrate_item_selection_input(self):
         state_name = 'Item Selection'
 
@@ -2092,6 +2198,26 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         }])
         self._verify_no_migration_validation_problems()
 
+    def test_migrate_item_selection_input_with_default_value(self):
+        state_name = 'Item Selection'
+
+        rule_spec_str = 'Default'
+        html_answer = '[u\'<p>Impossible</p>\']'
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(len(job_output), 2)
+        self.assertIn(
+            'ItemSelectionInput cannot have default answers',
+            sorted(job_output)[1])
+
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
     def test_migrate_logic_proof(self):
         state_name = 'Logic Proof'
 
@@ -2121,6 +2247,47 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_index': 0,
             'classification_categorization': (
                 exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'LogicProof',
+            'params': {},
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+        self._verify_no_migration_validation_problems()
+
+    def test_migrate_logic_proof_with_default_value(self):
+        state_name = 'Logic Proof'
+
+        rule_spec_str = 'Default'
+        html_answer = u'Something else'
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
+
+        # The answer should have been properly migrated to the new storage
+        # model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': {
+                'assumptions_string': 'p',
+                'target_string': 'p',
+                'proof_string': 'Something else',
+                'correct': False,
+                'error_category': '',
+                'error_code': '',
+                'error_message': '',
+                'error_line_number': -1
+            },
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 1,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'LogicProof',
             'params': {},
@@ -2166,6 +2333,42 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         }])
         self._verify_no_migration_validation_problems()
 
+    def test_migrate_math_expression_input_with_default_value(self):
+        state_name = 'Math Expression Input'
+
+        rule_spec_str = 'Default'
+        html_answer = (
+            '{\'ascii\': u\'x=1/2\', ''\'latex\': u\'x=\\\\dfract{1}{2}\'}')
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
+
+        # The answer should have been properly migrated to the new storage
+        # model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': {
+                'ascii': 'x=1/2',
+                'latex': 'x=\\dfract{1}{2}'
+            },
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 3,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'MathExpressionInput',
+            'params': {},
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+        self._verify_no_migration_validation_problems()
+
     def test_migrate_multiple_choice_input(self):
         state_name = 'Multiple Choice'
 
@@ -2197,6 +2400,26 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_str': html_answer
         }])
         self._verify_no_migration_validation_problems()
+
+    def test_migrate_multiple_choice_input_with_default_value(self):
+        state_name = 'Multiple Choice'
+
+        rule_spec_str = 'Default'
+        html_answer = '<p>Something impossible</p>'
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(len(job_output), 2)
+        self.assertIn(
+            'MultipleChoiceInput cannot have default answers',
+            sorted(job_output)[1])
+
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
 
     def test_migrate_music_notes_input(self):
         state_name = 'Music Notes Input'
@@ -2238,6 +2461,44 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         }])
         self._verify_no_migration_validation_problems()
 
+    def test_migrate_music_notes_input_with_default_value(self):
+        state_name = 'Music Notes Input'
+
+        rule_spec_str = 'Default'
+        html_answer = u'[A5]\n'
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
+
+        # The answer should have been properly migrated to the new storage
+        # model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': [{
+                'readableNoteName': 'A5',
+                'noteDuration': {
+                    'num': 1.0,
+                    'den': 1.0
+                }
+            }],
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 1,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'MusicNotesInput',
+            'params': {},
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+        self._verify_no_migration_validation_problems()
+
     def test_migrate_numeric_input(self):
         state_name = 'Number Input'
 
@@ -2262,6 +2523,38 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_index': 0,
             'classification_categorization': (
                 exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'NumericInput',
+            'params': {},
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+        self._verify_no_migration_validation_problems()
+
+    def test_migrate_numeric_input_with_default_value(self):
+        state_name = 'Number Input'
+
+        rule_spec_str = 'Default'
+        html_answer = '7.0'
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
+
+        # The answer should have been properly migrated to the new storage
+        # model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': 7.0,
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 1,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'NumericInput',
             'params': {},
@@ -2381,6 +2674,47 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         }])
         self._verify_no_migration_validation_problems()
 
+    def test_migrate_pencil_code_editor_with_default_value(self):
+        state_name = 'Pencil Code Editor'
+
+        rule_spec_str = 'Default'
+        html_answer = (
+            '{\'error\': u\'\', \'evaluation\': u\'\', \'code\': u"# Write a '
+            'goodbye to me, below.\\nwrite \'Hello Oppia\'\\n", \'output\': '
+            'u\'Hello Oppia\'}')
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
+
+        # The answer should have been properly migrated to the new storage
+        # model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': {
+                'error': '',
+                'evaluation': '',
+                'code': (
+                    '# Write a goodbye to me, below.\nwrite \'Hello Oppia\'\n'),
+                'output': 'Hello Oppia'
+            },
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 2,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'PencilCodeEditor',
+            'params': {},
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+        self._verify_no_migration_validation_problems()
+
     def test_migrate_set_input(self):
         state_name = 'Set Input'
 
@@ -2439,6 +2773,38 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_index': 0,
             'classification_categorization': (
                 exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'SetInput',
+            'params': {},
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+        self._verify_no_migration_validation_problems()
+
+    def test_migrate_set_input_with_default_value(self):
+        state_name = 'Set Input'
+
+        rule_spec_str = 'Default'
+        html_answer = '[u\'cool\']'
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
+
+        # The answer should have been properly migrated to the new storage
+        # model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': ['cool'],
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 1,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'SetInput',
             'params': {},
@@ -2507,6 +2873,38 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_index': 0,
             'classification_categorization': (
                 exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'TextInput',
+            'params': {},
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+        self._verify_no_migration_validation_problems()
+
+    def test_migrate_text_input_with_default_value(self):
+        state_name = self.text_input_state_name
+
+        rule_spec_str = 'Default'
+        html_answer = 'somethingelse'
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
+
+        # The answer should have been properly migrated to the new storage
+        # model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': 'somethingelse',
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 1,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'TextInput',
             'params': {},
