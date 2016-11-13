@@ -19,16 +19,14 @@
 
 oppia.factory('explorationSaveService', [
   '$http', '$modal', '$timeout', '$rootScope', '$window',
-  'alertsService','explorationTagsService',
+  'alertsService', 'explorationTagsService',
   'explorationTitleService', 'explorationObjectiveService',
-  'explorationCategoryService', 'explorationLanguageCodeService',
-  'siteAnalyticsService',
+  'explorationCategoryService', 'explorationLanguageCodeService'
   function(
       $http, $modal, $timeout, $rootScope, $window,
       alertsService, explorationTagsService, explorationTitleService,
       explorationObjectiveService, explorationCategoryService,
-      explorationLanguageCodeService, siteAnalyticsService) {
-
+      explorationLanguageCodeService) {
     // Whether or not a save action is currently in progress.
     var saveInProgress = false;
     // Whether or not a discard action is currently in progress.
@@ -47,7 +45,7 @@ oppia.factory('explorationSaveService', [
           !explorationCategoryService.savedMemento ||
           explorationLanguageCodeService.savedMemento ===
             GLOBALS.DEFAULT_LANGUAGE_CODE ||
-          explorationTagsService.savedMemento.length === 0)
+          explorationTagsService.savedMemento.length === 0);
       },
 
       isSavingAllowed: function() {
@@ -59,21 +57,21 @@ oppia.factory('explorationSaveService', [
           explorationLanguageCodeService.displayed);
       },
 
-      requiredFieldsFilled: function(){
+      requiredFieldsFilled: function() {
         if (!explorationTitleService.displayed) {
           alertsService.addWarning('Please specify a title');
-          return false
+          return false;
         }
         if (!explorationObjectiveService.displayed) {
           alertsService.addWarning('Please specify an objective');
-          return false
+          return false;
         }
         if (!explorationCategoryService.displayed) {
           alertsService.addWarning('Please specify a category');
-          return false
+          return false;
         }
 
-        return true
+        return true;
       },
 
       save: function() {
@@ -102,7 +100,7 @@ oppia.factory('explorationSaveService', [
         explorationLanguageCodeService.saveDisplayedValue();
         explorationTagsService.saveDisplayedValue();
 
-        return metadataList
+        return metadataList;
       },
 
       cancel: function() {
@@ -115,6 +113,6 @@ oppia.factory('explorationSaveService', [
         $modalInstance.dismiss('cancel');
         alertsService.clearWarnings();
       }
-    }
+    };
   }
 ]);
