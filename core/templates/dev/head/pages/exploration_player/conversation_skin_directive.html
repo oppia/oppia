@@ -58,7 +58,7 @@
        recommendedExplorationSummaries.length > 0"
        class="conversation-skin-final-recommendations">
 
-    <span style="color: #eee;" translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS"></span>
+    <span style="color: #064b46; font-size: 150%;" translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS"></span>
 
     <div class="oppia-exp-summary-tiles-container" style="padding-top: 10px;">
       <exploration-summary-tile ng-repeat="exp in (recommendedExplorationSummaries|limitTo:3) track by $index"
@@ -73,12 +73,21 @@
                                 thumbnail-bg-color="exp.thumbnail_bg_color"
                                 num-views="exp.num_views"
                                 is-community-owned="exp.community_owned"
-                                ng-attr-open-in-new-window="<[isIframed ? 'true' : undefined]>">
+                                ng-attr-open-in-new-window="<[isIframed ? 'true' : undefined]>"
+                                style="margin-left: 10px;">
       </exploration-summary-tile>
-
+      <collection-summary-tile ng-if="collectionId"
+                               collection-id="collectionSummary.id"
+                               collection-title="collectionSummary.title"
+                               last-updated-msec="collectionSummary.last_updated_msec"
+                               node-count="collectionSummary.node_count"
+                               objective="collectionSummary.objective"
+                               thumbnail-icon-url="collectionSummary.thumbnail_icon_url"
+                               thumbnail-bg-color="collectionSummary.thumbnail_bg_color"
+                               style="margin-left: 10px;">
+      </collection-summary-tile>
     </div>
   </div>
-
   <!-- The styles here need to be embedded within the directive script tags,
   since otherwise they will interfere with the iframed conversation skin
   directive. -->

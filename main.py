@@ -218,6 +218,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         feconf.EXPLORATION_SUMMARIES_DATA_URL,
         library.ExplorationSummariesHandler),
+    get_redirect_route(
+        feconf.COLLECTION_SUMMARIES_DATA_URL,
+        library.CollectionSummariesHandler),
 
     get_redirect_route(r'/profile/<username>', profile.ProfilePage),
     get_redirect_route(
