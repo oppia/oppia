@@ -398,15 +398,6 @@ oppia.factory('explorationSaveService', [
         }
       },
 
-      isSavingAllowed: function() {
-        return Boolean(
-          explorationTitleService.displayed &&
-          explorationObjectiveService.displayed &&
-          explorationObjectiveService.displayed.length >= 15 &&
-          explorationCategoryService.displayed &&
-          explorationLanguageCodeService.displayed);
-      },
-
       saveChanges: function() {
         // This flag is used to change text of save button to "Loading..." to
         // add indication for user that something is happening.
