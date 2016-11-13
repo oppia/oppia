@@ -511,33 +511,18 @@ oppia.controller('EditorNavbarBreadcrumb', [
 ]);
 
 oppia.controller('ExplorationSaveAndPublishButtons', [
-  '$scope', '$http', '$rootScope', '$window', '$timeout', '$modal', '$log',
-  'alertsService', 'changeListService', 'focusService', 'routerService',
-  'explorationData', 'explorationRightsService', 'editabilityService',
-  'explorationWarningsService', 'siteAnalyticsService',
-  'explorationObjectiveService', 'explorationTitleService',
-  'explorationCategoryService', 'explorationStatesService', 'CATEGORY_LIST',
-  'explorationLanguageCodeService', 'explorationTagsService',
-  'autosaveInfoModalsService', 'ExplorationDiffService',
-  'explorationInitStateNameService', 'explorationSaveService',
+  '$scope', '$http', '$rootScope', '$window',
+  'changeListService', 'editabilityService',
+  'explorationRightsService', 'explorationWarningsService',
+  'explorationSaveService',
   function(
-      $scope, $http, $rootScope, $window, $timeout, $modal, $log,
-      alertsService, changeListService, focusService, routerService,
-      explorationData, explorationRightsService, editabilityService,
-      explorationWarningsService, siteAnalyticsService,
-      explorationObjectiveService, explorationTitleService,
-      explorationCategoryService, explorationStatesService, CATEGORY_LIST,
-      explorationLanguageCodeService, explorationTagsService,
-      autosaveInfoModalsService, ExplorationDiffService,
-      explorationInitStateNameService, explorationSaveService) {
-    // Whether or not a save action is currently in progress.
+      $scope, $http, $rootScope, $window,
+      changeListService, editabilityService,
+      explorationRightsService, explorationWarningsService,
+      explorationSaveService) {
     $scope.isSaveInProgress = function() {
       return explorationSaveService.isSaveInProgress();
     };
-    // The last 'save' or 'discard' action. Can be null (no such action has
-    // been performed yet), 'save' (the last action was a save) or 'discard'
-    // (the last action was a discard).
-    $scope.lastSaveOrDiscardAction = null;
 
     $scope.isPrivate = function() {
       return explorationRightsService.isPrivate();

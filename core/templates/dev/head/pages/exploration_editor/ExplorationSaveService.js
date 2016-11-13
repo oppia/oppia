@@ -39,10 +39,6 @@ oppia.factory('explorationSaveService', [
     var saveInProgress = false;
     // Whether or not a discard action is currently in progress.
     var discardInPrograss = false;
-    // The last 'save' or 'discard' action. Can be null (no such action has
-    // been performed yet), 'save' (the last action was a save) or 'discard'
-    // (the last action was a discard).
-    var lastSaveOrDiscardAction = null;
 
     var publishModalOpening = false;
 
