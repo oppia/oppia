@@ -42,10 +42,16 @@ oppia.factory('explorationSaveService', [
     // (the last action was a discard).
     var lastSaveOrDiscardAction = null;
 
+    var publishModalOpening = false;
+
     return {
 
       isSaveInProgress: function() {
         return saveInProgress;
+      },
+
+      isPublishModalOpening: function() {
+        return publishModalOpening;
       },
 
       isExplorationSaveable: function() {
@@ -146,7 +152,9 @@ oppia.factory('explorationSaveService', [
       },
 
       openPublishExplorationModal: function() {
-        return $modal.open({
+        publishModalOpening = true;
+
+        var publishModalInstance = $modal.open({
           templateUrl: 'modals/publishExploration',
           backdrop: true,
           controller: [
@@ -160,6 +168,39 @@ oppia.factory('explorationSaveService', [
             }
           ]
         });
+
+        publishModalInstance.result.then(function() {
+          explorationRightsService.saveChangeToBackend({
+            is_public: true
+          });
+          siteAnalyticsService.registerPublishExplorationEvent(
+            explorationData.explorationId);
+          this.showCongratulatorySharingModal();
+        });
+
+        publishModalInstance.opened.then(function() {
+          publishModalOpening = false;
+        });
+      },
+
+      getPublishExplorationButtonTooltip: function() {
+        if (explorationWarningsService.countWarnings() > 0) {
+          return 'Please resolve the warnings before publishing.';
+        } else if (changeListService.isExplorationLockedForEditing()) {
+          return 'Please save your changes before publishing.';
+        } else {
+          return 'Publish to Oppia Library';
+        }
+      },
+
+      getSaveButtonTooltip: function() {
+        if (explorationWarningsService.hasCriticalWarnings() > 0) {
+          return 'Please resolve the warnings.';
+        } else if (explorationRightsService.isPrivate()) {
+          return 'Save Draft';
+        } else {
+          return 'Publish Changes';
+        }
       },
 
       isAdditionalMetadataNeeded: function() {

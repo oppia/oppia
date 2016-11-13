@@ -569,27 +569,12 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       return explorationRightsService.isPublic();
     };
 
-    $scope.showCongratulatorySharingModal = function() {
-      explorationSaveService.showCongratulatorySharingModal();
+    $scope.isPublishModalOpening = function() {
+      return explorationSaveService.isPublishModalOpening();
     };
 
-    var openPublishExplorationModal = function() {
-      $scope.publishModalIsOpening = true;
-      var publishModalInstance
-        = explorationSaveService.openPublishExplorationModal();
-
-      publishModalInstance.result.then(function() {
-        explorationRightsService.saveChangeToBackend({
-          is_public: true
-        });
-        siteAnalyticsService.registerPublishExplorationEvent(
-          explorationData.explorationId);
-        $scope.showCongratulatorySharingModal();
-      });
-
-      publishModalInstance.opened.then(function() {
-        $scope.publishModalIsOpening = false;
-      });
+    $scope.showCongratulatorySharingModal = function() {
+      explorationSaveService.showCongratulatorySharingModal();
     };
 
     $scope.showPublishExplorationModal = function() {
@@ -697,36 +682,24 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
           if (metadataList.length > 0) {
             var commitMessage = (
               'Add metadata: ' + metadataList.join(', ') + '.');
-            explorationSaveService
-              .saveDraftToBackend(commitMessage, openPublishExplorationModal);
+            explorationSaveService.saveDraftToBackend(commitMessage,
+              explorationSaveService.openPublishExplorationModal);
           } else {
-            openPublishExplorationModal();
+            explorationSaveService.openPublishExplorationModal();
           }
         });
       } else {
         // No further metadata is needed. Open the publish modal immediately.
-        openPublishExplorationModal();
+        explorationSaveService.openPublishExplorationModal();
       }
     };
 
     $scope.getPublishExplorationButtonTooltip = function() {
-      if (explorationWarningsService.countWarnings() > 0) {
-        return 'Please resolve the warnings before publishing.';
-      } else if ($scope.isExplorationLockedForEditing()) {
-        return 'Please save your changes before publishing.';
-      } else {
-        return 'Publish to Oppia Library';
-      }
+      return explorationSaveService.getPublishExplorationButtonTooltip();
     };
 
     $scope.getSaveButtonTooltip = function() {
-      if (explorationWarningsService.hasCriticalWarnings() > 0) {
-        return 'Please resolve the warnings.';
-      } else if ($scope.isPrivate()) {
-        return 'Save Draft';
-      } else {
-        return 'Publish Changes';
-      }
+      return explorationSaveService.getSaveButtonTooltip();
     };
 
     // This flag is used to ensure only one save exploration modal can be open
