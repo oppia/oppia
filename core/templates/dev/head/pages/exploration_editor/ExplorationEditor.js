@@ -697,7 +697,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
           if (metadataList.length > 0) {
             var commitMessage = (
               'Add metadata: ' + metadataList.join(', ') + '.');
-            explorationSaveService.saveDraftToBackend(commitMessage, openPublishExplorationModal);
+            explorationSaveService.
+              saveDraftToBackend(commitMessage, openPublishExplorationModal);
           } else {
             openPublishExplorationModal();
           }

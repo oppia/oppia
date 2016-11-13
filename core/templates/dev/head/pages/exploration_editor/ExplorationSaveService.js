@@ -120,7 +120,8 @@ oppia.factory('explorationSaveService', [
         saveInProgress = true;
 
         explorationData.save(
-          changeList, commitMessage, function(isDraftVersionValid, draftChanges) {
+          changeList, commitMessage,
+          function(isDraftVersionValid, draftChanges) {
             if (isDraftVersionValid === false &&
                 draftChanges !== null &&
                 draftChanges.length > 0) {
