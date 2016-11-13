@@ -591,7 +591,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     };
 
     $scope.showCongratulatorySharingModal = function() {
-      explorationSaveService.showCongratulatorySharingModal()
+      explorationSaveService.showCongratulatorySharingModal();
     };
 
     var saveDraftToBackend = function(commitMessage, successCallback) {
@@ -639,7 +639,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
     var openPublishExplorationModal = function() {
       $scope.publishModalIsOpening = true;
-      var publishModalInstance = explorationSaveService.openPublishExplorationModal();
+      var publishModalInstance
+        = explorationSaveService.openPublishExplorationModal();
 
       publishModalInstance.result.then(function() {
         explorationRightsService.saveChangeToBackend({

@@ -25,7 +25,6 @@ oppia.factory('explorationSaveService', [
   'explorationLanguageCodeService', 'explorationRightsService',
   'explorationWarningsService',
   'changeListService',
-  'siteAnalyticsService',
   function(
       $http, $modal, $timeout, $rootScope, $window,
       alertsService, explorationData,
@@ -33,8 +32,7 @@ oppia.factory('explorationSaveService', [
       explorationObjectiveService, explorationCategoryService,
       explorationLanguageCodeService, explorationRightsService,
       explorationWarningsService,
-      changeListService,
-      siteAnalyticsService) {
+      changeListService) {
     // Whether or not a save action is currently in progress.
     var saveInProgress = false;
     // Whether or not a discard action is currently in progress.
