@@ -768,15 +768,15 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               }
 
               $scope.isSavingAllowed = function() {
-                return explorationSaveService.isSavingAllowed()
+                return explorationSaveService.isSavingAllowed();
               };
 
               $scope.save = function() {
                 if(!explorationSaveService.requiredFieldsFilled()){
-                  return
+                  return;
                 }
 
-                var metadataList = explorationSaveService.save()
+                var metadataList = explorationSaveService.save();
 
                 // TODO(sll): Get rid of the $timeout here. It's currently used
                 // because there is a race condition: the saveDisplayedValue()

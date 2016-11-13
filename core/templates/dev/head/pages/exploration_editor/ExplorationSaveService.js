@@ -39,7 +39,6 @@ oppia.factory('explorationSaveService', [
     var lastSaveOrDiscardAction = null;
 
     return {
-      
 
       isAdditionalMetadataNeeded: function() {
         return (
