@@ -78,8 +78,8 @@ oppia.factory('explorationSaveService', [
           $rootScope.$broadcast('initExplorationPage');
 
           // The reload is necessary because, otherwise, the
-          // exploration-with-draft-changes will be reloaded (since it is already
-          // cached in explorationData).
+          // exploration-with-draft-changes will be reloaded
+          // (since it is already cached in explorationData).
           location.reload();
         }
       },
