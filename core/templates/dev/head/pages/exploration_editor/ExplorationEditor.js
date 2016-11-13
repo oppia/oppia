@@ -573,125 +573,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       return explorationSaveService.isPublishModalOpening();
     };
 
-    $scope.showCongratulatorySharingModal = function() {
-      explorationSaveService.showCongratulatorySharingModal();
-    };
-
     $scope.showPublishExplorationModal = function() {
-      siteAnalyticsService.registerOpenPublishExplorationModalEvent(
-        explorationData.explorationId);
-      alertsService.clearWarnings();
-
-      // If the metadata has not yet been specified, open the pre-publication
-      // 'add exploration metadata' modal.
-      if (explorationSaveService.isAdditionalMetadataNeeded()) {
-        $modal.open({
-          templateUrl: 'modals/addExplorationMetadata',
-          backdrop: 'static',
-          controller: [
-            '$scope', '$modalInstance', 'explorationObjectiveService',
-            'explorationTitleService', 'explorationCategoryService',
-            'explorationStatesService', 'CATEGORY_LIST',
-            'explorationLanguageCodeService', 'explorationTagsService',
-            function($scope, $modalInstance, explorationObjectiveService,
-            explorationTitleService, explorationCategoryService,
-            explorationStatesService, CATEGORY_LIST,
-            explorationLanguageCodeService, explorationTagsService) {
-              $scope.explorationTitleService = explorationTitleService;
-              $scope.explorationObjectiveService = explorationObjectiveService;
-              $scope.explorationCategoryService = explorationCategoryService;
-              $scope.explorationLanguageCodeService = (
-                explorationLanguageCodeService);
-              $scope.explorationTagsService = explorationTagsService;
-
-              $scope.objectiveHasBeenPreviouslyEdited = (
-                explorationObjectiveService.savedMemento.length > 0);
-
-              $scope.requireTitleToBeSpecified = (
-                !explorationTitleService.savedMemento);
-              $scope.requireObjectiveToBeSpecified = (
-                explorationObjectiveService.savedMemento.length < 15);
-              $scope.requireCategoryToBeSpecified = (
-                !explorationCategoryService.savedMemento);
-              $scope.askForLanguageCheck = (
-                explorationLanguageCodeService.savedMemento ===
-                GLOBALS.DEFAULT_LANGUAGE_CODE);
-              $scope.askForTags = (
-                explorationTagsService.savedMemento.length === 0);
-
-              $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
-
-              $scope.CATEGORY_LIST_FOR_SELECT2 = [];
-
-              for (var i = 0; i < CATEGORY_LIST.length; i++) {
-                $scope.CATEGORY_LIST_FOR_SELECT2.push({
-                  id: CATEGORY_LIST[i],
-                  text: CATEGORY_LIST[i]
-                });
-              }
-
-              var _states = explorationStatesService.getStates();
-              if (_states) {
-                var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2
-                .some(
-                  function(categoryItem) {
-                    return categoryItem.id ===
-                    explorationCategoryService.savedMemento;
-                  }
-                );
-
-                // If the current category is not in the dropdown, add it
-                // as the first option.
-                if (!categoryIsInSelect2 &&
-                    explorationCategoryService.savedMemento) {
-                  $scope.CATEGORY_LIST_FOR_SELECT2.unshift({
-                    id: explorationCategoryService.savedMemento,
-                    text: explorationCategoryService.savedMemento
-                  });
-                }
-              }
-
-              $scope.isSavingAllowed = function() {
-                return explorationSaveService.isSavingAllowed();
-              };
-
-              $scope.save = function() {
-                if (!explorationSaveService.requiredFieldsFilled()) {
-                  return;
-                }
-
-                var metadataList = explorationSaveService.save();
-
-                // TODO(sll): Get rid of the $timeout here. It's currently used
-                // because there is a race condition: the saveDisplayedValue()
-                // calls above result in autosave calls. These race with the
-                // discardDraft() call that will be called when the draft
-                // changes entered here are properly saved to the backend.
-                $timeout(function() {
-                  $modalInstance.close(metadataList);
-                }, 500);
-              };
-
-              $scope.cancel = function() {
-                explorationSaveService.save();
-                $modalInstance.dismiss('cancel');
-              };
-            }
-          ]
-        }).result.then(function(metadataList) {
-          if (metadataList.length > 0) {
-            var commitMessage = (
-              'Add metadata: ' + metadataList.join(', ') + '.');
-            explorationSaveService.saveDraftToBackend(commitMessage,
-              explorationSaveService.openPublishExplorationModal);
-          } else {
-            explorationSaveService.openPublishExplorationModal();
-          }
-        });
-      } else {
-        // No further metadata is needed. Open the publish modal immediately.
-        explorationSaveService.openPublishExplorationModal();
-      }
+      explorationSaveService.showPublishExplorationModal();
     };
 
     $scope.getPublishExplorationButtonTooltip = function() {
@@ -702,117 +585,16 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       return explorationSaveService.getSaveButtonTooltip();
     };
 
-    // This flag is used to ensure only one save exploration modal can be open
-    // at any one time.
-    var _modalIsOpen = false;
+    $scope.isSaveModalOpening = function() {
+      return explorationSaveService.isSaveModalOpening();
+    };
+
+    $scope.diffData = function() {
+      return explorationSaveService.getDiffData();
+    };
 
     $scope.saveChanges = function() {
-      // This flag is used to change text of save button to "Loading..." to
-      // add indication for user that something is happening.
-      $scope.saveModalIsOpening = true;
-
-      routerService.savePendingChanges();
-
-      if (!explorationRightsService.isPrivate() &&
-          explorationWarningsService.countWarnings() > 0) {
-        // If the exploration is not private, warnings should be fixed before
-        // it can be saved.
-        alertsService.addWarning(explorationWarningsService.getWarnings()[0]);
-        return;
-      }
-
-      explorationData.getLastSavedData().then(function(data) {
-        var oldStates = data.states;
-        var newStates = explorationStatesService.getStates();
-        var diffGraphData = ExplorationDiffService.getDiffGraphData(
-          oldStates, newStates, [{
-            changeList: changeListService.getChangeList(),
-            directionForwards: true
-          }]);
-        $scope.diffData = {
-          nodes: diffGraphData.nodes,
-          links: diffGraphData.links,
-          finalStateIds: diffGraphData.finalStateIds,
-          v1InitStateId: diffGraphData.originalStateIds[data.init_state_name],
-          v2InitStateId: diffGraphData.stateIds[
-            explorationInitStateNameService.displayed],
-          v1States: oldStates,
-          v2States: newStates
-        };
-
-        // TODO(wxy): after diff supports exploration metadata, add a check to
-        // exit if changes cancel each other out.
-
-        alertsService.clearWarnings();
-
-        // If the modal is open, do not open another one.
-        if (_modalIsOpen) {
-          return;
-        }
-
-        var modalInstance = $modal.open({
-          templateUrl: 'modals/saveExploration',
-          backdrop: true,
-          resolve: {
-            isExplorationPrivate: function() {
-              return explorationRightsService.isPrivate();
-            },
-            diffData: function() {
-              return $scope.diffData;
-            }
-          },
-          windowClass: 'oppia-save-exploration-modal',
-          controller: [
-            '$scope', '$modalInstance', 'isExplorationPrivate', 'diffData',
-            function($scope, $modalInstance, isExplorationPrivate, diffData) {
-              $scope.showDiff = false;
-              $scope.onClickToggleDiffButton = function() {
-                $scope.showDiff = !$scope.showDiff;
-                if ($scope.showDiff) {
-                  $('.oppia-save-exploration-modal').addClass(
-                    'oppia-save-exploration-wide-modal');
-                } else {
-                  $('.oppia-save-exploration-modal').removeClass(
-                    'oppia-save-exploration-wide-modal');
-                }
-              };
-
-              $scope.diffData = diffData;
-              $scope.isExplorationPrivate = isExplorationPrivate;
-
-              $scope.earlierVersionHeader = 'Last saved';
-              $scope.laterVersionHeader = 'New changes';
-
-              $scope.save = function(commitMessage) {
-                $modalInstance.close(commitMessage);
-              };
-              $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
-                alertsService.clearWarnings();
-              };
-            }
-          ]
-        });
-
-        // Modal is Opened
-        _modalIsOpen = true;
-        $scope.saveModalIsOpening = false;
-
-        modalInstance.opened.then(function() {
-          // The $timeout seems to be needed in order to give the modal time to
-          // render.
-          $timeout(function() {
-            focusService.setFocus('saveChangesModalOpened');
-          });
-        });
-
-        modalInstance.result.then(function(commitMessage) {
-          _modalIsOpen = false;
-          explorationSaveService.saveDraftToBackend(commitMessage);
-        }, function() {
-          _modalIsOpen = false;
-        });
-      });
+      return explorationSaveService.saveChanges();
     };
   }
 ]);

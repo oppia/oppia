@@ -186,14 +186,14 @@
         <button id="tutorialSaveButton" class="btn btn-default oppia-save-draft-button protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable(), 'oppia-save-draft-button-padding': getChangeListLength() && !isPrivate()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
           <span ng-if="!isSaveInProgress()">
             <span ng-if="isPrivate()">
-              <span ng-if="!saveModalIsOpening">
+              <span ng-if="!isSaveModalOpening()">
                 <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
                    alt="Save Draft">&#xE161;</i>
                 <span class="oppia-save-publish-button-label">Save Draft</span>
                 <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()" style="opacity: 0.5">(<[getChangeListLength()]>)</span>
               </span>
 
-              <span ng-if="saveModalIsOpening">
+              <span ng-if="isSaveModalOpening()">
                 <span class="oppia-save-publish-button-label">
                   Saving
                 </span>
@@ -201,14 +201,14 @@
               </span>
             </span>
             <span ng-if="!isPrivate()" title="Publish Changes">
-              <span ng-if="!saveModalIsOpening">
+              <span ng-if="!isSaveModalOpening()">
                 <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
                    alt="Publish Changes">&#xE2C3;</i>
                 <span class="oppia-save-publish-button-label">Publish Changes</span>
                 <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()" style="opacity: 0.5">(<[getChangeListLength()]>)</span>
               </span>
 
-              <span ng-if="saveModalIsOpening">
+              <span ng-if="isSaveModalOpening()">
                 <span class="oppia-save-publish-button-label">
                   Publishing
                 </span>
