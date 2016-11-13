@@ -18,21 +18,21 @@
  */
 
 oppia.factory('explorationSaveService', [
-  '$http', '$modal', '$timeout', '$rootScope', '$window',
+  '$http', '$modal', '$timeout', '$rootScope', '$window', '$log',
   'alertsService', 'explorationData',
   'explorationTagsService', 'explorationTitleService',
   'explorationObjectiveService', 'explorationCategoryService',
   'explorationLanguageCodeService', 'explorationRightsService',
   'explorationWarningsService',
-  'changeListService',
+  'changeListService', 'siteAnalyticsService',
   function(
-      $http, $modal, $timeout, $rootScope, $window,
+      $http, $modal, $timeout, $rootScope, $window, $log,
       alertsService, explorationData,
       explorationTagsService, explorationTitleService,
       explorationObjectiveService, explorationCategoryService,
       explorationLanguageCodeService, explorationRightsService,
       explorationWarningsService,
-      changeListService) {
+      changeListService, siteAnalyticsService) {
     // Whether or not a save action is currently in progress.
     var saveInProgress = false;
     // Whether or not a discard action is currently in progress.
@@ -46,11 +46,6 @@ oppia.factory('explorationSaveService', [
 
       isSaveInProgress: function() {
         return saveInProgress;
-      },
-
-      setSaveInProgress: function(isInProgress) {
-        saveInProgress = isInProgress;
-        return;
       },
 
       isExplorationSaveable: function() {
@@ -105,6 +100,48 @@ oppia.factory('explorationSaveService', [
             }
           ]
         });
+      },
+
+      saveDraftToBackend: function(commitMessage, successCallback) {
+        var changeList = changeListService.getChangeList();
+
+        if (explorationRightsService.isPrivate()) {
+          siteAnalyticsService.registerCommitChangesToPrivateExplorationEvent(
+            explorationData.explorationId);
+        } else {
+          siteAnalyticsService.registerCommitChangesToPublicExplorationEvent(
+            explorationData.explorationId);
+        }
+
+        if (explorationWarningsService.countWarnings() === 0) {
+          siteAnalyticsService.registerSavePlayableExplorationEvent(
+            explorationData.explorationId);
+        }
+        saveInProgress = true;
+
+        explorationData.save(
+          changeList, commitMessage, function(isDraftVersionValid, draftChanges) {
+            if (isDraftVersionValid === false &&
+                draftChanges !== null &&
+                draftChanges.length > 0) {
+              autosaveInfoModalsService.showVersionMismatchModal(changeList);
+              return;
+            }
+            $log.info('Changes to this exploration were saved successfully.');
+            changeListService.discardAllChanges();
+            $rootScope.$broadcast('initExplorationPage');
+            $rootScope.$broadcast('refreshVersionHistory', {
+              forceRefresh: true
+            });
+            alertsService.addSuccessMessage('Changes saved.');
+            saveInProgress = false;
+            if (successCallback) {
+              successCallback();
+            }
+          }, function() {
+            saveInProgress = false;
+          }
+        );
       },
 
       openPublishExplorationModal: function() {

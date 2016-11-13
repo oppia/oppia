@@ -573,48 +573,6 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       explorationSaveService.showCongratulatorySharingModal();
     };
 
-    var saveDraftToBackend = function(commitMessage, successCallback) {
-      var changeList = changeListService.getChangeList();
-
-      if ($scope.isPrivate()) {
-        siteAnalyticsService.registerCommitChangesToPrivateExplorationEvent(
-          explorationData.explorationId);
-      } else {
-        siteAnalyticsService.registerCommitChangesToPublicExplorationEvent(
-          explorationData.explorationId);
-      }
-
-      if (explorationWarningsService.countWarnings() === 0) {
-        siteAnalyticsService.registerSavePlayableExplorationEvent(
-          explorationData.explorationId);
-      }
-      explorationSaveService.setSaveInProgress(true);
-
-      explorationData.save(
-        changeList, commitMessage, function(isDraftVersionValid, draftChanges) {
-          if (isDraftVersionValid === false &&
-              draftChanges !== null &&
-              draftChanges.length > 0) {
-            autosaveInfoModalsService.showVersionMismatchModal(changeList);
-            return;
-          }
-          $log.info('Changes to this exploration were saved successfully.');
-          changeListService.discardAllChanges();
-          $rootScope.$broadcast('initExplorationPage');
-          $rootScope.$broadcast('refreshVersionHistory', {
-            forceRefresh: true
-          });
-          alertsService.addSuccessMessage('Changes saved.');
-          explorationSaveService.setSaveInProgress(false);
-          if (successCallback) {
-            successCallback();
-          }
-        }, function() {
-          explorationSaveService.setSaveInProgress(false);
-        }
-      );
-    };
-
     var openPublishExplorationModal = function() {
       $scope.publishModalIsOpening = true;
       var publishModalInstance
@@ -739,7 +697,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
           if (metadataList.length > 0) {
             var commitMessage = (
               'Add metadata: ' + metadataList.join(', ') + '.');
-            saveDraftToBackend(commitMessage, openPublishExplorationModal);
+            explorationSaveService.saveDraftToBackend(commitMessage, openPublishExplorationModal);
           } else {
             openPublishExplorationModal();
           }
@@ -876,7 +834,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
         modalInstance.result.then(function(commitMessage) {
           _modalIsOpen = false;
-          saveDraftToBackend(commitMessage);
+          explorationSaveService.saveDraftToBackend(commitMessage);
         }, function() {
           _modalIsOpen = false;
         });
