@@ -519,7 +519,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
   'explorationCategoryService', 'explorationStatesService', 'CATEGORY_LIST',
   'explorationLanguageCodeService', 'explorationTagsService',
   'autosaveInfoModalsService', 'ExplorationDiffService',
-  'explorationInitStateNameService',
+  'explorationInitStateNameService', 'explorationSaveService',
   function(
       $scope, $http, $rootScope, $window, $timeout, $modal, $log,
       alertsService, changeListService, focusService, routerService,
@@ -529,7 +529,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       explorationCategoryService, explorationStatesService, CATEGORY_LIST,
       explorationLanguageCodeService, explorationTagsService,
       autosaveInfoModalsService, ExplorationDiffService,
-      explorationInitStateNameService) {
+      explorationInitStateNameService, explorationSaveService) {
     // Whether or not a save action is currently in progress.
     $scope.isSaveInProgress = false;
     // Whether or not a discard action is currently in progress.
@@ -698,17 +698,9 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         explorationData.explorationId);
       alertsService.clearWarnings();
 
-      var additionalMetadataNeeded = (
-        !explorationTitleService.savedMemento ||
-        !explorationObjectiveService.savedMemento ||
-        !explorationCategoryService.savedMemento ||
-        explorationLanguageCodeService.savedMemento ===
-          GLOBALS.DEFAULT_LANGUAGE_CODE ||
-        explorationTagsService.savedMemento.length === 0);
-
       // If the metadata has not yet been specified, open the pre-publication
       // 'add exploration metadata' modal.
-      if (additionalMetadataNeeded) {
+      if (explorationSaveService.isAdditionalMetadataNeeded()) {
         $modal.open({
           templateUrl: 'modals/addExplorationMetadata',
           backdrop: 'static',
@@ -776,52 +768,15 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               }
 
               $scope.isSavingAllowed = function() {
-                return Boolean(
-                  explorationTitleService.displayed &&
-                  explorationObjectiveService.displayed &&
-                  explorationObjectiveService.displayed.length >= 15 &&
-                  explorationCategoryService.displayed &&
-                  explorationLanguageCodeService.displayed);
+                return explorationSaveService.isSavingAllowed()
               };
 
               $scope.save = function() {
-                if (!explorationTitleService.displayed) {
-                  alertsService.addWarning('Please specify a title');
-                  return;
-                }
-                if (!explorationObjectiveService.displayed) {
-                  alertsService.addWarning('Please specify an objective');
-                  return;
-                }
-                if (!explorationCategoryService.displayed) {
-                  alertsService.addWarning('Please specify a category');
-                  return;
+                if(!explorationSaveService.requiredFieldsFilled()){
+                  return
                 }
 
-                // Record any fields that have changed.
-                var metadataList = [];
-                if (explorationTitleService.hasChanged()) {
-                  metadataList.push('title');
-                }
-                if (explorationObjectiveService.hasChanged()) {
-                  metadataList.push('objective');
-                }
-                if (explorationCategoryService.hasChanged()) {
-                  metadataList.push('category');
-                }
-                if (explorationLanguageCodeService.hasChanged()) {
-                  metadataList.push('language');
-                }
-                if (explorationTagsService.hasChanged()) {
-                  metadataList.push('tags');
-                }
-
-                // Save all the displayed values.
-                explorationTitleService.saveDisplayedValue();
-                explorationObjectiveService.saveDisplayedValue();
-                explorationCategoryService.saveDisplayedValue();
-                explorationLanguageCodeService.saveDisplayedValue();
-                explorationTagsService.saveDisplayedValue();
+                var metadataList = explorationSaveService.save()
 
                 // TODO(sll): Get rid of the $timeout here. It's currently used
                 // because there is a race condition: the saveDisplayedValue()
@@ -829,19 +784,13 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
                 // discardDraft() call that will be called when the draft
                 // changes entered here are properly saved to the backend.
                 $timeout(function() {
-                  $modalInstance.close(metadataList);
+                  $modalInstance.close(metadataList)
                 }, 500);
               };
 
               $scope.cancel = function() {
-                explorationTitleService.restoreFromMemento();
-                explorationObjectiveService.restoreFromMemento();
-                explorationCategoryService.restoreFromMemento();
-                explorationLanguageCodeService.restoreFromMemento();
-                explorationTagsService.restoreFromMemento();
-
-                $modalInstance.dismiss('cancel');
-                alertsService.clearWarnings();
+                explorationSaveService.save()
+                $modalInstance.dismiss('cancel')
               };
             }
           ]

@@ -1,0 +1,121 @@
+// Copyright 2016 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Functionality for the create exploration button and upload
+ * modal.
+ */
+
+oppia.factory('explorationSaveService', [
+  '$http', '$modal', '$timeout', '$rootScope', '$window',
+  'alertsService','explorationTagsService',
+  'explorationTitleService', 'explorationObjectiveService',
+  'explorationCategoryService', 'explorationLanguageCodeService',
+  'siteAnalyticsService',
+  function(
+      $http, $modal, $timeout, $rootScope, $window,
+      alertsService, explorationTagsService, explorationTitleService,
+      explorationObjectiveService, explorationCategoryService,
+      explorationLanguageCodeService, siteAnalyticsService) {
+
+    // Whether or not a save action is currently in progress.
+    var saveInProgress = false;
+    // Whether or not a discard action is currently in progress.
+    var discardInPrograss = false;
+    // The last 'save' or 'discard' action. Can be null (no such action has
+    // been performed yet), 'save' (the last action was a save) or 'discard'
+    // (the last action was a discard).
+    var lastSaveOrDiscardAction = null;
+
+    return {
+      
+
+      isAdditionalMetadataNeeded: function() {
+        return (
+          !explorationTitleService.savedMemento ||
+          !explorationObjectiveService.savedMemento ||
+          !explorationCategoryService.savedMemento ||
+          explorationLanguageCodeService.savedMemento ===
+            GLOBALS.DEFAULT_LANGUAGE_CODE ||
+          explorationTagsService.savedMemento.length === 0)
+      },
+
+      isSavingAllowed: function() {
+        return Boolean(
+          explorationTitleService.displayed &&
+          explorationObjectiveService.displayed &&
+          explorationObjectiveService.displayed.length >= 15 &&
+          explorationCategoryService.displayed &&
+          explorationLanguageCodeService.displayed);
+      },
+
+      requiredFieldsFilled: function(){
+        if (!explorationTitleService.displayed) {
+          alertsService.addWarning('Please specify a title');
+          return false
+        }
+        if (!explorationObjectiveService.displayed) {
+          alertsService.addWarning('Please specify an objective');
+          return false
+        }
+        if (!explorationCategoryService.displayed) {
+          alertsService.addWarning('Please specify a category');
+          return false
+        }
+
+        return true
+      },
+
+      save: function() {
+        // Record any fields that have changed.
+        var metadataList = [];
+        if (explorationTitleService.hasChanged()) {
+          metadataList.push('title');
+        }
+        if (explorationObjectiveService.hasChanged()) {
+          metadataList.push('objective');
+        }
+        if (explorationCategoryService.hasChanged()) {
+          metadataList.push('category');
+        }
+        if (explorationLanguageCodeService.hasChanged()) {
+          metadataList.push('language');
+        }
+        if (explorationTagsService.hasChanged()) {
+          metadataList.push('tags');
+        }
+
+        // Save all the displayed values.
+        explorationTitleService.saveDisplayedValue();
+        explorationObjectiveService.saveDisplayedValue();
+        explorationCategoryService.saveDisplayedValue();
+        explorationLanguageCodeService.saveDisplayedValue();
+        explorationTagsService.saveDisplayedValue();
+
+        return metadataList
+      },
+
+      cancel: function() {
+        explorationTitleService.restoreFromMemento();
+        explorationObjectiveService.restoreFromMemento();
+        explorationCategoryService.restoreFromMemento();
+        explorationLanguageCodeService.restoreFromMemento();
+        explorationTagsService.restoreFromMemento();
+
+        $modalInstance.dismiss('cancel');
+        alertsService.clearWarnings();
+      }
+    }
+  }
+]);
