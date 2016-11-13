@@ -63,10 +63,13 @@
           <tr ng-repeat="q in currentPageOfQueries track by $index">
             <td><[q.id]></td>
             <td><[q.created_on]></td>
-            <td><[q.submitter_id]></td>
+            <td><[q.submitter]></td>
             <td><[q.status]></td>
             <td><[q.num_qualified_users]></td>
             <td><button ng-click="recheckStatus($index)">Re-check status</button></td>
+            <td ng-if="showLink(q.submitter, q.status)">
+              <a href="/emaildashboardresult/<[q.id]>"><button>Result</button></a>
+            </td>
           </tr>
         </tbody>
       </table>

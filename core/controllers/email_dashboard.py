@@ -82,7 +82,7 @@ class EmailDashboardDataHandler(base.BaseHandler):
 
         queries_list = [{
             'id': model.id,
-            'submitter_id': submitter_details[model.submitter_id],
+            'submitter': submitter_details[model.submitter_id],
             'created_on': model.created_on.strftime('%d-%m-%y %H:%M:%S'),
             'status': model.query_status,
             'num_qualified_users': len(model.user_ids)
@@ -114,7 +114,7 @@ class EmailDashboardDataHandler(base.BaseHandler):
         query_model = user_models.UserQueryModel.get(query_id)
         query_data = {
             'id': query_model.id,
-            'submitter_id': (
+            'submitter': (
                 user_services.get_username(query_model.submitter_id)),
             'created_on': query_model.created_on.strftime('%d-%m-%y %H:%M:%S'),
             'status': query_model.query_status,
@@ -149,7 +149,7 @@ class QueryStatusCheck(base.BaseHandler):
         query_model = user_models.UserQueryModel.get(query_id)
         query_data = {
             'id': query_model.id,
-            'submitter_id': (
+            'submitter': (
                 user_services.get_username(query_model.submitter_id)),
             'created_on': query_model.created_on.strftime('%d-%m-%y %H:%M:%S'),
             'status': query_model.query_status,
