@@ -19,14 +19,22 @@
 
 oppia.factory('explorationSaveService', [
   '$http', '$modal', '$timeout', '$rootScope', '$window',
-  'alertsService', 'explorationTagsService',
-  'explorationTitleService', 'explorationObjectiveService',
-  'explorationCategoryService', 'explorationLanguageCodeService',
+  'alertsService', 'explorationData',
+  'explorationTagsService', 'explorationTitleService',
+  'explorationObjectiveService', 'explorationCategoryService',
+  'explorationLanguageCodeService', 'explorationRightsService',
+  'explorationWarningsService',
+  'changeListService',
+  'siteAnalyticsService',
   function(
       $http, $modal, $timeout, $rootScope, $window,
-      alertsService, explorationTagsService, explorationTitleService,
+      alertsService, explorationData,
+      explorationTagsService, explorationTitleService,
       explorationObjectiveService, explorationCategoryService,
-      explorationLanguageCodeService) {
+      explorationLanguageCodeService, explorationRightsService,
+      explorationWarningsService,
+      changeListService,
+      siteAnalyticsService) {
     // Whether or not a save action is currently in progress.
     var saveInProgress = false;
     // Whether or not a discard action is currently in progress.
@@ -37,6 +45,67 @@ oppia.factory('explorationSaveService', [
     var lastSaveOrDiscardAction = null;
 
     return {
+
+      isSaveInProgress: function() {
+        return saveInProgress;
+      },
+
+      setSaveInProgress: function(isInProgress) {
+        saveInProgress = isInProgress;
+        return;
+      },
+
+      isExplorationSaveable: function() {
+        return (
+          changeListService.isExplorationLockedForEditing() &&
+          !saveInProgress && (
+            (explorationRightsService.isPrivate() &&
+              !explorationWarningsService.hasCriticalWarnings()) ||
+            (!explorationRightsService.isPrivate() &&
+              explorationWarningsService.countWarnings() === 0)
+          )
+        );
+      },
+
+      showCongratulatorySharingModal: function() {
+        return $modal.open({
+          templateUrl: 'modals/shareExplorationAfterPublish',
+          backdrop: true,
+          controller: [
+            '$scope', '$modalInstance', 'explorationContextService',
+            'UrlInterpolationService',
+            function($scope, $modalInstance, explorationContextService,
+              UrlInterpolationService) {
+              $scope.congratsImgUrl = UrlInterpolationService.getStaticImageUrl(
+                '/general/congrats.svg');
+              $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
+                GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
+              $scope.close = function() {
+                $modalInstance.dismiss('cancel');
+              };
+              $scope.explorationId = (
+                explorationContextService.getExplorationId());
+            }
+          ]
+        });
+      },
+
+      openPublishExplorationModal: function() {
+        return $modal.open({
+          templateUrl: 'modals/publishExploration',
+          backdrop: true,
+          controller: [
+            '$scope', '$modalInstance', function($scope, $modalInstance) {
+              $scope.publish = $modalInstance.close;
+
+              $scope.cancel = function() {
+                $modalInstance.dismiss('cancel');
+                alertsService.clearWarnings();
+              };
+            }
+          ]
+        });
+      },
 
       isAdditionalMetadataNeeded: function() {
         return (

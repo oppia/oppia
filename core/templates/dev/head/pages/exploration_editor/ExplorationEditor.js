@@ -531,7 +531,9 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       autosaveInfoModalsService, ExplorationDiffService,
       explorationInitStateNameService, explorationSaveService) {
     // Whether or not a save action is currently in progress.
-    $scope.isSaveInProgress = false;
+    $scope.isSaveInProgress = function() {
+      return explorationSaveService.isSaveInProgress();
+    };
     // Whether or not a discard action is currently in progress.
     $scope.isDiscardInProgress = false;
     // The last 'save' or 'discard' action. Can be null (no such action has
@@ -581,15 +583,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     };
 
     $scope.isExplorationSaveable = function() {
-      return (
-        $scope.isExplorationLockedForEditing() &&
-        !$scope.isSaveInProgress && (
-          ($scope.isPrivate() &&
-            !explorationWarningsService.hasCriticalWarnings()) ||
-          (!$scope.isPrivate() &&
-            explorationWarningsService.countWarnings() === 0)
-        )
-      );
+      return explorationSaveService.isExplorationSaveable();
     };
 
     $scope.isPublic = function() {
@@ -597,26 +591,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     };
 
     $scope.showCongratulatorySharingModal = function() {
-      $modal.open({
-        templateUrl: 'modals/shareExplorationAfterPublish',
-        backdrop: true,
-        controller: [
-          '$scope', '$modalInstance', 'explorationContextService',
-          'UrlInterpolationService',
-          function($scope, $modalInstance, explorationContextService,
-            UrlInterpolationService) {
-            $scope.congratsImgUrl = UrlInterpolationService.getStaticImageUrl(
-              '/general/congrats.svg');
-            $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
-              GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
-            $scope.close = function() {
-              $modalInstance.dismiss('cancel');
-            };
-            $scope.explorationId = (
-              explorationContextService.getExplorationId());
-          }
-        ]
-      });
+      explorationSaveService.showCongratulatorySharingModal()
     };
 
     var saveDraftToBackend = function(commitMessage, successCallback) {
@@ -634,7 +609,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         siteAnalyticsService.registerSavePlayableExplorationEvent(
           explorationData.explorationId);
       }
-      $scope.isSaveInProgress = true;
+      explorationSaveService.setSaveInProgress(true);
 
       explorationData.save(
         changeList, commitMessage, function(isDraftVersionValid, draftChanges) {
@@ -652,32 +627,19 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
           });
           alertsService.addSuccessMessage('Changes saved.');
           $scope.lastSaveOrDiscardAction = 'save';
-          $scope.isSaveInProgress = false;
+          explorationSaveService.setSaveInProgress(false);
           if (successCallback) {
             successCallback();
           }
         }, function() {
-          $scope.isSaveInProgress = false;
+          explorationSaveService.setSaveInProgress(false);
         }
       );
     };
 
     var openPublishExplorationModal = function() {
       $scope.publishModalIsOpening = true;
-      var publishModalInstance = $modal.open({
-        templateUrl: 'modals/publishExploration',
-        backdrop: true,
-        controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
-            $scope.publish = $modalInstance.close;
-
-            $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
-            };
-          }
-        ]
-      });
+      var publishModalInstance = explorationSaveService.openPublishExplorationModal();
 
       publishModalInstance.result.then(function() {
         explorationRightsService.saveChangeToBackend({
