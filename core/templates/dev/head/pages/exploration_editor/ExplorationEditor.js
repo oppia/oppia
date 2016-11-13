@@ -772,7 +772,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               };
 
               $scope.save = function() {
-                if(!explorationSaveService.requiredFieldsFilled()){
+                if (!explorationSaveService.requiredFieldsFilled()) {
                   return;
                 }
 
@@ -784,13 +784,13 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
                 // discardDraft() call that will be called when the draft
                 // changes entered here are properly saved to the backend.
                 $timeout(function() {
-                  $modalInstance.close(metadataList)
+                  $modalInstance.close(metadataList);
                 }, 500);
               };
 
               $scope.cancel = function() {
-                explorationSaveService.save()
-                $modalInstance.dismiss('cancel')
+                explorationSaveService.save();
+                $modalInstance.dismiss('cancel');
               };
             }
           ]

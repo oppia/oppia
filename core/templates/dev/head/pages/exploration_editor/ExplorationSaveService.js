@@ -21,7 +21,7 @@ oppia.factory('explorationSaveService', [
   '$http', '$modal', '$timeout', '$rootScope', '$window',
   'alertsService', 'explorationTagsService',
   'explorationTitleService', 'explorationObjectiveService',
-  'explorationCategoryService', 'explorationLanguageCodeService'
+  'explorationCategoryService', 'explorationLanguageCodeService',
   function(
       $http, $modal, $timeout, $rootScope, $window,
       alertsService, explorationTagsService, explorationTitleService,
