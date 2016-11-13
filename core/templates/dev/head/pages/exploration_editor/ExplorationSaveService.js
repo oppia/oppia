@@ -65,6 +65,25 @@ oppia.factory('explorationSaveService', [
         );
       },
 
+      discardChanges: function() {
+        var confirmDiscard = confirm(
+          'Are you sure you want to discard your changes?');
+
+        if (confirmDiscard) {
+          alertsService.clearWarnings();
+          $rootScope.$broadcast('externalSave');
+
+          changeListService.discardAllChanges();
+          alertsService.addSuccessMessage('Changes discarded.');
+          $rootScope.$broadcast('initExplorationPage');
+
+          // The reload is necessary because, otherwise, the
+          // exploration-with-draft-changes will be reloaded (since it is already
+          // cached in explorationData).
+          location.reload();
+        }
+      },
+
       showCongratulatorySharingModal: function() {
         return $modal.open({
           templateUrl: 'modals/shareExplorationAfterPublish',
