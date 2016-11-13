@@ -534,8 +534,6 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     $scope.isSaveInProgress = function() {
       return explorationSaveService.isSaveInProgress();
     };
-    // Whether or not a discard action is currently in progress.
-    $scope.isDiscardInProgress = false;
     // The last 'save' or 'discard' action. Can be null (no such action has
     // been performed yet), 'save' (the last action was a save) or 'discard'
     // (the last action was a discard).
@@ -563,12 +561,10 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         alertsService.clearWarnings();
         $rootScope.$broadcast('externalSave');
 
-        $scope.isDiscardInProgress = true;
         changeListService.discardAllChanges();
         alertsService.addSuccessMessage('Changes discarded.');
         $rootScope.$broadcast('initExplorationPage', function() {
           $scope.lastSaveOrDiscardAction = 'discard';
-          $scope.isDiscardInProgress = false;
         });
 
         // The reload is necessary because, otherwise, the
