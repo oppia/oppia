@@ -33,6 +33,8 @@ var oppia = angular.module(
 // TODO(sll): Get this to read from a common JSON file; it's replicated in
 // feconf.
 oppia.constant('CATEGORY_LIST', GLOBALS.ALL_CATEGORIES);
+oppia.constant(
+  'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', '/explorationsummarieshandler/data');
 
 // We use a slash because this character is forbidden in a state name.
 oppia.constant('PLACEHOLDER_OUTCOME_DEST', '/');
