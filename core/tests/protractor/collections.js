@@ -27,7 +27,7 @@ describe('Collections', function() {
     browser.get(general.ADMIN_URL_SUFFIX);
     element.all(by.css(
       '.protractor-test-reload-collection-button')).first().click();
-    browser.driver.switchTo().alert().accept();
+    general.acceptAlert();
     browser.waitForAngular();
     admin.editConfigProperty(
         'Names of users allowed to use the collection editor',
