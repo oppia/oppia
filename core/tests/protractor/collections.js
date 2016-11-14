@@ -34,24 +34,26 @@ describe('Collections', function() {
         'List', function(listEditor) {
       listEditor.addItem('Unicode').setValue(USERNAME);
     });
-  });
-
-  beforeEach(function() {
-    browser.get(general.SERVER_URL_PREFIX);
+    users.logout();
   });
 
   it('visits the collection editor', function() {
+    users.login('alice@collections.com');
+    browser.get(general.SERVER_URL_PREFIX);
     var dropdown = element(by.css('.protractor-test-profile-dropdown'));
     browser.actions().mouseMove(dropdown).perform();
     dropdown.element(by.css('.protractor-test-dashboard-link')).click();
     browser.waitForAngular();
     element(by.css('.protractor-test-create-activity')).click();
     element(by.css('.protractor-test-create-collection')).click();
+    users.logout();
   });
 
   it('visits the collection player', function() {
+    users.login('alice@collections.com');
     browser.get('/collection/0');
     browser.waitForAngular();
+    users.logout();
   });
 
   afterEach(function() {
