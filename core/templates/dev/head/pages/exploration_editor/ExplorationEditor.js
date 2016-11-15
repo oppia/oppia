@@ -565,7 +565,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
           templateUrl: 'modals/reloadingEditor',
           backdrop: 'static',
           keyboard: false,
-          windowClass: 'oppia-loading'
+          windowClass: 'oppia-loading-modal'
         });
         changeListService.discardAllChanges();
         alertsService.addSuccessMessage('Changes discarded.');
