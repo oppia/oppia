@@ -1,25 +1,4 @@
 <script type="text/ng-template" id="skins/Conversation">
-  <!--
-    Off-screen preview of the next card in order to pre-determine the target
-    height for the card content transition animation.
-  -->
-  <div class="conversation-skin-future-tutor-card" aria-hidden="true">
-    <div class="conversation-skin-tutor-card-content">
-      <div class="conversation-skin-tutor-card-top-section">
-        <div class="conversation-skin-tutor-card-top-content"
-             angular-html-bind="upcomingContentHtml">
-        </div>
-      </div>
-
-      <div ng-if="upcomingInlineInteractionHtml">
-        <div class="conversation-skin-inline-interaction">
-          <div angular-html-bind="upcomingInlineInteractionHtml">
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div role="main" style="margin: 0 auto; position: relative;" ng-if="hasFullyLoaded">
     <progress-dots num-dots="numProgressDots"
                    class="conversation-skin-progress-dots"
@@ -28,163 +7,49 @@
 
     <div class="conversation-skin-cards-container conversation-skin-animate-cards"
          ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
-      <div ng-show='!isViewportNarrow() || isScreenNarrowAndShowingTutorCard()'
-           class="conversation-skin-main-tutor-card"
-           ng-class="{'animate-card-width': startCardChangeAnimation,
-                      'has-shadow': isViewportNarrow() && isCurrentSupplementalCardNonempty(),
-                      'conversation-skin-animate-tutor-card-on-narrow': isViewportNarrow() && isCurrentSupplementalCardNonempty() }">
-        <div class="conversation-skin-tutor-card-content conversation-skin-animate-card-contents"
-             ng-class="{'animate-card-change': startCardChangeAnimation}">
-          <div class="conversation-skin-tutor-card-top-section">
-            <img class="conversation-skin-oppia-avatar"
-                 ng-src="<[::OPPIA_AVATAR_IMAGE_URL]>" alt="">
-            <div class="conversation-skin-tutor-card-top-content protractor-test-conversation-content"
-                 angular-html-bind="activeCard.contentHtml"
-                 focus-on="<[getContentFocusLabel($index)]>">
-            </div>
-          </div>
 
-          <div ng-if="(activeCard.answerFeedbackPairs.length > 1 && exploration.isInteractionInline(activeCard.stateName)) || (activeCard.answerFeedbackPairs.length > 0 && !exploration.isInteractionInline(activeCard.stateName))">
-            <h4 class="conversation-skin-responses-dropdown-container"
-                ng-click="toggleShowPreviousResponses()">
-              <span class="conversation-skin-responses-dropdown-text">
-                <span translate="I18N_PLAYER_PREVIOUS_RESPONSES"
-                      translate-values="{previousResponses: <[activeCard.answerFeedbackPairs.length - (exploration.isInteractionInline(activeCard.stateName) ? 1 : 0)]>}">
-                </span>
-                <span class="conversation-skin-responses-dropdown-icon"
-                      ng-class="{'conversation-skin-responses-dropdown-icon-rotated': arePreviousResponsesShown}">
-                  <i class="material-icons">&#xE037;</i>
-                </span>
-              </span>
-            </h4>
-          </div>
-
-          <div ng-show="arePreviousResponsesShown"
-               class="conversation-skin-tutor-card-middle-section conversation-skin-responses-animate-slide">
-            <div ng-repeat="responsePair in activeCard.answerFeedbackPairs track by $index">
-              <div ng-if="!$last || !exploration.isInteractionInline(activeCard.stateName)">
-                <answer-feedback-pair data="responsePair"
-                                      profile-picture="profilePicture"
-                                      oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL">
-                </answer-feedback-pair>
-              </div>
-            </div>
-          </div>
-
-          <!-- If the interaction is inline, always show the most recent response pair, if there is one. -->
-          <div class="conversation-skin-tutor-card-bottom-section" ng-if="exploration.isInteractionInline(activeCard.stateName) && activeCard.answerFeedbackPairs.length > 0">
-            <answer-feedback-pair data="activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1]"
-                                  profile-picture="profilePicture"
-                                  oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL">
-            </answer-feedback-pair>
-          </div>
-
-          <!--
-            Show the interaction (if it is inline), the interaction instructions
-            (if the interaction is supplemental), or a continuation button (if
-            Oppia has given feedback and the learner is being asked to move on
-            to the next card).
-
-            In addition, if the exploration is iframed, the terminal card will
-            have no learner input section, so we do not show it.
-          -->
-          <div ng-if="exploration.isInteractionInline(activeCard.stateName) && !waitingForOppiaFeedback &&
-          ((activeCard.interactionHtml && !activeCard.destStateName) || activeCard.destStateName) &&
-          (!isOnTerminalCard() || !isIframed || activeCard.destStateName) && isCurrentCardAtEndOfTranscript()">
-            <div class="conversation-skin-inline-interaction">
-              <div ng-if="activeCard.destStateName && activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].oppiaFeedbackHtml">
-                <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
-                           focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
-                           ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)"
-                           translate="I18N_PLAYER_CONTINUE_BUTTON">
-                </md-button>
-              </div>
-              <div ng-if="activeCard.interactionHtml && !activeCard.destStateName">
-                <div class="protractor-test-conversation-input"
-                     angular-html-bind="activeCard.interactionHtml">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div ng-if="!exploration.isInteractionInline(activeCard.stateName)"
-              class="conversation-skin-inline-interaction" style="opacity: 0.8;">
-            <div ng-if="!isViewportNarrow()" style="padding: 6px 12px;">
-              <[exploration.getInteractionInstructions(activeCard.stateName)]>
-              <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
-            </div>
-            <div ng-if="isViewportNarrow()">
-              <md-button class="instructions-button" ng-click="showSupplementalCardIfScreenIsNarrow()">
-                <[exploration.getInteractionInstructions(activeCard.stateName)]>
-              </md-button>
-            </div>
-          </div>
-
-          <div ng-if="!activeCard.interactionHtml && !isOnTerminalCard()">
-            <div class="conversation-skin-inline-interaction">
-              <span style="color: red;">
-                <strong>Error</strong>: No interaction specified for '<[activeCard.stateName]>'.
-              </span>
-            </div>
-          </div>
-        </div>
+      <div class="conversation-skin-tutor-card-container"
+          ng-show="!isViewportNarrow() || isScreenNarrowAndShowingTutorCard()"
+          ng-class="{ 'conversation-skin-animate-tutor-card-on-narrow':
+                        isViewportNarrow() && isCurrentSupplementalCardNonempty(),
+                      'conversation-skin-tutor-card-alone':
+                        isViewportNarrow() && !isCurrentSupplementalCardNonempty()}">
+        <tutor-card show-next-card="showUpcomingCard()"
+                    show-supplemental-card="showSupplementalCardIfScreenIsNarrow()"
+                    start-card-change-animation="startCardChangeAnimation"
+                    on-submit-answer="submitAnswer(answer, rulesService)">
+        </tutor-card>
       </div>
 
       <div ng-if="isCurrentSupplementalCardNonempty()"
            class="conversation-skin-supplemental-card-container">
-
         <img class="conversation-skin-oppia-avatar show-tutor-card"
              ng-if="isScreenNarrowAndShowingSupplementalCard() && isCurrentSupplementalCardNonempty()"
              ng-src="<[::OPPIA_AVATAR_IMAGE_URL]>"
              ng-click="showTutorCardIfScreenIsNarrow()" alt="">
 
         <div ng-if="isScreenNarrowAndShowingTutorCard()" class="supplemental-mask"></div>
-        <div ng-class="{'conversation-skin-help-card help-card-standard': !isWindowTall(),
-                        'conversation-skin-help-card help-card-tall': isWindowTall()}" ng-if="helpCardHtml">
-          <img class="conversation-skin-oppia-avatar"
-               ng-src="<[::OPPIA_AVATAR_IMAGE_URL]>" alt="">
-          <button type="button" class="conversation-skin-close-help-card-button"
-                    ng-click="clearHelpCard()" ng-if="!helpCardHasContinueButton">
-            <i class="material-icons md-18">&#xE5CD;</i>
-          </button>
-          <div class="conversation-skin-help-card-content" angular-html-bind="helpCardHtml"></div>
-          <br>
-          <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
-              focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
-              ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)"
-              ng-if="helpCardHasContinueButton"
-              style="margin-top: 12px;"
-              translate="I18N_PLAYER_CONTINUE_NEXT_CARD">
-          </md-button>
-        </div>
-
-        <div class="protractor-test-conversation-input"
-             angular-html-bind="activeCard.interactionHtml">
-        </div>
+        <supplemental-card show-next-card="showUpcomingCard()"
+                           on-submit-answer="submitAnswer(answer, rulesService)">
+        </supplemental-card>
       </div>
     </div>
   </div>
 
-  <oppia-gadget-panel panel-contents="exploration.getGadgetPanelsContents().bottom"
+  <oppia-gadget-panel ng-if="activeCard"
+                      panel-contents="getExplorationGadgetPanelsContents().bottom"
                       class="conversation-skin-bottom-gadget-panel"
                       current-state-name="activeCard.stateName">
   </oppia-gadget-panel>
 
   <div ng-if="isOnTerminalCard() && isLoggedIn && !isInPreviewMode && !isIframed && isCurrentCardAtEndOfTranscript()" class="conversation-skin-final-ratings">
-    <div style="color: #eee; margin-bottom: 20px;" translate="I18N_PLAYER_SHARE_EXPLORATION">
-    </div>
-    <sharing-links layout-type="row"
-                   class="conversation-skin-sharing-links"
-                   twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER"
-                   exploration-id="explorationId">
-    </sharing-links>
-    <div style="color: #eee; margin: 20px 0;" translate="I18N_PLAYER_RATE_EXPLORATION">
+    <div style="color: #064b46; margin: 20px 0;" translate="I18N_PLAYER_RATE_EXPLORATION">
     </div>
     <div popover-placement="bottom" popover-template="'popover/feedback'" popover-trigger="click">
       <rating-display rating-value="userRating"
                       is-editable="true"
                       on-edit="submitUserRating"
-                      style="letter-spacing: 10px; color: #eee;">
+                      style="letter-spacing: 10px; color: #064b46;">
       </rating-display>
     </div>
   </div>
@@ -193,7 +58,7 @@
        recommendedExplorationSummaries.length > 0"
        class="conversation-skin-final-recommendations">
 
-    <span style="color: #eee;" translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS"></span>
+    <span style="color: #064b46; font-size: 150%;" translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS"></span>
 
     <div class="oppia-exp-summary-tiles-container" style="padding-top: 10px;">
       <exploration-summary-tile ng-repeat="exp in (recommendedExplorationSummaries|limitTo:3) track by $index"
@@ -208,12 +73,21 @@
                                 thumbnail-bg-color="exp.thumbnail_bg_color"
                                 num-views="exp.num_views"
                                 is-community-owned="exp.community_owned"
-                                ng-attr-open-in-new-window="<[isIframed ? 'true' : undefined]>">
+                                ng-attr-open-in-new-window="<[isIframed ? 'true' : undefined]>"
+                                style="margin-left: 10px;">
       </exploration-summary-tile>
-
+      <collection-summary-tile ng-if="collectionId"
+                               collection-id="collectionSummary.id"
+                               collection-title="collectionSummary.title"
+                               last-updated-msec="collectionSummary.last_updated_msec"
+                               node-count="collectionSummary.node_count"
+                               objective="collectionSummary.objective"
+                               thumbnail-icon-url="collectionSummary.thumbnail_icon_url"
+                               thumbnail-bg-color="collectionSummary.thumbnail_bg_color"
+                               style="margin-left: 10px;">
+      </collection-summary-tile>
     </div>
   </div>
-
   <!-- The styles here need to be embedded within the directive script tags,
   since otherwise they will interfere with the iframed conversation skin
   directive. -->
@@ -223,8 +97,7 @@
       mode.
     */
     html, body {
-      background: url('/assets/common/images/general/background.jpg') no-repeat center center fixed;
-      background-color: #eee;
+      background: #eee no-repeat center center fixed;
       background-size: cover;
       color: rgba(0,0,0,0.87);
       font-family: 'Roboto', Arial, sans-serif;
@@ -235,11 +108,6 @@
       Additional CSS for the conversation_v1 skin.
       All classes below should start with .conversation-skin
      */
-
-    /* Overwrite the default color for the 'Loading...' message. */
-    .oppia-loading-fullpage {
-      color: #fff;
-    }
 
     .conversation-skin-progress-dots {
       left: 0;
@@ -270,56 +138,6 @@
       left: -20px;
     }
 
-    .conversation-skin-tutor-card-top-section .conversation-skin-oppia-avatar {
-      height: 48px;
-      left: -28px;
-      width: 48px;
-    }
-
-    .conversation-skin-inline-interaction .conversation-skin-user-avatar {
-      left: -20px;
-      top: 14px;
-    }
-
-    .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
-      right: -20px;
-    }
-
-    .conversation-skin-tutor-card-middle-section .conversation-skin-user-avatar,
-    .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-avatar {
-      display: none;
-    }
-
-    .conversation-skin-responses-dropdown-icon {
-      -moz-transition: all 0.2s;
-      -o-transition: all 0.2s;
-      -webkit-transition: all 0.2s;
-      font-size: 10px;
-      margin-bottom: -4px;
-      transition: 0.2s;
-    }
-
-    .conversation-skin-responses-dropdown-icon-rotated {
-      -moz-transform: rotate(90deg);
-      -o-transform: rotate(90deg);
-      -webkit-transform: rotate(90deg);
-      transform: rotate(90deg);
-    }
-
-    .conversation-skin-responses-dropdown-container {
-      border-bottom: 1px solid #ccc;
-      cursor: pointer;
-      line-height: 0.1em;
-      margin: 8px 20px 20px 20px;
-      text-align: center;
-    }
-
-    .conversation-skin-responses-dropdown-text {
-      background-color: #fff;
-      color: #888;
-      font-size: 0.8em;
-      padding: 0 10px;
-    }
 
     .conversation-skin-bottom-gadget-panel {
       bottom: 4px;
@@ -340,24 +158,20 @@
       justify-content: center;
       margin: 0 auto;
       max-width: 1400px;
-      padding: 40px 14px;
+      padding: 56px 14px;
       width: 100%;
     }
 
-    .conversation-skin-main-tutor-card,
-    .conversation-skin-future-tutor-card {
-      background: #fff;
-      border-radius: 2px;
+    .conversation-skin-tutor-card-container {
       flex-shrink: 10000;
       max-width: 560px;
       min-width: 360px;
-      padding-top: 20px;
-      text-align: left;
       width: 100%;
       z-index: 1;
     }
 
     .conversation-skin-supplemental-card-container {
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.12);
       flex-shrink: 1;
       margin-left: 12px;
       max-width: 1000px;
@@ -365,89 +179,11 @@
       position: relative;
     }
 
-    .conversation-skin-help-card {
-      background: #fff;
-      border-radius: 2px;
-      /* We move the help card lower so that it does not block
-         the terminal output in the CodeRepl interaction.
-      */
-      box-shadow: 0 1px 2px rgba(0,0,0,0.24), 0 1px 3px rgba(0,0,0,0.12);
-      min-height: 50px;
-      opacity: 1;
-      padding: 12px;
-      right: 12px;
-      text-align: left;
-      transition: all 350ms;
-      z-index: 500;
-    }
-
-    .help-card-standard {
-      bottom: -50px;
-      position: absolute;
-    }
-
-    .help-card-tall {
-      bottom: 50px;
-      position: fixed;
-    }
-
-    .conversation-skin-help-card.ng-enter,
-    .conversation-skin-help-card.ng-leave-active {
-      opacity: 0;
-      transform: translateX(200px);
-    }
-
-    .conversation-skin-help-card .conversation-skin-oppia-avatar {
-      top: 12px;
-    }
-
-    .conversation-skin-help-card-content {
-      width: 270px;
-    }
-
-    .conversation-skin-close-help-card-button {
-      background: none;
-      border: 0;
-      color: #000;
-      cursor: pointer;
-      height: 24px;
-      opacity: 0.5;
-      position: absolute;
-      right: 2px;
-      top: 2px;
-      width: 24px;
-      z-index: 200;
-    }
-
-    .conversation-skin-main-tutor-card.animate-card-width {
-      -webkit-transition: width 500ms;
-      transition: width 500ms;
-    }
-
-    .conversation-skin-future-tutor-card {
-      left: -30000px;
-      position: absolute;
-      top: -30000px;
-    }
-
-    .conversation-skin-tutor-card-top-section,
-    .conversation-skin-oppia-feedback-container,
-    .conversation-skin-learner-answer-container {
-      position: relative;
-    }
-
-    .conversation-skin-tutor-card-top-section,
-    .conversation-skin-oppia-feedback-container,
-    .conversation-skin-learner-answer-container {
-      padding: 0 20px;
-    }
-
     /* These rules must be kept in sync with corresponding rules in oppia.css
        (those with '.oppia-state-content-display-html > p,
          .form-control.oppia-rte-content > div > p' selectors specifying
         the same line-height, margin-top and margin-bottom attributes)
     */
-    .conversation-skin-tutor-card-top-content > p,
     .conversation-skin-oppia-feedback-content > p,
     .conversation-skin-learner-answer-content > p,
     .conversation-skin-help-card-content > p {
@@ -485,9 +221,6 @@
       margin-bottom: 12px;
     }
 
-    .conversation-skin-tutor-card-top-content {
-      width: 100%;
-    }
 
     .conversation-skin-tutor-card-top-content,
     .conversation-skin-help-card-content {
@@ -514,52 +247,6 @@
     .conversation-skin-oppia-feedback-content,
     .conversation-skin-help-card-content {
       border-top-left-radius: 0;
-    }
-
-    .conversation-skin-learner-answer-container {
-      text-align: right;
-    }
-
-    .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content {
-      background-color: rgba(236,239,241,0.4);
-    }
-
-    .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-feedback-content {
-      background-color: rgba(224,242,241,0.4);
-    }
-
-    .conversation-skin-tutor-card-top-content::before,
-    .conversation-skin-oppia-feedback-content::before,
-    .conversation-skin-help-card-content::before {
-      border-left: 8px solid transparent;
-      border-top: 12px solid rgba(224,242,241,1);
-      content: " ";
-      left: -8px;
-      position: absolute;
-      top: 0;
-    }
-
-    .conversation-skin-learner-answer-content::before {
-      border-right: 8px solid transparent;
-      border-top: 12px solid rgba(236,239,241,1);
-      content: " ";
-      position: absolute;
-      right: -8px;
-      top: 0;
-    }
-
-    .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-feedback-content::before,
-    .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content::before {
-      display: none;
-    }
-
-    .conversation-skin-inline-interaction {
-      background-color: rgba(236,239,241,1);
-      border-bottom-left-radius: 2px;
-      border-bottom-right-radius: 2px;
-      margin-top: 8px;
-      padding: 16px 20px;
-      position: relative;
     }
 
     .conversation-skin-learner-answer,
@@ -624,33 +311,6 @@
       opacity: 1;
     }
 
-    .conversation-skin-main-tutor-card.ng-hide-add.ng-hide-add-active,
-    .conversation-skin-main-tutor-card.ng-hide-remove.ng-hide-remove-active,
-    .conversation-skin-supplemental-card.ng-hide-add.ng-hide-add-active,
-    .conversation-skin-supplemental-card.ng-hide-remove.ng-hide-remove-active {
-      -webkit-transition: all ease-out 0.4s;
-      transition: all ease-out 0.4s;
-    }
-
-    .conversation-skin-main-tutor-card.ng-hide {
-      opacity: 0;
-      transform: translateX(-1000px);
-    }
-
-    .conversation-skin-supplemental-card.ng-hide {
-      opacity: 0;
-      transform: translateX(1000px);
-    }
-
-    .conversation-skin-main-tutor-card .instructions-button {
-        background: inherit;
-        border: none;
-    }
-
-    .conversation-skin-tutor-card-content {
-      word-wrap: break-word;
-    }
-
     @media screen and (max-width: 959px) {
       .conversation-skin-cards-container {
         display: block;
@@ -659,7 +319,8 @@
         width: 100%;
       }
 
-      .conversation-skin-main-tutor-card {
+      .conversation-skin-tutor-card-container {
+        position: absolute;
         left: 0px;
         margin: 0 auto;
         right: 0px;
@@ -668,8 +329,9 @@
         z-index: 15;
       }
 
-      .has-shadow {
-        box-shadow: 0 10px 10px rgba(0,0,0,0.24), 0 10px 10px rgba(0,0,0,0.24);
+      .conversation-skin-tutor-card-alone {
+        position: relative;
+        top: 0px;
       }
 
       .conversation-skin-supplemental-card-container {
@@ -690,17 +352,6 @@
         top: 0px;
         width: 100%;
         z-index: 14;
-      }
-
-      .conversation-skin-main-tutor-card .instructions-button {
-        background-color: #0D48A1;
-        color: #ffffff;
-        padding: 6px 12px;
-      }
-
-      .conversation-skin-main-tutor-card button.md-button.md-default-theme.instructions-button:focus,
-      .conversation-skin-main-tutor-card button.md-button.md-default-theme.instructions-button:hover {
-        background-color: #115FD4;
       }
 
       .conversation-skin-user-avatar,
