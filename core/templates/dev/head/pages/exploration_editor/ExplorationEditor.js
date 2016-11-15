@@ -569,7 +569,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         $rootScope.$broadcast('externalSave');
         $scope.isDiscardInProgress = true;
         $modal.open({
-          templateUrl: 'modals/loading',
+          templateUrl: 'modals/reloadingEditor',
           backdrop: 'static',
           keyboard: false,
           windowClass: 'oppia-loading'
