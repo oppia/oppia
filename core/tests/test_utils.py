@@ -61,6 +61,7 @@ def empty_environ():
     os.environ['DEFAULT_VERSION_HOSTNAME'] = '%s:%s' % (
         os.environ['HTTP_HOST'], os.environ['SERVER_PORT'])
 
+
 class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
     """Mock for google.appengine.api.urlfetch"""
 
@@ -71,11 +72,20 @@ class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
         self.request = None
 
     def set_return_values(self, content='', status_code=200, headers=None):
+        """Set mock content, status_code and headers for Url Service mock
+        object's return_values.
+
+        Parameters
+            content: Content for the return_values. Defaults to empty string.
+            status_code: status_code for the return_values. Defaults to 200.
+            headers: headers for the return_values. Defaults to None.
+
+        """
         self.return_values['content'] = content
         self.return_values['status_code'] = status_code
         self.return_values['headers'] = headers
 
-    def _Dynamic_Fetch(self, request, response): # pylint: disable=invalid-name
+    def _Dynamic_Fetch(self, request, response):  # pylint: disable=invalid-name
         return_values = self.return_values
         response.set_content(return_values.get('content', ''))
         response.set_statuscode(return_values.get('status_code', 200))
@@ -140,12 +150,26 @@ class TestBase(unittest.TestCase):
     }
 
     def _get_unicode_test_string(self, suffix):
+        """Adds a suffix to the UNICODE_TEST_STRING
+
+        Args:
+            suffix: the suffix pattern to the UNICODE_TEST_STRING
+
+        Returns:
+            string with UNICODE_TEST_STRING suffixed with string `suffix`
+        """
         return '%s%s' % (self.UNICODE_TEST_STRING, suffix)
 
     def setUp(self):
+        """To be overridden in inherited Test classes for initialization of the
+        fixture for the test suite.
+        """
         raise NotImplementedError
 
     def tearDown(self):
+        """To be overridden in inherited Test classes to do clean up of the
+        fixture after the tests ran.
+        """
         raise NotImplementedError
 
     def _assert_validation_error(self, item, error_substring):
@@ -165,6 +189,9 @@ class TestBase(unittest.TestCase):
         print '%s%s' % (LOG_LINE_PREFIX, line)
 
     def _delete_all_models(self):
+        """To be overriden the inherited Test class. Shall be used to delete
+        keys from Google App Engine's ndb datastore.
+        """
         raise NotImplementedError
 
     def _stash_current_user_env(self):
@@ -194,11 +221,29 @@ class TestBase(unittest.TestCase):
         self.stashed_user_env = None  # pylint: disable=attribute-defined-outside-init
 
     def login(self, email, is_super_admin=False):
+        """Gets User id from given email and checks if user is super admin.
+
+        Args
+            email: User's email to be picked up from environment variable
+                   `USER_EMAIL`
+            is_super_admin: Optional boolean parameter to be accepted. Default
+                            value is False
+
+        Returns
+            String `1` if user is super_admin else `0`
+
+        """
         os.environ['USER_EMAIL'] = email
         os.environ['USER_ID'] = self.get_user_id_from_email(email)
         os.environ['USER_IS_ADMIN'] = '1' if is_super_admin else '0'
 
     def logout(self):
+        """Removes USER_EMAIL, USER_ID, USER_IS_ADMIN from environment
+        variables by setting:
+            USER_EMAIL: ''
+            USER_ID: ''
+            USER_IS_ADMIN: '0'
+        """
         os.environ['USER_EMAIL'] = ''
         os.environ['USER_ID'] = ''
         os.environ['USER_IS_ADMIN'] = '0'
@@ -319,9 +364,19 @@ class TestBase(unittest.TestCase):
             config_domain.MODERATOR_USERNAMES, moderator_usernames)
 
     def get_current_logged_in_user_id(self):
+        """Returns the USER_ID from environment variable USER_ID
+        """
         return os.environ['USER_ID']
 
     def get_user_id_from_email(self, email):
+        """Fetches user_id from email
+
+        Parameters
+            email: valid email id stored in the Appengine database.
+
+        Returns
+            user_id for the user possessing given email.
+        """
         return current_user_services.get_user_id_from_email(email)
 
     def save_new_default_exploration(
@@ -424,6 +479,23 @@ class TestBase(unittest.TestCase):
             language_code=feconf.DEFAULT_LANGUAGE_CODE,
             exploration_id='an_exploration_id',
             end_state_name=DEFAULT_END_STATE_NAME):
+        """Creates an Oppia collection and adds a node saving the
+        exploration details.
+
+        Parameters
+            collection_id: Id for the collection to be created
+            owner_id: user_id for owner to be linked to the collection.
+            title: title for the collection
+            category: category of the exploration
+            objective: objective for the exploration
+            language_code: Defaults to `en` for English
+            exploration_id: exploration_id for the Oppia exploration.
+            end_state_name:
+
+        Returns
+            collection created with the given exploration node.
+
+        """
         collection = collection_domain.Collection.create_default_collection(
             collection_id, title, category, objective,
             language_code=language_code)
@@ -472,7 +544,6 @@ class TestBase(unittest.TestCase):
         slash.
         """
         return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
-
 
     @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):
@@ -562,8 +633,7 @@ class AppEngineTestBase(TestBase):
         return [q['name'] for q in self.taskqueue_stub.GetQueues()]
 
     @contextlib.contextmanager
-    def urlfetch_mock(
-            self, content='', status_code=200, headers=None):
+    def urlfetch_mock(self, content='', status_code=200, headers=None):
         """Enables the custom urlfetch mock (URLFetchServiceMock) within the
         context of a 'with' statement.
 
@@ -571,7 +641,7 @@ class AppEngineTestBase(TestBase):
         requests to fetch the Gravatar profile picture for new users while the
         backend tests are being run.
 
-        args:
+        Args:
           - content: Response content or body.
           - status_code: Response status code.
           - headers: Response headers.
@@ -635,7 +705,7 @@ class AppEngineTestBase(TestBase):
                     # Oppia-taskqueue-related ones.
                     headers = {
                         key: str(val) for key, val in task.headers.iteritems()
-                    }
+                        }
                     headers['Content-Length'] = str(len(task.payload or ''))
 
                     app = (
@@ -737,12 +807,12 @@ class FailingFunction(FunctionWrapper):
     def __init__(self, f, exception, num_tries_before_success):
         """Create a new Failing function.
 
-        args:
-          - f: see FunctionWrapper.
-          - exception: the exception to be raised.
-          - num_tries_before_success: the number of times to raise an
-            exception, before a call succeeds. If this is 0, all calls will
-            succeed, if it is FailingFunction.INFINITY, all calls will fail.
+        Args:
+            f: see FunctionWrapper.
+            exception: the exception to be raised.
+            num_tries_before_success: the number of times to raise an
+                exception, before a call succeeds. If this is 0, all calls will
+                succeed, if it is FailingFunction.INFINITY, all calls will fail.
         """
         super(FailingFunction, self).__init__(f)
         self._exception = exception
