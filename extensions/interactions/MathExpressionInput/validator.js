@@ -30,7 +30,7 @@ oppia.filter('oppiaInteractiveMathExpressionInputValidator', [
       var ruleSpecs = answerGroups[i].rule_specs;
       for (var j = 0; j < ruleSpecs.length; j++) {
         try {
-          MathExpression.fromText(ruleSpecs[j].inputs.x);
+          MathExpression.fromLatex(ruleSpecs[j].inputs.x);
         } catch (e) {
           warningsList.push({
             type: WARNING_TYPES.CRITICAL,

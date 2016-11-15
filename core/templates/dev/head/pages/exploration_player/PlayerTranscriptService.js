@@ -105,7 +105,7 @@ oppia.factory('playerTranscriptService', ['$log', function($log) {
       return transcript.length;
     },
     getCard: function(index) {
-      if (index >= transcript.length) {
+      if (index < 0 || index >= transcript.length) {
         $log.error(
           'Requested card with index ' + index +
           ', but transcript only has length ' + transcript.length + ' cards.');
@@ -119,14 +119,13 @@ oppia.factory('playerTranscriptService', ['$log', function($log) {
       return this.getCard(transcript.length - 1);
     },
     getNumSubmitsForLastCard: function() {
-      var card = this.getCard(transcript.length - 1);
-      return card.answerFeedbackPairs.length;
+      return this.getLastCard().answerFeedbackPairs.length;
     },
     updateLatestInteractionHtml: function(newInteractionHtml) {
       this.getLastCard().interactionHtml = newInteractionHtml;
     },
     getLastStateName: function() {
-      return transcript[transcript.length - 1].stateName;
+      return this.getLastCard().stateName;
     }
   };
 }]);
