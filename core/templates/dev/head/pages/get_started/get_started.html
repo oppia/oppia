@@ -1,0 +1,123 @@
+{% extends 'pages/base.html' %}
+
+{% block maintitle %}I18N_GET_STARTED_PAGE_TITLE{% endblock maintitle %}
+
+{% block header_js %}
+  {{ super() }}
+
+  <style>
+    html, body {
+      background-color: #eee;
+    }
+  </style>
+{% endblock %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      Get Started
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <div class="oppia-about-header">
+    <h1>Get Started</h1>
+  </div>
+
+  <div class="oppia-page-card oppia-about-content">
+    <div class="oppia-about-card-content-wide">
+      
+      <p>
+        Creating an Oppia lesson is easy and free.  After you create the lesson, you share it with 
+        others, and get feedback you can use to improve the lesson.  
+      </p>
+        
+      <h3>Choose a Topic</h3>
+      <p>All you need to get started is a topic you want 
+        to teach.  You can create a lesson about any topic, large or small.  The ideal size of 
+        topic for a lesson is one that you would cover in a single 
+        class.  You can also create multiple related lessons that are intended to be completed 
+        in sequence.
+      </p>
+        
+      
+      <h3>Create Your Lesson</h3>
+      <p>
+        When you have chosen a topic, just click ‘Create’, and log in with your Google account.    
+        If you don't have a Google account, you can <a href="https://accounts.google.com/SignUp" target="new">create one here</a>.
+      </p>
+      <p>
+        A lesson consists of a number of steps.  A step can can include text (e.g. a written 
+        explanation), pictures and video.  Each step presents the student with a question, which 
+        they must attempt in order to continue. It can be a multiple choice question, or require 
+        them to type something in, or any one of a number of other available interactions.
+      </p>
+      <p>
+        Once the learner has answered the question, Oppia will give them feedback and let them 
+        continue to the next step.  To see how learners experience Oppia, try out one of these lessons:
+      </p>
+      <p>
+        <ul>
+          <li><a href="https://www.oppia.org/explore/0" target="new">Welcome to Oppia</a></li>
+          <li><a href="https://www.oppia.org/explore/N9iXI-fZTo8s" target="new">Introduction 
+            to Chili Peppers</a></li>
+          <li><a href="https://www.oppia.org/explore/9" target="new">Pitch Perfect</a></li>
+        </ul>
+      </p>
+      <p>
+        More information about creating lessons can be found <a href="https://oppia.github.io/#/CreatingAnExploration" target="new">here</a>.
+      </p>
+
+      <h3>Publish Your Lesson</h3>
+      <p>
+        Once you've created your lesson and you're ready for learners to see it, click the 
+        'Publish' button at the top of the page.  This will make your lesson available to 
+        learners around the world!
+      </p>
+      
+      <h3>Share Your Lesson</h3>
+      <p>
+        After you publish the lesson, you can share it via a 
+        link, or even <a href="https://oppia.github.io/#/EmbeddingAnExploration" target="new">embed 
+        it in your own web page</a>.
+      </p>
+
+      <!-- todo: make it easy to get the right link to share, update this doc with that info -->
+            
+      <h3>Improve Your Lesson</h3>
+      <p>
+        When learners go through your lesson, they can send you feedback to alert you to problems
+        or to share ideas for making it better.
+      </p>
+      <p>
+        In addition, as learners use your lesson, you'll be able to see the common errors 
+        they're making. Sometimes this can reveal new insights about where they are confused.  
+        It's easy to augment the lesson with additional feedback if you think that other learners are 
+        likely to repeat these errors. If you wanted to, you could even send the learner to a different 
+        step, or "go deeper" by asking another question.
+      </p>
+
+      <h3>Get Involved</h3>
+      
+      <p>
+        To get involved in the Oppia
+        project and help us bring about our mission of free, high-quality
+        universal education, reach out via our
+        <a href="https://groups.google.com/forum/#!forum/oppia-dev">oppia-dev@</a> Google Group, or contact us at
+        <a href="mailto:admin@oppia.org" class="inline-links">admin@oppia.org</a>.
+        We're excited to hear from you!
+      </p>
+
+      <p>
+        Also, if you have any feedback for us, please don't hesitate to let us know via our <a href="{{SITE_FEEDBACK_FORM_URL}}">feedback form</a> &mdash; we read all the feedback we receive. Thanks in advance!
+      </p>
+    </div>  
+  </div>
+
+{% endblock %}
+
+{% block footer%}
+  {% include 'pages/footer.html' %}
+{% endblock %}

@@ -417,13 +417,6 @@ oppia.controller('EditorNavigation', [
       }, 5000);
     });
 
-    // This method is here because the trigger for the tutorial is in the site
-    // navbar. It broadcasts an event to tell the exploration editor to open the
-    // editor tutorial.
-    $scope.openEditorTutorial = function() {
-      $rootScope.$broadcast('openEditorTutorial');
-    };
-
     $scope.showUserHelpModal = function() {
       var explorationId = explorationContextService.getExplorationId();
       siteAnalyticsService.registerClickHelpButtonEvent(explorationId);
@@ -454,7 +447,7 @@ oppia.controller('EditorNavigation', [
       });
 
       modalInstance.result.then(function() {
-        $scope.openEditorTutorial();
+        $rootScope.$broadcast('openEditorTutorial');
       }, function() {
         stateEditorTutorialFirstTimeService.markTutorialFinished();
       });

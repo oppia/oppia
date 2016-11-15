@@ -65,6 +65,18 @@ class AboutPage(base.BaseHandler):
         self.render_template('pages/about/about.html')
 
 
+class GetStartedPage(base.BaseHandler):
+    """Page with information about how to get started using Oppia."""
+
+    def get(self):
+        """Handles GET requests."""
+        self.values.update({
+            'meta_description': feconf.GET_STARTED_PAGE_DESCRIPTION,
+            'nav_mode': feconf.NAV_MODE_GET_STARTED,
+        })
+        self.render_template('pages/get_started/get_started.html')
+
+
 class TeachPage(base.BaseHandler):
     """Page with information about how to teach on Oppia."""
 

@@ -23,6 +23,7 @@
                        ng-blur="saveExplorationObjective()" placeholder="Learn how to ...">
                 <span class="help-block" style="font-size: smaller">
                   What does this exploration help people to do?
+                  <span ng-if="!explorationObjectiveService.displayed || explorationObjectiveService.displayed.length < 15">Please provide a complete, descriptive sentence.</span>
                 </span>
               </div>
             </div>

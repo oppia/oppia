@@ -332,7 +332,7 @@ class FeedbackMessageModel(base_models.BaseModel):
         """
         full_thread_id = FeedbackThreadModel.generate_full_thread_id(
             exploration_id, thread_id)
-        return cls.get_all(include_deleted_entities=True).filter(
+        return cls.get_all(include_deleted=True).filter(
             cls.thread_id == full_thread_id).count()
 
     @classmethod
