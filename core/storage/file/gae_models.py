@@ -60,7 +60,7 @@ class FileMetadataModel(base_models.VersionedModel):
 
     @classmethod
     def _construct_id(cls, exploration_id, filepath):
-        """Builds the path for the id to be generated.
+        """Generates the path to the FileMetadataModel.
 
         Args:
             exploration_id: str. The ID of the exploration.
