@@ -158,7 +158,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
             self.submitter_id, 'whitelisted_email_senders',
             [self.SUBMITTER_USERNAME, self.NEW_SUBMITTER_USERNAME])
 
-    def test_that_correct_emails_are_sent_to_all(self):
+    def test_that_correct_emails_are_sent_to_all_users(self):
         self.login(self.SUBMITTER_EMAIL)
         csrf_token = self.get_csrf_token_from_response(
             self.testapp.get('/emaildashboard'))
@@ -205,8 +205,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
                     'data': {
                         'email_subject': 'subject',
                         'email_body': 'body',
-                        'email_option': 'all',
-                        'num_of_users_to_send': None,
+                        'max_recipients': None,
                         'email_intent': 'bulk_email_marketing'
                     }}, csrf_token)
             self.logout()
@@ -245,6 +244,17 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.BULK_EMAIL_INTENT_MARKETING)
+
+            # Check that BulkEmailModel id is stored in UsetBulkEmailModel of
+            # recipients.
+            recipient_a = user_models.UserBulkEmailsModel.get(self.user_a_id)
+            self.assertEqual(
+                recipient_a.sent_email_models_ids,
+                [query_models[0].sent_email_model_id])
+            recipient_b = user_models.UserBulkEmailsModel.get(self.user_b_id)
+            self.assertEqual(
+                recipient_b.sent_email_models_ids,
+                [query_models[0].sent_email_model_id])
 
     def test_that_valid_exceptions_are_raised(self):
         # Check that exception is raised for incorrect query id.
@@ -293,7 +303,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         # Check that exception is raised if current user is not submitter of
         # that query.
         self.login(self.NEW_SUBMITTER_EMAIL)
-        with self.assertRaisesRegexp(Exception, '400 Bad Request'):
+        with self.assertRaisesRegexp(Exception, '401 Unauthorized'):
             self.testapp.get('/emaildashboardresult/%s' % query_models[0].id)
         self.logout()
 
@@ -310,8 +320,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
                     'data': {
                         'email_subject': 'subject',
                         'email_body': 'body',
-                        'email_option': 'custom',
-                        'num_of_users_to_send': 1,
+                        'max_recipients': 1,
                         'email_intent': 'bulk_email_marketing'
                     }}, csrf_token)
             self.logout()
@@ -324,7 +333,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
             self.testapp.get('/emaildashboardresult/%s' % query_models[0].id)
         self.logout()
 
-    def test_that_correct_emails_are_sent_to_max_n_users(self):
+    def test_that_correct_emails_are_sent_to_max_n_recipients(self):
         self.login(self.SUBMITTER_EMAIL)
         csrf_token = self.get_csrf_token_from_response(
             self.testapp.get('/emaildashboard'))
@@ -358,8 +367,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
                     'data': {
                         'email_subject': 'subject',
                         'email_body': 'body',
-                        'email_option': 'custom',
-                        'num_of_users_to_send': 1,
+                        'max_recipients': 1,
                         'email_intent': 'bulk_email_marketing'
                     }}, csrf_token)
             self.logout()
@@ -369,6 +377,9 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
             # is sent to one of the 2 qualified users.
             messages = self.mail_stub.get_sent_messages()
             self.assertEqual(len(messages), 2)
+            self.assertEqual(messages[0].to, self.SUBMITTER_EMAIL)
+            self.assertIn(
+                messages[1].to, [self.USER_A_EMAIL, self.USER_B_EMAIL])
 
     def test_that_no_emails_are_sent_if_query_is_canceled(self):
         self.login(self.SUBMITTER_EMAIL)
@@ -400,14 +411,8 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
                 self.testapp.get(
                     '/emaildashboardresult/%s' % query_models[0].id))
             self.post_json(
-                '/emaildashboardresult/%s' % query_models[0].id, {
-                    'data': {
-                        'email_subject': 'subject',
-                        'email_body': 'body',
-                        'email_option': 'cancel',
-                        'num_of_users_to_send': None,
-                        'email_intent': 'bulk_email_marketing'
-                    }}, csrf_token)
+                '/emaildashboardcancelresult/%s' % query_models[0].id, {},
+                csrf_token)
             self.logout()
 
             # Check that no email is sent to qualified users.

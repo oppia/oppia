@@ -351,10 +351,11 @@ class UserQueryModel(base_models.BaseModel):
     # List of all user_ids who satisfy all parameters given in above query.
     # This list will be empty initially. Once query has completed its execution
     # this list will be populated with all qualifying user ids.
-    user_ids = ndb.StringProperty(indexed=True, repeated=True)
-    # Id of the user who submitted the query.
+    user_ids = ndb.JsonProperty(default=[], compressed=True)
+    # ID of the user who submitted the query.
     submitter_id = ndb.StringProperty(indexed=True, required=True)
-    # Id of the email model having information of sent emails.
+    # ID of the instance of BulkEmailModel which stores infromation
+    # about sent emails.
     sent_email_model_id = ndb.StringProperty(default=None, indexed=True)
     # Current status of the query.
     query_status = ndb.StringProperty(
@@ -374,3 +375,11 @@ class UserQueryModel(base_models.BaseModel):
             fetch_page(page_size, start_cursor=cursor))
         next_cursor = next_cursor.urlsafe() if (next_cursor and more) else None
         return query_models, next_cursor, more
+
+
+class UserBulkEmailsModel(base_models.BaseModel):
+    """Model to store IDs BulkEmailModel sent to a user.
+
+    Instances of this class are keyed by the user id"""
+    # IDs of all sent BulkEmailModels.
+    sent_email_models_ids = ndb.StringProperty(indexed=True, repeated=True)

@@ -76,7 +76,7 @@ oppia.controller('EmailDashboard', [
       });
     };
 
-    $scope.showLink = function(submitter, status) {
+    $scope.showLinkToResultPage = function(submitter, status) {
       return (submitter === GLOBALS.username) && (status === 'completed');
     };
 

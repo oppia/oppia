@@ -19,73 +19,99 @@
 oppia.controller('EmailDashboardResult', [
   '$scope', '$http', '$window', '$timeout',
   function($scope, $http, $window, $timeout) {
-    var EMAIL_POST_HANDLER = '/emaildashboardresult';
+    var RESULT_HANDLER_URL_PREFIX = '/emaildashboardresult';
+    var CANCEL_EMAIL_HANDLER_URL_PREFIX = '/emaildashboardcancelresult';
+    var EMAIL_DASHBOARD_PAGE = '/emaildashboard';
+
+    var getQueryId = function() {
+      return $window.location.pathname.split('/').slice(-1)[0];
+    };
 
     $scope.submitEmail = function() {
-      var postLink = EMAIL_POST_HANDLER + '/' + $scope.queryId;
+      var resultHandlerUrl = RESULT_HANDLER_URL_PREFIX + '/' + getQueryId();
       var invalidData = false;
-      var EMAIL_DASHBOARD_PAGE = '/emaildashboard';
 
-      if ($scope.email_option !== 'cancel') {
-        if ($scope.email_subject.length === 0) {
-          $scope.invalid.subject = true;
-          invalidData = true;
-        }
-        if ($scope.email_body.length === 0) {
-          $scope.invalid.body = true;
-          invalidData = true;
-        }
+      if ($scope.emailSubject.length === 0) {
+        $scope.invalid.subject = true;
+        invalidData = true;
       }
-      if ($scope.email_option === 'custom' &&
-        $scope.num_of_users_to_send === null) {
-        $scope.invalid.num_users = true;
+      if ($scope.emailBody.length === 0) {
+        $scope.invalid.body = true;
+        invalidData = true;
+      }
+      if ($scope.emailOption === 'custom' &&
+        $scope.maxRecipients === null) {
+        $scope.invalid.maxRecipients = true;
         invalidData = true;
       }
 
       if (!invalidData) {
+        $scope.submitIsInProgress = true;
         var data = {
-          email_subject: $scope.email_subject,
-          email_body: $scope.email_body,
-          email_option: $scope.email_option,
-          num_of_users_to_send: $scope.num_of_users_to_send,
-          email_intent: $scope.email_intent
+          email_subject: $scope.emailSubject,
+          email_body: $scope.emailBody,
+          email_intent: $scope.emailIntent
         };
+        if ($scope.emailOption === 'all') {
+          data.max_recipients = null;
+        } else {
+          data.max_recipients = $scope.maxRecipients;
+        }
 
-        $http.post(postLink, {
+        $http.post(resultHandlerUrl, {
           data: data
         }).success(function() {
           $scope.emailSubmitted = true;
           $timeout(function() {
             $window.location.href = EMAIL_DASHBOARD_PAGE;
           }, 4000);
+        }).error(function() {
+          $scope.errorHasOccurred = true;
+          $scope.submitIsInProgress = false;
         });
         $scope.invalid.subject = false;
         $scope.invalid.body = false;
-        $scope.invalid.num_users = false;
+        $scope.invalid.maxRecipients = false;
       }
     };
 
-    $scope.resetEmail = function() {
-      $scope.email_subject = '';
-      $scope.email_body = '';
-      $scope.email_option = 'all';
+    $scope.resetForm = function() {
+      $scope.emailSubject = '';
+      $scope.emailBody = '';
+      $scope.emailOption = 'all';
     };
 
-    $scope.queryId = GLOBALS.queryId;
-    $scope.email_option = 'all';
-    $scope.email_subject = '';
-    $scope.email_body = '';
+    $scope.cancelEmail = function() {
+      $scope.submitIsInProgress = true;
+      var cancelUrlHandler = (
+        CANCEL_EMAIL_HANDLER_URL_PREFIX + '/' + getQueryId());
+      $http.post(cancelUrlHandler).success(function() {
+        $scope.emailCancelled = true;
+        $timeout(function() {
+          $window.location.href = EMAIL_DASHBOARD_PAGE;
+        }, 4000);
+      }).error(function() {
+        $scope.errorHasOccurred = true;
+        $scope.submitIsInProgress = false;
+      });
+    };
+
+    $scope.emailOption = 'all';
+    $scope.emailSubject = '';
+    $scope.emailBody = '';
     $scope.invalid = {
       subject: false,
       body: false,
-      num_users: false
+      maxRecipients: false
     };
-    $scope.num_of_users_to_send = null;
-    $scope.possible_email_intents = [
+    $scope.maxRecipients = null;
+    $scope.POSSIBLE_EMAIL_INTENTS = [
       'bulk_email_marketing', 'bulk_email_improve_exploration',
       'bulk_email_create_exploration', 'bulk_email_creator_reengagement',
       'bulk_email_learner_reengagement'];
-    $scope.email_intent = $scope.possible_email_intents[0];
+    $scope.emailIntent = $scope.POSSIBLE_EMAIL_INTENTS[0];
     $scope.emailSubmitted = false;
+    $scope.submitIsInProgress = false;
+    $scope.errorHasOccurred = false;
   }
 ]);

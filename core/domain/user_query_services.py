@@ -43,27 +43,38 @@ def save_new_query_model(
 
 
 def send_email_to_qualified_users(
-        query_id, email_subject, email_body, email_intent, email_option,
-        num_of_users_to_send):
-    """Send email to maximum 'num_of_users_to_send' qualified users."""
+        query_id, email_subject, email_body, email_intent, max_recipients):
+    """Send email to maximum 'max_recipients' qualified users.
+
+    Args:
+        query_id: str. ID of the UserQueryModel instance.
+        email_subject: str. Subject of the email to be sent.
+        email_body: str. Body of the email to be sent.
+        email_intent: str. Intent of the email.
+        max_recipients: integer. Number of maximum recipients to send emails.
+    """
     query_model = user_models.UserQueryModel.get(query_id)
     query_model.query_status = feconf.USER_QUERY_STATUS_ARCHIVED
+    recipient_ids = query_model.user_ids
 
-    if email_option == feconf.USER_QUERY_EMAIL_OPTION_ALL:
-        bulk_email_model_id = email_manager.send_user_query_email(
-            query_model.submitter_id, query_model.user_ids, email_subject,
-            email_body, email_intent)
-        query_model.sent_email_model_id = bulk_email_model_id
-        query_model.put()
-    elif email_option == feconf.USER_QUERY_EMAIL_OPTION_CUSTOM:
-        recipient_ids = query_model.user_ids[:num_of_users_to_send]
-        bulk_email_model_id = email_manager.send_user_query_email(
-            query_model.submitter_id, recipient_ids, email_subject,
-            email_body, email_intent)
-        query_model.sent_email_model_id = bulk_email_model_id
-        query_model.put()
-    elif email_option == feconf.USER_QUERY_EMAIL_OPTION_CANCEL:
-        query_model.query_status = feconf.USER_QUERY_STATUS_ARCHIVED
-        query_model.put()
-    else:
-        raise Exception('Invalid email option.')
+    if max_recipients:
+        recipient_ids = recipient_ids[:max_recipients]
+
+    bulk_email_model_id = email_manager.send_user_query_email(
+        query_model.submitter_id, recipient_ids, email_subject,
+        email_body, email_intent)
+    query_model.sent_email_model_id = bulk_email_model_id
+    query_model.put()
+
+    # Store BulkEmailModel in UserBulkEmailsModel of each recipient.
+    for recipient_id in recipient_ids:
+        recipient_bulk_email_model = (
+            user_models.UserBulkEmailsModel.get(recipient_id, strict=False))
+
+        if recipient_bulk_email_model is None:
+            recipient_bulk_email_model = user_models.UserBulkEmailsModel(
+                id=recipient_id, sent_email_models_ids=[])
+
+        recipient_bulk_email_model.sent_email_models_ids.append(
+            bulk_email_model_id)
+        recipient_bulk_email_model.put()

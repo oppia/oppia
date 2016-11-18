@@ -554,10 +554,7 @@ USER_QUERY_STATUS_PROCESSING = 'processing'
 USER_QUERY_STATUS_COMPLETED = 'completed'
 USER_QUERY_STATUS_ARCHIVED = 'archived'
 USER_QUERY_STATUS_FAILED = 'failed'
-# Possible email option for sending emails using query.
-USER_QUERY_EMAIL_OPTION_ALL = 'all'
-USER_QUERY_EMAIL_OPTION_CUSTOM = 'custom'
-USER_QUERY_EMAIL_OPTION_CANCEL = 'cancel'
+
 # The time difference between which to consider two login events "close". This
 # is taken to be 12 hours.
 PROXIMAL_TIMEDELTA_SECS = 12 * 60 * 60

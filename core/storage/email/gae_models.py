@@ -179,7 +179,7 @@ class BulkEmailModel(base_models.BaseModel):
     """
 
     # The user IDs of the email recipients.
-    recipient_ids = ndb.StringProperty(indexed=True, repeated=True)
+    recipient_ids = ndb.JsonProperty(default=[], compressed=True)
     # The user ID of the email sender. For site-generated emails this is equal
     # to feconf.SYSTEM_COMMITTER_ID.
     sender_id = ndb.StringProperty(required=True)
@@ -210,8 +210,3 @@ class BulkEmailModel(base_models.BaseModel):
             sender_email=sender_email, intent=intent, subject=subject,
             html_body=html_body, sent_datetime=sent_datetime)
         email_model_instance.put()
-
-    @classmethod
-    def get_number_of_emails_sent_to_user(cls, recipient_id, intent):
-        return cls.query(ndb.AND(
-            cls.recipient_ids == recipient_id, cls.intent == intent)).count()
