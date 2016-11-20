@@ -50,7 +50,9 @@ oppia.controller('EmailDashboardResult', [
         var data = {
           email_subject: $scope.emailSubject,
           email_body: $scope.emailBody,
-          email_intent: $scope.emailIntent
+          email_intent: $scope.emailIntent,
+          max_recipients: (
+            $scope.emailOption !== 'all' ? $scope.max_recipients : null)
         };
         if ($scope.emailOption === 'all') {
           data.max_recipients = null;

@@ -354,7 +354,7 @@ class UserQueryModel(base_models.BaseModel):
     user_ids = ndb.JsonProperty(default=[], compressed=True)
     # ID of the user who submitted the query.
     submitter_id = ndb.StringProperty(indexed=True, required=True)
-    # ID of the instance of BulkEmailModel which stores infromation
+    # ID of the instance of BulkEmailModel which stores information
     # about sent emails.
     sent_email_model_id = ndb.StringProperty(default=None, indexed=True)
     # Current status of the query.
@@ -380,6 +380,8 @@ class UserQueryModel(base_models.BaseModel):
 class UserBulkEmailsModel(base_models.BaseModel):
     """Model to store IDs BulkEmailModel sent to a user.
 
-    Instances of this class are keyed by the user id"""
-    # IDs of all sent BulkEmailModels.
-    sent_email_models_ids = ndb.StringProperty(indexed=True, repeated=True)
+    Instances of this class are keyed by the user id.
+    """
+    # IDs of all BulkEmailModels that correspond to bulk emails sent to this
+    # user.
+    sent_email_model_ids = ndb.StringProperty(indexed=True, repeated=True)

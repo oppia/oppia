@@ -59,7 +59,7 @@
       Email intent: <select ng-model="emailIntent" ng-options="intent for intent in POSSIBLE_EMAIL_INTENTS"></select><br><br>
       Email option: <input type="radio" name="email" ng-model="emailOption" value="all" checked> Send to all
       <input type="radio" name="email" ng-model="emailOption" value="custom"> Send to max N users:
-      <input type="number" ng-model="maxRecipients" min="0" placeholder="Enter number of users..."><br><br>
+      <input type="number" ng-model="maxRecipients" min="0" placeholder="Enter number of users..." ng-disabled="emailOption == 'all'"><br><br>
       <input class="btn btn-success" type="submit" value="Submit Email">
       <input class="btn btn-default" type="reset" value="Reset" ng-click="resetForm()">
       <input class="btn btn-danger" type="button" ng-click="cancelEmail()" value="Cancel">

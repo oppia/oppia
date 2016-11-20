@@ -51,7 +51,7 @@ def send_email_to_qualified_users(
         email_subject: str. Subject of the email to be sent.
         email_body: str. Body of the email to be sent.
         email_intent: str. Intent of the email.
-        max_recipients: integer. Number of maximum recipients to send emails.
+        max_recipients: int. Maximum number of recipients send emails to.
     """
     query_model = user_models.UserQueryModel.get(query_id)
     query_model.query_status = feconf.USER_QUERY_STATUS_ARCHIVED
@@ -73,8 +73,8 @@ def send_email_to_qualified_users(
 
         if recipient_bulk_email_model is None:
             recipient_bulk_email_model = user_models.UserBulkEmailsModel(
-                id=recipient_id, sent_email_models_ids=[])
+                id=recipient_id, sent_email_model_ids=[])
 
-        recipient_bulk_email_model.sent_email_models_ids.append(
+        recipient_bulk_email_model.sent_email_model_ids.append(
             bulk_email_model_id)
         recipient_bulk_email_model.put()

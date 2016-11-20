@@ -249,11 +249,11 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
             # recipients.
             recipient_a = user_models.UserBulkEmailsModel.get(self.user_a_id)
             self.assertEqual(
-                recipient_a.sent_email_models_ids,
+                recipient_a.sent_email_model_ids,
                 [query_models[0].sent_email_model_id])
             recipient_b = user_models.UserBulkEmailsModel.get(self.user_b_id)
             self.assertEqual(
-                recipient_b.sent_email_models_ids,
+                recipient_b.sent_email_model_ids,
                 [query_models[0].sent_email_model_id])
 
     def test_that_valid_exceptions_are_raised(self):
