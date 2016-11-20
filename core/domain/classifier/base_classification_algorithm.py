@@ -14,11 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Base class of classification algorithms for free-form text answers"""
+
 from abc import abstractmethod
 import copy
 
 
-"""Base class of classification algorithms for free-form text answers"""
 class BaseClassificationAlgorithm(object):
     """A base class for classifiers that uses supervised learning to match
     free-form text answers to answer groups. The classifier trains on answers
