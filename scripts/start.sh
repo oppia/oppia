@@ -41,7 +41,7 @@ fi
 LOCK_FILE="./.lock"
 
 function cleanup {
-  rm -rf $LOCK_FILE
+  [ ! $NO_CLEAN ] && rm -rf $LOCK_FILE
 }
 
 trap cleanup EXIT
@@ -53,6 +53,7 @@ then
   echo ""
   echo "  Please wait for that instance to complete or terminate it "
   echo ""
+  NO_CLEAN=1
   exit 1
 else
   touch $LOCK_FILE
