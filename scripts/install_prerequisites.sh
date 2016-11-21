@@ -25,6 +25,15 @@
 #
 # Note that the root folder MUST be named 'oppia'.
 
+LOCK_FILE="./.lock"
+touch $LOCK_FILE
+
+function cleanup {
+  rm -rf $LOCK_FILE
+}
+
+trap cleanup EXIT
+
 sudo apt-get update
 sudo apt-get install curl
 sudo apt-get install git

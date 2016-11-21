@@ -35,7 +35,27 @@ then
   echo ""
   echo "     bash $0"
   echo ""
-  return 1
+  exit 1
+fi
+
+LOCK_FILE="./.lock"
+
+function cleanup {
+  rm -rf $LOCK_FILE
+}
+
+trap cleanup EXIT
+
+if [ -e "$LOCK_FILE" ]
+then
+  echo ""
+  echo "  Another setup instance is already running "
+  echo ""
+  echo "  Please wait for that instance to complete or terminate it "
+  echo ""
+  exit 1
+else
+  touch $LOCK_FILE
 fi
 
 set -e
