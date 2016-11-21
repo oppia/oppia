@@ -80,10 +80,10 @@ oppia.directive('tutorCard', [function() {
   return {
     restrict: 'E',
     scope: {
-      startCardChangeAnimation: '=',
-      showNextCard: '&',
-      showSupplementalCard: '&',
-      onSubmitAnswer: '&'
+      onClickContinueButton: '&',
+      onSubmitAnswer: '&',
+      onDismiss: '&',
+      startCardChangeAnimation: '='
     },
     templateUrl: 'components/TutorCard',
     controller: [
@@ -123,9 +123,8 @@ oppia.directive('tutorCard', [function() {
         $scope.OPPIA_AVATAR_IMAGE_URL = (
           UrlInterpolationService.getStaticImageUrl(
             '/avatar/oppia_black_72px.png'));
-
-        $scope.profilePicture = (UrlInterpolationService.getStaticImageUrl(
-            '/avatar/user_blue_72px.png'));
+        $scope.profilePicture = UrlInterpolationService.getStaticImageUrl(
+          '/avatar/user_blue_72px.png');
 
         oppiaPlayerService.getUserProfileImage().then(function(result) {
           $scope.profilePicture = result;
@@ -179,6 +178,7 @@ oppia.directive('tutorCard', [function() {
         });
 
         updateActiveCard();
-      }]
+      }
+    ]
   };
 }]);
