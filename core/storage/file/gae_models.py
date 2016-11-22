@@ -53,7 +53,7 @@ class FileMetadataModel(base_models.VersionedModel):
         model.
 
         Returns:
-            A list of undeleted items from the query.
+            list. A list of undeleted items from the query.
         """
         return cls.get_all().filter(cls.deleted == False).fetch(  # pylint: disable=singleton-comparison
             feconf.DEFAULT_QUERY_LIMIT)
@@ -67,7 +67,7 @@ class FileMetadataModel(base_models.VersionedModel):
             filepath: str. The path to the exploration file.
 
         Returns:
-            The path of the id to be generated.
+            str. The path of the id to be generated.
         """
         return utils.vfs_construct_path('/', exploration_id, filepath)
 
@@ -80,14 +80,14 @@ class FileMetadataModel(base_models.VersionedModel):
             filepath: str. The path to the exploration file.
 
         Returns:
-            int. Instance of the new file meta data model entry.
+            str. Instance of the new file meta data model entry.
         """
         model_id = cls._construct_id(exploration_id, filepath)
         return cls(id=model_id, deleted=False)
 
     @classmethod
     def get_model(cls, exploration_id, filepath, strict=False):
-        """Gets the model of an exploration by id.
+        """Gets a FileMetadataModel instance.
 
         Args:
             exploration_id: str. The ID of the exploration.
@@ -96,7 +96,8 @@ class FileMetadataModel(base_models.VersionedModel):
             entry is not found.
 
         Returns:
-            The FileMetaDataModel instance that corresponds to the given ID.
+            FileMetadataModel. The FileMetadataModel instance that corresponds
+            to the given ID.
         """
         model_id = cls._construct_id(exploration_id, filepath)
         return super(FileMetadataModel, cls).get(model_id, strict=strict)
