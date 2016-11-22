@@ -92,7 +92,7 @@ class FileMetadataModel(base_models.VersionedModel):
         Args:
             exploration_id: str. The ID of the exploration.
             filepath: str. The path to the exploration file.
-            strict: bool. Not raise an error if FileMetadataModel
+            strict: bool. Not fail noisily if FileMetadataModel
             entry is not found.
 
         Returns:
