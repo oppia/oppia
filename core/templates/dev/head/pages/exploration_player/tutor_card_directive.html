@@ -11,11 +11,9 @@
         </div>
       </div>
 
-      <div ng-if="upcomingInlineInteractionHtml">
-        <div class="conversation-skin-inline-interaction">
-          <div angular-html-bind="upcomingInlineInteractionHtml">
-          </div>
-        </div>
+      <div ng-if="upcomingInlineInteractionHtml"
+           class="conversation-skin-inline-interaction"
+           angular-html-bind="upcomingInlineInteractionHtml">
       </div>
     </div>
   </div>
@@ -86,7 +84,7 @@
             <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
                        ng-if="!isIframed"
                        focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
-                       ng-click="showNextCard()"
+                       ng-click="onClickContinueButton()"
                        translate="I18N_PLAYER_CONTINUE_BUTTON"
                        aria-label="Continue">
             </md-button>
@@ -106,7 +104,7 @@
           <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
         </div>
         <div ng-if="isViewportNarrow()">
-          <md-button class="instructions-button" ng-click="showSupplementalCard()">
+          <md-button class="instructions-button" ng-click="onDismiss()">
             <[interactionInstructions]>
           </md-button>
         </div>

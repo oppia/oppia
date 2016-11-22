@@ -20,7 +20,7 @@ oppia.directive('supplementalCard', [function() {
   return {
     restrict: 'E',
     scope: {
-      showNextCard: '&',
+      onClickContinueButton: '&',
       onSubmitAnswer: '&'
     },
     templateUrl: 'components/SupplementalCard',

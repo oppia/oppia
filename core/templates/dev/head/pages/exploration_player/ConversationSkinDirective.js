@@ -681,13 +681,11 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
           if (!$scope.isCurrentSupplementalCardNonempty()) {
             return $scope.isViewportNarrow();
           }
-          return $scope.isViewportNarrow() &&
-                 tutorCardIsDisplayedIfNarrow;
+          return $scope.isViewportNarrow() && tutorCardIsDisplayedIfNarrow;
         };
 
         $scope.isScreenNarrowAndShowingSupplementalCard = function() {
-          return $scope.isViewportNarrow() &&
-                 !tutorCardIsDisplayedIfNarrow;
+          return $scope.isViewportNarrow() && !tutorCardIsDisplayedIfNarrow;
         };
 
         $scope.showTutorCardIfScreenIsNarrow = function() {
