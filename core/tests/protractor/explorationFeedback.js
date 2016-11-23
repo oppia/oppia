@@ -24,6 +24,7 @@
 
 var general = require('../protractor_utils/general.js');
 var library = require('../protractor_utils/library.js');
+var player = require('../protractor_utils/player.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
@@ -48,27 +49,24 @@ describe('ExplorationFeedback', function() {
                                          EXPLORATION_CATEGORY,
                                          EXPLORATION_OBJECTIVE,
                                          EXPLORATION_LANGUAGE);
+    browser.get(general.SERVER_URL_PREFIX);
+    workflow.expectNoFeedbacks();
     users.logout();
 
     // Commenter plays the exploration and submits a feedback
     users.login('commenter@gmail.com');
     browser.get(general.LIBRARY_URL_SUFFIX);
     library.playExploration(EXPLORATION_TITLE);
-    element(by.css('.protractor-test-exploration-feedback-popup-link')).click();
-    element(by.css('.protractor-test-exploration-feedback-textarea')).
-      sendKeys(feedback);
-    element(by.css('.protractor-test-exploration-feedback-submit-btn')).click();
+    player.openFeedbackPopup();
+    player.submitFeedback(feedback);
     users.logout();
 
     // Creator reads the feedback and responds
     users.login('creator@gmail.com');
     browser.get(general.SERVER_URL_PREFIX);
-    element(by.css('.protractor-test-exploration-view-feedback-link')).click();
-    element(by.css('.protractor-test-oppia-feedback-tab-row')).click();
-    element(by.css('.protractor-test-feedback-response-textarea')).
-      sendKeys(feedbackResponse);
-    element(by.css('.protractor-test-oppia-feedback-response-send-btn')).
-      click();
+    var feedbackMessage = workflow.readFeedback();
+    expect(feedbackMessage).toEqual(feedback);
+    workflow.sendFeedbackResponse(feedbackResponse);
   });
 
   afterEach(function() {

@@ -58,19 +58,13 @@ var createAndPublishExploration = function(
     title, category, objective, language) {
   createExploration();
   editor.setContent(forms.toRichText('new exploration'));
-  editor.setInteraction('TextInput');
-  editor.setDefaultOutcome(null, 'final state', true);
+  editor.setInteraction('EndExploration');
   editor.setTitle(title);
   editor.setCategory(category);
   editor.setObjective(objective);
   if (language) {
     editor.setLanguage(language);
   }
-  editor.setInteraction('Continue');
-
-  // Setup a terminating state
-  editor.moveToState('final state');
-  editor.setInteraction('EndExploration');
   editor.saveChanges();
 
   publishExploration();
@@ -136,6 +130,30 @@ var getExplorationPlaytesters = function() {
   return _getExplorationRoles('viewer');
 };
 
+var expectNoFeedbacks = function() {
+  expect(element(by.css('.protractor-test-exploration-feedback-count')).
+    getText()).toEqual('0');
+};
+
+var readFeedback = function() {
+  var feedbackNotificationMessage = '(1 new)';
+  var feedbackViewLink =
+    element(by.css('.protractor-test-exploration-view-feedback-link'));
+
+  expect(feedbackViewLink.getText()).toEqual(feedbackNotificationMessage);
+  feedbackViewLink.click();
+  element(by.css('.protractor-test-oppia-feedback-tab-row')).click();
+
+  return element(by.css('.protractor-test-exploration-feedback')).getText();
+};
+
+var sendFeedbackResponse = function(feedbackResponse) {
+  element(by.css('.protractor-test-feedback-response-textarea')).
+    sendKeys(feedbackResponse);
+  element(by.css('.protractor-test-oppia-feedback-response-send-btn')).
+    click();
+};
+
 exports.createExploration = createExploration;
 exports.createExplorationAndStartTutorial = createExplorationAndStartTutorial;
 exports.publishExploration = publishExploration;
@@ -148,3 +166,7 @@ exports.addExplorationPlaytester = addExplorationPlaytester;
 exports.getExplorationManagers = getExplorationManagers;
 exports.getExplorationCollaborators = getExplorationCollaborators;
 exports.getExplorationPlaytesters = getExplorationPlaytesters;
+
+exports.expectNoFeedbacks = expectNoFeedbacks;
+exports.readFeedback = readFeedback;
+exports.sendFeedbackResponse = sendFeedbackResponse;
