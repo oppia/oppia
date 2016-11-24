@@ -59,7 +59,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
           };
 
           $scope.isCurrentAnswerValid = function() {
-            var asciiAnswer = Guppy.instances[guppyDivId].get_content('calc');
+            var asciiAnswer = Guppy.instances[guppyDivId].get_content('text');
 
             try {
               MathExpression.fromText(answer.ascii);
@@ -71,7 +71,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
           };
 
           $scope.submitAnswer = function() {
-            answer.ascii = Guppy.instances[guppyDivId].get_content('calc');
+            answer.ascii = Guppy.instances[guppyDivId].get_content('text');
             answer.latex = Guppy.instances[guppyDivId].get_content('latex');
 
             if (answer === undefined || answer === null ||
