@@ -3772,11 +3772,32 @@ md-card.preview-conversation-skin-supplemental-card {
   position: absolute;
 }
 
+.oppia-activity-summary-tile .tooltiptext {
+    visibility: hidden;
+    width:120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 4px;
+    padding: 5px 2px;
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+    bottom: -15%;
+    left: 50%;
+    margin-left: -60px;
+}
+
+.oppia-activity-summary-tile .objective:hover .tooltiptext {
+    visibility: visible;
+}
+
 .oppia-activity-summary-tile .objective {
   height: 60px;
   font-family: "Rubik", "Roboto", Arial, sans-serif;
   font-size: 0.85em;
   padding: 12px;
+  position:relative;
 }
 
 .oppia-activity-summary-tile .rating-disabled {
