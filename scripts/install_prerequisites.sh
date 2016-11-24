@@ -25,14 +25,10 @@
 #
 # Note that the root folder MUST be named 'oppia'.
 
-LOCK_FILE="./.lock"
-touch $LOCK_FILE
-
-function cleanup {
-  rm -rf $LOCK_FILE
-}
-
-trap cleanup EXIT
+if [ -e "/etc/is_vagrant_vm" ]
+then
+  source $(dirname $0)/vagrant_lockfile.sh || exit 1
+fi
 
 sudo apt-get update
 sudo apt-get install curl

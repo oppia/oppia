@@ -38,25 +38,9 @@ then
   exit 1
 fi
 
-LOCK_FILE="./.lock"
-
-function cleanup {
-  [ ! $NO_CLEAN ] && rm -rf $LOCK_FILE
-}
-
-trap cleanup EXIT
-
-if [ -e "$LOCK_FILE" ]
+if [ -e "/etc/is_vagrant_vm" ]
 then
-  echo ""
-  echo "  Another setup instance is already running "
-  echo ""
-  echo "  Please wait for that instance to complete or terminate it "
-  echo ""
-  NO_CLEAN=1
-  exit 1
-else
-  touch $LOCK_FILE
+  source $(dirname $0)/vagrant_lock.sh || exit 1
 fi
 
 set -e
