@@ -25,7 +25,7 @@ oppia.constant(
   'explorationTitleInputFocusLabel');
 
 oppia.controller('ExplorationEditor', [
-  '$scope', '$http', '$window', '$rootScope', '$log', '$timeout',
+  '$scope', '$http', '$window', '$modal', '$rootScope', '$log', '$timeout',
   'explorationData', 'editorContextService', 'explorationTitleService',
   'explorationCategoryService', 'explorationGadgetsService',
   'explorationObjectiveService', 'explorationLanguageCodeService',
@@ -34,10 +34,11 @@ oppia.controller('ExplorationEditor', [
   'routerService', 'graphDataService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
   'explorationWarningsService', '$templateCache', 'explorationContextService',
-  'explorationAdvancedFeaturesService', '$modal', 'changeListService',
-  'autosaveInfoModalsService', 'siteAnalyticsService',
+  'explorationAdvancedFeaturesService', 'changeListService',
+  'autosaveInfoModalsService', 'EditorModeService', 'siteAnalyticsService',
+  'SimpleEditorManagerService',
   function(
-      $scope, $http, $window, $rootScope, $log, $timeout,
+      $scope, $http, $window, $modal, $rootScope, $log, $timeout,
       explorationData, editorContextService, explorationTitleService,
       explorationCategoryService, explorationGadgetsService,
       explorationObjectiveService, explorationLanguageCodeService,
@@ -46,13 +47,16 @@ oppia.controller('ExplorationEditor', [
       routerService, graphDataService, stateEditorTutorialFirstTimeService,
       explorationParamSpecsService, explorationParamChangesService,
       explorationWarningsService, $templateCache, explorationContextService,
-      explorationAdvancedFeaturesService, $modal, changeListService,
-      autosaveInfoModalsService, siteAnalyticsService) {
+      explorationAdvancedFeaturesService, changeListService,
+      autosaveInfoModalsService, EditorModeService, siteAnalyticsService,
+      SimpleEditorManagerService) {
     $scope.editabilityService = editabilityService;
     $scope.editorContextService = editorContextService;
 
     $scope.areGadgetsEnabled = (
       explorationAdvancedFeaturesService.areGadgetsEnabled);
+    $scope.isEditorInSimpleMode = EditorModeService.isEditorInSimpleMode;
+    $scope.isEditorInFullMode = EditorModeService.isEditorInFullMode;
 
     /**********************************************************
      * Called on initial load of the exploration editor page.
@@ -174,8 +178,14 @@ oppia.controller('ExplorationEditor', [
           successCallback();
         }
 
-        stateEditorTutorialFirstTimeService.init(
-          data.show_state_editor_tutorial_on_load, $scope.explorationId);
+        // TODO(sll): Any time the main tab is switched to (e.g. if the creator
+        // goes to the settings tab and updates the title), a re-initialization
+        // should happen.
+        var simpleEditorInitSuccessful = SimpleEditorManagerService.tryToInit();
+        if (simpleEditorInitSuccessful) {
+          // TODO(sll): This should only fire once, on the initial page load.
+          EditorModeService.setModeToSimple();
+        }
       });
     };
 
