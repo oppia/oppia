@@ -1318,6 +1318,24 @@ var revertToVersion = function(version) {
   });
 };
 
+var readFeedbackMessages = function() {
+  element(by.css('.protractor-test-exploration-view-feedback-link')).
+    click();
+  var feedbackRowClassName = '.protractor-test-oppia-feedback-tab-row';
+  var feedbacks = element.all(by.css(feedbackRowClassName));
+
+  expect(feedbacks.count()).toEqual(1);
+  element(by.css(feedbackRowClassName)).click();
+  return element(by.css('.protractor-test-exploration-feedback')).getText();
+};
+
+var sendFeedbackResponse = function(feedbackResponse) {
+  element(by.css('.protractor-test-feedback-response-textarea')).
+    sendKeys(feedbackResponse);
+  element(by.css('.protractor-test-oppia-feedback-response-send-btn')).
+    click();
+};
+
 exports.exitTutorialIfNecessary = exitTutorialIfNecessary;
 exports.startTutorial = startTutorial;
 exports.progressInTutorial = progressInTutorial;
@@ -1392,3 +1410,6 @@ exports.expectCannotSaveChanges = expectCannotSaveChanges;
 exports.expectGraphComparisonOf = expectGraphComparisonOf;
 exports.expectTextComparisonOf = expectTextComparisonOf;
 exports.revertToVersion = revertToVersion;
+
+exports.readFeedbackMessages = readFeedbackMessages;
+exports.sendFeedbackResponse = sendFeedbackResponse;

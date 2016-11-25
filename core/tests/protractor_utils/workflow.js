@@ -130,28 +130,11 @@ var getExplorationPlaytesters = function() {
   return _getExplorationRoles('viewer');
 };
 
-var expectNoFeedbacks = function() {
-  expect(element(by.css('.protractor-test-exploration-feedback-count')).
-    getText()).toEqual('0');
-};
-
-var readFeedback = function() {
-  var feedbackNotificationMessage = '(1 new)';
-  var feedbackViewLink =
-    element(by.css('.protractor-test-exploration-view-feedback-link'));
-
-  expect(feedbackViewLink.getText()).toEqual(feedbackNotificationMessage);
-  feedbackViewLink.click();
-  element(by.css('.protractor-test-oppia-feedback-tab-row')).click();
-
-  return element(by.css('.protractor-test-exploration-feedback')).getText();
-};
-
-var sendFeedbackResponse = function(feedbackResponse) {
-  element(by.css('.protractor-test-feedback-response-textarea')).
-    sendKeys(feedbackResponse);
-  element(by.css('.protractor-test-oppia-feedback-response-send-btn')).
-    click();
+var getNumberOfFeedbackMessages = function() {
+  return element(by.css('.protractor-test-exploration-feedback-count')).
+    getText().then(function(text) {
+      return parseInt(text);
+    });
 };
 
 exports.createExploration = createExploration;
@@ -167,6 +150,4 @@ exports.getExplorationManagers = getExplorationManagers;
 exports.getExplorationCollaborators = getExplorationCollaborators;
 exports.getExplorationPlaytesters = getExplorationPlaytesters;
 
-exports.expectNoFeedbacks = expectNoFeedbacks;
-exports.readFeedback = readFeedback;
-exports.sendFeedbackResponse = sendFeedbackResponse;
+exports.getNumberOfFeedbackMessages = getNumberOfFeedbackMessages;

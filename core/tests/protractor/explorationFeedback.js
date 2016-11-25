@@ -18,10 +18,12 @@
  * User 1 creates and publishes an exploration.
  * User 2 plays the exploration and leaves feedback on it
  * User 1 reads the feedback and responds to it.
- * Can't test what happens after that because User 2 can only
- * find the response through an email
+ * Note: In production, after this sequence of events, the only notification
+ * User 2 will receive is via email, and we can't easily test this
+ * in an e2e test.
  */
 
+var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var library = require('../protractor_utils/library.js');
 var player = require('../protractor_utils/player.js');
@@ -36,7 +38,7 @@ describe('ExplorationFeedback', function() {
 
   beforeEach(function() {
     users.createUser('creator@gmail.com', 'creator');
-    users.createUser('commenter@gmail.com', 'commenter');
+    users.createUser('learner@gmail.com', 'learner');
   });
 
   it('adds feedback to an exploration', function() {
@@ -50,11 +52,12 @@ describe('ExplorationFeedback', function() {
                                          EXPLORATION_OBJECTIVE,
                                          EXPLORATION_LANGUAGE);
     browser.get(general.SERVER_URL_PREFIX);
-    workflow.expectNoFeedbacks();
+    var numberOfFeedbackMessages = workflow.getNumberOfFeedbackMessages();
+    expect(numberOfFeedbackMessages).toEqual(0);
     users.logout();
 
-    // Commenter plays the exploration and submits a feedback
-    users.login('commenter@gmail.com');
+    // Learner plays the exploration and submits a feedback
+    users.login('learner@gmail.com');
     browser.get(general.LIBRARY_URL_SUFFIX);
     library.playExploration(EXPLORATION_TITLE);
     player.openFeedbackPopup();
@@ -64,9 +67,11 @@ describe('ExplorationFeedback', function() {
     // Creator reads the feedback and responds
     users.login('creator@gmail.com');
     browser.get(general.SERVER_URL_PREFIX);
-    var feedbackMessage = workflow.readFeedback();
+    numberOfFeedbackMessages = workflow.getNumberOfFeedbackMessages();
+    expect(numberOfFeedbackMessages).toEqual(1);
+    var feedbackMessage = editor.readFeedbackMessages();
     expect(feedbackMessage).toEqual(feedback);
-    workflow.sendFeedbackResponse(feedbackResponse);
+    editor.sendFeedbackResponse(feedbackResponse);
   });
 
   afterEach(function() {
