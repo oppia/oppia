@@ -1065,7 +1065,9 @@ var discardChanges = function() {
   element(by.css('.protractor-test-save-discard-toggle')).click();
   element(by.css('.protractor-test-discard-changes')).click();
   general.acceptAlert();
+  var availableElement = by.css('oppia-loading-modal-body');
   general.waitForSystem();
+  browser.waitForAngular();
 };
 
 var expectCannotSaveChanges = function() {
