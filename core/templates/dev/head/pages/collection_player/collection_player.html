@@ -14,7 +14,7 @@
 
     <style>
       html, body {
-        background: #afd2eb no-repeat center center fixed;
+        background: #eeeeee no-repeat center center fixed;
         background-size: cover;
       }
     </style>
@@ -46,6 +46,7 @@
 
 {% block content %}
   <div ng-controller="CollectionPlayer">
+    <background-banner></background-banner>
     <div ng-if="collection" class="oppia-collection-player-tiles-container">
       <h2 ng-if="!collectionPlaythrough.hasFinishedCollection()" class="oppia-page-heading">
         <span ng-if="!collectionPlaythrough.hasStartedCollection()">Begin <[collection.getTitle()]>:</span>
