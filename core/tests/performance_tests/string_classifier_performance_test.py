@@ -12,7 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Performance tests for string classifier."""
+"""Performance tests for string classifier.
+
+Run this script from the Oppia root directory:
+
+    export PYTHONPATH=$PYTHONPATH:.
+    python core/tests/performance_tests/string_classifier_performance_test.py
+
+"""
 
 import os
 import time
