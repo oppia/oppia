@@ -531,9 +531,11 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     $scope.isExplorationLockedForEditing = function() {
       return changeListService.isExplorationLockedForEditing();
     };
+
     $scope.isEditableOutsideTutorialMode = function() {
       return editabilityService.isEditableOutsideTutorialMode();
     };
+
     $scope.countWarnings = function() {
       return explorationWarningsService.countWarnings();
     };
@@ -548,10 +550,6 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
     $scope.isExplorationSaveable = function() {
       return explorationSaveService.isExplorationSaveable();
-    };
-
-    $scope.isPublic = function() {
-      return explorationRightsService.isPublic();
     };
 
     $scope.isPublishModalOpening = function() {
@@ -572,10 +570,6 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
     $scope.isSaveModalOpening = function() {
       return explorationSaveService.isSaveModalOpening();
-    };
-
-    $scope.diffData = function() {
-      return explorationSaveService.getDiffData();
     };
 
     $scope.saveChanges = function() {

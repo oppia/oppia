@@ -47,7 +47,7 @@ oppia.factory('explorationSaveService', [
     var saveModalIsOpening = false;
     // This flag is used to ensure only one save exploration modal can be open
     // at any one time.
-    var _modalIsOpen = false;
+    var modalIsOpen = false;
 
     var diffData;
 
@@ -438,7 +438,7 @@ oppia.factory('explorationSaveService', [
           alertsService.clearWarnings();
 
           // If the modal is open, do not open another one.
-          if (_modalIsOpen) {
+          if (modalIsOpen) {
             return;
           }
 
@@ -487,7 +487,7 @@ oppia.factory('explorationSaveService', [
           });
 
           // Modal is Opened
-          _modalIsOpen = true;
+          modalIsOpen = true;
           saveModalIsOpening = false;
 
           modalInstance.opened.then(function() {
@@ -499,10 +499,10 @@ oppia.factory('explorationSaveService', [
           });
 
           modalInstance.result.then(function(commitMessage) {
-            _modalIsOpen = false;
+            modalIsOpen = false;
             saveDraftToBackend(commitMessage);
           }, function() {
-            _modalIsOpen = false;
+            modalIsOpen = false;
           });
         });
       }
