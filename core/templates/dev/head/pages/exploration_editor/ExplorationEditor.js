@@ -566,10 +566,9 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
           backdrop: 'static',
           keyboard: false,
           controller: ['$scope','$modalInstance',function($scope,$modalInstance){
-          		$scope.isDiscardInProgress = $higherScope.reloadIt;
           		$timeout(function() {
             		$modalInstance.dismiss('cancel');
-        		}, 4000);
+        		}, 500);
           	}
           ],
           windowClass: 'oppia-loading-modal'
