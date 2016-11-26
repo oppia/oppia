@@ -3621,14 +3621,21 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-dashboard-container a,
-.oppia-dashboard-container a:hover,
 .oppia-dashboard-container a:active,
 .oppia-dashboard-container a:visited {
-  color: #009688;
+  color: black;
 }
 
 .oppia-dashboard-container a:hover {
+    color: #009688;
     text-decoration: underline;
+}
+
+.oppia-dashboard-container .oppia-dashboard-feedback,
+.oppia-dashboard-container .oppia-dashboard-feedback:hover,
+.oppia-dashboard-container .oppia-dashboard-feedback:active,
+.oppia-dashboard-container .oppia-dashboard-feedback:visited {
+  color: #009688;
 }
 
 .oppia-dashboard-container .oppia-dashboard-list-summary,
