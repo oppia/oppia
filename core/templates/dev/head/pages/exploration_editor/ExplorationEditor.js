@@ -558,18 +558,19 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         'Are you sure you want to discard your changes?');
 
       if (confirmDiscard) {
-      	alertsService.clearWarnings();
+        alertsService.clearWarnings();
         $rootScope.$broadcast('externalSave');
         $scope.isDiscardInProgress = true;
         $modal.open({
           templateUrl: 'modals/reloadingEditor',
           backdrop: 'static',
           keyboard: false,
-          controller: ['$scope','$modalInstance',function($scope,$modalInstance){
-          		$timeout(function() {
-            		$modalInstance.dismiss('cancel');
-        		}, 500);
-          	}
+          controller: [
+            '$scope', '$modalInstance', function($scope, $modalInstance) {
+              $timeout(function() {
+                $modalInstance.dismiss('cancel');
+              }, 4000);
+            }
           ],
           windowClass: 'oppia-loading-modal'
         });
