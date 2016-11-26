@@ -25,10 +25,10 @@
         <div class="conversation-skin-main-tutor-card-embed"
              ng-show="!isViewportNarrow() || isScreenNarrowAndShowingTutorCard()"
              ng-class="{ 'conversation-skin-animate-tutor-card-on-narrow': isViewportNarrow() && isCurrentSupplementalCardNonempty()}">
-          <tutor-card show-next-card="showUpcomingCard()"
-                      show-supplemental-card="showSupplementalCardIfScreenIsNarrow()"
-                      start-card-change-animation="startCardChangeAnimation"
-                      on-submit-answer="submitAnswer(answer, rulesService)">
+          <tutor-card on-click-continue-button="showUpcomingCard()"
+                      on-submit-answer="submitAnswer(answer, rulesService)"
+                      on-dismiss="showSupplementalCardIfScreenIsNarrow()"
+                      start-card-change-animation="startCardChangeAnimation">
           </tutor-card>
         </div>
 
@@ -39,7 +39,7 @@
                ng-src="<[::OPPIA_AVATAR_IMAGE_URL]>"
                ng-click="showTutorCardIfScreenIsNarrow()" alt="">
           <div ng-if="isScreenNarrowAndShowingTutorCard()" class="supplemental-mask"></div>
-          <supplemental-card show-next-card="showUpcomingCard()"
+          <supplemental-card on-click-continue-button="showUpcomingCard()"
                              on-submit-answer="submitAnswer(answer, rulesService)">
           </supplemental-card>
         </div>

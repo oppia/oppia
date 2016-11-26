@@ -63,13 +63,9 @@ def get_human_readable_contributors_summary(contributors_summary):
     contributor_ids = contributors_summary.keys()
     contributor_usernames = user_services.get_human_readable_user_ids(
         contributor_ids)
-    contributor_profile_pictures = (
-        user_services.get_profile_pictures_by_user_ids(contributor_ids))
     return {
         contributor_usernames[ind]: {
             'num_commits': contributors_summary[contributor_ids[ind]],
-            'profile_picture_data_url': contributor_profile_pictures[
-                contributor_ids[ind]]
         }
         for ind in xrange(len(contributor_ids))
     }
