@@ -58,9 +58,9 @@ class StringClassifierBenchmarker(object):
     """Benchmark for string classifier.
 
     Usage:
-        benchmark = StringClassifierBenchmark()
-        benchmark.benchmark_on_train()
-        benchmark.benchmark_on_predict()
+        benchmark = StringClassifierBenchmarker()
+        benchmark.generate_training_benchmarks()
+        benchmark.generate_prediction_benchmarks()
 
     Attributes:
         examples: list of two-element lists. An item represents a sample
@@ -78,7 +78,8 @@ class StringClassifierBenchmarker(object):
         with open(yaml_path, 'r') as yaml_file:
             yaml_dict = yaml.load(yaml_file)
             interactions = yaml_dict['states']['Home']['interaction']
-            #the first element contains no training data, so only consider [1:]
+            # The first element contains no training data,
+            # so only consider [1:].
             for answer_group in interactions['answer_groups'][1:]:
                 label = answer_group['outcome']['feedback'][0]
                 for rule in answer_group['rule_specs']:
@@ -108,7 +109,7 @@ class StringClassifierBenchmarker(object):
 
     def generate_training_benchmarks(self):
         """Conduct benchmarking on model training at a pace of adding
-        100 samples each time
+        100 samples each time.
         """
         for num in xrange(100, len(self.examples), 100):
             self.train(num)
@@ -131,7 +132,7 @@ class StringClassifierBenchmarker(object):
 
     def generate_prediction_benchmarks(self):
         """Conduct benchmarking on predicting with self.classifier
-        at a pace of adding 100 samples each time
+        at a pace of adding 100 samples each time.
         """
         self.classifier_model_dict = self.train(len(self.examples))
         for num in xrange(100, len(self.docs_to_classify), 100):
