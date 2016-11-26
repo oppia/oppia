@@ -138,6 +138,6 @@ class StringClassifierBenchmarker(object):
 
 
 if __name__ == '__main__':
-    benchmark = StringClassifierBenchmarker()
+    benchmark = StringClassifierBenchmarker() #pylint: disable=invalid-name
     benchmark.benchmark_on_train()
     benchmark.benchmark_on_predict()
