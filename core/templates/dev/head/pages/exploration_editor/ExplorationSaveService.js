@@ -35,7 +35,7 @@ oppia.factory('explorationSaveService', [
       explorationInitStateNameService, routerService,
       focusService, changeListService, siteAnalyticsService) {
     // Whether or not a save action is currently in progress.
-    var isSaveInProgress = false;
+    var saveIsInProgress = false;
     // Whether or not a discard action is currently in progress.
     var discardInPrograss = false;
 
@@ -147,7 +147,7 @@ oppia.factory('explorationSaveService', [
         siteAnalyticsService.registerSavePlayableExplorationEvent(
           explorationData.explorationId);
       }
-      isSaveInProgress = true;
+      saveIsInProgress = true;
 
       explorationData.save(
         changeList, commitMessage,
@@ -165,12 +165,12 @@ oppia.factory('explorationSaveService', [
             forceRefresh: true
           });
           alertsService.addSuccessMessage('Changes saved.');
-          isSaveInProgress = false;
+          saveIsInProgress = false;
           if (successCallback) {
             successCallback();
           }
         }, function() {
-          isSaveInProgress = false;
+          saveIsInProgress = false;
         }
       );
     };
@@ -180,8 +180,8 @@ oppia.factory('explorationSaveService', [
         return saveModalIsOpening;
       },
 
-      isSaveInProgress: function() {
-        return isSaveInProgress;
+      saveIsInProgress: function() {
+        return saveIsInProgress;
       },
 
       isPublishModalOpening: function() {
@@ -191,7 +191,7 @@ oppia.factory('explorationSaveService', [
       isExplorationSaveable: function() {
         return (
           changeListService.isExplorationLockedForEditing() &&
-          !isSaveInProgress && (
+          !saveIsInProgress && (
             (explorationRightsService.isPrivate() &&
               !explorationWarningsService.hasCriticalWarnings()) ||
             (!explorationRightsService.isPrivate() &&
@@ -399,7 +399,7 @@ oppia.factory('explorationSaveService', [
 
       saveChanges: function() {
         // This is returned after modal is closed, so we can change
-        // controller 'isSaveInProgress' back to false.
+        // controller 'saveIsInProgress' back to false.
         var deferred = $q.defer();
 
         saveModalIsOpening = true;
