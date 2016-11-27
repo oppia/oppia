@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Functionality for the create exploration button and upload
- * modal.
+ * @fileoverview Service for exploration saving & publificiation functionality.
  */
 
 oppia.factory('explorationSaveService', [
