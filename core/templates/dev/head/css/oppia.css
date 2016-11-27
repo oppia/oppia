@@ -1182,13 +1182,15 @@ textarea {
   width: 200px;
 }
 
-.oppia-dashboard-tabs-active .oppia-dashboard-tabs-text {
+.oppia-dashboard-tabs-active .oppia-dashboard-tabs-text,
+.oppia-dashboard-tabs-active .oppia-dashboard-tabs-text:hover {
   border-bottom: 4px solid #009688;
   color: #009688;
   margin-left: 7.5px;
 }
 
-.oppia-dashboard-tabs .oppia-dashboard-tabs-text {
+.oppia-dashboard-tabs .oppia-dashboard-tabs-text,
+.oppia-dashboard-tabs .oppia-dashboard-tabs-text:hover {
   color: #009688;
   font-size: 1em;
   padding: 10px;
@@ -3624,11 +3626,18 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-dashboard-container a:hover,
 .oppia-dashboard-container a:active,
 .oppia-dashboard-container a:visited {
-  color: #009688;
+  color: black;
 }
 
 .oppia-dashboard-container a:hover {
     text-decoration: underline;
+}
+
+.oppia-dashboard-container .oppia-highlighted-link,
+.oppia-dashboard-container .oppia-highlighted-link:hover,
+.oppia-dashboard-container .oppia-highlighted-link:active,
+.oppia-dashboard-container .oppia-highlighted-link:visited {
+  color: #009688;
 }
 
 .oppia-dashboard-container .oppia-dashboard-list-summary,
