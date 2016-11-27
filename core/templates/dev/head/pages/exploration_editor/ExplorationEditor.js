@@ -569,7 +569,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
             '$scope', '$modalInstance', function($scope, $modalInstance) {
               $timeout(function() {
                 $modalInstance.dismiss('cancel');
-              }, 4000);
+              }, 2500);
             }
           ],
           windowClass: 'oppia-loading-modal'
