@@ -1,11 +1,9 @@
 oppia.controller('ExplorationSaveAndPublishButtons', [
-  '$scope', '$http', '$rootScope', '$window',
-  'changeListService', 'editabilityService',
+  '$scope', 'changeListService', 'editabilityService',
   'explorationRightsService', 'explorationWarningsService',
   'explorationSaveService',
   function(
-      $scope, $http, $rootScope, $window,
-      changeListService, editabilityService,
+      $scope, changeListService, editabilityService,
       explorationRightsService, explorationWarningsService,
       explorationSaveService) {
     $scope.isSaveInProgress = false;
