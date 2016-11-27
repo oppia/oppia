@@ -1067,6 +1067,7 @@ var discardChanges = function() {
   element(by.css('.protractor-test-discard-changes')).click();
   general.acceptAlert();
   general.waitForSystem();
+  browser.waitForAngular();
 };
 
 var expectCannotSaveChanges = function() {
