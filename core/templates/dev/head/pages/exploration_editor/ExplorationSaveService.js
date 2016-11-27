@@ -60,7 +60,7 @@ oppia.factory('explorationSaveService', [
         explorationTagsService.savedMemento.length === 0);
     };
 
-    var requiredFieldsFilled = function() {
+    var areRequiredFieldsFilled = function() {
       if (!explorationTitleService.displayed) {
         alertsService.addWarning('Please specify a title');
         return false;
