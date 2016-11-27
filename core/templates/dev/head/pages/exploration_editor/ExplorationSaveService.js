@@ -17,7 +17,7 @@
  */
 
 oppia.factory('explorationSaveService', [
-  '$http', '$modal', '$timeout', '$rootScope', '$window', '$log', '$q',
+  '$modal', '$timeout', '$rootScope', '$log', '$q',
   'alertsService', 'explorationData', 'explorationStatesService',
   'explorationTagsService', 'explorationTitleService',
   'explorationObjectiveService', 'explorationCategoryService',
@@ -26,7 +26,7 @@ oppia.factory('explorationSaveService', [
   'explorationInitStateNameService', 'routerService',
   'focusService', 'changeListService', 'siteAnalyticsService',
   function(
-      $http, $modal, $timeout, $rootScope, $window, $log, $q,
+      $modal, $timeout, $rootScope, $log, $q,
       alertsService, explorationData, explorationStatesService,
       explorationTagsService, explorationTitleService,
       explorationObjectiveService, explorationCategoryService,
