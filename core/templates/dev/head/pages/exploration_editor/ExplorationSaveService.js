@@ -39,7 +39,7 @@ oppia.factory('explorationSaveService', [
     // Whether or not a discard action is currently in progress.
     var discardInPrograss = false;
 
-    var publishModalOpening = false;
+    var publishModalIsOpening = false;
 
     // This flag is used to change text of save button to "Loading..." to
     // add indication for user that something is happening.
@@ -101,7 +101,7 @@ oppia.factory('explorationSaveService', [
     };
 
     var openPublishExplorationModal = function() {
-      publishModalOpening = true;
+      publishModalIsOpening = true;
 
       var publishModalInstance = $modal.open({
         templateUrl: 'modals/publishExploration',
@@ -128,7 +128,7 @@ oppia.factory('explorationSaveService', [
       });
 
       publishModalInstance.opened.then(function() {
-        publishModalOpening = false;
+        publishModalIsOpening = false;
       });
     };
 
@@ -184,8 +184,8 @@ oppia.factory('explorationSaveService', [
         return saveIsInProgress;
       },
 
-      isPublishModalOpening: function() {
-        return publishModalOpening;
+      publishModalIsOpening: function() {
+        return publishModalIsOpening;
       },
 
       isExplorationSaveable: function() {
