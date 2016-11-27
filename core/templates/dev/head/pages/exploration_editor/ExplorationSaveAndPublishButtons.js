@@ -1,4 +1,3 @@
-
 oppia.controller('ExplorationSaveAndPublishButtons', [
   '$scope', '$http', '$rootScope', '$window',
   'changeListService', 'editabilityService',
