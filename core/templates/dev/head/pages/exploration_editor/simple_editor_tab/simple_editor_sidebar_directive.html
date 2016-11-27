@@ -23,7 +23,9 @@
       </li>
     </ul>
 
-    <span class="full-editor-switch" ng-click="setEditorModeToFull()">Use Advanced Editor</span>
+    <button type="button" class="btn btn-default full-editor-btn" ng-click="setEditorModeToFull()">
+      Use Advanced Editor
+    </button>
   </div>
 </script>
 
@@ -63,23 +65,22 @@
     margin-left: 25px;
   }
   simple-editor-sidebar .sidebar {
-    padding-bottom: 80px;
+    padding-bottom: 85px;
   }
-  simple-editor-sidebar .full-editor-switch {
-    font-size: 1.0em;
+  simple-editor-sidebar .full-editor-btn {
     background-color: #f3fbf1;
     bottom: 0;
+    margin-bottom: 8px;
     position: fixed;
-    padding-top: 5px;
   }
-  ::-webkit-scrollbar {
+  simple-editor-sidebar::-webkit-scrollbar {
     width: 8px;
   }
-  ::-webkit-scrollbar-track {
+  simple-editor-sidebar::-webkit-scrollbar-track {
     background-color: rgba(0,0,0,.1);
   }
-  ::-webkit-scrollbar-thumb {
-    border-radius: 5px;
+  simple-editor-sidebar::-webkit-scrollbar-thumb {
     background-color: rgba(0,150,136,.8);
+    border-radius: 5px;
   }
 </style>
