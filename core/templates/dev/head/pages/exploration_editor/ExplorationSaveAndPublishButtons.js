@@ -54,8 +54,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       return explorationSaveService.isExplorationSaveable();
     };
 
-    $scope.isPublishModalOpening = function() {
-      return explorationSaveService.isPublishModalOpening();
+    $scope.publishModalIsOpening = function() {
+      return explorationSaveService.publishModalIsOpening();
     };
 
     $scope.showPublishExplorationModal = function() {
