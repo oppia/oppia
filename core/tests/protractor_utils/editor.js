@@ -77,6 +77,7 @@ var finishTutorial = function() {
 
 var navigateToMainTab = function() {
   element(by.css('.protractor-test-main-tab')).click();
+  general.waitForSystem();
   // Click a neutral element in order to dismiss any warnings.
   element(by.css('.protractor-test-neutral-element')).click();
 };
