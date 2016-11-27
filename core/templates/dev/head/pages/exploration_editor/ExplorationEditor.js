@@ -520,9 +520,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       changeListService, editabilityService,
       explorationRightsService, explorationWarningsService,
       explorationSaveService) {
-    $scope.isSaveInProgress = function() {
-      return explorationSaveService.isSaveInProgress();
-    };
+
+    $scope.isSaveInProgress = false;
 
     $scope.isPrivate = function() {
       return explorationRightsService.isPrivate();
@@ -573,7 +572,11 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     };
 
     $scope.saveChanges = function() {
-      return explorationSaveService.saveChanges();
+      $scope.isSaveInProgress = true;
+
+      explorationSaveService.saveChanges().then(function() {
+        $scope.isSaveInProgress = false;
+      });
     };
   }
 ]);

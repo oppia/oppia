@@ -18,7 +18,7 @@
  */
 
 oppia.factory('explorationSaveService', [
-  '$http', '$modal', '$timeout', '$rootScope', '$window', '$log',
+  '$http', '$modal', '$timeout', '$rootScope', '$window', '$log', '$q',
   'alertsService', 'explorationData', 'explorationStatesService',
   'explorationTagsService', 'explorationTitleService',
   'explorationObjectiveService', 'explorationCategoryService',
@@ -27,7 +27,7 @@ oppia.factory('explorationSaveService', [
   'explorationInitStateNameService', 'routerService',
   'focusService', 'changeListService', 'siteAnalyticsService',
   function(
-      $http, $modal, $timeout, $rootScope, $window, $log,
+      $http, $modal, $timeout, $rootScope, $window, $log, $q,
       alertsService, explorationData, explorationStatesService,
       explorationTagsService, explorationTitleService,
       explorationObjectiveService, explorationCategoryService,
@@ -36,7 +36,7 @@ oppia.factory('explorationSaveService', [
       explorationInitStateNameService, routerService,
       focusService, changeListService, siteAnalyticsService) {
     // Whether or not a save action is currently in progress.
-    var saveInProgress = false;
+    var isSaveInProgress = false;
     // Whether or not a discard action is currently in progress.
     var discardInPrograss = false;
 
@@ -148,7 +148,7 @@ oppia.factory('explorationSaveService', [
         siteAnalyticsService.registerSavePlayableExplorationEvent(
           explorationData.explorationId);
       }
-      saveInProgress = true;
+      isSaveInProgress = true;
 
       explorationData.save(
         changeList, commitMessage,
@@ -166,12 +166,12 @@ oppia.factory('explorationSaveService', [
             forceRefresh: true
           });
           alertsService.addSuccessMessage('Changes saved.');
-          saveInProgress = false;
+          isSaveInProgress = false;
           if (successCallback) {
             successCallback();
           }
         }, function() {
-          saveInProgress = false;
+          isSaveInProgress = false;
         }
       );
     };
@@ -182,7 +182,7 @@ oppia.factory('explorationSaveService', [
       },
 
       isSaveInProgress: function() {
-        return saveInProgress;
+        return isSaveInProgress;
       },
 
       isPublishModalOpening: function() {
@@ -192,7 +192,7 @@ oppia.factory('explorationSaveService', [
       isExplorationSaveable: function() {
         return (
           changeListService.isExplorationLockedForEditing() &&
-          !saveInProgress && (
+          !isSaveInProgress && (
             (explorationRightsService.isPrivate() &&
               !explorationWarningsService.hasCriticalWarnings()) ||
             (!explorationRightsService.isPrivate() &&
@@ -399,8 +399,10 @@ oppia.factory('explorationSaveService', [
       },
 
       saveChanges: function() {
-        // This flag is used to change text of save button to "Loading..." to
-        // add indication for user that something is happening.
+        // This is returned after modal is closed, so we can change
+        // controller 'isSaveInProgress' back to false.
+        var deferred = $q.defer();
+
         saveModalIsOpening = true;
 
         routerService.savePendingChanges();
@@ -501,10 +503,13 @@ oppia.factory('explorationSaveService', [
           modalInstance.result.then(function(commitMessage) {
             modalIsOpen = false;
             saveDraftToBackend(commitMessage);
+            deferred.resolve();
           }, function() {
             modalIsOpen = false;
+            deferred.resolve();
           });
         });
+        return deferred.promise;
       }
     };
   }
