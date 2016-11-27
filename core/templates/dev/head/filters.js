@@ -382,12 +382,18 @@ oppia.filter('removeDuplicatesInArray', [function() {
 
 oppia.filter('stripFormatting', [function() {
   return function(html, whitelistedImgClasses) {
+    // Oppia RTE adds style attribute to bold and italics tags that
+    // must be removed.
+    var styleRegex = new RegExp(' style=\"[^\"]+\"', 'gm');
     // Strip out anything between and including <>,
-    // unless it is an img whose class includes one of the whitelisted classes.
-    var regex = new RegExp(
+    // unless it is an img whose class includes one of the whitelisted classes
+    // or is the bold or italics tags.
+    var tagRegex = new RegExp(
       '(?!<img.*class=".*(' + whitelistedImgClasses.join('|') +
-      ').*>)<[^>]+>', 'gm');
-    var strippedText = html ? String(html).replace(regex, '') : '';
+      ').*".*>)(?!<b>|<\/b>|<i>|<\/i>)<[^>]+>', 'gm');
+    var strippedText = html ? String(html).replace(styleRegex, '') : '';
+    strippedText = strippedText ? String(strippedText).replace(
+      tagRegex, '') : '';
     return strippedText;
   };
 }]);

@@ -112,7 +112,8 @@ def _validate_customization_args_and_values(
     validation.
 
     Note that this may modify the given customization_args dict, if it has
-    extra or missing keys.
+    extra or missing keys. It also normalizes any HTML in the
+    customization_args dict.
     """
     ca_spec_names = [
         ca_spec.name for ca_spec in ca_specs_to_validate_against]
@@ -145,9 +146,10 @@ def _validate_customization_args_and_values(
     # Check that each value has the correct type.
     for ca_spec in ca_specs_to_validate_against:
         try:
-            schema_utils.normalize_against_schema(
-                customization_args[ca_spec.name]['value'],
-                ca_spec.schema)
+            customization_args[ca_spec.name]['value'] = (
+                schema_utils.normalize_against_schema(
+                    customization_args[ca_spec.name]['value'],
+                    ca_spec.schema))
         except Exception:
             # TODO(sll): Raise an actual exception here if parameters are not
             # involved. (If they are, can we get sample values for the state

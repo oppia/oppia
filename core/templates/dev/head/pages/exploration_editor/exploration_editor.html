@@ -363,6 +363,8 @@
   {% include 'components/rule_editor_directive.html' %}
   {% include 'components/version_diff_visualization_directive.html' %}
 
+  {% include 'pages/exploration_player/tutor_card_directive.html' %}
+  {% include 'pages/exploration_player/supplemental_card_directive.html' %}
   {% include 'pages/exploration_editor/help_modal_directive.html' %}
   {% include 'pages/exploration_editor/exploration_save_modal_directive.html' %}
   {% include 'pages/exploration_editor/exploration_metadata_modal_directive.html' %}
@@ -475,6 +477,10 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StateObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/StopwatchObjectFactory.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/TutorCardDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/SupplementalCardDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationPlayerStateService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerConstants.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerClassificationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerFeedbackPairDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ConversationSkinDirective.js"></script>

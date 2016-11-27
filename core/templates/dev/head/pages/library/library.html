@@ -104,12 +104,12 @@
 
             <!-- TODO(sll): Add card at end of the row that, when clicked, does showFullResultsPage(group.categories)" -->
             <div ng-if="!libraryWindowIsNarrow">
-              <md-button class="md-no-ink oppia-library-carousel-scroll-btn"
+              <md-button class="md-no-ink oppia-library-carousel-scroller"
                          ng-click="scroll($index, true)"
                          ng-hide="leftmostCardIndices[$index] == 0">
                 <i class="material-icons">&#xE314;</i>
               </md-button>
-              <div class="oppia-library-carousel-scroll-btn" ng-if="leftmostCardIndices[$index] == 0"></div>
+              <div class="oppia-library-carousel-scroller" ng-if="leftmostCardIndices[$index] == 0"></div>
 
               <div class="oppia-library-carousel"
                    ng-swipe-right="scroll($index, true)"
@@ -144,22 +144,22 @@
                 <div class="oppia-library-carousel-overlay-right"></div>
               </div>
 
-              <md-button class="md-no-ink oppia-library-carousel-scroll-btn"
+              <md-button class="md-no-ink oppia-library-carousel-scroller"
                          ng-click="scroll($index, false)"
                          ng-hide="(group.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[$index]">
                 <i class="material-icons">&#xE315;</i>
               </md-button>
-              <div class="oppia-library-carousel-scroll-btn"
+              <div class="oppia-library-carousel-scroller"
                    ng-if="(group.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[$index]"></div>
             </div>
 
             <div ng-if="libraryWindowIsNarrow && leftmostCardIndices">
-              <md-button class="md-no-ink oppia-library-carousel-scroll-btn"
+              <md-button class="md-no-ink oppia-library-carousel-scroller"
                          ng-click="decrementLeftmostCardIndex($index)"
                          ng-hide="leftmostCardIndices[$index] == 0">
                 <i class="material-icons">&#xE314;</i>
               </md-button>
-              <div class="oppia-library-carousel-scroll-btn" ng-if="leftmostCardIndices[$index] == 0"></div>
+              <div class="oppia-library-carousel-scroller" ng-if="leftmostCardIndices[$index] == 0"></div>
 
               <div class="oppia-library-carousel">
                 <div class="oppia-library-carousel-tiles">
@@ -188,12 +188,12 @@
                 </div>
               </div>
 
-              <md-button class="md-no-ink oppia-library-carousel-scroll-btn"
+              <md-button class="md-no-ink oppia-library-carousel-scroller"
                          ng-click="incrementLeftmostCardIndex($index)"
                          ng-hide="(group.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[$index]">
                 <i class="material-icons">&#xE315;</i>
               </md-button>
-              <div class="oppia-library-carousel-scroll-btn"
+              <div class="oppia-library-carousel-scroller"
                    ng-if="(group.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[$index]">
               </div>
             </div>
