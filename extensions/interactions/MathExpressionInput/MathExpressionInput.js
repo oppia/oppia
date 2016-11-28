@@ -32,7 +32,13 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
         '$scope', '$attrs', '$timeout', '$element', 'LABEL_FOR_CLEARING_FOCUS',
         function($scope, $attrs, $timeout, $element, LABEL_FOR_CLEARING_FOCUS) {
           var guppyDivElt = $element[0].querySelector('.guppy-div');
-          var guppyInstance = new Guppy(guppyDivElt, {});
+          var guppyInstance = new Guppy(guppyDivElt, {
+            ready_callback: function() {
+              Guppy.get_symbols(
+                GLOBALS.ASSET_DIR_PREFIX +
+                '/assets/overrides/guppy/oppia_symbols.json');
+            }
+          });
           var guppyDivId = guppyInstance.editor.id;
 
           var labelForFocusTarget = $attrs.labelForFocusTarget || null;
