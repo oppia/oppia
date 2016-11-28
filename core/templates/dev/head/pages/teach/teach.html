@@ -24,6 +24,10 @@
 {% endblock navbar_breadcrumb %}
 
 {% block content %}
+  <div class="oppia-about-header">
+    <h1 style="position: absolute; z-index: 1;">Teach with Oppia</h1>
+  </div>
+  <background-banner position-style="relative"></background-banner>
   <div ng-controller="Teach">
     <div class="oppia-page-card oppia-about-content">
       <div class="about-nav md-tab oppia-about-teach-tabs">
@@ -45,10 +49,6 @@
         <div class="teach oppia-about-tab-content oppia-about-visible-content">
 
           <div class="oppia-about-card-content-wide oppia-about-card-content-narrow">
-            <h2>
-              Teach with Oppia
-            </h2>
-
             <div style="text-align: center; width: 100%;">
               <em>We'll help you improve and promote your lessons, for free.</em>
             </div>

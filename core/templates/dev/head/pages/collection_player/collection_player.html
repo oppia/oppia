@@ -44,7 +44,7 @@
 
 {% block content %}
   <div ng-controller="CollectionPlayer">
-    <background-banner></background-banner>
+    <background-banner position-style="absolute"></background-banner>
     <div ng-if="collection" class="oppia-collection-player-tiles-container">
       <h2 ng-if="!collectionPlaythrough.hasFinishedCollection()" class="oppia-page-heading">
         <span ng-if="!collectionPlaythrough.hasStartedCollection()">Begin <[collection.getTitle()]>:</span>
