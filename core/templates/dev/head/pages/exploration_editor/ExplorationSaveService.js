@@ -135,7 +135,7 @@ oppia.factory('explorationSaveService', [
     };
 
     var saveDraftToBackend = function(commitMessage) {
-      //resolved when save is done
+      // Resolved when save is done.
       var deferred = $q.defer();
 
       var changeList = changeListService.getChangeList();
