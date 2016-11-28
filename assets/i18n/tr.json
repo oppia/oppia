@@ -168,6 +168,7 @@
   "I18N_PLAYER_EMBED_TOOLTIP": "Gömülü",
   "I18N_PLAYER_FEEDBACK_TOOLTIP": "Dönüt",
   "I18N_PLAYER_FORWARD": "İlerle",
+  "I18N_PLAYER_GO_TO_LIBRARY": "Kütüphaneye git",
   "I18N_PLAYER_INFO_TOOLTIP": "Bilgi",
   "I18N_PLAYER_LAST_UPDATED_TOOLTIP": "Son güncellenmiş",
   "I18N_PLAYER_LEAVE_FEEDBACK": "Yazarlar için dönüt bırak...",
@@ -193,7 +194,6 @@
   "I18N_PLAYER_REPORT_TOOLTIP": "Konu Anlatımını Rapor Et",
   "I18N_PLAYER_RETURN_TO_COLLECTION": "<[collectionTitle]>'a dön",
   "I18N_PLAYER_RETURN_TO_EDITOR": "Editöre dön",
-  "I18N_PLAYER_RETURN_TO_LIBRARY": "Kütüphaneye dön",
   "I18N_PLAYER_SHARE_EXPLORATION": "Bu konu anlatımını beğendin mi? Onu arkadaşlarınla paylaş!",
   "I18N_PLAYER_SHARE_THIS_EXPLORATION": "Bu konu anlatımını paylaş",
   "I18N_PLAYER_STAY_ANONYMOUS": "Anonim Kal",
@@ -296,4 +296,5 @@
   "I18N_TOPNAV_PREFERENCES": "Tercihler",
   "I18N_TOPNAV_SIGN_IN": "Giriş Yap",
   "I18N_TOPNAV_TEACH_WITH_OPPIA": "Oppia ile Öğret"
+  
 }
