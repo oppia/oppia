@@ -31,13 +31,13 @@
 
   <style>
     html, body {
-      background-color: #afd2eb;
+      background-color: #eee;
     }
   </style>
 {% endblock header_js %}
 
 {% block content %}
-  <div ng-controller="Library" class="oppia-library-container">
+  <div ng-controller="Library" class="oppia-library-container" style="background-image: url('<[backgroundImageFileUrl]>'); margin-top: -40px; padding-top: 40px; background-origin: content-box; background-repeat: no-repeat; background-size: 150%;">
     <div style="position: relative; z-index: 3;">
       <div>
         <div class="oppia-exp-summary-tiles-container" ng-if="pageMode === LIBRARY_PAGE_MODES.SEARCH">
