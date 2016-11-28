@@ -24,8 +24,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       $scope, changeListService, editabilityService,
       explorationRightsService, explorationWarningsService,
       explorationSaveService) {
-    $scope.saveIsInProgress = false;
-    $scope.publishModalIsOpening = false;
+    $scope.saveIsInProcess = false;
+    $scope.publishIsInProcess = false;
 
     $scope.isPrivate = function() {
       return explorationRightsService.isPrivate();
@@ -56,9 +56,10 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     };
 
     $scope.showPublishExplorationModal = function() {
-      $scope.publishModalIsOpening = true;
+      $scope.publishIsInProcess = true;
+
       explorationSaveService.showPublishExplorationModal().then(function() {
-        $scope.publishModalIsOpening = false;
+        $scope.publishIsInProcess = false;
       });
     };
 
@@ -82,15 +83,11 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       }
     };
 
-    $scope.isSaveModalOpening = function() {
-      return explorationSaveService.isSaveModalOpening();
-    };
-
     $scope.saveChanges = function() {
-      $scope.saveIsInProgress = true;
+      $scope.saveIsInProcess = true;
 
       explorationSaveService.saveChanges().then(function() {
-        $scope.saveIsInProgress = false;
+        $scope.saveIsInProcess = false;
       });
     };
   }

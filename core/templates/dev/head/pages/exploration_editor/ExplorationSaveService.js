@@ -38,9 +38,6 @@ oppia.factory('explorationSaveService', [
     // (request has been sent to backend but no reply received yet)
     var saveIsInProgress = false;
 
-    // This flag is used to change text of save button to "Loading..." to
-    // add indication for user that something is happening.
-    var saveModalIsOpening = false;
     // This flag is used to ensure only one save exploration modal can be open
     // at any one time.
     var modalIsOpen = false;
@@ -111,6 +108,7 @@ oppia.factory('explorationSaveService', [
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
               alertsService.clearWarnings();
+              deferred.resolve();
             };
           }
         ]
@@ -123,9 +121,6 @@ oppia.factory('explorationSaveService', [
         siteAnalyticsService.registerPublishExplorationEvent(
           explorationData.explorationId);
         showCongratulatorySharingModal();
-      });
-
-      publishModalInstance.opened.then(function() {
         deferred.resolve();
       });
 
@@ -179,9 +174,6 @@ oppia.factory('explorationSaveService', [
     };
 
     return {
-      isSaveModalOpening: function() {
-        return saveModalIsOpening;
-      },
 
       isExplorationSaveable: function() {
         return (
@@ -256,8 +248,6 @@ oppia.factory('explorationSaveService', [
               explorationTitleService, explorationCategoryService,
               explorationStatesService, CATEGORY_LIST,
               explorationLanguageCodeService, explorationTagsService) {
-                // Mark as resolved so we won't show loading dots.
-                deferred.resolve();
 
                 $scope.explorationTitleService = explorationTitleService;
                 $scope.explorationObjectiveService =
@@ -366,6 +356,7 @@ oppia.factory('explorationSaveService', [
                 };
 
                 $scope.cancel = function() {
+                  deferred.resolve();
                   explorationTitleService.restoreFromMemento();
                   explorationObjectiveService.restoreFromMemento();
                   explorationCategoryService.restoreFromMemento();
@@ -405,8 +396,6 @@ oppia.factory('explorationSaveService', [
         // This is marked as resolved after modal is closed, so we can change
         // controller 'saveIsInProgress' back to false.
         var deferred = $q.defer();
-
-        saveModalIsOpening = true;
 
         routerService.savePendingChanges();
 
@@ -493,7 +482,6 @@ oppia.factory('explorationSaveService', [
 
           // Modal is Opened
           modalIsOpen = true;
-          saveModalIsOpening = false;
 
           modalInstance.opened.then(function() {
             // The $timeout seems to be needed
