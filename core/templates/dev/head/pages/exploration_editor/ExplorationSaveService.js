@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for exploration saving & publificiation functionality.
+ * @fileoverview Service for exploration saving & publication functionality.
  */
 
 oppia.factory('explorationSaveService', [

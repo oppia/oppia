@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the exploration save & publish -buttons.
+ * @fileoverview Controller for the exploration save & publish buttons.
  */
 
 oppia.controller('ExplorationSaveAndPublishButtons', [
