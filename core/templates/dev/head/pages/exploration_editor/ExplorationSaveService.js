@@ -207,6 +207,20 @@ oppia.factory('explorationSaveService', [
           alertsService.clearWarnings();
           $rootScope.$broadcast('externalSave');
 
+          $modal.open({
+            templateUrl: 'modals/reloadingEditor',
+            backdrop: 'static',
+            keyboard: false,
+            controller: [
+              '$scope', '$modalInstance', function($scope, $modalInstance) {
+                $timeout(function() {
+                  $modalInstance.dismiss('cancel');
+                }, 2500);
+              }
+            ],
+            windowClass: 'oppia-loading-modal'
+          });
+
           changeListService.discardAllChanges();
           alertsService.addSuccessMessage('Changes discarded.');
           $rootScope.$broadcast('initExplorationPage');
