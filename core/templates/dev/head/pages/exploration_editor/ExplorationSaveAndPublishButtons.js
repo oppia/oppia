@@ -63,11 +63,23 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     };
 
     $scope.getPublishExplorationButtonTooltip = function() {
-      return explorationSaveService.getPublishExplorationButtonTooltip();
+      if (explorationWarningsService.countWarnings() > 0) {
+        return 'Please resolve the warnings before publishing.';
+      } else if (changeListService.isExplorationLockedForEditing()) {
+        return 'Please save your changes before publishing.';
+      } else {
+        return 'Publish to Oppia Library';
+      }
     };
 
     $scope.getSaveButtonTooltip = function() {
-      return explorationSaveService.getSaveButtonTooltip();
+      if (explorationWarningsService.hasCriticalWarnings() > 0) {
+        return 'Please resolve the warnings.';
+      } else if (explorationRightsService.isPrivate()) {
+        return 'Save Draft';
+      } else {
+        return 'Publish Changes';
+      }
     };
 
     $scope.isSaveModalOpening = function() {

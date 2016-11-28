@@ -377,26 +377,6 @@ oppia.factory('explorationSaveService', [
         }
       },
 
-      getPublishExplorationButtonTooltip: function() {
-        if (explorationWarningsService.countWarnings() > 0) {
-          return 'Please resolve the warnings before publishing.';
-        } else if (changeListService.isExplorationLockedForEditing()) {
-          return 'Please save your changes before publishing.';
-        } else {
-          return 'Publish to Oppia Library';
-        }
-      },
-
-      getSaveButtonTooltip: function() {
-        if (explorationWarningsService.hasCriticalWarnings() > 0) {
-          return 'Please resolve the warnings.';
-        } else if (explorationRightsService.isPrivate()) {
-          return 'Save Draft';
-        } else {
-          return 'Publish Changes';
-        }
-      },
-
       saveChanges: function() {
         // This is returned after modal is closed, so we can change
         // controller 'saveIsInProgress' back to false.
