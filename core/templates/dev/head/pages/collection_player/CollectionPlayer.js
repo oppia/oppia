@@ -32,13 +32,18 @@ oppia.animation('.oppia-collection-animate-slide', function() {
 
 oppia.controller('CollectionPlayer', [
   '$scope', 'ReadOnlyCollectionBackendApiService', 'CollectionObjectFactory',
-  'CollectionPlaythroughObjectFactory', 'alertsService',
+  'CollectionPlaythroughObjectFactory', 'alertsService', '$http',
   function($scope, ReadOnlyCollectionBackendApiService, CollectionObjectFactory,
-    CollectionPlaythroughObjectFactory, alertsService) {
+    CollectionPlaythroughObjectFactory, alertsService, $http) {
     $scope.collection = null;
     $scope.collectionPlaythrough = null;
     $scope.collectionId = GLOBALS.collectionId;
     $scope.showingAllExplorations = !GLOBALS.isLoggedIn;
+    $scope.showPreviewCard = true;
+
+    $scope.togglePreviewCard = function() {
+      $scope.showPreviewCard = !$scope.showPreviewCard;
+    };
 
     $scope.getCollectionNodeForExplorationId = function(explorationId) {
       var collectionNode = (
@@ -93,6 +98,34 @@ oppia.controller('CollectionPlayer', [
     $scope.toggleShowAllExplorations = function() {
       $scope.showingAllExplorations = !$scope.showingAllExplorations;
     };
+
+    $scope.updateExplorationPreview = function(explorationId) {
+      $scope.showPreviewCard = false;
+      $scope.currentExplorationId = explorationId;
+      $scope.explorationTitle = $scope.getCollectionNodeForExplorationId(explorationId).getExplorationSummaryObject().title;
+      $scope.explorationLastUpdateMsec = $scope.getCollectionNodeForExplorationId(explorationId).getExplorationSummaryObject().last_updated_msec;
+      $scope.explorationObjective = $scope.getCollectionNodeForExplorationId(explorationId).getExplorationSummaryObject().objective;
+      $scope.explorationCategory = $scope.getCollectionNodeForExplorationId(explorationId).getExplorationSummaryObject().category;
+      $scope.explorationRatings = $scope.getCollectionNodeForExplorationId(explorationId).getExplorationSummaryObject().ratings;
+      $scope.explorationNumViews = $scope.getCollectionNodeForExplorationId(explorationId).getExplorationSummaryObject().num_views;
+      $scope.explorationThumbnailIconUrl = $scope.getCollectionNodeForExplorationId(explorationId).getExplorationSummaryObject().thumbnail_icon_url;
+      $scope.explorationThumbnailBgColor = $scope.getCollectionNodeForExplorationId(explorationId).getExplorationSummaryObject().thumbnail_bg_color;
+      $scope.explorationIsCommunityOwned = $scope.getCollectionNodeForExplorationId(explorationId).getExplorationSummaryObject().community_owned;
+    };
+
+    $http.get('/collectionsummarieshandler/data', {
+            params: {
+              stringified_collection_ids: JSON.stringify([$scope.collectionId])
+            }
+          }).then(
+            function(response) {
+              $scope.collectionSummary = response.data.summaries[0];
+            },
+            function() {
+              alertsService.addWarning(
+                'There was an error while fetching the collection summary.');
+            }
+          );
 
     // Load the collection the learner wants to view.
     ReadOnlyCollectionBackendApiService.loadCollection(
