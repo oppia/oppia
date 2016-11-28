@@ -115,7 +115,7 @@ oppia.factory('explorationSaveService', [
       });
 
       publishModalInstance.result.then(function() {
-        //Toggle dots on.
+        // Toggle dots on.
         toggleLoadingDotsCallback(true);
 
         explorationRightsService.saveChangeToBackend({
@@ -255,7 +255,6 @@ oppia.factory('explorationSaveService', [
               explorationTitleService, explorationCategoryService,
               explorationStatesService, CATEGORY_LIST,
               explorationLanguageCodeService, explorationTagsService) {
-
                 $scope.explorationTitleService = explorationTitleService;
                 $scope.explorationObjectiveService =
                   explorationObjectiveService;
@@ -383,7 +382,6 @@ oppia.factory('explorationSaveService', [
           });
 
           modalInstance.result.then(function(metadataList) {
-
             if (metadataList.length > 0) {
               var commitMessage = (
                 'Add metadata: ' + metadataList.join(', ') + '.');
@@ -394,20 +392,22 @@ oppia.factory('explorationSaveService', [
               saveDraftToBackend(commitMessage).then(function() {
                 // Toggling loading dots back on.
                 toggleLoadingDotsCallback(false);
-                openPublishExplorationModal(toggleLoadingDotsCallback).then(function() {
+                openPublishExplorationModal(toggleLoadingDotsCallback)
+                .then(function() {
                   deferred.resolve();
                 });
               });
             } else {
-              openPublishExplorationModal(toggleLoadingDotsCallback).then(function() {
+              openPublishExplorationModal(toggleLoadingDotsCallback)
+              .then(function() {
                 deferred.resolve();
               });
             }
           });
-
         } else {
           // No further metadata is needed. Open the publish modal immediately.
-          openPublishExplorationModal(toggleLoadingDotsCallback).then(function() {
+          openPublishExplorationModal(toggleLoadingDotsCallback)
+          .then(function() {
             deferred.resolve();
           });
         }
