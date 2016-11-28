@@ -78,13 +78,14 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
     toggleLoadingDots = function(turnOnOrOff) {
       $scope.showLoadingDots = turnOnOrOff;
-    }
+    };
 
     $scope.showPublishExplorationModal = function() {
       $scope.publishIsInProcess = true;
       $scope.showLoadingDots = true;
 
-      explorationSaveService.showPublishExplorationModal(toggleLoadingDots).then(function() {
+      explorationSaveService.showPublishExplorationModal(toggleLoadingDots)
+      .then(function() {
         $scope.publishIsInProcess = false;
       });
     };
