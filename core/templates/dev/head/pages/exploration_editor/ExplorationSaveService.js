@@ -94,7 +94,7 @@ oppia.factory('explorationSaveService', [
       });
     };
 
-    var openPublishExplorationModal = function() {
+    var openPublishExplorationModal = function(toggleLoadingDotsCallback) {
       // This is resolved when modal is closed.
       var deferred = $q.defer();
 
@@ -115,13 +115,20 @@ oppia.factory('explorationSaveService', [
       });
 
       publishModalInstance.result.then(function() {
+        //Toggle dots on.
+        toggleLoadingDotsCallback(true);
+
         explorationRightsService.saveChangeToBackend({
           is_public: true
+        }).then(function() {
+          // Toggle dots back off.
+          toggleLoadingDotsCallback(false);
+
+          showCongratulatorySharingModal();
+          siteAnalyticsService.registerPublishExplorationEvent(
+            explorationData.explorationId);
+          deferred.resolve();
         });
-        siteAnalyticsService.registerPublishExplorationEvent(
-          explorationData.explorationId);
-        showCongratulatorySharingModal();
-        deferred.resolve();
       });
 
       return deferred.promise;
@@ -224,7 +231,7 @@ oppia.factory('explorationSaveService', [
         }
       },
 
-      showPublishExplorationModal: function() {
+      showPublishExplorationModal: function(toggleLoadingDotsCallback) {
         // This is resolved after publishing modals are closed,
         // so we can remove the loading-dots.
         var deferred = $q.defer();
@@ -236,7 +243,7 @@ oppia.factory('explorationSaveService', [
         // If the metadata has not yet been specified, open the pre-publication
         // 'add exploration metadata' modal.
         if (isAdditionalMetadataNeeded()) {
-          $modal.open({
+          var modalInstance = $modal.open({
             templateUrl: 'modals/addExplorationMetadata',
             backdrop: 'static',
             controller: [
@@ -368,31 +375,46 @@ oppia.factory('explorationSaveService', [
                 };
               }
             ]
-          }).result.then(function(metadataList) {
+          });
+
+          modalInstance.opened.then(function() {
+            // Toggle loading dots off after modal is opened
+            toggleLoadingDotsCallback(false);
+          });
+
+          modalInstance.result.then(function(metadataList) {
+
             if (metadataList.length > 0) {
               var commitMessage = (
                 'Add metadata: ' + metadataList.join(', ') + '.');
+
+              // Toggling loading dots back on.
+              toggleLoadingDotsCallback(true);
+
               saveDraftToBackend(commitMessage).then(function() {
-                openPublishExplorationModal().then(function() {
+                // Toggling loading dots back on.
+                toggleLoadingDotsCallback(false);
+                openPublishExplorationModal(toggleLoadingDotsCallback).then(function() {
                   deferred.resolve();
                 });
               });
             } else {
-              openPublishExplorationModal().then(function() {
+              openPublishExplorationModal(toggleLoadingDotsCallback).then(function() {
                 deferred.resolve();
               });
             }
           });
+
         } else {
           // No further metadata is needed. Open the publish modal immediately.
-          openPublishExplorationModal().then(function() {
+          openPublishExplorationModal(toggleLoadingDotsCallback).then(function() {
             deferred.resolve();
           });
         }
         return deferred.promise;
       },
 
-      saveChanges: function() {
+      saveChanges: function(toggleLoadingDotsCallback) {
         // This is marked as resolved after modal is closed, so we can change
         // controller 'saveIsInProgress' back to false.
         var deferred = $q.defer();
@@ -484,6 +506,8 @@ oppia.factory('explorationSaveService', [
           modalIsOpen = true;
 
           modalInstance.opened.then(function() {
+            // Toggle loading dots off after modal is opened
+            toggleLoadingDotsCallback(false);
             // The $timeout seems to be needed
             // in order to give the modal time to render.
             $timeout(function() {
@@ -493,6 +517,10 @@ oppia.factory('explorationSaveService', [
 
           modalInstance.result.then(function(commitMessage) {
             modalIsOpen = false;
+
+            // Toggle loading dots back on for loading from backend.
+            toggleLoadingDotsCallback(true);
+
             saveDraftToBackend(commitMessage).then(function() {
               deferred.resolve();
             });

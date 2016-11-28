@@ -26,6 +26,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       explorationSaveService) {
     $scope.saveIsInProcess = false;
     $scope.publishIsInProcess = false;
+    $scope.showLoadingDots = false;
 
     $scope.isPrivate = function() {
       return explorationRightsService.isPrivate();
@@ -55,14 +56,6 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       return explorationSaveService.isExplorationSaveable();
     };
 
-    $scope.showPublishExplorationModal = function() {
-      $scope.publishIsInProcess = true;
-
-      explorationSaveService.showPublishExplorationModal().then(function() {
-        $scope.publishIsInProcess = false;
-      });
-    };
-
     $scope.getPublishExplorationButtonTooltip = function() {
       if (explorationWarningsService.countWarnings() > 0) {
         return 'Please resolve the warnings before publishing.';
@@ -83,11 +76,26 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       }
     };
 
+    toggleLoadingDots = function(turnOnOrOff) {
+      $scope.showLoadingDots = turnOnOrOff;
+    }
+
+    $scope.showPublishExplorationModal = function() {
+      $scope.publishIsInProcess = true;
+      $scope.showLoadingDots = true;
+
+      explorationSaveService.showPublishExplorationModal(toggleLoadingDots).then(function() {
+        $scope.publishIsInProcess = false;
+      });
+    };
+
     $scope.saveChanges = function() {
       $scope.saveIsInProcess = true;
+      $scope.showLoadingDots = true;
 
-      explorationSaveService.saveChanges().then(function() {
+      explorationSaveService.saveChanges(toggleLoadingDots).then(function() {
         $scope.saveIsInProcess = false;
+        $scope.showLoadingDots = false;
       });
     };
   }
