@@ -34,7 +34,8 @@ oppia.factory('explorationSaveService', [
       explorationWarningsService, ExplorationDiffService,
       explorationInitStateNameService, routerService,
       focusService, changeListService, siteAnalyticsService) {
-    // Whether or not a save action is currently in progress.
+    // Whether or not a save action is currently in progress
+    // (request has been sent to backend but no reply received yet)
     var saveIsInProgress = false;
     // Whether or not a discard action is currently in progress.
     var discardInPrograss = false;
@@ -178,10 +179,6 @@ oppia.factory('explorationSaveService', [
     return {
       isSaveModalOpening: function() {
         return saveModalIsOpening;
-      },
-
-      saveIsInProgress: function() {
-        return saveIsInProgress;
       },
 
       publishModalIsOpening: function() {
