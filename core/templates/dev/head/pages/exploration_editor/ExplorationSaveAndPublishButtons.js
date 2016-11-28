@@ -25,6 +25,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       explorationRightsService, explorationWarningsService,
       explorationSaveService) {
     $scope.saveIsInProgress = false;
+    $scope.publishModalIsOpening = false;
 
     $scope.isPrivate = function() {
       return explorationRightsService.isPrivate();
@@ -54,12 +55,11 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       return explorationSaveService.isExplorationSaveable();
     };
 
-    $scope.publishModalIsOpening = function() {
-      return explorationSaveService.publishModalIsOpening();
-    };
-
     $scope.showPublishExplorationModal = function() {
-      explorationSaveService.showPublishExplorationModal();
+      $scope.publishModalIsOpening = true;
+      explorationSaveService.showPublishExplorationModal().then(function() {
+        $scope.publishModalIsOpening = false;
+      });
     };
 
     $scope.getPublishExplorationButtonTooltip = function() {

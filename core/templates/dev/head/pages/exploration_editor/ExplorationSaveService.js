@@ -40,8 +40,6 @@ oppia.factory('explorationSaveService', [
     // Whether or not a discard action is currently in progress.
     var discardInPrograss = false;
 
-    var publishModalIsOpening = false;
-
     // This flag is used to change text of save button to "Loading..." to
     // add indication for user that something is happening.
     var saveModalIsOpening = false;
@@ -102,7 +100,8 @@ oppia.factory('explorationSaveService', [
     };
 
     var openPublishExplorationModal = function() {
-      publishModalIsOpening = true;
+      // This is resolved when modal is closed.
+      var deferred = $q.defer();
 
       var publishModalInstance = $modal.open({
         templateUrl: 'modals/publishExploration',
@@ -129,11 +128,16 @@ oppia.factory('explorationSaveService', [
       });
 
       publishModalInstance.opened.then(function() {
-        publishModalIsOpening = false;
+        deferred.resolve();
       });
+
+      return deferred.promise;
     };
 
-    var saveDraftToBackend = function(commitMessage, successCallback) {
+    var saveDraftToBackend = function(commitMessage) {
+      //resolved when save is done
+      var deferred = $q.defer();
+
       var changeList = changeListService.getChangeList();
 
       if (explorationRightsService.isPrivate()) {
@@ -167,22 +171,18 @@ oppia.factory('explorationSaveService', [
           });
           alertsService.addSuccessMessage('Changes saved.');
           saveIsInProgress = false;
-          if (successCallback) {
-            successCallback();
-          }
+          deferred.resolve();
         }, function() {
           saveIsInProgress = false;
+          deferred.resolve();
         }
       );
+      return deferred.promise;
     };
 
     return {
       isSaveModalOpening: function() {
         return saveModalIsOpening;
-      },
-
-      publishModalIsOpening: function() {
-        return publishModalIsOpening;
       },
 
       isExplorationSaveable: function() {
@@ -221,6 +221,10 @@ oppia.factory('explorationSaveService', [
       },
 
       showPublishExplorationModal: function() {
+        // This is resolved after publishing modals are closed,
+        // so we can remove the loading-dots.
+        var deferred = $q.defer();
+
         siteAnalyticsService.registerOpenPublishExplorationModalEvent(
           explorationData.explorationId);
         alertsService.clearWarnings();
@@ -240,6 +244,9 @@ oppia.factory('explorationSaveService', [
               explorationTitleService, explorationCategoryService,
               explorationStatesService, CATEGORY_LIST,
               explorationLanguageCodeService, explorationTagsService) {
+                // Mark as resolved so we won't show loading dots.
+                deferred.resolve();
+
                 $scope.explorationTitleService = explorationTitleService;
                 $scope.explorationObjectiveService =
                   explorationObjectiveService;
@@ -306,7 +313,7 @@ oppia.factory('explorationSaveService', [
                 };
 
                 $scope.save = function() {
-                  if (!requiredFieldsFilled()) {
+                  if (!areRequiredFieldsFilled()) {
                     return;
                   }
 
@@ -362,16 +369,24 @@ oppia.factory('explorationSaveService', [
             if (metadataList.length > 0) {
               var commitMessage = (
                 'Add metadata: ' + metadataList.join(', ') + '.');
-              saveDraftToBackend(commitMessage,
-                openPublishExplorationModal);
+              saveDraftToBackend(commitMessage).then(function() {
+                openPublishExplorationModal().then(function() {
+                  deferred.resolve();
+                });
+              });
             } else {
-              openPublishExplorationModal();
+              openPublishExplorationModal().then(function() {
+                deferred.resolve();
+              });
             }
           });
         } else {
           // No further metadata is needed. Open the publish modal immediately.
-          openPublishExplorationModal();
+          openPublishExplorationModal().then(function() {
+            deferred.resolve();
+          });
         }
+        return deferred.promise;
       },
 
       saveChanges: function() {
@@ -478,8 +493,9 @@ oppia.factory('explorationSaveService', [
 
           modalInstance.result.then(function(commitMessage) {
             modalIsOpen = false;
-            saveDraftToBackend(commitMessage);
-            deferred.resolve();
+            saveDraftToBackend(commitMessage).then(function() {
+              deferred.resolve();
+            });
           }, function() {
             modalIsOpen = false;
             deferred.resolve();

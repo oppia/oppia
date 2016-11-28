@@ -161,18 +161,18 @@
                 ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}"
                 ng-click="showPublishExplorationModal()"
                 ng-disabled="isExplorationLockedForEditing() || countWarnings()">
-          <span ng-if="!publishModalIsOpening()">
+          <span ng-if="!publishModalIsOpening">
             <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
                alt="Publish to Oppia Library">&#xE2C3;</i>
             <span class="oppia-save-publish-button-label">Publish</span>
           </span>
-          <span ng-if="publishModalIsOpening()">
+          <span ng-if="publishModalIsOpening">
             <i class="oppia-save-publish-loading oppia-save-publish-button-icon"
                alt="Publish to Oppia Library">
                  <loading-dots></loading-dots>
             </i>
             <span class="oppia-save-publish-button-label">
-              Saving
+              Publishing
               <loading-dots></loading-dots>
             </span>
           </span>
