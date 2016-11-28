@@ -37,8 +37,6 @@ oppia.factory('explorationSaveService', [
     // Whether or not a save action is currently in progress
     // (request has been sent to backend but no reply received yet)
     var saveIsInProgress = false;
-    // Whether or not a discard action is currently in progress.
-    var discardInPrograss = false;
 
     // This flag is used to change text of save button to "Loading..." to
     // add indication for user that something is happening.
