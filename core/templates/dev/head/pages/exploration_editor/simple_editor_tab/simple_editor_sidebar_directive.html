@@ -23,9 +23,11 @@
       </li>
     </ul>
 
-    <button type="button" class="btn btn-default full-editor-btn" ng-click="setEditorModeToFull()">
-      Use Advanced Editor
-    </button>
+    <div class="full-editor-btn-container">
+      <button type="button" class="btn btn-default full-editor-btn" ng-click="setEditorModeToFull()">
+        Use Advanced Editor
+        </button>
+    </div>
   </div>
 </script>
 
@@ -67,11 +69,17 @@
   simple-editor-sidebar .sidebar {
     padding-bottom: 85px;
   }
-  simple-editor-sidebar .full-editor-btn {
+  simple-editor-sidebar .full-editor-btn-container {
     background-color: #f3fbf1;
     bottom: 0;
-    margin-bottom: 8px;
+    height: 50px;
+    left: 0;
     position: fixed;
+  }
+  simple-editor-sidebar .full-editor-btn {
+    margin-left: 30px;
+    margin-top: 10px;
+    position: static;
   }
   simple-editor-sidebar::-webkit-scrollbar {
     width: 8px;
