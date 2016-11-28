@@ -378,7 +378,7 @@ oppia.factory('explorationSaveService', [
       },
 
       saveChanges: function() {
-        // This is returned after modal is closed, so we can change
+        // This is marked as resolved after modal is closed, so we can change
         // controller 'saveIsInProgress' back to false.
         var deferred = $q.defer();
 
