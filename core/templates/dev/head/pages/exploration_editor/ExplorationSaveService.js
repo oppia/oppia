@@ -233,7 +233,7 @@ oppia.factory('explorationSaveService', [
       showPublishExplorationModal: function(showLoadingDotsCallback, hideLoadingDotsCallback) {
         // This is resolved after publishing modals are closed,
         // so we can remove the loading-dots.
-        var deferred = $q.defer();
+        var whenModalsClosed = $q.defer();
 
         var loadingDotsAreInUse = showLoadingDotsCallback && hideLoadingDotsCallback;
 
@@ -363,7 +363,7 @@ oppia.factory('explorationSaveService', [
                 };
 
                 $scope.cancel = function() {
-                  deferred.resolve();
+                  whenModalsClosed.resolve();
                   explorationTitleService.restoreFromMemento();
                   explorationObjectiveService.restoreFromMemento();
                   explorationCategoryService.restoreFromMemento();
@@ -393,13 +393,13 @@ oppia.factory('explorationSaveService', [
                 if (loadingDotsAreInUse) { hideLoadingDotsCallback(); };
                 openPublishExplorationModal(showLoadingDotsCallback, hideLoadingDotsCallback)
                   .then(function() {
-                    deferred.resolve();
+                    whenModalsClosed.resolve();
                   });
               });
             } else {
               openPublishExplorationModal(showLoadingDotsCallback, hideLoadingDotsCallback)
                 .then(function() {
-                  deferred.resolve();
+                  whenModalsClosed.resolve();
                 });
             }
           });
@@ -407,10 +407,10 @@ oppia.factory('explorationSaveService', [
           // No further metadata is needed. Open the publish modal immediately.
           openPublishExplorationModal(showLoadingDotsCallback, hideLoadingDotsCallback)
             .then(function() {
-              deferred.resolve();
+              whenModalsClosed.resolve();
             });
         }
-        return deferred.promise;
+        return whenModalsClosed.promise;
       },
 
       saveChanges: function(showLoadingDotsCallback, hideLoadingDotsCallback) {
