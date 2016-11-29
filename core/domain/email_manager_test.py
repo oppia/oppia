@@ -1274,7 +1274,7 @@ class FeedbackMessageInstantEmailTests(test_utils.GenericTestBase):
         expected_email_html_body = (
             'Hi newuser,<br><br>'
             'New update to thread "a subject" on '
-            '<a href="https://www.oppia.org/A">Title</a>:<br>'
+            '<a href="https://www.oppia.org/create/A#/feedback">Title</a>:<br>'
             '<ul><li>editor: editor message<br></li></ul>'
             '(You received this message because you are a '
             'participant in this thread.)<br><br>'
@@ -1452,3 +1452,252 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_REPORT_BAD_CONTENT)
+
+
+class QueryStatusNotificationEmailTests(test_utils.GenericTestBase):
+    """Test that email is send to submitter when query has completed or failed.
+    """
+    SUBMITTER_USERNAME = 'submit'
+    SUBMITTER_EMAIL = 'submit@example.com'
+
+    def setUp(self):
+        super(QueryStatusNotificationEmailTests, self).setUp()
+        self.signup(self.SUBMITTER_EMAIL, self.SUBMITTER_USERNAME)
+        self.submitter_id = self.get_user_id_from_email(self.SUBMITTER_EMAIL)
+        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+
+    def test_that_correct_completion_email_is_sent(self):
+        query_id = 'qid'
+        expected_email_subject = 'Query qid has successfully completed'
+        expected_email_html_body = (
+            'Hi submit,<br>'
+            'Your query with id qid has succesfully completed its '
+            'execution. Visit the result page '
+            '<a href="https://www.oppia.org/emaildashboardresult/qid">here</a> '
+            'to see result of your query.<br><br>'
+            'Thanks!<br>'
+            '<br>'
+            'Best wishes,<br>'
+            'The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_email_text_body = (
+            'Hi submit,\n'
+            'Your query with id qid has succesfully completed its '
+            'execution. Visit the result page here '
+            'to see result of your query.\n\n'
+            'Thanks!\n'
+            '\n'
+            'Best wishes,\n'
+            'The Oppia Team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+
+        with self.can_send_emails_ctx:
+            email_manager.send_query_completion_email(
+                self.submitter_id, query_id)
+
+            # Make sure correct email is sent.
+            messages = self.mail_stub.get_sent_messages(to=self.SUBMITTER_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(), expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(), expected_email_text_body)
+
+            # Make sure correct email model is stored.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            sent_email_model = all_models[0]
+            self.assertEqual(
+                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(
+                sent_email_model.recipient_id, self.submitter_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.SUBMITTER_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION)
+
+    def test_that_correct_failure_email_is_sent(self):
+        query_id = 'qid'
+        query_params = {
+            'key1': 'val1',
+            'key2': 'val2'
+        }
+
+        expected_email_subject = 'Query qid has failed'
+
+        expected_email_html_body = (
+            'Hi submit,<br>'
+            'Your query with id qid has failed due to error '
+            'during execution. '
+            'Please check the query parameters and submit query again.<br><br>'
+            'Thanks!<br>'
+            '<br>'
+            'Best wishes,<br>'
+            'The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_email_text_body = (
+            'Hi submit,\n'
+            'Your query with id qid has failed due to error '
+            'during execution. '
+            'Please check the query parameters and submit query again.\n\n'
+            'Thanks!\n'
+            '\n'
+            'Best wishes,\n'
+            'The Oppia Team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+
+        expected_admin_email_text_body = (
+            '(Sent from testbed-test)\n\n'
+            'Query job with qid query id has failed in its execution.\n'
+            'Query parameters:\n\n'
+            'key1: val1\n'
+            'key2: val2\n')
+
+        with self.can_send_emails_ctx:
+            email_manager.send_query_failure_email(
+                self.submitter_id, query_id, query_params)
+
+            # Make sure correct email is sent.
+            messages = self.mail_stub.get_sent_messages(to=self.SUBMITTER_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(), expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(), expected_email_text_body)
+
+            # Make sure correct email model is stored.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            sent_email_model = all_models[0]
+            self.assertEqual(
+                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(
+                sent_email_model.recipient_id, self.submitter_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.SUBMITTER_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION)
+
+            # Make sure that correct email is sent to admin.
+            admin_messages = self.mail_stub.get_sent_messages(
+                to=feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(admin_messages), 1)
+            self.assertEqual(
+                admin_messages[0].body.decode(), expected_admin_email_text_body)
+
+
+class BulkEmailsTests(test_utils.GenericTestBase):
+    SENDER_EMAIL = 'sender@example.com'
+    SENDER_USERNAME = 'sender'
+    FAKE_SENDER_EMAIL = 'fake@example.com'
+    FAKE_SENDER_USERNAME = 'fake'
+    RECIPIENT_A_EMAIL = 'a@example.com'
+    RECIPIENT_A_USERNAME = 'usera'
+    RECIPIENT_B_EMAIL = 'b@example.com'
+    RECIPIENT_B_USERNAME = 'userb'
+    def setUp(self):
+        super(BulkEmailsTests, self).setUp()
+        # SENDER is authorised sender.
+        # FAKE_SENDER is unauthorised sender.
+        # A and B are recipients.
+        self.signup(self.SENDER_EMAIL, self.SENDER_USERNAME)
+        self.sender_id = self.get_user_id_from_email(self.SENDER_EMAIL)
+        self.signup(self.FAKE_SENDER_EMAIL, self.FAKE_SENDER_USERNAME)
+        self.fake_sender_id = self.get_user_id_from_email(
+            self.FAKE_SENDER_EMAIL)
+        self.signup(self.RECIPIENT_A_EMAIL, self.RECIPIENT_A_USERNAME)
+        self.signup(self.RECIPIENT_B_EMAIL, self.RECIPIENT_B_USERNAME)
+        self.recipient_a_id = self.get_user_id_from_email(
+            self.RECIPIENT_A_EMAIL)
+        self.recipient_b_id = self.get_user_id_from_email(
+            self.RECIPIENT_B_EMAIL)
+        self.recipient_ids = [self.recipient_a_id, self.recipient_b_id]
+
+        config_services.set_property(
+            self.sender_id, 'whitelisted_email_senders',
+            [self.SENDER_USERNAME])
+        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+
+    def test_that_correct_email_is_sent(self):
+        email_subject = 'Dummy subject'
+        email_html_body = 'Dummy email body.<br>'
+        email_text_body = 'Dummy email body.\n'
+
+        with self.can_send_emails_ctx:
+            # pylint: disable=protected-access
+            email_manager._send_bulk_mail(
+                self.recipient_ids, self.sender_id,
+                feconf.BULK_EMAIL_INTENT_MARKETING, email_subject,
+                email_html_body, self.SENDER_EMAIL, self.SENDER_USERNAME)
+            # pylint: enable=protected-access
+
+        messages_a = self.mail_stub.get_sent_messages(to=self.RECIPIENT_A_EMAIL)
+        self.assertEqual(len(messages_a), 1)
+        self.assertEqual(
+            messages_a[0].html.decode(), email_html_body)
+        self.assertEqual(
+            messages_a[0].body.decode(), email_text_body)
+
+        messages_b = self.mail_stub.get_sent_messages(to=self.RECIPIENT_B_EMAIL)
+        self.assertEqual(len(messages_b), 1)
+        self.assertEqual(
+            messages_b[0].html.decode(), email_html_body)
+        self.assertEqual(
+            messages_b[0].body.decode(), email_text_body)
+
+        # Make sure correct email model is stored.
+        all_models = email_models.BulkEmailModel.get_all().fetch()
+        self.assertEqual(len(all_models), 1)
+        sent_email_model = all_models[0]
+        self.assertEqual(
+            sent_email_model.subject, email_subject)
+        self.assertEqual(
+            sent_email_model.html_body, email_html_body)
+        self.assertEqual(
+            sent_email_model.recipient_ids, self.recipient_ids)
+        self.assertEqual(
+            sent_email_model.sender_id, self.sender_id)
+        self.assertEqual(
+            sent_email_model.sender_email,
+            '%s <%s>' % (self.SENDER_USERNAME, self.SENDER_EMAIL))
+        self.assertEqual(
+            sent_email_model.intent,
+            feconf.BULK_EMAIL_INTENT_MARKETING)
+
+    def test_that_exception_is_raised_for_unauthorised_sender(self):
+        with self.can_send_emails_ctx, self.assertRaisesRegexp(
+            Exception, 'Invalid sender_id for email'):
+            # pylint: disable=protected-access
+            email_manager._send_bulk_mail(
+                self.recipient_ids, self.fake_sender_id,
+                feconf.BULK_EMAIL_INTENT_MARKETING, 'email_subject',
+                'email_html_body', self.FAKE_SENDER_EMAIL,
+                self.FAKE_SENDER_USERNAME)
+            # pylint: enable=protected-access
+
+        messages_a = self.mail_stub.get_sent_messages(to=self.RECIPIENT_A_EMAIL)
+        self.assertEqual(len(messages_a), 0)
+
+        messages_b = self.mail_stub.get_sent_messages(to=self.RECIPIENT_B_EMAIL)
+        self.assertEqual(len(messages_b), 0)
+
+        all_models = email_models.BulkEmailModel.get_all().fetch()
+        self.assertEqual(len(all_models), 0)

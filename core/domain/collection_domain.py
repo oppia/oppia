@@ -728,3 +728,17 @@ class CollectionSummary(object):
             'collection_model_created_on': self.collection_model_created_on,
             'collection_model_last_updated': self.collection_model_last_updated
         }
+
+    def is_editable_by(self, user_id=None):
+        """Checks if a given user may edit the collection.
+
+        Args:
+            user_id: str. User id of the user.
+
+        Returns:
+            bool. Whether the given user may edit the collection.
+        """
+        return user_id is not None and (
+            user_id in self.editor_ids
+            or user_id in self.owner_ids
+            or self.community_owned)

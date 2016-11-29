@@ -34,7 +34,8 @@ describe('Testing filters', function() {
     'summarizeAnswerGroup',
     'summarizeDefaultOutcome',
     'summarizeNonnegativeNumber',
-    'truncateAndCapitalize'
+    'truncateAndCapitalize',
+    'stripFormatting'
   ];
 
   beforeEach(angular.mock.module('oppia'));
@@ -263,5 +264,120 @@ describe('Testing filters', function() {
     // return whole objective.
     expect(filter('please do not test empty string', 100)).toEqual(
       'Please do not test empty string');
+  }));
+
+  it('should remove all tags except img tags with the whitelisted classes',
+      inject(function($filter) {
+    var LINK_HTML = ('<li><a href="/wiki/1800" title="1800">1800</a></li>');
+    var OPPIA_TABS = ('<img src="data:image/png;base64,' +
+    'iVBORw0KGgoAAAANSUhEUgAABNQAAAFgCAIAAAD8SbMaAAAM' +
+    'FWlDQ1BJQ0MgUHJvZmlsZQAASImV%0AlwdUk8kWx" ' +
+    'class="oppia-noninteractive-tabs block-element" ' +
+    'tab_contents-with-value="[{&amp;quot;title&amp;quot;:&amp;quot;' +
+    'Hint introduction&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;' +
+    'This set of tabs shows some hints.' +
+    ' Click on the other tabs to display the relevant hints.&amp;quot;},' +
+    '{&amp;quot;title&amp;quot;:&amp;quot;Hint 1&amp;quot;,' +
+    '&amp;quot;content&amp;quot;:&amp;quot;This is a first hint.&amp;quot;},' +
+    '{&amp;quot;title&amp;quot;:&amp;quot;Hint 2&amp;quot;,' +
+    '&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;' +
+    'Stuff and things&amp;lt;/p&amp;gt;&amp;quot;}]">');
+    var OPPIA_IMG = ('<img src="image.png" ' +
+    'class="oppia-noninteractive-image block-element" ' +
+    'alt-with-value="&amp;quot;&amp;quot;" ' +
+    'caption-with-value="&amp;quot;&amp;quot;" ' +
+    'filepath-with-value="&amp;quot;DearIDPodcast_sm.png&amp;quot;">');
+    var OPPIA_VIDEO = ('<img ' +
+    'src="https://img.youtube.com/vi/JcPwIQ6GCj8/hqdefault.jpg" ' +
+    'class="oppia-noninteractive-video block-element" ' +
+    'video_id-with-value="" start-with-value="0" end-with-value="0" ' +
+    'autoplay-with-value="false" exploration-id-with-value="">');
+    var IMG_HTML = ('<a ' +
+    'href="https://en.wikipedia.org/wiki/File:The_Purloined_Letter.jpg" ' +
+    'class="image"><img alt="The Purloined Letter.jpg" ' +
+    'src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/' +
+    'The_Purloined_Letter.jpg/220px-The_Purloined_Letter.jpg" width="220" ' +
+    'height="178"></a>');
+    var OTHER_TAG_LINK = ('<a href=""><img src="linkimage.jpg" ' +
+    'class="other-tag"></a>');
+    var INVALID_TAG_LINK = ('<a href="example.com" class="invalid-tag"></a>');
+    var DANGEROUS_SCRIPT_IMG = ('<img src="w3javascript.gif" ' +
+    'onload="loadImage()" width="100" height="132">');
+    var DANGEROUS_NESTED_SCRIPT = ('<scr<script>ipt>alert(42);' +
+    '</scr</script>ipt>');
+    var NO_TAG = ('The quick brown fox jumps over the lazy dog.');
+    var NON_IMAGE = ('<a href="example.com" ' +
+    'class="oppia-noninteractive-link">Example.com</a>');
+    var IMAGE_INVALID = ('<img src="linkimage.jpg" class="invalid-tag">');
+    var BOLD_TEXT = ('In baseball, the Chicago Cubs defeat the Cleveland ' +
+    'Indians to win the <b style="box-sizing: border-box; font-weight: bold;' +
+    'color: rgb(85, 85, 85); font-family: Roboto, Arial, sans-serif; ' +
+    'font-size: 16px; font-style: normal; font-variant-ligatures: normal; ' +
+    'font-variant-caps: normal; letter-spacing: normal; orphans: 2; ' +
+    'text-align: left; text-indent: 0px; text-transform: none; ' +
+    'white-space: normal; widows: 2; word-spacing: 0px; ' +
+    '-webkit-text-stroke-width: 0px; background-color: rgb(255, 255, 255);">' +
+    'World Series</b> for the first time since 1908.');
+    var ITALIC_TEXT = ('<i style="box-sizing: border-box; ' +
+    'color: rgb(85, 85, 85); font-family: Roboto, Arial, sans-serif; ' +
+    'font-size: 16px; font-variant-ligatures: normal; ' +
+    'font-variant-caps: normal; font-weight: normal; letter-spacing: normal; ' +
+    'orphans: 2; text-align: left; text-indent: 0px; text-transform: none; ' +
+    'white-space: normal; widows: 2; word-spacing: 0px; ' +
+    '-webkit-text-stroke-width: 0px; background-color: rgb(255, 255, 255);">' +
+    'MVP Ben Zobrist pictured</i>');
+    var whitelistedImgClasses = [
+      'oppia-noninteractive-collapsible',
+      'oppia-noninteractive-image',
+      'oppia-noninteractive-link',
+      'oppia-noninteractive-math',
+      'oppia-noninteractive-tabs',
+      'oppia-noninteractive-video',
+      'other-tag'
+    ];
+
+    expect(
+      $filter('stripFormatting')(LINK_HTML, whitelistedImgClasses)
+    ).toEqual('1800');
+    expect(
+      $filter('stripFormatting')(IMG_HTML, whitelistedImgClasses)
+    ).toEqual('');
+    expect(
+      $filter('stripFormatting')(OPPIA_TABS, whitelistedImgClasses)
+    ).toEqual(OPPIA_TABS);
+    expect(
+      $filter('stripFormatting')(OPPIA_IMG, whitelistedImgClasses)
+    ).toEqual(OPPIA_IMG);
+    expect(
+      $filter('stripFormatting')(OPPIA_VIDEO, whitelistedImgClasses)
+    ).toEqual(OPPIA_VIDEO);
+    expect(
+      $filter('stripFormatting')(DANGEROUS_SCRIPT_IMG, whitelistedImgClasses)
+    ).toEqual('');
+    expect(
+      $filter('stripFormatting')(OTHER_TAG_LINK, whitelistedImgClasses)
+    ).toEqual('<img src="linkimage.jpg" class="other-tag">');
+    expect(
+      $filter('stripFormatting')(INVALID_TAG_LINK, whitelistedImgClasses)
+    ).toEqual('');
+    expect(
+      $filter('stripFormatting')(DANGEROUS_NESTED_SCRIPT, whitelistedImgClasses)
+    ).toEqual('ipt>alert(42);ipt>');
+    expect(
+      $filter('stripFormatting')(NO_TAG, whitelistedImgClasses)
+    ).toEqual(NO_TAG);
+    expect(
+      $filter('stripFormatting')(NON_IMAGE, whitelistedImgClasses)
+    ).toEqual('Example.com');
+    expect(
+      $filter('stripFormatting')(IMAGE_INVALID, whitelistedImgClasses)
+    ).toEqual('');
+    expect(
+      $filter('stripFormatting')(BOLD_TEXT, whitelistedImgClasses)
+    ).toEqual('In baseball, the Chicago Cubs defeat the Cleveland Indians to ' +
+    'win the <b>World Series</b> for the first time since 1908.');
+    expect(
+      $filter('stripFormatting')(ITALIC_TEXT, whitelistedImgClasses)
+    ).toEqual('<i>MVP Ben Zobrist pictured</i>');
   }));
 });

@@ -27,49 +27,49 @@ describe('Math expression input rules service', function() {
   it('should have a correct equivalence rule', function() {
     expect(meirs.IsMathematicallyEquivalentTo({
       ascii: 'x',
-      latex: ''
+      latex: 'x'
     }, {
       x: 'x'
     })).toBe(true);
 
     expect(meirs.IsMathematicallyEquivalentTo({
       ascii: 'x + x - x',
-      latex: ''
+      latex: 'x + x - x'
     }, {
       x: 'x'
     })).toBe(true);
 
     expect(meirs.IsMathematicallyEquivalentTo({
       ascii: 'x',
-      latex: ''
+      latex: 'x'
     }, {
       x: 'x + x - x'
     })).toBe(true);
 
     expect(meirs.IsMathematicallyEquivalentTo({
       ascii: 'x^2/x',
-      latex: ''
+      latex: 'x^{2}/x'
     }, {
       x: 'x'
     })).toBe(true);
 
     expect(meirs.IsMathematicallyEquivalentTo({
       ascii: 'y',
-      latex: ''
+      latex: 'y'
     }, {
       x: 'x'
     })).toBe(false);
 
     expect(meirs.IsMathematicallyEquivalentTo({
       ascii: 'x^2',
-      latex: ''
+      latex: 'x^{2}'
     }, {
       x: 'x'
     })).toBe(false);
 
     expect(meirs.IsMathematicallyEquivalentTo({
       ascii: 'x + 0.1',
-      latex: ''
+      latex: 'x + 0.1'
     }, {
       x: 'x'
     })).toBe(false);

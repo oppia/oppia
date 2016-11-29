@@ -103,7 +103,14 @@
         SYSTEM_USERNAMES: JSON.parse('{{SYSTEM_USERNAMES|js_string}}'),
         SUPPORTED_SITE_LANGUAGES: JSON.parse(
           '{{SUPPORTED_SITE_LANGUAGES|js_string}}'),
-        userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}')
+        isAdmin: JSON.parse('{{is_admin|js_string}}'),
+        isModerator: JSON.parse('{{is_moderator|js_string}}'),
+        isSuperAdmin: JSON.parse('{{is_super_admin|js_string}}'),
+        loginUrl: JSON.parse('{{login_url|js_string}}'),
+        logoutUrl: JSON.parse('{{logout_url|js_string}}'),
+        profilePictureDataUrl: JSON.parse('{{profile_picture_data_url|js_string}}'),
+        userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}'),
+        username: JSON.parse('{{username|js_string}}')
       };
 
       {% if additional_angular_modules %}
@@ -123,176 +130,22 @@
     {% if iframed %}
       {{ warnings_and_loader() }}
     {% else %}
-      <div class="oppia-base-container" ng-class="{'oppia-sidebar-menu-open': sidebarIsShown, 'oppia-sidebar-menu-closed': !sidebarIsShown}" ng-swipe-left="closeSidebarOnSwipe()" ng-swipe-right="openSidebarOnSwipe()">
+      <div class="oppia-base-container"
+           ng-class="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
+           ng-swipe-left="closeSidebarOnSwipe()">
         <div class="oppia-content-container">
           <div id="wrapper">
             <div class="oppia-main-body">
-
-              <!-- Top navigation. -->
               <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
                 <div class="navbar-container">
-                  <div class="navbar-header protractor-test-navbar-header pull-left">
-                    <a ng-if="windowIsNarrow" ng-click="openSidebar()" class="navbar-brand oppia-navbar-menu oppia-transition-200">
-                      <i class="material-icons oppia-navbar-menu-icon">&#xE5D2;</i>
-                    </a>
-                    <a class="oppia-navbar-brand-name oppia-transition-200" href="/" focus-on="<[LABEL_FOR_CLEARING_FOCUS]>">
-                      <img ng-src="<[getStaticImageUrl('/logo/288x128_logo_white.png')]>" class="oppia-logo" ng-class="windowIsNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'">
-                    </a>
-                    <!-- This is needed for the correct image to appear when an exploration is shared using G+. -->
-                    <a style="display: none;">
-                      <img ng-src="<[getStaticImageUrl('/logo/288x128_logo_mint.png')]>" itemprop="image">
-                    </a>
-                  </div>
-
-
-                  {% if nav_mode != 'signup' %}
-                    <div ng-cloak class="navbar-header pull-right">
-                      <ul class="nav oppia-navbar-nav oppia-navbar-profile">
-                        {% if username %}
-                          <li class="dropdown pull-right">
-                            <a class="dropdown-toggle oppia-navbar-dropdown-toggle" data-toggle="dropdown" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
-                              <div class="oppia-navbar-profile-picture-container" ng-cloak>
-                                {% if profile_picture_data_url %}
-                                  <img src="{{profile_picture_data_url}}" class="oppia-navbar-profile-picture img-circle">
-                                  <span class="caret" style="margin-top: 10px;"></span>
-                                {% else %}
-                                  <i class="material-icons md-40" style="margin-top: -1px;">&#xE853;</i>
-                                  <span class="caret" style="margin-top: -26px;"></span>
-                                {% endif %}
-
-                                <div class="oppia-navbar-dashboard-indicator ng-cloak" ng-if="numUnseenNotifications > 0">
-                                  <span class="oppia-navbar-dashboard-indicator-text">
-                                    <[numUnseenNotifications]>
-                                  </span>
-                                </div>
-
-                                <div style="display: none;" class="oppia-user-email">
-                                  {{user_email}}
-                                </div>
-
-                                {% if is_admin or is_moderator %}
-                                  <div class="oppia-navbar-role-indicator">
-                                    {% if is_admin %}
-                                      <!-- "right: 4px;" is necessary here but not in moderator to prevent 'A' from appearing off-center because 'A' is slightly thinner than 'M' in this font -->
-                                      <span class="oppia-navbar-role-text" style="right: 4px;">A</span>
-                                    {% elif is_moderator %}
-                                      <span class="oppia-navbar-role-text">M</span>
-                                    {% endif %}
-                                  </div>
-                                {% endif %}
-                              </div>
-                            </a>
-
-                            <ul class="dropdown-menu ng-cloak oppia-navbar-dropdown" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)" ng-show="profileDropdownIsActive">
-                              <li>
-                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/profile/{{username}}">
-                                  <strong>{{username}}</strong>
-                                </a>
-                              </li>
-                              <hr class="oppia-top-right-menu-item-separator">
-                              <li>
-                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/dashboard">
-                                  <span translate="I18N_TOPNAV_DASHBOARD"></span>
-                                </a>
-                              </li>
-                              <li>
-                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/notifications_dashboard">
-                                  <span translate="I18N_TOPNAV_NOTIFICATIONS"></span>
-                                  <span ng-if="numUnseenNotifications > 0">
-                                    (<[numUnseenNotifications]>)
-                                  </span>
-                                </a>
-                              </li>
-                              <li>
-                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/preferences">
-                                  <span translate="I18N_TOPNAV_PREFERENCES"></span>
-                                </a>
-                              </li>
-
-                              {% if is_moderator %}
-                                <li>
-                                  <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/moderator" target="_blank">
-                                    <span translate="I18N_TOPNAV_MODERATOR_PAGE"></span>
-                                  </a>
-                                </li>
-                              {% endif %}
-                              {% if is_super_admin %}
-                                <li>
-                                  <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/admin" target="_blank">
-                                    <span translate="I18N_TOPNAV_ADMIN_PAGE"></span>
-                                  </a>
-                                </li>
-                              {% endif %}
-                              <hr class="oppia-top-right-menu-item-separator">
-                              <li>
-                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="{{logout_url}}">
-                                  <span translate="I18N_TOPNAV_LOGOUT"></span>
-                                </a>
-                              </li>
-                            </ul>
-                          </li>
-                        {% else %}
-                          <li class="dropdown oppia-navbar-clickable-dropdown pull-right">
-                            <div class="oppia-navbar-button-container" style="margin-right: 10px;">
-                              <button class="btn oppia-navbar-button"
-                                      ng-click="onLoginButtonClicked('{{login_url}}')">
-                                <span translate="I18N_TOPNAV_SIGN_IN"></span>
-                                <span class="caret"></span>
-                              </button>
-                            </div>
-                            <ul class="dropdown-menu oppia-navbar-dropdown" role="menu" style="margin-right: 15px; padding: 0;" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
-                              <li>
-                                <a href style="padding: 0; width: 200px;" ng-click="onLoginButtonClicked('{{login_url}}')">
-                                  <img ng-src="<[getStaticImageUrl('/signin/Red-signin-Long-base-44dp.png')]>">
-                                </a>
-                              </li>
-                            </ul>
-                          </li>
-                        {% endif %}
-                      </ul>
-                      <ul class="nav oppia-navbar-nav">
-                        {% if nav_mode not in ['create', 'explore', 'collection'] %}
-                          <ul ng-if="windowIsNarrow" class="nav oppia-navbar-tabs-narrow">
-                            <create-activity-button></create-activity-button>
-                          </ul>
-                          <ul ng-if="!windowIsNarrow" class="nav oppia-navbar-tabs">
-                            <create-activity-button></create-activity-button>
-                            <li>
-                              <div class="pull-right oppia-navbar-button-container">
-                                <a href="/donate" class="btn oppia-navbar-button oppia-navbar-hide-on-small-width protractor-test-create-activity oppia-transition-200"
-                                  <span translate="I18N_TOPNAV_DONATE"></span>
-                                </a>
-                              </div>
-                            </li>
-
-                            <li class="dropdown oppia-navbar-clickable-dropdown pull-right">
-                              <a class="oppia-navbar-tab">
-                                <span translate="I18N_TOPNAV_ABOUT"></span>
-                                <span class="caret"></span>
-                              </a>
-                              <ul class="dropdown-menu oppia-navbar-dropdown" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
-                                <li><a href="/about" translate="I18N_TOPNAV_ABOUT_OPPIA"></a></li>
-                                <li><a href="/teach" translate="I18N_TOPNAV_TEACH_WITH_OPPIA"></a></li>
-                                <li><a href="/blog" translate="I18N_TOPNAV_BLOG"></a></li>
-                                <li><a href="/forum" translate="I18N_TOPNAV_FORUM"></a></li>
-                                <li><a href="/contact" translate="I18N_TOPNAV_CONTACT_US"></a></li>
-                              </ul>
-                            </li>
-                            <li class="oppia-clickable-navbar-element pull-right">
-                              <a class="oppia-navbar-tab" href="/library" translate="I18N_TOPNAV_LIBRARY"></a>
-                            </li>
-                          </ul>
-                        {% endif %}
-                      </ul>
-                    </div>
-                  {% endif %}
+                  <top-navigation-bar></top-navigation-bar>
 
                   <div class="collapse navbar-collapse ng-cloak">
                     {% block navbar_breadcrumb %}
                     {% endblock navbar_breadcrumb %}
 
                     {% block local_top_nav_options %}
-                    {% endblock %}
+                    {% endblock local_top_nav_options %}
                   </div>
                 </div>
               </nav>
@@ -340,6 +193,7 @@
 
     {% include 'pages/footer_js_libs.html' %}
 
+    {% include 'components/background/background_banner_directive.html' %}
     {% include 'components/create_button/create_activity_button_directive.html' %}
     {% include 'components/forms/form_builder_templates.html' %}
     {% include 'components/forms/image_uploader_directive.html' %}
@@ -350,6 +204,7 @@
 
     {% include 'components/rating_display.html' %}
     {% include 'components/side_navigation_bar/side_navigation_bar_directive.html' %}
+    {% include 'components/top_navigation_bar/top_navigation_bar_directive.html' %}
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/app.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/directives.js"></script>
@@ -365,6 +220,7 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/utilsService.js"></script>
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/alerts/AlertMessageDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/create_button/CreateActivityButtonDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/ImageUploaderDirective.js"></script>
@@ -372,6 +228,7 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/Select2DropdownDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/side_navigation_bar/SideNavigationBarDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/top_navigation_bar/TopNavigationBarDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CircularImageDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CollectionSummaryTileDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
@@ -381,6 +238,7 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingDisplayDirective.js"></script>
 
+    <script src="{{TEMPLATE_DIR_PREFIX}}/domain/sidebar/SidebarStatusService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/UrlInterpolationService.js"></script>
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionSyntaxTree.js"></script>

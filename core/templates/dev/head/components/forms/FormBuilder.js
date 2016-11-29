@@ -604,11 +604,16 @@ oppia.factory('rteHelperService', [
       createRteElement: function(componentDefn, customizationArgsDict) {
         var el = $('<img/>');
         if (explorationContextService.isInExplorationContext()) {
-          customizationArgsDict = angular.extend(customizationArgsDict,
-            {
-              explorationId: explorationContextService.getExplorationId()
-            }
-          );
+          // TODO(sll): This extra key was introduced in commit
+          // 19a934ce20d592a3fc46bd97a2f05f41d33e3d66 in order to retrieve an
+          // image for RTE previews. However, it has had the unfortunate side-
+          // effect of adding an extra tag to the exploration RTE tags stored
+          // in the datastore. We are now removing this key in
+          // convertRteToHtml(), but we need to find a less invasive way to
+          // handle previews.
+          customizationArgsDict = angular.extend(customizationArgsDict, {
+            explorationId: explorationContextService.getExplorationId()
+          });
         }
         var interpolatedUrl = $interpolate(
           componentDefn.previewUrlTemplate, false, null, true)(
@@ -681,7 +686,11 @@ oppia.factory('rteHelperService', [
             var jQueryElt = $('<' + tagNameMatch[2] + '/>');
             for (var i = 0; i < this.attributes.length; i++) {
               var attr = this.attributes[i];
-              if (attr.name !== 'class' && attr.name !== 'src') {
+              // The exploration-id-with-value attribute was added in
+              // createRteElement(), and should be stripped. See commit
+              // 19a934ce20d592a3fc46bd97a2f05f41d33e3d66.
+              if (attr.name !== 'class' && attr.name !== 'src' &&
+                  attr.name !== 'exploration-id-with-value') {
                 jQueryElt.attr(attr.name, attr.value);
               }
             }
@@ -891,19 +900,23 @@ oppia.config(['$provide', function($provide) {
 }]);
 
 oppia.directive('textAngularRte', [
-    '$filter', 'oppiaHtmlEscaper', 'rteHelperService', '$timeout',
+    '$filter', '$timeout', 'oppiaHtmlEscaper', 'rteHelperService',
+    'textAngularManager',
     function(
-      $filter, oppiaHtmlEscaper, rteHelperService, $timeout) {
+        $filter, $timeout, oppiaHtmlEscaper, rteHelperService,
+        textAngularManager) {
       return {
         restrict: 'E',
         scope: {
           htmlContent: '=',
-          uiConfig: '&'
+          uiConfig: '&',
+          labelForFocusTarget: '&'
         },
         template: (
           '<div text-angular="" ta-toolbar="<[toolbarOptionsJson]>" ' +
           '     ta-paste="stripFormatting($html)" ng-model="tempContent"' +
-          '     placeholder="<[placeholderText]>">' +
+          '     placeholder="<[placeholderText]>"' +
+          '     name="<[labelForFocusTarget()]>">' +
           '</div>'),
         controller: ['$scope', function($scope) {
           // Currently, operations affecting the filesystem are allowed only in
@@ -914,6 +927,7 @@ oppia.directive('textAngularRte', [
             ['ol', 'ul', 'pre', 'indent', 'outdent'],
             []
           ];
+          var whitelistedImgClasses = [];
 
           if ($scope.uiConfig() && $scope.uiConfig().placeholder) {
             $scope.placeholderText = $scope.uiConfig().placeholder;
@@ -926,6 +940,8 @@ oppia.directive('textAngularRte', [
                     componentDefn.isComplex)) {
                 toolbarOptions[2].push(componentDefn.name);
               }
+              var imgClassName = 'oppia-noninteractive-' + componentDefn.name;
+              whitelistedImgClasses.push(imgClassName);
             }
           );
           $scope.toolbarOptionsJson = JSON.stringify(toolbarOptions);
@@ -935,7 +951,14 @@ oppia.directive('textAngularRte', [
           };
 
           $scope.stripFormatting = function(html) {
-            return $filter('sanitizeHtmlForRte')(html);
+            var safeHtml = $filter(
+              'stripFormatting'
+            )(html, whitelistedImgClasses);
+            // The '.' default is needed, otherwise some tags are not stripped
+            // properly. To reproduce, copy the image from this page
+            // (https://en.wikipedia.org/wiki/C._Auguste_Dupin) and paste it
+            // into the RTE.
+            return safeHtml || '.';
           };
 
           $scope.init = function() {
@@ -943,6 +966,15 @@ oppia.directive('textAngularRte', [
           };
 
           $scope.init();
+
+          $scope.$on('focusOn', function(evt, label) {
+            if (label === $scope.labelForFocusTarget()) {
+              var editorScope = textAngularManager.retrieveEditor(label).scope;
+              $timeout(function() {
+                editorScope.displayElements.text[0].focus();
+              });
+            }
+          });
 
           $scope.$watch('tempContent', function(newVal) {
             // Sanitizing while a modal is open would delete the markers that
@@ -1520,10 +1552,10 @@ oppia.directive('schemaBasedHtmlEditor', [function() {
 
 oppia.directive('schemaBasedListEditor', [
   'schemaDefaultValueService', 'recursionHelper', 'focusService',
-  'schemaUndefinedLastElementService',
+  'schemaUndefinedLastElementService', 'IdGenerationService',
   function(
     schemaDefaultValueService, recursionHelper, focusService,
-    schemaUndefinedLastElementService) {
+    schemaUndefinedLastElementService, IdGenerationService) {
     return {
       scope: {
         localValue: '=',
@@ -1545,7 +1577,7 @@ oppia.directive('schemaBasedListEditor', [
       controller: ['$scope', function($scope) {
         var baseFocusLabel = (
           $scope.labelForFocusTarget() ||
-          Math.random().toString(36).slice(2) + '-');
+          IdGenerationService.generateNewId() + '-');
         $scope.getFocusLabel = function(index) {
           // Treat the first item in the list as a special case -- if this list
           // is contained in another list, and the outer list is opened with a
@@ -1712,18 +1744,21 @@ oppia.directive('schemaBasedDictEditor', [
       templateUrl: 'schemaBasedEditor/dict',
       restrict: 'E',
       compile: recursionHelper.compile,
-      controller: ['$scope', function($scope) {
-        $scope.getHumanReadablePropertyDescription = function(property) {
-          return property.description || '[' + property.name + ']';
-        };
+      controller: [
+        '$scope', 'IdGenerationService',
+        function($scope, IdGenerationService) {
+          $scope.getHumanReadablePropertyDescription = function(property) {
+            return property.description || '[' + property.name + ']';
+          };
 
-        $scope.fieldIds = {};
-        for (var i = 0; i < $scope.propertySchemas().length; i++) {
-          // Generate random IDs for each field.
-          $scope.fieldIds[$scope.propertySchemas()[i].name] = (
-            Math.random().toString(36).slice(2));
+          $scope.fieldIds = {};
+          for (var i = 0; i < $scope.propertySchemas().length; i++) {
+            // Generate random IDs for each field.
+            $scope.fieldIds[$scope.propertySchemas()[i].name] = (
+              IdGenerationService.generateNewId());
+          }
         }
-      }]
+      ]
     };
   }
 ]);

@@ -66,9 +66,9 @@
     },
     "frontend": {
       "angular": {
-        "version": "1.4.7",
+        "version": "1.5.8",
         "downloadFormat": "files",
-        "url": "https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7",
+        "url": "https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8",
         "targetDirPrefix": "angularjs-",
         "files": [
           "angular.js", "angular.min.js", "angular.min.js.map", "angular-animate.js",
@@ -87,9 +87,9 @@
         }
       },
       "angularTest": {
-        "version": "1.4.7",
+        "version": "1.5.8",
         "downloadFormat": "files",
-        "url": "https://code.angularjs.org/1.4.7",
+        "url": "https://code.angularjs.org/1.5.8",
         "targetDirPrefix": "angularjs-",
         "files": ["angular-mocks.js", "angular-scenario.js"]
       },
@@ -230,9 +230,9 @@
         }
       },
       "guppy": {
-        "version": "0.0.2",
+        "version": "1.0.0",
         "downloadFormat": "zip",
-        "url": "https://github.com/daniel3735928559/guppy/archive/v0.0.2.zip",
+        "url": "https://github.com/daniel3735928559/guppy/archive/v1.0.0.zip",
         "rootDirPrefix": "guppy-",
         "targetDirPrefix": "guppy-"
       },
@@ -247,9 +247,9 @@
         }
       },
       "jquery": {
-        "version": "2.1.1",
+        "version": "3.0.0",
         "downloadFormat": "files",
-        "url": "https://ajax.googleapis.com/ajax/libs/jquery/2.1.1",
+        "url": "https://ajax.googleapis.com/ajax/libs/jquery/3.0.0",
         "rootDirPrefix": "jquery-",
         "targetDirPrefix": "jquery-",
         "files": ["jquery.js", "jquery.min.js", "jquery.min.js.map"],
@@ -283,11 +283,11 @@
         "targetDirPrefix": "jquery-ui-touch-punch-"
       },
       "mathExpressions": {
-        "version": "762ffd0effea1525b21a882624074322fa7aad26",
+        "version": "10186afeb160aa48ed94b20afd6353759c059dee",
         "downloadFormat": "zip",
-        "url": "https://github.com/kisonecat/math-expressions/archive/762ffd0effea1525b21a882624074322fa7aad26.zip",
+        "url": "https://github.com/kisonecat/math-expressions/archive/10186afeb160aa48ed94b20afd6353759c059dee.zip",
         "rootDirPrefix": "math-expressions-",
-        "targetDir": "math-expressions-762ffd"
+        "targetDir": "math-expressions-10186a"
       },
       "mathJax": {
         "version": "2.6.0",
@@ -304,11 +304,11 @@
         "targetDir": "midi-js-2ef687"
       },
       "ngJoyride": {
-        "version": "0.1.11",
+        "version": "5b25d076405c9a787db602d2a8ff49919228f4fc",
         "downloadFormat": "zip",
-        "url": "https://github.com/abhikmitra/ng-joyride/archive/0.1.11.zip",
+        "url": "https://github.com/seanlip/ng-joyride/archive/5b25d076405c9a787db602d2a8ff49919228f4fc.zip",
         "rootDirPrefix": "ng-joyride-",
-        "targetDirPrefix": "ng-joyride-",
+        "targetDir": "ng-joyride-5b25d0",
         "bundle": {
           "css": ["ng-joyride.css"],
           "js": ["ng-joyride.js"]

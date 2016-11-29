@@ -328,68 +328,6 @@ oppia.filter('convertToPlainText', [function() {
   };
 }]);
 
-oppia.filter('summarizeAnswerGroup', [
-    '$filter', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
-    function($filter, RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
-  return function(answerGroup, interactionId, answerChoices, shortenRule) {
-    var summary = '';
-    var outcome = answerGroup.outcome;
-    var hasFeedback = outcome.feedback.length > 0 && outcome.feedback[0];
-
-    if (answerGroup.rule_specs) {
-      var firstRule = $filter('convertToPlainText')(
-        $filter('parameterizeRuleDescription')(
-          answerGroup.rule_specs[0], interactionId, answerChoices));
-      summary = 'Answer ' + firstRule;
-
-      if (hasFeedback && shortenRule) {
-        summary = $filter('wrapTextWithEllipsis')(
-          summary, RULE_SUMMARY_WRAP_CHARACTER_COUNT);
-      }
-      summary = '[' + summary + '] ';
-    }
-
-    if (hasFeedback) {
-      summary += $filter('convertToPlainText')(outcome.feedback[0]);
-    }
-    return summary;
-  };
-}]);
-
-oppia.filter('summarizeDefaultOutcome', [
-    '$filter', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
-    function($filter, RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
-  return function(
-      defaultOutcome, interactionId, answerGroupCount, shortenRule) {
-    if (!defaultOutcome) {
-      return '';
-    }
-
-    var summary = '';
-    var feedback = defaultOutcome.feedback;
-    var hasFeedback = feedback.length > 0 && feedback[0];
-
-    if (interactionId === 'Continue') {
-      summary = 'When the button is clicked';
-    } else if (answerGroupCount > 0) {
-      summary = 'All other answers';
-    } else {
-      summary = 'All answers';
-    }
-
-    if (hasFeedback && shortenRule) {
-      summary = $filter('wrapTextWithEllipsis')(
-        summary, RULE_SUMMARY_WRAP_CHARACTER_COUNT);
-    }
-    summary = '[' + summary + '] ';
-
-    if (hasFeedback) {
-      summary += $filter('convertToPlainText')(defaultOutcome.feedback[0]);
-    }
-    return summary;
-  };
-}]);
-
 // Filter that summarizes a large number to a decimal followed by
 // the appropriate metric prefix (K, M or B). For example, 167656
 // becomes 167.7K.
@@ -439,5 +377,23 @@ oppia.filter('removeDuplicatesInArray', [function() {
     return input.filter(function(val, pos) {
       return input.indexOf(val) === pos;
     });
+  };
+}]);
+
+oppia.filter('stripFormatting', [function() {
+  return function(html, whitelistedImgClasses) {
+    // Oppia RTE adds style attribute to bold and italics tags that
+    // must be removed.
+    var styleRegex = new RegExp(' style=\"[^\"]+\"', 'gm');
+    // Strip out anything between and including <>,
+    // unless it is an img whose class includes one of the whitelisted classes
+    // or is the bold or italics tags.
+    var tagRegex = new RegExp(
+      '(?!<img.*class=".*(' + whitelistedImgClasses.join('|') +
+      ').*".*>)(?!<b>|<\/b>|<i>|<\/i>)<[^>]+>', 'gm');
+    var strippedText = html ? String(html).replace(styleRegex, '') : '';
+    strippedText = strippedText ? String(strippedText).replace(
+      tagRegex, '') : '';
+    return strippedText;
   };
 }]);

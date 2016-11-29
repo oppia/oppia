@@ -136,16 +136,49 @@ SENDER_VALIDATORS = {
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_MARKETING: (
         lambda x: rights_manager.Actor(x).is_admin()),
     feconf.EMAIL_INTENT_DELETE_EXPLORATION: (
         lambda x: rights_manager.Actor(x).is_moderator()),
     feconf.EMAIL_INTENT_REPORT_BAD_CONTENT: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.BULK_EMAIL_INTENT_MARKETING: (
+        lambda x: user_services.get_username(x) in
+        config_domain.WHITELISTED_EMAIL_SENDERS.value),
+    feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION: (
+        lambda x: user_services.get_username(x) in
+        config_domain.WHITELISTED_EMAIL_SENDERS.value),
+    feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION: (
+        lambda x: user_services.get_username(x) in
+        config_domain.WHITELISTED_EMAIL_SENDERS.value),
+    feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT: (
+        lambda x: user_services.get_username(x) in
+        config_domain.WHITELISTED_EMAIL_SENDERS.value),
+    feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT: (
+        lambda x: user_services.get_username(x) in
+        config_domain.WHITELISTED_EMAIL_SENDERS.value)
 }
 
 
 def _require_sender_id_is_valid(intent, sender_id):
+    """Ensure that the sender ID is valid, based on the email's intent.
+
+    Many emails are only allowed to be sent by a certain user or type of user,
+    e.g. 'admin' or an admin/moderator. This function will raise an exception
+    if the given sender is not allowed to send this type of email.
+
+    Args:
+        intent: str. The intent string, i.e. the purpose of the email.
+            Valid intent strings are defined in feconf.py.
+        sender_id: str. The ID of the user sending the email.
+
+    Raises:
+        Exception: The email intent is invalid.
+        Exception: The sender_id is not appropriate for the given intent.
+    """
+
     if intent not in SENDER_VALIDATORS:
         raise Exception('Invalid email intent string: %s' % intent)
     else:
@@ -167,7 +200,20 @@ def _send_email(
     Raises an Exception if the sender_id is not appropriate for the given
     intent. Currently we support only system-generated emails and emails
     initiated by moderator actions.
+
+    Args:
+        recipient_id: str. The user ID of the recipient.
+        sender_id: str. The user ID of the sender.
+        intent: str. The intent string for the email, i.e. the purpose/type.
+        email_subject: str. The subject of the email.
+        email_html_body: str. The body (message) of the email.
+        sender_email: str. The sender's email address.
+        bcc_admin: bool. Whether to send a copy of the email to the admin's
+            email address.
+        sender_name: str or None. The name to be shown in the "sender" field of
+            the email.
     """
+
     if sender_name is None:
         sender_name = EMAIL_SENDER_NAME.value
 
@@ -207,8 +253,66 @@ def _send_email(
     return transaction_services.run_in_transaction(_send_email_in_transaction)
 
 
+def _send_bulk_mail(
+        recipient_ids, sender_id, intent, email_subject, email_html_body,
+        sender_email, sender_name, instance_id=None):
+    """Sends an email to all given recipients.
+
+    Args:
+        recipient_ids: list(str). The user IDs of the email recipients.
+        sender_id: str. The ID of the user sending the email.
+        intent: str. The intent string, i.e. the purpose of the email.
+        email_subject: str. The subject of the email.
+        email_html_body: str. The body (message) of the email.
+        sender_email: str. The sender's email address.
+        sender_name: str. The name to be shown in the "sender" field of the
+            email.
+        instance_id: str or None. The ID of the BulkEmailModel entity instance.
+    """
+    _require_sender_id_is_valid(intent, sender_id)
+
+    recipients_settings = user_services.get_users_settings(recipient_ids)
+    recipient_emails = [user.email for user in recipients_settings]
+
+    cleaned_html_body = html_cleaner.clean(email_html_body)
+    if cleaned_html_body != email_html_body:
+        log_new_error(
+            'Original email HTML body does not match cleaned HTML body:\n'
+            'Original:\n%s\n\nCleaned:\n%s\n' %
+            (email_html_body, cleaned_html_body))
+        return
+
+    raw_plaintext_body = cleaned_html_body.replace('<br/>', '\n').replace(
+        '<br>', '\n').replace('<li>', '<li>- ').replace('</p><p>', '</p>\n<p>')
+    cleaned_plaintext_body = html_cleaner.strip_html_tags(raw_plaintext_body)
+
+    def _send_bulk_mail_in_transaction(instance_id=None):
+        sender_name_email = '%s <%s>' % (sender_name, sender_email)
+
+        email_services.send_bulk_mail(
+            sender_name_email, recipient_emails, email_subject,
+            cleaned_plaintext_body, cleaned_html_body)
+
+        if instance_id is None:
+            instance_id = email_models.BulkEmailModel.get_new_id('')
+        email_models.BulkEmailModel.create(
+            instance_id, recipient_ids, sender_id, sender_name_email, intent,
+            email_subject, cleaned_html_body, datetime.datetime.utcnow())
+
+    return transaction_services.run_in_transaction(
+        _send_bulk_mail_in_transaction, instance_id)
+
+
 def send_mail_to_admin(email_subject, email_body):
-    """Sends email to admin."""
+    """Send an email to the admin email address.
+
+    The email is sent to the ADMIN_EMAIL_ADDRESS set in feconf.py.
+
+    Args:
+        email_subject: str. Subject of the email.
+        email_body: str. Body (message) of the email.
+    """
+
     app_id = app_identity_services.get_application_id()
     body = '(Sent from %s)\n\n%s' % (app_id, email_body)
 
@@ -220,9 +324,13 @@ def send_mail_to_admin(email_subject, email_body):
 def send_post_signup_email(user_id):
     """Sends a post-signup email to the given user.
 
-    The caller is responsible for ensuring that emails are allowed to be sent
-    to users (i.e. feconf.CAN_SEND_EMAILS is True).
+    Raises an exception if emails are not allowed to be sent to users (i.e.
+    feconf.CAN_SEND_EMAILS is False).
+
+    Args:
+        user_id: str. User ID of the user that signed up.
     """
+
     for key, content in SIGNUP_EMAIL_CONTENT.value.iteritems():
         if content == SIGNUP_EMAIL_CONTENT.default_value[key]:
             log_new_error(
@@ -244,11 +352,30 @@ def send_post_signup_email(user_id):
 
 
 def require_valid_intent(intent):
+    """Checks if the given intent is valid, and raises an exception if it is
+    not.
+
+    Raises:
+        Exception: The given intent did not match an entry in
+            feconf.VALID_MODERATOR_ACTIONS.
+    """
+
     if intent not in feconf.VALID_MODERATOR_ACTIONS:
         raise Exception('Unrecognized email intent: %s' % intent)
 
 
 def _get_email_config(intent):
+    """Return the default body for the email type matching the given moderator
+    action intent.
+
+    Args:
+        intent: str. The intent string (cause/purpose) of the email.
+
+    Returns:
+        str. The default body for the email type matching the given moderator
+            action intent.
+    """
+
     require_valid_intent(intent)
     return config_domain.Registry.get_config_property(
         feconf.VALID_MODERATOR_ACTIONS[intent]['email_config'])
@@ -258,7 +385,15 @@ def get_draft_moderator_action_email(intent):
     """Returns a draft of the text of the body for an email sent immediately
     following a moderator action. An empty body is a signal to the frontend
     that no email will be sent.
+
+    Args:
+        intent: str. The intent string (cause/purpose) of the email.
+
+    Returns:
+        str. Draft of the email body for an email sent after a moderator action,
+            or an empty string if no email should be sent.
     """
+
     try:
         require_moderator_email_prereqs_are_satisfied()
         return _get_email_config(intent).value
@@ -268,7 +403,12 @@ def get_draft_moderator_action_email(intent):
 
 def require_moderator_email_prereqs_are_satisfied():
     """Raises an exception if, for any reason, moderator emails cannot be sent.
+
+    Raises:
+        Exception: feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION is False.
+        Exception: feconf.CAN_SEND_EMAILS is False.
     """
+
     if not feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION:
         raise Exception(
             'For moderator emails to be sent, please ensure that '
@@ -284,9 +424,18 @@ def send_moderator_action_email(
     """Sends a email immediately following a moderator action (publicize,
     unpublish, delete) to the given user.
 
-    The caller is responsible for ensuring that emails are allowed to be sent
-    to users (i.e. feconf.CAN_SEND_EMAILS is True).
+    Raises an exception if emails are not allowed to be sent to users (i.e.
+    feconf.CAN_SEND_EMAILS is False).
+
+    Args:
+        sender_id: str. User ID of the sender.
+        recipient_id: str. User ID of the recipient.
+        intent: str. The intent string (cause/purpose) of the email.
+        exploration_title: str. The title of the exploration on which the
+            moderator action was taken.
+        email_body: str. The email content/message.
     """
+
     require_moderator_email_prereqs_are_satisfied()
     email_config = feconf.VALID_MODERATOR_ACTIONS[intent]
 
@@ -316,7 +465,23 @@ def send_role_notification_email(
 
     Email will only be sent if recipient wants to receive these emails (i.e.
     'can_receive_editor_role_email' is set True in recipent's preferences).
+
+    Args:
+        inviter_id: str. ID of the user who invited the recipient to the new
+            role.
+        recipient_id: str. User ID of the recipient.
+        recipient_role: str. Role given to the recipient. Must be defined in
+            EDITOR_ROLE_EMAIL_HTML_ROLES.
+        exploration_id: str. ID of the exploration for which the recipient has
+            been given the new role.
+        exploration_title: str. Title of the exploration for which the recipient
+            has been given the new role.
+
+    Raises:
+        Exception: The role is invalid (i.e. not defined in
+            EDITOR_ROLE_EMAIL_HTML_ROLES).
     """
+
     # Editor role email body and email subject templates.
     email_subject_template = (
         '%s - invitation to collaborate')
@@ -380,8 +545,15 @@ def send_feedback_message_email(recipient_id, feedback_messages):
     """Sends an email when creator receives feedback message to an exploration.
 
     Args:
-    - recipient_id: id of recipient user.
-    - feedback_messages: dictionary containing feedback messages.
+        recipient_id: str. User ID of recipient.
+        feedback_messages: dict. Contains feedback messages. Example:
+
+            {
+                'exploration_id': {
+                    'title': 'Exploration 1234',
+                    'messages': ['Feedback message 1', 'Feedback message 2']
+                }
+            }
     """
 
     email_subject = (
@@ -434,6 +606,19 @@ def send_feedback_message_email(recipient_id, feedback_messages):
 
 def send_suggestion_email(
         exploration_title, exploration_id, author_id, recipient_list):
+    """Send emails to notify the given recipients about new suggestion.
+
+    Each recipient will only be emailed if their email preferences allow for
+    incoming feedback message emails.
+
+    Args:
+        exploration_title: str. Title of the exploration with the new
+            suggestion.
+        exploration_id: str. The ID of the exploration with the new suggestion.
+        author_id: str. The user ID of the author of the suggestion.
+        recipient_list: list(str). The user IDs of the email recipients.
+    """
+
     email_subject = 'New suggestion for "%s"' % exploration_title
 
     email_body_template = (
@@ -477,11 +662,23 @@ def send_suggestion_email(
 def send_instant_feedback_message_email(
         recipient_id, sender_id, message, email_subject, exploration_title,
         exploration_id, thread_title):
+    """Send an email when a new message is posted to a feedback thread, or when
+    the thread's status is changed.
+
+    Args:
+        recipient_id: str. The user ID of the recipient.
+        sender_id: str. The user ID of the sender.
+        message: str. The message text or status change text from the sender.
+        email_subject: str. The subject line to be sent in the email.
+        exploration_title: str. The title of the exploration.
+        exploration_id: str. ID of the exploration the feedback thread is about.
+        thread_title: str. The title of the feedback thread.
+    """
 
     email_body_template = (
         'Hi %s,<br><br>'
         'New update to thread "%s" on '
-        '<a href="https://www.oppia.org/%s">%s</a>:<br>'
+        '<a href="https://www.oppia.org/create/%s#/feedback">%s</a>:<br>'
         '<ul><li>%s: %s<br></li></ul>'
         '(You received this message because you are a '
         'participant in this thread.)<br><br>'
@@ -514,6 +711,14 @@ def send_instant_feedback_message_email(
 
 def send_flag_exploration_email(
         exploration_title, exploration_id, reporter_id, report_text):
+    """Send an email to all moderators when an exploration is flagged.
+
+    Args:
+        exploration_title: str. The title of the flagged exporation.
+        exploration_id: str. The ID of the flagged exploration.
+        reporter_id: str. The user ID of the reporter.
+        report_text: str. The message entered by the reporter.
+    """
     email_subject = 'Exploration flagged by user: "%s"' % exploration_title
 
     email_body_template = (
@@ -543,3 +748,87 @@ def send_flag_exploration_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_REPORT_BAD_CONTENT,
             email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_query_completion_email(recipient_id, query_id):
+    """Send an email to the initiator of a bulk email query with a link to view
+    the query results.
+
+    Args:
+        recipient_id: str. The recipient ID.
+        query_id: str. The query ID.
+    """
+    email_subject = 'Query %s has successfully completed' % query_id
+
+    email_body_template = (
+        'Hi %s,<br>'
+        'Your query with id %s has succesfully completed its '
+        'execution. Visit the result page '
+        '<a href="https://www.oppia.org/emaildashboardresult/%s">here</a> '
+        'to see result of your query.<br><br>'
+        'Thanks!<br>'
+        '<br>'
+        'Best wishes,<br>'
+        'The Oppia Team<br>'
+        '<br>%s')
+
+    recipient_user_settings = user_services.get_user_settings(recipient_id)
+    email_body = email_body_template % (
+        recipient_user_settings.username, query_id, query_id,
+        EMAIL_FOOTER.value)
+    _send_email(
+        recipient_id, feconf.SYSTEM_COMMITTER_ID,
+        feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION, email_subject,
+        email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_query_failure_email(recipient_id, query_id, query_params):
+    """Send an email to the initiator of a failed bulk email query.
+
+    Args:
+        recipient_id: str. The recipient ID.
+        query_id: str. The query ID.
+        query_params: dict. The parameters of the query, as key:value.
+    """
+    email_subject = 'Query %s has failed' % query_id
+
+    email_body_template = (
+        'Hi %s,<br>'
+        'Your query with id %s has failed due to error '
+        'during execution. '
+        'Please check the query parameters and submit query again.<br><br>'
+        'Thanks!<br>'
+        '<br>'
+        'Best wishes,<br>'
+        'The Oppia Team<br>'
+        '<br>%s')
+
+    recipient_user_settings = user_services.get_user_settings(recipient_id)
+    email_body = email_body_template % (
+        recipient_user_settings.username, query_id, EMAIL_FOOTER.value)
+    _send_email(
+        recipient_id, feconf.SYSTEM_COMMITTER_ID,
+        feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION, email_subject,
+        email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+
+    admin_email_subject = 'Query job has failed.'
+    admin_email_body_template = (
+        'Query job with %s query id has failed in its execution.\n'
+        'Query parameters:\n\n')
+
+    for key in sorted(query_params):
+        admin_email_body_template += '%s: %s\n' % (key, query_params[key])
+
+    admin_email_body = admin_email_body_template % query_id
+    send_mail_to_admin(admin_email_subject, admin_email_body)
+
+
+def send_user_query_email(
+        sender_id, recipient_ids, email_subject, email_body, email_intent):
+    bulk_email_model_id = email_models.BulkEmailModel.get_new_id('')
+    sender_name = user_services.get_username(sender_id)
+    sender_email = user_services.get_email_from_user_id(sender_id)
+    _send_bulk_mail(
+        recipient_ids, sender_id, email_intent, email_subject, email_body,
+        sender_email, sender_name, bulk_email_model_id)
+    return bulk_email_model_id

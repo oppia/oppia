@@ -417,13 +417,6 @@ oppia.controller('EditorNavigation', [
       }, 5000);
     });
 
-    // This method is here because the trigger for the tutorial is in the site
-    // navbar. It broadcasts an event to tell the exploration editor to open the
-    // editor tutorial.
-    $scope.openEditorTutorial = function() {
-      $rootScope.$broadcast('openEditorTutorial');
-    };
-
     $scope.showUserHelpModal = function() {
       var explorationId = explorationContextService.getExplorationId();
       siteAnalyticsService.registerClickHelpButtonEvent(explorationId);
@@ -454,7 +447,7 @@ oppia.controller('EditorNavigation', [
       });
 
       modalInstance.result.then(function() {
-        $scope.openEditorTutorial();
+        $rootScope.$broadcast('openEditorTutorial');
       }, function() {
         stateEditorTutorialFirstTimeService.markTutorialFinished();
       });
@@ -567,8 +560,20 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       if (confirmDiscard) {
         alertsService.clearWarnings();
         $rootScope.$broadcast('externalSave');
-
         $scope.isDiscardInProgress = true;
+        $modal.open({
+          templateUrl: 'modals/reloadingEditor',
+          backdrop: 'static',
+          keyboard: false,
+          controller: [
+            '$scope', '$modalInstance', function($scope, $modalInstance) {
+              $timeout(function() {
+                $modalInstance.dismiss('cancel');
+              }, 2500);
+            }
+          ],
+          windowClass: 'oppia-loading-modal'
+        });
         changeListService.discardAllChanges();
         alertsService.addSuccessMessage('Changes discarded.');
         $rootScope.$broadcast('initExplorationPage', function() {
@@ -786,6 +791,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
                 return Boolean(
                   explorationTitleService.displayed &&
                   explorationObjectiveService.displayed &&
+                  explorationObjectiveService.displayed.length >= 15 &&
                   explorationCategoryService.displayed &&
                   explorationLanguageCodeService.displayed);
               };

@@ -2,6 +2,130 @@ This file contains a summary of changes to the Oppia code base. For a full chang
 
     https://github.com/oppia/oppia/commits/master
 
+v2.3.6 (14 Nov 2016)
+--------------------
+Learner view:
+* Update learner view design by adjusting spacing at top of cards, augmenting card shadows, updating background images, and removing the share icons at the end.
+* Hide continue button when pagging back through the cards
+* Add Math component while suggesting changes
+* Fixed footer in learner view
+* Update the backgrounds of both players to use a solid blue background
+* Change font color from white to green at end of exploration
+* Fix color of progress dots in learner view
+* Fix tutor card position when viewport is narrow
+* Fix jittering help card at a certain size
+* Fix formatting error in item selection interaction display of learner answers
+* Add automatic line breaking for LaTeX expressions
+
+Editor:
+* Update the warning labels for changing the objective to be more clear
+* Upgrade math-expressions library and interpret the creator-defined string as LaTeX instead of text
+* Fix a bug where customization arg attributes are saved in the wrong order, leading to the item selection input interaction not recognizing HTML snippets with images
+* Add focusing functionality to the rich-text editor
+
+Collections:
+* Add option to go to collection view after finishing an exploration
+* Use collection-summary-tile for collections on small screens
+* Ensure explorations of a single state are properly recorded when completed
+* Remove 'Collection >' breadcrumb from collection player navbar
+
+Library page:
+* Make library carousel title links more obvious and remove "View All" button
+* Add protractor tests for visiting library pages
+* Change the mouse cursor to a pointer when the scroll button appears in the library
+
+Other pages:
+* Add a "Get Started" page.
+* Fix splash content alignment
+* Hide site feedback message text on smaller devices
+* Allow right clicking on dashboard tiles
+* Display a success toast when a new featured exploration is added
+
+I18N:
+* Fix Indonesian translation
+
+Emails:
+* Add functionality for sending emails to existing users in bulk.
+
+Dev tools:
+* Determine Vagrant env by checking existence of a file and env var
+* Fix flakiness when accepting alerts in Protractor tests
+
+Code health:
+* Refactor learner view
+* Minimize calls to is_admin, static site_name and feedback_url
+* Remove 'ALTERNATE' tag on translations
+* Refactor ID generation procedure into a separate service.
+* Separate the top navigation bar into its own directive
+* Split up the admin page controller
+* Update stripFormatting filter to preserve bold and italics
+* Improve docstrings for gae_models.py
+* Add docstrings for core.domain.stats_domain
+* Add docstrings for core.domain.stats_jobs_continuous
+* Add docstrings to gae_models.py
+
+v2.3.5 (17 Oct 2016)
+--------------------
+Infrastructure and tests:
+* Upgrade protractor to v4.0.9
+* Add protractor tests to visit static pages and for logged-in flow
+* Fix .load() method breakage due to jQuery upgrade
+* Use one-time bindings for admin page
+* Remove mail validation checks from mailgun email API
+* Add docstrings to collection_services.py
+
+I18N:
+* Add Portuguese (Brazil) translation
+
+UI fixes:
+* Make notifications right-clickable
+* Fix fallbacks triggering at the wrong time
+* Don't allow 'featured' label to break into 2 lines
+* Fix About page display on mobile
+
+
+v2.3.4 (10 Oct 2016)
+-------------------
+Embedded explorations:
+* Have a dedicated URL for iframed explorations.
+* Make the embedding script minimal.
+
+Creator Dashboard:
+* Display top unresolved answers and new feedback for dashboard explorations in a dropdown.
+* Make collection tiles in dashboard similar as in library.
+
+Emails and notifications:
+* Add a MR job for executing queries.
+* Fix bugs relating to emails.
+
+Player and editor:
+* Add functionality to report explorations.
+* Add collection recommendation for logged out users.
+* Strip formatting when text is pasted into the RTE.
+* Add check for objective length before publishing an exploration.
+* Show multiple rules for an answer group.
+* Fix placeholder for math input.
+
+Code health:
+* Major refactor of frontend code.
+* Update docstrings.
+* Delete duplicate angular filters.
+* Add e2e test for visiting moderator page.
+* Make 'ddescribe' and 'iit' forbidden strings.
+* Add an argument to show verbose log for backend tests.
+
+Infrastructure:
+* Upgrade jQuery to v3.0.0. Update AngularJS to v1.5.8.
+* Install requests package in third_party so that it is available to the deployed application.
+
+Library, collections and other pages:
+* Sort explorations in Top Rated and Recently Published pages.
+* Remove View all button and link for featured explorations.
+* Modified UI for adding a new exploration in collection.
+* Improve collection node list UI.
+* Remove splash page A/B tests.
+* Embed the Oppia blog on the main site.
+
 
 v2.3.3 (9 Sep 2016)
 -------------------

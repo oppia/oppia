@@ -236,6 +236,13 @@ EMAIL_INTENT_MARKETING = 'marketing'
 EMAIL_INTENT_PUBLICIZE_EXPLORATION = 'publicize_exploration'
 EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 EMAIL_INTENT_DELETE_EXPLORATION = 'delete_exploration'
+EMAIL_INTENT_QUERY_STATUS_NOTIFICATION = 'query_status_notification'
+# Possible intents for email sent in bulk.
+BULK_EMAIL_INTENT_MARKETING = 'bulk_email_marketing'
+BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
+BULK_EMAIL_INTENT_CREATE_EXPLORATION = 'bulk_email_create_exploration'
+BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT = 'bulk_email_creator_reengagement'
+BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT = 'bulk_email_learner_reengagement'
 
 MODERATOR_ACTION_PUBLICIZE_EXPLORATION = 'publicize_exploration'
 MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
@@ -435,6 +442,7 @@ TASK_URL_SUGGESTION_EMAILS = (
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
+COLLECTION_SUMMARIES_DATA_URL = '/collectionsummarieshandler/data'
 EDITABLE_COLLECTION_DATA_URL_PREFIX = '/collection_editor_handler/data'
 COLLECTION_RIGHTS_PREFIX = '/collection_editor_handler/rights'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
@@ -446,6 +454,7 @@ DASHBOARD_EXPLORATION_STATS_PREFIX = '/dashboardhandler/explorationstats'
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
+EXPLORATION_METADATA_SEARCH_URL = '/exploration/metadata_search'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
 EXPLORATION_SUMMARIES_DATA_URL = '/explorationsummarieshandler/data'
 EXPLORATION_URL_PREFIX = '/explore'
@@ -467,6 +476,7 @@ NEW_EXPLORATION_URL = '/contributehandler/create_new'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 ROBOTS_TXT_URL = '/robots.txt'
+SITE_FEEDBACK_FORM_URL = ''
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
@@ -478,6 +488,7 @@ UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 
 NAV_MODE_ABOUT = 'about'
+NAV_MODE_GET_STARTED = 'get_started'
 NAV_MODE_BLOG = 'blog'
 NAV_MODE_COLLECTION = 'collection'
 NAV_MODE_CONTACT = 'contact'
@@ -537,6 +548,14 @@ OUTPUT_FORMAT_ZIP = 'zip'
 UPDATE_TYPE_EXPLORATION_COMMIT = 'exploration_commit'
 UPDATE_TYPE_COLLECTION_COMMIT = 'collection_commit'
 UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
+
+# Possible values for user query status.
+# Valid status transitions are: processing --> completed --> archived
+# Or processing --> failed.
+USER_QUERY_STATUS_PROCESSING = 'processing'
+USER_QUERY_STATUS_COMPLETED = 'completed'
+USER_QUERY_STATUS_ARCHIVED = 'archived'
+USER_QUERY_STATUS_FAILED = 'failed'
 
 # The time difference between which to consider two login events "close". This
 # is taken to be 12 hours.
@@ -758,6 +777,9 @@ SUPPORTED_SITE_LANGUAGES = [{
     'id': 'pt',
     'text': 'Português'
 }, {
+    'id': 'pt-br',
+    'text': 'Português (Brasil)'
+}, {
     'id': 'vi',
     'text': 'Tiếng Việt'
 }, {
@@ -772,6 +794,8 @@ ABOUT_PAGE_DESCRIPTION = (
     'Oppia is an open source learning platform that connects a community of '
     'teachers and learners. You can use this site to create 1-1 learning '
     'scenarios for others.')
+GET_STARTED_PAGE_DESCRIPTION = (
+    'Learn how to get started using Oppia.')
 BLOG_PAGE_DESCRIPTION = (
     'Keep up to date with Oppia news and updates via our blog.')
 CONTACT_PAGE_DESCRIPTION = (
@@ -817,6 +841,7 @@ TERMS_PAGE_DESCRIPTION = (
     'distributing learning material.')
 THANKS_PAGE_DESCRIPTION = (
     'Thank you for donating to The Oppia Foundation.')
+SITE_NAME = 'Oppia.org'
 
 # The type of the response returned by a handler when an exception is raised.
 HANDLER_TYPE_HTML = 'html'

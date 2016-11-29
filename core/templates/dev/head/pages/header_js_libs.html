@@ -1,15 +1,9 @@
-<!--[if lt IE 9]>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<![endif]-->
-<!--[if gte IE 9]><!-->
-<!-- jquery.js, angular.js and jquery-ui.js are removed from bundled js because they need to be at the header. Including
-bundled js at the header will block rendering.-->
-  <script src="/third_party/static/jquery-2.1.1/jquery.min.js">
-  </script>
-<!--<![endif]-->
-<script src="/third_party/static/jqueryui-1.10.3/jquery-ui.min.js">
-</script>
-<script src="/third_party/static/angularjs-1.4.7/angular.min.js"></script>
+<!-- jquery.js, angular.js and jquery-ui.js are removed from bundled js because
+they need to be at the header. Including bundled js at the header will block
+rendering.-->
+<script src="/third_party/static/jquery-3.0.0/jquery.min.js"></script>
+<script src="/third_party/static/jqueryui-1.10.3/jquery-ui.min.js"></script>
+<script src="/third_party/static/angularjs-1.5.8/angular.min.js"></script>
 <script src="/third_party/static/jquery-ui-touch-punch-0.3.1/jquery.ui.touch-punch-improved.js"></script>
 <!-- See http://docs.mathjax.org/en/latest/start.html#mathjax-cdn -->
 <script type="text/x-mathjax-config">
@@ -17,6 +11,10 @@ bundled js at the header will block rendering.-->
     skipStartupTypeset: true,
     messageStyle: 'none',
     'HTML-CSS': {
+      linebreaks: {
+        automatic: true,
+        width: '500px'
+      },
       showMathMenu: false
     }
   });

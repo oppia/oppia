@@ -1,10 +1,5 @@
 <md-card class="oppia-editor-card" ng-controller="FeedbackTab">
   <div ng-if="!activeThread">
-    <!--
-      The filter syntax below checks for the existence of the suggestion_id
-      property. It works as of Angular 1.4.7. See
-      http://stackoverflow.com/a/18644490.
-    -->
     <div ng-if="threadData.suggestionThreads.length > 0">
       <h2>Suggestions from Learners</h2>
       <thread-table threads="threadData.suggestionThreads"

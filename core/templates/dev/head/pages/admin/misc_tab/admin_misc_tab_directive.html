@@ -1,0 +1,17 @@
+<script type="text/ng-template" id="admin/miscTab">
+  <md-card class="oppia-page-card oppia-long-text" style="max-width: 700px">
+    <h3>Topic Similarities</h3>
+    <div>
+      Upload a csv file:<br>
+      The first line of data should be a list of topic names. The next lines should be a symmetric adjacency matrix of similarities, which are values between 0 and 1.<br>
+      <input type="file" id="topicSimilaritiesFile">
+      <button ng-click="uploadTopicSimilaritiesFile()">Upload</button><br>
+      <button ng-click="downloadTopicSimilaritiesFile()">Download current topic similarities</button>
+    </div>
+  </md-card>
+
+  <md-card class="oppia-page-card oppia-long-text" style="max-width: 700px">
+    <h3>Search Index</h3>
+    <button ng-click="clearSearchIndex()">Clear Search Index</button>
+  </md-card>
+</script>

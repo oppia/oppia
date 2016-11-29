@@ -77,6 +77,7 @@ var finishTutorial = function() {
 
 var navigateToMainTab = function() {
   element(by.css('.protractor-test-main-tab')).click();
+  general.waitForSystem();
   // Click a neutral element in order to dismiss any warnings.
   element(by.css('.protractor-test-neutral-element')).click();
 };
@@ -1064,8 +1065,9 @@ var saveChanges = function(commitMessage) {
 var discardChanges = function() {
   element(by.css('.protractor-test-save-discard-toggle')).click();
   element(by.css('.protractor-test-discard-changes')).click();
-  browser.driver.switchTo().alert().accept();
+  general.acceptAlert();
   general.waitForSystem();
+  browser.waitForAngular();
 };
 
 var expectCannotSaveChanges = function() {

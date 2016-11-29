@@ -66,7 +66,7 @@ function maybeInstallDependencies {
     install_node_module karma-coverage 0.5.2
     install_node_module karma-ng-html2js-preprocessor 0.1.0
     install_node_module karma-chrome-launcher 0.1.4
-    install_node_module protractor 3.3.0
+    install_node_module protractor 4.0.11
     install_node_module protractor-screenshot-reporter 0.0.5
     install_node_module jasmine-spec-reporter 2.2.2
 
@@ -191,7 +191,7 @@ fi
 # Adjust path to support the default Chrome locations for Unix, Windows and Mac OS.
 if [ "$TRAVIS" = true ]; then
   export CHROME_BIN="/usr/bin/chromium-browser"
-elif [ "$VAGRANT" = true ]; then
+elif [ "$VAGRANT" = true ] || [ -f "/etc/is_vagrant_vm" ]; then
   # XVFB is required for headless testing in Vagrant
   sudo apt-get install xvfb chromium-browser
   export CHROME_BIN="/usr/bin/chromium-browser"
