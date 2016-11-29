@@ -82,17 +82,18 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
     hideLoadingDots = function() {
       $scope.loadingDotsAreShown = false;
-    }
+    };
 
     $scope.showPublishExplorationModal = function() {
       $scope.publishIsInProcess = true;
       $scope.loadingDotsAreShown = true;
 
-      explorationSaveService.showPublishExplorationModal(showLoadingDots, hideLoadingDots)
-        .then(function() {
-          $scope.loadingDotsAreShown = false;
-          $scope.publishIsInProcess = false;
-        });
+      explorationSaveService.showPublishExplorationModal(showLoadingDots,
+        hideLoadingDots)
+          .then(function() {
+            $scope.loadingDotsAreShown = false;
+            $scope.publishIsInProcess = false;
+          });
     };
 
     $scope.saveChanges = function() {
