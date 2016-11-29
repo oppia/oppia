@@ -230,11 +230,11 @@
         }
       },
       "guppy": {
-        "version": "06918aba8b03fa99f5a369ee94fdf96a696795f8",
+        "version": "be6f14251b6b6c981925f438ddc556d6492649a5",
         "downloadFormat": "zip",
-        "url": "https://github.com/daniel3735928559/guppy/archive/06918aba8b03fa99f5a369ee94fdf96a696795f8.zip",
+        "url": "https://github.com/daniel3735928559/guppy/archive/be6f14251b6b6c981925f438ddc556d6492649a5.zip",
         "rootDirPrefix": "guppy-",
-        "targetDir": "guppy-06918a"
+        "targetDir": "guppy-be6f14"
       },
       "hammerJs": {
         "version": "2.0.4",
