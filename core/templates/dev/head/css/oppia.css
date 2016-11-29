@@ -4057,34 +4057,34 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-about-header {
+  align-items: center;
+  display: flex;
+  height: 140px;
   position: absolute;
   text-align: center;
   width: 100%;
-  height: 140px;
-  display: flex;
-  align-items: center;
 }
 .oppia-about-header h1 {
   color: #01645C;
+  display: inline;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 3em;
-  width: 80%;
   left: 50%;
+  position: absolute;
   transform: translateX(-50%);
   -webkit-transform: translateX(-50%);
   -ms-transform: translateX(-50%);
-  display: inline;
-  position: absolute;
+  width: 80%;
   z-index: 1;
 }
 
 .oppia-about-content {
-  padding: 0;
-  width: 60%;
-  position: relative; 
-  margin-top: 0px; 
+  margin-top: 0; 
   margin-bottom: 300px;
+  padding: 0;
+  position: relative; 
   top: 250px;
+  width: 60%;
 }
 
 .oppia-about-extra-container {
@@ -4094,8 +4094,8 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-about-extra-content {
   margin: 0 auto;
   position: relative;
-  width: 60%;
   top: 0;
+  width: 60%;
 }
 
 .oppia-about-otter-container {
