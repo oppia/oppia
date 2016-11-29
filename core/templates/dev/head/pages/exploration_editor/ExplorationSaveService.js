@@ -94,7 +94,9 @@ oppia.factory('explorationSaveService', [
       });
     };
 
-    var openPublishExplorationModal = function(toggleLoadingDotsCallback) {
+    var openPublishExplorationModal = function(showLoadingDotsCallback, hideLoadingDotsCallback) {
+      var loadingDotsAreInUse = showLoadingDotsCallback && hideLoadingDotsCallback;
+
       // This is resolved when modal is closed.
       var deferred = $q.defer();
 
@@ -115,18 +117,12 @@ oppia.factory('explorationSaveService', [
       });
 
       publishModalInstance.result.then(function() {
-        // Toggle dots on.
-        if (toggleLoadingDotsCallback) {
-          toggleLoadingDotsCallback(true);
-        };
+        if (loadingDotsAreInUse) { showLoadingDotsCallback(); };
 
         explorationRightsService.saveChangeToBackend({
           is_public: true
         }).then(function() {
-          // Toggle dots back off.
-          if (toggleLoadingDotsCallback) {
-            toggleLoadingDotsCallback(false);
-          };
+          if (loadingDotsAreInUse) { hideLoadingDotsCallback(); };
 
           showCongratulatorySharingModal();
           siteAnalyticsService.registerPublishExplorationEvent(
@@ -235,10 +231,12 @@ oppia.factory('explorationSaveService', [
         }
       },
 
-      showPublishExplorationModal: function(toggleLoadingDotsCallback) {
+      showPublishExplorationModal: function(showLoadingDotsCallback, hideLoadingDotsCallback) {
         // This is resolved after publishing modals are closed,
         // so we can remove the loading-dots.
         var deferred = $q.defer();
+
+        var loadingDotsAreInUse = showLoadingDotsCallback && hideLoadingDotsCallback;
 
         siteAnalyticsService.registerOpenPublishExplorationModalEvent(
           explorationData.explorationId);
@@ -382,9 +380,7 @@ oppia.factory('explorationSaveService', [
 
           modalInstance.opened.then(function() {
             // Toggle loading dots off after modal is opened
-            if (toggleLoadingDotsCallback) {
-              toggleLoadingDotsCallback(false);
-            };
+            if (loadingDotsAreInUse) { hideLoadingDotsCallback(); };
           });
 
           modalInstance.result.then(function(metadataList) {
@@ -392,42 +388,39 @@ oppia.factory('explorationSaveService', [
               var commitMessage = (
                 'Add metadata: ' + metadataList.join(', ') + '.');
 
-              // Toggling loading dots back on.
-              if (toggleLoadingDotsCallback) {
-                toggleLoadingDotsCallback(true);
-              };
+              if (loadingDotsAreInUse) { showLoadingDotsCallback(); };
 
               saveDraftToBackend(commitMessage).then(function() {
-                // Toggling loading dots back on.
-                if (toggleLoadingDotsCallback) {
-                  toggleLoadingDotsCallback(false);
-                };
-                openPublishExplorationModal(toggleLoadingDotsCallback)
+                if (loadingDotsAreInUse) { hideLoadingDotsCallback(); };
+                openPublishExplorationModal(showLoadingDotsCallback, hideLoadingDotsCallback)
+                  .then(function() {
+                    deferred.resolve();
+                  });
+              });
+            } else {
+              openPublishExplorationModal(showLoadingDotsCallback, hideLoadingDotsCallback)
                 .then(function() {
                   deferred.resolve();
                 });
-              });
-            } else {
-              openPublishExplorationModal(toggleLoadingDotsCallback)
-              .then(function() {
-                deferred.resolve();
-              });
             }
           });
         } else {
           // No further metadata is needed. Open the publish modal immediately.
-          openPublishExplorationModal(toggleLoadingDotsCallback)
-          .then(function() {
-            deferred.resolve();
-          });
+          openPublishExplorationModal(showLoadingDotsCallback, hideLoadingDotsCallback)
+            .then(function() {
+              deferred.resolve();
+            });
         }
         return deferred.promise;
       },
 
-      saveChanges: function(toggleLoadingDotsCallback) {
+      saveChanges: function(showLoadingDotsCallback, hideLoadingDotsCallback) {
+        var loadingDotsAreInUse = showLoadingDotsCallback && hideLoadingDotsCallback;
+
         // This is marked as resolved after modal is closed, so we can change
         // controller 'saveIsInProgress' back to false.
         var deferred = $q.defer();
+
 
         routerService.savePendingChanges();
 
@@ -517,9 +510,7 @@ oppia.factory('explorationSaveService', [
 
           modalInstance.opened.then(function() {
             // Toggle loading dots off after modal is opened
-            if (toggleLoadingDotsCallback) {
-              toggleLoadingDotsCallback(false);
-            };
+            if (loadingDotsAreInUse) { hideLoadingDotsCallback(); };
             // The $timeout seems to be needed
             // in order to give the modal time to render.
             $timeout(function() {
@@ -531,9 +522,7 @@ oppia.factory('explorationSaveService', [
             modalIsOpen = false;
 
             // Toggle loading dots back on for loading from backend.
-            if (toggleLoadingDotsCallback) {
-              toggleLoadingDotsCallback(true);
-            };
+            if (loadingDotsAreInUse) { showLoadingDotsCallback(); };
 
             saveDraftToBackend(commitMessage).then(function() {
               deferred.resolve();
