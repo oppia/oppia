@@ -117,12 +117,16 @@ oppia.factory('explorationSaveService', [
       });
 
       publishModalInstance.result.then(function() {
-        if (loadingDotsAreInUse) { showLoadingDotsCallback(); };
+        if (loadingDotsAreInUse) {
+          showLoadingDotsCallback();
+        };
 
         explorationRightsService.saveChangeToBackend({
           is_public: true
         }).then(function() {
-          if (loadingDotsAreInUse) { hideLoadingDotsCallback(); };
+          if (loadingDotsAreInUse) {
+            hideLoadingDotsCallback();
+          };
 
           showCongratulatorySharingModal();
           siteAnalyticsService.registerPublishExplorationEvent(
@@ -379,7 +383,9 @@ oppia.factory('explorationSaveService', [
 
           modalInstance.opened.then(function() {
             // Toggle loading dots off after modal is opened
-            if (loadingDotsAreInUse) { hideLoadingDotsCallback(); };
+            if (loadingDotsAreInUse) {
+              hideLoadingDotsCallback();
+            };
           });
 
           modalInstance.result.then(function(metadataList) {
@@ -387,10 +393,14 @@ oppia.factory('explorationSaveService', [
               var commitMessage = (
                 'Add metadata: ' + metadataList.join(', ') + '.');
 
-              if (loadingDotsAreInUse) { showLoadingDotsCallback(); };
+              if (loadingDotsAreInUse) {
+                showLoadingDotsCallback();
+              };
 
               saveDraftToBackend(commitMessage).then(function() {
-                if (loadingDotsAreInUse) { hideLoadingDotsCallback(); };
+                if (loadingDotsAreInUse) {
+                  hideLoadingDotsCallback();
+                };
                 openPublishExplorationModal(showLoadingDotsCallback, hideLoadingDotsCallback)
                   .then(function() {
                     whenModalsClosed.resolve();
@@ -508,7 +518,9 @@ oppia.factory('explorationSaveService', [
 
           modalInstance.opened.then(function() {
             // Toggle loading dots off after modal is opened
-            if (loadingDotsAreInUse) { hideLoadingDotsCallback(); };
+            if (loadingDotsAreInUse) {
+              hideLoadingDotsCallback();
+            };
             // The $timeout seems to be needed
             // in order to give the modal time to render.
             $timeout(function() {
@@ -520,7 +532,9 @@ oppia.factory('explorationSaveService', [
             modalIsOpen = false;
 
             // Toggle loading dots back on for loading from backend.
-            if (loadingDotsAreInUse) { showLoadingDotsCallback(); };
+            if (loadingDotsAreInUse) {
+              showLoadingDotsCallback();
+            };
 
             saveDraftToBackend(commitMessage).then(function() {
               whenModalClosed.resolve();
