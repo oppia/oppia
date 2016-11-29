@@ -527,7 +527,7 @@ oppia.factory('explorationRightsService', [
       return this._viewableIfPrivate;
     },
     saveChangeToBackend: function(requestParams) {
-      var deferred = $q.defer();
+      var whenRightsSaved = $q.defer();
       var that = this;
 
       requestParams.version = explorationData.data.version;
@@ -541,9 +541,9 @@ oppia.factory('explorationRightsService', [
           data.rights.viewer_names, data.rights.status,
           data.rights.cloned_from, data.rights.community_owned,
           data.rights.viewable_if_private);
-        deferred.resolve();
+        whenRightsSaved.resolve();
       });
-      return deferred.promise;
+      return whenRightsSaved.promise;
     },
     saveModeratorChangeToBackend: function(action, emailBody) {
       var that = this;
