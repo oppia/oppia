@@ -4074,6 +4074,8 @@ md-card.preview-conversation-skin-supplemental-card {
   -webkit-transform: translateX(-50%);
   -ms-transform: translateX(-50%);
   display: inline;
+  position: absolute;
+  z-index: 1;
 }
 
 .oppia-about-content {
