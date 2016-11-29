@@ -181,7 +181,6 @@ oppia.factory('explorationSaveService', [
     };
 
     return {
-
       isExplorationSaveable: function() {
         return (
           changeListService.isExplorationLockedForEditing() &&
