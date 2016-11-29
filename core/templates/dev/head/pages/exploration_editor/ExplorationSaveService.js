@@ -94,8 +94,10 @@ oppia.factory('explorationSaveService', [
       });
     };
 
-    var openPublishExplorationModal = function(showLoadingDotsCallback, hideLoadingDotsCallback) {
-      var loadingDotsAreInUse = showLoadingDotsCallback && hideLoadingDotsCallback;
+    var openPublishExplorationModal = function(
+        showLoadingDotsCallback, hideLoadingDotsCallback) {
+      var loadingDotsAreInUse =
+        showLoadingDotsCallback && hideLoadingDotsCallback;
 
       // This is resolved when modal is closed.
       var whenModalClosed = $q.defer();
@@ -234,12 +236,14 @@ oppia.factory('explorationSaveService', [
         }
       },
 
-      showPublishExplorationModal: function(showLoadingDotsCallback, hideLoadingDotsCallback) {
+      showPublishExplorationModal: function(
+          showLoadingDotsCallback, hideLoadingDotsCallback) {
         // This is resolved after publishing modals are closed,
         // so we can remove the loading-dots.
         var whenModalsClosed = $q.defer();
 
-        var loadingDotsAreInUse = showLoadingDotsCallback && hideLoadingDotsCallback;
+        var loadingDotsAreInUse =
+          showLoadingDotsCallback && hideLoadingDotsCallback;
 
         siteAnalyticsService.registerOpenPublishExplorationModalEvent(
           explorationData.explorationId);
@@ -401,13 +405,15 @@ oppia.factory('explorationSaveService', [
                 if (loadingDotsAreInUse) {
                   hideLoadingDotsCallback();
                 };
-                openPublishExplorationModal(showLoadingDotsCallback, hideLoadingDotsCallback)
+                openPublishExplorationModal(
+                    showLoadingDotsCallback, hideLoadingDotsCallback)
                   .then(function() {
                     whenModalsClosed.resolve();
                   });
               });
             } else {
-              openPublishExplorationModal(showLoadingDotsCallback, hideLoadingDotsCallback)
+              openPublishExplorationModal(
+                  showLoadingDotsCallback, hideLoadingDotsCallback)
                 .then(function() {
                   whenModalsClosed.resolve();
                 });
@@ -415,7 +421,8 @@ oppia.factory('explorationSaveService', [
           });
         } else {
           // No further metadata is needed. Open the publish modal immediately.
-          openPublishExplorationModal(showLoadingDotsCallback, hideLoadingDotsCallback)
+          openPublishExplorationModal(
+              showLoadingDotsCallback, hideLoadingDotsCallback)
             .then(function() {
               whenModalsClosed.resolve();
             });
@@ -424,7 +431,8 @@ oppia.factory('explorationSaveService', [
       },
 
       saveChanges: function(showLoadingDotsCallback, hideLoadingDotsCallback) {
-        var loadingDotsAreInUse = showLoadingDotsCallback && hideLoadingDotsCallback;
+        var loadingDotsAreInUse =
+          showLoadingDotsCallback && hideLoadingDotsCallback;
 
         // This is marked as resolved after modal is closed, so we can change
         // controller 'saveIsInProgress' back to false.
