@@ -4060,14 +4060,14 @@ md-card.preview-conversation-skin-supplemental-card {
   position: absolute;
   text-align: center;
   width: 100%;
-  height: 120px;
+  height: 140px;
+  display: flex;
+  align-items: center;
 }
 .oppia-about-header h1 {
   color: #01645C;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 3em;
-  margin: 50px 0;
-  height: 100%;
   width: 80%;
   left: 50%;
   transform: translateX(-50%);
