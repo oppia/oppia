@@ -136,7 +136,7 @@ oppia.factory('explorationSaveService', [
 
     var saveDraftToBackend = function(commitMessage) {
       // Resolved when save is done.
-      var deferred = $q.defer();
+      var whenSavingDone = $q.defer();
 
       var changeList = changeListService.getChangeList();
 
@@ -171,13 +171,13 @@ oppia.factory('explorationSaveService', [
           });
           alertsService.addSuccessMessage('Changes saved.');
           saveIsInProgress = false;
-          deferred.resolve();
+          whenSavingDone.resolve();
         }, function() {
           saveIsInProgress = false;
-          deferred.resolve();
+          whenSavingDone.resolve();
         }
       );
-      return deferred.promise;
+      return whenSavingDone.promise;
     };
 
     return {
