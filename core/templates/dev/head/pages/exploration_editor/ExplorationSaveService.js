@@ -418,8 +418,7 @@ oppia.factory('explorationSaveService', [
 
         // This is marked as resolved after modal is closed, so we can change
         // controller 'saveIsInProgress' back to false.
-        var deferred = $q.defer();
-
+        var whenModalClosed = $q.defer();
 
         routerService.savePendingChanges();
 
@@ -524,14 +523,14 @@ oppia.factory('explorationSaveService', [
             if (loadingDotsAreInUse) { showLoadingDotsCallback(); };
 
             saveDraftToBackend(commitMessage).then(function() {
-              deferred.resolve();
+              whenModalClosed.resolve();
             });
           }, function() {
             modalIsOpen = false;
-            deferred.resolve();
+            whenModalClosed.resolve();
           });
         });
-        return deferred.promise;
+        return whenModalClosed.promise;
       }
     };
   }
