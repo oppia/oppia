@@ -4083,8 +4083,12 @@ md-card.preview-conversation-skin-supplemental-card {
   margin-bottom: 300px;
   padding: 0;
   position: relative; 
-  top: 250px;
+  top: 50px;
   width: 60%;
+}
+
+.oppia-about-content-below-banner {
+  top: 250px;
 }
 
 .oppia-about-extra-container {
