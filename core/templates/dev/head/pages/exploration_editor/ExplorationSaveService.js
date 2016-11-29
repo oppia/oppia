@@ -98,7 +98,7 @@ oppia.factory('explorationSaveService', [
       var loadingDotsAreInUse = showLoadingDotsCallback && hideLoadingDotsCallback;
 
       // This is resolved when modal is closed.
-      var deferred = $q.defer();
+      var whenModalClosed = $q.defer();
 
       var publishModalInstance = $modal.open({
         templateUrl: 'modals/publishExploration',
@@ -110,7 +110,7 @@ oppia.factory('explorationSaveService', [
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
               alertsService.clearWarnings();
-              deferred.resolve();
+              whenModalClosed.resolve();
             };
           }
         ]
@@ -127,11 +127,11 @@ oppia.factory('explorationSaveService', [
           showCongratulatorySharingModal();
           siteAnalyticsService.registerPublishExplorationEvent(
             explorationData.explorationId);
-          deferred.resolve();
+          whenModalClosed.resolve();
         });
       });
 
-      return deferred.promise;
+      return whenModalClosed.promise;
     };
 
     var saveDraftToBackend = function(commitMessage) {
