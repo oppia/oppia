@@ -89,20 +89,21 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       $scope.loadingDotsAreShown = true;
 
       explorationSaveService.showPublishExplorationModal(showLoadingDots, hideLoadingDots)
-      .then(function() {
-        $scope.loadingDotsAreShown = false;
-        $scope.publishIsInProcess = false;
-      });
+        .then(function() {
+          $scope.loadingDotsAreShown = false;
+          $scope.publishIsInProcess = false;
+        });
     };
 
     $scope.saveChanges = function() {
       $scope.saveIsInProcess = true;
       $scope.loadingDotsAreShown = true;
 
-      explorationSaveService.saveChanges(showLoadingDots, hideLoadingDots).then(function() {
-        $scope.saveIsInProcess = false;
-        $scope.loadingDotsAreShown = false;
-      });
+      explorationSaveService.saveChanges(showLoadingDots, hideLoadingDots)
+        .then(function() {
+          $scope.saveIsInProcess = false;
+          $scope.loadingDotsAreShown = false;
+        });
     };
   }
 ]);
