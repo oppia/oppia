@@ -19,9 +19,7 @@
 oppia.directive('backgroundBanner', [function() {
   return {
     restrict: 'E',
-    scope: {
-      positionStyle: '@'
-    },
+    scope: {},
     templateUrl: 'background/banner',
     controller: [
       '$scope', 'UrlInterpolationService',

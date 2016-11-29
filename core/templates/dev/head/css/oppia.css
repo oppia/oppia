@@ -4079,6 +4079,10 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-about-content {
   padding: 0;
   width: 60%;
+  position: relative; 
+  margin-top: 0px; 
+  margin-bottom: 300px;
+  top: 250px;
 }
 
 .oppia-about-extra-container {
@@ -4089,6 +4093,7 @@ md-card.preview-conversation-skin-supplemental-card {
   margin: 0 auto;
   position: relative;
   width: 60%;
+  top: 0;
 }
 
 .oppia-about-otter-container {
