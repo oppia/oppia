@@ -42,7 +42,7 @@ oppia.factory('explorationSaveService', [
     // at any one time.
     var modalIsOpen = false;
 
-    var diffData;
+    var diffData = null;
 
     var isAdditionalMetadataNeeded = function() {
       return (
