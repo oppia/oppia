@@ -785,6 +785,9 @@ SUPPORTED_SITE_LANGUAGES = [{
 }, {
     'id': 'hi',
     'text': 'हिन्दी'
+}, {
+    'id': 'tr',
+    'text': 'Türkçe'
 }]
 SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
