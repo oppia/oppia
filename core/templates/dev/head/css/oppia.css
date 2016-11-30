@@ -4057,11 +4057,47 @@ md-card.preview-conversation-skin-supplemental-card {
   display: table;
 }
 
+.oppia-static-header {
+  align-items: center;
+  display: flex;
+  height: 140px;
+  position: absolute;
+  text-align: center;
+  width: 100%;
+}
+
+.oppia-static-header h1 {
+  color: #01645C;
+  display: inline;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 3em;
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%);
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  width: 80%;
+  z-index: 1;
+}
+
+.oppia-static-content {
+  margin-top: 0; 
+  margin-bottom: 300px;
+  padding: 0;
+  position: relative; 
+  top: 50px;
+  width: 60%;
+}
+
+.oppia-static-content-below-banner {
+  top: 250px;
+}
+
 .oppia-about-extra-container {
   width: 100%;
 }
 
-.oppia-about-extra-content {
+.oppia-static-extra-content {
   margin: 0 auto;
   position: relative;
   top: 0;
@@ -4124,8 +4160,22 @@ md-card.preview-conversation-skin-supplemental-card {
   color: #000;
 }
 
-.oppia-about-extra-content p {
+.oppia-about-static-content p {
   margin: 1.5em 0;
+}
+
+.oppia-static-card-content {
+  margin: 0 auto;
+  max-width: 600px;
+  padding: 5% 0;
+}
+
+.oppia-static-card-content-wide {
+  width: 90%;
+}
+
+.oppia-static-card-content-narrow {
+  width: 70%;
 }
 
 .oppia-about-three-cols-feature,
@@ -4310,62 +4360,12 @@ md-card.preview-conversation-skin-supplemental-card {
   color: rgba(255,255,255,1);
 }
 
-.oppia-static-header {
-  align-items: center;
-  display: flex;
-  height: 140px;
-  position: absolute;
-  text-align: center;
-  width: 100%;
-}
-
-.oppia-static-header h1 {
-  color: #01645C;
-  display: inline;
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 3em;
-  left: 50%;
-  position: absolute;
-  transform: translateX(-50%);
-  -webkit-transform: translateX(-50%);
-  -ms-transform: translateX(-50%);
-  width: 80%;
-  z-index: 1;
-}
-
-.oppia-static-content {
-  margin-top: 0; 
-  margin-bottom: 300px;
-  padding: 0;
-  position: relative; 
-  top: 50px;
-  width: 60%;
-}
-
-.oppia-static-content-below-banner {
-  top: 250px;
-}
-
-.oppia-static-card-content {
-  margin: 0 auto;
-  max-width: 600px;
-  padding: 5% 0;
-}
-
-.oppia-static-card-content-wide {
-  width: 90%;
-}
-
-.oppia-static-card-content-narrow {
-  width: 70%;
-}
-
 /*
   about/learners/creators media queries
 */
 
 @media only screen and (min-width: 1400px) {
-  .oppia-about-content, .oppia-about-extra-content {
+  .oppia-about-content, .oppia-static-extra-content {
     width: 960px;
   }
 }
@@ -4384,7 +4384,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 @media only screen and (max-width: 768px) {
-  .oppia-about-content, .oppia-about-extra-content {
+  .oppia-about-content, .oppia-static-extra-content {
     width: 90%;
   }
   .oppia-about-otter-container {
