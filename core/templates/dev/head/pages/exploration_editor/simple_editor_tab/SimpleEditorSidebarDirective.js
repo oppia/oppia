@@ -16,17 +16,40 @@
  * @fileoverview Directive for the sidebar of the simple editor.
  */
 
+oppia.factory('ScrollSyncService', ['$anchorScroll', function($anchorScroll) {
+    $anchorScroll.yOffset = 80;
+    return {
+      scrollTo: function(hash) {
+        $anchorScroll(hash);
+      }
+    }
+}]);
+
 oppia.directive('simpleEditorSidebar', [function() {
   return {
     restrict: 'E',
     templateUrl: 'simpleEditor/sidebar',
     controller: [
         '$scope', 'EditorModeService', 'SimpleEditorManagerService',
-        function($scope, EditorModeService, SimpleEditorManagerService) {
+        'ScrollSyncService',
+        function($scope, EditorModeService, SimpleEditorManagerService,
+                 ScrollSyncService) {
       $scope.SUBFIELD_LABELS = [
-        'Multiple choice', 'Correct answer', 'Hints', 'Bridge text'];
+        {label: 'Multiple choice', abbr: 'mc'},
+        {label: 'Correct answer', abbr: 'ca'},
+        {label: 'Hints', abbr: 'hint'},
+        {label: 'Bridge text', abbr: 'bt'}
+      ];
       $scope.setEditorModeToFull = EditorModeService.setModeToFull;
       $scope.questionList = SimpleEditorManagerService.getQuestionList();
+      $scope.hightlighted_element_hash = 'title';
+      $scope.scrollTo = function(hash) {
+        ScrollSyncService.scrollTo(hash);
+        $scope.hightlighted_element_hash = hash;
+      };
+      $scope.isHighlighted = function(hash) {
+        return hash === $scope.hightlighted_element_hash;
+      };
     }]
   };
 }]);

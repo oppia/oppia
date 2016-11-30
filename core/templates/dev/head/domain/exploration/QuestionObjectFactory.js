@@ -58,6 +58,14 @@ oppia.factory('QuestionObjectFactory', [function() {
     return this._bridgeHtml;
   };
 
+  Question.prototype.getHash = function(suffix) {
+    var hash = this.getStateName().toLowerCase().replace(' ','-');
+    if (typeof suffix === 'undefined'){
+      return hash;
+    }
+    return [hash,suffix].join('-');
+  }
+
   Question.prototype.setInteractionCustomizationArgs = function(
       newCustomizationArgs) {
     this._interactionCustomizationArgs = newCustomizationArgs;

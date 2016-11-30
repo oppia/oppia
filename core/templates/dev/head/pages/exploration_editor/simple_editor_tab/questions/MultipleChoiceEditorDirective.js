@@ -41,6 +41,15 @@ oppia.directive('multipleChoiceEditor', [function() {
         // Note that a questionId generated in this way may contain spaces,
         // since it is just the state name.
         $scope.questionId = $scope.getUniqueId();
+
+        $scope.getHash = function(suffix) {
+          var hash = $scope.questionId.toLowerCase().replace(' ','-');
+          if (typeof suffix === 'undefined'){
+            return hash;
+          }
+          return [hash,suffix].join('-');
+        };
+
         $scope.getFieldId = function(index) {
           return $scope.questionId + '.' + index;
         };

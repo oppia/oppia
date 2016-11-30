@@ -1,22 +1,26 @@
 <script type="text/ng-template" id="simpleEditor/sidebar">
   <div class="sidebar">
     <ul>
-      <li class="sidebar-item">
+      <li ng-class="{'highlighted': isHighlighted('title')}"
+          ng-click="scrollTo('title')" class="sidebar-item">
         <strong>Title</strong>
       </li>
 
-      <li class="sidebar-item">
+      <li ng-class="{'highlighted': isHighlighted('intro')}"
+          ng-click="scrollTo('intro')" class="sidebar-item">
         <strong>Introduction</strong>
       </li>
 
       <li class="sidebar-item" ng-repeat="question in questionList.getQuestions() track by $index">
-        <strong>Question <[$index + 1]></strong>
+        <strong ng-click="scrollTo(question.getHash())">Question <[$index + 1]></strong>
 
         <ul>
           <li class="sidebar-item sidebar-item-indented"
-              ng-repeat="subfieldLabel in SUBFIELD_LABELS track by $index">
+              ng-repeat="subfield in SUBFIELD_LABELS track by $index"
+              ng-click="scrollTo(question.getHash(subfield.abbr))"
+              ng-class="{'highlighted': isHighlighted(question.getHash(subfield.abbr))}">
             <span>
-              <a><[subfieldLabel]></a>
+              <a><[subfield.label]></a>
             </span>
           </li>
         </ul>
@@ -90,5 +94,8 @@
   simple-editor-sidebar::-webkit-scrollbar-thumb {
     background-color: rgba(0,150,136,.8);
     border-radius: 5px;
+  }
+  simple-editor-sidebar .highlighted {
+    text-decoration: underline;
   }
 </style>
