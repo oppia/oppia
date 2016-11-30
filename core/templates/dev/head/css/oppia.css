@@ -675,14 +675,15 @@ textarea {
   color: #fff;
   font-size: 13px;
   line-height: 20px;
+  margin-top: 250px;
   position: absolute;
   width: 100%;
 }
 
 .oppia-footer-container {
-  max-width: 800px;
   margin-left: auto;
   margin-right: auto;
+  max-width: 800px;
   padding: 30px 80px;
 }
 
@@ -1075,7 +1076,7 @@ textarea {
   }
 }
 
-.oppia-library-carousel-scroll-btn {
+.oppia-library-carousel-scroller {
   color: #2c4841;
   cursor: default;
   float: left;
@@ -1086,7 +1087,10 @@ textarea {
   position: relative;
   width: 10vw;
 }
-.oppia-library-carousel-scroll-btn i {
+.md-button.oppia-library-carousel-scroller {
+  cursor: pointer;
+}
+.oppia-library-carousel-scroller i {
   font-size: 36px;
   margin: 0;
   padding: 0;
@@ -1181,13 +1185,15 @@ textarea {
   width: 200px;
 }
 
-.oppia-dashboard-tabs-active .oppia-dashboard-tabs-text {
+.oppia-dashboard-tabs-active .oppia-dashboard-tabs-text,
+.oppia-dashboard-tabs-active .oppia-dashboard-tabs-text:hover {
   border-bottom: 4px solid #009688;
   color: #009688;
   margin-left: 7.5px;
 }
 
-.oppia-dashboard-tabs .oppia-dashboard-tabs-text {
+.oppia-dashboard-tabs .oppia-dashboard-tabs-text,
+.oppia-dashboard-tabs .oppia-dashboard-tabs-text:hover {
   color: #009688;
   font-size: 1em;
   padding: 10px;
@@ -1456,7 +1462,7 @@ md-card.oppia-dashboard-tile {
 }
 
 .oppia-cc-icon {
-  bottom: 0;
+  bottom: 34px;
   opacity: 0.4;
   position: fixed;
   right: 25px;
@@ -1768,7 +1774,7 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-collection-player-tiles-container {
   height: 100%;
-  margin-top: 60px;
+  padding-top: 60px;
   margin-left: auto;
   margin-right: auto;
   max-width: 800px;
@@ -3496,7 +3502,7 @@ md-card.preview-conversation-skin-supplemental-card {
     max-width: 500px;
     transform: translate(-150px, 10px);
     position: relative;
-    width: 100%; 
+    width: 100%;
   }
 
   .oppia-splash-section-two-content {
@@ -3619,11 +3625,18 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-dashboard-container a:hover,
 .oppia-dashboard-container a:active,
 .oppia-dashboard-container a:visited {
-  color: #009688;
+  color: black;
 }
 
 .oppia-dashboard-container a:hover {
     text-decoration: underline;
+}
+
+.oppia-dashboard-container .oppia-highlighted-link,
+.oppia-dashboard-container .oppia-highlighted-link:hover,
+.oppia-dashboard-container .oppia-highlighted-link:active,
+.oppia-dashboard-container .oppia-highlighted-link:visited {
+  color: #009688;
 }
 
 .oppia-dashboard-container .oppia-dashboard-list-summary,

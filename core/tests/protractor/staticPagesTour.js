@@ -57,7 +57,8 @@ describe('Oppia static pages tour', function() {
     general.checkForConsoleErrors([
       // TODO (Jacob) Remove when
       // https://code.google.com/p/google-cast-sdk/issues/detail?id=309 is fixed
-      'cast_sender.js - Failed to load resource: net::ERR_FAILED'
+      'cast_sender.js - Failed to load resource: net::ERR_FAILED',
+      'Uncaught ReferenceError: ytcfg is not defined'
     ]);
   });
 });
