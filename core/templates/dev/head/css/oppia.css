@@ -140,9 +140,10 @@ body {
 }
 
 .oppia-profile-container {
-  margin: 30px auto 30px auto;
+  margin: 0 auto 30px auto;
   max-width: 980px;
   overflow: auto;
+  padding-top: 30px;
   position: relative;
   width: 90%;
 }
