@@ -4057,41 +4057,6 @@ md-card.preview-conversation-skin-supplemental-card {
   display: table;
 }
 
-.oppia-about-header {
-  align-items: center;
-  display: flex;
-  height: 140px;
-  position: absolute;
-  text-align: center;
-  width: 100%;
-}
-.oppia-about-header h1 {
-  color: #01645C;
-  display: inline;
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 3em;
-  left: 50%;
-  position: absolute;
-  transform: translateX(-50%);
-  -webkit-transform: translateX(-50%);
-  -ms-transform: translateX(-50%);
-  width: 80%;
-  z-index: 1;
-}
-
-.oppia-about-content {
-  margin-top: 0; 
-  margin-bottom: 300px;
-  padding: 0;
-  position: relative; 
-  top: 50px;
-  width: 60%;
-}
-
-.oppia-about-content-below-banner {
-  top: 250px;
-}
-
 .oppia-about-extra-container {
   width: 100%;
 }
@@ -4163,17 +4128,6 @@ md-card.preview-conversation-skin-supplemental-card {
   margin: 1.5em 0;
 }
 
-.oppia-about-card-content-wide {
-  margin: 0 auto;
-  max-width: 600px;
-  padding: 5% 0;
-  width: 90%;
-}
-
-.oppia-about-card-content-narrow {
-  width: 70%;
-}
-
 .oppia-about-three-cols-feature,
 .oppia-about-three-cols-feature p {
   text-align: center;
@@ -4221,16 +4175,16 @@ md-card.preview-conversation-skin-supplemental-card {
   position: relative;
 }
 
-.oppia-about-content p {
+.oppia-static-content p {
   margin: 1.5em 0;
 }
 
-.oppia-about-content ol,
-.oppia-about-content ul {
+.oppia-static-content ol,
+.oppia-static-content ul {
   padding: 0;
 }
 
-.oppia-about-content h2 {
+.oppia-static-content h2 {
   text-align: center;
 }
 
@@ -4356,6 +4310,56 @@ md-card.preview-conversation-skin-supplemental-card {
   color: rgba(255,255,255,1);
 }
 
+.oppia-static-header {
+  align-items: center;
+  display: flex;
+  height: 140px;
+  position: absolute;
+  text-align: center;
+  width: 100%;
+}
+
+.oppia-static-header h1 {
+  color: #01645C;
+  display: inline;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 3em;
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%);
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  width: 80%;
+  z-index: 1;
+}
+
+.oppia-static-content {
+  margin-top: 0; 
+  margin-bottom: 300px;
+  padding: 0;
+  position: relative; 
+  top: 50px;
+  width: 60%;
+}
+
+.oppia-static-content-below-banner {
+  top: 250px;
+}
+
+.oppia-static-card-content {
+  margin: 0 auto;
+  max-width: 600px;
+  padding: 5% 0;
+}
+
+.oppia-static-card-content-wide {
+  width: 90%;
+}
+
+.oppia-static-card-content-narrow {
+  width: 70%;
+}
+
 /*
   about/learners/creators media queries
 */
@@ -4399,7 +4403,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 @media only screen and (max-width: 500px) {
-  .oppia-about-header h1 {
+  .oppia-static-header h1 {
     font-size: 2.5em;
   }
   .oppia-about-tabs li, .oppia-about-teach-tabs ul li {
@@ -4407,7 +4411,7 @@ md-card.preview-conversation-skin-supplemental-card {
     border-right: none;
     border-bottom: 1px solid rgba(0,0,0,0.1);
   }
-  .oppia-about-card-content-wide, .oppia-about-card-content-narrow {
+  .oppia-static-card-content-wide, .oppia-static-card-content-narrow {
     width: 80%;
   }
   .oppia-about-otter-speech-card {
