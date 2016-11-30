@@ -45,10 +45,10 @@ oppia.directive('simpleEditorSidebar', [function() {
       $scope.hightlighted_element_hash = 'title';
       $scope.scrollTo = function(hash) {
         ScrollSyncService.scrollTo(hash);
-        $scope.hightlighted_element_hash = hash;
+        $scope.highlightedElementHash = hash;
       };
       $scope.isHighlighted = function(hash) {
-        return hash === $scope.hightlighted_element_hash;
+        return hash === $scope.highlightedElementHash;
       };
     }]
   };
