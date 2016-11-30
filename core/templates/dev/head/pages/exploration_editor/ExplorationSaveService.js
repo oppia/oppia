@@ -197,10 +197,6 @@ oppia.factory('explorationSaveService', [
         );
       },
 
-      getDiffData: function() {
-        return diffData;
-      },
-
       discardChanges: function() {
         var confirmDiscard = confirm(
           'Are you sure you want to discard your changes?');
@@ -496,7 +492,7 @@ oppia.factory('explorationSaveService', [
                   }
                 };
 
-                $scope.diffData = this.diffData;
+                $scope.diffData = diffData;
                 $scope.isExplorationPrivate = isExplorationPrivate;
 
                 $scope.earlierVersionHeader = 'Last saved';
