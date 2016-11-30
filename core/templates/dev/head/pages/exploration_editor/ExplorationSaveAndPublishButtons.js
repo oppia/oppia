@@ -91,8 +91,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       explorationSaveService.showPublishExplorationModal(showLoadingDots,
         hideLoadingDots)
           .then(function() {
-            $scope.loadingDotsAreShown = false;
             $scope.publishIsInProcess = false;
+            $scope.loadingDotsAreShown = false;
           });
     };
 
