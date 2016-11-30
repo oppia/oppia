@@ -66,6 +66,12 @@
     the page title because the head of the file is outside the scope of
     any other controller. -->
     <title itemprop="name" translate="{% block maintitle %}Oppia{% endblock maintitle %}"></title>
+
+    <!-- This block is used when we want to dynamically change the title of
+    the page.For example in exploration editor page we dynamically change the
+    title of the page based on the title of the exploration. -->
+    {% block dynamic_title %}{% endblock dynamic_title %}
+
     {% block base_url %}{% endblock base_url %}
 
     {% block header_css %}

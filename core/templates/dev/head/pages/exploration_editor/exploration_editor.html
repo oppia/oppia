@@ -1,12 +1,8 @@
 {% extends 'pages/base.html' %}
 
-{% block maintitle %}
-  {% if title %}
-    {{ title }} - Oppia Editor
-  {% else %}
-    Untitled Exploration - Oppia Editor
-  {% endif %}
-{% endblock maintitle %}
+{% block dynamic_title %}
+  <div ng-controller="DynamicTitleEditor"></div>
+{% endblock dynamic_title %}
 
 {% block header_js %}
   {{ super() }}

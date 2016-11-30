@@ -1006,3 +1006,23 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     };
   }
 ]);
+
+oppia.controller('DynamicTitleEditor', [
+  '$scope', 'explorationTitleService', 'routerService', 'focusService',
+  'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', '$window',
+  function(
+      $scope, explorationTitleService, routerService, focusService,
+      EXPLORATION_TITLE_INPUT_FOCUS_LABEL, $window) {
+    $scope.navbarTitle = null;
+    $scope.$on('explorationPropertyChanged', function() {
+      $scope.navbarTitle = explorationTitleService.savedMemento;
+
+      // Set the title of the page when the exploration title changes.
+      if ($scope.navbarTitle === '') {
+        $window.document.title = 'Untitled Exploration - Oppia Editor';
+      } else {
+        $window.document.title = $scope.navbarTitle + ' - Oppia Editor';
+      }
+    });
+  }
+]);
