@@ -6,3 +6,27 @@
     '/third_party/static/guppy-be6f14/src/transform.xsl',
     '/third_party/static/guppy-be6f14/src/symbols.json');
 </script>
+
+<style>
+  .guppy_active {
+    border: 1px solid rgba(81, 203, 238, 1);
+  }
+
+  .guppy_inactive {
+    background: #ffffff;
+    border: 1px solid black;
+  }
+
+  .guppy_active .main_cursor {
+    animation: guppy-blink-animation 1s steps(2, start) infinite;
+    -webkit-animation: guppy-blink-animation 1s steps(2, start) infinite;
+  }
+
+  @keyframes guppy-blink-animation {
+    to { visibility: hidden; }
+  }
+
+  @-webkit-keyframes guppy-blink-animation {
+    to { visibility: hidden; }
+  }
+</style>
