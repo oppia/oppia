@@ -4084,10 +4084,10 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-static-content {
-  margin-top: 0; 
+  margin-top: 0;
   margin-bottom: 0;
   padding: 0;
-  position: relative; 
+  position: relative;
   top: 0;
   width: 60%;
 }
@@ -4371,7 +4371,7 @@ md-card.preview-conversation-skin-supplemental-card {
 */
 
 @media only screen and (min-width: 1400px) {
-  .oppia-about-content, .oppia-static-extra-content {
+  .oppia-static-content, .oppia-static-extra-content {
     width: 960px;
   }
 }
@@ -4390,7 +4390,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 @media only screen and (max-width: 768px) {
-  .oppia-about-content, .oppia-static-extra-content {
+  .oppia-static-content, .oppia-static-extra-content {
     width: 90%;
   }
   .oppia-about-otter-container {
