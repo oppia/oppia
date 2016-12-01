@@ -673,7 +673,6 @@ textarea {
   color: #fff;
   font-size: 13px;
   line-height: 20px;
-  margin-top: 250px;
   position: absolute;
   width: 100%;
 }
@@ -705,6 +704,10 @@ textarea {
 
 .oppia-footer-padding {
   height: 198px;
+}
+
+.oppia-footer-padding-below-banner {
+  height: 300px;
 }
 
 @media (max-width: 768px) {
@@ -4082,18 +4085,21 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-static-content {
   margin-top: 0; 
-  margin-bottom: 300px;
+  margin-bottom: 0;
   padding: 0;
   position: relative; 
-  top: 50px;
+  top: 0;
   width: 60%;
 }
 
 .oppia-static-content-below-banner {
+  position: relative;
   top: 250px;
 }
 
 .oppia-about-extra-container {
+  position: relative;
+  top: 50px;
   width: 100%;
 }
 
