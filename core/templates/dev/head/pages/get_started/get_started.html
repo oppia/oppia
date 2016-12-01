@@ -22,12 +22,12 @@
 {% endblock navbar_breadcrumb %}
 
 {% block content %}
-  <div class="oppia-about-header">
-    <h1>Get Started</h1>
+  <div class="oppia-static-header">
+    <h1>Get Started!</h1>
   </div>
-
-  <div class="oppia-page-card oppia-about-content">
-    <div class="oppia-about-card-content-wide">
+  <background-banner></background-banner>
+  <div class="oppia-page-card oppia-static-content oppia-static-content-below-banner">
+    <div class="oppia-static-card-content oppia-static-card-content-narrow">
       
       <p>
         Creating an Oppia lesson is easy and free.  After you create the lesson, you share it with 
@@ -115,7 +115,8 @@
       </p>
     </div>  
   </div>
-
+  <div class="oppia-footer-padding-below-banner">
+  </div>
 {% endblock %}
 
 {% block footer%}
