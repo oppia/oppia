@@ -139,6 +139,7 @@ var openFeedbackPopup = function() {
 };
 
 var submitFeedback = function(feedback) {
+  openFeedbackPopup();
   element(by.css('.protractor-test-exploration-feedback-textarea')).
     sendKeys(feedback);
   element(by.css('.protractor-test-exploration-feedback-submit-btn')).click();

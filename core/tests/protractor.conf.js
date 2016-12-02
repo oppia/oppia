@@ -96,7 +96,8 @@ exports.config = {
 
     i18n: [
       'protractor/i18n.js'
-    ]
+    ],
+    only: ['protractor/explorationFeedback.js']
   },
 
   // ----- Capabilities to be passed to the webdriver instance ----

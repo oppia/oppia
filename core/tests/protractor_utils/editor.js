@@ -1318,15 +1318,35 @@ var revertToVersion = function(version) {
   });
 };
 
-var readFeedbackMessages = function() {
-  element(by.css('.protractor-test-exploration-view-feedback-link')).
-    click();
-  var feedbackRowClassName = '.protractor-test-oppia-feedback-tab-row';
-  var feedbacks = element.all(by.css(feedbackRowClassName));
+// Wrapper for functions involving the feedback tab
+var _runFromFeedbackTab = function(callbackFunction) {
+  element(by.css('.protractor-test-feedback-tab')).click();
+  var result = callbackFunction();
+  general.waitForSystem();
+  element(by.css('.protractor-test-main-tab')).click();
+  return result;
+};
 
-  expect(feedbacks.count()).toEqual(1);
-  element(by.css(feedbackRowClassName)).click();
-  return element(by.css('.protractor-test-exploration-feedback')).getText();
+var readFeedbackMessages = function() {
+  return _runFromFeedbackTab(function() {
+    var feedbackRowClassName = '.protractor-test-oppia-feedback-tab-row';
+    var messages = [];
+    return element.all(by.css(feedbackRowClassName)).then(function(rows) {
+      console.log('rows:' + rows);
+      rows.forEach(function(row) {
+        row.click();
+        alert('just clicked');
+        element(by.css('.protractor-test-exploration-feedback'))
+          .getText().then(function(text) {
+            messages.push(text);
+        });
+        element(by.css('.protractor-test-oppia-feedback-back-button')).click();
+      });
+      console.log(messages);
+      console.log(typeof messages);
+      return messages;
+    });
+  });
 };
 
 var sendFeedbackResponse = function(feedbackResponse) {

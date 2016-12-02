@@ -130,13 +130,6 @@ var getExplorationPlaytesters = function() {
   return _getExplorationRoles('viewer');
 };
 
-var getNumberOfFeedbackMessages = function() {
-  return element(by.css('.protractor-test-exploration-feedback-count')).
-    getText().then(function(text) {
-      return parseInt(text);
-    });
-};
-
 exports.createExploration = createExploration;
 exports.createExplorationAndStartTutorial = createExplorationAndStartTutorial;
 exports.publishExploration = publishExploration;
@@ -149,5 +142,3 @@ exports.addExplorationPlaytester = addExplorationPlaytester;
 exports.getExplorationManagers = getExplorationManagers;
 exports.getExplorationCollaborators = getExplorationCollaborators;
 exports.getExplorationPlaytesters = getExplorationPlaytesters;
-
-exports.getNumberOfFeedbackMessages = getNumberOfFeedbackMessages;

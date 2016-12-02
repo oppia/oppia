@@ -23,6 +23,7 @@
  * in an e2e test.
  */
 
+var dashboard = require('../protractor_utils/dashboard.js');
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var library = require('../protractor_utils/library.js');
@@ -52,7 +53,7 @@ describe('ExplorationFeedback', function() {
                                          EXPLORATION_OBJECTIVE,
                                          EXPLORATION_LANGUAGE);
     browser.get(general.SERVER_URL_PREFIX);
-    var numberOfFeedbackMessages = workflow.getNumberOfFeedbackMessages();
+    var numberOfFeedbackMessages = dashboard.getNumberOfFeedbackMessages();
     expect(numberOfFeedbackMessages).toEqual(0);
     users.logout();
 
@@ -60,18 +61,24 @@ describe('ExplorationFeedback', function() {
     users.login('learner@gmail.com');
     browser.get(general.LIBRARY_URL_SUFFIX);
     library.playExploration(EXPLORATION_TITLE);
-    player.openFeedbackPopup();
     player.submitFeedback(feedback);
     users.logout();
 
     // Creator reads the feedback and responds
     users.login('creator@gmail.com');
     browser.get(general.SERVER_URL_PREFIX);
-    numberOfFeedbackMessages = workflow.getNumberOfFeedbackMessages();
+    numberOfFeedbackMessages = dashboard.getNumberOfFeedbackMessages();
     expect(numberOfFeedbackMessages).toEqual(1);
-    var feedbackMessage = editor.readFeedbackMessages();
-    expect(feedbackMessage).toEqual(feedback);
+    dashboard.openFeedback();
+
+    var feedbackMessages = editor.readFeedbackMessages();
+    console.log(feedbackMessages);
+    console.log('Gonna fail');
+    expect(feedbackMessages.length).toEqual(1);
+    console.log('Failed');
+    expect(feedbackMessages[0]).toEqual(feedback);
     editor.sendFeedbackResponse(feedbackResponse);
+    users.logout();
   });
 
   afterEach(function() {
