@@ -38,8 +38,7 @@ oppia.directive('simpleEditorBody', [function() {
         $scope.canAddNewQuestion = SimpleEditorManagerService.canAddNewQuestion;
         $scope.addState = SimpleEditorManagerService.addState;
         $scope.addNewQuestion = SimpleEditorManagerService.addNewQuestion;
-        $scope.canTryToPublish = SimpleEditorManagerService.canTryToPublish;
-
+        $scope.canTryToFinishExploration = SimpleEditorManagerService.canTryToFinishExploration;
         $scope.tryToPublishExploration = function() {
           // TODO(sll): Implement this.
         };

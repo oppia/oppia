@@ -47,7 +47,7 @@
     </div>
     <div class="advance-btn-wrapper end-exploration-btn-wrapper">
       <span class="advance-btn-description" ng-show="finishBtnHovered">Finish exploration</span>
-      <button ng-show="canTryToPublish()" type="button"
+      <button ng-show="canTryToFinishExploration()" type="button"
               class="btn btn-default advance-btn"
               ng-click="tryToPublishExploration(); finishBtnHovered = false"
               ng-mouseenter="finishBtnHovered = true" ng-mouseleave="finishBtnHovered = false">
