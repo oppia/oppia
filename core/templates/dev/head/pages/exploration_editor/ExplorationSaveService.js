@@ -533,11 +533,11 @@ oppia.factory('explorationSaveService', [
             };
 
             saveDraftToBackend(commitMessage).then(function() {
-              whenModalClosed.resolve();
+              whenModalClosed.resolve(true);
             });
           }, function() {
             modalIsOpen = false;
-            whenModalClosed.resolve();
+            whenModalClosed.resolve(false);
           });
         });
         return whenModalClosed.promise;
