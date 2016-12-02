@@ -953,6 +953,10 @@ textarea {
   color: rgba(255,255,255,1);
 }
 
+.btn:focus, .btn:active:focus {
+    outline: 0;
+}
+
 @media (max-width: 768px) {
   .oppia-navbar-hide-on-small-width {
     display: none;
