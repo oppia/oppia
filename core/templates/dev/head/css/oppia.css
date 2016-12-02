@@ -953,7 +953,7 @@ textarea {
 }
 
 .btn:focus, .btn:active:focus {
-    outline: 0px;
+    outline: 0;
 }
 
 @media (max-width: 768px) {
