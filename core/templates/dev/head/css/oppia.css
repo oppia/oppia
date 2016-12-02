@@ -32,8 +32,7 @@
 }
 
 /* Angular material overrides. */
-md-input-group.long > input
-{
+md-input-group.long > input {
   width: 100%;
   height: 45px;
 }
@@ -87,6 +86,7 @@ button.md-button.md-default-theme.oppia-learner-continue-button:hover {
 
 /* Bootstrap overrides and additions. */
 html {
+  background-color: #e8e7e3;
   /*
     The HTML font-size is set to 62.5% in order to make 'em' units easier to
     work with. Modern browsers set their default font-size to 16px. This means
