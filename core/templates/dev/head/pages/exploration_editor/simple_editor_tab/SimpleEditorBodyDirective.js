@@ -23,7 +23,11 @@ oppia.directive('simpleEditorBody', [function() {
     templateUrl: 'simpleEditor/body',
     controller: [
       '$scope', 'SimpleEditorManagerService',
-      function($scope, SimpleEditorManagerService) {
+      'explorationSaveService', 'explorationRightsService',
+      'explorationWarningsService',
+      function($scope, SimpleEditorManagerService,
+          explorationSaveService, explorationRightsService,
+          explorationWarningsService) {
         $scope.data = SimpleEditorManagerService.getData();
 
         $scope.saveTitle = SimpleEditorManagerService.saveTitle;
@@ -39,8 +43,34 @@ oppia.directive('simpleEditorBody', [function() {
         $scope.addState = SimpleEditorManagerService.addState;
         $scope.addNewQuestion = SimpleEditorManagerService.addNewQuestion;
         $scope.canTryToFinishExploration = SimpleEditorManagerService.canTryToFinishExploration;
-        $scope.tryToPublishExploration = function() {
-          // TODO(sll): Implement this.
+
+        $scope.isExplorationFinishable = function() {
+          if (explorationRightsService.isPrivate()) {
+            if(!explorationWarningsService.countWarnings()) {
+              return true;
+            }
+          } else if (explorationSaveService.isExplorationSaveable()) {
+            return true;
+          }
+
+          return false;
+        }
+
+        $scope.startFinishExploration = function() {
+          // If exploration is not yet published and doesn't have unsaved changes,
+          // we can just open publishing modal straight away.
+          if (explorationRightsService.isPrivate()
+              && !explorationSaveService.isExplorationSaveable()) {
+            explorationSaveService.showPublishExplorationModal();
+          } else {
+            explorationSaveService.saveChanges().then(function(didSaveExploration) {
+              // The publish modal is shown here only if changes we're saved
+              // and the exploration has not been published yet.
+              if(didSaveExploration && explorationRightsService.isPrivate()) {
+                explorationSaveService.showPublishExplorationModal();
+              }
+            });
+          }
         };
       }
     ]
