@@ -103,6 +103,7 @@ html {
 
 body {
   color: rgba(0,0,0,0.87);
+  background-color: #e8e7e3;
   font-family: "Roboto", Arial, sans-serif;
   /*
     A font-size of 1.6em sets the default font-size on Oppia to 16px, though
