@@ -42,11 +42,12 @@ oppia.directive('simpleEditorBody', [function() {
         $scope.canAddNewQuestion = SimpleEditorManagerService.canAddNewQuestion;
         $scope.addState = SimpleEditorManagerService.addState;
         $scope.addNewQuestion = SimpleEditorManagerService.addNewQuestion;
-        $scope.canTryToFinishExploration = SimpleEditorManagerService.canTryToFinishExploration;
+        $scope.canTryToFinishExploration =
+          SimpleEditorManagerService.canTryToFinishExploration;
 
         $scope.isExplorationFinishable = function() {
           if (explorationRightsService.isPrivate()) {
-            if(!explorationWarningsService.countWarnings()) {
+            if (!explorationWarningsService.countWarnings()) {
               return true;
             }
           } else if (explorationSaveService.isExplorationSaveable()) {
@@ -54,22 +55,25 @@ oppia.directive('simpleEditorBody', [function() {
           }
 
           return false;
-        }
+        };
 
         $scope.startFinishExploration = function() {
-          // If exploration is not yet published and doesn't have unsaved changes,
+          // If exploration is not yet published
+          // and doesn't have unsaved changes,
           // we can just open publishing modal straight away.
-          if (explorationRightsService.isPrivate()
-              && !explorationSaveService.isExplorationSaveable()) {
+          if (explorationRightsService.isPrivate() &&
+              !explorationSaveService.isExplorationSaveable()) {
             explorationSaveService.showPublishExplorationModal();
           } else {
-            explorationSaveService.saveChanges().then(function(didSaveExploration) {
-              // The publish modal is shown here only if changes we're saved
-              // and the exploration has not been published yet.
-              if(didSaveExploration && explorationRightsService.isPrivate()) {
-                explorationSaveService.showPublishExplorationModal();
-              }
-            });
+            explorationSaveService.saveChanges()
+              .then(function(didSaveExploration) {
+                // The publish modal is shown here only if changes we're saved
+                // and the exploration has not been published yet.
+                if (didSaveExploration &&
+                    explorationRightsService.isPrivate()) {
+                  explorationSaveService.showPublishExplorationModal();
+                }
+              });
           }
         };
       }
