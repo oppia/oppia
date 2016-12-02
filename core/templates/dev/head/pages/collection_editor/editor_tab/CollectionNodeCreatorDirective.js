@@ -25,17 +25,40 @@ oppia.directive('collectionNodeCreator', [function() {
       'validatorsService', 'CollectionEditorStateService',
       'CollectionLinearizerService', 'CollectionUpdateService',
       'CollectionNodeObjectFactory', 'ExplorationSummaryBackendApiService',
-      'siteAnalyticsService',
+      'siteAnalyticsService', 'oppiaDebouncer',
       function(
           $scope, $http, $window, $filter, alertsService,
           validatorsService, CollectionEditorStateService,
           CollectionLinearizerService, CollectionUpdateService,
           CollectionNodeObjectFactory, ExplorationSummaryBackendApiService,
-          siteAnalyticsService) {
+          siteAnalyticsService, oppiaDebouncer) {
         $scope.collection = CollectionEditorStateService.getCollection();
         $scope.newExplorationId = '';
         $scope.newExplorationTitle = '';
         var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
+        $scope.searchQuery = '';
+
+        var onSearchQueryChangeExec = function  () {
+          queryUrl = '/exploration/metadata_search' + '?q=' + $scope.searchQuery;
+          $http.get(queryUrl).then(function(response) {
+            var data = response.data;
+            var options = '';
+            for(var i = 0; i < data.collection_node_metadata_list.length; i++)
+              if(data.collection_node_metadata_list[i]) {
+                options += '<option value=" ' + data.collection_node_metadata_list[i].id + '">' + data.collection_node_metadata_list[i].title + '</option>';
+              }
+            document.getElementById('explorations').innerHTML = options;
+          });
+        };
+
+        $scope.onSearchQueryChange = function(evt) {
+          // Query immediately when the enter or space key is pressed.
+          if (evt.keyCode === 13 || evt.keyCode === 32) {
+            onSearchQueryChangeExec();
+          } else {
+            oppiaDebouncer.debounce(onSearchQueryChangeExec, 150)();
+          }
+        };
 
         var addExplorationToCollection = function(newExplorationId) {
           if (!newExplorationId) {

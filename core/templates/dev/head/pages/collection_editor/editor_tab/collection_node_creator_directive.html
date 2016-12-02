@@ -6,7 +6,8 @@
   </form>
   or
   <form ng-submit="addExploration()">
-    <input ng-model="newExplorationId" type="text" placeholder="New exploration ID">
-    <button type="submit" ng-disabled="!newExplorationId">Add Existing Exploration</button>
+    <input ng-model="newExplorationId" list="explorations" type="text" placeholder="Search explorations" ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
+    <datalist id="explorations"></datalist>
+    <button type="submit">Add Existing Exploration</button>
   </form>
 </script>
