@@ -158,7 +158,9 @@ SENDER_VALIDATORS = {
         config_domain.WHITELISTED_EMAIL_SENDERS.value),
     feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT: (
         lambda x: user_services.get_username(x) in
-        config_domain.WHITELISTED_EMAIL_SENDERS.value)
+        config_domain.WHITELISTED_EMAIL_SENDERS.value),
+    feconf.BULK_EMAIL_INTENT_TEST: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID)
 }
 
 
@@ -832,3 +834,9 @@ def send_user_query_email(
         recipient_ids, sender_id, email_intent, email_subject, email_body,
         sender_email, sender_name, bulk_email_model_id)
     return bulk_email_model_id
+
+
+def send_test_email_for_bulk_emails(recipient_id, email_subject, email_body):
+    return _send_email(
+        recipient_id, feconf.SYSTEM_COMMITTER_ID, feconf.BULK_EMAIL_INTENT_TEST,
+        email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)

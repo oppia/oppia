@@ -22,6 +22,7 @@ oppia.controller('EmailDashboardResult', [
     var RESULT_HANDLER_URL_PREFIX = '/emaildashboardresult';
     var CANCEL_EMAIL_HANDLER_URL_PREFIX = '/emaildashboardcancelresult';
     var EMAIL_DASHBOARD_PAGE = '/emaildashboard';
+    var TEST_BULK_EMAIL_URL_PREFIX = '/emaildashboardtestbulkemailhandler';
 
     var getQueryId = function() {
       return $window.location.pathname.split('/').slice(-1)[0];
@@ -93,6 +94,36 @@ oppia.controller('EmailDashboardResult', [
       });
     };
 
+    $scope.sendTestEmail = function() {
+      var testEmailHandlerUrl = TEST_BULK_EMAIL_URL_PREFIX + '/' + getQueryId();
+      var invalidData = false;
+      if ($scope.emailSubject.length === 0) {
+        $scope.invalid.subject = true;
+        invalidData = true;
+      }
+      if ($scope.emailBody.length === 0) {
+        $scope.invalid.body = true;
+        invalidData = true;
+      }
+
+      if (!invalidData) {
+        var testEmailBody = '[This is test email.]<br>' + $scope.emailBody;
+        var data = {
+          email_subject: $scope.emailSubject,
+          email_body: testEmailBody
+        };
+
+        $http.post(testEmailHandlerUrl, {
+          data: data
+        }).success(function() {
+          $scope.testEmailSentSuccesfully = true;
+        });
+        $scope.invalid.subject = false;
+        $scope.invalid.body = false;
+        $scope.invalid.maxRecipients = false;
+      }
+    };
+
     $scope.emailOption = 'all';
     $scope.emailSubject = '';
     $scope.emailBody = '';
@@ -110,5 +141,6 @@ oppia.controller('EmailDashboardResult', [
     $scope.emailSubmitted = false;
     $scope.submitIsInProgress = false;
     $scope.errorHasOccurred = false;
+    $scope.testEmailSentSuccesfully = false;
   }
 ]);
