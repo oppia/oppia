@@ -206,6 +206,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
       'StatsReportingService', 'UrlInterpolationService',
       'siteAnalyticsService', 'ExplorationPlayerStateService',
       'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX', 'alertsService',
+      'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
       function(
           $scope, $timeout, $rootScope, $window, $translate, $http,
           messengerService, oppiaPlayerService, urlService, focusService,
@@ -214,8 +215,9 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
           playerPositionService, explorationRecommendationsService,
           StatsReportingService, UrlInterpolationService,
           siteAnalyticsService, ExplorationPlayerStateService,
-          TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX, alertsService) {
-        $scope.CONTINUE_BUTTON_FOCUS_LABEL = 'continueButton';
+          TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX, alertsService,
+          CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED) {
+        $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
         // The minimum width, in pixels, needed to be able to show two cards
         // side-by-side.
         var TIME_PADDING_MSEC = 250;
@@ -303,7 +305,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
         // Navigates to the currently-active card, and resets the 'show previous
         // responses' setting.
         var _navigateToActiveCard = function() {
-          $scope.$broadcast('activeCardChanged');
+          $scope.$broadcast(EVENT_ACTIVE_CARD_CHANGED);
 
           var index = playerPositionService.getActiveCardIndex();
           $scope.activeCard = playerTranscriptService.getCard(index);

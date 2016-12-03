@@ -29,11 +29,13 @@ oppia.directive('supplementalCard', [function() {
       'playerPositionService', 'playerTranscriptService',
       'ExplorationObjectFactory', 'windowDimensionsService',
       'CONTENT_FOCUS_LABEL_PREFIX', 'TWO_CARD_THRESHOLD_PX',
+      'EVENT_ACTIVE_CARD_CHANGED',
       function(
         $scope, $window, oppiaPlayerService, UrlInterpolationService,
         playerPositionService, playerTranscriptService,
         ExplorationObjectFactory, windowDimensionsService,
-        CONTENT_FOCUS_LABEL_PREFIX, TWO_CARD_THRESHOLD_PX) {
+        CONTENT_FOCUS_LABEL_PREFIX, TWO_CARD_THRESHOLD_PX,
+        EVENT_ACTIVE_CARD_CHANGED) {
         var updateActiveCard = function() {
           var index = playerPositionService.getActiveCardIndex();
           if (index === null) {
@@ -77,7 +79,7 @@ oppia.directive('supplementalCard', [function() {
           });
         };
 
-        $scope.$on('activeCardChanged', function() {
+        $scope.$on(EVENT_ACTIVE_CARD_CHANGED, function() {
           updateActiveCard();
         });
 
