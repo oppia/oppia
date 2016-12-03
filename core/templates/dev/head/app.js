@@ -56,8 +56,6 @@ oppia.constant('PARAMETER_TYPES', {
   UNICODE_STRING: 'UnicodeString'
 });
 
-oppia.constant('EVENT_HTML_CHANGED', 'htmlChanged');
-
 // The maximum number of nodes to show in a row of the state graph.
 oppia.constant('MAX_NODES_PER_ROW', 4);
 // The following variable must be at least 3. It represents the maximum length,

@@ -19,9 +19,8 @@
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
-oppia.directive('oppiaNoninteractiveVideoMp4', [
-  '$sce', 'oppiaHtmlEscaper', 'EVENT_HTML_CHANGED',
-  function($sce, oppiaHtmlEscaper, EVENT_HTML_CHANGED) {
+oppia.directive('oppiaNoninteractiveVideoMp4', ['$sce', 'oppiaHtmlEscaper',
+  function($sce, oppiaHtmlEscaper) {
     return {
       restrict: 'E',
       scope: {},
@@ -37,7 +36,7 @@ oppia.directive('oppiaNoninteractiveVideoMp4', [
         //
         // See W3C spec 4.7.10.18
         // Ref: https://www.w3.org/TR/html5/embedded-content-0.html
-        $scope.$on(EVENT_HTML_CHANGED, function() {
+        $scope.$on('activeCardChanged', function() {
           $scope.videoUrl = '';
         });
       }]
