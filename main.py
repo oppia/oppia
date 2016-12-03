@@ -393,6 +393,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/emaildashboardcancelresult/<query_id>',
         email_dashboard.EmailDashboardCancelEmailHandler),
     get_redirect_route(
+        r'/emaildashboardtestbulkemailhandler/<query_id>',
+        email_dashboard.EmailDashboardTestBulkEmailHandler),
+    get_redirect_route(
         r'%s' % feconf.EXPLORATION_METADATA_SEARCH_URL,
         collection_editor.ExplorationMetadataSearchHandler),
 

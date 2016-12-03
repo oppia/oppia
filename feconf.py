@@ -243,6 +243,7 @@ BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
 BULK_EMAIL_INTENT_CREATE_EXPLORATION = 'bulk_email_create_exploration'
 BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT = 'bulk_email_creator_reengagement'
 BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT = 'bulk_email_learner_reengagement'
+BULK_EMAIL_INTENT_TEST = 'bulk_email_test'
 
 MODERATOR_ACTION_PUBLICIZE_EXPLORATION = 'publicize_exploration'
 MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
