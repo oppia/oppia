@@ -422,8 +422,8 @@ oppia.factory('explorationSaveService', [
       },
 
       saveChanges: function(onStartLoadingCallback, onEndLoadingCallback) {
-        // This is marked as resolved after modal is closed, so we can change
-        // controller 'saveIsInProgress' back to false.
+        // This is resolved as true when user saves changes,
+        // and false when user quits modal(s) without saving.
         var whenModalClosed = $q.defer();
 
         routerService.savePendingChanges();
