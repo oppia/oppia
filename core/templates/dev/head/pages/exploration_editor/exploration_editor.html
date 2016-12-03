@@ -161,19 +161,19 @@
                 ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}"
                 ng-click="showPublishExplorationModal()"
                 ng-disabled="isExplorationLockedForEditing() || countWarnings()">
-          <span ng-if="!publishModalIsOpening">
+          <span ng-if="!publishIsInProcess">
             <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
                alt="Publish to Oppia Library">&#xE2C3;</i>
             <span class="oppia-save-publish-button-label">Publish</span>
           </span>
-          <span ng-if="publishModalIsOpening">
+          <span ng-if="publishIsInProcess">
             <i class="oppia-save-publish-loading oppia-save-publish-button-icon"
                alt="Publish to Oppia Library">
-                 <loading-dots></loading-dots>
+              <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
             </i>
             <span class="oppia-save-publish-button-label">
-              Saving
-              <loading-dots></loading-dots>
+              Publishing
+              <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
             </span>
           </span>
         </button>
@@ -184,46 +184,28 @@
       <div dropdown class="btn-group" style="margin-right: 10px; margin-top: 8px;"
            title="<[getSaveButtonTooltip()]>">
         <button id="tutorialSaveButton" class="btn btn-default oppia-save-draft-button protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable(), 'oppia-save-draft-button-padding': getChangeListLength() && !isPrivate()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
-          <span ng-if="!isSaveInProgress">
+          <span ng-if="!saveIsInProcess">
             <span ng-if="isPrivate()">
-              <span ng-if="!saveModalIsOpening">
-                <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
-                   alt="Save Draft">&#xE161;</i>
-                <span class="oppia-save-publish-button-label">Save Draft</span>
-                <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()" style="opacity: 0.5">(<[getChangeListLength()]>)</span>
-              </span>
-
-              <span ng-if="saveModalIsOpening">
-                <span class="oppia-save-publish-button-label">
-                  Saving
-                </span>
-                <loading-dots></loading-dots>
-              </span>
+              <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+                 alt="Save Draft">&#xE161;</i>
+              <span class="oppia-save-publish-button-label">Save Draft</span>
+              <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()" style="opacity: 0.5">(<[getChangeListLength()]>)</span>
             </span>
             <span ng-if="!isPrivate()" title="Publish Changes">
-              <span ng-if="!saveModalIsOpening">
-                <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
-                   alt="Publish Changes">&#xE2C3;</i>
-                <span class="oppia-save-publish-button-label">Publish Changes</span>
-                <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()" style="opacity: 0.5">(<[getChangeListLength()]>)</span>
-              </span>
-
-              <span ng-if="saveModalIsOpening">
-                <span class="oppia-save-publish-button-label">
-                  Publishing
-                </span>
-                <loading-dots></loading-dots>
-              </span>
+              <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+                 alt="Publish Changes">&#xE2C3;</i>
+              <span class="oppia-save-publish-button-label">Publish Changes</span>
+              <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()" style="opacity: 0.5">(<[getChangeListLength()]>)</span>
             </span>
           </span>
-          <span ng-if="isSaveInProgress">
+          <span ng-if="saveIsInProcess">
             <span ng-if="isPrivate()" class="oppia-save-publish-button-label">
               Saving
             </span>
             <span ng-if="!isPrivate()" class="oppia-save-publish-button-label">
               Publishing
             </span>
-            <loading-dots></loading-dots>
+            <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
           </span>
         </button>
         <button type="button" class="btn btn-default dropdown-toggle protractor-test-save-discard-toggle"
@@ -240,127 +222,6 @@
 
 {% block content %}
   <div ng-controller="ExplorationEditor" ng-cloak>
-
-    <script type="text/ng-template" id="modals/addExplorationMetadata">
-      <div class="modal-header">
-        <h3>Add Some Details</h3>
-      </div>
-
-      <div class="modal-body oppia-long-text">
-        <p>
-          Just a few more things before you publish:
-        </p>
-        <p ng-if="requireTitleToBeSpecified">
-          Add a title: what should your exploration be called?
-          <input type="text" class="form-control" ng-model="explorationTitleService.displayed"
-                 placeholder="Music in the 19th Century" maxlength="40">
-        </p>
-        <form name="objectiveForm">
-          <p ng-if="requireObjectiveToBeSpecified"
-             ng-class="{'has-error': (objectiveForm.objectiveInput.$touched || objectiveHasBeenPreviouslyEdited) && explorationObjectiveService.displayed.length < 15}">
-            Add a goal: what does the exploration help people to do?
-            <input name="objectiveInput" type="text" class="form-control" ng-model="explorationObjectiveService.displayed"
-                   placeholder="Learn how to ...">
-            <span class="help-block" ng-show="(objectiveForm.objectiveInput.$touched || objectiveHasBeenPreviouslyEdited) && explorationObjectiveService.displayed.length < 15" style="font-size: smaller; color: #a94442">Please provide a complete sentence that describes what this exploration is about.</span>
-          </p>
-        </form>
-        <p ng-if="requireCategoryToBeSpecified">
-          Add a category: how would you categorize your exploration?
-          <select2-dropdown item="explorationCategoryService.displayed"
-                            choices="CATEGORY_LIST_FOR_SELECT2"
-                            placeholder="Choose or type new"
-                            new-choice-regex="^[A-Z a-z]+$"
-                            width="100%"
-                            invalid-search-term-message="Invalid category name">
-          </select2-dropdown>
-        </p>
-
-        <p ng-if="askForLanguageCheck">
-          Verify the language: is your exploration written in this language?
-          <select id="explorationLanguageCode" class="form-control protractor-test-exploration-language-select" ng-model="explorationLanguageCodeService.displayed" ng-change="saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in explorationLanguageCodeService.getAllLanguageCodes()">
-          </select>
-        </p>
-        <p ng-if="askForTags">
-          Add tags to help learners discover your exploration.
-          <select2-dropdown item="explorationTagsService.displayed"
-                            tag-mode="true"
-                            allow-multiple-choices="true"
-                            invalid-search-term-message="Add a new tag (using lowercase letters and spaces)..."
-                            new-choice-regex="<[::TAG_REGEX]>"
-                            width="100%"
-                            placeholder="Skills, concepts, topics, ..."
-                            on-selection-change="saveExplorationTags()">
-          </select2-dropdown>
-        </p>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-        <button class="btn btn-success protractor-test-confirm-pre-publication" ng-click="save()" ng-disabled="!isSavingAllowed()">Save Changes</button>
-      </div>
-    </script>
-
-    <script type="text/ng-template" id="modals/publishExploration">
-      <div class="modal-header">
-        <h3>Publish Exploration</h3>
-      </div>
-
-      <div class="modal-body oppia-long-text">
-        <p>
-          Congratulations, you're about to publish an exploration!
-        </p>
-        <p>
-          Before publishing, please ensure that your exploration fits the
-          <a href="/teach#playbook" target="_blank">site publication criteria</a>. In particular, it should:
-          <ul>
-            <li>help its intended audience learn something new</li>
-            <li>provide useful feedback/guidance to help them if they get stuck.</li>
-          </ul>
-        </p>
-        <p>
-          Once the exploration is published, it will be available in the Oppia library for anyone to learn from and provide feedback. You can also check out
-            its stats by clicking on the Stats tab in the top right of the editor.
-        </p>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-        <button class="btn btn-success protractor-test-confirm-publish" ng-click="publish()">Publish Exploration</button>
-      </div>
-    </script>
-
-    <script type="text/ng-template" id="modals/saveExploration">
-      <div class="modal-header">
-        <h3>
-          <span ng-if="isExplorationPrivate">Save Draft</span>
-          <span ng-if="!isExplorationPrivate">Publish Changes</span>
-        </h3>
-      </div>
-      <div class="modal-body oppia-long-text">
-        <p>
-          <span ng-if="isExplorationPrivate">(Optional)</span>
-          Please enter a brief description of what you have changed:
-          <textarea rows="3" cols="50" ng-model="commitMessage" focus-on="saveChangesModalOpened" class="protractor-test-commit-message-input" autofocus></textarea>
-        </p>
-        <button class="btn btn-default" ng-click="onClickToggleDiffButton()">
-          <span ng-if="!showDiff">Show Changes</span>
-          <span ng-if="showDiff">Hide Changes</span>
-        </button>
-
-        <version-diff-visualization ng-if="showDiff" diff-data="diffData"
-                                    earlier-version-header="earlierVersionHeader"
-                                    later-version-header="laterVersionHeader">
-        </version-diff-visualization>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-        <button class="btn btn-success protractor-test-close-save-modal" ng-disabled="!isExplorationPrivate && !commitMessage" ng-click="save(commitMessage)">
-          <span ng-if="isExplorationPrivate">Save Draft</span>
-          <span ng-if="!isExplorationPrivate">Publish Changes</span>
-        </button>
-      </div>
-    </script>
-
     <script type="text/ng-template" id="modals/saveValidationFail">
       <div class="modal-header">
         <h3>Error Saving Exploration</h3>
@@ -488,6 +349,9 @@
   {% include 'pages/exploration_player/supplemental_card_directive.html' %}
   {% include 'pages/exploration_editor/editor_reloading_modal_directive.html' %}
   {% include 'pages/exploration_editor/help_modal_directive.html' %}
+  {% include 'pages/exploration_editor/exploration_save_modal_directive.html' %}
+  {% include 'pages/exploration_editor/exploration_metadata_modal_directive.html' %}
+  {% include 'pages/exploration_editor/exploration_publish_modal_directive.html' %}
   {% include 'pages/exploration_editor/param_changes_editor_directive.html' %}
   {% include 'pages/exploration_editor/post_publish_modal_directive.html' %}
   {% include 'pages/exploration_editor/state_diff_modal_directive.html' %}
@@ -556,9 +420,11 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/utilsService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationEditor.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationSaveAndPublishButtons.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorServices.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationDiffService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationEditorAdvancedFeaturesService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationSaveService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/GadgetValidationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ParamChangesEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ParameterMetadataService.js"></script>

@@ -25,6 +25,16 @@ from core.domain import rte_component_registry
 
 
 def filter_a(name, value):
+    """Returns whether the described attribute of an anchor ('a') tag should be
+    whitelisted.
+
+    Args:
+        name: str. The name of the attribute.
+        value: str. The value of the attribute.
+
+    Returns:
+        bool. Whether the given attribute should be whitelisted.
+    """
     if name in ('title', 'target'):
         return True
     if name == 'href':
@@ -64,8 +74,14 @@ ATTRS_WHITELIST = {
 def clean(user_submitted_html):
     """Cleans a piece of user submitted HTML.
 
-    This only allows HTML from a restricted set of tags, attrs and styles. It
-    strips out unrecognized tags.
+    This only allows HTML from a restricted set of tags, attrs and styles.
+
+    Args:
+        user_submitted_html: str. An untrusted HTML string.
+
+    Returns:
+        str. The HTML string that results after stripping out unrecognized tags
+        and attributes.
     """
     oppia_custom_tags = (
         rte_component_registry.Registry.get_tag_list_with_attrs())
@@ -81,5 +97,13 @@ def clean(user_submitted_html):
 
 
 def strip_html_tags(html):
-    """Strips all HTML markup from an HTML string."""
+    """Strips all HTML markup from an HTML string.
+
+    Args:
+        html: str. An HTML string.
+
+    Returns:
+        str. The HTML string that results after all the tags and attributes are
+        stripped out.
+    """
     return bleach.clean(html, tags=[], attributes={}, strip=True)
