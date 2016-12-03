@@ -66,6 +66,8 @@ oppia.constant('MAX_NODE_LABEL_LENGTH', 15);
 // displayed.
 oppia.constant('FATAL_ERROR_CODES', [400, 401, 404, 500]);
 
+oppia.constant('ACTIVE_CARD_CHANGED', 'activeCardChanged');
+
 oppia.config([
   '$compileProvider', '$httpProvider', '$interpolateProvider',
   '$locationProvider',

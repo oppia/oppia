@@ -91,13 +91,13 @@ oppia.directive('tutorCard', [function() {
       'playerPositionService', 'playerTranscriptService',
       'ExplorationPlayerStateService', 'windowDimensionsService',
       'urlService', 'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX',
-      'CONTINUE_BUTTON_FOCUS_LABEL',
+      'CONTINUE_BUTTON_FOCUS_LABEL', 'ACTIVE_CARD_CHANGED',
       function(
         $scope, oppiaPlayerService, UrlInterpolationService,
         playerPositionService, playerTranscriptService,
         ExplorationPlayerStateService, windowDimensionsService,
         urlService, TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX,
-        CONTINUE_BUTTON_FOCUS_LABEL) {
+        CONTINUE_BUTTON_FOCUS_LABEL, ACTIVE_CARD_CHANGED) {
         var updateActiveCard = function() {
           var index = playerPositionService.getActiveCardIndex();
           if (index === null) {
@@ -165,7 +165,7 @@ oppia.directive('tutorCard', [function() {
               $scope.activeCard.stateName);
         };
 
-        $scope.$on('activeCardChanged', function() {
+        $scope.$on(ACTIVE_CARD_CHANGED, function() {
           updateActiveCard();
         });
 

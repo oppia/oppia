@@ -25,7 +25,8 @@ oppia.directive('oppiaNoninteractiveVideoMp4', ['$sce', 'oppiaHtmlEscaper',
       restrict: 'E',
       scope: {},
       templateUrl: 'richTextComponent/VideoMp4',
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
+      controller: ['$scope', '$attrs', 'ACTIVE_CARD_CHANGED',
+      function($scope, $attrs, ACTIVE_CARD_CHANGED) {
         $scope.videoUrl = $sce.trustAsResourceUrl(
           oppiaHtmlEscaper.escapedJsonToObj($attrs.videoUrlWithValue));
 
@@ -36,7 +37,7 @@ oppia.directive('oppiaNoninteractiveVideoMp4', ['$sce', 'oppiaHtmlEscaper',
         //
         // See W3C spec 4.7.10.18
         // Ref: https://www.w3.org/TR/html5/embedded-content-0.html
-        $scope.$on('activeCardChanged', function() {
+        $scope.$on(ACTIVE_CARD_CHANGED, function() {
           $scope.videoUrl = '';
         });
       }]
