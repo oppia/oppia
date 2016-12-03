@@ -442,6 +442,9 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.process_and_flush_pending_tasks()
 
+            email_subject = 'email_subject'
+            email_body = 'email_body'
+
             # Check that correct test email is sent.
             self.login(self.SUBMITTER_EMAIL)
             csrf_token = self.get_csrf_token_from_response(
@@ -449,32 +452,34 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
                     '/emaildashboardresult/%s' % query_models[0].id))
             self.post_json(
                 '/emaildashboardtestbulkemailhandler/%s' % query_models[0].id, {
-                    'data': {
-                        'email_body': 'test_email_body',
-                        'email_subject': 'test_email_subject'
-                    }}, csrf_token)
+                    'email_body': email_body,
+                    'email_subject': email_subject
+                }, csrf_token)
             self.logout()
 
             # Check that correct test email is sent to submitter of query.
             # One email is sent when query is completed and other is test email.
+            test_email_html_body = '[This is test email.]<br> %s' % email_body
+            test_email_text_body = '[This is test email.]\n %s' % email_body
+
             messages = self.mail_stub.get_sent_messages(to=self.SUBMITTER_EMAIL)
             self.assertEqual(len(messages), 2)
             self.assertEqual(
-                messages[1].html.decode(), 'test_email_body')
+                messages[1].html.decode(), test_email_html_body)
             self.assertEqual(
-                messages[1].body.decode(), 'test_email_body')
+                messages[1].body.decode(), test_email_text_body)
 
             all_model = email_models.SentEmailModel.query().fetch()
             self.assertEqual(len(all_model), 2)
 
             sent_email_model = all_model[0]
             self.assertEqual(
-                sent_email_model.subject, 'test_email_subject')
+                sent_email_model.subject, email_subject)
             self.assertEqual(
-                sent_email_model.html_body, 'test_email_body')
+                sent_email_model.html_body, test_email_html_body)
             self.assertEqual(
                 sent_email_model.recipient_id, query_models[0].submitter_id)
             self.assertEqual(
-                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+                sent_email_model.sender_id, query_models[0].submitter_id)
             self.assertEqual(
                 sent_email_model.intent, feconf.BULK_EMAIL_INTENT_TEST)

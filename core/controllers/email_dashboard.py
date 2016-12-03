@@ -235,9 +235,9 @@ class EmailDashboardTestBulkEmailHandler(base.BaseHandler):
             raise self.UnauthorizedUserException(
                 '%s is not an authorized user for this query.', self.user_id)
 
-        data = self.payload['data']
-        email_subject = data['email_subject']
-        email_body = data['email_body']
+        email_subject = self.payload['email_subject']
+        email_body = self.payload['email_body']
+        test_email_body = '[This is test email.]<br> %s' % email_body
         email_manager.send_test_email_for_bulk_emails(
-            query_model.submitter_id, email_subject, email_body)
+            query_model.submitter_id, email_subject, test_email_body)
         self.render_json({})
