@@ -237,7 +237,7 @@ class EmailDashboardTestBulkEmailHandler(base.BaseHandler):
 
         email_subject = self.payload['email_subject']
         email_body = self.payload['email_body']
-        test_email_body = '[This is test email.]<br> %s' % email_body
+        test_email_body = '[This is a test email.]<br><br> %s' % email_body
         email_manager.send_test_email_for_bulk_emails(
             query_model.submitter_id, email_subject, test_email_body)
         self.render_json({})

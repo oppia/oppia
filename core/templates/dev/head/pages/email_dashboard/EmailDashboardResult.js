@@ -29,16 +29,16 @@ oppia.controller('EmailDashboardResult', [
     };
 
     var validateEmailSubjectAndBody = function() {
-      var invalidData = false;
+      var dataIsValid = true;
       if ($scope.emailSubject.length === 0) {
         $scope.invalid.subject = true;
-        invalidData = true;
+        dataIsValid = false;
       }
       if ($scope.emailBody.length === 0) {
         $scope.invalid.body = true;
-        invalidData = true;
+        dataIsValid = false;
       }
-      return invalidData;
+      return dataIsValid;
     };
 
     $scope.submitEmail = function() {
@@ -46,15 +46,15 @@ oppia.controller('EmailDashboardResult', [
         RESULT_HANDLER_URL, {
           query_id: getQueryId()
         });
-      var invalidData = validateEmailSubjectAndBody();
+      var dataIsValid = validateEmailSubjectAndBody();
 
       if ($scope.emailOption === 'custom' &&
         $scope.maxRecipients === null) {
         $scope.invalid.maxRecipients = true;
-        invalidData = true;
+        dataIsValid = false;
       }
 
-      if (!invalidData) {
+      if (dataIsValid) {
         $scope.submitIsInProgress = true;
         var data = {
           email_subject: $scope.emailSubject,
@@ -110,9 +110,9 @@ oppia.controller('EmailDashboardResult', [
         TEST_BULK_EMAIL_URL, {
           query_id: getQueryId()
         });
-      var invalidData = validateEmailSubjectAndBody();
+      var dataIsValid = validateEmailSubjectAndBody();
 
-      if (!invalidData) {
+      if (dataIsValid) {
         $http.post(testEmailHandlerUrl, {
           email_subject: $scope.emailSubject,
           email_body: $scope.emailBody

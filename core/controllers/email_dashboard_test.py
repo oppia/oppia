@@ -459,8 +459,9 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
 
             # Check that correct test email is sent to submitter of query.
             # One email is sent when query is completed and other is test email.
-            test_email_html_body = '[This is test email.]<br> %s' % email_body
-            test_email_text_body = '[This is test email.]\n %s' % email_body
+            test_email_html_body = (
+                '[This is a test email.]<br><br> %s' % email_body)
+            test_email_text_body = '[This is a test email.]\n\n %s' % email_body
 
             messages = self.mail_stub.get_sent_messages(to=self.SUBMITTER_EMAIL)
             self.assertEqual(len(messages), 2)
