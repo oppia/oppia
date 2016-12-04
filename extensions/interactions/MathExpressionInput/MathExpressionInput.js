@@ -32,7 +32,13 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
         '$scope', '$attrs', '$timeout', '$element', 'LABEL_FOR_CLEARING_FOCUS',
         function($scope, $attrs, $timeout, $element, LABEL_FOR_CLEARING_FOCUS) {
           var guppyDivElt = $element[0].querySelector('.guppy-div');
-          var guppyInstance = new Guppy(guppyDivElt, {});
+          var guppyInstance = new Guppy(guppyDivElt, {
+            ready_callback: function() {
+              Guppy.get_symbols(
+                GLOBALS.ASSET_DIR_PREFIX +
+                '/assets/overrides/guppy/oppia_symbols.json');
+            }
+          });
           var guppyDivId = guppyInstance.editor.id;
 
           var labelForFocusTarget = $attrs.labelForFocusTarget || null;
@@ -59,10 +65,10 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
           };
 
           $scope.isCurrentAnswerValid = function() {
-            var asciiAnswer = Guppy.instances[guppyDivId].get_content('calc');
+            var latexAnswer = Guppy.instances[guppyDivId].get_content('latex');
 
             try {
-              MathExpression.fromText(answer.ascii);
+              MathExpression.fromLatex(answer.latex);
             } catch (e) {
               return false;
             }
@@ -71,11 +77,10 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
           };
 
           $scope.submitAnswer = function() {
-            answer.ascii = Guppy.instances[guppyDivId].get_content('calc');
+            answer.ascii = Guppy.instances[guppyDivId].get_content('text');
             answer.latex = Guppy.instances[guppyDivId].get_content('latex');
 
-            if (answer === undefined || answer === null ||
-                !$scope.isCurrentAnswerValid()) {
+            if (!$scope.isCurrentAnswerValid()) {
               return;
             }
 

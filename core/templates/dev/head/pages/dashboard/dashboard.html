@@ -19,12 +19,6 @@
       <span translate="I18N_TOPNAV_DASHBOARD"></span>
     </li>
   </ul>
-
-  <style>
-    html, body {
-      background-color: #f2f2ee;
-    }
-  </style>
 {% endblock navbar_breadcrumb %}
 
 {% block content %}
@@ -194,7 +188,8 @@
                   </a>
                   <div style="position: absolute; margin-left: 13px;">
                     <a ng-if="exploration.num_open_threads != 0"
-                       ng-href="/create/<[exploration.id]>#/feedback">
+                       ng-href="/create/<[exploration.id]>#/feedback"
+                       class="oppia-highlighted-link">
                       (<[exploration.num_open_threads]> new)
                     </a>
                   </div>
@@ -258,7 +253,7 @@
                    ng-if="explorationStats[exploration.id].open_feedback.length !==0"
                    ng-show="activeSubDropdown === EXPLORATION_DROPDOWN_STATS.OPEN_FEEDBACK || checkMobileView()">
                 <div ng-repeat="feedback in explorationStats[exploration.id].open_feedback">
-                  <[feedback.text | truncate: 100]> (by <a ng-href="/create/<[exploration.id]>#/feedback"><[feedback.author_username || 'a learner']></a>)
+                  <[feedback.text | truncate: 100]> (by <a ng-href="/create/<[exploration.id]>#/feedback" class="oppia-highlighted-link"><[feedback.author_username || 'a learner']></a>)
                 </div>
                 <div ng-if="(exploration.num_open_threads - explorationStats[exploration.id].open_feedback.length) > 0">
                   ... and <[exploration.num_open_threads - explorationStats[exploration.id].open_feedback.length]> more
@@ -341,7 +336,8 @@
                 </span>
                 <[exploration.num_total_threads]>
                 <a ng-if="exploration.num_open_threads != 0"
-                   ng-href="/create/<[exploration.id]>#/feedback">
+                   ng-href="/create/<[exploration.id]>#/feedback"
+                   class="oppia-highlighted-link">
                   (<[exploration.num_open_threads]> new)
                 </a>
               </li>

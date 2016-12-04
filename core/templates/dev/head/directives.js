@@ -19,19 +19,13 @@
 
 // HTML bind directive that trusts the value it is given and also evaluates
 // custom directive tags in the provided value.
-oppia.directive('angularHtmlBind', ['$compile', '$timeout',
-  'EVENT_HTML_CHANGED', function($compile, $timeout, EVENT_HTML_CHANGED) {
+oppia.directive('angularHtmlBind', ['$compile', function($compile) {
   return {
     restrict: 'A',
     link: function(scope, elm, attrs) {
       scope.$watch(attrs.angularHtmlBind, function(newValue) {
-        // Inform child components that the value of the HTML string has
-        // changed, so that they can perform any necessary cleanup.
-        scope.$broadcast(EVENT_HTML_CHANGED);
-        $timeout(function() {
-          elm.html(newValue);
-          $compile(elm.contents())(scope);
-        }, 10);
+        elm.html(newValue);
+        $compile(elm.contents())(scope);
       });
     }
   };
