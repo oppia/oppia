@@ -219,7 +219,7 @@
                  is-dropdown-open="activeExplorationId === exploration.id"
                  is-private="exploration.status === 'private'"
                  ng-click="getStatsForNonPrivateExp(exploration.status, exploration.id)">
-          <exploration-title-section exploration="exploration" active-exploration-id="activeExplorationId">
+          <a ng-href="/create/<[exploration.id]>">
             <div class="title-section"
                  ng-class="{'oppia-exp-arrow': activeExplorationId === exploration.id}"
                  style="background-color: <[exploration.thumbnail_bg_color]>;">
@@ -236,7 +236,7 @@
             <div class="mask-wrap">
               <div class="title-section-mask"></div>
             </div>
-          </exploration-title-section>
+          </a>
           <md-card class="oppia-exp-dropdown-stats"
                    ng-click="$event.stopPropagation()"
                    ng-if="exploration.status !=='private' && activeExplorationId === exploration.id">
@@ -299,6 +299,7 @@
                 layout-wrap
                 class="metrics"
                 layout-align="space-between center">
+              <a class = "overlay" ng-href="<[getExplorationUrl(exploration.id)]>" style="position: absolute; height: 88px; width: 184px; bottom: 12px; background: white; opacity: 0;"></a>
               <li flex="50">
                 <span class="protractor-test-exp-summary-tile-rating">
                   <span class="fa fa-star fa-lg"
@@ -309,6 +310,14 @@
                     <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
                   </span>
                 </span>
+              </li>
+
+              <li flex="50">
+                <span class="fa fa-eye fa-lg"
+                      tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>"
+                      tooltip-placement="top">
+                </span>
+                <[exploration.num_views]>
               </li>
 
               <li flex="50">
