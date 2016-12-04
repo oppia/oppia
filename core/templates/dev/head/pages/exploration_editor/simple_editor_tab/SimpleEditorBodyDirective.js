@@ -57,7 +57,7 @@ oppia.directive('simpleEditorBody', [function() {
           return false;
         };
 
-        $scope.startFinishExploration = function() {
+        $scope.finishExploration = function() {
           // If exploration is not yet published
           // and doesn't have unsaved changes,
           // we can just open publishing modal straight away.
