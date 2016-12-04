@@ -264,22 +264,6 @@
               </li>
 
               <li flex="50">
-                <span class="fa fa-eye fa-lg"
-                      tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>"
-                      tooltip-placement="top">
-                </span>
-                <[exploration.num_views]>
-              </li>
-
-              <li flex="50">
-                <span class="fa fa-eye fa-lg"
-                      tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>"
-                      tooltip-placement="top">
-                </span>
-                <[exploration.num_views]>
-              </li>
-
-              <li flex="50">
                 <span class="fa fa-comments fa-lg"
                       tooltip="<['I18N_DASHBOARD_OPEN_FEEDBACK' | translate]>"
                       tooltip-placement="top">
@@ -287,9 +271,25 @@
                 <[exploration.num_total_threads]>
                 <a ng-if="exploration.num_open_threads != 0"
                    ng-href="/create/<[exploration.id]>#/feedback"
-                   class="oppia-highlighted-link">
+                   class="oppia-highlighted-link"
+                   style="display: inline-block; position: absolute; padding-left: 5px;">
                   (<[exploration.num_open_threads]> new)
                 </a>
+              </li>
+
+              <li flex="50">
+                <span class="fa fa-eye fa-lg"
+                      tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>"
+                      tooltip-placement="top">
+                </span>
+                <[exploration.num_views]>
+              </li>
+
+              <li flex="50" class="oppia-exploration-card-statistics">
+                <img ng-src="<[unresolvedAnsImgUrl]>" style="width: 15px;" tooltip="Unresolved Answers" tooltip-placement="top" class="oppia-exploration-card-statistics-icon">
+                <span>
+                  <[exploration.num_unresolved_answers]>
+                </span>
               </li>
 
               <li flex="50">
