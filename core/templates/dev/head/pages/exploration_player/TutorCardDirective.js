@@ -175,6 +175,9 @@ oppia.directive('tutorCard', [function() {
           $scope.upcomingStateName = card.upcomingStateName;
           $scope.upcomingInlineInteractionHtml = (
             card.upcomingInlineInteractionHtml);
+          $scope.upcomingInteractionInstructions = (
+            ExplorationPlayerStateService.getInteractionInstructions(
+              $scope.upcomingStateName));
         });
 
         $scope.$on('oppiaFeedbackAvailable', function() {
