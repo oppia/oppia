@@ -257,10 +257,10 @@ body {
 }
 
 .oppia-profile-content-card {
-  background-color: #fff;
+  box-shadow: none;
   float: left;
   min-height: 630px;
-  padding: 30px;
+  padding: 0 30 30 30;
   position: relative;
   width: -webkit-calc(100% - 280px);
   width: -moz-calc(100% - 280px);
@@ -283,9 +283,10 @@ body {
 .oppia-profile-portfolio-pages {
   bottom: 0;
   display: block;
-  font-size: .7em;
-  margin-bottom: 20px;
-  margin-right: 40px;
+  font-size: .9em;
+  font-weight: bold;
+  margin-bottom: 60px;
+  margin-right: 65px;
   position: absolute;
   right: 0;
   text-align: right;
@@ -3606,7 +3607,7 @@ md-card.preview-conversation-skin-supplemental-card {
     The margin setting is so that exploration summary tiles and collection
     summary tiles would be the same widths (214px).
   */
-  margin: 12px 5.5px;
+  margin: 8px 5.5px;
   padding: 0;
   position: relative;
   text-align: left;
