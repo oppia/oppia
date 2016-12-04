@@ -67,7 +67,7 @@ oppia.directive('simpleEditorBody', [function() {
           } else {
             explorationSaveService.saveChanges()
               .then(function(saveSucceeded) {
-                // The publish modal is shown here only if changes we're saved
+                // The publish modal is shown here only if changes were saved
                 // and the exploration has not been published yet.
                 if (saveSucceeded &&
                     explorationRightsService.isPrivate()) {
