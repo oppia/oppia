@@ -66,10 +66,10 @@ oppia.directive('simpleEditorBody', [function() {
             explorationSaveService.showPublishExplorationModal();
           } else {
             explorationSaveService.saveChanges()
-              .then(function(didSaveExploration) {
+              .then(function(saveSucceeded) {
                 // The publish modal is shown here only if changes we're saved
                 // and the exploration has not been published yet.
-                if (didSaveExploration &&
+                if (saveSucceeded &&
                     explorationRightsService.isPrivate()) {
                   explorationSaveService.showPublishExplorationModal();
                 }
