@@ -3822,6 +3822,15 @@ md-card.preview-conversation-skin-supplemental-card {
   text-align: center;
 }
 
+.oppia-exploration-card-statistics-icon {
+  position: absolute;
+  padding-top: 3px;
+}
+
+.oppia-exploration-card-statistics-values {
+  padding-left: 17px;
+}
+
 .oppia-activity-summary-tile .metrics li .fa {
   font-size: 1.1em;
   margin-right: 2px;
@@ -3875,7 +3884,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-dashboard-card-view-item .metrics > li {
-  padding: 0 0 4px 14px;
+  padding: 0 0 5px 14px;
   text-align: left;
 }
 

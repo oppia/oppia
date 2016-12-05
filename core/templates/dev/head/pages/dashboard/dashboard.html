@@ -253,22 +253,24 @@
               <a class = "overlay" ng-href="<[getExplorationUrl(exploration.id)]>" style="position: absolute; height: 88px; width: 184px; bottom: 12px; background: white; opacity: 0;"></a>
               <li flex="50">
                 <span class="protractor-test-exp-summary-tile-rating">
-                  <span class="fa fa-star fa-lg"
+                  <span class="fa fa-star fa-lg oppia-exploration-card-statistics-icon"
                         tooltip="<['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]>"
                         tooltip-placement="top">
                   </span>
-                  <span>
+                  <span class="oppia-exploration-card-statistics-values">
                     <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
                   </span>
                 </span>
               </li>
 
-              <li flex="50">
-                <span class="fa fa-comments fa-lg"
+              <li flex="50" style="padding-left: 8px;">
+                <span class="fa fa-comments fa-lg oppia-exploration-card-statistics-icon"
                       tooltip="<['I18N_DASHBOARD_OPEN_FEEDBACK' | translate]>"
                       tooltip-placement="top">
                 </span>
-                <[exploration.num_total_threads]>
+                <span class="oppia-exploration-card-statistics-values">
+                  <[exploration.num_total_threads]>  
+                </span>
                 <a ng-if="exploration.num_open_threads != 0"
                    ng-href="/create/<[exploration.id]>#/feedback"
                    class="oppia-highlighted-link"
@@ -278,31 +280,34 @@
               </li>
 
               <li flex="50">
-                <span class="fa fa-eye fa-lg"
+                <span class="fa fa-eye fa-lg oppia-exploration-card-statistics-icon"
                       tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>"
                       tooltip-placement="top">
                 </span>
-                <[exploration.num_views]>
+                <span class="oppia-exploration-card-statistics-values">
+                  <[exploration.num_views]>  
+                </span>
               </li>
 
-              <li flex="50" class="oppia-exploration-card-statistics">
+              <li flex="50" style="padding-left: 8px;">
                 <img ng-src="<[unresolvedAnsImgUrl]>" style="width: 15px;" tooltip="Unresolved Answers" tooltip-placement="top" class="oppia-exploration-card-statistics-icon">
-                <span>
+                <span class="oppia-exploration-card-statistics-values">
                   <[exploration.num_unresolved_answers]>
                 </span>
               </li>
 
               <li flex="50">
-                <span class="fa fa-clock-o fa-lg"
+                <span class="fa fa-clock-o fa-lg oppia-exploration-card-statistics-icon"
                       tooltip="<['I18N_LIBRARY_LAST_UPDATED' | translate]>"
                       tooltip-placement="top">
                 </span>
-                <span>
+                <span class="oppia-exploration-card-statistics-values">
                   <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
                 </span>
               </li>
               <sharing-links ng-if="exploration.status !== 'private'"
                              ng-click="$event.stopPropagation()"
+                             style="position: relative; right: 8px; bottom: 2px;"
                              flex="100"
                              class="dashboard-hide-mobile"
                              layout-type="row"
