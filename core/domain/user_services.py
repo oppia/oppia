@@ -196,8 +196,8 @@ class UserSettings(object):
             username: str. Identifiable username to display in the UI.
 
         Returns:
-            str or None. A string representing normalized username if it exists in this
-            UserSettings domain object. Otherwise None.
+            str or None. A string representing normalized username if user with
+            given username exists. Otherwise None.
         """
 
         return username.lower() if username else None
@@ -259,7 +259,7 @@ def get_email_from_user_id(user_id):
         str. user_email corresponding to the given user_id.
 
     Raises:
-        Exception: If the user is not found.
+        Exception: The user is not found.
     """
     user_settings = get_user_settings(user_id)
     return user_settings.email
@@ -427,13 +427,12 @@ def get_profile_pictures_by_user_ids(user_ids):
     representing the settings for the given user_ids.
 
     Args:
-        user_ids: list(str). The list of user_ids to get UserSettings
-            domain objects for.
+        user_ids: list(str). The list of user_ids to get profile_picture_data_url for.
 
     Returns:
-        dict. A dictionary containing profile_picture_data_url for given user_ids as keys.
-        If user_id does not exist, corresponding entry in the returned
-        dict is None.
+        dict. A dictionary whose keys are user_ids and whose corresponding values are
+        their profile_picture_data_url entries. If a user_id does not exist, the
+        corresponding value is None.
     """
     user_settings_models = user_models.UserSettingsModel.get_multi(user_ids)
     result = {}
@@ -458,7 +457,7 @@ def get_user_settings(user_id, strict=False):
         returns None. Otherwise, returns the corresponding UserSettings domain object.
 
     Raises:
-        Exception: If strict is True and given user_id does not exist.
+        Exception: strict is True and given user_id does not exist.
     """
 
     user_settings = get_users_settings([user_id])[0]
@@ -604,11 +603,10 @@ def get_usernames(user_ids):
     """Gets usernames corresponding to the given user_ids.
 
     Args:
-        user_ids: list(str). The list of user_ids to get UserSettings
-            domain objects for.
+        user_ids: list(str). The list of user_ids to get username for.
 
     Returns:
-        list. Containing usernames based on given user_ids.
+        list(str|None). Containing usernames based on given user_ids.
         If a user_id does not exist, the corresponding entry in the
         returned list is None.
     """
@@ -619,7 +617,7 @@ def get_usernames(user_ids):
 # NB: If we ever allow usernames to change, update the
 # config_domain.BANNED_USERNAMES property.
 def set_username(user_id, new_username):
-    """Sets username to new_username of User with given user_id.
+    """Updates the username of the user with the given user_id.
 
     Args:
         user_id: str. The user id.
@@ -710,7 +708,7 @@ def _update_first_contribution_msec(user_id, first_contribution_msec):
 
     Args:
         user_id: str. The user id.
-        first_contribution_msec: str. New time to set in milliseconds
+        first_contribution_msec: float. New time to set in milliseconds
             representing user's first contribution to Oppia.
     """
     user_settings = get_user_settings(user_id, strict=True)
@@ -724,7 +722,7 @@ def update_first_contribution_msec_if_not_set(user_id, first_contribution_msec):
 
     Args:
         user_id: str. The user id.
-        first_contribution_msec: str. New time to set in milliseconds
+        first_contribution_msec: float. New time to set in milliseconds
             representing user's first contribution to Oppia.
     """
     user_settings = get_user_settings(user_id, strict=True)
@@ -768,13 +766,13 @@ def get_human_readable_user_ids(user_ids):
         user_ids: list(str). The list of user_ids to get UserSettings domain objects for.
 
     Returns:
-        list(UserSettings). The UserSettings domain objects corresponding to given
-        user ids. If username does not exist, the corresponding entry in the
-        returned list is truncated email address.
+        list(str). List of usernames corresponding to given user_ids. If username
+        does not exist, the corresponding entry in the returned list is truncated
+        email address.
 
     Raises:
-        Exception: If User is not found for any user_id in user_ids list.
-            Also logs a corresponding error.
+        Exception: At least one of the user_ids does not correspond to a valid
+        UserSettingsModel.
     """
     users_settings = get_users_settings(user_ids)
     usernames = []
@@ -795,8 +793,8 @@ def get_human_readable_user_ids(user_ids):
 
 
 def record_user_started_state_editor_tutorial(user_id):
-    """Updates last_started_state_editor_tutorial time for the user
-    with given user_id.
+    """Updates last_started_state_editor_tutorial to the current datetime
+    for the user with given user_id.
 
     Args:
         user_id: str. The user id.
@@ -808,7 +806,8 @@ def record_user_started_state_editor_tutorial(user_id):
 
 
 def record_user_logged_in(user_id):
-    """Updates last_logged_in time for the user with given user_id.
+    """Updates last_logged_in to the current datetime for the user with
+    given user_id.
 
     Args:
         user_id: str. The user id.
@@ -820,7 +819,8 @@ def record_user_logged_in(user_id):
 
 
 def record_user_edited_an_exploration(user_id):
-    """Updates last_edited_an_exploration for the user with given user_id.
+    """Updates last_edited_an_exploration to the current datetime for
+    the user with given user_id.
 
     Args:
         user_id: str. The user id.
@@ -832,7 +832,8 @@ def record_user_edited_an_exploration(user_id):
 
 
 def record_user_created_an_exploration(user_id):
-    """Updates last_created_an_exploration for the user with given user_id.
+    """Updates last_created_an_exploration to the current datetime for
+    the user with given user_id.
 
     Args:
         user_id: str. The user id.
@@ -1010,7 +1011,8 @@ def create_user_contributions(
             user has edited.
 
     Returns:
-        UserContributions. UserContributions domain object based on given user_id.
+        UserContributions. The domain object representing the newly-created
+        UserContributionsModel.
 
     Raises:
         Exception: The UserContributionsModel for the given user_id already exists.
@@ -1029,7 +1031,7 @@ def create_user_contributions(
 def update_user_contributions(user_id, created_exploration_ids,
                               edited_exploration_ids):
     """Updates an existing UserContributionsModel with new calculated
-    contributions
+    contributions.
 
     Args:
         user_id: str. The user id.
@@ -1112,7 +1114,7 @@ def _migrate_dashboard_stats_to_latest_schema(versioned_dashboard_stats):
             user-specific statistics.
 
     Raises:
-        Exception: If schema_version <= CURRENT_DASHBOARD_STATS_SCHEMA_VERSION.
+        Exception: If schema_version > CURRENT_DASHBOARD_STATS_SCHEMA_VERSION.
     """
     stats_schema_version = versioned_dashboard_stats.schema_version
     if not (1 <= stats_schema_version
@@ -1123,7 +1125,7 @@ def _migrate_dashboard_stats_to_latest_schema(versioned_dashboard_stats):
 
 
 def get_current_date_as_string():
-    """Gets current date.
+    """Gets the current date.
 
     Returns:
         str. Current date as a string of format 'YYYY-MM-DD'.
@@ -1133,7 +1135,8 @@ def get_current_date_as_string():
 
 
 def parse_date_from_string(datetime_str):
-    """Gives parsed date from a string.
+    """Parses the given string, and returns the year, month and day of the
+    date that it represents.
 
     Args:
         datetime_str: str. String representing datetime.
@@ -1151,14 +1154,14 @@ def parse_date_from_string(datetime_str):
 
 
 def get_user_impact_score(user_id):
-    """Gets user impact score.
+    """Gets the user impact score for the given user_id.
 
     Args:
         user_id: str. The user id.
 
     Returns:
-        float. Representing user impact score associated with the given user_id.
-        Otherwise returns 0 if UserStatsModel does not exist for the given user_id.
+        float. The user impact score associated with the given user_id.
+        Returns 0 if UserStatsModel does not exist for the given user_id.
     """
     model = user_models.UserStatsModel.get(user_id, strict=False)
 
@@ -1175,13 +1178,12 @@ def get_weekly_dashboard_stats(user_id):
         user_id: str. The user id.
 
     Returns:
-        list(dict): Where each dict in the list denotes the dashboard stats
-        of the user, keyed by a datetime string.
+        list(dict): The weekly dashboard stats for the given user. Each dict in the
+        list denotes the dashboard stats of the user, keyed by a datetime string.
         The stats currently being saved are:
             - 'average ratings': Average of ratings across all explorations of a
                 user.
-            - 'total plays': Sum total of number of plays across all explorations
-                of a user.
+            - 'total plays': Total number of plays across all explorations of a user.
 
         The format of returned value:
         [
@@ -1200,7 +1202,7 @@ def get_weekly_dashboard_stats(user_id):
                 }
             }
         ]
-        If the user doesn't exist, then this method returns None.
+        If the user doesn't exist, then this function returns None.
     """
     model = user_models.UserStatsModel.get(user_id, strict=False)
 
@@ -1217,9 +1219,9 @@ def get_last_week_dashboard_stats(user_id):
         user_id: str. The user id.
 
     Returns:
-        list(dict): Where each dict in the list denotes dashboard stats
-        of the user, keyed by a datetime string. If the user doesn't exist,
-        then this method returns None.
+        list(dict): The weekly dashboard stats for the given user. Each dict in the
+        list denotes dashboard stats of the user, keyed by a datetime string. 
+        If the user doesn't exist, then this function returns None.
     """
     weekly_dashboard_stats = get_weekly_dashboard_stats(user_id)
     if weekly_dashboard_stats:
