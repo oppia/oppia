@@ -278,7 +278,7 @@
   "I18N_SPLASH_SECOND_EXPLORATION_DESCRIPTION": "Konu anlatımlarını oluşturması basit. Konu anlatımları bireysel öğrenci dönütlerine ve dünya genelindeki öğrenenlerin deneyimlerine dayalı olarak kolayca uyarlanabilir.",
   "I18N_SPLASH_SITE_FEEDBACK": "Site Dönütü",
   "I18N_SPLASH_SUBTITLE": "Oppia, eğiten ve güdüleyen etkileşimli dersler oluşturmayı kolay hale getirir.",
-  "I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": " Oppia, geniş konu aralığında sadece hayal gücünle sınırlandırılmış farklı konu anlatımları oluşturmana ve paylaşmana izin verir.",
+  "I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Oppia, geniş konu aralığında sadece hayal gücünle sınırlandırılmış farklı konu anlatımları <a href=\"/dashboard?mode=create\">oluşturmana</a> ve <a href=\"/library\">paylaşmana</a> izin verir.",
   "I18N_SPLASH_TITLE": "Kitapların dışında düşün.",
   "I18N_TOPNAV_ABOUT": "Hakkında",
   "I18N_TOPNAV_ABOUT_OPPIA": "Hakkımızda - Oppia",

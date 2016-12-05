@@ -278,7 +278,7 @@
   "I18N_SPLASH_SECOND_EXPLORATION_DESCRIPTION": "Eksplorasi mudah dibuat. Sesuaikan materi dengan mudah berdasarkan feedback individual murid dan tren dari pengalaman semua pelajar anda dari seluruh dunia.",
   "I18N_SPLASH_SITE_FEEDBACK": "Feedback Situs",
   "I18N_SPLASH_SUBTITLE": "Oppia mempermudah penciptaan pelajaran interaktif yang mendidik dan menarik.",
-  "I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Dengan Oppia, ciptakan dan bagikan eksplorasimu dalam berbagai subjek, hanya imajinasimu batasnya.",
+  "I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Dengan Oppia, <a href=\"/dashboard?mode=create\">ciptakan</a> dan <a href=\"/library\">bagikan</a> eksplorasimu dalam berbagai subjek, hanya imajinasimu batasnya.",
   "I18N_SPLASH_TITLE": "Berpikir di luar buku.",
   "I18N_TOPNAV_ABOUT": "Tentang",
   "I18N_TOPNAV_ABOUT_OPPIA": "Tentang Oppia",

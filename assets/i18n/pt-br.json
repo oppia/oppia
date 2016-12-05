@@ -278,7 +278,7 @@
   "I18N_SPLASH_SECOND_EXPLORATION_DESCRIPTION": "Explorações são fáceis de criar. Elas são facilmente adaptáveis com base no feedback de cada estudante e em tendências na experiência de estudantes do mundo todo.",
   "I18N_SPLASH_SITE_FEEDBACK": "Deixe sua opinião sobre o site",
   "I18N_SPLASH_SUBTITLE": "Oppia facilita a criação de aulas interativas que educam e engajam.",
-  "I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Oppia lhe permite criar e compartilhar explorações sobre uma ampla gama de assuntos, limitado apenas pela sua imaginação.",
+  "I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Oppia lhe permite <a href=\"/dashboard?mode=create\">criar</a> e <a href=\"/library\">compartilhar</a> explorações sobre uma ampla gama de assuntos, limitado apenas pela sua imaginação.",
   "I18N_SPLASH_TITLE": "Pense de forma inovadora.",
   "I18N_TOPNAV_ABOUT": "Sobre",
   "I18N_TOPNAV_ABOUT_OPPIA": "Sobre o Oppia",
