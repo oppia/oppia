@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utilities for interacting with the creator dashboard page, 
+ * @fileoverview Utilities for interacting with the creator dashboard page,
  * for use in Protractor tests.
  */
 
@@ -26,7 +26,7 @@ var getNumberOfFeedbackMessages = function() {
 
 var openFeedback = function() {
   element(by.css('.protractor-test-exploration-view-feedback-link')).click();
-}
+};
 
 exports.getNumberOfFeedbackMessages = getNumberOfFeedbackMessages;
 exports.openFeedback = openFeedback;

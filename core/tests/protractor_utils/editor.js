@@ -1332,24 +1332,23 @@ var readFeedbackMessages = function() {
     var feedbackRowClassName = '.protractor-test-oppia-feedback-tab-row';
     var messages = [];
     return element.all(by.css(feedbackRowClassName)).then(function(rows) {
-      console.log('rows:' + rows);
       rows.forEach(function(row) {
         row.click();
-        alert('just clicked');
         element(by.css('.protractor-test-exploration-feedback'))
-          .getText().then(function(text) {
-            messages.push(text);
-        });
+          .getText().then(function(message) {
+            messages.push(message);
+          });
         element(by.css('.protractor-test-oppia-feedback-back-button')).click();
       });
-      console.log(messages);
-      console.log(typeof messages);
       return messages;
     });
   });
 };
 
-var sendFeedbackResponse = function(feedbackResponse) {
+var sendResponseToLatestFeedback = function(feedbackResponse) {
+  element(by.css('.protractor-test-feedback-tab')).click();
+  element.all(by.css('.protractor-test-oppia-feedback-tab-row')).last().click();
+
   element(by.css('.protractor-test-feedback-response-textarea')).
     sendKeys(feedbackResponse);
   element(by.css('.protractor-test-oppia-feedback-response-send-btn')).
@@ -1432,4 +1431,4 @@ exports.expectTextComparisonOf = expectTextComparisonOf;
 exports.revertToVersion = revertToVersion;
 
 exports.readFeedbackMessages = readFeedbackMessages;
-exports.sendFeedbackResponse = sendFeedbackResponse;
+exports.sendResponseToLatestFeedback = sendResponseToLatestFeedback;

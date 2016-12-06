@@ -71,13 +71,11 @@ describe('ExplorationFeedback', function() {
     expect(numberOfFeedbackMessages).toEqual(1);
     dashboard.openFeedback();
 
-    var feedbackMessages = editor.readFeedbackMessages();
-    console.log(feedbackMessages);
-    console.log('Gonna fail');
-    expect(feedbackMessages.length).toEqual(1);
-    console.log('Failed');
-    expect(feedbackMessages[0]).toEqual(feedback);
-    editor.sendFeedbackResponse(feedbackResponse);
+    editor.readFeedbackMessages().then(function(messages) {
+      expect(messages.length).toEqual(1);
+      expect(messages[0]).toEqual(feedback);
+    });
+    editor.sendResponseToLatestFeedback(feedbackResponse);
     users.logout();
   });
 
