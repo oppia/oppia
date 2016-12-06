@@ -1347,7 +1347,8 @@ var readFeedbackMessages = function() {
 
 var sendResponseToLatestFeedback = function(feedbackResponse) {
   element(by.css('.protractor-test-feedback-tab')).click();
-  element.all(by.css('.protractor-test-oppia-feedback-tab-row')).last().click();
+  element.all(by.css('.protractor-test-oppia-feedback-tab-row')).
+    first().click();
 
   element(by.css('.protractor-test-feedback-response-textarea')).
     sendKeys(feedbackResponse);

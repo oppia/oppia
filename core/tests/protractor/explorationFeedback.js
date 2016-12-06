@@ -38,8 +38,10 @@ describe('ExplorationFeedback', function() {
   var EXPLORATION_LANGUAGE = 'English';
 
   beforeEach(function() {
-    users.createUser('creator@gmail.com', 'creator');
-    users.createUser('learner@gmail.com', 'learner');
+    users.createUser('user1@ExplorationFeedback.com',
+                     'user1ExplorationFeedback');
+    users.createUser('user2@ExplorationFeedback.com',
+                     'user2ExplorationFeedback');
   });
 
   it('adds feedback to an exploration', function() {
@@ -47,7 +49,7 @@ describe('ExplorationFeedback', function() {
     var feedbackResponse = 'Thanks for the feedback';
 
     // Creator creates and publishes an exploration
-    users.login('creator@gmail.com');
+    users.login('user1@ExplorationFeedback.com');
     workflow.createAndPublishExploration(EXPLORATION_TITLE,
                                          EXPLORATION_CATEGORY,
                                          EXPLORATION_OBJECTIVE,
@@ -58,14 +60,14 @@ describe('ExplorationFeedback', function() {
     users.logout();
 
     // Learner plays the exploration and submits a feedback
-    users.login('learner@gmail.com');
+    users.login('user2@ExplorationFeedback.com');
     browser.get(general.LIBRARY_URL_SUFFIX);
     library.playExploration(EXPLORATION_TITLE);
     player.submitFeedback(feedback);
     users.logout();
 
     // Creator reads the feedback and responds
-    users.login('creator@gmail.com');
+    users.login('user1@ExplorationFeedback.com');
     browser.get(general.SERVER_URL_PREFIX);
     numberOfFeedbackMessages = dashboard.getNumberOfFeedbackMessages();
     expect(numberOfFeedbackMessages).toEqual(1);
