@@ -279,7 +279,7 @@
 	"I18N_SPLASH_SECOND_EXPLORATION_DESCRIPTION": "एक्सप्लोरेशन्स बनाना काफी आसान है। वे आसानी से व्यक्तिगत छात्र प्रतिक्रिया और दुनिया भर में अपने शिक्षार्थियों के अनुभव के अनुसार अनुकूलित हो जाती है।",
 	"I18N_SPLASH_SITE_FEEDBACK": "साइट फीडबैक",
 	"I18N_SPLASH_SUBTITLE": "Oppia के द्वारा आसानी से इंटरैक्टिव पाठ बनाया जा सकता है जो सिखाता है अथवा संलग्न करता है।",
-	"I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Oppia के द्वारा कई विषयो पर एक्सप्लोरेशन्स बनाया और शेयर किये जा सकते है , जो केवल आपकी कप्लना द्वारा सिमित है।",
+	"I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Oppia के द्वारा कई विषयो पर एक्सप्लोरेशन्स <a href=\"/dashboard?mode=create\">बनाया</a> और <a href=\"/library\">शेयर</a> किये जा सकते है , जो केवल आपकी कप्लना द्वारा सिमित है।",
 	"I18N_SPLASH_TITLE": "पुस्तकों के बाहर सोचे।",
 	"I18N_TOPNAV_ABOUT": "जानिए",
 	"I18N_TOPNAV_ABOUT_OPPIA": "Oppia के बारे में",
