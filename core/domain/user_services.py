@@ -196,8 +196,8 @@ class UserSettings(object):
             username: str. Identifiable username to display in the UI.
 
         Returns:
-            str or None. A string representing normalized username if user with
-            given username exists. Otherwise None.
+            str or None. The normalized version of the given username, or None if
+            the passed-in username is None.
         """
 
         return username.lower() if username else None
@@ -603,7 +603,7 @@ def get_usernames(user_ids):
     """Gets usernames corresponding to the given user_ids.
 
     Args:
-        user_ids: list(str). The list of user_ids to get username for.
+        user_ids: list(str). The list of user_ids to get usernames for.
 
     Returns:
         list(str|None). Containing usernames based on given user_ids.
@@ -767,8 +767,8 @@ def get_human_readable_user_ids(user_ids):
 
     Returns:
         list(str). List of usernames corresponding to given user_ids. If username
-        does not exist, the corresponding entry in the returned list is truncated
-        email address.
+        does not exist, the corresponding entry in the returned list is the user's
+        truncated email address.
 
     Raises:
         Exception: At least one of the user_ids does not correspond to a valid
