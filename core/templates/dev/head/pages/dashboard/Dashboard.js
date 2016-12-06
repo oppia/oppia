@@ -59,9 +59,6 @@ oppia.controller('Dashboard', [
 
     $scope.explorationStats = {};
     $scope.activeExplorationId = '';
-    // Keeps track of the sub-dropdown that is opened in the main exploration
-    // dropdown.
-    $scope.activeSubDropdown = '';
 
     $scope.EXPLORATION_DROPDOWN_STATS = EXPLORATION_DROPDOWN_STATS;
     $scope.EXPLORATIONS_SORT_BY_KEYS = EXPLORATIONS_SORT_BY_KEYS;
@@ -78,6 +75,9 @@ oppia.controller('Dashboard', [
 
     $scope.emptyDashboardImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/general/empty_dashboard.svg');
+
+    $scope.unresolvedAnswersIconUrl = UrlInterpolationService.getStaticImageUrl(
+      '/icons/unresolved_answers.svg');
 
     $scope.activeTab = 'myExplorations';
     $scope.setActiveTab = function(newActiveTabName) {
@@ -104,9 +104,6 @@ oppia.controller('Dashboard', [
             }
           }
         );
-        $scope.activeSubDropdown = '';
-        $scope.activeExplorationId = (
-          ($scope.activeExplorationId === explorationId) ? '' : explorationId);
       }
     };
 
@@ -137,15 +134,6 @@ oppia.controller('Dashboard', [
     angular.element($window).bind('resize', function() {
       $scope.updatesGivenScreenWidth();
     });
-
-    // Used to toggle between the sub dropdowns that appear for displaying
-    // statistics within the main dropdown for an exploration. The argument
-    // 'type' can take values out of values of EXPLORATION_DROPDOWN_STATS.
-    $scope.toggleSubDropdown = function(type, event) {
-      event.stopPropagation();
-      $scope.activeSubDropdown = (
-        (type === $scope.activeSubDropdown) ? '' : type);
-    };
 
     $scope.setExplorationsSortingOptions = function(sortType) {
       if (sortType === $scope.currentSortType) {
