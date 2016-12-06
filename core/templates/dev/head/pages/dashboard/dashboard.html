@@ -235,38 +235,34 @@
             </div>
           </a>
           <div ng-attr-section="'<['right-section']>">
-            <a ng-href="<[getExplorationUrl(exploration.id)]>"
-               ng-if="exploration.status === 'private'"
-               style="text-decoration: none; display: block; height: 75px">
-              <div class="exp-private-text">
-                <[publishText]>
-              </div>
-            </a>
+            <a ng-class="checkMobileView() ? 'oppia-dashboard-mobile-statistics-card-link': 'oppia-dashboard-statistics-card-link'"
+               ng-href="<[getExplorationUrl(exploration.id)]>"></a>
+            <div class="exp-private-text" ng-if="exploration.status === 'private'">
+              <[publishText]>
+            </div>
             <ul ng-if="exploration.status !== 'private'"
                 layout="row"
                 layout-wrap
                 class="metrics"
                 layout-align="space-between center">
-              <a ng-class="checkMobileView() ? 'oppia-dashboard-mobile-statistics-card-link': 'oppia-dashboard-statistics-card-link'"
-                 ng-href="<[getExplorationUrl(exploration.id)]>"></a>
               <li flex="50">
                 <span class="protractor-test-exp-summary-tile-rating">
-                  <span class="fa fa-star fa-lg oppia-exploration-card-statistics-icon"
+                  <span class="fa fa-star fa-lg oppia-dashboard-card-statistic-icon"
                         tooltip="<['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]>"
                         tooltip-placement="top">
                   </span>
-                  <span class="oppia-exploration-card-statistics-values">
+                  <span class="oppia-dashboard-card-statistic-value">
                     <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
                   </span>
                 </span>
               </li>
 
               <li flex="50" style="padding-left: 8px;">
-                <span class="fa fa-comments fa-lg oppia-exploration-card-statistics-icon"
+                <span class="fa fa-comments fa-lg oppia-dashboard-card-statistic-icon"
                       tooltip="<['I18N_DASHBOARD_OPEN_FEEDBACK' | translate]>"
                       tooltip-placement="top">
                 </span>
-                <span class="oppia-exploration-card-statistics-values">
+                <span class="oppia-dashboard-card-statistic-value">
                   <[exploration.num_total_threads]>  
                 </span>
                 <a ng-if="exploration.num_open_threads != 0"
@@ -278,28 +274,28 @@
               </li>
 
               <li flex="50">
-                <span class="fa fa-eye fa-lg oppia-exploration-card-statistics-icon"
+                <span class="fa fa-eye fa-lg oppia-dashboard-card-statistic-icon"
                       tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>"
                       tooltip-placement="top">
                 </span>
-                <span class="oppia-exploration-card-statistics-values">
+                <span class="oppia-dashboard-card-statistic-value">
                   <[exploration.num_views]>  
                 </span>
               </li>
 
               <li flex="50" style="padding-left: 8px;">
-                <img ng-src="<[unresolvedAnsImgUrl]>" style="width: 15px; padding-top: 1px;" tooltip="Unresolved Answers" tooltip-placement="top" class="oppia-exploration-card-statistics-icon">
-                <span class="oppia-exploration-card-statistics-values">
+                <img ng-src="<[unresolvedAnswersIconUrl]>" style="width: 15px; padding-top: 1px;" tooltip="Unresolved Answers" tooltip-placement="top" class="oppia-dashboard-card-statistic-icon">
+                <span class="oppia-dashboard-card-statistic-value">
                   <[exploration.num_unresolved_answers]>
                 </span>
               </li>
 
               <li flex="50">
-                <span class="fa fa-clock-o fa-lg oppia-exploration-card-statistics-icon"
+                <span class="fa fa-clock-o fa-lg oppia-dashboard-card-statistic-icon"
                       tooltip="<['I18N_LIBRARY_LAST_UPDATED' | translate]>"
                       tooltip-placement="top">
                 </span>
-                <span class="oppia-exploration-card-statistics-values">
+                <span class="oppia-dashboard-card-statistic-value">
                   <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
                 </span>
               </li>
@@ -388,7 +384,6 @@
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/dashboard/DashboardBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/dashboard/ScrollOnClickDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/dashboard/ShowExplorationTitleSection.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/dashboard/Dashboard.js"></script>
 {% endblock footer_js %}

@@ -3821,14 +3821,14 @@ md-card.preview-conversation-skin-supplemental-card {
   text-align: center;
 }
 
-.oppia-exploration-card-statistics-icon {
+.oppia-dashboard-card-statistic-icon {
   padding-top: 3px;
   position: absolute;
 }
 
 .oppia-dashboard-mobile-statistics-card-link {
   background: white;
-  height: 66px;
+  height: 54px;
   opacity: 0;
   position: absolute;
   width: 96%;
@@ -3843,7 +3843,7 @@ md-card.preview-conversation-skin-supplemental-card {
   width: 184px;
 }
 
-.oppia-exploration-card-statistics-values {
+.oppia-dashboard-card-statistic-value {
   padding-left: 19px;
 }
 
