@@ -151,7 +151,7 @@ oppia.factory('SimpleEditorManagerService', [
           return data.questionList.getLastQuestion().hasAnswerGroups();
         }
       },
-      canTryToPublish: function() {
+      canTryToFinishExploration: function() {
         return (
           this.canAddNewQuestion() &&
           data.questionList.getQuestionCount() > 2);
