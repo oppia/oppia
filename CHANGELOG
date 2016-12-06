@@ -2,6 +2,63 @@ This file contains a summary of changes to the Oppia code base. For a full chang
 
     https://github.com/oppia/oppia/commits/master
 
+
+v2.3.7 (4 Dec 2016)
+-------------------
+Learner view:
+* Fix #2686: make autofocus behave correctly in the player view (PR #2805)
+* Do not wrap mathematical formulae that are less than 500px wide (PR #2772)
+* Fix some janky animations in the learner view (PR #2809)
+* Fix #1924: rename the button at the end of an exploration from 'return to library' to 'go to library' (PR #2771)
+
+Editor:
+* Fix #2626: in the exploration editor, gray out the screen immediately after a draft is discarded (PR #2663)
+* Move exploration save/publish functionality to a new explorationSaveService (PR #2718)
+* Reword the 'share' invitation after a creator publishes an exploration.
+
+Library page:
+* Remove thumbnail images that show up in exploration summary tiles on the search page (PR #2756)
+* Increase the debounce time for executing a search query.
+
+Other pages:
+* Update the copy across the site (PR #2793)
+* Fix #2735: standardize the backgrounds for the collection player, exploration player and various static pages (PRs #2758, #2763, #2782)
+* Fix #2788: Make all the background colors consistent throughout the site (PR #2794)
+* Remove functionality for opening the sidebar on swipe (PR #2769)
+* Fix a bug where the navbar overflowed off the right side of the screen (PR #2795)
+* Fix an incorrect navbar breakpoint (PR #2795)
+* Fix #2787: eliminate blue outlines on focused buttons (PR #2797)
+* Fix the color of collection descriptions in the creator dashboard (PR #2765)
+* Fix part of #2665: split up directives in FormBuilder.js into separate files (PR #2666)
+
+Interactions:
+* Add a benchmark test for the string classifier (PR #2697)
+* Fix #2754: make the math expression input field clearer (PR #2785)
+* Fix #2755: allow the math expression input field to accept fractions.
+* Add a 'submit' button to the NumericInput interaction.
+
+I18N:
+* Add Turkish translations.
+
+Emails:
+* Fix #2269: complete the functionality for sending emails to all users returned via a query (PR #2717)
+* Fix #2790: add functionality for testing a bulk email prior to sending it out (PR #2799)
+
+Dev tools:
+* Update node.js to v6.9.1.
+* Update guppy to v1.1.0 (PR #2786)
+* Fix #2611: update protractor to v4.0.11 (PR #2777)
+* Add e2e tests for collections
+* Remove the flaky performance test from the regular Travis build (PR #2757)
+* Fix an issue where Travis was broken because it could not detect the location of the Java executable (PR #2796)
+* Fix #2773: remove some flakiness in the interactions e2e test.
+* Fix a YouTube console error in the e2e tests (PR #2742)
+
+Code health:
+* Add docstrings to email_manager.py (PR #2720)
+* Add docstrings to html_cleaner.py (PR #2779)
+
+
 v2.3.6 (14 Nov 2016)
 --------------------
 Learner view:
@@ -63,6 +120,7 @@ Code health:
 * Add docstrings for core.domain.stats_domain
 * Add docstrings for core.domain.stats_jobs_continuous
 * Add docstrings to gae_models.py
+
 
 v2.3.5 (17 Oct 2016)
 --------------------
