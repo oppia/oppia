@@ -39,9 +39,9 @@ describe('ExplorationFeedback', function() {
 
   beforeEach(function() {
     users.createUser('user1@ExplorationFeedback.com',
-                     'user1ExplorationFeedback');
+                     'creatorExplorationFeedback');
     users.createUser('user2@ExplorationFeedback.com',
-                     'user2ExplorationFeedback');
+                     'learnerExplorationFeedback');
   });
 
   it('adds feedback to an exploration', function() {
