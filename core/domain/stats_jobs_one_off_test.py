@@ -282,16 +282,11 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
 
     def test_rule_parameter_evaluation_with_invalid_characters(self):
         exploration = self.save_new_valid_exploration(
-            'exp_id0', self.owner_id, end_state_name='End')
+            'exp_id0', self.owner_id, end_state_name='End',
+            interaction_id='MathExpressionInput')
         state_name = exploration.init_state_name
         initial_state = exploration.states[state_name]
         exp_services.update_exploration(self.owner_id, 'exp_id0', [{
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-            'new_value': 'MathExpressionInput',
-            'old_value': initial_state.interaction.id
-        }, {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': state_name,
             'property_name': (
@@ -551,16 +546,11 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         exploration found in production.
         """
         exploration = self.save_new_valid_exploration(
-            'exp_id0', self.owner_id, end_state_name='End')
+            'exp_id0', self.owner_id, end_state_name='End',
+            interaction_id='NumericInput')
         state_name = exploration.init_state_name
         initial_state = exploration.states[state_name]
         exp_services.update_exploration(self.owner_id, 'exp_id0', [{
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-            'new_value': 'NumericInput',
-            'old_value': initial_state.interaction.id
-        }, {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': state_name,
             'property_name': (
@@ -758,17 +748,13 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         and last_updated for the submitted answers.
         """
         exploration = self.save_new_valid_exploration(
-            'exp_id0', self.owner_id, end_state_name='End')
+            'exp_id0', self.owner_id, end_state_name='End',
+            interaction_id='TextInput')
         state_name = exploration.init_state_name
         initial_state = exploration.states[state_name]
 
         # Set the initial state to be text input.
         exp_services.update_exploration(self.owner_id, 'exp_id0', [{
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-            'new_value': 'TextInput'
-        }, {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': state_name,
             'property_name': (
@@ -884,15 +870,11 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         changed between created_on and last_updated for the submitted answers.
         """
         exploration = self.save_new_valid_exploration(
-            'exp_id0', self.owner_id, end_state_name='End')
+            'exp_id0', self.owner_id, end_state_name='End',
+            interaction_id='MultipleChoiceInput')
         state_name = exploration.init_state_name
 
         exp_services.update_exploration(self.owner_id, 'exp_id0', [{
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-            'new_value': 'MultipleChoiceInput'
-        }, {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': state_name,
             'property_name': (
@@ -1029,16 +1011,12 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         exploration version.
         """
         exploration = self.save_new_valid_exploration(
-            'exp_id0', self.owner_id, end_state_name='End')
+            'exp_id0', self.owner_id, end_state_name='End',
+            interaction_id='TextInput')
         state_name = exploration.init_state_name
         initial_state = exploration.states[state_name]
 
         exp_services.update_exploration(self.owner_id, 'exp_id0', [{
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-            'new_value': 'TextInput'
-        }, {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': state_name,
             'property_name': (
@@ -1398,16 +1376,12 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         production.
         """
         exploration = self.save_new_valid_exploration(
-            'exp_id0', self.owner_id, end_state_name='End')
+            'exp_id0', self.owner_id, end_state_name='End',
+            interaction_id='NumericInput')
         state_name = exploration.init_state_name
         initial_state = exploration.states[state_name]
 
         exp_services.update_exploration(self.owner_id, 'exp_id0', [{
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-            'new_value': 'NumericInput'
-        }, {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': state_name,
             'property_name': (
@@ -1514,13 +1488,9 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
 
         # Create a valid exploration.
         self.save_new_valid_exploration(
-            'exp_id0', self.owner_id, end_state_name='End')
+            'exp_id0', self.owner_id, end_state_name='End',
+            interaction_id='TextInput')
         exp_services.update_exploration(self.owner_id, 'exp_id0', [{
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-            'new_value': 'TextInput'
-        }, {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': state_name,
             'property_name': (
@@ -1588,16 +1558,12 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         item's bucket successfully migrated before the failure).
         """
         exploration = self.save_new_valid_exploration(
-            'exp_id0', self.owner_id, end_state_name='End')
+            'exp_id0', self.owner_id, end_state_name='End',
+            interaction_id='NumericInput')
         state_name = exploration.init_state_name
         initial_state = exploration.states[state_name]
 
         exp_services.update_exploration(self.owner_id, 'exp_id0', [{
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-            'new_value': 'NumericInput'
-        }, {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': state_name,
             'property_name': (
@@ -2176,24 +2142,79 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self._verify_no_migration_validation_problems()
 
     def test_migrate_item_selection_input_with_default_value(self):
-        state_name = 'Item Selection'
+        exploration = self.save_new_valid_exploration(
+            'exp_id0', self.owner_id, end_state_name='End',
+            interaction_id='ItemSelectionInput')
+        state_name = exploration.init_state_name
+        initial_state = exploration.states[state_name]
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': [
+                            '<p>Option A</p>',
+                            '<p>Option B</p>'
+                        ]
+                    }
+                }],
+                'outcome': {
+                    'dest': 'End',
+                    'feedback': ['Yes'],
+                    'param_changes': []
+                }
+            }]
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+            'new_value': {
+                'choices': {
+                    'value': [
+                        '<p>Option A</p>',
+                        '<p>Option B</p>',
+                        '<p>Option C</p>'
+                    ]
+                }
+            }
+        }], 'Initialize item selection exploration')
 
         rule_spec_str = 'Default'
-        html_answer = '[u\'<p>Impossible</p>\']'
-        self._record_old_answer(state_name, rule_spec_str, html_answer)
+        html_answer = '[u\'<p>Option C</p>\']'
+        self._record_old_answer(
+            state_name, rule_spec_str, html_answer, exploration_id='exp_id0')
 
         # There should be no answers in the new data storage model.
-        state_answers = self._get_state_answers(state_name)
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0', exploration_version=2)
         self.assertIsNone(state_answers)
 
         job_output = self._run_migration_job()
-        self.assertEqual(len(job_output), 2)
-        self.assertIn(
-            'ItemSelectionInput cannot have default answers',
-            sorted(job_output)[1])
+        self.assertEqual(job_output, [])
 
-        state_answers = self._get_state_answers(state_name)
-        self.assertIsNone(state_answers)
+        # The answer should have been properly migrated to the new storage
+        # model.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0', exploration_version=2)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': ['<p>Option C</p>'],
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 1,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'ItemSelectionInput',
+            'params': {},
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+        self._verify_no_migration_validation_problems()
+
 
     def test_migrate_logic_proof(self):
         state_name = 'Logic Proof'
@@ -2379,24 +2400,74 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self._verify_no_migration_validation_problems()
 
     def test_migrate_multiple_choice_input_with_default_value(self):
-        state_name = 'Multiple Choice'
+        exploration = self.save_new_valid_exploration(
+            'exp_id0', self.owner_id, end_state_name='End',
+            interaction_id='MultipleChoiceInput')
+        state_name = exploration.init_state_name
+        initial_state = exploration.states[state_name]
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': 0
+                    }
+                }],
+                'outcome': {
+                    'dest': 'End',
+                    'feedback': ['Yes'],
+                    'param_changes': []
+                }
+            }]
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+            'new_value': {
+                'choices': {
+                    'value': [
+                        '<p>First</p>',
+                        '<p>Second</p>'
+                    ]
+                }
+            }
+        }], 'Initialize multiple choice exploration')
 
         rule_spec_str = 'Default'
-        html_answer = '<p>Something impossible</p>'
-        self._record_old_answer(state_name, rule_spec_str, html_answer)
+        html_answer = '<p>Second</p>'
+        self._record_old_answer(
+            state_name, rule_spec_str, html_answer, exploration_id='exp_id0')
 
         # There should be no answers in the new data storage model.
-        state_answers = self._get_state_answers(state_name)
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0', exploration_version=2)
         self.assertIsNone(state_answers)
 
         job_output = self._run_migration_job()
-        self.assertEqual(len(job_output), 2)
-        self.assertIn(
-            'MultipleChoiceInput cannot have default answers',
-            sorted(job_output)[1])
+        self.assertEqual(job_output, [])
 
-        state_answers = self._get_state_answers(state_name)
-        self.assertIsNone(state_answers)
+        # The answer should have been properly migrated to the new storage
+        # model.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id='exp_id0', exploration_version=2)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': 1,
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 1,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'MultipleChoiceInput',
+            'params': {},
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+        self._verify_no_migration_validation_problems()
 
     def test_migrate_music_notes_input(self):
         state_name = 'Music Notes Input'
@@ -2583,16 +2654,11 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
 
     def test_migrate_pencil_code_editor_with_code_contains_rule_type(self):
         exploration = self.save_new_valid_exploration(
-            'exp_id0', self.owner_id, end_state_name='End')
+            'exp_id0', self.owner_id, end_state_name='End',
+            interaction_id='PencilCodeEditor')
         state_name = exploration.init_state_name
         initial_state = exploration.states[state_name]
         exp_services.update_exploration(self.owner_id, 'exp_id0', [{
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-            'new_value': 'PencilCodeEditor',
-            'old_value': initial_state.interaction.id
-        }, {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': state_name,
             'property_name': (
@@ -3033,13 +3099,9 @@ class PurgeInconsistentAnswersJobTests(test_utils.GenericTestBase):
 
         # Create a valid exploration.
         self.save_new_valid_exploration(
-            'exp_id0', self.owner_id, end_state_name='End')
+            'exp_id0', self.owner_id, end_state_name='End',
+            interaction_id='TextInput')
         exp_services.update_exploration(self.owner_id, 'exp_id0', [{
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-            'new_value': 'TextInput'
-        }, {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': state_name,
             'property_name': (
@@ -3091,13 +3153,9 @@ class PurgeInconsistentAnswersJobTests(test_utils.GenericTestBase):
 
         # Create a valid exploration.
         self.save_new_valid_exploration(
-            'exp_id0', self.owner_id, end_state_name='End')
+            'exp_id0', self.owner_id, end_state_name='End',
+            interaction_id='TextInput')
         exp_services.update_exploration(self.owner_id, 'exp_id0', [{
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-            'new_value': 'TextInput'
-        }, {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'property_name': (

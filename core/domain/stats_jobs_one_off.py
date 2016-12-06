@@ -1259,18 +1259,13 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     @classmethod
     def _cb_reconstitute_item_selection_input(
             cls, state, answer_group_index, rule_spec, rule_str, answer_str):
-        if rule_str == cls._DEFAULT_RULESPEC_STR:
-            return (
-                None,
-                'ItemSelectionInput cannot have default answers: %s' % (
-                    answer_str))
-
         # The Jinja representation for SetOfHtmlString answer strings is:
         #   {{ answer }}
         supported_rule_types = [
             'Equals', 'ContainsAtLeastOneOf', 'DoesNotContainAtLeastOneOf'
         ]
-        if rule_spec.rule_type not in supported_rule_types:
+        if rule_str != cls._DEFAULT_RULESPEC_STR and (
+                rule_spec.rule_type not in supported_rule_types):
             return (
                 None,
                 'Cannot reconstitute ItemSelectionInput object without an '
@@ -1382,28 +1377,28 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             cls, state, answer_group_index, rule_spec, rule_str, answer_str):
         # The Jinja representation for NonnegativeInt answer strings is:
         #   {{ choices[answer|int] }}
-        if rule_str == cls._DEFAULT_RULESPEC_STR:
-            return (
-                None,
-                'MultipleChoiceInput cannot have default answers: %s' % (
-                    answer_str))
-
         interaction = state.interaction
-        if rule_spec.rule_type == 'Equals':
+        if rule_str == cls._DEFAULT_RULESPEC_STR or (
+                rule_spec.rule_type == 'Equals'):
             customization_args = interaction.customization_args
             choices = customization_args['choices']['value']
 
-            outcome = interaction.answer_groups[answer_group_index].outcome
-            temporary_special_param = next(
-                (param_change for param_change in outcome.param_changes
-                if param_change.name == (
-                    AnswerMigrationJob._TEMPORARY_SPECIAL_RULE_PARAMETER)),
-                None)
+            # An answer group index is only available for non-default rules.
+            if rule_str != cls._DEFAULT_RULESPEC_STR:
+                outcome = interaction.answer_groups[answer_group_index].outcome
+                temporary_special_param = next(
+                    (param_change for param_change in outcome.param_changes
+                    if param_change.name == (
+                        AnswerMigrationJob._TEMPORARY_SPECIAL_RULE_PARAMETER)),
+                    None)
+
             # If the subject type is not an answer, then the index is extracted
             # by matching the answer_str against possible choices in the
             # interaction customization args. The index was not stored in the
-            # rule spec string.
-            if temporary_special_param:
+            # rule spec string. Otherwise, if this is a default classified
+            # answer the only way to reconstitute the index is using the
+            # submitted answer itself.
+            if rule_str == cls._DEFAULT_RULESPEC_STR or temporary_special_param:
                 if answer_str not in choices:
                     return (
                         None,
