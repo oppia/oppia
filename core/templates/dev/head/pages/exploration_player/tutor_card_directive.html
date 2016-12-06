@@ -1,36 +1,4 @@
 <script type="text/ng-template" id="components/TutorCard">
-  <!--
-    Off-screen preview of the next card in order to pre-determine the target
-    height for the card content transition animation.
-  -->
-  <div class="conversation-skin-future-tutor-card" aria-hidden="true">
-    <div class="conversation-skin-tutor-card-content">
-      <div class="conversation-skin-tutor-card-top-section">
-        <div class="conversation-skin-tutor-card-top-content"
-             angular-html-bind="upcomingContentHtml">
-        </div>
-      </div>
-
-      <div ng-if="upcomingInlineInteractionHtml"
-           class="conversation-skin-inline-interaction"
-           angular-html-bind="upcomingInlineInteractionHtml">
-      </div>
-
-      <div ng-if="!upcomingInlineInteractionHtml"
-          class="conversation-skin-inline-interaction">
-        <div ng-if="!isViewportNarrow()" style="padding: 6px 12px;">
-          <[upcomingInteractionInstructions]>
-          <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
-        </div>
-        <div ng-if="isViewportNarrow()">
-          <md-button class="instructions-button">
-            <[upcomingInteractionInstructions]>
-          </md-button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div class="conversation-skin-tutor-card"
        ng-class="{'animate-card-width': startCardChangeAnimation,
                   'has-shadow': isViewportNarrow() && !isInteractionInline}">
@@ -155,13 +123,6 @@
       transition: width 500ms;
     }
 
-    .conversation-skin-future-tutor-card {
-      left: -30000px;
-      max-width: 560px;
-      position: fixed;
-      top: -30000px;
-    }
-
     .conversation-skin-tutor-card-top-section {
       position: relative;
     }
@@ -175,7 +136,6 @@
       margin-bottom: 18px;
       margin-top: 18px;
     }
-
 
     .conversation-skin-tutor-card-top-content {
       width: 100%;
