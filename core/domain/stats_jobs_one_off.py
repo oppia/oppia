@@ -21,6 +21,7 @@ import itertools
 import os
 import random
 import re
+import traceback
 
 from core import jobs
 from core.domain import exp_domain
@@ -1732,7 +1733,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             return
 
         for value_dict in value_dict_list:
-            item_id = value_dict['item_id']
+            item_id = value_dict['item_id'].decode('utf-8')
             item = stats_models.StateRuleAnswerLogModel.get(item_id)
             rule_str = value_dict['rule_str']
             last_updated = value_dict['last_updated']
@@ -1745,11 +1746,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 if error.startswith('Expected failure'):
                     yield error
                 else:
-                    yield (
-                        'Item ID: %s, last updated: %s, state name: %s, '
-                        'exp id: %s, error: %s' % (
-                            item_id, last_updated, state_name.encode('utf-8'),
-                            exploration_id, error))
+                    yield 'Item ID: %s, error: %s' % (item_id, error)
 
     @classmethod
     def _migrate_answers(cls, item_id, explorations, exploration_id, state_name,
@@ -1883,8 +1880,12 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             # of the exploration was created.
             if exploration.created_on >= last_updated:
                 continue
-            answer, error = cls._migrate_answer(
-                answer_str, rule_str, exploration, state_name)
+            try:
+                answer, error = cls._migrate_answer(
+                    answer_str, rule_str, exploration, state_name)
+            except:
+                answer = None
+                error = traceback.format_exc()
             if not answer:
                 if not first_error:
                     first_error = error
