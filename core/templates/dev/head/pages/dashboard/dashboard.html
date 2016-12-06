@@ -182,14 +182,14 @@
               <td ng-if="exploration.status !== 'private'">
                 <div style="position: relative; height: 21px;">
                   <a ng-href="<[getExplorationUrl(exploration.id)]>"
-                     class="oppia-dashboard-list-summary"
+                     class="oppia-dashboard-list-summary protractor-test-exploration-feedback-count"
                      style="position: absolute; width: 100%;">
                     <[exploration.num_total_threads]>
                   </a>
                   <div style="position: absolute; margin-left: 13px;">
-                    <a ng-if="exploration.num_open_threads != 0"
-                       ng-href="/create/<[exploration.id]>#/feedback"
-                       class="oppia-highlighted-link">
+                    <a class="oppia-highlighted-link protractor-test-exploration-view-feedback-link"
+                       ng-if="exploration.num_open_threads != 0"
+                       ng-href="/create/<[exploration.id]>#/feedback">
                       (<[exploration.num_open_threads]> new)
                     </a>
                   </div>
@@ -329,7 +329,7 @@
                 </span>
               </li>
 
-              <li flex="50">
+              <li flex="50" class="protractor-test-exploration-feedback-count">
                 <span class="fa fa-comments fa-lg"
                       tooltip="<['I18N_DASHBOARD_OPEN_FEEDBACK' | translate]>"
                       tooltip-placement="top">
@@ -337,7 +337,7 @@
                 <[exploration.num_total_threads]>
                 <a ng-if="exploration.num_open_threads != 0"
                    ng-href="/create/<[exploration.id]>#/feedback"
-                   class="oppia-highlighted-link">
+                   class="oppia-highlighted-link protractor-test-exploration-view-feedback-link">
                   (<[exploration.num_open_threads]> new)
                 </a>
               </li>
