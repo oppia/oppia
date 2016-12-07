@@ -59,11 +59,12 @@ class UserSettings(object):
         profile_picture_data_url: str or None. User uploaded profile picture as
             a dataURI string.
         user_bio: str. User-specified biography.
-        subject_interests: list(str) or None. Subject interests specified by the user.
+        subject_interests: list(str) or None. Subject interests specified by
+            the user.
         first_contribution_msec: float or None. The time in milliseconds when
             the user first contributed to Oppia.
-        preferred_language_codes: list(str) or None. Exploration language preferences
-            specified by the user.
+        preferred_language_codes: list(str) or None. Exploration language
+            preferences specified by the user.
         preferred_site_language_code: str or None. System language preference.
     """
     def __init__(
@@ -181,7 +182,7 @@ class UserSettings(object):
         """Returns username in lowercase or None if it does not exist.
 
         Returns:
-            str or None. If this object has a 'username' property, returns 
+            str or None. If this object has a 'username' property, returns
             the normalized version of the username. Otherwise, returns None.
         """
 
@@ -189,15 +190,15 @@ class UserSettings(object):
 
     @classmethod
     def normalize_username(cls, username):
-        """Returns the normalized version of the given username, 
+        """Returns the normalized version of the given username,
         or None if the passed-in 'username' is None.
 
         Args:
             username: str. Identifiable username to display in the UI.
 
         Returns:
-            str or None. The normalized version of the given username, or None if
-            the passed-in username is None.
+            str or None. The normalized version of the given username,
+            or None if the passed-in username is None.
         """
 
         return username.lower() if username else None
@@ -272,8 +273,8 @@ def get_email_from_username(username):
         username: str. Identifiable username to display in the UI.
 
     Returns:
-        str or None. If the user with given username does not exist, return None.
-        Otherwise return the corresponding user_email.
+        str or None. If the user with given username does not exist,
+        return None. Otherwise return the corresponding user_email.
     """
     user_model = user_models.UserSettingsModel.get_by_normalized_username(
         UserSettings.normalize_username(username))
@@ -290,8 +291,8 @@ def get_user_id_from_username(username):
         username: str. Identifiable username to display in the UI.
 
     Returns:
-        str or None. If the user with given username does not exist, return None.
-        Otherwise return the user_id corresponding to given username.
+        str or None. If the user with given username does not exist, return
+        None. Otherwise return the user_id corresponding to given username.
     """
     user_model = user_models.UserSettingsModel.get_by_normalized_username(
         UserSettings.normalize_username(username))
@@ -327,8 +328,8 @@ def get_users_settings(user_ids):
             domain objects for.
 
     Returns:
-        list(UserSettings|None). The UserSettings domain objects corresponding to
-        the given user ids. If the given user_id does not exist, the
+        list(UserSettings|None). The UserSettings domain objects corresponding
+        to the given user ids. If the given user_id does not exist, the
         corresponding entry in the returned list is None.
     """
     user_settings_models = user_models.UserSettingsModel.get_multi(user_ids)
@@ -427,12 +428,13 @@ def get_profile_pictures_by_user_ids(user_ids):
     representing the settings for the given user_ids.
 
     Args:
-        user_ids: list(str). The list of user_ids to get profile_picture_data_url for.
+        user_ids: list(str). The list of user_ids to get
+            profile_picture_data_url for.
 
     Returns:
-        dict. A dictionary whose keys are user_ids and whose corresponding values are
-        their profile_picture_data_url entries. If a user_id does not exist, the
-        corresponding value is None.
+        dict. A dictionary whose keys are user_ids and whose corresponding
+        values are their profile_picture_data_url entries. If a user_id does
+        not exist, the corresponding value is None.
     """
     user_settings_models = user_models.UserSettingsModel.get_multi(user_ids)
     result = {}
@@ -453,8 +455,9 @@ def get_user_settings(user_id, strict=False):
             id exists in the datastore. Defaults to False.
 
     Returns:
-        UserSettings or None. If the given user_id does not exist and strict is False,
-        returns None. Otherwise, returns the corresponding UserSettings domain object.
+        UserSettings or None. If the given user_id does not exist and strict
+        is False, returns None. Otherwise, returns the corresponding
+        UserSettings domain object.
 
     Raises:
         Exception: strict is True and given user_id does not exist.
@@ -568,8 +571,9 @@ def _create_user(user_id, email):
 
 
 def get_or_create_user(user_id, email):
-    """Returns a UserSettings domain object with given user_id and email. 
-    If user does not exist, it creates a new one and returns the new User model.
+    """Returns a UserSettings domain object with given user_id and email.
+    If user does not exist, it creates a new one and returns the new
+    User model.
 
     Args:
         user_id: str. The user id.
@@ -736,8 +740,8 @@ def update_preferred_language_codes(user_id, preferred_language_codes):
 
     Args:
         user_id: str. The user id.
-        preferred_language_codes: list(str). New exploration language preferences
-            to set.
+        preferred_language_codes: list(str). New exploration language
+            preferences to set.
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.preferred_language_codes = preferred_language_codes
@@ -763,12 +767,13 @@ def get_human_readable_user_ids(user_ids):
     Requires all users to be known.
 
     Args:
-        user_ids: list(str). The list of user_ids to get UserSettings domain objects for.
+        user_ids: list(str). The list of user_ids to get UserSettings domain
+            objects for.
 
     Returns:
-        list(str). List of usernames corresponding to given user_ids. If username
-        does not exist, the corresponding entry in the returned list is the user's
-        truncated email address.
+        list(str). List of usernames corresponding to given user_ids. If
+        username does not exist, the corresponding entry in the returned
+        list is the user's truncated email address.
 
     Raises:
         Exception: At least one of the user_ids does not correspond to a valid
@@ -986,8 +991,9 @@ def get_user_contributions(user_id, strict=False):
             id exists in the datastore. Defaults to False.
 
     Returns:
-        UserContributions or None. If the given user_id does not exist, return None.
-        Otherwise, return the corresponding UserContributions domain object.
+        UserContributions or None. If the given user_id does not exist, return
+        None. Otherwise, return the corresponding UserContributions domain
+        object.
     """
     model = user_models.UserContributionsModel.get(user_id, strict=strict)
     if model is not None:
@@ -1015,7 +1021,8 @@ def create_user_contributions(
         UserContributionsModel.
 
     Raises:
-        Exception: The UserContributionsModel for the given user_id already exists.
+        Exception: The UserContributionsModel for the given user_id already
+            exists.
     """
     user_contributions = get_user_contributions(user_id, strict=False)
     if user_contributions:
@@ -1041,7 +1048,8 @@ def update_user_contributions(user_id, created_exploration_ids,
             user has edited.
 
     Raises:
-        Exception: The UserContributionsModel for the given user_id does not exist.
+        Exception: The UserContributionsModel for the given user_id does not
+            exist.
     """
     user_contributions = get_user_contributions(user_id, strict=False)
     if not user_contributions:
@@ -1178,12 +1186,13 @@ def get_weekly_dashboard_stats(user_id):
         user_id: str. The user id.
 
     Returns:
-        list(dict): The weekly dashboard stats for the given user. Each dict in the
-        list denotes the dashboard stats of the user, keyed by a datetime string.
-        The stats currently being saved are:
-            - 'average ratings': Average of ratings across all explorations of a
-                user.
-            - 'total plays': Total number of plays across all explorations of a user.
+        list(dict): The weekly dashboard stats for the given user. Each dict in
+        the list denotes the dashboard stats of the user, keyed by a datetime
+        string. The stats currently being saved are:
+            - 'average ratings': Average of ratings across all explorations of
+                a user.
+            - 'total plays': Total number of plays across all explorations of
+                a user.
 
         The format of returned value:
         [
@@ -1219,9 +1228,9 @@ def get_last_week_dashboard_stats(user_id):
         user_id: str. The user id.
 
     Returns:
-        list(dict): The weekly dashboard stats for the given user. Each dict in the
-        list denotes dashboard stats of the user, keyed by a datetime string. 
-        If the user doesn't exist, then this function returns None.
+        list(dict): The weekly dashboard stats for the given user. Each dict
+        in the list denotes dashboard stats of the user, keyed by a datetime
+        string. If the user doesn't exist, then this function returns None.
     """
     weekly_dashboard_stats = get_weekly_dashboard_stats(user_id)
     if weekly_dashboard_stats:
