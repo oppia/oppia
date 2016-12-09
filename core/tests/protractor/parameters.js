@@ -36,7 +36,8 @@ describe('Parameters', function() {
     editor.setContent(forms.toRichText(
       'Change value of a from {{a}} to'));
     editor.setInteraction('NumericInput');
-    editor.addResponse('NumericInput', null, 'card 2', true, 'IsGreaterThan', 0);
+    editor.addResponse(
+      'NumericInput', null, 'card 2', true, 'IsGreaterThan', 0);
 
     editor.moveToState('card 2');
     editor.addParameterChange('a', '{{answer}}');
@@ -44,10 +45,11 @@ describe('Parameters', function() {
     editor.setContent(forms.toRichText(
       'Change value of b from {{b}} to'));
     editor.setInteraction('NumericInput');
-    editor.addResponse('NumericInput', null, 'card 3', true, 'IsGreaterThan', 0);
+    editor.addResponse(
+      'NumericInput', null, 'card 3', true, 'IsGreaterThan', 0);
 
     editor.moveToState('card 3');
-     editor.addParameterChange('b', '{{answer}}');
+    editor.addParameterChange('b', '{{answer}}');
     editor.setContent(forms.toRichText(
       'sum of {{a}} and {{b}} is {{a + b}}'));
     editor.setInteraction(
