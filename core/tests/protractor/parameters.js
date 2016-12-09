@@ -24,28 +24,28 @@ var editor = require('../protractor_utils/editor.js');
 var player = require('../protractor_utils/player.js');
 
 describe('Parameters', function() {
-  fit('should navigate multiple states correctly, with parameters', function() {
+  it('should navigate multiple states correctly, with parameters', function() {
     users.createUser('user4@parameters.com', 'user4parameters');
     users.login('user4@parameters.com');
 
     workflow.createExploration();
     editor.enableParameters();
-   
+
     editor.setStateName('card 1');
     editor.addParameterChange('a', 2);
-    editor.setContent(forms.toRichText('Change value of a from {{a}} to'));
+    editor.setContent(forms.toRichText(
+      'Change value of a from {{a}} to'));
     editor.setInteraction('NumericInput');
     editor.addResponse('NumericInput', null, 'card 2', true, 'IsGreaterThan', 0);
-    
-    
+
     editor.moveToState('card 2');
     editor.addParameterChange('a', '{{answer}}');
     editor.addParameterChange('b', 3);
-    editor.setContent(forms.toRichText('Change value of b from {{b}} to'));
+    editor.setContent(forms.toRichText(
+      'Change value of b from {{b}} to'));
     editor.setInteraction('NumericInput');
     editor.addResponse('NumericInput', null, 'card 3', true, 'IsGreaterThan', 0);
-   
-    
+
     editor.moveToState('card 3');
      editor.addParameterChange('b', '{{answer}}');
     editor.setContent(forms.toRichText(
@@ -63,19 +63,23 @@ describe('Parameters', function() {
     editor.saveChanges();
 
     general.moveToPlayer();
-    player.expectContentToMatch(forms.toRichText('Change value of a from 2 to'));
+    player.expectContentToMatch(forms.toRichText(
+      'Change value of a from 2 to'));
     player.submitAnswer('NumericInput', 5);
-    player.expectContentToMatch(forms.toRichText('Change value of b from 3 to'));
+    player.expectContentToMatch(forms.toRichText(
+      'Change value of b from 3 to'));
     player.submitAnswer('NumericInput', 2);
     player.expectContentToMatch(forms.toRichText(
       'sum of 5 and 2 is 7'));
     player.submitAnswer('MultipleChoiceInput', 'return');
-    player.expectContentToMatch(forms.toRichText('Change value of b from 3 to'));
+    player.expectContentToMatch(forms.toRichText(
+      'Change value of b from 3 to'));
     player.submitAnswer('NumericInput', 5);
     player.expectContentToMatch(forms.toRichText(
       'sum of 5 and 5 is 10'));
     player.submitAnswer('MultipleChoiceInput', 'return');
-    player.expectContentToMatch(forms.toRichText('Change value of b from 3 to'));
+    player.expectContentToMatch(forms.toRichText(
+      'Change value of b from 3 to'));
     player.submitAnswer('NumericInput', 4);
     player.expectContentToMatch(forms.toRichText(
       'sum of 5 and 4 is 9'));
