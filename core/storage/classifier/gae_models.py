@@ -78,7 +78,7 @@ class ClassifierModel(base_models.BaseModel):
     @classmethod
     def create(
             cls, exp_id, exp_version_when_created, state_name, algorithm_id,
-            cached_classifier_data, cached_classifier_data_schema_version):
+            cached_classifier_data, cached_classifier_data_schema_version):  # pylint: disable=invalid-name
         """Creates a new ClassifierModel entry.
 
         Args:
