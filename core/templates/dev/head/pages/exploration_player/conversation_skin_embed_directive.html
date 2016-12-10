@@ -365,11 +365,16 @@
       bottom: -50px;
       position: absolute;
     }
+    .help-card-fixed {
+      bottom: -50px;
+      position: absolute;
+    }
 
     .help-card-tall {
       bottom: 50px;
       position: fixed;
     }
+
 
     .conversation-skin-help-card.ng-enter,
     .conversation-skin-help-card.ng-leave-active {
@@ -635,6 +640,10 @@
         margin-left: 0;
       }
 
+      .conversation-skin-main-tutor-card-embed.conversation-skin-animate-tutor-card-on-narrow{
+        position: absolute;
+      }
+
       .conversation-skin-cards-container {
         display: flex;
         flex-direction: column;
@@ -664,13 +673,10 @@
       }
 
       .conversation-skin-supplemental-card-container {
-        left: 50%;
         margin: 40px auto;
         max-width: 959px;
         min-width: 360px;
-        position: absolute;
-        top: 0;
-        transform: translateX(-50%);
+        position: relative;
       }
 
       .conversation-skin-supplemental-card-container .supplemental-mask {
