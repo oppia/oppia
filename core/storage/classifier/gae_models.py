@@ -37,11 +37,11 @@ class ClassifierModel(base_models.BaseModel):
     state_name = ndb.StringProperty(required=True)
     # The ID of the algorithm used to create the model.
     algorithm_id = ndb.IntegerProperty(required=True)
-    # The actual model used for classification. Immutable, unless a schema upgrade takes place.
+    # The actual model used for classification. Immutable, unless a schema
+    # upgrade takes place.
     cached_classifier_data = ndb.JsonProperty(required=True)
     # The schema version for the data that is being classified
-    cached_classifier_data_schema_version = ndb.IntegerProperty(required=True,
-                                                                default=1)
+    cached_classifier_data_schema_version = ndb.IntegerProperty(required=True, default=1)  # pylint: disable=invalid-name, line-too-long
 
     @classmethod
     def _generate_id(cls, exp_id):
@@ -99,8 +99,8 @@ class ClassifierModel(base_models.BaseModel):
         instance_id = cls._generate_id(exp_id)
         classifier_model_instance = cls(
             id=instance_id, exp_id=exp_id,
-            exp_version_when_created=exp_version_when_created, state_name=state_name,
-            algorithm_id=algorithm_id,
+            exp_version_when_created=exp_version_when_created,
+            state_name=state_name, algorithm_id=algorithm_id,
             cached_classifier_data=cached_classifier_data,
             cached_classifier_data_schema_version=cached_classifier_data_schema_version)  # pylint: disable=line-too-long
 

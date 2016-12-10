@@ -14,12 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime
-import types
-
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
 
@@ -30,15 +26,14 @@ class ClassifierModelUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(ClassifierModelUnitTests, self).setUp()
         classifier_models.ClassifierModel.create('exp_id1', 1, 'state_name1',
-                                               1, {'aplha':1.0}, 1)
+                                                 1, {'aplha': 1.0}, 1)
         classifier_models.ClassifierModel.create('exp_id1', 1, 'state_name2',
                                                  1, {'aplha': 1.0}, 1)
         classifier_models.ClassifierModel.create('exp_id2', 1, 'state_name3',
                                                  1, {'aplha': 1.0}, 1)
 
     def test_create_new_classifier_runs_successfully(self):
-        classifier_id = classifier_models.ClassifierModel.create('exp_id3', 1, 'state_name1',
-                                                 1, {'aplha': 1.0}, 1)
+        classifier_id = classifier_models.ClassifierModel.create('exp_id3', 1, 'state_name1', 1, {'aplha': 1.0}, 1)  # pylint: disable=line-too-long
 
         classifier = (
             classifier_models.ClassifierModel.get(classifier_id))
@@ -46,5 +41,5 @@ class ClassifierModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(classifier.exp_id, 'exp_id3')
         self.assertEqual(classifier.exp_version_when_created, 1)
         self.assertEqual(classifier.state_name, 'state_name1')
-        self.assertEqual(classifier.cached_classifier_data, {'aplha':1.0})
+        self.assertEqual(classifier.cached_classifier_data, {'aplha': 1.0})
         self.assertEqual(classifier.cached_classifier_data_schema_version, 1)
