@@ -22,14 +22,7 @@ oppia.factory('DashboardBackendApiService', ['$http', function($http) {
     return $http.get('/dashboardhandler/data');
   };
 
-  var _fetchExplorationStats = function(explorationId) {
-    return $http.get('/dashboardhandler/explorationstats/' + explorationId, {
-      cache: true
-    });
-  };
-
   return {
-    fetchDashboardData: _fetchDashboardData,
-    fetchExplorationStats: _fetchExplorationStats
+    fetchDashboardData: _fetchDashboardData
   };
 }]);

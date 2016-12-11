@@ -71,7 +71,7 @@ describe('ExplorationFeedback', function() {
     browser.get(general.SERVER_URL_PREFIX);
     numberOfFeedbackMessages = dashboard.getNumberOfFeedbackMessages();
     expect(numberOfFeedbackMessages).toEqual(1);
-    dashboard.openFeedback();
+    dashboard.navigateToExplorationEditor();
 
     editor.readFeedbackMessages().then(function(messages) {
       expect(messages.length).toEqual(1);
