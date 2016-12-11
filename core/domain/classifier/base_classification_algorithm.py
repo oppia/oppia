@@ -46,7 +46,7 @@ class BaseClassificationAlgorithm(object):
 
     def __init__(self):
         pass
-    
+
     @abstractmethod
     def from_dict(self, model):
         """Initializes the properties of this classifier from a dict
