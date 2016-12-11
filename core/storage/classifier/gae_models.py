@@ -41,7 +41,7 @@ class ClassifierModel(base_models.BaseModel):
     # upgrade takes place.
     cached_classifier_data = ndb.JsonProperty(required=True)
     # The schema version for the data that is being classified
-    cached_classifier_data_schema_version = ndb.IntegerProperty(required=True, default=1)  # pylint: disable=invalid-name, line-too-long
+    data_schema_version = ndb.IntegerProperty(required=True, default=1)
 
     @classmethod
     def _generate_id(cls, exp_id):
@@ -78,7 +78,7 @@ class ClassifierModel(base_models.BaseModel):
     @classmethod
     def create(
             cls, exp_id, exp_version_when_created, state_name, algorithm_id,
-            cached_classifier_data, cached_classifier_data_schema_version):  # pylint: disable=invalid-name
+            cached_classifier_data, data_schema_version):
         """Creates a new ClassifierModel entry.
 
         Args:
@@ -87,7 +87,7 @@ class ClassifierModel(base_models.BaseModel):
             state_name: str. ID of the message.
             algorithm_id: int. ID of the algorithm used to generate the model.
             cached_classifier_data: Dict. the model used for classification.
-            cached_classifier_data_schema_version: int. schema version of the
+            data_schema_version: int. schema version of the
             data used by the classifier.
 
         Returns:
@@ -102,7 +102,7 @@ class ClassifierModel(base_models.BaseModel):
             exp_version_when_created=exp_version_when_created,
             state_name=state_name, algorithm_id=algorithm_id,
             cached_classifier_data=cached_classifier_data,
-            cached_classifier_data_schema_version=cached_classifier_data_schema_version)  # pylint: disable=line-too-long
+            data_schema_version=data_schema_version)
 
         classifier_model_instance.put()
         return instance_id

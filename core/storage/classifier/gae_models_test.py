@@ -42,4 +42,4 @@ class ClassifierModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(classifier.exp_version_when_created, 1)
         self.assertEqual(classifier.state_name, 'state_name1')
         self.assertEqual(classifier.cached_classifier_data, {'aplha': 1.0})
-        self.assertEqual(classifier.cached_classifier_data_schema_version, 1)
+        self.assertEqual(classifier.data_schema_version, 1)
