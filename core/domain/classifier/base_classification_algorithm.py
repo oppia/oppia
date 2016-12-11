@@ -17,7 +17,6 @@
 """Base class of classification algorithms for free-form text answers"""
 
 from abc import abstractmethod
-import copy
 
 
 class BaseClassificationAlgorithm(object):
