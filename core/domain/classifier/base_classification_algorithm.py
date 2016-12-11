@@ -45,8 +45,8 @@ class BaseClassificationAlgorithm(object):
     DEFAULT_LABEL = '_default'
 
     def __init__(self):
-        self.training_data = []
-
+        pass
+    
     @abstractmethod
     def from_dict(self, model):
         """Initializes the properties of this classifier from a dict
