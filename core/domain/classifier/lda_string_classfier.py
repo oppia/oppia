@@ -16,7 +16,7 @@
 
 """Classifier for free-form text answers."""
 
-from base_classification_algorithm import BaseClassificationAlgorithm
+from core.domain.classifier.base_classification_algorithm import BaseClassificationAlgorithm #pylint: disable=line-too-long
 
 import copy
 import numpy
