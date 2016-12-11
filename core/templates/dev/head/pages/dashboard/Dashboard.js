@@ -57,9 +57,6 @@ oppia.controller('Dashboard', [
       smText: 'Publish the exploration to receive statistics.'
     };
 
-    $scope.explorationStats = {};
-    $scope.activeExplorationId = '';
-
     $scope.EXPLORATION_DROPDOWN_STATS = EXPLORATION_DROPDOWN_STATS;
     $scope.EXPLORATIONS_SORT_BY_KEYS = EXPLORATIONS_SORT_BY_KEYS;
     $scope.HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS = (
@@ -92,21 +89,6 @@ oppia.controller('Dashboard', [
       return '/collection_editor/create/' + collectionId;
     };
 
-    $scope.getStatsForNonPrivateExp = function(status, explorationId) {
-      if (status !== 'private') {
-        DashboardBackendApiService.fetchExplorationStats(explorationId).then(
-          function(response) {
-            $scope.explorationStats[explorationId] = response.data;
-          }, function(errorResponse) {
-            if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-              alertsService.addWarning(
-                'Failed to get statistics for this exploration');
-            }
-          }
-        );
-      }
-    };
-
     $scope.myExplorationsView = 'card';
     $scope.setMyExplorationsView = function(viewType) {
       $scope.myExplorationsView = viewType;
@@ -123,11 +105,6 @@ oppia.controller('Dashboard', [
       } else {
         $scope.publishText = EXP_PUBLISH_TEXTS.defaultText;
       }
-    };
-
-    $scope.activeExplorationIdOnMobile = function(explorationId) {
-      return ($scope.checkMobileView() &&
-              $scope.activeExplorationId === explorationId);
     };
 
     $scope.updatesGivenScreenWidth();
