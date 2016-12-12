@@ -95,8 +95,8 @@ oppia.directive('explorationSaveAndPublishButtons', [function() {
             });
 
             // The reload is necessary because, otherwise, the
-            // exploration-with-draft-changes will be reloaded (since it is already
-            // cached in explorationData).
+            // exploration-with-draft-changes will be reloaded
+            // (since it is already cached in explorationData).
             location.reload();
           }
         };
@@ -130,8 +130,9 @@ oppia.directive('explorationSaveAndPublishButtons', [function() {
               'UrlInterpolationService',
               function($scope, $modalInstance, explorationContextService,
                 UrlInterpolationService) {
-                $scope.congratsImgUrl = UrlInterpolationService.getStaticImageUrl(
-                  '/general/congrats.svg');
+                $scope.congratsImgUrl = (
+                  UrlInterpolationService.getStaticImageUrl(
+                  '/general/congrats.svg'));
                 $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
                   GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
                 $scope.close = function() {
@@ -162,7 +163,8 @@ oppia.directive('explorationSaveAndPublishButtons', [function() {
           $scope.isSaveInProgress = true;
 
           explorationData.save(
-            changeList, commitMessage, function(isDraftVersionValid, draftChanges) {
+            changeList, commitMessage, function(isDraftVersionValid,
+              draftChanges) {
               if (isDraftVersionValid === false &&
                   draftChanges !== null &&
                   draftChanges.length > 0) {
@@ -231,8 +233,8 @@ oppia.directive('explorationSaveAndPublishButtons', [function() {
               GLOBALS.DEFAULT_LANGUAGE_CODE ||
             explorationTagsService.savedMemento.length === 0);
 
-          // If the metadata has not yet been specified, open the pre-publication
-          // 'add exploration metadata' modal.
+          // If the metadata has not yet been specified, open the
+          // pre-publication 'add exploration metadata' modal.
           if (additionalMetadataNeeded) {
             $modal.open({
               templateUrl: 'modals/addExplorationMetadata',
@@ -246,9 +248,12 @@ oppia.directive('explorationSaveAndPublishButtons', [function() {
                 explorationTitleService, explorationCategoryService,
                 explorationStatesService, CATEGORY_LIST,
                 explorationLanguageCodeService, explorationTagsService) {
-                  $scope.explorationTitleService = explorationTitleService;
-                  $scope.explorationObjectiveService = explorationObjectiveService;
-                  $scope.explorationCategoryService = explorationCategoryService;
+                  $scope.explorationTitleService = (
+                    explorationTitleService);
+                  $scope.explorationObjectiveService = (
+                    explorationObjectiveService);
+                  $scope.explorationCategoryService = (
+                    explorationCategoryService);
                   $scope.explorationLanguageCodeService = (
                     explorationLanguageCodeService);
                   $scope.explorationTagsService = explorationTagsService;
@@ -348,9 +353,10 @@ oppia.directive('explorationSaveAndPublishButtons', [function() {
                     explorationLanguageCodeService.saveDisplayedValue();
                     explorationTagsService.saveDisplayedValue();
 
-                    // TODO(sll): Get rid of the $timeout here. It's currently used
-                    // because there is a race condition: the saveDisplayedValue()
-                    // calls above result in autosave calls. These race with the
+                    // TODO(sll): Get rid of the $timeout here. It's currently
+                    // used because there is a race condition:
+                    // the saveDisplayedValue() calls above result
+                    // in autosave calls. These race with the
                     // discardDraft() call that will be called when the draft
                     // changes entered here are properly saved to the backend.
                     $timeout(function() {
@@ -380,7 +386,8 @@ oppia.directive('explorationSaveAndPublishButtons', [function() {
               }
             });
           } else {
-            // No further metadata is needed. Open the publish modal immediately.
+            // No further metadata is needed.
+            // Open the publish modal immediately.
             openPublishExplorationModal();
           }
         };
@@ -405,8 +412,8 @@ oppia.directive('explorationSaveAndPublishButtons', [function() {
           }
         };
 
-        // This flag is used to ensure only one save exploration modal can be open
-        // at any one time.
+        // This flag is used to ensure only one save exploration modal
+        // can be open at any one time.
         var _modalIsOpen = false;
 
         $scope.saveChanges = function() {
@@ -418,9 +425,10 @@ oppia.directive('explorationSaveAndPublishButtons', [function() {
 
           if (!explorationRightsService.isPrivate() &&
               explorationWarningsService.countWarnings() > 0) {
-            // If the exploration is not private, warnings should be fixed before
-            // it can be saved.
-            alertsService.addWarning(explorationWarningsService.getWarnings()[0]);
+            // If the exploration is not private, warnings should be fixed
+            // before it can be saved.
+            alertsService.addWarning(
+              explorationWarningsService.getWarnings()[0]);
             return;
           }
 
@@ -436,15 +444,16 @@ oppia.directive('explorationSaveAndPublishButtons', [function() {
               nodes: diffGraphData.nodes,
               links: diffGraphData.links,
               finalStateIds: diffGraphData.finalStateIds,
-              v1InitStateId: diffGraphData.originalStateIds[data.init_state_name],
+              v1InitStateId: (
+                diffGraphData.originalStateIds[data.init_state_name]),
               v2InitStateId: diffGraphData.stateIds[
                 explorationInitStateNameService.displayed],
               v1States: oldStates,
               v2States: newStates
             };
 
-            // TODO(wxy): after diff supports exploration metadata, add a check to
-            // exit if changes cancel each other out.
+            // TODO(wxy): after diff supports exploration metadata, add a check
+            // to exit if changes cancel each other out.
 
             alertsService.clearWarnings();
 
@@ -467,7 +476,8 @@ oppia.directive('explorationSaveAndPublishButtons', [function() {
               windowClass: 'oppia-save-exploration-modal',
               controller: [
                 '$scope', '$modalInstance', 'isExplorationPrivate', 'diffData',
-                function($scope, $modalInstance, isExplorationPrivate, diffData) {
+                function($scope, $modalInstance, isExplorationPrivate,
+                  diffData) {
                   $scope.showDiff = false;
                   $scope.onClickToggleDiffButton = function() {
                     $scope.showDiff = !$scope.showDiff;
@@ -502,8 +512,8 @@ oppia.directive('explorationSaveAndPublishButtons', [function() {
             $scope.saveModalIsOpening = false;
 
             modalInstance.opened.then(function() {
-              // The $timeout seems to be needed in order to give the modal time to
-              // render.
+              // The $timeout seems to be needed in order to give the modal
+              // time to render.
               $timeout(function() {
                 focusService.setFocus('saveChangesModalOpened');
               });

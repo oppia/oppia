@@ -54,7 +54,8 @@ oppia.directive('editorNavigation', [function() {
               function(
                 $scope, $modalInstance,
                 siteAnalyticsService, explorationContextService) {
-                var explorationId = explorationContextService.getExplorationId();
+                var explorationId = (
+                  explorationContextService.getExplorationId());
 
                 $scope.beginTutorial = function() {
                   siteAnalyticsService.registerOpenTutorialFromHelpCenterEvent(
@@ -63,7 +64,8 @@ oppia.directive('editorNavigation', [function() {
                 };
 
                 $scope.goToHelpCenter = function() {
-                  siteAnalyticsService.registerVisitHelpCenterEvent(explorationId);
+                  siteAnalyticsService.registerVisitHelpCenterEvent(
+                    explorationId);
                   $modalInstance.dismiss('cancel');
                 };
               }
@@ -80,7 +82,8 @@ oppia.directive('editorNavigation', [function() {
 
         $scope.countWarnings = explorationWarningsService.countWarnings;
         $scope.getWarnings = explorationWarningsService.getWarnings;
-        $scope.hasCriticalWarnings = explorationWarningsService.hasCriticalWarnings;
+        $scope.hasCriticalWarnings = (
+          explorationWarningsService.hasCriticalWarnings);
 
         $scope.explorationRightsService = explorationRightsService;
         $scope.getTabStatuses = routerService.getTabStatuses;
