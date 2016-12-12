@@ -65,10 +65,10 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
           };
 
           $scope.isCurrentAnswerValid = function() {
-            var asciiAnswer = Guppy.instances[guppyDivId].get_content('text');
+            var latexAnswer = Guppy.instances[guppyDivId].get_content('latex');
 
             try {
-              MathExpression.fromText(answer.ascii);
+              MathExpression.fromLatex(answer.latex);
             } catch (e) {
               return false;
             }
@@ -80,8 +80,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
             answer.ascii = Guppy.instances[guppyDivId].get_content('text');
             answer.latex = Guppy.instances[guppyDivId].get_content('latex');
 
-            if (answer === undefined || answer === null ||
-                !$scope.isCurrentAnswerValid()) {
+            if (!$scope.isCurrentAnswerValid()) {
               return;
             }
 

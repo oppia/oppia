@@ -19,9 +19,6 @@
 
 {% block content %}
   <style>
-    html, body {
-      background-color: #f2f2ee;
-    }
     .oppia-email-form {
       text-align: center;
       margin-top: 2%;
@@ -46,6 +43,7 @@
   </style>
   <div class="oppia-email-form" ng-controller="EmailDashboardResult">
     <p ng-if="emailSubmitted" class="success">Emails sent successfully. Redirecting to the Email Dashboard...</p>
+    <p ng-if="testEmailSentSuccessfully" class="success">Test email sent successfully. Please check your inbox.</p>
     <p ng-if="emailCancelled" class="warning">Emails cancelled. Redirecting to the Email Dashboard...</p>
     <p ng-if="invalid.subject" class="invalid-input">Please enter a valid email subject</p>
     <p ng-if="invalid.body" class="invalid-input">Please enter a valid email body</p>
@@ -60,6 +58,7 @@
       Email option: <input type="radio" name="email" ng-model="emailOption" value="all" checked> Send to all
       <input type="radio" name="email" ng-model="emailOption" value="custom"> Send to max N users:
       <input type="number" ng-model="maxRecipients" min="0" placeholder="Enter number of users..." ng-disabled="emailOption == 'all'"><br><br>
+      <input class="btn btn-default" type="button" ng-click="sendTestEmail()" value="Send yourself a test email">
       <input class="btn btn-success" type="submit" value="Submit Email">
       <input class="btn btn-default" type="reset" value="Reset" ng-click="resetForm()">
       <input class="btn btn-danger" type="button" ng-click="cancelEmail()" value="Cancel">

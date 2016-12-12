@@ -56,8 +56,6 @@ oppia.constant('PARAMETER_TYPES', {
   UNICODE_STRING: 'UnicodeString'
 });
 
-oppia.constant('EVENT_HTML_CHANGED', 'htmlChanged');
-
 // The maximum number of nodes to show in a row of the state graph.
 oppia.constant('MAX_NODES_PER_ROW', 4);
 // The following variable must be at least 3. It represents the maximum length,
@@ -67,6 +65,8 @@ oppia.constant('MAX_NODE_LABEL_LENGTH', 15);
 // If an $http request fails with the following error codes, a warning is
 // displayed.
 oppia.constant('FATAL_ERROR_CODES', [400, 401, 404, 500]);
+
+oppia.constant('EVENT_ACTIVE_CARD_CHANGED', 'activeCardChanged');
 
 oppia.config([
   '$compileProvider', '$httpProvider', '$interpolateProvider',

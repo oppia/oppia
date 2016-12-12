@@ -1,5 +1,5 @@
 <script type="text/ng-template" id="inline/editor_navigation_directive">
-  <ul class="nav navbar-nav oppia-navbar-nav pull-right ng-cloak" style="margin-left: 20px;">
+   <ul class="nav navbar-nav oppia-navbar-nav pull-right ng-cloak" style="margin-left: 20px;">
     <li ng-class="{'active': getTabStatuses().active === 'main', 'dropdown': countWarnings()}">
       <a href="#" tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()"
          class="oppia-editor-navbar-tab-anchor protractor-test-main-tab">
@@ -59,7 +59,7 @@
 
     <li ng-class="{'active': getTabStatuses().active === 'feedback'}" ng-click="selectFeedbackTab()">
       <a href="#" tooltip="Feedback" tooltip-placement="bottom"
-         class="oppia-editor-navbar-tab-anchor">
+         class="oppia-editor-navbar-tab-anchor protractor-test-feedback-tab">
         <i class="material-icons">&#xE87F;</i>
       </a>
       <div ng-show="getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">

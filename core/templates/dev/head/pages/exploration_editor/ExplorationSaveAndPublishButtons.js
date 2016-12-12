@@ -1,3 +1,4 @@
+
 // Copyright 2016 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +14,7 @@
 // limitations under the License.
 
 /**
+<<<<<<< HEAD
  * @fileoverview Directive for showing Save and Publish buttons
  * in Exploration Editor
  */

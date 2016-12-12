@@ -19,12 +19,6 @@
       <span translate="I18N_TOPNAV_DASHBOARD"></span>
     </li>
   </ul>
-
-  <style>
-    html, body {
-      background-color: #f2f2ee;
-    }
-  </style>
 {% endblock navbar_breadcrumb %}
 
 {% block content %}
@@ -148,7 +142,7 @@
                 <p ng-if="key === 'TITLE'">Exploration</p>
                 <p ng-if="key === 'RATING'">Rating</p>
                 <p ng-if="key === 'NUM_VIEWS'">Plays</p>
-                <p ng-if="key === 'OPEN_FEEDBACK'">Feedback</p>
+                <p ng-if="key === 'OPEN_FEEDBACK'">Open Threads</p>
                 <p ng-if="key === 'LAST_UPDATED'">Last Updated</p>
                 <p ng-if="key === 'UNRESOLVED_ANSWERS'">Unresolved Answers</p>
                 <span class="fa"
@@ -161,7 +155,7 @@
                 class="exploration-list-item">
               <td>
                 <a ng-href="<[getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
-                  <[exploration.title || 'Untitled']>
+                  <[exploration.title || DEFAULT_EMPTY_TITLE]>
                   <span ng-if="exploration.status === 'publicized'"
                         class="featured-badge">
                     featured
@@ -186,20 +180,10 @@
                 </a>
               </td>
               <td ng-if="exploration.status !== 'private'">
-                <div style="position: relative; height: 21px;">
-                  <a ng-href="<[getExplorationUrl(exploration.id)]>"
-                     class="oppia-dashboard-list-summary"
-                     style="position: absolute; width: 100%;">
-                    <[exploration.num_total_threads]>
-                  </a>
-                  <div style="position: absolute; margin-left: 13px;">
-                    <a ng-if="exploration.num_open_threads != 0"
-                       ng-href="/create/<[exploration.id]>#/feedback"
-                       class="oppia-highlighted-link">
-                      (<[exploration.num_open_threads]> new)
-                    </a>
-                  </div>
-                </div>
+                <a ng-href="/create/<[exploration.id]>#/feedback"
+                   class="oppia-dashboard-list-summary">
+                  <[exploration.num_open_threads]>
+                </a>
               </td>
               <td ng-if="exploration.status !== 'private'">
                 <a ng-href="<[getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
@@ -219,87 +203,27 @@
       <div ng-if="myExplorationsView === 'card' && explorationsList.length > 0"
            class="oppia-card-view-wrap">
         <md-card ng-repeat="exploration in explorationsList | orderBy:sortByFunction:isCurrentSortDescending track by exploration.id"
-                 class="oppia-activity-summary-tile oppia-dashboard-card-view-item"
-                 ng-class="{'dropdown-open': activeExplorationId === exploration.id}"
-                 scroll-on-click
-                 is-dropdown-open="activeExplorationId === exploration.id"
-                 is-private="exploration.status === 'private'"
-                 ng-click="getStatsForNonPrivateExp(exploration.status, exploration.id)">
-          <exploration-title-section exploration="exploration" active-exploration-id="activeExplorationId">
+                 class="oppia-activity-summary-tile oppia-dashboard-card-view-item protractor-test-exploration-dashboard-card"
+                 is-private="exploration.status === 'private'">
+          <a ng-href="/create/<[exploration.id]>">
             <div class="title-section"
-                 ng-class="{'oppia-exp-arrow': activeExplorationId === exploration.id}"
                  style="background-color: <[exploration.thumbnail_bg_color]>;">
               <img class="thumbnail-image"
-                   ng-src="<[exploration.thumbnail_icon_url]>"
-                   ng-hide="activeExplorationIdOnMobile(exploration.id)">
-              <span class="thumbnail-image caret-thumb fa fa-caret-up"
-                    ng-show="activeExplorationIdOnMobile(exploration.id)">
-              </span>
+                   ng-src="<[exploration.thumbnail_icon_url]>">
               <h2 class="activity-title protractor-test-exp-summary-tile-title">
-                <span><[exploration.title || 'Untitled' | truncate:40]></span>
+                <span><[(exploration.title || DEFAULT_EMPTY_TITLE) | truncate:40]></span>
               </h2>
             </div>
             <div class="mask-wrap">
               <div class="title-section-mask"></div>
             </div>
-          </exploration-title-section>
-          <md-card class="oppia-exp-dropdown-stats"
-                   ng-click="$event.stopPropagation()"
-                   ng-if="exploration.status !=='private' && activeExplorationId === exploration.id">
-            <div class="stat-block">
-              <div class="heading-text"
-                   ng-click="toggleSubDropdown(EXPLORATION_DROPDOWN_STATS.OPEN_FEEDBACK, $event)">
-                <[explorationStats[exploration.id] ? exploration.num_open_threads + ' Open Feedback': 'Retrieving Feedback Data ...']>
-                <span class="fa"
-                      ng-if="explorationStats[exploration.id].open_feedback.length !==0 && !checkMobileView()"
-                      ng-class="activeSubDropdown === EXPLORATION_DROPDOWN_STATS.OPEN_FEEDBACK ? 'fa-caret-up': 'fa-caret-down'">
-                </span>
-              </div>
-              <div class="stat-block-values"
-                   ng-if="explorationStats[exploration.id].open_feedback.length !==0"
-                   ng-show="activeSubDropdown === EXPLORATION_DROPDOWN_STATS.OPEN_FEEDBACK || checkMobileView()">
-                <div ng-repeat="feedback in explorationStats[exploration.id].open_feedback">
-                  <[feedback.text | truncate: 100]> (by <a ng-href="/create/<[exploration.id]>#/feedback" class="oppia-highlighted-link"><[feedback.author_username || 'a learner']></a>)
-                </div>
-                <div ng-if="(exploration.num_open_threads - explorationStats[exploration.id].open_feedback.length) > 0">
-                  ... and <[exploration.num_open_threads - explorationStats[exploration.id].open_feedback.length]> more
-                </div>
-              </div>
-            </div>
-            <div class="stat-block" ng-if="!checkMobileView()">
-              <div class="heading-text"
-                   ng-click="toggleSubDropdown(EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS, $event)">
-                <[explorationStats[exploration.id] ? exploration.num_unresolved_answers + ' Unresolved Answers from users': 'Retrieving Answers Data ...']>
-                <span class="fa"
-                      ng-if="exploration.top_unresolved_answers.length !== 0 && !checkMobileView()"
-                      ng-class="activeSubDropdown === EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS ? 'fa-caret-up': 'fa-caret-down'">
-                </span>
-              </div>
-              <div class="stat-block-values"
-                   ng-if="exploration.top_unresolved_answers.length !==0"
-                   ng-show="activeSubDropdown === EXPLORATION_DROPDOWN_STATS.TOP_UNRESOLVED_ANSWERS">
-                <div ng-repeat="answer in exploration.top_unresolved_answers">
-                  <[answer.value | truncate: 100]> (<[answer.count]> instances in <[answer.state]>)
-                </div>
-                <div ng-if="(exploration.num_unresolved_answers - topUnresolvedAnswersCount(exploration)) > 0">
-                  ... and <[exploration.num_unresolved_answers - topUnresolvedAnswersCount(exploration)]> more
-                </div>
-              </div>
-            </div>
-            <a ng-href="<[getExplorationUrl(exploration.id)]>">
-              <button class="btn open-in-editor-btn">
-                Open In Editor
-              </button>
-            </a>
-          </md-card>
+          </a>
           <div ng-attr-section="'<['right-section']>">
-            <a ng-href="<[getExplorationUrl(exploration.id)]>"
-               ng-if="exploration.status === 'private'"
-               style="text-decoration: none; display: block; height: 75px">
-              <div class="exp-private-text">
-                <[publishText]>
-              </div>
-            </a>
+            <a ng-class="checkMobileView() ? 'oppia-dashboard-mobile-statistics-card-link': 'oppia-dashboard-statistics-card-link'"
+               ng-href="<[getExplorationUrl(exploration.id)]>"></a>
+            <div class="exp-private-text" ng-if="exploration.status === 'private'">
+              <[publishText]>
+            </div>
             <ul ng-if="exploration.status !== 'private'"
                 layout="row"
                 layout-wrap
@@ -307,48 +231,60 @@
                 layout-align="space-between center">
               <li flex="50">
                 <span class="protractor-test-exp-summary-tile-rating">
-                  <span class="fa fa-star fa-lg"
+                  <span class="fa fa-star fa-lg oppia-dashboard-card-statistic-icon"
                         tooltip="<['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]>"
                         tooltip-placement="top">
                   </span>
-                  <span>
+                  <span class="oppia-dashboard-card-statistic-value">
                     <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
                   </span>
                 </span>
               </li>
 
-              <li flex="50">
-                <span class="fa fa-eye fa-lg"
-                      tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>"
-                      tooltip-placement="top">
-                </span>
-                <[exploration.num_views]>
-              </li>
-
-              <li flex="50">
-                <span class="fa fa-clock-o fa-lg"
-                      tooltip="<['I18N_LIBRARY_LAST_UPDATED' | translate]>"
-                      tooltip-placement="top">
-                </span>
-                <span>
-                  <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
-                </span>
-              </li>
-
-              <li flex="50">
-                <span class="fa fa-comments fa-lg"
+              <li flex="50" style="padding-left: 8px;" class="protractor-test-exploration-feedback-count">
+                <span class="fa fa-comments fa-lg oppia-dashboard-card-statistic-icon"
                       tooltip="<['I18N_DASHBOARD_OPEN_FEEDBACK' | translate]>"
                       tooltip-placement="top">
                 </span>
-                <[exploration.num_total_threads]>
-                <a ng-if="exploration.num_open_threads != 0"
-                   ng-href="/create/<[exploration.id]>#/feedback"
-                   class="oppia-highlighted-link">
-                  (<[exploration.num_open_threads]> new)
+                <a ng-if="exploration.num_open_threads != 0" ng-href="/create/<[exploration.id]>#/feedback"
+                   class="oppia-dashboard-card-statistic-value">
+                  <[exploration.num_open_threads]>
                 </a>
+                <span ng-if="exploration.num_open_threads === 0"
+                      class="oppia-dashboard-card-statistic-value">
+                  <[exploration.num_open_threads]>
+                </span>
+              </li>
+
+              <li flex="50">
+                <span class="fa fa-eye fa-lg oppia-dashboard-card-statistic-icon"
+                      tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>"
+                      tooltip-placement="top">
+                </span>
+                <span class="oppia-dashboard-card-statistic-value">
+                  <[exploration.num_views]>
+                </span>
+              </li>
+
+              <li flex="50" style="padding-left: 8px;">
+                <img ng-src="<[unresolvedAnswersIconUrl]>" style="width: 15px; padding-top: 1px;" tooltip="Unresolved Answers" tooltip-placement="top" class="oppia-dashboard-card-statistic-icon">
+                <span class="oppia-dashboard-card-statistic-value">
+                  <[exploration.num_unresolved_answers]>
+                </span>
+              </li>
+
+              <li flex="50">
+                <span class="fa fa-clock-o fa-lg oppia-dashboard-card-statistic-icon"
+                      tooltip="<['I18N_LIBRARY_LAST_UPDATED' | translate]>"
+                      tooltip-placement="top">
+                </span>
+                <span class="oppia-dashboard-card-statistic-value">
+                  <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
+                </span>
               </li>
               <sharing-links ng-if="exploration.status !== 'private'"
                              ng-click="$event.stopPropagation()"
+                             style="position: relative; right: 8px; bottom: 2px;"
                              flex="100"
                              class="dashboard-hide-mobile"
                              layout-type="row"
@@ -384,7 +320,7 @@
                   <div class="title-section"
                        style="background-color: <[collection.thumbnail_bg_color]>;">
                     <img class="thumbnail-image" ng-src="<[collection.thumbnail_icon_url]>">
-                    <h2 class="activity-title"><[collection.title || 'Untitled']></h2>
+                    <h2 class="activity-title"><[collection.title || DEFAULT_EMPTY_TITLE]></h2>
                   </div>
 
                   <div>
@@ -430,8 +366,5 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/share/SharingLinksDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/dashboard/DashboardBackendApiService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/dashboard/ScrollOnClickDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/dashboard/ShowExplorationTitleSection.js"></script>
-
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/dashboard/Dashboard.js"></script>
 {% endblock footer_js %}

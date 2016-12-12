@@ -57,6 +57,7 @@
 <editor-navigation></editor-navigation>
   
 <exploration-save-and-publish-buttons></exploration-save-and-publish-buttons>  
+
 {% endblock local_top_nav_options %}
 
 {% block content %}
@@ -147,9 +148,13 @@
   {% include 'pages/exploration_editor/editor_navigation_directive.html' %}
   {% include 'pages/exploration_editor/editor_navbar_breadcrumb_directive.html' %}
   {% include 'pages/exploration_editor/editor_reloading_modal_directive.html' %}
+  {% include 'pages/exploration_editor/exploration_metadata_modal_directive.html' %}
+  {% include 'pages/exploration_editor/exploration_publish_modal_directive.html' %}
   {% include 'pages/exploration_editor/exploration_save_and_publish_buttons_directive.html' %}
+  {% include 'pages/exploration_editor/exploration_save_modal_directive.html' %}
   {% include 'pages/exploration_editor/help_modal_directive.html' %}
   {% include 'pages/exploration_editor/param_changes_editor_directive.html' %} 
+  {% include 'pages/exploration_editor/param_changes_editor_directive.html' %}
   {% include 'pages/exploration_editor/post_publish_modal_directive.html' %}
   {% include 'pages/exploration_editor/publish_exploration_modal.html' %}
   {% include 'pages/exploration_editor/save_exploration_modal.html' %}
@@ -220,11 +225,11 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/messengerService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/utilsService.js"></script>
 
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationEditor.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorNavbarBreadcrumbDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorNavigationDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorServices.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationDiffService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationEditor.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationEditorAdvancedFeaturesService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationSaveAndPublishButtons.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/GadgetValidationService.js"></script>
