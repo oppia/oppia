@@ -72,26 +72,27 @@ class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
         self.request = None
 
     def set_return_values(self, content='', status_code=200, headers=None):
-        """Set mock content, status_code and headers for Url Service mock
-        object's return_values.
+        """Sets the content, status code and headers that the urlfetch mock
+        should return with.
 
         Args:
-            content: Content for the return_values. Defaults to empty string.
-            status_code: status_code for the return_values. Defaults to 200.
-            headers: headers for the return_values. Defaults to None.
-
+            content: str. The content to return in subsequent calls to the
+            urlfetch mock.
+            status_code: int. The status_code to return in subsequent calls
+            to the urlfetch mock.
+            headers: dict. The headers to return in subsequent calls to
+            urlfetch mock.
         """
         self.return_values['content'] = content
         self.return_values['status_code'] = status_code
         self.return_values['headers'] = headers
 
     def _Dynamic_Fetch(self, request, response):  # pylint: disable=invalid-name
-        """
-        Sets request and response content for the URL Mock.
+        """Simulates urlfetch mock by setting request & response object.
 
         Args:
-            request: Request object for the URLMock
-            response: Response object for the URLMock
+            request: dict. Request object for the URLMock
+            response: dict. Response object for the URLMock
         """
         return_values = self.return_values
         response.set_content(return_values.get('content', ''))
@@ -157,7 +158,7 @@ class TestBase(unittest.TestCase):
     }
 
     def _get_unicode_test_string(self, suffix):
-        """Adds a suffix to the UNICODE_TEST_STRING
+        """Tests if unicode string are working properly.
 
         Args:
             suffix: the suffix pattern to the UNICODE_TEST_STRING
@@ -168,14 +169,14 @@ class TestBase(unittest.TestCase):
         return '%s%s' % (self.UNICODE_TEST_STRING, suffix)
 
     def setUp(self):
-        """To be overridden in inherited Test classes for initialization of the
-        fixture for the test suite.
+        """Initializes the fixture for the test suite. Subclasses of TestBase
+        should override this method.
         """
         raise NotImplementedError
 
     def tearDown(self):
-        """To be overridden in inherited Test classes to do clean up of the
-        fixture after the tests ran.
+        """Cleans up the fixture after the test runs. Subclasses of
+        TestBaseshould override this method.
         """
         raise NotImplementedError
 
@@ -196,8 +197,8 @@ class TestBase(unittest.TestCase):
         print '%s%s' % (LOG_LINE_PREFIX, line)
 
     def _delete_all_models(self):
-        """To be overriden the inherited Test class. Shall be used to delete
-        keys from Google App Engine's ndb datastore.
+        """Deletes all keys from the NDB datastore. Subclasses of TestBase
+        should override this method.
         """
         raise NotImplementedError
 
@@ -228,23 +229,21 @@ class TestBase(unittest.TestCase):
         self.stashed_user_env = None  # pylint: disable=attribute-defined-outside-init
 
     def login(self, email, is_super_admin=False):
-        """Gets User id from given email and checks if user is super admin.
+        """Sets environment variables to simulate a login. Sets
+        USER_IS_ADMIN to `1` if is_super_admin is True else `0`
 
         Args:
-            email: User's email to be picked up from environment variable
+            email: str. User's email to be picked up from environment variable
                 `USER_EMAIL`
-            is_super_admin: Optional boolean parameter to be accepted. Default
-                value is False
-
-        Returns:
-            String `1` if user is super_admin else `0`
+            is_super_admin: bool. Optional parameter to be accepted. False
+                by default.
         """
         os.environ['USER_EMAIL'] = email
         os.environ['USER_ID'] = self.get_user_id_from_email(email)
         os.environ['USER_IS_ADMIN'] = '1' if is_super_admin else '0'
 
     def logout(self):
-        """Removes USER_EMAIL, USER_ID, USER_IS_ADMIN from environment
+        """Resets USER_EMAIL, USER_ID, USER_IS_ADMIN from environment
         variables.
         """
         os.environ['USER_EMAIL'] = ''
@@ -367,17 +366,21 @@ class TestBase(unittest.TestCase):
             config_domain.MODERATOR_USERNAMES, moderator_usernames)
 
     def get_current_logged_in_user_id(self):
-        """Returns the USER_ID from environment variable USER_ID"""
+        """Gets the user_id of the current logged-in user.
+
+        Returns:
+            Value of USER_ID env variable.
+        """
         return os.environ['USER_ID']
 
     def get_user_id_from_email(self, email):
-        """Fetches user_id from email
+        """Gets the user_id corresponding to the given email.
 
         Args:
             email: valid email id stored in the Appengine database.
 
         Returns:
-            user_id for the user possessing given email.
+            user_id: . Id of user possessing given email.
         """
         return current_user_services.get_user_id_from_email(email)
 
@@ -508,7 +511,8 @@ class TestBase(unittest.TestCase):
         collection_services.save_new_collection(owner_id, collection)
         return collection
 
-    def get_updated_param_dict(self, param_dict, param_changes, exp_param_specs):
+    def get_updated_param_dict(
+            self, param_dict, param_changes, exp_param_specs):
         """Updates a param dict using the given list of param_changes.
 
         Note that the list of parameter changes is ordered. Parameter
@@ -584,7 +588,8 @@ class AppEngineTestBase(TestBase):
     """Base class for tests requiring App Engine services."""
 
     def _delete_all_models(self):
-        """Deletes all models for Google NDB
+        """Deletes all keys from the NDB datastore. Subclasses of TestBase
+        should override this method.
         """
         from google.appengine.ext import ndb
         ndb.delete_multi(ndb.Query().iter(keys_only=True))
@@ -708,7 +713,7 @@ class AppEngineTestBase(TestBase):
                     # Oppia-taskqueue-related ones.
                     headers = {
                         key: str(val) for key, val in task.headers.iteritems()
-                    }
+                        }
                     headers['Content-Length'] = str(len(task.payload or ''))
 
                     app = (
