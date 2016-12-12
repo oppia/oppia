@@ -142,7 +142,7 @@
                 <p ng-if="key === 'TITLE'">Exploration</p>
                 <p ng-if="key === 'RATING'">Rating</p>
                 <p ng-if="key === 'NUM_VIEWS'">Plays</p>
-                <p ng-if="key === 'OPEN_FEEDBACK'">Open Feedback</p>
+                <p ng-if="key === 'OPEN_FEEDBACK'">Open Threads</p>
                 <p ng-if="key === 'LAST_UPDATED'">Last Updated</p>
                 <p ng-if="key === 'UNRESOLVED_ANSWERS'">Unresolved Answers</p>
                 <span class="fa"
@@ -155,7 +155,7 @@
                 class="exploration-list-item">
               <td>
                 <a ng-href="<[getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
-                  <[exploration.title || 'Untitled']>
+                  <[exploration.title || DEFAULT_EMPTY_TITLE]>
                   <span ng-if="exploration.status === 'publicized'"
                         class="featured-badge">
                     featured
@@ -211,7 +211,7 @@
               <img class="thumbnail-image"
                    ng-src="<[exploration.thumbnail_icon_url]>">
               <h2 class="activity-title protractor-test-exp-summary-tile-title">
-                <span><[exploration.title || 'Untitled' | truncate:40]></span>
+                <span><[(exploration.title || DEFAULT_EMPTY_TITLE) | truncate:40]></span>
               </h2>
             </div>
             <div class="mask-wrap">
@@ -320,7 +320,7 @@
                   <div class="title-section"
                        style="background-color: <[collection.thumbnail_bg_color]>;">
                     <img class="thumbnail-image" ng-src="<[collection.thumbnail_icon_url]>">
-                    <h2 class="activity-title"><[collection.title || 'Untitled']></h2>
+                    <h2 class="activity-title"><[collection.title || DEFAULT_EMPTY_TITLE]></h2>
                   </div>
 
                   <div>
