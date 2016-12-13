@@ -36,6 +36,7 @@ EXP_ID_2 = 'exp_id_2'
 FEEDBACK_THREAD_ID = 'fthread_id'
 FEEDBACK_THREAD_ID_2 = 'fthread_id_2'
 USER_ID = 'user_id'
+USER_ID_2 = 'user_id_2'
 
 
 class SubscriptionsTest(test_utils.GenericTestBase):
@@ -55,6 +56,20 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.owner_2_id = self.get_user_id_from_email(self.OWNER_2_EMAIL)
+
+    def _get_all_subscribers_of_creators(self, user_id):
+        subscriptions_model = user_models.UserSubscriptionsModel.get(
+            user_id, strict=False)
+        return (
+            subscriptions_model.subscriber_ids
+            if subscriptions_model else [])
+
+    def _get_all_creators_to_which_learner_has_subscribed(self, user_id):
+        subscriptions_model = user_models.UserSubscriptionsModel.get(
+            user_id, strict=False)
+        return (
+            subscriptions_model.subscribed_to_ids
+            if subscriptions_model else [])
 
     def _get_thread_ids_subscribed_to(self, user_id):
         subscriptions_model = user_models.UserSubscriptionsModel.get(
@@ -111,6 +126,106 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(USER_ID),
             [EXP_ID, EXP_ID_2])
+
+    def test_subscribe_to_creator(self):
+        self.assertEqual(self._get_all_subscribers_of_creators(
+            self.owner_id), [])
+
+        # Subscribe a user to a creator.
+        subscription_services.subscribe_to_creator(USER_ID, self.owner_id)
+        self.assertEqual(
+            self._get_all_subscribers_of_creators(self.owner_id), [USER_ID])
+        self.assertEqual(
+            self._get_all_creators_to_which_learner_has_subscribed(USER_ID),
+            [self.owner_id])
+
+        # Repeated subscriptions to the same creator has no effect.
+        subscription_services.subscribe_to_creator(USER_ID, self.owner_id)
+        self.assertEqual(
+            self._get_all_subscribers_of_creators(self.owner_id), [USER_ID])
+        self.assertEqual(
+            self._get_all_creators_to_which_learner_has_subscribed(USER_ID),
+            [self.owner_id])
+
+        # Subscribe another creator.
+        subscription_services.subscribe_to_creator(USER_ID_2,
+                                                   self.owner_id)
+        self.assertEqual(
+            self._get_all_subscribers_of_creators(self.owner_id),
+            [USER_ID, USER_ID_2])
+        self.assertEqual(
+            self._get_all_creators_to_which_learner_has_subscribed(
+                USER_ID_2), [self.owner_id])
+
+    def test_unsubscribe_from_creator(self):
+        self.assertEqual(self._get_all_subscribers_of_creators(
+            self.owner_id), [])
+
+        # Add subscribers to a creator.
+        subscription_services.subscribe_to_creator(USER_ID, self.owner_id)
+        subscription_services.subscribe_to_creator(USER_ID_2, self.owner_id)
+        self.assertEqual(
+            self._get_all_subscribers_of_creators(self.owner_id), [
+                USER_ID, USER_ID_2])
+        self.assertEqual(
+            self._get_all_creators_to_which_learner_has_subscribed(USER_ID),
+            [self.owner_id])
+        self.assertEqual(
+            self._get_all_creators_to_which_learner_has_subscribed(USER_ID_2),
+            [self.owner_id])
+
+        # Unsubscribing a user from a creator.
+        subscription_services.unsubscribe_from_creator(USER_ID, self.owner_id)
+        self.assertEqual(
+            self._get_all_subscribers_of_creators(self.owner_id), [USER_ID_2])
+        self.assertEqual(
+            self._get_all_creators_to_which_learner_has_subscribed(USER_ID), [])
+
+        # Unsubscribing the same user again has no effect.
+        subscription_services.unsubscribe_from_creator(USER_ID, self.owner_id)
+        self.assertEqual(
+            self._get_all_subscribers_of_creators(self.owner_id), [USER_ID_2])
+        self.assertEqual(
+            self._get_all_creators_to_which_learner_has_subscribed(USER_ID), [])
+
+        # Unsubscribing the second user.
+        subscription_services.unsubscribe_from_creator(
+            USER_ID_2, self.owner_id)
+        self.assertEqual(self._get_all_subscribers_of_creators(
+            self.owner_id), [])
+        self.assertEqual(
+            self._get_all_creators_to_which_learner_has_subscribed(USER_ID_2),
+            [])
+
+    def test_get_all_subscribers_of_creators(self):
+        self.assertEqual(
+            subscription_services.get_all_subscribers_of_creator(
+                self.owner_id), [])
+
+        subscription_services.subscribe_to_creator(USER_ID, self.owner_id)
+        self.assertEqual(
+            subscription_services.get_all_subscribers_of_creator(self.owner_id),
+            [USER_ID])
+
+        subscription_services.subscribe_to_creator(USER_ID_2, self.owner_id)
+        self.assertEqual(
+            subscription_services.get_all_subscribers_of_creator(self.owner_id),
+            [USER_ID, USER_ID_2])
+
+    def test_get_all_creators_to_which_learner_has_subscribed(self):
+        self.assertEqual(
+            subscription_services.get_all_creators_to_which_learner_has_subscribed( # pylint: disable=line-too-long
+                USER_ID), [])
+
+        subscription_services.subscribe_to_creator(USER_ID, self.owner_id)
+        self.assertEqual(
+            subscription_services.get_all_creators_to_which_learner_has_subscribed( # pylint: disable=line-too-long
+                USER_ID), [self.owner_id])
+
+        subscription_services.subscribe_to_creator(USER_ID, self.owner_2_id)
+        self.assertEqual(
+            subscription_services.get_all_creators_to_which_learner_has_subscribed( # pylint: disable=line-too-long
+                USER_ID), [self.owner_id, self.owner_2_id])
 
     def test_get_exploration_ids_subscribed_to(self):
         self.assertEqual(

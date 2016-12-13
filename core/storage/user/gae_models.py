@@ -131,6 +131,10 @@ class UserSubscriptionsModel(base_models.BaseModel):
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of feedback thread ids that this user subscribes to.
     feedback_thread_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # IDs of the learners who have subscribed to this user.
+    subscriber_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # IDs of the creators to which this user has subscribed.
+    subscribed_to_ids = ndb.StringProperty(repeated=True, indexed=True)
     # When the user last checked notifications. May be None.
     last_checked = ndb.DateTimeProperty(default=None)
 
