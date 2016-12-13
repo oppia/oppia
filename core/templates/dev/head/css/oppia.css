@@ -989,6 +989,7 @@ textarea {
   padding-top: 24px;
   width: 100vw;
 }
+
 /* Ensure that the summary tiles tiles remain centered. Note that these values
    would need to be updated if the summary tiles are changed. */
 @media (max-width: 844px) {
