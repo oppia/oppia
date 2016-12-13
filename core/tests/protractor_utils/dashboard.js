@@ -24,9 +24,9 @@ var getNumberOfFeedbackMessages = function() {
     });
 };
 
-var openFeedback = function() {
-  element(by.css('.protractor-test-exploration-view-feedback-link')).click();
+var navigateToExplorationEditor = function() {
+  element(by.css('.protractor-test-exploration-dashboard-card')).click();
 };
 
 exports.getNumberOfFeedbackMessages = getNumberOfFeedbackMessages;
-exports.openFeedback = openFeedback;
+exports.navigateToExplorationEditor = navigateToExplorationEditor;

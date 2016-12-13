@@ -57,9 +57,7 @@ oppia.controller('Dashboard', [
       smText: 'Publish the exploration to receive statistics.'
     };
 
-    $scope.explorationStats = {};
-    $scope.activeExplorationId = '';
-
+    $scope.DEFAULT_EMPTY_TITLE = 'Untitled';
     $scope.EXPLORATION_DROPDOWN_STATS = EXPLORATION_DROPDOWN_STATS;
     $scope.EXPLORATIONS_SORT_BY_KEYS = EXPLORATIONS_SORT_BY_KEYS;
     $scope.HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS = (
@@ -92,21 +90,6 @@ oppia.controller('Dashboard', [
       return '/collection_editor/create/' + collectionId;
     };
 
-    $scope.getStatsForNonPrivateExp = function(status, explorationId) {
-      if (status !== 'private') {
-        DashboardBackendApiService.fetchExplorationStats(explorationId).then(
-          function(response) {
-            $scope.explorationStats[explorationId] = response.data;
-          }, function(errorResponse) {
-            if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-              alertsService.addWarning(
-                'Failed to get statistics for this exploration');
-            }
-          }
-        );
-      }
-    };
-
     $scope.myExplorationsView = 'card';
     $scope.setMyExplorationsView = function(viewType) {
       $scope.myExplorationsView = viewType;
@@ -123,11 +106,6 @@ oppia.controller('Dashboard', [
       } else {
         $scope.publishText = EXP_PUBLISH_TEXTS.defaultText;
       }
-    };
-
-    $scope.activeExplorationIdOnMobile = function(explorationId) {
-      return ($scope.checkMobileView() &&
-              $scope.activeExplorationId === explorationId);
     };
 
     $scope.updatesGivenScreenWidth();
@@ -147,23 +125,16 @@ oppia.controller('Dashboard', [
       // This function is passed as a custom comparator function to `orderBy`,
       // so that special cases can be handled while sorting explorations.
       var value = entity[$scope.currentSortType];
-      var DEFAULT_TEXT_EMPTY_TITLE = 'Untitled';
       if (entity.status === 'private') {
-        if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.TITLE &&
-            value === '') {
-          return DEFAULT_TEXT_EMPTY_TITLE;
+        if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.TITLE) {
+          value = (value || $scope.DEFAULT_EMPTY_TITLE);
         } else if ($scope.currentSortType !==
                    EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED) {
-          return (-1 * $scope.explorationsList.indexOf(entity));
+          value = 0;
         }
       } else if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.RATING) {
-        if (!$scope.getAverageRating(value)) {
-          return (
-            $scope.isCurrentSortDescending ?
-              (-1 * $scope.explorationsList.indexOf(entity)) :
-              $scope.explorationsList.indexOf(entity));
-        }
-        return $scope.getAverageRating(value);
+        var averageRating = $scope.getAverageRating(value);
+        value = (averageRating || 0);
       }
       return value;
     };
