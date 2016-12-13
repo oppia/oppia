@@ -484,3 +484,53 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
                 sent_email_model.sender_id, query_models[0].submitter_id)
             self.assertEqual(
                 sent_email_model.intent, feconf.BULK_EMAIL_INTENT_TEST)
+
+    def test_that_test_email_is_not_sent_to_query_recipients(self):
+        self.login(self.SUBMITTER_EMAIL)
+        csrf_token = self.get_csrf_token_from_response(
+            self.testapp.get('/emaildashboard'))
+        self.post_json(
+            '/emaildashboarddatahandler', {
+                'data': {
+                    'has_not_logged_in_for_n_days': None,
+                    'inactive_in_last_n_days': None,
+                    'created_at_least_n_exps': 1,
+                    'created_fewer_than_n_exps': None,
+                    'edited_at_least_n_exps': None,
+                    'edited_fewer_than_n_exps': None
+                }}, csrf_token)
+        self.logout()
+
+        query_models = user_models.UserQueryModel.query().fetch()
+
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            self.process_and_flush_pending_tasks()
+
+            self.login(self.SUBMITTER_EMAIL)
+            csrf_token = self.get_csrf_token_from_response(
+                self.testapp.get(
+                    '/emaildashboardresult/%s' % query_models[0].id))
+            self.post_json(
+                '/emaildashboardtestbulkemailhandler/%s' % query_models[0].id, {
+                    'email_body': 'email_body',
+                    'email_subject': 'email_subject'
+                }, csrf_token)
+            self.logout()
+
+            # Check that test email is sent to submitter of query.
+            # One email is sent when query is completed and other is test email.
+            messages = self.mail_stub.get_sent_messages(to=self.SUBMITTER_EMAIL)
+            self.assertEqual(len(messages), 2)
+
+            # Check that no emails are sent to query recipients.
+            query_models = user_models.UserQueryModel.query().fetch()
+            query_model = query_models[0]
+            self.assertEqual(len(query_model.user_ids), 2)
+            self.assertEqual(
+                sorted(query_model.user_ids),
+                sorted([self.user_a_id, self.user_b_id]))
+            # Check that no emails are sent to user A or user B.
+            messages_a = self.mail_stub.get_sent_messages(to=self.USER_A_EMAIL)
+            self.assertEqual(len(messages_a), 0)
+            messages_b = self.mail_stub.get_sent_messages(to=self.USER_B_EMAIL)
+            self.assertEqual(len(messages_b), 0)
