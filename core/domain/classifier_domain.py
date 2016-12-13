@@ -19,8 +19,9 @@ import copy
 class Classifier(object):
     """Domain object for a classifier."""
 
-    def __init__(self, classifier_id, exp_id, exp_version_when_created, state_name,
-                 algorithm_id, cached_classifier_data, data_schema_version):
+    def __init__(self, classifier_id, exp_id, exp_version_when_created,
+                 state_name, algorithm_id, cached_classifier_data,
+                 data_schema_version):
         self.id = classifier_id
         self.exp_id = exp_id
         self.exp_version_when_created = exp_version_when_created
