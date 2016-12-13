@@ -973,8 +973,8 @@ textarea {
   }
 }
 @media (max-width: 1023px) {
-  .oppia-navbar-hide-on-medium-width {
-    display: none !important;
+  div.navbar-container .oppia-navbar-hide-on-medium-width {
+    display: none;
   }
 }
 
