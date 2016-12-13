@@ -19,10 +19,10 @@
 import copy
 import numpy
 
-from core.domain.classifier.base_classification_algorithm import BaseClassificationAlgorithm #pylint: disable=line-too-long
+from core.domain.classifier.base import BaseClassifier
 
 
-class LDAStringClassifier(BaseClassificationAlgorithm):
+class LDAStringClassifier(BaseClassifier):
     """A classifier that uses supervised learning to match free-form text
     answers to answer groups. The classifier trains on answers that exploration
     editors have assigned to an answer group. Given a new answer, it predicts

@@ -14,12 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Base class of classification algorithms for free-form text answers"""
+"""Base class for classification algorithms"""
 
-from abc import abstractmethod
+import abc
 
-
-class BaseClassificationAlgorithm(object):
+class BaseClassifier(object):
     """A base class for classifiers that uses supervised learning to match
     free-form text answers to answer groups. The classifier trains on answers
     that exploration editors have assigned to an answer group. Given a new
@@ -32,22 +31,25 @@ class BaseClassificationAlgorithm(object):
         be matched.
     predicting_data: list of 'predicting_data'. Each element of the list
         represents a single 'predicting_data'.
-    label - An answer group that the doc should correspond to. If a doc is
-        being added to train a model, labels are provided. If a doc is being
-        added for prediction purposes, no labels are provided. If a doc does
-        not match any label, the doc should have only one label, '_default'.
+    label - An answer group that the training sample should correspond to. If a
+        sample is being added to train a model, labels are provided. If a
+        sample is being added for prediction purposes, no labels are provided.
+        If a sample does not match any label, the sample should have only one
+        label, '_default'.
 
     Attributes:
         DEFAULT_LABEL: str. The label used to characterize a word with no label
             assigned to it.
     """
 
+    __metaclass__ = abc.ABCMeta
+
     DEFAULT_LABEL = '_default'
 
     def __init__(self):
         pass
 
-    @abstractmethod
+    @abc.abstractmethod
     def from_dict(self, model):
         """Initializes the properties of this classifier from a dict
           constructed using to_dict().
@@ -57,7 +59,7 @@ class BaseClassificationAlgorithm(object):
         """
         pass
 
-    @abstractmethod
+    @abc.abstractmethod
     def to_dict(self, model):
         """Returns a dict representing this classifier.
 
@@ -66,7 +68,7 @@ class BaseClassificationAlgorithm(object):
         """
         pass
 
-    @abstractmethod
+    @abc.abstractmethod
     def predict(self, predicting_data):
         """Returns the predicted label from the predicting_data's prediction
         report.
@@ -80,6 +82,7 @@ class BaseClassificationAlgorithm(object):
         """
         pass
 
+    @abc.abstractmethod
     def train(self, training_data):
         """Loads examples for training.
 
