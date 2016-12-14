@@ -57,7 +57,7 @@ class BaseClassifier(object):
           Args:
               model: A dict representing the classifier.
         """
-        pass
+        raise NotImplementedError
 
     @abc.abstractmethod
     def to_dict(self, model):
@@ -66,7 +66,7 @@ class BaseClassifier(object):
         Returns:
             dict. A representation of the state of the classifier.
         """
-        pass
+        raise NotImplementedError
 
     @abc.abstractmethod
     def predict(self, predicting_data):
@@ -80,7 +80,7 @@ class BaseClassifier(object):
             list of str. The labels predicted by the classifier
             for the given 'predicting_data'.
         """
-        pass
+        raise NotImplementedError
 
     @abc.abstractmethod
     def train(self, training_data):
@@ -92,4 +92,4 @@ class BaseClassifier(object):
                 is the single training data, and the second item is a list
                 of labels that the data should be matched.
         """
-        pass
+        raise NotImplementedError
