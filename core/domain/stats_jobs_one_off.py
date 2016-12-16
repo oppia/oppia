@@ -586,9 +586,28 @@ class ClearUnknownMissingAnswersJob(jobs.BaseMapReduceJobManager):
                         migrated_answer_record.state_name)
                     if not all_models:
                         continue
+                    # The entire state of records need to be deleted since there
+                    # isn't a reliable way to go into submitted answers and
+                    # remove specific failures. The entire state will be
+                    # re-migrated the next time the AnswerMigrationJob runs.
                     for state_answer_model in all_models:
+                        submitted_answers = [
+                            stats_domain.SubmittedAnswer.from_dict(
+                                submitted_answer_dict)
+                            for submitted_answer_dict
+                            in state_answer_model.submitted_answer_list]
+                        exp_id = state_answer_model.exploration_id
+                        state_name = state_answer_model.state_name
+                        for submited_answer in submitted_answers:
+                            rule_str = submited_answer.rule_spec_str
+                            old_item_id = u'%s.%s.%s.%s' % (
+                                exp_id, state_name, 'submit', rule_str)
+                            separate_migrated_answer_record = (
+                                stats_models.MigratedAnswerModel.get(
+                                    old_item_id, strict=False))
+                            if separate_migrated_answer_record:
+                                separate_migrated_answer_record.delete()
                         state_answer_model.delete()
-                migrated_answer_record.delete()
                 yield (
                     'Deleting \'%s\' since its new model is inconsistent with '
                     'its old model' % item_id.decode('utf-8'))
