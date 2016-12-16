@@ -589,9 +589,9 @@ class ClearUnknownMissingAnswersJob(jobs.BaseMapReduceJobManager):
                     for state_answer_model in all_models:
                         state_answer_model.delete()
                 migrated_answer_record.delete()
-            yield (
-                'Deleting \'%s\' since its new model is inconsistent with its '
-                'old' % item_id.decode('utf-8'))
+                yield (
+                    'Deleting \'%s\' since its new model is inconsistent with '
+                    'its old model' % item_id.decode('utf-8'))
 
 
 class ClearMigratedAnswersJob(jobs.BaseMapReduceJobManager):
