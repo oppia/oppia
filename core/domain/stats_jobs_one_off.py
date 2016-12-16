@@ -1103,7 +1103,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
         # TODO(bhenning): Should something more significant (like None) be used
         # for sentinel values for output/evaluation/error instead?
-        if not answer_str:
+        if answer_str == None:
             return (None, 'Failed to recover code: %s' % answer_str)
         if rule_str != cls._DEFAULT_RULESPEC_STR:
             if rule_spec.rule_type != 'OutputEquals' and (
@@ -1300,7 +1300,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # structure consists of three strings: assumptions_string,
         # target_string, and proof_string. The latter is already available
         # as the answer_str.
-        if not answer_str:
+        if answer_str == None:
             return (
                 None,
                 'Failed to recover CheckedProof answer: %s' % answer_str)
@@ -1508,6 +1508,32 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                     'Unsupported rule type encountered while attempting to '
                     'reconstitute NumericInput object: %s' % (
                         rule_spec.rule_type))
+        # Answer strings which were submitted to P68_sbYDON5s.4.submit.Default
+        # somehow; these cannot be reconstituted but they've been manually
+        # verified and should not prevent other answers in the group from being
+        # migrated.
+        ignored_answer_strs = [
+            'UXVhbmcgVmFuIGhhaQ==',
+            'SG93IHRvIHVwbG9hZCBCbG9nZ2VyIHRlbXBsYXRlcw0KDQoxLiBEb3dubG9hZCB5b3'
+            'VyIEJsb2dnZXIgWE1MIHRlbXBsYXRlIGZyb20gQlRlbXBsYXRlcy5jb20uIA0KVGhl'
+            'IHRlbXBsYXRlIGlzIGNvbnRhaW5lZCBpbiBhIHppcCBmaWxlICh3aW56aXAsIHdpbn'
+            'JhciksIGVuc3VyZSB5b3UgaGF2ZSBleHRyYWN0ZWQgdGhlIFhNTCB0ZW1wbGF0ZS4N'
+            'CjIuIExvZyBpbiB0byB5b3VyIEJsb2dnZXIgZGFzaGJvYXJkIGFuZCBnbyB0byBMYX'
+            'lvdXQgPiBFZGl0IEhUTUwNCjMuIEVuc3VyZSB5b3UgYmFjayB1cCB5b3VyIG9sZCB0'
+            'ZW1wbGF0ZSBpbiBjYXNlIHlvdSBkZWNpZGUgdG8gdXNlIGl0IGFnYWluLiBUbyBkby'
+            'B0aGlzLCBjbGljayBvbiB0aGUgImRvd25sb2FkIGZ1bGwgdGVtcGxhdGUiIGxpbmsg'
+            'YW5kIHNhdmUgdGhlIGZpbGUgdG8geW91ciBoYXJkIGRyaXZlLg0KNC4gTG9vayBmb3'
+            'IgdGhlIHNlY3Rpb24gbmVhciB0aGUgdG9wIHdoZXJlIHlvdSBjYW4gYnJvd3NlIGZv'
+            'ciB5b3VyIFhNTCB0ZW1wbGF0ZToNCjUuIEVudGVyIHRoZSBsb2NhdGlvbiBvZiB5b3'
+            'VyIHRlbXBsYXRlIGFuZCBwcmVzcyAidXBsb2FkIi4NCjYuIFRoZSBIVE1MIG9mIHlv'
+            'dXIgbmV3IHRlbXBsYXRlIHdpbGwgbm93IGFwcGVhciBpbiB0aGUgYm94IGJlbG93Li'
+            'BZb3UgY2FuIHByZXZpZXcgeW91ciB0ZW1wbGF0ZSBvciBzaW1wbHkgc2F2ZSB0byBz'
+            'dGFydCB1c2luZyBpdCENCjcuIEVuam95IQ0KDQoNClRlbXBsYXRlcy9MYXlvdXRzIG'
+            'luIGh0dHA6Ly9idGVtcGxhdGVzLmNvbQ==']
+        if answer_str in ignored_answer_strs:
+            return (
+                None,
+                'Expected failure: Cannot convert non-string answer to float')
         input_value = float(answer_str)
         return cls._normalize_raw_answer_object(
             objects.Real, input_value, answer_str)
