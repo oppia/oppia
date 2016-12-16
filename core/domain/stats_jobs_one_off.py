@@ -21,6 +21,7 @@ import itertools
 import os
 import random
 import re
+import traceback
 
 from core import jobs
 from core.domain import exp_domain
@@ -1104,7 +1105,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # TODO(bhenning): Should something more significant (like None) be used
         # for sentinel values for output/evaluation/error instead?
         if answer_str == None:
-            return (None, 'Failed to recover code: %s' % answer_str)
+            return (None, 'Failed to recover code: \'%s\'' % answer_str)
         if rule_str != cls._DEFAULT_RULESPEC_STR:
             if rule_spec.rule_type != 'OutputEquals' and (
                     rule_spec.rule_type not in rule_types_without_output):
@@ -1188,17 +1189,18 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             if rule_spec.rule_type != 'IsInRegion':
                 return (
                     None,
-                    'Cannot reconstitute ImageClickInput object without an IsInRegion '
-                    'rule.')
+                    'Cannot reconstitute ImageClickInput object without an '
+                    'IsInRegion rule.')
             # Extract the region clicked on from the rule string.
             clicked_regions = [rule_str[len(rule_spec.rule_type) + 1:-1]]
         else:
             # If the default outcome happened, then no regions were clicked on
             clicked_regions = []
 
-        # Match the pattern: '(real, real)' to extract the coordinates.
+        # Match the pattern: '(real, real)' to extract the coordinates. One
+        # answer in production demonstrated a negative coordinate.
         pattern = re.compile(
-            r'\((?P<x>\d+\.?\d*), (?P<y>\d+\.?\d*)\)')
+            r'\((?P<x>\-?\d+\.?\d*), (?P<y>\-?\d+\.?\d*)\)')
         match = pattern.match(answer_str)
         if not match:
             return (
@@ -1258,18 +1260,13 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     @classmethod
     def _cb_reconstitute_item_selection_input(
             cls, state, answer_group_index, rule_spec, rule_str, answer_str):
-        if rule_str == cls._DEFAULT_RULESPEC_STR:
-            return (
-                None,
-                'ItemSelectionInput cannot have default answers: %s' % (
-                    answer_str))
-
         # The Jinja representation for SetOfHtmlString answer strings is:
         #   {{ answer }}
         supported_rule_types = [
             'Equals', 'ContainsAtLeastOneOf', 'DoesNotContainAtLeastOneOf'
         ]
-        if rule_spec.rule_type not in supported_rule_types:
+        if rule_str != cls._DEFAULT_RULESPEC_STR and (
+                rule_spec.rule_type not in supported_rule_types):
             return (
                 None,
                 'Cannot reconstitute ItemSelectionInput object without an '
@@ -1303,7 +1300,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         if answer_str == None:
             return (
                 None,
-                'Failed to recover CheckedProof answer: %s' % answer_str)
+                'Failed to recover CheckedProof answer: \'%s\'' % answer_str)
 
         # assumptions_string and target_string come from the assumptions and
         # results customized to this particular LogicProof instance.
@@ -1381,33 +1378,33 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             cls, state, answer_group_index, rule_spec, rule_str, answer_str):
         # The Jinja representation for NonnegativeInt answer strings is:
         #   {{ choices[answer|int] }}
-        if rule_str == cls._DEFAULT_RULESPEC_STR:
-            return (
-                None,
-                'MultipleChoiceInput cannot have default answers: %s' % (
-                    answer_str))
-
         interaction = state.interaction
-        if rule_spec.rule_type == 'Equals':
+        if rule_str == cls._DEFAULT_RULESPEC_STR or (
+                rule_spec.rule_type == 'Equals'):
             customization_args = interaction.customization_args
             choices = customization_args['choices']['value']
 
-            outcome = interaction.answer_groups[answer_group_index].outcome
-            temporary_special_param = next(
-                (param_change for param_change in outcome.param_changes
-                if param_change.name == (
-                    AnswerMigrationJob._TEMPORARY_SPECIAL_RULE_PARAMETER)),
-                None)
+            # An answer group index is only available for non-default rules.
+            if rule_str != cls._DEFAULT_RULESPEC_STR:
+                outcome = interaction.answer_groups[answer_group_index].outcome
+                temporary_special_param = next(
+                    (param_change for param_change in outcome.param_changes
+                    if param_change.name == (
+                        AnswerMigrationJob._TEMPORARY_SPECIAL_RULE_PARAMETER)),
+                    None)
+
             # If the subject type is not an answer, then the index is extracted
             # by matching the answer_str against possible choices in the
             # interaction customization args. The index was not stored in the
-            # rule spec string.
-            if temporary_special_param:
+            # rule spec string. Otherwise, if this is a default classified
+            # answer the only way to reconstitute the index is using the
+            # submitted answer itself.
+            if rule_str == cls._DEFAULT_RULESPEC_STR or temporary_special_param:
                 if answer_str not in choices:
                     return (
                         None,
                         'Answer \'%s\' was not found among the choices in the '
-                        'exploration: %s', answer_str, choices)
+                        'exploration: %s' % (answer_str, choices))
                 clicked_index = choices.index(answer_str)
             else:
                 # Extract the clicked index from the rule string.
@@ -1557,7 +1554,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # the code; it's easier to reconstitute.
         code_evaluation_dict = ast.literal_eval(answer_str)
         if not isinstance(code_evaluation_dict, dict):
-            return (None, 'Failed to recover pencil code: %s' % answer_str)
+            return (None, 'Failed to recover pencil code: \'%s\'' % answer_str)
         return cls._normalize_raw_answer_object(
             objects.CodeEvaluation, code_evaluation_dict, answer_str)
 
@@ -1576,7 +1573,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                     'reconstitute SetInput object: %s' % rule_spec.rule_type)
         unicode_string_list = ast.literal_eval(answer_str)
         if not isinstance(unicode_string_list, list):
-            return (None, 'Failed to recover set: %s' % answer_str)
+            return (None, 'Failed to recover set: \'%s\'' % answer_str)
         return cls._normalize_raw_answer_object(
             objects.SetOfUnicodeString, unicode_string_list, answer_str)
 
@@ -1758,7 +1755,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             return
 
         for value_dict in value_dict_list:
-            item_id = value_dict['item_id']
+            item_id = value_dict['item_id'].decode('utf-8')
             item = stats_models.StateRuleAnswerLogModel.get(item_id)
             rule_str = value_dict['rule_str']
             last_updated = value_dict['last_updated']
@@ -1771,11 +1768,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 if error.startswith('Expected failure'):
                     yield error
                 else:
-                    yield (
-                        'Item ID: %s, last updated: %s, state name: %s, '
-                        'exp id: %s, error: %s' % (
-                            item_id, last_updated, state_name.encode('utf-8'),
-                            exploration_id, error))
+                    yield 'Item ID: %s, error: %s' % (item_id, error)
 
     @classmethod
     def _migrate_answers(cls, item_id, explorations, exploration_id, state_name,
@@ -1909,8 +1902,12 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             # of the exploration was created.
             if exploration.created_on >= last_updated:
                 continue
-            answer, error = cls._migrate_answer(
-                answer_str, rule_str, exploration, state_name)
+            try:
+                answer, error = cls._migrate_answer(
+                    answer_str, rule_str, exploration, state_name)
+            except:
+                answer = None
+                error = traceback.format_exc()
             if not answer:
                 if not first_error:
                     first_error = error
