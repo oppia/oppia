@@ -578,16 +578,17 @@ class ClearUnknownMissingAnswersJob(jobs.BaseMapReduceJobManager):
         if old_total_count != new_total_count:
             item_id = first_value_dict['item_id']
             migrated_answer_record = stats_models.MigratedAnswerModel.get(
-                item_id)
-            for exp_version in migrated_answer_record.exploration_versions:
-                all_models = stats_models.StateAnswersModel.get_all_models(
-                    migrated_answer_record.exploration_id, exp_version,
-                    migrated_answer_record.state_name)
-                if not all_models:
-                    continue
-                for state_answer_model in all_models:
-                    state_answer_model.delete()
-            migrated_answer_record.delete()
+                item_id, strict=False)
+            if migrated_answer_record:
+                for exp_version in migrated_answer_record.exploration_versions:
+                    all_models = stats_models.StateAnswersModel.get_all_models(
+                        migrated_answer_record.exploration_id, exp_version,
+                        migrated_answer_record.state_name)
+                    if not all_models:
+                        continue
+                    for state_answer_model in all_models:
+                        state_answer_model.delete()
+                migrated_answer_record.delete()
             yield (
                 'Deleting \'%s\' since its new model is inconsistent with its '
                 'old', item_id.decode('utf-8'))
