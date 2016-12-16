@@ -386,7 +386,6 @@ class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
 
             item_id = item_id[handler_period_idx+1:]
             period_idx = item_id.index('.')
-            handler_name = item_id[:period_idx]
 
             item_id = item_id[period_idx+1:]
             rule_str = item_id
@@ -488,6 +487,112 @@ class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
                     'models' % rule_name)
 
 
+class ClearUnknownMissingAnswersJob(jobs.BaseMapReduceJobManager):
+
+    _OLD_ANSWER_MODEL_TYPE = 'StateRuleAnswerLogModel'
+    _NEW_ANSWER_MODEL_TYPE = 'StateAnswersModel'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            stats_models.StateRuleAnswerLogModel, stats_models.StateAnswersModel
+        ]
+
+    @staticmethod
+    def map(item):
+        if isinstance(item, stats_models.StateRuleAnswerLogModel):
+            item_id = item.id
+
+            period_idx = item_id.index('.')
+            exp_id = item_id[:period_idx]
+
+            item_id = item_id[period_idx+1:]
+            handler_period_idx = item_id.index('submit') - 1
+            state_name = item_id[:handler_period_idx]
+
+            item_id = item_id[handler_period_idx+1:]
+            period_idx = item_id.index('.')
+
+            item_id = item_id[period_idx+1:]
+            rule_str = item_id
+
+            if '(' in rule_str:
+                rule_name = rule_str[:rule_str.index('(')]
+            else:
+                rule_name = rule_str
+
+            answers = item.answers
+            total_submission_count = 0
+            for _, count in answers.iteritems():
+                total_submission_count = total_submission_count + count
+
+            yield (item.id, {
+                'frequency': total_submission_count,
+                'type': ClearUnknownMissingAnswersJob._OLD_ANSWER_MODEL_TYPE,
+                'item_id': item.id,
+                'rule_name': rule_name
+            })
+        else:
+            # Answers need to be collected one at a time in the new data store
+            for answer in item.submitted_answer_list:
+                exp_id = item.exploration_id
+                state_name = item.state_name
+                rule_str = answer['rule_spec_str']
+                old_item_id = u'%s.%s.%s.%s' % (
+                    exp_id, state_name, 'submit', rule_str)
+                if '(' in rule_str:
+                    rule_name = rule_str[:rule_str.index('(')]
+                else:
+                    rule_name = rule_str
+                yield (old_item_id.encode('utf-8'), {
+                    'frequency': 1,
+                    'type': (
+                        ClearUnknownMissingAnswersJob._NEW_ANSWER_MODEL_TYPE),
+                    'item_id': old_item_id.encode('utf-8'),
+                    'rule_name': rule_name
+                })
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        value_dict_list = [
+            ast.literal_eval(stringified_value)
+            for stringified_value in stringified_values]
+
+        # The first dict can be used to extract item_id and rule_name since they
+        # will be the same for all results managed by this call to reduce().
+        # Note that the item_id is only available for non-aggregation results.
+        first_value_dict = value_dict_list[0]
+
+        old_total_count = 0
+        new_total_count = 0
+        for value_str in stringified_values:
+            value_dict = ast.literal_eval(value_str)
+            if value_dict['type'] == (
+                    ClearUnknownMissingAnswersJob._OLD_ANSWER_MODEL_TYPE):
+                old_total_count = old_total_count + value_dict['frequency']
+            else:
+                new_total_count = new_total_count + value_dict['frequency']
+
+        # Only output the exploration ID if the counts differ to avoid
+        # large amounts of output.
+        if old_total_count != new_total_count:
+            item_id = first_value_dict['item_id']
+            migrated_answer_record = stats_models.MigratedAnswerModel.get(
+                item_id)
+            for exp_version in migrated_answer_record.exploration_versions:
+                all_models = stats_models.StateAnswersModel.get_all_models(
+                    migrated_answer_record.exploration_id, exp_version,
+                    migrated_answer_record.state_name)
+                if not all_models:
+                    continue
+                for state_answer_model in all_models:
+                    state_answer_model.delete()
+            migrated_answer_record.delete()
+            yield (
+                'Deleting \'%s\' since its new model is inconsistent with its '
+                'old', item_id.decode('utf-8'))
+
+
 class ClearMigratedAnswersJob(jobs.BaseMapReduceJobManager):
     """This job deletes all answers stored in the
     stats_models.StateAnswersModel and all book-keeping information stored in
@@ -542,7 +647,6 @@ class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
 
         item_id = item_id[period_idx+1:]
         handler_period_idx = item_id.index('submit') - 1
-        state_name = item_id[:handler_period_idx]
 
         item_id = item_id[handler_period_idx+1:]
         period_idx = item_id.index('.')
