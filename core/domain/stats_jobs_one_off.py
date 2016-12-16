@@ -1176,8 +1176,10 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # That leaves 1 lonely graph answer to reconstitute; we're dropping it
         # in favor of avoiding the time needed to build and test the
         # reconstitution of the graph object.
-        return (None, 'Unsupported answer type: \'%s\' for answer \'%s\'' % (
-            rule_str, answer_str))
+        return (
+            None,
+            'Expected failure: Unsupported answer type: \'%s\' for graph '
+            'answer \'%s\'' % (rule_str, answer_str))
 
     @classmethod
     def _cb_reconstitute_image_click_input(
