@@ -127,8 +127,7 @@ def _validate_customization_args_and_values(
     validation.
 
     Note that this may modify the given customization_args dict, if it has
-    extra or missing keys. It also normalizes any HTML in the
-    customization_args dict.
+    extra or missing keys.
     """
     ca_spec_names = [
         ca_spec.name for ca_spec in ca_specs_to_validate_against]
@@ -161,10 +160,9 @@ def _validate_customization_args_and_values(
     # Check that each value has the correct type.
     for ca_spec in ca_specs_to_validate_against:
         try:
-            customization_args[ca_spec.name]['value'] = (
-                schema_utils.normalize_against_schema(
-                    customization_args[ca_spec.name]['value'],
-                    ca_spec.schema))
+            schema_utils.normalize_against_schema(
+                customization_args[ca_spec.name]['value'],
+                ca_spec.schema)
         except Exception:
             # TODO(sll): Raise an actual exception here if parameters are not
             # involved. (If they are, can we get sample values for the state
@@ -2620,20 +2618,3 @@ class ExplorationSummary(object):
         self.exploration_model_created_on = exploration_model_created_on
         self.exploration_model_last_updated = exploration_model_last_updated
         self.first_published_msec = first_published_msec
-
-    def to_metadata_dict(self):
-        """Given an exploration summary, this method returns a dict containing
-        id, title and objective of the exploration.
-
-        Returns:
-            A metadata dict for the given exploration summary.
-            The metadata dict has three keys:
-                'id': the exploration id
-                'title': the exploration title
-                'objective': the exploration objective
-        """
-        return {
-            'id': self.id,
-            'title': self.title,
-            'objective': self.objective,
-        }

@@ -184,7 +184,7 @@ class DashboardHandler(base.BaseHandler):
             exploration.update(feedback_thread_analytics[ind].to_dict())
             exploration.update({
                 'num_unresolved_answers': (
-                    unresolved_answers_dict[exploration['id']]['count']
+                    unresolved_answers_dict[exploration['id']]['frequency']
                     if exploration['id'] in unresolved_answers_dict else 0
                 ),
                 'top_unresolved_answers': (

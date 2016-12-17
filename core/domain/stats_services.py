@@ -41,22 +41,22 @@ def get_exps_unresolved_answers_for_default_rule(exp_ids):
     Returns a dict of the following format:
         {
           'exp_id_1': {
-            'count': 7 (number of unresolved answers for this exploration),
+            'frequency': 7 (number of unresolved answers for this exploration),
             'unresolved_answers': (list of unresolved answers sorted by count)
               [
-                {'count': 4, 'value': 'answer_1', 'state': 'Introduction'},
-                {'count': 2, 'value': 'answer_2', 'state': 'Introduction'},
-                {'count': 1, 'value': 'answer_3', 'state': 'End'}
+                {'frequency': 4, 'answer': 'answer_1', 'state': 'Introduction'},
+                {'frequency': 2, 'answer': 'answer_2', 'state': 'Introduction'},
+                {'frequency': 1, 'answer': 'answer_3', 'state': 'End'}
               ]
           },
           'exp_id_2': {
-            'count': 13,
+            'frequency': 13,
             'unresolved_answers':
               [
-                {'count': 8, 'value': 'answer_5', 'state': 'Introduction'},
-                {'count': 3, 'value': 'answer_4', 'state': 'Quest'},
-                {'count': 1, 'value': 'answer_6', 'state': 'End'}
-                {'count': 1, 'value': 'answer_8', 'state': 'End'}
+                {'frequency': 8, 'answer': 'answer_5', 'state': 'Introduction'},
+                {'frequency': 3, 'answer': 'answer_4', 'state': 'Quest'},
+                {'frequency': 1, 'answer': 'answer_6', 'state': 'End'}
+                {'frequency': 1, 'answer': 'answer_8', 'state': 'End'}
               ]
           }
         }
@@ -89,11 +89,11 @@ def get_exps_unresolved_answers_for_default_rule(exp_ids):
         exp_id = explorations_states_tuples[ind][0]
         if exp_id not in exps_answers_mapping:
             exps_answers_mapping[exp_id] = {
-                'count': 0,
+                'frequency': 0,
                 'unresolved_answers': []
             }
         for answer in statewise_answers:
-            exps_answers_mapping[exp_id]['count'] += answer['count']
+            exps_answers_mapping[exp_id]['frequency'] += answer['frequency']
             answer['state'] = explorations_states_tuples[ind][1]
 
         exps_answers_mapping[exp_id]['unresolved_answers'].extend(
@@ -102,7 +102,7 @@ def get_exps_unresolved_answers_for_default_rule(exp_ids):
     for exp_id in exps_answers_mapping:
         exps_answers_mapping[exp_id]['unresolved_answers'] = (sorted(
             exps_answers_mapping[exp_id]['unresolved_answers'],
-            key=lambda a: a['count'],
+            key=lambda a: a['frequency'],
             reverse=True))
 
     return exps_answers_mapping
@@ -192,6 +192,8 @@ def get_top_state_rule_answers_multi(
                 calc_output[category]
                 for category in classify_category_list
                 if category in calc_output)))
+        else:
+            answer_lists.append([])
     return answer_lists
 
 
