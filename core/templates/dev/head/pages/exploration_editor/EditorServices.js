@@ -489,8 +489,8 @@ oppia.factory('changeListService', [
 
 // A data service that stores data about the rights for this exploration.
 oppia.factory('explorationRightsService', [
-    '$http', 'explorationData', 'alertsService',
-    function($http, explorationData, alertsService) {
+    '$http', '$q', 'explorationData', 'alertsService',
+    function($http, $q, explorationData, alertsService) {
   return {
     init: function(
         ownerNames, editorNames, viewerNames, status, clonedFrom,
@@ -527,6 +527,7 @@ oppia.factory('explorationRightsService', [
       return this._viewableIfPrivate;
     },
     saveChangeToBackend: function(requestParams) {
+      var whenRightsSaved = $q.defer();
       var that = this;
 
       requestParams.version = explorationData.data.version;
@@ -540,7 +541,9 @@ oppia.factory('explorationRightsService', [
           data.rights.viewer_names, data.rights.status,
           data.rights.cloned_from, data.rights.community_owned,
           data.rights.viewable_if_private);
+        whenRightsSaved.resolve();
       });
+      return whenRightsSaved.promise;
     },
     saveModeratorChangeToBackend: function(action, emailBody) {
       var that = this;

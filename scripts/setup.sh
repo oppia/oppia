@@ -66,7 +66,7 @@ function maybeInstallDependencies {
     install_node_module karma-coverage 0.5.2
     install_node_module karma-ng-html2js-preprocessor 0.1.0
     install_node_module karma-chrome-launcher 0.1.4
-    install_node_module protractor 3.3.0
+    install_node_module protractor 4.0.11
     install_node_module protractor-screenshot-reporter 0.0.5
     install_node_module jasmine-spec-reporter 2.2.2
 
@@ -134,7 +134,7 @@ mkdir -p $THIRD_PARTY_DIR
 mkdir -p $NODE_MODULE_DIR
 
 # Adjust the path to include a reference to node.
-export NODE_PATH=$TOOLS_DIR/node-4.2.1
+export NODE_PATH=$TOOLS_DIR/node-6.9.1
 export PATH=$NODE_PATH/bin:$PATH
 export MACHINE_TYPE=`uname -m`
 export OS=`uname`
@@ -165,19 +165,19 @@ if [ ! -d "$NODE_PATH" ]; then
   echo Installing Node.js
   if [ ${OS} == "Darwin" ]; then
     if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-      NODE_FILE_NAME=node-v4.2.1-darwin-x64
+      NODE_FILE_NAME=node-v6.9.1-darwin-x64
     else
-      NODE_FILE_NAME=node-v4.2.1-darwin-x86
+      NODE_FILE_NAME=node-v6.9.1-darwin-x86
     fi
   elif [ ${OS} == "Linux" ]; then
     if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-      NODE_FILE_NAME=node-v4.2.1-linux-x64
+      NODE_FILE_NAME=node-v6.9.1-linux-x64
     else
-      NODE_FILE_NAME=node-v4.2.1-linux-x86
+      NODE_FILE_NAME=node-v6.9.1-linux-x86
     fi
   fi
 
-  curl --silent http://nodejs.org/dist/v4.2.1/$NODE_FILE_NAME.tar.gz -o node-download.tgz
+  curl --silent http://nodejs.org/dist/v6.9.1/$NODE_FILE_NAME.tar.gz -o node-download.tgz
   tar xzf node-download.tgz --directory $TOOLS_DIR
   mv $TOOLS_DIR/$NODE_FILE_NAME $NODE_PATH
   rm node-download.tgz
@@ -191,7 +191,7 @@ fi
 # Adjust path to support the default Chrome locations for Unix, Windows and Mac OS.
 if [ "$TRAVIS" = true ]; then
   export CHROME_BIN="/usr/bin/chromium-browser"
-elif [ "$VAGRANT" = true ]; then
+elif [ "$VAGRANT" = true ] || [ -f "/etc/is_vagrant_vm" ]; then
   # XVFB is required for headless testing in Vagrant
   sudo apt-get install xvfb chromium-browser
   export CHROME_BIN="/usr/bin/chromium-browser"

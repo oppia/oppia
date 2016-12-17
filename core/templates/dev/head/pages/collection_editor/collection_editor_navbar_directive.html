@@ -38,15 +38,6 @@
     </li>
     {% endif %}
 
-    <!-- Feedback -->
-    {% if SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK %}
-    <li ng-class="{'active': getTabStatuses().active === 'feedback'}">
-      <a href="#" tooltip="Feedback" tooltip-placement="bottom" ng-click="selectFeedbackTab()">
-        <i class="material-icons">&#xE87F;</i>
-      </a>
-    </li>
-    {% endif %}
-
     <!-- Stats -->
     {% if SHOW_COLLECTION_NAVIGATION_TAB_STATS and username %}
       <li ng-class="{'active': getTabStatuses().active === 'stats'}">

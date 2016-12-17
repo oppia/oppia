@@ -36,7 +36,7 @@
         ng-mousedown="onMousedownRegion($index)">
       </rect>
       <text ng-repeat="labeledRegion in $parent.$parent.value.labeledRegions"
-        ng-attr-style="<[REGION_LABEL_STYLE]>"
+        ng-attr-style="<[::REGION_LABEL_STYLE]>"
         ng-attr-x="<[labeledRegion.region.area[0][0] * getImageWidth() + REGION_LABEL_OFFSET_X]>"
         ng-attr-y="<[labeledRegion.region.area[0][1] * getImageHeight() + REGION_LABEL_OFFSET_Y]>">
         <[labeledRegion.label]>

@@ -19,6 +19,7 @@ import os
 
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
+from core.domain import rating_services
 from core.domain import rights_manager
 from core.tests import test_utils
 import feconf
@@ -185,6 +186,121 @@ class LibraryPageTest(test_utils.GenericTestBase):
             'objective': 'Objective B',
             'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
         }, response_dict['activity_list'][0])
+
+
+class LibraryGroupPageTest(test_utils.GenericTestBase):
+
+    def test_library_group_pages(self):
+        """Test access to the top rated and recently published pages."""
+        response = self.testapp.get(feconf.LIBRARY_TOP_RATED_URL)
+        self.assertEqual(response.status_int, 200)
+
+        response = self.testapp.get(feconf.LIBRARY_RECENTLY_PUBLISHED_URL)
+        self.assertEqual(response.status_int, 200)
+
+    def test_handler_for_recently_published_library_group_page(self):
+        """Test library handler for recently published group page."""
+        response_dict = self.get_json(
+            feconf.LIBRARY_GROUP_DATA_URL,
+            {'group_name': feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED})
+        self.assertDictContainsSubset({
+            'is_admin': False,
+            'is_moderator': False,
+            'is_super_admin': False,
+            'activity_list': [],
+            'preferred_language_codes': ['en'],
+            'profile_picture_data_url': None,
+        }, response_dict)
+
+        # Load a public demo exploration.
+        exp_services.load_demo('0')
+
+        response_dict = self.get_json(
+            feconf.LIBRARY_GROUP_DATA_URL,
+            {'group_name': feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED})
+        self.assertEqual(len(response_dict['activity_list']), 1)
+        self.assertDictContainsSubset({
+            'header_i18n_id': 'I18N_LIBRARY_GROUPS_RECENTLY_PUBLISHED',
+            'preferred_language_codes': ['en'],
+        }, response_dict)
+        self.assertDictContainsSubset({
+            'id': '0',
+            'category': 'Welcome',
+            'title': 'Welcome to Oppia!',
+            'language_code': 'en',
+            'objective': 'become familiar with Oppia\'s capabilities',
+            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+        }, response_dict['activity_list'][0])
+
+    def test_handler_for_top_rated_library_group_page(self):
+        """Test library handler for top rated group page."""
+
+        # Load a public demo exploration.
+        exp_services.load_demo('0')
+
+        response_dict = self.get_json(
+            feconf.LIBRARY_GROUP_DATA_URL,
+            {'group_name': feconf.LIBRARY_GROUP_TOP_RATED})
+        self.assertDictContainsSubset({
+            'is_admin': False,
+            'is_moderator': False,
+            'is_super_admin': False,
+            'activity_list': [],
+            'preferred_language_codes': ['en'],
+            'profile_picture_data_url': None,
+        }, response_dict)
+
+        # Assign rating to exploration to test handler for top rated
+        # explorations page.
+        rating_services.assign_rating_to_exploration('user', '0', 2)
+
+        # Test whether the response contains the exploration we have rated.
+        response_dict = self.get_json(
+            feconf.LIBRARY_GROUP_DATA_URL,
+            {'group_name': feconf.LIBRARY_GROUP_TOP_RATED})
+        self.assertDictContainsSubset({
+            'header_i18n_id': 'I18N_LIBRARY_GROUPS_TOP_RATED_EXPLORATIONS',
+            'preferred_language_codes': ['en'],
+        }, response_dict)
+        self.assertEqual(len(response_dict['activity_list']), 1)
+        self.assertDictContainsSubset({
+            'id': '0',
+            'category': 'Welcome',
+            'title': 'Welcome to Oppia!',
+            'language_code': 'en',
+            'objective': 'become familiar with Oppia\'s capabilities',
+            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+        }, response_dict['activity_list'][0])
+
+        # Load another public demo exploration.
+        exp_services.load_demo('1')
+
+        # Assign rating to exploration to test handler for top rated
+        # explorations page.
+        rating_services.assign_rating_to_exploration('user', '1', 4)
+
+        # Test whether the response contains both the explorations we have
+        # rated and they are returned in decending order of rating.
+        response_dict = self.get_json(
+            feconf.LIBRARY_GROUP_DATA_URL,
+            {'group_name': feconf.LIBRARY_GROUP_TOP_RATED})
+        self.assertEqual(len(response_dict['activity_list']), 2)
+        self.assertDictContainsSubset({
+            'id': '1',
+            'category': 'Programming',
+            'title': 'Project Euler Problem 1',
+            'language_code': 'en',
+            'objective': 'solve Problem 1 on the Project Euler site',
+            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+        }, response_dict['activity_list'][0])
+        self.assertDictContainsSubset({
+            'id': '0',
+            'category': 'Welcome',
+            'title': 'Welcome to Oppia!',
+            'language_code': 'en',
+            'objective': 'become familiar with Oppia\'s capabilities',
+            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+        }, response_dict['activity_list'][1])
 
 
 class CategoryConfigTest(test_utils.GenericTestBase):

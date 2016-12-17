@@ -24,20 +24,30 @@ describe('Account creation', function() {
   it('should create users', function() {
     users.createUser(
       'ordinaryuser@userManagement.com', 'ordinaryUserManagement');
+
+    users.login('ordinaryuser@userManagement.com');
+    browser.get(general.LIBRARY_URL_SUFFIX);
+    general.checkForConsoleErrors([]);
+
+    browser.get(general.MODERATOR_URL_SUFFIX);
+    general.checkForConsoleErrors([
+      'Failed to load resource: the server responded with a status of 401']);
+    users.logout();
   });
 
   it('should create moderators', function() {
-    users.createModerator(
-      'mod@userManagement.com', 'moderatorUserManagement');
+    users.createModerator('mod@userManagement.com', 'moderatorUserManagement');
+
+    users.login('mod@userManagement.com');
+    browser.get(general.MODERATOR_URL_SUFFIX);
+    users.logout();
+
+    general.checkForConsoleErrors([]);
   });
 
   // Usernames containing "admin" are not permitted.
   it('should create admins', function() {
-    users.createAdmin(
-      'admin@userManagement.com', 'adm1nUserManagement');
-  });
-
-  afterEach(function() {
+    users.createAdmin('admin@userManagement.com', 'adm1nUserManagement');
     general.checkForConsoleErrors([]);
   });
 });

@@ -604,11 +604,16 @@ oppia.factory('rteHelperService', [
       createRteElement: function(componentDefn, customizationArgsDict) {
         var el = $('<img/>');
         if (explorationContextService.isInExplorationContext()) {
-          customizationArgsDict = angular.extend(customizationArgsDict,
-            {
-              explorationId: explorationContextService.getExplorationId()
-            }
-          );
+          // TODO(sll): This extra key was introduced in commit
+          // 19a934ce20d592a3fc46bd97a2f05f41d33e3d66 in order to retrieve an
+          // image for RTE previews. However, it has had the unfortunate side-
+          // effect of adding an extra tag to the exploration RTE tags stored
+          // in the datastore. We are now removing this key in
+          // convertRteToHtml(), but we need to find a less invasive way to
+          // handle previews.
+          customizationArgsDict = angular.extend(customizationArgsDict, {
+            explorationId: explorationContextService.getExplorationId()
+          });
         }
         var interpolatedUrl = $interpolate(
           componentDefn.previewUrlTemplate, false, null, true)(
@@ -681,7 +686,11 @@ oppia.factory('rteHelperService', [
             var jQueryElt = $('<' + tagNameMatch[2] + '/>');
             for (var i = 0; i < this.attributes.length; i++) {
               var attr = this.attributes[i];
-              if (attr.name !== 'class' && attr.name !== 'src') {
+              // The exploration-id-with-value attribute was added in
+              // createRteElement(), and should be stripped. See commit
+              // 19a934ce20d592a3fc46bd97a2f05f41d33e3d66.
+              if (attr.name !== 'class' && attr.name !== 'src' &&
+                  attr.name !== 'exploration-id-with-value') {
                 jQueryElt.attr(attr.name, attr.value);
               }
             }
@@ -891,19 +900,23 @@ oppia.config(['$provide', function($provide) {
 }]);
 
 oppia.directive('textAngularRte', [
-    '$filter', 'oppiaHtmlEscaper', 'rteHelperService', '$timeout',
+    '$filter', '$timeout', 'oppiaHtmlEscaper', 'rteHelperService',
+    'textAngularManager',
     function(
-      $filter, oppiaHtmlEscaper, rteHelperService, $timeout) {
+        $filter, $timeout, oppiaHtmlEscaper, rteHelperService,
+        textAngularManager) {
       return {
         restrict: 'E',
         scope: {
           htmlContent: '=',
-          uiConfig: '&'
+          uiConfig: '&',
+          labelForFocusTarget: '&'
         },
         template: (
           '<div text-angular="" ta-toolbar="<[toolbarOptionsJson]>" ' +
           '     ta-paste="stripFormatting($html)" ng-model="tempContent"' +
-          '     placeholder="<[placeholderText]>">' +
+          '     placeholder="<[placeholderText]>"' +
+          '     name="<[labelForFocusTarget()]>">' +
           '</div>'),
         controller: ['$scope', function($scope) {
           // Currently, operations affecting the filesystem are allowed only in
@@ -914,6 +927,7 @@ oppia.directive('textAngularRte', [
             ['ol', 'ul', 'pre', 'indent', 'outdent'],
             []
           ];
+          var whitelistedImgClasses = [];
 
           if ($scope.uiConfig() && $scope.uiConfig().placeholder) {
             $scope.placeholderText = $scope.uiConfig().placeholder;
@@ -926,6 +940,8 @@ oppia.directive('textAngularRte', [
                     componentDefn.isComplex)) {
                 toolbarOptions[2].push(componentDefn.name);
               }
+              var imgClassName = 'oppia-noninteractive-' + componentDefn.name;
+              whitelistedImgClasses.push(imgClassName);
             }
           );
           $scope.toolbarOptionsJson = JSON.stringify(toolbarOptions);
@@ -935,7 +951,14 @@ oppia.directive('textAngularRte', [
           };
 
           $scope.stripFormatting = function(html) {
-            return $filter('sanitizeHtmlForRte')(html);
+            var safeHtml = $filter(
+              'stripFormatting'
+            )(html, whitelistedImgClasses);
+            // The '.' default is needed, otherwise some tags are not stripped
+            // properly. To reproduce, copy the image from this page
+            // (https://en.wikipedia.org/wiki/C._Auguste_Dupin) and paste it
+            // into the RTE.
+            return safeHtml || '.';
           };
 
           $scope.init = function() {
@@ -943,6 +966,15 @@ oppia.directive('textAngularRte', [
           };
 
           $scope.init();
+
+          $scope.$on('focusOn', function(evt, label) {
+            if (label === $scope.labelForFocusTarget()) {
+              var editorScope = textAngularManager.retrieveEditor(label).scope;
+              $timeout(function() {
+                editorScope.displayElements.text[0].focus();
+              });
+            }
+          });
 
           $scope.$watch('tempContent', function(newVal) {
             // Sanitizing while a modal is open would delete the markers that
@@ -1151,702 +1183,3 @@ oppia.factory('recursionHelper', ['$compile', function($compile) {
     }
   };
 }]);
-
-/*********************************************************************
- *
- * DIRECTIVES FOR SCHEMA-BASED EDITORS
- *
- *********************************************************************/
-oppia.directive('schemaBasedEditor', [function() {
-  return {
-    scope: {
-      schema: '&',
-      isDisabled: '&',
-      localValue: '=',
-      allowExpressions: '&',
-      labelForFocusTarget: '&',
-      onInputBlur: '=',
-      onInputFocus: '='
-    },
-    templateUrl: 'schemaBasedEditor/master',
-    restrict: 'E'
-  };
-}]);
-
-oppia.directive('schemaBasedChoicesEditor', [
-  'recursionHelper', function(recursionHelper) {
-    return {
-      scope: {
-        localValue: '=',
-        // The choices for the object's value.
-        choices: '&',
-        // The schema for this object.
-        // TODO(sll): Validate each choice against the schema.
-        schema: '&',
-        isDisabled: '&'
-      },
-      templateUrl: 'schemaBasedEditor/choices',
-      restrict: 'E',
-      compile: recursionHelper.compile,
-      controller: ['$scope', function($scope) {
-        $scope.getReadonlySchema = function() {
-          var readonlySchema = angular.copy($scope.schema());
-          delete readonlySchema.choices;
-          return readonlySchema;
-        };
-      }]
-    };
-  }
-]);
-
-oppia.directive('schemaBasedExpressionEditor', [function() {
-  return {
-    scope: {
-      localValue: '=',
-      isDisabled: '&',
-      // TODO(sll): Currently only takes a string which is either 'bool', 'int'
-      // or 'float'. May need to generalize.
-      outputType: '&',
-      labelForFocusTarget: '&'
-    },
-    templateUrl: 'schemaBasedEditor/expression',
-    restrict: 'E'
-  };
-}]);
-
-oppia.directive('schemaBasedBoolEditor', [function() {
-  return {
-    scope: {
-      localValue: '=',
-      isDisabled: '&',
-      allowExpressions: '&',
-      labelForFocusTarget: '&'
-    },
-    templateUrl: 'schemaBasedEditor/bool',
-    restrict: 'E',
-    controller: [
-      '$scope', 'parameterSpecsService',
-      function($scope, parameterSpecsService) {
-        if ($scope.allowExpressions()) {
-          $scope.paramNames = parameterSpecsService.getAllParamsOfType('bool');
-          $scope.expressionMode = angular.isString($scope.localValue);
-
-          $scope.$watch('localValue', function(newValue) {
-            $scope.expressionMode = angular.isString(newValue);
-          });
-
-          $scope.toggleExpressionMode = function() {
-            $scope.expressionMode = !$scope.expressionMode;
-            $scope.localValue = (
-              $scope.expressionMode ? $scope.paramNames[0] : false);
-          };
-        }
-      }
-    ]
-  };
-}]);
-
-oppia.directive('schemaBasedIntEditor', [function() {
-  return {
-    scope: {
-      localValue: '=',
-      isDisabled: '&',
-      allowExpressions: '&',
-      validators: '&',
-      labelForFocusTarget: '&',
-      onInputBlur: '=',
-      onInputFocus: '='
-    },
-    templateUrl: 'schemaBasedEditor/int',
-    restrict: 'E',
-    controller: [
-      '$scope', 'parameterSpecsService',
-      function($scope, parameterSpecsService) {
-        if ($scope.localValue === undefined) {
-          $scope.localValue = 0;
-        }
-
-        $scope.onKeypress = function(evt) {
-          if (evt.keyCode === 13) {
-            $scope.$emit('submittedSchemaBasedIntForm');
-          }
-        };
-
-        if ($scope.allowExpressions()) {
-          $scope.paramNames = parameterSpecsService.getAllParamsOfType('int');
-          $scope.expressionMode = angular.isString($scope.localValue);
-
-          $scope.$watch('localValue', function(newValue) {
-            $scope.expressionMode = angular.isString(newValue);
-          });
-
-          $scope.toggleExpressionMode = function() {
-            $scope.expressionMode = !$scope.expressionMode;
-            $scope.localValue = (
-              $scope.expressionMode ? $scope.paramNames[0] : 0);
-          };
-        }
-      }
-    ]
-  };
-}]);
-
-oppia.directive('schemaBasedFloatEditor', [function() {
-  return {
-    scope: {
-      localValue: '=',
-      isDisabled: '&',
-      allowExpressions: '&',
-      validators: '&',
-      labelForFocusTarget: '&',
-      onInputBlur: '=',
-      onInputFocus: '='
-    },
-    templateUrl: 'schemaBasedEditor/float',
-    restrict: 'E',
-    controller: [
-      '$scope', '$filter', '$timeout', 'parameterSpecsService',
-      'focusService',
-      function(
-          $scope, $filter, $timeout, parameterSpecsService, focusService) {
-        $scope.hasLoaded = false;
-        $scope.isUserCurrentlyTyping = false;
-        $scope.hasFocusedAtLeastOnce = false;
-
-        $scope.labelForErrorFocusTarget = focusService.generateFocusLabel();
-
-        $scope.validate = function(localValue) {
-          return $filter('isFloat')(localValue) !== undefined;
-        };
-
-        $scope.onFocus = function() {
-          $scope.hasFocusedAtLeastOnce = true;
-          if ($scope.onInputFocus) {
-            $scope.onInputFocus();
-          }
-        };
-
-        $scope.onBlur = function() {
-          $scope.isUserCurrentlyTyping = false;
-          if ($scope.onInputBlur) {
-            $scope.onInputBlur();
-          }
-        };
-
-        // TODO(sll): Move these to ng-messages when we move to Angular 1.3.
-        $scope.getMinValue = function() {
-          for (var i = 0; i < $scope.validators().length; i++) {
-            if ($scope.validators()[i].id === 'is_at_least') {
-              return $scope.validators()[i].min_value;
-            }
-          }
-        };
-
-        $scope.getMaxValue = function() {
-          for (var i = 0; i < $scope.validators().length; i++) {
-            if ($scope.validators()[i].id === 'is_at_most') {
-              return $scope.validators()[i].max_value;
-            }
-          }
-        };
-
-        $scope.onKeypress = function(evt) {
-          if (evt.keyCode === 13) {
-            if (Object.keys($scope.floatForm.floatValue.$error).length !== 0) {
-              $scope.isUserCurrentlyTyping = false;
-              focusService.setFocus($scope.labelForErrorFocusTarget);
-            } else {
-              $scope.$emit('submittedSchemaBasedFloatForm');
-            }
-          } else {
-            $scope.isUserCurrentlyTyping = true;
-          }
-        };
-
-        if ($scope.localValue === undefined) {
-          $scope.localValue = 0.0;
-        }
-
-        if ($scope.allowExpressions()) {
-          $scope.paramNames = parameterSpecsService.getAllParamsOfType('float');
-          $scope.expressionMode = angular.isString($scope.localValue);
-
-          $scope.$watch('localValue', function(newValue) {
-            $scope.expressionMode = angular.isString(newValue);
-          });
-
-          $scope.toggleExpressionMode = function() {
-            $scope.expressionMode = !$scope.expressionMode;
-            $scope.localValue = (
-              $scope.expressionMode ? $scope.paramNames[0] : 0.0);
-          };
-        }
-
-        // This prevents the red 'invalid input' warning message from flashing
-        // at the outset.
-        $timeout(function() {
-          $scope.hasLoaded = true;
-        });
-      }
-    ]
-  };
-}]);
-
-oppia.directive('schemaBasedUnicodeEditor', [function() {
-  return {
-    scope: {
-      localValue: '=',
-      isDisabled: '&',
-      validators: '&',
-      uiConfig: '&',
-      allowExpressions: '&',
-      labelForFocusTarget: '&',
-      onInputBlur: '=',
-      onInputFocus: '='
-    },
-    templateUrl: 'schemaBasedEditor/unicode',
-    restrict: 'E',
-    controller: ['$scope', '$filter', '$sce', 'parameterSpecsService',
-        function($scope, $filter, $sce, parameterSpecsService) {
-      $scope.allowedParameterNames = parameterSpecsService.getAllParamsOfType(
-        'unicode');
-      $scope.doUnicodeParamsExist = ($scope.allowedParameterNames.length > 0);
-
-      if ($scope.uiConfig() && $scope.uiConfig().rows &&
-          $scope.doUnicodeParamsExist) {
-        $scope.doUnicodeParamsExist = false;
-        console.log(
-          'Multi-row unicode fields with parameters are not currently ' +
-          'supported.');
-      }
-
-      if ($scope.uiConfig() && $scope.uiConfig().coding_mode) {
-        // Flag that is flipped each time the codemirror view is
-        // shown. (The codemirror instance needs to be refreshed
-        // every time it is unhidden.)
-        $scope.codemirrorStatus = false;
-        var CODING_MODE_NONE = 'none';
-
-        $scope.codemirrorOptions = {
-          // Convert tabs to spaces.
-          extraKeys: {
-            Tab: function(cm) {
-              var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
-              cm.replaceSelection(spaces);
-              // Move the cursor to the end of the selection.
-              var endSelectionPos = cm.getDoc().getCursor('head');
-              cm.getDoc().setCursor(endSelectionPos);
-            }
-          },
-          indentWithTabs: false,
-          lineNumbers: true
-        };
-
-        if ($scope.isDisabled()) {
-          $scope.codemirrorOptions.readOnly = 'nocursor';
-        }
-        // Note that only 'coffeescript', 'javascript', 'lua', 'python', 'ruby'
-        // and 'scheme' have CodeMirror-supported syntax highlighting. For other
-        // languages, syntax highlighting will not happen.
-        if ($scope.uiConfig().coding_mode !== CODING_MODE_NONE) {
-          $scope.codemirrorOptions.mode = $scope.uiConfig().coding_mode;
-        }
-
-        setTimeout(function() {
-          $scope.codemirrorStatus = !$scope.codemirrorStatus;
-        }, 200);
-
-        // When the form view is opened, flip the status flag. The
-        // timeout seems to be needed for the line numbers etc. to display
-        // properly.
-        $scope.$on('schemaBasedFormsShown', function() {
-          setTimeout(function() {
-            $scope.codemirrorStatus = !$scope.codemirrorStatus;
-          }, 200);
-        });
-      }
-
-      $scope.onKeypress = function(evt) {
-        if (evt.keyCode === 13) {
-          $scope.$emit('submittedSchemaBasedUnicodeForm');
-        }
-      };
-
-      $scope.getPlaceholder = function() {
-        if (!$scope.uiConfig()) {
-          return '';
-        } else {
-          return $scope.uiConfig().placeholder;
-        }
-      };
-
-      $scope.getRows = function() {
-        if (!$scope.uiConfig()) {
-          return null;
-        } else {
-          return $scope.uiConfig().rows;
-        }
-      };
-
-      $scope.getCodingMode = function() {
-        if (!$scope.uiConfig()) {
-          return null;
-        } else {
-          return $scope.uiConfig().coding_mode;
-        }
-      };
-
-      $scope.getDisplayedValue = function() {
-        return $sce.trustAsHtml(
-          $filter('convertUnicodeWithParamsToHtml')($scope.localValue));
-      };
-    }]
-  };
-}]);
-
-oppia.directive('schemaBasedHtmlEditor', [function() {
-  return {
-    scope: {
-      localValue: '=',
-      isDisabled: '&',
-      allowExpressions: '&',
-      labelForFocusTarget: '&',
-      uiConfig: '&'
-    },
-    templateUrl: 'schemaBasedEditor/html',
-    restrict: 'E'
-  };
-}]);
-
-oppia.directive('schemaBasedListEditor', [
-  'schemaDefaultValueService', 'recursionHelper', 'focusService',
-  'schemaUndefinedLastElementService',
-  function(
-    schemaDefaultValueService, recursionHelper, focusService,
-    schemaUndefinedLastElementService) {
-    return {
-      scope: {
-        localValue: '=',
-        isDisabled: '&',
-        // Read-only property. The schema definition for each item in the list.
-        itemSchema: '&',
-        // The length of the list. If not specified, the list is of arbitrary
-        // length.
-        len: '=',
-        // UI configuration. May be undefined.
-        uiConfig: '&',
-        allowExpressions: '&',
-        validators: '&',
-        labelForFocusTarget: '&'
-      },
-      templateUrl: 'schemaBasedEditor/list',
-      restrict: 'E',
-      compile: recursionHelper.compile,
-      controller: ['$scope', function($scope) {
-        var baseFocusLabel = (
-          $scope.labelForFocusTarget() ||
-          Math.random().toString(36).slice(2) + '-');
-        $scope.getFocusLabel = function(index) {
-          // Treat the first item in the list as a special case -- if this list
-          // is contained in another list, and the outer list is opened with a
-          // desire to autofocus on the first input field, we can then focus on
-          // the given $scope.labelForFocusTarget().
-          // NOTE: This will cause problems for lists nested within lists, since
-          // sub-element 0 > 1 will have the same label as sub-element 1 > 0.
-          // But we will assume (for now) that nested lists won't be used -- if
-          // they are, this will need to be changed.
-          return (
-            index === 0 ? baseFocusLabel : baseFocusLabel + index.toString());
-        };
-
-        $scope.isAddItemButtonPresent = true;
-        $scope.addElementText = 'Add element';
-        if ($scope.uiConfig() && $scope.uiConfig().add_element_text) {
-          $scope.addElementText = $scope.uiConfig().add_element_text;
-        }
-
-        // Only hide the 'add item' button in the case of single-line unicode
-        // input.
-        $scope.isOneLineInput = true;
-        if ($scope.itemSchema().type !== 'unicode' ||
-            $scope.itemSchema().hasOwnProperty('choices')) {
-          $scope.isOneLineInput = false;
-        } else if ($scope.itemSchema().ui_config) {
-          if ($scope.itemSchema().ui_config.coding_mode) {
-            $scope.isOneLineInput = false;
-          } else if (
-              $scope.itemSchema().ui_config.hasOwnProperty('rows') &&
-              $scope.itemSchema().ui_config.rows > 2) {
-            $scope.isOneLineInput = false;
-          }
-        }
-
-        $scope.minListLength = null;
-        $scope.maxListLength = null;
-        $scope.showDuplicatesWarning = false;
-        if ($scope.validators()) {
-          for (var i = 0; i < $scope.validators().length; i++) {
-            if ($scope.validators()[i].id === 'has_length_at_most') {
-              $scope.maxListLength = $scope.validators()[i].max_value;
-            } else if ($scope.validators()[i].id === 'has_length_at_least') {
-              $scope.minListLength = $scope.validators()[i].min_value;
-            } else if ($scope.validators()[i].id === 'is_uniquified') {
-              $scope.showDuplicatesWarning = true;
-            }
-          }
-        }
-
-        while ($scope.localValue.length < $scope.minListLength) {
-          $scope.localValue.push(
-            schemaDefaultValueService.getDefaultValue($scope.itemSchema()));
-        }
-
-        $scope.hasDuplicates = function() {
-          var valuesSoFar = {};
-          for (var i = 0; i < $scope.localValue.length; i++) {
-            var value = $scope.localValue[i];
-            if (!valuesSoFar.hasOwnProperty(value)) {
-              valuesSoFar[value] = true;
-            } else {
-              return true;
-            }
-          }
-          return false;
-        };
-
-        if ($scope.len === undefined) {
-          $scope.addElement = function() {
-            if ($scope.isOneLineInput) {
-              $scope.hideAddItemButton();
-            }
-
-            $scope.localValue.push(
-              schemaDefaultValueService.getDefaultValue($scope.itemSchema()));
-            focusService.setFocus(
-              $scope.getFocusLabel($scope.localValue.length - 1));
-          };
-
-          var _deleteLastElementIfUndefined = function() {
-            var lastValueIndex = $scope.localValue.length - 1;
-            var valueToConsiderUndefined = (
-              schemaUndefinedLastElementService.getUndefinedValue(
-                $scope.itemSchema()));
-            if ($scope.localValue[lastValueIndex] ===
-                valueToConsiderUndefined) {
-              $scope.deleteElement(lastValueIndex);
-            }
-          };
-
-          $scope.lastElementOnBlur = function() {
-            _deleteLastElementIfUndefined();
-            $scope.showAddItemButton();
-          };
-
-          $scope.showAddItemButton = function() {
-            $scope.isAddItemButtonPresent = true;
-          };
-
-          $scope.hideAddItemButton = function() {
-            $scope.isAddItemButtonPresent = false;
-          };
-
-          $scope._onChildFormSubmit = function(evt) {
-            if (!$scope.isAddItemButtonPresent) {
-              /**
-               * If form submission happens on last element of the set (i.e the
-               * add item button is absent) then automatically add the element
-               * to the list.
-               */
-              if (($scope.maxListLength === null ||
-                   $scope.localValue.length < $scope.maxListLength) &&
-                  !!$scope.localValue[$scope.localValue.length - 1]) {
-                $scope.addElement();
-              }
-            } else {
-              /**
-               * If form submission happens on existing element remove focus
-               * from it
-               */
-              document.activeElement.blur();
-            }
-            evt.stopPropagation();
-          };
-
-          $scope.$on('submittedSchemaBasedIntForm', $scope._onChildFormSubmit);
-          $scope.$on(
-            'submittedSchemaBasedFloatForm', $scope._onChildFormSubmit);
-          $scope.$on(
-            'submittedSchemaBasedUnicodeForm', $scope._onChildFormSubmit);
-
-          $scope.deleteElement = function(index) {
-            // Need to let the RTE know that HtmlContent has been changed.
-            $scope.$broadcast('externalHtmlContentChange');
-            $scope.localValue.splice(index, 1);
-          };
-        } else {
-          if ($scope.len <= 0) {
-            throw 'Invalid length for list editor: ' + $scope.len;
-          }
-          if ($scope.len !== $scope.localValue.length) {
-            throw 'List editor length does not match length of input value: ' +
-              $scope.len + ' ' + $scope.localValue;
-          }
-        }
-      }]
-    };
-  }
-]);
-
-oppia.directive('schemaBasedDictEditor', [
-  'recursionHelper', function(recursionHelper) {
-    return {
-      scope: {
-        localValue: '=',
-        isDisabled: '&',
-        // Read-only property. An object whose keys and values are the dict
-        // properties and the corresponding schemas.
-        propertySchemas: '&',
-        allowExpressions: '&',
-        labelForFocusTarget: '&'
-      },
-      templateUrl: 'schemaBasedEditor/dict',
-      restrict: 'E',
-      compile: recursionHelper.compile,
-      controller: ['$scope', function($scope) {
-        $scope.getHumanReadablePropertyDescription = function(property) {
-          return property.description || '[' + property.name + ']';
-        };
-
-        $scope.fieldIds = {};
-        for (var i = 0; i < $scope.propertySchemas().length; i++) {
-          // Generate random IDs for each field.
-          $scope.fieldIds[$scope.propertySchemas()[i].name] = (
-            Math.random().toString(36).slice(2));
-        }
-      }]
-    };
-  }
-]);
-
-oppia.directive('schemaBasedCustomEditor', [
-  'recursionHelper', function(recursionHelper) {
-    return {
-      scope: {
-        localValue: '=',
-        // The class of the object being edited.
-        objType: '='
-      },
-      templateUrl: 'schemaBasedEditor/custom',
-      restrict: 'E',
-      compile: recursionHelper.compile
-    };
-  }
-]);
-
-/*********************************************************************
- *
- * DIRECTIVES FOR SCHEMA-BASED VIEWERS
- *
- *********************************************************************/
-oppia.directive('schemaBasedViewer', [function() {
-  return {
-    scope: {
-      schema: '&',
-      localValue: '='
-    },
-    templateUrl: 'schemaBasedViewer/master',
-    restrict: 'E'
-  };
-}]);
-
-oppia.directive('schemaBasedPrimitiveViewer', [function() {
-  return {
-    scope: {
-      localValue: '='
-    },
-    templateUrl: 'schemaBasedViewer/primitive',
-    restrict: 'E',
-    controller: ['$scope', function($scope) {
-      $scope.isExpression = function(value) {
-        return angular.isString(value);
-      };
-    }]
-  };
-}]);
-
-oppia.directive('schemaBasedUnicodeViewer', [function() {
-  return {
-    scope: {
-      localValue: '='
-    },
-    templateUrl: 'schemaBasedViewer/unicode',
-    restrict: 'E',
-    controller: ['$scope', '$filter', '$sce', function($scope, $filter, $sce) {
-      $scope.getDisplayedValue = function() {
-        return $sce.trustAsHtml($filter('convertUnicodeWithParamsToHtml')(
-          $scope.localValue));
-      };
-    }]
-  };
-}]);
-
-oppia.directive('schemaBasedHtmlViewer', [function() {
-  return {
-    scope: {
-      localValue: '='
-    },
-    templateUrl: 'schemaBasedViewer/html',
-    restrict: 'E'
-  };
-}]);
-
-oppia.directive('schemaBasedListViewer', [
-  'recursionHelper', function(recursionHelper) {
-    return {
-      scope: {
-        localValue: '=',
-        // Read-only property. The schema definition for each item in the list.
-        itemSchema: '&'
-      },
-      templateUrl: 'schemaBasedViewer/list',
-      restrict: 'E',
-      compile: recursionHelper.compile
-    };
-  }
-]);
-
-oppia.directive('schemaBasedDictViewer', [
-  'recursionHelper', function(recursionHelper) {
-    return {
-      scope: {
-        localValue: '=',
-        // Read-only property. An object whose keys and values are the dict
-        // properties and the corresponding schemas.
-        propertySchemas: '&'
-      },
-      templateUrl: 'schemaBasedViewer/dict',
-      restrict: 'E',
-      compile: recursionHelper.compile,
-      controller: ['$scope', function($scope) {
-        $scope.getHumanReadablePropertyDescription = function(property) {
-          return property.description || '[' + property.name + ']';
-        };
-      }]
-    };
-  }
-]);
-
-oppia.directive('schemaBasedCustomViewer', [
-  'recursionHelper', function(recursionHelper) {
-    return {
-      scope: {
-        localValue: '=',
-        // The class of the object being edited.
-        objType: '='
-      },
-      templateUrl: 'schemaBasedViewer/custom',
-      restrict: 'E',
-      compile: recursionHelper.compile
-    };
-  }
-]);

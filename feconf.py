@@ -73,12 +73,20 @@ RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
 DEFAULT_QUERY_LIMIT = 1000
 
 # The maximum number of results to retrieve in a datastore query
-# for top rated published explorations.
-NUMBER_OF_TOP_RATED_EXPLORATIONS = 8
+# for top rated published explorations in /library page.
+NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE = 8
 
 # The maximum number of results to retrieve in a datastore query
-# for recently published explorations.
-RECENTLY_PUBLISHED_QUERY_LIMIT = 8
+# for recently published explorations in /library page.
+RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE = 8
+
+# The maximum number of results to retrieve in a datastore query
+# for top rated published explorations in /library/top_rated page.
+NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE = 20
+
+# The maximum number of results to retrieve in a datastore query
+# for recently published explorations in /library/recently_published page.
+RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 
 # The current version of the dashboard stats blob schema. If any backward-
 # incompatible changes are made to the stats blob schema in the data store,
@@ -229,6 +237,14 @@ EMAIL_INTENT_MARKETING = 'marketing'
 EMAIL_INTENT_PUBLICIZE_EXPLORATION = 'publicize_exploration'
 EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 EMAIL_INTENT_DELETE_EXPLORATION = 'delete_exploration'
+EMAIL_INTENT_QUERY_STATUS_NOTIFICATION = 'query_status_notification'
+# Possible intents for email sent in bulk.
+BULK_EMAIL_INTENT_MARKETING = 'bulk_email_marketing'
+BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
+BULK_EMAIL_INTENT_CREATE_EXPLORATION = 'bulk_email_create_exploration'
+BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT = 'bulk_email_creator_reengagement'
+BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT = 'bulk_email_learner_reengagement'
+BULK_EMAIL_INTENT_TEST = 'bulk_email_test'
 
 MODERATOR_ACTION_PUBLICIZE_EXPLORATION = 'publicize_exploration'
 MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
@@ -428,33 +444,41 @@ TASK_URL_SUGGESTION_EMAILS = (
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
-COLLECTION_WRITABLE_DATA_URL_PREFIX = '/collection_editor_handler/data'
+COLLECTION_SUMMARIES_DATA_URL = '/collectionsummarieshandler/data'
+EDITABLE_COLLECTION_DATA_URL_PREFIX = '/collection_editor_handler/data'
 COLLECTION_RIGHTS_PREFIX = '/collection_editor_handler/rights'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
 DASHBOARD_URL = '/dashboard'
 DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % DASHBOARD_URL
 DASHBOARD_DATA_URL = '/dashboardhandler/data'
+DASHBOARD_EXPLORATION_STATS_PREFIX = '/dashboardhandler/explorationstats'
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
+EXPLORATION_METADATA_SEARCH_URL = '/exploration/metadata_search'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
 EXPLORATION_SUMMARIES_DATA_URL = '/explorationsummarieshandler/data'
 EXPLORATION_URL_PREFIX = '/explore'
+EXPLORATION_URL_EMBED_PREFIX = '/embed/exploration'
 FEEDBACK_STATS_URL_PREFIX = '/feedbackstatshandler'
 FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
+LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
 LIBRARY_INDEX_URL = '/library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
+LIBRARY_RECENTLY_PUBLISHED_URL = '/library/recently_published'
 LIBRARY_SEARCH_URL = '/search/find'
 LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
+LIBRARY_TOP_RATED_URL = '/library/top_rated'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 ROBOTS_TXT_URL = '/robots.txt'
+SITE_FEEDBACK_FORM_URL = ''
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
@@ -466,6 +490,7 @@ UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 
 NAV_MODE_ABOUT = 'about'
+NAV_MODE_GET_STARTED = 'get_started'
 NAV_MODE_BLOG = 'blog'
 NAV_MODE_COLLECTION = 'collection'
 NAV_MODE_CONTACT = 'contact'
@@ -507,10 +532,14 @@ COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
+# Number of unresolved answers to be displayed in the dashboard for each
+# exploration.
+TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
+# Number of open feedback to be displayed in the dashboard for each exploration.
+OPEN_FEEDBACK_COUNT_DASHBOARD = 3
 # NOTE TO DEVELOPERS: This should be synchronized with base.js
 ENABLE_STRING_CLASSIFIER = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
-SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK = False
 SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
 
 # Output formats of downloaded explorations.
@@ -522,6 +551,14 @@ UPDATE_TYPE_EXPLORATION_COMMIT = 'exploration_commit'
 UPDATE_TYPE_COLLECTION_COMMIT = 'collection_commit'
 UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
 
+# Possible values for user query status.
+# Valid status transitions are: processing --> completed --> archived
+# Or processing --> failed.
+USER_QUERY_STATUS_PROCESSING = 'processing'
+USER_QUERY_STATUS_COMPLETED = 'completed'
+USER_QUERY_STATUS_ARCHIVED = 'archived'
+USER_QUERY_STATUS_FAILED = 'failed'
+
 # The time difference between which to consider two login events "close". This
 # is taken to be 12 hours.
 PROXIMAL_TIMEDELTA_SECS = 12 * 60 * 60
@@ -529,9 +566,9 @@ PROXIMAL_TIMEDELTA_SECS = 12 * 60 * 60
 DEFAULT_COLOR = '#a33f40'
 DEFAULT_THUMBNAIL_ICON = 'Lightbulb'
 
-# List of supported default categories. For now, each category has
-# a specific color associated with it. Each category also has a thumbnail icon
-# whose filename is "{{CategoryName}}.svg".
+# List of supported default categories. For now, each category has a specific
+# color associated with it. Each category also has a thumbnail icon whose
+# filename is "{{CategoryName}}.svg".
 CATEGORIES_TO_COLORS = {
     'Mathematics': '#cd672b',
     'Algebra': '#cd672b',
@@ -623,6 +660,24 @@ LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = (
 # The i18n id for the header of the "Recently Published" category in the
 # library index page.
 LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'I18N_LIBRARY_GROUPS_RECENTLY_PUBLISHED'
+
+# The group name that appears at the end of the url for the recently published
+# page.
+LIBRARY_GROUP_RECENTLY_PUBLISHED = 'recently_published'
+# The group name that appears at the end of the url for the top rated page.
+LIBRARY_GROUP_TOP_RATED = 'top_rated'
+
+# NOTE TO DEVELOPERS: The LIBRARY_PAGE_MODE constants defined below should have
+# the same value as the ones defined in LIBRARY_PAGE_MODES in Library.js. For
+# example LIBRARY_PAGE_MODE_GROUP should have the same value as
+# LIBRARY_PAGE_MODES.GROUP.
+# Page mode for the group pages such as top rated and recently published
+# explorations.
+LIBRARY_PAGE_MODE_GROUP = 'group'
+# Page mode for the main library page.
+LIBRARY_PAGE_MODE_INDEX = 'index'
+# Page mode for the search results page.
+LIBRARY_PAGE_MODE_SEARCH = 'search'
 
 # List of supported language codes. Each description has a
 # parenthetical part that may be stripped out to give a shorter
@@ -724,11 +779,17 @@ SUPPORTED_SITE_LANGUAGES = [{
     'id': 'pt',
     'text': 'Português'
 }, {
+    'id': 'pt-br',
+    'text': 'Português (Brasil)'
+}, {
     'id': 'vi',
     'text': 'Tiếng Việt'
 }, {
     'id': 'hi',
     'text': 'हिन्दी'
+}, {
+    'id': 'tr',
+    'text': 'Türkçe'
 }]
 SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
@@ -738,6 +799,8 @@ ABOUT_PAGE_DESCRIPTION = (
     'Oppia is an open source learning platform that connects a community of '
     'teachers and learners. You can use this site to create 1-1 learning '
     'scenarios for others.')
+GET_STARTED_PAGE_DESCRIPTION = (
+    'Learn how to get started using Oppia.')
 BLOG_PAGE_DESCRIPTION = (
     'Keep up to date with Oppia news and updates via our blog.')
 CONTACT_PAGE_DESCRIPTION = (
@@ -754,6 +817,10 @@ DONATE_PAGE_DESCRIPTION = (
 FORUM_PAGE_DESCRIPTION = (
     'Engage with the Oppia community by discussing questions, bugs and '
     'explorations in the forum.')
+LIBRARY_GROUP_PAGE_DESCRIPTION = (
+    'Discover top-rated or recently-published explorations on Oppia. Learn '
+    'from these explorations or help improve an existing one for the '
+    'community.')
 LIBRARY_PAGE_DESCRIPTION = (
     'Looking to learn something new? Find explorations created by professors, '
     'teachers and Oppia users in a subject you\'re interested in, and start '
@@ -779,6 +846,7 @@ TERMS_PAGE_DESCRIPTION = (
     'distributing learning material.')
 THANKS_PAGE_DESCRIPTION = (
     'Thank you for donating to The Oppia Foundation.')
+SITE_NAME = 'Oppia.org'
 
 # The type of the response returned by a handler when an exception is raised.
 HANDLER_TYPE_HTML = 'html'

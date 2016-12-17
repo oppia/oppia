@@ -74,22 +74,29 @@
 {% endblock local_top_nav_options %}
 
 {% block content %}
-  <conversation-skin></conversation-skin>
-
-  <br><br><br>
-
-  {% if not iframed %}
-    <attribution-guide></attribution-guide>
-  {% endif %}
+  <div>
+    <background-banner></background-banner>
+    <conversation-skin></conversation-skin>
+    {% if not iframed %}
+      <attribution-guide></attribution-guide>
+    {% endif %}
+  </div>
 
   {% include 'components/attribution_guide/attribution_guide_directive.html' %}
-  {% include 'components/exploration_embed_button_modal.html' %}
-  {% include 'components/gadget_directive.html' %}
-  {% include 'components/gadget_panel_directive.html' %}
-  {% include 'components/profile_link_image_directive.html' %}
-  {% include 'components/sharing_links_directive.html' %}
+  {% include 'components/embed_modal/embed_exploration_modal_directive.html' %}
+  {% include 'components/gadget/gadget_directive.html' %}
+  {% include 'components/gadget/gadget_panel_directive.html' %}
+  {% include 'components/profile_link/profile_link_image_directive.html' %}
+
+  {% if iframed %}
+    {% include 'pages/exploration_player/conversation_skin_embed_directive.html' %}
+  {% else %}
+    {% include 'pages/exploration_player/conversation_skin_directive.html' %}
+  {% endif %}
+
+  {% include 'pages/exploration_player/tutor_card_directive.html' %}
+  {% include 'pages/exploration_player/supplemental_card_directive.html' %}
   {% include 'pages/exploration_player/answer_feedback_pair_directive.html' %}
-  {% include 'pages/exploration_player/conversation_skin_directive.html' %}
   {% include 'pages/exploration_player/exploration_successfully_flagged_modal.html' %}
   {% include 'pages/exploration_player/feedback_popup_directive.html' %}
   {% include 'pages/exploration_player/flag_exploration_modal.html' %}
@@ -98,25 +105,42 @@
 
 {% endblock %}
 
+{% block footer %}
+  {% if not iframed %}
+    {% include 'pages/exploration_player/exploration_footer_directive.html' %}
+    {% include 'components/share/sharing_links_directive.html' %}
+    <exploration-footer twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></exploration-footer>
+  {% endif %}
+{% endblock %}
+
 {% block footer_js %}
   {{ super() }}
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/MathLatexStringEditor.js"></script>
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/SanitizedUrlEditor.js"></script>
+
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/explorationServices.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/messengerService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/attribution_guide/AttributionGuideDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/ExplorationEmbedButtonService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/GadgetDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/GadgetPanelDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/ProfileLinkImageDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/SharingLinksDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/embed_modal/ExplorationEmbedButtonService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/gadget/GadgetDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/gadget/GadgetPanelDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/profile_link/ProfileLinkImageDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/share/SharingLinksDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ExplorationObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StateObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/summary/ExplorationSummaryBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/StopwatchObjectFactory.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/TutorCardDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/SupplementalCardDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationPlayerStateService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerConstants.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerClassificationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerFeedbackPairDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ConversationSkinDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationFooterDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationRecommendationsService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/FeedbackPopupDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerLocalNav.js"></script>

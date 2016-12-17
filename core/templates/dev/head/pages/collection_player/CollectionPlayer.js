@@ -31,9 +31,9 @@ oppia.animation('.oppia-collection-animate-slide', function() {
 });
 
 oppia.controller('CollectionPlayer', [
-  '$scope', 'CollectionBackendApiService', 'CollectionObjectFactory',
+  '$scope', 'ReadOnlyCollectionBackendApiService', 'CollectionObjectFactory',
   'CollectionPlaythroughObjectFactory', 'alertsService',
-  function($scope, CollectionBackendApiService, CollectionObjectFactory,
+  function($scope, ReadOnlyCollectionBackendApiService, CollectionObjectFactory,
     CollectionPlaythroughObjectFactory, alertsService) {
     $scope.collection = null;
     $scope.collectionPlaythrough = null;
@@ -95,7 +95,8 @@ oppia.controller('CollectionPlayer', [
     };
 
     // Load the collection the learner wants to view.
-    CollectionBackendApiService.loadCollection($scope.collectionId).then(
+    ReadOnlyCollectionBackendApiService.loadCollection(
+      $scope.collectionId).then(
       function(collectionBackendObject) {
         $scope.collection = CollectionObjectFactory.create(
           collectionBackendObject);

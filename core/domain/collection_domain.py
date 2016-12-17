@@ -435,6 +435,59 @@ class Collection(object):
                 next_exp_ids.append(node.exploration_id)
         return next_exp_ids
 
+    def get_next_exploration_ids_in_sequence(self, current_exploration):
+        """Returns a list of exploration IDs that a logged-out user should
+        complete next based on the prerequisite skills they must have attained
+        by the time they completed the current exploration.  This recursively
+        compiles a list of 'learned skills' then, depending on the
+        'learned skills' and the current exploration's acquired skills,
+        returns either a list of exploration ids that have either just
+        unlocked or the user is qualified to explore.  If neither of these
+        lists can be generated a blank list is returned instead."""
+        skills_learned_by_exp_id = {}
+
+        def _recursively_find_learned_skills(node):
+            """Given a node, returns the skills that the user must have
+            acquired by the time they've completed it."""
+            if node.exploration_id in skills_learned_by_exp_id:
+                return skills_learned_by_exp_id[node.exploration_id]
+
+            skills_learned = set(node.acquired_skills)
+            for other_node in self.nodes:
+                if other_node.exploration_id not in skills_learned_by_exp_id:
+                    for skill in node.prerequisite_skills:
+                        if skill in other_node.acquired_skills:
+                            skills_learned = skills_learned.union(
+                                _recursively_find_learned_skills(other_node))
+
+            skills_learned_by_exp_id[node.exploration_id] = skills_learned
+            return skills_learned
+
+        explorations_just_unlocked = []
+        explorations_qualified_for = []
+
+        collection_node = self.get_node(current_exploration)
+        collected_skills = _recursively_find_learned_skills(collection_node)
+
+        for node in self.nodes:
+            if node.exploration_id in skills_learned_by_exp_id:
+                continue
+
+            if set(node.prerequisite_skills).issubset(set(collected_skills)):
+                if (any([
+                        skill in collection_node.acquired_skills
+                        for skill in node.prerequisite_skills])):
+                    explorations_just_unlocked.append(node.exploration_id)
+                else:
+                    explorations_qualified_for.append(node.exploration_id)
+
+        if explorations_just_unlocked:
+            return explorations_just_unlocked
+        elif explorations_qualified_for:
+            return explorations_qualified_for
+        else:
+            return []
+
     @classmethod
     def is_demo_collection_id(cls, collection_id):
         """Whether the collection id is that of a demo collection."""
@@ -675,3 +728,17 @@ class CollectionSummary(object):
             'collection_model_created_on': self.collection_model_created_on,
             'collection_model_last_updated': self.collection_model_last_updated
         }
+
+    def is_editable_by(self, user_id=None):
+        """Checks if a given user may edit the collection.
+
+        Args:
+            user_id: str. User id of the user.
+
+        Returns:
+            bool. Whether the given user may edit the collection.
+        """
+        return user_id is not None and (
+            user_id in self.editor_ids
+            or user_id in self.owner_ids
+            or self.community_owned)

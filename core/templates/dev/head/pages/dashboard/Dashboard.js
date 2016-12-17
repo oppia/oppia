@@ -16,6 +16,11 @@
  * @fileoverview Controllers for the creator dashboard.
  */
 
+oppia.constant('EXPLORATION_DROPDOWN_STATS', {
+  OPEN_FEEDBACK: 'open_feedback',
+  TOP_UNRESOLVED_ANSWERS: 'top_unresolved_answers'
+});
+
 oppia.constant('EXPLORATIONS_SORT_BY_KEYS', {
   TITLE: 'title',
   RATING: 'ratings',
@@ -37,24 +42,29 @@ oppia.constant('HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', {
 oppia.controller('Dashboard', [
   '$scope', '$rootScope', '$window', 'oppiaDatetimeFormatter', 'alertsService',
   'DashboardBackendApiService', 'RatingComputationService',
-  'ExplorationCreationService', 'FATAL_ERROR_CODES', 'UrlInterpolationService',
-  'EXPLORATIONS_SORT_BY_KEYS', 'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS',
+  'ExplorationCreationService', 'UrlInterpolationService', 'FATAL_ERROR_CODES',
+  'EXPLORATION_DROPDOWN_STATS', 'EXPLORATIONS_SORT_BY_KEYS',
+  'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS',
   function(
       $scope, $rootScope, $window, oppiaDatetimeFormatter, alertsService,
       DashboardBackendApiService, RatingComputationService,
-      ExplorationCreationService, FATAL_ERROR_CODES, UrlInterpolationService,
-      EXPLORATIONS_SORT_BY_KEYS, HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS) {
+      ExplorationCreationService, UrlInterpolationService, FATAL_ERROR_CODES,
+      EXPLORATION_DROPDOWN_STATS, EXPLORATIONS_SORT_BY_KEYS,
+      HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS) {
     var EXP_PUBLISH_TEXTS = {
       defaultText: (
         'This exploration is private. Publish it to receive statistics.'),
       smText: 'Publish the exploration to receive statistics.'
     };
 
+    $scope.DEFAULT_EMPTY_TITLE = 'Untitled';
+    $scope.EXPLORATION_DROPDOWN_STATS = EXPLORATION_DROPDOWN_STATS;
     $scope.EXPLORATIONS_SORT_BY_KEYS = EXPLORATIONS_SORT_BY_KEYS;
     $scope.HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS = (
       HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS);
     $scope.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
       GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
+
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
     $scope.createNewExploration = (
       ExplorationCreationService.createNewExploration);
@@ -64,17 +74,20 @@ oppia.controller('Dashboard', [
     $scope.emptyDashboardImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/general/empty_dashboard.svg');
 
+    $scope.unresolvedAnswersIconUrl = UrlInterpolationService.getStaticImageUrl(
+      '/icons/unresolved_answers.svg');
+
     $scope.activeTab = 'myExplorations';
     $scope.setActiveTab = function(newActiveTabName) {
       $scope.activeTab = newActiveTabName;
     };
 
-    $scope.showExplorationEditor = function(explorationId) {
-      $window.location = '/create/' + explorationId;
+    $scope.getExplorationUrl = function(explorationId) {
+      return '/create/' + explorationId;
     };
 
-    $scope.showCollectionEditor = function(collectionId) {
-      $window.location = '/collection_editor/create/' + collectionId;
+    $scope.getCollectionUrl = function(collectionId) {
+      return '/collection_editor/create/' + collectionId;
     };
 
     $scope.myExplorationsView = 'card';
@@ -82,8 +95,12 @@ oppia.controller('Dashboard', [
       $scope.myExplorationsView = viewType;
     };
 
-    $scope.checkForMobileView = function() {
-      if ($window.innerWidth < 500) {
+    $scope.checkMobileView = function() {
+      return ($window.innerWidth < 500);
+    };
+
+    $scope.updatesGivenScreenWidth = function() {
+      if ($scope.checkMobileView()) {
         $scope.myExplorationsView = 'card';
         $scope.publishText = EXP_PUBLISH_TEXTS.smText;
       } else {
@@ -91,9 +108,9 @@ oppia.controller('Dashboard', [
       }
     };
 
-    $scope.checkForMobileView();
+    $scope.updatesGivenScreenWidth();
     angular.element($window).bind('resize', function() {
-      $scope.checkForMobileView();
+      $scope.updatesGivenScreenWidth();
     });
 
     $scope.setExplorationsSortingOptions = function(sortType) {
@@ -108,36 +125,38 @@ oppia.controller('Dashboard', [
       // This function is passed as a custom comparator function to `orderBy`,
       // so that special cases can be handled while sorting explorations.
       var value = entity[$scope.currentSortType];
-      var DEFAULT_TEXT_EMPTY_TITLE = 'Untitled';
-      if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.TITLE) {
-        if (!value) {
-          return DEFAULT_TEXT_EMPTY_TITLE;
+      if (entity.status === 'private') {
+        if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.TITLE) {
+          value = (value || $scope.DEFAULT_EMPTY_TITLE);
+        } else if ($scope.currentSortType !==
+                   EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED) {
+          value = 0;
         }
       } else if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.RATING) {
-        if (!$scope.getAverageRating(value)) {
-          return (
-            $scope.isCurrentSortDescending ?
-              (-1 * $scope.explorationsList.indexOf(entity)) :
-              $scope.explorationsList.indexOf(entity));
-        }
-        return $scope.getAverageRating(value);
-      } else if (!value) {
-        return ($scope.isCurrentSortDescending ?
-                (-1 * $scope.explorationsList.indexOf(entity)) :
-                $scope.explorationsList.indexOf(entity));
+        var averageRating = $scope.getAverageRating(value);
+        value = (averageRating || 0);
       }
       return value;
+    };
+
+    $scope.topUnresolvedAnswersCount = function(exploration) {
+      var topUnresolvedAnswersCount = 0;
+      exploration.top_unresolved_answers.forEach(function(answer) {
+        topUnresolvedAnswersCount += answer.count;
+      });
+      return topUnresolvedAnswersCount;
     };
 
     $rootScope.loadingMessage = 'Loading';
     DashboardBackendApiService.fetchDashboardData().then(
       function(response) {
+        var responseData = response.data;
         $scope.currentSortType = EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK;
         $scope.isCurrentSortDescending = true;
-        $scope.explorationsList = response.explorations_list;
-        $scope.collectionsList = response.collections_list;
-        $scope.dashboardStats = response.dashboard_stats;
-        $scope.lastWeekStats = response.last_week_stats;
+        $scope.explorationsList = responseData.explorations_list;
+        $scope.collectionsList = responseData.collections_list;
+        $scope.dashboardStats = responseData.dashboard_stats;
+        $scope.lastWeekStats = responseData.last_week_stats;
         if ($scope.dashboardStats && $scope.lastWeekStats) {
           $scope.relativeChangeInTotalPlays = (
             $scope.dashboardStats.total_plays - $scope.lastWeekStats.total_plays
@@ -145,8 +164,8 @@ oppia.controller('Dashboard', [
         }
         $rootScope.loadingMessage = '';
       },
-      function(errorStatus) {
-        if (FATAL_ERROR_CODES.indexOf(errorStatus) !== -1) {
+      function(errorResponse) {
+        if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
           alertsService.addWarning('Failed to get dashboard data');
         }
       }

@@ -81,22 +81,8 @@ describe('rich-text components', function() {
     general.checkForConsoleErrors([
       // TODO (Jacob) Remove when
       // https://code.google.com/p/google-cast-sdk/issues/detail?id=309 is fixed
-      'chrome-extension://boadgeojelhgndaghljhdicfkmllpafd/' +
-        'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED',
-      'chrome-extension://dliochdbjfkdbacpmhlcpmleaejidimm/' +
-        'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED',
-      'chrome-extension://hfaagokkkhdbgiakmmlclaapfelnkoah/' +
-        'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED',
-      'chrome-extension://fmfcbgogabcbclcofgocippekhfcmgfj/' +
-        'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED',
-      'chrome-extension://enhhojjnijigcajfphajepfemndkmdlo/' +
-        'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED',
-      'chrome-extension://eojlgccfgnjlphjnlopmadngcgmmdgpk/' +
-        'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED',
-      'chrome-extension://fjhoaacokmgbjemoflkofnenfaiekifl/' +
-        'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED',
-      'chrome-extension://pkedcjkdefgpdelpbcmbmeomcjbeemfm/' +
-        'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED'
+      'cast_sender.js - Failed to load resource: net::ERR_FAILED',
+      'Uncaught ReferenceError: ytcfg is not defined'
     ]);
   });
 });

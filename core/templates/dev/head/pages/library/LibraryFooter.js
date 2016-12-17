@@ -17,7 +17,8 @@
  */
 
 oppia.controller('LibraryFooter', [
-  '$scope', '$window', function($scope, $window) {
-  // The following checks if the page is in search mode.
-  $scope.inSearchMode = ($window.location.pathname.indexOf('/search') === 0);
-}]);
+  '$scope', 'LIBRARY_PAGE_MODES', function($scope, LIBRARY_PAGE_MODES) {
+    $scope.pageMode = GLOBALS.PAGE_MODE;
+    $scope.LIBRARY_PAGE_MODES = LIBRARY_PAGE_MODES;
+  }
+]);

@@ -18,14 +18,6 @@
     GLOBALS.isPrivate = JSON.parse('{{is_private|js_string}}');
     GLOBALS.TAG_REGEX = JSON.parse('{{TAG_REGEX|js_string}}');
   </script>
-
-  <style>
-    html, body {
-      background-color: #eee;
-    }
-  </style>
-
-  {{dependencies_html}}
 {% endblock header_js %}
 
 {% block navbar_breadcrumb %}
@@ -52,10 +44,6 @@
       <collection-history-tab></collection-history-tab>
     </div>
 
-    <div ng-show="getTabStatuses().active === 'feedback'">
-      <collection-feedback-tab></collection-feedback-tab>
-    </div>
-
     <div ng-show="getTabStatuses().active === 'stats'">
       <collection-statistics-tab></collection-statistics-tab>
     </div>
@@ -63,16 +51,19 @@
 
   {% include 'pages/collection_editor/collection_editor_navbar_breadcrumb_directive.html' %}
   {% include 'pages/collection_editor/collection_editor_navbar_directive.html' %}
-  {% include 'pages/collection_editor/collection_editor_save_modal.html' %}
-  {% include 'pages/collection_editor/collection_editor_pre_publish_modal.html' %}
-  {% include 'pages/collection_editor/editor_tab/collection_main_tab_directive.html' %}
+  {% include 'pages/collection_editor/collection_editor_pre_publish_modal_directive.html' %}
+  {% include 'pages/collection_editor/collection_editor_save_modal_directive.html' %}
+
+  {% include 'pages/collection_editor/editor_tab/collection_editor_tab_directive.html' %}
   {% include 'pages/collection_editor/editor_tab/collection_node_creator_directive.html' %}
   {% include 'pages/collection_editor/editor_tab/collection_node_editor_directive.html' %}
   {% include 'pages/collection_editor/editor_tab/collection_skill_list_directive.html' %}
-  {% include 'pages/collection_editor/feedback_tab/collection_feedback_tab_directive.html' %}
+
   {% include 'pages/collection_editor/history_tab/collection_history_tab_directive.html' %}
+
   {% include 'pages/collection_editor/settings_tab/collection_details_editor_directive.html' %}
   {% include 'pages/collection_editor/settings_tab/collection_settings_tab_directive.html' %}
+
   {% include 'pages/collection_editor/statistics_tab/collection_statistics_tab_directive.html' %}
 {% endblock content %}
 
@@ -82,28 +73,28 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/CollectionEditorNavbarBreadcrumbDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/CollectionEditorNavbarDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/CollectionEditorStateService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/editor_tab/CollectionEditorTabDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/editor_tab/CollectionLinearizerService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/editor_tab/CollectionMainTabDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/editor_tab/CollectionNodeCreatorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/editor_tab/CollectionNodeEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/editor_tab/CollectionSkillListDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/feedback_tab/CollectionFeedbackTabDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/history_tab/CollectionHistoryTabDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/settings_tab/CollectionDetailsEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/settings_tab/CollectionSettingsTabDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/statistics_tab/CollectionStatisticsTabDirective.js"></script>
 
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionBackendApiService.js"></script>
+
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionNodeObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionRightsBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionUpdateService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionValidationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/EditableCollectionBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/ReadOnlyCollectionBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/SkillListObjectFactory.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/WritableCollectionBackendApiService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/ChangeObjectFactory.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/UndoRedoService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/summaries/ExplorationSummaryBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/ChangeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/UndoRedoService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/summary/ExplorationSummaryBackendApiService.js"></script>
 
   {# TODO(bhenning): Remove these once RouterServices is decoupled from the exploration editor #}
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorServices.js"></script>
