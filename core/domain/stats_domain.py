@@ -21,6 +21,7 @@ import operator
 import sys
 import utils
 
+from core.domain import exp_domain
 from core.domain import interaction_registry
 from core.platform import models
 import feconf
@@ -39,103 +40,6 @@ import feconf
 # this string must never change.
 MIGRATED_STATE_ANSWER_SESSION_ID = 'migrated_state_answer_session_id'
 MIGRATED_STATE_ANSWER_TIME_SPENT_IN_SEC = 0.0
-
-
-# TODO(bhenning): Remove this.
-class StateRuleAnswerLog(object):
-    """Domain object that stores answers which match different state rules.
-
-    All methods and properties in this file should be independent of the
-    specific storage model used.
-    """
-    def __init__(self, answers):
-        # This dict represents a log of answers that hit this rule and that
-        # have not been resolved. The keys of this dict are the answers encoded
-        # as HTML strings, and the values are integer counts representing how
-        # many times the answer has been entered.
-        self.answers = copy.deepcopy(answers)
-
-    @property
-    def total_answer_count(self):
-        """Total count of answers for this rule that have not been resolved."""
-        # TODO(sll): Cache this computed property.
-        return sum(self.answers.values())
-
-    @classmethod
-    def get_multi_by_multi_explorations(
-            cls, exploration_state_list, rule_str_list):
-        """Gets domain objects given a list of exploration and state tuples.
-
-        Args:
-            exploration_state_list: a list of exploration ID and state name
-                tuples
-            rule_str_list: a list of rule spec strings which are used to filter
-                the answers matched to the provided explorations and states
-
-        Returns a list of StateRuleAnswerLog objects containing answers matched
-        to each exploration ID-state name. The number of elements returned is
-        the same as the number of elements passed in exploration_state_list. The
-        number of answers in each StateRuleAnswerLog object depends on the
-        number of answers matched against each rule spec strings specified in
-        rule_str_list.
-        """
-        # TODO(sll): Should each rule_str be unicode instead?
-        answer_log_models_list = (
-            stats_models.StateRuleAnswerLogModel.get_or_create_multi_for_multi_explorations( # pylint: disable=line-too-long
-                exploration_state_list, rule_str_list))
-        answer_log_list = []
-        for answer_log_models in answer_log_models_list:
-            combined_answers = {}
-            for answer_log_model in answer_log_models:
-                for answer, frequency in answer_log_model.answers.iteritems():
-                    if answer in combined_answers:
-                        combined_answers[answer] += frequency
-                    else:
-                        combined_answers[answer] = frequency
-            answer_log_list.append(cls(combined_answers))
-        return answer_log_list
-
-    @classmethod
-    def get_multi(cls, exploration_id, rule_data):
-        """Gets domain objects corresponding to the given rule data.
-        Args:
-            exploration_id: the exploration id
-            rule_data: a list of dicts, each with the following keys:
-                (state_name, rule_str).
-        """
-        # TODO(sll): Should each rule_str be unicode instead?
-        # TODO(bhenning): Combine this with get_multi_by_multi_explorations as
-        # part of the answer migration project.
-        answer_log_models = (
-            stats_models.StateRuleAnswerLogModel.get_or_create_multi(
-                exploration_id, rule_data))
-        return [cls(answer_log_model.answers)
-                for answer_log_model in answer_log_models]
-
-    @classmethod
-    def get(cls, exploration_id, state_name, rule_str):
-        # TODO(sll): Deprecate this method.
-        return cls.get_multi_by_multi_explorations(
-            [(exploration_id, state_name)], [rule_str])[0]
-
-    def get_all_top_answers(self):
-        """Returns a list of (answer, count) sorted by count."""
-
-        return sorted(
-            self.answers.iteritems(), key=operator.itemgetter(1),
-            reverse=True)
-
-    def get_top_answers(self, num_answers_to_return):
-        """Returns the top `num_answers_to_return` answers.
-
-        Args:
-            num_answers_to_return: the maximum number of answers to return.
-
-        Returns:
-            A list of (answer, count) tuples for the `num_answers_to_return`
-            answers with the highest counts.
-        """
-        return self.get_all_top_answers()[:num_answers_to_return]
 
 
 class StateAnswers(object):
@@ -170,30 +74,46 @@ class StateAnswers(object):
 
         if not isinstance(self.exploration_id, basestring):
             raise utils.ValidationError(
-                'Expected exploration_id to be a string, received %s' %
-                self.exploration_id)
+                'Expected exploration_id to be a string, received %s' % str(
+                    self.exploration_id))
 
         if not isinstance(self.state_name, basestring):
             raise utils.ValidationError(
-                'Expected state_name to be a string, received %s' %
-                self.state_name)
+                'Expected state_name to be a string, received %s' % str(
+                    self.state_name))
 
         if self.interaction_id is not None:
             if not isinstance(self.interaction_id, basestring):
                 raise utils.ValidationError(
-                    'Expected interaction_id to be a string, received %s' %
-                    self.interaction_id)
+                    'Expected interaction_id to be a string, received %s' % str(
+                        self.interaction_id))
 
             # Verify interaction_id is valid.
             if (self.interaction_id not in
                     interaction_registry.Registry.get_all_interaction_ids()):
                 raise utils.ValidationError(
-                    'Unknown interaction id %s' % self.interaction_id)
+                    'Unknown interaction_id: %s' % self.interaction_id)
 
         if not isinstance(self.submitted_answer_list, list):
             raise utils.ValidationError(
                 'Expected submitted_answer_list to be a list, received %s' %
-                self.submitted_answer_list)
+                str(self.submitted_answer_list))
+
+        if not isinstance(self.schema_version, int):
+            raise utils.ValidationError(
+                'Expected schema_version to be an integer, received %s' % str(
+                    self.schema_version))
+
+        if self.schema_version < 1:
+            raise utils.ValidationError(
+                'schema_version < 1: %d' % self.schema_version)
+
+        if self.schema_version > feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION:
+            raise utils.ValidationError(
+                'schema_version > feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION '
+                '(%d): %d' % (
+                    feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION,
+                    self.schema_version))
 
         for submitted_answer in self.submitted_answer_list:
             submitted_answer.validate()
@@ -201,19 +121,6 @@ class StateAnswers(object):
 
 class SubmittedAnswer(object):
     """Domain object representing an answer submitted to a state."""
-
-    # There is a danger of data overflow if the answer log exceeds 1 MB. Given
-    # 1000-5000 answers, each answer must be at most 200-1000 bytes in size. We
-    # will address this later if it happens regularly. At the moment, a
-    # ValidationError is raised if an answer exceeds the maximum size.
-    _MAX_BYTES_PER_ANSWER = 2500
-
-    # Prefix of strings that are cropped because they are too long.
-    _CROPPED_PREFIX_STRING = 'CROPPED: '
-
-    # Answer value that is stored if non-string answer is too big
-    # pylint: disable=invalid-name
-    _PLACEHOLDER_FOR_TOO_LARGE_NONSTRING = 'TOO LARGE NONSTRING'
 
     # NOTE TO DEVELOPERS: do not use the rule_spec_str and answer_str
     # parameters, as they are here as part of the answer migration.
@@ -265,20 +172,26 @@ class SubmittedAnswer(object):
 
     def validate(self):
         """Validates this submitted answer object."""
-        # TODO(msl): These validation methods need tests to ensure that
-        # the right errors show up in the various cases.
-
-        # It's valid for normalized_answer to be None if the interaction type is
-        # Continue.
         # TODO(bhenning): Validate the normalized answer against future answer
         # objects after #956 is addressed.
-
         if self.time_spent_in_sec is None:
             raise utils.ValidationError(
                 'SubmittedAnswers must have a provided time_spent_in_sec')
         if self.session_id is None:
             raise utils.ValidationError(
                 'SubmittedAnswers must have a provided session_id')
+
+        if self.rule_spec_str is not None and not isinstance(
+                self.rule_spec_str, basestring):
+            raise utils.ValidationError(
+                'Expected rule_spec_str to be either None or a string, '
+                'received %s' % str(self.rule_spec_str))
+
+        if self.answer_str is not None and not isinstance(
+                self.answer_str, basestring):
+            raise utils.ValidationError(
+                'Expected answer_str to be either None or a string, received '
+                '%s' % str(self.answer_str))
 
         if not isinstance(self.session_id, basestring):
             raise utils.ValidationError(
@@ -290,10 +203,55 @@ class SubmittedAnswer(object):
                 'Expected time_spent_in_sec to be a float, received %s' %
                 str(self.time_spent_in_sec))
 
+        if not isinstance(self.params, dict):
+            raise utils.ValidationError(
+                'Expected params to be a dict, received %s' % str(self.params))
+
+        if not isinstance(self.answer_group_index, int):
+            raise utils.ValidationError(
+                'Expected answer_group_index to be an integer, received %s' %
+                str(self.answer_group_index))
+
+        if not isinstance(self.rule_spec_index, int):
+            raise utils.ValidationError(
+                'Expected rule_spec_index to be an integer, received %s' %
+                str(self.rule_spec_index))
+
+        if not isinstance(self.classification_categorization, basestring):
+            raise utils.ValidationError(
+                'Expected classification_categorization to be a string, '
+                'received %s' % str(self.classification_categorization))
+
+        if self.answer_group_index < 0:
+            raise utils.ValidationError(
+                'Expected answer_group_index to be non-negative, received %d' %
+                self.answer_group_index)
+
+        if self.rule_spec_index < 0:
+            raise utils.ValidationError(
+                'Expected rule_spec_index to be non-negative, received %d' %
+                self.rule_spec_index)
+
         if self.time_spent_in_sec < 0.:
             raise utils.ValidationError(
                 'Expected time_spent_in_sec to be non-negative, received %f' %
                 self.time_spent_in_sec)
+
+        if self.normalized_answer is None and self.interaction_id != 'Continue':
+            raise utils.ValidationError(
+                'SubmittedAnswers must have a provided normalized_answer '
+                'except for Continue interactions')
+
+        valid_classification_categories = [
+            exp_domain.EXPLICIT_CLASSIFICATION,
+            exp_domain.TRAINING_DATA_CLASSIFICATION,
+            exp_domain.STATISTICAL_CLASSIFICATION,
+            exp_domain.DEFAULT_OUTCOME_CLASSIFICATION]
+        if self.classification_categorization not in (
+                valid_classification_categories):
+            raise utils.ValidationError(
+                'Expected valid classification_categorization, received %s' %
+                self.classification_categorization)
 
 
 class StateAnswersCalcOutput(object):
@@ -333,18 +291,18 @@ class StateAnswersCalcOutput(object):
 
         if not isinstance(self.exploration_id, basestring):
             raise utils.ValidationError(
-                'Expected exploration_id to be a string, received %s' %
-                self.exploration_id)
+                'Expected exploration_id to be a string, received %s' % str(
+                    self.exploration_id))
 
         if not isinstance(self.state_name, basestring):
             raise utils.ValidationError(
-                'Expected state_name to be a string, received %s' %
-                self.state_name)
+                'Expected state_name to be a string, received %s' % str(
+                    self.state_name))
 
         if not isinstance(self.calculation_id, basestring):
             raise utils.ValidationError(
-                'Expected calculation_id to be a string, received %s' %
-                self.calculation_id)
+                'Expected calculation_id to be a string, received %s' % str(
+                    self.calculation_id))
 
         output_data = self.calculation_output
         if sys.getsizeof(output_data) > max_bytes_per_calc_output_data:
@@ -352,5 +310,5 @@ class StateAnswersCalcOutput(object):
             # calculation output data, e.g. just skip. At the moment,
             # too long answers produce a ValidationError.
             raise utils.ValidationError(
-                "calculation_output is too big to be stored: %s" %
-                str(output_data))
+                'calculation_output is too big to be stored (size: %d): %s' % (
+                    sys.getsizeof(output_data), str(output_data)))
