@@ -17,6 +17,37 @@
         background: #eeeeee no-repeat center center fixed;
         background-size: cover;
       }
+      .exploration-list-table {
+        top: 168px;
+        left: 10%;
+        max-width: 675px;
+        margin-top: 20px;
+        padding-bottom: 25px;
+        padding-left: 20px;
+        padding-right: 20px;
+        position: fixed;
+        background: #fff;
+        border-radius: 2px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
+        padding-top: 20px;
+        text-align: left;
+        float: left;
+      }
+      .card-preview-panel {
+        top: 188px;
+        right: 70px;
+        padding-top: 30px;
+        padding-bottom: 70px;
+        padding-left: 75px;
+        padding-right: 75px;
+        position: fixed;
+        background: #fff;
+        border-radius: 2px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
+        text-align: left;
+        pointer-events: none;
+      }
+
     </style>
   {% endif %}
 {% endblock header_js %}
@@ -55,16 +86,14 @@
       </h2>
 
       {% if is_logged_in %}
-      <div ng-if="collection" style="height: 100%; margin-left: -205px; margin-right: auto; max-width: 675px; margin-top: 20px;
-      padding-bottom: 25px; padding-left: 20px; position: relative; background: #fff; border-radius: 2px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23); padding-top: 20px; text-align: left; float: left;">
+      <div ng-if="collection" class="exploration-list-table">
 
         <table class="oppia-dashboard-table">
           <tr>
             <th>
               <p>Exploration</p>
             </th>
-            <th>
+            <th class="hidden-md hidden-sm hidden-xs">
               <p>Objective</p>
             </th>
           </tr>
@@ -72,17 +101,17 @@
           class="exploration-list-item">
           <td>
             <a ng-href="/explore/<[collection._explorationId]>"
-              ng-mouseover="updateExplorationPreview(collection._explorationId)"
-              ng-mouseleave="togglePreviewCard()"
-              class="oppia-dashboard-list-summary">
+               ng-mouseover="updateExplorationPreview(collection._explorationId)"
+               ng-mouseleave="togglePreviewCard()"
+               class="oppia-dashboard-list-summary">
               <[collection._explorationSummaryObject.title]>
             </a>
           </td>
-          <td>
+          <td class="hidden-md hidden-sm hidden-xs">
             <a ng-href="/explore/<[collection._explorationId]>"
-              ng-mouseover="updateExplorationPreview(collection._explorationId)"
-              ng-mouseleave="togglePreviewCard()"
-              class="oppia-dashboard-list-summary">
+               ng-mouseover="updateExplorationPreview(collection._explorationId)"
+               ng-mouseleave="togglePreviewCard()"
+               class="oppia-dashboard-list-summary">
               <[collection._explorationSummaryObject.objective]>
             </a>
           </td>
@@ -90,9 +119,7 @@
       </table>
 
 
-        <div ng-if="collection" style="top: 188px; right: 70px; padding-bottom: 70px; padding-left: 75px; padding-right: 75px;
-        position: fixed; background: #fff; border-radius: 2px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23); padding-top: 30px; text-align: left;">
+        <div ng-if="collection" class="card-preview-panel hidden-xs">
 
         <md-card class="oppia-activity-summary-tile md-default-theme">
           <div class="title-section" style="background-color: <[collectionSummary.thumbnail_bg_color]>; z-index: 1;">
@@ -100,18 +127,19 @@
           </div>
         </md-card>
 
-        <exploration-summary-tile ng-if="!showPreviewCard" collection-id="getCollectionId()"
-                              exploration-id="currentExplorationId"
-                              exploration-title="explorationTitle"
-                              last-updated-msec="explorationLastUpdateMsec"
-                              objective="explorationObjective"
-                              category="explorationCategory"
-                              ratings="explorationRatings"
-                              num-views="explorationNumViews"
-                              thumbnail-icon-url="explorationThumbnailIconUrl"
-                              thumbnail-bg-color="explorationThumbnailBgColor"
-                              is-community-owned="explorationIsCommunityOwned"
-                              style="position: absolute; left: 75px; z-index: 10;"/>
+        <exploration-summary-tile ng-if="!showPreviewCard"
+                                  collection-id="getCollectionId()"
+                                  exploration-id="currentExplorationId"
+                                  exploration-title="summaryToPreview.title"
+                                  last-updated-msec="summaryToPreview.last_updated_msec"
+                                  objective="summaryToPreview.objective"
+                                  category="summaryToPreview.category"
+                                  ratings="summaryToPreview.ratings"
+                                  num-views="summaryToPreview.num_views"
+                                  thumbnail-icon-url="summaryToPreview.thumbnail_icon_url"
+                                  thumbnail-bg-color="summaryToPreview.thumbnail_bg_color"
+                                  is-community-owned="summaryToPreview.community_owned"
+                                  style="position: absolute; left: 75px; z-index: 10;"/>
       </div>
     </div>
       {% else %}
