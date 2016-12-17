@@ -243,6 +243,12 @@ class ExplorationUserDataModel(base_models.BaseModel):
     # The exploration version that this change list applied to.
     draft_change_list_exp_version = ndb.IntegerProperty(default=None)
 
+    # The user's preference for receiving suggestion emails for this exploration
+    mute_suggestion_notifications = ndb.BooleanProperty(default=False)
+
+    # The user's preference for receiving feedback emails for this exploration
+    mute_feedback_notifications = ndb.BooleanProperty(default=False)
+
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
         return '%s.%s' % (user_id, exploration_id)

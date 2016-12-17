@@ -913,6 +913,67 @@ def get_email_preferences(user_id):
     }
 
 
+def set_email_preferences_for_exploration(
+        user_id, exploration_id, mute_feedback_notifications=None,
+        mute_suggestion_notifications=None):
+    """Sets mute preferences for exploration with given exploration_id of user
+    with given user_id.
+
+    If no ExplorationUserDataModel exists for this user and exploration,
+    a new one will be created.
+
+    Args:
+        user_id: str. The user id.
+        exploration_id: str. The exploration id.
+        mute_feedback_notifications: bool. Whether the given user has muted
+            feedback emails. Defaults to None.
+        mute_suggestion_notifications: bool. Whether the given user has muted
+            suggestion emails. Defaults to None.
+    """
+    exploration_user_model = user_models.ExplorationUserDataModel.get(
+        user_id, exploration_id)
+    if exploration_user_model is None:
+        exploration_user_model = user_models.ExplorationUserDataModel.create(
+            user_id, exploration_id)
+    if mute_feedback_notifications is not None:
+        exploration_user_model.mute_feedback_notifications = (
+            mute_feedback_notifications)
+    if mute_suggestion_notifications is not None:
+        exploration_user_model.mute_suggestion_notifications = (
+            mute_suggestion_notifications)
+    exploration_user_model.put()
+
+
+def get_email_preferences_for_exploration(user_id, exploration_id):
+    """Gives mute preferences for exploration with given exploration_id of user
+    with given user_id.
+
+    Args:
+        user_id: str. The user id.
+        exploration_id: str. The exploration id.
+
+    Returns:
+        dict. Representing whether the user has muted emails for exploration
+        with given exploration_id. The format of returned value:
+        {
+            'mute_feedback_notifications': value(bool),
+            'mute_suggestion_notifications': value(bool)
+        }
+    """
+    exploration_user_model = user_models.ExplorationUserDataModel.get(
+        user_id, exploration_id)
+    return {
+        'mute_feedback_notifications': (
+            feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE
+            if exploration_user_model is None
+            else exploration_user_model.mute_feedback_notifications),
+        'mute_suggestion_notifications': (
+            feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE
+            if exploration_user_model is None
+            else exploration_user_model.mute_suggestion_notifications)
+    }
+
+
 class UserContributions(object):
     """Value object representing a user's contributions.
 
