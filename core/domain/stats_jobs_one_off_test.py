@@ -277,7 +277,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'Cannot recover.'])
 
         stae_answers_model_count = stats_models.StateAnswersModel.get_all(
-            include_deleted_entities=True).count()
+            include_deleted=True).count()
         self.assertEqual(stae_answers_model_count, 0)
 
     def test_rule_parameter_evaluation_with_invalid_characters(self):
@@ -3005,14 +3005,14 @@ class PurgeInconsistentAnswersJobTests(test_utils.GenericTestBase):
         self._record_old_answer(state_name, self.DEFAULT_RULESPEC_STR, 'other')
 
         answer_entity_count = stats_models.StateRuleAnswerLogModel.get_all(
-            include_deleted_entities=True).count()
+            include_deleted=True).count()
         self.assertEqual(answer_entity_count, 2)
 
         job_output = self._run_clear_answers_job()
         self.assertEqual(job_output, [])
 
         answer_entity_count = stats_models.StateRuleAnswerLogModel.get_all(
-            include_deleted_entities=True).count()
+            include_deleted=True).count()
         self.assertEqual(answer_entity_count, 2)
 
     def test_answers_which_are_too_long(self):
@@ -3031,7 +3031,7 @@ class PurgeInconsistentAnswersJobTests(test_utils.GenericTestBase):
         self._record_old_answer(state_name, rule_spec_str, 'graph')
 
         answer_entity_count = stats_models.StateRuleAnswerLogModel.get_all(
-            include_deleted_entities=True).count()
+            include_deleted=True).count()
         self.assertEqual(answer_entity_count, 1)
 
         job_output = self._run_clear_answers_job()
@@ -3041,7 +3041,7 @@ class PurgeInconsistentAnswersJobTests(test_utils.GenericTestBase):
         ])
 
         answer_entity_count = stats_models.StateRuleAnswerLogModel.get_all(
-            include_deleted_entities=True).count()
+            include_deleted=True).count()
         self.assertEqual(answer_entity_count, 0)
 
     def test_answers_referring_to_deleted_exploration(self):
@@ -3052,7 +3052,7 @@ class PurgeInconsistentAnswersJobTests(test_utils.GenericTestBase):
         self._record_old_answer(state_name, rule_spec_str, html_answer)
 
         answer_entity_count = stats_models.StateRuleAnswerLogModel.get_all(
-            include_deleted_entities=True).count()
+            include_deleted=True).count()
         self.assertEqual(answer_entity_count, 1)
 
         exp_services.delete_exploration(self.owner_id, self.DEMO_EXP_ID)
@@ -3064,7 +3064,7 @@ class PurgeInconsistentAnswersJobTests(test_utils.GenericTestBase):
         ])
 
         answer_entity_count = stats_models.StateRuleAnswerLogModel.get_all(
-            include_deleted_entities=True).count()
+            include_deleted=True).count()
         self.assertEqual(answer_entity_count, 0)
 
     def test_answers_referring_to_permanently_deleted_exploration(self):
@@ -3075,7 +3075,7 @@ class PurgeInconsistentAnswersJobTests(test_utils.GenericTestBase):
         self._record_old_answer(state_name, rule_spec_str, html_answer)
 
         answer_entity_count = stats_models.StateRuleAnswerLogModel.get_all(
-            include_deleted_entities=True).count()
+            include_deleted=True).count()
         self.assertEqual(answer_entity_count, 1)
 
         exp_services.delete_exploration(
@@ -3088,7 +3088,7 @@ class PurgeInconsistentAnswersJobTests(test_utils.GenericTestBase):
         ])
 
         answer_entity_count = stats_models.StateRuleAnswerLogModel.get_all(
-            include_deleted_entities=True).count()
+            include_deleted=True).count()
         self.assertEqual(answer_entity_count, 0)
 
     def test_answers_older_than_their_explorations(self):
@@ -3134,7 +3134,7 @@ class PurgeInconsistentAnswersJobTests(test_utils.GenericTestBase):
             'exp_id0', self.owner_id, end_state_name='End')
 
         answer_entity_count = stats_models.StateRuleAnswerLogModel.get_all(
-            include_deleted_entities=True).count()
+            include_deleted=True).count()
         self.assertEqual(answer_entity_count, 1)
 
         job_output = self._run_clear_answers_job()
@@ -3144,7 +3144,7 @@ class PurgeInconsistentAnswersJobTests(test_utils.GenericTestBase):
         ])
 
         answer_entity_count = stats_models.StateRuleAnswerLogModel.get_all(
-            include_deleted_entities=True).count()
+            include_deleted=True).count()
         self.assertEqual(answer_entity_count, 0)
 
     def test_only_bad_answers_are_removed(self):
@@ -3191,12 +3191,12 @@ class PurgeInconsistentAnswersJobTests(test_utils.GenericTestBase):
         self._record_old_answer(state_name, self.DEFAULT_RULESPEC_STR, 'other')
 
         answer_entity_count = stats_models.StateRuleAnswerLogModel.get_all(
-            include_deleted_entities=True).count()
+            include_deleted=True).count()
         self.assertEqual(answer_entity_count, 3)
 
         job_output = self._run_clear_answers_job()
         self.assertEqual(len(job_output), 2)
 
         answer_entity_count = stats_models.StateRuleAnswerLogModel.get_all(
-            include_deleted_entities=True).count()
+            include_deleted=True).count()
         self.assertEqual(answer_entity_count, 2)
