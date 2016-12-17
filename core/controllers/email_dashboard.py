@@ -16,6 +16,7 @@
 
 from core.controllers import base
 from core.domain import config_domain
+from core.domain import email_manager
 from core.domain import user_query_jobs_one_off
 from core.domain import user_query_services
 from core.domain import user_services
@@ -214,4 +215,29 @@ class EmailDashboardCancelEmailHandler(base.BaseHandler):
                 '%s is not an authorized user for this query.', self.user_id)
         query_model.query_status = feconf.USER_QUERY_STATUS_ARCHIVED
         query_model.put()
+        self.render_json({})
+
+
+class EmailDashboardTestBulkEmailHandler(base.BaseHandler):
+    """Handler for testing bulk email before sending it.
+
+    This handler sends a test email to submitter of query before it is sent to
+    qualfied users in bulk.
+    """
+    @require_valid_sender
+    def post(self, query_id):
+        query_model = user_models.UserQueryModel.get(query_id, strict=False)
+        if (query_model is None or
+                query_model.query_status != feconf.USER_QUERY_STATUS_COMPLETED):
+            raise self.InvalidInputException('400 Invalid query id.')
+
+        if query_model.submitter_id != self.user_id:
+            raise self.UnauthorizedUserException(
+                '%s is not an authorized user for this query.', self.user_id)
+
+        email_subject = self.payload['email_subject']
+        email_body = self.payload['email_body']
+        test_email_body = '[This is a test email.]<br><br> %s' % email_body
+        email_manager.send_test_email_for_bulk_emails(
+            query_model.submitter_id, email_subject, test_email_body)
         self.render_json({})

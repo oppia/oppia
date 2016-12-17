@@ -66,28 +66,11 @@ function maybeInstallDependencies {
     install_node_module karma-coverage 0.5.2
     install_node_module karma-ng-html2js-preprocessor 0.1.0
     install_node_module karma-chrome-launcher 0.1.4
-    install_node_module protractor 4.0.9
+    install_node_module protractor 4.0.11
     install_node_module protractor-screenshot-reporter 0.0.5
     install_node_module jasmine-spec-reporter 2.2.2
 
     $NODE_MODULE_DIR/.bin/webdriver-manager update
-
-    # WARNING: THIS IS A HACK WHICH SHOULD BE REMOVED AT THE EARLIEST OPPORTUNITY,
-    # PROBABLY WHEN PROTRACTOR IS UPGRADED BEYOND v4.0.9.
-    # Chromedriver v2.22 fails on Travis with an "unexpected alert open" error.
-    # Attempt to replace it with v2.24, but rename it to 2.22 so as not to trigger
-    # a version check error.
-    if [ ${OS} == "Linux" ]; then
-      if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-        echo "  Replacing chromedriver with a newer version..."
-        curl --silent https://chromedriver.storage.googleapis.com/2.24/chromedriver_linux64.zip -o chromedriver_2.22linux64.zip
-        mkdir -p $NODE_MODULE_DIR/protractor/node_modules/webdriver-manager/selenium/
-        mv -f ./chromedriver_2.22linux64.zip $NODE_MODULE_DIR/protractor/node_modules/webdriver-manager/selenium/
-        unzip -q $NODE_MODULE_DIR/protractor/node_modules/webdriver-manager/selenium/chromedriver_2.22linux64.zip -d $NODE_MODULE_DIR/protractor/node_modules/webdriver-manager/selenium
-        mv -f $NODE_MODULE_DIR/protractor/node_modules/webdriver-manager/selenium/chromedriver $NODE_MODULE_DIR/protractor/node_modules/webdriver-manager/selenium/chromedriver_2.22
-        ls $NODE_MODULE_DIR/protractor/node_modules/webdriver-manager/selenium
-      fi
-    fi
   fi
 
   if [ "$RUN_MINIFIED_TESTS" = "true" ]; then
@@ -151,7 +134,7 @@ mkdir -p $THIRD_PARTY_DIR
 mkdir -p $NODE_MODULE_DIR
 
 # Adjust the path to include a reference to node.
-export NODE_PATH=$TOOLS_DIR/node-4.2.1
+export NODE_PATH=$TOOLS_DIR/node-6.9.1
 export PATH=$NODE_PATH/bin:$PATH
 export MACHINE_TYPE=`uname -m`
 export OS=`uname`
@@ -182,19 +165,19 @@ if [ ! -d "$NODE_PATH" ]; then
   echo Installing Node.js
   if [ ${OS} == "Darwin" ]; then
     if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-      NODE_FILE_NAME=node-v4.2.1-darwin-x64
+      NODE_FILE_NAME=node-v6.9.1-darwin-x64
     else
-      NODE_FILE_NAME=node-v4.2.1-darwin-x86
+      NODE_FILE_NAME=node-v6.9.1-darwin-x86
     fi
   elif [ ${OS} == "Linux" ]; then
     if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-      NODE_FILE_NAME=node-v4.2.1-linux-x64
+      NODE_FILE_NAME=node-v6.9.1-linux-x64
     else
-      NODE_FILE_NAME=node-v4.2.1-linux-x86
+      NODE_FILE_NAME=node-v6.9.1-linux-x86
     fi
   fi
 
-  curl --silent http://nodejs.org/dist/v4.2.1/$NODE_FILE_NAME.tar.gz -o node-download.tgz
+  curl --silent http://nodejs.org/dist/v6.9.1/$NODE_FILE_NAME.tar.gz -o node-download.tgz
   tar xzf node-download.tgz --directory $TOOLS_DIR
   mv $TOOLS_DIR/$NODE_FILE_NAME $NODE_PATH
   rm node-download.tgz
