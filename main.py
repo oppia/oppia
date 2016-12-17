@@ -22,6 +22,7 @@ from core.controllers import base
 from core.controllers import collection_editor
 from core.controllers import collection_viewer
 from core.controllers import dashboard
+from core.controllers import email_dashboard
 from core.controllers import editor
 from core.controllers import feedback
 from core.controllers import library
@@ -142,6 +143,7 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(feconf.SPLASH_URL, pages.SplashPage),
     get_redirect_route(r'/about', pages.AboutPage),
+    get_redirect_route(r'/get_started', pages.GetStartedPage),
     get_redirect_route(r'/foundation', pages.AboutRedirectPage),
     get_redirect_route(r'/credits', pages.AboutRedirectPage),
     get_redirect_route(r'/teach', pages.TeachPage),
@@ -176,6 +178,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.DASHBOARD_DATA_URL, dashboard.DashboardHandler),
     get_redirect_route(
+        r'%s/<exploration_id>' % feconf.DASHBOARD_EXPLORATION_STATS_PREFIX,
+        dashboard.ExplorationDashboardStatsHandler),
+    get_redirect_route(
         r'%s' % feconf.NEW_EXPLORATION_URL, dashboard.NewExploration),
     get_redirect_route(
         r'%s' % feconf.NEW_COLLECTION_URL, dashboard.NewCollection),
@@ -195,7 +200,14 @@ URLS = MAPREDUCE_HANDLERS + [
         resources.ValueGeneratorHandler),
 
     get_redirect_route(r'%s' % feconf.LIBRARY_INDEX_URL, library.LibraryPage),
-    get_redirect_route(r'/libraryindexhandler', library.LibraryIndexHandler),
+    get_redirect_route(r'%s' % feconf.LIBRARY_INDEX_DATA_URL,
+                       library.LibraryIndexHandler),
+    get_redirect_route(r'%s' % feconf.LIBRARY_RECENTLY_PUBLISHED_URL,
+                       library.LibraryGroupPage),
+    get_redirect_route(r'%s' % feconf.LIBRARY_TOP_RATED_URL,
+                       library.LibraryGroupPage),
+    get_redirect_route(r'%s' % feconf.LIBRARY_GROUP_DATA_URL,
+                       library.LibraryGroupIndexHandler),
     get_redirect_route(r'%s' % feconf.LIBRARY_SEARCH_URL, library.LibraryPage),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_SEARCH_DATA_URL, library.SearchHandler),
@@ -206,6 +218,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         feconf.EXPLORATION_SUMMARIES_DATA_URL,
         library.ExplorationSummariesHandler),
+    get_redirect_route(
+        feconf.COLLECTION_SUMMARIES_DATA_URL,
+        library.CollectionSummariesHandler),
 
     get_redirect_route(r'/profile/<username>', profile.ProfilePage),
     get_redirect_route(
@@ -234,6 +249,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
         reader.ExplorationPage),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.EXPLORATION_URL_EMBED_PREFIX,
+        reader.ExplorationPageEmbed),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_INIT_URL_PREFIX,
         reader.ExplorationHandler),
@@ -353,11 +371,30 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<collection_id>' % feconf.COLLECTION_EDITOR_URL_PREFIX,
         collection_editor.CollectionEditorPage),
     get_redirect_route(
-        r'%s/<collection_id>' % feconf.COLLECTION_WRITABLE_DATA_URL_PREFIX,
-        collection_editor.WritableCollectionDataHandler),
+        r'%s/<collection_id>' % feconf.EDITABLE_COLLECTION_DATA_URL_PREFIX,
+        collection_editor.EditableCollectionDataHandler),
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_RIGHTS_PREFIX,
         collection_editor.CollectionRightsHandler),
+
+    get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
+    get_redirect_route(
+        r'/emaildashboarddatahandler',
+        email_dashboard.EmailDashboardDataHandler),
+    get_redirect_route(
+        r'/querystatuscheck', email_dashboard.QueryStatusCheck),
+    get_redirect_route(
+        r'/emaildashboardresult/<query_id>',
+        email_dashboard.EmailDashboardResultPage),
+    get_redirect_route(
+        r'/emaildashboardcancelresult/<query_id>',
+        email_dashboard.EmailDashboardCancelEmailHandler),
+    get_redirect_route(
+        r'/emaildashboardtestbulkemailhandler/<query_id>',
+        email_dashboard.EmailDashboardTestBulkEmailHandler),
+    get_redirect_route(
+        r'%s' % feconf.EXPLORATION_METADATA_SEARCH_URL,
+        collection_editor.ExplorationMetadataSearchHandler),
 
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),

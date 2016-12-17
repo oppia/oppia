@@ -145,7 +145,6 @@ describe('Library index page', function() {
     general.waitForSystem();
     library.playExploration(EXPLORATION_SILMARILS);
     player.expectExplorationNameToBe('silmarils');
-    player.submitAnswer('Continue');
 
     users.logout();
   });

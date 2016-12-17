@@ -10,12 +10,6 @@
 
 {% block header_js %}
   {{ super() }}
-
-  <style>
-    html, body {
-      background-color: #f2f2ee;
-    }
-  </style>
 {% endblock %}
 
 {% block navbar_breadcrumb %}
@@ -26,7 +20,7 @@
     <div class="oppia-splash-section-one text-center">
       <h1 class="oppia-splash-h1" style="max-width: 800px; font-size: 2.3em; line-height: 1.5em; padding-bottom: 0.5em;">Need new homework ideas?</h1>
 
-      <div style="position: relative; left: -webkit-calc(-70px + 15%); left: -moz-calc(-70px + 15%); left: -o-calc(-70px + 15%); left: calc(-70px + 15%);">
+      <div class="oppia-splash-button-heading">
         <h2 style="max-width: 400px; color: #005c53; font-size: 1.6em; font-family: Capriola; line-height: 1.5em;">
           Easily create interactive homework that you don't need to grade.
         </h2>
@@ -133,7 +127,7 @@
           </div>
         </div>
 
-        <div style="position: absolute; width: 100%;">
+        <div class="oppia-splash-button-container">
           {% if not user_is_logged_in %}
             <!-- User must complete the registration process. -->
             <button type="button"
@@ -172,7 +166,7 @@
             <img ng-src="<[getStaticImageUrl('/splash/bullet1icon.svg')]>" class="oppia-splash-overlapping-image-1">
           </div>
           <div class="oppia-splash-bullet-block oppia-splash-block-right-text"
-               translate="I18N_SPLASH_FIRST_EXPLORATION_DESCRIPTION_ALTERNATE">
+               translate="I18N_SPLASH_FIRST_EXPLORATION_DESCRIPTION">
           </div>
         </div>
 

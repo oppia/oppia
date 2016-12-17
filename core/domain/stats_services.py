@@ -28,45 +28,82 @@ from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
-# TODO(bhenning): Restore tests for this.
-def get_exps_unresolved_answers_count_for_default_rule(exp_ids):
-    """Gets answer counts per exploration for the answer groups for default
-    rule across all states for explorations with ids in exp_ids.
-    Note that this method currently returns the counts only for the DEFAULT
-    rule. This should ideally handle all types of unresolved answers.
-    Returns:
-        A dict, keyed by the string '{exp_id}', whose values are the number of
-        unresolved answers that exploration has. Any exp_ids for explorations
-        that don't exist or that have been deleted will be ignored, and not
-        included in the return value.
-    """
-    explorations = exp_services.get_multiple_explorations_by_id(
-        exp_ids, strict=False)
+# TODO(bhenning): Ensure this works with the new answer backend.
+def get_exps_unresolved_answers_for_default_rule(exp_ids):
+    """Gets unresolved answers per exploration for default rule across all
+    states for explorations with ids in exp_ids. The value of total count should
+    match the sum of values of indiviual counts for each unresolved answer.
 
-    # The variable `exploration_states_tuples` is a list of all
-    # (exp_id, state_name) tuples for the given exp_ids.
-    # E.g. - [
-    #   ('eid1', 'Introduction'),
-    #   ('eid1', 'End'),
-    #   ('eid2', 'Introduction'),
-    #   ('eid3', 'Introduction')
-    # ]
-    # when exp_ids = ['eid1', 'eid2', 'eid3'].
-    explorations_states_tuples = [
-        (exp_domain_object.id, state_key)
-        for exp_domain_object in explorations.values()
-        for state_key in exp_domain_object.states
-    ]
+    TODO(526avijitgupta): Note that this method currently returns the data only
+    for the DEFAULT rule. This should ideally handle all types of unresolved
+    answers.
+
+    Returns a dict of the following format:
+        {
+          'exp_id_1': {
+            'count': 7 (number of unresolved answers for this exploration),
+            'unresolved_answers': (list of unresolved answers sorted by count)
+              [
+                {'count': 4, 'value': 'answer_1', 'state': 'Introduction'},
+                {'count': 2, 'value': 'answer_2', 'state': 'Introduction'},
+                {'count': 1, 'value': 'answer_3', 'state': 'End'}
+              ]
+          },
+          'exp_id_2': {
+            'count': 13,
+            'unresolved_answers':
+              [
+                {'count': 8, 'value': 'answer_5', 'state': 'Introduction'},
+                {'count': 3, 'value': 'answer_4', 'state': 'Quest'},
+                {'count': 1, 'value': 'answer_6', 'state': 'End'}
+                {'count': 1, 'value': 'answer_8', 'state': 'End'}
+              ]
+          }
+        }
+    """
+    def _get_explorations_states_tuples_by_ids(exp_ids):
+        """Returns a list of all (exp_id, state_name) tuples for the given
+        exp_ids.
+        E.g. - [
+          ('eid1', 'Introduction'),
+          ('eid1', 'End'),
+          ('eid2', 'Introduction'),
+          ('eid3', 'Introduction')
+        ]
+        when exp_ids = ['eid1', 'eid2', 'eid3'].
+        """
+        explorations = (
+            exp_services.get_multiple_explorations_by_id(exp_ids, strict=False))
+        return [
+            (exploration.id, state_name)
+            for exploration in explorations.values()
+            for state_name in exploration.states
+        ]
+
+    explorations_states_tuples = _get_explorations_states_tuples_by_ids(exp_ids)
     exploration_states_answers_list = get_top_state_rule_answers_multi(
         explorations_states_tuples, [exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
     exps_answers_mapping = {}
 
     for ind, statewise_answers in enumerate(exploration_states_answers_list):
+        exp_id = explorations_states_tuples[ind][0]
+        if exp_id not in exps_answers_mapping:
+            exps_answers_mapping[exp_id] = {
+                'count': 0,
+                'unresolved_answers': []
+            }
         for answer in statewise_answers:
-            exp_id = explorations_states_tuples[ind][0]
-            if exp_id not in exps_answers_mapping:
-                exps_answers_mapping[exp_id] = 0
-            exps_answers_mapping[exp_id] += answer['frequency']
+            exps_answers_mapping[exp_id]['count'] += answer['count']
+            answer['state'] = explorations_states_tuples[ind][1]
+
+        exps_answers_mapping[exp_id]['unresolved_answers'].extend(
+            statewise_answers)
+
+    for exp_id in exps_answers_mapping:
+        exps_answers_mapping[exp_id]['unresolved_answers'] = (sorted(
+            exps_answers_mapping[exp_id]['unresolved_answers'],
+            key=lambda a: a['count'],
+            reverse=True))
 
     return exps_answers_mapping
 

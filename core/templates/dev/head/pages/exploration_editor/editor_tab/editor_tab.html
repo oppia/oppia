@@ -1,0 +1,15 @@
+<div class="row">
+  <div class="col-lg-8 col-md-8 col-sm-8">
+    {% include 'pages/exploration_editor/editor_tab/state_editor.html' %}
+  </div>
+  <div class="col-lg-4 col-md-4 col-sm-4">
+    <div class="oppia-editor-sidebar hidden-xs hidden-sm">
+      {% include 'pages/exploration_editor/editor_tab/exploration_graph.html' %}
+      <div ng-show="areGadgetsEnabled()">
+        {% include 'pages/exploration_editor/editor_tab/gadget_editor.html' %}
+      </div>
+    </div>
+  </div>
+
+  <attribution-guide></attribution-guide>
+</div>

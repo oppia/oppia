@@ -327,6 +327,202 @@ class AnswerStatsTests(test_utils.GenericTestBase):
             'params': []
         }])
 
+    def _create_and_update_fake_exploration(self, exp_id):
+        exp = exp_domain.Exploration.create_default_exploration(exp_id)
+        exp_services.save_new_exploration('fake@user.com', exp)
+        exp_services.update_exploration('fake@user.com', exp_id, [{
+            'cmd': 'edit_state_property',
+            'state_name': exp.init_state_name,
+            'property_name': 'widget_id',
+            'new_value': 'TextInput',
+        }, {
+            'cmd': 'add_state',
+            'state_name': self.STATE_2_NAME,
+        }, {
+            'cmd': 'edit_state_property',
+            'state_name': self.STATE_2_NAME,
+            'property_name': 'widget_id',
+            'new_value': 'TextInput',
+        }], 'Add new state')
+        return exp
+
+    def _get_default_dict_when_no_unresolved_answers(self, exp_ids):
+        result = {}
+        for exp_id in exp_ids:
+            result[exp_id] = {'count': 0, 'unresolved_answers': []}
+        return result
+
+    def test_get_top_unresolved_answers(self):
+        exp = exp_domain.Exploration.create_default_exploration(
+            'eid', 'title', 'category')
+        exp_services.save_new_exploration('user_id', exp)
+        state_name = exp.init_state_name
+
+        self.assertEquals(
+            stats_services.get_top_unresolved_answers_for_default_rule(
+                'eid', state_name), {})
+
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid', 1, state_name,
+            self.DEFAULT_RULESPEC_STR, 'session', self.DEFAULT_TIME_SPENT,
+            self.DEFAULT_PARAMS, 'a1')
+        self.assertEquals(
+            stats_services.get_top_unresolved_answers_for_default_rule(
+                'eid', state_name), {'a1': 1})
+
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid', 1, state_name,
+            self.DEFAULT_RULESPEC_STR, 'session', self.DEFAULT_TIME_SPENT,
+            self.DEFAULT_PARAMS, 'a1')
+        self.assertEquals(
+            stats_services.get_top_unresolved_answers_for_default_rule(
+                'eid', state_name), {'a1': 2})
+
+        event_services.DefaultRuleAnswerResolutionEventHandler.record(
+            'eid', state_name, ['a1'])
+        self.assertEquals(
+            stats_services.get_top_unresolved_answers_for_default_rule(
+                'eid', state_name), {})
+
+    def test_unresolved_answers_for_single_exploration(self):
+        exp_1 = self._create_and_update_fake_exploration('eid1')
+        self.assertEquals(
+            stats_services.get_exps_unresolved_answers_for_default_rule(
+                ['eid1']), self._get_default_dict_when_no_unresolved_answers(
+                    ['eid1']))
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid1', 1, exp_1.init_state_name, self.DEFAULT_RULESPEC_STR, 'a1')
+        self.assertEquals(
+            stats_services.get_exps_unresolved_answers_for_default_rule(
+                ['eid1']), {
+                    'eid1': {'count': 1, 'unresolved_answers': [
+                        {'count': 1, 'value': 'a1',
+                         'state': exp_1.init_state_name}
+                    ]}
+                })
+
+    def test_unresolved_answers_for_multiple_explorations(self):
+        exp_1 = self._create_and_update_fake_exploration('eid1')
+        exp_2 = self._create_and_update_fake_exploration('eid2')
+        exp_3 = self._create_and_update_fake_exploration('eid3')
+        self.assertEquals(
+            stats_services.get_exps_unresolved_answers_for_default_rule(
+                ['eid1', 'eid2', 'eid3']),
+            self._get_default_dict_when_no_unresolved_answers(
+                ['eid1', 'eid2', 'eid3']))
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid1', 1, exp_1.init_state_name, self.DEFAULT_RULESPEC_STR, 'a1')
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid2', 1, exp_2.init_state_name, self.DEFAULT_RULESPEC_STR, 'a3')
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid2', 1, exp_2.init_state_name, self.DEFAULT_RULESPEC_STR, 'a2')
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid3', 1, exp_3.init_state_name, self.DEFAULT_RULESPEC_STR, 'a2')
+        self.assertEquals(
+            stats_services.get_exps_unresolved_answers_for_default_rule(
+                ['eid1', 'eid2', 'eid3']), {
+                    'eid1': {'count': 1, 'unresolved_answers': [
+                        {'count': 1, 'value': 'a1',
+                         'state': exp_1.init_state_name}
+                    ]},
+                    'eid2': {'count': 2, 'unresolved_answers': [
+                        {'count': 1, 'value': 'a3',
+                         'state': exp_2.init_state_name},
+                        {'count': 1, 'value': 'a2',
+                         'state': exp_2.init_state_name}
+                    ]},
+                    'eid3': {'count': 1, 'unresolved_answers': [
+                        {'count': 1, 'value': 'a2',
+                         'state': exp_3.init_state_name}
+                    ]}
+                })
+
+    def test_unresolved_answers_count_when_answers_marked_as_resolved(self):
+        exp_1 = self._create_and_update_fake_exploration('eid1')
+        self.assertEquals(
+            stats_services.get_exps_unresolved_answers_for_default_rule(
+                ['eid1']),
+            self._get_default_dict_when_no_unresolved_answers(['eid1']))
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid1', 1, exp_1.init_state_name, self.DEFAULT_RULESPEC_STR, 'a1')
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid1', 1, exp_1.init_state_name, self.DEFAULT_RULESPEC_STR, 'a2')
+        self.assertEquals(
+            stats_services.get_exps_unresolved_answers_for_default_rule(
+                ['eid1']), {
+                    'eid1': {'count': 2, 'unresolved_answers': [
+                        {'count': 1, 'value': 'a1',
+                         'state': exp_1.init_state_name},
+                        {'count': 1, 'value': 'a2',
+                         'state': exp_1.init_state_name}
+                    ]}
+                })
+
+        event_services.DefaultRuleAnswerResolutionEventHandler.record(
+            'eid1', exp_1.init_state_name, ['a1'])
+        self.assertEquals(
+            stats_services.get_exps_unresolved_answers_for_default_rule(
+                ['eid1']), {
+                    'eid1': {'count': 1, 'unresolved_answers': [
+                        {'count': 1, 'value': 'a2',
+                         'state': exp_1.init_state_name}
+                    ]}
+                })
+
+        exp_2 = self._create_and_update_fake_exploration('eid2')
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid2', 1, exp_2.init_state_name, self.DEFAULT_RULESPEC_STR, 'a1')
+        event_services.DefaultRuleAnswerResolutionEventHandler.record(
+            'eid1', exp_1.init_state_name, ['a2'])
+        event_services.DefaultRuleAnswerResolutionEventHandler.record(
+            'eid2', exp_1.init_state_name, ['a1'])
+        self.assertEquals(
+            stats_services.get_exps_unresolved_answers_for_default_rule(
+                ['eid1', 'eid2']),
+            self._get_default_dict_when_no_unresolved_answers(
+                ['eid1', 'eid2']))
+
+    def test_unresolved_answers_count_for_multiple_states(self):
+        exp_1 = self._create_and_update_fake_exploration('eid1')
+        self.assertEquals(
+            stats_services.get_exps_unresolved_answers_for_default_rule(
+                ['eid1']), self._get_default_dict_when_no_unresolved_answers(
+                    ['eid1']))
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid1', 1, exp_1.init_state_name, self.DEFAULT_RULESPEC_STR, 'a1')
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid1', 1, self.STATE_2_NAME, self.DEFAULT_RULESPEC_STR, 'a1')
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid1', 1, self.STATE_2_NAME, self.DEFAULT_RULESPEC_STR, 'a2')
+        self.assertEquals(
+            stats_services.get_exps_unresolved_answers_for_default_rule(
+                ['eid1']), {
+                    'eid1': {'count': 3, 'unresolved_answers': [
+                        {'count': 1, 'value': 'a1',
+                         'state': exp_1.init_state_name},
+                        {'count': 1, 'value': 'a1',
+                         'state': self.STATE_2_NAME},
+                        {'count': 1, 'value': 'a2',
+                         'state': self.STATE_2_NAME}
+                    ]}
+                })
+
+    def test_unresolved_answers_count_for_non_default_rules(self):
+        exp_1 = self._create_and_update_fake_exploration('eid1')
+        self.assertEquals(
+            stats_services.get_exps_unresolved_answers_for_default_rule(
+                ['eid1']), self._get_default_dict_when_no_unresolved_answers(
+                    ['eid1']))
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid1', 1, exp_1.init_state_name, self.CLASSIFIER_RULESPEC_STR, 'a1'
+        )
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid1', 1, self.STATE_2_NAME, self.CLASSIFIER_RULESPEC_STR, 'a1')
+        self.assertEquals(
+            stats_services.get_exps_unresolved_answers_for_default_rule(
+                ['eid1']), self._get_default_dict_when_no_unresolved_answers(
+                    ['eid1']))
+
 
 class ExplorationStatsTests(test_utils.GenericTestBase):
     """Tests for stats functions related to explorations."""

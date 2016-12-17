@@ -16,8 +16,6 @@
 
 """Domain object for statistics models."""
 
-import copy
-import operator
 import sys
 import utils
 

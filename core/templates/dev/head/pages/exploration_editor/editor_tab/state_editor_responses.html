@@ -1,0 +1,244 @@
+<div ng-controller="StateResponses">
+  <div class="oppia-editor-header">
+    <strong>Learner's Answers and Oppia's Responses</strong>
+  </div>
+
+  <md-card class="oppia-editor-card-with-avatar">
+    <div class="oppia-editor-card-body">
+      <div ng-if="answerGroups.length > 0">
+        <ul class="nav nav-stacked nav-pills" role="tablist" ui-sortable="ANSWER_GROUP_LIST_SORTABLE_OPTIONS" ng-model="answerGroups">
+          <!-- An HTML element marked ui-sortable should contain only one element,
+          and this element should have an ng-repeat defined on it. See the
+          ui-sortable documentation for more details. -->
+          <!-- Note that adding "track by $index" here seems to mess up the final
+          index in the stop() event handler. -->
+          <li ng-repeat="answerGroup in answerGroups" ng-class="{'active': activeAnswerGroupIndex === $index}" class="oppia-rule-block oppia-sortable-rule-block oppia-prevent-selection" style="margin-top: 0;">
+            <span class="oppia-rule-sort-handle" ng-if="answerGroups.length > 1" ng-mousedown="changeActiveAnswerGroupIndex(-1)">
+              <img ng-if="editabilityService.isEditable()" ng-src="<[dragDotsImgUrl]>" width="10">
+            </span>
+            <div class="oppia-rule-header-warning-placement" ng-if="isSelfLoopWithNoFeedback(answerGroup.outcome)" ng-click="changeActiveAnswerGroupIndex($index)"
+                 tooltip="<[getOutcomeTooltip(answerGroup.outcome)]>" tooltip-placement="bottom">
+              <div class="oppia-rule-header-warning-style" >
+                ⚠
+              </div>
+            </div>
+            <a ng-click="changeActiveAnswerGroupIndex($index)" class="oppia-rule-tab protractor-test-response-tab" ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex === $index}">
+              <response-header index="$index"
+                               summary="answerGroup | summarizeAnswerGroup : getCurrentInteractionId():getAnswerChoices():false"
+                               short-summary="answerGroup | summarizeAnswerGroup : getCurrentInteractionId():getAnswerChoices():true"
+                               is-active="$index === activeAnswerGroupIndex"
+                               on-delete-fn="deleteAnswerGroup"
+                               outcome="answerGroup.outcome"
+                               num-rules="answerGroup.rule_specs.length">
+              </response-header>
+            </a>
+
+            <div ng-if="activeAnswerGroupIndex === $index">
+              <div class="oppia-editor-card-section">
+                <div class="oppia-rule-body-container protractor-test-response-body-<[$index]>">
+                  <answer-group-editor rules="answerGroup.rule_specs"
+                                       outcome="answerGroup.outcome"
+                                       on-save-answer-group-feedback="saveActiveAnswerGroupFeedback"
+                                       on-save-answer-group-dest="saveActiveAnswerGroupDest"
+                                       on-save-answer-group-rules="saveActiveAnswerGroupRules"
+                                       is-editable="editabilityService.isEditable()"
+                                       display-feedback="!isLinearWithNoFeedback(answerGroup.outcome)"
+                                       class="protractor-test-response-body">
+                  </answer-group-editor>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <ul class="nav nav-stacked nav-pills" role="tablist">
+          <li ng-class="{'active': activeAnswerGroupIndex === answerGroups.length}" class="oppia-rule-block">
+            <div class="oppia-rule-header-warning-placement" ng-if="isSelfLoopWithNoFeedback(defaultOutcome) && !suppressDefaultAnswerGroupWarnings()" ng-click="changeActiveAnswerGroupIndex(answerGroups.length)"
+                 tooltip="<[getOutcomeTooltip(defaultOutcome)]>" tooltip-placement="bottom">
+              <div class="oppia-rule-header-warning-style" >
+                ⚠
+              </div>
+            </div>
+            <a ng-click="changeActiveAnswerGroupIndex(answerGroups.length)" class="oppia-rule-tab oppia-default-rule-tab protractor-test-default-response-tab" ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex == answerGroups.length}">
+              <response-header index="$index"
+                               is-active="$index === activeAnswerGroupIndex"
+                               summary="defaultOutcome|summarizeDefaultOutcome:getCurrentInteractionId():answerGroups.length:false"
+                               short-summary="defaultOutcome|summarizeDefaultOutcome:getCurrentInteractionId():answerGroups.length:true"
+                               outcome="defaultOutcome">
+              </response-header>
+            </a>
+
+            <div ng-if="activeAnswerGroupIndex === answerGroups.length">
+              <div class="oppia-editor-card-section">
+                <div class="oppia-rule-body-container protractor-test-response-body-default">
+                  <answer-group-editor rules="null"
+                                       outcome="defaultOutcome"
+                                       on-save-answer-group-feedback="saveDefaultOutcomeFeedback"
+                                       on-save-answer-group-dest="saveDefaultOutcomeDest"
+                                       is-editable="editabilityService.isEditable()"
+                                       suppress-warnings="suppressDefaultAnswerGroupWarnings()"
+                                       display-feedback="!isLinearWithNoFeedback(defaultOutcome)"
+                                       class="protractor-test-response-body">
+                  </answer-group-editor>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </md-card>
+
+{% if SHOW_TRAINABLE_UNRESOLVED_ANSWERS %}
+  <md-card style="margin: 20px 0px; padding: 0px;" ng-if="isCurrentInteractionTrainable()">
+    <div ng-if="editabilityService.isEditableOutsideTutorialMode() && !isCurrentInteractionLinear()">
+      <button type="button" class="btn btn-default btn-lg oppia-add-response-button protractor-test-open-teach-modal" ng-click="openTeachOppiaModal()">
+        + Teach Oppia
+      </button>
+    </div>
+  </md-card>
+  <md-card style="margin: 20px 0px; padding: 0px;" ng-if="!isCurrentInteractionTrainable()">
+{% else %}
+  <md-card style="margin: 0px; padding: 0px;">
+{% endif %}
+    <div ng-if="editabilityService.isEditableOutsideTutorialMode() && !isCurrentInteractionLinear()">
+      <button type="button" class="btn btn-default btn-lg oppia-add-response-button protractor-test-open-add-response-modal" ng-click="openAddAnswerGroupModal()">
+        + Add New Oppia Response
+      </button>
+    </div>
+  </md-card>
+</div>
+
+{% if SHOW_TRAINABLE_UNRESOLVED_ANSWERS %}
+  <script type="text/ng-template" id="modals/teachOppia">
+    <div class="modal-header">
+      <h3>Enter a Sample Answer</h3>
+    </div>
+
+    <div class="modal-body">
+      <div class="oppia-rule-details-header">
+        <test-interaction-panel state-content="stateContent" input-template="inputTemplate" on-submit-answer="submitAnswer(answer)">
+        </test-interaction-panel>
+
+        <div ng-if="trainingDataAnswer" style="padding-top: 10px; border-top: 1px solid #e5e5e5;">
+          <form name="testOppiaForm" class="form-inline">
+            <training-panel ng-if="classification.answerGroupIndex >= 0" answer="trainingDataAnswer" answer-feedback="trainingDataFeedback" answer-outcome-dest="trainingDataOutcomeDest" classification="classification" on-finish-training="finishTeaching(true)">
+            </training-panel>
+          </form>
+          <div ng-if="classification.answerGroupIndex === -1">
+            <div>
+              <span><strong>If Oppia encounters the answer:</strong></span>
+            </div>
+
+            <div>
+              <div angular-html-bind="answerTemplate">
+              </div>
+            </div>
+
+            <br>
+
+            <div>
+              <span><strong>it will reply with:</strong></span>
+            </div>
+
+            <div>
+              <div angular-html-bind="trainingDataFeedback">
+              </div>
+            </div>
+
+            <br>
+
+            <div>
+              <span><strong>and then direct the learner to: </strong></span>
+              <span angular-html-bind="trainingDataOutcomeDest"></span>
+            </div>
+
+            <br>
+
+            <div>
+              <span><strong>This is due to a specific rule and therefore cannot be trained. If you do not think this is right, you should change the rule directly referring to this answer.</strong></span>
+            </div>
+          </div>
+        </div>
+      <div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-default" ng-click="finishTeaching(false)">Exit</button>
+    </div>
+  </script>
+{% endif %}
+
+<script type="text/ng-template" id="modals/addAnswerGroup">
+  <div class="modal-header protractor-test-add-response-modal-header">
+    <h3>Add Response</h3>
+  </div>
+
+  <div class="modal-body">
+    <form name="addAnswerGroupForm.outcomeDetailsForm" class="form-inline protractor-test-add-response-details">
+      <div class="oppia-rule-details-header">
+        <strong>If the learner's answer...</strong>
+      </div>
+
+      <rule-editor rule="tmpRule" is-editable="editabilityService.isEditable()" is-editing-rule-inline="false">
+      </rule-editor>
+
+      <br>
+
+      <div ng-if="!feedbackEditorIsOpen && !isLinearWithNoFeedback(tmpOutcome)"
+           title="Edit feedback"
+           style="height: 100%; margin-right: 22px;">
+        <div class="oppia-rule-details-header oppia-editable-section">
+          <div class="oppia-rule-preview oppia-transition-200">
+            <div class="oppia-click-to-start-editing protractor-test-open-feedback-editor" ng-click="openFeedbackEditor()">
+              <i class="material-icons oppia-editor-edit-icon pull-right" title="Edit Feedback">&#xE254;</i>
+            </div>
+            <strong>Oppia tells the learner...</strong>
+            <div style="position: relative;">
+              <span style="color: #888">
+                <em>Nothing</em>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div ng-if="feedbackEditorIsOpen">
+        <outcome-feedback-editor outcome="tmpOutcome">
+        </outcome-feedback-editor>
+      </div>
+      <br>
+
+      <outcome-destination-editor outcome="tmpOutcome" outcome-has-feedback="!isLinearWithNoFeedback(tmpOutcome)">
+      </outcome-destination-editor>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default protractor-test-close-add-response-modal" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-success protractor-test-add-new-response" ng-click="saveResponse(false)" ng-disabled="addAnswerGroupForm.outcomeDetailsForm.$invalid || isSelfLoopWithNoFeedback(tmpOutcome)">Save Response</button>
+    <button class="btn btn-success" ng-click="saveResponse(true)" ng-disabled="addAnswerGroupForm.outcomeDetailsForm.$invalid || isSelfLoopWithNoFeedback(tmpOutcome)">Save and Add Another</button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="modals/deleteAnswerGroup">
+  <div class="modal-header">
+    <h3>Delete Response</h3>
+  </div>
+
+  <div class="modal-body">
+    <p>
+      Are you sure you want to delete this response?
+    </p>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-danger protractor-test-confirm-delete-response"
+            ng-click="reallyDelete()">
+      Delete Response
+    </button>
+  </div>
+</script>

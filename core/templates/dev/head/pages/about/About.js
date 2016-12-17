@@ -18,8 +18,8 @@
 
 oppia.controller('About', [
   '$scope', 'UrlInterpolationService',
-  function(
-      $scope, UrlInterpolationService) {
+  function($scope, UrlInterpolationService) {
+    $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     $scope.aboutPageMascotImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/general/about_page_mascot.png');
   }

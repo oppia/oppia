@@ -120,7 +120,7 @@ oppia.factory('oppiaPlayerService', [
           exploration.initStateName, newParams);
       }
 
-      $rootScope.$broadcast('playerStateChange');
+      $rootScope.$broadcast('playerStateChange', initialState.name);
       successCallback(exploration, questionHtml, newParams);
     };
 
@@ -143,6 +143,15 @@ oppia.factory('oppiaPlayerService', [
 
       LearnerParamsService.init(startingParams);
     };
+
+    // Ensure the transition to a terminal state properly logs the end of the
+    // exploration.
+    $rootScope.$on('playerStateChange', function(evt, newStateName) {
+      if (!_editorPreviewMode && exploration.isStateTerminal(newStateName)) {
+        StatsReportingService.recordExplorationCompleted(
+          newStateName, LearnerParamsService.getAllParams());
+      }
+    });
 
     return {
       // This should only be used in editor preview mode. It sets the
@@ -272,7 +281,11 @@ oppia.factory('oppiaPlayerService', [
               classificationResult.classificationCategorization);
           }
 
-          var outcome = classificationResult.outcome;
+          // Use angular.copy() to clone the object
+          // since classificationResult.outcome points
+          // at oldState.interaction.default_outcome
+          var outcome = angular.copy(classificationResult.outcome);
+
           // If this is a return to the same state, and the resubmission trigger
           // kicks in, replace the dest, feedback and param changes with that
           // of the trigger.
@@ -335,15 +348,10 @@ oppia.factory('oppiaPlayerService', [
             StatsReportingService.recordStateTransition(
               oldStateName, newStateName, answer,
               LearnerParamsService.getAllParams());
-
-            if (exploration.isStateTerminal(newStateName)) {
-              StatsReportingService.recordExplorationCompleted(
-                newStateName, LearnerParamsService.getAllParams());
-            }
           }
 
           $rootScope.$broadcast('updateActiveStateIfInEditor', newStateName);
-          $rootScope.$broadcast('playerStateChange');
+          $rootScope.$broadcast('playerStateChange', newStateName);
           successCallback(
             newStateName, refreshInteraction, feedbackHtml, questionHtml,
             newParams);

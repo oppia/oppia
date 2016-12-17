@@ -130,6 +130,7 @@ class BaseJobManager(object):
 
         model.status_code = STATUS_CODE_QUEUED
         model.time_queued_msec = utils.get_current_time_in_millisecs()
+        model.additional_job_params = additional_job_params
         model.put()
 
         cls._post_enqueue_hook(job_id)

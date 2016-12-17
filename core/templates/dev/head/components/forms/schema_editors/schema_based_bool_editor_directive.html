@@ -1,0 +1,22 @@
+<script type="text/ng-template" id="schemaBasedEditor/bool">
+  <div class="input-group">
+    <span ng-if="!expressionMode">
+      <input type="checkbox" ng-model="$parent.localValue" ng-disabled="isDisabled()"
+             focus-on="<[labelForFocusTarget()]>">
+    </span>
+
+    <span ng-if="allowExpressions()">
+      <schema-based-expression-editor ng-if="expressionMode" is-disabled="isDisabled()"
+                                      local-value="$parent.$parent.localValue"
+                                      param-names="paramNames" output-type="bool"
+                                      label-for-focus-target="labelForFocusTarget()">
+      </schema-based-expression-editor>
+      <span class="input-group-btn">
+        <button type="button" class="btn btn-default" ng-click="toggleExpressionMode()" ng-disabled="isDisabled()">
+          <span ng-if="!expressionMode">E</span>
+          <span ng-if="expressionMode"><del>E</del></span>
+        </button>
+      </span>
+    </span>
+  </div>
+</script>

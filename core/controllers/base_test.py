@@ -73,7 +73,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
             response = self.testapp.get(url, expect_errors=True)
             self.log_line(
                 'Fetched %s with status code %s' % (url, response.status_int))
-            self.assertIn(response.status_int, [200, 302, 404])
+            self.assertIn(response.status_int, [200, 302, 401, 404])
 
         # TODO(sll): Add similar tests for POST, PUT, DELETE.
         # TODO(sll): Set a self.payload attr in the BaseHandler for
@@ -179,15 +179,6 @@ class EscapingTest(test_utils.GenericTestBase):
         # Update a config property that shows in all pages.
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.testapp.get('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json('/adminhandler', {
-            'action': 'save_config_properties',
-            'new_config_property_values': {
-                base.SITE_FEEDBACK_FORM_URL.name: (
-                    '<[angular_tag]> x{{51 * 3}}y'),
-            }
-        }, csrf_token)
 
         # Modify the testapp to use the fake handler.
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -196,14 +187,16 @@ class EscapingTest(test_utils.GenericTestBase):
         ))
 
     def test_jinja_autoescaping(self):
-        response = self.testapp.get('/fake')
-        self.assertEqual(response.status_int, 200)
+        form_url = '<[angular_tag]> x{{51 * 3}}y'
+        with self.swap(feconf, 'SITE_FEEDBACK_FORM_URL', form_url):
+            response = self.testapp.get('/fake')
+            self.assertEqual(response.status_int, 200)
 
-        self.assertIn('&lt;[angular_tag]&gt;', response.body)
-        self.assertNotIn('<[angular_tag]>', response.body)
+            self.assertIn('&lt;[angular_tag]&gt;', response.body)
+            self.assertNotIn('<[angular_tag]>', response.body)
 
-        self.assertIn('x{{51 * 3}}y', response.body)
-        self.assertNotIn('x153y', response.body)
+            self.assertIn('x{{51 * 3}}y', response.body)
+            self.assertNotIn('x153y', response.body)
 
     def test_special_char_escaping(self):
         response = self.testapp.post('/fake', {})

@@ -81,6 +81,18 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
 
     @classmethod
     def _handle_incoming_event(cls, active_realtime_layer, event_type, *args):
+        """Records incoming events in the given realtime layer.
+
+        Args:
+            active_realtime_layer: int. Currently active realtime datastore
+                layer.
+            event_type: str. The event triggered by a student. For example, when
+                a student starts an exploration, event of type `start` is
+                triggered. If he/she completes an exploration, event of type
+                `complete` is triggered.
+            *args: Variable length argument list. The first element of *args
+                corresponds to the id of the exploration currently being played.
+        """
         exp_id = args[0]
 
         def _increment_visit_counter():
@@ -121,25 +133,32 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
     # Public query method.
     @classmethod
     def get_statistics(cls, exploration_id, exploration_version):
-        """
-        Args:
-          - exploration_id: id of the exploration to get statistics for
-          - exploration_version: str. Which version of the exploration to get
-              statistics for; this can be a version number, the string 'all',
-              or the string 'none'.
+        """Gets the statistics for the specified exploration and version.
 
-        Returns a dict with the following keys:
-        - 'start_exploration_count': # of times exploration was started
-        - 'complete_exploration_count': # of times exploration was completed
-        - 'state_hit_counts': a dict containing the hit counts for the states
-           in the exploration. It is formatted as follows:
-            {
-                state_name: {
-                    'first_entry_count': # of sessions which hit this state
-                    'total_entry_count': # of total hits for this state
-                    'no_answer_count': # of hits with no answer for this state
-                }
-            }
+        Args:
+            exploration_id: str. The id of the exploration to get statistics
+                for.
+            exploration_version: str. Which version of the exploration to
+                get statistics for. This can be a version number, the string
+                'all', or the string 'none'.
+
+        Returns:
+            dict. The keys of the dict are:
+                'start_exploration_count': # of times exploration was started.
+                'complete_exploration_count': # of times exploration was
+                    completed.
+                'state_hit_counts': a dict containing the hit counts for the
+                    states in the exploration. It is formatted as follows:
+                    {
+                        state_name: {
+                            'first_entry_count': # of sessions which hit
+                                this state.
+                            'total_entry_count': # of total hits for this
+                                state.
+                            'no_answer_count': # of hits with no answer for
+                                this state.
+                        }
+                    }
         """
         num_starts = 0
         num_completions = 0
@@ -171,9 +190,15 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
 
     @classmethod
     def get_views_multi(cls, exploration_ids):
-        """Given a list of exploration ids, returns a list of view counts
-        for the explorations therein. If any of the exploration_ids are
-        None, the corresponding return value is 0.
+        """Generates the view counts for the given exploration IDs.
+
+        Args:
+            exploration_ids: list(str). The list of exploration IDs to get view
+                counts for.
+
+        Returns:
+            list(int). The number of times each exploration in exploration_ids
+                has been viewed.
         """
         entity_ids = [stats_models.ExplorationAnnotationsModel.get_entity_id(
             exploration_id, VERSION_ALL) for exploration_id in exploration_ids]
@@ -219,6 +244,52 @@ class StatisticsMRJobManager(
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+
+        Args:
+            item: StartExplorationEventLogEntryModel or
+                MaybeLeaveExplorationEventLogEntryModel or
+                CompleteExplorationEventLogEntryModel or
+                StateHitEventLogEntryModel or StateCounterModel. If item is of
+                type StateCounterModel the information yielded corresponds to
+                the various counts related to the exploration. If it is of any
+                LogEntryModel type the information yielded corresponds to the
+                type of the event and other details related to the exploration.
+
+        Yields:
+            tuple. 2-tuple in the form ('exploration_id:version', value).
+                `exploration_id` corresponds to the id of the exploration.
+                `version` corresponds to the version of the exploration.
+                `value`: If item is of type StateCounterModel, the value
+                    yielded is:
+                    {
+                        'type': 'counter',
+                        'exploration_id': The ID of the exploration,
+                        'version': Version of the exploration,
+                        'state_name': Name of current state,
+                        'first_entry_count': Number of times the state was
+                            entered for the first time in a reader session,
+                        'subsequent_entries_count': Number of times the state
+                            was entered for the second time or later in a reader
+                            session,
+                        'resolved_answer_count': Number of times an answer
+                            submitted for this state was subsequently resolved
+                            by an exploration editor and removed from the answer
+                            logs,
+                        'active_answer_count': Number of times an answer was
+                            entered for this state and was not subsequently
+                            resolved by an exploration admin}
+                    If item is of LogEntryModel type, value yielded is:
+                    {
+                        'type': 'event',
+                        'event_type': Type of event triggered,
+                        'session_id': ID of current student's session,
+                        'state_name': Name of current state,
+                        'created_on': How many milliseconds ago the exploration
+                            was created,
+                        'exploration_id': The ID of the exploration,
+                        'version': Version of exploration}
+        """
         if StatisticsMRJobManager._entity_created_before_job_queued(item):
             if isinstance(item, stats_models.StateCounterModel):
                 first_dot_index = item.id.find('.')
@@ -257,6 +328,45 @@ class StatisticsMRJobManager(
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Updates statistics for the given (exploration, version) and list of
+        events and creates batch model(ExplorationAnnotationsModel) for storing
+        this output.
+
+        Args:
+            key: str. The exploration id and version of the exploration in the
+                form 'exploration_id.version'.
+            stringified_values: list(str). A list of stringified values
+                associated with the given key. It includes information depending
+                on the type of event. If type of event is 'event',
+                an element of stringified_values would be:
+                '{
+                    'type': 'event',
+                    'event_type': Type of event triggered,
+                    'session_id': ID of current student's session,
+                    'state_name': Name of current state,
+                    'created_on': How many milliseconds ago the exploration was
+                        created,
+                    'exploration_id': The ID of the exploration,
+                    'version': Version of exploration}'
+                If type is 'counter', then an element of stringified_values
+                would be of the form:
+                '{
+                    'type': 'counter',
+                    'exploration_id': The ID of the exploration,
+                    'version': Version of the exploration,
+                    'state_name': Name of current state,
+                    'first_entry_count': Number of times the state was entered
+                        for the first time in a reader session,
+                    'subsequent_entries_count': Number of times the state was
+                        entered for the second time or later in a reader
+                        session,
+                    'resolved_answer_count': Number of times an answer
+                        submitted for this state was subsequently resolved by
+                        an exploration admin and removed from the answer logs,
+                    'active_answer_count': Number of times an answer was entered
+                        for this state and was not subsequently resolved by an
+                        exploration admin}'
+        """
         exploration = None
         exp_id, version = key.split(':')
         try:

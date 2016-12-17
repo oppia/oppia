@@ -10,12 +10,6 @@
 
 {% block header_js %}
   {{ super() }}
-
-  <style>
-    html, body {
-      background-color: #f2f2ee;
-    }
-  </style>
 {% endblock %}
 
 {% block navbar_breadcrumb %}
@@ -25,7 +19,7 @@
   <div ng-controller="Splash">
     <div class="oppia-splash-section-one text-center">
       <h1 class="oppia-splash-h1" translate="I18N_SPLASH_TITLE"></h1>
-      <div style="position: relative;">
+      <div style="position: relative; margin-left: auto; margin-right: auto; max-width: 2000px;">
         <div style="padding-left: 200px;">
           <div class="oppia-splash-background-icon-row">
             <img ng-src="<[getStaticImageUrl('/splash/books.svg')]>" class="oppia-splash-books" style="margin-left: -250px; width: 500px; top: 95px;">
@@ -126,7 +120,7 @@
           </div>
         </div>
 
-        <div style="position: absolute; width: 100%;">
+        <div class="oppia-splash-button-container">
           {% if not user_is_logged_in %}
             <!-- User must complete the registration process. -->
             <button type="button"
@@ -153,18 +147,18 @@
       </div>
 
       <div class="oppia-splash-h2-container">
-        <h2 class="oppia-splash-h2" translate="I18N_SPLASH_SUBTITLE_ALTERNATE" style="padding-bottom: 30px; font-size: 1.6em; padding-top: 100px; max-width: 700px;"></h2>
+        <h2 class="oppia-splash-h2" translate="I18N_SPLASH_SUBTITLE" style="padding-bottom: 30px; font-size: 1.6em; padding-top: 100px; max-width: 700px;"></h2>
       </div>
     </div>
 
     <div class="oppia-splash-section-two">
       <div class="oppia-splash-section-two-content" style="padding-top: 0;">
-        <div class="oppia-splash-bullet" style="overflow: visible;">
+        <div class="oppia-splash-bullet" style="clear: both; overflow: visible;">
           <div class="oppia-splash-bullet-block oppia-splash-block-left-image">
             <img ng-src="<[getStaticImageUrl('/splash/bullet1icon.svg')]>" class="oppia-splash-overlapping-image-1">
           </div>
           <div class="oppia-splash-bullet-block oppia-splash-block-right-text"
-               translate="I18N_SPLASH_FIRST_EXPLORATION_DESCRIPTION_ALTERNATE">
+               translate="I18N_SPLASH_FIRST_EXPLORATION_DESCRIPTION">
           </div>
         </div>
 

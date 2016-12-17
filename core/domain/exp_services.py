@@ -371,20 +371,20 @@ def get_non_private_exploration_summaries():
         exp_models.ExpSummaryModel.get_non_private())
 
 
-def get_top_rated_exploration_summaries():
+def get_top_rated_exploration_summaries(limit):
     """Returns a dict with top rated exploration summary domain objects,
     keyed by their id.
     """
     return _get_exploration_summaries_from_models(
-        exp_models.ExpSummaryModel.get_top_rated())
+        exp_models.ExpSummaryModel.get_top_rated(limit))
 
 
-def get_recently_published_exploration_summaries():
+def get_recently_published_exp_summaries(limit):
     """Returns a dict with all featured exploration summary domain objects,
     keyed by their id.
     """
     return _get_exploration_summaries_from_models(
-        exp_models.ExpSummaryModel.get_recently_published())
+        exp_models.ExpSummaryModel.get_recently_published(limit))
 
 
 def get_all_exploration_summaries():
@@ -670,6 +670,7 @@ def save_new_exploration(committer_id, exploration):
     }])
     user_services.add_created_exploration_id(committer_id, exploration.id)
     user_services.add_edited_exploration_id(committer_id, exploration.id)
+    user_services.record_user_created_an_exploration(committer_id)
 
 
 def delete_exploration(committer_id, exploration_id, force_deletion=False):
@@ -817,6 +818,7 @@ def update_exploration(
     # Update summary of changed exploration.
     update_exploration_summary(exploration.id, committer_id)
     user_services.add_edited_exploration_id(committer_id, exploration.id)
+    user_services.record_user_edited_an_exploration(committer_id)
 
     if not rights_manager.is_exploration_private(exploration.id):
         user_services.update_first_contribution_msec_if_not_set(

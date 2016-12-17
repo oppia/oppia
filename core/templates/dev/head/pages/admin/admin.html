@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="oppia">
+<html ng-app="oppia" ng-controller="Admin">
   <head>
     <title>Oppia Admin Panel</title>
 
@@ -8,376 +8,114 @@
     <script>
       var GLOBALS = {
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
+        USERNAME: JSON.parse('{{username|js_string}}'),
+        USER_EMAIL: JSON.parse('{{user_email|js_string}}'),
+        PROFILE_PICTURE_DATA_URL: JSON.parse('{{profile_picture_data_url|js_string}}'),
+        IS_MODERATOR: JSON.parse('{{is_moderator|js_string}}'),
+        IS_SUPER_ADMIN: JSON.parse('{{is_super_admin|js_string}}'),
+        LOGOUT_URL: JSON.parse('{{logout_url|js_string}}'),
         ASSET_DIR_PREFIX: JSON.parse('{{ASSET_DIR_PREFIX|js_string}}'),
-        DEMO_EXPLORATION_IDS: JSON.parse('{{demo_exploration_ids|js_string}}')
+        DEMO_EXPLORATIONS: JSON.parse('{{demo_explorations|js_string}}'),
+        DEMO_EXPLORATION_IDS: JSON.parse('{{demo_exploration_ids|js_string}}'),
+        DEMO_COLLECTIONS: JSON.parse('{{demo_collections|js_string}}'),
+        HUMAN_READABLE_CURRENT_TIME: JSON.parse(
+          '{{human_readable_current_time|js_string}}'),
+        CONTINUOUS_COMPUTATIONS_DATA: JSON.parse(
+          '{{continuous_computations_data|js_string}}'),
+        ONE_OFF_JOB_SPECS: JSON.parse('{{one_off_job_specs|js_string}}'),
+        UNFINISHED_JOB_DATA: JSON.parse('{{unfinished_job_data|js_string}}'),
+        RECENT_JOB_DATA: JSON.parse('{{recent_job_data|js_string}}'),
+        DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}')
       }
     </script>
-    <style>
-      html, body {
-        background-color: #eee;
-      }
-    </style>
   </head>
 
-  <body ng-controller="Admin" ng-cloak>
-    <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
-      <!-- IMPORTANT: The change to the navbar color should be reverted prior to merge into develop. -->
-      <div class="navbar-container" style="background-color: #666">
-        <div class="navbar-header protractor-test-navbar-header pull-left">
-          <a class="oppia-navbar-brand-name oppia-transition-200" href="/library">
-            <img ng-src="<[logoWhiteImgUrl]>" class="oppia-logo" ng-class="'oppia-logo-wide'">
-          </a>
-          <ul class="nav navbar-nav oppia-navbar-breadcrumb">
-            <li>
-              <span class="oppia-navbar-breadcrumb-separator"></span>
-              <!-- IMPORTANT: The change to this text should be reverted prior to merge into develop. -->
-              Admin (answer-migration branch)
-            </li>
-          </ul>
-        </div>
+  <body>
+    <admin-navbar username="username" user-email="userEmail"
+                  profile-picture-data-url="profilePictureDataUrl"
+                  is-moderator="isModerator" is-super-admin="isSuperAdmin"
+                  logout-url="logoutUrl">
+    </admin-navbar>
 
-        <div ng-cloak class="navbar-header pull-right">
-          <ul class="nav oppia-navbar-nav oppia-navbar-profile-admin">
-            <li class="dropdown pull-right">
-              <a class="dropdown-toggle oppia-navbar-dropdown-toggle" data-toggle="dropdown" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
-                <div class="oppia-navbar-profile-picture-container" ng-cloak>
-                  {% if profile_picture_data_url %}
-                    <img src="{{profile_picture_data_url}}" class="oppia-navbar-profile-picture img-circle">
-                    <span class="caret" style="margin-top: 10px;"></span>
-                  {% else %}
-                    <i class="material-icons md-40" style="margin-top: -1px;">&#xE853;</i>
-                    <span class="caret" style="margin-top: -26px;"></span>
-                  {% endif %}
-
-                  <div class="oppia-navbar-dashboard-indicator ng-cloak" ng-if="numUnseenNotifications > 0">
-                    <span class="oppia-navbar-dashboard-indicator-text">
-                      <[numUnseenNotifications]>
-                    </span>
-                  </div>
-
-                  <div style="display: none;" class="oppia-user-email">
-                    {{user_email}}
-                  </div>
-                </div>
-              </a>
-              <ul class="dropdown-menu ng-cloak oppia-navbar-dropdown" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)" ng-show="profileDropdownIsActive">
-                <li>
-                  <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/profile/{{username}}" style="color: #00376d">
-                    <strong>{{username}}</strong>
-                  </a>
-                </li>
-                <hr class="oppia-top-right-menu-item-separator">
-                <li>
-                  <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/dashboard" style="color: #00376d">
-                    Creator Dashboard
-                  </a>
-                </li>
-                <li>
-                  <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/notifications_dashboard" style="color: #00376d">
-                    Notifications
-                    <span ng-if="numUnseenNotifications > 0">
-                      (<[numUnseenNotifications]>)
-                    </span>
-                  </a>
-                </li>
-                <li>
-                  <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/preferences" style="color: #00376d">Preferences</a>
-                </li>
-
-                {% if is_moderator %}
-                  <li>
-                    <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/moderator" target="_blank" style="color: #00376d">
-                      Moderator Page
-                    </a>
-                  </li>
-                {% endif %}
-                {% if is_super_admin %}
-                  <li>
-                    <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/admin" target="_blank" style="color: #00376d">
-                      Admin Page
-                    </a>
-                  </li>
-                {% endif %}
-                <hr class="oppia-top-right-menu-item-separator">
-                <li>
-                  <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="{{logout_url}}" style="color: #00376d">Logout</a>
-                </li>
-              </ul>
-            </li>
-
-            <ul class="nav oppia-navbar-tabs oppia-navbar-tabs-admin">
-              <li class="oppia-clickable-navbar-element pull-right">
-                <a class="oppia-navbar-tab" ng-href="<[MISC_URL]>" tooltip="Miscellaneous" tooltip-placement="bottom" ng-click="showMiscTab()">
-                  Misc
-                </a>
-              </li>
-              <li class="oppia-clickable-navbar-element pull-right">
-                <a class="oppia-navbar-tab protractor-test-admin-config-tab" ng-href="<[CONFIG_URL]>" tooltip="Config" tooltip-placement="bottom" ng-click="showConfigTab()">
-                  Config
-                </a>
-              </li>
-              <li class="oppia-clickable-navbar-element pull-right">
-                <a class="oppia-navbar-tab" ng-href="<[JOBS_URL]>" tooltip="Jobs" tooltip-placement="bottom" ng-click="showJobsTab()">
-                  Jobs
-                </a>
-              </li>
-              <li class="dropdown oppia-navbar-clickable-dropdown pull-right">
-                <a class="oppia-navbar-tab" ng-href="<[ACTIVITIES_URL]>" tooltip="Activities" tooltip-placement="bottom" ng-click="showActivitiesTab()">
-                  Activities
-                </a>
-              </li>
-            </ul>
-          </ul>
-        </div>
-      </div>
-    </nav>
-
-    <div align="center" ng-if="message" style="background-color: #ffffff; position: fixed; max-width: 30%; z-index: 3000; border: 1px solid #00376d; right: 30px; bottom: 30px">
-      <[message]>
+    <div align="center"
+         ng-if="statusMessage"
+         style="background-color: #ffffff; position: fixed; max-width: 30%; z-index: 3000; border: 1px solid #00376d; right: 30px; bottom: 30px">
+      <[statusMessage]>
     </div>
     <br>
 
-    <div class="row">
-      {% if DEV_MODE %}
-        <div class="col-lg-12 col-md-12 col-sm-12" ng-if="currentTab === TAB_ACTIVITIES" style="margin-top: 16px;">
-          <md-card class="oppia-page-card oppia-long-text" style="max-width: 700px">
-            <div class="container" style="margin-left: 0;">
-              <h3>Reload a single exploration</h3>
-              {% for exploration in demo_explorations %}
-                <div class="row protractor-test-reload-exploration-row">
-                  <span class="col-lg-4 col-md-4 col-sm-4 protractor-test-reload-exploration-title">
-                    {{exploration[1]}}
-                  </span>
-                  <span class="col-lg-2 col-md-2 col-sm-2">
-                    <button type="button" class="btn btn-default protractor-test-reload-exploration-button pull-right" ng-click="reloadExploration({{exploration[0]}})">
-                    Reload
-                    </button>
-                  </span>
-                </div>
-              {% endfor %}
-              <button type="button" class="btn btn-default protractor-test-reload-all-explorations-button" ng-click="reloadAllExplorations()">
-              Reload All Explorations
-              </button>
-            </div>
-          </md-card>
+    <div style="padding-top: 16px;">
+      <admin-dev-mode-activities-tab ng-if="isActivitiesTabOpen() && inDevMode"
+                                     set-status-message="setStatusMessage">
+      </admin-dev-mode-activities-tab>
+      <admin-prod-mode-activities-tab ng-if="isActivitiesTabOpen() && !inDevMode">
+      </admin-prod-mode-activities-tab>
 
-          <md-card class="oppia-page-card oppia-long-text" style="max-width: 700px">
-            <div class="container" style="margin-left: 0;">
-              <h3>Reload a single collection</h3>
-              {% for collection in demo_collections %}
-                <div class="row protractor-test-reload-collection-row">
-                  <span class="col-lg-4 col-md-4 col-sm-4 protractor-test-reload-collection-title">
-                    {{collection[1]}}
-                  </span>
-                  <span class="col-lg-2 col-md-2 col-sm-2">
-                    <button type="button" class="btn btn-default protractor-test-reload-collection-button pull-right" ng-click="reloadCollection({{collection[0]}})">
-                    Reload
-                    </button>
-                  </span>
-                </div>
-              {% endfor %}
-            </div>
-          </md-card>
-        </div><br><br>
-      {% else %}
-        <div class="col-lg-12 col-md-12 col-sm-12" ng-if="currentTab === TAB_ACTIVITIES" style="margin-top: 16px;">
-          <md-card class="oppia-page-card oppia-long-text" style="max-width: 700px">
-            The 'Activities' tab is not available in the production environment.
-          </md-card>
-        </div>
-      {% endif %}
+      <admin-jobs-tab ng-if="isJobsTabOpen()"
+                      set-status-message="setStatusMessage">
+      </admin-jobs-tab>
 
-      <div class="col-lg-12 col-md-12 col-sm-12" style="margin-top: -30px; margin-bottom: -30px">
-        <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_JOBS" style="max-width: 900px">
-          <h4>Continuous computations</h4>
-          <table class="table">
-            <tr>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Last started</th>
-              <th>Last stop signal sent</th>
-              <th>Last finished</th>
-              <th>Active realtime layer</th>
-              <th>Controls</th>
-            </tr>
-            {% for computation in continuous_computations_data %}
-              <tr>
-                <td>{{computation.computation_type}}</td>
-                <td>{{computation.status_code}}</td>
-                <td>{{computation.human_readable_last_started}}</td>
-                <td>{{computation.human_readable_last_stopped}}</td>
-                <td>{{computation.human_readable_last_finished}}</td>
-                <td>{{computation.active_realtime_layer_index}}</td>
-                <td>
-              {% if computation.is_startable %}
-                <button ng-click="startComputation('{{computation.computation_type}}')">
-                  Start
-                </button>
-              {% endif %}
-              {% if computation.is_stoppable %}
-                <button ng-click="stopComputation('{{computation.computation_type}}')">
-                  Stop
-                </button>
-              {% endif %}
-                </td>
-              </tr>
-            {% endfor %}
-          </table>
-        </md-card>
+      <admin-config-tab ng-if="isConfigTabOpen()"
+                        set-status-message="setStatusMessage">
+      </admin-config-tab>
 
-        <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_JOBS" style="max-width: 900px">
-          <h3>Jobs</h3>
-          <h4>Current time: {{human_readable_current_time}}</h4>
-          <h4>One-off jobs</h4>
-          <table class="table table-striped">
-            {% for job_spec in one_off_job_specs %}
-              <tr>
-                <td>
-                  {{job_spec.job_type}}
-                </td>
-                <td>
-                  <button class="pull-right" ng-click="startNewJob('{{job_spec.job_type}}')">
-                    Start new job
-                  </button>
-                  {% if job_spec.is_queued_or_running %}
-                    <span class="oppia-serious-warning-text">
-                      <strong>(warning: an instance of this job type is already running)</strong>
-                    </span>
-                  {% endif %}
-                </td>
-              </tr>
-            {% endfor %}
-          </table>
-        </md-card>
-
-        <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_JOBS" style="max-width: 900px">
-          <h4>Unfinished jobs</h4>
-          <em>Note: This table may be stale; refresh to see the latest state.</em>
-          <table class="table">
-            <tr>
-              <th>Job ID</th>
-              <th>Status</th>
-              <th>Time started</th>
-              <th>Time finished</th>
-              <th></th>
-            </tr>
-            {% for job in unfinished_job_data %}
-              <tr>
-                <td>{{job.id}}</td>
-                <td>{{job.status_code}}</td>
-                <td>{{job.human_readable_time_started}}</td>
-                <td>{{job.human_readable_time_finished}}</td>
-                <td>
-                  {% if job.can_be_canceled %}
-                    <button ng-click="cancelJob('{{job['id']}}', '{{job['job_type']}}')">
-                      Cancel
-                    </button>
-                  {% endif %}
-                </td>
-              </tr>
-            {% endfor %}
-          </table>
-        </md-card>
-
-        <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_JOBS" style="max-width: 900px">
-          <h4>Recent jobs</h4>
-          <em>Note: This table may be stale; refresh to see the latest state.</em>
-          <table class="table">
-            <tr>
-              <th>Job ID</th>
-              <th>Status</th>
-              <th>Time started</th>
-              <th>Time finished</th>
-              <th></th>
-            </tr>
-            {% for job in recent_job_data %}
-              <tr>
-                <td>{{job.id}}</td>
-                <td>{{job.status_code}}</td>
-                <td>{{job.human_readable_time_started}}</td>
-                <td>{{job.human_readable_time_finished}}</td>
-                <td>
-                  <button ng-click="getJobOutput('{{job['id']}}')">
-                    View Output
-                  </button>
-                </td>
-              </tr>
-            {% endfor %}
-          </table>
-          <div ng-if="showJobOutput">
-            <h4>Job Output</h4>
-            <ul ng-if="jobOutput.length != 0">
-              <li ng-repeat="output in jobOutput track by $index"><[output]></li>
-            </ul>
-            <em ng-if="jobOutput.length == 0">None</em>
-          </div>
-        </md-card>
-
-        <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_CONFIG" style="max-width: 1050px">
-          <h3>Configuration properties</h3>
-          <div class="container" ng-if="isNonemptyObject(configProperties)" style="margin-left: 0;">
-            <div ng-repeat="(configPropertyId, configPropertyData) in configProperties">
-              <div class="row protractor-test-config-property" style="padding-bottom: 10px;">
-                <span class="col-lg-2 col-md-2 col-sm-2">
-                  <em class="protractor-test-config-title"><[configPropertyData.description]></em>
-                </span>
-                <span class="col-lg-6 col-md-6 col-sm-6">
-                  <schema-based-editor schema="configPropertyData.schema" local-value="configPropertyData.value">
-                  </schema-based-editor>
-                </span>
-                <span class="col-lg-2 col-md-2 col-sm-2">
-                  <button type="button" class="btn btn-default" ng-click="revertToDefaultConfigPropertyValue(configPropertyId)">Revert to default</button>
-                </span>
-              </div>
-            </div>
-
-            <button ng-click="saveConfigProperties()" class="protractor-test-save-all-configs">Save</button>
-            <button ng-click="reloadConfigProperties()">Undo changes</button>
-          </div>
-
-          <div ng-if="!isNonemptyObject(configProperties)">
-            No configuration properties are available.
-          </div>
-        </md-card>
-
-        <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_MISC" style="max-width: 700px">
-          <h3>Topic Similarities</h3>
-          <div>
-            Upload a csv file:<br>
-            The first line of data should be a list of topic names. The next lines should be a symmetric adjacency matrix of similarities, which are values between 0 and 1.<br>
-            <input type="file" id="topicSimilaritiesFile">
-            <button ng-click="uploadTopicSimilaritiesFile()">Upload</button><br>
-            <button ng-click="downloadTopicSimilaritiesFile()">Download current topic similarities</button>
-          </div>
-        </md-card>
-
-        <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_MISC" style="max-width: 700px">
-          <h3>Search Index</h3>
-          <button ng-click="clearSearchIndex()">Clear Search Index</button>
-        </md-card>
-      </div>
+      <admin-misc-tab ng-if="isMiscTabOpen()"
+                      set-status-message="setStatusMessage">
+      </admin-misc-tab>
     </div>
 
-    {% if DEV_MODE %}
-      <div class="oppia-dev-mode">
-        Dev Mode
-      </div>
-    {% endif %}
+    <div ng-if="inDevMode" class="oppia-dev-mode">
+      Dev Mode
+    </div>
 
     {% include 'components/forms/form_builder_templates.html' %}
+    {% include 'components/forms/schema_editors/schema_based_bool_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_choices_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_custom_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_dict_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_expression_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_float_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_html_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_int_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_list_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_unicode_editor_directive.html' %}
     {% include 'pages/footer_js_libs.html' %}
+    {% include 'pages/admin/admin_navbar_directive.html' %}
+    {% include 'pages/admin/activities_tab/admin_dev_mode_activities_tab_directive.html' %}
+    {% include 'pages/admin/activities_tab/admin_prod_mode_activities_tab_directive.html' %}
+    {% include 'pages/admin/config_tab/admin_config_tab_directive.html' %}
+    {% include 'pages/admin/jobs_tab/admin_jobs_tab_directive.html' %}
+    {% include 'pages/admin/misc_tab/admin_misc_tab_directive.html' %}
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/app.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/Base.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/Admin.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/AdminNavbarDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/AdminRouterService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/AdminTaskManagerService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/activities_tab/AdminDevModeActivitiesTabDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/activities_tab/AdminProdModeActivitiesTabDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/config_tab/AdminConfigTabDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/jobs_tab/AdminJobsTabDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/misc_tab/AdminMiscTabDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/directives.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/alertsService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/explorationContextService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/utilsService.js"></script>
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/ObjectEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/ValueGeneratorEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/ObjectEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedCustomEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedDictEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedExpressionEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedFloatEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedHtmlEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedIntEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedListEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.js"></script>
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionSyntaxTree.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/evaluator.js"></script>

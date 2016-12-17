@@ -149,13 +149,9 @@ class ExplorationDisplayableSummariesTest(
         self.assertEqual({
             self.ALBERT_NAME: {
                 'num_commits': 10,
-                'profile_picture_data_url': (
-                    user_services.DEFAULT_IDENTICON_DATA_URL)
             },
             self.BOB_NAME: {
                 'num_commits': 13,
-                'profile_picture_data_url': (
-                    user_services.DEFAULT_IDENTICON_DATA_URL)
             }
         }, summary_services.get_human_readable_contributors_summary(
             contributors_summary))
@@ -164,12 +160,9 @@ class ExplorationDisplayableSummariesTest(
         self.assertEqual({
             self.USER_C_NAME: {
                 'num_commits': 1,
-                'profile_picture_data_url': self.USER_C_PROFILE_PICTURE
             },
             self.USER_D_NAME: {
                 'num_commits': 2,
-                'profile_picture_data_url': (
-                    user_services.DEFAULT_IDENTICON_DATA_URL)
             }
         }, summary_services.get_human_readable_contributors_summary(
             contributors_summary))
@@ -636,8 +629,9 @@ class TopRatedExplorationDisplayableSummariesTest(
             self.bob_id, self.EXP_ID_1, 1)
 
         top_rated_exploration_summaries = (
-            summary_services.get_top_rated_exploration_summary_dicts([
-                feconf.DEFAULT_LANGUAGE_CODE]))
+            summary_services.get_top_rated_exploration_summary_dicts(
+                [feconf.DEFAULT_LANGUAGE_CODE],
+                feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE))
         expected_summary = {
             'status': u'public',
             'thumbnail_bg_color': '#a33f40',
@@ -673,8 +667,9 @@ class TopRatedExplorationDisplayableSummariesTest(
             self.bob_id, self.EXP_ID_2, 5)
 
         top_rated_exploration_summaries = (
-            summary_services.get_top_rated_exploration_summary_dicts([
-                feconf.DEFAULT_LANGUAGE_CODE]))
+            summary_services.get_top_rated_exploration_summary_dicts(
+                [feconf.DEFAULT_LANGUAGE_CODE],
+                feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE))
 
         expected_summary = {
             'status': u'public',
@@ -757,7 +752,8 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         """
 
         recently_published_exploration_summaries = (
-            summary_services.get_recently_published_exploration_summary_dicts())
+            summary_services.get_recently_published_exp_summary_dicts(
+                feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE))
         test_summary_1 = {
             'status': 'public',
             'thumbnail_bg_color': '#a33f40',
@@ -821,7 +817,8 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             }], 'Changed title.')
 
         recently_published_exploration_summaries = (
-            summary_services.get_recently_published_exploration_summary_dicts())
+            summary_services.get_recently_published_exp_summary_dicts(
+                feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE))
         self.assertEqual(
             recently_published_exploration_summaries[1]['title'], 'New title')
         self.assertDictContainsSubset(
@@ -879,3 +876,147 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
                 feconf.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0),
             activity_domain.ActivityReference(
                 feconf.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2)])
+
+
+class CollectionNodeMetadataDictsTest(
+        exp_services_test.ExplorationServicesUnitTests):
+    """Test functions for getting collection node metadata dicts."""
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    BOB_EMAIL = 'bob@example.com'
+    BOB_NAME = 'bob'
+
+    EXP_ID1 = 'eid1'
+    EXP_ID2 = 'eid2'
+    EXP_ID3 = 'eid3'
+    EXP_ID4 = 'eid4'
+    EXP_ID5 = 'eid5'
+    INVALID_EXP_ID = 'invalid_exp_id'
+
+    def setUp(self):
+        super(CollectionNodeMetadataDictsTest, self).setUp()
+
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
+        self.signup(self.BOB_EMAIL, self.BOB_NAME)
+
+        self.save_new_valid_exploration(self.EXP_ID1, self.albert_id,
+                                        title='Exploration 1 Albert title',
+                                        objective='An objective 1')
+
+        self.save_new_valid_exploration(self.EXP_ID2, self.albert_id,
+                                        title='Exploration 2 Albert title',
+                                        objective='An objective 2')
+
+        self.save_new_valid_exploration(self.EXP_ID3, self.albert_id,
+                                        title='Exploration 3 Albert title',
+                                        objective='An objective 3')
+
+        self.save_new_valid_exploration(self.EXP_ID4, self.bob_id,
+                                        title='Exploration 4 Bob title',
+                                        objective='An objective 4')
+
+        self.save_new_valid_exploration(self.EXP_ID5, self.albert_id,
+                                        title='Exploration 5 Albert title',
+                                        objective='An objective 5')
+
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID1)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID2)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID3)
+        rights_manager.publish_exploration(self.bob_id, self.EXP_ID4)
+
+        exp_services.index_explorations_given_ids([
+            self.EXP_ID1, self.EXP_ID2, self.EXP_ID3,
+            self.EXP_ID4])
+
+    def test_get_exploration_metadata_dicts(self):
+        metadata_dicts = (summary_services.get_exploration_metadata_dicts(
+            [self.EXP_ID1, self.EXP_ID2, self.EXP_ID3], self.albert_id))
+
+        expected_metadata_dicts = [{
+            'id': self.EXP_ID1,
+            'objective': u'An objective 1',
+            'title': u'Exploration 1 Albert title',
+        }, {
+            'id': self.EXP_ID2,
+            'objective': u'An objective 2',
+            'title': u'Exploration 2 Albert title',
+        }, {
+            'id': self.EXP_ID3,
+            'objective': u'An objective 3',
+            'title': u'Exploration 3 Albert title',
+        }]
+        self.assertEqual(expected_metadata_dicts, metadata_dicts)
+
+    def test_private_exps_of_another_user_are_not_returned(self):
+        metadata_dicts = (summary_services.get_exploration_metadata_dicts(
+            [self.EXP_ID5, self.EXP_ID4], self.bob_id))
+
+        expected_metadata_dicts = [{
+            'id': self.EXP_ID4,
+            'objective': u'An objective 4',
+            'title': u'Exploration 4 Bob title',
+        }]
+        self.assertEqual(expected_metadata_dicts, metadata_dicts)
+
+    def test_public_exps_of_another_user_are_returned(self):
+        metadata_dicts = (summary_services.get_exploration_metadata_dicts(
+            [self.EXP_ID2, self.EXP_ID3, self.EXP_ID4], self.bob_id))
+
+        expected_metadata_dicts = [{
+            'id': self.EXP_ID2,
+            'objective': u'An objective 2',
+            'title': u'Exploration 2 Albert title',
+        }, {
+            'id': self.EXP_ID3,
+            'objective': u'An objective 3',
+            'title': u'Exploration 3 Albert title',
+        }, {
+            'id': self.EXP_ID4,
+            'objective': u'An objective 4',
+            'title': u'Exploration 4 Bob title',
+        }]
+        self.assertEqual(expected_metadata_dicts, metadata_dicts)
+
+    def test_deleted_exps_are_not_returned(self):
+        exp_services.delete_exploration(self.albert_id, self.EXP_ID2)
+
+        metadata_dicts = (summary_services.get_exploration_metadata_dicts(
+            [self.EXP_ID2, self.EXP_ID3, self.EXP_ID4], self.bob_id))
+
+        expected_metadata_dicts = [{
+            'id': self.EXP_ID3,
+            'objective': u'An objective 3',
+            'title': u'Exploration 3 Albert title',
+        }, {
+            'id': self.EXP_ID4,
+            'objective': u'An objective 4',
+            'title': u'Exploration 4 Bob title',
+        }]
+        self.assertEqual(expected_metadata_dicts, metadata_dicts)
+
+    def test_exp_metadata_dicts_matching_query(self):
+        metadata_dicts, _ = (
+            summary_services.get_exp_metadata_dicts_matching_query(
+                'Exploration 1', None, self.albert_id))
+
+        expected_metadata_dicts = [{
+            'id': self.EXP_ID1,
+            'objective': u'An objective 1',
+            'title': u'Exploration 1 Albert title',
+        }]
+        self.assertEqual(expected_metadata_dicts, metadata_dicts)
+
+    def test_invalid_exp_ids(self):
+        metadata_dicts = (summary_services.get_exploration_metadata_dicts(
+            [self.EXP_ID3, self.INVALID_EXP_ID], self.albert_id))
+
+        expected_metadata_dicts = [{
+            'id': self.EXP_ID3,
+            'objective': u'An objective 3',
+            'title': u'Exploration 3 Albert title',
+        }]
+        self.assertEqual(expected_metadata_dicts, metadata_dicts)

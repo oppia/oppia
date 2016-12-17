@@ -93,6 +93,12 @@ indexes:
   - name: deleted
   - name: thread_id
   - name: last_updated
+
+- kind: FeedbackMessageModel
+  properties:
+  - name: deleted
+  - name: thread_id
+  - name: last_updated
     direction: desc
 
 - kind: FeedbackThreadModel
