@@ -50,6 +50,7 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
       tutorCardAnimatedLeft = oppiaAvatarLeft;
       tutorCardAnimatedWidth = 0;
     }
+
     oppiaAvatar.hide();
     tutorCard.css({
       'min-width': 0
@@ -197,24 +198,26 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
     },
     template: '<div ng-include="directiveTemplateId"></div>',
     controller: [
-      '$scope', '$timeout', '$rootScope', '$window', '$translate',
+      '$scope', '$timeout', '$rootScope', '$window', '$translate', '$http',
        'messengerService', 'oppiaPlayerService', 'urlService', 'focusService',
       'LearnerViewRatingService', 'windowDimensionsService',
       'playerTranscriptService', 'LearnerParamsService',
       'playerPositionService', 'explorationRecommendationsService',
       'StatsReportingService', 'UrlInterpolationService',
       'siteAnalyticsService', 'ExplorationPlayerStateService',
-      'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX',
+      'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX', 'alertsService',
+      'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
       function(
-          $scope, $timeout, $rootScope, $window, $translate,
+          $scope, $timeout, $rootScope, $window, $translate, $http,
           messengerService, oppiaPlayerService, urlService, focusService,
           LearnerViewRatingService, windowDimensionsService,
           playerTranscriptService, LearnerParamsService,
           playerPositionService, explorationRecommendationsService,
           StatsReportingService, UrlInterpolationService,
           siteAnalyticsService, ExplorationPlayerStateService,
-          TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX) {
-        $scope.CONTINUE_BUTTON_FOCUS_LABEL = 'continueButton';
+          TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX, alertsService,
+          CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED) {
+        $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
         // The minimum width, in pixels, needed to be able to show two cards
         // side-by-side.
         var TIME_PADDING_MSEC = 250;
@@ -302,7 +305,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
         // Navigates to the currently-active card, and resets the 'show previous
         // responses' setting.
         var _navigateToActiveCard = function() {
-          $scope.$broadcast('activeCardChanged');
+          $scope.$broadcast(EVENT_ACTIVE_CARD_CHANGED);
 
           var index = playerPositionService.getActiveCardIndex();
           $scope.activeCard = playerTranscriptService.getCard(index);
@@ -680,13 +683,11 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
           if (!$scope.isCurrentSupplementalCardNonempty()) {
             return $scope.isViewportNarrow();
           }
-          return $scope.isViewportNarrow() &&
-                 tutorCardIsDisplayedIfNarrow;
+          return $scope.isViewportNarrow() && tutorCardIsDisplayedIfNarrow;
         };
 
         $scope.isScreenNarrowAndShowingSupplementalCard = function() {
-          return $scope.isViewportNarrow() &&
-                 !tutorCardIsDisplayedIfNarrow;
+          return $scope.isViewportNarrow() && !tutorCardIsDisplayedIfNarrow;
         };
 
         $scope.showTutorCardIfScreenIsNarrow = function() {
@@ -708,6 +709,22 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
 
         $scope.collectionId = GLOBALS.collectionId;
         $scope.collectionTitle = GLOBALS.collectionTitle;
+
+        if ($scope.collectionId) {
+          $http.get('/collectionsummarieshandler/data', {
+            params: {
+              stringified_collection_ids: JSON.stringify([$scope.collectionId])
+            }
+          }).then(
+            function(response) {
+              $scope.collectionSummary = response.data.summaries[0];
+            },
+            function() {
+              alertsService.addWarning(
+                'There was an error while fetching the collection summary.');
+            }
+          );
+        }
 
         $scope.onNavigateFromIframe = function() {
           siteAnalyticsService.registerVisitOppiaFromIframeEvent(

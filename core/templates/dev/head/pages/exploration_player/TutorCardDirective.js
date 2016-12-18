@@ -80,10 +80,10 @@ oppia.directive('tutorCard', [function() {
   return {
     restrict: 'E',
     scope: {
-      startCardChangeAnimation: '=',
-      showNextCard: '&',
-      showSupplementalCard: '&',
-      onSubmitAnswer: '&'
+      onClickContinueButton: '&',
+      onSubmitAnswer: '&',
+      onDismiss: '&',
+      startCardChangeAnimation: '='
     },
     templateUrl: 'components/TutorCard',
     controller: [
@@ -91,11 +91,13 @@ oppia.directive('tutorCard', [function() {
       'playerPositionService', 'playerTranscriptService',
       'ExplorationPlayerStateService', 'windowDimensionsService',
       'urlService', 'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX',
+      'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
       function(
         $scope, oppiaPlayerService, UrlInterpolationService,
         playerPositionService, playerTranscriptService,
         ExplorationPlayerStateService, windowDimensionsService,
-        urlService, TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX) {
+        urlService, TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX,
+        CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED) {
         var updateActiveCard = function() {
           var index = playerPositionService.getActiveCardIndex();
           if (index === null) {
@@ -120,12 +122,13 @@ oppia.directive('tutorCard', [function() {
 
         $scope.isIframed = urlService.isIframed();
 
+        $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
+
         $scope.OPPIA_AVATAR_IMAGE_URL = (
           UrlInterpolationService.getStaticImageUrl(
             '/avatar/oppia_black_72px.png'));
-
-        $scope.profilePicture = (UrlInterpolationService.getStaticImageUrl(
-            '/avatar/user_blue_72px.png'));
+        $scope.profilePicture = UrlInterpolationService.getStaticImageUrl(
+          '/avatar/user_blue_72px.png');
 
         oppiaPlayerService.getUserProfileImage().then(function(result) {
           $scope.profilePicture = result;
@@ -162,7 +165,7 @@ oppia.directive('tutorCard', [function() {
               $scope.activeCard.stateName);
         };
 
-        $scope.$on('activeCardChanged', function() {
+        $scope.$on(EVENT_ACTIVE_CARD_CHANGED, function() {
           updateActiveCard();
         });
 
@@ -172,6 +175,9 @@ oppia.directive('tutorCard', [function() {
           $scope.upcomingStateName = card.upcomingStateName;
           $scope.upcomingInlineInteractionHtml = (
             card.upcomingInlineInteractionHtml);
+          $scope.upcomingInteractionInstructions = (
+            ExplorationPlayerStateService.getInteractionInstructions(
+              $scope.upcomingStateName));
         });
 
         $scope.$on('oppiaFeedbackAvailable', function() {
@@ -179,6 +185,7 @@ oppia.directive('tutorCard', [function() {
         });
 
         updateActiveCard();
-      }]
+      }
+    ]
   };
 }]);

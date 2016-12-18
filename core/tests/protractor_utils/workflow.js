@@ -58,19 +58,13 @@ var createAndPublishExploration = function(
     title, category, objective, language) {
   createExploration();
   editor.setContent(forms.toRichText('new exploration'));
-  editor.setInteraction('TextInput');
-  editor.setDefaultOutcome(null, 'final state', true);
+  editor.setInteraction('EndExploration');
   editor.setTitle(title);
   editor.setCategory(category);
   editor.setObjective(objective);
   if (language) {
     editor.setLanguage(language);
   }
-  editor.setInteraction('Continue');
-
-  // Setup a terminating state
-  editor.moveToState('final state');
-  editor.setInteraction('EndExploration');
   editor.saveChanges();
 
   publishExploration();
