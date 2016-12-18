@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from core.domain.classifier.lda_string_classfier import LDAStringClassifier
+from core.domain.classifier.lda_string_classifier import LDAStringClassifier
 from core.tests import test_utils
 
 # pylint: disable=protected-access
