@@ -73,4 +73,103 @@ describe('Collection rights backend API service', function() {
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalled();
   });
+
+  it('should successfully set a new owner to the collection', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect(
+      'PUT', '/collection_editor_handler/rights/0').respond(
+      200);
+    CollectionRightsBackendApiService.SetCollectionOwner('0', 1, 'owner1').then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+    $rootScope.$digest();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  });
+
+  it('should call the provided fail handler on HTTP failure on setting new' +
+     'collection owner', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect(
+      'PUT', '/collection_editor_handler/rights/0').respond(
+      500, 'Error loading collection 0.');
+    CollectionRightsBackendApiService.SetCollectionOwner('0', 1, 'owner1').then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+    $rootScope.$digest();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  });
+
+  it('should successfully set a new editor to the collection', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect(
+      'PUT', '/collection_editor_handler/rights/0').respond(
+      200);
+    CollectionRightsBackendApiService.SetCollectionOwner(
+      '0', 1, 'editor1').then(successHandler, failHandler);
+    $httpBackend.flush();
+    $rootScope.$digest();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  });
+
+  it('should call the provided fail handler on HTTP failure on setting new' +
+     'collection editor', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect(
+      'PUT', '/collection_editor_handler/rights/0').respond(
+      500, 'Error loading collection 0.');
+    CollectionRightsBackendApiService.SetCollectionOwner(
+      '0', 1, 'editor1').then(successHandler, failHandler);
+    $httpBackend.flush();
+    $rootScope.$digest();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  });
+
+  it('should successfully set a new viewer to the collection', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect(
+      'PUT', '/collection_editor_handler/rights/0').respond(
+      200);
+    CollectionRightsBackendApiService.SetCollectionOwner(
+      '0', 1, 'viewer1').then(successHandler, failHandler);
+    $httpBackend.flush();
+    $rootScope.$digest();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  });
+
+  it('should call the provided fail handler on HTTP failure on setting new' +
+     'collection viewer', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect(
+      'PUT', '/collection_editor_handler/rights/0').respond(
+      500, 'Error loading collection 0.');
+    CollectionRightsBackendApiService.SetCollectionOwner(
+      '0', 1, 'viewer1').then(successHandler, failHandler);
+    $httpBackend.flush();
+    $rootScope.$digest();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  });
 });

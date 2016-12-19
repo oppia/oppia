@@ -1,0 +1,78 @@
+<script type="text/ng-template" id="inline/collection_permissions_editor_directive">
+  <div role="form" class="form-horizontal">
+    <div class="row">
+      <div class="col-lg-5 col-md-5 col-sm-5">
+        <h3>Roles</h3>
+        <strong>Managers</strong>
+        <ul>
+          <li ng-repeat="ownerName in owners track by $index">
+            <[ownerName]>
+          </li>
+        </ul>
+      </div>
+
+      <div ng-show="editors.length > 0">
+        <strong>Collaborators</strong>
+        <ul>
+          <li ng-repeat="editorName in editors track by $index">
+            <[editorName]>
+          </li>
+        </ul>
+      </div>
+
+      <div ng-show="viewers.length > 0">
+        <strong>Playtesters</strong>
+        <ul>
+          <li ng-repeat="viewerName in viewers track by $index">
+            <[viewerName]>
+          </li>
+        </ul>
+      </div>
+
+      {% if can_modify_roles %}
+        <div ng-hide="isRolesFormOpen">
+          <button type="button" class="btn btn-default protractor-test-edit-roles" ng-click="openEditRolesForm()">
+            Edit Roles
+          </button>
+        </div>
+
+        <div ng-show="isRolesFormOpen">
+          <strong>Add or Change Role</strong>
+          <div class="form-group">
+            <form ng-submit="editRole(newMemberUsername, newMemberRole.value)">
+              <label for="newMemberUsername">Username of invited user</label>
+              <div>
+                <input type="text" id="newMemberUsername" class="form-control protractor-test-role-username" ng-model="newMemberUsername" placeholder="{{username}}">
+              </div>
+              <br>
+              <label for="newMemberRole">Role of invited user</label>
+              <div>
+                <select ng-model="newMemberRole" class="form-control protractor-test-role-select" ng-options="r.name for r in ROLES" style="width: 250px;">
+                </select>
+                <span class="help-block">
+                  Note that managers also have the permissions of collaborators, and collaborators also have the permissions of viewers. Please note that assigning roles is irreversible (though you can always assign somebody to a higher role).
+                </span>
+              </div>
+
+              <input type="submit" class="btn btn-default protractor-test-save-role" value="Save">
+              <button type="button" class="btn btn-default" ng-click="closeEditRolesForm()"
+                ng-show="isRolesFormOpen">
+                Cancel
+              </button>
+            </form>
+          </div>
+        </div>
+      {% endif %}
+
+      <div class="col-lg-7 col-md-7 col-sm-7">
+        <h3>Permissions</h3>
+        <div ng-if="isPrivate">
+          This collection is <strong>private</strong>. Anyone with the link can access it.
+        </div>
+        <div ng-if="!isPrivate">
+          This collection is <strong>public</strong>: anyone can access it.
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
