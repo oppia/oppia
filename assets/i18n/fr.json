@@ -1,11 +1,4 @@
 {
-	"@metadata": {
-		"authors": [
-			"Gomoko",
-			"Jef Imagiste",
-			"Wladek92"
-		]
-	},
 	"I18N_ABOUT_PAGE_TITLE": "À notre sujet — Oppia",
 	"I18N_ACTION_APPLY_TO_TEACH_WITH_OPPIA": "Postuler à « Teach with Oppia »",
 	"I18N_ACTION_BROWSE_EXPLORATIONS": "Parcourir nos explorations",

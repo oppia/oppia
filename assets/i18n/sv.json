@@ -1,9 +1,4 @@
 {
-	"@metadata": {
-		"authors": [
-			"WikiPhoenix"
-		]
-	},
 	"I18N_ABOUT_PAGE_TITLE": "Om oss - Oppia",
 	"I18N_ACTION_BROWSE_LESSONS": "Bläddra bland våra lektioner",
 	"I18N_ACTION_CREATE_LESSON": "Skapa din egen lektion",

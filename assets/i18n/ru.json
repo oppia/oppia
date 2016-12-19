@@ -1,10 +1,4 @@
 {
-	"@metadata": {
-		"authors": [
-			"Kareyac",
-			"Okras"
-		]
-	},
 	"I18N_ABOUT_PAGE_TITLE": "О нас - Oppia",
 	"I18N_ACTION_BROWSE_LESSONS": "Просмотреть наши уроки",
 	"I18N_ACTION_CREATE_LESSON": "Создайте свой собственный урок",

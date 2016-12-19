@@ -1,9 +1,4 @@
 {
-	"@metadata": {
-		"authors": [
-			"Beta16"
-		]
-	},
 	"I18N_CREATE_ACTIVITY_TITLE": "Crea un'attività",
 	"I18N_CREATE_COLLECTION": "Crea collezione",
 	"I18N_CREATE_EXPLORATION": "Crea esplorazione",
