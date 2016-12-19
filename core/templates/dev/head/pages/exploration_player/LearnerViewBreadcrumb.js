@@ -19,7 +19,9 @@
 
 oppia.controller('LearnerViewBreadcrumb', [
   '$scope', '$modal', '$http', '$log', 'explorationContextService',
-  function($scope, $modal, $http, $log, explorationContextService) {
+  'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
+  function($scope, $modal, $http, $log, explorationContextService,
+    EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
     var explorationId = explorationContextService.getExplorationId();
     var expInfo = null;
 
@@ -27,7 +29,7 @@ oppia.controller('LearnerViewBreadcrumb', [
       if (expInfo) {
         openInformationCardModal();
       } else {
-        $http.get('/explorationsummarieshandler/data', {
+        $http.get(EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
           params: {
             stringified_exp_ids: JSON.stringify([explorationId])
           }

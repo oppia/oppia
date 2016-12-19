@@ -89,25 +89,6 @@ oppia.directive('explorationSummaryTile', [function() {
         );
 
         $scope.avatarsList = [];
-        $scope.contributors.forEach(function(contributorName) {
-          var DEFAULT_PROFILE_IMAGE_PATH = (
-            UrlInterpolationService.getStaticImageUrl(
-              '/avatar/user_blue_72px.png'));
-
-          var avatarData = {
-            image: contributorsSummary[
-              contributorName].profile_picture_data_url ||
-              DEFAULT_PROFILE_IMAGE_PATH,
-            tooltipText: contributorName
-          };
-
-          if (GLOBALS.SYSTEM_USERNAMES.indexOf(contributorName) === -1) {
-            avatarData.link = '/profile/' + contributorName;
-          }
-
-          $scope.avatarsList.push(avatarData);
-        });
-
         if ($scope.isCommunityOwned()) {
           var COMMUNITY_OWNED_IMAGE_PATH = (
             UrlInterpolationService.getStaticImageUrl(

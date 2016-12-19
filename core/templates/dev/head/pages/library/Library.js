@@ -42,6 +42,8 @@ oppia.controller('Library', [
     $scope.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
       '/library/' + $scope.bannerImageFilename);
 
+    $scope.activeGroupIndex = null;
+
     $scope.pageMode = GLOBALS.PAGE_MODE;
     $scope.LIBRARY_PAGE_MODES = LIBRARY_PAGE_MODES;
     // Below is the width of each tile (width + margins), which can be found
@@ -100,6 +102,14 @@ oppia.controller('Library', [
         }
       });
     }
+
+    $scope.setActiveGroup = function(groupIndex) {
+      $scope.activeGroupIndex = groupIndex;
+    };
+
+    $scope.clearActiveGroup = function() {
+      $scope.activeGroupIndex = null;
+    };
 
     // If the value below is changed, the following CSS values in oppia.css
     // must be changed:

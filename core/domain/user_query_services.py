@@ -16,7 +16,9 @@
 
 """Domain object for a parameters of a query."""
 
+from core.domain import email_manager
 from core.platform import models
+
 import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
@@ -38,3 +40,41 @@ def save_new_query_model(
         query_status=feconf.USER_QUERY_STATUS_PROCESSING,
         user_ids=[]).put()
     return query_id
+
+
+def send_email_to_qualified_users(
+        query_id, email_subject, email_body, email_intent, max_recipients):
+    """Send email to maximum 'max_recipients' qualified users.
+
+    Args:
+        query_id: str. ID of the UserQueryModel instance.
+        email_subject: str. Subject of the email to be sent.
+        email_body: str. Body of the email to be sent.
+        email_intent: str. Intent of the email.
+        max_recipients: int. Maximum number of recipients send emails to.
+    """
+    query_model = user_models.UserQueryModel.get(query_id)
+    query_model.query_status = feconf.USER_QUERY_STATUS_ARCHIVED
+    recipient_ids = query_model.user_ids
+
+    if max_recipients:
+        recipient_ids = recipient_ids[:max_recipients]
+
+    bulk_email_model_id = email_manager.send_user_query_email(
+        query_model.submitter_id, recipient_ids, email_subject,
+        email_body, email_intent)
+    query_model.sent_email_model_id = bulk_email_model_id
+    query_model.put()
+
+    # Store BulkEmailModel in UserBulkEmailsModel of each recipient.
+    for recipient_id in recipient_ids:
+        recipient_bulk_email_model = (
+            user_models.UserBulkEmailsModel.get(recipient_id, strict=False))
+
+        if recipient_bulk_email_model is None:
+            recipient_bulk_email_model = user_models.UserBulkEmailsModel(
+                id=recipient_id, sent_email_model_ids=[])
+
+        recipient_bulk_email_model.sent_email_model_ids.append(
+            bulk_email_model_id)
+        recipient_bulk_email_model.put()

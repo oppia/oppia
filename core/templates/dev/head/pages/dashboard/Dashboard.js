@@ -57,12 +57,7 @@ oppia.controller('Dashboard', [
       smText: 'Publish the exploration to receive statistics.'
     };
 
-    $scope.explorationStats = {};
-    $scope.activeExplorationId = '';
-    // Keeps track of the sub-dropdown that is opened in the main exploration
-    // dropdown.
-    $scope.activeSubDropdown = '';
-
+    $scope.DEFAULT_EMPTY_TITLE = 'Untitled';
     $scope.EXPLORATION_DROPDOWN_STATS = EXPLORATION_DROPDOWN_STATS;
     $scope.EXPLORATIONS_SORT_BY_KEYS = EXPLORATIONS_SORT_BY_KEYS;
     $scope.HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS = (
@@ -79,37 +74,20 @@ oppia.controller('Dashboard', [
     $scope.emptyDashboardImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/general/empty_dashboard.svg');
 
+    $scope.unresolvedAnswersIconUrl = UrlInterpolationService.getStaticImageUrl(
+      '/icons/unresolved_answers.svg');
+
     $scope.activeTab = 'myExplorations';
     $scope.setActiveTab = function(newActiveTabName) {
       $scope.activeTab = newActiveTabName;
     };
 
-    $scope.showExplorationEditor = function(explorationId) {
-      $window.location = '/create/' + explorationId;
+    $scope.getExplorationUrl = function(explorationId) {
+      return '/create/' + explorationId;
     };
 
-    $scope.openExploration = function(status, explorationId) {
-      if (status === 'private') {
-        $scope.showExplorationEditor(explorationId);
-      } else {
-        DashboardBackendApiService.fetchExplorationStats(explorationId).then(
-          function(response) {
-            $scope.explorationStats[explorationId] = response.data;
-          }, function(errorResponse) {
-            if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-              alertsService.addWarning(
-                'Failed to get statistics for this exploration');
-            }
-          }
-        );
-        $scope.activeSubDropdown = '';
-        $scope.activeExplorationId = (
-          ($scope.activeExplorationId === explorationId) ? '' : explorationId);
-      }
-    };
-
-    $scope.showCollectionEditor = function(collectionId) {
-      $window.location = '/collection_editor/create/' + collectionId;
+    $scope.getCollectionUrl = function(collectionId) {
+      return '/collection_editor/create/' + collectionId;
     };
 
     $scope.myExplorationsView = 'card';
@@ -130,24 +108,10 @@ oppia.controller('Dashboard', [
       }
     };
 
-    $scope.activeExplorationIdOnMobile = function(explorationId) {
-      return ($scope.checkMobileView() &&
-              $scope.activeExplorationId === explorationId);
-    };
-
     $scope.updatesGivenScreenWidth();
     angular.element($window).bind('resize', function() {
       $scope.updatesGivenScreenWidth();
     });
-
-    // Used to toggle between the sub dropdowns that appear for displaying
-    // statistics within the main dropdown for an exploration. The argument
-    // 'type' can take values out of values of EXPLORATION_DROPDOWN_STATS.
-    $scope.toggleSubDropdown = function(type, event) {
-      event.stopPropagation();
-      $scope.activeSubDropdown = (
-        (type === $scope.activeSubDropdown) ? '' : type);
-    };
 
     $scope.setExplorationsSortingOptions = function(sortType) {
       if (sortType === $scope.currentSortType) {
@@ -161,23 +125,16 @@ oppia.controller('Dashboard', [
       // This function is passed as a custom comparator function to `orderBy`,
       // so that special cases can be handled while sorting explorations.
       var value = entity[$scope.currentSortType];
-      var DEFAULT_TEXT_EMPTY_TITLE = 'Untitled';
       if (entity.status === 'private') {
-        if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.TITLE &&
-            value === '') {
-          return DEFAULT_TEXT_EMPTY_TITLE;
+        if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.TITLE) {
+          value = (value || $scope.DEFAULT_EMPTY_TITLE);
         } else if ($scope.currentSortType !==
                    EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED) {
-          return (-1 * $scope.explorationsList.indexOf(entity));
+          value = 0;
         }
       } else if ($scope.currentSortType === EXPLORATIONS_SORT_BY_KEYS.RATING) {
-        if (!$scope.getAverageRating(value)) {
-          return (
-            $scope.isCurrentSortDescending ?
-              (-1 * $scope.explorationsList.indexOf(entity)) :
-              $scope.explorationsList.indexOf(entity));
-        }
-        return $scope.getAverageRating(value);
+        var averageRating = $scope.getAverageRating(value);
+        value = (averageRating || 0);
       }
       return value;
     };

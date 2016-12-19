@@ -128,6 +128,7 @@ class LibraryIndexHandler(base.BaseHandler):
                 'header_i18n_id': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
                 'has_full_results_page': True,
                 'full_results_url': feconf.LIBRARY_RECENTLY_PUBLISHED_URL,
+                'protractor_id': 'recently-published',
             })
         if top_rated_activity_summary_dicts:
             summary_dicts_by_category.insert(0, {
@@ -137,6 +138,7 @@ class LibraryIndexHandler(base.BaseHandler):
                     feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS),
                 'has_full_results_page': True,
                 'full_results_url': feconf.LIBRARY_TOP_RATED_URL,
+                'protractor_id': 'top-rated',
             })
         if featured_activity_summary_dicts:
             summary_dicts_by_category.insert(0, {
@@ -299,6 +301,28 @@ class ExplorationSummariesHandler(base.BaseHandler):
             summaries = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
                     exp_ids))
+        self.values.update({
+            'summaries': summaries
+        })
+        self.render_json(self.values)
+
+
+class CollectionSummariesHandler(base.BaseHandler):
+    """Returns collection summaries corresponding to collection ids.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    def get(self):
+        """Handles GET requests."""
+        try:
+            collection_ids = json.loads(
+                self.request.get('stringified_collection_ids'))
+        except Exception:
+            raise self.PageNotFoundException
+        summaries = (
+            summary_services.get_displayable_collection_summary_dicts_matching_ids( # pylint: disable=line-too-long
+                collection_ids))
         self.values.update({
             'summaries': summaries
         })

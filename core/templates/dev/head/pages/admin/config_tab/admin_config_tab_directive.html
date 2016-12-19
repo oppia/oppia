@@ -1,0 +1,30 @@
+<script type="text/ng-template" id="admin/configTag">
+  <md-card class="oppia-page-card oppia-long-text" style="max-width: 1050px">
+    <h3>Configuration properties</h3>
+    <div class="container" ng-if="isNonemptyObject(configProperties)" style="margin-left: 0;">
+      <div ng-repeat="(configPropertyId, configPropertyData) in configProperties">
+        <div class="row protractor-test-config-property" style="padding-bottom: 10px;">
+          <span class="col-lg-2 col-md-2 col-sm-2">
+            <em class="protractor-test-config-title"><[configPropertyData.description]></em>
+          </span>
+          <span class="col-lg-6 col-md-6 col-sm-6">
+            <schema-based-editor schema="configPropertyData.schema" local-value="configPropertyData.value">
+            </schema-based-editor>
+          </span>
+          <span class="col-lg-2 col-md-2 col-sm-2">
+            <button type="button" class="btn btn-default" ng-click="revertToDefaultConfigPropertyValue(configPropertyId)">
+              Revert to default
+            </button>
+          </span>
+        </div>
+      </div>
+
+      <button ng-click="saveConfigProperties()" class="protractor-test-save-all-configs">Save</button>
+      <button ng-click="reloadConfigProperties()">Undo changes</button>
+    </div>
+
+    <div ng-if="!isNonemptyObject(configProperties)">
+      No configuration properties are available.
+    </div>
+  </md-card>
+</script>

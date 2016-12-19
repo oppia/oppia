@@ -66,7 +66,7 @@ def process_js(source_path, target_path):
 def build_minified_third_party_libs(output_directory):
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
     node_path = os.path.join(
-        parent_dir, 'oppia_tools', 'node-4.2.1', 'bin', 'node')
+        parent_dir, 'oppia_tools', 'node-6.9.1', 'bin', 'node')
     gulp_path = os.path.join(
         parent_dir, 'node_modules', 'gulp', 'bin', 'gulp.js')
     gulp_build_cmd = [node_path, gulp_path, 'build', '--minify=True',
