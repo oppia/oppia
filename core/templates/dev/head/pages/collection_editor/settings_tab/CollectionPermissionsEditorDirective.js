@@ -28,8 +28,6 @@ oppia.directive('collectionPermissionsEditor', [function() {
       function(
           $scope, CollectionEditorStateService,
           CollectionRightsBackendApiService) {
-
-
         $scope.ROLES = [{
           name: 'Manager (can edit permissions)',
           value: 'owner'
@@ -65,19 +63,17 @@ oppia.directive('collectionPermissionsEditor', [function() {
 
         $scope.editRole = function(newMemberUsername, newMemberRole) {
           $scope.isRolesFormOpen = false;
-          if (newMemberRole == $scope.ROLES[0].value) {
+          if (newMemberRole === $scope.ROLES[0].value) {
             CollectionRightsBackendApiService.SetCollectionOwner(
               CollectionId, CollectionVersion, newMemberUsername);
-          } else if (newMemberRole == $scope.ROLES[1].value) {
+          } else if (newMemberRole === $scope.ROLES[1].value) {
             CollectionRightsBackendApiService.SetCollectionEditor(
               CollectionId, CollectionVersion, newMemberUsername);
-          } else if (newMemberRole == $scope.ROLES[2].value) {
+          } else if (newMemberRole === $scope.ROLES[2].value) {
             CollectionRightsBackendApiService.SetCollectionPlaytester(
               CollectionId, CollectionVersion, newMemberUsername);
           }
-          
         };
-
       }
     ]
   };

@@ -22,7 +22,6 @@ oppia.factory('CollectionRightsBackendApiService', [
       UrlInterpolationService) {
       var SetCollectionRights = function(
         collectionId, putParams, successCallback, errorCallback) {
-
         var collectionRightsUrl = UrlInterpolationService.interpolateUrl(
           COLLECTION_RIGHTS_URL_TEMPLATE, {
             collection_id: collectionId
@@ -45,7 +44,6 @@ oppia.factory('CollectionRightsBackendApiService', [
       var _setCollectionStatus = function(
           collectionId, collectionVersion, isPublic, successCallback,
           errorCallback) {
-
         var putParams = {
           version: collectionVersion,
           is_public: isPublic
@@ -53,13 +51,11 @@ oppia.factory('CollectionRightsBackendApiService', [
 
         return SetCollectionRights(
           collectionId, putParams, successCallback, errorCallback);
-
       };
 
       var SetCollectionMember = function(
         collectionId, collectionVersion, newCollectionMember,
         newCollectionMemberRole, successCallback, errorCallback) {
-
         var putParams = {
           version: collectionVersion,
           new_member_username: newCollectionMember,
@@ -99,9 +95,9 @@ oppia.factory('CollectionRightsBackendApiService', [
         SetCollectionOwner: function(
           collectionId, collectionVersion, newCollectionOwner) {
           return $q(function(resolve, reject) {
-          SetCollectionMember(
-            collectionId, collectionVersion, newCollectionOwner, 'owner',
-            resolve, reject);
+            SetCollectionMember(
+              collectionId, collectionVersion, newCollectionOwner, 'owner',
+              resolve, reject);
           });
         },
 
@@ -111,9 +107,9 @@ oppia.factory('CollectionRightsBackendApiService', [
         SetCollectionEditor: function(
           collectionId, collectionVersion, newCollectionEditor) {
           return $q(function(resolve, reject) {
-          SetCollectionMember(
-            collectionId, collectionVersion, newCollectionEditor, 'editor',
-            resolve, reject);
+            SetCollectionMember(
+              collectionId, collectionVersion, newCollectionEditor, 'editor',
+              resolve, reject);
           });
         },
 
@@ -123,11 +119,10 @@ oppia.factory('CollectionRightsBackendApiService', [
         SetCollectionPlaytester: function(
           collectionId, collectionVersion, newCollectionPlaytester) {
           return $q(function(resolve, reject) {
-          SetCollectionMember(
-            collectionId, collectionVersion, newCollectionPlaytester, 'viewer',
-            resolve, reject);
+            SetCollectionMember(
+              collectionId, collectionVersion, newCollectionPlaytester,
+              'viewer', resolve, reject);
           });
-        },
-
+        }
       };
     }]);
