@@ -27,12 +27,12 @@ oppia.factory('CollectionRightsBackendApiService', [
             collection_id: collectionId
           });
 
-        $http.put(collectionRightsUrl, putParams).then(function() {
+        $http.put(collectionRightsUrl, putParams).then(function(response) {
           // TODO(bhenning): Consolidate the backend rights domain objects and
           // implement a frontend activity rights domain object. The rights
           // being passed in here should be used to create one of those objects.
           if (successCallback) {
-            successCallback();
+            successCallback(response.data);
           }
         }, function(errorResponse) {
           if (errorCallback) {
@@ -41,7 +41,7 @@ oppia.factory('CollectionRightsBackendApiService', [
         });
       };
 
-      var _setCollectionStatus = function(
+      var SetCollectionStatus = function(
           collectionId, collectionVersion, isPublic, successCallback,
           errorCallback) {
         var putParams = {
@@ -73,7 +73,7 @@ oppia.factory('CollectionRightsBackendApiService', [
          */
         setCollectionPublic: function(collectionId, collectionVersion) {
           return $q(function(resolve, reject) {
-            _setCollectionStatus(
+            SetCollectionStatus(
               collectionId, collectionVersion, true, resolve, reject);
           });
         },
@@ -84,7 +84,7 @@ oppia.factory('CollectionRightsBackendApiService', [
          */
         setCollectionPrivate: function(collectionId, collectionVersion) {
           return $q(function(resolve, reject) {
-            _setCollectionStatus(
+            SetCollectionStatus(
               collectionId, collectionVersion, false, resolve, reject);
           });
         },

@@ -23,11 +23,9 @@ oppia.directive('collectionPermissionsEditor', [function() {
     restrict: 'E',
     templateUrl: 'inline/collection_permissions_editor_directive',
     controller: [
-      '$scope', 'CollectionEditorStateService',
-      'CollectionRightsBackendApiService',
+      '$scope', 'CollectionRightsBackendApiService',
       function(
-          $scope, CollectionEditorStateService,
-          CollectionRightsBackendApiService) {
+          $scope, CollectionRightsBackendApiService) {
         $scope.ROLES = [{
           name: 'Manager (can edit permissions)',
           value: 'owner'
@@ -64,14 +62,32 @@ oppia.directive('collectionPermissionsEditor', [function() {
         $scope.editRole = function(newMemberUsername, newMemberRole) {
           $scope.isRolesFormOpen = false;
           if (newMemberRole === $scope.ROLES[0].value) {
-            CollectionRightsBackendApiService.SetCollectionOwner(
-              CollectionId, CollectionVersion, newMemberUsername);
+            var newRights =
+              CollectionRightsBackendApiService.SetCollectionOwner(
+                CollectionId, CollectionVersion, newMemberUsername);
+            newRights.then(function(data) {
+              $scope.owners = data.rights.owner_names;
+              $scope.editors = data.rights.editor_names;
+              $scope.viewers = data.rights.viewer_names;
+            });
           } else if (newMemberRole === $scope.ROLES[1].value) {
-            CollectionRightsBackendApiService.SetCollectionEditor(
-              CollectionId, CollectionVersion, newMemberUsername);
+            var newRights =
+              CollectionRightsBackendApiService.SetCollectionEditor(
+                CollectionId, CollectionVersion, newMemberUsername);
+            newRights.then(function(data) {
+              $scope.owners = data.rights.owner_names;
+              $scope.editors = data.rights.editor_names;
+              $scope.viewers = data.rights.viewer_names;
+            });
           } else if (newMemberRole === $scope.ROLES[2].value) {
-            CollectionRightsBackendApiService.SetCollectionPlaytester(
-              CollectionId, CollectionVersion, newMemberUsername);
+            var newRights =
+              CollectionRightsBackendApiService.SetCollectionPlaytester(
+                CollectionId, CollectionVersion, newMemberUsername);
+            newRights.then(function(data) {
+              $scope.owners = data.rights.owner_names;
+              $scope.editors = data.rights.editor_names;
+              $scope.viewers = data.rights.viewer_names;
+            });
           }
         };
       }
