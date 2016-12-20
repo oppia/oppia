@@ -772,6 +772,15 @@ SUPPORTED_SITE_LANGUAGES = [{
     'id': 'en',
     'text': 'English'
 }, {
+    'id': 'de',
+    'text': 'Deutsch'
+}, {
+    'id': 'fr',
+    'text': 'français'
+}, {
+    'id': 'nl',
+    'text': 'Nederlands'
+}, {
     'id': 'es',
     'text': 'Español'
 }, {
@@ -781,14 +790,26 @@ SUPPORTED_SITE_LANGUAGES = [{
     'id': 'pt-br',
     'text': 'Português (Brasil)'
 }, {
+    'id': 'mk',
+    'text': 'македонски јазик'
+}, {
     'id': 'vi',
     'text': 'Tiếng Việt'
 }, {
     'id': 'hi',
     'text': 'हिन्दी'
 }, {
+    'id': 'bn',
+    'text': 'বাংলা'
+}, {
     'id': 'tr',
     'text': 'Türkçe'
+}, {
+    'id': 'zh-hans',
+    'text': '中文(简体)'
+}, {
+    'id': 'zh-hant',
+    'text': '中文(繁體)'
 }]
 SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
