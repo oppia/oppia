@@ -50,8 +50,6 @@ describe('Library pages tour', function() {
     );
     visitLibraryPage();
     library.playExploration(EXPLORATION_TITLE);
-
-    player.submitAnswer('Continue');
     player.rateExploration(EXPLORATION_RATING);
 
     visitLibraryPage();

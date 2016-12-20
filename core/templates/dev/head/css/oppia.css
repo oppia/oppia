@@ -32,8 +32,7 @@
 }
 
 /* Angular material overrides. */
-md-input-group.long > input
-{
+md-input-group.long > input {
   width: 100%;
   height: 45px;
 }
@@ -87,6 +86,7 @@ button.md-button.md-default-theme.oppia-learner-continue-button:hover {
 
 /* Bootstrap overrides and additions. */
 html {
+  background-color: #e8e7e3;
   /*
     The HTML font-size is set to 62.5% in order to make 'em' units easier to
     work with. Modern browsers set their default font-size to 16px. This means
@@ -103,6 +103,7 @@ html {
 
 body {
   color: rgba(0,0,0,0.87);
+  background-color: #e8e7e3;
   font-family: "Roboto", Arial, sans-serif;
   /*
     A font-size of 1.6em sets the default font-size on Oppia to 16px, though
@@ -256,15 +257,20 @@ body {
 }
 
 .oppia-profile-content-card {
-  background-color: #fff;
+  box-shadow: none;
   float: left;
   min-height: 630px;
-  padding: 30px;
+  padding: 0 30px 30px 30px;
   position: relative;
   width: -webkit-calc(100% - 280px);
   width: -moz-calc(100% - 280px);
   width: -o-calc(100% - 280px);
   width: calc(100% - 280px);
+}
+
+md-card.oppia-profile-content-card {
+  margin-top: 0;
+  padding-top: 0;
 }
 
 /* For issue #1867 (https://github.com/oppia/oppia/issues/1867)
@@ -279,12 +285,17 @@ body {
   width: 100%;
 }
 
+md-content.oppia-profile-portfolio-container {
+  background-color: transparent;
+}
+
 .oppia-profile-portfolio-pages {
   bottom: 0;
   display: block;
-  font-size: .7em;
-  margin-bottom: 20px;
-  margin-right: 40px;
+  font-size: .9em;
+  font-weight: bold;
+  margin-bottom: 60px;
+  margin-right: 65px;
   position: absolute;
   right: 0;
   text-align: right;
@@ -952,7 +963,11 @@ textarea {
   color: rgba(255,255,255,1);
 }
 
-@media (max-width: 768px) {
+.btn:focus, .btn:active:focus {
+    outline: 0;
+}
+
+@media (max-width: 767px) {
   .oppia-navbar-hide-on-small-width {
     display: none;
   }
@@ -984,6 +999,7 @@ textarea {
   padding-top: 24px;
   width: 100vw;
 }
+
 /* Ensure that the summary tiles tiles remain centered. Note that these values
    would need to be updated if the summary tiles are changed. */
 @media (max-width: 844px) {
@@ -3448,7 +3464,6 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-splash-section-two {
-  background-color: #f2f2ee;
   color: #2c4841;
   margin-left: auto;
   margin-right: auto;
@@ -3601,7 +3616,7 @@ md-card.preview-conversation-skin-supplemental-card {
     The margin setting is so that exploration summary tiles and collection
     summary tiles would be the same widths (214px).
   */
-  margin: 12px 5.5px;
+  margin: 8px 5.5px;
   padding: 0;
   position: relative;
   text-align: left;
@@ -3817,6 +3832,31 @@ md-card.preview-conversation-skin-supplemental-card {
   text-align: center;
 }
 
+.oppia-dashboard-card-statistic-icon {
+  padding-top: 3px;
+  position: absolute;
+}
+
+.oppia-dashboard-mobile-statistics-card-link {
+  background: white;
+  height: 54px;
+  opacity: 0;
+  position: absolute;
+  width: 96%;
+}
+
+.oppia-dashboard-statistics-card-link {
+  background: white;
+  height: 88px;
+  opacity: 0;
+  position: absolute;
+  width: 184px;
+}
+
+.oppia-dashboard-card-statistic-value {
+  padding-left: 19px;
+}
+
 .oppia-activity-summary-tile .metrics li .fa {
   font-size: 1.1em;
   margin-right: 2px;
@@ -3870,7 +3910,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-dashboard-card-view-item .metrics > li {
-  padding: 0 0 4px 14px;
+  padding: 0 0 5px 14px;
   text-align: left;
 }
 
