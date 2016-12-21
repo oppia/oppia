@@ -16,8 +16,8 @@
 
 Run this script from the Oppia root directory:
 
-    export PYTHONPATH=$PYTHONPATH:.
-    python core/tests/performance_tests/lda_string_classifier_performance_test.py #pylint: disable=line-too-long
+  export PYTHONPATH=$PYTHONPATH:.
+  python core/tests/performance_tests/lda_string_classifier_performance_test.py
 
 """
 
