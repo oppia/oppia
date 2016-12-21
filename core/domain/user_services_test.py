@@ -261,9 +261,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.get_or_create_user(user_id, user_email)
         user_services.set_username(user_id, username)
 
-        # When ExplorationUserDataModel is yet to be created,
-        # the value of mute_feedback_notifications and
-        # mute_suggestion_notifications should be False.
+        # When ExplorationUserDataModel is yet to be created, the value
+        # of mute_feedback_notifications and mute_suggestion_notifications
+        # should match the default values.
+        exploration_user_model = (
+            user_services.user_models.ExplorationUserDataModel.get(
+                user_id, exploration_id))
+        self.assertIsNone(exploration_user_model)
         email_preferences = user_services.get_email_preferences_for_exploration(
             user_id, exploration_id)
         self.assertEquals(
