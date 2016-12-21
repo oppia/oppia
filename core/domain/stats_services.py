@@ -28,7 +28,6 @@ from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
-# TODO(bhenning): Ensure this works with the new answer backend.
 def get_exps_unresolved_answers_for_default_rule(exp_ids):
     """Gets unresolved answers per exploration for default rule across all
     states for explorations with ids in exp_ids. The value of total count should
@@ -148,26 +147,22 @@ def get_visualizations_info(exploration_id, state_name):
             if visualization.calculation_id in calculation_ids_to_outputs]
 
 
-# TODO(bhenning): These need to be thoroughly tested (similar to how the
-# unresolved answers getter was before). It would be preferred if this were
-# tested on a branch alongside these changes, then used to verify that these
-# changes to do not change the contract of the function.
-
 def get_top_state_rule_answers(
         exploration_id, state_name, classify_category_list):
-    """Returns a list of top answers (by submission frequency) submitted to the
-    given state in the given exploration which were mapped to any of the rule
-    classification categories listed in 'classify_category_list'. All answers
-    submitted to the specified state and match the rule spec strings in
+    """Returns a list of top answers (sorted by submission frequency) submitted
+    to the given state in the given exploration which were mapped to any of the
+    rule classification categories listed in 'classify_category_list'. All
+    answers submitted to the specified state and match the rule spec strings in
     rule_str_list are returned.
     """
     return get_top_state_rule_answers_multi(
         [(exploration_id, state_name)], classify_category_list)[0]
 
+
 def get_top_state_rule_answers_multi(
         exploration_state_list, classify_category_list):
-    """Returns a list of top answers (by submission frequency) submitted to the
-    given explorations and states which were mapped to any of the rule
+    """Returns a list of top answers (sorted by submission frequency) submitted
+    to the given explorations and states which were mapped to any of the rule
     classification categories listed in 'classify_category_list'.
 
     NOTE TO DEVELOPERS: Classification categories are stored upon answer
@@ -188,34 +183,55 @@ def get_top_state_rule_answers_multi(
                 exploration_id, state_name, 'TopAnswersByCategorization'))
         if job_result:
             calc_output = job_result.calculation_output
-            answer_lists.append(list(itertools.chain.from_iterable(
+            answer_list = list(itertools.chain.from_iterable(
                 calc_output[category]
                 for category in classify_category_list
-                if category in calc_output)))
+                if category in calc_output))
+
+            # If the answer_list includes similar answers matching multiple
+            # categories, those answers should be de-duplicated.
+            # TODO(bhenning): Make this better than O(N^2); probably better just
+            # to implement the job described above.
+            combined_answer_list = [
+                {'answer': answer['answer'], 'frequency': 0}
+                for answer in answer_list]
+            for answer in answer_list:
+                for combined_answer in combined_answer_list:
+                    if answer['answer'] == combined_answer['answer']:
+                        combined_answer['frequency'] += answer['frequency']
+                        break
+            # Remove answers which are duplicated (have zero frequency)
+            reduced_answer_list = [
+                {'answer': answer['answer'], 'frequency': answer['frequency']}
+                for answer in combined_answer_list if answer['frequency'] > 0]
+
+            answer_lists.append(sorted(
+                reduced_answer_list,
+                cmp=lambda x, y: y['frequency'] - x['frequency']))
         else:
             answer_lists.append([])
     return answer_lists
 
 
 def count_top_state_rule_answers(
-        exploration_id, state_name, classification_category,
-        top_answer_count_per_category):
+        exploration_id, state_name, classification_category):
     """Returns the number of answers that have been submitted to the specified
     state and exploration and have been classified as the specific
     classification category.
     """
     top_answers = get_top_state_rule_answers(
-        exploration_id, state_name, [classification_category],
-        top_answer_count_per_category)
+        exploration_id, state_name, [classification_category])
     return sum([answer['frequency'] for answer in top_answers])
 
 
+# TODO(bhenning): Test
 def get_versions_for_exploration_stats(exploration_id):
     """Returns list of versions for this exploration."""
     return stats_models.ExplorationAnnotationsModel.get_versions(
         exploration_id)
 
 
+# TODO(bhenning): Test
 def get_exploration_stats(exploration_id, exploration_version):
     """Returns a dict with state statistics for the given exploration id.
 
@@ -228,11 +244,6 @@ def get_exploration_stats(exploration_id, exploration_version):
     last_updated = exp_stats['last_updated']
     state_hit_counts = exp_stats['state_hit_counts']
 
-    # TODO(bhenning): 'num_default_answers' isn't the true count, since the
-    # number of top answers pulled from the data store needs to be fixed.
-    # Figure out whether this is adequate or if we need to have another job
-    # which simply counts all answers for a given category (doesn't seem like a
-    # very useful calculation).
     return {
         'last_updated': last_updated,
         'num_completions': exp_stats['complete_exploration_count'],
@@ -251,7 +262,7 @@ def get_exploration_stats(exploration_id, exploration_version):
                     if state_name in state_hit_counts else 0),
                 'num_default_answers': count_top_state_rule_answers(
                     exploration_id, state_name,
-                    exp_domain.DEFAULT_OUTCOME_CLASSIFICATION, 100),
+                    exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
             } for state_name in exploration.states
         },
     }

@@ -34,10 +34,9 @@ from core.platform import models
 from extensions.interactions import base
 from extensions.objects.models import objects
 
-import feconf
 import utils
 
-(base_models, stats_models, exp_models,) = models.Registry.import_models([
+(base_models, stats_models, exp_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.statistics, models.NAMES.exploration
 ])
 transaction_services = models.Registry.import_transaction_services()

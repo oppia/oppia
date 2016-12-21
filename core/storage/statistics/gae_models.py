@@ -548,7 +548,8 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
 
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     """Batch model for storing MapReduce calculation output for
-    exploration-level statistics."""
+    exploration-level statistics.
+    """
     # Id of exploration.
     exploration_id = ndb.StringProperty(indexed=True)
     # Version of exploration.

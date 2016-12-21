@@ -22,8 +22,11 @@ from core.domain import stats_jobs_continuous
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import user_services
+from core.platform import models
 from core.tests import test_utils
 import feconf
+
+(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
 class ModifiedStatisticsAggregator(stats_jobs_continuous.StatisticsAggregator):
@@ -369,6 +372,46 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'params': {}
         }])
 
+    def test_record_answers_exceeding_one_shard(self):
+        state_answers = stats_services.get_state_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertIsNone(state_answers)
+
+        submitted_answer_list = [
+            stats_domain.SubmittedAnswer(
+                'answer a', 'TextInput', 0, 1,
+                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 10.0),
+            stats_domain.SubmittedAnswer(
+                'answer ccc', 'TextInput', 1, 1,
+                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 3.0),
+            stats_domain.SubmittedAnswer(
+                'answer bbbbb', 'TextInput', 1, 0,
+                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 7.5),
+        ]
+        stats_services.record_answers(
+            self.exploration, self.exploration.init_state_name,
+            submitted_answer_list * 200)
+
+        # Verify more than 1 shard was stored. The index shard (shard_id 0) is
+        # not included in the shard count.
+        model = stats_models.StateAnswersModel.get('%s:%s:%s:%s' % (
+            self.exploration.id, str(self.exploration.version),
+            self.exploration.init_state_name, '0'))
+        self.assertEqual(model.shard_count, 1)
+
+        # The order of the answers returned depends on the size of the answers.
+        state_answers = stats_services.get_state_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertEqual(state_answers.exploration_id, 'exp_id0')
+        self.assertEqual(state_answers.exploration_version, 1)
+        self.assertEqual(
+            state_answers.state_name, feconf.DEFAULT_INIT_STATE_NAME)
+        self.assertEqual(state_answers.interaction_id, 'TextInput')
+        self.assertEqual(
+            len(state_answers.get_submitted_answer_dict_list()), 600)
+
     def test_record_many_answers_with_preexisting_entry(self):
         stats_services.record_answer(
             self.exploration, self.exploration.init_state_name,
@@ -513,7 +556,7 @@ class AnswerStatsTests(test_utils.GenericTestBase):
             top_answers = stats_services.get_top_state_rule_answers(
                 'eid0', self.state_name00, [
                     exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
-            self.assertEquals(len(top_answers), 0)
+            self.assertEqual(len(top_answers), 0)
 
             # Submit some answers.
             self._record_answer_to_default_exp('a')
@@ -528,8 +571,8 @@ class AnswerStatsTests(test_utils.GenericTestBase):
             top_answers = stats_services.get_top_state_rule_answers(
                 'eid0', self.state_name00, [
                     exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
-            self.assertEquals(len(top_answers), 3)
-            self.assertEquals(top_answers, [{
+            self.assertEqual(len(top_answers), 3)
+            self.assertEqual(top_answers, [{
                 'answer': 'b',
                 'frequency': 3
             }, {
@@ -549,7 +592,7 @@ class AnswerStatsTests(test_utils.GenericTestBase):
                 'eid0', self.state_name00, [
                     exp_domain.STATISTICAL_CLASSIFICATION,
                     exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
-            self.assertEquals(len(top_answers), 0)
+            self.assertEqual(len(top_answers), 0)
 
             # Submit some answers.
             self._record_answer_to_default_exp(
@@ -572,10 +615,10 @@ class AnswerStatsTests(test_utils.GenericTestBase):
                 'eid0', self.state_name00, [
                     exp_domain.STATISTICAL_CLASSIFICATION,
                     exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
-            self.assertEquals(len(top_answers), 3)
+            self.assertEqual(len(top_answers), 3)
             # Rules across multiple rule types are combined and still sorted by
             # frequency.
-            self.assertEquals(top_answers, [{
+            self.assertEqual(top_answers, [{
                 'answer': 'b',
                 'frequency': 3
             }, {
@@ -594,9 +637,9 @@ class AnswerStatsTests(test_utils.GenericTestBase):
             top_answers_list = stats_services.get_top_state_rule_answers_multi(
                 [('eid0', self.state_name00), ('eid1', self.state_name10)],
                 [exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
-            self.assertEquals(len(top_answers_list), 2)
-            self.assertEquals(len(top_answers_list[0]), 0)
-            self.assertEquals(len(top_answers_list[1]), 0)
+            self.assertEqual(len(top_answers_list), 2)
+            self.assertEqual(len(top_answers_list[0]), 0)
+            self.assertEqual(len(top_answers_list[1]), 0)
 
             # Submit some answers.
             self._record_answer('a', self.exploration0, self.state_name00)
@@ -611,15 +654,15 @@ class AnswerStatsTests(test_utils.GenericTestBase):
             top_answers_list = stats_services.get_top_state_rule_answers_multi(
                 [('eid0', self.state_name00), ('eid1', self.state_name10)],
                 [exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
-            self.assertEquals(len(top_answers_list), 2)
-            self.assertEquals(top_answers_list[0], [{
+            self.assertEqual(len(top_answers_list), 2)
+            self.assertEqual(top_answers_list[0], [{
                 'answer': 'a',
                 'frequency': 1
             }, {
                 'answer': 'c',
                 'frequency': 1
             }])
-            self.assertEquals(top_answers_list[1], [{
+            self.assertEqual(top_answers_list[1], [{
                 'answer': 'b',
                 'frequency': 3
             }, {
@@ -638,9 +681,9 @@ class AnswerStatsTests(test_utils.GenericTestBase):
             top_answers_list = stats_services.get_top_state_rule_answers_multi(
                 [('eid0', self.state_name00), ('eid0', self.state_name01)],
                 [exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
-            self.assertEquals(len(top_answers_list), 2)
-            self.assertEquals(len(top_answers_list[0]), 0)
-            self.assertEquals(len(top_answers_list[1]), 0)
+            self.assertEqual(len(top_answers_list), 2)
+            self.assertEqual(len(top_answers_list[0]), 0)
+            self.assertEqual(len(top_answers_list[1]), 0)
 
             # Submit some answers.
             self._record_answer('a', self.exploration0, self.state_name00)
@@ -655,15 +698,15 @@ class AnswerStatsTests(test_utils.GenericTestBase):
             top_answers_list = stats_services.get_top_state_rule_answers_multi(
                 [('eid0', self.state_name00), ('eid0', self.state_name01)],
                 [exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
-            self.assertEquals(len(top_answers_list), 2)
-            self.assertEquals(top_answers_list[0], [{
+            self.assertEqual(len(top_answers_list), 2)
+            self.assertEqual(top_answers_list[0], [{
                 'answer': 'a',
                 'frequency': 1
             }, {
                 'answer': 'c',
                 'frequency': 1
             }])
-            self.assertEquals(top_answers_list[1], [{
+            self.assertEqual(top_answers_list[1], [{
                 'answer': 'b',
                 'frequency': 3
             }, {
@@ -673,6 +716,74 @@ class AnswerStatsTests(test_utils.GenericTestBase):
                 'answer': 'c',
                 'frequency': 1
             }])
+
+    def test_count_top_state_rule_answers(self):
+        with self.swap(
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS):
+            # There are no initial top answers for this state.
+            default_answer_count = stats_services.count_top_state_rule_answers(
+                'eid0', self.state_name00,
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
+            self.assertEqual(default_answer_count, 0)
+
+            stats_answer_count = stats_services.count_top_state_rule_answers(
+                'eid0', self.state_name00,
+                exp_domain.STATISTICAL_CLASSIFICATION)
+            self.assertEqual(stats_answer_count, 0)
+
+            # Submit some answers.
+            self._record_answer_to_default_exp(
+                'a', classification=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
+            self._record_answer_to_default_exp(
+                'a', classification=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
+            self._record_answer_to_default_exp(
+                'b', classification=exp_domain.STATISTICAL_CLASSIFICATION)
+            self._record_answer_to_default_exp(
+                'b', classification=exp_domain.STATISTICAL_CLASSIFICATION)
+            self._record_answer_to_default_exp(
+                'b', classification=exp_domain.STATISTICAL_CLASSIFICATION)
+            self._record_answer_to_default_exp(
+                'c', classification=exp_domain.STATISTICAL_CLASSIFICATION)
+            self._record_answer_to_default_exp(
+                'c', classification=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
+            self._run_aggregator_job()
+
+            top_answers = stats_services.get_top_state_rule_answers(
+                'eid0', self.state_name00, [
+                    exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
+            # Rules across multiple rule types are combined and still sorted by
+            # frequency.
+            self.assertEqual(top_answers, [{
+                'answer': 'a',
+                'frequency': 2
+            }, {
+                'answer': 'c',
+                'frequency': 1
+            }])
+
+            default_answer_count = stats_services.count_top_state_rule_answers(
+                'eid0', self.state_name00,
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
+            self.assertEqual(default_answer_count, 3)
+
+            top_answers = stats_services.get_top_state_rule_answers(
+                'eid0', self.state_name00, [
+                    exp_domain.STATISTICAL_CLASSIFICATION])
+            # Rules across multiple rule types are combined and still sorted by
+            # frequency.
+            self.assertEqual(top_answers, [{
+                'answer': 'b',
+                'frequency': 3
+            }, {
+                'answer': 'c',
+                'frequency': 1
+            }])
+
+            stats_answer_count = stats_services.count_top_state_rule_answers(
+                'eid0', self.state_name00,
+                exp_domain.STATISTICAL_CLASSIFICATION)
+            self.assertEqual(stats_answer_count, 4)
 
 
 class UnresolvedAnswersTests(test_utils.GenericTestBase):
