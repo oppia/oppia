@@ -257,15 +257,20 @@ body {
 }
 
 .oppia-profile-content-card {
-  background-color: #fff;
+  box-shadow: none;
   float: left;
   min-height: 630px;
-  padding: 30px;
+  padding: 0 30px 30px 30px;
   position: relative;
   width: -webkit-calc(100% - 280px);
   width: -moz-calc(100% - 280px);
   width: -o-calc(100% - 280px);
   width: calc(100% - 280px);
+}
+
+md-card.oppia-profile-content-card {
+  margin-top: 0;
+  padding-top: 0;
 }
 
 /* For issue #1867 (https://github.com/oppia/oppia/issues/1867)
@@ -280,12 +285,17 @@ body {
   width: 100%;
 }
 
+md-content.oppia-profile-portfolio-container {
+  background-color: transparent;
+}
+
 .oppia-profile-portfolio-pages {
   bottom: 0;
   display: block;
-  font-size: .7em;
-  margin-bottom: 20px;
-  margin-right: 40px;
+  font-size: .9em;
+  font-weight: bold;
+  margin-bottom: 60px;
+  margin-right: 65px;
   position: absolute;
   right: 0;
   text-align: right;
@@ -3606,7 +3616,7 @@ md-card.preview-conversation-skin-supplemental-card {
     The margin setting is so that exploration summary tiles and collection
     summary tiles would be the same widths (214px).
   */
-  margin: 12px 5.5px;
+  margin: 8px 5.5px;
   padding: 0;
   position: relative;
   text-align: left;
