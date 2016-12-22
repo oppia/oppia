@@ -16,8 +16,8 @@
 
 Run this script from the Oppia root directory:
 
-    export PYTHONPATH=$PYTHONPATH:.
-    python core/tests/performance_tests/string_classifier_performance_test.py
+  export PYTHONPATH=$PYTHONPATH:.
+  python core/tests/performance_tests/lda_string_classifier_performance_test.py
 
 """
 
@@ -25,7 +25,7 @@ import os
 import time
 import yaml
 
-from core.domain.classifier_services import StringClassifier
+from core.domain.classifier.lda_string_classifier import LDAStringClassifier
 
 def measure_runtime(func):
     """A decorator that measures the amount of time func takes to run.
@@ -54,11 +54,11 @@ def measure_runtime(func):
         return result
     return time_taken
 
-class StringClassifierBenchmarker(object):
+class LDAStringClassifierBenchmarker(object):
     """Benchmark for string classifier.
 
     Usage:
-        benchmark = StringClassifierBenchmarker()
+        benchmark = LDAStringClassifierBenchmarker()
         benchmark.generate_training_benchmarks()
         benchmark.generate_prediction_benchmarks()
 
@@ -102,9 +102,9 @@ class StringClassifierBenchmarker(object):
         Returns:
             dict. The dict representing the resulting classifier model.
         """
-        string_classifier = StringClassifier()
-        string_classifier.load_examples(self.examples[:num])
-        classifier_dict = string_classifier.to_dict()
+        classifier = LDAStringClassifier()
+        classifier.train(self.examples[:num])
+        classifier_dict = classifier.to_dict()
         return classifier_dict
 
     def generate_training_benchmarks(self):
@@ -123,12 +123,9 @@ class StringClassifierBenchmarker(object):
         """
         if not self.classifier_model_dict:
             raise Exception('No classifier found')
-        string_classifier = StringClassifier()
-        string_classifier.from_dict(self.classifier_model_dict)
-        doc_ids = string_classifier.add_docs_for_predicting(
-            self.docs_to_classify[:num])
-        for doc_id in doc_ids:
-            string_classifier.predict_label_for_doc(doc_id)
+        classifier = LDAStringClassifier()
+        classifier.from_dict(self.classifier_model_dict)
+        classifier.predict(self.docs_to_classify[:num])
 
     def generate_prediction_benchmarks(self):
         """Conduct benchmarking on predicting with self.classifier
@@ -140,7 +137,7 @@ class StringClassifierBenchmarker(object):
 
 
 def main():
-    benchmarker = StringClassifierBenchmarker()
+    benchmarker = LDAStringClassifierBenchmarker()
     benchmarker.generate_training_benchmarks()
     benchmarker.generate_prediction_benchmarks()
 
