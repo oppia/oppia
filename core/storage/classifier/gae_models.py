@@ -26,12 +26,12 @@ class ClassifierModel(base_models.BaseModel):
     """Storage model for classifier used for answer classification.
 
     The id/key of instances of this class has the form
-    {{exp_id}}.{{random_hash_of_16_chars}}..
+    {{exp_id}}.{{random_hash_of_16_chars}}
     """
 
     # The exploration_id of the exploration to whose state the model belongs.
     exp_id = ndb.StringProperty(required=True)
-    # The exploration version when the model was created.
+    # The exploration version at the time this classifier model was created.
     exp_version_when_created = ndb.IntegerProperty(required=True)
     # The name of the state to which the model belongs.
     state_name = ndb.StringProperty(required=True)
@@ -52,22 +52,19 @@ class ClassifierModel(base_models.BaseModel):
             exp_id: str. ID of the exploration.
 
         Returns:
-            new_id: str. ID of the new classifier model.
+            ID of the new classifier model.
 
         Raises:
             Exception: The id generator for ClassifierModel is producing too
             many collisions.
         """
 
-        id_prefix = '%s.' % exp_id
-
         for _ in range(base_models.MAX_RETRIES):
             new_id = '%s.%s' % (
-                id_prefix,
+                exp_id,
                 utils.convert_to_hash(
                     str(utils.get_random_int(base_models.RAND_RANGE)),
                     base_models.ID_LENGTH))
-            print cls.get_by_id(new_id)
             if not cls.get_by_id(new_id):
                 return new_id
 
@@ -83,18 +80,21 @@ class ClassifierModel(base_models.BaseModel):
 
         Args:
             exp_id: str. ID of the exploration.
-            exp_version_when_created: int. ID of the thread.
-            state_name: str. ID of the message.
+            exp_version_when_created: int. The version of the exploration when
+                this classification model was created.
+            state_name: str. The name of the state to which the classifier
+                belongs.
             algorithm_id: int. ID of the algorithm used to generate the model.
-            cached_classifier_data: Dict. the model used for classification.
-            data_schema_version: int. schema version of the
-            data used by the classifier.
+            cached_classifier_data: dict. The model used for classification.
+            data_schema_version: int. Schema version of the
+                data used by the classifier.
 
         Returns:
-            ClassifierModel ID. ID of the new ClassifierModel entry.
+            ID of the new ClassifierModel entry.
 
         Raises:
-            Exception: A model with the same ID already exists."""
+            Exception: A model with the same ID already exists.
+        """
 
         instance_id = cls._generate_id(exp_id)
         classifier_model_instance = cls(

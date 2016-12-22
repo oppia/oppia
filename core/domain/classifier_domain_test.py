@@ -14,18 +14,18 @@
 
 """Tests for classifier domain objects."""
 
-from core.tests import test_utils
+
 from core.domain import classifier_domain
+from core.tests import test_utils
+
 
 class ClassifierDomainTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(ClassifierDomainTests, self).setUp()
+    """Test the classifier domain."""
 
     def test_to_dict(self):
         expected_classifier_dict = {
-            'classifier_id': "exp_id1.SOME_RANDOM_STRING",
-            'exp_id': "exp_id1",
+            'classifier_id': 'exp_id1.SOME_RANDOM_STRING',
+            'exp_id': 'exp_id1',
             'exp_version_when_created': 1,
             'state_name': 'a state name',
             'algorithm_id': 1,

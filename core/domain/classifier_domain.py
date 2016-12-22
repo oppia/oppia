@@ -17,21 +17,59 @@
 import copy
 
 class Classifier(object):
-    """Domain object for a classifier."""
+    """Domain object for a classifier.
+
+    A classifier is a machine learning model created using a particular
+    classification algorithm which is used for answer classification
+    task.
+
+    Attributes:
+        id: str. The unique id of the classifier.
+        exp_id: str. The exploration id to which this classifier belongs.
+        exp_version_when_created: str. The version of the exploration when
+            this classification model was created.
+        state_name: str. The name of the state to which the classifier belongs.
+        algorithm_id: int. The id of the algorithm used for generating
+            classifier.
+        cached_classifier_data: dict. The actual classifier model used for
+            classification purpose.
+        data_schema_version: int. Schema version of the
+            data used by the classifier.
+    """
 
     def __init__(self, classifier_id, exp_id, exp_version_when_created,
                  state_name, algorithm_id, cached_classifier_data,
                  data_schema_version):
+        """Constructs an Classifier domain object.
+
+        Args:
+            classifier_id: str. The unique id of the classifier.
+            exp_id: str. The exploration id to which classifier belongs.
+            exp_version_when_created: str. The version of the exploration when
+                this classification model was created.
+            state_name: str. The name of the state to which the classifier belongs.
+            algorithm_id: int. The id of the algorithm used for generating
+                classifier.
+            cached_classifier_data: dict. The actual classifier model used for
+                classification purpose.
+            data_schema_version: int. Schema version of the
+                data used by the classifier.
+        """
         self.id = classifier_id
         self.exp_id = exp_id
         self.exp_version_when_created = exp_version_when_created
         self.state_name = state_name
         self.algorithm_id = algorithm_id
-        self.cached_classifier_data = {}
         self.cached_classifier_data = copy.deepcopy(cached_classifier_data),
         self.data_schema_version = data_schema_version
 
     def to_dict(self):
+        """Constructs an dict representation of Classifier domain object.
+
+        Returns:
+            A dict representation of Classifier domain object.
+        """
+
         return {
             'classifier_id': self.id,
             'exp_id': self.exp_id,
