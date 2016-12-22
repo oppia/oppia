@@ -545,23 +545,21 @@ class InteractionAnswerSummariesMRJobManager(
                 'exploration_version': item.exploration_version,
                 'state_name': _encode(item.state_name),
                 'interaction_id': item.interaction_id,
-                'submitted_answer_list': _encode(item.submitted_answer_list),
+                'submitted_answer_list': item.submitted_answer_list,
             }
 
             # Output answers submitted to the exploration for this exp version.
-            versioned_key = '%s:%s:%s' % (
-                item.exploration_id, item.exploration_version,
-                _encode(item.state_name))
-            yield (versioned_key, state_answers_dict)
+            versioned_key = u'%s:%s:%s' % (
+                item.exploration_id, item.exploration_version, item.state_name)
+            yield (versioned_key.encode('utf-8'), state_answers_dict)
 
             # Output the same set of answers independent of the version. This
             # allows the reduce step to aggregate answers across all
             # exploration versions.
             state_answers_dict['exploration_version'] = VERSION_ALL
-            all_versions_key = '%s:%s:%s' % (
-                item.exploration_id, VERSION_ALL,
-                _encode(item.state_name))
-            yield (all_versions_key, state_answers_dict)
+            all_versions_key = u'%s:%s:%s' % (
+                item.exploration_id, VERSION_ALL, item.state_name)
+            yield (all_versions_key.encode('utf-8'), state_answers_dict)
 
     @staticmethod
     def reduce(key, stringified_submitted_answer_list):

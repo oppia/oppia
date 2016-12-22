@@ -185,10 +185,8 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
         # working with the set itself, rather than a stringified representation
         # of it.
         list_of_all_elements = []
-        for setstring in answer_values:
-            elts_this_set = (
-                setstring.replace('[', '').replace(']', '').split(', '))
-            list_of_all_elements += elts_this_set
+        for set_value in answer_values:
+            list_of_all_elements += set_value
 
         elements_as_list_of_pairs = sorted(
             collections.Counter(list_of_all_elements).items(),

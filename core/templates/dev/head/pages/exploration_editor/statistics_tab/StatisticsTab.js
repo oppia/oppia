@@ -28,7 +28,8 @@ oppia.controller('StatisticsTab', [
   function(
       $scope, $http, $modal, alertsService, explorationStatesService,
       explorationData, computeGraphService, oppiaDatetimeFormatter,
-      StateImprovementSuggestionService, IMPROVE_TYPE_INCOMPLETE) {
+      StateImprovementSuggestionService, IMPROVE_TYPE_DEFAULT,
+      IMPROVE_TYPE_INCOMPLETE) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
       chartAreaWidth: 300,
       colors: ['green', 'firebrick'],
