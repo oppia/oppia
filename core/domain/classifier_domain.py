@@ -47,7 +47,8 @@ class Classifier(object):
             exp_id: str. The exploration id to which classifier belongs.
             exp_version_when_created: str. The version of the exploration when
                 this classification model was created.
-            state_name: str. The name of the state to which the classifier belongs.
+            state_name: str. The name of the state to which the classifier
+                belongs.
             algorithm_id: int. The id of the algorithm used for generating
                 classifier.
             cached_classifier_data: dict. The actual classifier model used for
