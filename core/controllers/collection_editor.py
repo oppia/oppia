@@ -19,8 +19,10 @@
 from core.controllers import base
 from core.domain import collection_services
 from core.domain import config_domain
+from core.domain import email_manager
 from core.domain import rights_manager
 from core.domain import summary_services
+from core.domain import user_services
 from core.platform import models
 import feconf
 import utils
@@ -102,13 +104,32 @@ class CollectionEditorPage(CollectionEditorHandler):
         collection = collection_services.get_collection_by_id(
             collection_id, strict=False)
 
+        can_edit = (
+            bool(self.user_id) and
+            self.username not in config_domain.BANNED_USERNAMES.value and
+            rights_manager.Actor(self.user_id).can_edit(
+                feconf.ACTIVITY_TYPE_COLLECTION, collection_id))
+
+
+        user_permissions = rights_manager.get_collection_rights(
+            collection_id).to_dict()
+        owner_names = user_permissions['owner_names']
+        editor_names = user_permissions['editor_names']
+        viewer_names = user_permissions['viewer_names']
+
         self.values.update({
-            'can_edit': True,
+            'can_edit': can_edit,
+            'can_modify_roles': rights_manager.Actor(
+                self.user_id).can_modify_roles(
+                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id),
             'can_unpublish': rights_manager.Actor(
                 self.user_id).can_unpublish(
                     feconf.ACTIVITY_TYPE_COLLECTION, collection_id),
             'collection_id': collection.id,
+            'collection_version': collection.version,
+            'editors': editor_names,
             'is_private': rights_manager.is_collection_private(collection_id),
+            'owners': owner_names,
             'nav_mode': feconf.NAV_MODE_CREATE,
             'title': collection.title,
             'SHOW_COLLECTION_NAVIGATION_TAB_HISTORY': (
@@ -116,6 +137,7 @@ class CollectionEditorPage(CollectionEditorHandler):
             'SHOW_COLLECTION_NAVIGATION_TAB_STATS': (
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_STATS),
             'TAG_REGEX': feconf.TAG_REGEX,
+            'viewers': viewer_names,
         })
 
         self.render_template('pages/collection_editor/collection_editor.html')
@@ -151,7 +173,7 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
             raise self.PageNotFoundException(e)
 
         self.values.update({
-            'collection': collection_dict
+            'collection': collection_dict,
         })
 
         self.render_json(self.values)
@@ -197,8 +219,33 @@ class CollectionRightsHandler(CollectionEditorHandler):
 
         # TODO(bhenning): Implement other rights changes here.
         is_public = self.payload.get('is_public')
+        is_publicized = self.payload.get('is_publicized')
+        new_member_username = self.payload.get('new_member_username')
+        new_member_role = self.payload.get('new_member_role')
+        viewable_if_private = self.payload.get('viewable_if_private')
 
-        if is_public is not None:
+        if new_member_username:
+            if not rights_manager.Actor(
+                    self.user_id).can_modify_roles(
+                        feconf.ACTIVITY_TYPE_COLLECTION,
+                        collection_id):
+                raise self.UnauthorizedUserException(
+                    'Only an owner of this collection can add or change '
+                    'roles.')
+
+            new_member_id = user_services.get_user_id_from_username(
+                new_member_username)
+            if new_member_id is None:
+                raise Exception(
+                    'Sorry, we could not find the specified user.')
+
+            rights_manager.assign_role_for_collection(
+                self.user_id, collection_id, new_member_id, new_member_role)
+            email_manager.send_role_notification_email(
+                self.user_id, new_member_id, new_member_role, collection_id,
+                collection.title)
+
+        elif is_public is not None:
             if is_public:
                 try:
                     collection.validate(strict=True)
@@ -219,6 +266,27 @@ class CollectionRightsHandler(CollectionEditorHandler):
             else:
                 raise self.InvalidInputException(
                     'Cannot unpublish a collection.')
+
+        elif is_publicized is not None:
+            if is_publicized:
+                try:
+                    collection.validate(strict=True)
+                except utils.ValidationError as e:
+                    raise self.InvalidInputException(e)
+
+                rights_manager.publicize_exploration(
+                    self.user_id, collection_id)
+            else:
+                rights_manager.unpublicize_exploration(
+                    self.user_id, collection_id)
+
+        elif viewable_if_private is not None:
+            rights_manager.set_private_viewability_of_exploration(
+                self.user_id, collection_id, viewable_if_private)
+
+        else:
+            raise self.InvalidInputException(
+                'No change was made to this exploration.')
 
         self.render_json({
             'rights': rights_manager.get_collection_rights(

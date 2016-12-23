@@ -20,30 +20,50 @@ oppia.factory('CollectionRightsBackendApiService', [
     '$http', '$q', 'COLLECTION_RIGHTS_URL_TEMPLATE', 'UrlInterpolationService',
     function($http, $q, COLLECTION_RIGHTS_URL_TEMPLATE,
       UrlInterpolationService) {
-      var _setCollectionStatus = function(
-          collectionId, collectionVersion, isPublic, successCallback,
-          errorCallback) {
+      var SetCollectionRights = function(
+        collectionId, putParams, successCallback, errorCallback) {
         var collectionRightsUrl = UrlInterpolationService.interpolateUrl(
           COLLECTION_RIGHTS_URL_TEMPLATE, {
             collection_id: collectionId
           });
 
-        var putParams = {
-          version: collectionVersion,
-          is_public: isPublic
-        };
-        $http.put(collectionRightsUrl, putParams).then(function() {
+        $http.put(collectionRightsUrl, putParams).then(function(response) {
           // TODO(bhenning): Consolidate the backend rights domain objects and
           // implement a frontend activity rights domain object. The rights
           // being passed in here should be used to create one of those objects.
           if (successCallback) {
-            successCallback();
+            successCallback(response.data);
           }
         }, function(errorResponse) {
           if (errorCallback) {
             errorCallback(errorResponse.data);
           }
         });
+      };
+
+      var SetCollectionStatus = function(
+          collectionId, collectionVersion, isPublic, successCallback,
+          errorCallback) {
+        var putParams = {
+          version: collectionVersion,
+          is_public: isPublic
+        };
+
+        return SetCollectionRights(
+          collectionId, putParams, successCallback, errorCallback);
+      };
+
+      var SetCollectionMember = function(
+        collectionId, collectionVersion, newCollectionMember,
+        newCollectionMemberRole, successCallback, errorCallback) {
+        var putParams = {
+          version: collectionVersion,
+          new_member_username: newCollectionMember,
+          new_member_role: newCollectionMemberRole
+        };
+
+        return SetCollectionRights(
+          collectionId, putParams, successCallback, errorCallback);
       };
 
       return {
@@ -53,7 +73,7 @@ oppia.factory('CollectionRightsBackendApiService', [
          */
         setCollectionPublic: function(collectionId, collectionVersion) {
           return $q(function(resolve, reject) {
-            _setCollectionStatus(
+            SetCollectionStatus(
               collectionId, collectionVersion, true, resolve, reject);
           });
         },
@@ -64,8 +84,44 @@ oppia.factory('CollectionRightsBackendApiService', [
          */
         setCollectionPrivate: function(collectionId, collectionVersion) {
           return $q(function(resolve, reject) {
-            _setCollectionStatus(
+            SetCollectionStatus(
               collectionId, collectionVersion, false, resolve, reject);
+          });
+        },
+
+        /**
+         * Adds a a new owner to the collection, given its ID and version.
+         */
+        SetCollectionOwner: function(
+          collectionId, collectionVersion, newCollectionOwner) {
+          return $q(function(resolve, reject) {
+            SetCollectionMember(
+              collectionId, collectionVersion, newCollectionOwner, 'owner',
+              resolve, reject);
+          });
+        },
+
+        /**
+         * Adds a a new owner to the collection, given its ID and version.
+         */
+        SetCollectionEditor: function(
+          collectionId, collectionVersion, newCollectionEditor) {
+          return $q(function(resolve, reject) {
+            SetCollectionMember(
+              collectionId, collectionVersion, newCollectionEditor, 'editor',
+              resolve, reject);
+          });
+        },
+
+        /**
+         * Adds a a new owner to the collection, given its ID and version.
+         */
+        SetCollectionPlaytester: function(
+          collectionId, collectionVersion, newCollectionPlaytester) {
+          return $q(function(resolve, reject) {
+            SetCollectionMember(
+              collectionId, collectionVersion, newCollectionPlaytester,
+              'viewer', resolve, reject);
           });
         }
       };
