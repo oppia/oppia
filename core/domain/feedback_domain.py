@@ -20,25 +20,30 @@ import utils
 
 class FeedbackThread(object):
     """Domain object for a feedback thread.
+    
     Attributes:
-        full_thread_id: An int representing the feedback thread ID.
-        exploration_id: An int representing the associated exploration's ID.
-        state_name: A string containing the name of the state associated with 
-        the feedback thread.
-        original_author_id: An int representing the ID of the original author.
-        status: String from a select, indicating the current status of the 
-        thread.
-        subject: A string representing the subject of the feedback thread.
-        summary: A string representing a summary of the feedback thread.
-        has_suggestion: Indicates whether a given exploration has a change 
-        suggestion.
-        created_on: The date in which the feedback thread was created. 
-        last_updated: The date in which the feedback thread was last updated.
+        full_thread_id: str. The feedback thread ID.
+        exploration_id: str. The associated exploration's ID.
+        state_name: str. The name of the state associated with 
+            the feedback thread.
+        original_author_id: str. The ID of the original author.
+        status: string(select). The current status of the 
+            thread.
+        subject: str. The subject of the feedback thread.
+        summary: str. A summary of the feedback thread.
+        has_suggestion: bool. Indicates whether a given exploration has a 
+            change suggestion.
+        created_on: str. The date in which the feedback thread was created. 
+        last_updated: str. The date in which the feedback thread was last 
+            updated.
     """
 
     def __init__(self, full_thread_id, exploration_id, state_name,
                  original_author_id, status, subject, summary, has_suggestion,
                  created_on, last_updated):
+        """Initializes a FeedbackThread object.
+        """
+
         self.id = full_thread_id
         self.exploration_id = exploration_id
         self.state_name = state_name
@@ -50,16 +55,24 @@ class FeedbackThread(object):
 
         self.created_on = created_on
         self.last_updated = last_updated
-
+        
+        
     def get_thread_id(self):
+        """
+        
+        Returns:
+            str. The full feedback thread ID from the main object.
+        """
         return FeedbackThread.get_thread_id_from_full_thread_id(self.id)
+
 
     def to_dict(self):
         """
+        
         Returns:
             list(dict). Dicts mapping key-value pairs based on the 
             corresponding data fetched regarding the given feedback thread.
-        """
+        """        
         return {
             'last_updated': utils.get_time_in_millisecs(self.last_updated),
             'original_author_username': user_services.get_username(
@@ -73,25 +86,36 @@ class FeedbackThread(object):
 
     @staticmethod
     def get_exp_id_from_full_thread_id(full_thread_id):
+        """
+        
+        Returns:
+            str. The full feedback thread ID split by a period(.) separator.
+        """
         return full_thread_id.split('.')[0]
 
     @staticmethod
     def get_thread_id_from_full_thread_id(full_thread_id):
+        """
+        
+        Returns:
+            str. The full feedback thread ID split by a period(.) separator.
+        """
         return full_thread_id.split('.')[1]
 
 
 class FeedbackMessage(object):
     """Domain object for a feedback message.
+    
     Attributes:
-        full_message_id: An int representing the ID to the full feedback thread 
-        message.
-        full_thread_id: An int representing the containing the feedback thread 
-        ID. 
-        message_id: An int representing the ID of the feedback thread message.
-        author_id: An int representing the ID of the message's author.
-        updated_status: A string representing the new status of the feedback 
-        thread.
-        updated_subject: A string representing the new feedback thread subject.
+        full_message_id: str. The ID to the full feedback thread 
+            message.
+        full_thread_id: str. The containing feedback thread 
+            ID. 
+        message_id: str. The ID of the feedback thread message.
+        author_id: str. The ID of the message's author.
+        updated_status: str. The new status of the feedback 
+            thread.
+        updated_subject: str. The new feedback thread subject.
         text: This is the text for the full feedback thread message.
     """
 
@@ -108,12 +132,19 @@ class FeedbackMessage(object):
         self.created_on = created_on
         self.last_updated = last_updated
 
+
     @property
     def exploration_id(self):
+        """
+        
+        Returns:
+            str. Exploration ID split by the period(.) separator.
+        """
         return self.id.split('.')[0]
 
     def to_dict(self):
         """
+        
         Returns:
             list(dict). Dicts mapping key-value pairs based on the 
             corresponding data fetched regarding the given feedback message.
@@ -134,21 +165,25 @@ class FeedbackMessage(object):
 class FeedbackAnalytics(object):
     """Domain object representing feedback analytics
     for a specific exploration.
+    
     Attributes:
-        exploration_id: An int representing the associated exploration's ID.
-        num_open_threads: An int representing the number of open threads under 
-        a given exploration.
-        num_total_threads: An int representing the number of total thread under 
-        a given exploration (regardless of status).
+        exploration_id: str. The associated exploration's ID.
+        num_open_threads: int. The number of open threads under 
+            a given exploration.
+        num_total_threads: int. The number of total threads under 
+            a given exploration (regardless of status).
     """
 
     def __init__(self, exploration_id, num_open_threads, num_total_threads):
+        """Initializes a FeedbackAnalytics object.
+        """
         self.id = exploration_id
         self.num_open_threads = num_open_threads
         self.num_total_threads = num_total_threads
 
     def to_dict(self):
         """
+        
         Returns:
             list(dict). Dicts mapping key-value pairs based on the 
             corresponding data fetched regarding the number of open and total
@@ -158,16 +193,17 @@ class FeedbackAnalytics(object):
             'num_open_threads': self.num_open_threads,
             'num_total_threads': self.num_total_threads
         }
-
+        
 
 class Suggestion(object):
     """Domain object for a suggestion.
+    
     Attributes:
-        full_thread_id: An int representing the suggestion thread ID.
-        author_id: An int representing the ID of the message's author.
-        exploration_id: An int representing the associated exploration's ID.
+        full_thread_id: str. The suggestion thread ID.
+        author_id: str. The ID of the message's author.
+        exploration_id: str. The associated exploration's ID.
         exploration_version: This represents the version of the exploration 
-        associated with the suggestion.
+            associated with the suggestion.
         state_name: The name of the state attached to the suggestion.
         description: A description of the change suggestion.
         state_content: The state's "suggested" content.
@@ -175,6 +211,8 @@ class Suggestion(object):
 
     def __init__(self, full_thread_id, author_id, exploration_id,
                  exploration_version, state_name, description, state_content):
+        """Initializes a Suggestion object. 
+        """
         self.id = full_thread_id
         self.author_id = author_id
         self.exploration_id = exploration_id
@@ -184,10 +222,16 @@ class Suggestion(object):
         self.state_content = state_content
 
     def get_author_name(self):
+        """
+        
+        Returns:
+            str. The ID of the specified author in the call.
+        """
         return user_services.get_username(self.author_id)
 
     def to_dict(self):
         """
+        
         Returns:
             list(dict). Dicts mapping key-value pairs based on the 
             corresponding data fetched regarding the a given suggestion thread.
@@ -204,19 +248,23 @@ class Suggestion(object):
 
 class FeedbackMessageReference(object):
     """Domain object for feedback message references
+    
     Attributes:
-        exploration_id: An int representing the associated exploration's ID.
-        thread_id: An int representing the feedback thread's ID.
-        message_id: An int representing the ID of the feedback thread message.
+        exploration_id: str. The associated exploration's ID.
+        thread_id: str. The feedback thread's ID.
+        message_id: str. The ID of the feedback thread message.
     """
 
     def __init__(self, exploration_id, thread_id, message_id):
+        """Initializes a FeedbackMessageReference object.
+        """
         self.exploration_id = exploration_id
         self.thread_id = thread_id
         self.message_id = message_id
 
     def to_dict(self):
         """
+        
         Returns:
             list(dict). Dicts mapping key-value pairs based on the 
             corresponding data fetched regarding a particular feedback message
