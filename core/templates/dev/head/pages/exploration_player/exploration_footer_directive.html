@@ -97,7 +97,10 @@
   }
 
   .oppia-exploration-footer .dropdown-menu.author-profile-dropdown-menu {
-    border-radius: 0;
+    border: none !important;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    box-shadow: 0px -6px 12px rgba(0, 0, 0, 0.176);
     float: left;
     list-style-type: none;
     margin:0 0 16px -1px;
@@ -106,7 +109,6 @@
   .oppia-exploration-footer .author-profile-dropdown-menu li {
     color: #094142;
     float: none;
-    padding: 10px 0 5px 5px;
     text-overflow: clip;
     white-space: nowrap;
     width: 100%;
@@ -114,12 +116,12 @@
 
   .oppia-exploration-footer .author-profile-dropdown-menu li > a {
     color: #094142;
-    padding: 0;
+    padding: 3px 20px;
   }
 
-  .oppia-exploration-footer .author-profile-dropdown-menu li:hover a {
-    background-color: #fff;
-    color: #115FD4;
+  .oppia-exploration-footer .author-profile-dropdown-menu li a:hover {
+    background-color: #eee;
+    color: #888;
   }
 
   .oppia-exploration-footer .author-profile-text {
