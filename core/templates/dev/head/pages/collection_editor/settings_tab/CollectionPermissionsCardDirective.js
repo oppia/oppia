@@ -13,15 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for displaying and editing a collection details.
- * Edit options include: changing the title, objective, and category, and also
- * adding a new exploration.
+ * @fileoverview Directive for displaying the collection's owner name and
+ * permissions.
  */
 
-oppia.directive('collectionPermissionsEditor', [function() {
+oppia.directive('collectionPermissionsCard', [function() {
   return {
     restrict: 'E',
-    templateUrl: 'inline/collection_permissions_directive',
+    templateUrl: 'inline/collection_permissions_card_directive',
     controller: [
       '$scope',
       function($scope) {

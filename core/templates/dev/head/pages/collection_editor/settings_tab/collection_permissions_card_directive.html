@@ -1,5 +1,6 @@
-<script type="text/ng-template" id="inline/collection_permissions_directive">
-  <div role="form" class="form-horizontal">
+<script type="text/ng-template" id="inline/collection_permissions_card_directive">
+  <md-card class="oppia-page-card oppia-long-text">
+    <h2>Collection Permissions</h2>
     <div class="row">
       <div class="col-lg-5 col-md-5 col-sm-5">
         <h3>Managers</h3>
@@ -10,11 +11,10 @@
         </ul>
       </div>
 
-
       <div class="col-lg-7 col-md-7 col-sm-7">
         <h3>Permissions</h3>
         <div ng-if="isPrivate">
-          This collection is <strong>private</strong>. Anyone with the link can access it.
+          This collection is <strong>private</strong>.
           <br>
           <br>
           It is <strong>not shown</strong> in the Oppia library.
@@ -27,5 +27,5 @@
         </div>
       </div>
     </div>
-  </div>
+  </md-card>
 </script>
