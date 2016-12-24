@@ -103,19 +103,13 @@ class CollectionEditorPage(CollectionEditorHandler):
             collection_id, strict=False)
 
         self.values.update({
-            'can_edit': True,
-            'can_unpublish': rights_manager.Actor(
-                self.user_id).can_unpublish(
-                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id),
             'collection_id': collection.id,
-            'is_private': rights_manager.is_collection_private(collection_id),
             'nav_mode': feconf.NAV_MODE_CREATE,
             'title': collection.title,
             'SHOW_COLLECTION_NAVIGATION_TAB_HISTORY': (
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_HISTORY),
             'SHOW_COLLECTION_NAVIGATION_TAB_STATS': (
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_STATS),
-            'TAG_REGEX': feconf.TAG_REGEX,
         })
 
         self.render_template('pages/collection_editor/collection_editor.html')
@@ -150,8 +144,10 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
+        collection_dict['TAG_REGEX'] = feconf.TAG_REGEX
+
         self.values.update({
-            'collection': collection_dict
+            'collection': collection_dict,
         })
 
         self.render_json(self.values)
@@ -187,6 +183,30 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
 
 class CollectionRightsHandler(CollectionEditorHandler):
     """Handles management of collection editing rights."""
+
+    @require_editor
+    def get(self, collection_id):
+        """Gets the editing rights for the given collection."""
+        collection = collection_services.get_collection_by_id(collection_id)
+
+        can_edit = (
+            bool(self.user_id) and
+            self.username in
+            config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value and
+            rights_manager.Actor(self.user_id).can_edit(
+                feconf.ACTIVITY_TYPE_COLLECTION, collection_id))
+
+        self.values.update({
+            'can_edit': can_edit,
+            'can_unpublish': rights_manager.Actor(
+                self.user_id).can_unpublish(
+                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id),
+            'collection_id': collection.id,
+            'is_private': rights_manager.is_collection_private(collection_id),
+        })
+
+        self.render_json(self.values)
+
 
     @require_editor
     def put(self, collection_id):
