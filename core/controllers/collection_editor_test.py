@@ -52,20 +52,6 @@ class BaseCollectionEditorControllerTest(test_utils.GenericTestBase):
             }]
         }
 
-    def assert_can_edit(self, response_body):
-        """Returns True if the response body indicates that the collection is
-        editable.
-        """
-        self.assertIn(self.CAN_EDIT_STR, response_body)
-        self.assertNotIn(self.CANNOT_EDIT_STR, response_body)
-
-    def assert_cannot_edit(self, response_body):
-        """Returns True if the response body indicates that the collection is
-        not editable.
-        """
-        self.assertIn(self.CANNOT_EDIT_STR, response_body)
-        self.assertNotIn(self.CAN_EDIT_STR, response_body)
-
 
 class CollectionEditorTest(BaseCollectionEditorControllerTest):
     COLLECTION_ID = '0'
@@ -106,7 +92,6 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
                        self.COLLECTION_ID))
         self.assertEqual(response.status_int, 200)
         self.assertIn('Introduction to Collections in Oppia', response.body)
-        self.assert_can_edit(response.body)
         self.logout()
 
     def test_editable_collection_handler_get(self):
