@@ -55,7 +55,7 @@
     </li>
   </ul>
 
-  <ul class="nav navbar-nav oppia-navbar-nav navbar-right">
+  <ul ng-if="rightsHasLoaded" class="nav navbar-nav oppia-navbar-nav navbar-right">
     <li style="margin-right: 10px; margin-top: 8px;">
       <button class="btn btn-default oppia-save-draft-button"
               ng-class="{'btn-success': isCollectionSaveable()}"

@@ -16,31 +16,41 @@
  * @fileoverview Directive for the navbar of the collection editor.
  */
 
+oppia.constant('EVENT_COLLECTION_STATUS_CHANGE', 'collectionStatusChange');
+
 oppia.directive('collectionEditorNavbar', [function() {
   return {
     restrict: 'E',
     templateUrl: 'inline/collection_editor_navbar_directive',
     controller: [
-      '$scope', '$modal', 'alertsService', 'routerService', 'UndoRedoService',
-      'CollectionEditorStateService', 'CollectionValidationService',
-      'CollectionRightsBackendApiService',
-      'EditableCollectionBackendApiService',
-      'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
+      '$scope', '$log', '$modal', '$rootScope', 'alertsService',
+      'routerService', 'UndoRedoService', 'CollectionEditorStateService',
+      'CollectionValidationService', 'CollectionRightsBackendApiService',
+      'EditableCollectionBackendApiService', 'EVENT_COLLECTION_INITIALIZED',
+      'EVENT_COLLECTION_REINITIALIZED', 'EVENT_COLLECTION_STATUS_CHANGE',
       'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
       function(
-          $scope, $modal, alertsService, routerService, UndoRedoService,
-          CollectionEditorStateService, CollectionValidationService,
-          CollectionRightsBackendApiService,
-          EditableCollectionBackendApiService,
-          EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED,
+          $scope, $log, $modal, $rootScope, alertsService,
+          routerService, UndoRedoService, CollectionEditorStateService,
+          CollectionValidationService, CollectionRightsBackendApiService,
+          EditableCollectionBackendApiService, EVENT_COLLECTION_INITIALIZED,
+          EVENT_COLLECTION_REINITIALIZED, EVENT_COLLECTION_STATUS_CHANGE,
           EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
+        $scope.rightsHasLoaded = false;
+
         $scope.collectionId = GLOBALS.collectionId;
         $scope.collection = CollectionEditorStateService.getCollection();
-        $scope.isPrivate = GLOBALS.isPrivate;
-        $scope.canUnpublish = GLOBALS.canUnpublish;
         $scope.validationIssues = [];
         $scope.isSaveInProgress = (
           CollectionEditorStateService.isSavingCollection);
+
+        CollectionRightsBackendApiService.getCollectionRights(
+          $scope.collectionId).then(function(data) {
+          $scope.isPrivate = data.is_private;
+          $scope.canUnpublish = data.can_unpublish;
+
+          $scope.rightsHasLoaded = true;
+        });
 
         $scope.getTabStatuses = routerService.getTabStatuses;
         $scope.selectMainTab = routerService.navigateToMainTab;
@@ -68,11 +78,15 @@ oppia.directive('collectionEditorNavbar', [function() {
           // action since it is not reversible.
           CollectionRightsBackendApiService.setCollectionPublic(
             $scope.collectionId, $scope.collection.getVersion()).then(
-            function() {
-              // TODO(bhenning): There should be a scope-level rights object
-              // used, instead. The rights object should be loaded with the
-              // collection.
-              $scope.isPrivate = false;
+            function(data) {
+              if (!data.is_private) {
+                $scope.isPrivate = data.is_private;
+                $rootScope.$broadcast(EVENT_COLLECTION_STATUS_CHANGE);
+              } else {
+                $log.error(
+                  'Backend indicated a collection was successfully ' +
+                  'published, but response.data.is_private returned true.');
+              }
             }, function() {
               alertsService.addWarning(
                 'There was an error when publishing the collection.');
@@ -228,8 +242,15 @@ oppia.directive('collectionEditorNavbar', [function() {
         $scope.unpublishCollection = function() {
           CollectionRightsBackendApiService.setCollectionPrivate(
             $scope.collectionId, $scope.collection.getVersion()).then(
-            function() {
-              $scope.isPrivate = true;
+            function(data) {
+              if (data.is_private) {
+                $scope.isPrivate = data.is_private;
+                $rootScope.$broadcast(EVENT_COLLECTION_STATUS_CHANGE);
+              } else {
+                $log.error(
+                  'Backend indicated a collection was successfully ' +
+                  'unpublished, but response.data.is_private returned false.');
+              }
             }, function() {
               alertsService.addWarning(
                 'There was an error when unpublishing the collection.');
