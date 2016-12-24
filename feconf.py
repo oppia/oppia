@@ -211,6 +211,12 @@ DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS = 3600
 # Whether to send an email when new feedback message is received for
 # an exploration.
 DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE = True
+# Whether exploration feedback emails are muted,
+# when the user has not specified a preference.
+DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE = False
+# Whether exploration suggestion emails are muted,
+# when the user has not specified a preference.
+DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE = False
 # Whether to send email updates to a user who has not specified a preference.
 DEFAULT_EMAIL_UPDATES_PREFERENCE = False
 # Whether to send an invitation email when the user is granted
