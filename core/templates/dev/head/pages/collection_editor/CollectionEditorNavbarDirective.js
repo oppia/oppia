@@ -36,11 +36,15 @@ oppia.directive('collectionEditorNavbar', [function() {
           EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
         $scope.collectionId = GLOBALS.collectionId;
         $scope.collection = CollectionEditorStateService.getCollection();
-        $scope.isPrivate = GLOBALS.isPrivate;
-        $scope.canUnpublish = GLOBALS.canUnpublish;
         $scope.validationIssues = [];
         $scope.isSaveInProgress = (
           CollectionEditorStateService.isSavingCollection);
+
+        CollectionRightsBackendApiService.getCollectionRights(
+          $scope.collectionId).then(function(response) {
+          $scope.isPrivate = response.is_private;
+          $scope.canUnpublish = response.can_unpublish;
+        });
 
         $scope.getTabStatuses = routerService.getTabStatuses;
         $scope.selectMainTab = routerService.navigateToMainTab;
@@ -68,11 +72,11 @@ oppia.directive('collectionEditorNavbar', [function() {
           // action since it is not reversible.
           CollectionRightsBackendApiService.setCollectionPublic(
             $scope.collectionId, $scope.collection.getVersion()).then(
-            function() {
+            function(response) {
               // TODO(bhenning): There should be a scope-level rights object
               // used, instead. The rights object should be loaded with the
               // collection.
-              $scope.isPrivate = false;
+              $scope.isPrivate = response.is_private;
             }, function() {
               alertsService.addWarning(
                 'There was an error when publishing the collection.');
@@ -228,8 +232,8 @@ oppia.directive('collectionEditorNavbar', [function() {
         $scope.unpublishCollection = function() {
           CollectionRightsBackendApiService.setCollectionPrivate(
             $scope.collectionId, $scope.collection.getVersion()).then(
-            function() {
-              $scope.isPrivate = true;
+            function(response) {
+              $scope.isPrivate = response.is_private;
             }, function() {
               alertsService.addWarning(
                 'There was an error when unpublishing the collection.');

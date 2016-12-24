@@ -47,7 +47,7 @@ oppia.directive('collectionDetailsEditor', [function() {
         );
 
         $scope.languageListForSelect = GLOBALS.ALL_LANGUAGE_CODES;
-        $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
+        $scope.TAG_REGEX = $scope.collection.TAG_REGEX;
 
         var refreshSettingsTab = function() {
           $scope.displayedCollectionTitle = $scope.collection.getTitle();

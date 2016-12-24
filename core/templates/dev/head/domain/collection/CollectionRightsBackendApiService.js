@@ -20,6 +20,24 @@ oppia.factory('CollectionRightsBackendApiService', [
     '$http', '$q', 'COLLECTION_RIGHTS_URL_TEMPLATE', 'UrlInterpolationService',
     function($http, $q, COLLECTION_RIGHTS_URL_TEMPLATE,
       UrlInterpolationService) {
+      var _getCollectionRights = function(collectionId, successCallback,
+        errorCallback) {
+        var collectionRightsUrl = UrlInterpolationService.interpolateUrl(
+          COLLECTION_RIGHTS_URL_TEMPLATE, {
+            collection_id: collectionId
+          });
+
+        $http.get(collectionRightsUrl).then(function(response) {
+          if (successCallback) {
+            successCallback(response.data);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
+      };
+
       var _setCollectionStatus = function(
           collectionId, collectionVersion, isPublic, successCallback,
           errorCallback) {
@@ -32,12 +50,12 @@ oppia.factory('CollectionRightsBackendApiService', [
           version: collectionVersion,
           is_public: isPublic
         };
-        $http.put(collectionRightsUrl, putParams).then(function() {
+        $http.put(collectionRightsUrl, putParams).then(function(response) {
           // TODO(bhenning): Consolidate the backend rights domain objects and
           // implement a frontend activity rights domain object. The rights
           // being passed in here should be used to create one of those objects.
           if (successCallback) {
-            successCallback();
+            successCallback(response.data);
           }
         }, function(errorResponse) {
           if (errorCallback) {
@@ -47,6 +65,15 @@ oppia.factory('CollectionRightsBackendApiService', [
       };
 
       return {
+        /**
+         * Gets a collection's rights, given its ID.
+         */
+        getCollectionRights: function(collectionId) {
+          return $q(function(resolve, reject) {
+            _getCollectionRights(collectionId, resolve, reject);
+          });
+        },
+
         /**
          * Updates a collection's rights to be have public learner access, given
          * its ID and version.
