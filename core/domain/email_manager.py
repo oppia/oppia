@@ -528,13 +528,13 @@ def send_role_notification_email(
         raise Exception(
             'Invalid role: %s' % recipient_role)
 
-    role_descriptipn = EDITOR_ROLE_EMAIL_HTML_ROLES[recipient_role]
-    rights_html = EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE[role_descriptipn]
+    role_description = EDITOR_ROLE_EMAIL_HTML_ROLES[recipient_role]
+    rights_html = EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE[role_description]
 
     email_subject = email_subject_template % exploration_title
     email_body = email_body_template % (
         recipient_user_settings.username, inviter_user_settings.username,
-        role_descriptipn, exploration_id, exploration_title, rights_html,
+        role_description, exploration_id, exploration_title, rights_html,
         exploration_id, EMAIL_FOOTER.value)
 
     _send_email(
