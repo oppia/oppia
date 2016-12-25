@@ -81,7 +81,9 @@ class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
             status_code: int. The status_code to return in subsequent calls
             to the urlfetch mock.
             headers: dict. The headers to return in subsequent calls to
-            urlfetch mock.
+            urlfetch mock. The keys of this dict are strings that represent
+            the header name and the value represents corresponding value of
+            that header.
         """
         self.return_values['content'] = content
         self.return_values['status_code'] = status_code
@@ -91,8 +93,8 @@ class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
         """Simulates urlfetch mock by setting request & response object.
 
         Args:
-            request: dict. Request object for the URLMock
-            response: dict. Response object for the URLMock
+            request: dict. Request object for the URLMock.
+            response: dict. Response object for the URLMock.
         """
         return_values = self.return_values
         response.set_content(return_values.get('content', ''))
@@ -161,10 +163,11 @@ class TestBase(unittest.TestCase):
         """Tests if unicode string are working properly.
 
         Args:
-            suffix: the suffix pattern to the UNICODE_TEST_STRING
+            suffix: str. the suffix pattern to the UNICODE_TEST_STRING.
 
         Returns:
-            string with UNICODE_TEST_STRING suffixed with string `suffix`
+            str. string with UNICODE_TEST_STRING appended to the value
+            passed in `suffix` variable.
         """
         return '%s%s' % (self.UNICODE_TEST_STRING, suffix)
 
@@ -230,11 +233,11 @@ class TestBase(unittest.TestCase):
 
     def login(self, email, is_super_admin=False):
         """Sets environment variables to simulate a login. Sets
-        USER_IS_ADMIN to `1` if is_super_admin is True else `0`
+        USER_IS_ADMIN to `1` if is_super_admin is True else `0`.
 
         Args:
             email: str. User's email to be picked up from environment variable
-                `USER_EMAIL`
+                `USER_EMAIL`.
             is_super_admin: bool. Optional parameter to be accepted. False
                 by default.
         """
@@ -369,7 +372,7 @@ class TestBase(unittest.TestCase):
         """Gets the user_id of the current logged-in user.
 
         Returns:
-            Value of USER_ID env variable.
+            str. Value of USER_ID env variable.
         """
         return os.environ['USER_ID']
 
@@ -377,10 +380,10 @@ class TestBase(unittest.TestCase):
         """Gets the user_id corresponding to the given email.
 
         Args:
-            email: valid email id stored in the Appengine database.
+            email: str. valid email id stored in the Appengine database.
 
         Returns:
-            user_id: . Id of user possessing given email.
+            user_id: str. Id of user possessing given email.
         """
         return current_user_services.get_user_id_from_email(email)
 
@@ -488,17 +491,18 @@ class TestBase(unittest.TestCase):
         exploration details.
 
         Args:
-            collection_id: Id for the collection to be created
-            owner_id: user_id for owner to be linked to the collection.
-            title: title for the collection
-            category: category of the exploration
-            objective: objective for the exploration
-            language_code: Defaults to `en` for English
-            exploration_id: exploration_id for the Oppia exploration.
-            end_state_name:
+            collection_id: int. Id for the collection to be created.
+            owner_id: int. user_id for owner to be linked to the collection.
+            title: str. title for the collection.
+            category: str. category of the exploration.
+            objective: str. objective for the exploration.
+            language_code: str. Defaults to `en` for English.
+            exploration_id: int. exploration_id for the Oppia exploration.
+            end_state_name: str. end state for the exploration.
 
         Returns:
-            collection created with the given exploration node.
+            collection: dict. Collection object created with the given
+            exploration node.
         """
         collection = collection_domain.Collection.create_default_collection(
             collection_id, title, category, objective,
@@ -650,9 +654,9 @@ class AppEngineTestBase(TestBase):
         backend tests are being run.
 
         Args:
-            content: Response content or body.
-            status_code: Response status code.
-            headers: Response headers.
+            content: str. Response content or body.
+            status_code: int. Response status code.
+            headers: dict. Response headers.
         """
         if headers is None:
             response_headers = {}
@@ -713,7 +717,7 @@ class AppEngineTestBase(TestBase):
                     # Oppia-taskqueue-related ones.
                     headers = {
                         key: str(val) for key, val in task.headers.iteritems()
-                        }
+                    }
                     headers['Content-Length'] = str(len(task.payload or ''))
 
                     app = (
