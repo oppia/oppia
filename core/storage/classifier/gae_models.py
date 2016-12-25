@@ -21,6 +21,10 @@ from google.appengine.ext import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
+# Available choices of algorithms for classification.
+ALGORITHM_CHOICES = [
+    'LDAStringClassifier'
+]
 
 class ClassifierModel(base_models.BaseModel):
     """Storage model for classifier used for answer classification.
@@ -36,12 +40,12 @@ class ClassifierModel(base_models.BaseModel):
     # The name of the state to which the model belongs.
     state_name = ndb.StringProperty(required=True)
     # The ID of the algorithm used to create the model.
-    algorithm_id = ndb.IntegerProperty(required=True)
+    algorithm_id = ndb.StringProperty(required=True, choices=ALGORITHM_CHOICES)
     # The actual model used for classification. Immutable, unless a schema
     # upgrade takes place.
     cached_classifier_data = ndb.JsonProperty(required=True)
-    # The schema version for the data that is being classified
-    data_schema_version = ndb.IntegerProperty(required=True, default=1)
+    # The schema version for the data that is being classified.
+    data_schema_version = ndb.IntegerProperty(required=True)
 
     @classmethod
     def _generate_id(cls, exp_id):

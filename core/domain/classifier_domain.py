@@ -44,7 +44,7 @@ class Classifier(object):
 
         Args:
             classifier_id: str. The unique id of the classifier.
-            exp_id: str. The exploration id to which classifier belongs.
+            exp_id: str. The exploration id to which the classifier belongs.
             exp_version_when_created: str. The version of the exploration when
                 this classification model was created.
             state_name: str. The name of the state to which the classifier
@@ -65,7 +65,7 @@ class Classifier(object):
         self.data_schema_version = data_schema_version
 
     def to_dict(self):
-        """Constructs an dict representation of Classifier domain object.
+        """Constructs a dict representation of Classifier domain object.
 
         Returns:
             A dict representation of Classifier domain object.
