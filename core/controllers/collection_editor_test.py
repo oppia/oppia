@@ -92,6 +92,13 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
                        self.COLLECTION_ID))
         self.assertEqual(response.status_int, 200)
         self.assertIn('Introduction to Collections in Oppia', response.body)
+
+        # Check that editor can edit in the editor page.
+        json_response = self.get_json(
+            '%s/%s' % (feconf.COLLECTION_RIGHTS_PREFIX,
+                       self.COLLECTION_ID))
+
+        self.assertEqual(json_response['can_edit'], True)
         self.logout()
 
     def test_editable_collection_handler_get(self):
