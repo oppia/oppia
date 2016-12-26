@@ -1,11 +1,8 @@
 <script type="text/ng-template" id="summaryTile/collection">
-  <md-card class="oppia-activity-summary-tile bottom-card">
-    <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;"></div>
-    <md-card class="oppia-activity-summary-tile middle-card">
-      <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;"></div>
       <md-card class="oppia-activity-summary-tile top-card">
         <a ng-href="<[getCollectionLink()]>">
           <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
+          <img class="collection-corner-image" ng-src="/assets/images/general/collection_corner.svg">
             <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
             <h2 class="activity-title"><[getCollectionTitle()]></h2>
           </div>
@@ -36,34 +33,22 @@
           <div class="title-section-mask top-card-mask"></div>
         </a>
       </md-card>
-      <div class="title-section-mask"></div>
-    </md-card>
-    <div class="title-section-mask"></div>
-  </md-card>
 </script>
 
 <style>
-  .bottom-card {
-    box-shadow: 8px 8px 2px 0 rgba(0, 0, 0, 0.26);
-    height: 250px;
-    margin: 12px 10px 12px 4px;
-  }
-  .bottom-card .title-section {
-    height: 154px;
-  }
-
-  .middle-card, .top-card {
+  .top-card {
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
-    height: 250px;
-    margin: -150px 3px;
+    height: 258px;
+    margin: 8px 5.5px;
     z-index: 11;
   }
 
   .top-card .thumbnail-image {
-    top: 11.5%;
+    top: 15.5%;
   }
 
-  .oppia-activity-summary-tile.middle-card.oppia-activity-summary-tile.top-card {
-    margin: -158px 6px;
+  .collection-corner-image {
+    position: absolute;
+    width: 36px;
   }
 </style>

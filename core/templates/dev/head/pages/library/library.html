@@ -114,7 +114,6 @@
               <div class="oppia-library-carousel"
                    ng-swipe-right="scroll($index, true)"
                    ng-swipe-left="scroll($index, false)">
-                <div class="oppia-library-carousel-overlay-left"></div>
                 <div class="oppia-library-carousel-tiles">
                   <div ng-repeat="tile in group.activity_summary_dicts" style="display: inline-block;">
                     <collection-summary-tile ng-if="tile.activity_type == 'collection'"
@@ -141,7 +140,6 @@
                     </exploration-summary-tile>
                   </div>
                 </div>
-                <div class="oppia-library-carousel-overlay-right"></div>
               </div>
 
               <md-button class="md-no-ink oppia-library-carousel-scroller"
