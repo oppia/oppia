@@ -895,40 +895,15 @@ class UpdateGadgetTests(ExplorationServicesUnitTests):
         super(UpdateGadgetTests, self).setUp()
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id)
-
-        self.init_state_name = exploration.init_state_name
-
-        self.param_changes = [{
-            'customization_args': {
-                'list_of_values': ['1', '2'], 'parse_with_jinja': False
-            },
-            'name': 'myParam',
-            'generator_id': 'RandomSelector'
-        }]
-        # List of answer groups to add into an interaction.
-        self.interaction_answer_groups = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0},
-            }],
-            'outcome': {
-                'dest': self.init_state_name,
-                'feedback': ['Try again'],
-                'param_changes': []
-            },
-        }]
         # Default outcome specification for an interaction.
         self.interaction_default_outcome = {
-            'dest': self.init_state_name,
+            'dest': feconf.DEFAULT_INIT_STATE_NAME,
             'feedback': ['Incorrect', '<b>Wrong answer</b>'],
             'param_changes': []
         }
 
-
-    def test_gadget_commands(self):
+    def test_add_gadget_cmd(self):
         """test adding of a gadget"""
-
-        #Test add gadget
         gadget_customization = {
             'adviceObjects': {
                 'value': [{
@@ -939,24 +914,49 @@ class UpdateGadgetTests(ExplorationServicesUnitTests):
         }
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
-        self.assertNotIn('new gadget', exploration.get_all_gadget_names())
+        self.assertNotIn('NewGadget', exploration.get_all_gadget_names())
         exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-            'cmd':exp_domain.CMD_ADD_GADGET,
+            'cmd': exp_domain.CMD_ADD_GADGET,
             'panel': 'bottom',
             'gadget_dict' : {'gadget_type': 'ScoreBar',
                              'gadget_name': 'NewGadget',
                              'customization_args': gadget_customization,
-                             'visible_in_states':
-                                 [feconf.DEFAULT_INIT_STATE_NAME]}
+                             'visible_in_states': [feconf.DEFAULT_INIT_STATE_NAME]}
             }], 'add a new gadget')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
         self.assertIn('NewGadget', exploration.get_all_gadget_names())
 
-        #test rename
+    def test_rename_gadget_cmd(self):
+        """test rename"""
+        gadget_customization = {
+            'adviceObjects': {
+                'value': [{
+                    'adviceTitle': 'b',
+                    'adviceHtml': '<p>c</p>'
+                }]
+            }
+        }
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+
         exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-            'cmd':exp_domain.CMD_RENAME_GADGET,
+            'cmd': exp_domain.CMD_ADD_GADGET,
+            'panel': 'bottom',
+            'gadget_dict' : {'gadget_type': 'ScoreBar',
+                             'gadget_name': 'NewGadget',
+                             'customization_args': gadget_customization,
+                             'visible_in_states': [feconf.DEFAULT_INIT_STATE_NAME]}
+            }], 'add a new gadget')
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+
+        self.assertIn('NewGadget', exploration.get_all_gadget_names())
+        self.assertNotIn('gadget', exploration.get_all_gadget_names())
+
+        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
+            'cmd': exp_domain.CMD_RENAME_GADGET,
             'new_gadget_name': 'gadget',
             'old_gadget_name': 'NewGadget',
             }], 'rename a gadget')
@@ -966,15 +966,41 @@ class UpdateGadgetTests(ExplorationServicesUnitTests):
         self.assertIn('gadget', exploration.get_all_gadget_names())
         self.assertNotIn('NewGadget', exploration.get_all_gadget_names())
 
-        #test delete
+    def test_delete_gadget_cmd(self):
+        """test delete"""
+        gadget_customization = {
+            'adviceObjects': {
+                'value': [{
+                    'adviceTitle': 'b',
+                    'adviceHtml': '<p>c</p>'
+                }]
+            }
+        }
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+
         exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-            'cmd':exp_domain.CMD_DELETE_GADGET,
-            'gadget_name': 'gadget',
+            'cmd': exp_domain.CMD_ADD_GADGET,
+            'panel': 'bottom',
+            'gadget_dict' : {'gadget_type': 'ScoreBar',
+                             'gadget_name': 'NewGadget',
+                             'customization_args': gadget_customization,
+                             'visible_in_states': [feconf.DEFAULT_INIT_STATE_NAME]}
+            }], 'add a new gadget')
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+
+        self.assertIn('NewGadget', exploration.get_all_gadget_names())
+
+
+        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
+            'cmd': exp_domain.CMD_DELETE_GADGET,
+            'gadget_name': 'NewGadget',
             }], 'delete a gadget')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
-        self.assertNotIn('gadget', exploration.get_all_gadget_names())
+        self.assertNotIn('NewGadget', exploration.get_all_gadget_names())
 
 
 class UpdateStateTests(ExplorationServicesUnitTests):
@@ -1013,7 +1039,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'param_changes': []
         }
 
-    def test_state_commands(self):
+    def test_add_state_cmd(self):
         """ Test adding of states."""
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
@@ -1027,29 +1053,42 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertIn('new state', exploration.states)
 
+    def test_update_state_cmd(self):
+        """Test updating of state name."""
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
-        #Test updating of state name.
         self.assertIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
 
         exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
             'cmd': exp_domain.CMD_RENAME_STATE,
-            'old_state_name': 'new state',
+            'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'new_state_name': 'state',
         }], 'Change state name')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertIn('state', exploration.states)
-        self.assertNotIn('new state', exploration.states)
+        self.assertNotIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
 
+    def test_delete_state_cmd(self):
+        """test deleting state"""
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
-        #test deleting state
+        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': 'new state',
+        }], 'Add state name')
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+
+        self.assertIn('new state', exploration.states)
+
         exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
             'cmd': exp_domain.CMD_DELETE_STATE,
-            'state_name': 'state',
+            'state_name': 'new state',
             }], 'delete state')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        self.assertNotIn('state', exploration.states)
+        self.assertNotIn('new state', exploration.states)
 
     def test_update_state_name_with_unicode(self):
         """Test updating of state name to one that uses unicode characters."""
