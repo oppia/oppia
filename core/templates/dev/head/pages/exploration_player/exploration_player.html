@@ -74,12 +74,8 @@
 {% endblock local_top_nav_options %}
 
 {% block content %}
-  <div ng-controller="ExplorationPlayer">
-    <div style="position: absolute; width: 100%; background-color: #aed2e9; text-align: center;">
-      <img ng-src="<[bannerImageFileUrl]>" align="center"
-           style="width: 3000px; top: 65px; max-width: 3000px;">
-    </div>
-
+  <div>
+    <background-banner></background-banner>
     <conversation-skin></conversation-skin>
     {% if not iframed %}
       <attribution-guide></attribution-guide>
@@ -146,7 +142,6 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ConversationSkinDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationFooterDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationRecommendationsService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationPlayer.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/FeedbackPopupDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerLocalNav.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerParamsService.js"></script>

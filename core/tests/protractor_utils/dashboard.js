@@ -13,17 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the Oppia exploration player.
+ * @fileoverview Utilities for interacting with the creator dashboard page,
+ * for use in Protractor tests.
  */
 
-oppia.controller('ExplorationPlayer', [
-  '$scope', 'UrlInterpolationService',
-  function($scope, UrlInterpolationService) {
-    var possibleBannerFilenames = [
-      'bannerA.svg', 'bannerB.svg', 'bannerC.svg', 'bannerD.svg'];
-    $scope.bannerImageFilename = possibleBannerFilenames[
-      Math.floor(Math.random() * possibleBannerFilenames.length)];
-    $scope.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
-      '/background/' + $scope.bannerImageFilename);
-  }
-]);
+var getNumberOfFeedbackMessages = function() {
+  return element(by.css('.protractor-test-exploration-feedback-count')).
+    getText().then(function(text) {
+      return parseInt(text);
+    });
+};
+
+var navigateToExplorationEditor = function() {
+  element(by.css('.protractor-test-exploration-dashboard-card')).click();
+};
+
+exports.getNumberOfFeedbackMessages = getNumberOfFeedbackMessages;
+exports.navigateToExplorationEditor = navigateToExplorationEditor;

@@ -1,0 +1,72 @@
+{% extends 'pages/base.html' %}
+
+{% block maintitle %}
+  Email Dashboard Result - Oppia
+{% endblock maintitle %}
+
+{% block header_js %}
+  {{ super() }}
+{% endblock header_js %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      Email Dashboard Result
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <style>
+    .oppia-email-form {
+      text-align: center;
+      margin-top: 2%;
+    }
+    .disable-form {
+      pointer-events: none;
+      opacity: 0.6;
+    }
+    textarea {
+      margin-bottom: 1%;
+      border-radius: 10px;
+    }
+    .invalid-input {
+      color: red;
+    }
+    .success {
+      color: green;
+    }
+    .warning {
+      color: #ccb418;
+    }
+  </style>
+  <div class="oppia-email-form" ng-controller="EmailDashboardResult">
+    <p ng-if="emailSubmitted" class="success">Emails sent successfully. Redirecting to the Email Dashboard...</p>
+    <p ng-if="testEmailSentSuccessfully" class="success">Test email sent successfully. Please check your inbox.</p>
+    <p ng-if="emailCancelled" class="warning">Emails cancelled. Redirecting to the Email Dashboard...</p>
+    <p ng-if="invalid.subject" class="invalid-input">Please enter a valid email subject</p>
+    <p ng-if="invalid.body" class="invalid-input">Please enter a valid email body</p>
+    <p ng-if="invalid.maxRecipients" class="invalid-input">Please enter valid number of recipients</p>
+    <p ng-if="errorHasOccurred" class="invalid-input">There was an error processing your request. Please report this bug.</p>
+    <form ng-class = "{'disable-form': submitIsInProgress}" ng-submit="submitEmail()">
+      Email subject: <textarea rows="2" cols="10" placeholder="Enter email subject here..." ng-model="emailSubject"></textarea>
+      <br>
+      Email body: <textarea rows="15" cols="20" placeholder="Enter email body here..." ng-model="emailBody"></textarea>
+      <br>
+      Email intent: <select ng-model="emailIntent" ng-options="intent for intent in POSSIBLE_EMAIL_INTENTS"></select><br><br>
+      Email option: <input type="radio" name="email" ng-model="emailOption" value="all" checked> Send to all
+      <input type="radio" name="email" ng-model="emailOption" value="custom"> Send to max N users:
+      <input type="number" ng-model="maxRecipients" min="0" placeholder="Enter number of users..." ng-disabled="emailOption == 'all'"><br><br>
+      <input class="btn btn-default" type="button" ng-click="sendTestEmail()" value="Send yourself a test email">
+      <input class="btn btn-success" type="submit" value="Submit Email">
+      <input class="btn btn-default" type="reset" value="Reset" ng-click="resetForm()">
+      <input class="btn btn-danger" type="button" ng-click="cancelEmail()" value="Cancel">
+    </form>
+  </div>
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/email_dashboard/EmailDashboardResult.js"></script>
+{% endblock footer_js %}

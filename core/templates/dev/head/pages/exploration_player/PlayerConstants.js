@@ -19,3 +19,5 @@
 oppia.constant('CONTENT_FOCUS_LABEL_PREFIX', 'content-focus-label-');
 
 oppia.constant('TWO_CARD_THRESHOLD_PX', 960);
+
+oppia.constant('CONTINUE_BUTTON_FOCUS_LABEL', 'continueButton');

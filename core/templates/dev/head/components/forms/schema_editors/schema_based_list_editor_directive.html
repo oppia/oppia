@@ -1,0 +1,35 @@
+<script type="text/ng-template" id="schemaBasedEditor/list">
+  <table style="width: 100%;">
+    <tr ng-repeat="item in localValue track by $index">
+      <td>
+        <schema-based-editor schema="itemSchema()" is-disabled="isDisabled()" local-value="localValue[$index]"
+                             allow-expressions="allowExpressions()"
+                             label-for-focus-target="getFocusLabel($index)"
+                             on-input-blur="($last ? lastElementOnBlur : showAddItemButton)"
+                             on-input-focus="($last ? hideAddItemButton : showAddItemButton)">
+        </schema-based-editor>
+      </td>
+      <td ng-if="!len && (!minListLength || localValue.length > minListLength)" style="vertical-align: top;">
+        <button class="oppia-delete-list-entry-button oppia-transition-200 protractor-test-delete-list-entry" type="button"
+                ng-click="deleteElement($index)"
+                ng-disabled="isDisabled()">
+          <i class="material-icons md-18">&#xE5CD;</i>
+        </button>
+      </td>
+    </tr>
+  </table>
+
+  <div ng-if="showDuplicatesWarning && hasDuplicates()" class="oppia-form-error" aria-live="assertive">
+    Please ensure that the list has no duplicates.
+  </div>
+
+  <!-- The margin-left is added here to left-align the button with the previous list items. -->
+  <div style="height: 30px; margin-top: 4px;">
+    <button ng-show="!isOneLineInput || isAddItemButtonPresent"
+            ng-if="!len && (maxListLength === null || localValue.length < maxListLength)"
+            type="button" class="btn btn-default btn-sm protractor-test-add-list-entry" ng-click="addElement()"
+            ng-disabled="isDisabled()" style="margin-left: 0;">
+      <[addElementText]>
+    </button>
+  </div>
+</script>

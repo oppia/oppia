@@ -26,7 +26,6 @@ oppia.controller('Base', [
     $rootScope.loadingMessage = '';
 
     $scope.isSidebarShown = SidebarStatusService.isSidebarShown;
-    $scope.openSidebarOnSwipe = SidebarStatusService.openSidebar;
     $scope.closeSidebarOnSwipe = SidebarStatusService.closeSidebar;
 
     // TODO(sll): use 'touchstart' for mobile.

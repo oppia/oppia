@@ -75,6 +75,11 @@ oppia.controller('EmailDashboard', [
         $scope.currentPageOfQueries[index] = query;
       });
     };
+
+    $scope.showLinkToResultPage = function(submitter, status) {
+      return (submitter === GLOBALS.username) && (status === 'completed');
+    };
+
     EmailDashboardDataService.getNextQueries().then(function(queries) {
       $scope.currentPageOfQueries = queries;
     });

@@ -58,7 +58,8 @@ class SentEmailModel(base_models.BaseModel):
         feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION,
         feconf.EMAIL_INTENT_DELETE_EXPLORATION,
         feconf.EMAIL_INTENT_REPORT_BAD_CONTENT,
-        feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION
+        feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION,
+        feconf.BULK_EMAIL_INTENT_TEST
     ])
     # The subject line of the email.
     subject = ndb.TextProperty(required=True)
@@ -179,7 +180,7 @@ class BulkEmailModel(base_models.BaseModel):
     """
 
     # The user IDs of the email recipients.
-    recipient_ids = ndb.StringProperty(indexed=True, repeated=True)
+    recipient_ids = ndb.JsonProperty(default=[], compressed=True)
     # The user ID of the email sender. For site-generated emails this is equal
     # to feconf.SYSTEM_COMMITTER_ID.
     sender_id = ndb.StringProperty(required=True)
@@ -210,8 +211,3 @@ class BulkEmailModel(base_models.BaseModel):
             sender_email=sender_email, intent=intent, subject=subject,
             html_body=html_body, sent_datetime=sent_datetime)
         email_model_instance.put()
-
-    @classmethod
-    def get_number_of_emails_sent_to_user(cls, recipient_id, intent):
-        return cls.query(ndb.AND(
-            cls.recipient_ids == recipient_id, cls.intent == intent)).count()

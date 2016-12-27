@@ -75,20 +75,7 @@ describe('Dashboard backend API service', function() {
     }
   };
 
-  var sampleExplorationStatsData = {
-    new_feedback: [{
-      author_username: 'avijit',
-      created_on: 1471649252020.614,
-      exploration_id: 'ASt_bM51b4k8',
-      message_id: 0,
-      text: 'Awesome :)',
-      updated_status: 'open',
-      updated_subject: '(Feedback from a learner)'
-    }]
-  };
-
   var DASHBOARD_DATA_URL = '/dashboardhandler/data';
-  var EXPLORATION_STATS_URL_PREFIX = '/dashboardhandler/explorationstats/';
   var ERROR_STATUS_CODE = 500;
 
   beforeEach(module('oppia'));
@@ -128,38 +115,6 @@ describe('Dashboard backend API service', function() {
     $httpBackend.expect('GET', DASHBOARD_DATA_URL).respond(
       ERROR_STATUS_CODE, 'Error loading dashboard data.');
     DashboardBackendApiService.fetchDashboardData().then(
-      successHandler, failHandler);
-    $httpBackend.flush();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
-  });
-
-  it('should successfully fetch statistics for an exploration from the backend',
-      function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-
-    $httpBackend.expect(
-      'GET', EXPLORATION_STATS_URL_PREFIX + SAMPLE_EXP_ID).respond(
-      sampleExplorationStatsData);
-    DashboardBackendApiService.fetchExplorationStats(SAMPLE_EXP_ID).then(
-      successHandler, failHandler);
-    $httpBackend.flush();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  });
-
-  it('should use rejection handler if exploration stats backend request failed',
-      function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-
-    $httpBackend.expect(
-      'GET', EXPLORATION_STATS_URL_PREFIX + SAMPLE_EXP_ID).respond(
-        ERROR_STATUS_CODE, 'Error fetching exploration stats.');
-    DashboardBackendApiService.fetchExplorationStats(SAMPLE_EXP_ID).then(
       successHandler, failHandler);
     $httpBackend.flush();
 
