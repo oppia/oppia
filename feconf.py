@@ -211,6 +211,9 @@ DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS = 3600
 # Whether to send an email when new feedback message is received for
 # an exploration.
 DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE = True
+# If enabled then emails regarding the user's subscription to other creators
+# will be sent to that user.
+DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE = True
 # Whether exploration feedback emails are muted,
 # when the user has not specified a preference.
 DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE = False

@@ -909,7 +909,11 @@ def get_email_preferences(user_id):
         'can_receive_feedback_message_email': (
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE
             if email_preferences_model is None
-            else email_preferences_model.feedback_message_notifications)
+            else email_preferences_model.feedback_message_notifications),
+        'can_receive_subscription_email': (
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE
+            if email_preferences_model is None
+            else email_preferences_model.subscription_emails)
     }
 
 

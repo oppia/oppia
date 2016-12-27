@@ -243,8 +243,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         # The user sets their membership email preference to False.
         user_services.update_email_preferences(
-            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE, False,
-            False)
+            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE, False, False)
 
         email_preferences = user_services.get_email_preferences(user_id)
         self.assertEquals(

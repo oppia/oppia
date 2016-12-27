@@ -22,6 +22,7 @@ import logging
 from core.domain import config_domain
 from core.domain import html_cleaner
 from core.domain import rights_manager
+from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -542,6 +543,58 @@ def send_role_notification_email(
         feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION, email_subject, email_body,
         feconf.NOREPLY_EMAIL_ADDRESS,
         sender_name=inviter_user_settings.username)
+
+
+def send_emails_to_subscribers(creator_id, exploration_id, exploration_title):
+    """Sends an email to all the subscribers of the creators when the creator
+    publishes an exploration.
+
+    Args:
+        creator_id: str. The id of the creator who has published an exploration
+            and to whose subscribers we are sending emails.
+        exploration_id: str. The id of the exploration which the creator has
+            published.
+        exploration_title: str. The title of the exploration which the creator
+            has published.
+    """
+
+    creator_name = user_services.get_username(creator_id)
+    email_subject = ('%s has published another exploration!' % creator_name)
+    email_body_template = (
+        'Hi %s,<br>'
+        '<br>'
+        'Your subscription, %s has published a new exploration. You can play '
+        'the exploration over here - '
+        '<a href="https://www.oppia.org/explore/%s">%s</a>.<br>'
+        '<br>'
+        'Thanks, and happy learning!<br>'
+        '<br>'
+        'Best wishes,<br>'
+        '- The Oppia Team<br>'
+        '<br>%s')
+
+    if not feconf.CAN_SEND_EMAILS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    if not feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS:
+        log_new_error('This app cannot send feedback message emails to users.')
+        return
+
+    recipient_list = subscription_services.get_all_subscribers_of_creator(
+        creator_id)
+    for recipient_id in recipient_list:
+        recipient_user_settings = user_services.get_user_settings(recipient_id)
+        recipient_preferences = (
+            user_services.get_email_preferences(recipient_id))
+        if recipient_preferences['can_receive_subscription_email']:
+            email_body = email_body_template % (
+                recipient_user_settings.username, creator_name, exploration_id,
+                exploration_title, EMAIL_FOOTER.value)
+            _send_email(
+                recipient_id, feconf.SYSTEM_COMMITTER_ID,
+                feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION,
+                email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
 def send_feedback_message_email(recipient_id, feedback_messages):
