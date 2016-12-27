@@ -1,46 +1,46 @@
 <script type="text/ng-template" id="summaryTile/collection">
-      <md-card class="oppia-activity-summary-tile">
-        <a ng-href="<[getCollectionLink()]>">
-          <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
-            <img class="collection-corner-image" ng-src="/assets/images/general/collection_corner.svg">
-            <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
-            <h2 class="activity-title"><[getCollectionTitle()]></h2>
-          </div>
+  <md-card class="oppia-activity-summary-tile">
+    <a ng-href="<[getCollectionLink()]>">
+      <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
+        <img class="collection-corner-image" ng-src="/assets/images/general/collection_corner.svg">
+        <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
+        <h2 class="activity-title"><[getCollectionTitle()]></h2>
+      </div>
 
-          <div>
-            <div class="objective">
-              <[getObjective() | truncateAndCapitalize: 45]>
-              <span ng-if="!getObjective()">No objective specified.</span>
-            </div>
+      <div>
+        <div class="objective">
+          <[getObjective() | truncateAndCapitalize: 45]>
+          <span ng-if="!getObjective()">No objective specified.</span>
+        </div>
 
-            <ul layout="row" class="metrics" layout-align="space-between center">
-              <li>
-                <span>
-                  COLLECTION (<[getNodeCount()]>)
-                </span>
-              </li>
+        <ul layout="row" class="metrics" layout-align="space-between center">
+          <li>
+            <span>
+              COLLECTION (<[getNodeCount()]>)
+            </span>
+          </li>
 
-              <li>
-                <span ng-if="!wasRecentlyUpdated()">
-                  <[getLastUpdatedDatetime()]>
-                </span>
-                <span ng-if="wasRecentlyUpdated()" class="recently-updated">
-                  UPDATED
-                </span>
-              </li>
-            </ul>
-          </div>
-          <div class="title-section-mask"></div>
-        </a>
-      </md-card>
+          <li>
+            <span ng-if="!wasRecentlyUpdated()">
+              <[getLastUpdatedDatetime()]>
+            </span>
+            <span ng-if="wasRecentlyUpdated()" class="recently-updated">
+              UPDATED
+            </span>
+          </li>
+        </ul>
+      </div>
+      <div class="title-section-mask"></div>
+    </a>
+  </md-card>
 </script>
 
 <style>
-  .thumbnail-image {
+  .oppia-activity-summary-tile .thumbnail-image {
     top: 15.5%;
   }
 
-  .collection-corner-image {
+  .oppia-activity-summary-tile .collection-corner-image {
     position: absolute;
     width: 36px;
   }
