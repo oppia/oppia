@@ -60,6 +60,76 @@ def subscribe_to_exploration(user_id, exploration_id):
         subscriptions_model.put()
 
 
+def subscribe_to_creator(user_id, creator_id):
+    """Subscribes a user (learner) to a creator.
+
+    Callers of this function should ensure that the user_id and creator_id
+    are valid.
+    """
+    subscribers_model_creator = user_models.UserSubscribersModel.get(
+        creator_id, strict=False)
+    subscriptions_model_user = user_models.UserSubscriptionsModel.get(
+        user_id, strict=False)
+
+    if not subscribers_model_creator:
+        subscribers_model_creator = user_models.UserSubscribersModel(
+            id=creator_id)
+
+    if not subscriptions_model_user:
+        subscriptions_model_user = user_models.UserSubscriptionsModel(
+            id=user_id)
+
+    if user_id not in subscribers_model_creator.subscriber_ids:
+        subscribers_model_creator.subscriber_ids.append(user_id)
+        subscriptions_model_user.creator_ids.append(creator_id)
+        subscribers_model_creator.put()
+        subscriptions_model_user.put()
+
+
+def unsubscribe_from_creator(user_id, creator_id):
+    """Unsubscribe a user from a creator.
+
+    Callers of this function should ensure that the user_id and creator_id
+    are valid.
+    """
+    subscribers_model_creator = user_models.UserSubscribersModel.get(
+        creator_id, strict=False)
+    subscriptions_model_user = user_models.UserSubscriptionsModel.get(
+        user_id, strict=False)
+
+    if user_id in subscribers_model_creator.subscriber_ids:
+        subscribers_model_creator.subscriber_ids.remove(user_id)
+        subscriptions_model_user.creator_ids.remove(creator_id)
+        subscribers_model_creator.put()
+        subscriptions_model_user.put()
+
+
+def get_all_creators_to_which_learner_has_subscribed(user_id):
+    """Returns a list with ids of all the creators to which this learner has
+    subscribed.
+
+    Callers of this function should ensure that the user_id is valid.
+    """
+    subscriptions_model = user_models.UserSubscriptionsModel.get(
+        user_id, strict=False)
+    return (
+        subscriptions_model.creator_ids
+        if subscriptions_model else [])
+
+
+def get_all_subscribers_of_creator(user_id):
+    """Returns a list with ids of all users who have subscribed to this
+    creator.
+
+    Callers of this function should ensure that the user_id is valid.
+    """
+    subscribers_model = user_models.UserSubscribersModel.get(
+        user_id, strict=False)
+    return (
+        subscribers_model.subscriber_ids
+        if subscribers_model else [])
+
+
 def get_exploration_ids_subscribed_to(user_id):
     """Returns a list with ids of all explorations that the given user
     subscribes to.
