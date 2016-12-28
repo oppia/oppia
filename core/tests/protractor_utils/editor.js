@@ -398,28 +398,27 @@ var addParameterChange = function(paramName, paramValue) {
 };
 
 // This function adds a exploration level parameter change, creating
-//the parameter if necessary.
+// the parameter if necessary.
 var addExplorationLevelParameterChange = function(paramName, paramValue) {
-   runFromSettingsTab(function() {
+  runFromSettingsTab(function() {
     element(by.css('.protractor-test-exploration-edit-param-changes')).click();
     element(by.css('.protractor-test-add-param-button')).click();
 
-  var editorRowElem = element.all(by.css(
+    var editorRowElem = element.all(by.css(
     '.protractor-test-param-changes-list')).last();
 
-  forms.AutocompleteDropdownEditor(editorRowElem).setValue(paramName);
+    forms.AutocompleteDropdownEditor(editorRowElem).setValue(paramName);
 
-  /* Setting parameter value is difficult via css since the associated
-  input is a sub-component of the third party select2 library. We isolate
-  it as the third input in the current parameter changes UI. */
-  editorRowElem.all(by.tagName('input')).then(function(items) {
-    items[2].clear();
-    items[2].sendKeys(paramValue);
-  });
+    /* Setting parameter value is difficult via css since the associated
+    input is a sub-component of the third party select2 library. We isolate
+    it as the third input in the current parameter changes UI. */
+    editorRowElem.all(by.tagName('input')).then(function(items) {
+      items[2].clear();
+      items[2].sendKeys(paramValue);
+    });
 
-  element(by.css('.protractor-test-save-param-changes-button')).click();
-  });
-
+    element(by.css('.protractor-test-save-param-changes-button')).click();
+    });
 };
 
 // RULES
