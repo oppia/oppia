@@ -901,6 +901,7 @@ class UpdateGadgetTests(ExplorationServicesUnitTests):
             'feedback': ['Incorrect', '<b>Wrong answer</b>'],
             'param_changes': []
         }
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
     def test_add_gadget_cmd(self):
         """test adding of a gadget"""
