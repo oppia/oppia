@@ -33,7 +33,7 @@ class Classifier(object):
             classifier.
         cached_classifier_data: dict. The actual classifier model used for
             classification purpose.
-        data_schema_version: int. Schema version of the data used by the 
+        data_schema_version: int. Schema version of the data used by the
             classifier. This depends on the algorithm ID.
     """
 
