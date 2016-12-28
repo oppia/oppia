@@ -1134,34 +1134,6 @@ textarea {
   position: relative;
 }
 
-.oppia-library-carousel-overlay-left,
-.oppia-library-carousel-overlay-right {
-  /*The display is set in Library.js*/
-  display: none;
-  height: 258px;
-  margin-top: 12px;
-  position: absolute;
-  top: 0;
-  width: 20px;
-  z-index: 99;
-}
-
-.oppia-library-carousel-overlay-left {
-  background: #b5bdc8;
-  background: -moz-linear-gradient(left, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%);
-  background: -webkit-linear-gradient(left, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%);
-  background: linear-gradient(to right, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%);
-  left: 0;
-}
-
-.oppia-library-carousel-overlay-right {
-  background: #b5bdc8;
-  background: -moz-linear-gradient(left, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%);
-  background: -webkit-linear-gradient(left, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%);
-  background: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%);
-  right: 0;
-}
-
 .oppia-dashboard-aggregated-stats md-card {
   background: #fff;
   margin: 0 7.5px 40px 7.5px;
