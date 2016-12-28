@@ -577,8 +577,8 @@ def send_emails_to_subscribers(creator_id, exploration_id, exploration_title):
         log_new_error('This app cannot send emails to users.')
         return
 
-    if not feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS:
-        log_new_error('This app cannot send feedback message emails to users.')
+    if not feconf.CAN_SEND_SUBSCRIPTION_EMAILS:
+        log_new_error('This app cannot send subscription emails to users.')
         return
 
     recipient_list = subscription_services.get_all_subscribers_of_creator(

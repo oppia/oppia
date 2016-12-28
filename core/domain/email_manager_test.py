@@ -1267,8 +1267,8 @@ class SubscriptionEmailTest(test_utils.GenericTestBase):
 
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
-        self.can_send_feedback_email_ctx = self.swap(
-            feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+        self.can_send_subscription_email_ctx = self.swap(
+            feconf, 'CAN_SEND_SUBSCRIPTION_EMAILS', True)
 
     def test_that_subscription_emails_are_correct(self):
         expected_email_subject = 'editor has published another exploration!'
@@ -1301,7 +1301,7 @@ class SubscriptionEmailTest(test_utils.GenericTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_emails_ctx, self.can_send_subscription_email_ctx:
             email_manager.send_emails_to_subscribers(
                 self.editor_id, self.exploration.id, self.exploration.title)
 
