@@ -26,6 +26,7 @@ ALGORITHM_CHOICES = [
     'LDAStringClassifier'
 ]
 
+
 class ClassifierModel(base_models.BaseModel):
     """Storage model for classifier used for answer classification.
 
@@ -34,11 +35,11 @@ class ClassifierModel(base_models.BaseModel):
     """
 
     # The exploration_id of the exploration to whose state the model belongs.
-    exp_id = ndb.StringProperty(required=True, index=True)
+    exp_id = ndb.StringProperty(required=True, indexed=True)
     # The exploration version at the time this classifier model was created.
-    exp_version_when_created = ndb.IntegerProperty(required=True, index=True)
+    exp_version_when_created = ndb.IntegerProperty(required=True, indexed=True)
     # The name of the state to which the model belongs.
-    state_name = ndb.StringProperty(required=True, index=True)
+    state_name = ndb.StringProperty(required=True, indexed=True)
     # The ID of the algorithm used to create the model.
     algorithm_id = ndb.StringProperty(required=True, choices=ALGORITHM_CHOICES)
     # The actual model used for classification. Immutable, unless a schema
