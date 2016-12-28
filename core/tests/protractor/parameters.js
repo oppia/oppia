@@ -30,7 +30,8 @@ describe('Parameters', function() {
 
     workflow.createExploration();
     editor.enableParameters();
-
+    editor.addExplorationLevelParameterChange('z', 2);
+    
     editor.setStateName('card 1');
     editor.addParameterChange('a', 2);
     editor.setContent(forms.toRichText(
@@ -51,7 +52,7 @@ describe('Parameters', function() {
     editor.moveToState('card 3');
     editor.addParameterChange('b', '{{answer}}');
     editor.setContent(forms.toRichText(
-      'sum of {{a}} and {{b}} is {{a + b}}'));
+      'sum of {{z}} and {{b}} is {{z + b}}, sum of {{a}} and {{b}} is {{a + b}}'));
     editor.setInteraction(
       'MultipleChoiceInput',
       [forms.toRichText('return'), forms.toRichText('complete')]);
@@ -72,19 +73,19 @@ describe('Parameters', function() {
       'Change value of b from 3 to'));
     player.submitAnswer('NumericInput', 2);
     player.expectContentToMatch(forms.toRichText(
-      'sum of 5 and 2 is 7'));
+      'sum of 2 and 2 is 4, sum of 5 and 2 is 7'));
     player.submitAnswer('MultipleChoiceInput', 'return');
     player.expectContentToMatch(forms.toRichText(
       'Change value of b from 3 to'));
     player.submitAnswer('NumericInput', 5);
     player.expectContentToMatch(forms.toRichText(
-      'sum of 5 and 5 is 10'));
+      'sum of 2 and 5 is 7, sum of 5 and 5 is 10'));
     player.submitAnswer('MultipleChoiceInput', 'return');
     player.expectContentToMatch(forms.toRichText(
       'Change value of b from 3 to'));
     player.submitAnswer('NumericInput', 4);
     player.expectContentToMatch(forms.toRichText(
-      'sum of 5 and 4 is 9'));
+      'sum of 2 and 4 is 6, sum of 5 and 4 is 9'));
     player.submitAnswer('MultipleChoiceInput', 'complete');
     player.expectExplorationToBeOver();
     users.logout();
