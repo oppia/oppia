@@ -587,6 +587,7 @@ def send_emails_to_subscribers(creator_id, exploration_id, exploration_title):
         recipient_user_settings = user_services.get_user_settings(recipient_id)
         recipient_preferences = (
             user_services.get_email_preferences(recipient_id))
+        print "Hello", recipient_preferences['can_receive_subscription_email']
         if recipient_preferences['can_receive_subscription_email']:
             email_body = email_body_template % (
                 recipient_user_settings.username, creator_name, exploration_id,

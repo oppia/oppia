@@ -1,4 +1,3 @@
-from core.domain import email_manager
 from core.domain import email_subscription_services
 from core.domain import subscription_services
 from core.platform import models
@@ -6,9 +5,13 @@ from core.tests import test_utils
 import feconf
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 USER_NAME = 'user'
 USER_EMAIL = 'user@test.com'
+
+USER_NAME_2 = 'user2'
+USER_EMAIL_2 = 'user2@test.com'
 
 
 class InformSubscribersTest(test_utils.GenericTestBase):
@@ -20,10 +23,12 @@ class InformSubscribersTest(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(USER_EMAIL, USER_NAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.signup(USER_EMAIL_2, USER_NAME_2)
 
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.user_id_2 = self.get_user_id_from_email(USER_EMAIL_2)
 
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, 'Title')
@@ -35,41 +40,49 @@ class InformSubscribersTest(test_utils.GenericTestBase):
 
     def test_inform_subscribers(self):
         subscription_services.subscribe_to_creator(
+            self.user_id_2, self.editor_id)
+        subscription_services.subscribe_to_creator(
             self.new_user_id, self.editor_id)
         subscription_services.subscribe_to_creator(
             self.user_id, self.editor_id)
 
+        email_preferences_model = user_models.UserEmailPreferencesModel.get(
+            self.user_id_2, strict=False)
+        if email_preferences_model is None:
+            email_preferences_model = user_models.UserEmailPreferencesModel(
+                id=self.user_id_2)
+
+        email_preferences_model.subscription_emails = False
+        email_preferences_model.put()
+
         with self.can_send_emails_ctx, self.can_send_subscription_email_ctx:
             email_subscription_services.inform_subscribers(
-            self.editor_id, 'A')
+                self.editor_id, 'A')
 
-            # make sure correct number of emails is sent.
+            # make sure correct number of emails is sent and no email is sent
+            # to the person who has unsubscribed from subscription emails.
             messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
             messages = self.mail_stub.get_sent_messages(to=USER_EMAIL)
             self.assertEqual(len(messages), 1)
+            messages = self.mail_stub.get_sent_messages(to=USER_EMAIL_2)
+            self.assertEqual(len(messages), 0)
 
             # Make sure correct email models are stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
-            sent_email_model_1 = all_models[0]
-            sent_email_model_2 = all_models[1]
-            if sent_email_model_1.recipient_id == self.user_id:
-                self.assertEqual(
-                sent_email_model_1.recipient_id, self.user_id)
-                self.assertEqual(
-                    sent_email_model_1.recipient_email, USER_EMAIL)
+            self.assertEqual(True, any(
+                model.recipient_id == self.user_id for model in all_models))
+            self.assertEqual(True, any(
+                model.recipient_email == USER_EMAIL for model in all_models))
 
-                self.assertEqual(
-                    sent_email_model_2.recipient_id, self.new_user_id)
-                self.assertEqual(
-                    sent_email_model_2.recipient_email, self.NEW_USER_EMAIL)
-            else:
-                self.assertEqual(
-                sent_email_model_1.recipient_id, self.new_user_id)
-                self.assertEqual(
-                    sent_email_model_1.recipient_email, self.NEW_USER_EMAIL)
+            self.assertEqual(True, any(
+                model.recipient_id == self.new_user_id for model in all_models)) # pylint: disable=line-too-long
+            self.assertEqual(True, any(
+                model.recipient_email == self.NEW_USER_EMAIL for model in all_models)) # pylint: disable=line-too-long
 
-                self.assertEqual(
-                    sent_email_model_2.recipient_id, self.user_id)
-                self.assertEqual(
-                    sent_email_model_2.recipient_email, USER_EMAIL)
+            # No email model is stored for the user who has unsubscribed from
+            # subscription emails.
+            self.assertEqual(False, any(
+                model.recipient_id == self.user_id_2 for model in all_models))
+            self.assertEqual(False, any(
+                model.recipient_email == USER_EMAIL_2 for model in all_models))
