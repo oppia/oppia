@@ -1,25 +1,4 @@
 <script type="text/ng-template" id="components/TutorCard">
-  <!--
-    Off-screen preview of the next card in order to pre-determine the target
-    height for the card content transition animation.
-  -->
-  <div class="conversation-skin-future-tutor-card" aria-hidden="true">
-    <div class="conversation-skin-tutor-card-content">
-      <div class="conversation-skin-tutor-card-top-section">
-        <div class="conversation-skin-tutor-card-top-content"
-             angular-html-bind="upcomingContentHtml">
-        </div>
-      </div>
-
-      <div ng-if="upcomingInlineInteractionHtml">
-        <div class="conversation-skin-inline-interaction">
-          <div angular-html-bind="upcomingInlineInteractionHtml">
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div class="conversation-skin-tutor-card"
        ng-class="{'animate-card-width': startCardChangeAnimation,
                   'has-shadow': isViewportNarrow() && !isInteractionInline}">
@@ -86,7 +65,7 @@
             <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
                        ng-if="!isIframed"
                        focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
-                       ng-click="showNextCard()"
+                       ng-click="onClickContinueButton()"
                        translate="I18N_PLAYER_CONTINUE_BUTTON"
                        aria-label="Continue">
             </md-button>
@@ -106,7 +85,7 @@
           <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
         </div>
         <div ng-if="isViewportNarrow()">
-          <md-button class="instructions-button" ng-click="showSupplementalCard()">
+          <md-button class="instructions-button" ng-click="onDismiss()">
             <[interactionInstructions]>
           </md-button>
         </div>
@@ -144,12 +123,6 @@
       transition: width 500ms;
     }
 
-    .conversation-skin-future-tutor-card {
-      left: -30000px;
-      position: fixed;
-      top: -30000px;
-    }
-
     .conversation-skin-tutor-card-top-section {
       position: relative;
     }
@@ -164,7 +137,6 @@
       margin-top: 18px;
     }
 
-
     .conversation-skin-tutor-card-top-content {
       width: 100%;
     }
@@ -173,7 +145,7 @@
     .conversation-skin-future-tutor-card {
       background: #fff;
       border-radius: 2px;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.12);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
       padding-top: 20px;
       text-align: left;
     }
@@ -232,11 +204,9 @@
     }
 
     .conversation-skin-inline-interaction {
-      background-color: rgba(236,239,241,1);
       border-bottom-left-radius: 2px;
       border-bottom-right-radius: 2px;
-      margin-top: 8px;
-      padding: 16px 20px;
+      padding: 8px 20px 16px;
       position: relative;
     }
 

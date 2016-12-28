@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2015 The Oppia Authors. All Rights Reserved.
+# Copyright 2016 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,11 +17,12 @@
 """Classifier for free-form text answers."""
 
 import copy
-
 import numpy
 
+from core.domain.classifier.base import BaseClassifier
 
-class StringClassifier(object):
+
+class LDAStringClassifier(BaseClassifier):
     """A classifier that uses supervised learning to match free-form text
     answers to answer groups. The classifier trains on answers that exploration
     editors have assigned to an answer group. Given a new answer, it predicts
@@ -34,30 +35,28 @@ class StringClassifier(object):
 
         # Examples are formatted as a list. Each element is a doc followed by a
         # list of labels.
-        examples = [
+        train_data = [
             ['i eat fish and vegetables', ['food']],
             ['fish are pets', ['pets']],
             ['my kitten eats fish', ['food', 'pets']]
         ]
-        string_classifier = StringClassifier()
-        string_classifier.load_examples(examples)
-        classifier_dict = string_classifier.to_dict()
+        classifier = LDAStringClassifier()
+        classifier.train(train_data)
+        classifier_dict = classifier.to_dict()
         save_to_data_store(classifier_dict)
 
     Below is an example workflow for using an existing classifier to predict a
     document's label.
 
         # A list of docs to classify.
-        prediction_docs = [
+        prediction_data = [
             'i only eat fish and vegetables'
         ]
         classifier_dict = load_from_data_store()
-        string_classifier = StringClassifier()
-        string_classifier.from_dict(classifier_dict)
-        doc_ids = string_classifier.add_docs_for_predicting(
-            prediction_examples)
-        label = string_classifier.predict_label_for_doc(doc_ids[0])
-        print label
+        classifier = LDAStringClassifier()
+        classifier.from_dict(classifier_dict)
+        labels = classifier.predict(prediction_data)
+        print labels
 
     Below are some concepts used in this class.
     doc - A student free form response, represented as a string of arbitrary
@@ -80,10 +79,6 @@ class StringClassifier(object):
     It is possible for a word instance in a doc to not have an explicit label
     assigned to it. This is characterized by assigning DEFAULT_LABEL to the
     word instance.
-
-    Attributes:
-        DEFAULT_LABEL: str. The label used to characterize a word with no label
-            assigned to it.
     """
 
     # Internal learning rates. These are initialized to Wikipedia's
@@ -110,8 +105,6 @@ class StringClassifier(object):
     # prediction.
     _DEFAULT_MIN_LABELS_TO_PREDICT = 3
 
-    DEFAULT_LABEL = '_default'
-
     def __init__(self):
         """Initializes constants for the classifier.
 
@@ -127,7 +120,7 @@ class StringClassifier(object):
             w - word id
             d - doc id
         """
-
+        super(LDAStringClassifier, self).__init__()
         # Setting a seed ensures that results are deterministic.
         # There is nothing special about the value 4.
         numpy.random.seed(seed=4)
@@ -450,7 +443,7 @@ class StringClassifier(object):
         """
         return self._add_examples(training_examples, self._training_iterations)
 
-    def add_docs_for_predicting(self, prediction_docs):
+    def _add_docs_for_predicting(self, prediction_docs):
         """Adds examples to the classifier with _prediction_iterations number
         of iterations.
 
@@ -470,71 +463,20 @@ class StringClassifier(object):
                 copy.deepcopy(all_labels) for _ in prediction_docs]),
             self._prediction_iterations)
 
-    def load_examples(self, examples):
-        """Sets the internal state of the classifier, assigns random initial
-        labels to the docs, and runs Gibbs sampling for _training_iterations
-        number of iterations.
+    def _predict_label_for_doc(self, sample):
+        """Returns the predicted label from a sample's prediction report.
 
         Args:
-            examples: list of 'examples'. Each example is represented
-                by a 2-element list. The first item of the list is a str
-                representing a doc, and the second item is a list of labels
-                that the doc should be matched to. E.g.:
-
-                training_examples = [
-                    ['i eat fish and vegetables', ['food']],
-                    ['fish are pets', ['pets']],
-                    ['my kitten eats fish', ['food', 'pets']]
-                ]
-        """
-        docs, labels_list = self._parse_examples(examples)
-
-        label_set = set(
-            [self.DEFAULT_LABEL] +
-            [label for labels in labels_list for label in labels])
-
-        self._num_labels = len(label_set)
-        self._label_to_id = dict(zip(label_set, xrange(self._num_labels)))
-
-        self._num_words = 0
-        self._word_to_id = {}
-
-        self._num_docs = len(docs)
-
-        self._b_dl = numpy.array(
-            map(self._get_label_vector, labels_list), dtype=int)
-        self._w_dp = [map(self._get_word_id, doc) for doc in docs]
-        self._c_dl = numpy.zeros(
-            (self._num_docs, self._num_labels), dtype=int)
-        self._c_lw = numpy.zeros(
-            (self._num_labels, self._num_words), dtype=int)
-        self._c_l = numpy.zeros(self._num_labels, dtype=int)
-        self._l_dp = []
-
-        for d in xrange(self._num_docs):
-            doc, _ = self._get_doc_with_label_vector(d)
-            l_p = numpy.random.random_integers(
-                0, self._num_labels - 1, size=len(doc)).tolist()
-            self._l_dp.append(l_p)
-            for w, l in zip(doc, l_p):
-                self._increment_counting_matrices(d, w, l)
-        self._iterate_gibbs_sampling(
-            self._training_iterations,
-            xrange(self._num_docs))
-
-    def predict_label_for_doc(self, d):
-        """Returns the predicted label from a doc's prediction report.
-
-        Args:
-            d: int. A doc id (see example in class docstring).
+            sample: int. A doc id (see example in class docstring).
 
         Returns:
-            str. The label predicted by the classifier for the given doc.
+            str. The label predicted by the classifier for the given sample.
         """
         if (self._num_docs < self._DEFAULT_MIN_DOCS_TO_PREDICT or
                 self._num_labels < self._DEFAULT_MIN_LABELS_TO_PREDICT):
             return self.DEFAULT_LABEL
-        return self._get_prediction_report_for_doc(d)['prediction_label_name']
+        return self._get_prediction_report_for_doc(
+            sample)['prediction_label_name']
 
     def to_dict(self):
         """Returns a dict representing this StringClassifier.
@@ -590,3 +532,67 @@ class StringClassifier(object):
         self._c_dl = copy.deepcopy(model['_c_dl'])
         self._c_lw = copy.deepcopy(model['_c_lw'])
         self._c_l = copy.deepcopy(model['_c_l'])
+
+    def train(self, training_data):
+        """Sets the internal state of the classifier, assigns random initial
+        labels to the docs, and runs Gibbs sampling for _training_iterations
+        number of iterations.
+
+        Args:
+            training_data: list of free form texts. Each item is represented
+            by a 2-element list. The first item of the list is a str
+            representing a sample, and the second item is a list of labels
+            that the sample should be matched to. E.g.: [
+                ['i eat fish and vegetables', ['food']],
+                ['fish are pets', ['pets']],
+                ['my kitten eats fish', ['food', 'pets']]
+        """
+        docs, labels_list = self._parse_examples(training_data)
+
+        label_set = set(
+            [self.DEFAULT_LABEL] +
+            [label for labels in labels_list for label in labels])
+
+        self._num_labels = len(label_set)
+        self._label_to_id = dict(zip(label_set, xrange(self._num_labels)))
+
+        self._num_words = 0
+        self._word_to_id = {}
+
+        self._num_docs = len(docs)
+
+        self._b_dl = numpy.array(
+            map(self._get_label_vector, labels_list), dtype=int)
+        self._w_dp = [map(self._get_word_id, doc) for doc in docs]
+        self._c_dl = numpy.zeros(
+            (self._num_docs, self._num_labels), dtype=int)
+        self._c_lw = numpy.zeros(
+            (self._num_labels, self._num_words), dtype=int)
+        self._c_l = numpy.zeros(self._num_labels, dtype=int)
+        self._l_dp = []
+
+        for d in xrange(self._num_docs):
+            doc, _ = self._get_doc_with_label_vector(d)
+            l_p = numpy.random.random_integers(
+                0, self._num_labels - 1, size=len(doc)).tolist()
+            self._l_dp.append(l_p)
+            for w, l in zip(doc, l_p):
+                self._increment_counting_matrices(d, w, l)
+        self._iterate_gibbs_sampling(
+            self._training_iterations,
+            xrange(self._num_docs))
+
+    def predict(self, predicting_data):
+        """Predicts what labels should be set to each sample in
+        'predicting_data'
+
+        Args:
+            predicting_data: list(str). Each item represents a free form
+                text input by user.
+
+        Returns:
+            list(prediction report). Each item is a prediction report
+                for the corresponding sample.
+        """
+        doc_ids = self._add_docs_for_predicting(predicting_data)
+        return [self._predict_label_for_doc(doc_id) for doc_id in doc_ids]

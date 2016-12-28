@@ -294,6 +294,13 @@ def get_collection_rights(collection_id, strict=True):
         model, feconf.ACTIVITY_TYPE_COLLECTION)
 
 
+def get_collection_owner_names(collection_id):
+    """Retrieves the owners for this collection from the datastore."""
+    collection_rights = get_collection_rights(collection_id)
+    return user_services.get_human_readable_user_ids(
+        collection_rights.owner_ids)
+
+
 def is_collection_private(collection_id):
     collection_rights = get_collection_rights(collection_id)
     return collection_rights.status == ACTIVITY_STATUS_PRIVATE

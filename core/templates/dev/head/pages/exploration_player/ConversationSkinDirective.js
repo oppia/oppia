@@ -50,6 +50,7 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
       tutorCardAnimatedLeft = oppiaAvatarLeft;
       tutorCardAnimatedWidth = 0;
     }
+
     oppiaAvatar.hide();
     tutorCard.css({
       'min-width': 0
@@ -107,6 +108,47 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
   return {
     beforeAddClass: beforeAddClass,
     removeClass: removeClass
+  };
+});
+
+oppia.animation('.conversation-skin-animate-tutor-card-content', function() {
+  var animateCardChange = function(element, className, done) {
+    if (className !== 'animate-card-change') {
+      return;
+    }
+
+    var currentHeight = element.height();
+    var expectedNextHeight = $(
+      '.conversation-skin-future-tutor-card ' +
+      '.conversation-skin-tutor-card-content'
+    ).height();
+
+    // Fix the current card height, so that it does not change during the
+    // animation, even though its contents might.
+    element.css('height', currentHeight);
+
+    jQuery(element).animate({
+      opacity: 0
+    }, TIME_FADEOUT_MSEC).animate({
+      height: expectedNextHeight
+    }, TIME_HEIGHT_CHANGE_MSEC).animate({
+      opacity: 1
+    }, TIME_FADEIN_MSEC, function() {
+      element.css('height', '');
+      done();
+    });
+
+    return function(cancel) {
+      if (cancel) {
+        element.css('opacity', '1.0');
+        element.css('height', '');
+        element.stop();
+      }
+    };
+  };
+
+  return {
+    addClass: animateCardChange
   };
 });
 
@@ -197,24 +239,26 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
     },
     template: '<div ng-include="directiveTemplateId"></div>',
     controller: [
-      '$scope', '$timeout', '$rootScope', '$window', '$translate',
+      '$scope', '$timeout', '$rootScope', '$window', '$translate', '$http',
        'messengerService', 'oppiaPlayerService', 'urlService', 'focusService',
       'LearnerViewRatingService', 'windowDimensionsService',
       'playerTranscriptService', 'LearnerParamsService',
       'playerPositionService', 'explorationRecommendationsService',
       'StatsReportingService', 'UrlInterpolationService',
       'siteAnalyticsService', 'ExplorationPlayerStateService',
-      'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX',
+      'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX', 'alertsService',
+      'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
       function(
-          $scope, $timeout, $rootScope, $window, $translate,
+          $scope, $timeout, $rootScope, $window, $translate, $http,
           messengerService, oppiaPlayerService, urlService, focusService,
           LearnerViewRatingService, windowDimensionsService,
           playerTranscriptService, LearnerParamsService,
           playerPositionService, explorationRecommendationsService,
           StatsReportingService, UrlInterpolationService,
           siteAnalyticsService, ExplorationPlayerStateService,
-          TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX) {
-        $scope.CONTINUE_BUTTON_FOCUS_LABEL = 'continueButton';
+          TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX, alertsService,
+          CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED) {
+        $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
         // The minimum width, in pixels, needed to be able to show two cards
         // side-by-side.
         var TIME_PADDING_MSEC = 250;
@@ -302,7 +346,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
         // Navigates to the currently-active card, and resets the 'show previous
         // responses' setting.
         var _navigateToActiveCard = function() {
-          $scope.$broadcast('activeCardChanged');
+          $scope.$broadcast(EVENT_ACTIVE_CARD_CHANGED);
 
           var index = playerPositionService.getActiveCardIndex();
           $scope.activeCard = playerTranscriptService.getCard(index);
@@ -510,14 +554,9 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
                     oppiaPlayerService.getInteractionHtml(
                       newStateName, _nextFocusLabel
                     ) + oppiaPlayerService.getRandomSuffix() : '');
-
-                  $scope.$broadcast('destinationCardAvailable', {
-                    upcomingStateName: $scope.upcomingStateName,
-                    upcomingParams: $scope.upcomingParams,
-                    upcomingContentHtml: $scope.upcomingContentHtml,
-                    upcomingInlineInteractionHtml:
-                        $scope.upcomingInlineInteractionHtml
-                  });
+                  $scope.upcomingInteractionInstructions = (
+                    ExplorationPlayerStateService.getInteractionInstructions(
+                      $scope.upcomingStateName));
 
                   if (feedbackHtml) {
                     playerTranscriptService.addNewFeedback(feedbackHtml);
@@ -567,6 +606,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
             $scope.upcomingParams = null;
             $scope.upcomingContentHtml = null;
             $scope.upcomingInlineInteractionHtml = null;
+            $scope.upcomingInteractionInstructions = null;
           }, TIME_FADEOUT_MSEC + 0.1 * TIME_HEIGHT_CHANGE_MSEC);
 
           $timeout(function() {
@@ -680,13 +720,11 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
           if (!$scope.isCurrentSupplementalCardNonempty()) {
             return $scope.isViewportNarrow();
           }
-          return $scope.isViewportNarrow() &&
-                 tutorCardIsDisplayedIfNarrow;
+          return $scope.isViewportNarrow() && tutorCardIsDisplayedIfNarrow;
         };
 
         $scope.isScreenNarrowAndShowingSupplementalCard = function() {
-          return $scope.isViewportNarrow() &&
-                 !tutorCardIsDisplayedIfNarrow;
+          return $scope.isViewportNarrow() && !tutorCardIsDisplayedIfNarrow;
         };
 
         $scope.showTutorCardIfScreenIsNarrow = function() {
@@ -708,6 +746,22 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
 
         $scope.collectionId = GLOBALS.collectionId;
         $scope.collectionTitle = GLOBALS.collectionTitle;
+
+        if ($scope.collectionId) {
+          $http.get('/collectionsummarieshandler/data', {
+            params: {
+              stringified_collection_ids: JSON.stringify([$scope.collectionId])
+            }
+          }).then(
+            function(response) {
+              $scope.collectionSummary = response.data.summaries[0];
+            },
+            function() {
+              alertsService.addWarning(
+                'There was an error while fetching the collection summary.');
+            }
+          );
+        }
 
         $scope.onNavigateFromIframe = function() {
           siteAnalyticsService.registerVisitOppiaFromIframeEvent(
