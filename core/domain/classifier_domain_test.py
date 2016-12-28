@@ -28,7 +28,7 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
             'exp_id': 'exp_id1',
             'exp_version_when_created': 1,
             'state_name': 'a state name',
-            'algorithm_id': 1,
+            'algorithm_id': "LDAStringClassifier",
             'cached_classifier_data': {'alpha': 1.0},
             'data_schema_version': 1
         }

@@ -29,12 +29,12 @@ class Classifier(object):
         exp_version_when_created: str. The version of the exploration when
             this classification model was created.
         state_name: str. The name of the state to which the classifier belongs.
-        algorithm_id: int. The id of the algorithm used for generating
+        algorithm_id: str. The id of the algorithm used for generating
             classifier.
         cached_classifier_data: dict. The actual classifier model used for
             classification purpose.
-        data_schema_version: int. Schema version of the
-            data used by the classifier.
+        data_schema_version: int. Schema version of the data used by the 
+            classifier. This depends on the algorithm ID.
     """
 
     def __init__(self, classifier_id, exp_id, exp_version_when_created,
@@ -49,7 +49,7 @@ class Classifier(object):
                 this classification model was created.
             state_name: str. The name of the state to which the classifier
                 belongs.
-            algorithm_id: int. The id of the algorithm used for generating
+            algorithm_id: str. The id of the algorithm used for generating
                 classifier.
             cached_classifier_data: dict. The actual classifier model used for
                 classification purpose.

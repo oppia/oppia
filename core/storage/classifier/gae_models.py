@@ -29,16 +29,16 @@ ALGORITHM_CHOICES = [
 class ClassifierModel(base_models.BaseModel):
     """Storage model for classifier used for answer classification.
 
-    The id/key of instances of this class has the form
+    The id of instances of this class has the form
     {{exp_id}}.{{random_hash_of_16_chars}}
     """
 
     # The exploration_id of the exploration to whose state the model belongs.
-    exp_id = ndb.StringProperty(required=True)
+    exp_id = ndb.StringProperty(required=True, index=True)
     # The exploration version at the time this classifier model was created.
-    exp_version_when_created = ndb.IntegerProperty(required=True)
+    exp_version_when_created = ndb.IntegerProperty(required=True, index=True)
     # The name of the state to which the model belongs.
-    state_name = ndb.StringProperty(required=True)
+    state_name = ndb.StringProperty(required=True, index=True)
     # The ID of the algorithm used to create the model.
     algorithm_id = ndb.StringProperty(required=True, choices=ALGORITHM_CHOICES)
     # The actual model used for classification. Immutable, unless a schema
@@ -88,7 +88,7 @@ class ClassifierModel(base_models.BaseModel):
                 this classification model was created.
             state_name: str. The name of the state to which the classifier
                 belongs.
-            algorithm_id: int. ID of the algorithm used to generate the model.
+            algorithm_id: str. ID of the algorithm used to generate the model.
             cached_classifier_data: dict. The model used for classification.
             data_schema_version: int. Schema version of the
                 data used by the classifier.
