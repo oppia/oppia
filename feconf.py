@@ -205,8 +205,7 @@ CAN_SEND_EMAILS = False
 CAN_SEND_EDITOR_ROLE_EMAILS = False
 # If enabled then emails will be sent to creators for feedback messages.
 CAN_SEND_FEEDBACK_MESSAGE_EMAILS = False
-# If enabled then emails regarding the user's subscription to other creators
-# will be sent to that user.
+# If enabled subscription emails will be sent to that user.
 CAN_SEND_SUBSCRIPTION_EMAILS = False
 # Time to wait before sending feedback message emails (currently set to 1
 # hour).
