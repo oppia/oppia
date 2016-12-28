@@ -418,7 +418,7 @@ var addExplorationLevelParameterChange = function(paramName, paramValue) {
     });
 
     element(by.css('.protractor-test-save-param-changes-button')).click();
-    });
+  });
 };
 
 // RULES
