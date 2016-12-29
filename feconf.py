@@ -211,6 +211,12 @@ DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS = 3600
 # Whether to send an email when new feedback message is received for
 # an exploration.
 DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE = True
+# Whether exploration feedback emails are muted,
+# when the user has not specified a preference.
+DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE = False
+# Whether exploration suggestion emails are muted,
+# when the user has not specified a preference.
+DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE = False
 # Whether to send email updates to a user who has not specified a preference.
 DEFAULT_EMAIL_UPDATES_PREFERENCE = False
 # Whether to send an invitation email when the user is granted
@@ -772,6 +778,15 @@ SUPPORTED_SITE_LANGUAGES = [{
     'id': 'en',
     'text': 'English'
 }, {
+    'id': 'de',
+    'text': 'Deutsch'
+}, {
+    'id': 'fr',
+    'text': 'français'
+}, {
+    'id': 'nl',
+    'text': 'Nederlands'
+}, {
     'id': 'es',
     'text': 'Español'
 }, {
@@ -781,14 +796,26 @@ SUPPORTED_SITE_LANGUAGES = [{
     'id': 'pt-br',
     'text': 'Português (Brasil)'
 }, {
+    'id': 'mk',
+    'text': 'македонски јазик'
+}, {
     'id': 'vi',
     'text': 'Tiếng Việt'
 }, {
     'id': 'hi',
     'text': 'हिन्दी'
 }, {
+    'id': 'bn',
+    'text': 'বাংলা'
+}, {
     'id': 'tr',
     'text': 'Türkçe'
+}, {
+    'id': 'zh-hans',
+    'text': '中文(简体)'
+}, {
+    'id': 'zh-hant',
+    'text': '中文(繁體)'
 }]
 SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]

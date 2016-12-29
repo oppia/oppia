@@ -71,7 +71,8 @@
                       class="conversation-skin-bottom-gadget-panel">
   </oppia-gadget-panel>
 
-  <div ng-if="isOnTerminalCard() && isCurrentCardAtEndOfTranscript()">
+  <div ng-if="isOnTerminalCard() && isCurrentCardAtEndOfTranscript()"
+       class="conversation-skin-final-summary">
     <div ng-if="isLoggedIn && !isInPreviewMode" class="conversation-skin-final-ratings">
       <div class="conversation-skin-final-ratings-header" translate="I18N_PLAYER_RATE_EXPLORATION">
       </div>
@@ -88,7 +89,7 @@
             translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS">
       </span>
 
-      <div class="oppia-exp-summary-tiles-container" style="padding-top: 10px;">
+      <div class="oppia-exp-summary-tiles-container conversation-skin-recommended-explorations-container">
         <exploration-summary-tile ng-repeat="exp in (recommendedExplorationSummaries|limitTo:3) track by $index"
                                   collection-id="collectionId"
                                   exploration-id="exp.id"
@@ -344,6 +345,14 @@
     }
     .conversation-skin-oppia-feedback.ng-enter.ng-enter-active {
       opacity: 1;
+    }
+
+    .conversation-skin-final-summary {
+      margin-bottom: 25px;
+    }
+
+    .conversation-skin-recommended-explorations-container {
+      padding-top: 10px;
     }
 
     @media screen and (max-width: 959px) {
