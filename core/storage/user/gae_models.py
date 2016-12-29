@@ -19,6 +19,7 @@
 from core.platform import models
 import feconf
 
+from google.appengine.datastore.datastore_query import Cursor
 from google.appengine.ext import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
@@ -130,8 +131,17 @@ class UserSubscriptionsModel(base_models.BaseModel):
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of feedback thread ids that this user subscribes to.
     feedback_thread_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # IDs of the learners who have subscribed to this user.
+    creator_ids = ndb.StringProperty(repeated=True, indexed=True)
     # When the user last checked notifications. May be None.
     last_checked = ndb.DateTimeProperty(default=None)
+
+
+class UserSubscribersModel(base_models.BaseModel):
+    """The list of subscribers of the user.
+    """
+    # IDs of the learners who have subscribed to this user.
+    subscriber_ids = ndb.StringProperty(repeated=True, indexed=True)
 
 
 class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
@@ -242,6 +252,14 @@ class ExplorationUserDataModel(base_models.BaseModel):
     # The exploration version that this change list applied to.
     draft_change_list_exp_version = ndb.IntegerProperty(default=None)
 
+    # The user's preference for receiving suggestion emails for this exploration
+    mute_suggestion_notifications = ndb.BooleanProperty(
+        default=feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
+
+    # The user's preference for receiving feedback emails for this exploration
+    mute_feedback_notifications = ndb.BooleanProperty(
+        default=feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE)
+
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
         return '%s.%s' % (user_id, exploration_id)
@@ -350,9 +368,12 @@ class UserQueryModel(base_models.BaseModel):
     # List of all user_ids who satisfy all parameters given in above query.
     # This list will be empty initially. Once query has completed its execution
     # this list will be populated with all qualifying user ids.
-    user_ids = ndb.StringProperty(indexed=True, repeated=True)
-    # Id of the user who submitted the query.
+    user_ids = ndb.JsonProperty(default=[], compressed=True)
+    # ID of the user who submitted the query.
     submitter_id = ndb.StringProperty(indexed=True, required=True)
+    # ID of the instance of BulkEmailModel which stores information
+    # about sent emails.
+    sent_email_model_id = ndb.StringProperty(default=None, indexed=True)
     # Current status of the query.
     query_status = ndb.StringProperty(
         indexed=True,
@@ -362,3 +383,22 @@ class UserQueryModel(base_models.BaseModel):
             feconf.USER_QUERY_STATUS_ARCHIVED,
             feconf.USER_QUERY_STATUS_FAILED
         ])
+
+    @classmethod
+    def fetch_page(cls, page_size, cursor):
+        cursor = Cursor(urlsafe=cursor)
+        query_models, next_cursor, more = (
+            cls.query().order(-cls.created_on).
+            fetch_page(page_size, start_cursor=cursor))
+        next_cursor = next_cursor.urlsafe() if (next_cursor and more) else None
+        return query_models, next_cursor, more
+
+
+class UserBulkEmailsModel(base_models.BaseModel):
+    """Model to store IDs BulkEmailModel sent to a user.
+
+    Instances of this class are keyed by the user id.
+    """
+    # IDs of all BulkEmailModels that correspond to bulk emails sent to this
+    # user.
+    sent_email_model_ids = ndb.StringProperty(indexed=True, repeated=True)

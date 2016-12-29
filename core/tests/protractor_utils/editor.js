@@ -77,6 +77,7 @@ var finishTutorial = function() {
 
 var navigateToMainTab = function() {
   element(by.css('.protractor-test-main-tab')).click();
+  general.waitForSystem();
   // Click a neutral element in order to dismiss any warnings.
   element(by.css('.protractor-test-neutral-element')).click();
 };
@@ -1064,8 +1065,9 @@ var saveChanges = function(commitMessage) {
 var discardChanges = function() {
   element(by.css('.protractor-test-save-discard-toggle')).click();
   element(by.css('.protractor-test-discard-changes')).click();
-  browser.driver.switchTo().alert().accept();
+  general.acceptAlert();
   general.waitForSystem();
+  browser.waitForAngular();
 };
 
 var expectCannotSaveChanges = function() {
@@ -1316,6 +1318,44 @@ var revertToVersion = function(version) {
   });
 };
 
+// Wrapper for functions involving the feedback tab
+var _runFromFeedbackTab = function(callbackFunction) {
+  element(by.css('.protractor-test-feedback-tab')).click();
+  var result = callbackFunction();
+  general.waitForSystem();
+  element(by.css('.protractor-test-main-tab')).click();
+  return result;
+};
+
+var readFeedbackMessages = function() {
+  return _runFromFeedbackTab(function() {
+    var feedbackRowClassName = '.protractor-test-oppia-feedback-tab-row';
+    var messages = [];
+    return element.all(by.css(feedbackRowClassName)).then(function(rows) {
+      rows.forEach(function(row) {
+        row.click();
+        element(by.css('.protractor-test-exploration-feedback'))
+          .getText().then(function(message) {
+            messages.push(message);
+          });
+        element(by.css('.protractor-test-oppia-feedback-back-button')).click();
+      });
+      return messages;
+    });
+  });
+};
+
+var sendResponseToLatestFeedback = function(feedbackResponse) {
+  element(by.css('.protractor-test-feedback-tab')).click();
+  element.all(by.css('.protractor-test-oppia-feedback-tab-row')).
+    first().click();
+
+  element(by.css('.protractor-test-feedback-response-textarea')).
+    sendKeys(feedbackResponse);
+  element(by.css('.protractor-test-oppia-feedback-response-send-btn')).
+    click();
+};
+
 exports.exitTutorialIfNecessary = exitTutorialIfNecessary;
 exports.startTutorial = startTutorial;
 exports.progressInTutorial = progressInTutorial;
@@ -1390,3 +1430,6 @@ exports.expectCannotSaveChanges = expectCannotSaveChanges;
 exports.expectGraphComparisonOf = expectGraphComparisonOf;
 exports.expectTextComparisonOf = expectTextComparisonOf;
 exports.revertToVersion = revertToVersion;
+
+exports.readFeedbackMessages = readFeedbackMessages;
+exports.sendResponseToLatestFeedback = sendResponseToLatestFeedback;

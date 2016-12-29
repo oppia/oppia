@@ -63,13 +63,9 @@ def get_human_readable_contributors_summary(contributors_summary):
     contributor_ids = contributors_summary.keys()
     contributor_usernames = user_services.get_human_readable_user_ids(
         contributor_ids)
-    contributor_profile_pictures = (
-        user_services.get_profile_pictures_by_user_ids(contributor_ids))
     return {
         contributor_usernames[ind]: {
             'num_commits': contributors_summary[contributor_ids[ind]],
-            'profile_picture_data_url': contributor_profile_pictures[
-                contributor_ids[ind]]
         }
         for ind in xrange(len(contributor_ids))
     }
@@ -295,6 +291,10 @@ def get_displayable_exp_summary_dicts(exploration_summaries):
             'language_code': exploration_summary.language_code,
             'last_updated_msec': utils.get_time_in_millisecs(
                 exploration_summary.exploration_model_last_updated
+            ),
+            'human_readable_contributors_summary': (
+                get_human_readable_contributors_summary(
+                    exploration_summary.contributors_summary)
             ),
             'status': exploration_summary.status,
             'ratings': exploration_summary.ratings,

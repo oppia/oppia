@@ -16,45 +16,47 @@
  * @fileoverview Directive for uploading images.
  */
 
-oppia.directive('imageUploader', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      height: '@',
-      onFileChanged: '=',
-      width: '@'
-    },
-    templateUrl: 'components/imageUploader',
-    link: function(scope, elt) {
-      var onDragEnd = function(e) {
-        e.preventDefault();
-        $(elt).removeClass('image-uploader-is-active');
-      };
+oppia.directive('imageUploader', [
+  'IdGenerationService', function(IdGenerationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        height: '@',
+        onFileChanged: '=',
+        width: '@'
+      },
+      templateUrl: 'components/imageUploader',
+      link: function(scope, elt) {
+        var onDragEnd = function(e) {
+          e.preventDefault();
+          $(elt).removeClass('image-uploader-is-active');
+        };
 
-      $(elt).bind('drop', function(e) {
-        onDragEnd(e);
-        scope.onFileChanged(
-          e.originalEvent.dataTransfer.files[0],
-          e.originalEvent.dataTransfer.files[0].name);
-      });
+        $(elt).bind('drop', function(e) {
+          onDragEnd(e);
+          scope.onFileChanged(
+            e.originalEvent.dataTransfer.files[0],
+            e.originalEvent.dataTransfer.files[0].name);
+        });
 
-      $(elt).bind('dragover', function(e) {
-        e.preventDefault();
-        $(elt).addClass('image-uploader-is-active');
-      });
+        $(elt).bind('dragover', function(e) {
+          e.preventDefault();
+          $(elt).addClass('image-uploader-is-active');
+        });
 
-      $(elt).bind('dragleave', onDragEnd);
+        $(elt).bind('dragleave', onDragEnd);
 
-      // We generate a random class name to distinguish this input from
-      // others in the DOM.
-      scope.fileInputClassName = (
-        'image-uploader-file-input' + Math.random().toString(36).substring(5));
-      angular.element(document).on(
-          'change', '.' + scope.fileInputClassName, function(evt) {
-        scope.onFileChanged(
-          evt.currentTarget.files[0],
-          evt.target.value.split(/(\\|\/)/g).pop());
-      });
-    }
-  };
-}]);
+        // We generate a random class name to distinguish this input from
+        // others in the DOM.
+        scope.fileInputClassName = (
+          'image-uploader-file-input' + IdGenerationService.generateNewId());
+        angular.element(document).on(
+            'change', '.' + scope.fileInputClassName, function(evt) {
+          scope.onFileChanged(
+            evt.currentTarget.files[0],
+            evt.target.value.split(/(\\|\/)/g).pop());
+        });
+      }
+    };
+  }
+]);

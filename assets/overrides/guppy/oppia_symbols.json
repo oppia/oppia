@@ -1,0 +1,31 @@
+{
+    "frac": {
+        "output": {
+            "latex": "\\frac{{$1}}{{$2}}",
+            "small_latex": "\\frac{{$1}}{{$2}}",
+            "text": "({$1})/({$2})"
+        },
+        "current": 0,
+        "type": "fraction",
+        "attrs": {
+            "up": [1, 1],
+            "down": [2, 2],
+            "name": ["numerator", "denominator"]
+        }
+    },
+    "slash": {
+        "output": {
+            "latex":"\\frac{{$1}}{{$2}}",
+            "small_latex":"\\frac{{$1}}{{$2}}",
+            "text":"({$1})/({$2})"
+        },
+        "current": 1,
+        "current_type": "token",
+        "type": "fraction",
+        "attrs": {
+            "up": [1, 1],
+            "down": [2, 2],
+            "name": ["numerator", "denominator"]
+        }
+    }
+}

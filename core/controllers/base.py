@@ -48,8 +48,6 @@ DEFAULT_CSRF_SECRET = 'oppia csrf secret'
 CSRF_SECRET = config_domain.ConfigProperty(
     'oppia_csrf_secret', {'type': 'unicode'},
     'Text used to encrypt CSRF tokens.', DEFAULT_CSRF_SECRET)
-SITE_NAME = config_domain.ConfigProperty(
-    'site_name', {'type': 'unicode'}, 'The site name', 'SITE_NAME')
 
 BEFORE_END_HEAD_TAG_HOOK = config_domain.ConfigProperty(
     'before_end_head_tag_hook', {
@@ -60,13 +58,10 @@ BEFORE_END_HEAD_TAG_HOOK = config_domain.ConfigProperty(
     },
     'Code to insert just before the closing </head> tag in all pages.', '')
 
-SITE_FEEDBACK_FORM_URL = config_domain.ConfigProperty(
-    'site_feedback_form_url', {'type': 'unicode'},
-    'Site feedback form URL (leave blank if there is no such form)', '')
-
 
 def require_user(handler):
     """Decorator that checks if a user is associated to the current session."""
+
     def test_login(self, **kwargs):
         """Checks if the user for the current session is logged in."""
         if not self.user_id:
@@ -80,6 +75,7 @@ def require_user(handler):
 
 def require_moderator(handler):
     """Decorator that checks if the current user is a moderator."""
+
     def test_is_moderator(self, **kwargs):
         """Check that the user is a moderator."""
         if not self.user_id:
@@ -212,8 +208,9 @@ class BaseHandler(webapp2.RequestHandler):
                             user_settings.last_logged_in)):
                     user_services.record_user_logged_in(self.user_id)
 
-        self.is_moderator = rights_manager.Actor(self.user_id).is_moderator()
-        self.is_admin = rights_manager.Actor(self.user_id).is_admin()
+        rights_mgr_user = rights_manager.Actor(self.user_id)
+        self.is_moderator = rights_mgr_user.is_moderator()
+        self.is_admin = rights_mgr_user.is_admin()
         self.is_super_admin = (
             current_user_services.is_current_user_super_admin())
 
@@ -320,8 +317,9 @@ class BaseHandler(webapp2.RequestHandler):
             'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
             'RTE_COMPONENT_SPECS': (
                 rte_component_registry.Registry.get_all_specs()),
-            'SITE_FEEDBACK_FORM_URL': SITE_FEEDBACK_FORM_URL.value,
-            'SITE_NAME': SITE_NAME.value,
+            'SITE_FEEDBACK_FORM_URL': feconf.SITE_FEEDBACK_FORM_URL,
+            'SITE_NAME': feconf.SITE_NAME,
+
             'SUPPORTED_SITE_LANGUAGES': feconf.SUPPORTED_SITE_LANGUAGES,
             'SYSTEM_USERNAMES': feconf.SYSTEM_USERNAMES,
             'TEMPLATE_DIR_PREFIX': utils.get_template_dir_prefix(),
@@ -329,6 +327,7 @@ class BaseHandler(webapp2.RequestHandler):
                 self.username and self.username in
                 config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value
             ),
+            'username': self.username,
             'user_is_logged_in': user_services.has_fully_registered(
                 self.user_id),
             'preferred_site_language_code': self.preferred_site_language_code
@@ -352,6 +351,7 @@ class BaseHandler(webapp2.RequestHandler):
         if redirect_url_on_logout is None:
             redirect_url_on_logout = self.request.uri
         if self.user_id:
+            values['login_url'] = None
             values['logout_url'] = (
                 current_user_services.create_logout_url(
                     redirect_url_on_logout))
@@ -361,6 +361,7 @@ class BaseHandler(webapp2.RequestHandler):
                 else self.request.uri)
             values['login_url'] = (
                 current_user_services.create_login_url(target_url))
+            values['logout_url'] = None
 
         # Create a new csrf token for inclusion in HTML responses. This assumes
         # that tokens generated in one handler will be sent back to a handler
@@ -408,7 +409,6 @@ class BaseHandler(webapp2.RequestHandler):
                     'pages/error/error_iframed.html', iframe_restriction=None)
             else:
                 self.render_template('pages/error/error.html')
-
 
     def handle_exception(self, exception, unused_debug_mode):
         """Overwrites the default exception handler."""

@@ -376,14 +376,14 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertIn(
             self.EXP_ID,
             [exp.id for exp in exp_models.ExplorationModel.get_all(
-                include_deleted_entities=True)]
+                include_deleted=True)]
         )
 
         # The exploration summary is deleted however
         self.assertNotIn(
             self.EXP_ID,
             [exp.id for exp in exp_models.ExpSummaryModel.get_all(
-                include_deleted_entities=True)]
+                include_deleted=True)]
         )
 
     def test_hard_deletion_of_explorations(self):
@@ -406,7 +406,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertNotIn(
             self.EXP_ID,
             [exp.id for exp in exp_models.ExplorationModel.get_all(
-                include_deleted_entities=True)]
+                include_deleted=True)]
         )
 
     def test_summaries_of_hard_deleted_explorations(self):
@@ -427,7 +427,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertNotIn(
             self.EXP_ID,
             [exp.id for exp in exp_models.ExpSummaryModel.get_all(
-                include_deleted_entities=True)]
+                include_deleted=True)]
         )
 
     def test_explorations_are_removed_from_index_when_deleted(self):

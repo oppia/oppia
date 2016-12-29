@@ -42,6 +42,8 @@ oppia.controller('Library', [
     $scope.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
       '/library/' + $scope.bannerImageFilename);
 
+    $scope.activeGroupIndex = null;
+
     $scope.pageMode = GLOBALS.PAGE_MODE;
     $scope.LIBRARY_PAGE_MODES = LIBRARY_PAGE_MODES;
     // Below is the width of each tile (width + margins), which can be found
@@ -101,6 +103,14 @@ oppia.controller('Library', [
       });
     }
 
+    $scope.setActiveGroup = function(groupIndex) {
+      $scope.activeGroupIndex = groupIndex;
+    };
+
+    $scope.clearActiveGroup = function() {
+      $scope.activeGroupIndex = null;
+    };
+
     // If the value below is changed, the following CSS values in oppia.css
     // must be changed:
     // - .oppia-exp-summary-tiles-container: max-width
@@ -144,10 +154,6 @@ oppia.controller('Library', [
       }
       var carouselJQuerySelector = (
         '.oppia-library-carousel-tiles:eq(n)'.replace('n', ind));
-      var leftOverlaySelector =
-        '.oppia-library-carousel-overlay-left:eq(n)'.replace('n', ind);
-      var rightOverlaySelector =
-        '.oppia-library-carousel-overlay-right:eq(n)'.replace('n', ind);
 
       var direction = isLeftScroll ? -1 : 1;
       var carouselScrollPositionPx = $(carouselJQuerySelector).scrollLeft();
@@ -185,19 +191,6 @@ oppia.controller('Library', [
         complete: function() {
           isAnyCarouselCurrentlyScrolling = false;
         }
-      });
-
-      $(leftOverlaySelector).css({
-        display: 'inline'
-      }).fadeOut({
-        duration: 800,
-        queue: false
-      });
-      $(rightOverlaySelector).css({
-        display: 'inline'
-      }).fadeOut({
-        duration: 800,
-        queue: false
       });
     };
 
