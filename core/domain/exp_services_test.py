@@ -896,12 +896,13 @@ class UpdateGadgetTests(ExplorationServicesUnitTests):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id)
         # Default outcome specification for an interaction.
+        self.init_state_name = exploration.init_state_name
+
         self.interaction_default_outcome = {
-            'dest': feconf.DEFAULT_INIT_STATE_NAME,
+            'dest': self.init_state_name,
             'feedback': ['Incorrect', '<b>Wrong answer</b>'],
             'param_changes': []
         }
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
     def test_add_gadget_cmd(self):
         """test adding of a gadget"""
