@@ -661,6 +661,23 @@ def send_feedback_message_email(recipient_id, feedback_messages):
         email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
+def _can_receive_suggestion_email(user_id, exploration_id):
+    """Returns if user can receive suggestion email
+
+    Args:
+        recipient_id: str. ID of person that should receive the email.
+        exploration_id: str. ID of exploration that received new message.
+
+    Returns:
+        bool. True if user can receive the email, False otherwise."""
+    user_global_prefs = user_services.get_email_preferences(user_id)
+    user_exploration_prefs = (
+        user_services.get_email_preferences_for_exploration(
+            user_id, exploration_id))
+    return (user_global_prefs['can_receive_feedback_message_email']
+            and not user_exploration_prefs['mute_suggestion_notifications'])
+
+
 def send_suggestion_email(
         exploration_title, exploration_id, author_id, recipient_list):
     """Send emails to notify the given recipients about new suggestion.
@@ -701,10 +718,7 @@ def send_suggestion_email(
     author_settings = user_services.get_user_settings(author_id)
     for recipient_id in recipient_list:
         recipient_user_settings = user_services.get_user_settings(recipient_id)
-        recipient_preferences = (
-            user_services.get_email_preferences(recipient_id))
-
-        if recipient_preferences['can_receive_feedback_message_email']:
+        if _can_receive_suggestion_email(recipient_id, exploration_id):
             # Send email only if recipient wants to receive.
             email_body = email_body_template % (
                 recipient_user_settings.username, author_settings.username,

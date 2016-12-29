@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# pylint: disable=protected-access
+
 """Tests for feedback-related services."""
 import json
 
@@ -73,6 +75,59 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
         threadlist = feedback_services.get_all_threads(exp_id, False)
         thread_status = threadlist[0].status
         self.assertEqual(thread_status, feedback_models.STATUS_CHOICES_OPEN)
+
+    def test_can_receive_email(self):
+        user_id = 'someUser'
+        exp_id = 'someExploration'
+        username = 'username'
+        user_email = 'user@example.com'
+
+        user_services.get_or_create_user(user_id, user_email)
+        user_services.set_username(user_id, username)
+
+        # User can receive all emails in default setting.
+        self.assertTrue(
+            feedback_services._can_receive_email(user_id, exp_id, True))
+        self.assertTrue(
+            feedback_services._can_receive_email(user_id, exp_id, False))
+
+        # User have muted feedback notifications for this exploration,
+        # therefore he should receive only feedback emails.
+        user_services.set_email_preferences_for_exploration(
+            user_id, exp_id, mute_feedback_notifications=True)
+        self.assertTrue(
+            feedback_services._can_receive_email(user_id, exp_id, True))
+        self.assertFalse(
+            feedback_services._can_receive_email(user_id, exp_id, False))
+
+        # User have muted suggestion notifications for this exploration too,
+        # therefore he should not receive any emails.
+        user_services.set_email_preferences_for_exploration(
+            user_id, exp_id, mute_suggestion_notifications=True)
+        self.assertFalse(
+            feedback_services._can_receive_email(user_id, exp_id, True))
+        self.assertFalse(
+            feedback_services._can_receive_email(user_id, exp_id, False))
+
+        # User have unmuted feedback/suggestion emails for this exploration, but
+        # disabled all emails globally, therefore he should not receive any
+        # emails.
+        user_services.set_email_preferences_for_exploration(
+            user_id, exp_id, mute_feedback_notifications=False,
+            mute_suggestion_notifications=False)
+        user_services.update_email_preferences(user_id, True, True, False)
+        self.assertFalse(
+            feedback_services._can_receive_email(user_id, exp_id, True))
+        self.assertFalse(
+            feedback_services._can_receive_email(user_id, exp_id, False))
+
+        # User have enabled all emails globally, therefore he should
+        # receive all emails.
+        user_services.update_email_preferences(user_id, True, True, True)
+        self.assertTrue(
+            feedback_services._can_receive_email(user_id, exp_id, True))
+        self.assertTrue(
+            feedback_services._can_receive_email(user_id, exp_id, False))
 
 
 class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
@@ -459,9 +514,26 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
                 expected_feedback_message_dict2)
             self.assertEqual(model.retries, 0)
 
-    def test_email_is_not_sent_if_recipient_has_declined_such_emails(self):
+    def test_email_is_not_sent_recipient_has_muted_emails_globally(self):
         user_services.update_email_preferences(
             self.editor_id, True, False, False)
+
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name', self.user_id_a,
+                'a subject', 'some text')
+
+            # Note: the job in the taskqueue represents the realtime
+            # event emitted by create_thread().
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            self.assertEqual(len(messages), 0)
+
+    def test_email_is_not_sent_recipient_has_muted_this_exploration(self):
+        user_services.set_email_preferences_for_exploration(
+            self.editor_id, self.exploration.id,
+            mute_feedback_notifications=True)
 
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
@@ -839,6 +911,21 @@ class SuggestionEmailHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(
                 messages[0].body.decode(),
                 expected_email_text_body)
+
+    def test_email_is_not_sent_recipient_has_muted_this_exploration(self):
+        user_services.set_email_preferences_for_exploration(
+            self.editor_id, self.exploration.id,
+            mute_suggestion_notifications=True)
+
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_suggestion(
+                self.exploration.id, self.new_user_id, self.exploration.version,
+                'state', 'description', {'type': 'text', 'value': 'text'})
+
+            self.process_and_flush_pending_tasks()
+
+            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            self.assertEqual(len(messages), 0)
 
     def test_correct_email_is_sent_for_multiple_recipients(self):
         rights_manager.assign_role_for_exploration(
