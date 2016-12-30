@@ -411,10 +411,12 @@ oppia.controller('EditorNavigation', [
     $scope.postTutorialHelpPopoverIsShown = false;
 
     $scope.$on('openPostTutorialHelpPopover', function() {
-      $scope.postTutorialHelpPopoverIsShown = true;
-      $timeout(function() {
-        $scope.postTutorialHelpPopoverIsShown = false;
-      }, 5000);
+      if ($(window).width() >= 1024) {
+        $scope.postTutorialHelpPopoverIsShown = true;
+        $timeout(function() {
+          $scope.postTutorialHelpPopoverIsShown = false;
+        }, 5000);
+      }
     });
 
     $scope.showUserHelpModal = function() {
