@@ -1331,7 +1331,7 @@ class SubscriptionEmailTest(test_utils.GenericTestBase):
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
                 sent_email_model.intent,
-                feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION)
+                feconf.EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION)
 
 
 class FeedbackMessageInstantEmailTests(test_utils.GenericTestBase):

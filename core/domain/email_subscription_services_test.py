@@ -1,34 +1,52 @@
+# coding: utf-8
+#
+# Copyright 2014 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Tests for email_subscription_services."""
+
 from core.domain import email_subscription_services
 from core.domain import subscription_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(email_models,) = models.Registry.import_models([models.NAMES.email])
-(user_models,) = models.Registry.import_models([models.NAMES.user])
-
-USER_NAME = 'user'
-USER_EMAIL = 'user@test.com'
-
-USER_NAME_2 = 'user2'
-USER_EMAIL_2 = 'user2@test.com'
+(email_models, user_models) = models.Registry.import_models([
+    models.NAMES.email, models.NAMES.user])
 
 
 class InformSubscribersTest(test_utils.GenericTestBase):
     """Test for informing subscribers when an exploration is published by the
     creator."""
 
+    USER_NAME = 'user'
+    USER_EMAIL = 'user@test.com'
+
+    USER_NAME_2 = 'user2'
+    USER_EMAIL_2 = 'user2@test.com'
+
     def setUp(self):
         super(InformSubscribersTest, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.signup(USER_EMAIL, USER_NAME)
+        self.signup(self.USER_EMAIL, self.USER_NAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.signup(USER_EMAIL_2, USER_NAME_2)
+        self.signup(self.USER_EMAIL_2, self.USER_NAME_2)
 
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
-        self.user_id_2 = self.get_user_id_from_email(USER_EMAIL_2)
+        self.user_id_2 = self.get_user_id_from_email(self.USER_EMAIL_2)
 
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, 'Title')
@@ -63,9 +81,9 @@ class InformSubscribersTest(test_utils.GenericTestBase):
             # to the person who has unsubscribed from subscription emails.
             messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
-            messages = self.mail_stub.get_sent_messages(to=USER_EMAIL)
+            messages = self.mail_stub.get_sent_messages(to=self.USER_EMAIL)
             self.assertEqual(len(messages), 1)
-            messages = self.mail_stub.get_sent_messages(to=USER_EMAIL_2)
+            messages = self.mail_stub.get_sent_messages(to=self.USER_EMAIL_2)
             self.assertEqual(len(messages), 0)
 
             # Make sure correct email models are stored.
@@ -73,7 +91,7 @@ class InformSubscribersTest(test_utils.GenericTestBase):
             self.assertEqual(True, any(
                 model.recipient_id == self.user_id for model in all_models))
             self.assertEqual(True, any(
-                model.recipient_email == USER_EMAIL for model in all_models))
+                model.recipient_email == self.USER_EMAIL for model in all_models)) # pylint: disable=line-too-long
 
             self.assertEqual(True, any(
                 model.recipient_id == self.new_user_id for model in all_models)) # pylint: disable=line-too-long
@@ -85,4 +103,4 @@ class InformSubscribersTest(test_utils.GenericTestBase):
             self.assertEqual(False, any(
                 model.recipient_id == self.user_id_2 for model in all_models))
             self.assertEqual(False, any(
-                model.recipient_email == USER_EMAIL_2 for model in all_models))
+                model.recipient_email == self.USER_EMAIL_2 for model in all_models)) # pylint: disable=line-too-long

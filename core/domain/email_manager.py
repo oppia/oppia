@@ -137,6 +137,8 @@ SENDER_VALIDATORS = {
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_MARKETING: (
@@ -594,7 +596,7 @@ def send_emails_to_subscribers(creator_id, exploration_id, exploration_title):
                 exploration_title, EMAIL_FOOTER.value)
             _send_email(
                 recipient_id, feconf.SYSTEM_COMMITTER_ID,
-                feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION,
+                feconf.EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION,
                 email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
