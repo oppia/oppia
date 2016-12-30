@@ -17,35 +17,44 @@
  */
 
 oppia.controller('EmailDashboardResult', [
-  '$scope', '$http', '$window', '$timeout',
-  function($scope, $http, $window, $timeout) {
-    var RESULT_HANDLER_URL_PREFIX = '/emaildashboardresult';
-    var CANCEL_EMAIL_HANDLER_URL_PREFIX = '/emaildashboardcancelresult';
+  '$scope', '$http', '$window', '$timeout', 'UrlInterpolationService',
+  function($scope, $http, $window, $timeout, UrlInterpolationService) {
+    var RESULT_HANDLER_URL = '/emaildashboardresult/<query_id>';
+    var CANCEL_EMAIL_HANDLER_URL = '/emaildashboardcancelresult/<query_id>';
     var EMAIL_DASHBOARD_PAGE = '/emaildashboard';
+    var TEST_BULK_EMAIL_URL = '/emaildashboardtestbulkemailhandler/<query_id>';
 
     var getQueryId = function() {
       return $window.location.pathname.split('/').slice(-1)[0];
     };
 
-    $scope.submitEmail = function() {
-      var resultHandlerUrl = RESULT_HANDLER_URL_PREFIX + '/' + getQueryId();
-      var invalidData = false;
-
+    var validateEmailSubjectAndBody = function() {
+      var dataIsValid = true;
       if ($scope.emailSubject.length === 0) {
         $scope.invalid.subject = true;
-        invalidData = true;
+        dataIsValid = false;
       }
       if ($scope.emailBody.length === 0) {
         $scope.invalid.body = true;
-        invalidData = true;
+        dataIsValid = false;
       }
+      return dataIsValid;
+    };
+
+    $scope.submitEmail = function() {
+      var resultHandlerUrl = UrlInterpolationService.interpolateUrl(
+        RESULT_HANDLER_URL, {
+          query_id: getQueryId()
+        });
+      var dataIsValid = validateEmailSubjectAndBody();
+
       if ($scope.emailOption === 'custom' &&
         $scope.maxRecipients === null) {
         $scope.invalid.maxRecipients = true;
-        invalidData = true;
+        dataIsValid = false;
       }
 
-      if (!invalidData) {
+      if (dataIsValid) {
         $scope.submitIsInProgress = true;
         var data = {
           email_subject: $scope.emailSubject,
@@ -80,8 +89,11 @@ oppia.controller('EmailDashboardResult', [
 
     $scope.cancelEmail = function() {
       $scope.submitIsInProgress = true;
-      var cancelUrlHandler = (
-        CANCEL_EMAIL_HANDLER_URL_PREFIX + '/' + getQueryId());
+      var cancelUrlHandler = UrlInterpolationService.interpolateUrl(
+        CANCEL_EMAIL_HANDLER_URL, {
+          query_id: getQueryId()
+        });
+
       $http.post(cancelUrlHandler).success(function() {
         $scope.emailCancelled = true;
         $timeout(function() {
@@ -91,6 +103,26 @@ oppia.controller('EmailDashboardResult', [
         $scope.errorHasOccurred = true;
         $scope.submitIsInProgress = false;
       });
+    };
+
+    $scope.sendTestEmail = function() {
+      var testEmailHandlerUrl = UrlInterpolationService.interpolateUrl(
+        TEST_BULK_EMAIL_URL, {
+          query_id: getQueryId()
+        });
+      var dataIsValid = validateEmailSubjectAndBody();
+
+      if (dataIsValid) {
+        $http.post(testEmailHandlerUrl, {
+          email_subject: $scope.emailSubject,
+          email_body: $scope.emailBody
+        }).success(function() {
+          $scope.testEmailSentSuccesfully = true;
+        });
+        $scope.invalid.subject = false;
+        $scope.invalid.body = false;
+        $scope.invalid.maxRecipients = false;
+      }
     };
 
     $scope.emailOption = 'all';
@@ -110,5 +142,6 @@ oppia.controller('EmailDashboardResult', [
     $scope.emailSubmitted = false;
     $scope.submitIsInProgress = false;
     $scope.errorHasOccurred = false;
+    $scope.testEmailSentSuccesfully = false;
   }
 ]);

@@ -6,12 +6,6 @@
 
 {% block header_js %}
   {{ super() }}
-
-  <style>
-    html, body {
-      background-color: #eee;
-    }
-  </style>
 {% endblock %}
 
 {% block navbar_breadcrumb %}
@@ -24,7 +18,7 @@
 {% endblock navbar_breadcrumb %}
 
 {% block content %}
-  <div class="oppia-page-card oppia-about-content" ng-controller="Donate">
+  <div class="oppia-page-card oppia-static-content" ng-controller="Donate">
     <div class="oppia-donation-card-content-wide">
       <div class="oppia-donate-info">
         <div style="height: 0; margin: 60px auto 0px auto; width: 70%; padding-bottom: 56.25%; position: relative;">
@@ -40,8 +34,7 @@
             In 2012, Oppia started with a simple idea: to improve the education of
             students around the world while improving the quality of teaching.
             This vision has since turned into an educational platform with over
-            5,500 explorations that are used by approximately 145,000
-            users worldwide.
+            8,000 explorations that are used by almost 250,000 users worldwide.
           </p>
           <p style="font-size: 0.825em;">
             Please donate to The Oppia Foundation, a registered 501(c)(3) nonprofit,
@@ -65,6 +58,14 @@
           <input type="hidden" name="hosted_button_id" value="UWKTY87SYU766">
           <button class="btn oppia-donate-options-button">
             PayPal
+          </button>
+        </div>
+        <div style="text-align: center;">
+          <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" ng-submit="onDonateThroughPayPal()">
+          <input type="hidden" name="cmd" value="_s-xclick">
+          <input type="hidden" name="hosted_button_id" value="UWKTY87SYU766">
+          <button class="btn oppia-donate-options-button">
+            Credit Card
           </button>
         </div>
         <div style="text-align: center;">

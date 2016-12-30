@@ -159,13 +159,14 @@
             <noscript>
               <div class="oppia-page-cards-container">
                 <div class="md-default-theme oppia-page-card oppia-long-text">
+                  <!-- Note to developers: We replicate the translated text inline because, without JavaScript enabled, the translation engine doesn't kick in.-->
                   <h2>
-                    <span translate="I18N_SPLASH_JAVASCRIPT_ERROR_TITLE"></span>
+                    <span translate="I18N_SPLASH_JAVASCRIPT_ERROR_TITLE">We Need JavaScript in Your Browser</span>
                     <i class="material-icons">&#xE811;</i>
                   </h2>
                   <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION"
-                     translate-values="{hrefUrl: 'http://www.enable-javascript.com/'}"></p>
-                  <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_THANKS"></p>
+                     translate-values="{hrefUrl: 'http://www.enable-javascript.com/'}">Oppia is a free, open-source learning platform full of interactive activities called 'explorations'.  Sadly, Oppia requires JavaScript to be enabled in your web browser in order to function properly and your web browser has JavaScript disabled.  If you need help enabling JavaScript, <a href="http://www.enable-javascript.com"/>click here.</a></p>
+                  <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_THANKS">Thank you.</p>
                 </div>
               </div>
             </noscript>
@@ -195,8 +196,28 @@
 
     {% include 'components/background/background_banner_directive.html' %}
     {% include 'components/create_button/create_activity_button_directive.html' %}
+
     {% include 'components/forms/form_builder_templates.html' %}
     {% include 'components/forms/image_uploader_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_bool_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_choices_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_custom_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_dict_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_expression_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_float_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_html_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_int_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_list_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_unicode_editor_directive.html' %}
+    {% include 'components/forms/schema_viewers/schema_based_custom_viewer_directive.html' %}
+    {% include 'components/forms/schema_viewers/schema_based_dict_viewer_directive.html' %}
+    {% include 'components/forms/schema_viewers/schema_based_html_viewer_directive.html' %}
+    {% include 'components/forms/schema_viewers/schema_based_list_viewer_directive.html' %}
+    {% include 'components/forms/schema_viewers/schema_based_primitive_viewer_directive.html' %}
+    {% include 'components/forms/schema_viewers/schema_based_unicode_viewer_directive.html' %}
+    {% include 'components/forms/schema_viewers/schema_based_viewer_directive.html' %}
+
     {% include 'components/loading/loading_dots_directive.html' %}
     {% include 'components/summary_tile/circular_image_directive.html' %}
     {% include 'components/summary_tile/collection_summary_tile_directive.html' %}
@@ -222,10 +243,30 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/alerts/AlertMessageDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/create_button/CreateActivityButtonDirective.js"></script>
+
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/ImageUploaderDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/ObjectEditorDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/Select2DropdownDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedCustomEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedDictEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedExpressionEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedFloatEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedHtmlEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedIntEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedListEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedCustomViewerDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedDictViewerDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedListViewerDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedViewerDirective.js"></script>
+
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/side_navigation_bar/SideNavigationBarDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/top_navigation_bar/TopNavigationBarDirective.js"></script>

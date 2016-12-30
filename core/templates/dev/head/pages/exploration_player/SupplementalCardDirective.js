@@ -29,11 +29,13 @@ oppia.directive('supplementalCard', [function() {
       'playerPositionService', 'playerTranscriptService',
       'ExplorationObjectFactory', 'windowDimensionsService',
       'CONTENT_FOCUS_LABEL_PREFIX', 'TWO_CARD_THRESHOLD_PX',
+      'EVENT_ACTIVE_CARD_CHANGED', 'CONTINUE_BUTTON_FOCUS_LABEL',
       function(
         $scope, $window, oppiaPlayerService, UrlInterpolationService,
         playerPositionService, playerTranscriptService,
         ExplorationObjectFactory, windowDimensionsService,
-        CONTENT_FOCUS_LABEL_PREFIX, TWO_CARD_THRESHOLD_PX) {
+        CONTENT_FOCUS_LABEL_PREFIX, TWO_CARD_THRESHOLD_PX,
+        EVENT_ACTIVE_CARD_CHANGED, CONTINUE_BUTTON_FOCUS_LABEL) {
         var updateActiveCard = function() {
           var index = playerPositionService.getActiveCardIndex();
           if (index === null) {
@@ -47,7 +49,7 @@ oppia.directive('supplementalCard', [function() {
           UrlInterpolationService.getStaticImageUrl(
             '/avatar/oppia_black_72px.png'));
 
-        $scope.CONTINUE_BUTTON_FOCUS_LABEL = 'continueButton';
+        $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
 
         $scope.helpCardHtml = null;
         $scope.helpCardHasContinueButton = false;
@@ -70,6 +72,12 @@ oppia.directive('supplementalCard', [function() {
         };
 
         $scope.submitAnswer = function(answer, interactionRulesService) {
+          // Do not clear the help card or submit an answer if there is an
+          // upcoming card.
+          if ($scope.activeCard.destStateName) {
+            return;
+          }
+
           $scope.clearHelpCard();
           $scope.onSubmitAnswer({
             answer: answer,
@@ -77,7 +85,7 @@ oppia.directive('supplementalCard', [function() {
           });
         };
 
-        $scope.$on('activeCardChanged', function() {
+        $scope.$on(EVENT_ACTIVE_CARD_CHANGED, function() {
           updateActiveCard();
         });
 

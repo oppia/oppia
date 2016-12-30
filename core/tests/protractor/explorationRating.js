@@ -34,7 +34,6 @@ describe('Library index page', function() {
     browser.get(general.LIBRARY_URL_SUFFIX);
     library.playExploration(EXPLORATION_RATINGTEST);
     player.expectExplorationNameToBe(explorationName);
-    player.submitAnswer('Continue');
     player.rateExploration(ratingValue);
 
     users.logout();

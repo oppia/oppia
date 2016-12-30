@@ -131,8 +131,17 @@ class UserSubscriptionsModel(base_models.BaseModel):
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of feedback thread ids that this user subscribes to.
     feedback_thread_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # IDs of the learners who have subscribed to this user.
+    creator_ids = ndb.StringProperty(repeated=True, indexed=True)
     # When the user last checked notifications. May be None.
     last_checked = ndb.DateTimeProperty(default=None)
+
+
+class UserSubscribersModel(base_models.BaseModel):
+    """The list of subscribers of the user.
+    """
+    # IDs of the learners who have subscribed to this user.
+    subscriber_ids = ndb.StringProperty(repeated=True, indexed=True)
 
 
 class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
@@ -242,6 +251,14 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     # The exploration version that this change list applied to.
     draft_change_list_exp_version = ndb.IntegerProperty(default=None)
+
+    # The user's preference for receiving suggestion emails for this exploration
+    mute_suggestion_notifications = ndb.BooleanProperty(
+        default=feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
+
+    # The user's preference for receiving feedback emails for this exploration
+    mute_feedback_notifications = ndb.BooleanProperty(
+        default=feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE)
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
