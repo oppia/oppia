@@ -405,7 +405,7 @@ var addExplorationLevelParameterChange = function(paramName, paramValue) {
     element(by.css('.protractor-test-add-param-button')).click();
 
     var editorRowElem = element.all(by.css(
-    '.protractor-test-param-changes-list')).last();
+      '.protractor-test-param-changes-list')).last();
 
     forms.AutocompleteDropdownEditor(editorRowElem).setValue(paramName);
 
