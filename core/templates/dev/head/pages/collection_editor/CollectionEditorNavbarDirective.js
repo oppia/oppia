@@ -16,8 +16,6 @@
  * @fileoverview Directive for the navbar of the collection editor.
  */
 
-oppia.constant('EVENT_COLLECTION_STATUS_CHANGE', 'collectionStatusChange');
-
 oppia.directive('collectionEditorNavbar', [function() {
   return {
     restrict: 'E',
@@ -25,17 +23,18 @@ oppia.directive('collectionEditorNavbar', [function() {
     controller: [
       '$scope', '$log', '$modal', '$rootScope', 'alertsService',
       'routerService', 'UndoRedoService', 'CollectionEditorStateService',
-      'CollectionValidationService', 'CollectionRightsBackendApiService',
-      'EditableCollectionBackendApiService', 'EVENT_COLLECTION_INITIALIZED',
-      'EVENT_COLLECTION_REINITIALIZED', 'EVENT_COLLECTION_STATUS_CHANGE',
+      'CollectionRightsBackendApiService', 'CollectionRightsObjectFactory',
+      'CollectionValidationService', 'EditableCollectionBackendApiService',
+      'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
       'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
       function(
           $scope, $log, $modal, $rootScope, alertsService,
           routerService, UndoRedoService, CollectionEditorStateService,
-          CollectionValidationService, CollectionRightsBackendApiService,
-          EditableCollectionBackendApiService, EVENT_COLLECTION_INITIALIZED,
-          EVENT_COLLECTION_REINITIALIZED, EVENT_COLLECTION_STATUS_CHANGE,
+          CollectionRightsBackendApiService, CollectionRightsObjectFactory,
+          CollectionValidationService, EditableCollectionBackendApiService,
+          EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED,
           EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
+        var collectionRightsObject = null;
         $scope.rightsHasLoaded = false;
 
         $scope.collectionId = GLOBALS.collectionId;
@@ -49,6 +48,7 @@ oppia.directive('collectionEditorNavbar', [function() {
           $scope.isPrivate = data.is_private;
           $scope.canUnpublish = data.can_unpublish;
 
+          collectionRightsObject = CollectionRightsObjectFactory.create(data);
           $scope.rightsHasLoaded = true;
         });
 
@@ -79,13 +79,10 @@ oppia.directive('collectionEditorNavbar', [function() {
           CollectionRightsBackendApiService.setCollectionPublic(
             $scope.collectionId, $scope.collection.getVersion()).then(
             function(data) {
-              if (!data.is_private) {
-                $scope.isPrivate = data.is_private;
-                $rootScope.$broadcast(EVENT_COLLECTION_STATUS_CHANGE);
-              } else {
-                $log.error(
-                  'Backend indicated a collection was successfully ' +
-                  'published, but response.data.is_private returned true.');
+              $scope.isPrivate = collectionRightsObject.setPublic(data);
+              if ($scope.isPrivate) {
+                alertsService.addWarning(
+                  'There was an error when publishing the collection.');
               }
             }, function() {
               alertsService.addWarning(
@@ -243,13 +240,10 @@ oppia.directive('collectionEditorNavbar', [function() {
           CollectionRightsBackendApiService.setCollectionPrivate(
             $scope.collectionId, $scope.collection.getVersion()).then(
             function(data) {
-              if (data.is_private) {
-                $scope.isPrivate = data.is_private;
-                $rootScope.$broadcast(EVENT_COLLECTION_STATUS_CHANGE);
-              } else {
-                $log.error(
-                  'Backend indicated a collection was successfully ' +
-                  'unpublished, but response.data.is_private returned false.');
+              $scope.isPrivate = collectionRightsObject.setPrivate(data);
+              if (!$scope.isPrivate) {
+                alertsService.addWarning(
+                  'There was an error when unpublishing the collection.');
               }
             }, function() {
               alertsService.addWarning(

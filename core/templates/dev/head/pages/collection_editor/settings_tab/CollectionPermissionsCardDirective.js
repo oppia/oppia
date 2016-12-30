@@ -22,25 +22,26 @@ oppia.directive('collectionPermissionsCard', [function() {
     restrict: 'E',
     templateUrl: 'inline/collection_permissions_card_directive',
     controller: [
-      '$scope', 'CollectionRightsBackendApiService',
-      'EVENT_COLLECTION_STATUS_CHANGE',
-      function($scope, CollectionRightsBackendApiService,
-        EVENT_COLLECTION_STATUS_CHANGE) {
-        $scope.rightsHasLoaded = false;
-
+      '$scope', 'CollectionRightsObjectFactory',
+      'CollectionRightsBackendApiService',
+      function($scope, CollectionRightsObjectFactory,
+        CollectionRightsBackendApiService) {
+        var collectionRightsObject =
+          CollectionRightsObjectFactory.createEmptyCollectionRights();
         var refreshPermissionsCard = function() {
-          $scope.rightsHasLoaded = false;
           CollectionRightsBackendApiService.getCollectionRights(
             GLOBALS.collectionId).then(function(data) {
             $scope.ownerNames = data.owner_names;
             $scope.isPrivate = data.is_private;
-
-            $scope.rightsHasLoaded = true;
+            collectionRightsObject =
+              CollectionRightsObjectFactory.create(data);
           });
         };
         refreshPermissionsCard();
 
-        $scope.$on(EVENT_COLLECTION_STATUS_CHANGE, refreshPermissionsCard);
+        $scope.$watch(function() {
+          return collectionRightsObject.isPrivate();
+        }, refreshPermissionsCard);
       }
     ]
   };
