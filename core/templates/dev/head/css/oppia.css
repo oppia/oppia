@@ -3321,7 +3321,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-splash-section-one {
   background-color: #afd2eb;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .oppia-splash-h1, .oppia-splash-h2 {
