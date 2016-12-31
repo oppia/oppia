@@ -14,16 +14,16 @@
 
 oppia.factory('AnswerGroupObjectFactory', [
   function() {
-    var AnswerGroup = function(rule_specs, outcome) {
-      this.rule_specs = rule_specs;
+    var AnswerGroup = function(ruleSpecs, outcome) {
+      this.rule_specs = ruleSpecs;
       this.outcome = outcome;
-    }
+    };
 
     // Static class methods. Note that "this" is not available in
     // static contexts.
-    AnswerGroup.create = function(rule_specs, outcome) {
-      return new AnswerGroup(rule_specs, outcome);
-    }
+    AnswerGroup.create = function(ruleSpecs, outcome) {
+      return new AnswerGroup(ruleSpecs, outcome);
+    };
 
     return AnswerGroup;
   }
