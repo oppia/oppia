@@ -337,13 +337,13 @@ oppia.controller('StateResponses', [
   'editorContextService', 'alertsService', 'responsesService', 'routerService',
   'explorationContextService', 'trainingDataService',
   'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
-  'INTERACTION_SPECS', 'UrlInterpolationService',
+  'INTERACTION_SPECS', 'UrlInterpolationService', 'AnswerGroupObjectFactory',
   function(
       $scope, $rootScope, $modal, $filter, stateInteractionIdService,
       editorContextService, alertsService, responsesService, routerService,
       explorationContextService, trainingDataService,
       stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
-      INTERACTION_SPECS, UrlInterpolationService) {
+      INTERACTION_SPECS, UrlInterpolationService, AnswerGroupObjectFactory) {
     $scope.editorContextService = editorContextService;
 
     $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
@@ -728,10 +728,8 @@ oppia.controller('StateResponses', [
         ]
       }).result.then(function(result) {
         // Create a new answer group.
-        $scope.answerGroups.push({
-          rule_specs: [result.tmpRule],
-          outcome: angular.copy(result.tmpOutcome)
-        });
+        $scope.answerGroups.push(AnswerGroupObjectFactory.create(
+          [result.tmpRule], result.tmpOutcome));
         responsesService.save($scope.answerGroups, $scope.defaultOutcome);
         $scope.changeActiveAnswerGroupIndex($scope.answerGroups.length - 1);
 
