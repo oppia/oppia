@@ -561,13 +561,13 @@ def send_emails_to_subscribers(creator_id, exploration_id, exploration_title):
     """
 
     creator_name = user_services.get_username(creator_id)
-    email_subject = ('%s has published another exploration!' % creator_name)
+    email_subject = ('%s has published a new exploration!' % creator_name)
     email_body_template = (
         'Hi %s,<br>'
         '<br>'
-        'Your subscription, %s has published a new exploration. You can play '
-        'the exploration over here - '
-        '<a href="https://www.oppia.org/explore/%s">%s</a>.<br>'
+        '%s has published a new exploration, %s. Play it here: <br>'
+        '<a href="https://www.oppia.org/explore/%s">'
+        'https://www.oppia.org/explore/%s</a><br>'
         '<br>'
         'Thanks, and happy learning!<br>'
         '<br>'
@@ -585,17 +585,16 @@ def send_emails_to_subscribers(creator_id, exploration_id, exploration_title):
 
     recipient_list = subscription_services.get_all_subscribers_of_creator(
         creator_id)
-    for recipient_id in recipient_list:
-        recipient_user_settings = user_services.get_user_settings(recipient_id)
-        recipient_preferences = (
-            user_services.get_email_preferences(recipient_id))
-
-        if recipient_preferences['can_receive_subscription_email']:
+    recipients_usernames = user_services.get_usernames(recipient_list)
+    recipients_preferences = user_services.get_users_email_preferences(
+        recipient_list)
+    for index, username in enumerate(recipients_usernames):
+        if recipients_preferences[index]['can_receive_subscription_email']:
             email_body = email_body_template % (
-                recipient_user_settings.username, creator_name, exploration_id,
-                exploration_title, EMAIL_FOOTER.value)
+                username, creator_name, exploration_title,
+                exploration_id, exploration_id, EMAIL_FOOTER.value)
             _send_email(
-                recipient_id, feconf.SYSTEM_COMMITTER_ID,
+                recipient_list[index], feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION,
                 email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 

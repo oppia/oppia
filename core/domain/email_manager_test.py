@@ -1271,14 +1271,14 @@ class SubscriptionEmailTest(test_utils.GenericTestBase):
             feconf, 'CAN_SEND_SUBSCRIPTION_EMAILS', True)
 
     def test_that_subscription_emails_are_correct(self):
-        expected_email_subject = 'editor has published another exploration!'
+        expected_email_subject = 'editor has published a new exploration!'
 
         expected_email_html_body = (
             'Hi newuser,<br>'
             '<br>'
-            'Your subscription, editor has published a new exploration. You '
-            'can play the exploration over here - '
-            '<a href="https://www.oppia.org/explore/A">Title</a>.<br>'
+            'editor has published a new exploration, Title. Play it here: <br>'
+            '<a href="https://www.oppia.org/explore/A">'
+            'https://www.oppia.org/explore/A</a><br>'
             '<br>'
             'Thanks, and happy learning!<br>'
             '<br>'
@@ -1291,8 +1291,8 @@ class SubscriptionEmailTest(test_utils.GenericTestBase):
         expected_email_text_body = (
             'Hi newuser,\n'
             '\n'
-            'Your subscription, editor has published a new exploration. You '
-            'can play the exploration over here - Title.\n'
+            'editor has published a new exploration, Title. Play it here: \n'
+            'https://www.oppia.org/explore/A\n'
             '\n'
             'Thanks, and happy learning!\n'
             '\n'
