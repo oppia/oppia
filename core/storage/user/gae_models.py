@@ -120,7 +120,7 @@ class UserEmailPreferencesModel(base_models.BaseModel):
 
     # The user's preference for receiving email when a creator, to which this
     # user has subscribed, publishes an exploration.
-    subscription_emails = ndb.BooleanProperty(
+    subscription_notifications = ndb.BooleanProperty(
         indexed=True, default=feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
 

@@ -70,7 +70,7 @@ class InformSubscribersTest(test_utils.GenericTestBase):
             email_preferences_model = user_models.UserEmailPreferencesModel(
                 id=self.user_id_2)
 
-        email_preferences_model.subscription_emails = False
+        email_preferences_model.subscription_notifications = False
         email_preferences_model.put()
 
         with self.can_send_emails_ctx, self.can_send_subscription_email_ctx:

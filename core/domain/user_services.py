@@ -914,7 +914,7 @@ def get_email_preferences(user_id):
         'can_receive_subscription_email': (
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE
             if email_preferences_model is None
-            else email_preferences_model.subscription_emails)
+            else email_preferences_model.subscription_notifications)
     }
 
 def get_users_email_preferences(user_ids):
@@ -954,7 +954,7 @@ def get_users_email_preferences(user_ids):
             'can_receive_subscription_email': (
                 feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE
                 if email_preferences_model is None
-                else email_preferences_model.subscription_emails)
+                else email_preferences_model.subscription_notifications)
         })
 
     return result
