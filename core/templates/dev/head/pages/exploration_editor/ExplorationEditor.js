@@ -401,17 +401,17 @@ oppia.controller('EditorNavigation', [
   'explorationRightsService', 'explorationWarningsService',
   'stateEditorTutorialFirstTimeService',
   'threadDataService', 'siteAnalyticsService',
-  'explorationContextService',
+  'explorationContextService', 'windowDimensionsService',
   function(
     $scope, $rootScope, $timeout, $modal, routerService,
     explorationRightsService, explorationWarningsService,
     stateEditorTutorialFirstTimeService,
     threadDataService, siteAnalyticsService,
-    explorationContextService) {
+    explorationContextService, windowDimensionsService) {
     $scope.postTutorialHelpPopoverIsShown = false;
 
     $scope.$on('openPostTutorialHelpPopover', function() {
-      if ($(window).width() >= 1024) {
+      if (windowDimensionsService.getWidth() >= 1024) {
         $scope.postTutorialHelpPopoverIsShown = true;
         $timeout(function() {
           $scope.postTutorialHelpPopoverIsShown = false;
