@@ -565,9 +565,8 @@ def send_emails_to_subscribers(creator_id, exploration_id, exploration_title):
     email_body_template = (
         'Hi %s,<br>'
         '<br>'
-        '%s has published a new exploration, %s. Play it here: <br>'
-        '<a href="https://www.oppia.org/explore/%s">'
-        'https://www.oppia.org/explore/%s</a><br>'
+        '%s has published a new exploration! You can play it here: '
+        '<a href="https://www.oppia.org/explore/%s">%s</a><br>'
         '<br>'
         'Thanks, and happy learning!<br>'
         '<br>'
@@ -591,8 +590,8 @@ def send_emails_to_subscribers(creator_id, exploration_id, exploration_title):
     for index, username in enumerate(recipients_usernames):
         if recipients_preferences[index]['can_receive_subscription_email']:
             email_body = email_body_template % (
-                username, creator_name, exploration_title,
-                exploration_id, exploration_id, EMAIL_FOOTER.value)
+                username, creator_name, exploration_id,
+                exploration_title, EMAIL_FOOTER.value)
             _send_email(
                 recipient_list[index], feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION,

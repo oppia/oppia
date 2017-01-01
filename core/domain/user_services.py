@@ -933,8 +933,8 @@ def get_users_email_preferences(user_ids):
             'can_receive_subscription_email': value(bool)
         }
     """
-    user_email_preferences_models = user_models.UserEmailPreferencesModel.get_multi( # pylint: disable=line-too-long
-        user_ids)
+    user_email_preferences_models = (
+        user_models.UserEmailPreferencesModel.get_multi(user_ids))
     result = []
 
     for email_preferences_model in user_email_preferences_models:
