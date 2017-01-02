@@ -997,7 +997,6 @@ class UpdateGadgetTests(ExplorationServicesUnitTests):
 
         self.assertIn('NewGadget', exploration.get_all_gadget_names())
 
-
         exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
             'cmd': exp_domain.CMD_DELETE_GADGET,
             'gadget_name': 'NewGadget',
