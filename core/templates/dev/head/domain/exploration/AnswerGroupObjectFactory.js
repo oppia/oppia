@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-oppia.factory('AnswerGroupObjectFactory', [
-  function() {
+oppia.factory('AnswerGroupObjectFactory', [function() {
     var AnswerGroup = function(ruleSpecs, outcome) {
       this.ruleSpecs = ruleSpecs;
       this.outcome = outcome;
