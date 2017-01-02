@@ -818,12 +818,18 @@ oppia.factory('explorationStatesService', [
       return angular.copy(propertyRef);
     };
 
-    var saveStateProperty = function(stateName, backendName, newValue) {
+    var saveStateProperty = function(stateName,
+      backendName, newValue, newValueBackend) {
       var oldValue = getStatePropertyMemento(stateName, backendName);
 
       if (!angular.equals(oldValue, newValue)) {
-        changeListService.editStateProperty(
-          stateName, backendName, newValue, oldValue);
+        if (newValueBackend === undefined) {
+          changeListService.editStateProperty(
+            stateName, backendName, newValue, oldValue);
+        } else {
+          changeListService.editStateProperty(
+            stateName, backendName, newValueBackend, oldValue);
+        }
 
         var newStateData = angular.copy(_states[stateName]);
         var accessorList = PROPERTY_REF_DATA[backendName];
@@ -832,6 +838,7 @@ oppia.factory('explorationStatesService', [
         for (var i = 0; i < accessorList.length - 1; i++) {
           propertyRef = propertyRef[accessorList[i]];
         }
+
         propertyRef[accessorList[accessorList.length - 1]] = angular.copy(
           newValue);
 
@@ -902,7 +909,12 @@ oppia.factory('explorationStatesService', [
         return getStatePropertyMemento(stateName, 'answer_groups');
       },
       saveInteractionAnswerGroups: function(stateName, newAnswerGroups) {
-        saveStateProperty(stateName, 'answer_groups', newAnswerGroups);
+        var newAnswerGroupsToBackend = [];
+        for (var i = 0; i < newAnswerGroups.length; i++) {
+          newAnswerGroupsToBackend.push(newAnswerGroups[i].toBackendDict());
+        }
+        saveStateProperty(stateName, 'answer_groups',
+          newAnswerGroups, newAnswerGroupsToBackend);
       },
       getConfirmedUnclassifiedAnswersMemento: function(stateName) {
         return getStatePropertyMemento(
@@ -1891,9 +1903,9 @@ oppia.factory('explorationWarningsService', [
       var answerGroups = state.interaction.answer_groups;
       for (var i = 0; i < answerGroups.length; i++) {
         var group = answerGroups[i];
-        if (group.rule_specs.length === 1 &&
-            group.rule_specs[0].rule_type === CLASSIFIER_RULESPEC_STR &&
-            group.rule_specs[0].inputs.training_data.length === 0) {
+        if (group.ruleSpecs.length === 1 &&
+            group.ruleSpecs[0].rule_type === CLASSIFIER_RULESPEC_STR &&
+            group.ruleSpecs[0].inputs.training_data.length === 0) {
           indexes.push(i);
         }
       }
@@ -2062,7 +2074,7 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
 
   var makeRulesListHumanReadable = function(answerGroupValue) {
     var rulesList = [];
-    answerGroupValue.rule_specs.forEach(function(ruleSpec) {
+    answerGroupValue.ruleSpecs.forEach(function(ruleSpec) {
       var ruleElm = angular.element('<li></li>');
       ruleElm.html('<p>Type: ' + ruleSpec.rule_type + '</p>');
       ruleElm.append(
@@ -2234,7 +2246,7 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
                       '<div class="feedback">' + newValue.outcome.feedback +
                       '</div></div>');
                 }
-                if (!angular.equals(newValue.rule_specs, oldValue.rule_specs)) {
+                if (!angular.equals(newValue.ruleSpecs, oldValue.ruleSpecs)) {
                   var rulesList = makeRulesListHumanReadable(newValue);
                   if (rulesList.length > 0) {
                     answerGroupHtml += '<p class="sub-edit"><i>Rules: </i></p>';

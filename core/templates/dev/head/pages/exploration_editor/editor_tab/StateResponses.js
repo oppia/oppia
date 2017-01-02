@@ -70,14 +70,9 @@ oppia.factory('responsesService', [
         _answerGroups = newAnswerGroups;
         $rootScope.$broadcast('answerGroupChanged');
 
-        newAnswerGroupsToBackend = [];
-        for (var i = 0; i < newAnswerGroups.length; i++) {
-          newAnswerGroupsToBackend.push(newAnswerGroups[i].toBackendDict());
-        }
-
         explorationStatesService.saveInteractionAnswerGroups(
           editorContextService.getActiveStateName(),
-          angular.copy(newAnswerGroupsToBackend));
+          angular.copy(newAnswerGroups));
 
         graphDataService.recompute();
         _answerGroupsMemento = angular.copy(newAnswerGroups);
@@ -87,7 +82,7 @@ oppia.factory('responsesService', [
     var _updateAnswerGroup = function(index, updates) {
       var answerGroup = _answerGroups[index];
       if (updates.rules) {
-        answerGroup.rule_specs = updates.rules;
+        answerGroup.ruleSpecs = updates.rules;
       }
       if (updates.feedback) {
         answerGroup.outcome.feedback = updates.feedback;
@@ -287,7 +282,7 @@ oppia.factory('responsesService', [
           });
 
           _answerGroups.forEach(function(answerGroup, answerGroupIndex) {
-            var newRules = angular.copy(answerGroup.rule_specs);
+            var newRules = angular.copy(answerGroup.ruleSpecs);
             newRules.forEach(function(rule) {
               for (var key in rule.inputs) {
                 var newInputValue = [];
@@ -376,8 +371,8 @@ oppia.controller('StateResponses', [
         // Collect all answers which have been handled by at least one
         // answer group.
         for (var i = 0; i < answerGroups.length; i++) {
-          for (var j = 0; j < answerGroups[i].rule_specs.length; j++) {
-            handledAnswersArray.push(answerGroups[i].rule_specs[j].inputs.x);
+          for (var j = 0; j < answerGroups[i].ruleSpecs.length; j++) {
+            handledAnswersArray.push(answerGroups[i].ruleSpecs[j].inputs.x);
           }
         }
         for (var i = 0; i < numChoices; i++) {
@@ -408,7 +403,7 @@ oppia.controller('StateResponses', [
           });
 
           answerGroups.forEach(function(answerGroup) {
-            var ruleSpecs = answerGroup.rule_specs;
+            var ruleSpecs = answerGroup.ruleSpecs;
             ruleSpecs.forEach(function(ruleSpec) {
               var ruleInputs = ruleSpec.inputs.x;
               ruleInputs.forEach(function(ruleInput) {
@@ -641,7 +636,7 @@ oppia.controller('StateResponses', [
                   if (answerGroupIndex !==
                         _state.interaction.answer_groups.length &&
                       _state.interaction.answer_groups[
-                        answerGroupIndex].rule_specs[
+                        answerGroupIndex].ruleSpecs[
                           ruleSpecIndex].rule_type !==
                             CLASSIFIER_RULESPEC_STR) {
                     $scope.classification.answerGroupIndex = -1;
@@ -845,10 +840,10 @@ oppia.filter('summarizeAnswerGroup', [
     var outcome = answerGroup.outcome;
     var hasFeedback = outcome.feedback.length > 0 && outcome.feedback[0];
 
-    if (answerGroup.rule_specs) {
+    if (answerGroup.ruleSpecs) {
       var firstRule = $filter('convertToPlainText')(
         $filter('parameterizeRuleDescription')(
-          answerGroup.rule_specs[0], interactionId, answerChoices));
+          answerGroup.ruleSpecs[0], interactionId, answerChoices));
       summary = 'Answer ' + firstRule;
 
       if (hasFeedback && shortenRule) {

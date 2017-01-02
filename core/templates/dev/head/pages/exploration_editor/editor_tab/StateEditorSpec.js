@@ -189,7 +189,7 @@ describe('State Editor controller', function() {
 
   describe('TrainingDataService', function() {
     var $httpBackend;
-    var scope, siis, ecs, cls, rs, tds, ess, IS, CLASSIFIER_RULESPEC_STR;
+    var scope, siis, ecs, cls, rs, tds, ess, IS, agf, CLASSIFIER_RULESPEC_STR;
     var mockExplorationData;
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
@@ -225,11 +225,22 @@ describe('State Editor controller', function() {
       ess = $injector.get('explorationStatesService');
       rs = $injector.get('responsesService');
       tds = $injector.get('trainingDataService');
+      agf = $injector.get('AnswerGroupObjectFactory');
       IS = $injector.get('INTERACTION_SPECS');
       CLASSIFIER_RULESPEC_STR = $injector.get('CLASSIFIER_RULESPEC_STR');
 
       // Set the currently loaded interaction ID.
       siis.savedMemento = 'TextInput';
+
+      var answerGroup = agf.create([{
+                rule_type: 'Contains',
+                inputs: {
+                  x: 'Test'
+                }
+              }], {
+                feedback: 'Feedback',
+                dest: 'State'
+              });
 
       ess.init({
         State: {
@@ -239,18 +250,7 @@ describe('State Editor controller', function() {
           }],
           interaction: {
             id: 'TextInput',
-            answer_groups: [{
-              ruleSpecs: [{
-                rule_type: 'Contains',
-                inputs: {
-                  x: 'Test'
-                }
-              }],
-              outcome: {
-                feedback: 'Feedback',
-                dest: 'State'
-              }
-            }],
+            answer_groups: [answerGroup],
             default_outcome: {
               feedback: 'Default',
               dest: 'State'

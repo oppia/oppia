@@ -37,6 +37,7 @@ describe('Answer classification service with string classifier disabled',
   beforeEach(inject(function($injector) {
     acs = $injector.get('AnswerClassificationService');
     sof = $injector.get('StateObjectFactory');
+    agf = $injector.get('AnswerGroupObjectFactory');
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
     successHandler = jasmine.createSpy('success');
@@ -49,17 +50,14 @@ describe('Answer classification service with string classifier disabled',
       }],
       interaction: {
         id: 'RuleTest',
-        answer_groups: [{
-          outcome: 'outcome 1',
-          rule_specs: [{
+        answer_groups: [
+          agf.create([{
             inputs: {
               x: 10
             },
             rule_type: 'Equals'
-          }]
-        }, {
-          outcome: 'outcome 2',
-          rule_specs: [{
+          }], 'outcome 1'),
+          agf.create([{
             inputs: {
               x: 5
             },
@@ -79,8 +77,7 @@ describe('Answer classification service with string classifier disabled',
               x: 7
             },
             rule_type: 'FuzzyMatches'
-          }]
-        }],
+          }], 'outcome 2')],
         default_outcome: 'default'
       },
       param_changes: []
@@ -165,15 +162,13 @@ describe('Answer classification service with string classifier disabled',
       }],
       interaction: {
         id: 'RuleTest',
-        answer_groups: [{
-          outcome: 'outcome 1',
-          rule_specs: [{
+        answer_groups: [
+          agf.create([{
             inputs: {
               x: 10
             },
             rule_type: 'Equals'
-          }]
-        }]
+          }], 'outcome 1')]
       },
       param_changes: []
     });
@@ -210,6 +205,7 @@ describe('Answer classification service with string classifier enabled',
   beforeEach(inject(function($injector) {
     acs = $injector.get('AnswerClassificationService');
     sof = $injector.get('StateObjectFactory');
+    agf = $injector.get('AnswerGroupObjectFactory');
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
     successHandler = jasmine.createSpy('success');
@@ -222,17 +218,14 @@ describe('Answer classification service with string classifier enabled',
       }],
       interaction: {
         id: 'TrainableInteraction',
-        answer_groups: [{
-          outcome: 'outcome 1',
-          rule_specs: [{
+        answer_groups: [
+          agf.create([{
             inputs: {
               x: 10
             },
             rule_type: 'Equals'
-          }]
-        }, {
-          outcome: 'outcome 2',
-          rule_specs: [{
+          }], 'outcome 1'),
+          agf.create([{
             inputs: {
               x: 5
             },
@@ -247,8 +240,7 @@ describe('Answer classification service with string classifier enabled',
               x: 7
             },
             rule_type: 'FuzzyMatches'
-          }]
-        }],
+          }], 'outcome 2')],
         default_outcome: 'default'
       },
       param_changes: []
