@@ -14,10 +14,8 @@
 
 """Tests for user subscriptions."""
 
-from core.controllers import base
 from core.domain import subscription_services
 from core.platform import models
-from core.domain import user_services
 from core.tests import test_utils
 import feconf
 
