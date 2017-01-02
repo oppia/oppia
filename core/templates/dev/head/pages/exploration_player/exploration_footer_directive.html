@@ -56,14 +56,14 @@
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 13px;
     height: 42px;
-    line-height: 0px;
+    line-height: 0;
     margin-top: 30px;
     width: 100%;
   }
 
   .oppia-exploration-footer .exploration-footer-img {
     height: 60px;
-    margin: -25px 0px 0px 10px;
+    margin: -25px 0 0 10px;
     width: 60px;
   }
 
@@ -97,16 +97,18 @@
   }
 
   .oppia-exploration-footer .dropdown-menu.author-profile-dropdown-menu {
-    border-radius: 0;
+    border: none;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    box-shadow: 0 -6px 12px rgba(0, 0, 0, 0.176);
     float: left;
     list-style-type: none;
-    margin:0 0 16px -1px;
+    margin:0 0 16px 0;
   }
 
   .oppia-exploration-footer .author-profile-dropdown-menu li {
     color: #094142;
     float: none;
-    padding: 10px 0 5px 5px;
     text-overflow: clip;
     white-space: nowrap;
     width: 100%;
@@ -114,12 +116,12 @@
 
   .oppia-exploration-footer .author-profile-dropdown-menu li > a {
     color: #094142;
-    padding: 0;
+    padding: 3px 20px;
   }
 
-  .oppia-exploration-footer .author-profile-dropdown-menu li:hover a {
-    background-color: #fff;
-    color: #115FD4;
+  .oppia-exploration-footer .author-profile-dropdown-menu li a:hover {
+    background-color: #eee;
+    color: #888;
   }
 
   .oppia-exploration-footer .author-profile-text {

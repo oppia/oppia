@@ -205,12 +205,23 @@ CAN_SEND_EMAILS = False
 CAN_SEND_EDITOR_ROLE_EMAILS = False
 # If enabled then emails will be sent to creators for feedback messages.
 CAN_SEND_FEEDBACK_MESSAGE_EMAILS = False
+# If enabled subscription emails will be sent to that user.
+CAN_SEND_SUBSCRIPTION_EMAILS = False
 # Time to wait before sending feedback message emails (currently set to 1
 # hour).
 DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS = 3600
 # Whether to send an email when new feedback message is received for
 # an exploration.
 DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE = True
+# Whether to send an email to all the creator's subscribers when he/she
+# publishes an exploration.
+DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE = True
+# Whether exploration feedback emails are muted,
+# when the user has not specified a preference.
+DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE = False
+# Whether exploration suggestion emails are muted,
+# when the user has not specified a preference.
+DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE = False
 # Whether to send email updates to a user who has not specified a preference.
 DEFAULT_EMAIL_UPDATES_PREFERENCE = False
 # Whether to send an invitation email when the user is granted
@@ -230,6 +241,7 @@ EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
 EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION = 'editor_role_notification'
 EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION = 'feedback_message_notification'
+EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION = 'subscription_notification'
 EMAIL_INTENT_SUGGESTION_NOTIFICATION = 'suggestion_notification'
 EMAIL_INTENT_REPORT_BAD_CONTENT = 'report_bad_content'
 EMAIL_INTENT_MARKETING = 'marketing'
@@ -772,6 +784,15 @@ SUPPORTED_SITE_LANGUAGES = [{
     'id': 'en',
     'text': 'English'
 }, {
+    'id': 'de',
+    'text': 'Deutsch'
+}, {
+    'id': 'fr',
+    'text': 'français'
+}, {
+    'id': 'nl',
+    'text': 'Nederlands'
+}, {
     'id': 'es',
     'text': 'Español'
 }, {
@@ -781,14 +802,26 @@ SUPPORTED_SITE_LANGUAGES = [{
     'id': 'pt-br',
     'text': 'Português (Brasil)'
 }, {
+    'id': 'mk',
+    'text': 'македонски јазик'
+}, {
     'id': 'vi',
     'text': 'Tiếng Việt'
 }, {
     'id': 'hi',
     'text': 'हिन्दी'
 }, {
+    'id': 'bn',
+    'text': 'বাংলা'
+}, {
     'id': 'tr',
     'text': 'Türkçe'
+}, {
+    'id': 'zh-hans',
+    'text': '中文(简体)'
+}, {
+    'id': 'zh-hant',
+    'text': '中文(繁體)'
 }]
 SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]

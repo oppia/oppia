@@ -892,7 +892,8 @@ def get_email_preferences(user_id):
         {
             'can_receive_email_updates': value(bool),
             'can_receive_editor_role_email': value(bool),
-            'can_receive_feedback_message_email': value(bool)
+            'can_receive_feedback_message_email': value(bool),
+            'can_receive_subscription_email': value(bool)
         }
     """
     email_preferences_model = user_models.UserEmailPreferencesModel.get(
@@ -909,7 +910,113 @@ def get_email_preferences(user_id):
         'can_receive_feedback_message_email': (
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE
             if email_preferences_model is None
-            else email_preferences_model.feedback_message_notifications)
+            else email_preferences_model.feedback_message_notifications),
+        'can_receive_subscription_email': (
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE
+            if email_preferences_model is None
+            else email_preferences_model.subscription_notifications)
+    }
+
+def get_users_email_preferences(user_ids):
+    """Get email preferences for the list of users.
+
+    Args:
+        user_ids: list. A list of user IDs for whom we want to get email
+            preferences.
+
+    Returns: list. A list of dicts representing the user's email preferences.
+        The format of the dict is as follows:
+        {
+            'can_receive_email_updates': value(bool),
+            'can_receive_editor_role_email': value(bool),
+            'can_receive_feedback_message_email': value(bool),
+            'can_receive_subscription_email': value(bool)
+        }
+    """
+    user_email_preferences_models = (
+        user_models.UserEmailPreferencesModel.get_multi(user_ids))
+    result = []
+
+    for email_preferences_model in user_email_preferences_models:
+        result.append({
+            'can_receive_email_updates': (
+                feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                if email_preferences_model is None
+                else email_preferences_model.site_updates),
+            'can_receive_editor_role_email': (
+                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE
+                if email_preferences_model is None
+                else email_preferences_model.editor_role_notifications),
+            'can_receive_feedback_message_email': (
+                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE
+                if email_preferences_model is None
+                else email_preferences_model.feedback_message_notifications),
+            'can_receive_subscription_email': (
+                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE
+                if email_preferences_model is None
+                else email_preferences_model.subscription_notifications)
+        })
+
+    return result
+
+def set_email_preferences_for_exploration(
+        user_id, exploration_id, mute_feedback_notifications=None,
+        mute_suggestion_notifications=None):
+    """Sets mute preferences for exploration with given exploration_id of user
+    with given user_id.
+
+    If no ExplorationUserDataModel exists for this user and exploration,
+    a new one will be created.
+
+    Args:
+        user_id: str. The user id.
+        exploration_id: str. The exploration id.
+        mute_feedback_notifications: bool. Whether the given user has muted
+            feedback emails. Defaults to None.
+        mute_suggestion_notifications: bool. Whether the given user has muted
+            suggestion emails. Defaults to None.
+    """
+    exploration_user_model = user_models.ExplorationUserDataModel.get(
+        user_id, exploration_id)
+    if exploration_user_model is None:
+        exploration_user_model = user_models.ExplorationUserDataModel.create(
+            user_id, exploration_id)
+    if mute_feedback_notifications is not None:
+        exploration_user_model.mute_feedback_notifications = (
+            mute_feedback_notifications)
+    if mute_suggestion_notifications is not None:
+        exploration_user_model.mute_suggestion_notifications = (
+            mute_suggestion_notifications)
+    exploration_user_model.put()
+
+
+def get_email_preferences_for_exploration(user_id, exploration_id):
+    """Gives mute preferences for exploration with given exploration_id of user
+    with given user_id.
+
+    Args:
+        user_id: str. The user id.
+        exploration_id: str. The exploration id.
+
+    Returns:
+        dict. Representing whether the user has muted emails for exploration
+        with given exploration_id. The format of returned value:
+        {
+            'mute_feedback_notifications': value(bool),
+            'mute_suggestion_notifications': value(bool)
+        }
+    """
+    exploration_user_model = user_models.ExplorationUserDataModel.get(
+        user_id, exploration_id)
+    return {
+        'mute_feedback_notifications': (
+            feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE
+            if exploration_user_model is None
+            else exploration_user_model.mute_feedback_notifications),
+        'mute_suggestion_notifications': (
+            feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE
+            if exploration_user_model is None
+            else exploration_user_model.mute_suggestion_notifications)
     }
 
 
