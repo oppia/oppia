@@ -384,13 +384,12 @@ var addParameterChange = function(paramName, paramValue) {
 
   forms.AutocompleteDropdownEditor(editorRowElem).setValue(paramName);
 
-  /* Setting parameter value is difficult via css since the associated
-  input is a sub-component of the third party select2 library. We isolate
-  it as the third input in the current parameter changes UI. */
-  editorRowElem.all(by.tagName('input')).then(function(items) {
-    items[2].clear();
-    items[2].sendKeys(paramValue);
-  });
+  /* Setting parameter value is difficult via css since input fields
+    are dynamically generated. We isolate it as the last input in the
+    current parameter changes UI. */
+    var item = editorRowElem.all(by.tagName('input')).last();
+    item.clear();
+    item.sendKeys(paramValue);
 
   element(by.css('.protractor-test-save-param-changes-button')).click();
 
@@ -409,13 +408,12 @@ var addExplorationLevelParameterChange = function(paramName, paramValue) {
 
     forms.AutocompleteDropdownEditor(editorRowElem).setValue(paramName);
 
-    /* Setting parameter value is difficult via css since the associated
-    input is a sub-component of the third party select2 library. We isolate
-    it as the third input in the current parameter changes UI. */
-    editorRowElem.all(by.tagName('input')).then(function(items) {
-      items[2].clear();
-      items[2].sendKeys(paramValue);
-    });
+    /* Setting parameter value is difficult via css since input fields
+    are dynamically generated. We isolate it as the last input in the
+    current parameter changes UI. */
+    var item = editorRowElem.all(by.tagName('input')).last();
+    item.clear();
+    item.sendKeys(paramValue);
 
     element(by.css('.protractor-test-save-param-changes-button')).click();
   });
