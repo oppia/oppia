@@ -972,6 +972,11 @@ textarea {
     display: none;
   }
 }
+@media (max-width: 1023px) {
+  div.navbar-container .oppia-navbar-hide-on-medium-width {
+    display: none;
+  }
+}
 
 .btn.oppia-unresolved-answer-button {
   background-color: white;
@@ -3321,7 +3326,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-splash-section-one {
   background-color: #afd2eb;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .oppia-splash-h1, .oppia-splash-h2 {
@@ -4369,7 +4374,7 @@ md-card.preview-conversation-skin-supplemental-card {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 16px;
   height: 40px;
-  margin: 15px auto;
+  margin: 10px auto;
   width: 180px;
 }
 
