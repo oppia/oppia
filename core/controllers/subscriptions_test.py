@@ -111,7 +111,7 @@ class SubscriptionTest(test_utils.GenericTestBase):
         # removed from the list of subscriptions of the learner.
         self.post_json(feconf.UNSUBSCRIBE_URL_PREFIX, payload, csrf_token)
         self.assertEqual(subscription_services.get_all_subscribers_of_creator(
-        self.editor_id), [self.user_id])
+            self.editor_id), [self.user_id])
         self.assertEqual(
             subscription_services.get_all_creators_to_which_learner_has_subscribed( # pylint: disable=line-too-long
                 self.user_id_2), [])
@@ -119,7 +119,7 @@ class SubscriptionTest(test_utils.GenericTestBase):
         # Unsubscribing the same user has no effect.
         self.post_json(feconf.UNSUBSCRIBE_URL_PREFIX, payload, csrf_token)
         self.assertEqual(subscription_services.get_all_subscribers_of_creator(
-        self.editor_id), [self.user_id])
+            self.editor_id), [self.user_id])
         self.assertEqual(
             subscription_services.get_all_creators_to_which_learner_has_subscribed( # pylint: disable=line-too-long
                 self.user_id_2), [])
@@ -132,7 +132,7 @@ class SubscriptionTest(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json(feconf.UNSUBSCRIBE_URL_PREFIX, payload, csrf_token)
         self.assertEqual(subscription_services.get_all_subscribers_of_creator(
-        self.editor_id), [])
+            self.editor_id), [])
         self.assertEqual(
             subscription_services.get_all_creators_to_which_learner_has_subscribed( # pylint: disable=line-too-long
                 self.user_id), [])
