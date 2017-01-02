@@ -23,13 +23,15 @@ oppia.directive('editorNavigation', [function() {
     templateUrl: 'inline/editor_navigation_directive',
     controller: [
       '$scope', '$rootScope', '$timeout', '$modal',
-      'routerService', 'explorationRightsService', 'explorationWarningsService',
+      'routerService', 'explorationRightsService',
+      'explorationWarningsService',
       'stateEditorTutorialFirstTimeService',
       'threadDataService', 'siteAnalyticsService',
       'explorationContextService',
       function(
-          $scope, $rootScope, $timeout, $modal, routerService,
-          explorationRightsService, explorationWarningsService,
+          $scope, $rootScope, $timeout, $modal,
+          routerService, explorationRightsService,
+          explorationWarningsService,
           stateEditorTutorialFirstTimeService,
           threadDataService, siteAnalyticsService,
           explorationContextService) {

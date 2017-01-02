@@ -25,8 +25,8 @@ oppia.directive('editorNavbarBreadcrumb', [function() {
       '$scope', 'explorationTitleService', 'routerService',
       'focusService', 'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
       function(
-          $scope, explorationTitleService, routerService, focusService,
-          EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
+          $scope, explorationTitleService, routerService,
+          focusService, EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
         $scope.navbarTitle = null;
         $scope.$on('explorationPropertyChanged', function() {
           var _MAX_TITLE_LENGTH = 20;
