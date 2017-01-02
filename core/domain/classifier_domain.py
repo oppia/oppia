@@ -61,7 +61,7 @@ class Classifier(object):
         self.exp_version_when_created = exp_version_when_created
         self.state_name = state_name
         self.algorithm_id = algorithm_id
-        self.cached_classifier_data = copy.deepcopy(cached_classifier_data),
+        self.cached_classifier_data = copy.deepcopy(cached_classifier_data)
         self.data_schema_version = data_schema_version
 
     def to_dict(self):
