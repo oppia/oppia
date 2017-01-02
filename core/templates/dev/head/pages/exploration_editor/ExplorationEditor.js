@@ -395,3 +395,4 @@ oppia.controller('ExplorationEditor', [
     $scope.$on('openEditorTutorial', $scope.startTutorial);
   }
 ]);
+

@@ -972,6 +972,11 @@ textarea {
     display: none;
   }
 }
+@media (max-width: 1023px) {
+  div.navbar-container .oppia-navbar-hide-on-medium-width {
+    display: none;
+  }
+}
 
 .btn.oppia-unresolved-answer-button {
   background-color: white;

@@ -118,6 +118,11 @@ class UserEmailPreferencesModel(base_models.BaseModel):
     feedback_message_notifications = ndb.BooleanProperty(
         indexed=True, default=feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
 
+    # The user's preference for receiving email when a creator, to which this
+    # user has subscribed, publishes an exploration.
+    subscription_notifications = ndb.BooleanProperty(
+        indexed=True, default=feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+
 
 class UserSubscriptionsModel(base_models.BaseModel):
     """A list of things that a user subscribes to.
