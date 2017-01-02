@@ -15,8 +15,15 @@
 oppia.factory('AnswerGroupObjectFactory', [
   function() {
     var AnswerGroup = function(ruleSpecs, outcome) {
-      this.rule_specs = ruleSpecs;
+      this.ruleSpecs = ruleSpecs;
       this.outcome = outcome;
+    };
+
+    AnswerGroup.prototype.toBackendDict = function() {
+      return {
+        rule_specs: this.ruleSpecs,
+        outcome: this.outcome
+      };
     };
 
     // Static class methods. Note that "this" is not available in

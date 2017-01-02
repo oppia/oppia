@@ -70,9 +70,14 @@ oppia.factory('responsesService', [
         _answerGroups = newAnswerGroups;
         $rootScope.$broadcast('answerGroupChanged');
 
+        newAnswerGroupsToBackend = []
+        for (var i = 0; i < newAnswerGroups.length; i++) {
+          newAnswerGroupsToBackend.push(newAnswerGroups[i].toBackendDict())
+        }
+
         explorationStatesService.saveInteractionAnswerGroups(
           editorContextService.getActiveStateName(),
-          angular.copy(newAnswerGroups));
+          angular.copy(newAnswerGroupsToBackend));
 
         graphDataService.recompute();
         _answerGroupsMemento = angular.copy(newAnswerGroups);
