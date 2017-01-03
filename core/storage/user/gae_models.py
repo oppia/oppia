@@ -118,6 +118,11 @@ class UserEmailPreferencesModel(base_models.BaseModel):
     feedback_message_notifications = ndb.BooleanProperty(
         indexed=True, default=feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
 
+    # The user's preference for receiving email when a creator, to which this
+    # user has subscribed, publishes an exploration.
+    subscription_notifications = ndb.BooleanProperty(
+        indexed=True, default=feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+
 
 class UserSubscriptionsModel(base_models.BaseModel):
     """A list of things that a user subscribes to.
@@ -131,8 +136,17 @@ class UserSubscriptionsModel(base_models.BaseModel):
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of feedback thread ids that this user subscribes to.
     feedback_thread_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # IDs of the learners who have subscribed to this user.
+    creator_ids = ndb.StringProperty(repeated=True, indexed=True)
     # When the user last checked notifications. May be None.
     last_checked = ndb.DateTimeProperty(default=None)
+
+
+class UserSubscribersModel(base_models.BaseModel):
+    """The list of subscribers of the user.
+    """
+    # IDs of the learners who have subscribed to this user.
+    subscriber_ids = ndb.StringProperty(repeated=True, indexed=True)
 
 
 class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
