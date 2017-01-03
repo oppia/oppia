@@ -31,18 +31,20 @@ oppia.animation('.oppia-collection-animate-slide', function() {
 });
 
 oppia.controller('CollectionPlayer', [
-  '$scope', '$http', 'ReadOnlyCollectionBackendApiService', 'CollectionObjectFactory',
-  'CollectionPlaythroughObjectFactory', 'alertsService',
-  function($scope, $http, ReadOnlyCollectionBackendApiService, CollectionObjectFactory,
-    CollectionPlaythroughObjectFactory, alertsService) {
+  '$scope', '$http', 'ReadOnlyCollectionBackendApiService',
+  'CollectionObjectFactory', 'CollectionPlaythroughObjectFactory',
+  'alertsService',
+  function($scope, $http, ReadOnlyCollectionBackendApiService,
+    CollectionObjectFactory, CollectionPlaythroughObjectFactory,
+    alertsService) {
     $scope.collection = null;
     $scope.collectionPlaythrough = null;
     $scope.collectionId = GLOBALS.collectionId;
     $scope.showingAllExplorations = !GLOBALS.isLoggedIn;
-    $scope.showPreviewCard = true;
+    $scope.previewCardIsShown = true;
 
     $scope.togglePreviewCard = function() {
-      $scope.showPreviewCard = !$scope.showPreviewCard;
+      $scope.previewCardIsShown = !$scope.previewCardIsShown;
     };
 
     $scope.getCollectionNodeForExplorationId = function(explorationId) {
@@ -100,7 +102,7 @@ oppia.controller('CollectionPlayer', [
     };
 
     $scope.updateExplorationPreview = function(explorationId) {
-      $scope.showPreviewCard = false;
+      $scope.previewCardIsShown = false;
       $scope.currentExplorationId = explorationId;
       $scope.summaryToPreview = $scope.getCollectionNodeForExplorationId(
         explorationId).getExplorationSummaryObject();
@@ -110,15 +112,14 @@ oppia.controller('CollectionPlayer', [
       params: {
         stringified_collection_ids: JSON.stringify([$scope.collectionId])
       }
-      }).then(
-        function(response) {
-          $scope.collectionSummary = response.data.summaries[0];
-        },
-        function() {
-          alertsService.addWarning(
-            'There was an error while fetching the collection summary.');
-        }
-      );
+    }).then(
+    function(response) {
+      $scope.collectionSummary = response.data.summaries[0];
+    },
+    function() {
+      alertsService.addWarning(
+        'There was an error while fetching the collection summary.');
+    });
 
     // Load the collection the learner wants to view.
     ReadOnlyCollectionBackendApiService.loadCollection(
