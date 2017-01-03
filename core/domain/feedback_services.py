@@ -23,6 +23,7 @@ from core.domain import feedback_jobs_continuous
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
+from core.domain import email_manager
 from core.platform import models
 import feconf
 
@@ -724,29 +725,6 @@ def _get_all_recipient_ids(exploration_id, thread_id, author_id):
     return (batch_recipient_ids, other_recipient_ids)
 
 
-def _can_receive_email(recipient_id, exploration_id, has_suggestion):
-    """Returns if user can receive email
-
-    Args:
-        recipient_id: str. ID of person that should receive the email.
-        exploration_id: str. ID of exploration that received new message.
-        has_suggestion: bool. True if thread contains suggestion.
-
-    Returns:
-        bool. True if user can receive the email, False otherwise.
-    """
-    user_global_prefs = user_services.get_email_preferences(recipient_id)
-    user_exploration_prefs = (
-        user_services.get_email_preferences_for_exploration(
-            recipient_id, exploration_id))
-    if has_suggestion:
-        return (user_global_prefs['can_receive_feedback_message_email']
-                and not user_exploration_prefs['mute_suggestion_notifications'])
-    else:
-        return (user_global_prefs['can_receive_feedback_message_email']
-                and not user_exploration_prefs['mute_feedback_notifications'])
-
-
 def _send_batch_emails(
         recipient_list, feedback_message_reference, exploration_id,
         has_suggestion):
@@ -759,9 +737,15 @@ def _send_batch_emails(
             of the email.
         feedback_message_reference: FeedbackMessageReference.
             The reference to add to each email buffer.
+        exploration_id: str. ID of exploration that received new message.
+        has_suggestion: bool. Whether this thread has a related
+            learner suggestion.
     """
-    for recipient_id in recipient_list:
-        if _can_receive_email(recipient_id, exploration_id, has_suggestion):
+    can_users_receive_email = (
+        email_manager.can_users_receive_thread_email(
+            recipient_list, exploration_id, has_suggestion))
+    for index, recipient_id in enumerate(recipient_list):
+        if can_users_receive_email[index]:
             transaction_services.run_in_transaction(
                 _add_feedback_message_reference, recipient_id,
                 feedback_message_reference)
@@ -778,9 +762,15 @@ def _send_instant_emails(
         recipient_list: list of str. A list of user_ids of all
             recipients of the email.
         feedback_message_reference: FeedbackMessageReference.
+        exploration_id: str. ID of exploration that received new message.
+        has_suggestion: bool. Whether this thread has a related
+            learner suggestion.
     """
-    for recipient_id in recipient_list:
-        if _can_receive_email(recipient_id, exploration_id, has_suggestion):
+    can_users_receive_email = (
+        email_manager.can_users_receive_thread_email(
+            recipient_list, exploration_id, has_suggestion))
+    for index, recipient_id in enumerate(recipient_list):
+        if can_users_receive_email[index]:
             transaction_services.run_in_transaction(
                 enqueue_feedback_message_instant_email_task, recipient_id,
                 feedback_message_reference)
@@ -796,9 +786,15 @@ def _send_feedback_thread_status_change_emails(
         feedback_message_reference: FeedbackMessageReference
         old_status: str, one of STATUS_CHOICES
         new_status: str, one of STATUS_CHOICES
+        exploration_id: str. ID of exploration that received new message.
+        has_suggestion: bool. Whether this thread has a related
+            learner suggestion.
     """
-    for recipient_id in recipient_list:
-        if _can_receive_email(recipient_id, exploration_id, has_suggestion):
+    can_users_receive_email = (
+        email_manager.can_users_receive_thread_email(
+            recipient_list, exploration_id, has_suggestion))
+    for index, recipient_id in enumerate(recipient_list):
+        if can_users_receive_email[index]:
             transaction_services.run_in_transaction(
                 _enqueue_feedback_thread_status_change_email_task,
                 recipient_id, feedback_message_reference,

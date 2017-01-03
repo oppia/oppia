@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# pylint: disable=protected-access
-
 """Tests for feedback-related services."""
 import json
 
@@ -75,59 +73,6 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
         threadlist = feedback_services.get_all_threads(exp_id, False)
         thread_status = threadlist[0].status
         self.assertEqual(thread_status, feedback_models.STATUS_CHOICES_OPEN)
-
-    def test_can_receive_email(self):
-        user_id = 'someUser'
-        exp_id = 'someExploration'
-        username = 'username'
-        user_email = 'user@example.com'
-
-        user_services.get_or_create_user(user_id, user_email)
-        user_services.set_username(user_id, username)
-
-        # User can receive all emails in default setting.
-        self.assertTrue(
-            feedback_services._can_receive_email(user_id, exp_id, True))
-        self.assertTrue(
-            feedback_services._can_receive_email(user_id, exp_id, False))
-
-        # User have muted feedback notifications for this exploration,
-        # therefore he should receive only feedback emails.
-        user_services.set_email_preferences_for_exploration(
-            user_id, exp_id, mute_feedback_notifications=True)
-        self.assertTrue(
-            feedback_services._can_receive_email(user_id, exp_id, True))
-        self.assertFalse(
-            feedback_services._can_receive_email(user_id, exp_id, False))
-
-        # User have muted suggestion notifications for this exploration too,
-        # therefore he should not receive any emails.
-        user_services.set_email_preferences_for_exploration(
-            user_id, exp_id, mute_suggestion_notifications=True)
-        self.assertFalse(
-            feedback_services._can_receive_email(user_id, exp_id, True))
-        self.assertFalse(
-            feedback_services._can_receive_email(user_id, exp_id, False))
-
-        # User have unmuted feedback/suggestion emails for this exploration, but
-        # disabled all emails globally, therefore he should not receive any
-        # emails.
-        user_services.set_email_preferences_for_exploration(
-            user_id, exp_id, mute_feedback_notifications=False,
-            mute_suggestion_notifications=False)
-        user_services.update_email_preferences(user_id, True, True, False)
-        self.assertFalse(
-            feedback_services._can_receive_email(user_id, exp_id, True))
-        self.assertFalse(
-            feedback_services._can_receive_email(user_id, exp_id, False))
-
-        # User have enabled all emails globally, therefore he should
-        # receive all emails.
-        user_services.update_email_preferences(user_id, True, True, True)
-        self.assertTrue(
-            feedback_services._can_receive_email(user_id, exp_id, True))
-        self.assertTrue(
-            feedback_services._can_receive_email(user_id, exp_id, False))
 
 
 class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
