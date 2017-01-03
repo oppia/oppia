@@ -779,12 +779,12 @@ oppia.factory('explorationStatesService', [
   '$log', '$modal', '$filter', '$location', '$rootScope',
   'explorationInitStateNameService', 'alertsService', 'changeListService',
   'editorContextService', 'validatorsService', 'newStateTemplateService',
-  'explorationGadgetsService',
+  'explorationGadgetsService', 'StateObjectFactory',
   function(
       $log, $modal, $filter, $location, $rootScope,
       explorationInitStateNameService, alertsService, changeListService,
       editorContextService, validatorsService, newStateTemplateService,
-      explorationGadgetsService) {
+      explorationGadgetsService, StateObjectFactory) {
     var _states = null;
 
     // Maps backend names to the corresponding frontend dict accessor lists.
@@ -854,8 +854,18 @@ oppia.factory('explorationStatesService', [
 
     // TODO(sll): Add unit tests for all get/save methods.
     return {
-      init: function(value) {
-        _states = angular.copy(value);
+      init: function(states) {
+        _states = {};
+        console.log(states);
+        for (var stateName in states) {
+          if (states.hasOwnProperty(stateName)) {
+            var stateData = states[stateName];
+            _states[stateName] = StateObjectFactory.create(stateName, stateData);
+            // console.log("state");
+            // console.log(_states[stateName])
+          }
+        }
+        console.log(_states);
       },
       getStates: function() {
         return angular.copy(_states);
