@@ -26,15 +26,15 @@ class ClassifierModelUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(ClassifierModelUnitTests, self).setUp()
         classifier_models.ClassifierModel.create('exp_id1', 1, 'state_name1',
-                                                 1, {'alpha': 1.0}, 1)
+                                                 'LDAStringClassifier', {'alpha': 1.0}, 1)
         classifier_models.ClassifierModel.create('exp_id1', 1, 'state_name2',
-                                                 1, {'alpha': 1.0}, 1)
+                                                 'LDAStringClassifier', {'alpha': 1.0}, 1)
         classifier_models.ClassifierModel.create('exp_id2', 1, 'state_name3',
-                                                 1, {'alpha': 1.0}, 1)
+                                                 'LDAStringClassifier', {'alpha': 1.0}, 1)
 
     def test_create_new_classifier_runs_successfully(self):
         classifier_id = classifier_models.ClassifierModel.create(
-            'exp_id3', 1, 'state_name1', 1, {'alpha': 1.0}, 1)
+            'exp_id3', 1, 'state_name1', 'LDAStringClassifier', {'alpha': 1.0}, 1)
 
         classifier = (
             classifier_models.ClassifierModel.get(classifier_id))
@@ -42,5 +42,6 @@ class ClassifierModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(classifier.exp_id, 'exp_id3')
         self.assertEqual(classifier.exp_version_when_created, 1)
         self.assertEqual(classifier.state_name, 'state_name1')
+        self.assertEqual(classifier.algorithm_id, 'LDAStringClassifier')
         self.assertEqual(classifier.cached_classifier_data, {'alpha': 1.0})
         self.assertEqual(classifier.data_schema_version, 1)
