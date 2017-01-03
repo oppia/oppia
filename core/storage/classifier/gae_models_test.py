@@ -26,15 +26,19 @@ class ClassifierModelUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(ClassifierModelUnitTests, self).setUp()
         classifier_models.ClassifierModel.create('exp_id1', 1, 'state_name1',
-                                                 'LDAStringClassifier', {'alpha': 1.0}, 1)
+                                                 'LDAStringClassifier',
+                                                 {'alpha': 1.0}, 1)
         classifier_models.ClassifierModel.create('exp_id1', 1, 'state_name2',
-                                                 'LDAStringClassifier', {'alpha': 1.0}, 1)
+                                                 'LDAStringClassifier',
+                                                 {'alpha': 1.0}, 1)
         classifier_models.ClassifierModel.create('exp_id2', 1, 'state_name3',
-                                                 'LDAStringClassifier', {'alpha': 1.0}, 1)
+                                                 'LDAStringClassifier',
+                                                 {'alpha': 1.0}, 1)
 
     def test_create_new_classifier_runs_successfully(self):
         classifier_id = classifier_models.ClassifierModel.create(
-            'exp_id3', 1, 'state_name1', 'LDAStringClassifier', {'alpha': 1.0}, 1)
+            'exp_id3', 1, 'state_name1', 'LDAStringClassifier', {'alpha': 1.0},
+            1)
 
         classifier = (
             classifier_models.ClassifierModel.get(classifier_id))
