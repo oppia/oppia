@@ -870,6 +870,44 @@ textarea {
   border: none;
 }
 
+/*Prevent Exploration Player From collapse On Small Screen*/
+@media(max-width:600px) {
+  .oppia-exploration-header {
+    font-size: 18px;
+  }
+}
+@media(max-width:450px) {
+  .oppia-exploration-header {
+    float: right;
+    display: block;
+    max-width: 12ch;
+    max-height: 2ch;
+    overflow: hidden;
+    margin-top: 2px;
+  }
+  .oppia-navbar-breadcrumb-icon {
+    height: 16px;
+    margin: 0 4px 4px 0px;
+    width: 16px;
+  }
+}
+
+@media(max-width:380px) {
+  .oppia-exploration-header {
+    max-width: 10ch;
+  }
+}
+
+@media(max-width:768px) {
+/* Disabling navbar-collapse */
+  .oppia-navbar-breadcrumb {
+    margin-top: 0;
+    margin-left: 5px;
+  }
+  .navbar-right{
+    display: none;
+  }
+}
 /* Show the navbar submenu dropdowns on-hover rather than on-click, if the
    screen size is large enough. */
 @media (min-width: 768px) {

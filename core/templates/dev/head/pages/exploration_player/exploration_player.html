@@ -18,16 +18,40 @@
       GLOBALS.INTERACTION_SPECS = JSON.parse(
         '{{INTERACTION_SPECS|js_string}}');
     </script>
+
   {% endif %}
 
   {{dependencies_html}}
+  <style>
+   @media(max-width:768px) {
+     .navbar-collapse.collapse {
+       display: block;
+     }
+     .navbar-nav>li, .navbar-nav {
+       float: left;
+     }
+   }
+   @media(max-width:600px) {
+     .oppia-navbar-brand-name {
+       max-width: 35px;
+       overflow: hidden;
+     }
+     .oppia-logo {
+       height: 48px;
+       margin-top: 8px;
+       margin-left: 0;
+       max-width:none;
+     }
+   }
+  </style>
+
 {% endblock header_js %}
 
 {% block navbar_breadcrumb %}
   <ul class="nav navbar-nav oppia-navbar-breadcrumb" ng-controller="LearnerViewBreadcrumb">
     <li>
       <span class="oppia-navbar-breadcrumb-separator"></span>
-      <span class="protractor-test-exploration-header" itemprop="description">{{exploration_title}}</span>
+      <span class="protractor-test-exploration-header oppia-exploration-header" itemprop="description">{{exploration_title}}</span>
     </li>
     <li ng-click="showInformationCard()" tooltip="<['I18N_PLAYER_INFO_TOOLTIP' | translate]>" tooltip-placement="bottom" style="cursor: pointer;" class="protractor-test-exploration-info-icon">
       <i class="material-icons oppia-navbar-breadcrumb-icon" style="font-size: 20px;">&#xE88E;</i>
