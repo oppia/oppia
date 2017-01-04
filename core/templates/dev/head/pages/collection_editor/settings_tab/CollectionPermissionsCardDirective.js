@@ -26,22 +26,17 @@ oppia.directive('collectionPermissionsCard', [function() {
       'CollectionRightsBackendApiService',
       function($scope, CollectionRightsObjectFactory,
         CollectionRightsBackendApiService) {
-        var collectionRightsObject =
-          CollectionRightsObjectFactory.createEmptyCollectionRights();
+        $scope.collectionRightsObject = null;
+        $scope.hasRightsLoaded = false;
         var refreshPermissionsCard = function() {
-          CollectionRightsBackendApiService.getCollectionRights(
+          CollectionRightsBackendApiService.loadCollectionRights(
             GLOBALS.collectionId).then(function(data) {
-            $scope.ownerNames = data.owner_names;
-            $scope.isPrivate = data.is_private;
-            collectionRightsObject =
+            $scope.collectionRightsObject =
               CollectionRightsObjectFactory.create(data);
+            $scope.hasRightsLoaded = true;
           });
         };
         refreshPermissionsCard();
-
-        $scope.$watch(function() {
-          return collectionRightsObject.isPrivate();
-        }, refreshPermissionsCard);
       }
     ]
   };

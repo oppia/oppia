@@ -18,8 +18,8 @@
  */
 
 oppia.factory('CollectionRightsObjectFactory', [
-    '$rootScope', '$log',
-    function($rootScope, $log) {
+    '$rootScope',
+    function($rootScope) {
     var CollectionRights = function(collectionRightsObject) {
       this._collectionId = collectionRightsObject.collection_id;
       this._canEdit = collectionRightsObject.can_edit;
@@ -51,40 +51,14 @@ oppia.factory('CollectionRightsObjectFactory', [
       return $rootScope.isPrivate;
     };
 
-    // Sets isPrivate to false only if the
-    // collectionRightsBackendObject.is_private passed in is false; otherwise,
-    // writes an error to the log. Assumes that the backend returns a success
-    // in set public operation. Returns the result of isPrivate regardless of
-    // error.
-    CollectionRights.prototype.setPublic = function(
-      collectionRightsBackendObject) {
-      if (!collectionRightsBackendObject.is_private) {
-        $rootScope.isPrivate = false;
-      } else {
-        $log.error(
-          'Backend indicated a collection was successfully ' +
-          'published, but response.data.is_private returned true.');
-      }
-      return this.isPrivate();
+    CollectionRights.prototype.setPublic = function() {
+      $rootScope.isPrivate = false;
     };
 
-    // Sets isPrivate to true only if the
-    // collectionRightsBackendObject.is_private passed in is true AND
-    // canUnpublish is true. If canUnpublish is true and is_private is false,
-    // it writes an error to the log. Assumes that the backend returns a
-    // success in set private operation. Returns the result of isPrivate
-    // regardless of error.
-    CollectionRights.prototype.setPrivate = function(
-      collectionRightsBackendObject) {
+    // Sets isPrivate to true only if canUnpublish in is true.
+    CollectionRights.prototype.setPrivate = function() {
       if (this.canUnpublish()) {
-        if (collectionRightsBackendObject.is_private) {
-          $rootScope.isPrivate = true;
-        } else {
-          $log.error(
-            'Backend indicated a collection was successfully ' +
-            'unpublished, but response.data.is_private returned false.');
-        }
-        return this.isPrivate();
+        $rootScope.isPrivate = true;
       }
     };
 
@@ -102,7 +76,7 @@ oppia.factory('CollectionRightsObjectFactory', [
 
     // Create a new, empty collection rights. This is not guaranteed to pass
     // validation tests.
-    CollectionRights.createEmptyCollectionRights = function() {
+    CollectionRights.createDummyCollectionRights = function() {
       return new CollectionRights({
         owner_names: []
       });

@@ -34,7 +34,7 @@ oppia.directive('collectionEditorNavbar', [function() {
           CollectionValidationService, EditableCollectionBackendApiService,
           EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED,
           EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
-        var collectionRightsObject = null;
+        $scope.collectionRightsObject = null;
         $scope.rightsHasLoaded = false;
 
         $scope.collectionId = GLOBALS.collectionId;
@@ -43,12 +43,10 @@ oppia.directive('collectionEditorNavbar', [function() {
         $scope.isSaveInProgress = (
           CollectionEditorStateService.isSavingCollection);
 
-        CollectionRightsBackendApiService.getCollectionRights(
+        CollectionRightsBackendApiService.fetchCollectionRights(
           $scope.collectionId).then(function(data) {
-          $scope.isPrivate = data.is_private;
-          $scope.canUnpublish = data.can_unpublish;
-
-          collectionRightsObject = CollectionRightsObjectFactory.create(data);
+          $scope.collectionRightsObject =
+            CollectionRightsObjectFactory.create(data);
           $scope.rightsHasLoaded = true;
         });
 
@@ -60,7 +58,7 @@ oppia.directive('collectionEditorNavbar', [function() {
         $scope.selectHistoryTab = routerService.navigateToHistoryTab;
 
         var _validateCollection = function() {
-          if ($scope.isPrivate) {
+          if ($scope.collectionRightsObject.isPrivate()) {
             $scope.validationIssues = (
               CollectionValidationService
                 .findValidationIssuesForPrivateCollection(
@@ -78,12 +76,8 @@ oppia.directive('collectionEditorNavbar', [function() {
           // action since it is not reversible.
           CollectionRightsBackendApiService.setCollectionPublic(
             $scope.collectionId, $scope.collection.getVersion()).then(
-            function(data) {
-              $scope.isPrivate = collectionRightsObject.setPublic(data);
-              if ($scope.isPrivate) {
-                alertsService.addWarning(
-                  'There was an error when publishing the collection.');
-              }
+            function() {
+              $scope.collectionRightsObject.setPublic();
             }, function() {
               alertsService.addWarning(
                 'There was an error when publishing the collection.');
@@ -111,13 +105,13 @@ oppia.directive('collectionEditorNavbar', [function() {
 
         $scope.isCollectionPublishable = function() {
           return (
-            $scope.isPrivate &&
+            $scope.collectionRightsObject.isPrivate() &&
             $scope.getChangeListCount() === 0 &&
             $scope.validationIssues.length === 0);
         };
 
         $scope.saveChanges = function() {
-          var isPrivate = $scope.isPrivate;
+          var isPrivate = $scope.collectionRightsObject.isPrivate();
           var modalInstance = $modal.open({
             templateUrl: 'modals/saveCollection',
             backdrop: true,
@@ -239,12 +233,8 @@ oppia.directive('collectionEditorNavbar', [function() {
         $scope.unpublishCollection = function() {
           CollectionRightsBackendApiService.setCollectionPrivate(
             $scope.collectionId, $scope.collection.getVersion()).then(
-            function(data) {
-              $scope.isPrivate = collectionRightsObject.setPrivate(data);
-              if (!$scope.isPrivate) {
-                alertsService.addWarning(
-                  'There was an error when unpublishing the collection.');
-              }
+            function() {
+              $scope.collectionRightsObject.setPrivate();
             }, function() {
               alertsService.addWarning(
                 'There was an error when unpublishing the collection.');

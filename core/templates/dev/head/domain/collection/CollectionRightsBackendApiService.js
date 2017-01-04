@@ -17,10 +17,14 @@
  */
 
 oppia.factory('CollectionRightsBackendApiService', [
-    '$http', '$q', 'COLLECTION_RIGHTS_URL_TEMPLATE', 'UrlInterpolationService',
-    function($http, $q, COLLECTION_RIGHTS_URL_TEMPLATE,
+    '$http', '$log', '$q', 'COLLECTION_RIGHTS_URL_TEMPLATE',
+    'UrlInterpolationService',
+    function($http, $log, $q, COLLECTION_RIGHTS_URL_TEMPLATE,
       UrlInterpolationService) {
-      var _getCollectionRights = function(collectionId, successCallback,
+      // Maps previously loaded collection rights to their IDs.
+      var collectionRightsCache = [];
+
+      var _fetchCollectionRights = function(collectionId, successCallback,
         errorCallback) {
         var collectionRightsUrl = UrlInterpolationService.interpolateUrl(
           COLLECTION_RIGHTS_URL_TEMPLATE, {
@@ -53,9 +57,27 @@ oppia.factory('CollectionRightsBackendApiService', [
         $http.put(collectionRightsUrl, putParams).then(function(response) {
           // TODO(bhenning): Consolidate the backend rights domain objects and
           // implement a frontend activity rights domain object. The rights
-          // being passed in here should be used to create one of those objects.
-          if (successCallback) {
-            successCallback(response.data);
+          // being passed in here should be used to create one of those objects
+
+          // Check if the reponse from the backend does not contradict
+          // putParams.
+          if (response.data.is_private === isPublic) {
+            if (isPublic) {
+              $log.error(
+                'Backend indicated a collection was successfully ' +
+                'published, but response.data.is_private returned true.');
+            } else {
+              $log.error(
+                'Backend indicated a collection was successfully ' +
+                'unpublished, but response.data.is_private returned false.');
+            }
+            if (errorCallback) {
+              errorCallback(response.data);
+            }
+          } else {
+            if (successCallback) {
+              successCallback(response.data.rights);
+            }
           }
         }, function(errorResponse) {
           if (errorCallback) {
@@ -64,13 +86,44 @@ oppia.factory('CollectionRightsBackendApiService', [
         });
       };
 
+      var isCached = function(collectionId) {
+        return collectionRightsCache.hasOwnProperty(collectionId);
+      };
+
       return {
         /**
          * Gets a collection's rights, given its ID.
          */
-        getCollectionRights: function(collectionId) {
+        fetchCollectionRights: function(collectionId) {
           return $q(function(resolve, reject) {
-            _getCollectionRights(collectionId, resolve, reject);
+            _fetchCollectionRights(collectionId, resolve, reject);
+          });
+        },
+
+        /**
+         * Behaves in the exactly as fetchCollectionRights (including callback
+         * behavior and returning a promise object), except this function will
+         * attempt to see whether the given collection rights has already been
+         * loaded. If it has not yet been loaded, it will fetch the collection
+         * rights from the backend. If it successfully retrieves the collection
+         * rights from the backend, it will store it in the cache to avoid
+         * requests from the backend in further function calls.
+         */
+        loadCollectionRights: function(collectionId) {
+          return $q(function(resolve, reject) {
+            if (isCached(collectionId)) {
+              if (resolve) {
+                resolve(angular.copy(collectionRightsCache[collectionId]));
+              }
+            } else {
+              _fetchCollectionRights(collectionId, function(collectionRights) {
+                // Save the fetched collection to avoid future fetches.
+                collectionRightsCache[collectionId] = collectionRights;
+                if (resolve) {
+                  resolve(angular.copy(collectionRights));
+                }
+              }, reject);
+            }
           });
         },
 

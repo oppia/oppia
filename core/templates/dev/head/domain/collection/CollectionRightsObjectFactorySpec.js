@@ -28,7 +28,7 @@ describe('Collection rights object factory', function() {
 
   it('should be able to create an empty collection rights object', function() {
     var collectionRights =
-      CollectionRightsObjectFactory.createEmptyCollectionRights();
+      CollectionRightsObjectFactory.createDummyCollectionRights();
     expect(collectionRights.getCollectionId()).toBeUndefined();
     expect(collectionRights.canEdit()).toBeUndefined();
     expect(collectionRights.canUnpublish()).toBeUndefined();
@@ -49,14 +49,7 @@ describe('Collection rights object factory', function() {
       initialCollectionRightsBackendObject);
     expect(sampleCollectionRights.isPrivate()).toBe(true);
 
-    var publicCollectionRightsBackendObject = {
-      collection_id: 0,
-      can_edit: true,
-      can_unpublish: false,
-      is_private: false,
-      owner_names: ['A']
-    };
-    sampleCollectionRights.setPublic(publicCollectionRightsBackendObject);
+    sampleCollectionRights.setPublic();
     expect(sampleCollectionRights.isPrivate()).toBe(false);
   });
 
@@ -73,14 +66,7 @@ describe('Collection rights object factory', function() {
       initialCollectionRightsBackendObject);
     expect(sampleCollectionRights.isPrivate()).toBe(false);
 
-    var privateCollectionRightsBackendObject = {
-      collection_id: 0,
-      can_edit: true,
-      can_unpublish: true,
-      is_private: true,
-      owner_names: ['A']
-    };
-    sampleCollectionRights.setPrivate(privateCollectionRightsBackendObject);
+    sampleCollectionRights.setPrivate();
     expect(sampleCollectionRights.isPrivate()).toBe(true);
   });
 
@@ -98,14 +84,7 @@ describe('Collection rights object factory', function() {
       noUnpublishCollectionRightsBackendObject);
     expect(sampleCollectionRights.isPrivate()).toBe(false);
 
-    var noPrivateCollectionRightsBackendObject = {
-      collection_id: 0,
-      can_edit: true,
-      can_unpublish: false,
-      is_private: true,
-      owner_names: ['A']
-    };
-    sampleCollectionRights.setPrivate(noPrivateCollectionRightsBackendObject);
+    sampleCollectionRights.setPrivate();
     expect(sampleCollectionRights.isPrivate()).toBe(false);
   });
 });
