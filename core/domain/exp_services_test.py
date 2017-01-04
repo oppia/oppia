@@ -920,11 +920,11 @@ class UpdateGadgetTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
             'cmd': exp_domain.CMD_ADD_GADGET,
             'panel': 'bottom',
-            'gadget_dict' : {'gadget_type': 'ScoreBar',
-                             'gadget_name': 'NewGadget',
-                             'customization_args': gadget_customization,
-                             'visible_in_states':
-                             [feconf.DEFAULT_INIT_STATE_NAME]}
+            'gadget_dict' : {
+                'gadget_type': 'ScoreBar',
+                'gadget_name': 'NewGadget',
+                'customization_args': gadget_customization,
+                'visible_in_states':[feconf.DEFAULT_INIT_STATE_NAME]}
             }], 'add a new gadget')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
@@ -947,11 +947,11 @@ class UpdateGadgetTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
             'cmd': exp_domain.CMD_ADD_GADGET,
             'panel': 'bottom',
-            'gadget_dict' : {'gadget_type': 'ScoreBar',
-                             'gadget_name': 'NewGadget',
-                             'customization_args': gadget_customization,
-                             'visible_in_states':
-                             [feconf.DEFAULT_INIT_STATE_NAME]}
+            'gadget_dict' : {
+                'gadget_type': 'ScoreBar',
+                'gadget_name': 'NewGadget',
+                'customization_args': gadget_customization,
+                'visible_in_states':[feconf.DEFAULT_INIT_STATE_NAME]}
             }], 'add a new gadget')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
@@ -986,11 +986,11 @@ class UpdateGadgetTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
             'cmd': exp_domain.CMD_ADD_GADGET,
             'panel': 'bottom',
-            'gadget_dict' : {'gadget_type': 'ScoreBar',
-                             'gadget_name': 'NewGadget',
-                             'customization_args': gadget_customization,
-                             'visible_in_states':
-                             [feconf.DEFAULT_INIT_STATE_NAME]}
+            'gadget_dict' : {
+                'gadget_type': 'ScoreBar',
+                'gadget_name': 'NewGadget',
+                'customization_args': gadget_customization,
+                'visible_in_states':[feconf.DEFAULT_INIT_STATE_NAME]}
             }], 'add a new gadget')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
