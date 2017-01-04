@@ -31,17 +31,25 @@ oppia.factory('StateObjectFactory', [
     for (var answerGroup in interaction.answer_groups) {
       console.log(interaction.answer_groups);
       var answerGroupData = interaction.answer_groups[answerGroup];
-      console.log(answerGroupData);
+      console.log(angular.copy(answerGroupData));
       answerGroups.push(
         AnswerGroupObjectFactory.create(
           answerGroupData.rule_specs, answerGroupData.outcome));
     }
     this.interaction.answer_groups = answerGroups;
-    console.log(this);
+    console.log(angular.copy(this));
   };
 
   // Instance methods.
   State.prototype.toBackendDict = function() {
+    // var answerGroups = [];
+    // console.log(angular.copy(this.interaction.answer_groups));
+    // for (answer_group in this.interaction.answer_groups) {
+    //   answerGroups.push(this.interaction
+    //     .answer_groups[answer_group].toBackendDict());
+    // }
+    // this.interaction.answer_groups = answerGroups;
+
     return {
       content: this.content,
       interaction: this.interaction,

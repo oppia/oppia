@@ -268,9 +268,10 @@ oppia.factory('oppiaPlayerService', [
         }
 
         answerIsBeingProcessed = true;
+        console.log(angular.copy(exploration));
         var oldState = exploration.getState(
           playerTranscriptService.getLastStateName());
-
+        console.log(angular.copy(oldState));
         AnswerClassificationService.getMatchingClassificationResult(
           _explorationId, oldState, answer, false, interactionRulesService
         ).then(function(classificationResult) {

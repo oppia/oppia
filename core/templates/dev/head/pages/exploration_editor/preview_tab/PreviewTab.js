@@ -129,6 +129,7 @@ oppia.controller('PreviewTab', [
       // $timeout isn't necessary.
       $timeout(function() {
         console.log(angular.copy(explorationStatesService.getStates()));
+        console.log(angular.copy(explorationStatesService.getStatesAsBackendDicts()));
         oppiaPlayerService.populateExploration({
           category: explorationCategoryService.savedMemento,
           init_state_name: stateName,
