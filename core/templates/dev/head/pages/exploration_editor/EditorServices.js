@@ -91,7 +91,7 @@ oppia.factory('explorationData', [
             }
           }).then(function(response) {
             $log.info('Retrieved exploration data.');
-            $log.info(response.data);
+            $log.info(JSON.parse(JSON.stringify(response.data)));
 
             explorationData.data = response.data;
 
@@ -856,19 +856,28 @@ oppia.factory('explorationStatesService', [
     return {
       init: function(states) {
         _states = {};
-        console.log(states);
+        console.log(JSON.parse(JSON.stringify(states)));
         for (var stateName in states) {
           if (states.hasOwnProperty(stateName)) {
             var stateData = states[stateName];
+            console.log(angular.copy(stateData));
             _states[stateName] = StateObjectFactory.create(stateName, stateData);
             // console.log("state");
             // console.log(_states[stateName])
           }
         }
-        console.log(_states);
+        console.log(angular.copy(_states));
       },
       getStates: function() {
         return angular.copy(_states);
+      },
+      getStatesAsBackendDicts: function() {
+        var statesAsBackendDicts = {};
+        for (state in _states) {
+          statesAsBackendDicts[state] = _states[state].toBackendDict();
+        }
+        console.log(angular.copy(statesAsBackendDicts));
+        return statesAsBackendDicts;
       },
       hasState: function(stateName) {
         return _states.hasOwnProperty(stateName);

@@ -17,12 +17,27 @@
  * domain objects.
  */
 
-oppia.factory('StateObjectFactory', [function() {
+oppia.factory('StateObjectFactory', [
+  'AnswerGroupObjectFactory', 
+  function(AnswerGroupObjectFactory) {
   var State = function(name, content, interaction, paramChanges) {
+    console.log(paramChanges);
     this.name = name;
     this.content = content;
     this.interaction = interaction;
     this.paramChanges = paramChanges;
+
+    var answerGroups = [];
+    for (var answerGroup in interaction.answer_groups) {
+      console.log(interaction.answer_groups);
+      var answerGroupData = interaction.answer_groups[answerGroup];
+      console.log(answerGroupData);
+      answerGroups.push(
+        AnswerGroupObjectFactory.create(
+          answerGroupData.rule_specs, answerGroupData.outcome));
+    }
+    this.interaction.answer_groups = answerGroups;
+    console.log(this);
   };
 
   // Instance methods.
@@ -37,6 +52,8 @@ oppia.factory('StateObjectFactory', [function() {
   // Static class methods. Note that "this" is not available in
   // static contexts.
   State.create = function(stateName, stateDict) {
+    console.log(angular.copy(stateDict))
+    console.log(angular.copy(stateDict.param_changes));
     return new State(
       stateName,
       stateDict.content,

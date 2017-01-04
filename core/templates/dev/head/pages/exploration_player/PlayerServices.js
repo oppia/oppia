@@ -99,8 +99,9 @@ oppia.factory('oppiaPlayerService', [
 
     // This should only be called when 'exploration' is non-null.
     var _loadInitialState = function(successCallback) {
+      console.log(angular.copy(exploration));
       var initialState = exploration.getInitialState();
-
+      console.log(angular.copy(initialState));
       var oldParams = LearnerParamsService.getAllParams();
       var newParams = makeParams(
         oldParams, initialState.paramChanges, [oldParams]);
@@ -159,8 +160,10 @@ oppia.factory('oppiaPlayerService', [
       // also initializes the parameters to empty strings.
       populateExploration: function(explorationData, manualParamChanges) {
         if (_editorPreviewMode) {
+          console.log(angular.copy(explorationData));
           exploration = ExplorationObjectFactory.create(explorationData);
           initParams(manualParamChanges);
+          console.log(angular.copy(exploration));
         } else {
           throw 'Error: cannot populate exploration in learner mode.';
         }

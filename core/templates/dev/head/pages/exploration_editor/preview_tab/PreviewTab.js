@@ -128,12 +128,13 @@ oppia.controller('PreviewTab', [
       // obtaining the current version of the exploration, so that the use of
       // $timeout isn't necessary.
       $timeout(function() {
+        console.log(angular.copy(explorationStatesService.getStates()));
         oppiaPlayerService.populateExploration({
           category: explorationCategoryService.savedMemento,
           init_state_name: stateName,
           param_changes: explorationParamChangesService.savedMemento,
           param_specs: explorationParamSpecsService.savedMemento,
-          states: explorationStatesService.getStates(),
+          states: explorationStatesService.getStatesAsBackendDicts(),
           title: explorationTitleService.savedMemento,
           skin_customizations: {
             panels_contents: explorationGadgetsService.getPanelsContents()

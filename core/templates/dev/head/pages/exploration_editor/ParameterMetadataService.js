@@ -86,7 +86,8 @@ oppia.factory('parameterMetadataService', [
     var getStateParamMetadata = function(state) {
       // First, the state param changes are applied: we get their values
       // and set the params.
-      var result = getMetadataFromParamChanges(state.param_changes);
+      console.log(angular.copy(state));
+      var result = getMetadataFromParamChanges(state.paramChanges);
 
       // Next, the content is evaluated.
       expressionInterpolationService.getParamsFromString(
