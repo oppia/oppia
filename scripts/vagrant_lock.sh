@@ -22,28 +22,24 @@
 # It can be overridden by passing --nolock to start.sh
 
 
-# This keeps all the arguments passed in, except for --nolock just in case
-# its unexpected presence makes something downstream upset
-declare -a keep_args
 for arg in "$@"; do
   case $arg in
     --nolock)
       NO_LOCK=true
       ;;
-    *)
-    keep_args+=($arg)
-    ;;
   esac
 done
 
-set -- "${keep_args[@]}"
-
-[ $NO_LOCK ] && return 0
+if [ $NO_LOCK ]; then
+  return 0
+fi
 
 VAGRANT_LOCK_FILE="./.lock"
 
 function vagrant_lock_cleanup {
-  [ ! $NO_CLEAN ] && rm -rf $VAGRANT_LOCK_FILE
+  if [ ! $NO_CLEAN ]; then
+     rm -rf $VAGRANT_LOCK_FILE
+  fi
 }
 
 trap vagrant_lock_cleanup EXIT
