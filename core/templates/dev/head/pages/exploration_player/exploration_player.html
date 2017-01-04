@@ -24,11 +24,9 @@
   {{dependencies_html}}
   <style>
    @media(max-width:768px) {
-     .navbar-collapse.collapse {
+     /*To prevent Navbar From Collapsing On Exploration Player*/
+     .oppia-navbar-collapse.collapse {
        display: block;
-     }
-     .navbar-nav>li, .navbar-nav {
-       float: left;
      }
    }
    @media(max-width:600px) {
@@ -44,7 +42,6 @@
      }
    }
   </style>
-
 {% endblock header_js %}
 
 {% block navbar_breadcrumb %}
@@ -53,7 +50,7 @@
       <span class="oppia-navbar-breadcrumb-separator"></span>
       <span class="protractor-test-exploration-header oppia-exploration-header" itemprop="description">{{exploration_title}}</span>
     </li>
-    <li ng-click="showInformationCard()" tooltip="<['I18N_PLAYER_INFO_TOOLTIP' | translate]>" tooltip-placement="bottom" style="cursor: pointer;" class="protractor-test-exploration-info-icon">
+    <li ng-click="showInformationCard()" tooltip="<['I18N_PLAYER_INFO_TOOLTIP' | translate]>" tooltip-placement="bottom" style="cursor: pointer;" class="protractor-test-exploration-info-icon oppia-exploration-info-icon">
       <i class="material-icons oppia-navbar-breadcrumb-icon" style="font-size: 20px;">&#xE88E;</i>
     </li>
   </ul>
