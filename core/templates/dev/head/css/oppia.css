@@ -4316,9 +4316,11 @@ md-card.preview-conversation-skin-supplemental-card {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 18px;
   margin: 15px;
+  max-width: 90%;
   padding: 15px;
   text-transform: uppercase;
   white-space: normal;
+  width: 366px;
 }
 
 .oppia-about-button:hover {
