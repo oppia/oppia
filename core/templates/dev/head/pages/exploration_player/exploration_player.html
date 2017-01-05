@@ -24,12 +24,18 @@
   {{dependencies_html}}
   <style>
    @media(max-width:768px) {
-     /*To prevent Navbar From Collapsing On Exploration Player*/
+     /*To prevent Navbar From Collapsing On Exploration Player, so that title can appear*/
      .oppia-navbar-collapse.collapse {
        display: block;
      }
    }
    @media(max-width:600px) {
+     .oppia-navbar-breadcrumb-icon {
+       display: none;
+     }
+     .oppia-exploration-header {
+       font-size: 18px;
+     }
      .oppia-navbar-brand-name {
        max-width: 35px;
        overflow: hidden;
@@ -39,6 +45,16 @@
        margin-top: 8px;
        margin-left: 0;
        max-width:none;
+     }
+   }
+   @media(max-width: 450px) {
+     .oppia-exploration-header {
+       float: right;
+       display: block;
+       max-width: 12ch;
+       max-height: 2ch;
+       overflow: hidden;
+       margin-top: 2px;
      }
    }
   </style>
