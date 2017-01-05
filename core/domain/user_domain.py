@@ -19,17 +19,43 @@
 import feconf
 
 class UserGlobalPrefs(object):
-    """Domain object for user global email preferences"""
+    """Domain object for user global email preferences.
 
-    def __init__(self, site_updates, editor_role_notifications,
-                 feedback_message_notifications, subscription_notifications):
-        self.can_receive_email_updates = site_updates
-        self.can_receive_editor_role_email = editor_role_notifications
-        self.can_receive_feedback_message_email = feedback_message_notifications
-        self.can_receive_subscription_email = subscription_notifications
+    Attributes:
+        can_receive_email_updates: bool. Whether the user can receive
+            email updates.
+        can_receive_editor_role_email: bool. Whether the user can receive
+            emails notifying them of role changes.
+        can_receive_feedback_message_email: bool. Whether the user can
+            receive emails when users submit feedback to their explorations.
+        can_receive_subscription_email: bool. Whether the user can receive
+             subscription emails notifying them about new explorations.
+    """
+
+    def __init__(
+            self, can_receive_email_updates, can_receive_editor_role_email,
+            can_receive_feedback_message_email, can_receive_subscription_email):
+        """Constructs a UserGlobalPrefs domain object.
+
+        Args:
+            can_receive_email_updates: bool. Whether the user can receive
+                email updates.
+            can_receive_editor_role_email: bool. Whether the user can receive
+                emails notifying them of role changes.
+            can_receive_feedback_message_email: bool. Whether the user can
+                receive emails when users submit feedback to their explorations.
+            can_receive_subscription_email: bool. Whether the user can receive
+                 subscription emails notifying them about new explorations.
+        """
+        self.can_receive_email_updates = can_receive_email_updates
+        self.can_receive_editor_role_email = can_receive_editor_role_email
+        self.can_receive_feedback_message_email = ( #pylint: disable=invalid-name
+            can_receive_feedback_message_email)
+        self.can_receive_subscription_email = can_receive_subscription_email
 
     @classmethod
     def create_default_prefs(cls):
+        """Returns UserGlobalPrefs with default attributes."""
         return cls(
             feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
@@ -38,15 +64,31 @@ class UserGlobalPrefs(object):
 
 
 class UserExplorationPrefs(object):
-    """Domain object for user global email preferences"""
+    """Domain object for user exploration email preferences.
+
+    Attributes:
+        mute_feedback_notifications: bool. Whether the given user has muted
+            feedback emails.
+        mute_suggestion_notifications: bool. Whether the given user has
+            muted suggestion emails.
+    """
 
     def __init__(self, mute_feedback_notifications,
                  mute_suggestion_notifications):
+        """Constructs a UserExplorationPrefs domain object.
+
+        Args:
+            mute_feedback_notifications: bool. Whether the given user has muted
+                feedback emails.
+            mute_suggestion_notifications: bool. Whether the given user has
+                muted suggestion emails.
+        """
         self.mute_feedback_notifications = mute_feedback_notifications
         self.mute_suggestion_notifications = mute_suggestion_notifications
 
     @classmethod
     def create_default_prefs(cls):
+        """Returns UserExplorationPrefs with default attributes."""
         return cls(
             feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE,
             feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
