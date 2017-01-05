@@ -892,7 +892,8 @@ def get_email_preferences(user_id):
         {
             'can_receive_email_updates': value(bool),
             'can_receive_editor_role_email': value(bool),
-            'can_receive_feedback_message_email': value(bool)
+            'can_receive_feedback_message_email': value(bool),
+            'can_receive_subscription_email': value(bool)
         }
     """
     email_preferences_model = user_models.UserEmailPreferencesModel.get(
@@ -909,9 +910,54 @@ def get_email_preferences(user_id):
         'can_receive_feedback_message_email': (
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE
             if email_preferences_model is None
-            else email_preferences_model.feedback_message_notifications)
+            else email_preferences_model.feedback_message_notifications),
+        'can_receive_subscription_email': (
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE
+            if email_preferences_model is None
+            else email_preferences_model.subscription_notifications)
     }
 
+def get_users_email_preferences(user_ids):
+    """Get email preferences for the list of users.
+
+    Args:
+        user_ids: list. A list of user IDs for whom we want to get email
+            preferences.
+
+    Returns: list. A list of dicts representing the user's email preferences.
+        The format of the dict is as follows:
+        {
+            'can_receive_email_updates': value(bool),
+            'can_receive_editor_role_email': value(bool),
+            'can_receive_feedback_message_email': value(bool),
+            'can_receive_subscription_email': value(bool)
+        }
+    """
+    user_email_preferences_models = (
+        user_models.UserEmailPreferencesModel.get_multi(user_ids))
+    result = []
+
+    for email_preferences_model in user_email_preferences_models:
+        result.append({
+            'can_receive_email_updates': (
+                feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                if email_preferences_model is None
+                else email_preferences_model.site_updates),
+            'can_receive_editor_role_email': (
+                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE
+                if email_preferences_model is None
+                else email_preferences_model.editor_role_notifications),
+            'can_receive_feedback_message_email': (
+                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE
+                if email_preferences_model is None
+                else email_preferences_model.feedback_message_notifications),
+            'can_receive_subscription_email': (
+                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE
+                if email_preferences_model is None
+                else email_preferences_model.subscription_notifications)
+        })
+
+    return result
 
 def set_email_preferences_for_exploration(
         user_id, exploration_id, mute_feedback_notifications=None,
