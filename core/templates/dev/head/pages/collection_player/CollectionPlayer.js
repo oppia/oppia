@@ -113,13 +113,14 @@ oppia.controller('CollectionPlayer', [
         stringified_collection_ids: JSON.stringify([$scope.collectionId])
       }
     }).then(
-    function(response) {
-      $scope.collectionSummary = response.data.summaries[0];
-    },
-    function() {
-      alertsService.addWarning(
-        'There was an error while fetching the collection summary.');
-    });
+      function(response) {
+        $scope.collectionSummary = response.data.summaries[0];
+      },
+      function() {
+        alertsService.addWarning(
+          'There was an error while fetching the collection summary.');
+      }
+    );
 
     // Load the collection the learner wants to view.
     ReadOnlyCollectionBackendApiService.loadCollection(

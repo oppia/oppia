@@ -41,8 +41,8 @@
         text-align: left;
         top: 188px;
       }
-      td {
-        min-width: 150px !important;
+      .exploration-list-table-item {
+        min-width: 150px;
       }
     </style>
   {% endif %}
@@ -94,33 +94,33 @@
           </tr>
           <tr ng-repeat="node in collection.getCollectionNodes()"
               class="exploration-list-item">
-              <td>
-                <a ng-href="/explore/<[node.getExplorationId()]>"
-                  ng-mouseover="updateExplorationPreview(node.getExplorationId())"
-                  ng-mouseleave="togglePreviewCard()"
-                  class="oppia-dashboard-list-summary">
-                  <[node._explorationSummaryObject.title]>
-                </a>
-              </td>
-              <td class="hidden-md hidden-sm hidden-xs">
-                <a ng-href="/explore/<[node.getExplorationId()]>"
-                  ng-mouseover="updateExplorationPreview(node.getExplorationId())"
-                  ng-mouseleave="togglePreviewCard()"
-                  class="oppia-dashboard-list-summary">
-                  <[node._explorationSummaryObject.objective]>
-                </a>
-              </td>
+            <td class="exploration-list-table-item">
+              <a ng-href="/explore/<[node.getExplorationId()]>"
+                 ng-mouseover="updateExplorationPreview(node.getExplorationId())"
+                 ng-mouseleave="togglePreviewCard()"
+                 class="oppia-dashboard-list-summary">
+                <[node._explorationSummaryObject.title]>
+              </a>
+            </td>
+            <td class="hidden-md hidden-sm hidden-xs exploration-list-table-item">
+              <a ng-href="/explore/<[node.getExplorationId()]>"
+                 ng-mouseover="updateExplorationPreview(node.getExplorationId())"
+                 ng-mouseleave="togglePreviewCard()"
+                 class="oppia-dashboard-list-summary">
+                <[node._explorationSummaryObject.objective]>
+              </a>
+            </td>
           </tr>
         </table>
 
 
-      <div ng-if="collection" class="card-preview-panel hidden-xs">
+        <div ng-if="collection" class="card-preview-panel hidden-xs">
 
-        <md-card class="oppia-activity-summary-tile md-default-theme">
-          <div class="title-section" style="background-color: <[collectionSummary.thumbnail_bg_color]>; z-index: 1;">
-            <img ng-src="<[collectionSummary.thumbnail_icon_url]>" class="thumbnail-image">
-          </div>
-        </md-card>
+          <md-card class="oppia-activity-summary-tile md-default-theme">
+            <div class="title-section" style="background-color: <[collectionSummary.thumbnail_bg_color]>; z-index: 1;">
+              <img ng-src="<[collectionSummary.thumbnail_icon_url]>" class="thumbnail-image">
+            </div>
+          </md-card>
 
         <exploration-summary-tile ng-if="!previewCardIsShown"
                                   collection-id="getCollectionId()"
@@ -135,7 +135,7 @@
                                   thumbnail-bg-color="summaryToPreview.thumbnail_bg_color"
                                   is-community-owned="summaryToPreview.community_owned"
                                   style="position: absolute; left: 75px; z-index: 10;"/>
-      </div>
+        </div>
       </div>
     </div>
   </div>
