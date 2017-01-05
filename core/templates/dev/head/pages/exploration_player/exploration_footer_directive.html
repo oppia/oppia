@@ -15,6 +15,8 @@
                  data-toggle="dropdown" ng-if="contributorNames.length > 0">
                 <h4 translate="I18N_FOOTER_AUTHOR_PROFILES" class="author-profile-text"
                     ng-class="{'hovered-text':hovering, 'not-hovered' : !hovering}"></h4>
+                <h4 translate="I18N_FOOTER_AUTHORS" class="author-profile-text-mobile"
+                    ng-class="{'hovered-text':hovering, 'not-hovered' : !hovering}"></h4>    
               </a>
               <ul class="author-profile-dropdown-menu dropdown-menu" aria-labelledby="dropdownMenu2" role="menu">
                 <li ng-repeat="name in contributorNames | limitTo: 5">
@@ -30,7 +32,7 @@
         <div class="pull-right">
           <ul class="author-profile">
             <li>
-              <h4 translate="I18N_PLAYER_SHARE_THIS_EXPLORATION" class="share-exploration-footer"></h4>
+              <h4 translate="I18N_PLAYER_SHARE_THIS_EXPLORATION" class="share-exploration-footer oppia-hide-mobile"></h4>
             </li>
             <li>
               <sharing-links ng-if="explorationStatus !== 'private'"
@@ -38,7 +40,7 @@
                              twitter-text="getTwitterText()"
                              exploration-id="explorationId"
                              layout-type="row" 
-                             class="oppia-exploration-footer-sharing-links">
+                             class="oppia-exploration-footer-sharing-links oppia-mobile-exploration-footer-sharing-links">
               </sharing-links>
             </li>
           </ul>
@@ -49,6 +51,7 @@
 </script>
 
 <style>
+
 
   .oppia-exploration-footer {
     background-color: #094142;
@@ -124,15 +127,16 @@
     color: #888;
   }
 
-  .oppia-exploration-footer .author-profile-text {
+  .oppia-exploration-footer .author-profile-text .author-profile-text-mobile{
     cursor: default;
     line-height: 0.6;
     padding-left: 4px;
     text-overflow: clip;
+    text-align: center;
     white-space: nowrap;
   }
 
-  .oppia-exploration-footer .author-profile-text.not-hovered{
+  .oppia-exploration-footer .author-profile-text.not-hovered {
     color: #fff;
     text-transform: uppercase;
   }
@@ -143,6 +147,16 @@
     text-transform: uppercase;
   }
 
+  .oppia-exploration-footer .author-profile-text-mobile.not-hovered {
+    color: #fff;
+    text-transform: uppercase;
+  }
+
+  .oppia-exploration-footer .author-profile-text-mobile.hovered-text {
+    color: #094142;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
   .oppia-exploration-footer .share-exploration-footer {
     line-height: 0.6;
     padding-right:10px;
@@ -155,11 +169,49 @@
 
   .oppia-exploration-footer .oppia-exploration-footer-sharing-links ul {
     display: block;
-    float: left;
+    float: right;
     margin: -8px;
   }
 
   .oppia-exploration-footer .oppia-exploration-footer-sharing-links li {
     float: left;
+  }
+
+  @media (max-device-width: 480px) {
+    .author-profile-text {
+      display: none;
+    }
+
+    .author-profile-text-mobile {
+      display: block;
+    }
+
+    .oppia-exploration-footer .author-profile .hover-link {
+    background-color: #094142;
+      width: 70px;
+    }
+
+    .oppia-exploration-footer .oppia-exploration-footer-sharing-links ul {
+        display: block;
+        float: right;
+        margin: -8px;
+      margin-right: -25px;
+    }
+  }
+
+  @media (max-device-width:641px){
+    .oppia-hide-mobile {
+      display: none;
+    }
+  }
+
+  @media (min-device-width: 481px) {
+    .author-profile-text-mobile {
+      display: none;
+    }
+
+    .author-profile-text {
+      display: block;
+    }
   }
 </style>
