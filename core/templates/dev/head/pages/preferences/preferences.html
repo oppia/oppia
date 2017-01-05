@@ -155,19 +155,29 @@
             <div class="col-lg-10 col-md-10 col-sm-10">
               <div class="checkbox">
                 <label>
-                  <input type="checkbox" ng-model="canReceiveEmailUpdates" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail)">
+                  <input type="checkbox" ng-model="canReceiveEmailUpdates" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail,
+                  canReceiveSubscriptionEmail)">
                   <span translate="I18N_PREFERENCES_EMAIL_RECEIVE_NEWS"></span>
                 </label>
               </div>
               <div class="checkbox">
                 <label>
-                  <input type="checkbox" ng-model="canReceiveEditorRoleEmail" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail)">
+                  <input type="checkbox" ng-model="canReceiveEditorRoleEmail" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail,
+                  canReceiveSubscriptionEmail)">
                   Receive emails when someone gives you edit rights to an exploration
                 </label>
               </div>
               <div class="checkbox">
                 <label>
-                  <input type="checkbox" ng-model="canReceiveFeedbackMessageEmail" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail)">
+                  <input type="checkbox" ng-model="canReceiveSubscriptionEmail" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail,
+                  canReceiveSubscriptionEmail)">
+                  Receive emails when a creator to whom you have subscribed, publishes an exploration
+                </label>
+              </div>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" ng-model="canReceiveFeedbackMessageEmail" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail,
+                  canReceiveSubscriptionEmail)">
                   Receive emails when someone sends you feedback on an exploration
                 </label>
               </div>

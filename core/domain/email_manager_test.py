@@ -135,7 +135,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
 
     def test_email_is_not_sent_if_recipient_has_declined_such_emails(self):
         user_services.update_email_preferences(
-            self.new_user_id, True, False, False)
+            self.new_user_id, True, False, False, False)
 
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             email_manager.send_role_notification_email(

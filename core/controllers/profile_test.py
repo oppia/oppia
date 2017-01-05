@@ -156,6 +156,10 @@ class UsernameCheckHandlerTests(test_utils.GenericTestBase):
 
 class EmailPreferencesTests(test_utils.GenericTestBase):
 
+    def setUp(self):
+        super(EmailPreferencesTests, self).setUp()
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
     def test_user_not_setting_email_prefs_on_signup(self):
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get(feconf.SIGNUP_URL)
@@ -204,10 +208,9 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
             csrf_token=csrf_token)
 
         # The email update preference should be True in all cases.
-        editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', True):
             self.assertEqual(
-                user_services.get_email_preferences(editor_id),
+                user_services.get_email_preferences(self.editor_id),
                 {
                     'can_receive_email_updates': True,
                     'can_receive_editor_role_email': (
@@ -219,7 +222,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 })
         with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', False):
             self.assertEqual(
-                user_services.get_email_preferences(editor_id),
+                user_services.get_email_preferences(self.editor_id),
                 {
                     'can_receive_email_updates': True,
                     'can_receive_editor_role_email': (
@@ -244,8 +247,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', True):
             self.assertEqual(
-                user_services.get_email_preferences(editor_id),
-                {
+                user_services.get_email_preferences(editor_id), {
                     'can_receive_email_updates': False,
                     'can_receive_editor_role_email': (
                         feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE),
@@ -266,6 +268,61 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                     'can_receive_subscription_email': (
                         feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
                 })
+
+    def test_email_preferences_updates(self):
+        """Test that Preferences Handler correctly updates the email
+        preferences of the user.
+        """
+
+        self.signup(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.login(self.EDITOR_EMAIL)
+        response = self.testapp.get('/preferences')
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        payload = {
+            'update_type': 'email_preferences',
+            'data': {
+                'can_receive_email_updates': True,
+                'can_receive_editor_role_email': True,
+                'can_receive_feedback_message_email': True,
+                'can_receive_subscription_email': True
+            }
+        }
+
+        # Allow all emails.
+        self.put_json(
+            '/preferenceshandler/data', payload, csrf_token=csrf_token)
+
+        user_services.get_email_preferences(self.editor_id)
+        self.assertEqual(user_services.get_email_preferences(self.editor_id), {
+            'can_receive_email_updates': True,
+            'can_receive_editor_role_email': True,
+            'can_receive_feedback_message_email': True,
+            'can_receive_subscription_email': True
+        })
+
+        payload = {
+            'update_type': 'email_preferences',
+            'data': {
+                'can_receive_email_updates': False,
+                'can_receive_editor_role_email': False,
+                'can_receive_feedback_message_email': False,
+                'can_receive_subscription_email': False
+            }
+        }
+
+        # Disallow all emails.
+        self.put_json(
+            '/preferenceshandler/data', payload, csrf_token=csrf_token)
+
+        user_services.get_email_preferences(self.editor_id)
+        self.assertEqual(user_services.get_email_preferences(self.editor_id), {
+            'can_receive_email_updates': False,
+            'can_receive_editor_role_email': False,
+            'can_receive_feedback_message_email': False,
+            'can_receive_subscription_email': False
+        })
 
 
 class ProfileLinkTests(test_utils.GenericTestBase):

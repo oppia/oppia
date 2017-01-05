@@ -231,7 +231,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.update_email_preferences(
             user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
-            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
         email_preferences = user_services.get_email_preferences(user_id)
         self.assertEquals(
@@ -243,13 +244,16 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         # The user sets their membership email preference to False.
         user_services.update_email_preferences(
-            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE, False, False)
+            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE, False, False,
+            False)
 
         email_preferences = user_services.get_email_preferences(user_id)
         self.assertEquals(
             email_preferences['can_receive_editor_role_email'], False)
         self.assertEquals(
             email_preferences['can_receive_feedback_message_email'], False)
+        self.assertEquals(
+            email_preferences['can_receive_subscription_email'], False)
 
     def test_set_and_get_user_email_preferences_for_exploration(self):
         user_id = 'someUser'
