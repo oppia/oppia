@@ -23,6 +23,7 @@ from core.domain import feedback_jobs_continuous
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
+from core.domain import email_manager
 from core.platform import models
 import feconf
 
@@ -724,7 +725,9 @@ def _get_all_recipient_ids(exploration_id, thread_id, author_id):
     return (batch_recipient_ids, other_recipient_ids)
 
 
-def _send_batch_emails(recipient_list, feedback_message_reference):
+def _send_batch_emails(
+        recipient_list, feedback_message_reference, exploration_id,
+        has_suggestion):
     """Adds the given FeedbackMessageReference to each of the
     recipient's email buffers. The collected messages will be
     sent out as a batch after a short delay.
@@ -734,17 +737,23 @@ def _send_batch_emails(recipient_list, feedback_message_reference):
             of the email.
         feedback_message_reference: FeedbackMessageReference.
             The reference to add to each email buffer.
+        exploration_id: str. ID of exploration that received new message.
+        has_suggestion: bool. Whether this thread has a related
+            learner suggestion.
     """
-    for recipient_id in recipient_list:
-        recipient_preferences = (
-            user_services.get_email_preferences(recipient_id))
-        if recipient_preferences['can_receive_feedback_message_email']:
+    can_users_receive_email = (
+        email_manager.can_users_receive_thread_email(
+            recipient_list, exploration_id, has_suggestion))
+    for index, recipient_id in enumerate(recipient_list):
+        if can_users_receive_email[index]:
             transaction_services.run_in_transaction(
                 _add_feedback_message_reference, recipient_id,
                 feedback_message_reference)
 
 
-def _send_instant_emails(recipient_list, feedback_message_reference):
+def _send_instant_emails(
+        recipient_list, feedback_message_reference, exploration_id,
+        has_suggestion):
     """Adds the given FeedbackMessageReference to each of the
     recipient's email buffers. The collected messages will be
     sent out immediately.
@@ -753,18 +762,23 @@ def _send_instant_emails(recipient_list, feedback_message_reference):
         recipient_list: list of str. A list of user_ids of all
             recipients of the email.
         feedback_message_reference: FeedbackMessageReference.
+        exploration_id: str. ID of exploration that received new message.
+        has_suggestion: bool. Whether this thread has a related
+            learner suggestion.
     """
-    for recipient_id in recipient_list:
-        recipient_preferences = (
-            user_services.get_email_preferences(recipient_id))
-        if recipient_preferences['can_receive_feedback_message_email']:
+    can_users_receive_email = (
+        email_manager.can_users_receive_thread_email(
+            recipient_list, exploration_id, has_suggestion))
+    for index, recipient_id in enumerate(recipient_list):
+        if can_users_receive_email[index]:
             transaction_services.run_in_transaction(
                 enqueue_feedback_message_instant_email_task, recipient_id,
                 feedback_message_reference)
 
 
 def _send_feedback_thread_status_change_emails(
-        recipient_list, feedback_message_reference, old_status, new_status):
+        recipient_list, feedback_message_reference, old_status, new_status,
+        exploration_id, has_suggestion):
     """Notifies the given recipients about the status change.
 
     Args:
@@ -772,11 +786,15 @@ def _send_feedback_thread_status_change_emails(
         feedback_message_reference: FeedbackMessageReference
         old_status: str, one of STATUS_CHOICES
         new_status: str, one of STATUS_CHOICES
+        exploration_id: str. ID of exploration that received new message.
+        has_suggestion: bool. Whether this thread has a related
+            learner suggestion.
     """
-    for recipient_id in recipient_list:
-        recipient_preferences = (
-            user_services.get_email_preferences(recipient_id))
-        if recipient_preferences['can_receive_feedback_message_email']:
+    can_users_receive_email = (
+        email_manager.can_users_receive_thread_email(
+            recipient_list, exploration_id, has_suggestion))
+    for index, recipient_id in enumerate(recipient_list):
+        if can_users_receive_email[index]:
             transaction_services.run_in_transaction(
                 _enqueue_feedback_thread_status_change_email_task,
                 recipient_id, feedback_message_reference,
@@ -800,6 +818,11 @@ def _add_message_to_email_buffer(
         old_status: str, one of STATUS_CHOICES. Value of old thread status.
         new_status: str, one of STATUS_CHOICES. Value of new thread status.
     """
+    thread = (
+        feedback_models.FeedbackThreadModel.get_by_exp_and_thread_id(
+            exploration_id, thread_id))
+    has_suggestion = thread.has_suggestion
+
     feedback_message_reference = feedback_domain.FeedbackMessageReference(
         exploration_id, thread_id, message_id)
     batch_recipient_ids, other_recipient_ids = (
@@ -809,10 +832,14 @@ def _add_message_to_email_buffer(
         # Send email for feedback thread status change.
         _send_feedback_thread_status_change_emails(
             other_recipient_ids, feedback_message_reference,
-            old_status, new_status)
+            old_status, new_status, exploration_id, has_suggestion)
 
     if message_length > 0:
         # Send feedback message email only if message text is non empty.
         # It can be empty in the case when only status is changed.
-        _send_batch_emails(batch_recipient_ids, feedback_message_reference)
-        _send_instant_emails(other_recipient_ids, feedback_message_reference)
+        _send_batch_emails(
+            batch_recipient_ids, feedback_message_reference,
+            exploration_id, has_suggestion)
+        _send_instant_emails(
+            other_recipient_ids, feedback_message_reference,
+            exploration_id, has_suggestion)
