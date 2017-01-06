@@ -30,7 +30,7 @@
         <div class="pull-right">
           <ul class="author-profile">
             <li>
-              <h4 translate="I18N_PLAYER_SHARE_THIS_EXPLORATION" class="share-exploration-footer oppia-hide-mobile"></h4>
+              <h4 translate="I18N_PLAYER_SHARE_THIS_EXPLORATION" class="oppia-share-exploration-footer"></h4>
             </li>
             <li>
               <sharing-links ng-if="explorationStatus !== 'private'"
@@ -38,7 +38,7 @@
                              twitter-text="getTwitterText()"
                              exploration-id="explorationId"
                              layout-type="row" 
-                             class="oppia-exploration-footer-sharing-links oppia-mobile-exploration-footer-sharing-links">
+                             class="oppia-exploration-footer-sharing-links">
               </sharing-links>
             </li>
           </ul>
@@ -145,7 +145,7 @@
     text-transform: uppercase;
   }
 
-  .oppia-exploration-footer .share-exploration-footer {
+  .oppia-exploration-footer .oppia-share-exploration-footer {
     line-height: 0.6;
     padding-right:10px;
     text-transform: uppercase;
@@ -171,8 +171,8 @@
     }
   }
 
-  @media (max-width:641px) {
-    .oppia-hide-mobile {
+  @media (max-width: 641px) {
+    .oppia-share-exploration-footer {
       display: none;
     }
   }
