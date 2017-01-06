@@ -26,16 +26,6 @@ describe('Collection rights object factory', function() {
       'CollectionRightsObjectFactory');
   }));
 
-  it('should be able to create an empty collection rights object', function() {
-    var collectionRights =
-      CollectionRightsObjectFactory.createDummyCollectionRights();
-    expect(collectionRights.getCollectionId()).toBeUndefined();
-    expect(collectionRights.canEdit()).toBeUndefined();
-    expect(collectionRights.canUnpublish()).toBeUndefined();
-    expect(collectionRights.isPrivate()).toBeUndefined();
-    expect(collectionRights.getOwnerNames()).toEqual([]);
-  });
-
   it('should be able to set public', function() {
     var initialCollectionRightsBackendObject = {
       collection_id: 0,

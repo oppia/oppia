@@ -18,13 +18,12 @@
  */
 
 oppia.factory('CollectionRightsObjectFactory', [
-    '$rootScope',
-    function($rootScope) {
+    function() {
     var CollectionRights = function(collectionRightsObject) {
       this._collectionId = collectionRightsObject.collection_id;
       this._canEdit = collectionRightsObject.can_edit;
       this._canUnpublish = collectionRightsObject.can_unpublish;
-      $rootScope.isPrivate = collectionRightsObject.is_private;
+      this._isPrivate = collectionRightsObject.is_private;
       this._ownerNames = collectionRightsObject.owner_names;
     };
 
@@ -48,17 +47,17 @@ oppia.factory('CollectionRightsObjectFactory', [
 
     // Returns true if the collection is private.
     CollectionRights.prototype.isPrivate = function() {
-      return $rootScope.isPrivate;
+      return this._isPrivate;
     };
 
     CollectionRights.prototype.setPublic = function() {
-      $rootScope.isPrivate = false;
+      this._isPrivate = false;
     };
 
     // Sets isPrivate to true only if canUnpublish in is true.
     CollectionRights.prototype.setPrivate = function() {
       if (this.canUnpublish()) {
-        $rootScope.isPrivate = true;
+        this._isPrivate = true;
       }
     };
 
@@ -72,14 +71,6 @@ oppia.factory('CollectionRightsObjectFactory', [
     // collection python dict.
     CollectionRights.create = function(collectionRightsBackendObject) {
       return new CollectionRights(collectionRightsBackendObject);
-    };
-
-    // Create a new, empty collection rights. This is not guaranteed to pass
-    // validation tests.
-    CollectionRights.createDummyCollectionRights = function() {
-      return new CollectionRights({
-        owner_names: []
-      });
     };
 
     return CollectionRights;

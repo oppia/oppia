@@ -239,12 +239,9 @@ class CollectionRightsHandler(CollectionEditorHandler):
             else:
                 raise self.InvalidInputException(
                     'Cannot unpublish a collection.')
-        rights = rights_manager.get_collection_rights(
-            collection_id).to_dict()
-        rights['is_private'] = \
-            (rights['status'] == feconf.ACTIVITY_STATUS_PRIVATE)
         self.render_json({
-            'rights': rights
+            'rights': rights_manager.get_collection_rights(
+                collection_id).to_dict()
         })
 
 

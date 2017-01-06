@@ -43,7 +43,7 @@ oppia.directive('collectionEditorNavbar', [function() {
         $scope.isSaveInProgress = (
           CollectionEditorStateService.isSavingCollection);
 
-        CollectionRightsBackendApiService.fetchCollectionRights(
+        CollectionRightsBackendApiService.loadCollectionRights(
           $scope.collectionId).then(function(data) {
           $scope.collectionRightsObject =
             CollectionRightsObjectFactory.create(data);

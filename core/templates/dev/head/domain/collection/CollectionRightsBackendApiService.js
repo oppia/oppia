@@ -22,7 +22,7 @@ oppia.factory('CollectionRightsBackendApiService', [
     function($http, $log, $q, COLLECTION_RIGHTS_URL_TEMPLATE,
       UrlInterpolationService) {
       // Maps previously loaded collection rights to their IDs.
-      var collectionRightsCache = [];
+      var collectionRightsCache = {};
 
       var _fetchCollectionRights = function(collectionId, successCallback,
         errorCallback) {
@@ -55,13 +55,10 @@ oppia.factory('CollectionRightsBackendApiService', [
           is_public: isPublic
         };
         $http.put(collectionRightsUrl, putParams).then(function(response) {
-          // TODO(bhenning): Consolidate the backend rights domain objects and
-          // implement a frontend activity rights domain object. The rights
-          // being passed in here should be used to create one of those objects
-
-          // Check if the reponse from the backend does not contradict
+          // Check if the response from the backend does not contradict
           // putParams.
-          if (response.data.is_private === isPublic) {
+          var isPrivateResponse = (response.data.status === 'private');
+          if (isPrivateResponse === isPublic) {
             if (isPublic) {
               $log.error(
                 'Backend indicated a collection was successfully ' +
@@ -75,8 +72,14 @@ oppia.factory('CollectionRightsBackendApiService', [
               errorCallback(response.data);
             }
           } else {
+            // An additional fetch is required because the GET response object
+            // is different than that of the PUT response object.
+            _fetchCollectionRights(collectionId, function(collectionRights) {
+              // Save the fetched collection to avoid future fetches.
+              collectionRightsCache[collectionId] = collectionRights;
+            }, errorCallback);
             if (successCallback) {
-              successCallback(response.data.rights);
+              successCallback(collectionRightsCache[collectionId]);
             }
           }
         }, function(errorResponse) {
@@ -87,7 +90,7 @@ oppia.factory('CollectionRightsBackendApiService', [
       };
 
       var isCached = function(collectionId) {
-        return collectionRightsCache.hasOwnProperty(collectionId);
+        return collectionId in collectionRightsCache;
       };
 
       return {
@@ -113,14 +116,14 @@ oppia.factory('CollectionRightsBackendApiService', [
           return $q(function(resolve, reject) {
             if (isCached(collectionId)) {
               if (resolve) {
-                resolve(angular.copy(collectionRightsCache[collectionId]));
+                resolve(collectionRightsCache[collectionId]);
               }
             } else {
               _fetchCollectionRights(collectionId, function(collectionRights) {
                 // Save the fetched collection to avoid future fetches.
                 collectionRightsCache[collectionId] = collectionRights;
                 if (resolve) {
-                  resolve(angular.copy(collectionRights));
+                  resolve(collectionRightsCache[collectionId]);
                 }
               }, reject);
             }
@@ -147,6 +150,22 @@ oppia.factory('CollectionRightsBackendApiService', [
             _setCollectionStatus(
               collectionId, collectionVersion, false, resolve, reject);
           });
+        },
+
+        /**
+         * Returns true if the collection is private given the collectionId.
+         * This method will check the collection rights object exists, if so,
+         * return the result from the cache. However, this will not cache the
+         * collection rights object if it does not exist in the cache.
+         */
+        isCollectionPrivate: function(collectionId) {
+          if (isCached(collectionId)) {
+            return collectionRightsCache[collectionId].is_private;
+          } else {
+            _fetchCollectionRights(collectionId, function(collectionRights) {
+              return collectionRights.is_private;
+            });
+          }
         }
       };
     }]);

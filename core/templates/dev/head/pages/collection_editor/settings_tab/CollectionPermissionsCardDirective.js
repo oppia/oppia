@@ -26,11 +26,14 @@ oppia.directive('collectionPermissionsCard', [function() {
       'CollectionRightsBackendApiService',
       function($scope, CollectionRightsObjectFactory,
         CollectionRightsBackendApiService) {
+        $scope.collectionId = GLOBALS.collectionId;
         $scope.collectionRightsObject = null;
         $scope.hasRightsLoaded = false;
+        $scope.isPrivate =
+          CollectionRightsBackendApiService.isCollectionPrivate;
         var refreshPermissionsCard = function() {
           CollectionRightsBackendApiService.loadCollectionRights(
-            GLOBALS.collectionId).then(function(data) {
+            $scope.collectionId).then(function(data) {
             $scope.collectionRightsObject =
               CollectionRightsObjectFactory.create(data);
             $scope.hasRightsLoaded = true;

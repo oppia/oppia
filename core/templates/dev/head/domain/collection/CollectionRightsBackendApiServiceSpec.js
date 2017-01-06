@@ -84,7 +84,7 @@ describe('Collection rights backend API service', function() {
 
     $httpBackend.expect(
       'PUT', '/collection_editor_handler/rights/0').respond(200, {
-        is_private: true
+        status: 'private'
       });
     CollectionRightsBackendApiService.setCollectionPublic('0', 1).then(
       successHandler, failHandler);
@@ -102,7 +102,7 @@ describe('Collection rights backend API service', function() {
 
     $httpBackend.expect(
       'PUT', '/collection_editor_handler/rights/0').respond(200, {
-        is_private: false
+        status: 'public'
       });
     CollectionRightsBackendApiService.setCollectionPrivate('0', 1).then(
       successHandler, failHandler);
@@ -111,5 +111,45 @@ describe('Collection rights backend API service', function() {
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalled();
+  });
+
+  it('should return true if the collection is private', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect(
+      'GET', '/collection_editor_handler/rights/0').respond(200, {
+        is_private: true
+      });
+
+    CollectionRightsBackendApiService.loadCollectionRights('0').then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+    $rootScope.$digest();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+    expect(
+      CollectionRightsBackendApiService.isCollectionPrivate('0')).toBe(true);
+  });
+
+  it('should return false if the collection is not private', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect(
+      'GET', '/collection_editor_handler/rights/0').respond(200, {
+        is_private: false
+      });
+
+    CollectionRightsBackendApiService.loadCollectionRights('0').then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+    $rootScope.$digest();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+    expect(
+      CollectionRightsBackendApiService.isCollectionPrivate('0')).toBe(false);
   });
 });

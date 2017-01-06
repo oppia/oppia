@@ -13,13 +13,13 @@
 
       <div class="col-lg-7 col-md-7 col-sm-7">
         <h3>Permissions</h3>
-        <div ng-if="collectionRightsObject.isPrivate()">
+        <div ng-if="isPrivate(collectionId)">
           This collection is <strong>private</strong>.
           <br>
           <br>
           It is <strong>not shown</strong> in the Oppia library.
         </div>
-        <div ng-if="!collectionRightsObject.isPrivate()">
+        <div ng-if="!isPrivate(collectionId)">
           This collection is <strong>public</strong>: anyone can access it.
           <br>
           <br>
