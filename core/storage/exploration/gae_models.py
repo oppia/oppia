@@ -104,9 +104,9 @@ class ExplorationModel(base_models.VersionedModel):
             commit_message: str. The commit description message.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, which should give sufficient information to
-                reconstruct the commit. Each Dict always contains:
+                reconstruct the commit. Each dict always contains:
                     cmd: str. Unique command.
-                And additional arguments for that command.
+                and additional arguments for that command.
         """
         super(ExplorationModel, self).commit(
             committer_id, commit_message, commit_cmds)
@@ -120,15 +120,14 @@ class ExplorationModel(base_models.VersionedModel):
         Args:
             committer_id: str. The user_id of the user who committed the
                 change.
-            commit_type: str. Unique identifier of the type of commit.
-                Possible values are in
-                core.storage.base_models.COMMIT_TYPE_CHOICES in the base model.
+            commit_type: str. The type of commit. Possible values are in
+                core.storage.base_models.COMMIT_TYPE_CHOICES.
             commit_message: str. The commit description message.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, which should give sufficient information to
-                reconstruct the commit. Each Dict always contains:
+                reconstruct the commit. Each dict always contains:
                     cmd: str. Unique command.
-                And then additional arguments for that command.
+                and then additional arguments for that command.
         """
         super(ExplorationModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
@@ -224,15 +223,14 @@ class ExplorationRightsModel(base_models.VersionedModel):
         Args:
             committer_id: str. The user_id of the user who committed the
                 change.
-            commit_type: str. Unique identifier of commit type. Possible
-                values are in
-                core.storage.base_models.COMMIT_TYPE_CHOICES in the base model.
+            commit_type: str. The type of commit. Possible values are in
+                core.storage.base_models.COMMIT_TYPE_CHOICES.
             commit_message: str. The commit description message.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, should give sufficient information to
-                reconstruct the commit. Each Dict always contains:
+                reconstruct the commit. Each dict always contains:
                     cmd: str. Unique command.
-                And then additional arguments for that command.
+                and then additional arguments for that command.
         """
         super(ExplorationRightsModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
@@ -343,12 +341,12 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
                 returned entities starts from this datastore cursor.
                 Otherwise, the returned entities start from the beginning
                 of the full list of entities.
-            max_age: datetime.timedelta. The Maximum time duration within which
+            max_age: datetime.timedelta. The maximum time duration within which
                 commits are needed.
 
         Returns:
             3-tuple of (results, cursor, more) which were created which were
-            created no earlier than max_age before the current time.
+            created no earlier than max_age before the current time where:
                 results: List of query results.
                 cursor: str or None. A query cursor pointing to the next
                     batch of results. If there are no more results, this will
@@ -446,7 +444,7 @@ class ExpSummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_non_private(cls):
-        """Returns an iterable with non-private expSummary models.
+        """Returns an iterable with non-private ExpSummary models.
 
         Returns:
             iterable. An iterable with non-private ExpSummary models.
@@ -460,7 +458,7 @@ class ExpSummaryModel(base_models.BaseModel):
     @classmethod
     def get_top_rated(cls, limit):
         """Fetches the top-rated exp summaries that are public in descending
-            order of scaled_average_rating.
+        order of scaled_average_rating.
 
         Args:
             limit: int. The maximum number of results to return.
@@ -481,7 +479,7 @@ class ExpSummaryModel(base_models.BaseModel):
     @classmethod
     def get_private_at_least_viewable(cls, user_id):
         """Fetches private exp summaries that are at least viewable by the
-            given user.
+        given user.
 
         Args:
             user_id: The id of the given user.
@@ -527,7 +525,8 @@ class ExpSummaryModel(base_models.BaseModel):
 
         Returns:
             An iterable with exp summaries that are recently published. The
-                returned list is sorted by the time of publication.
+                returned list is sorted by the time of publication with latest
+                being first in the list.
         """
         return ExpSummaryModel.query().filter(
             ndb.OR(ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLIC,
