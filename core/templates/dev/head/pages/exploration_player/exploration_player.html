@@ -29,24 +29,24 @@
       .oppia-exploration-header {
         display: block;
         float: right;
-        margin-top: 3px;
-        max-height: 2ch;
-        max-width: 22ch;
+        max-width: 240px;
         overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
       .oppia-navbar-collapse.collapse {
         display: block;
       }
     }
     @media(max-width: 600px) {
-      .oppia-exploration-header {
-        max-width: 16ch;
-      }
       .oppia-logo {
         height: 48px;
         margin-top: 8px;
         margin-left: 0;
         max-width: none;
+      }
+      .oppia-exploration-header {
+        max-width: 180px;
       }
       .oppia-navbar-brand-name {
         max-width: 35px;
@@ -56,9 +56,9 @@
         display: none;
       }
     }
-    @media(max-width: 450px) {
+    @media(max-width: 400px) {
       .oppia-exploration-header {
-        max-width: 12ch;
+        max-width: 130px;
       }
     }
   </style>
