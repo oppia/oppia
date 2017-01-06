@@ -14,7 +14,7 @@
               <a id="dropdownMenu2" class="dropdown-toggle" ng-class="{'hovered-text':hovering}" 
                  data-toggle="dropdown" ng-if="contributorNames.length > 0">
                 <h4 translate="I18N_FOOTER_AUTHOR_PROFILES" class="author-profile-text"
-                    ng-class="{'hovered-text':hovering, 'not-hovered' : !hovering}"></h4>   
+                    ng-class="{'hovered-text':hovering, 'not-hovered' : !hovering}"></h4>
               </a>
               <ul class="author-profile-dropdown-menu dropdown-menu" aria-labelledby="dropdownMenu2" role="menu">
                 <li ng-repeat="name in contributorNames | limitTo: 5">
@@ -165,12 +165,9 @@
     float: left;
   }
 
-  @media (max-width: 480px) {
-    .oppia-exploration-footer .oppia-exploration-footer-sharing-links ul {
-      display: block;
-      float: right;
-      margin: -8px;
-      margin-right: -25px;
+  @media (max-width: 420px) {
+    .oppia-exploration-footer-sharing-links {
+      display: none;
     }
   }
 
