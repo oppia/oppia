@@ -23,39 +23,43 @@
 
   {{dependencies_html}}
   <style>
-   @media(max-width:768px) {
-     /*To prevent Navbar From Collapsing On Exploration Player, so that title can appear*/
-     .oppia-navbar-collapse.collapse {
-       display: block;
-     }
-   }
-   @media(max-width:600px) {
-     .oppia-navbar-breadcrumb-icon {
-       display: none;
-     }
-     .oppia-exploration-header {
-       font-size: 18px;
-     }
-     .oppia-navbar-brand-name {
-       max-width: 35px;
-       overflow: hidden;
-     }
-     .oppia-logo {
-       height: 48px;
-       margin-top: 8px;
-       margin-left: 0;
-       max-width:none;
-     }
+    @media(max-width: 768px) {
+      /* This prevents the navbar from collapsing in the exploration page,
+      so that the exploration title can be shown. */
+      .oppia-exploration-header {
+        display: block;
+        float: right;
+        margin-top: 2px;
+        max-height: 2ch;
+        max-width: 22ch;
+        overflow: hidden;
+      }
+      .oppia-navbar-collapse.collapse {
+        display: block;
+      }
+    }
+    @media(max-width: 600px) {
+      .oppia-exploration-header {
+        max-width: 16ch;
+      }
+      .oppia-logo {
+        height: 48px;
+        margin-top: 8px;
+        margin-left: 0;
+        max-width:none;
+      }
+      .oppia-navbar-brand-name {
+        max-width: 35px;
+        overflow: hidden;
+      }
+      .oppia-navbar-breadcrumb-icon {
+        display: none;
+      }
    }
    @media(max-width: 450px) {
-     .oppia-exploration-header {
-       float: right;
-       display: block;
-       max-width: 12ch;
-       max-height: 2ch;
-       overflow: hidden;
-       margin-top: 2px;
-     }
+      .oppia-exploration-header {
+        max-width: 12ch;
+      }
    }
   </style>
 {% endblock header_js %}
