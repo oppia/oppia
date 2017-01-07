@@ -856,14 +856,19 @@ oppia.factory('explorationStatesService', [
     return {
       init: function(states) {
         _states = {};
+        console.log('EditorService.js:859');
         console.log(JSON.parse(JSON.stringify(states)));
         for (var stateName in states) {
           if (states.hasOwnProperty(stateName)) {
             var stateData = states[stateName];
+            console.log('EditorService.js: 865');
             console.log(angular.copy(stateData));
-            _states[stateName] = StateObjectFactory.create(stateName, stateData);
-            // console.log("state");
-            // console.log(_states[stateName])
+            console.log(angular.copy(stateData.interaction.answer_groups));
+            _states[stateName] = StateObjectFactory.create(
+              stateName, stateData);
+            console.log(_states[stateName].interaction.answer_groups);
+            // Console.log("state");
+            // Console.log(_states[stateName])
           }
         }
         console.log(angular.copy(_states));

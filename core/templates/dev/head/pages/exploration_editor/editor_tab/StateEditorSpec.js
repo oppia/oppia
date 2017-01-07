@@ -232,15 +232,7 @@ describe('State Editor controller', function() {
       // Set the currently loaded interaction ID.
       siis.savedMemento = 'TextInput';
 
-      var answerGroup = agf.create([{
-                rule_type: 'Contains',
-                inputs: {
-                  x: 'Test'
-                }
-              }], {
-                feedback: 'Feedback',
-                dest: 'State'
-              });
+      console.log('LINE 245: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
 
       ess.init({
         State: {
@@ -250,7 +242,18 @@ describe('State Editor controller', function() {
           }],
           interaction: {
             id: 'TextInput',
-            answer_groups: [answerGroup],
+            answer_groups: [{
+              rule_specs: [{
+                rule_type: 'Contains',
+                inputs: {
+                  x: 'Test'
+                }
+              }],
+              outcome: {
+                feedback: 'Feedback',
+                dest: 'State'
+              }
+            }],
             default_outcome: {
               feedback: 'Default',
               dest: 'State'
@@ -262,6 +265,9 @@ describe('State Editor controller', function() {
       });
 
       var state = ess.getState('State');
+      console.log('STTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTATE');
+      console.log(state);
+      console.log(state.interaction.answer_groups);
       rs.init({
         answerGroups: state.interaction.answer_groups,
         defaultOutcome: state.interaction.default_outcome,

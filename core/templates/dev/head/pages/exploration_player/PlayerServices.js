@@ -130,6 +130,7 @@ oppia.factory('oppiaPlayerService', [
     // manual parameter changes (in editor preview mode).
     var initParams = function(manualParamChanges) {
       var baseParams = {};
+      console.log(angular.copy(exploration));
       for (var paramName in exploration.paramSpecs) {
         // TODO(sll): This assumes all parameters are of type
         // UnicodeString. We should generalize this to other default values
@@ -161,9 +162,16 @@ oppia.factory('oppiaPlayerService', [
       populateExploration: function(explorationData, manualParamChanges) {
         if (_editorPreviewMode) {
           console.log(angular.copy(explorationData));
-          exploration = ExplorationObjectFactory.create(explorationData);
-          initParams(manualParamChanges);
-          console.log(angular.copy(exploration));
+          var explorationDataUrl = '/createhandler/data/' + _explorationId;
+          $http.get(explorationDataUrl, {
+            params: {
+              apply_draft: true
+            }
+          }).then(function(response) {
+            console.log(angular.copy(response.data));
+            exploration = ExplorationObjectFactory.create(response.data);
+            initParams(manualParamChanges);
+          });
         } else {
           throw 'Error: cannot populate exploration in learner mode.';
         }
@@ -200,6 +208,7 @@ oppia.factory('oppiaPlayerService', [
             (version ? '?v=' + version : ''));
           $http.get(explorationDataUrl).then(function(response) {
             var data = response.data;
+            console.log(angular.copy(data.exploration));
             exploration = ExplorationObjectFactory.create(data.exploration);
             version = data.version;
 
