@@ -74,10 +74,14 @@ class SentEmailModel(base_models.BaseModel):
     @classmethod
     def _generate_id(cls, intent):
     	"""Generates full message ID given the intent.
+
         Args:
-            intent: str. The intent of the email.
+            intent: str. The intent string, i.e. the purpose of the email.
+            Valid intent strings are defined in feconf.py.
+
         Returns:
-            The message ID generated through given intent.
+            The ID of the message generated for a given intent.
+
         Raises:
             Exception: The id generator for SentEmailModel is producing
             too many collisions.
@@ -108,10 +112,10 @@ class SentEmailModel(base_models.BaseModel):
             recipient_email: str. The email address of the recipient.
             sender_id: str. The user ID of the email sender.
             sender_email: str. The email address used to send the notification.
-            intent: str. The intent of the email.
+            intent: str. The intent string, i.e. the purpose of the email.
             subject: str. The subject line of the email.
             html_body: str. The HTML content of the email body.
-            sent_datetime: str. The datetime the email was sent, in UTC.
+            sent_datetime: Date and time. The datetime the email was sent, in UTC.
         """
         instance_id = cls._generate_id(intent)
         email_model_instance = cls(
@@ -123,7 +127,7 @@ class SentEmailModel(base_models.BaseModel):
         email_model_instance.put()
 
     def put(self):
-    	"""Put the email instance into the messages."""
+    	"""Put the email instance into the messages by hashing it."""
         email_hash = self._generate_hash(
             self.recipient_id, self.subject, self.html_body)
         self.email_hash = email_hash
@@ -140,11 +144,15 @@ class SentEmailModel(base_models.BaseModel):
 
         Args:
             email_hash: str. The hash value of the email.
-            sent_datetime_lower_bound: str. The lower bound on sent_datetime.
+            sent_datetime_lower_bound: Date and time. The lower bound on 
+            sent_datetime of the email to be searched.
+
         Returns:
-            The message given the hash value of email.
+            The message searched given the hash value of email.
+
         Raises:
-            Exception: The datetime of the hashed email is lower than bound given.
+            Exception: The datetime of the hashed email is less than 
+            the lower bound given.
         """
 
         if sent_datetime_lower_bound is not None:
@@ -167,12 +175,14 @@ class SentEmailModel(base_models.BaseModel):
     def _generate_hash(cls, recipient_id, email_subject, email_body):
         """Generate hash for a given recipient_id, email_subject and cleaned
         email_body.
+
         Args:
             recipient_id: str. The user ID of the email recipient.
             email_subject: str. The subject line of the email.
             email_body: str. The HTML content of the email body.
+
         Returns:
-            Generated hash value of the email.
+            Generated hash value of the email in the messages list.
 
         """
         hash_value = utils.convert_to_hash(
@@ -186,13 +196,15 @@ class SentEmailModel(base_models.BaseModel):
         """Check for a given recipient_id, email_subject and cleaned
         email_body, whether a similar message has been sent in the last
         DUPLICATE_EMAIL_INTERVAL_MINS.
+
 		Args:
             recipient_id: str. The user ID of the email recipient.
             email_subject: str. The subject line of the email.
             email_body: str. The HTML content of the email body.
+
         Returns:
-            True if duplicate exists in the messages.
-            False if duplicate does not exists in the messages.
+            True if the message already existed in the messages.
+            False if the message did not exist in the messages.
 
         """
 
@@ -251,15 +263,18 @@ class BulkEmailModel(base_models.BaseModel):
             cls, instance_id, recipient_ids, sender_id, sender_email,
             intent, subject, html_body, sent_datetime):
         """Creates a new BulkEmailModel entry.
+        
         Args:
-            instance_id: str. The randomly generated string of length 12.
+            instance_id: str. The ID of the instance.(randomly generated string
+            of length 12)
             recipient_ids: str. The user IDs of the email recipients.
             sender_id: str. The user ID of the email sender.
             sender_email: str. The email address used to send the notification.
-            intent: str. The intent of the email.
+            intent: str. The intent string, i.e. the purpose of the email.
             subject: str. The subject line of the email.
             html_body: str. The HTML content of the email body.
-            sent_datetime: str. The datetime the email was sent, in UTC.
+            sent_datetime: Date and time. The date and time the email was sent,
+            in UTC.
 
         """
         email_model_instance = cls(
