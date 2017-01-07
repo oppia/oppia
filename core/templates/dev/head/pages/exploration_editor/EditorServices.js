@@ -91,7 +91,7 @@ oppia.factory('explorationData', [
             }
           }).then(function(response) {
             $log.info('Retrieved exploration data.');
-            $log.info(JSON.parse(JSON.stringify(response.data)));
+            $log.info(response.data);
 
             explorationData.data = response.data;
 
@@ -801,10 +801,7 @@ oppia.factory('explorationStatesService', [
     };
 
     var _setState = function(stateName, stateData, refreshGraph) {
-      console.log(angular.copy(stateData));
-      console.log(angular.copy(stateName));
       _states[stateName] = angular.copy(stateData);
-      console.log(angular.copy(_states));
       if (refreshGraph) {
         $rootScope.$broadcast('refreshGraph');
       }
@@ -851,7 +848,6 @@ oppia.factory('explorationStatesService', [
         // a change in the customization args dict anyway, so the graph will
         // get refreshed after both properties have been updated.
         var refreshGraph = (backendName !== 'widget_id');
-        console.log(angular.copy(newStateData));
         _setState(stateName, newStateData, refreshGraph);
       }
     };
