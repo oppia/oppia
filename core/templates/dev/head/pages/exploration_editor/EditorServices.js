@@ -1639,14 +1639,12 @@ oppia.factory('newStateTemplateService',
     // NB: clients should ensure that the desired state name is valid.
     getNewStateTemplate: function(newStateName) {
       //StateObjectFactory.create(newStateName);
-      console.log(GLOBALS.NEW_STATE_TEMPLATE);
       var newState = StateObjectFactory.create(newStateName, {
         content: GLOBALS.NEW_STATE_TEMPLATE.content,
         interaction: GLOBALS.NEW_STATE_TEMPLATE.interaction,
         param_changes: GLOBALS.NEW_STATE_TEMPLATE.param_changes
       });
       newState.interaction.default_outcome.dest = newStateName;
-      console.log(angular.copy(newState));
       return newState;
     }
   };

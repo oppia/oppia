@@ -32,7 +32,6 @@ oppia.factory('parameterMetadataService', [
 
     var getMetadataFromParamChanges = function(paramChanges) {
       var result = [];
-      console.log(angular.copy(paramChanges));
       for (var i = 0; i < paramChanges.length; i++) {
         var pc = paramChanges[i];
 
@@ -86,7 +85,6 @@ oppia.factory('parameterMetadataService', [
     var getStateParamMetadata = function(state) {
       // First, the state param changes are applied: we get their values
       // and set the params.
-      console.log(angular.copy(state));
       var result = getMetadataFromParamChanges(state.paramChanges);
 
       // Next, the content is evaluated.
@@ -162,7 +160,6 @@ oppia.factory('parameterMetadataService', [
             allParamNames.push(expParamMetadataItem.paramName);
           }
         });
-        console.log(angular.copy(states));
         for (var stateName in states) {
           stateParamMetadatas[stateName] = getStateParamMetadata(
             states[stateName]);

@@ -119,18 +119,8 @@ oppia.controller('PreviewTab', [
     };
 
     $scope.loadPreviewState = function(stateName, manualParamChanges) {
-      // There is a race condition here that can sometimes occur when the editor
-      // preview tab is loaded: the exploration in PlayerServices is populated,
-      // but with null values for the category, init_state_name, etc. fields,
-      // presumably because the various exploration property services have not
-      // yet been updated. The timeout alleviates this.
-      // TODO(sll): Refactor the editor frontend to create a single place for
-      // obtaining the current version of the exploration, so that the use of
-      // $timeout isn't necessary.
-      $timeout(function() {
-        oppiaPlayerService.populateExploration(manualParamChanges);
-        $scope.isExplorationPopulated = true;
-      }, 200);
+      oppiaPlayerService.applyManualParamChanges(manualParamChanges);
+      $scope.isExplorationPopulated = true;
     };
 
     $scope.resetPreview = function() {

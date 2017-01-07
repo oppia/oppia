@@ -30,14 +30,14 @@ oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 // and audit it to ensure it behaves differently for learner mode and editor
 // mode. Add tests to ensure this.
 oppia.factory('oppiaPlayerService', [
-  '$http', '$rootScope', '$q', 'LearnerParamsService',
+  '$http', '$rootScope', '$q', '$timeout', 'LearnerParamsService',
   'alertsService', 'AnswerClassificationService', 'explorationContextService',
   'PAGE_CONTEXT', 'oppiaExplorationHtmlFormatterService',
   'playerTranscriptService', 'ExplorationObjectFactory',
   'expressionInterpolationService', 'StatsReportingService',
   'UrlInterpolationService',
   function(
-      $http, $rootScope, $q, LearnerParamsService,
+      $http, $rootScope, $q, $timeout, LearnerParamsService,
       alertsService, AnswerClassificationService, explorationContextService,
       PAGE_CONTEXT, oppiaExplorationHtmlFormatterService,
       playerTranscriptService, ExplorationObjectFactory,
@@ -50,6 +50,7 @@ oppia.factory('oppiaPlayerService', [
     var answerIsBeingProcessed = false;
 
     var exploration = null;
+    var manualParamChanges = null;
     var version = GLOBALS.explorationVersion;
 
     var randomFromArray = function(arr) {
@@ -156,17 +157,9 @@ oppia.factory('oppiaPlayerService', [
       // This should only be used in editor preview mode. It sets the
       // exploration data from what's currently specified in the editor, and
       // also initializes the parameters to empty strings.
-      populateExploration: function(manualParamChanges) {
+      applyManualParamChanges: function(manualParamChangesToApply) {
         if (_editorPreviewMode) {
-          var explorationDataUrl = '/createhandler/data/' + _explorationId;
-          $http.get(explorationDataUrl, {
-            params: {
-              apply_draft: true
-            }
-          }).then(function(response) {
-            exploration = ExplorationObjectFactory.create(response.data);
-            initParams(manualParamChanges);
-          });
+          manualParamChanges = manualParamChangesToApply;
         } else {
           throw 'Error: cannot populate exploration in learner mode.';
         }
@@ -190,13 +183,16 @@ oppia.factory('oppiaPlayerService', [
         playerTranscriptService.init();
 
         if (_editorPreviewMode) {
-          if (exploration) {
+          var explorationDataUrl = '/createhandler/data/' + _explorationId;
+          $http.get(explorationDataUrl, {
+            params: {
+              apply_draft: true
+            }
+          }).then(function(response) {
+            exploration = ExplorationObjectFactory.create(response.data);
+            initParams(manualParamChanges);
             _loadInitialState(successCallback);
-          } else {
-            alertsService.addWarning(
-              'Could not initialize exploration, because it was not yet ' +
-              'populated.');
-          }
+          });
         } else {
           var explorationDataUrl = (
             '/explorehandler/init/' + _explorationId +
