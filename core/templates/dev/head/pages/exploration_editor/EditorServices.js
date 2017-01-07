@@ -801,7 +801,10 @@ oppia.factory('explorationStatesService', [
     };
 
     var _setState = function(stateName, stateData, refreshGraph) {
+      console.log(angular.copy(stateData));
+      console.log(angular.copy(stateName));
       _states[stateName] = angular.copy(stateData);
+      console.log(angular.copy(_states));
       if (refreshGraph) {
         $rootScope.$broadcast('refreshGraph');
       }
@@ -848,6 +851,7 @@ oppia.factory('explorationStatesService', [
         // a change in the customization args dict anyway, so the graph will
         // get refreshed after both properties have been updated.
         var refreshGraph = (backendName !== 'widget_id');
+        console.log(angular.copy(newStateData));
         _setState(stateName, newStateData, refreshGraph);
       }
     };
@@ -856,33 +860,16 @@ oppia.factory('explorationStatesService', [
     return {
       init: function(states) {
         _states = {};
-        console.log('EditorService.js:859');
-        console.log(JSON.parse(JSON.stringify(states)));
         for (var stateName in states) {
           if (states.hasOwnProperty(stateName)) {
             var stateData = states[stateName];
-            console.log('EditorService.js: 865');
-            console.log(angular.copy(stateData));
-            console.log(angular.copy(stateData.interaction.answer_groups));
             _states[stateName] = StateObjectFactory.create(
               stateName, stateData);
-            console.log(_states[stateName].interaction.answer_groups);
-            // Console.log("state");
-            // Console.log(_states[stateName])
           }
         }
-        console.log(angular.copy(_states));
       },
       getStates: function() {
         return angular.copy(_states);
-      },
-      getStatesAsBackendDicts: function() {
-        var statesAsBackendDicts = {};
-        for (state in _states) {
-          statesAsBackendDicts[state] = _states[state].toBackendDict();
-        }
-        console.log(angular.copy(statesAsBackendDicts));
-        return statesAsBackendDicts;
       },
       hasState: function(stateName) {
         return _states.hasOwnProperty(stateName);

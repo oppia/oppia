@@ -232,8 +232,6 @@ describe('State Editor controller', function() {
       // Set the currently loaded interaction ID.
       siis.savedMemento = 'TextInput';
 
-      console.log('LINE 245: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
-
       ess.init({
         State: {
           content: [{
@@ -265,9 +263,7 @@ describe('State Editor controller', function() {
       });
 
       var state = ess.getState('State');
-      console.log('STTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTATE');
-      console.log(state);
-      console.log(state.interaction.answer_groups);
+
       rs.init({
         answerGroups: state.interaction.answer_groups,
         defaultOutcome: state.interaction.default_outcome,

@@ -18,10 +18,9 @@
  */
 
 oppia.factory('StateObjectFactory', [
-  'AnswerGroupObjectFactory', 
+  'AnswerGroupObjectFactory',
   function(AnswerGroupObjectFactory) {
   var State = function(name, content, interaction, paramChanges) {
-    console.log(paramChanges);
     this.name = name;
     this.content = content;
     this.interaction = interaction;
@@ -29,27 +28,16 @@ oppia.factory('StateObjectFactory', [
 
     var answerGroups = [];
     for (var answerGroup in interaction.answer_groups) {
-      console.log(interaction.answer_groups);
       var answerGroupData = interaction.answer_groups[answerGroup];
-      console.log(angular.copy(answerGroupData));
       answerGroups.push(
         AnswerGroupObjectFactory.create(
           answerGroupData.rule_specs, answerGroupData.outcome));
     }
     this.interaction.answer_groups = answerGroups;
-    console.log(angular.copy(this));
   };
 
   // Instance methods.
   State.prototype.toBackendDict = function() {
-    // var answerGroups = [];
-    // console.log(angular.copy(this.interaction.answer_groups));
-    // for (answer_group in this.interaction.answer_groups) {
-    //   answerGroups.push(this.interaction
-    //     .answer_groups[answer_group].toBackendDict());
-    // }
-    // this.interaction.answer_groups = answerGroups;
-
     return {
       content: this.content,
       interaction: this.interaction,
@@ -60,8 +48,6 @@ oppia.factory('StateObjectFactory', [
   // Static class methods. Note that "this" is not available in
   // static contexts.
   State.create = function(stateName, stateDict) {
-    console.log(angular.copy(stateDict))
-    console.log(angular.copy(stateDict.param_changes));
     return new State(
       stateName,
       stateDict.content,

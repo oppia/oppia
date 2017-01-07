@@ -43,7 +43,6 @@ oppia.factory('AnswerClassificationService', [
     var classifyAnswer = function(
         answer, answerGroups, defaultOutcome, interactionRulesService) {
       // Find the first group that contains a rule which returns true
-      console.log(angular.copy(answerGroups));
       for (var i = 0; i < answerGroups.length; i++) {
         for (var j = 0; j < answerGroups[i].ruleSpecs.length; j++) {
           var ruleSpec = answerGroups[i].ruleSpecs[j];
@@ -97,12 +96,10 @@ oppia.factory('AnswerClassificationService', [
       getMatchingClassificationResult: function(
           explorationId, oldState, answer, isInEditorMode,
           interactionRulesService) {
-        console.log(angular.copy(oldState));
         var deferred = $q.defer();
         var result = null;
         var answerGroups = oldState.interaction.answer_groups;
         var defaultOutcome = oldState.interaction.default_outcome;
-        console.log(angular.copy(answerGroups));
         if (interactionRulesService) {
           result = classifyAnswer(
             answer, answerGroups, defaultOutcome, interactionRulesService);

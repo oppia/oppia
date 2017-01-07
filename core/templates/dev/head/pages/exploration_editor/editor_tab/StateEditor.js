@@ -246,9 +246,7 @@ oppia.factory('trainingDataService', [
 
       // Remove the answer from all answer groups.
       for (var i = 0; i < answerGroups.length; i++) {
-        console.log('ANSWER GROUPPPPPPPPPPPPPPPPPPPPPPPPPPP');
         var answerGroup = answerGroups[i];
-        console.log(answerGroup);
         var ruleSpecs = answerGroup.ruleSpecs;
         var trainingData = null;
         var classifierIndex = -1;

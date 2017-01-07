@@ -99,9 +99,7 @@ oppia.factory('oppiaPlayerService', [
 
     // This should only be called when 'exploration' is non-null.
     var _loadInitialState = function(successCallback) {
-      console.log(angular.copy(exploration));
       var initialState = exploration.getInitialState();
-      console.log(angular.copy(initialState));
       var oldParams = LearnerParamsService.getAllParams();
       var newParams = makeParams(
         oldParams, initialState.paramChanges, [oldParams]);
@@ -130,7 +128,6 @@ oppia.factory('oppiaPlayerService', [
     // manual parameter changes (in editor preview mode).
     var initParams = function(manualParamChanges) {
       var baseParams = {};
-      console.log(angular.copy(exploration));
       for (var paramName in exploration.paramSpecs) {
         // TODO(sll): This assumes all parameters are of type
         // UnicodeString. We should generalize this to other default values
@@ -159,16 +156,14 @@ oppia.factory('oppiaPlayerService', [
       // This should only be used in editor preview mode. It sets the
       // exploration data from what's currently specified in the editor, and
       // also initializes the parameters to empty strings.
-      populateExploration: function(explorationData, manualParamChanges) {
+      populateExploration: function(manualParamChanges) {
         if (_editorPreviewMode) {
-          console.log(angular.copy(explorationData));
           var explorationDataUrl = '/createhandler/data/' + _explorationId;
           $http.get(explorationDataUrl, {
             params: {
               apply_draft: true
             }
           }).then(function(response) {
-            console.log(angular.copy(response.data));
             exploration = ExplorationObjectFactory.create(response.data);
             initParams(manualParamChanges);
           });
@@ -208,7 +203,6 @@ oppia.factory('oppiaPlayerService', [
             (version ? '?v=' + version : ''));
           $http.get(explorationDataUrl).then(function(response) {
             var data = response.data;
-            console.log(angular.copy(data.exploration));
             exploration = ExplorationObjectFactory.create(data.exploration);
             version = data.version;
 
@@ -277,10 +271,8 @@ oppia.factory('oppiaPlayerService', [
         }
 
         answerIsBeingProcessed = true;
-        console.log(angular.copy(exploration));
         var oldState = exploration.getState(
           playerTranscriptService.getLastStateName());
-        console.log(angular.copy(oldState));
         AnswerClassificationService.getMatchingClassificationResult(
           _explorationId, oldState, answer, false, interactionRulesService
         ).then(function(classificationResult) {

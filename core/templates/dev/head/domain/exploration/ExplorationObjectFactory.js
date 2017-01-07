@@ -38,7 +38,6 @@ oppia.factory('ExplorationObjectFactory', [
         this.states[stateName] = StateObjectFactory.create(
           stateName, states[stateName]);
       }
-      console.log(angular.copy(this));
     };
 
     // Instance methods
@@ -125,7 +124,6 @@ oppia.factory('ExplorationObjectFactory', [
     // Static class methods. Note that "this" is not available in
     // static contexts.
     Exploration.create = function(explorationDict) {
-      console.log(angular.copy(explorationDict));
       return new Exploration(
         explorationDict.init_state_name,
         explorationDict.param_changes,
