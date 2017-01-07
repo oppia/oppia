@@ -391,7 +391,7 @@ def _pre_commit_linter(all_files):
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
     node_path = os.path.join(
-        parent_dir, 'oppia_tools', 'node-4.2.1', 'bin', 'node')
+        parent_dir, 'oppia_tools', 'node-6.9.1', 'bin', 'node')
     jscs_path = os.path.join(
         parent_dir, 'node_modules', 'jscs', 'bin', 'jscs')
 

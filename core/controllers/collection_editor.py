@@ -110,6 +110,8 @@ class CollectionEditorPage(CollectionEditorHandler):
             'collection_id': collection.id,
             'is_private': rights_manager.is_collection_private(collection_id),
             'nav_mode': feconf.NAV_MODE_CREATE,
+            'owner_names': rights_manager.get_collection_owner_names(
+                collection_id),
             'title': collection.title,
             'SHOW_COLLECTION_NAVIGATION_TAB_HISTORY': (
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_HISTORY),

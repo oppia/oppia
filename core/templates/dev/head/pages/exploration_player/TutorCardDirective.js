@@ -35,47 +35,6 @@ oppia.animation('.conversation-skin-responses-animate-slide', function() {
   };
 });
 
-oppia.animation('.conversation-skin-animate-tutor-card-content', function() {
-  var animateCardChange = function(element, className, done) {
-    if (className !== 'animate-card-change') {
-      return;
-    }
-
-    var currentHeight = element.height();
-    var expectedNextHeight = $(
-      '.conversation-skin-future-tutor-card ' +
-      '.conversation-skin-tutor-card-content'
-    ).height();
-
-    // Fix the current card height, so that it does not change during the
-    // animation, even though its contents might.
-    element.css('height', currentHeight);
-
-    jQuery(element).animate({
-      opacity: 0
-    }, TIME_FADEOUT_MSEC).animate({
-      height: expectedNextHeight
-    }, TIME_HEIGHT_CHANGE_MSEC).animate({
-      opacity: 1
-    }, TIME_FADEIN_MSEC, function() {
-      element.css('height', '');
-      done();
-    });
-
-    return function(cancel) {
-      if (cancel) {
-        element.css('opacity', '1.0');
-        element.css('height', '');
-        element.stop();
-      }
-    };
-  };
-
-  return {
-    addClass: animateCardChange
-  };
-});
-
 oppia.directive('tutorCard', [function() {
   return {
     restrict: 'E',
@@ -91,11 +50,13 @@ oppia.directive('tutorCard', [function() {
       'playerPositionService', 'playerTranscriptService',
       'ExplorationPlayerStateService', 'windowDimensionsService',
       'urlService', 'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX',
+      'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
       function(
         $scope, oppiaPlayerService, UrlInterpolationService,
         playerPositionService, playerTranscriptService,
         ExplorationPlayerStateService, windowDimensionsService,
-        urlService, TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX) {
+        urlService, TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX,
+        CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED) {
         var updateActiveCard = function() {
           var index = playerPositionService.getActiveCardIndex();
           if (index === null) {
@@ -119,6 +80,8 @@ oppia.directive('tutorCard', [function() {
         $scope.waitingForOppiaFeedback = false;
 
         $scope.isIframed = urlService.isIframed();
+
+        $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
 
         $scope.OPPIA_AVATAR_IMAGE_URL = (
           UrlInterpolationService.getStaticImageUrl(
@@ -161,16 +124,8 @@ oppia.directive('tutorCard', [function() {
               $scope.activeCard.stateName);
         };
 
-        $scope.$on('activeCardChanged', function() {
+        $scope.$on(EVENT_ACTIVE_CARD_CHANGED, function() {
           updateActiveCard();
-        });
-
-        $scope.$on('destinationCardAvailable', function(event, card) {
-          $scope.upcomingContentHtml = card.upcomingContentHtml;
-          $scope.upcomingParams = card.upcomingParams;
-          $scope.upcomingStateName = card.upcomingStateName;
-          $scope.upcomingInlineInteractionHtml = (
-            card.upcomingInlineInteractionHtml);
         });
 
         $scope.$on('oppiaFeedbackAvailable', function() {

@@ -158,6 +158,9 @@ SENDER_VALIDATORS = {
         config_domain.WHITELISTED_EMAIL_SENDERS.value),
     feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT: (
         lambda x: user_services.get_username(x) in
+        config_domain.WHITELISTED_EMAIL_SENDERS.value),
+    feconf.BULK_EMAIL_INTENT_TEST: (
+        lambda x: user_services.get_username(x) in
         config_domain.WHITELISTED_EMAIL_SENDERS.value)
 }
 
@@ -525,13 +528,13 @@ def send_role_notification_email(
         raise Exception(
             'Invalid role: %s' % recipient_role)
 
-    role_descriptipn = EDITOR_ROLE_EMAIL_HTML_ROLES[recipient_role]
-    rights_html = EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE[role_descriptipn]
+    role_description = EDITOR_ROLE_EMAIL_HTML_ROLES[recipient_role]
+    rights_html = EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE[role_description]
 
     email_subject = email_subject_template % exploration_title
     email_body = email_body_template % (
         recipient_user_settings.username, inviter_user_settings.username,
-        role_descriptipn, exploration_id, exploration_title, rights_html,
+        role_description, exploration_id, exploration_title, rights_html,
         exploration_id, EMAIL_FOOTER.value)
 
     _send_email(
@@ -832,3 +835,11 @@ def send_user_query_email(
         recipient_ids, sender_id, email_intent, email_subject, email_body,
         sender_email, sender_name, bulk_email_model_id)
     return bulk_email_model_id
+
+
+def send_test_email_for_bulk_emails(tester_id, email_subject, email_body):
+    tester_name = user_services.get_username(tester_id)
+    tester_email = user_services.get_email_from_user_id(tester_id)
+    return _send_email(
+        tester_id, tester_id, feconf.BULK_EMAIL_INTENT_TEST,
+        email_subject, email_body, tester_email, sender_name=tester_name)
