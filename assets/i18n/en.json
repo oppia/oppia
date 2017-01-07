@@ -210,6 +210,7 @@
     "I18N_PREFERENCES_EMAIL": "Email",
     "I18N_PREFERENCES_EMAIL_EXPLAIN": "Only moderators and site admins can see this.",
     "I18N_PREFERENCES_EMAIL_RECEIVE_NEWS": "Receive news and updates about the site",
+    "I18N_PREFERENCES_EMAIL_RECEIVE_SUBSCRIPTION_NEWS": "Receive emails when a creator you've subscribed to publishes a new exploration",
     "I18N_PREFERENCES_HEADING": "Preferences",
     "I18N_PREFERENCES_HEADING_SUBTEXT": "Any changes that you make on this page will be auto-saved.",
     "I18N_PREFERENCES_PAGE_TITLE": "Change your profile preferences - Oppia",
