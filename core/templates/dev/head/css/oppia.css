@@ -882,7 +882,11 @@ textarea {
     display: none;
   }
 }
-
+@media(max-width: 600px) {
+  .oppia-navbar-breadcrumb {
+    margin-top: 3px;
+  }
+}
 
 /* Show the navbar submenu dropdowns on-hover rather than on-click, if the
    screen size is large enough. */
