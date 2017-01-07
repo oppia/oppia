@@ -62,6 +62,7 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Before each individual test, create a dummy exploration."""
+
         super(ExplorationServicesUnitTests, self).setUp()
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -317,6 +318,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_retrieval_of_explorations(self):
         """Test the get_exploration_by_id() method."""
+
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             exp_services.get_exploration_by_id('fake_eid')
 
@@ -357,6 +359,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_soft_deletion_of_explorations(self):
         """Test that soft deletion of explorations works correctly."""
+
         # TODO(sll): Add tests for deletion of states and version snapshots.
 
         self.save_new_default_exploration(self.EXP_ID, self.owner_id)
@@ -388,6 +391,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_hard_deletion_of_explorations(self):
         """Test that hard deletion of explorations works correctly."""
+
         self.save_new_default_exploration(self.EXP_ID, self.owner_id)
         # The exploration shows up in queries.
         self.assertEqual(
@@ -412,6 +416,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_summaries_of_hard_deleted_explorations(self):
         """Test that summaries of hard deleted explorations are
         correctly deleted."""
+
         self.save_new_default_exploration(self.EXP_ID, self.owner_id)
 
         exp_services.delete_exploration(
@@ -519,6 +524,7 @@ class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
 
     def test_loading_and_validation_and_deletion_of_demo_explorations(self):
         """Test loading, validation and deletion of the demo explorations."""
+
         self.assertEqual(
             exp_models.ExplorationModel.get_exploration_count(), 0)
 
@@ -680,6 +686,7 @@ title: A title
 
     def test_export_to_zip_file(self):
         """Test the export_to_zip_file() method."""
+
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, objective='The objective')
         init_state = exploration.states[exploration.init_state_name]
@@ -698,6 +705,7 @@ title: A title
 
     def test_export_to_zip_file_with_assets(self):
         """Test exporting an exploration with assets to a zip file."""
+
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, objective='The objective')
         init_state = exploration.states[exploration.init_state_name]
@@ -723,6 +731,7 @@ title: A title
 
     def test_export_by_versions(self):
         """Test export_to_zip_file() for different versions."""
+
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, objective='The objective')
         self.assertEqual(exploration.version, 1)
@@ -761,7 +770,6 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations represented as a dict whose keys
     are state names and whose values are YAML strings representing the state's
     contents."""
-
     _SAMPLE_INIT_STATE_CONTENT = ("""content:
 - type: text
   value: ''
@@ -830,6 +838,7 @@ param_changes: []
 
     def test_export_to_dict(self):
         """Test the export_to_dict() method."""
+
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, objective='The objective')
         init_state = exploration.states[exploration.init_state_name]
@@ -845,6 +854,7 @@ param_changes: []
 
     def test_export_by_versions(self):
         """Test export_to_dict() for different versions."""
+
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id)
         self.assertEqual(exploration.version, 1)
@@ -880,6 +890,7 @@ param_changes: []
 
 def _get_change_list(state_name, property_name, new_value):
     """Generates a change list for a single state change."""
+
     return [{
         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
         'state_name': state_name,
@@ -905,15 +916,8 @@ class UpdateGadgetTests(ExplorationServicesUnitTests):
         }
 
     def test_add_gadget_cmd(self):
-        """test adding of a gadget"""
-        gadget_customization = {
-            'adviceObjects': {
-                'value': [{
-                    'adviceTitle': 'b',
-                    'adviceHtml': '<p>c</p>'
-                }]
-            }
-        }
+        """Test adding of a gadget."""
+
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
         self.assertNotIn('NewGadget', exploration.get_all_gadget_names())
@@ -923,7 +927,14 @@ class UpdateGadgetTests(ExplorationServicesUnitTests):
             'gadget_dict' : {
                 'gadget_type': 'ScoreBar',
                 'gadget_name': 'NewGadget',
-                'customization_args': gadget_customization,
+                'customization_args': {
+            		'adviceObjects': {
+                		'value': [{
+                    		'adviceTitle': 'b',
+                    		'adviceHtml': '<p>c</p>'
+                		}]
+            		}
+        		}
                 'visible_in_states':[feconf.DEFAULT_INIT_STATE_NAME]}
             }], 'add a new gadget')
 
@@ -932,15 +943,7 @@ class UpdateGadgetTests(ExplorationServicesUnitTests):
         self.assertIn('NewGadget', exploration.get_all_gadget_names())
 
     def test_rename_gadget_cmd(self):
-        """test rename"""
-        gadget_customization = {
-            'adviceObjects': {
-                'value': [{
-                    'adviceTitle': 'b',
-                    'adviceHtml': '<p>c</p>'
-                }]
-            }
-        }
+        """Test renaming a gadget."""
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
@@ -949,37 +952,36 @@ class UpdateGadgetTests(ExplorationServicesUnitTests):
             'panel': 'bottom',
             'gadget_dict' : {
                 'gadget_type': 'ScoreBar',
-                'gadget_name': 'NewGadget',
-                'customization_args': gadget_customization,
+                'gadget_name': 'Gadget',
+                'customization_args': {
+            		'adviceObjects': {
+                		'value': [{
+                    		'adviceTitle': 'b',
+                    		'adviceHtml': '<p>c</p>'
+                		}]
+            		}
+        		}
                 'visible_in_states':[feconf.DEFAULT_INIT_STATE_NAME]}
             }], 'add a new gadget')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
-        self.assertIn('NewGadget', exploration.get_all_gadget_names())
-        self.assertNotIn('gadget', exploration.get_all_gadget_names())
+        self.assertIn('Gadget', exploration.get_all_gadget_names())
+        self.assertNotIn('RenameGadget', exploration.get_all_gadget_names())
 
         exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
             'cmd': exp_domain.CMD_RENAME_GADGET,
-            'new_gadget_name': 'gadget',
-            'old_gadget_name': 'NewGadget',
+            'new_gadget_name': 'RenameGadget',
+            'old_gadget_name': 'Gadget',
             }], 'rename a gadget')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
-        self.assertIn('gadget', exploration.get_all_gadget_names())
-        self.assertNotIn('NewGadget', exploration.get_all_gadget_names())
+        self.assertIn('RenameGadget', exploration.get_all_gadget_names())
+        self.assertNotIn('Gadget', exploration.get_all_gadget_names())
 
     def test_delete_gadget_cmd(self):
-        """test delete"""
-        gadget_customization = {
-            'adviceObjects': {
-                'value': [{
-                    'adviceTitle': 'b',
-                    'adviceHtml': '<p>c</p>'
-                }]
-            }
-        }
+        """Test deleting a gadget."""
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
@@ -989,7 +991,14 @@ class UpdateGadgetTests(ExplorationServicesUnitTests):
             'gadget_dict' : {
                 'gadget_type': 'ScoreBar',
                 'gadget_name': 'NewGadget',
-                'customization_args': gadget_customization,
+                'customization_args': {
+            		'adviceObjects': {
+                		'value': [{
+                    		'adviceTitle': 'b',
+                    		'adviceHtml': '<p>c</p>'
+                		}]
+            		}
+        		}
                 'visible_in_states':[feconf.DEFAULT_INIT_STATE_NAME]}
             }], 'add a new gadget')
 
@@ -1045,6 +1054,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_add_state_cmd(self):
         """ Test adding of states."""
+
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
         self.assertNotIn('new state', exploration.states)
@@ -1057,8 +1067,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertIn('new state', exploration.states)
 
-    def test_update_state_cmd(self):
+    def test_rename_state_cmd(self):
         """Test updating of state name."""
+
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
         self.assertIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
@@ -1074,7 +1085,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertNotIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
 
     def test_delete_state_cmd(self):
-        """test deleting state"""
+        """Test deleting a state name."""
+
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
         exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
@@ -1096,6 +1108,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_state_name_with_unicode(self):
         """Test updating of state name to one that uses unicode characters."""
+
+
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
         self.assertNotIn(u'¡Hola! αβγ', exploration.states)
@@ -1113,6 +1127,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_param_changes(self):
         """Test updating of param_changes."""
+
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         exploration.param_specs = {
             'myParam': param_domain.ParamSpec('UnicodeString')}
@@ -1131,6 +1146,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_invalid_param_changes(self):
         """Check that updates cannot be made to non-existent parameters."""
+
         with self.assertRaisesRegexp(
             utils.ValidationError,
             r'The parameter with name \'myParam\' .* does not exist .*'
@@ -1142,6 +1158,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_invalid_generator(self):
         """Test for check that the generator_id in param_changes exists."""
+
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         exploration.param_specs = {
             'myParam': param_domain.ParamSpec('UnicodeString')}
@@ -1159,6 +1176,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_interaction_id(self):
         """Test updating of interaction_id."""
+
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, _get_change_list(
                 self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
@@ -1170,6 +1188,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_interaction_customization_args(self):
         """Test updating of interaction customization_args."""
+
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID,
             _get_change_list(
@@ -1188,6 +1207,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_interaction_handlers_fails(self):
         """Test legacy interaction handler updating."""
+
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         exploration.add_states(['State 2'])
         exploration.states['State 2'].update_interaction_id('TextInput')
@@ -1213,6 +1233,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_interaction_answer_groups(self):
         """Test updating of interaction_answer_groups."""
+
         # We create a second state to use as a rule destination
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         exploration.add_states(['State 2'])
@@ -1249,6 +1270,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_interaction_fallbacks(self):
         """Test updating of interaction_fallbacks."""
+
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID,
             _get_change_list(
@@ -1279,6 +1301,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_interaction_fallbacks_invalid_dest(self):
         """Test updating of interaction_fallbacks with an invalid dest state."""
+
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'The fallback destination INVALID is not a valid state'
@@ -1305,6 +1328,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_state_invalid_state(self):
         """Test that rule destination states cannot be non-existent."""
+
         self.interaction_answer_groups[0]['outcome']['dest'] = 'INVALID'
         with self.assertRaisesRegexp(
             utils.ValidationError,
@@ -1349,6 +1373,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_state_variable_types(self):
         """Test that parameters in rules must have the correct type."""
+
         self.interaction_answer_groups[0]['rule_specs'][0][
             'inputs']['x'] = 'abc'
         with self.assertRaisesRegexp(Exception, 'invalid literal for int()'):
@@ -1370,6 +1395,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_content(self):
         """Test updating of content."""
+
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, _get_change_list(
                 self.init_state_name, 'content', [{
@@ -1385,6 +1411,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_content_missing_key(self):
         """Test that missing keys in content yield an error."""
+
         with self.assertRaisesRegexp(KeyError, 'type'):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_ID, _get_change_list(
@@ -1405,6 +1432,7 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
 
     def test_record_commit_message(self):
         """Check published explorations record commit messages."""
+
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
 
         exp_services.update_exploration(
@@ -2521,6 +2549,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
 
 class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
     """Tests the exploration model -> exploration conversion pipeline."""
+
     OLD_EXP_ID = 'exp_id0'
     NEW_EXP_ID = 'exp_id1'
 
