@@ -210,6 +210,7 @@
     "I18N_PREFERENCES_EMAIL": "Text displayed in the preferences page. - Text shown to the left of the user email address.\n{{Identical|E-mail}}",
     "I18N_PREFERENCES_EMAIL_EXPLAIN": "Text displayed in the preferences page. - Text shown below the user email address.",
     "I18N_PREFERENCES_EMAIL_RECEIVE_NEWS": "Text displayed in the preferences page. - Text shown to the left of a checkbox that allows the user to agree or disagree to receive periodic emails from the site.",
+    "I18N_PREFERENCES_EMAIL_RECEIVE_SUBSCRIPTION_NEWS": "Text displayed in the preferences page. - Text shown to the left of a checkbox that allows the user to agree or disagree to receive emails related to user subscriptions.",
     "I18N_PREFERENCES_HEADING": "Text displayed in the preferences page. - Text shown as the title.\n{{Identical|Preferences}}",
     "I18N_PREFERENCES_HEADING_SUBTEXT": "Text displayed in the preferences page. - Text shown below the title. Indicates that the changes made on the profile are going to be saved even if the user does not click a save button.",
     "I18N_PREFERENCES_PAGE_TITLE": "Title of the preferences page.",

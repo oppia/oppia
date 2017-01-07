@@ -459,9 +459,26 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
                 expected_feedback_message_dict2)
             self.assertEqual(model.retries, 0)
 
-    def test_email_is_not_sent_if_recipient_has_declined_such_emails(self):
+    def test_email_is_not_sent_recipient_has_muted_emails_globally(self):
         user_services.update_email_preferences(
             self.editor_id, True, False, False, False)
+
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name', self.user_id_a,
+                'a subject', 'some text')
+
+            # Note: the job in the taskqueue represents the realtime
+            # event emitted by create_thread().
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            self.assertEqual(len(messages), 0)
+
+    def test_email_is_not_sent_recipient_has_muted_this_exploration(self):
+        user_services.set_email_preferences_for_exploration(
+            self.editor_id, self.exploration.id,
+            mute_feedback_notifications=True)
 
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
@@ -839,6 +856,21 @@ class SuggestionEmailHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(
                 messages[0].body.decode(),
                 expected_email_text_body)
+
+    def test_email_is_not_sent_recipient_has_muted_this_exploration(self):
+        user_services.set_email_preferences_for_exploration(
+            self.editor_id, self.exploration.id,
+            mute_suggestion_notifications=True)
+
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_suggestion(
+                self.exploration.id, self.new_user_id, self.exploration.version,
+                'state', 'description', {'type': 'text', 'value': 'text'})
+
+            self.process_and_flush_pending_tasks()
+
+            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            self.assertEqual(len(messages), 0)
 
     def test_correct_email_is_sent_for_multiple_recipients(self):
         rights_manager.assign_role_for_exploration(

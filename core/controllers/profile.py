@@ -141,13 +141,13 @@ class PreferencesHandler(base.BaseHandler):
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests,
             'can_receive_email_updates': (
-                user_email_preferences['can_receive_email_updates']),
+                user_email_preferences.can_receive_email_updates),
             'can_receive_editor_role_email': (
-                user_email_preferences['can_receive_editor_role_email']),
+                user_email_preferences.can_receive_editor_role_email),
             'can_receive_feedback_message_email': (
-                user_email_preferences['can_receive_feedback_message_email']),
+                user_email_preferences.can_receive_feedback_message_email),
             'can_receive_subscription_email': (
-                user_email_preferences['can_receive_subscription_email'])
+                user_email_preferences.can_receive_subscription_email)
         })
         self.render_json(self.values)
 

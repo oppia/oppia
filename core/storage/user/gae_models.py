@@ -287,6 +287,14 @@ class ExplorationUserDataModel(base_models.BaseModel):
         return super(ExplorationUserDataModel, cls).get(
             instance_id, strict=False)
 
+    @classmethod
+    def get_multi(cls, user_ids, exploration_id):
+        """Gets the ExplorationUserDataModel for the given ids."""
+        instance_ids = (
+            cls._generate_id(user_id, exploration_id) for user_id in user_ids)
+        return super(ExplorationUserDataModel, cls).get_multi(
+            instance_ids)
+
 
 class CollectionProgressModel(base_models.BaseModel):
     """Stores progress a user has made within a collection, including all
