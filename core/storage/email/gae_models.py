@@ -128,8 +128,7 @@ class SentEmailModel(base_models.BaseModel):
         email_model_instance.put()
 
     def put(self):
-        """Creates a hash value and saves this SentEmailModel 
-        instance to the datastore."""
+        """Saves this SentEmailModel instance to the datastore."""
         email_hash = self._generate_hash(
             self.recipient_id, self.subject, self.html_body)
         self.email_hash = email_hash
@@ -150,7 +149,7 @@ class SentEmailModel(base_models.BaseModel):
                 sent_datetime of the email to be searched.
 
         Returns:
-            list(str). A list of emails which have the given hash value and 
+            list(SentEmailModel). A list of emails which have the given hash value and 
                 which were sent more recently than sent_datetime_lower_bound.
 
         Raises:
@@ -233,7 +232,7 @@ class BulkEmailModel(base_models.BaseModel):
     """Records the content of an email sent from Oppia to multiple users.
 
     This model is read-only; entries cannot be modified once created. The
-    id/key of instances of this model is randomly generated string of 
+    id/key of instances of this model is a randomly generated string of 
     length 12.
     """
 
