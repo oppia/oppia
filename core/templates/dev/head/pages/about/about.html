@@ -161,12 +161,12 @@
                 <a href="https://www.apache.org/licenses/" class="inline-links">Apache 2.0</a> license.
               </p>
               <div class="text-center">
-                <button class="btn btn oppia-about-button oppia-about-foundation-tab-button">
-                  <a href="/donate">Donate</a>
-                </button>
-                <button class="btn btn oppia-about-button oppia-about-foundation-tab-button">
-                  <a href="/contact">Get Invloved</a>
-                </button>
+                <a href="/donate" class="oppia-about-foundation-tab-button">
+                  <button class="btn btn oppia-about-button">Donate</button>
+                </a>
+                <a href="/contact" class="oppia-about-foundation-tab-button">
+                  <button class="btn btn oppia-about-button">Get Involved</button>
+                </a>
               </div>
             </div>
           </div>
@@ -481,11 +481,11 @@
   </script>
   <style>
     .oppia-about-foundation-tab-button {
+      color: white;
+    }
+    .oppia-about-foundation-tab-button button {
       background-color: #009788;
       width: 33%;
-    }
-    .oppia-about-foundation-tab-button a {
-      color: white;
     }
   </style>
 {% endblock %}
