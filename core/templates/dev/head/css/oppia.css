@@ -870,6 +870,24 @@ textarea {
   border: none;
 }
 
+@media(max-width: 768px) {
+  .oppia-navbar-breadcrumb > li, .oppia-navbar-breadcrumb {
+    float: left;
+  }
+  .oppia-navbar-breadcrumb {
+    margin-top: 0;
+    margin-left: 5px;
+  }
+  .navbar-nav.oppia-navbar-nav > li > a {
+    display: none;
+  }
+}
+@media(max-width: 600px) {
+  .oppia-navbar-breadcrumb {
+    margin-top: 3px;
+  }
+}
+
 /* Show the navbar submenu dropdowns on-hover rather than on-click, if the
    screen size is large enough. */
 @media (min-width: 768px) {
