@@ -84,7 +84,9 @@ BAD_PATTERNS = {
         'excluded_files': ()},
     '\t': {
         'message': 'Please use spaces instead of tabs.',
-        'excluded_files': ()},
+        'excluded_files': (),
+        'excluded_dirs': (
+            'assets/i18n/')},
     '\r': {
         'message': 'Please make sure all files only have LF endings (no CRLF).',
         'excluded_files': ()},
@@ -462,8 +464,10 @@ def _check_bad_patterns(all_files):
             content = f.read()
             total_files_checked += 1
             for pattern in BAD_PATTERNS:
-                if pattern in content and filename not in (
-                        BAD_PATTERNS[pattern]['excluded_files']):
+                if pattern in content and not any(
+                        filename.startswith(bad_pattern) for bad_pattern in
+                        BAD_PATTERNS[pattern]['excluded_dirs']) and filename \
+                not in BAD_PATTERNS[pattern]['excluded_files']:
                     failed = True
                     print '%s --> %s' % (
                         filename, BAD_PATTERNS[pattern]['message'])
