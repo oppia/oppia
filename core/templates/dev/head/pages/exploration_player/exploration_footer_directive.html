@@ -30,7 +30,7 @@
         <div class="pull-right">
           <ul class="author-profile">
             <li>
-              <h4 translate="I18N_PLAYER_SHARE_THIS_EXPLORATION" class="share-exploration-footer"></h4>
+              <h4 translate="I18N_PLAYER_SHARE_THIS_EXPLORATION" class="oppia-share-exploration-footer"></h4>
             </li>
             <li>
               <sharing-links ng-if="explorationStatus !== 'private'"
@@ -49,6 +49,7 @@
 </script>
 
 <style>
+
 
   .oppia-exploration-footer {
     background-color: #094142;
@@ -116,7 +117,7 @@
 
   .oppia-exploration-footer .author-profile-dropdown-menu li > a {
     color: #094142;
-    padding: 3px 20px;
+    padding: 3px 6px;
   }
 
   .oppia-exploration-footer .author-profile-dropdown-menu li a:hover {
@@ -127,12 +128,12 @@
   .oppia-exploration-footer .author-profile-text {
     cursor: default;
     line-height: 0.6;
-    padding-left: 4px;
+    padding-left: 6px;
     text-overflow: clip;
     white-space: nowrap;
   }
 
-  .oppia-exploration-footer .author-profile-text.not-hovered{
+  .oppia-exploration-footer .author-profile-text.not-hovered {
     color: #fff;
     text-transform: uppercase;
   }
@@ -143,7 +144,7 @@
     text-transform: uppercase;
   }
 
-  .oppia-exploration-footer .share-exploration-footer {
+  .oppia-exploration-footer .oppia-share-exploration-footer {
     line-height: 0.6;
     padding-right:10px;
     text-transform: uppercase;
@@ -155,11 +156,23 @@
 
   .oppia-exploration-footer .oppia-exploration-footer-sharing-links ul {
     display: block;
-    float: left;
+    float: right;
     margin: -8px;
   }
 
   .oppia-exploration-footer .oppia-exploration-footer-sharing-links li {
     float: left;
+  }
+
+  @media (max-width: 475px) {
+    .oppia-exploration-footer-sharing-links {
+      display: none;
+    }
+  }
+
+  @media (max-width: 658px) {
+    .oppia-share-exploration-footer {
+      display: none;
+    }
   }
 </style>
