@@ -115,7 +115,8 @@ class SentEmailModel(base_models.BaseModel):
             intent: str. The intent string, i.e. the purpose of the email.
             subject: str. The subject line of the email.
             html_body: str. The HTML content of the email body.
-            sent_datetime: datetime.datetime. The datetime the email was sent, in UTC.
+            sent_datetime: datetime.datetime. The datetime the email was sent,
+                in UTC.
         """
         instance_id = cls._generate_id(intent)
         email_model_instance = cls(
@@ -127,7 +128,8 @@ class SentEmailModel(base_models.BaseModel):
         email_model_instance.put()
 
     def put(self):
-    	"""Creates the hash value of the instance of SentEmailModel."""
+        """Creates a hash value and saves this SentEmailModel 
+        instance to the datastore."""
         email_hash = self._generate_hash(
             self.recipient_id, self.subject, self.html_body)
         self.email_hash = email_hash
@@ -148,11 +150,11 @@ class SentEmailModel(base_models.BaseModel):
                 sent_datetime of the email to be searched.
 
         Returns:
-            A list of messages.The hashed messages with the given hash value
-                and sent_datemtime greater than lower bound.
+            list(str). A list of emails which have the given hash value and 
+                which were sent more recently than sent_datetime_lower_bound.
+
         Raises:
-            Exception: The type of sent_datetime_lower_bound argument given is 
-                not same as the type of the datetime.datetime.
+            Exception: sent_datetime_lower_bound is not a valid datetime.datetime.
         """
 
         if sent_datetime_lower_bound is not None:
@@ -173,8 +175,8 @@ class SentEmailModel(base_models.BaseModel):
 
     @classmethod
     def _generate_hash(cls, recipient_id, email_subject, email_body):
-        """Generate hash for a given recipient_id, email_subject and cleaned
-        email_body.
+        """Generate hash for a given recipient_id, email_subject and 
+        cleaned email_body.
 
         Args:
             recipient_id: str. The user ID of the email recipient.
@@ -193,10 +195,10 @@ class SentEmailModel(base_models.BaseModel):
     @classmethod
     def check_duplicate_message(cls, recipient_id, email_subject, email_body):
         """Check for a given recipient_id, email_subject and cleaned
-            email_body, whether a similar message has been sent in the last
-            DUPLICATE_EMAIL_INTERVAL_MINS.
+        email_body, whether a similar message has been sent in the last
+        DUPLICATE_EMAIL_INTERVAL_MINS.
 
-	    Args:
+        Args:
             recipient_id: str. The user ID of the email recipient.
             email_subject: str. The subject line of the email.
             email_body: str. The HTML content of the email body.
@@ -231,7 +233,8 @@ class BulkEmailModel(base_models.BaseModel):
     """Records the content of an email sent from Oppia to multiple users.
 
     This model is read-only; entries cannot be modified once created. The
-    id/key of instances of this model is randomly generated string of length 12.
+    id/key of instances of this model is randomly generated string of 
+    length 12.
     """
 
     # The user IDs of the email recipients.
@@ -264,7 +267,7 @@ class BulkEmailModel(base_models.BaseModel):
         
         Args:
             instance_id: str. The ID of the instance.
-            recipient_ids: A list of IDs. The user IDs of the email recipients.
+            recipient_ids: list(str). The user IDs of the email recipients.
             sender_id: str. The user ID of the email sender.
             sender_email: str. The email address used to send the notification.
             intent: str. The intent string, i.e. the purpose of the email.
