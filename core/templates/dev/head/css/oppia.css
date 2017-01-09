@@ -4098,7 +4098,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-static-header {
   align-items: center;
   display: flex;
-  height: 140px;
+  height: 210px;
   position: absolute;
   text-align: center;
   width: 100%;
@@ -4110,7 +4110,7 @@ md-card.preview-conversation-skin-supplemental-card {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 3em;
   left: 50%;
-  position: absolute;
+  position: relative;
   transform: translateX(-50%);
   -webkit-transform: translateX(-50%);
   -ms-transform: translateX(-50%);
