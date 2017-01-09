@@ -226,7 +226,7 @@ def main():
         out.write('\n### Commit History:\n')
         for name, title in [(log.author, log.message.split('\n\n')[0])
                             for log in logs]:
-            out.write('%s: %s  \n' % (name, title))
+            out.write('* %s\n' % title)
 
         if issue_links:
             out.write('\n### Issues mentioned in commits:\n')
