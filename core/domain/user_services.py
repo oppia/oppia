@@ -852,7 +852,7 @@ def record_user_created_an_exploration(user_id):
 
 def update_email_preferences(
         user_id, can_receive_email_updates, can_receive_editor_role_email,
-        can_receive_feedback_email):
+        can_receive_feedback_email, can_receive_subscription_email):
     """Updates whether the user has chosen to receive email updates.
 
     If no UserEmailPreferencesModel exists for this user, a new one will
@@ -866,6 +866,8 @@ def update_email_preferences(
             emails notifying them of role changes.
         can_receive_feedback_email: bool. Whether the given user can receive
             emails when users submit feedback to their explorations.
+        can_receive_subscription_email: bool. Whether the given user can receive
+            emails related to his/her creator subscriptions.
     """
     email_preferences_model = user_models.UserEmailPreferencesModel.get(
         user_id, strict=False)
@@ -878,6 +880,8 @@ def update_email_preferences(
         can_receive_editor_role_email)
     email_preferences_model.feedback_message_notifications = (
         can_receive_feedback_email)
+    email_preferences_model.subscription_notifications = (
+        can_receive_subscription_email)
     email_preferences_model.put()
 
 

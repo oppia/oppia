@@ -461,7 +461,7 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
 
     def test_email_is_not_sent_recipient_has_muted_emails_globally(self):
         user_services.update_email_preferences(
-            self.editor_id, True, False, False)
+            self.editor_id, True, False, False, False)
 
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
