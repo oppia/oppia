@@ -42,6 +42,7 @@ oppia.directive('multipleChoiceEditor', [function() {
         // since it is just the state name.
         $scope.questionId = $scope.getUniqueId();
 
+        // Returns a unique id for sub-elements of a question given a suffix.
         $scope.getHash = function(suffix) {
           var hash = $scope.questionId.toLowerCase().replace(' ','-');
           if (typeof suffix === 'undefined'){
