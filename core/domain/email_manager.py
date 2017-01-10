@@ -22,6 +22,7 @@ import logging
 from core.domain import config_domain
 from core.domain import html_cleaner
 from core.domain import rights_manager
+from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -135,6 +136,8 @@ SENDER_VALIDATORS = {
     feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
@@ -520,7 +523,7 @@ def send_role_notification_email(
     inviter_user_settings = user_services.get_user_settings(inviter_id)
     recipient_preferences = user_services.get_email_preferences(recipient_id)
 
-    if not recipient_preferences['can_receive_editor_role_email']:
+    if not recipient_preferences.can_receive_editor_role_email:
         # Do not send email if recipient has declined.
         return
 
@@ -542,6 +545,57 @@ def send_role_notification_email(
         feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION, email_subject, email_body,
         feconf.NOREPLY_EMAIL_ADDRESS,
         sender_name=inviter_user_settings.username)
+
+
+def send_emails_to_subscribers(creator_id, exploration_id, exploration_title):
+    """Sends an email to all the subscribers of the creators when the creator
+    publishes an exploration.
+
+    Args:
+        creator_id: str. The id of the creator who has published an exploration
+            and to whose subscribers we are sending emails.
+        exploration_id: str. The id of the exploration which the creator has
+            published.
+        exploration_title: str. The title of the exploration which the creator
+            has published.
+    """
+
+    creator_name = user_services.get_username(creator_id)
+    email_subject = ('%s has published a new exploration!' % creator_name)
+    email_body_template = (
+        'Hi %s,<br>'
+        '<br>'
+        '%s has published a new exploration! You can play it here: '
+        '<a href="https://www.oppia.org/explore/%s">%s</a><br>'
+        '<br>'
+        'Thanks, and happy learning!<br>'
+        '<br>'
+        'Best wishes,<br>'
+        '- The Oppia Team<br>'
+        '<br>%s')
+
+    if not feconf.CAN_SEND_EMAILS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    if not feconf.CAN_SEND_SUBSCRIPTION_EMAILS:
+        log_new_error('This app cannot send subscription emails to users.')
+        return
+
+    recipient_list = subscription_services.get_all_subscribers_of_creator(
+        creator_id)
+    recipients_usernames = user_services.get_usernames(recipient_list)
+    recipients_preferences = user_services.get_users_email_preferences(
+        recipient_list)
+    for index, username in enumerate(recipients_usernames):
+        if recipients_preferences[index].can_receive_subscription_email:
+            email_body = email_body_template % (
+                username, creator_name, exploration_id,
+                exploration_title, EMAIL_FOOTER.value)
+            _send_email(
+                recipient_list[index], feconf.SYSTEM_COMMITTER_ID,
+                feconf.EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION,
+                email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
 def send_feedback_message_email(recipient_id, feedback_messages):
@@ -607,6 +661,39 @@ def send_feedback_message_email(recipient_id, feedback_messages):
         email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
+def can_users_receive_thread_email(
+        recipient_ids, exploration_id, has_suggestion):
+    """Returns if users can receive email.
+
+    Args:
+        recipient_ids: list(str). IDs of persons that should receive the email.
+        exploration_id: str. ID of exploration that received new message.
+        has_suggestion: bool. True if thread contains suggestion.
+
+    Returns:
+        list(bool). True if user can receive the email, False otherwise.
+    """
+    users_global_prefs = (
+        user_services.get_users_email_preferences(recipient_ids))
+    users_exploration_prefs = (
+        user_services.get_users_email_preferences_for_exploration(
+            recipient_ids, exploration_id))
+    zipped_preferences = zip(users_global_prefs, users_exploration_prefs)
+
+    result = []
+    if has_suggestion:
+        for user_global_prefs, user_exploration_prefs in zipped_preferences:
+            result.append(
+                user_global_prefs.can_receive_feedback_message_email
+                and not user_exploration_prefs.mute_suggestion_notifications)
+    else:
+        for user_global_prefs, user_exploration_prefs in zipped_preferences:
+            result.append(
+                user_global_prefs.can_receive_feedback_message_email
+                and not user_exploration_prefs.mute_feedback_notifications)
+
+    return result
+
 def send_suggestion_email(
         exploration_title, exploration_id, author_id, recipient_list):
     """Send emails to notify the given recipients about new suggestion.
@@ -645,12 +732,11 @@ def send_suggestion_email(
         return
 
     author_settings = user_services.get_user_settings(author_id)
-    for recipient_id in recipient_list:
+    can_users_receive_email = (
+        can_users_receive_thread_email(recipient_list, exploration_id, True))
+    for index, recipient_id in enumerate(recipient_list):
         recipient_user_settings = user_services.get_user_settings(recipient_id)
-        recipient_preferences = (
-            user_services.get_email_preferences(recipient_id))
-
-        if recipient_preferences['can_receive_feedback_message_email']:
+        if can_users_receive_email[index]:
             # Send email only if recipient wants to receive.
             email_body = email_body_template % (
                 recipient_user_settings.username, author_settings.username,
@@ -701,7 +787,7 @@ def send_instant_feedback_message_email(
     recipient_settings = user_services.get_user_settings(recipient_id)
     recipient_preferences = user_services.get_email_preferences(recipient_id)
 
-    if recipient_preferences['can_receive_feedback_message_email']:
+    if recipient_preferences.can_receive_feedback_message_email:
         email_body = email_body_template % (
             recipient_settings.username, thread_title, exploration_id,
             exploration_title, sender_settings.username, message,

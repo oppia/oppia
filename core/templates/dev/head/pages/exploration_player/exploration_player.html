@@ -18,16 +18,57 @@
       GLOBALS.INTERACTION_SPECS = JSON.parse(
         '{{INTERACTION_SPECS|js_string}}');
     </script>
+
   {% endif %}
 
   {{dependencies_html}}
+  <style>
+    @media(max-width: 768px) {
+      /* This prevents the navbar from collapsing in the exploration page,
+      so that the exploration title can be shown. */
+      .oppia-exploration-header {
+        display: block;
+        float: right;
+        max-width: 240px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .oppia-navbar-collapse.collapse {
+        display: block;
+      }
+    }
+    @media(max-width: 600px) {
+      .oppia-logo {
+        height: 48px;
+        margin-left: 0;
+        margin-top: 8px;
+        max-width: none;
+      }
+      .oppia-exploration-header {
+        max-width: 180px;
+      }
+      .oppia-navbar-brand-name {
+        max-width: 35px;
+        overflow: hidden;
+      }
+      .oppia-navbar-breadcrumb-icon {
+        display: none;
+      }
+    }
+    @media(max-width: 400px) {
+      .oppia-exploration-header {
+        max-width: 130px;
+      }
+    }
+  </style>
 {% endblock header_js %}
 
 {% block navbar_breadcrumb %}
   <ul class="nav navbar-nav oppia-navbar-breadcrumb" ng-controller="LearnerViewBreadcrumb">
     <li>
       <span class="oppia-navbar-breadcrumb-separator"></span>
-      <span class="protractor-test-exploration-header" itemprop="description">{{exploration_title}}</span>
+      <span class="protractor-test-exploration-header oppia-exploration-header" itemprop="description">{{exploration_title}}</span>
     </li>
     <li ng-click="showInformationCard()" tooltip="<['I18N_PLAYER_INFO_TOOLTIP' | translate]>" tooltip-placement="bottom" style="cursor: pointer;" class="protractor-test-exploration-info-icon">
       <i class="material-icons oppia-navbar-breadcrumb-icon" style="font-size: 20px;">&#xE88E;</i>

@@ -870,6 +870,24 @@ textarea {
   border: none;
 }
 
+@media(max-width: 768px) {
+  .oppia-navbar-breadcrumb > li, .oppia-navbar-breadcrumb {
+    float: left;
+  }
+  .oppia-navbar-breadcrumb {
+    margin-top: 0;
+    margin-left: 5px;
+  }
+  .navbar-nav.oppia-navbar-nav > li > a {
+    display: none;
+  }
+}
+@media(max-width: 600px) {
+  .oppia-navbar-breadcrumb {
+    margin-top: 3px;
+  }
+}
+
 /* Show the navbar submenu dropdowns on-hover rather than on-click, if the
    screen size is large enough. */
 @media (min-width: 768px) {
@@ -969,6 +987,11 @@ textarea {
 
 @media (max-width: 767px) {
   .oppia-navbar-hide-on-small-width {
+    display: none;
+  }
+}
+@media (max-width: 1023px) {
+  div.navbar-container .oppia-navbar-hide-on-medium-width {
     display: none;
   }
 }
@@ -4110,9 +4133,21 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-about-extra-container {
+  margin-bottom: 20px;
   position: relative;
   top: 50px;
   width: 100%;
+}
+
+@media(max-width: 700px) {
+  .oppia-about-extra-container {
+    margin-bottom: -10px;
+  }
+}
+@media(max-width: 440px) {
+  .oppia-about-extra-container {
+    margin-bottom: 40px;
+  }
 }
 
 .oppia-static-extra-content {
@@ -4185,7 +4220,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-static-card-content {
   margin: 0 auto;
   max-width: 600px;
-  padding: 5% 0;
+  padding: 4% 0 5% 0;
 }
 
 .oppia-static-card-content-wide {
@@ -4311,9 +4346,11 @@ md-card.preview-conversation-skin-supplemental-card {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 18px;
   margin: 15px;
+  max-width: 90%;
   padding: 15px;
   text-transform: uppercase;
   white-space: normal;
+  width: 366px;
 }
 
 .oppia-about-button:hover {

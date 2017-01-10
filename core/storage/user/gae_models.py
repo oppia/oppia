@@ -118,6 +118,11 @@ class UserEmailPreferencesModel(base_models.BaseModel):
     feedback_message_notifications = ndb.BooleanProperty(
         indexed=True, default=feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
 
+    # The user's preference for receiving email when a creator, to which this
+    # user has subscribed, publishes an exploration.
+    subscription_notifications = ndb.BooleanProperty(
+        indexed=True, default=feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+
 
 class UserSubscriptionsModel(base_models.BaseModel):
     """A list of things that a user subscribes to.
@@ -281,6 +286,14 @@ class ExplorationUserDataModel(base_models.BaseModel):
         instance_id = cls._generate_id(user_id, exploration_id)
         return super(ExplorationUserDataModel, cls).get(
             instance_id, strict=False)
+
+    @classmethod
+    def get_multi(cls, user_ids, exploration_id):
+        """Gets the ExplorationUserDataModel for the given ids."""
+        instance_ids = (
+            cls._generate_id(user_id, exploration_id) for user_id in user_ids)
+        return super(ExplorationUserDataModel, cls).get_multi(
+            instance_ids)
 
 
 class CollectionProgressModel(base_models.BaseModel):
