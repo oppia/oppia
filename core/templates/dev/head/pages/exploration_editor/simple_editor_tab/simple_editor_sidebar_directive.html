@@ -1,24 +1,30 @@
 <script type="text/ng-template" id="simpleEditor/sidebar">
   <div class="sidebar">
     <ul>
-      <li ng-class="{'highlighted': isHighlighted('title')}"
+      <li id="si-title"
           ng-click="scrollTo('title')" class="sidebar-item">
         <strong>Title</strong>
       </li>
 
-      <li ng-class="{'highlighted': isHighlighted('intro')}"
+      <li id="si-intro"
           ng-click="scrollTo('intro')" class="sidebar-item">
         <strong>Introduction</strong>
       </li>
 
       <li class="sidebar-item" ng-repeat="question in questionList.getQuestions() track by $index">
-        <strong ng-click="scrollTo(question.getHash())">Question <[$index + 1]></strong>
+        <div class="sidebar-item-header">
+          <i ng-click="collapse(question)" class="collapse-icon material-icons">
+            <[isCollapsed(question) ? '&#xE5C7;' : '&#xE5C5;']>
+          </i>
+          <strong ng-click="scrollTo(question.getHash())">Question <[$index + 1]></strong>
+          <i class="preview-icon material-icons">&#xE8F4;</i>
+        </div>
 
-        <ul>
+        <ul ng-hide="!isCollapsed(question)">
           <li class="sidebar-item sidebar-item-indented"
               ng-repeat="subfield in SUBFIELD_LABELS track by $index"
               ng-click="scrollTo(question.getHash(subfield.abbr))"
-              ng-class="{'highlighted': isHighlighted(question.getHash(subfield.abbr))}">
+              id="<['si-'+question.getHash(subfield.abbr)]>">
             <span>
               <a><[subfield.label]></a>
             </span>
@@ -37,7 +43,7 @@
 
 <style>
   simple-editor-sidebar {
-    background-color: #f3fbf1;
+    background-color: #eff8f0;
     height: 100%;
     left: 0;
     overflow: auto;
@@ -53,8 +59,9 @@
     margin-left: 0;
     padding-left: 0;
   }
-  simple-editor-sidebar a {
-    color: #333;
+  simple-editor-sidebar a,
+  simple-editor-sidebar li.sidebar-item {
+    color: #477349;
   }
   simple-editor-sidebar .sidebar-item-disabled {
     color: #ccc;
@@ -65,10 +72,17 @@
     text-decoration: underline;
   }
   simple-editor-sidebar li.sidebar-item a:hover {
+    color: #6aa03b;
     text-decoration: none;
   }
   simple-editor-sidebar li.sidebar-item-indented {
-    margin-left: 25px;
+    position: relative;
+    right: 30px;
+    text-indent: 50px;
+    width: 220px;
+  }
+  simple-editor-sidebar li.sidebar-item-indented span::before {
+    content: '-';
   }
   simple-editor-sidebar .sidebar {
     padding-bottom: 85px;
@@ -86,16 +100,35 @@
     position: static;
   }
   simple-editor-sidebar::-webkit-scrollbar {
-    width: 8px;
+    width: 5px;
   }
   simple-editor-sidebar::-webkit-scrollbar-track {
-    background-color: rgba(0,0,0,.1);
+    background-color: #d3ebd5;
   }
   simple-editor-sidebar::-webkit-scrollbar-thumb {
-    background-color: rgba(0,150,136,.8);
+    background-color: #6aa03b;
     border-radius: 5px;
   }
   simple-editor-sidebar .highlighted {
-    text-decoration: underline;
+    background-color: #c5e1a5;
+  }
+  simple-editor-sidebar .sidebar-item-header strong {
+    left: -20px;
+    position: relative;
+  }
+  simple-editor-sidebar .collapse-icon {
+    color: #477349;
+    left: -1.5em;
+    position: relative;
+  }
+  simple-editor-sidebar .preview-icon {
+    color: #c0dbca;
+    position: relative;
+    right: -4em;
+  }
+  simple-editor-sidebar .preview-icon,
+  simple-editor-sidebar .collapse-icon {
+    font-size: 1.0em;
+    line-height: 2.5em;
   }
 </style>
