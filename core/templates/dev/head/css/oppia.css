@@ -4220,7 +4220,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-static-card-content {
   margin: 0 auto;
   max-width: 600px;
-  padding: 4% 0 5% 0;
+  padding: 4% 0 1% 0;
 }
 
 .oppia-static-card-content-wide {
@@ -4266,11 +4266,15 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-about-page-extra-info {
-  height: 220px;
+  height: 245px;
 }
 
 .oppia-about-tab-content {
   display: none;
+}
+
+.oppia-teach-tab-content{
+  padding-bottom: 7%;
 }
 
 .oppia-about-visible-content {
@@ -4341,7 +4345,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-about-button {
-  background-color: rgba(0,0,0,0.2);
+  background-color: rgb(0, 121, 109);
   color: rgba(255,255,255,1.0);
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 18px;
@@ -4356,6 +4360,11 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-about-button:hover {
   background-color: rgba(5,190,178,1);
   color: rgba(255,255,255,1);
+}
+
+.oppia-teach-button{
+  display: block;
+  margin: 0px auto 0 auto;
 }
 
 .oppia-about-buttons-container {
@@ -4420,9 +4429,13 @@ md-card.preview-conversation-skin-supplemental-card {
 */
 
 @media only screen and (min-width: 1400px) {
+  .oppia-about-extra-info {
+    height: 245px;
+  }
   .oppia-static-content, .oppia-static-extra-content {
     width: 960px;
   }
+
 }
 
 @media only screen and (max-width: 1140px) {
@@ -4453,7 +4466,7 @@ md-card.preview-conversation-skin-supplemental-card {
     padding: 10px;
   }
   .oppia-about-extra-info {
-    height: 400px;
+    height: 310px;
   }
 }
 
@@ -4480,11 +4493,16 @@ md-card.preview-conversation-skin-supplemental-card {
     margin: 0;
   }
   .oppia-about-extra-info {
-    height: 400px;
+    height: 320px;
   }
-
   .oppia-about-three-cols-layout {
     width: 100%;
+  }
+}
+
+@media only screen and (max-width: 440px) {
+  .oppia-about-extra-info {
+    height: 270px;
   }
 }
 
