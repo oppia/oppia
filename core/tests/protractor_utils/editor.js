@@ -385,17 +385,39 @@ var addParameterChange = function(paramName, paramValue) {
 
   forms.AutocompleteDropdownEditor(editorRowElem).setValue(paramName);
 
-  /* Setting parameter value is difficult via css since the associated
-  input is a sub-component of the third party select2 library. We isolate
-  it as the third input in the current parameter changes UI. */
-  editorRowElem.all(by.tagName('input')).then(function(items) {
-    items[2].clear();
-    items[2].sendKeys(paramValue);
-  });
+  /* Setting parameter value is difficult via css since input fields
+    are dynamically generated. We isolate it as the last input in the
+    current parameter changes UI. */
+  var item = editorRowElem.all(by.tagName('input')).last();
+  item.clear();
+  item.sendKeys(paramValue);
 
   element(by.css('.protractor-test-save-param-changes-button')).click();
 
   general.waitForSystem(500);
+};
+
+// This function adds a exploration level parameter change, creating
+// the parameter if necessary.
+var addExplorationLevelParameterChange = function(paramName, paramValue) {
+  runFromSettingsTab(function() {
+    element(by.css('.protractor-test-exploration-edit-param-changes')).click();
+    element(by.css('.protractor-test-add-param-button')).click();
+
+    var editorRowElem = element.all(by.css(
+      '.protractor-test-param-changes-list')).last();
+
+    forms.AutocompleteDropdownEditor(editorRowElem).setValue(paramName);
+
+    /* Setting parameter value is difficult via css since input fields
+      are dynamically generated. We isolate it as the last input in the
+      current parameter changes UI. */
+    var item = editorRowElem.all(by.tagName('input')).last();
+    item.clear();
+    item.sendKeys(paramValue);
+
+    element(by.css('.protractor-test-save-param-changes-button')).click();
+  });
 };
 
 // RULES
@@ -1318,6 +1340,44 @@ var revertToVersion = function(version) {
   });
 };
 
+// Wrapper for functions involving the feedback tab
+var _runFromFeedbackTab = function(callbackFunction) {
+  element(by.css('.protractor-test-feedback-tab')).click();
+  var result = callbackFunction();
+  general.waitForSystem();
+  element(by.css('.protractor-test-main-tab')).click();
+  return result;
+};
+
+var readFeedbackMessages = function() {
+  return _runFromFeedbackTab(function() {
+    var feedbackRowClassName = '.protractor-test-oppia-feedback-tab-row';
+    var messages = [];
+    return element.all(by.css(feedbackRowClassName)).then(function(rows) {
+      rows.forEach(function(row) {
+        row.click();
+        element(by.css('.protractor-test-exploration-feedback'))
+          .getText().then(function(message) {
+            messages.push(message);
+          });
+        element(by.css('.protractor-test-oppia-feedback-back-button')).click();
+      });
+      return messages;
+    });
+  });
+};
+
+var sendResponseToLatestFeedback = function(feedbackResponse) {
+  element(by.css('.protractor-test-feedback-tab')).click();
+  element.all(by.css('.protractor-test-oppia-feedback-tab-row')).
+    first().click();
+
+  element(by.css('.protractor-test-feedback-response-textarea')).
+    sendKeys(feedbackResponse);
+  element(by.css('.protractor-test-oppia-feedback-response-send-btn')).
+    click();
+};
+
 exports.exitTutorialIfNecessary = exitTutorialIfNecessary;
 exports.startTutorial = startTutorial;
 exports.progressInTutorial = progressInTutorial;
@@ -1359,6 +1419,7 @@ exports.enableGadgetVisibilityForState = enableGadgetVisibilityForState;
 exports.disableGadgetVisibilityForState = disableGadgetVisibilityForState;
 
 exports.addParameterChange = addParameterChange;
+exports.addExplorationLevelParameterChange = addExplorationLevelParameterChange;
 
 exports.addResponse = addResponse;
 exports.ResponseEditor = ResponseEditor;
@@ -1392,3 +1453,6 @@ exports.expectCannotSaveChanges = expectCannotSaveChanges;
 exports.expectGraphComparisonOf = expectGraphComparisonOf;
 exports.expectTextComparisonOf = expectTextComparisonOf;
 exports.revertToVersion = revertToVersion;
+
+exports.readFeedbackMessages = readFeedbackMessages;
+exports.sendResponseToLatestFeedback = sendResponseToLatestFeedback;

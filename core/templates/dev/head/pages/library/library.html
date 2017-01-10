@@ -79,7 +79,7 @@
 
         <div class="oppia-exp-summary-tiles-container" ng-if="pageMode === LIBRARY_PAGE_MODES.INDEX">
           <img ng-src="<[bannerImageFileUrl]>" align="center"
-               width="100%">
+               width="100%" alt="">
           <div style="text-align: center; width: 100%;">
             <h1 class="oppia-library-h1" translate="I18N_LIBRARY_MAIN_HEADER"></h1>
             <h2 class="oppia-library-h2" translate="I18N_LIBRARY_SUB_HEADER"></h2>
@@ -114,7 +114,6 @@
               <div class="oppia-library-carousel"
                    ng-swipe-right="scroll($index, true)"
                    ng-swipe-left="scroll($index, false)">
-                <div class="oppia-library-carousel-overlay-left"></div>
                 <div class="oppia-library-carousel-tiles">
                   <div ng-repeat="tile in group.activity_summary_dicts" style="display: inline-block;">
                     <collection-summary-tile ng-if="tile.activity_type == 'collection'"
@@ -141,7 +140,6 @@
                     </exploration-summary-tile>
                   </div>
                 </div>
-                <div class="oppia-library-carousel-overlay-right"></div>
               </div>
 
               <md-button class="md-no-ink oppia-library-carousel-scroller"

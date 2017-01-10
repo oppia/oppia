@@ -1,4 +1,36 @@
 <script type="text/ng-template" id="skins/Conversation">
+  <!--
+    Off-screen preview of the next card in order to pre-determine the target
+    height for the card content transition animation.
+  -->
+  <div class="conversation-skin-future-tutor-card" aria-hidden="true">
+    <div class="conversation-skin-tutor-card-content">
+      <div class="conversation-skin-tutor-card-top-section">
+        <div class="conversation-skin-tutor-card-top-content"
+             angular-html-bind="upcomingContentHtml">
+        </div>
+      </div>
+
+      <div ng-if="upcomingInlineInteractionHtml"
+           class="conversation-skin-inline-interaction"
+           angular-html-bind="upcomingInlineInteractionHtml">
+      </div>
+
+      <div ng-if="!upcomingInlineInteractionHtml"
+          class="conversation-skin-inline-interaction">
+        <div ng-if="!isViewportNarrow()" style="padding: 6px 12px;">
+          <[upcomingInteractionInstructions]>
+          <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
+        </div>
+        <div ng-if="isViewportNarrow()">
+          <md-button class="instructions-button">
+            <[upcomingInteractionInstructions]>
+          </md-button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div role="main" style="margin: 0 auto; position: relative;" ng-if="hasFullyLoaded">
     <progress-dots num-dots="numProgressDots" class="conversation-skin-progress-dots">
     </progress-dots>
@@ -39,7 +71,8 @@
                       class="conversation-skin-bottom-gadget-panel">
   </oppia-gadget-panel>
 
-  <div ng-if="isOnTerminalCard() && isCurrentCardAtEndOfTranscript()">
+  <div ng-if="isOnTerminalCard() && isCurrentCardAtEndOfTranscript()"
+       class="conversation-skin-final-summary">
     <div ng-if="isLoggedIn && !isInPreviewMode" class="conversation-skin-final-ratings">
       <div class="conversation-skin-final-ratings-header" translate="I18N_PLAYER_RATE_EXPLORATION">
       </div>
@@ -56,7 +89,7 @@
             translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS">
       </span>
 
-      <div class="oppia-exp-summary-tiles-container" style="padding-top: 10px;">
+      <div class="oppia-exp-summary-tiles-container conversation-skin-recommended-explorations-container">
         <exploration-summary-tile ng-repeat="exp in (recommendedExplorationSummaries|limitTo:3) track by $index"
                                   collection-id="collectionId"
                                   exploration-id="exp.id"
@@ -153,6 +186,13 @@
       z-index: 1;
     }
 
+    .conversation-skin-future-tutor-card {
+      left: -30000px;
+      max-width: 560px;
+      position: fixed;
+      top: -30000px;
+    }
+
     .conversation-skin-supplemental-card-container {
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.12);
       flex-shrink: 1;
@@ -160,6 +200,7 @@
       max-width: 1000px;
       min-width: 560px;
       position: relative;
+      z-index: 2;
     }
 
     /* These rules must be kept in sync with corresponding rules in oppia.css
@@ -304,6 +345,14 @@
     }
     .conversation-skin-oppia-feedback.ng-enter.ng-enter-active {
       opacity: 1;
+    }
+
+    .conversation-skin-final-summary {
+      margin-bottom: 25px;
+    }
+
+    .conversation-skin-recommended-explorations-container {
+      padding-top: 10px;
     }
 
     @media screen and (max-width: 959px) {

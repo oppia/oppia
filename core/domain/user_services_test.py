@@ -243,14 +243,79 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         # The user sets their membership email preference to False.
         user_services.update_email_preferences(
-            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE, False,
-            False)
+            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE, False, False)
 
         email_preferences = user_services.get_email_preferences(user_id)
         self.assertEquals(
             email_preferences['can_receive_editor_role_email'], False)
         self.assertEquals(
             email_preferences['can_receive_feedback_message_email'], False)
+
+    def test_set_and_get_user_email_preferences_for_exploration(self):
+        user_id = 'someUser'
+        exploration_id = 'someExploration'
+        username = 'username'
+        user_email = 'user@example.com'
+
+        user_services.get_or_create_user(user_id, user_email)
+        user_services.set_username(user_id, username)
+
+        # When ExplorationUserDataModel is yet to be created, the value
+        # of mute_feedback_notifications and mute_suggestion_notifications
+        # should match the default values.
+        exploration_user_model = (
+            user_services.user_models.ExplorationUserDataModel.get(
+                user_id, exploration_id))
+        self.assertIsNone(exploration_user_model)
+        email_preferences = user_services.get_email_preferences_for_exploration(
+            user_id, exploration_id)
+        self.assertEquals(
+            email_preferences['mute_feedback_notifications'],
+            feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE)
+        self.assertEquals(
+            email_preferences['mute_suggestion_notifications'],
+            feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
+
+        # This initializes a ExplorationUserDataModel instance with
+        # the default mute values.
+        user_services.set_email_preferences_for_exploration(
+            user_id, exploration_id,
+            feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE,
+            feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
+
+        email_preferences = user_services.get_email_preferences_for_exploration(
+            user_id, exploration_id)
+        self.assertEquals(
+            email_preferences['mute_feedback_notifications'],
+            feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE)
+        self.assertEquals(
+            email_preferences['mute_suggestion_notifications'],
+            feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
+
+        # This sets only mute_suggestion_notifications property to True.
+        # mute_feedback_notifications should remain same as before.
+        user_services.set_email_preferences_for_exploration(
+            user_id, exploration_id, mute_suggestion_notifications=True)
+
+        email_preferences = user_services.get_email_preferences_for_exploration(
+            user_id, exploration_id)
+        self.assertEquals(
+            email_preferences['mute_feedback_notifications'],
+            feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE)
+        self.assertEquals(
+            email_preferences['mute_suggestion_notifications'], True)
+
+        # This sets only mute_feedback_notifications property to True.
+        # mute_suggestion_notifications should remain same as before.
+        user_services.set_email_preferences_for_exploration(
+            user_id, exploration_id, mute_feedback_notifications=True)
+
+        email_preferences = user_services.get_email_preferences_for_exploration(
+            user_id, exploration_id)
+        self.assertEquals(
+            email_preferences['mute_feedback_notifications'], True)
+        self.assertEquals(
+            email_preferences['mute_suggestion_notifications'], True)
 
     def test_get_current_date_as_string(self):
         custom_datetimes = [

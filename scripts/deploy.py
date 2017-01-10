@@ -33,8 +33,6 @@ IMPORTANT NOTES:
     It should also contain a folder called /common, which should contain:
     - favicon.ico and robots.txt.
     - one folder images/general which contains:
-        - background.jpg
-        - icons-bg.png
         - warning.png
 
 2.  Before running this script, you must install third-party dependencies by

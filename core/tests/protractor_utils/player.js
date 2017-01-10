@@ -134,6 +134,17 @@ var expectExplorationToNotBeOver = function() {
   )).last().getText()).not.toEqual('Congratulations, you have finished!');
 };
 
+var openFeedbackPopup = function() {
+  element(by.css('.protractor-test-exploration-feedback-popup-link')).click();
+};
+
+var submitFeedback = function(feedback) {
+  openFeedbackPopup();
+  element(by.css('.protractor-test-exploration-feedback-textarea')).
+    sendKeys(feedback);
+  element(by.css('.protractor-test-exploration-feedback-submit-btn')).click();
+};
+
 exports.restartExploration = restartExploration;
 
 exports.expectExplorationNameToBe = expectExplorationNameToBe;
@@ -153,3 +164,6 @@ exports.expectExplorationRatingOnInformationCardToEqual = (
 
 exports.expectExplorationToBeOver = expectExplorationToBeOver;
 exports.expectExplorationToNotBeOver = expectExplorationToNotBeOver;
+
+exports.openFeedbackPopup = openFeedbackPopup;
+exports.submitFeedback = submitFeedback;
