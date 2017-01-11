@@ -857,12 +857,12 @@ oppia.factory('explorationStatesService', [
     };
 
     var convertToBackend = function(propertyValue) {
-        var propToBackend = [];
-        for (var i = 0; i < propertyValue.length; i++) {
-          propToBackend.push(propertyValue[i].toBackendDict());
-        }
-        return propToBackend;
-    }
+      var propToBackend = [];
+      for (var i = 0; i < propertyValue.length; i++) {
+        propToBackend.push(propertyValue[i].toBackendDict());
+      }
+      return propToBackend;
+    };
 
     // TODO(sll): Add unit tests for all get/save methods.
     return {
