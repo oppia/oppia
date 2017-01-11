@@ -786,11 +786,11 @@ oppia.factory('explorationStatesService', [
       editorContextService, validatorsService, newStateTemplateService,
       explorationGadgetsService, StateObjectFactory) {
     var _states = null;
-    // Properties that have a different backend representation from the frontend 
-    // and must be converted.
+    // Properties that have a different backend representation from the 
+    // frontend and must be converted.
     var PROPERTIES_TO_CONVERT = [
       'answer_groups'
-    ]
+    ];
     // Maps backend names to the corresponding frontend dict accessor lists.
     var PROPERTY_REF_DATA = {
       answer_groups: ['interaction', 'answer_groups'],
