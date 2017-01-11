@@ -210,6 +210,7 @@
 	"I18N_PREFERENCES_EMAIL": "Correo electrónico",
 	"I18N_PREFERENCES_EMAIL_EXPLAIN": "Sólo moderadores y administradores pueden ver esto.",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_NEWS": "Recibir noticias y actualizaciones sobre el sitio.",
+	"I18N_PREFERENCES_EMAIL_RECEIVE_SUBSCRIPTION_NEWS": "Recibir mensajes de correo cuando el autor ha suscrito una nueva publicación de exploración.",
 	"I18N_PREFERENCES_HEADING": "Preferencias",
 	"I18N_PREFERENCES_HEADING_SUBTEXT": "Los cambios que hagas en esta página serán guardados automáticamente.",
 	"I18N_PREFERENCES_PAGE_TITLE": "Cambiar sus preferencias de perfil - Oppia",
