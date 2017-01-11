@@ -786,7 +786,11 @@ oppia.factory('explorationStatesService', [
       editorContextService, validatorsService, newStateTemplateService,
       explorationGadgetsService, StateObjectFactory) {
     var _states = null;
-
+    // Properties that have a different backend representation from the frontend 
+    // and must be converted.
+    var PROPERTIES_TO_CONVERT = [
+      'answer_groups'
+    ]
     // Maps backend names to the corresponding frontend dict accessor lists.
     var PROPERTY_REF_DATA = {
       answer_groups: ['interaction', 'answer_groups'],
@@ -819,17 +823,17 @@ oppia.factory('explorationStatesService', [
     };
 
     var saveStateProperty = function(stateName,
-      backendName, newValue, newValueBackend) {
+      backendName, newValue) {
       var oldValue = getStatePropertyMemento(stateName, backendName);
+      var newValueBackend = angular.copy(newValue);
+
+      if (PROPERTIES_TO_CONVERT.indexOf(backendName) > -1) {
+        newValueBackend = convertToBackend(newValue);
+      }
 
       if (!angular.equals(oldValue, newValue)) {
-        if (newValueBackend === undefined) {
-          changeListService.editStateProperty(
-            stateName, backendName, newValue, oldValue);
-        } else {
-          changeListService.editStateProperty(
-            stateName, backendName, newValueBackend, oldValue);
-        }
+        changeListService.editStateProperty(
+          stateName, backendName, newValueBackend, oldValue);
 
         var newStateData = angular.copy(_states[stateName]);
         var accessorList = PROPERTY_REF_DATA[backendName];
@@ -851,6 +855,14 @@ oppia.factory('explorationStatesService', [
         _setState(stateName, newStateData, refreshGraph);
       }
     };
+
+    var convertToBackend = function(propertyValue) {
+        var propToBackend = [];
+        for (var i = 0; i < propertyValue.length; i++) {
+          propToBackend.push(propertyValue[i].toBackendDict());
+        }
+        return propToBackend;
+    }
 
     // TODO(sll): Add unit tests for all get/save methods.
     return {
@@ -916,12 +928,7 @@ oppia.factory('explorationStatesService', [
         return getStatePropertyMemento(stateName, 'answer_groups');
       },
       saveInteractionAnswerGroups: function(stateName, newAnswerGroups) {
-        var newAnswerGroupsToBackend = [];
-        for (var i = 0; i < newAnswerGroups.length; i++) {
-          newAnswerGroupsToBackend.push(newAnswerGroups[i].toBackendDict());
-        }
-        saveStateProperty(stateName, 'answer_groups',
-          newAnswerGroups, newAnswerGroupsToBackend);
+        saveStateProperty(stateName, 'answer_groups', newAnswerGroups);
       },
       getConfirmedUnclassifiedAnswersMemento: function(stateName) {
         return getStatePropertyMemento(

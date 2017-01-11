@@ -23,18 +23,27 @@ oppia.factory('StateObjectFactory', [
   var State = function(name, content, interaction, paramChanges) {
     this.name = name;
     this.content = content;
-    this.interaction = interaction;
+    this.interaction = {
+      answer_groups: generateAnswerGroupsFromBackend(interaction.answer_groups),
+      confirmed_unclassified_answers: interaction.confirmed_unclassified_answers,
+      customization_args: interaction.customization_args,
+      default_outcome: interaction.default_outcome,
+      fallbacks: interaction.fallbacks,
+      id: interaction.id
+    }
     this.paramChanges = paramChanges;
+  };
 
+  var generateAnswerGroupsFromBackend = function(answerGroupsBackendDict) {
     var answerGroups = [];
-    for (var answerGroup in interaction.answer_groups) {
-      var answerGroupData = interaction.answer_groups[answerGroup];
+    for (var answerGroup in answerGroupsBackendDict) {
+      var answerGroupData = answerGroupsBackendDict[answerGroup];
       answerGroups.push(
         AnswerGroupObjectFactory.create(
           answerGroupData.rule_specs, answerGroupData.outcome));
     }
-    this.interaction.answer_groups = answerGroups;
-  };
+    return answerGroups;
+  }
 
   // Instance methods.
   State.prototype.toBackendDict = function() {
