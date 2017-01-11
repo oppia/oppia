@@ -77,23 +77,27 @@ _EXCLUSIVE_GROUP.add_argument(
 BAD_PATTERNS = {
     '__author__': {
         'message': 'Please remove author tags from this file.',
-        'excluded_files': ()},
+        'excluded_files': (),
+        'excluded_dirs': ()},
     'datetime.datetime.now()': {
         'message': 'Please use datetime.datetime.utcnow() instead of'
                    'datetime.datetime.now().',
-        'excluded_files': ()},
+        'excluded_files': (),
+        'excluded_dirs': ()},
     '\t': {
         'message': 'Please use spaces instead of tabs.',
         'excluded_files': (),
         'excluded_dirs': (
-            'assets/i18n/')},
+            'assets/i18n/',)},
     '\r': {
         'message': 'Please make sure all files only have LF endings (no CRLF).',
-        'excluded_files': ()},
+        'excluded_files': (),
+        'excluded_dirs': ()},
     'glyphicon': {
         'message': 'Please use equivalent material-icons '
                    'instead of glyphicons.',
-        'excluded_files': ()}
+        'excluded_files': (),
+        'excluded_dirs': ()}
 }
 
 BAD_PATTERNS_JS = {
@@ -182,15 +186,19 @@ _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
 
 
-def _is_filename_excluded_for_bad_patterns_check(filename):
+def _is_filename_excluded_for_bad_patterns_check(pattern, filename):
     """Checks if file is excluded from the bad patterns check
+
+    Args:
+    - pattern: The pattern to be checked against.
+    - filename: Name of the file.
 
     Returns:
         a boolean: true if excluded
     """
     return (any(filename.startswith(bad_pattern)
-                for bad_pattern in BAD_PATTERNS['\t']['excluded_dirs'])
-            or filename in BAD_PATTERNS['\t']['excluded_files'])
+                for bad_pattern in BAD_PATTERNS[pattern]['excluded_dirs'])
+            or filename in BAD_PATTERNS[pattern]['excluded_files'])
 
 def _get_changed_filenames():
     """Returns a list of modified files (both staged and unstaged)
@@ -474,7 +482,8 @@ def _check_bad_patterns(all_files):
             content = f.read()
             total_files_checked += 1
             for pattern in BAD_PATTERNS:
-                if not _is_filename_excluded_for_bad_patterns_check(filename):
+                if not _is_filename_excluded_for_bad_patterns_check(
+                        pattern, filename):
                     failed = True
                     print '%s --> %s' % (
                         filename, BAD_PATTERNS[pattern]['message'])
