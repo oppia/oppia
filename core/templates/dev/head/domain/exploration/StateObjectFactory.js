@@ -24,13 +24,15 @@ oppia.factory('StateObjectFactory', [
     this.name = name;
     this.content = content;
     this.interaction = {
-      answer_groups: generateAnswerGroupsFromBackend(interaction.answer_groups),
-      confirmed_unclassified_answers: interaction.confirmed_unclassified_answers,
+      answer_groups:
+        generateAnswerGroupsFromBackend(interaction.answer_groups),
+      confirmed_unclassified_answers:
+        interaction.confirmed_unclassified_answers,
       customization_args: interaction.customization_args,
       default_outcome: interaction.default_outcome,
       fallbacks: interaction.fallbacks,
       id: interaction.id
-    }
+    };
     this.paramChanges = paramChanges;
   };
 
@@ -43,7 +45,7 @@ oppia.factory('StateObjectFactory', [
           answerGroupData.rule_specs, answerGroupData.outcome));
     }
     return answerGroups;
-  }
+  };
 
   // Instance methods.
   State.prototype.toBackendDict = function() {
