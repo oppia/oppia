@@ -182,6 +182,16 @@ _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
 
 
+def _is_filename_excluded_for_bad_patterns_check(filename):
+    """Checks if file is excluded from the bad patterns check
+
+    Returns:
+        a boolean: true if excluded
+    """
+    return (any(filename.startswith(bad_pattern)
+                for bad_pattern in BAD_PATTERNS['\t']['excluded_dirs'])
+            or filename in BAD_PATTERNS['\t']['excluded_files'])
+
 def _get_changed_filenames():
     """Returns a list of modified files (both staged and unstaged)
 
@@ -464,10 +474,7 @@ def _check_bad_patterns(all_files):
             content = f.read()
             total_files_checked += 1
             for pattern in BAD_PATTERNS:
-                if pattern in content and not any(
-                        filename.startswith(bad_pattern) for bad_pattern in
-                        BAD_PATTERNS[pattern]['excluded_dirs']) and filename \
-                not in BAD_PATTERNS[pattern]['excluded_files']:
+                if not _is_filename_excluded_for_bad_patterns_check(filename):
                     failed = True
                     print '%s --> %s' % (
                         filename, BAD_PATTERNS[pattern]['message'])
