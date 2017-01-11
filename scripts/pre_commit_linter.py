@@ -482,8 +482,9 @@ def _check_bad_patterns(all_files):
             content = f.read()
             total_files_checked += 1
             for pattern in BAD_PATTERNS:
-                if not _is_filename_excluded_for_bad_patterns_check(
-                        pattern, filename):
+                if (pattern in content and
+                        not _is_filename_excluded_for_bad_patterns_check(
+                            pattern, filename)):
                     failed = True
                     print '%s --> %s' % (
                         filename, BAD_PATTERNS[pattern]['message'])
