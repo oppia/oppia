@@ -40,7 +40,7 @@ CUSTOMIZATION OPTIONS
 1.  To lint only files that have been touched in this commit
        python scripts/pre_commit_linter.py
 
-2.  To lint all files in  the folder or to lint just a specific file
+2.  To lint all files in the folder or to lint just a specific file
         python scripts/pre_commit_linter.py --path filepath
 
 3.  To lint a specific list of files (*.js/*.py only). Separate files by spaces
@@ -190,8 +190,8 @@ def _is_filename_excluded_for_bad_patterns_check(pattern, filename):
     """Checks if file is excluded from the bad patterns check.
 
     Args:
-        pattern: The pattern to be checked against.
-        filename: Name of the file.
+        pattern: str. The pattern to be checked against.
+        filename: str. Name of the file.
 
     Returns:
         bool: Whether to exclude the given file from this
@@ -206,7 +206,7 @@ def _get_changed_filenames():
     """Returns a list of modified files (both staged and unstaged)
 
     Returns:
-        a list of filenames of modified files
+        a list of filenames of modified files.
     """
     unstaged_files = subprocess.check_output([
         'git', 'diff', '--name-only']).splitlines()
@@ -240,7 +240,8 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
 
     Args:
         dir_path: str. Path to the folder to be linted.
-        excluded_glob_patterns: set. Set of all files to be excluded.
+        excluded_glob_patterns: set(str). Set of all glob patterns
+        to be excluded.
 
     Returns:
         a list of files in directory and subdirectories without excluded files.
@@ -264,9 +265,9 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint, stdout,
         node_path: str. Path to the node binary.
         jscs_path: str. Path to the JSCS binary.
         config_jscsrc: str. Configuration args for the call to the JSCS binary.
-        files_to_lint: list of str. A list of filepaths to lint.
-        stdout:  multiprocessing.Queue. A queue to store JSCS outputs
-        result: multiprocessing.Queue. A queue to put results of test
+        files_to_lint: list(str). A list of filepaths to lint.
+        stdout:  multiprocessing.Queue. A queue to store JSCS outputs.
+        result: multiprocessing.Queue. A queue to put results of test.
 
     Returns:
         None
@@ -313,8 +314,8 @@ def _lint_py_files(config_pylint, files_to_lint, result):
 
     Args:
         config_pylint: str. Path to the .pylintrc file.
-        files_to_lint: list of str. A list of filepaths to lint.
-        result: multiprocessing.Queue. A queue to put results of test
+        files_to_lint: list(str). A list of filepaths to lint.
+        result: multiprocessing.Queue. A queue to put results of test.
 
     Returns:
         None
@@ -400,7 +401,7 @@ def _get_all_files():
 
 def _pre_commit_linter(all_files):
     """This function is used to check if node-jscs dependencies are installed
-    and pass JSCS binary path
+    and pass JSCS binary path.
     """
     print 'Starting linter...'
 
