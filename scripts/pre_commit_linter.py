@@ -220,7 +220,7 @@ def _get_glob_patterns_excluded_from_jscsrc(config_jscsrc):
     """Collects excludeFiles from jscsrc file.
 
     Args:
-    - config_jscsrc: str. Path to .jscsrc file.
+        config_jscsrc: str. Path to .jscsrc file.
 
     Returns:
         a list of files in excludeFiles.
@@ -239,8 +239,8 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     subdirectories of specified path.
 
     Args:
-    - dir_path: str. Path to the folder to be linted.
-    - excluded_glob_patterns: set. Set of all files to be excluded.
+        dir_path: str. Path to the folder to be linted.
+        excluded_glob_patterns: set. Set of all files to be excluded.
 
     Returns:
         a list of files in directory and subdirectories without excluded files.
@@ -261,12 +261,12 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint, stdout,
     """Prints a list of lint errors in the given list of JavaScript files.
 
     Args:
-    - node_path: str. Path to the node binary.
-    - jscs_path: str. Path to the JSCS binary.
-    - config_jscsrc: str. Configuration args for the call to the JSCS binary.
-    - files_to_lint: list of str. A list of filepaths to lint.
-    - stdout:  multiprocessing.Queue. A queue to store JSCS outputs
-    - result: multiprocessing.Queue. A queue to put results of test
+        node_path: str. Path to the node binary.
+        jscs_path: str. Path to the JSCS binary.
+        config_jscsrc: str. Configuration args for the call to the JSCS binary.
+        files_to_lint: list of str. A list of filepaths to lint.
+        stdout:  multiprocessing.Queue. A queue to store JSCS outputs
+        result: multiprocessing.Queue. A queue to put results of test
 
     Returns:
         None
@@ -312,9 +312,9 @@ def _lint_py_files(config_pylint, files_to_lint, result):
     """Prints a list of lint errors in the given list of Python files.
 
     Args:
-    - config_pylint: str. Path to the .pylintrc file.
-    - files_to_lint: list of str. A list of filepaths to lint.
-    - result: multiprocessing.Queue. A queue to put results of test
+        config_pylint: str. Path to the .pylintrc file.
+        files_to_lint: list of str. A list of filepaths to lint.
+        result: multiprocessing.Queue. A queue to put results of test
 
     Returns:
         None
