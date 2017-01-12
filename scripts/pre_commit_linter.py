@@ -187,18 +187,19 @@ _MESSAGE_TYPE_FAILED = 'FAILED'
 
 
 def _is_filename_excluded_for_bad_patterns_check(pattern, filename):
-    """Checks if file is excluded from the bad patterns check
+    """Checks if file is excluded from the bad patterns check.
 
     Args:
-    - pattern: The pattern to be checked against.
-    - filename: Name of the file.
+        pattern: The pattern to be checked against.
+        filename: Name of the file.
 
     Returns:
-        a boolean: true if excluded
+        bool: Whether to exclude the given file from this particular pattern check.
     """
     return (any(filename.startswith(bad_pattern)
                 for bad_pattern in BAD_PATTERNS[pattern]['excluded_dirs'])
             or filename in BAD_PATTERNS[pattern]['excluded_files'])
+
 
 def _get_changed_filenames():
     """Returns a list of modified files (both staged and unstaged)
