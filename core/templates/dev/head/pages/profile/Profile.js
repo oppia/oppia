@@ -71,12 +71,29 @@ oppia.controller('Profile', [
         }
       });
 
+      $scope.isAlreadySubscribed = data.is_already_subscribed;
+      $scope.isUserVisitingOwnProfile = data.is_user_visiting_own_profile;
+
       $scope.currentPageNumber = 0;
       $scope.PAGE_SIZE = 6;
       $scope.startingExplorationNumber = 1;
       $scope.endingExplorationNumber = 6;
       $scope.Math = window.Math;
       $scope.profileIsOfCurrentUser = data.profile_is_of_current_user;
+
+      $scope.changeSubscriptionStatus = function() {
+        if ($scope.isAlreadySubscribed === false) {
+          $scope.isAlreadySubscribed = true;
+          $http.post('/subscribehandler', {
+            creator_username: data.profile_username
+          });
+        } else {
+          $scope.isAlreadySubscribed = false;
+          $http.post('/unsubscribehandler', {
+            creator_username: data.profile_username
+          });
+        }
+      };
 
       $scope.goToPreviousPage = function() {
         if ($scope.currentPageNumber === 0) {
