@@ -194,7 +194,8 @@ def _is_filename_excluded_for_bad_patterns_check(pattern, filename):
         filename: Name of the file.
 
     Returns:
-        bool: Whether to exclude the given file from this particular pattern check.
+        bool: Whether to exclude the given file from this
+        particular pattern check.
     """
     return (any(filename.startswith(bad_pattern)
                 for bad_pattern in BAD_PATTERNS[pattern]['excluded_dirs'])
