@@ -31,14 +31,21 @@ oppia.animation('.oppia-collection-animate-slide', function() {
 });
 
 oppia.controller('CollectionPlayer', [
-  '$scope', 'ReadOnlyCollectionBackendApiService', 'CollectionObjectFactory',
-  'CollectionPlaythroughObjectFactory', 'alertsService',
-  function($scope, ReadOnlyCollectionBackendApiService, CollectionObjectFactory,
-    CollectionPlaythroughObjectFactory, alertsService) {
+  '$scope', '$http', 'ReadOnlyCollectionBackendApiService',
+  'CollectionObjectFactory', 'CollectionPlaythroughObjectFactory',
+  'alertsService',
+  function($scope, $http, ReadOnlyCollectionBackendApiService,
+    CollectionObjectFactory, CollectionPlaythroughObjectFactory,
+    alertsService) {
     $scope.collection = null;
     $scope.collectionPlaythrough = null;
     $scope.collectionId = GLOBALS.collectionId;
     $scope.showingAllExplorations = !GLOBALS.isLoggedIn;
+    $scope.previewCardIsShown = true;
+
+    $scope.togglePreviewCard = function() {
+      $scope.previewCardIsShown = !$scope.previewCardIsShown;
+    };
 
     $scope.getCollectionNodeForExplorationId = function(explorationId) {
       var collectionNode = (
@@ -93,6 +100,27 @@ oppia.controller('CollectionPlayer', [
     $scope.toggleShowAllExplorations = function() {
       $scope.showingAllExplorations = !$scope.showingAllExplorations;
     };
+
+    $scope.updateExplorationPreview = function(explorationId) {
+      $scope.previewCardIsShown = false;
+      $scope.currentExplorationId = explorationId;
+      $scope.summaryToPreview = $scope.getCollectionNodeForExplorationId(
+        explorationId).getExplorationSummaryObject();
+    };
+
+    $http.get('/collectionsummarieshandler/data', {
+      params: {
+        stringified_collection_ids: JSON.stringify([$scope.collectionId])
+      }
+    }).then(
+      function(response) {
+        $scope.collectionSummary = response.data.summaries[0];
+      },
+      function() {
+        alertsService.addWarning(
+          'There was an error while fetching the collection summary.');
+      }
+    );
 
     // Load the collection the learner wants to view.
     ReadOnlyCollectionBackendApiService.loadCollection(

@@ -1815,6 +1815,10 @@ pre.oppia-pre-wrapped-text {
   margin-bottom: 6px;
 }
 
+.oppia-collection-player-title-font {
+  font-family: Capriola, Roboto, Arial, sans-serif;
+}
+
 /* Styles for the statistics page. */
 
 .oppia-back-arrow {
