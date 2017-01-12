@@ -241,7 +241,7 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     Args:
         dir_path: str. Path to the folder to be linted.
         excluded_glob_patterns: set(str). Set of all glob patterns
-        to be excluded.
+            to be excluded.
 
     Returns:
         a list of files in directory and subdirectories without excluded files.
