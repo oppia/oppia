@@ -730,6 +730,11 @@ textarea {
   }
 
 }
+@media only screen and (min-width: 700px) and (max-width: 768px){
+  .oppia-footer-padding-below-banner{
+    height: 270px;
+  }
+}
 @media (max-width: 440px) {
   .oppia-footer-padding-below-banner{
     height: 250px;
