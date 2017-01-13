@@ -72,7 +72,6 @@ class ModifiedInteractionAnswerSummariesMRJobManager(
         return ModifiedInteractionAnswerSummariesAggregator
 
 
-# TODO(bhenning): Implement all of the missing stats services tests.
 class EventLogEntryTests(test_utils.GenericTestBase):
     """Test for the event log creation."""
 

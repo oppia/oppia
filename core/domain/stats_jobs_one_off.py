@@ -39,7 +39,6 @@ import utils
 (base_models, stats_models, exp_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.statistics, models.NAMES.exploration
 ])
-transaction_services = models.Registry.import_transaction_services()
 
 
 # pylint: disable=W0123
@@ -631,7 +630,7 @@ class ClearMigratedAnswersJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
-        yield 'Deleted %d answers' % len(stringified_values)
+        yield 'Deleted %d answer buckets' % len(stringified_values)
 
 
 class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):

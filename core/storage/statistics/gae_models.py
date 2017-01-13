@@ -28,6 +28,7 @@ import utils
 from google.appengine.ext import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+transaction_services = models.Registry.import_transaction_services()
 
 # TODO(bhenning): Everything is handler name submit; therefore, it is
 # pointless and should be removed.
@@ -655,15 +656,9 @@ class StateAnswersModel(base_models.BaseModel):
             return None
 
     @classmethod
-    def insert_submitted_answers(
+    def _insert_submitted_answers_unsafe(
             cls, exploration_id, exploration_version, state_name,
             interaction_id, new_submitted_answer_dict_list):
-        """Given an exploration ID, version, state name, and interaction ID,
-        attempt to insert a list of specified SubmittedAnswers into this model,
-        performing sharding operations as necessary. This method automatically
-        commits updated/new models to the data store. This method returns
-        nothing.
-        """
         # The main shard always needs to be retrieved. At most one other shard
         # needs to be retrieved (the last one).
         main_shard = cls._get_model(
@@ -728,6 +723,21 @@ class StateAnswersModel(base_models.BaseModel):
                 entities_to_put.append(last_shard)
 
         cls.put_multi(entities_to_put)
+
+    @classmethod
+    def insert_submitted_answers(
+            cls, exploration_id, exploration_version, state_name,
+            interaction_id, new_submitted_answer_dict_list):
+        """Given an exploration ID, version, state name, and interaction ID,
+        attempt to insert a list of specified SubmittedAnswers into this model,
+        performing sharding operations as necessary. This method automatically
+        commits updated/new models to the data store. This method returns
+        nothing.
+        """
+        transaction_services.run_in_transaction(
+            cls._insert_submitted_answers_unsafe, exploration_id,
+            exploration_version, state_name, interaction_id,
+            new_submitted_answer_dict_list)
 
     @classmethod
     def _get_entity_id(
