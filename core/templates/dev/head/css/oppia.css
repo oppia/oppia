@@ -1818,6 +1818,10 @@ pre.oppia-pre-wrapped-text {
   margin-bottom: 6px;
 }
 
+.oppia-collection-player-title-font {
+  font-family: Capriola, Roboto, Arial, sans-serif;
+}
+
 /* Styles for the statistics page. */
 
 .oppia-back-arrow {
@@ -4101,7 +4105,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-static-header {
   align-items: center;
   display: flex;
-  height: 140px;
+  height: 210px;
   position: absolute;
   text-align: center;
   width: 100%;
@@ -4113,7 +4117,7 @@ md-card.preview-conversation-skin-supplemental-card {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 3em;
   left: 50%;
-  position: absolute;
+  position: relative;
   transform: translateX(-50%);
   -webkit-transform: translateX(-50%);
   -ms-transform: translateX(-50%);
@@ -4223,6 +4227,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-static-card-content {
   margin: 0 auto;
   max-width: 600px;
+  padding: 4% 0 1% 0;
 }
 
 .oppia-static-card-content-wide {
@@ -4438,6 +4443,9 @@ md-card.preview-conversation-skin-supplemental-card {
 */
 
 @media only screen and (min-width: 1400px) {
+  .oppia-about-extra-info {
+    height: 245px;
+  }
   .oppia-static-content, .oppia-static-extra-content {
     width: 960px;
   }
@@ -4471,6 +4479,7 @@ md-card.preview-conversation-skin-supplemental-card {
   .oppia-about-otter-speech-bubble {
     padding: 10px;
   }
+
 }
 
 @media only screen and (max-width: 500px) {
@@ -4495,11 +4504,11 @@ md-card.preview-conversation-skin-supplemental-card {
   .oppia-about-buttons:first-child {
     margin: 0;
   }
-
   .oppia-about-three-cols-layout {
     width: 100%;
   }
 }
+
 
 
 .oppia-save-exploration-wide-modal .modal-dialog {
