@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service that syncs the postion of the user in the simple editor
+ * @fileoverview Service that syncs the position of the user in the simple editor
  with the navigation sidebar.
  */
 
