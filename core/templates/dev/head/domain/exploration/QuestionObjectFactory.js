@@ -27,6 +27,7 @@ oppia.factory('QuestionObjectFactory', [function() {
     this._answerGroups = answerGroups;
     this._defaultOutcome = defaultOutcome;
     this._bridgeHtml = bridgeHtml;
+    this.collapsed = false;
   };
 
   // Instance methods.

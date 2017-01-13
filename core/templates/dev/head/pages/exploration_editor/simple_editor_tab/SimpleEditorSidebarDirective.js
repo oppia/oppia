@@ -32,27 +32,20 @@ oppia.directive('simpleEditorSidebar', [function() {
         {label: 'Bridge text', abbr: 'bt'}
       ];
       $scope.setEditorModeToFull = EditorModeService.setModeToFull;
-      $scope.questionList = ScrollSyncService._questionList = SimpleEditorManagerService.getQuestionList();
+      $scope.questionList = SimpleEditorManagerService.getQuestionList();
       $scope.getHash = QuestionHashService.getHash;
       $scope.getSidebarItemHash = QuestionHashService.getSidebarItemHash;
       $scope.scrollTo = function(question, subfield) {
         ScrollSyncService.scrollTo($scope.getHash(question, subfield));
       };
       $scope.collapse = function(question) {
-        if (!angular.isDefined(question.collapsed)) {
-          question.collapsed = false;
-        } else {
-          question.collapsed = !question.collapsed;
-        }
+        question.collapsed = !question.collapsed;
       };
       $scope.$on('SimpleEditorSidebarLinkCollapse', function(event, question) {
         $scope.collapse(question);
         $scope.$apply();
       });
       $scope.isCollapsed = function(question) {
-        if (!angular.isDefined(question.collapsed)) {
-          question.collapsed = false;
-        };
         return question.collapsed;
       };
     }]
