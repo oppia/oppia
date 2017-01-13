@@ -71,8 +71,16 @@ oppia.controller('Profile', [
         }
       });
 
+      if (data.username) {
+        $scope.userNotLoggedIn = false;
+      } else {
+        $scope.userNotLoggedIn = true;
+      }
+
       $scope.isAlreadySubscribed = data.is_already_subscribed;
       $scope.isUserVisitingOwnProfile = data.is_user_visiting_own_profile;
+
+      $scope.subscriptionButtonPopoverText = '';
 
       $scope.currentPageNumber = 0;
       $scope.PAGE_SIZE = 6;
@@ -82,18 +90,42 @@ oppia.controller('Profile', [
       $scope.profileIsOfCurrentUser = data.profile_is_of_current_user;
 
       $scope.changeSubscriptionStatus = function() {
-        if ($scope.isAlreadySubscribed === false) {
-          $scope.isAlreadySubscribed = true;
-          $http.post('/subscribehandler', {
-            creator_username: data.profile_username
-          });
+        if ($scope.userNotLoggedIn === true) {
+          window.location.href = GLOBALS.loginUrl;
         } else {
-          $scope.isAlreadySubscribed = false;
-          $http.post('/unsubscribehandler', {
-            creator_username: data.profile_username
-          });
+          if ($scope.isAlreadySubscribed === false) {
+            $scope.isAlreadySubscribed = true;
+            $http.post('/subscribehandler', {
+              creator_username: data.profile_username
+            });
+          } else {
+            $scope.isAlreadySubscribed = false;
+            $http.post('/unsubscribehandler', {
+              creator_username: data.profile_username
+            });
+          }
+          $scope.updateSubscriptionButtonPopoverText();
         }
       };
+
+      $scope.updateSubscriptionButtonPopoverText = function() {
+        if ($scope.userNotLoggedIn === true) {
+          $scope.subscriptionButtonPopoverText = ('Log in or sign up to ' +
+          'subscribe to your favorite creators.');
+        } else if ($scope.isUserVisitingOwnProfile === true) {
+          $scope.subscriptionButtonPopoverText = 'No need to subscribe to ' +
+          'yourself.';
+        } else if ($scope.isAlreadySubscribed === true) {
+          $scope.subscriptionButtonPopoverText = ('Unsubscribe to stop ' +
+          'receiving email notifications regarding new explorations ' +
+          'published by ' + $scope.username.value + '.');
+        } else {
+          $scope.subscriptionButtonPopoverText = ('Receive email ' +
+          'notifications, whenever ' + $scope.username.value + ' publishes ' +
+          'a new exploration.');
+        }
+      };
+      $scope.updateSubscriptionButtonPopoverText();
 
       $scope.goToPreviousPage = function() {
         if ($scope.currentPageNumber === 0) {

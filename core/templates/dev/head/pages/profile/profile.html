@@ -131,7 +131,11 @@
 
     <button ng-disabled="isUserVisitingOwnProfile"
             class="btn oppia-subscription-button oppia-transition-200"
-            ng-click="changeSubscriptionStatus()">
+            ng-click="changeSubscriptionStatus()"
+            popover-placement="right"
+            ng-attr-popover="<[subscriptionButtonPopoverText]>"
+            popover-append-to-body
+            popover-trigger="mouseenter">
             <span translate="I18N_SUBSCRIBE_BUTTON_TEXT" ng-if="!isAlreadySubscribed"></span>
             <span translate="I18N_UNSUBSCRIBE_BUTTON_TEXT" ng-if="isAlreadySubscribed"></span>
     </button>
