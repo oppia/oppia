@@ -47,7 +47,7 @@ oppia.factory('ScrollSyncService', [
 
     var scrollSyncService = {
       // Add an element to the targets list, when a user scrolls to an element
-      // in the target list to sidebar is updated accordingly.
+      // in the target list, the sidebar is updated accordingly.
       addTarget: function(target) {
         targets.push(target);
       },
