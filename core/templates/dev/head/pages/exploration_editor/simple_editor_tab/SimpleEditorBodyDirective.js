@@ -24,10 +24,10 @@ oppia.directive('simpleEditorBody', [function() {
     controller: [
       '$scope', 'SimpleEditorManagerService',
       'explorationSaveService', 'explorationRightsService',
-      'explorationWarningsService',
+      'explorationWarningsService', 'QuestionHashService',
       function($scope, SimpleEditorManagerService,
           explorationSaveService, explorationRightsService,
-          explorationWarningsService) {
+          explorationWarningsService, QuestionHashService) {
         $scope.data = SimpleEditorManagerService.getData();
 
         $scope.saveTitle = SimpleEditorManagerService.saveTitle;
@@ -44,6 +44,7 @@ oppia.directive('simpleEditorBody', [function() {
         $scope.addNewQuestion = SimpleEditorManagerService.addNewQuestion;
         $scope.canTryToFinishExploration =
           SimpleEditorManagerService.canTryToFinishExploration;
+        $scope.getHash = QuestionHashService.getHash;
 
         $scope.isExplorationFinishable = function() {
           if (explorationRightsService.isPrivate()) {

@@ -29,7 +29,7 @@
 
         <!-- TODO(sll): Update this condition when control of individual field visibility is added. -->
         <div ng-if="!$last">
-          <h3 id="<[question.getHash('bt')]>" scroll-sync>Bridge Text</h3>
+          <h3 id="<[getHash(question, 'bt')]>" scroll-sync>Bridge Text</h3>
           <editor-html-field original-value="question.getBridgeHtml()"
                              on-finish-editing="saveBridgeHtml(question.getStateName(), newValue)">
           </editor-html-field>

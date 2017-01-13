@@ -16,15 +16,15 @@
           <i ng-click="collapse(question)" class="collapse-icon material-icons">
             <[isCollapsed(question) ? '&#xE5C7;' : '&#xE5C5;']>
           </i>
-          <strong ng-click="scrollTo(question.getHash())">Question <[$index + 1]></strong>
+          <strong ng-click="scrollTo(question)">Question <[$index + 1]></strong>
           <i class="preview-icon material-icons">&#xE8F4;</i>
         </div>
 
         <ul ng-hide="!isCollapsed(question)">
           <li class="sidebar-item sidebar-item-indented"
               ng-repeat="subfield in SUBFIELD_LABELS track by $index"
-              ng-click="scrollTo(question.getHash(subfield.abbr))"
-              id="<['si-'+question.getHash(subfield.abbr)]>">
+              ng-click="scrollTo(question, subfield)"
+              id="<[getSidebarItemHash(question, subfield)]>">
             <span>
               <a><[subfield.label]></a>
             </span>
