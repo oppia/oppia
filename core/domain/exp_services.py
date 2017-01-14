@@ -1484,7 +1484,7 @@ def index_explorations_given_ids(exp_ids):
     # We pass 'strict=False' so as not to index deleted explorations.
     exploration_models = get_multiple_explorations_by_id(exp_ids, strict=False)
     search_services.add_documents_to_index([
-    _exp_to_search_dict(exp) for exp in exploration_models.values()
+        _exp_to_search_dict(exp) for exp in exploration_models.values()
         if _should_index(exp)
     ], SEARCH_INDEX_EXPLORATIONS)
 
