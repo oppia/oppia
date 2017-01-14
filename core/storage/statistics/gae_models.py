@@ -17,9 +17,7 @@
 """Models for Oppia statistics."""
 
 import datetime
-import json
 import logging
-import sys
 
 from core.platform import models
 import feconf
@@ -618,6 +616,12 @@ class StateAnswersModel(base_models.BaseModel):
     # present when shard_id is 0. This starts at 0 (the main shard is not
     # counted).
     shard_count = ndb.IntegerProperty(indexed=True, required=False)
+    # The total number of bytes needed to store all of the answers in the
+    # submitted_answer_list, minus any overhead of the property itself. This
+    # value is found by summing all json_size values for answer dicts inside
+    # submitted_answer_list.
+    accumulated_answer_json_size = ndb.IntegerProperty(
+        indexed=False, required=False, default=0)
     # List of answer dicts, each of which is stored as JSON blob. The content
     # of answer dicts is specified in core.domain.stats_domain.StateAnswers.
     submitted_answer_list = ndb.JsonProperty(repeated=True, indexed=False)
@@ -679,8 +683,10 @@ class StateAnswersModel(base_models.BaseModel):
                 exploration_id, exploration_version, state_name,
                 main_shard.shard_count)
 
-        sharded_answer_lists = cls._shard_answers(
-            last_shard.submitted_answer_list, new_submitted_answer_dict_list)
+        sharded_answer_lists, sharded_answer_list_sizes = cls._shard_answers(
+            last_shard.submitted_answer_list,
+            last_shard.accumulated_answer_json_size,
+            new_submitted_answer_dict_list)
         new_shard_count = main_shard.shard_count + len(sharded_answer_lists) - 1
 
         # Collect all entities to update to efficiently send them as a single
@@ -691,6 +697,8 @@ class StateAnswersModel(base_models.BaseModel):
         # Update the last shard if it changed.
         if sharded_answer_lists[0] != last_shard.submitted_answer_list:
             last_shard.submitted_answer_list = sharded_answer_lists[0]
+            last_shard.accumulated_answer_json_size = (
+                sharded_answer_list_sizes[0])
             last_shard_updated = True
         else:
             last_shard_updated = False
@@ -704,7 +712,8 @@ class StateAnswersModel(base_models.BaseModel):
                 id=entity_id, exploration_id=exploration_id,
                 exploration_version=exploration_version, state_name=state_name,
                 shard_id=shard_id, interaction_id=interaction_id,
-                submitted_answer_list=sharded_answer_lists[i])
+                submitted_answer_list=sharded_answer_lists[i],
+                accumulated_answer_json_size=sharded_answer_list_sizes[i])
             entities_to_put.append(new_shard)
 
         # Update the shard count if any new shards were added.
@@ -732,7 +741,12 @@ class StateAnswersModel(base_models.BaseModel):
         attempt to insert a list of specified SubmittedAnswers into this model,
         performing sharding operations as necessary. This method automatically
         commits updated/new models to the data store. This method returns
-        nothing.
+        nothing. This method can guarantee atomicity since mutations are
+        performed transactionally, but it cannot guarantee uniqueness for answer
+        submission. Answers may be duplicated in cases where a past transaction
+        is interrupted and retried. Furthermore, this method may fail with a
+        DeadlineExceededError if too many answers are attempted for submission
+        simultaneously.
         """
         transaction_services.run_in_transaction(
             cls._insert_submitted_answers_unsafe, exploration_id,
@@ -747,38 +761,30 @@ class StateAnswersModel(base_models.BaseModel):
             str(shard_id)])
 
     @classmethod
-    def _shard_answers(cls, current_answer_list, new_answer_list):
+    def _shard_answers(
+            cls, current_answer_list, current_answer_list_size,
+            new_answer_list):
         """Given a current answer list which can fit within one NDB entity and
         a list of new answers which need to try and fit in the current answer
         list, shard the answers such that a list of answer lists are returned.
         The first entry is guaranteed to contain all answers of the current
         answer list.
         """
-        current_answer_size_list = [{
-            'answer_dict': answer_dict,
-            'json_size': sys.getsizeof(json.dumps(answer_dict))
-        } for answer_dict in current_answer_list]
         # Sort the new answers to insert in a descending by size in bytes.
-        new_answer_size_list = sorted([{
-            'answer_dict': answer_dict,
-            'json_size': sys.getsizeof(json.dumps(answer_dict))
-        } for answer_dict in new_answer_list], key=lambda x: x['json_size'])
-        sharded_answer_lists = [current_answer_size_list]
-        last_answer_list_size = reduce(
-            lambda x, y: x + y['json_size'],
-            sharded_answer_lists[-1], 0)
-        for size_answer_dict in new_answer_size_list:
-            answer_size = size_answer_dict['json_size']
-            if (last_answer_list_size + answer_size <=
+        new_answer_list_sorted = sorted(
+            new_answer_list, key=lambda x: x['json_size'])
+        sharded_answer_lists = [list(current_answer_list)]
+        sharded_answer_list_sizes = [current_answer_list_size]
+        for answer_dict in new_answer_list_sorted:
+            answer_size = answer_dict['json_size']
+            if (sharded_answer_list_sizes[-1] + answer_size <=
                     cls._MAX_ANSWER_LIST_BYTE_SIZE):
-                sharded_answer_lists[-1].append(size_answer_dict)
-                last_answer_list_size += answer_size
+                sharded_answer_lists[-1].append(answer_dict)
+                sharded_answer_list_sizes[-1] += answer_size
             else:
-                sharded_answer_lists.append([size_answer_dict])
-                last_answer_list_size = answer_size
-        return [[sharded_answer['answer_dict']
-                 for sharded_answer in sharded_answer_list]
-                for sharded_answer_list in sharded_answer_lists]
+                sharded_answer_lists.append([answer_dict])
+                sharded_answer_list_sizes.append(answer_size)
+        return sharded_answer_lists, sharded_answer_list_sizes
 
 
 class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):

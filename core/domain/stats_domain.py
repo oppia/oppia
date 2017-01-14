@@ -16,6 +16,7 @@
 
 """Domain object for statistics models."""
 
+import json
 import sys
 import utils
 
@@ -137,7 +138,15 @@ class SubmittedAnswer(object):
         self.rule_spec_str = rule_spec_str
         self.answer_str = answer_str
 
-    def to_dict(self):
+    @property
+    def json_size(self):
+        """Returns the size of the dict returned by to_dict(). This may not be
+        exactly the size of the returned dict, since it assumes the property in
+        the dict for the json_size is sys.maxint.
+        """
+        return sys.getsizeof(json.dumps(self.to_dict(json_size=sys.maxint)))
+
+    def to_dict(self, json_size=None):
         submitted_answer_dict = {
             'answer': self.normalized_answer,
             'interaction_id': self.interaction_id,
@@ -146,7 +155,8 @@ class SubmittedAnswer(object):
             'classification_categorization': self.classification_categorization,
             'params': self.params,
             'session_id': self.session_id,
-            'time_spent_in_sec': self.time_spent_in_sec
+            'time_spent_in_sec': self.time_spent_in_sec,
+            'json_size': self.json_size if not json_size else json_size,
         }
         if self.rule_spec_str is not None:
             submitted_answer_dict['rule_spec_str'] = self.rule_spec_str

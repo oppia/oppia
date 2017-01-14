@@ -34,7 +34,11 @@ class StateAnswersTests(test_utils.GenericTestBase):
                     'Other text', 'TextInput', 1, 0,
                     exp_domain.DEFAULT_OUTCOME_CLASSIFICATION, {}, 'sess', 7.5,
                     rule_spec_str='rule spec str2', answer_str='answer str2')])
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        submitted_answer_dict_list = (
+            state_answers.get_submitted_answer_dict_list())
+        for submitted_answer_dict in submitted_answer_dict_list:
+            del submitted_answer_dict['json_size']
+        self.assertEqual(submitted_answer_dict_list, [{
             'answer': 'Text',
             'interaction_id': 'TextInput',
             'answer_group_index': 0,
@@ -151,7 +155,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
             'Text', 'TextInput', 0, 1, exp_domain.EXPLICIT_CLASSIFICATION, {},
             'sess', 10.5, rule_spec_str='rule spec str',
             answer_str='answer str')
-        self.assertEqual(submitted_answer.to_dict(), {
+        self.assertEqual(submitted_answer.to_dict(json_size=1), {
             'answer': 'Text',
             'interaction_id': 'TextInput',
             'answer_group_index': 0,
@@ -160,6 +164,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
             'params': {},
             'session_id': 'sess',
             'time_spent_in_sec': 10.5,
+            'json_size': 1,
             'rule_spec_str': 'rule spec str',
             'answer_str': 'answer str'
         })
@@ -168,7 +173,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
         submitted_answer = stats_domain.SubmittedAnswer(
             'Text', 'TextInput', 0, 1, exp_domain.EXPLICIT_CLASSIFICATION, {},
             'sess', 10.5)
-        self.assertEqual(submitted_answer.to_dict(), {
+        self.assertEqual(submitted_answer.to_dict(json_size=1), {
             'answer': 'Text',
             'interaction_id': 'TextInput',
             'answer_group_index': 0,
@@ -176,7 +181,8 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': exp_domain.EXPLICIT_CLASSIFICATION,
             'params': {},
             'session_id': 'sess',
-            'time_spent_in_sec': 10.5
+            'time_spent_in_sec': 10.5,
+            'json_size': 1
         })
 
     def test_requires_normalized_answer_to_be_created_from_dict(self):

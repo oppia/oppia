@@ -58,6 +58,13 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         except Exception as e:
             logging.error(e)
 
+    def _get_submitted_answer_dict_list(self, state_answers):
+        submitted_answer_dict_list = (
+            state_answers.get_submitted_answer_dict_list())
+        for submitted_answer_dict in submitted_answer_dict_list:
+            del submitted_answer_dict['json_size']
+        return submitted_answer_dict_list
+
     def _run_migration_job(self):
         """Start the AnswerMigrationJob to migrate answers submitted to
         StateRuleAnswerLogModel.
@@ -201,7 +208,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': [{
                 'readableNoteName': 'C5',
                 'noteDuration': {
@@ -240,7 +247,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
 
         # The answer should have still migrated.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': 'appreciate',
             'time_spent_in_sec': 0.0,
             'answer_group_index': 0,
@@ -645,7 +652,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # model.
         state_answers = self._get_state_answers(
             state_name, exploration_id='exp_id0', exploration_version=2)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': 4.0,
             'time_spent_in_sec': 0.0,
             'answer_group_index': 0,
@@ -725,7 +732,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should be matched to version 3 of the exploration.
         state_answers = self._get_state_answers(
             state_name, exploration_id='exp_id0', exploration_version=3)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': None,
             'time_spent_in_sec': 0.0,
             'answer_group_index': 0,
@@ -829,7 +836,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # between those two answers.
         state_answers = self._get_state_answers(
             state_name, exploration_id='exp_id0', exploration_version=2)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': 'fiddle',
             'time_spent_in_sec': 0.0,
             'answer_group_index': 0,
@@ -846,7 +853,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
 
         state_answers = self._get_state_answers(
             state_name, exploration_id='exp_id0', exploration_version=3)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': None,
             'time_spent_in_sec': 0.0,
             'answer_group_index': 0,
@@ -971,7 +978,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # changed between those two versions.
         state_answers = self._get_state_answers(
             state_name, exploration_id='exp_id0', exploration_version=2)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': 1,
             'time_spent_in_sec': 0.0,
             'answer_group_index': 1,
@@ -988,7 +995,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
 
         state_answers = self._get_state_answers(
             state_name, exploration_id='exp_id0', exploration_version=3)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': 1,
             'time_spent_in_sec': 0.0,
             'answer_group_index': 1,
@@ -1101,7 +1108,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # version which changes their meaning.
         state_answers = self._get_state_answers(
             state_name, exploration_id='exp_id0', exploration_version=4)
-        submitted_answer_list = state_answers.get_submitted_answer_dict_list()
+        submitted_answer_list = self._get_submitted_answer_dict_list(state_answers)
         self.assertIn({
             'answer': 'levitate',
             'time_spent_in_sec': 0.0,
@@ -1303,22 +1310,23 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'AbuDhabi', exploration_id=exp_id)
 
         # Verify the answer submitted to AbuDhabi.
-        self.assertEqual(state_answers1.get_submitted_answer_dict_list(), [{
-            'answer': [27.28934, 50.99873],
-            'time_spent_in_sec': 0.0,
-            'answer_group_index': 0,
-            'rule_spec_index': 0,
-            'classification_categorization': (
-                exp_domain.EXPLICIT_CLASSIFICATION),
-            'session_id': 'migrated_state_answer_session_id',
-            'interaction_id': 'InteractiveMap',
-            'params': {},
-            'rule_spec_str': 'Within(11.0,[24.467, 54.367])',
-            'answer_str': '(27.28934, 50.99873)'
-        }])
+        self.assertEqual(
+            self._get_submitted_answer_dict_list(state_answers1), [{
+                'answer': [27.28934, 50.99873],
+                'time_spent_in_sec': 0.0,
+                'answer_group_index': 0,
+                'rule_spec_index': 0,
+                'classification_categorization': (
+                    exp_domain.EXPLICIT_CLASSIFICATION),
+                'session_id': 'migrated_state_answer_session_id',
+                'interaction_id': 'InteractiveMap',
+                'params': {},
+                'rule_spec_str': 'Within(11.0,[24.467, 54.367])',
+                'answer_str': '(27.28934, 50.99873)'
+            }])
 
         # Verify the answers submitted to PickCity.
-        submitted_answers = state_answers0.get_submitted_answer_dict_list()
+        submitted_answers = self._get_submitted_answer_dict_list(state_answers0)
         self.assertEqual(len(submitted_answers), 3)
         self.assertIn({
             'answer': 1,
@@ -1459,7 +1467,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # both.
         state_answers = self._get_state_answers(
             state_name, exploration_id='exp_id0', exploration_version=3)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': '2.5',
             'time_spent_in_sec': 0.0,
             'answer_group_index': 0,
@@ -1667,7 +1675,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # earlier version of the exploration should also match.
         state_answers = self._get_state_answers(
             state_name, exploration_id='exp_id0', exploration_version=2)
-        submitted_answer_list = state_answers.get_submitted_answer_dict_list()
+        submitted_answer_list = self._get_submitted_answer_dict_list(state_answers)
         self.assertEqual(sorted(submitted_answer_list), [{
             'answer': 2.5,
             'time_spent_in_sec': 0.0,
@@ -1684,7 +1692,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
 
         state_answers = self._get_state_answers(
             state_name, exploration_id='exp_id0', exploration_version=3)
-        submitted_answer_list = state_answers.get_submitted_answer_dict_list()
+        submitted_answer_list = self._get_submitted_answer_dict_list(state_answers)
         self.assertEqual(len(submitted_answer_list), 2)
         self.assertEqual(sorted(submitted_answer_list), [{
             'answer': 'appreciate',
@@ -1732,7 +1740,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # All answers should now be properly migrated.
         state_answers = self._get_state_answers(
             state_name, exploration_id='exp_id0', exploration_version=2)
-        submitted_answer_list = state_answers.get_submitted_answer_dict_list()
+        submitted_answer_list = self._get_submitted_answer_dict_list(state_answers)
         self.assertEqual(sorted(submitted_answer_list), [{
             'answer': 2.5,
             'time_spent_in_sec': 0.0,
@@ -1748,7 +1756,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         }])
         state_answers = self._get_state_answers(
             state_name, exploration_id='exp_id0', exploration_version=3)
-        submitted_answer_list = state_answers.get_submitted_answer_dict_list()
+        submitted_answer_list = self._get_submitted_answer_dict_list(state_answers)
         self.assertEqual(len(submitted_answer_list), 3)
         self.assertEqual(sorted(submitted_answer_list), [{
             'answer': 'appreciate',
@@ -1806,7 +1814,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': {
                 'code': code_answer,
                 'output': 'Hello Oppia',
@@ -1845,7 +1853,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         state_answers = self._get_state_answers(state_name)
 
         # The output cannot be known for default answers.
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': {
                 'code': code_answer,
                 'output': '',
@@ -1879,7 +1887,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': None,
             'time_spent_in_sec': 0.0,
             'answer_group_index': 0,
@@ -1911,7 +1919,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': {
                 'clickPosition': [0.307, 0.871],
                 'clickedRegions': ['ctor']
@@ -1946,7 +1954,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': {
                 'clickPosition': [0.007, 0.271],
                 'clickedRegions': []
@@ -1982,7 +1990,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': [18.979026, -99.316406],
             'time_spent_in_sec': 0.0,
             'answer_group_index': 2,
@@ -2020,7 +2028,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': [18.979026, -99.316406],
             'time_spent_in_sec': 0.0,
             'answer_group_index': 2,
@@ -2060,7 +2068,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': [18.979026, -99.316406],
             'time_spent_in_sec': 0.0,
             'answer_group_index': 2,
@@ -2092,7 +2100,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': [900.979026, 909.316406],
             'time_spent_in_sec': 0.0,
             'answer_group_index': 3,
@@ -2126,7 +2134,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': ['<p>Good option A.</p>', '<p>Good option C.</p>'],
             'time_spent_in_sec': 0.0,
             'answer_group_index': 0,
@@ -2200,7 +2208,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # model.
         state_answers = self._get_state_answers(
             state_name, exploration_id='exp_id0', exploration_version=2)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': ['<p>Option C</p>'],
             'time_spent_in_sec': 0.0,
             'answer_group_index': 1,
@@ -2233,7 +2241,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': {
                 'assumptions_string': 'p',
                 'target_string': 'p',
@@ -2270,7 +2278,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': {
                 'assumptions_string': 'p',
                 'target_string': 'p',
@@ -2313,7 +2321,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': {
                 'ascii': 'y=(1)/(2)mx+b',
                 'latex': 'y=\\dfract{1}{2}mx+b'
@@ -2349,7 +2357,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': {
                 'ascii': 'x=1/2',
                 'latex': 'x=\\dfract{1}{2}'
@@ -2384,7 +2392,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': 1,
             'time_spent_in_sec': 0.0,
             'answer_group_index': 0,
@@ -2454,7 +2462,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # model.
         state_answers = self._get_state_answers(
             state_name, exploration_id='exp_id0', exploration_version=2)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': 1,
             'time_spent_in_sec': 0.0,
             'answer_group_index': 1,
@@ -2488,7 +2496,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': [{
                 'readableNoteName': 'C5',
                 'noteDuration': {
@@ -2526,7 +2534,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': [{
                 'readableNoteName': 'A5',
                 'noteDuration': {
@@ -2564,7 +2572,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': 89.0,
             'time_spent_in_sec': 0.0,
             'answer_group_index': 0,
@@ -2596,7 +2604,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': 7.0,
             'time_spent_in_sec': 0.0,
             'answer_group_index': 1,
@@ -2631,7 +2639,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': {
                 'error': '',
                 'evaluation': '',
@@ -2697,7 +2705,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # model.
         state_answers = self._get_state_answers(
             state_name, exploration_id='exp_id0', exploration_version=2)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': {
                 'error': 'Error',
                 'evaluation': '',
@@ -2737,7 +2745,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': {
                 'error': '',
                 'evaluation': '',
@@ -2776,7 +2784,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': ['purple'],
             'time_spent_in_sec': 0.0,
             'answer_group_index': 0,
@@ -2809,7 +2817,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': ['<p>some element</p>'],
             'time_spent_in_sec': 0.0,
             'answer_group_index': 0,
@@ -2841,7 +2849,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': ['cool'],
             'time_spent_in_sec': 0.0,
             'answer_group_index': 1,
@@ -2873,7 +2881,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': 'appreciate',
             'time_spent_in_sec': 0.0,
             'answer_group_index': 0,
@@ -2909,7 +2917,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': 'Let f(x)<|a|',
             'time_spent_in_sec': 0.0,
             'answer_group_index': 0,
@@ -2941,7 +2949,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': 'somethingelse',
             'time_spent_in_sec': 0.0,
             'answer_group_index': 1,

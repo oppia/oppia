@@ -90,6 +90,13 @@ class AnswerEventTests(test_utils.GenericTestBase):
     TIME_SPENT = 5.0
     PARAMS = {}
 
+    def _get_submitted_answer_dict_list(self, state_answers):
+        submitted_answer_dict_list = (
+            state_answers.get_submitted_answer_dict_list())
+        for submitted_answer_dict in submitted_answer_dict_list:
+            del submitted_answer_dict['json_size']
+        return submitted_answer_dict_list
+
     def test_record_answer(self):
         self.save_new_default_exploration('eid', 'fake@user.com')
         exp = exp_services.get_exploration_by_id('eid')
@@ -175,13 +182,13 @@ class AnswerEventTests(test_utils.GenericTestBase):
         state_answers = stats_services.get_state_answers(
             'eid', exp_version, first_state_name)
         self.assertEqual(
-            state_answers.get_submitted_answer_dict_list(),
+            self._get_submitted_answer_dict_list(state_answers),
             expected_submitted_answer_list1)
 
         state_answers = stats_services.get_state_answers(
             'eid', exp_version, second_state_name)
         self.assertEqual(
-            state_answers.get_submitted_answer_dict_list(),
+            self._get_submitted_answer_dict_list(state_answers),
             expected_submitted_answer_list2)
 
 
@@ -189,6 +196,13 @@ class RecordAnswerTests(test_utils.GenericTestBase):
     """Tests for functionality related to recording and retrieving answers."""
 
     EXP_ID = 'exp_id0'
+
+    def _get_submitted_answer_dict_list(self, state_answers):
+        submitted_answer_dict_list = (
+            state_answers.get_submitted_answer_dict_list())
+        for submitted_answer_dict in submitted_answer_dict_list:
+            del submitted_answer_dict['json_size']
+        return submitted_answer_dict_list
 
     def setUp(self):
         super(RecordAnswerTests, self).setUp()
@@ -212,7 +226,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         state_answers = stats_services.get_state_answers(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': 'first answer',
             'time_spent_in_sec': 1.0,
             'answer_group_index': 0,
@@ -244,7 +258,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         self.assertEqual(
             state_answers.state_name, feconf.DEFAULT_INIT_STATE_NAME)
         self.assertEqual(state_answers.interaction_id, 'TextInput')
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': 'some text',
             'time_spent_in_sec': 10.0,
             'answer_group_index': 0,
@@ -266,7 +280,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         state_answers = stats_services.get_state_answers(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': 'first answer',
             'time_spent_in_sec': 1.0,
             'answer_group_index': 0,
@@ -292,7 +306,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         self.assertEqual(
             state_answers.state_name, feconf.DEFAULT_INIT_STATE_NAME)
         self.assertEqual(state_answers.interaction_id, 'TextInput')
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': 'first answer',
             'time_spent_in_sec': 1.0,
             'answer_group_index': 0,
@@ -342,7 +356,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         self.assertEqual(
             state_answers.state_name, feconf.DEFAULT_INIT_STATE_NAME)
         self.assertEqual(state_answers.interaction_id, 'TextInput')
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': 'answer a',
             'time_spent_in_sec': 10.0,
             'answer_group_index': 0,
@@ -409,7 +423,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             state_answers.state_name, feconf.DEFAULT_INIT_STATE_NAME)
         self.assertEqual(state_answers.interaction_id, 'TextInput')
         self.assertEqual(
-            len(state_answers.get_submitted_answer_dict_list()), 600)
+            len(self._get_submitted_answer_dict_list(state_answers)), 600)
 
     def test_record_many_answers_with_preexisting_entry(self):
         stats_services.record_answer(
@@ -422,7 +436,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         state_answers = stats_services.get_state_answers(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name)
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': '1 answer',
             'time_spent_in_sec': 1.0,
             'answer_group_index': 0,
@@ -457,7 +471,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         self.assertEqual(
             state_answers.state_name, feconf.DEFAULT_INIT_STATE_NAME)
         self.assertEqual(state_answers.interaction_id, 'TextInput')
-        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
             'answer': '1 answer',
             'time_spent_in_sec': 1.0,
             'answer_group_index': 0,
