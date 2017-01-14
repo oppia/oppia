@@ -71,11 +71,7 @@ oppia.controller('Profile', [
         }
       });
 
-      if (data.username) {
-        $scope.userNotLoggedIn = false;
-      } else {
-        $scope.userNotLoggedIn = true;
-      }
+      $scope.userNotLoggedIn = !data.username;
 
       $scope.isAlreadySubscribed = data.is_already_subscribed;
       $scope.isUserVisitingOwnProfile = data.is_user_visiting_own_profile;
@@ -90,10 +86,10 @@ oppia.controller('Profile', [
       $scope.profileIsOfCurrentUser = data.profile_is_of_current_user;
 
       $scope.changeSubscriptionStatus = function() {
-        if ($scope.userNotLoggedIn === true) {
+        if ($scope.userNotLoggedIn) {
           window.location.href = GLOBALS.loginUrl;
         } else {
-          if ($scope.isAlreadySubscribed === false) {
+          if (!$scope.isAlreadySubscribed) {
             $scope.isAlreadySubscribed = true;
             $http.post('/subscribehandler', {
               creator_username: data.profile_username
@@ -109,13 +105,10 @@ oppia.controller('Profile', [
       };
 
       $scope.updateSubscriptionButtonPopoverText = function() {
-        if ($scope.userNotLoggedIn === true) {
+        if ($scope.userNotLoggedIn) {
           $scope.subscriptionButtonPopoverText = ('Log in or sign up to ' +
           'subscribe to your favorite creators.');
-        } else if ($scope.isUserVisitingOwnProfile === true) {
-          $scope.subscriptionButtonPopoverText = 'No need to subscribe to ' +
-          'yourself.';
-        } else if ($scope.isAlreadySubscribed === true) {
+        } else if ($scope.isAlreadySubscribed) {
           $scope.subscriptionButtonPopoverText = ('Unsubscribe to stop ' +
           'receiving email notifications regarding new explorations ' +
           'published by ' + $scope.username.value + '.');
