@@ -106,10 +106,10 @@ def _migrate_states_schema(versioned_exploration_states):
 def _get_exploration_memcache_key(exploration_id, version=None):
     """
     Args:
-		- exploration_id: str. The exploration id.
-		- version: int. Version of the exploration , default value None.
-	Returns:
-		A memcache key for an exploration.
+        - exploration_id: str. The exploration id.
+        - version: int. Version of the exploration , default value None.
+    Returns:
+        A memcache key for an exploration.
     """
     if version:
         return 'exploration-version:%s:%s' % (exploration_id, version)
@@ -130,12 +130,12 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
 
     Args:
     - exploration_model: An ExplorationModel instance.
-	- run_conversion: bool. If True, updates the exploration to the latest
-	    states_schema_version if necessary.
+    - run_conversion: bool. If True, updates the exploration to the latest
+        states_schema_version if necessary.
 
     Returns:
-		An Exploration domain object given an exploration model loaded
-	    from the datastore.
+        An Exploration domain object given an exploration model loaded
+        from the datastore.
     """
 
     # Ensure the original exploration model does not get altered.
@@ -165,13 +165,13 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
 
 
 def get_exploration_summary_from_model(exp_summary_model):
-	"""
-	Args:
-	- exp_summary_model: The ExplorationSummaryModel whose summary is
-		to be fetched.
-	"""
+    """
+    Args:
+    - exp_summary_model: The ExplorationSummaryModel whose summary is
+        to be fetched.
+    """
 
-	return exp_domain.ExplorationSummary(
+    return exp_domain.ExplorationSummary(
         exp_summary_model.id, exp_summary_model.title,
         exp_summary_model.category, exp_summary_model.objective,
         exp_summary_model.language_code, exp_summary_model.tags,
@@ -196,7 +196,7 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
     - version: int. Version of the exploration , default value None.
 
     Returns:
-	A domain object representing an exploration.
+    A domain object representing an exploration.
     """
     exploration_memcache_key = _get_exploration_memcache_key(
         exploration_id, version=version)
@@ -223,7 +223,7 @@ def get_exploration_summary_by_id(exploration_id):
     - exploration_id: str. The exploration id.
 
     Returns:
-	A domain object representing an exploration summary.
+    A domain object representing an exploration summary.
     """
     # TODO(msl): Maybe use memcache similarly to get_exploration_by_id.
     exp_summary_model = exp_models.ExpSummaryModel.get(
@@ -300,11 +300,11 @@ def is_exp_summary_editable(exp_summary, user_id=None):
     Args:
     - exp_summary: An ExplorationSummaryDomain object.
     - user_id: str. The id of the user whose editing permissions are
-	being checked.
+    being checked.
 
     Returns:
-	A bool value, True if given user havs permission to edit the summary
-	else False.
+    A bool value, True if given user havs permission to edit the summary
+    else False.
     """
     return user_id is not None and (
         user_id in exp_summary.editor_ids
@@ -325,7 +325,7 @@ def get_exploration_titles_and_categories(exp_ids):
     - exp_ids: list(str). The list of exploration ids.
 
     Returns:
-	An exploration titles and categories for the given ids.
+    An exploration titles and categories for the given ids.
     """
     explorations = [
         (get_exploration_from_model(e) if e else None)
@@ -352,8 +352,8 @@ def _get_exploration_summaries_from_models(exp_summary_models):
     - exp_summary_models: List. An ExplorationSummaryModel instances.
 
     Return:
-	A dict with key as exploration_id and value as
-	ExplorationSummaryDomain object.
+    A dict with key as exploration_id and value as
+    ExplorationSummaryDomain object.
     """
     exploration_summaries = [
         get_exploration_summary_from_model(exp_summary_model)
@@ -373,7 +373,7 @@ def get_exploration_summaries_matching_ids(exp_ids):
     - exp_ids: list. The list of exploration ids.
 
     Returns:
-	A list of ExplorationSummaryDomain objects.
+    A list of ExplorationSummaryDomain objects.
     """
     return [
         (get_exploration_summary_from_model(model) if model else None)
@@ -391,12 +391,12 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
 
     Args:
     - query_string: str. A search query string.
-	- cursor: str. Optional cursor from which to start the search query,
-	  for default value of None the first N results matching the query
-	  are returned.
+    - cursor: str. Optional cursor from which to start the search query,
+      for default value of None the first N results matching the query
+      are returned.
 
-	Returns:
-		A list of Exploration ids. matching the query_string.
+    Returns:
+        A list of Exploration ids. matching the query_string.
     """
     returned_exploration_ids = []
     search_cursor = cursor
@@ -449,8 +449,8 @@ def get_top_rated_exploration_summaries(limit):
     - limit: int. The maximum number of results to return.
 
     Returns:
-	A dict of length of limit, key as exp_id and value as
-	ExplorationSummaryDomain object with top rated exploration summaries.
+    A dict of length of limit, key as exp_id and value as
+    ExplorationSummaryDomain object with top rated exploration summaries.
     """
     return _get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_top_rated(limit))
@@ -464,8 +464,8 @@ def get_recently_published_exp_summaries(limit):
     - limit: int. The maximum number of results to return.
 
     Returns:
-	A dict of length of limit, key as exp_id and value as
-	ExplorationSummaryDomain object with top rated exploration summaries.
+    A dict of length of limit, key as exp_id and value as
+    ExplorationSummaryDomain object with top rated exploration summaries.
     """
     return _get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_recently_published(limit))
@@ -488,7 +488,7 @@ def export_to_zip_file(exploration_id, version=None):
     - version: int.  Version of the exploration, default value None.
 
     Returns:
-	A Zip archive of the exploration with given exploration_id.
+    A Zip archive of the exploration with given exploration_id.
     """
     exploration = get_exploration_by_id(exploration_id, version=version)
     yaml_repr = exploration.to_yaml()
@@ -537,7 +537,7 @@ def export_states_to_yaml(exploration_id, version=None, width=80):
      Args:
     - exploration_id: str. The exploration id.
     - version: int. Version of the exploration ,for default value None the
-	latest version of the exploration will be exported.
+    latest version of the exploration will be exported.
     - width: Int.
     """
     exploration = get_exploration_by_id(exploration_id, version=version)
@@ -558,7 +558,7 @@ def apply_change_list(exploration_id, change_list):
      Args:
     - exploration_id: str. The exploration id.
     - change_list: list of dicts. These changes are applied resulting
-	exploration.
+    exploration.
 
     Returns:
       The resulting exploration domain object.
@@ -686,7 +686,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     - commit_message: str or None. A description of changes made to the state.
 
     - change_list: list of dicts. These changes are applied in sequence
-	to produce the resulting exploration.
+    to produce the resulting exploration.
     """
     if change_list is None:
         change_list = []
@@ -750,9 +750,9 @@ def _create_exploration(
     - exploration: str. The exploration id.
     - commit_message: str. The commit description message.
     - commit_cmds: list(dict). A list of commands to commit for the
-		created exploration. Each dict always contains:
-							- cmd: str. Unique command.
-							and additional arguments for that command.
+        created exploration. Each dict always contains:
+                            - cmd: str. Unique command.
+                            and additional arguments for that command.
     """
     # This line is needed because otherwise a rights object will be created,
     # but the creation of an exploration object will fail.
@@ -809,7 +809,7 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
 
     Args:
     - committer_id: str. The id of the user who is performing the save
-		action.
+        action.
     - exploration_id: str. The exploration id.
     - force_deletion: bool. Request for force deletation, default value False.
     """
@@ -871,8 +871,8 @@ def _get_last_updated_by_human_ms(exp_id):
     - exp_id: str. The exploration id.
 
     Returns:
-	Float. the last time, in milliseconds, when the given exploration was
-	updated by a human.
+    Float. the last time, in milliseconds, when the given exploration was
+    updated by a human.
     """
     # Iterate backwards through the exploration history metadata until we find
     # the most recent snapshot that was committed by a human.
@@ -960,7 +960,7 @@ def create_exploration_summary(exploration_id, contributor_id_to_add):
     Args:
     - exploration_id: str. The exploration id.
     - contributor_id_to_add: str. the id of the contributor who is creating
-	this summary.
+    this summary.
     """
     exploration = get_exploration_by_id(exploration_id)
     exp_summary = compute_summary_of_exploration(
@@ -973,7 +973,7 @@ def update_exploration_summary(exploration_id, contributor_id_to_add):
     Args:
     - exploration_id: str. The exploration id.
     - contributor_id_to_add: str. the id of the contributor who is updating
-	the summary.
+    the summary.
     """
     exploration = get_exploration_by_id(exploration_id)
     exp_summary = compute_summary_of_exploration(
@@ -1049,10 +1049,10 @@ def compute_exploration_contributors_summary(exploration_id):
     - exploration_id: str. The exploration id.
 
     Returns:
-	A dict whose keys are user_ids and whose values are
-	the number of (non-revert) commits made to the given exploration
-	by that user_id. This does not count commits which have since
-	been reverted.
+    A dict whose keys are user_ids and whose values are
+    the number of (non-revert) commits made to the given exploration
+    by that user_id. This does not count commits which have since
+    been reverted.
     """
     snapshots_metadata = get_exploration_snapshots_metadata(exploration_id)
     current_version = len(snapshots_metadata)
@@ -1198,7 +1198,7 @@ def save_new_exploration_from_yaml_and_assets(
 
     Args:
     - committer_id: str. id of the committer of new yaml exploration and
-		assests.
+        assests.
     - yaml_content: str: content of the new exploration in yaml.
     - exploration_id: str. The exploration id.
     """
@@ -1295,9 +1295,9 @@ def get_next_page_of_all_commits(
 
      Args:
      - page_size: int. number of pages of commits, default value is
-	COMMIT_LIST_PAGE_SIZE (20).
+    COMMIT_LIST_PAGE_SIZE (20).
      - urlsafe_start_cursor: str. URL to fetch the commits from starting,
-	default is None.
+    default is None.
     """
     results, new_urlsafe_start_cursor, more = (
         exp_models.ExplorationCommitLogEntryModel.get_all_commits(
@@ -1324,11 +1324,11 @@ def get_next_page_of_all_non_private_commits(
 
     Args:
      - page_size: int. number of pages of commits, default value is
-	COMMIT_LIST_PAGE_SIZE (20).
+    COMMIT_LIST_PAGE_SIZE (20).
      - urlsafe_start_cursor: str. URL to fetch the commits from starting,
-	default is None.
+    default is None.
      - max_age: the datetime.timedelta instance to fetch commitis in revers
-	order of it's age.
+    order of it's age.
     """
     if max_age is not None and not isinstance(max_age, datetime.timedelta):
         raise ValueError(
@@ -1355,12 +1355,12 @@ def _exp_rights_to_search_dict(rights):
 
 
 def _should_index(exp):
-	"""
-	Args:
-	- exp: An ExplorationModel instance.
-	"""
-	rights = rights_manager.get_exploration_rights(exp.id)
-	return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
+    """
+    Args:
+    - exp: An ExplorationModel instance.
+    """
+    rights = rights_manager.get_exploration_rights(exp.id)
+    return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
 
 
 def get_number_of_ratings(ratings):
@@ -1434,27 +1434,27 @@ def get_search_rank_from_exp_summary(exp_summary):
 
 
 def get_search_rank(exp_id):
-	"""
-	Args:
-	- exp_id: str. The exploration id.
+    """
+    Args:
+    - exp_id: str. The exploration id.
 
-	Returns:
-		Int. Search rank of the the exploration with the exp_id.
-	"""
-	exp_summary = get_exploration_summary_by_id(exp_id)
-	return get_search_rank_from_exp_summary(exp_summary)
+    Returns:
+        Int. Search rank of the the exploration with the exp_id.
+    """
+    exp_summary = get_exploration_summary_by_id(exp_id)
+    return get_search_rank_from_exp_summary(exp_summary)
 
 
 def _exp_to_search_dict(exp):
-	"""
-	Args:
-	- exp: The ExplorationModel instance.
+    """
+    Args:
+    - exp: The ExplorationModel instance.
 
-	Returns:
-		dict. data with search values of exploration and the rights.
-	"""
-	rights = rights_manager.get_exploration_rights(exp.id)
-	doc = {
+    Returns:
+        dict. data with search values of exploration and the rights.
+    """
+    rights = rights_manager.get_exploration_rights(exp.id)
+    doc = {
         'id': exp.id,
         'language_code': exp.language_code,
         'title': exp.title,
@@ -1465,8 +1465,8 @@ def _exp_to_search_dict(exp):
         'author_notes': exp.author_notes,
         'rank': get_search_rank(exp.id),
     }
-	doc.update(_exp_rights_to_search_dict(rights))
-	return doc
+    doc.update(_exp_rights_to_search_dict(rights))
+    return doc
 
 
 def clear_search_index():
@@ -1477,16 +1477,16 @@ def clear_search_index():
 
 
 def index_explorations_given_ids(exp_ids):
-	"""
-	Args:
-	- exp_ids: List(str). list of exploration ids.
-	"""
-	# We pass 'strict=False' so as not to index deleted explorations.
-	exploration_models = get_multiple_explorations_by_id(exp_ids, strict=False)
-	search_services.add_documents_to_index([
-	_exp_to_search_dict(exp) for exp in exploration_models.values()
-		if _should_index(exp)
-	], SEARCH_INDEX_EXPLORATIONS)
+    """
+    Args:
+    - exp_ids: List(str). list of exploration ids.
+    """
+    # We pass 'strict=False' so as not to index deleted explorations.
+    exploration_models = get_multiple_explorations_by_id(exp_ids, strict=False)
+    search_services.add_documents_to_index([
+    _exp_to_search_dict(exp) for exp in exploration_models.values()
+        if _should_index(exp)
+    ], SEARCH_INDEX_EXPLORATIONS)
 
 
 def patch_exploration_search_document(exp_id, update):
@@ -1496,33 +1496,33 @@ def patch_exploration_search_document(exp_id, update):
     Args:
     - exp_id: str. The exploration id.
     - update: dict(str).   key ,value pair to updated the exploraion of exp_id.
-	"""
+    """
     doc = search_services.get_document_from_index(
-		exp_id, SEARCH_INDEX_EXPLORATIONS)
+        exp_id, SEARCH_INDEX_EXPLORATIONS)
     doc.update(update)
     search_services.add_documents_to_index([doc], SEARCH_INDEX_EXPLORATIONS)
 
 
 def update_exploration_status_in_search(exp_id):
-	"""
-	Args:
+    """
+    Args:
     - exp_id: str. The exploration id.
-	"""
-	rights = rights_manager.get_exploration_rights(exp_id)
-	if rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
-		delete_documents_from_search_index([exp_id])
-	else:
-		patch_exploration_search_document(
-			rights.id, _exp_rights_to_search_dict(rights))
+    """
+    rights = rights_manager.get_exploration_rights(exp_id)
+    if rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+        delete_documents_from_search_index([exp_id])
+    else:
+        patch_exploration_search_document(
+            rights.id, _exp_rights_to_search_dict(rights))
 
 
 def delete_documents_from_search_index(exploration_ids):
-	"""
-	Args:
-	- exp_ids: List(str). list of exploration ids.
-	"""
-	search_services.delete_documents_from_index(
-		exploration_ids, SEARCH_INDEX_EXPLORATIONS)
+    """
+    Args:
+    - exp_ids: List(str). list of exploration ids.
+    """
+    search_services.delete_documents_from_index(
+        exploration_ids, SEARCH_INDEX_EXPLORATIONS)
 
 
 def search_explorations(query, limit, sort=None, cursor=None):
@@ -1689,9 +1689,9 @@ def create_or_update_draft(
     - exp_id: str. The exploration id.
     - user_id: str. User id of the given user.
     - change_list: list of dicts. draft will be created or updated with these
-	given list.
+    given list.
     - exp_version: int. the version of the exploration in which draft will be
-	 created or get update.
+     created or get update.
     - exploration_id: str. The exploration id.
     """
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
