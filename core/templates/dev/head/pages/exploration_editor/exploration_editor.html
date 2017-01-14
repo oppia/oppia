@@ -54,73 +54,9 @@
 {% endblock navbar_breadcrumb %}
 
 {% block local_top_nav_options %}
-<editor-navigation></editor-navigation>
+  <editor-navigation></editor-navigation>
 
-<ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak" ng-controller="ExplorationSaveAndPublishButtons">
-    <li ng-if="isPrivate()">
-      <div class="btn-group" style="margin-right: 10px; margin-top: 8px;"
-           title="<[getPublishExplorationButtonTooltip()]>">
-        <button type="button" class="btn btn-default oppia-editor-publish-button protractor-test-publish-exploration"
-                ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}"
-                ng-click="showPublishExplorationModal()"
-                ng-disabled="isExplorationLockedForEditing() || countWarnings()">
-          <span ng-if="!publishIsInProcess">
-            <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
-               alt="Publish to Oppia Library">&#xE2C3;</i>
-            <span class="oppia-save-publish-button-label">Publish</span>
-          </span>
-          <span ng-if="publishIsInProcess">
-            <i class="oppia-save-publish-loading oppia-save-publish-button-icon"
-               alt="Publish to Oppia Library">
-              <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
-            </i>
-            <span class="oppia-save-publish-button-label">
-              Publishing
-              <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
-            </span>
-          </span>
-        </button>
-      </div>
-    </li>
-
-    <li ng-if="isEditableOutsideTutorialMode()">
-      <div dropdown class="btn-group" style="margin-right: 10px; margin-top: 8px;"
-           title="<[getSaveButtonTooltip()]>">
-        <button id="tutorialSaveButton" class="btn btn-default oppia-save-draft-button protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable(), 'oppia-save-draft-button-padding': getChangeListLength() && !isPrivate()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
-          <span ng-if="!saveIsInProcess">
-            <span ng-if="isPrivate()">
-              <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
-                 alt="Save Draft">&#xE161;</i>
-              <span class="oppia-save-publish-button-label">Save Draft</span>
-              <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()" style="opacity: 0.5">(<[getChangeListLength()]>)</span>
-            </span>
-            <span ng-if="!isPrivate()" title="Publish Changes">
-              <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
-                 alt="Publish Changes">&#xE2C3;</i>
-              <span class="oppia-save-publish-button-label">Publish Changes</span>
-              <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()" style="opacity: 0.5">(<[getChangeListLength()]>)</span>
-            </span>
-          </span>
-          <span ng-if="saveIsInProcess">
-            <span ng-if="isPrivate()" class="oppia-save-publish-button-label">
-              Saving
-            </span>
-            <span ng-if="!isPrivate()" class="oppia-save-publish-button-label">
-              Publishing
-            </span>
-            <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
-          </span>
-        </button>
-        <button type="button" class="btn btn-default dropdown-toggle protractor-test-save-discard-toggle"
-                ng-disabled="!getChangeListLength()" dropdown-toggle>
-          <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu" role="menu" style="min-width: 120px; right: inherit;" ng-style="{ width: getChangeListLength() && !isPrivate() ? '150px' : '120px' }">
-          <li><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="protractor-test-discard-changes" title="Discard all pending changes.">Discard Draft</a></li>
-        </ul>
-      </div>
-    </li>
-  </ul>
+  <exploration-save-and-publish-buttons></exploration-save-and-publish-buttons>
 {% endblock local_top_nav_options %}
 
 {% block content %}
@@ -211,6 +147,7 @@
   {% include 'pages/exploration_editor/editor_reloading_modal_directive.html' %}
   {% include 'pages/exploration_editor/exploration_metadata_modal_directive.html' %}
   {% include 'pages/exploration_editor/exploration_publish_modal_directive.html' %}
+  {% include 'pages/exploration_editor/exploration_save_and_publish_buttons_directive.html' %}
   {% include 'pages/exploration_editor/exploration_save_modal_directive.html' %}
   {% include 'pages/exploration_editor/help_modal_directive.html' %}
   {% include 'pages/exploration_editor/param_changes_editor_directive.html' %}
@@ -288,7 +225,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationDiffService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationEditor.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationEditorAdvancedFeaturesService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationSaveAndPublishButtons.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationSaveAndPublishButtonsDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationSaveService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/GadgetValidationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ParamChangesEditorDirective.js"></script>

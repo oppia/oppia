@@ -135,7 +135,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
 
     def test_email_is_not_sent_if_recipient_has_declined_such_emails(self):
         user_services.update_email_preferences(
-            self.new_user_id, True, False, False)
+            self.new_user_id, True, False, False, False)
 
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             email_manager.send_role_notification_email(
@@ -1785,3 +1785,76 @@ class BulkEmailsTests(test_utils.GenericTestBase):
 
         all_models = email_models.BulkEmailModel.get_all().fetch()
         self.assertEqual(len(all_models), 0)
+
+
+class EmailPreferencesTests(test_utils.GenericTestBase):
+
+    def test_can_users_receive_thread_email(self):
+        user_ids = ('someUser1', 'someUser2')
+        exp_id = 'someExploration'
+        usernames = ('username1', 'username2')
+        emails = ('user1@example.com', 'user2@example.com')
+
+        for user_id, username, user_email in zip(user_ids, usernames, emails):
+            user_services.get_or_create_user(user_id, user_email)
+            user_services.set_username(user_id, username)
+
+        # Both users can receive all emails in default setting.
+        self.assertListEqual(email_manager.can_users_receive_thread_email(
+            user_ids, exp_id, True), [True, True])
+        self.assertTrue(email_manager.can_users_receive_thread_email(
+            user_ids, exp_id, False), [True, True])
+
+        # First user have muted feedback notifications for this exploration,
+        # therefore he should receive only suggestion emails.
+        user_services.set_email_preferences_for_exploration(
+            user_ids[0], exp_id, mute_feedback_notifications=True)
+        self.assertListEqual(email_manager.can_users_receive_thread_email(
+            user_ids, exp_id, True), [True, True])
+        self.assertListEqual(email_manager.can_users_receive_thread_email(
+            user_ids, exp_id, False), [False, True])
+
+        # Second user have muted suggestion notifications for this exploration,
+        # therefore he should receive only feedback emails.
+        user_services.set_email_preferences_for_exploration(
+            user_ids[1], exp_id, mute_suggestion_notifications=True)
+        self.assertListEqual(email_manager.can_users_receive_thread_email(
+            user_ids, exp_id, True), [True, False])
+        self.assertListEqual(email_manager.can_users_receive_thread_email(
+            user_ids, exp_id, False), [False, True])
+
+        # Both users have disabled all emails globally, therefore they
+        # should not receive any emails.
+        for user_id in user_ids:
+            user_services.update_email_preferences(user_id, True, True, False,
+                                                   True)
+
+        self.assertListEqual(email_manager.can_users_receive_thread_email(
+            user_ids, exp_id, True), [False, False])
+        self.assertTrue(email_manager.can_users_receive_thread_email(
+            user_ids, exp_id, False), [False, False])
+
+        # Both users have unmuted feedback/suggestion emails for this
+        # exploration, but all emails are still disabled globally,
+        # therefore they should not receive any emails.
+        user_services.set_email_preferences_for_exploration(
+            user_ids[0], exp_id, mute_feedback_notifications=False)
+        user_services.set_email_preferences_for_exploration(
+            user_ids[1], exp_id, mute_suggestion_notifications=False)
+        user_services.update_email_preferences(user_id, True, True, False,
+                                               True)
+        self.assertListEqual(email_manager.can_users_receive_thread_email(
+            user_ids, exp_id, True), [False, False])
+        self.assertTrue(email_manager.can_users_receive_thread_email(
+            user_ids, exp_id, False), [False, False])
+
+        # Both user have enabled all emails globally, therefore they should
+        # receive all emails.
+        for user_id in user_ids:
+            user_services.update_email_preferences(user_id, True, True, True,
+                                                   True)
+
+        self.assertListEqual(email_manager.can_users_receive_thread_email(
+            user_ids, exp_id, True), [True, True])
+        self.assertTrue(email_manager.can_users_receive_thread_email(
+            user_ids, exp_id, False), [True, True])

@@ -723,15 +723,23 @@ textarea {
 
 @media (max-width: 768px) {
   .oppia-footer-padding {
-    height: 464px;
+    height: 554px;
   }
-
   .oppia-footer-container {
     padding: 30px;
   }
 
 }
-
+@media only screen and (min-width: 700px) and (max-width: 768px){
+  .oppia-footer-padding-below-banner{
+    height: 270px;
+  }
+}
+@media (max-width: 440px) {
+  .oppia-footer-padding-below-banner{
+    height: 250px;
+  }
+}
 /*
   This is needed for proper display of tabs. See
 
@@ -868,6 +876,24 @@ textarea {
 
 .nav .dropdown:hover > .dropdown-menu {
   border: none;
+}
+
+@media(max-width: 768px) {
+  .oppia-navbar-breadcrumb > li, .oppia-navbar-breadcrumb {
+    float: left;
+  }
+  .oppia-navbar-breadcrumb {
+    margin-top: 0;
+    margin-left: 5px;
+  }
+  .navbar-nav.oppia-navbar-nav > li > a {
+    display: none;
+  }
+}
+@media(max-width: 600px) {
+  .oppia-navbar-breadcrumb {
+    margin-top: 3px;
+  }
 }
 
 /* Show the navbar submenu dropdowns on-hover rather than on-click, if the
@@ -1795,6 +1821,10 @@ pre.oppia-pre-wrapped-text {
   font-size: 1em;
   margin-top: 12px;
   margin-bottom: 6px;
+}
+
+.oppia-collection-player-title-font {
+  font-family: Capriola, Roboto, Arial, sans-serif;
 }
 
 /* Styles for the statistics page. */
@@ -4080,7 +4110,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-static-header {
   align-items: center;
   display: flex;
-  height: 140px;
+  height: 210px;
   position: absolute;
   text-align: center;
   width: 100%;
@@ -4092,7 +4122,7 @@ md-card.preview-conversation-skin-supplemental-card {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 3em;
   left: 50%;
-  position: absolute;
+  position: relative;
   transform: translateX(-50%);
   -webkit-transform: translateX(-50%);
   -ms-transform: translateX(-50%);
@@ -4115,9 +4145,21 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-about-extra-container {
+  margin-bottom: 20px;
   position: relative;
   top: 50px;
   width: 100%;
+}
+
+@media(max-width: 700px) {
+  .oppia-about-extra-container {
+    margin-bottom: -10px;
+  }
+}
+@media(max-width: 440px) {
+  .oppia-about-extra-container {
+    margin-bottom: 40px;
+  }
 }
 
 .oppia-static-extra-content {
@@ -4190,7 +4232,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-static-card-content {
   margin: 0 auto;
   max-width: 600px;
-  padding: 5% 0;
+  padding: 4% 0 1% 0;
 }
 
 .oppia-static-card-content-wide {
@@ -4232,15 +4274,20 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-about-extra-info {
   background-color: #009788;
   color: #fff;
+  height: 245px;
   width: 100%;
 }
 
 .oppia-about-page-extra-info {
-  height: 220px;
+  height: 245px;
 }
 
 .oppia-about-tab-content {
   display: none;
+}
+
+.oppia-teach-tab-content{
+  padding-bottom: 7%;
 }
 
 .oppia-about-visible-content {
@@ -4311,19 +4358,26 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-about-button {
-  background-color: rgba(0,0,0,0.2);
+  background-color: rgb(0, 121, 109);
   color: rgba(255,255,255,1.0);
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 18px;
-  margin: 15px;
+  margin: 0 15px 15px 15px;
+  max-width: 90%;
   padding: 15px;
   text-transform: uppercase;
   white-space: normal;
+  width: 366px;
 }
 
 .oppia-about-button:hover {
   background-color: rgba(5,190,178,1);
   color: rgba(255,255,255,1);
+}
+
+.oppia-teach-button{
+  display: block;
+  margin: 0px auto 0 auto;
 }
 
 .oppia-about-buttons-container {
@@ -4336,6 +4390,12 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-about-credits-letter-groups ul li {
   list-style-type: none;
+}
+
+.oppia-about-extra-content{
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .oppia-donation-card {
@@ -4388,9 +4448,13 @@ md-card.preview-conversation-skin-supplemental-card {
 */
 
 @media only screen and (min-width: 1400px) {
+  .oppia-about-extra-info {
+    height: 245px;
+  }
   .oppia-static-content, .oppia-static-extra-content {
     width: 960px;
   }
+
 }
 
 @media only screen and (max-width: 1140px) {
@@ -4420,9 +4484,7 @@ md-card.preview-conversation-skin-supplemental-card {
   .oppia-about-otter-speech-bubble {
     padding: 10px;
   }
-  .oppia-about-extra-info {
-    height: 400px;
-  }
+
 }
 
 @media only screen and (max-width: 500px) {
@@ -4447,14 +4509,12 @@ md-card.preview-conversation-skin-supplemental-card {
   .oppia-about-buttons:first-child {
     margin: 0;
   }
-  .oppia-about-extra-info {
-    height: 400px;
-  }
-
   .oppia-about-three-cols-layout {
     width: 100%;
   }
 }
+
+
 
 .oppia-save-exploration-wide-modal .modal-dialog {
   max-width: 1200px;

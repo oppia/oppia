@@ -40,7 +40,7 @@ CUSTOMIZATION OPTIONS
 1.  To lint only files that have been touched in this commit
        python scripts/pre_commit_linter.py
 
-2.  To lint all files in  the folder or to lint just a specific file
+2.  To lint all files in the folder or to lint just a specific file
         python scripts/pre_commit_linter.py --path filepath
 
 3.  To lint a specific list of files (*.js/*.py only). Separate files by spaces
@@ -77,21 +77,27 @@ _EXCLUSIVE_GROUP.add_argument(
 BAD_PATTERNS = {
     '__author__': {
         'message': 'Please remove author tags from this file.',
-        'excluded_files': ()},
+        'excluded_files': (),
+        'excluded_dirs': ()},
     'datetime.datetime.now()': {
         'message': 'Please use datetime.datetime.utcnow() instead of'
                    'datetime.datetime.now().',
-        'excluded_files': ()},
+        'excluded_files': (),
+        'excluded_dirs': ()},
     '\t': {
         'message': 'Please use spaces instead of tabs.',
-        'excluded_files': ()},
+        'excluded_files': (),
+        'excluded_dirs': (
+            'assets/i18n/',)},
     '\r': {
         'message': 'Please make sure all files only have LF endings (no CRLF).',
-        'excluded_files': ()},
+        'excluded_files': (),
+        'excluded_dirs': ()},
     'glyphicon': {
         'message': 'Please use equivalent material-icons '
                    'instead of glyphicons.',
-        'excluded_files': ()}
+        'excluded_files': (),
+        'excluded_dirs': ()}
 }
 
 BAD_PATTERNS_JS = {
@@ -180,11 +186,27 @@ _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
 
 
+def _is_filename_excluded_for_bad_patterns_check(pattern, filename):
+    """Checks if file is excluded from the bad patterns check.
+
+    Args:
+        pattern: str. The pattern to be checked against.
+        filename: str. Name of the file.
+
+    Returns:
+        bool: Whether to exclude the given file from this
+        particular pattern check.
+    """
+    return (any(filename.startswith(bad_pattern)
+                for bad_pattern in BAD_PATTERNS[pattern]['excluded_dirs'])
+            or filename in BAD_PATTERNS[pattern]['excluded_files'])
+
+
 def _get_changed_filenames():
     """Returns a list of modified files (both staged and unstaged)
 
     Returns:
-        a list of filenames of modified files
+        a list of filenames of modified files.
     """
     unstaged_files = subprocess.check_output([
         'git', 'diff', '--name-only']).splitlines()
@@ -198,7 +220,7 @@ def _get_glob_patterns_excluded_from_jscsrc(config_jscsrc):
     """Collects excludeFiles from jscsrc file.
 
     Args:
-    - config_jscsrc: str. Path to .jscsrc file.
+        config_jscsrc: str. Path to .jscsrc file.
 
     Returns:
         a list of files in excludeFiles.
@@ -217,8 +239,9 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     subdirectories of specified path.
 
     Args:
-    - dir_path: str. Path to the folder to be linted.
-    - excluded_glob_patterns: set. Set of all files to be excluded.
+        dir_path: str. Path to the folder to be linted.
+        excluded_glob_patterns: set(str). Set of all glob patterns
+            to be excluded.
 
     Returns:
         a list of files in directory and subdirectories without excluded files.
@@ -239,12 +262,12 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint, stdout,
     """Prints a list of lint errors in the given list of JavaScript files.
 
     Args:
-    - node_path: str. Path to the node binary.
-    - jscs_path: str. Path to the JSCS binary.
-    - config_jscsrc: str. Configuration args for the call to the JSCS binary.
-    - files_to_lint: list of str. A list of filepaths to lint.
-    - stdout:  multiprocessing.Queue. A queue to store JSCS outputs
-    - result: multiprocessing.Queue. A queue to put results of test
+        node_path: str. Path to the node binary.
+        jscs_path: str. Path to the JSCS binary.
+        config_jscsrc: str. Configuration args for the call to the JSCS binary.
+        files_to_lint: list(str). A list of filepaths to lint.
+        stdout:  multiprocessing.Queue. A queue to store JSCS outputs.
+        result: multiprocessing.Queue. A queue to put results of test.
 
     Returns:
         None
@@ -290,9 +313,9 @@ def _lint_py_files(config_pylint, files_to_lint, result):
     """Prints a list of lint errors in the given list of Python files.
 
     Args:
-    - config_pylint: str. Path to the .pylintrc file.
-    - files_to_lint: list of str. A list of filepaths to lint.
-    - result: multiprocessing.Queue. A queue to put results of test
+        config_pylint: str. Path to the .pylintrc file.
+        files_to_lint: list(str). A list of filepaths to lint.
+        result: multiprocessing.Queue. A queue to put results of test.
 
     Returns:
         None
@@ -378,7 +401,7 @@ def _get_all_files():
 
 def _pre_commit_linter(all_files):
     """This function is used to check if node-jscs dependencies are installed
-    and pass JSCS binary path
+    and pass JSCS binary path.
     """
     print 'Starting linter...'
 
@@ -462,8 +485,9 @@ def _check_bad_patterns(all_files):
             content = f.read()
             total_files_checked += 1
             for pattern in BAD_PATTERNS:
-                if pattern in content and filename not in (
-                        BAD_PATTERNS[pattern]['excluded_files']):
+                if (pattern in content and
+                        not _is_filename_excluded_for_bad_patterns_check(
+                            pattern, filename)):
                     failed = True
                     print '%s --> %s' % (
                         filename, BAD_PATTERNS[pattern]['message'])
