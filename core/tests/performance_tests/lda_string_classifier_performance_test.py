@@ -25,7 +25,7 @@ import os
 import time
 import yaml
 
-from core.domain.classifier.lda_string_classifier import LDAStringClassifier
+from core.domain.classifier.LDAStringClassifier import LDAStringClassifier
 
 def measure_runtime(func):
     """A decorator that measures the amount of time func takes to run.

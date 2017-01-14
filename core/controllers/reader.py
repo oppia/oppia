@@ -21,7 +21,7 @@ import random
 import jinja2
 
 from core.controllers import base
-from core.domain.classifier import lda_string_classifier
+from core.domain.classifier import LDAStringClassifier
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import dependency_registry
@@ -88,7 +88,7 @@ def classify_string_classifier_rule(state, normalized_answer):
     best_matched_answer_group_index = len(state.interaction.answer_groups)
     best_matched_rule_spec_index = None
 
-    sc = lda_string_classifier.LDAStringClassifier()
+    sc = LDAStringClassifier.LDAStringClassifier()
     training_examples = [
         [doc, []] for doc in state.interaction.confirmed_unclassified_answers]
     for (answer_group_index, answer_group) in enumerate(
@@ -108,7 +108,7 @@ def classify_string_classifier_rule(state, normalized_answer):
         labels = sc.predict([normalized_answer])
         predicted_label = labels[0]
         if (predicted_label !=
-                lda_string_classifier.LDAStringClassifier.DEFAULT_LABEL):
+                LDAStringClassifier.LDAStringClassifier.DEFAULT_LABEL):
             predicted_answer_group_index = int(predicted_label)
             predicted_answer_group = state.interaction.answer_groups[
                 predicted_answer_group_index]

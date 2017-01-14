@@ -47,6 +47,7 @@ if PLATFORM == 'gae':
 else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 
+CLASSIFIERS_PKG = 'core.domain.classifier'
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
@@ -347,6 +348,14 @@ ALLOWED_RTE_EXTENSIONS = {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Video')
     },
 }
+
+# Ids of the allowed classification algorithm classes.
+ALLOWED_CLASSIFIER_CLASSES = [{
+    'name': 'StringClassifiers',
+    'algorithm_ids': [
+        'LDAStringClassifier',
+    ],
+}]
 
 # These categories and interactions are displayed in the order in which they
 # appear in the interaction selector.

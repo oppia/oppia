@@ -17,7 +17,7 @@
 import os
 
 from core.controllers import reader
-from core.domain.classifier import lda_string_classifier
+from core.domain.classifier import LDAStringClassifier
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import param_domain
@@ -136,12 +136,12 @@ class ReaderClassifyTests(test_utils.GenericTestBase):
 
     def _is_string_classifier_called(self, answer):
         string_classifier_predict = (
-            lda_string_classifier.LDAStringClassifier.predict)
+            LDAStringClassifier.LDAStringClassifier.predict)
         predict_counter = test_utils.CallCounter(
             string_classifier_predict)
 
         with self.swap(
-            lda_string_classifier.LDAStringClassifier,
+            LDAStringClassifier.LDAStringClassifier,
             'predict', predict_counter):
 
             response = reader.classify(self.exp_state, answer)
