@@ -105,7 +105,6 @@ def _migrate_states_schema(versioned_exploration_states):
 # Repository GET methods.
 def _get_exploration_memcache_key(exploration_id, version=None):
     """
-    
     Args:
 		- exploration_id: str. The exploration id.
 		- version: int. Version of the exploration , default value None.
@@ -128,14 +127,15 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
     IMPORTANT NOTE TO DEVELOPERS: In general, run_conversion should never be
     False. This option is only used for testing that the states schema version
     migration works correctly, and it should never be changed otherwise.
-    
+
     Args:
     - exploration_model: An ExplorationModel instance.
-	- run_conversion: bool. If True, updates the exploration to the latest states_schema_version if necessary.
-	
-	Returns:
+	- run_conversion: bool. If True, updates the exploration to the latest
+	    states_schema_version if necessary.
+
+    Returns:
 		An Exploration domain object given an exploration model loaded
-	from the datastore.
+	    from the datastore.
     """
 
     # Ensure the original exploration model does not get altered.
@@ -167,10 +167,10 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
 def get_exploration_summary_from_model(exp_summary_model):
 	"""
 	Args:
-	- exp_summary_model: The ExplorationSummaryModel whose summary is 
+	- exp_summary_model: The ExplorationSummaryModel whose summary is
 		to be fetched.
 	"""
-	
+
 	return exp_domain.ExplorationSummary(
         exp_summary_model.id, exp_summary_model.title,
         exp_summary_model.category, exp_summary_model.objective,
@@ -194,7 +194,7 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
     - strict: bool. Whether to fail noisily if no exploration with a given id
             exists.
     - version: int. Version of the exploration , default value None.
-    
+
     Returns:
 	A domain object representing an exploration.
     """
@@ -218,10 +218,10 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
 
 
 def get_exploration_summary_by_id(exploration_id):
-    """ 
+    """
     Args:
     - exploration_id: str. The exploration id.
-    
+
     Returns:
 	A domain object representing an exploration summary.
     """
@@ -239,7 +239,7 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
     """Returns a dict of domain objects representing explorations with the
     given ids as keys. If an exp_id is not present it is not included in the
     return dict.
-    
+
     Args:
     - exp_ids: list(str). The list of exploration ids.
     - strict: bool. Whether to fail noisily if no exploration with a given id
@@ -296,12 +296,12 @@ def get_new_exploration_id():
 def is_exp_summary_editable(exp_summary, user_id=None):
     """Checks if a given user may edit an exploration by checking
     the given domain object.
-    
+
     Args:
     - exp_summary: An ExplorationSummaryDomain object.
-    - user_id: str. The id of the user whose editing permissions are 
+    - user_id: str. The id of the user whose editing permissions are
 	being checked.
-    
+
     Returns:
 	A bool value, True if given user havs permission to edit the summary
 	else False.
@@ -320,10 +320,10 @@ def get_exploration_titles_and_categories(exp_ids):
 
     Any invalid exp_ids will not be included in the return dict. No error will
     be raised.
-    
+
     Args:
     - exp_ids: list(str). The list of exploration ids.
-    
+
     Returns:
 	An exploration titles and categories for the given ids.
     """
@@ -347,12 +347,12 @@ def get_exploration_titles_and_categories(exp_ids):
 def _get_exploration_summaries_from_models(exp_summary_models):
     """Given an iterable of ExpSummaryModel instances, create a dict containing
     corresponding exploration summary domain objects, keyed by id.
-    
+
     Args:
     - exp_summary_models: List. An ExplorationSummaryModel instances.
-    
+
     Return:
-	A dict with key as exploration_id and value as 
+	A dict with key as exploration_id and value as
 	ExplorationSummaryDomain object.
     """
     exploration_summaries = [
@@ -368,10 +368,10 @@ def get_exploration_summaries_matching_ids(exp_ids):
     """Given a list of exploration ids, return a list with the corresponding
     summary domain objects (or None if the corresponding summary does not
     exist).
-    
+
     Args:
     - exp_ids: list. The list of exploration ids.
-    
+
     Returns:
 	A list of ExplorationSummaryDomain objects.
     """
@@ -388,15 +388,15 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
     there are at least that many, otherwise it returns all remaining results.
     (If this behaviour does not occur, an error will be logged.) The method
     also returns a search cursor.
-    
+
     Args:
     - query_string: str. A search query string.
 	- cursor: str. Optional cursor from which to start the search query,
 	  for default value of None the first N results matching the query
 	  are returned.
-	  
+
 	Returns:
-		A list of Exploration ids. matching the query_string. 
+		A list of Exploration ids. matching the query_string.
     """
     returned_exploration_ids = []
     search_cursor = cursor
@@ -444,12 +444,12 @@ def get_non_private_exploration_summaries():
 def get_top_rated_exploration_summaries(limit):
     """Returns a dict with top rated exploration summary domain objects,
     keyed by their id.
-    
+
     Args:
     - limit: int. The maximum number of results to return.
-    
+
     Returns:
-	A dict of length of limit, key as exp_id and value as 
+	A dict of length of limit, key as exp_id and value as
 	ExplorationSummaryDomain object with top rated exploration summaries.
     """
     return _get_exploration_summaries_from_models(
@@ -459,13 +459,13 @@ def get_top_rated_exploration_summaries(limit):
 def get_recently_published_exp_summaries(limit):
     """Returns a dict with all featured exploration summary domain objects,
     keyed by their id.
-    
+
     Args:
     - limit: int. The maximum number of results to return.
-    
+
     Returns:
-	A dict of length of limit, key as exp_id and value as 
-	ExplorationSummaryDomain object with top rated exploration summaries.		
+	A dict of length of limit, key as exp_id and value as
+	ExplorationSummaryDomain object with top rated exploration summaries.
     """
     return _get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_recently_published(limit))
@@ -482,11 +482,11 @@ def get_all_exploration_summaries():
 # Methods for exporting states and explorations to other formats.
 def export_to_zip_file(exploration_id, version=None):
     """Returns a ZIP archive of the exploration.
-     
+
      Args:
     - exploration_id: str. The exploration id.
     - version: int.  Version of the exploration, default value None.
-    
+
     Returns:
 	A Zip archive of the exploration with given exploration_id.
     """
@@ -533,12 +533,12 @@ def export_states_to_yaml(exploration_id, version=None, width=80):
     """Returns a python dictionary of the exploration, whose keys are state
     names and values are yaml strings representing the state contents with
     lines wrapped at 'width' characters.
-    
+
      Args:
     - exploration_id: str. The exploration id.
-    - version: int. Version of the exploration ,for default value None the 
+    - version: int. Version of the exploration ,for default value None the
 	latest version of the exploration will be exported.
-    - width: Int. 
+    - width: Int.
     """
     exploration = get_exploration_by_id(exploration_id, version=version)
     exploration_dict = {}
@@ -554,7 +554,7 @@ def apply_change_list(exploration_id, change_list):
 
     Each entry in change_list is a dict that represents an ExplorationChange
     object.
-    
+
      Args:
     - exploration_id: str. The exploration id.
     - change_list: list of dicts. These changes are applied resulting
@@ -678,15 +678,15 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     If successful, increments the version number of the incoming exploration
     domain object by 1.
-    
+
     Args:
     - committer_id: str. The id of the user who is performing the save
         action.
     - exploration: str. The exploration id.
     - commit_message: str or None. A description of changes made to the state.
-   
+
     - change_list: list of dicts. These changes are applied in sequence
-	to produce the resulting exploration.		
+	to produce the resulting exploration.
     """
     if change_list is None:
         change_list = []
@@ -743,7 +743,7 @@ def _create_exploration(
 
     This is because _save_exploration() depends on the rights object being
     present to tell it whether to do strict validation or not.
-    
+
     Args:
     - committer_id: str. The id of the user who is performing the save
         action.
@@ -806,7 +806,7 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     and are unrecoverable. Otherwise, the exploration and all its history are
     marked as deleted, but the corresponding models are still retained in the
     datastore. This last option is the preferred one.
-    
+
     Args:
     - committer_id: str. The id of the user who is performing the save
 		action.
@@ -866,10 +866,10 @@ def get_exploration_snapshots_metadata(exploration_id):
 
 
 def _get_last_updated_by_human_ms(exp_id):
-    """    
+    """
     Args:
     - exp_id: str. The exploration id.
-    
+
     Returns:
 	Float. the last time, in milliseconds, when the given exploration was
 	updated by a human.
@@ -892,9 +892,9 @@ def publish_exploration_and_update_user_profiles(committer_id, exp_id):
 
     It is the responsibility of the caller to check that the exploration is
     valid prior to publication.
-    
+
     Args:
-    - committer_id: str. Id of the committer. 
+    - committer_id: str. Id of the committer.
     - exp_id: str. Id of the  newly published exploration.
     """
     rights_manager.publish_exploration(committer_id, exp_id)
@@ -986,11 +986,11 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
     domain object and return it. contributor_id_to_add will be added to
     the list of contributors for the exploration if the argument is not
     None and if the id is not a system id.
-    
+
     Args:
     - exploration: new ExplorationSumarry domain.
     - contributor_id_to_add: str. Id to be added to the contributor list.
-    
+
     """
     exp_rights = exp_models.ExplorationRightsModel.get_by_id(exploration.id)
     exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exploration.id)
@@ -1014,7 +1014,7 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
             contributor_id_to_add not in feconf.SYSTEM_USER_IDS):
         if contributor_id_to_add not in contributor_ids:
             contributor_ids.append(contributor_id_to_add)
-            
+
     if contributor_id_to_add not in feconf.SYSTEM_USER_IDS:
         if contributor_id_to_add is None:
             # Revert commit or other non-positive commit
@@ -1044,10 +1044,10 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
 
 
 def compute_exploration_contributors_summary(exploration_id):
-    """    
+    """
     Args:
     - exploration_id: str. The exploration id.
-    
+
     Returns:
 	A dict whose keys are user_ids and whose values are
 	the number of (non-revert) commits made to the given exploration
@@ -1077,7 +1077,7 @@ def compute_exploration_contributors_summary(exploration_id):
 def save_exploration_summary(exp_summary):
     """Save an exploration summary domain object as an ExpSummaryModel entity
     in the datastore.
-    
+
     Args:
     - exp_summary: an ExplorationSummary domain object.
     """
@@ -1111,7 +1111,7 @@ def save_exploration_summary(exp_summary):
 
 def delete_exploration_summary(exploration_id):
     """Delete an exploration summary model.
-    
+
     Args:
     - exploration_id: str. The exploration id.
     """
@@ -1127,7 +1127,7 @@ def revert_exploration(
         action.
     - exploration_id: str. The exploration id.
     - current_version: int. Current version of the exploration.
-    - revert_to_version: int. the 
+    - revert_to_version: int. the
     """
     exploration_model = exp_models.ExplorationModel.get(
         exploration_id, strict=False)
@@ -1195,10 +1195,10 @@ def save_new_exploration_from_yaml_and_assets(
     exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
     since in that case the YAML schema will not have a title and category
     present.
-    
+
     Args:
-    - committer_id: str. id of the committer of new yaml exploration and 
-		assests. 
+    - committer_id: str. id of the committer of new yaml exploration and
+		assests.
     - yaml_content: str: content of the new exploration in yaml.
     - exploration_id: str. The exploration id.
     """
@@ -1239,7 +1239,7 @@ def save_new_exploration_from_yaml_and_assets(
 
 def delete_demo(exploration_id):
     """Deletes a single demo exploration.
-    
+
     Args:
     - exploration_id: str. The exploration id.
     """
@@ -1260,7 +1260,7 @@ def load_demo(exploration_id):
 
     The resulting exploration will have two commits in its history (one for its
     initial creation and one for its subsequent modification.)
-    
+
     Args:
     - exploration_id: str. The exploration id.
     """
@@ -1292,11 +1292,11 @@ def get_next_page_of_all_commits(
     fetch_page() at:
 
         https://developers.google.com/appengine/docs/python/ndb/queryclass
-        
+
      Args:
-     - page_size: int. number of pages of commits, default value is 
+     - page_size: int. number of pages of commits, default value is
 	COMMIT_LIST_PAGE_SIZE (20).
-     - urlsafe_start_cursor: str. URL to fetch the commits from starting, 
+     - urlsafe_start_cursor: str. URL to fetch the commits from starting,
 	default is None.
     """
     results, new_urlsafe_start_cursor, more = (
@@ -1321,11 +1321,11 @@ def get_next_page_of_all_non_private_commits(
     fetch_page() at:
 
         https://developers.google.com/appengine/docs/python/ndb/queryclass
-        
+
     Args:
-     - page_size: int. number of pages of commits, default value is 
+     - page_size: int. number of pages of commits, default value is
 	COMMIT_LIST_PAGE_SIZE (20).
-     - urlsafe_start_cursor: str. URL to fetch the commits from starting, 
+     - urlsafe_start_cursor: str. URL to fetch the commits from starting,
 	default is None.
      - max_age: the datetime.timedelta instance to fetch commitis in revers
 	order of it's age.
@@ -1408,10 +1408,10 @@ def get_search_rank_from_exp_summary(exp_summary):
     Featured explorations get a ranking bump, and so do explorations that
     have been more recently updated. Good ratings will increase the ranking
     and bad ones will lower it.
-    
+
     Args:
     - exp_summary: the ExplorationSummary domain object.
-    
+
     Returns:
       int. integral value determining the document's rank in search.
     """
@@ -1437,7 +1437,7 @@ def get_search_rank(exp_id):
 	"""
 	Args:
 	- exp_id: str. The exploration id.
-	
+
 	Returns:
 		Int. Search rank of the the exploration with the exp_id.
 	"""
@@ -1449,9 +1449,9 @@ def _exp_to_search_dict(exp):
 	"""
 	Args:
 	- exp: The ExplorationModel instance.
-	
+
 	Returns:
-		dict. data with search values of exploration and the rights. 
+		dict. data with search values of exploration and the rights.
 	"""
 	rights = rights_manager.get_exploration_rights(exp.id)
 	doc = {
@@ -1492,7 +1492,7 @@ def index_explorations_given_ids(exp_ids):
 def patch_exploration_search_document(exp_id, update):
     """Patches an exploration's current search document, with the values
     from the 'update' dictionary.
-    
+
     Args:
     - exp_id: str. The exploration id.
     - update: dict(str).   key ,value pair to updated the exploraion of exp_id.
@@ -1555,7 +1555,7 @@ def _is_suggestion_valid(thread_id, exploration_id):
     """Check if the suggestion is still valid. A suggestion is considered
     invalid if the name of the state that the suggestion was made for has
     changed since.
-    
+
     Args:
     - thread_id: str. Id of the suggestion thread.
     - exploration_id: str. The exploration id.
@@ -1570,7 +1570,7 @@ def _is_suggestion_valid(thread_id, exploration_id):
 
 def _is_suggestion_handled(thread_id, exploration_id):
     """Checks if the current suggestion has already been accepted/rejected.
-    
+
     Args:
     - thread_id: str. id of the suggestion thread.
     - exploration_id: str. The exploration id.
@@ -1600,7 +1600,7 @@ def _get_commit_message_for_suggestion(
     NOTE TO DEVELOPERS: This should not be changed, since in the future we may
     want to determine and credit the original authors of suggestions, and in
     order to do so we will look for commit messages that follow this format.
-    
+
     Args:
     - suggestion_author_username: str. Username of the author of the suggestion.
     - commit_message: str or None. A description of commit made for suggestion.
@@ -1613,7 +1613,7 @@ def _get_commit_message_for_suggestion(
 def accept_suggestion(editor_id, thread_id, exploration_id, commit_message):
     """If the suggestion is valid, accepts it by updating the exploration.
     Raises an exception if the suggestion is not valid.
-    
+
     Args:
     - editor_id: str. id of the editor whose suggestion to be validate.
     - thread_id: str. id of the suggestion thread.
@@ -1645,7 +1645,7 @@ def accept_suggestion(editor_id, thread_id, exploration_id, commit_message):
 
 def reject_suggestion(editor_id, thread_id, exploration_id):
     """Set the state of a suggetion to REJECTED.
-    
+
     Args:
     - editor_id: str. id of the editor whose suggestion is to be reject.
     - thread_id: str. id of the suggestion thread.
@@ -1667,7 +1667,7 @@ def reject_suggestion(editor_id, thread_id, exploration_id):
 def is_version_of_draft_valid(exp_id, version):
     """Checks if the draft version is the same as the latest version of the
     exploration.
-    
+
     Args:
     - exp_id: str. The exploration id.
     - version: int. the draft version
@@ -1684,11 +1684,11 @@ def create_or_update_draft(
     timestamp of the draft.
     The method assumes that a ExplorationUserDataModel object exists for the
     given user and exploration.
-    
+
     Args:
     - exp_id: str. The exploration id.
-    - user_id: str. User id of the given user. 
-    - change_list: list of dicts. draft will be created or updated with these 
+    - user_id: str. User id of the given user.
+    - change_list: list of dicts. draft will be created or updated with these
 	given list.
     - exp_version: int. the version of the exploration in which draft will be
 	 created or get update.
@@ -1715,10 +1715,10 @@ def create_or_update_draft(
 def get_exp_with_draft_applied(exp_id, user_id):
     """If a draft exists for the given user and exploration,
     apply it to the exploration.
-    
+
     Args:
     - exploration_id: str. The exploration id.
-    - usr_id: str. User id of the applied draft and exploration. 
+    - usr_id: str. User id of the applied draft and exploration.
     """
 
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
@@ -1733,10 +1733,10 @@ def get_exp_with_draft_applied(exp_id, user_id):
 
 def discard_draft(exp_id, user_id):
     """Discard the draft for the given user and exploration.
-    
+
     Args:
     - exploration_id: str. The exploration id.
-    - usr_id: str. Id of the user whose draft would be discarded . 
+    - usr_id: str. Id of the user whose draft would be discarded .
     """
 
     exp_user_data = user_models.ExplorationUserDataModel.get(
