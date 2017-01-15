@@ -16,8 +16,8 @@
 
 """Registry for classification algorithms/classifiers."""
 
-import feconf
 import itertools
+import feconf
 
 
 class Registry(object):

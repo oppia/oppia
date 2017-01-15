@@ -15,11 +15,12 @@
 """Tests for algorithm registry."""
 
 
+import itertools
+import feconf
+
 from core.domain.classifier import algorithm_registry
 from core.domain.classifier.LDAStringClassifier import LDAStringClassifier
 from core.tests import test_utils
-import feconf
-import itertools
 
 
 class AlgorithmRegistryTest(test_utils.GenericTestBase):
