@@ -13,14 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the side navigation bar.
+ * @fileoverview Directive for the Follow Button.
  */
 
 oppia.directive('followButton', [function() {
   return {
     restrict: 'E',
     scope: {},
-    templateUrl: 'components/follow_button',
+    templateUrl: 'components/followButton',
     controller: ['$scope', '$timeout', 'UrlInterpolationService', function(
         $scope, $timeout, UrlInterpolationService) {
       $scope.NAV_MODE = GLOBALS.NAV_MODE;
