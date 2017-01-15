@@ -95,13 +95,90 @@ oppia.directive('topNavigationBar', [function() {
         }
 
         $scope.windowIsNarrow = windowDimensionsService.isWindowNarrow();
+        var handleOverflowResizeTimer;
+        var initialWindowWidth = windowDimensionsService.getWidth();
+        var hideNavElements = {
+          'I18N_TOPNAV_DONATE': false,
+          'I18N_TOPNAV_ABOUT': false,
+          'I18N_CREATE_EXPLORATION_CREATE': false,
+          'I18N_TOPNAV_LIBRARY': false
+        };
+
         windowDimensionsService.registerOnResizeHook(function() {
           $scope.windowIsNarrow = windowDimensionsService.isWindowNarrow();
           $scope.$apply();
           // Close the sidebar, if necessary.
           SidebarStatusService.closeSidebar();
+          // Limit calls to handleOverflow() to one per 500ms to prevent flicker
+          $timeout.cancel(handleOverflowResizeTimer);
+
+          // If the window is resized larger, try displaying the hidden elements
+          if (initialWindowWidth < windowDimensionsService.getWidth()) {
+            $.each(hideNavElements, function(element, state) {
+              if ( state == true ) {
+                $('[translate='+element+']').closest('div, li').css('display', 'block');
+                hideNavElements[element] = false;
+              }
+            });
+          }
+          initialWindowWidth = windowDimensionsService.getWidth();
+          handleOverflowResizeTimer = $timeout(handleOverflow, 500);
         });
 
+        var handleOverflow = function () {
+          if (windowDimensionsService.getWidth() < 768) {
+            return false;
+          }
+
+          var navReady = true;
+          // Wait until i18n is completed.
+          $('.oppia-navbar-tabs a[translate], .oppia-navbar-tabs span[translate]')
+            .each(function(i,e) {
+              if ( e.innerText.length == 0 ) {
+                console.log("Setting new timeout from: "+e.getAttribute('translate'));
+                $timeout(handleOverflow, 100);
+                navReady = false;
+                return false;
+              }
+            });
+          if ( !navReady ) {
+            return false;
+          }
+
+          var navWidth = 0;
+          $('ul.oppia-navbar-tabs').children().each(function(i, e) {
+              // Some nav elements have invalid widths, use widths of their child elements instead
+              if (e.clientWidth == 0 || e.clientWidth >= 176) {
+                  $(e).children().each(function(i, e) {
+                      navWidth += 5; // Padding
+                      navWidth += e.clientWidth;
+                  });
+              } else {
+                  navWidth += 5; // Padding
+                  navWidth += e.clientWidth;
+              }
+          });
+
+          if ( $('ul.nav.oppia-navbar-profile').length > 0 ) {
+            navWidth += $('ul.nav.oppia-navbar-profile').width();
+          }
+
+          $('ul.nav.oppia-navbar-tabs').css('min-width', navWidth);
+
+          if ( $('div.collapse.navbar-collapse').height() > 60 ) {
+            $.each(hideNavElements, function(element, state) {
+              if (state == false) {
+                $('[translate='+element+']').closest('div, li').css('display', 'None');
+                hideNavElements[element] = true;
+                $timeout(handleOverflow, 10);
+                return false;
+              }
+            });
+          }
+        };
+
+        // For Chrome, timeout 0 appears to run after i18n.
+        $timeout(handleOverflow, 0);
         $scope.toggleSidebar = SidebarStatusService.toggleSidebar;
       }
     ]
