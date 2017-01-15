@@ -16,8 +16,10 @@
 
 
 from core.domain.classifier import algorithm_registry
-from core.tests import test_utils
 from core.domain.classifier.LDAStringClassifier import LDAStringClassifier
+from core.tests import test_utils
+import feconf
+import itertools
 
 
 class AlgorithmRegistryTest(test_utils.GenericTestBase):
@@ -31,8 +33,12 @@ class AlgorithmRegistryTest(test_utils.GenericTestBase):
         self.assertItemsEqual(expected_algorithm_ids, algorithm_ids)
 
     def test_get_all_classifiers(self):
+        num_classifiers = len(list(itertools.chain(*[
+            classifier_class['algorithm_ids']
+            for classifier_class in feconf.ALLOWED_CLASSIFIER_CLASSES
+        ])))
         classifier_instances = algorithm_registry.Registry.get_all_classifiers()  # pylint: disable=line-too-long
-        self.assertEquals(len(classifier_instances), 1)
+        self.assertEquals(len(classifier_instances), num_classifiers)
 
     def test_get_classifier_by_id(self):
         classifier_id = 'LDAStringClassifier'

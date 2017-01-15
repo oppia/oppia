@@ -16,8 +16,8 @@
 
 """Registry for classification algorithms/classifiers."""
 
-import itertools
 import feconf
+import itertools
 
 
 class Registry(object):
@@ -44,7 +44,7 @@ class Registry(object):
 
     @classmethod
     def get_all_classifier_ids(cls):
-        """Get a list of all algorithm ids.
+        """Retrieves a list of all algorithm ids.
 
         Returns:
             A list containing all the classifier IDs.
@@ -56,7 +56,7 @@ class Registry(object):
 
     @classmethod
     def _refresh(cls):
-        """Refresh the dict mapping algorithm ids to instances."""
+        """Refreshes the dict mapping algorithm ids to instances."""
 
         cls._classification_algorithms.clear()
 
@@ -72,20 +72,28 @@ class Registry(object):
 
     @classmethod
     def get_all_classifiers(cls):
-        """Get a list of instances of all classifiers."""
+        """Retrieves a list of instances of all classifiers.
+
+        Returns:
+            A list of instances of all the classification algorithms.
+        """
+
         if len(cls._classification_algorithms) == 0:
             cls._refresh()
         return cls._classification_algorithms.values()
 
     @classmethod
     def get_classifier_by_id(cls, classifier_id):
-        """Gets a classifier instance by its id.
+        """Retrieves a classifier instance by its id.
 
         Refreshes once if the classifier is not found; subsequently, throws a
         KeyError.
 
         Args:
             classifier_id: str. The ID of the classifier.
+
+        Raises:
+            KeyError: If the classifier is not found the first time.
 
         Returns:
             An instance of the classifier.
