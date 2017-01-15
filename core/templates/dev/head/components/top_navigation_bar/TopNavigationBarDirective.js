@@ -134,7 +134,7 @@ oppia.directive('topNavigationBar', [function() {
           var navReady = true;
           // Wait until i18n is completed.
           $('.oppia-navbar-tabs a[translate], ' +
-            '.oppia-navbar-tabs span[translate]').each(function(index, element) {
+            '.oppia-navbar-tabs span[translate]').each(function(i, element) {
               if (element.innerText.length === 0) {
                 $timeout(handleOverflow, 100);
                 navReady = false;
