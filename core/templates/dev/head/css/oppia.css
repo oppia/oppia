@@ -723,15 +723,23 @@ textarea {
 
 @media (max-width: 768px) {
   .oppia-footer-padding {
-    height: 464px;
+    height: 554px;
   }
-
   .oppia-footer-container {
     padding: 30px;
   }
 
 }
-
+@media only screen and (min-width: 700px) and (max-width: 768px){
+  .oppia-footer-padding-below-banner{
+    height: 270px;
+  }
+}
+@media (max-width: 440px) {
+  .oppia-footer-padding-below-banner{
+    height: 250px;
+  }
+}
 /*
   This is needed for proper display of tabs. See
 
@@ -4266,6 +4274,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-about-extra-info {
   background-color: #009788;
   color: #fff;
+  height: 245px;
   width: 100%;
 }
 
@@ -4353,7 +4362,7 @@ md-card.preview-conversation-skin-supplemental-card {
   color: rgba(255,255,255,1.0);
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 18px;
-  margin: 15px;
+  margin: 0 15px 15px 15px;
   max-width: 90%;
   padding: 15px;
   text-transform: uppercase;
@@ -4381,6 +4390,12 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-about-credits-letter-groups ul li {
   list-style-type: none;
+}
+
+.oppia-about-extra-content{
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .oppia-donation-card {
@@ -4469,9 +4484,7 @@ md-card.preview-conversation-skin-supplemental-card {
   .oppia-about-otter-speech-bubble {
     padding: 10px;
   }
-  .oppia-about-extra-info {
-    height: 310px;
-  }
+
 }
 
 @media only screen and (max-width: 500px) {
@@ -4496,19 +4509,12 @@ md-card.preview-conversation-skin-supplemental-card {
   .oppia-about-buttons:first-child {
     margin: 0;
   }
-  .oppia-about-extra-info {
-    height: 320px;
-  }
   .oppia-about-three-cols-layout {
     width: 100%;
   }
 }
 
-@media only screen and (max-width: 440px) {
-  .oppia-about-extra-info {
-    height: 270px;
-  }
-}
+
 
 .oppia-save-exploration-wide-modal .modal-dialog {
   max-width: 1200px;
