@@ -464,7 +464,7 @@ oppia.factory('windowDimensionsService', ['$window', function($window) {
     },
     isWindowNarrow: function() {
       var NAVBAR_WITH_SEARCH_CUTOFF_WIDTH_PX = 1171;
-      var NORMAL_NAVBAR_CUTOFF_WIDTH_PX = 800;
+      var NORMAL_NAVBAR_CUTOFF_WIDTH_PX = 768;
       var navbarHasSearchBar = (
         $window.location.pathname.indexOf('/search') === 0 ||
         $window.location.pathname.indexOf('/library') === 0);
