@@ -98,10 +98,10 @@ oppia.directive('topNavigationBar', [function() {
         var handleOverflowResizeTimer;
         var initialWindowWidth = windowDimensionsService.getWidth();
         var hideNavElements = {
-          'I18N_TOPNAV_DONATE': false,
-          'I18N_TOPNAV_ABOUT': false,
-          'I18N_CREATE_EXPLORATION_CREATE': false,
-          'I18N_TOPNAV_LIBRARY': false
+          I18N_TOPNAV_DONATE: false,
+          I18N_TOPNAV_ABOUT: false,
+          I18N_CREATE_EXPLORATION_CREATE: false,
+          I18N_TOPNAV_LIBRARY: false
         };
 
         windowDimensionsService.registerOnResizeHook(function() {
@@ -115,8 +115,9 @@ oppia.directive('topNavigationBar', [function() {
           // If the window is resized larger, try displaying the hidden elements
           if (initialWindowWidth < windowDimensionsService.getWidth()) {
             $.each(hideNavElements, function(element, state) {
-              if ( state == true ) {
-                $('[translate='+element+']').closest('div, li').css('display', 'block');
+              if (state === true) {
+                $('[translate=' + element + ']')
+                  .closest('div, li').css('display', 'block');
                 hideNavElements[element] = false;
               }
             });
@@ -125,50 +126,51 @@ oppia.directive('topNavigationBar', [function() {
           handleOverflowResizeTimer = $timeout(handleOverflow, 500);
         });
 
-        var handleOverflow = function () {
+        var handleOverflow = function() {
           if (windowDimensionsService.getWidth() < 768) {
             return false;
           }
 
           var navReady = true;
           // Wait until i18n is completed.
-          $('.oppia-navbar-tabs a[translate], .oppia-navbar-tabs span[translate]')
-            .each(function(i,e) {
-              if ( e.innerText.length == 0 ) {
-                console.log("Setting new timeout from: "+e.getAttribute('translate'));
+          $('.oppia-navbar-tabs a[translate], ' +
+            '.oppia-navbar-tabs span[translate]').each(function(index, element) {
+              if (element.innerText.length === 0) {
                 $timeout(handleOverflow, 100);
                 navReady = false;
                 return false;
               }
             });
-          if ( !navReady ) {
+          if (!navReady) {
             return false;
           }
 
           var navWidth = 0;
-          $('ul.oppia-navbar-tabs').children().each(function(i, e) {
-              // Some nav elements have invalid widths, use widths of their child elements instead
-              if (e.clientWidth == 0 || e.clientWidth >= 176) {
-                  $(e).children().each(function(i, e) {
-                      navWidth += 5; // Padding
-                      navWidth += e.clientWidth;
-                  });
-              } else {
-                  navWidth += 5; // Padding
-                  navWidth += e.clientWidth;
-              }
+          $('ul.oppia-navbar-tabs').children().each(function(i, element) {
+            // Some nav elements have invalid widths from floating
+            // Use widths of their first-level child elements instead
+            if (element.clientWidth === 0 || element.clientWidth >= 176) {
+              $(element).children().each(function(i, element) {
+                navWidth += 5;
+                navWidth += element.clientWidth;
+              });
+            } else {
+              navWidth += 5;
+              navWidth += element.clientWidth;
+            }
           });
 
-          if ( $('ul.nav.oppia-navbar-profile').length > 0 ) {
+          if ($('ul.nav.oppia-navbar-profile').length > 0) {
             navWidth += $('ul.nav.oppia-navbar-profile').width();
           }
 
           $('ul.nav.oppia-navbar-tabs').css('min-width', navWidth);
 
-          if ( $('div.collapse.navbar-collapse').height() > 60 ) {
+          if ($('div.collapse.navbar-collapse').height() > 60) {
             $.each(hideNavElements, function(element, state) {
-              if (state == false) {
-                $('[translate='+element+']').closest('div, li').css('display', 'None');
+              if (state === false) {
+                $('[translate=' + element + ']')
+                  .closest('div, li').css('display', 'None');
                 hideNavElements[element] = true;
                 $timeout(handleOverflow, 10);
                 return false;
