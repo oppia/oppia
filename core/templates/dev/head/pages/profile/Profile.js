@@ -106,16 +106,16 @@ oppia.controller('Profile', [
 
       $scope.updateSubscriptionButtonPopoverText = function() {
         if ($scope.userNotLoggedIn) {
-          $scope.subscriptionButtonPopoverText = ('Log in or sign up to ' +
-          'subscribe to your favorite creators.');
+          $scope.subscriptionButtonPopoverText = (
+            'Log in or sign up to subscribe to your favorite creators.');
         } else if ($scope.isAlreadySubscribed) {
-          $scope.subscriptionButtonPopoverText = ('Unsubscribe to stop ' +
-          'receiving email notifications regarding new explorations ' +
-          'published by ' + $scope.username.value + '.');
+          $scope.subscriptionButtonPopoverText = (
+            'Unsubscribe to stop receiving email notifications regarding new ' +
+            'explorations published by ' + $scope.username.value + '.');
         } else {
-          $scope.subscriptionButtonPopoverText = ('Receive email ' +
-          'notifications, whenever ' + $scope.username.value + ' publishes ' +
-          'a new exploration.');
+          $scope.subscriptionButtonPopoverText = (
+            'Receive email notifications, whenever ' +
+            $scope.username.value + ' publishes a new exploration.');
         }
       };
       $scope.updateSubscriptionButtonPopoverText();
