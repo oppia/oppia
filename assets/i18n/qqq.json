@@ -281,6 +281,7 @@
     "I18N_SPLASH_SUBTITLE": "The second title shown in Oppia's landing page, below the main image - It should not exceed two lines in length.",
     "I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Paragraph describing Oppia showed in the splash page next to an image.",
     "I18N_SPLASH_TITLE": "The main title shown in Oppia's landing page - This is an English idiom, it can be changed for a local common saying with similar meaning. It should not exceed one line in length.",
+    "I18N_SUBSCRIBE_BUTTON_TEXT": "The text that appears on the subscribe button, which allows users to subscribe to creators.",
     "I18N_TOPNAV_ABOUT": "Text displayed in the navigation bar. - When the user hovers over the button, a list with several information pages is displayed.\n{{Identical|Cancel}}",
     "I18N_TOPNAV_ABOUT_OPPIA": "Text displayed inside drop-down menu - The list is shown after the user hovers over the I18N_TOPNAV_ABOUT button. When the option is clicked, the about oppia page is loaded which contains a more general description of the site.",
     "I18N_TOPNAV_ADMIN_PAGE": "Text displayed inside a drop-down menu. - The list is shown after the user hovers over their profile picture. When the option is clicked, the admin page is loaded.",
@@ -296,5 +297,6 @@
     "I18N_TOPNAV_NOTIFICATIONS": "Text displayed inside a drop-down menu. - The list is shown after the user hovers over their profile picture. When the option is clicked, the notifications page is loaded.\n{{Identical|Notification}}",
     "I18N_TOPNAV_PREFERENCES": "Text displayed inside a drop-down menu. - The list is shown after the user hovers over their profile picture. When the option is clicked, the preference page is loaded where the user can modify the account information.\n{{Identical|Preferences}}",
     "I18N_TOPNAV_SIGN_IN": "Text displayed in the top right corner of the page. - When clicked, the user is redirected to the sign in page where he can access his account.\n{{Identical|Sign in}}",
-    "I18N_TOPNAV_TEACH_WITH_OPPIA": "Text displayed inside drop-down menu - The list is shown after the user hovers over the I18N_TOPNAV_ABOUT button. When the option is clicked, the teach with oppia page is loaded which contains information specific for teachers who would like to create explorations."
+    "I18N_TOPNAV_TEACH_WITH_OPPIA": "Text displayed inside drop-down menu - The list is shown after the user hovers over the I18N_TOPNAV_ABOUT button. When the option is clicked, the teach with oppia page is loaded which contains information specific for teachers who would like to create explorations.",
+    "I18N_UNSUBSCRIBE_BUTTON_TEXT": "The text that appears on the unsubscribe button, which allows users to unsubscribe from creators."
 }

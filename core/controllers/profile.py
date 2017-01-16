@@ -16,6 +16,7 @@
 
 from core.controllers import base
 from core.domain import email_manager
+from core.domain import subscription_services
 from core.domain import summary_services
 from core.domain import user_services
 import feconf
@@ -78,6 +79,11 @@ class ProfileHandler(base.BaseHandler):
         created_exp_summary_dicts = []
         edited_exp_summary_dicts = []
 
+        subscriber_ids = subscription_services.get_all_subscribers_of_creator(
+            user_settings.user_id)
+        is_already_subscribed = (self.user_id in subscriber_ids)
+        is_user_visiting_own_profile = (self.user_id == user_settings.user_id)
+
         user_contributions = user_services.get_user_contributions(
             user_settings.user_id)
         if user_contributions:
@@ -102,6 +108,8 @@ class ProfileHandler(base.BaseHandler):
                 user_settings.user_id),
             'created_exp_summary_dicts': created_exp_summary_dicts,
             'edited_exp_summary_dicts': edited_exp_summary_dicts,
+            'is_already_subscribed': is_already_subscribed,
+            'is_user_visiting_own_profile': is_user_visiting_own_profile
         })
         self.render_json(self.values)
 
