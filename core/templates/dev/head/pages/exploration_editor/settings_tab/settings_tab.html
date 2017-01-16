@@ -347,16 +347,21 @@
             </label>
             <span class="col-lg-2 col-md-2 col-sm-2">
               <button type="button" class="btn btn-default protractor-test-enable-fallbacks"
-              ng-click="muteFeedbackNotifications()" ng-if="!userExplorationEmailsHandler.areFeedbackNotificationsMuted()">
+                      ng-click="muteFeedbackNotifications()" ng-if="!userExplorationEmailsHandler.areFeedbackNotificationsMuted()">
                  Mute
               </button>
               <button type="button" class="btn btn-default protractor-test-enable-fallbacks"
-              ng-click="unmuteFeedbackNotifications()" ng-if="userExplorationEmailsHandler.areFeedbackNotificationsMuted()">
+                      ng-click="unmuteFeedbackNotifications()" ng-if="userExplorationEmailsHandler.areFeedbackNotificationsMuted()">
                  Unmute
               </button>
             </span>
-            <span class="col-lg-7 col-md-7 col-sm-7 help-block" style="font-size: smaller;">
-              Special conditions you can trigger if a learner looks stuck, e.g. if they get a question wrong many times.
+            <span class="col-lg-7 col-md-7 col-sm-7 help-block" style="font-size: smaller;"
+                  ng-if="!userExplorationEmailsHandler.areFeedbackNotificationsMuted()">
+              You are currently receiving notifications of new feedback for this exploration.
+            </span>
+            <span class="col-lg-7 col-md-7 col-sm-7 help-block" style="font-size: smaller;"
+                  ng-if="userExplorationEmailsHandler.areFeedbackNotificationsMuted()">
+              You have muted feedback notifications for this exploration. You will not receive an email when a new feedback is submitted.
             </span>
           </div>
         </div>
@@ -370,16 +375,21 @@
             </label>
             <span class="col-lg-2 col-md-2 col-sm-2">
               <button type="button" class="btn btn-default protractor-test-enable-fallbacks"
-              ng-click="muteSuggestionNotifications()" ng-if="!userExplorationEmailsHandler.areSuggestionNotificationsMuted()">
+                      ng-click="muteSuggestionNotifications()" ng-if="!userExplorationEmailsHandler.areSuggestionNotificationsMuted()">
                  Mute
               </button>
               <button type="button" class="btn btn-default protractor-test-enable-fallbacks"
-              ng-click="unmuteSuggestionNotifications()" ng-if="userExplorationEmailsHandler.areSuggestionNotificationsMuted()">
+                      ng-click="unmuteSuggestionNotifications()" ng-if="userExplorationEmailsHandler.areSuggestionNotificationsMuted()">
                  Unmute
               </button>
             </span>
-            <span class="col-lg-7 col-md-7 col-sm-7 help-block" style="font-size: smaller;">
-              Customizable components that persist throughout an exploration.
+            <span class="col-lg-7 col-md-7 col-sm-7 help-block" style="font-size: smaller;"
+                  ng-if="!userExplorationEmailsHandler.areSuggestionNotificationsMuted()">
+              You are currently receiving notifications of new suggestion for this exploration.
+            </span>
+            <span class="col-lg-7 col-md-7 col-sm-7 help-block" style="font-size: smaller;"
+                  ng-if="userExplorationEmailsHandler.areSuggestionNotificationsMuted()">
+              You have muted suggestion notifications for this exploration. You will not receive an email when a new suggestion is submitted.
             </span>
           </div>
         </div>

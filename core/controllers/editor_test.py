@@ -1034,6 +1034,12 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTest):
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, exp_id))
         csrf_token = self.get_csrf_token_from_response(response)
 
+        exp_email_preferences = (
+            user_services.get_email_preferences_for_exploration(self.owner_id,
+                                                                exp_id))
+        self.assertFalse(exp_email_preferences.mute_feedback_notifications)
+        self.assertFalse(exp_email_preferences.mute_suggestion_notifications)
+
         # Owner changes email preferences
         emails_url = '%s/%s' % (feconf.USER_EXPLORATION_EMAILS_PREFIX, exp_id)
         self.put_json(
@@ -1042,19 +1048,19 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTest):
                 'mute': True,
                 'message_type': 'feedback'
             }, csrf_token)
+
+        exp_email_preferences = (
+            user_services.get_email_preferences_for_exploration(self.owner_id,
+                                                                exp_id))
+        self.assertTrue(exp_email_preferences.mute_feedback_notifications)
+        self.assertFalse(exp_email_preferences.mute_suggestion_notifications)
+
         self.put_json(
             emails_url, {
                 'version': exploration.version,
                 'mute': True,
                 'message_type': 'suggestion'
             }, csrf_token)
-
-        exp_email_preferences = (
-            user_services.get_email_preferences_for_exploration(self.owner_id,
-                                                                exp_id))
-        self.assertTrue(exp_email_preferences.mute_feedback_notifications)
-        self.assertTrue(exp_email_preferences.mute_suggestion_notifications)
-
         self.put_json(
             emails_url, {
                 'version': exploration.version,
@@ -1066,6 +1072,7 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTest):
             user_services.get_email_preferences_for_exploration(self.owner_id,
                                                                 exp_id))
         self.assertFalse(exp_email_preferences.mute_feedback_notifications)
+        self.assertTrue(exp_email_preferences.mute_suggestion_notifications)
 
         self.logout()
 

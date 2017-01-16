@@ -286,8 +286,9 @@ class ExplorationHandler(EditorHandler):
                 exploration_id, exp_user_data.draft_change_list_exp_version)
             if exp_user_data and exp_user_data.draft_change_list_exp_version
             else None)
-        email_preferences = user_services.get_email_preferences_for_exploration(
-            self.user_id, exploration_id).to_dict()
+        exploration_email_preferences = (
+            user_services.get_email_preferences_for_exploration(
+                self.user_id, exploration_id))
         editor_dict = {
             'category': exploration.category,
             'exploration_id': exploration_id,
@@ -308,7 +309,7 @@ class ExplorationHandler(EditorHandler):
             'version': exploration.version,
             'is_version_of_draft_valid': is_version_of_draft_valid,
             'draft_changes': draft_changes,
-            'email_preferences': email_preferences
+            'email_preferences': exploration_email_preferences.to_dict()
         }
 
         return editor_dict
@@ -550,33 +551,38 @@ class ExplorationModeratorRightsHandler(EditorHandler):
 
 class UserExplorationEmailsHandler(EditorHandler):
     """Handles management of user email notification preferences for this
-    exploration."""
+    exploration.
+    """
 
     def put(self, exploration_id):
         """Updates the email notification preferences for the given exploration.
+
+        Args:
+            exploration_id: str. The exploration id.
+
+        Raises:
+            InvalidInputException: Invalid message type.
         """
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-        version = self.payload.get('version')
-        _require_valid_version(version, exploration.version)
 
         mute = self.payload.get('mute')
         message_type = self.payload.get('message_type')
 
-        if message_type == 'feedback':
+        if message_type == feconf.MESSAGE_TYPE_FEEDBACK:
             user_services.set_email_preferences_for_exploration(
                 self.user_id, exploration_id, mute_feedback_notifications=mute)
-        elif message_type == 'suggestion':
+        elif message_type == feconf.MESSAGE_TYPE_SUGGESTION:
             user_services.set_email_preferences_for_exploration(
                 self.user_id, exploration_id,
                 mute_suggestion_notifications=mute)
         else:
             raise self.InvalidInputException(
-                'No change was made to this exploration.')
+                'Invalid message type.')
 
-        email_preferences = user_services.get_email_preferences_for_exploration(
-            self.user_id, exploration_id).to_dict()
+        exploration_email_preferences = (
+            user_services.get_email_preferences_for_exploration(
+                self.user_id, exploration_id))
         self.render_json({
-            'email_preferences': email_preferences
+            'email_preferences': exploration_email_preferences.to_dict()
         })
 
 class ResolvedAnswersHandler(EditorHandler):

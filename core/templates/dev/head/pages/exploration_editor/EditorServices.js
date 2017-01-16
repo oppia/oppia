@@ -567,41 +567,6 @@ oppia.factory('explorationRightsService', [
   };
 }]);
 
-oppia.factory('userExplorationEmailsHandler', [
-    '$http', '$q', 'explorationData', 'alertsService',
-    function($http, $q, explorationData, alertsService) {
-  return {
-    init: function(
-      feedbackNotificationsMuted, suggestionNotificationsMuted) {
-      this.feedbackNotificationsMuted = feedbackNotificationsMuted;
-      this.suggestionNotificationsMuted = suggestionNotificationsMuted;
-    },
-    areFeedbackNotificationsMuted: function() {
-      return this.feedbackNotificationsMuted;
-    },
-    areSuggestionNotificationsMuted: function() {
-      return this.suggestionNotificationsMuted;
-    },
-    saveChangeToBackend: function(requestParams) {
-      var whenPrefernecesSaved = $q.defer();
-      var that = this;
-
-      requestParams.version = explorationData.data.version;
-      var emailPreferencesUrl = (
-        '/createhandler/notificationpreferences/' +
-        explorationData.explorationId);
-      $http.put(emailPreferencesUrl, requestParams).then(function(response) {
-        var data = response.data;
-        alertsService.clearWarnings();
-        that.init(data.email_preferences.mute_feedback_notifications,
-          data.email_preferences.mute_suggestion_notifications);
-        whenPrefernecesSaved.resolve();
-      });
-      return whenPrefernecesSaved.promise;
-    }
-  };
-}]);
-
 oppia.factory('explorationPropertyService', [
     '$rootScope', '$log', 'changeListService', 'alertsService',
     function($rootScope, $log, changeListService, alertsService) {

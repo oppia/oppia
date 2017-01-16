@@ -210,29 +210,17 @@ oppia.controller('SettingsTab', [
     ********************************************/
 
     $scope.muteFeedbackNotifications = function() {
-      userExplorationEmailsHandler.saveChangeToBackend({
-        message_type: 'feedback',
-        mute: true
-      });
+      userExplorationEmailsHandler.setFeedbackNotifications(true);
     };
     $scope.muteSuggestionNotifications = function() {
-      userExplorationEmailsHandler.saveChangeToBackend({
-        message_type: 'suggestion',
-        mute: true
-      });
+      userExplorationEmailsHandler.setSuggestionNotifications(true);
     };
 
     $scope.unmuteFeedbackNotifications = function() {
-      userExplorationEmailsHandler.saveChangeToBackend({
-        message_type: 'feedback',
-        mute: false
-      });
+      userExplorationEmailsHandler.setFeedbackNotifications(false);
     };
     $scope.unmuteSuggestionNotifications = function() {
-      userExplorationEmailsHandler.saveChangeToBackend({
-        message_type: 'suggestion',
-        mute: false
-      });
+      userExplorationEmailsHandler.setSuggestionNotifications(false);
     };
 
     /********************************************
