@@ -23,7 +23,6 @@ oppia.directive('followButton', [function() {
     templateUrl: 'components/followButton',
     controller: ['$scope', '$timeout', 'UrlInterpolationService', function(
         $scope, $timeout, UrlInterpolationService) {
-      $scope.NAV_MODE = GLOBALS.NAV_MODE;
       $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     }]
   };
