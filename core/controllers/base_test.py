@@ -296,7 +296,7 @@ class I18nDictsTest(test_utils.GenericTestBase):
     def test_keys_in_source_code_match_en(self):
         """Tests that keys in HTML files are present in en.json."""
         en_key_list = self._extract_keys_from_json_file('en.json')
-        for root, dirs, files in os.walk(os.path.join(
+        for root, _, files in os.walk(os.path.join(
                 os.getcwd(), self.get_static_asset_filepath())):
             for filename in files:
                 if filename.endswith('.html'):
