@@ -3189,6 +3189,12 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .tooltip.right {
   min-width:200px;
+  bottom: -10px;
+}
+
+.tooltip.top{
+  padding: 5px;
+  margin-top: 10px;
 }
 
 .tooltip-inner {
