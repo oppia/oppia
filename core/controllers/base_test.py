@@ -298,14 +298,14 @@ class I18nDictsTest(test_utils.GenericTestBase):
         en_key_list = self._extract_keys_from_json_file('en.json')
         for root, dirs, files in os.walk(os.path.join(
                 os.getcwd(), self.get_static_asset_filepath())):
-            for file in files:
-                if file.endswith('.html'):
+            for filename in files:
+                if filename.endswith('.html'):
                     html_key_list = self._extract_keys_from_html_file(
-                        os.path.join(root, file))
+                        os.path.join(root, filename))
                     self.assertLessEqual(set(html_key_list), set(en_key_list))
-                    if not set(html_key_list) <= set(en_key_list):
+                    if set(html_key_list) > set(en_key_list):
                         self.log_line('ERROR: Undefined keys in %s...'
-                                      % os.path.join(root, file))
+                                      % os.path.join(root, filename))
                         missing_keys = list(
                             set(html_key_list) - set(en_key_list))
                         for key in missing_keys:
