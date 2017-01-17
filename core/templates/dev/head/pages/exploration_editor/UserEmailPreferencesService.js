@@ -35,13 +35,13 @@ oppia.factory('userExplorationEmailsHandler', [
       areSuggestionNotificationsMuted: function() {
         return this.suggestionNotificationsMuted;
       },
-      setFeedbackNotifications: function(mute) {
+      setFeedbackNotificationPreferences: function(mute) {
         this.saveChangeToBackend({
           message_type: MESSAGE_TYPE_FEEDBACK,
           mute: mute
         });
       },
-      setSuggestionNotifications: function(mute) {
+      setSuggestionNotificationPreferences: function(mute) {
         this.saveChangeToBackend({
           message_type: MESSAGE_TYPE_SUGGESTION,
           mute: mute

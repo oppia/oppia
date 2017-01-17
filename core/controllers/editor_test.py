@@ -1035,8 +1035,8 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTest):
         csrf_token = self.get_csrf_token_from_response(response)
 
         exp_email_preferences = (
-            user_services.get_email_preferences_for_exploration(self.owner_id,
-                                                                exp_id))
+            user_services.get_email_preferences_for_exploration(
+                self.owner_id, exp_id))
         self.assertFalse(exp_email_preferences.mute_feedback_notifications)
         self.assertFalse(exp_email_preferences.mute_suggestion_notifications)
 
@@ -1050,8 +1050,8 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTest):
             }, csrf_token)
 
         exp_email_preferences = (
-            user_services.get_email_preferences_for_exploration(self.owner_id,
-                                                                exp_id))
+            user_services.get_email_preferences_for_exploration(
+                self.owner_id, exp_id))
         self.assertTrue(exp_email_preferences.mute_feedback_notifications)
         self.assertFalse(exp_email_preferences.mute_suggestion_notifications)
 
@@ -1069,8 +1069,8 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTest):
             }, csrf_token)
 
         exp_email_preferences = (
-            user_services.get_email_preferences_for_exploration(self.owner_id,
-                                                                exp_id))
+            user_services.get_email_preferences_for_exploration(
+                self.owner_id, exp_id))
         self.assertFalse(exp_email_preferences.mute_feedback_notifications)
         self.assertTrue(exp_email_preferences.mute_suggestion_notifications)
 
