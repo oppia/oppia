@@ -305,7 +305,7 @@ class I18nDictsTest(test_utils.GenericTestBase):
                     self.assertLessEqual(set(html_key_list), set(en_key_list))
                     if not set(html_key_list) <= set(en_key_list):
                         self.log_line('ERROR: Undefined keys in %s...'
-                            % os.path.join(root, file))
+                                      % os.path.join(root, file))
                         missing_keys = list(
                             set(html_key_list) - set(en_key_list))
                         for key in missing_keys:
