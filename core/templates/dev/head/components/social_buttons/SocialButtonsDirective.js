@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the Follow Button.
+ * @fileoverview Directive for the Social Buttons.
  */
 
 oppia.directive('socialButtons', [function() {
