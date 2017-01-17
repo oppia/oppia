@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the social buttons.
+ * @fileoverview Directive for the Social Buttons.
  */
 
 oppia.directive('socialButtons', [function() {
@@ -21,8 +21,8 @@ oppia.directive('socialButtons', [function() {
     restrict: 'E',
     scope: {},
     templateUrl: 'components/socialButtons',
-    controller: ['$scope',  'UrlInterpolationService', function(
-        $scope, $timeout, UrlInterpolationService) {
+    controller: ['$scope', 'UrlInterpolationService', function(
+        $scope, UrlInterpolationService) {
       $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     }]
   };
