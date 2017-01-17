@@ -236,7 +236,7 @@ class I18nDictsTest(test_utils.GenericTestBase):
         )).keys())
 
     def _extract_keys_from_html_file(self, filename):
-        regex_pattern = r"(I18N_[A-Z/_\d]*)"
+        regex_pattern = r'(I18N_[A-Z/_\d]*)'
         return re.findall(regex_pattern, utils.get_file_contents(
             filename))
 
@@ -296,21 +296,30 @@ class I18nDictsTest(test_utils.GenericTestBase):
     def test_keys_in_source_code_match_en(self):
         """Tests that keys in HTML files are present in en.json."""
         en_key_list = self._extract_keys_from_json_file('en.json')
-        for root, _, files in os.walk(os.path.join(
-                os.getcwd(), self.get_static_asset_filepath())):
-            for filename in files:
-                if filename.endswith('.html'):
-                    html_key_list = self._extract_keys_from_html_file(
-                        os.path.join(root, filename))
-                    self.assertLessEqual(set(html_key_list), set(en_key_list))
-                    if set(html_key_list) > set(en_key_list):
-                        self.log_line('ERROR: Undefined keys in %s...'
-                                      % os.path.join(root, filename))
-                        missing_keys = list(
-                            set(html_key_list) - set(en_key_list))
-                        for key in missing_keys:
-                            self.log_line(' - %s' % key)
-                        self.log_line('')
+        dirs_to_search = ['core', 'extensions']
+        files_checked = 0
+        missing_keys_count = 0
+        for directory in dirs_to_search:
+            for root, _, files in os.walk(os.path.join(
+                    os.getcwd(), directory)):
+                for filename in files:
+                    if filename.endswith('.html'):
+                        files_checked += 1
+                        html_key_list = self._extract_keys_from_html_file(
+                            os.path.join(root, filename))
+                        if set(html_key_list) <= set(en_key_list):
+                            pass
+                        else:
+                            self.log_line('ERROR: Undefined keys in %s:'
+                                          % os.path.join(root, filename))
+                            missing_keys = list(
+                                set(html_key_list) - set(en_key_list))
+                            missing_keys_count += len(missing_keys)
+                            for key in missing_keys:
+                                self.log_line(' - %s' % key)
+                            self.log_line('')
+        self.assertEqual(missing_keys_count, 0)
+        self.assertGreater(files_checked, 0)
 
 
 class GetHandlerTypeIfExceptionRaisedTest(test_utils.GenericTestBase):
