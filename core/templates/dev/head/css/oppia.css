@@ -3187,20 +3187,6 @@ md-card.preview-conversation-skin-supplemental-card {
   color: blue;
 }
 
-.tile-tooltip .tooltip.right {
-  bottom: -10px;
-  min-width: 200px;
-}
-
-.tooltip.top {
-  margin-top: 10px;
-  padding: 5px;
-}
-
-.tile-tooltip .tooltip-inner {
-  min-width: 200px;
-}
-
 /* This is necessary so that long usernames don't overflow the tooltip. */
 .oppia-info-card-content .tooltip-inner {
   max-width: none;
