@@ -18,8 +18,6 @@
 
 oppia.directive('socialButtons', [function() {
   return {
-    restrict: 'E',
-    scope: {},
     templateUrl: 'components/socialButtons',
     controller: ['$scope', '$timeout', 'UrlInterpolationService', function(
         $scope, $timeout, UrlInterpolationService) {
