@@ -43,10 +43,10 @@
       <div class="title-section-mask"></div>
 
       <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>">
-        <span ng-if="getObjective()">
+        <span ng-if="getObjective()" class="tile-tooltip">
           <span tooltip="<[getObjective()]>" tooltip-placement="top">
             <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
-                <[getObjective() | truncateAndCapitalize: 40]>
+              <[getObjective() | truncateAndCapitalize: 40]>
             </div>
           </span>
         </span>
