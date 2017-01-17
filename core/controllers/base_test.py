@@ -307,8 +307,7 @@ class I18nDictsTest(test_utils.GenericTestBase):
                         files_checked += 1
                         html_key_list = self._extract_keys_from_html_file(
                             os.path.join(root, filename))
-                        #pylint: disable=unneeded-not
-                        if not set(html_key_list) <= set(en_key_list):
+                        if not set(html_key_list) <= set(en_key_list): #pylint: disable=unneeded-not
                             self.log_line('ERROR: Undefined keys in %s:'
                                           % os.path.join(root, filename))
                             missing_keys = list(
