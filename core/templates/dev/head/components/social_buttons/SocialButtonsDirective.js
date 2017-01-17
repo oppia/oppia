@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the Social Buttons.
+ * @fileoverview Directive for the Social Buttons. Used for Social Buttons displayed in the footer.
  */
 
 oppia.directive('socialButtons', [function() {
