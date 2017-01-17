@@ -235,6 +235,11 @@ class I18nDictsTest(test_utils.GenericTestBase):
                          'assets', 'i18n', filename)
         )).keys())
 
+    def _extract_keys_from_html_file(self, filename):
+        regex_pattern = r"(I18N_[A-Z/_\d]*)"
+        return re.findall(regex_pattern, utils.get_file_contents(
+            filename))
+
     def test_i18n_keys(self):
         """Tests that all JSON files in i18n.js have the same set of keys."""
         master_key_list = self._extract_keys_from_json_file('en.json')
@@ -287,6 +292,25 @@ class I18nDictsTest(test_utils.GenericTestBase):
         en_key_list = self._extract_keys_from_json_file('en.json')
         qqq_key_list = self._extract_keys_from_json_file('qqq.json')
         self.assertEqual(en_key_list, qqq_key_list)
+
+    def test_keys_in_source_code_match_en(self):
+        """Tests that keys in HTML files are present in en.json."""
+        en_key_list = self._extract_keys_from_json_file('en.json')
+        for root, dirs, files in os.walk(os.path.join(
+                os.getcwd(), self.get_static_asset_filepath())):
+            for file in files:
+                if file.endswith('.html'):
+                    html_key_list = self._extract_keys_from_html_file(
+                        os.path.join(root, file))
+                    self.assertLessEqual(set(html_key_list), set(en_key_list))
+                    if not set(html_key_list) <= set(en_key_list):
+                        self.log_line('ERROR: Undefined keys in %s...'
+                            % os.path.join(root, file))
+                        missing_keys = list(
+                            set(html_key_list) - set(en_key_list))
+                        for key in missing_keys:
+                            self.log_line(' - %s' % key)
+                        self.log_line('')
 
 
 class GetHandlerTypeIfExceptionRaisedTest(test_utils.GenericTestBase):
