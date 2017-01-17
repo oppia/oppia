@@ -710,7 +710,7 @@ textarea {
   list-style-position: inside;
   list-style-type: none;
 }
-.oppia-footer-social a:hover{
+.oppia-footer-social a:hover {
   text-decoration: none;
 }
 .oppia-footer-social a > img {
