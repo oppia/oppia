@@ -121,7 +121,7 @@ describe('oppiaInteractiveImageClickInputValidator', function() {
       }]);
 
       customizationArguments.imageAndRegions.value.labeledRegions = [];
-      goodAnswerGroups[0].rule_specs = [];
+      goodAnswerGroups[0].ruleSpecs = [];
       warnings = validator(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
@@ -132,7 +132,7 @@ describe('oppiaInteractiveImageClickInputValidator', function() {
     });
 
   it('should expect rule types to reference valid region labels', function() {
-    goodAnswerGroups[0].rule_specs[0].inputs.x = 'FakeLabel';
+    goodAnswerGroups[0].ruleSpecs[0].inputs.x = 'FakeLabel';
     var warnings = validator(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
