@@ -48,7 +48,7 @@ describe('oppiaInteractiveMultipleChoiceInputValidator', function() {
     };
 
     goodAnswerGroups = [{
-      rule_specs: [{
+      ruleSpecs: [{
         rule_type: 'Equals',
         inputs: {
           x: 0
@@ -98,7 +98,7 @@ describe('oppiaInteractiveMultipleChoiceInputValidator', function() {
 
   it('should validate answer group rules refer to valid choices only once',
     function() {
-      goodAnswerGroups[0].rule_specs[0].inputs.x = 2;
+      goodAnswerGroups[0].ruleSpecs[0].inputs.x = 2;
       var warnings = validator(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
@@ -107,7 +107,7 @@ describe('oppiaInteractiveMultipleChoiceInputValidator', function() {
         message: 'Please ensure rule 1 in group 1 refers to a valid choice.'
       }]);
 
-      goodAnswerGroups[0].rule_specs[0].inputs.x = 1;
+      goodAnswerGroups[0].ruleSpecs[0].inputs.x = 1;
       warnings = validator(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
@@ -132,7 +132,7 @@ describe('oppiaInteractiveMultipleChoiceInputValidator', function() {
 
       // Taking away 1 rule reverts back to the expect validation behavior with
       // default outcome.
-      goodAnswerGroups[0].rule_specs.splice(1, 1);
+      goodAnswerGroups[0].ruleSpecs.splice(1, 1);
       warnings = validator(
         currentState, customizationArguments, goodAnswerGroups, null);
       expect(warnings).toEqual([{

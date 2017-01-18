@@ -53,7 +53,7 @@ describe('oppiaInteractiveImageClickInputValidator', function() {
       }
     };
     goodAnswerGroups = [{
-      rule_specs: [{
+      ruleSpecs: [{
         rule_type: 'IsInRegion',
         inputs: {
           x: 'SecondLabel'
@@ -65,7 +65,7 @@ describe('oppiaInteractiveImageClickInputValidator', function() {
 
   it('should expect a customization argument for image and regions',
     function() {
-      goodAnswerGroups[0].rule_specs = [];
+      goodAnswerGroups[0].ruleSpecs = [];
       expect(function() {
         validator(currentState, {}, goodAnswerGroups, goodDefaultOutcome);
       }).toThrow(
