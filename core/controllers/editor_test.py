@@ -27,6 +27,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -1010,6 +1011,68 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
                 'new_member_role': rights_manager.ROLE_EDITOR,
                 }, csrf_token, expect_errors=True, expected_status_int=401)
         self.assertEqual(response_dict['code'], 401)
+
+        self.logout()
+
+
+class UserExplorationEmailsIntegrationTest(BaseEditorControllerTest):
+    """Test the handler for user email notification preferences."""
+
+    def test_user_exploration_emails_handler(self):
+        """Test user exploration emails handler."""
+
+        # Owner creates exploration
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for emails handler test!',
+            category='Category')
+
+        exploration = exp_services.get_exploration_by_id(exp_id)
+
+        response = self.testapp.get(
+            '%s/%s' % (feconf.EDITOR_URL_PREFIX, exp_id))
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        exp_email_preferences = (
+            user_services.get_email_preferences_for_exploration(
+                self.owner_id, exp_id))
+        self.assertFalse(exp_email_preferences.mute_feedback_notifications)
+        self.assertFalse(exp_email_preferences.mute_suggestion_notifications)
+
+        # Owner changes email preferences
+        emails_url = '%s/%s' % (feconf.USER_EXPLORATION_EMAILS_PREFIX, exp_id)
+        self.put_json(
+            emails_url, {
+                'version': exploration.version,
+                'mute': True,
+                'message_type': 'feedback'
+            }, csrf_token)
+
+        exp_email_preferences = (
+            user_services.get_email_preferences_for_exploration(
+                self.owner_id, exp_id))
+        self.assertTrue(exp_email_preferences.mute_feedback_notifications)
+        self.assertFalse(exp_email_preferences.mute_suggestion_notifications)
+
+        self.put_json(
+            emails_url, {
+                'version': exploration.version,
+                'mute': True,
+                'message_type': 'suggestion'
+            }, csrf_token)
+        self.put_json(
+            emails_url, {
+                'version': exploration.version,
+                'mute': False,
+                'message_type': 'feedback'
+            }, csrf_token)
+
+        exp_email_preferences = (
+            user_services.get_email_preferences_for_exploration(
+                self.owner_id, exp_id))
+        self.assertFalse(exp_email_preferences.mute_feedback_notifications)
+        self.assertTrue(exp_email_preferences.mute_suggestion_notifications)
 
         self.logout()
 

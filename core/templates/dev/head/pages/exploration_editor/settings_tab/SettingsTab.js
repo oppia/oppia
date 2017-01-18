@@ -25,7 +25,7 @@ oppia.controller('SettingsTab', [
   'changeListService', 'alertsService', 'explorationStatesService',
   'explorationParamChangesService', 'explorationWarningsService',
   'CATEGORY_LIST', 'explorationAdvancedFeaturesService',
-  'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
+  'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'userExplorationEmailsHandler',
   function(
       $scope, $http, $window, $modal, $rootScope,
       explorationData, explorationTitleService, explorationCategoryService,
@@ -35,7 +35,7 @@ oppia.controller('SettingsTab', [
       changeListService, alertsService, explorationStatesService,
       explorationParamChangesService, explorationWarningsService,
       CATEGORY_LIST, explorationAdvancedFeaturesService,
-      EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
+      EXPLORATION_TITLE_INPUT_FOCUS_LABEL, userExplorationEmailsHandler) {
     $scope.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
 
@@ -70,6 +70,7 @@ oppia.controller('SettingsTab', [
       $scope.explorationInitStateNameService = explorationInitStateNameService;
       $scope.explorationParamSpecsService = explorationParamSpecsService;
       $scope.explorationParamChangesService = explorationParamChangesService;
+      $scope.userExplorationEmailsHandler = userExplorationEmailsHandler;
 
       explorationData.getData().then(function() {
         $scope.refreshSettingsTab();
@@ -202,6 +203,24 @@ oppia.controller('SettingsTab', [
       explorationRightsService.saveChangeToBackend({
         viewable_if_private: !explorationRightsService.viewableIfPrivate()
       });
+    };
+
+    /********************************************
+    * Methods for notifications muting.
+    ********************************************/
+
+    $scope.muteFeedbackNotifications = function() {
+      userExplorationEmailsHandler.setFeedbackNotificationPreferences(true);
+    };
+    $scope.muteSuggestionNotifications = function() {
+      userExplorationEmailsHandler.setSuggestionNotificationPreferences(true);
+    };
+
+    $scope.unmuteFeedbackNotifications = function() {
+      userExplorationEmailsHandler.setFeedbackNotificationPreferences(false);
+    };
+    $scope.unmuteSuggestionNotifications = function() {
+      userExplorationEmailsHandler.setSuggestionNotificationPreferences(false);
     };
 
     /********************************************
