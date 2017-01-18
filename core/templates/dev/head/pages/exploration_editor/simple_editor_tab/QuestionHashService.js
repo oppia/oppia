@@ -14,44 +14,30 @@
 
 /**
  * @fileoverview Service that contains common functionalities for creating
-unique Question identifiers.
+ * unique identifiers for sidebar items and editor field headers.
  */
 
 oppia.factory('QuestionHashService', [function() {
+  // Strip the space, and set to lower case.
+  var strip = function(string) {
+    return string.trim().toLowerCase().split(' ').join('');
+  };
   return {
-    getHash: function(question, subfield) {
-      var questionId;
-      var suffix;
-      if (angular.isDefined(question)) {
-        if (angular.isString(question)) {
-          questionId = question.toLowerCase().replace(' ', '-');
-        } else if (angular.isObject(question)) {
-          questionId = question.getStateName().toLowerCase().replace(' ', '-');
-        }
-      };
-      if (angular.isDefined(subfield)) {
-        if (angular.isString(subfield)) {
-          suffix = subfield;
-        } else if (angular.isObject(subfield)) {
-          suffix = subfield.abbr;
-        }
-      };
-      if (angular.isDefined(suffix)) {
-        return [questionId, suffix].join('-');
-      } else {
-        return questionId;
-      };
+    // Returns a question hash (question stateName without spaces).
+    getQuestionHash: function(question) {
+      return strip(question.getStateName());
     },
-    getSidebarItemHash: function(question, subfield) {
-      return 'si-' + this.getHash(question, subfield);
+    // Returns a hash used to identify a question subfield.
+    getSubfieldHash: function(questionId, label) {
+      return [strip(questionId), strip(label)].join('-');
     },
-    getParentQuestionHash: function(childHash) {
-      var hash = childHash.split('-');
-      if (hash.length > 2) {
-        return hash.slice(0, 2).join('-');
-      } else {
-        return hash[0];
-      };
+    // Returns a hash used to identify a sidebar item.
+    getSidebarItemHash: function(questionId, label) {
+      return 'sidebaritem-' + this.getSubfieldHash(questionId, label);
+    },
+    // Extracts the questionHash from a subfieldHash.
+    getParentQuestionHash: function(subfieldHash) {
+      return subfieldHash.split('-')[0];
     }
   };
 }]);

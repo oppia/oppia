@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service that syncs the position of the user in the simple editor
- with the navigation sidebar.
+ * @fileoverview Service that syncs the position of the user in the simple
+ * editor with the navigation sidebar, see ScrollSyncDirective.js.
  */
 
 oppia.factory('ScrollSyncService', [
@@ -24,25 +24,23 @@ oppia.factory('ScrollSyncService', [
            SimpleEditorManagerService) {
     var targets = [];
     var questionList = SimpleEditorManagerService.getQuestionList();
-    var clear = function() {
+
+    var clearHighlighted = function() {
       angular.element('.highlighted').removeClass('highlighted');
     };
+
     var collapse = function(hash) {
-      var question;
-      var questionIndex;
       var questions = questionList.getQuestions();
       for (var i = 0; i < questions.length; i++) {
-        if (QuestionHashService.getHash(questions[i]) === hash) {
-          questionIndex = i;
+        if (QuestionHashService.getQuestionHash(questions[i]) === hash) {
+          $rootScope.$broadcast(
+            'SimpleEditorSidebarToggleCollapse', questions[i]
+          );
           break;
         }
       };
-      if (!angular.isDefined(questionIndex)) {
-        return;
-      };
-      question = questions[questionIndex];
-      $rootScope.$broadcast('SimpleEditorSidebarLinkCollapse', question);
     };
+
     $anchorScroll.yOffset = 80;
 
     var scrollSyncService = {
@@ -56,8 +54,8 @@ oppia.factory('ScrollSyncService', [
         if (!angular.isDefined(hash)) {
           return;
         } else {
-          clear();
-          var elm = angular.element('#si-' + hash);
+          clearHighlighted();
+          var elm = angular.element('#sidebaritem-' + hash);
 
           if (!(hash === 'intro' || hash === 'title')) {
             elm.addClass('highlighted');
@@ -67,60 +65,46 @@ oppia.factory('ScrollSyncService', [
           if (elm.is(':hidden')) {
             collapse(QuestionHashService.getParentQuestionHash(hash));
           };
-          // TODO: scroll to the nav link in case not displayed
+          // TODO(andromfins): If the nav link is not displayed when the sidebar
+          // is overflown, scroll to it.
         }
       },
-      // Scroll to an element in the editor given it's id.
+      // Scroll to an element in the editor given its hash.
       scrollTo: function(hash) {
         $anchorScroll(hash);
       }
     };
 
-    // Onscroll event handler
+    // Onscroll event handler.
     $document.on('scroll', function() {
-      var documentY = $document.scrollTop();
-      var positiveTargets = {};
-      var positiveTargetsDy = [];
       // Find the closest positive target (the closest element in the target
-      // list to the top of the editor, with a positive distance from it.)
-      for (var i = 0; i < targets.length; i++) {
-        var target = angular.element(targets[i]);
-        var targetOffset = target.offset().top;
-        var dy = targetOffset - documentY;
+      // list to the top of the editor, with a positive distance from it).
+      var minPositiveTarget;
+      var documentY = $document.scrollTop();
+      for (var i = 0, foundPositive = false, minDy; i < targets.length; i++) {
+        var dy = targets[i].offset().top - documentY;
         if (dy > 0) {
-          positiveTargets[dy] = target;
-          positiveTargetsDy.push(dy);
-        }
-      };
-      for (var i = 0, minPositive = null; i < positiveTargetsDy.length; i++) {
-        if (i === 0) {
-          minPositive = positiveTargetsDy[i];
-          continue;
-        } else {
-          var dy = positiveTargetsDy[i];
-          if (minPositive > dy) {
-            minPositive = dy;
+          if (!foundPositive) {
+            minDy = dy;
+            minPositiveTarget = targets[i];
+            foundPositive = true;
+            continue;
+          } else {
+            if (dy < minDy) {
+              minDy = dy;
+              minPositiveTarget = targets[i];
+            }
           }
         }
       };
-      if (minPositive === null) {
+
+      if (!angular.isDefined(minPositiveTarget)) {
         return;
       } else {
-        // Update the sidebar active element
-        var closestTarget = positiveTargets[minPositive];
-        scrollSyncService.updateActive(closestTarget.attr('id'));
+        // Update the sidebar active element.
+        scrollSyncService.updateActive(minPositiveTarget.attr('id'));
       }
     });
 
     return scrollSyncService;
-}]);
-
-// Used to mark parts of the editor that have a sidebar item associated to it.
-oppia.directive('scrollSync', ['ScrollSyncService', function(ScrollSyncService) {
-  return {
-    restrict: 'A',
-    link: function(scope, element) {
-      ScrollSyncService.addTarget(element);
-    }
-  };
 }]);

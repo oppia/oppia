@@ -1,5 +1,5 @@
 <script type="text/ng-template" id="simpleEditorQuestions/MultipleChoiceInput">
-  <h3 id="<[getHash('mc')]>" scroll-sync>Multiple choice</h3>
+  <h3 scroll-sync>Multiple choice</h3>
   <div class="options-container">
     <ul style="margin-bottom: 0;">
       <li ng-repeat="choice in getChoices() track by $index" class="option" style="list-style-type: disc;">
@@ -22,7 +22,7 @@
     </button>
   </div>
 
-  <h3 id="<[getHash('ca')]>" scroll-sync>Pick the correct answer</h3>
+  <h3 scroll-sync="Correct answer">Pick the correct answer</h3>
   <div class="correct-answer-picker-container">
     <button class="correct-answer-option"
             ng-repeat="choice in getChoices() track by $index"
@@ -48,7 +48,7 @@
     </editor-html-field>
   </div>
 
-  <h3 id="<[getHash('hint')]>" scroll-sync>Provide a hint for all other answers</h3>
+  <h3 scroll-sync="Hints">Provide a hint for all other answers</h3>
   <editor-html-field original-value="getDefaultOutcome().feedback[0]"
                      on-finish-editing="saveDefaultFeedback(newValue)"
                      placeholder="Type something">

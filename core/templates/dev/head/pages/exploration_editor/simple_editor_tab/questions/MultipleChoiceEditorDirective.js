@@ -36,16 +36,11 @@ oppia.directive('multipleChoiceEditor', [function() {
     },
     templateUrl: 'simpleEditorQuestions/MultipleChoiceInput',
     controller: [
-      '$scope', '$timeout', 'alertsService', 'QuestionHashService',
-      function($scope, $timeout, alertsService, QuestionHashService) {
+      '$scope', '$timeout', 'alertsService',
+      function($scope, $timeout, alertsService) {
         // Note that a questionId generated in this way may contain spaces,
         // since it is just the state name.
         $scope.questionId = $scope.getUniqueId();
-
-        // Returns a unique id for sub-elements of a question given a suffix.
-        $scope.getHash = function(suffix) {
-          return QuestionHashService.getHash($scope.questionId, suffix);
-        };
 
         $scope.getFieldId = function(index) {
           return $scope.questionId + '.' + index;
