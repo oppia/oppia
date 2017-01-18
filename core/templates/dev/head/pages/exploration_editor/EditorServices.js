@@ -791,6 +791,17 @@ oppia.factory('explorationStatesService', [
     var PROPERTIES_TO_CONVERT = [
       'answer_groups'
     ];
+
+    var BACKEND_CONVERSIONS = {
+      answer_groups: function(answerGroups) {
+        var answerGroupsToBackend = [];
+        for (var i = 0; i < answerGroups.length; i++) {
+          answerGroupsToBackend.push(answerGroups[i].toBackendDict());
+        }
+        return answerGroupsToBackend;
+      }
+    };
+
     // Maps backend names to the corresponding frontend dict accessor lists.
     var PROPERTY_REF_DATA = {
       answer_groups: ['interaction', 'answer_groups'],
@@ -822,18 +833,17 @@ oppia.factory('explorationStatesService', [
       return angular.copy(propertyRef);
     };
 
-    var saveStateProperty = function(stateName,
-      backendName, newValue) {
+    var saveStateProperty = function(stateName, backendName, newValue) {
       var oldValue = getStatePropertyMemento(stateName, backendName);
-      var newValueBackend = angular.copy(newValue);
+      var newBackendValue = angular.copy(newValue);
 
-      if (PROPERTIES_TO_CONVERT.indexOf(backendName) > -1) {
-        newValueBackend = convertToBackend(newValue);
+      if (BACKEND_CONVERSIONS.hasOwnProperty(backendName)) {
+        newBackendValue = convertToBackendRepresentation(newValue, backendName);
       }
 
       if (!angular.equals(oldValue, newValue)) {
         changeListService.editStateProperty(
-          stateName, backendName, newValueBackend, oldValue);
+          stateName, backendName, newBackendValue, oldValue);
 
         var newStateData = angular.copy(_states[stateName]);
         var accessorList = PROPERTY_REF_DATA[backendName];
@@ -856,12 +866,9 @@ oppia.factory('explorationStatesService', [
       }
     };
 
-    var convertToBackend = function(propertyValue) {
-      var propToBackend = [];
-      for (var i = 0; i < propertyValue.length; i++) {
-        propToBackend.push(propertyValue[i].toBackendDict());
-      }
-      return propToBackend;
+    var convertToBackendRepresentation = function(propertyValue, backendName) {
+      var conversionFunction = BACKEND_CONVERSIONS[backendName];
+      return conversionFunction(propertyValue);
     };
 
     // TODO(sll): Add unit tests for all get/save methods.
@@ -869,11 +876,9 @@ oppia.factory('explorationStatesService', [
       init: function(states) {
         _states = {};
         for (var stateName in states) {
-          if (states.hasOwnProperty(stateName)) {
-            var stateData = states[stateName];
-            _states[stateName] = StateObjectFactory.create(
-              stateName, stateData);
-          }
+          var stateData = states[stateName];
+          _states[stateName] = StateObjectFactory.create(
+            stateName, stateData);
         }
       },
       getStates: function() {
@@ -1636,21 +1641,24 @@ oppia.factory('explorationGadgetsService', [
 // A service that returns the frontend representation of a newly-added state.
 oppia.factory('newStateTemplateService',
   ['StateObjectFactory', function(StateObjectFactory) {
-  return {
-    // Returns a template for the new state with the given state name, changing
-    // the default rule destination to the new state name in the process.
-    // NB: clients should ensure that the desired state name is valid.
-    getNewStateTemplate: function(newStateName) {
-      var newState = StateObjectFactory.create(newStateName, {
-        content: GLOBALS.NEW_STATE_TEMPLATE.content,
-        interaction: GLOBALS.NEW_STATE_TEMPLATE.interaction,
-        param_changes: GLOBALS.NEW_STATE_TEMPLATE.param_changes
-      });
-      newState.interaction.default_outcome.dest = newStateName;
-      return newState;
-    }
-  };
-}]);
+    var newStateTemplate = angular.copy(GLOBALS.NEW_STATE_TEMPLATE);
+    return {
+      // Returns a template for the new state with the given state name,
+      // changing the default rule destination to the new state name in
+      // the process.
+      // NB: clients should ensure that the desired state name is valid.
+      getNewStateTemplate: function(newStateName) {
+        var newState = StateObjectFactory.create(newStateName, {
+          content: newStateTemplate.content,
+          interaction: newStateTemplate.interaction,
+          param_changes: newStateTemplate.param_changes
+        });
+        newState.interaction.default_outcome.dest = newStateName;
+        return newState;
+      }
+    };
+  }
+]);
 
 oppia.factory('computeGraphService', [
   'INTERACTION_SPECS', function(INTERACTION_SPECS) {

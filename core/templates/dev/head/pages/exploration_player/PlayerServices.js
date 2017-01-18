@@ -50,6 +50,8 @@ oppia.factory('oppiaPlayerService', [
     var answerIsBeingProcessed = false;
 
     var exploration = null;
+
+    // Param changes to be used ONLY in editor preview mode.
     var manualParamChanges = null;
     var version = GLOBALS.explorationVersion;
 
@@ -157,9 +159,9 @@ oppia.factory('oppiaPlayerService', [
       // This should only be used in editor preview mode. It sets the
       // exploration data from what's currently specified in the editor, and
       // also initializes the parameters to empty strings.
-      applyManualParamChanges: function(manualParamChangesToApply) {
+      initManualParamChanges: function(manualParamChangesToInit) {
         if (_editorPreviewMode) {
-          manualParamChanges = manualParamChangesToApply;
+          manualParamChanges = manualParamChangesToInit;
         } else {
           throw 'Error: cannot populate exploration in learner mode.';
         }
@@ -183,7 +185,10 @@ oppia.factory('oppiaPlayerService', [
         playerTranscriptService.init();
 
         if (_editorPreviewMode) {
-          var explorationDataUrl = '/createhandler/data/' + _explorationId;
+          var explorationDataUrl = UrlInterpolationService.interpolateUrl(
+            '/createhandler/data/<exploration_id>', {
+              exploration_id: _explorationId
+            });
           $http.get(explorationDataUrl, {
             params: {
               apply_draft: true
@@ -194,9 +199,10 @@ oppia.factory('oppiaPlayerService', [
             _loadInitialState(successCallback);
           });
         } else {
-          var explorationDataUrl = (
-            '/explorehandler/init/' + _explorationId +
-            (version ? '?v=' + version : ''));
+          var explorationDataUrl = (UrlInterpolationService.interpolateUrl(
+            '/explorehandler/init/<exploration_id>', {
+              exploration_id: _explorationId
+            }) + (version ? '?v=' + version : ''));
           $http.get(explorationDataUrl).then(function(response) {
             var data = response.data;
             exploration = ExplorationObjectFactory.create(data.exploration);

@@ -119,7 +119,7 @@ oppia.controller('PreviewTab', [
     };
 
     $scope.loadPreviewState = function(stateName, manualParamChanges) {
-      oppiaPlayerService.applyManualParamChanges(manualParamChanges);
+      oppiaPlayerService.initManualParamChanges(manualParamChanges);
       $scope.isExplorationPopulated = true;
     };
 

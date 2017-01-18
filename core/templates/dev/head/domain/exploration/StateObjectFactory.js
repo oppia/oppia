@@ -37,13 +37,11 @@ oppia.factory('StateObjectFactory', [
   };
 
   var generateAnswerGroupsFromBackend = function(answerGroupsBackendDict) {
-    var answerGroups = [];
-    for (var answerGroup in answerGroupsBackendDict) {
-      var answerGroupData = answerGroupsBackendDict[answerGroup];
-      answerGroups.push(
-        AnswerGroupObjectFactory.create(
-          answerGroupData.rule_specs, answerGroupData.outcome));
-    }
+    var answerGroups = answerGroupsBackendDict.map(function(answerGroup) {
+      return AnswerGroupObjectFactory.create(
+        answerGroup.rule_specs, answerGroup.outcome);
+    });
+
     return answerGroups;
   };
 

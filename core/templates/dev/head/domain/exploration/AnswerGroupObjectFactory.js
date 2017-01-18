@@ -13,24 +13,23 @@
 // limitations under the License.
 
 oppia.factory('AnswerGroupObjectFactory', [function() {
-    var AnswerGroup = function(ruleSpecs, outcome) {
-      this.ruleSpecs = ruleSpecs;
-      this.outcome = outcome;
-    };
+  var AnswerGroup = function(ruleSpecs, outcome) {
+    this.ruleSpecs = ruleSpecs;
+    this.outcome = outcome;
+  };
 
-    AnswerGroup.prototype.toBackendDict = function() {
-      return {
-        rule_specs: this.ruleSpecs,
-        outcome: this.outcome
-      };
+  AnswerGroup.prototype.toBackendDict = function() {
+    return {
+      rule_specs: this.ruleSpecs,
+      outcome: this.outcome
     };
+  };
 
-    // Static class methods. Note that "this" is not available in
-    // static contexts.
-    AnswerGroup.create = function(ruleSpecs, outcome) {
-      return new AnswerGroup(ruleSpecs, outcome);
-    };
+  // Static class methods. Note that "this" is not available in
+  // static contexts.
+  AnswerGroup.create = function(ruleSpecs, outcome) {
+    return new AnswerGroup(ruleSpecs, outcome);
+  };
 
-    return AnswerGroup;
-  }
-]);
+  return AnswerGroup;
+}]);
