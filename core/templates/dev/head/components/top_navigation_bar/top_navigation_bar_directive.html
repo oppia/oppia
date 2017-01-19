@@ -128,8 +128,8 @@
         <create-activity-button></create-activity-button>
       </ul>
       <ul ng-if="!windowIsNarrow" class="nav oppia-navbar-tabs">
-        <create-activity-button></create-activity-button>
-        <li>
+        <create-activity-button ng-show="navElementsVisibilityStatus.I18N_CREATE_EXPLORATION_CREATE"></create-activity-button>
+        <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_DONATE">
           <div class="pull-right oppia-navbar-button-container">
             <a href="/donate"
                class="btn oppia-navbar-button oppia-navbar-hide-on-small-width protractor-test-create-activity oppia-transition-200">
@@ -138,7 +138,7 @@
           </div>
         </li>
 
-        <li class="dropdown oppia-navbar-clickable-dropdown pull-right protractor-test-about-oppia-list-item">
+        <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_ABOUT" class="dropdown oppia-navbar-clickable-dropdown pull-right protractor-test-about-oppia-list-item">
           <a class="oppia-navbar-tab">
             <span translate="I18N_TOPNAV_ABOUT"></span>
             <span class="caret"></span>
@@ -154,7 +154,7 @@
             <li><a class="protractor-test-contact-link" href="/contact" translate="I18N_TOPNAV_CONTACT_US"></a></li>
           </ul>
         </li>
-        <li class="oppia-clickable-navbar-element pull-right">
+        <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_LIBRARY" class="oppia-clickable-navbar-element pull-right">
           <a class="oppia-navbar-tab" href="/library" translate="I18N_TOPNAV_LIBRARY"></a>
         </li>
       </ul>

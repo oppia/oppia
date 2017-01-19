@@ -26,11 +26,11 @@ oppia.directive('topNavigationBar', [function() {
     controller: [
       '$scope', '$http', '$window', '$timeout', 'UrlInterpolationService',
       'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS',
-      'siteAnalyticsService', 'windowDimensionsService',
+      'siteAnalyticsService', 'windowDimensionsService', 'oppiaDebouncer',
       function(
           $scope, $http, $window, $timeout, UrlInterpolationService,
           SidebarStatusService, LABEL_FOR_CLEARING_FOCUS,
-          siteAnalyticsService, windowDimensionsService) {
+          siteAnalyticsService, windowDimensionsService, oppiaDebouncer) {
         var NAV_MODE_SIGNUP = 'signup';
         var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
           'create', 'explore', 'collection'];
@@ -95,13 +95,12 @@ oppia.directive('topNavigationBar', [function() {
         }
 
         $scope.windowIsNarrow = windowDimensionsService.isWindowNarrow();
-        var handleOverflowResizeTimer;
-        var initialWindowWidth = windowDimensionsService.getWidth();
-        var hideNavElements = {
-          I18N_TOPNAV_DONATE: false,
-          I18N_TOPNAV_ABOUT: false,
-          I18N_CREATE_EXPLORATION_CREATE: false,
-          I18N_TOPNAV_LIBRARY: false
+        var currentWindowWidth = windowDimensionsService.getWidth();
+        $scope.navElementsVisibilityStatus = {
+          I18N_TOPNAV_DONATE: true,
+          I18N_TOPNAV_ABOUT: true,
+          I18N_CREATE_EXPLORATION_CREATE: true,
+          I18N_TOPNAV_LIBRARY: true
         };
 
         windowDimensionsService.registerOnResizeHook(function() {
@@ -109,24 +108,22 @@ oppia.directive('topNavigationBar', [function() {
           $scope.$apply();
           // Close the sidebar, if necessary.
           SidebarStatusService.closeSidebar();
-          // Limit calls to handleOverflow() to one per 500ms to prevent flicker
-          $timeout.cancel(handleOverflowResizeTimer);
 
           // If the window is resized larger, try displaying the hidden elements
-          if (initialWindowWidth < windowDimensionsService.getWidth()) {
-            $.each(hideNavElements, function(element, state) {
-              if (state === true) {
-                $('[translate=' + element + ']')
-                  .closest('div, li').css('display', 'block');
-                hideNavElements[element] = false;
+          if (currentWindowWidth < windowDimensionsService.getWidth()) {
+            $.each($scope.navElementsVisibilityStatus, function(element, visible) {
+              if (!visible) {
+                console.log("Showing:", element);
+                $scope.navElementsVisibilityStatus[element] = true;
               }
             });
           }
-          initialWindowWidth = windowDimensionsService.getWidth();
-          handleOverflowResizeTimer = $timeout(handleOverflow, 500);
+          currentWindowWidth = windowDimensionsService.getWidth();
+          oppiaDebouncer.debounce(handleOverflow, 500)();
         });
 
         var handleOverflow = function() {
+          console.log("Called at", Date.now());
           if (windowDimensionsService.getWidth() < 768) {
             return false;
           }
@@ -167,11 +164,10 @@ oppia.directive('topNavigationBar', [function() {
           $('ul.nav.oppia-navbar-tabs').css('min-width', navWidth);
 
           if ($('div.collapse.navbar-collapse').height() > 60) {
-            $.each(hideNavElements, function(element, state) {
-              if (state === false) {
-                $('[translate=' + element + ']')
-                  .closest('div, li').css('display', 'None');
-                hideNavElements[element] = true;
+            $.each($scope.navElementsVisibilityStatus, function(element, visible) {
+              if (visible) {
+                console.log("Hiding:", element);
+                $scope.navElementsVisibilityStatus[element] = false;
                 $timeout(handleOverflow, 10);
                 return false;
               }
