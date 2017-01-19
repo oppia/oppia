@@ -44,6 +44,7 @@
 	"I18N_FOOTER_CONTRIBUTE_ALL_CAPS": "贡献",
 	"I18N_FOOTER_CREDITS": "制作人员",
 	"I18N_FOOTER_DONATE": "捐款",
+	"I18N_FOOTER_FOLLOW_US": "关注我们",
 	"I18N_FOOTER_FORUM": "论坛",
 	"I18N_FOOTER_GET_INVOLVED": "介入",
 	"I18N_FOOTER_GET_STARTED": "入门",
@@ -235,7 +236,6 @@
 	"I18N_SIDEBAR_BLOG": "博客",
 	"I18N_SIDEBAR_CONTACT_US": "联系我们",
 	"I18N_SIDEBAR_DONATE": "捐款",
-	"I18N_SIDEBAR_FOLLOW_US": "关注我们",
 	"I18N_SIDEBAR_FORUM": "论坛",
 	"I18N_SIDEBAR_GET_STARTED": "入门",
 	"I18N_SIDEBAR_LIBRARY_LINK": "图书馆",
@@ -281,6 +281,7 @@
 	"I18N_SPLASH_SUBTITLE": "Oppia使创建交互式课程来从事教育，并与其建立关系变得容易。",
 	"I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Oppia让您<a href=\"/dashboard?mode=create\">创建</a>并<a href=\"/library\">分享</a>范围广泛的学科探险，只因您的想象而不同。",
 	"I18N_SPLASH_TITLE": "打破书本常规。",
+	"I18N_SUBSCRIBE_BUTTON_TEXT": "订阅",
 	"I18N_TOPNAV_ABOUT": "关于",
 	"I18N_TOPNAV_ABOUT_OPPIA": "关于Oppia",
 	"I18N_TOPNAV_ADMIN_PAGE": "管理页面",
@@ -296,5 +297,6 @@
 	"I18N_TOPNAV_NOTIFICATIONS": "通知",
 	"I18N_TOPNAV_PREFERENCES": "参数设置",
 	"I18N_TOPNAV_SIGN_IN": "登录",
-	"I18N_TOPNAV_TEACH_WITH_OPPIA": "通过Oppia教学"
+	"I18N_TOPNAV_TEACH_WITH_OPPIA": "通过Oppia教学",
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "取消订阅"
 }

@@ -44,6 +44,7 @@
 	"I18N_FOOTER_CONTRIBUTE_ALL_CAPS": "УЧЕСТВУВАЈТЕ",
 	"I18N_FOOTER_CREDITS": "Признанија",
 	"I18N_FOOTER_DONATE": "Дарувајте",
+	"I18N_FOOTER_FOLLOW_US": "Следете нè",
 	"I18N_FOOTER_FORUM": "Форум",
 	"I18N_FOOTER_GET_INVOLVED": "Вклучете се",
 	"I18N_FOOTER_GET_STARTED": "Започнете",
@@ -235,7 +236,6 @@
 	"I18N_SIDEBAR_BLOG": "Блог",
 	"I18N_SIDEBAR_CONTACT_US": "Контактирајте нè",
 	"I18N_SIDEBAR_DONATE": "Дарувајте",
-	"I18N_SIDEBAR_FOLLOW_US": "Следете нè",
 	"I18N_SIDEBAR_FORUM": "Форум",
 	"I18N_SIDEBAR_GET_STARTED": "Започнете",
 	"I18N_SIDEBAR_LIBRARY_LINK": "Библиотека",
@@ -281,6 +281,7 @@
 	"I18N_SPLASH_SUBTITLE": "Опија овозможува лесно создавање на интерактивни четива каде читателите можат да научат и да се вклучат.",
 	"I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Опија ви овозможува <a href=\"/dashboard?mode=create\">создавате</a> и <a href=\"/library\">споделувате</a> на истражувања на најразлични теми — сè што ќе можете замислите.",
 	"I18N_SPLASH_TITLE": "Размислувајте надвор од книгите.",
+	"I18N_SUBSCRIBE_BUTTON_TEXT": "Претплати се",
 	"I18N_TOPNAV_ABOUT": "За нас",
 	"I18N_TOPNAV_ABOUT_OPPIA": "За Опија",
 	"I18N_TOPNAV_ADMIN_PAGE": "Администраторска страница",
@@ -296,5 +297,6 @@
 	"I18N_TOPNAV_NOTIFICATIONS": "Известувања",
 	"I18N_TOPNAV_PREFERENCES": "Поставки",
 	"I18N_TOPNAV_SIGN_IN": "Најава",
-	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Подучувајте со Опија"
+	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Подучувајте со Опија",
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Отпиши ме"
 }

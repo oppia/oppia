@@ -44,6 +44,7 @@
 	"I18N_FOOTER_CONTRIBUTE_ALL_CAPS": "CONTRIBUER",
 	"I18N_FOOTER_CREDITS": "Crédits",
 	"I18N_FOOTER_DONATE": "Donner",
+	"I18N_FOOTER_FOLLOW_US": "Nous suivre",
 	"I18N_FOOTER_FORUM": "Forum",
 	"I18N_FOOTER_GET_INVOLVED": "S’impliquer",
 	"I18N_FOOTER_GET_STARTED": "Commencer",
@@ -235,7 +236,6 @@
 	"I18N_SIDEBAR_BLOG": "Blog",
 	"I18N_SIDEBAR_CONTACT_US": "Nous contacter",
 	"I18N_SIDEBAR_DONATE": "Faire un don",
-	"I18N_SIDEBAR_FOLLOW_US": "Nous suivre",
 	"I18N_SIDEBAR_FORUM": "Forum",
 	"I18N_SIDEBAR_GET_STARTED": "Démarrer",
 	"I18N_SIDEBAR_LIBRARY_LINK": "Bibliothèque",
@@ -281,6 +281,7 @@
 	"I18N_SPLASH_SUBTITLE": "Oppia rend facile la création de leçons interactives qui éduquent et engagent.",
 	"I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Oppia vous laisse <a href=\"/dashboard?mode=create\">créer</a> et <a href=\"/library\">partager</a> des explorations sur une large palette de sujets, limitée uniquement par votre imagination.",
 	"I18N_SPLASH_TITLE": "Réfléchissez hors les livres.",
+	"I18N_SUBSCRIBE_BUTTON_TEXT": "S’abonner",
 	"I18N_TOPNAV_ABOUT": "À propos",
 	"I18N_TOPNAV_ABOUT_OPPIA": "Concernant Oppia",
 	"I18N_TOPNAV_ADMIN_PAGE": "Page de l'administrateur",
@@ -296,5 +297,6 @@
 	"I18N_TOPNAV_NOTIFICATIONS": "Notifications",
 	"I18N_TOPNAV_PREFERENCES": "Préférences",
 	"I18N_TOPNAV_SIGN_IN": "Connexion",
-	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Enseigner avec Oppia"
+	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Enseigner avec Oppia",
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Se désabonner"
 }

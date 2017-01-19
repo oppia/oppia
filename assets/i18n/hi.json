@@ -44,6 +44,7 @@
 	"I18N_FOOTER_CONTRIBUTE_ALL_CAPS": "योगदान करें",
 	"I18N_FOOTER_CREDITS": "श्रेय",
 	"I18N_FOOTER_DONATE": "दान करे",
+	"I18N_FOOTER_FOLLOW_US": "हमसे जुड़े",
 	"I18N_FOOTER_FORUM": "मंच",
 	"I18N_FOOTER_GET_INVOLVED": "शामिल होईये",
 	"I18N_FOOTER_GET_STARTED": "शुरू हो जाओ",
@@ -235,7 +236,6 @@
 	"I18N_SIDEBAR_BLOG": "ब्लॉग",
 	"I18N_SIDEBAR_CONTACT_US": "संपर्क करें",
 	"I18N_SIDEBAR_DONATE": "दान करे",
-	"I18N_SIDEBAR_FOLLOW_US": "हमसे जुड़े",
 	"I18N_SIDEBAR_FORUM": "मंच",
 	"I18N_SIDEBAR_GET_STARTED": "शुरू हो जाओ",
 	"I18N_SIDEBAR_LIBRARY_LINK": "पुस्तकालय",
@@ -281,6 +281,7 @@
 	"I18N_SPLASH_SUBTITLE": "Oppia के द्वारा आसानी से इंटरैक्टिव पाठ बनाया जा सकता है जो सिखाता है अथवा संलग्न करता है।",
 	"I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Oppia के द्वारा कई विषयो पर एक्सप्लोरेशन्स <a href=\"/dashboard?mode=create\">बनाया</a> और <a href=\"/library\">शेयर</a> किये जा सकते है , जो केवल आपकी कप्लना द्वारा सिमित है।",
 	"I18N_SPLASH_TITLE": "पुस्तकों के बाहर सोचे।",
+	"I18N_SUBSCRIBE_BUTTON_TEXT": "सदस्यता लें",
 	"I18N_TOPNAV_ABOUT": "जानिए",
 	"I18N_TOPNAV_ABOUT_OPPIA": "Oppia के बारे में",
 	"I18N_TOPNAV_ADMIN_PAGE": "व्यवस्थापक पेज",
@@ -296,5 +297,6 @@
 	"I18N_TOPNAV_NOTIFICATIONS": "सूचनाएं",
 	"I18N_TOPNAV_PREFERENCES": "प्राथमिकताएं",
 	"I18N_TOPNAV_SIGN_IN": "खाता खोले",
-	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Oppia के साथ  सिखाये"
+	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Oppia के साथ  सिखाये",
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "सदस्यता समाप्त"
 }

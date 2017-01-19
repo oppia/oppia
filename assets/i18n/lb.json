@@ -140,6 +140,7 @@
 	"I18N_SPLASH_JAVASCRIPT_ERROR_THANKS": "Merci.",
 	"I18N_SPLASH_JAVASCRIPT_ERROR_TITLE": "Mir brauche JavaScript an Ärem Browser",
 	"I18N_SPLASH_SITE_FEEDBACK": "Feedback vum Site",
+	"I18N_SUBSCRIBE_BUTTON_TEXT": "Abonnéieren",
 	"I18N_TOPNAV_ABOUT": "Iwwer",
 	"I18N_TOPNAV_ABOUT_OPPIA": "Iwwer Oppia",
 	"I18N_TOPNAV_CONTACT_US": "Kontaktéiert Eis",
@@ -150,5 +151,6 @@
 	"I18N_TOPNAV_LOGOUT": "Ausloggen",
 	"I18N_TOPNAV_NOTIFICATIONS": "Notifikatiounen",
 	"I18N_TOPNAV_PREFERENCES": "Astellungen",
-	"I18N_TOPNAV_SIGN_IN": "Aloggen"
+	"I18N_TOPNAV_SIGN_IN": "Aloggen",
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Ofbestellen"
 }

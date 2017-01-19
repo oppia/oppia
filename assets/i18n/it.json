@@ -98,6 +98,7 @@
 	"I18N_SIGNUP_EMAIL_PREFERENCES": "Preferenze di posta elettronica",
 	"I18N_SIGNUP_LOADING": "Caricamento",
 	"I18N_SIGNUP_USERNAME": "Nome utente",
+	"I18N_SUBSCRIBE_BUTTON_TEXT": "Iscriviti",
 	"I18N_TOPNAV_BLOG": "Blog",
 	"I18N_TOPNAV_CONTACT_US": "Contattaci",
 	"I18N_TOPNAV_DONATE": "Dona",
@@ -106,5 +107,6 @@
 	"I18N_TOPNAV_NOTIFICATIONS": "Notifiche",
 	"I18N_TOPNAV_PREFERENCES": "Preferenze",
 	"I18N_TOPNAV_SIGN_IN": "Accedi",
-	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Insegna con Oppia"
+	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Insegna con Oppia",
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Cancella iscrizione"
 }

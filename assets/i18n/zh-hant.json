@@ -44,6 +44,7 @@
 	"I18N_FOOTER_CONTRIBUTE_ALL_CAPS": "貢獻",
 	"I18N_FOOTER_CREDITS": "製作群",
 	"I18N_FOOTER_DONATE": "贊助",
+	"I18N_FOOTER_FOLLOW_US": "關注我們",
 	"I18N_FOOTER_FORUM": "論壇",
 	"I18N_FOOTER_GET_INVOLVED": "參與",
 	"I18N_FOOTER_GET_STARTED": "入門",
@@ -235,7 +236,6 @@
 	"I18N_SIDEBAR_BLOG": "部落格",
 	"I18N_SIDEBAR_CONTACT_US": "聯絡我們",
 	"I18N_SIDEBAR_DONATE": "贊助",
-	"I18N_SIDEBAR_FOLLOW_US": "關注我們",
 	"I18N_SIDEBAR_FORUM": "論壇",
 	"I18N_SIDEBAR_GET_STARTED": "入門",
 	"I18N_SIDEBAR_LIBRARY_LINK": "圖書館",
@@ -281,6 +281,7 @@
 	"I18N_SPLASH_SUBTITLE": "Oppia讓創造互動式課程方面的教導及參與更容易。",
 	"I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Oppia讓您<a href=\"/dashboard?mode=create\">創造</a>及<a href=\"/library\">分享</a>在廣泛學科裡的探索，一切由您的想像來發揮。",
 	"I18N_SPLASH_TITLE": "打破常規思考。",
+	"I18N_SUBSCRIBE_BUTTON_TEXT": "訂閱",
 	"I18N_TOPNAV_ABOUT": "關於",
 	"I18N_TOPNAV_ABOUT_OPPIA": "關於Oppia",
 	"I18N_TOPNAV_ADMIN_PAGE": "管理頁面",
@@ -296,5 +297,6 @@
 	"I18N_TOPNAV_NOTIFICATIONS": "通知",
 	"I18N_TOPNAV_PREFERENCES": "偏好設定",
 	"I18N_TOPNAV_SIGN_IN": "登入",
-	"I18N_TOPNAV_TEACH_WITH_OPPIA": "以Oppia教學"
+	"I18N_TOPNAV_TEACH_WITH_OPPIA": "以Oppia教學",
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "取消訂閱"
 }

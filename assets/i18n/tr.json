@@ -44,6 +44,7 @@
 	"I18N_FOOTER_CONTRIBUTE_ALL_CAPS": "KATKIDA BULUN",
 	"I18N_FOOTER_CREDITS": "Krediler",
 	"I18N_FOOTER_DONATE": "Bağış Yap",
+	"I18N_FOOTER_FOLLOW_US": "Bizi Takip Edin",
 	"I18N_FOOTER_FORUM": "Forum",
 	"I18N_FOOTER_GET_INVOLVED": "Dahil Ol",
 	"I18N_FOOTER_GET_STARTED": "Başla",
@@ -235,7 +236,6 @@
 	"I18N_SIDEBAR_BLOG": "Blog",
 	"I18N_SIDEBAR_CONTACT_US": "Bize Ulaşın",
 	"I18N_SIDEBAR_DONATE": "Bağış Yap",
-	"I18N_SIDEBAR_FOLLOW_US": "Bizi Takip Edin",
 	"I18N_SIDEBAR_FORUM": "Forum",
 	"I18N_SIDEBAR_GET_STARTED": "Başla",
 	"I18N_SIDEBAR_LIBRARY_LINK": "Kütüphane",
@@ -281,6 +281,7 @@
 	"I18N_SPLASH_SUBTITLE": "Oppia, eğiten ve güdüleyen etkileşimli dersler oluşturmayı kolay hale getirir.",
 	"I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Oppia, geniş konu aralığında sadece hayal gücünle sınırlandırılmış farklı konu anlatımları <a href=\"/dashboard?mode=create\">oluşturmana</a> ve <a href=\"/library\">paylaşmana</a> izin verir.",
 	"I18N_SPLASH_TITLE": "Kitapların dışında düşün.",
+	"I18N_SUBSCRIBE_BUTTON_TEXT": "Abone ol",
 	"I18N_TOPNAV_ABOUT": "Hakkında",
 	"I18N_TOPNAV_ABOUT_OPPIA": "Hakkımızda - Oppia",
 	"I18N_TOPNAV_ADMIN_PAGE": "Yönetici Sayfası",
@@ -296,5 +297,6 @@
 	"I18N_TOPNAV_NOTIFICATIONS": "Bildirimler",
 	"I18N_TOPNAV_PREFERENCES": "Tercihler",
 	"I18N_TOPNAV_SIGN_IN": "Gİrİş Yap",
-	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Oppia ile Öğret"
+	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Oppia ile Öğret",
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Abonelikten çık"
 }
