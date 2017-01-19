@@ -113,41 +113,43 @@ oppia.directive('topNavigationBar', [function() {
           if (currentWindowWidth < windowDimensionsService.getWidth()) {
             $.each($scope.navElementsVisibilityStatus, function(element, visible) {
               if (!visible) {
-                console.log("Showing:", element);
                 $scope.navElementsVisibilityStatus[element] = true;
               }
             });
           }
           currentWindowWidth = windowDimensionsService.getWidth();
-          oppiaDebouncer.debounce(handleOverflow, 500)();
+          oppiaDebouncer.debounce(truncateNavbar, 500)();
         });
 
-        var handleOverflow = function() {
-          console.log("Called at", Date.now());
-          if (windowDimensionsService.getWidth() < 768) {
-            return false;
-          }
-
-          var navReady = true;
-          // Wait until i18n is completed.
+        /**
+         * Checks if i18n has been run.
+         * If i18n has not yet run, the <a> and <span> tags will have
+         * no text content, so their innerText.length value will be 0.
+         * @returns {boolean}
+         */
+        var checkIfI18NCompleted = function() {
+          var i18nCompleted = true;
           $('.oppia-navbar-tabs a[translate], ' +
             '.oppia-navbar-tabs span[translate]').each(function(i, element) {
-              if (element.innerText.length === 0) {
-                $timeout(handleOverflow, 100);
-                navReady = false;
-                return false;
-              }
-            });
-          if (!navReady) {
-            return false;
-          }
+            if (element.innerText.length === 0) {
+              i18nCompleted = false;
+              return false;
+            }
+          });
+          return i18nCompleted;
+        };
 
+        var calculateNavWidth = function() {
           var navWidth = 0;
           $('ul.oppia-navbar-tabs').children().each(function(i, element) {
-            // Some nav elements have invalid widths from floating
-            // Use widths of their first-level child elements instead
+            // The "create" button has a 0 width on its top-level element.
+            // The <li> tag from the Donate button has a large/invalid width.
+            // Use widths of their first-level child elements instead.
             if (element.clientWidth === 0 || element.clientWidth >= 176) {
               $(element).children().each(function(i, element) {
+                // Adding a small padding accounts for any unexpected padding
+                // or font differences. It may be possible to safely eliminate
+                // the extra by using Web Font Loader.
                 navWidth += 5;
                 navWidth += element.clientWidth;
               });
@@ -157,18 +159,42 @@ oppia.directive('topNavigationBar', [function() {
             }
           });
 
-          if ($('ul.nav.oppia-navbar-profile').length > 0) {
+          // If the user is logged in, add the width of the gravatar section.
+          if ($scope.username) {
             navWidth += $('ul.nav.oppia-navbar-profile').width();
           }
 
-          $('ul.nav.oppia-navbar-tabs').css('min-width', navWidth);
+          return navWidth;
+        };
 
+        /**
+         * Sets the min-width for the tabs part of the navbar, then checks
+         * for overflow. If overflow is detected hides the least important
+         * tab and then calls itself again after a 10ms delay.
+         */
+        var truncateNavbar = function() {
+          console.log('Called at', Date.now());
+          // If the window is narrow, the standard nav tabs are not shown.
+          if (windowDimensionsService.isWindowNarrow()) {
+            return false;
+          }
+
+          // If i18n hasn't completed, retry after 100ms.
+          if (!checkIfI18NCompleted()) {
+            $timeout(truncateNavbar, 100);
+            return false;
+          }
+
+          $('ul.nav.oppia-navbar-tabs').css('min-width', calculateNavWidth());
+
+          // Measured non-overflowed navbar height to be under 60px via inspector.
           if ($('div.collapse.navbar-collapse').height() > 60) {
             $.each($scope.navElementsVisibilityStatus, function(element, visible) {
               if (visible) {
-                console.log("Hiding:", element);
+                // Hide one element, then check again after 10ms.
+                // This gives the browser time to render the visibility change.
                 $scope.navElementsVisibilityStatus[element] = false;
-                $timeout(handleOverflow, 10);
+                $timeout(truncateNavbar, 10);
                 return false;
               }
             });
@@ -176,7 +202,7 @@ oppia.directive('topNavigationBar', [function() {
         };
 
         // For Chrome, timeout 0 appears to run after i18n.
-        $timeout(handleOverflow, 0);
+        $timeout(truncateNavbar, 0);
         $scope.toggleSidebar = SidebarStatusService.toggleSidebar;
       }
     ]
