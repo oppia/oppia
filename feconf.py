@@ -257,6 +257,9 @@ BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT = 'bulk_email_creator_reengagement'
 BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT = 'bulk_email_learner_reengagement'
 BULK_EMAIL_INTENT_TEST = 'bulk_email_test'
 
+MESSAGE_TYPE_FEEDBACK = 'feedback'
+MESSAGE_TYPE_SUGGESTION = 'suggestion'
+
 MODERATOR_ACTION_PUBLICIZE_EXPLORATION = 'publicize_exploration'
 MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 DEFAULT_SALUTATION_HTML_FN = (
@@ -500,6 +503,7 @@ SUGGESTION_URL_PREFIX = '/suggestionhandler'
 SUBSCRIBE_URL_PREFIX = '/subscribehandler'
 UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
+USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 
 NAV_MODE_ABOUT = 'about'

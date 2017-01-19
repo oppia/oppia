@@ -44,6 +44,7 @@
     "I18N_FOOTER_CONTRIBUTE_ALL_CAPS": "CONTRIBUTE",
     "I18N_FOOTER_CREDITS": "Credits",
     "I18N_FOOTER_DONATE": "Donate",
+    "I18N_FOOTER_FOLLOW_US": "Follow Us",
     "I18N_FOOTER_FORUM": "Forum",
     "I18N_FOOTER_GET_INVOLVED": "Get Involved",
     "I18N_FOOTER_GET_STARTED": "Get Started",
@@ -235,7 +236,6 @@
     "I18N_SIDEBAR_BLOG": "Blog",
     "I18N_SIDEBAR_CONTACT_US": "Contact Us",
     "I18N_SIDEBAR_DONATE": "Donate",
-    "I18N_SIDEBAR_FOLLOW_US": "Follow Us",
     "I18N_SIDEBAR_FORUM": "Forum",
     "I18N_SIDEBAR_GET_STARTED": "Get Started",
     "I18N_SIDEBAR_LIBRARY_LINK": "Library",
@@ -281,6 +281,7 @@
     "I18N_SPLASH_SUBTITLE": "Oppia makes it easy to create interactive lessons that educate and engage.",
     "I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Oppia lets you <a href=\"/dashboard?mode=create\">create</a> and <a href=\"/library\">share</a> explorations on a wide range of subjects, limited only by your imagination.",
     "I18N_SPLASH_TITLE": "Think outside the books.",
+    "I18N_SUBSCRIBE_BUTTON_TEXT": "Subscribe",
     "I18N_TOPNAV_ABOUT": "About",
     "I18N_TOPNAV_ABOUT_OPPIA": "About Oppia",
     "I18N_TOPNAV_ADMIN_PAGE": "Admin Page",
@@ -296,5 +297,6 @@
     "I18N_TOPNAV_NOTIFICATIONS": "Notifications",
     "I18N_TOPNAV_PREFERENCES": "Preferences",
     "I18N_TOPNAV_SIGN_IN": "Sign in",
-    "I18N_TOPNAV_TEACH_WITH_OPPIA": "Teach with Oppia"
+    "I18N_TOPNAV_TEACH_WITH_OPPIA": "Teach with Oppia",
+    "I18N_UNSUBSCRIBE_BUTTON_TEXT": "Unsubscribe"
 }

@@ -235,6 +235,11 @@ class I18nDictsTest(test_utils.GenericTestBase):
                          'assets', 'i18n', filename)
         )).keys())
 
+    def _extract_keys_from_html_file(self, filename):
+        regex_pattern = r'(I18N_[A-Z/_\d]*)'
+        return re.findall(regex_pattern, utils.get_file_contents(
+            filename))
+
     def test_i18n_keys(self):
         """Tests that all JSON files in i18n.js have the same set of keys."""
         master_key_list = self._extract_keys_from_json_file('en.json')
@@ -287,6 +292,32 @@ class I18nDictsTest(test_utils.GenericTestBase):
         en_key_list = self._extract_keys_from_json_file('en.json')
         qqq_key_list = self._extract_keys_from_json_file('qqq.json')
         self.assertEqual(en_key_list, qqq_key_list)
+
+    def test_keys_in_source_code_match_en(self):
+        """Tests that keys in HTML files are present in en.json."""
+        en_key_list = self._extract_keys_from_json_file('en.json')
+        dirs_to_search = ['core', 'extensions']
+        files_checked = 0
+        missing_keys_count = 0
+        for directory in dirs_to_search:
+            for root, _, files in os.walk(os.path.join(
+                    os.getcwd(), directory)):
+                for filename in files:
+                    if filename.endswith('.html'):
+                        files_checked += 1
+                        html_key_list = self._extract_keys_from_html_file(
+                            os.path.join(root, filename))
+                        if not set(html_key_list) <= set(en_key_list): #pylint: disable=unneeded-not
+                            self.log_line('ERROR: Undefined keys in %s:'
+                                          % os.path.join(root, filename))
+                            missing_keys = list(
+                                set(html_key_list) - set(en_key_list))
+                            missing_keys_count += len(missing_keys)
+                            for key in missing_keys:
+                                self.log_line(' - %s' % key)
+                            self.log_line('')
+        self.assertEqual(missing_keys_count, 0)
+        self.assertGreater(files_checked, 0)
 
 
 class GetHandlerTypeIfExceptionRaisedTest(test_utils.GenericTestBase):
