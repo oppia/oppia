@@ -149,26 +149,6 @@ body {
   width: 90%;
 }
 
-.oppia-subscription-button,
-.oppia-subscription-button:focus,
-.oppia-subscription-button:active {
-  background-color: #015c54;
-  border-radius: 0;
-  color: white;
-  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-  font-size: 14px;
-  margin-bottom: 20px;
-  margin-left: 54px;
-  margin-top: 20px;
-  text-transform: uppercase;
-  width: 129.42px;
-}
-
-.oppia-subscription-button:hover {
-  background-color: #05beb2;
-  color: white;
-}
-
 .oppia-profile-user-card {
   background-color: #fff;
   float: left;
@@ -278,7 +258,7 @@ body {
 
 .oppia-profile-content-card {
   box-shadow: none;
-  float: right;
+  float: left;
   min-height: 630px;
   padding: 0 30px 30px 30px;
   position: relative;
@@ -575,6 +555,7 @@ textarea {
   background: #fff;
   height: 100%;
   left: 0;
+  overflow-y: scroll;
   position: fixed;
   top: 0;
   -webkit-transform: translate3d(-100%, 0, 0);
@@ -677,7 +658,9 @@ textarea {
   background: none;
 }
 
-
+.oppia-sidebar-footer a > img {
+  width: 26px;
+}
 
 .oppia-sidebar-menu-open .oppia-sidebar-menu {
   box-shadow: 1px 0 3px rgba(0,0,0,0.12), 1px 0 2px rgba(0,0,0,0.24);
@@ -730,12 +713,7 @@ textarea {
   list-style-position: inside;
   list-style-type: none;
 }
-.oppia-footer-social a:hover {
-  text-decoration: none;
-}
-.oppia-footer-social a > img {
-  width: 30px;
-}
+
 .oppia-footer-padding {
   height: 198px;
 }
@@ -746,23 +724,15 @@ textarea {
 
 @media (max-width: 768px) {
   .oppia-footer-padding {
-    height: 554px;
+    height: 464px;
   }
+
   .oppia-footer-container {
     padding: 30px;
   }
 
 }
-@media only screen and (min-width: 700px) and (max-width: 768px){
-  .oppia-footer-padding-below-banner{
-    height: 270px;
-  }
-}
-@media (max-width: 440px) {
-  .oppia-footer-padding-below-banner{
-    height: 250px;
-  }
-}
+
 /*
   This is needed for proper display of tabs. See
 
@@ -1844,10 +1814,6 @@ pre.oppia-pre-wrapped-text {
   font-size: 1em;
   margin-top: 12px;
   margin-bottom: 6px;
-}
-
-.oppia-collection-player-title-font {
-  font-family: Capriola, Roboto, Arial, sans-serif;
 }
 
 /* Styles for the statistics page. */
@@ -4133,7 +4099,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-static-header {
   align-items: center;
   display: flex;
-  height: 210px;
+  height: 140px;
   position: absolute;
   text-align: center;
   width: 100%;
@@ -4145,7 +4111,7 @@ md-card.preview-conversation-skin-supplemental-card {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 3em;
   left: 50%;
-  position: relative;
+  position: absolute;
   transform: translateX(-50%);
   -webkit-transform: translateX(-50%);
   -ms-transform: translateX(-50%);
@@ -4255,7 +4221,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-static-card-content {
   margin: 0 auto;
   max-width: 600px;
-  padding: 4% 0 1% 0;
+  padding: 4% 0 5% 0;
 }
 
 .oppia-static-card-content-wide {
@@ -4297,20 +4263,15 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-about-extra-info {
   background-color: #009788;
   color: #fff;
-  height: 245px;
   width: 100%;
 }
 
 .oppia-about-page-extra-info {
-  height: 245px;
+  height: 220px;
 }
 
 .oppia-about-tab-content {
   display: none;
-}
-
-.oppia-teach-tab-content{
-  padding-bottom: 7%;
 }
 
 .oppia-about-visible-content {
@@ -4381,11 +4342,11 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-about-button {
-  background-color: rgb(0, 121, 109);
+  background-color: rgba(0,0,0,0.2);
   color: rgba(255,255,255,1.0);
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 18px;
-  margin: 0 15px 15px 15px;
+  margin: 15px;
   max-width: 90%;
   padding: 15px;
   text-transform: uppercase;
@@ -4398,11 +4359,6 @@ md-card.preview-conversation-skin-supplemental-card {
   color: rgba(255,255,255,1);
 }
 
-.oppia-teach-button{
-  display: block;
-  margin: 0px auto 0 auto;
-}
-
 .oppia-about-buttons-container {
   text-align: center;
 }
@@ -4413,12 +4369,6 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-about-credits-letter-groups ul li {
   list-style-type: none;
-}
-
-.oppia-about-extra-content{
-  position: relative;
-  top: 50%;
-  transform: translateY(-50%);
 }
 
 .oppia-donation-card {
@@ -4471,13 +4421,9 @@ md-card.preview-conversation-skin-supplemental-card {
 */
 
 @media only screen and (min-width: 1400px) {
-  .oppia-about-extra-info {
-    height: 245px;
-  }
   .oppia-static-content, .oppia-static-extra-content {
     width: 960px;
   }
-
 }
 
 @media only screen and (max-width: 1140px) {
@@ -4507,7 +4453,9 @@ md-card.preview-conversation-skin-supplemental-card {
   .oppia-about-otter-speech-bubble {
     padding: 10px;
   }
-
+  .oppia-about-extra-info {
+    height: 400px;
+  }
 }
 
 @media only screen and (max-width: 500px) {
@@ -4532,12 +4480,14 @@ md-card.preview-conversation-skin-supplemental-card {
   .oppia-about-buttons:first-child {
     margin: 0;
   }
+  .oppia-about-extra-info {
+    height: 400px;
+  }
+
   .oppia-about-three-cols-layout {
     width: 100%;
   }
 }
-
-
 
 .oppia-save-exploration-wide-modal .modal-dialog {
   max-width: 1200px;
