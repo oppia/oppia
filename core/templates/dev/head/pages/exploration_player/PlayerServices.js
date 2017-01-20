@@ -163,10 +163,8 @@ oppia.factory('oppiaPlayerService', [
       initSettingsFromEditor: function(activeStateNameFromPreviewTab,
         manualParamChangesToInit) {
         if (_editorPreviewMode) {
-          console.log("initSettingsFromEditor");
           manualParamChanges = manualParamChangesToInit;
           initStateName = activeStateNameFromPreviewTab;
-          console.log(angular.copy(initStateName));
         } else {
           throw 'Error: cannot populate exploration in learner mode.';
         }
