@@ -190,7 +190,6 @@ oppia.factory('oppiaPlayerService', [
         playerTranscriptService.init();
 
         if (_editorPreviewMode) {
-          console.log("playerServiceInit");
           var explorationDataUrl = UrlInterpolationService.interpolateUrl(
             '/createhandler/data/<exploration_id>', {
               exploration_id: _explorationId
@@ -200,14 +199,8 @@ oppia.factory('oppiaPlayerService', [
               apply_draft: true
             }
           }).then(function(response) {
-            console.log("loadedExploration");
-            if (manualParamChanges == null) {
-              console.log("OOPS!!!!");
-            }
             exploration = ExplorationObjectFactory.create(response.data);
-            console.log(angular.copy(exploration));
             exploration.setInitialStateName(initStateName);
-            console.log(angular.copy(exploration));
             initParams(manualParamChanges);
             _loadInitialState(successCallback);
           });
