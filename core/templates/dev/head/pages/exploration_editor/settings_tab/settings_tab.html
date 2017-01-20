@@ -87,8 +87,46 @@
               </div>
             </div>
           </div>
-        </div>
+          <div class="text-right">
+            <button class="btn btn-success" style="width: 15em;" data-toggle="modal" data-target="#myModal" onclick="load()">Preview Summary Tite</button>
+          </div>
+          <div id="myModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header" style="height: 65px;">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h3 class="text-center" style="padding-top: 0px;">Summary Tile</h3>
+                </div>
+                <div class="modal-body text-center">
+                  <md-card class="oppia-activity-summary-tile oppia-dashboard-card-view-item protractor-test-exploration-dashboard-card md-default-theme">
+                    <a ng-href="/create/3f0fkDxYOqAd" href="/create/3f0fkDxYOqAd">
+                      <div class="title-section" style="background-color: #a33f40;">
+                        <img class="thumbnail-image" ng-src="/assets/images/subjects/Lightbulb.svg" src="/assets/images/subjects/Lightbulb.svg">
+                        <h2 class="activity-title protractor-test-exp-summary-tile-title">
+                          <span id="modal-exploration-title">Untitled</span>
+                        </h2>
+                      </div>
+                      <div class="mask-wrap">
+                        <div class="title-section-mask"></div>
+                      </div>
+                    </a>
+                    <div ng-attr-section="'<['right-section']>" section="'right-section">
+                      <a ng-class="checkMobileView() ? 'oppia-dashboard-mobile-statistics-card-link': 'oppia-dashboard-statistics-card-link'" ng-href="/create/3f0fkDxYOqAd" href="/create/3f0fkDxYOqAd" class="oppia-dashboard-statistics-card-link"></a>
+                      <div class="exp-private-text" id='modal-exploration-objective'>
+                        This exploration is private. Publish it to receive statistics.
+                      </div>
+                    </div>
+                  </md-card>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+              </div>
 
+            </div>
+          </div>
+        </div>
+    
         <div ng-if="!editabilityService.isEditable()">
           <div class="row">
             <div class="col-lg-2 col-md-2 col-sm-2">
@@ -585,4 +623,20 @@
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     <button class="btn btn-danger" ng-click="reallyDelete()">Delete Exploration</button>
   </div>
+</script>
+
+<script>
+  function load() {
+    var explorationTitle = document.getElementById('explorationTitle').value;
+    var explorationObjective = document.getElementById("explorationObjective").value;
+    if( explorationTitle != ''){
+      var modalExplorationTitle = document.getElementById("modal-exploration-title");
+      modalExplorationTitle.innerHTML = explorationTitle;
+      var modalExplorationObjective = document.getElementById("modal-exploration-objective");  
+      modalExplorationObjective.innerHTML = explorationObjective;
+    } else if( explorationTitle == ''){
+      var modal_exploration_title = document.getElementById("modal-exploration-title");
+      modalExplorationTitle.innerHTML = 'Untitled';
+    }
+  }
 </script>
