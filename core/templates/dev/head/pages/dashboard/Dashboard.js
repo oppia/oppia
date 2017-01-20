@@ -155,6 +155,7 @@ oppia.controller('Dashboard', [
         $scope.isCurrentSortDescending = true;
         $scope.explorationsList = responseData.explorations_list;
         $scope.collectionsList = responseData.collections_list;
+        $scope.subscribersList = responseData.subscribers_list;
         $scope.dashboardStats = responseData.dashboard_stats;
         $scope.lastWeekStats = responseData.last_week_stats;
         if ($scope.dashboardStats && $scope.lastWeekStats) {

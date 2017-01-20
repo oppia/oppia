@@ -2350,6 +2350,12 @@ md-card.oppia-dashboard-tile {
   text-transform: uppercase;
 }
 
+.oppia-creator-dashboard-subscriber-card {
+  margin: 8px 8px 15px 8px;
+  padding: 0;
+  width: 150px;
+}
+
 ul.oppia-dashboard-tiles {
   list-style-type: none;
   margin-top: 15px;
