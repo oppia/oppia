@@ -67,7 +67,7 @@
         </li>
         {% if not can_create_collections %}
           <!-- A layout fix when the 'My Collections' tab is absent -->
-          <li ng-if="collectionsList.length == 0"></li>
+          <li ng-if="collectionsList.length === 0 && subscribersList.length === 0"></li>
         {% endif %}
         {% if can_create_collections %}
           <li ng-if="collectionsList.length > 0"
@@ -78,6 +78,7 @@
             </a>
           </li>
         {% endif %}
+
         <li class="list-card-view-toggle dashboard-hide-mobile" ng-if="activeTab === 'myExplorations'">
           <button class="card-view-btn"
                   ng-class="{'dashboard-active-view': myExplorationsView === 'card'}"
@@ -90,7 +91,10 @@
             <span class="fa fa-list fa-lg"></span>
           </button>
         </li>
-        <li class="sort-explorations-select pull-right" ng-if="activeTab === 'myExplorations'">
+
+        <li class="sort-explorations-select"
+            ng-if="activeTab === 'myExplorations'" 
+            ng-class="{'sort-explorations-select-three-tabs': (collectionsList.length !== 0 && subscribersList.length !== 0)}">
           <p class="sort-by-text">Sort By</p>
           <select ng-model="currentSortType"
                   class="sort-options"
@@ -311,22 +315,26 @@
 
     <div ng-if="activeTab === 'mySubscribers'" style="margin-top: 8px;">
       <md-card class="oppia-profile-user-card oppia-creator-dashboard-subscriber-card" ng-repeat="subscriber in subscribersList">
-        <div>
-          <img ng-src="<[subscriber.subscriber_picture_data_url]>">
-        </div>
-
-        <h4 class="oppia-profile-user-stat-container-large-screen" style="margin: 10px 0px 10px;">
-          <strong style="font-size: 20px; padding-bottom: 10px;">
-            <[subscriber.subscriber_username| truncate:16]>
-          </strong>
-        </h4>
-
-        <div class="oppia-profile-user-stat-container-large-screen" style="padding-bottom: 5px;">
-          <div ng-repeat="stat in subscriber.subscriber_stats" class="oppia-profile-user-stat">
-              <span style="font-size: 1em;"><strong><[stat.value]></strong></span>
-              <span><[stat.title]></span>
+        <a class="oppia-subscriber-profile-link" href="/profile/<[subscriber.subscriber_username]>" target="_blank">
+          <div class="oppia-creator-dashboard-subscriber-picture">
+            <img ng-src="<[subscriber.subscriber_picture_data_url]>">
           </div>
-        </div>
+
+          <div class="oppia-creator-dashboard-subscriber-summary">
+            <h4 class="oppia-profile-user-stat-container-large-screen oppia-creator-dashboard-subscriber-username">
+              <strong>
+                <[subscriber.subscriber_username| truncate:16]>
+              </strong>
+            </h4>
+
+            <div class="oppia-profile-user-stat-container-large-screen oppia-creator-dashboard-subscriber-stats" style="padding-bottom: 5px; margin-top: 10px;">
+              <div ng-repeat="stat in subscriber.subscriber_stats" class="oppia-profile-user-stat">
+                  <span style="font-size: 1em;"><strong><[stat.value]></strong></span>
+                  <span><[stat.title]></span>
+              </div>
+            </div>
+          </div>
+        </a>
       </md-card>
     </div>
 

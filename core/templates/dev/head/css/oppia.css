@@ -1283,10 +1283,13 @@ textarea {
 }
 
 li.sort-explorations-select {
-  display: block;
-  margin-left: auto;
+  display: inline-block;
   margin-right: auto;
   width: auto;
+}
+
+li.sort-explorations-select-three-tabs {
+  margin-top: 10px;
 }
 
 li.sort-explorations-select .sort-by-text,
@@ -2354,6 +2357,22 @@ md-card.oppia-dashboard-tile {
   margin: 8px 8px 15px 8px;
   padding: 0;
   width: 150px;
+}
+
+.oppia-creator-dashboard-subscriber-username {
+  font-size: 20px;
+  margin-bottom: 0px;
+  margin-top: 10px;
+}
+
+.oppia-creator-dashboard-subscriber-card .oppia-subscriber-profile-link,
+.oppia-creator-dashboard-subscriber-card .oppia-subscriber-profile-link:hover {
+  display: block;
+  text-decoration: none;
+}
+
+.oppia-creator-dashboard-subscriber-card:hover {
+  box-shadow: 0 6px 13px rgba(0,0,0,0.17), 0 4px 6px rgba(0,0,0,0.23);
 }
 
 ul.oppia-dashboard-tiles {

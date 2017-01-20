@@ -259,7 +259,7 @@ def get_displayable_exp_summary_dicts_matching_ids(
     return get_displayable_exp_summary_dicts(filtered_exploration_summaries)
 
 
-def get_total_displayable_exp_matching_ids(exploration_ids):
+def get_total_displayable_exp_matching_ids(exploration_ids, editor_user_id=None):
     exploration_summaries = (
         exp_services.get_exploration_summaries_matching_ids(exploration_ids))
 

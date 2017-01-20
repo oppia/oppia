@@ -93,6 +93,36 @@
 
         <div role="form" class="form-horizontal">
           <div class="form-group">
+            <label class="col-lg-2 col-md-2 col-sm-2">Subscriptions</label>
+            <div class="col-lg-10 col-md-10 col-sm-10">
+                <md-card class="oppia-profile-user-card oppia-creator-dashboard-subscriber-card" ng-repeat="subscription in subscriptionList">
+                  <a class="oppia-subscriber-profile-link" href="/profile/<[subscription.creator_username]>" target="_blank">
+                    <div class="oppia-creator-dashboard-subscriber-picture">
+                      <img ng-src="<[subscription.creator_picture_data_url]>">
+                    </div>
+
+                    <div class="oppia-creator-dashboard-subscriber-summary">
+                      <h4 class="oppia-profile-user-stat-container-large-screen oppia-creator-dashboard-subscriber-username">
+                        <strong>
+                          <[subscription.creator_username| truncate:16]>
+                        </strong>
+                      </h4>
+
+                      <div class="oppia-profile-user-stat-container-large-screen oppia-creator-dashboard-subscriber-stats" style="padding-bottom: 5px; margin-top: 10px;">
+                        <div ng-repeat="stat in subscription.creator_stats" class="oppia-profile-user-stat">
+                            <span style="font-size: 1em;"><strong><[stat.value]></strong></span>
+                            <span><[stat.title]></span>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </md-card>
+            </div>
+          </div>
+        </div>
+
+        <div role="form" class="form-horizontal">
+          <div class="form-group">
             <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE"></label>
             <div class="col-lg-10 col-md-10 col-sm-10">
               <!--
