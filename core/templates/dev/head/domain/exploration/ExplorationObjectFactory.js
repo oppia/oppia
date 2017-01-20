@@ -117,6 +117,10 @@ oppia.factory('ExplorationObjectFactory', [
       return this.getState(this.initStateName);
     };
 
+    Exploration.prototype.setInitialStateName = function(stateName) {
+      this.initStateName = stateName;
+    };
+
     Exploration.prototype.getUninterpolatedContentHtml = function(stateName) {
       return this.getState(stateName).content[0].value;
     };

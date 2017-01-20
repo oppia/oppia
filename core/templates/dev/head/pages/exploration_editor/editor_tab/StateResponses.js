@@ -80,6 +80,8 @@ oppia.factory('responsesService', [
     };
 
     var _updateAnswerGroup = function(index, updates) {
+      console.log(angular.copy(index));
+      console.log(angular.copy(_answerGroups));
       var answerGroup = _answerGroups[index];
       if (updates.rules) {
         answerGroup.ruleSpecs = updates.rules;

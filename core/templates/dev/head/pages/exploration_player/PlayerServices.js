@@ -53,6 +53,7 @@ oppia.factory('oppiaPlayerService', [
 
     // Param changes to be used ONLY in editor preview mode.
     var manualParamChanges = null;
+    var initialStateName = null;
     var version = GLOBALS.explorationVersion;
 
     var randomFromArray = function(arr) {
@@ -159,9 +160,13 @@ oppia.factory('oppiaPlayerService', [
       // This should only be used in editor preview mode. It sets the
       // exploration data from what's currently specified in the editor, and
       // also initializes the parameters to empty strings.
-      initManualParamChanges: function(manualParamChangesToInit) {
+      initSettingsFromEditor: function(activeStateNameFromPreviewTab,
+        manualParamChangesToInit) {
         if (_editorPreviewMode) {
+          console.log("initSettingsFromEditor");
           manualParamChanges = manualParamChangesToInit;
+          initStateName = activeStateNameFromPreviewTab;
+          console.log(angular.copy(initStateName));
         } else {
           throw 'Error: cannot populate exploration in learner mode.';
         }
@@ -185,6 +190,7 @@ oppia.factory('oppiaPlayerService', [
         playerTranscriptService.init();
 
         if (_editorPreviewMode) {
+          console.log("playerServiceInit");
           var explorationDataUrl = UrlInterpolationService.interpolateUrl(
             '/createhandler/data/<exploration_id>', {
               exploration_id: _explorationId
@@ -194,7 +200,14 @@ oppia.factory('oppiaPlayerService', [
               apply_draft: true
             }
           }).then(function(response) {
+            console.log("loadedExploration");
+            if (manualParamChanges == null) {
+              console.log("OOPS!!!!");
+            }
             exploration = ExplorationObjectFactory.create(response.data);
+            console.log(angular.copy(exploration));
+            exploration.setInitialStateName(initStateName);
+            console.log(angular.copy(exploration));
             initParams(manualParamChanges);
             _loadInitialState(successCallback);
           });
