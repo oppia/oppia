@@ -135,17 +135,34 @@ oppia.directive('schemaBasedListEditor', [
             }
           };
 
+          var _deleteElementIfEmpty = function() {
+            for (var i = 0; i < $scope.localValue.length; i++) {
+              if ($scope.localValue[i].length === 0) {
+                $scope.deleteElement(i);
+                i--;
+              }
+            }
+          };
+
           $scope.lastElementOnBlur = function() {
             _deleteLastElementIfUndefined();
+            _deleteElementIfEmpty();
             $scope.showAddItemButton();
           };
 
           $scope.showAddItemButton = function() {
+            _deleteElementIfEmpty();
             $scope.isAddItemButtonPresent = true;
           };
 
           $scope.hideAddItemButton = function() {
+            var lastValueIndex = $scope.localValue.length - 1;
             $scope.isAddItemButtonPresent = false;
+            if (lastValueIndex >= 0) {
+              if ($scope.localValue[lastValueIndex].length > 0) {
+                $scope.isAddItemButtonPresent = true;
+              }
+            }
           };
 
           $scope._onChildFormSubmit = function(evt) {
@@ -180,6 +197,16 @@ oppia.directive('schemaBasedListEditor', [
             // Need to let the RTE know that HtmlContent has been changed.
             $scope.$broadcast('externalHtmlContentChange');
             $scope.localValue.splice(index, 1);
+          };
+
+          $scope.showbutton = function() {
+            var lastValueIndex = $scope.localValue.length - 1;
+            if (lastValueIndex >= 0) {
+              if ($scope.localValue[lastValueIndex].length > 0) {
+                return true;
+              }
+            }
+            return false;
           };
         } else {
           if ($scope.len <= 0) {
