@@ -43,13 +43,15 @@
       <div class="title-section-mask"></div>
 
       <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>">
-        <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
-          <span ng-if="getObjective()">
-            <[getObjective() | truncateAndCapitalize: 40]>
+        <span ng-if="getObjective()" class="oppia-activity-summary-tooltip">
+          <span tooltip="<[getObjective()]>" tooltip-placement="top">
+            <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
+              <[getObjective() | truncateAndCapitalize: 40]>
+            </div>
           </span>
-          <span ng-if="!getObjective()" translate="I18N_LIBRARY_NO_OBJECTIVE">
-          </span>
-        </div>
+        </span>
+        <span ng-if="!getObjective()" translate="I18N_LIBRARY_NO_OBJECTIVE">
+        </span>
         <ul layout="row" class="metrics" layout-align="space-between center">
           <li>
             <span class="protractor-test-exp-summary-tile-rating" ng-class="{'rating-disabled': !getAverageRating()}">
@@ -81,3 +83,19 @@
     </a>
   </md-card>
 </script>
+
+<style> 
+  .oppia-activity-summary-tooltip .tooltip.right {
+    bottom: -10px;
+    min-width: 200px;
+  }
+
+  .oppia-activity-summary-tooltip .tooltip.top {
+    margin-top: 10px;
+    padding: 5px;
+  }
+
+  .oppia-activity-summary-tooltip .tooltip-inner {
+    min-width: 200px;
+  }
+</style>

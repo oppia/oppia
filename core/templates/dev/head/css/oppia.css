@@ -677,9 +677,7 @@ textarea {
   background: none;
 }
 
-.oppia-sidebar-footer a > img {
-  width: 26px;
-}
+
 
 .oppia-sidebar-menu-open .oppia-sidebar-menu {
   box-shadow: 1px 0 3px rgba(0,0,0,0.12), 1px 0 2px rgba(0,0,0,0.24);
@@ -732,7 +730,12 @@ textarea {
   list-style-position: inside;
   list-style-type: none;
 }
-
+.oppia-footer-social a:hover {
+  text-decoration: none;
+}
+.oppia-footer-social a > img {
+  width: 30px;
+}
 .oppia-footer-padding {
   height: 198px;
 }
