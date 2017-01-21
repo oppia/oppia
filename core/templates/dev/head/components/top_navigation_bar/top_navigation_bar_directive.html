@@ -2,8 +2,9 @@
   <div class="navbar-header protractor-test-navbar-header pull-left">
     <a ng-if="windowIsNarrow" ng-click="toggleSidebar()"
        class="navbar-brand oppia-navbar-menu oppia-transition-200">
-      <i class="material-icons oppia-navbar-menu-icon">&#xE5D2;</i>
+      <i class="material-icons oppia-navbar-menu-icon"><[toggleText]></i>
     </a>
+
     <a class="oppia-navbar-brand-name oppia-transition-200" href="/"
        focus-on="<[::LABEL_FOR_CLEARING_FOCUS]>">
       <img ng-src="<[getStaticImageUrl('/logo/288x128_logo_white.png')]>" class="oppia-logo"

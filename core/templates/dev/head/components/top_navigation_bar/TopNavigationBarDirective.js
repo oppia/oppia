@@ -60,7 +60,8 @@ oppia.directive('topNavigationBar', [function() {
             $window.location = GLOBALS.loginUrl;
           }, 150);
         };
-
+        $scope.toggleText = '\uE5D2';
+        $scope.isSidebarShown = SidebarStatusService.isSidebarShown();
         $scope.profileDropdownIsActive = false;
         $scope.onMouseoverProfilePictureOrDropdown = function(evt) {
           angular.element(evt.currentTarget).parent().addClass('open');
@@ -100,9 +101,18 @@ oppia.directive('topNavigationBar', [function() {
           $scope.$apply();
           // Close the sidebar, if necessary.
           SidebarStatusService.closeSidebar();
+          $scope.toggleText = '\uE5D2';
         });
 
-        $scope.toggleSidebar = SidebarStatusService.toggleSidebar;
+        $scope.toggleSidebar = function(){
+          $scope.isSidebarShown = SidebarStatusService.isSidebarShown();
+          if ($scope.isSidebarShown){
+            $scope.toggleText = '\uE5D2';
+            console.log($scope.isSidebarShown);
+          }
+          else $scope.toggleText = '\u2715';
+          SidebarStatusService.toggleSidebar();
+        }
       }
     ]
   };
