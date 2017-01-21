@@ -104,13 +104,15 @@ oppia.directive('topNavigationBar', [function() {
           $scope.toggleText = '\uE5D2';
         });
 
-        $scope.toggleSidebar = function(){
+        $scope.toggleSidebar = function() {
           $scope.isSidebarShown = SidebarStatusService.isSidebarShown();
-          if ($scope.isSidebarShown){
+          if ($scope.isSidebarShown) {
             $scope.toggleText = '\uE5D2';
             console.log($scope.isSidebarShown);
           }
-          else $scope.toggleText = '\u2715';
+          else {
+            $scope.toggleText = '\u2715';
+          }
           SidebarStatusService.toggleSidebar();
         }
       }
