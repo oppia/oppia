@@ -74,24 +74,24 @@ class UserSettingsModel(base_models.BaseModel):
         """Returns whether or not a given normalized_username is taken.
 
         Args:
-          normalized_username: str. The given user's normalized username.
+            normalized_username: str. The given user's normalized username.
 
         Returns:
-          True if the normalized_username is taken, False otherwise.
+            True if the normalized_username is taken, False otherwise.
          """
         return bool(cls.get_all().filter(
             cls.normalized_username == normalized_username).get())
 
     @classmethod
     def get_by_normalized_username(cls, normalized_username):
-        """Returns a user model given a normalized username
+        """Returns a user model given a normalized username.
 
         Args:
-          normalized_username: str. The user's normalized username.
+            normalized_username: str. The user's normalized username.
 
         Returns:
-          The user model instance which contains the same normalized_username.
-
+            UserSettingsModel. The UserSettingsModel instance which contains the same
+            normalized_username.
         """
         return cls.get_all().filter(
             cls.normalized_username == normalized_username).get()
@@ -149,7 +149,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
     feedback_thread_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of the learners who have subscribed to this user.
     creator_ids = ndb.StringProperty(repeated=True, indexed=True)
-   # When the user last checked notifications. May be None.
+    # When the user last checked notifications. May be None.
     last_checked = ndb.DateTimeProperty(default=None)
 
 
@@ -168,8 +168,6 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
     """
     # The output of the batch job.
     output = ndb.JsonProperty(indexed=False)
-
-
     # The time, in milliseconds since the epoch, when the job that computed
     # this batch model was queued.
     job_queued_msec = ndb.FloatProperty(indexed=False)
@@ -230,11 +228,11 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
         """Creates a new UserStatsModel instance, if it does not already exist.
 
         Args:
-          user_id: str. The user_id to be associated with the UserStatsModel.
+            user_id: str. The user_id to be associated with the UserStatsModel.
 
         Returns:
-          A UserStatsModel instance. Either one which matches the given user_id,
-          or the newly created one if it did not already exist.
+            A UserStatsModel instance. Either an existing one which matches the
+            given user_id, or the newly created one if it did not already exist.
         """
         entity = cls.get(user_id, strict=False)
         if not entity:
@@ -276,18 +274,18 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, user_id, exploration_id):
-        """Creates a new ExplorationUserDataModel entry and returns it.
+        """Creates a new ExplorationUserDataModel instance and returns it.
 
         Note that the client is responsible for actually saving this entity to
         the datastore.
 
         Args:
-          user_id: str. The id of the user.
-          exploration_id: str. The id of the exploration.
+            user_id: str. The id of the user.
+            exploration_id: str. The id of the exploration.
 
         Returns:
-          A ExplorationUserDataModel instance created with the given user_id
-          and exploration_id.
+            ExplorationUserDataModel instance. The newly created
+            ExplorationUserDataModel instance.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
         return cls(
@@ -295,15 +293,16 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     @classmethod
     def get(cls, user_id, exploration_id):
-        """Gets the ExplorationUserDataModel for the given ids.
+        """Gets the ExplorationUserDataModel for the given user and exploration
+         ids.
 
         Args:
-          user_id: str. The id of the user.
-          exploration_id: str. The id of the exploration.
+            user_id: str. The id of the user.
+            exploration_id: str. The id of the exploration.
 
         Returns:
-          The ExplorationUserDataModel instance which matches with the given
-          user_id and exploration_id.
+            ExplorationUserDataModel. The ExplorationUserDataModel instance
+            which matches with the given user_id and exploration_id.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
         return super(ExplorationUserDataModel, cls).get(
@@ -311,15 +310,16 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     @classmethod
     def get_multi(cls, user_ids, exploration_id):
-        """Gets the ExplorationUserDataModel for the given ids.
+        """Gets the ExplorationUserDataModel for the given user and exploration
+         ids.
 
         Args:
-          user_ids: list. A list of user_ids, each of which is a string.
-          exploration_id: str. The id of the exploration.
+            user_ids: list(str). A list of user_ids.
+            exploration_id: str. The id of the exploration.
 
         Returns:
-          The ExplorationUserDataModel instance which matches with the given
-          user_ids and exploration_id.
+            ExplorationUserDataModel. The ExplorationUserDataModel instance
+            which matches with the given user_ids and exploration_id.
         """
         instance_ids = (
             cls._generate_id(user_id, exploration_id) for user_id in user_ids)
@@ -360,11 +360,12 @@ class CollectionProgressModel(base_models.BaseModel):
         datastore.
 
         Args:
-          user_id: str. The id of the user.
-          exploration_id: str. The id of the exploration.
+            user_id: str. The id of the user.
+            exploration_id: str. The id of the exploration.
 
         Returns:
-          The newly created CollectionProgressModel instance.
+            CollectionProgressModel. The newly created CollectionProgressModel
+            instance.
         """
         instance_id = cls._generate_id(user_id, collection_id)
         return cls(
@@ -372,34 +373,35 @@ class CollectionProgressModel(base_models.BaseModel):
 
     @classmethod
     def get(cls, user_id, collection_id):
-        """Gets the CollectionProgressModel for the given id.
+        """Gets the CollectionProgressModel for the given user and collection
+        ids.
 
         Args:
-          user_id: str. The id of the user.
-          exploration_id: str. The id of the exploration.
+            user_id: str. The id of the user.
+            exploration_id: str. The id of the exploration.
 
         Returns:
-          The CollectionProgressModel instance which matches the given user_id
-          and exploration_id.
+            CollectionProgressModel. The CollectionProgressModel instance which
+            matches the given user_id and collection_id.
         """
-
         instance_id = cls._generate_id(user_id, collection_id)
         return super(CollectionProgressModel, cls).get(
             instance_id, strict=False)
 
     @classmethod
     def get_or_create(cls, user_id, collection_id):
-        """Gets the CollectionProgressModel for the given id, or creates a new
-        entry with the given id if no such instance yet exists within the data
-        store.
+        """Gets the CollectionProgressModel for the given user and collection
+        ids, or creates a new entry with if no such instance yet exists within
+        the datastore.
 
         Args:
-          user_id: str. The id of the user.
-          exploration_id: str. The id of the exploration.
+            user_id: str. The id of the user.
+            exploration_id: str. The id of the exploration.
 
         Returns:
-          A CollectionProgressModel instance. Either one which matches the given
-          user_id, or the newly created one if it does not already exist.
+            A CollectionProgressModel instance. Either an existing one which
+            matches the given user_id and collection_id, or the newly created
+            one if it does not already exist.
         """
         instance_model = cls.get(user_id, collection_id)
         if instance_model:
@@ -456,14 +458,14 @@ class UserQueryModel(base_models.BaseModel):
         """Fetches a list of all query_models sorted by creation date.
 
         Args:
-          page_size: int. The maximum number of entities to be returned.
-          cursor: str or None. The list of returned entities starts from this
-            datastore cursor.
+            page_size: int. The maximum number of entities to be returned.
+            cursor: str or None. The list of returned entities starts from this
+                datastore cursor.
 
         Returns:
-          3-tuple of (query_models, cursor, more) as described in fetch_page()
-           at:
-             https://developers.google.com/appengine/docs/python/ndb/queryclass,
+            3-tuple of (query_models, cursor, more) as described in fetch_page()
+            at:
+            https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
                 query_models: List of UserQueryModel instances.
                 next_cursor: str or None. A query cursor pointing to the next
