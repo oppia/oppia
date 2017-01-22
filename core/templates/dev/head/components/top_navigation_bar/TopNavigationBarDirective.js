@@ -60,7 +60,7 @@ oppia.directive('topNavigationBar', [function() {
             $window.location = GLOBALS.loginUrl;
           }, 150);
         };
-        $scope.isSidebarShown = true;
+        $scope.sidebarIsShown = false;
         $scope.profileDropdownIsActive = false;
         $scope.onMouseoverProfilePictureOrDropdown = function(evt) {
           angular.element(evt.currentTarget).parent().addClass('open');
@@ -103,8 +103,8 @@ oppia.directive('topNavigationBar', [function() {
         });
 
         $scope.toggleSidebar = (function() {
-          $scope.isSidebarShown = SidebarStatusService.isSidebarShown();
           SidebarStatusService.toggleSidebar();
+          $scope.sidebarIsShown = SidebarStatusService.isSidebarShown();
         });
       }
     ]
