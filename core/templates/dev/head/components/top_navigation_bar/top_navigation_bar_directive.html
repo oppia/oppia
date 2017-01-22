@@ -2,7 +2,8 @@
   <div class="navbar-header protractor-test-navbar-header pull-left">
     <a ng-if="windowIsNarrow" ng-click="toggleSidebar()"
        class="navbar-brand oppia-navbar-menu oppia-transition-200">
-      <i class="material-icons oppia-navbar-menu-icon"><[toggleText]></i>
+      <i class="material-icons oppia-navbar-menu-icon" ng-if="isSidebarShown" >&#xE5D2;</i>
+      <i class="material-icons oppia-navbar-close-icon" ng-if="!isSidebarShown" >&#10005;</i>
     </a>
 
     <a class="oppia-navbar-brand-name oppia-transition-200" href="/"

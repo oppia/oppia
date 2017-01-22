@@ -2499,6 +2499,11 @@ div#ng-curtain {
   outline-color: transparent;
   padding-top: 20px;
 }
+.oppia-navbar-close-icon {
+  color: #fff;
+  margin-right: 4px;
+  margin-top: -10px;
+}
 .oppia-navbar-menu-icon {
   color: #fff;
   margin-top: -5px;
