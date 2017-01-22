@@ -104,8 +104,8 @@ oppia.directive('topNavigationBar', [function() {
 
         $scope.isSidebarShown = true;
         $scope.toggleSidebar = (function() {
-        $scope.isSidebarShown = SidebarStatusService.isSidebarShown();
-        SidebarStatusService.toggleSidebar();
+          $scope.isSidebarShown = SidebarStatusService.isSidebarShown();
+          SidebarStatusService.toggleSidebar();
         });
       }
     ]
