@@ -21,7 +21,6 @@ import random
 import jinja2
 
 from core.controllers import base
-from core.domain.classifier import LDAStringClassifier
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import dependency_registry
@@ -37,6 +36,7 @@ from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import summary_services
+from extensions.classifiers.LDAStringClassifier import LDAStringClassifier
 import feconf
 import utils
 

@@ -17,12 +17,12 @@
 import os
 
 from core.controllers import reader
-from core.domain.classifier import LDAStringClassifier
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import param_domain
 from core.domain import rights_manager
 from core.tests import test_utils
+from extensions.classifiers.LDAStringClassifier import LDAStringClassifier
 import feconf
 import utils
 
