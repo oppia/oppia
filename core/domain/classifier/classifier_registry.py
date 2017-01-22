@@ -29,22 +29,6 @@ class Registry(object):
     _classifier_instances = {}
 
     @classmethod
-    def custom_import(cls, path):
-        """Utility function for importing a classifier class.
-
-        Args:
-            path: str. Full path of the class to be imported.
-
-        Returns:
-            A reference to the class.
-        """
-        components = path.split('.')
-        mod = __import__(components[0])
-        for comp in components[1:]:
-            mod = getattr(mod, comp)
-        return mod
-
-    @classmethod
     def get_all_classifier_ids(cls):
         """Retrieves a list of all algorithm ids.
 
@@ -80,14 +64,6 @@ class Registry(object):
                 base_class.__name__ for base_class in clazz.__bases__]
             if 'BaseClassifier' in ancestor_names:
                 cls._classifier_instances[clazz.__name__] = clazz()
-
-        # Crawl the directories and add new classifier instances to the
-        # registry.
-        # for classifier_id in all_classifier_ids:
-        #     my_class = cls.custom_import(''.join([feconf.CLASSIFIERS_PKG, '.',
-        #                                           classifier_id, '.',
-        #                                           classifier_id]))
-        #     cls._classification_algorithms[my_class.__name__] = my_class()
 
     @classmethod
     def get_all_classifiers(cls):
