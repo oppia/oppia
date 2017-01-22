@@ -136,7 +136,7 @@ oppia.directive('schemaBasedListEditor', [
           };
 
           var _deleteElementIfEmpty = function() {
-            for (var i = 0; i < $scope.localValue.length; i++) {
+            for (var i = 0; i < $scope.localValue.length - 1; i++) {
               if ($scope.localValue[i].length === 0) {
                 $scope.deleteElement(i);
                 i--;
@@ -156,13 +156,7 @@ oppia.directive('schemaBasedListEditor', [
           };
 
           $scope.hideAddItemButton = function() {
-            var lastValueIndex = $scope.localValue.length - 1;
             $scope.isAddItemButtonPresent = false;
-            if (lastValueIndex >= 0) {
-              if ($scope.localValue[lastValueIndex].length > 0) {
-                $scope.isAddItemButtonPresent = true;
-              }
-            }
           };
 
           $scope._onChildFormSubmit = function(evt) {
