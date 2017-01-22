@@ -354,7 +354,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, user_id, collection_id):
-        """Creates a new CollectionProgressModel entry and returns it.
+        """Creates a new CollectionProgressModel instance and returns it.
 
         Note: the client is responsible for actually saving this entity to the
         datastore.
@@ -391,7 +391,7 @@ class CollectionProgressModel(base_models.BaseModel):
     @classmethod
     def get_or_create(cls, user_id, collection_id):
         """Gets the CollectionProgressModel for the given user and collection
-        ids, or creates a new entry with if no such instance yet exists within
+        ids, or creates a new instance with if no such instance yet exists within
         the datastore.
 
         Args:
