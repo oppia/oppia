@@ -23,9 +23,11 @@ Run this script from the Oppia root directory:
 
 import os
 import time
+
 import yaml
 
-from core.domain.classifier.LDAStringClassifier import LDAStringClassifier
+from extensions.classifiers.LDAStringClassifier.LDAStringClassifier import LDAStringClassifier  # pylint: disable=line-too-long
+
 
 def measure_runtime(func):
     """A decorator that measures the amount of time func takes to run.
@@ -53,6 +55,7 @@ def measure_runtime(func):
                                                         end - start, num)
         return result
     return time_taken
+
 
 class LDAStringClassifierBenchmarker(object):
     """Benchmark for string classifier.

@@ -17,14 +17,16 @@
 """Registry for classification algorithms/classifiers."""
 
 import itertools
+import os
+import pkgutil
 import feconf
 
 
 class Registry(object):
-    """Registry of all classification algorithms/classifiers."""
+    """Registry of all classification classes."""
 
-    # Dict mapping algorithm ids to instances of the classification algorithms.
-    _classification_algorithms = {}
+    # Dict mapping algorithm ids to instances of the classification classes.
+    _classifier_instances = {}
 
     @classmethod
     def custom_import(cls, path):
@@ -51,24 +53,41 @@ class Registry(object):
         """
         return list(itertools.chain(*[
             classifier_class['algorithm_ids']
-            for classifier_class in feconf.ALLOWED_CLASSIFIER_CLASSES
+            for classifier_class in feconf.ANSWER_CLASSIFIER_CLASSES
         ]))
 
     @classmethod
     def _refresh(cls):
-        """Refreshes the dict mapping algorithm ids to instances."""
-
-        cls._classification_algorithms.clear()
+        """Refreshes the dict mapping algorithm ids to instances of
+        classifiers.
+        """
+        cls._classifier_instances.clear()
 
         all_classifier_ids = cls.get_all_classifier_ids()
 
+        # Assemble all paths to the interactions.
+        extension_paths = [
+            os.path.join(feconf.CLASSIFIERS_DIR, classifier_id)
+            for classifier_id in all_classifier_ids]
+
+        # Crawl the directories and add new interaction instances to the
+        # registry.
+        for loader, name, _ in pkgutil.iter_modules(path=extension_paths):
+            module = loader.find_module(name).load_module(name)
+            clazz = getattr(module, name)
+
+            ancestor_names = [
+                base_class.__name__ for base_class in clazz.__bases__]
+            if 'BaseClassifier' in ancestor_names:
+                cls._classifier_instances[clazz.__name__] = clazz()
+
         # Crawl the directories and add new classifier instances to the
         # registry.
-        for classifier_id in all_classifier_ids:
-            my_class = cls.custom_import(''.join([feconf.CLASSIFIERS_PKG, '.',
-                                                  classifier_id, '.',
-                                                  classifier_id]))
-            cls._classification_algorithms[my_class.__name__] = my_class()
+        # for classifier_id in all_classifier_ids:
+        #     my_class = cls.custom_import(''.join([feconf.CLASSIFIERS_PKG, '.',
+        #                                           classifier_id, '.',
+        #                                           classifier_id]))
+        #     cls._classification_algorithms[my_class.__name__] = my_class()
 
     @classmethod
     def get_all_classifiers(cls):
@@ -77,10 +96,9 @@ class Registry(object):
         Returns:
             A list of instances of all the classification algorithms.
         """
-
-        if len(cls._classification_algorithms) == 0:
+        if not cls._classifier_instances:
             cls._refresh()
-        return cls._classification_algorithms.values()
+        return cls._classifier_instances.values()
 
     @classmethod
     def get_classifier_by_id(cls, classifier_id):
@@ -98,7 +116,6 @@ class Registry(object):
         Returns:
             An instance of the classifier.
         """
-
-        if classifier_id not in cls._classification_algorithms:
+        if classifier_id not in cls._classifier_instances:
             cls._refresh()
-        return cls._classification_algorithms[classifier_id]
+        return cls._classifier_instances[classifier_id]

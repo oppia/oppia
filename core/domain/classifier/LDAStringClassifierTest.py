@@ -14,8 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from core.domain.classifier.LDAStringClassifier import LDAStringClassifier
 from core.tests import test_utils
+from extensions.classifiers.LDAStringClassifier import LDAStringClassifier
+
 
 # pylint: disable=protected-access
 
@@ -39,7 +40,7 @@ class LDAStringClassifierUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(LDAStringClassifierUnitTests, self).setUp()
-        self.classifier = LDAStringClassifier()
+        self.classifier = LDAStringClassifier.LDAStringClassifier()
         self.classifier.train(self._EXAMPLES_TRAIN)
 
     def _validate_instance(self):

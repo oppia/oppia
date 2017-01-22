@@ -47,7 +47,7 @@ if PLATFORM == 'gae':
 else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 
-CLASSIFIERS_PKG = 'core.domain.classifier'
+CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
@@ -68,6 +68,9 @@ OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
     'extensions', 'interactions', 'object_defaults.json')
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
     os.getcwd(), 'extensions', 'interactions', 'rules.json')
+
+# The ID of the classifier to be used as a default string classifier.
+DEFAULT_STRING_CLASSIFIER = 'LDAStringClassifier'
 
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
@@ -349,9 +352,10 @@ ALLOWED_RTE_EXTENSIONS = {
     },
 }
 
-# Ids of the allowed classification algorithm classes.
-ALLOWED_CLASSIFIER_CLASSES = [{
-    'name': 'StringClassifiers',
+# The list contains dicts with category of the classifier i.e. 'StringClassifiers'
+# or 'CodeClassifiers' and the IDs of the corresponding classifiers.
+ANSWER_CLASSIFIER_CLASSES = [{
+    'category': 'StringClassifiers',
     'algorithm_ids': [
         'LDAStringClassifier',
     ],
