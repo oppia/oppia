@@ -198,16 +198,6 @@ oppia.directive('schemaBasedListEditor', [
             $scope.$broadcast('externalHtmlContentChange');
             $scope.localValue.splice(index, 1);
           };
-
-          $scope.showbutton = function() {
-            var lastValueIndex = $scope.localValue.length - 1;
-            if (lastValueIndex >= 0) {
-              if ($scope.localValue[lastValueIndex].length > 0) {
-                return true;
-              }
-            }
-            return false;
-          };
         } else {
           if ($scope.len <= 0) {
             throw 'Invalid length for list editor: ' + $scope.len;
