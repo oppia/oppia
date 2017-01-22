@@ -90,8 +90,8 @@ class UserSettingsModel(base_models.BaseModel):
             normalized_username: str. The user's normalized username.
 
         Returns:
-            UserSettingsModel. The UserSettingsModel instance which contains the same
-            normalized_username.
+            UserSettingsModel. The UserSettingsModel instance which contains
+            the same normalized_username.
         """
         return cls.get_all().filter(
             cls.normalized_username == normalized_username).get()
