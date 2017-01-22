@@ -111,11 +111,11 @@ oppia.directive('topNavigationBar', [function() {
 
           // If the window is resized larger, try displaying the hidden elements
           if (currentWindowWidth < windowDimensionsService.getWidth()) {
-            $.each($scope.navElementsVisibilityStatus, function(e, visible) {
-              if (!visible) {
-                $scope.navElementsVisibilityStatus[e] = true;
+            for(element in $scope.navElementsVisibilityStatus) {
+              if (!$scope.navElementsVisibilityStatus[element]) {
+                $scope.navElementsVisibilityStatus[element] = true;
               }
-            });
+            }
           }
           currentWindowWidth = windowDimensionsService.getWidth();
           oppiaDebouncer.debounce(truncateNavbar, 500)();
@@ -189,15 +189,15 @@ oppia.directive('topNavigationBar', [function() {
 
           // Measured non-overflowed navbar height under 60px via inspector.
           if ($('div.collapse.navbar-collapse').height() > 60) {
-            $.each($scope.navElementsVisibilityStatus, function(e, visible) {
-              if (visible) {
+            for (element in $scope.navElementsVisibilityStatus) {
+              if ($scope.navElementsVisibilityStatus[element]) {
                 // Hide one element, then check again after 10ms.
                 // This gives the browser time to render the visibility change.
-                $scope.navElementsVisibilityStatus[e] = false;
+                $scope.navElementsVisibilityStatus[element] = false;
                 $timeout(truncateNavbar, 10);
                 return false;
               }
-            });
+            }
           }
         };
 
