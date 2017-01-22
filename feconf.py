@@ -352,8 +352,9 @@ ALLOWED_RTE_EXTENSIONS = {
     },
 }
 
-# The list contains dicts with category of the classifier i.e. 'StringClassifiers'
-# or 'CodeClassifiers' and the IDs of the corresponding classifiers.
+# The list contains dicts with category of the classifier i.e.
+# 'StringClassifiers' or 'CodeClassifiers' and the IDs of the
+# corresponding classifiers.
 ANSWER_CLASSIFIER_CLASSES = [{
     'category': 'StringClassifiers',
     'algorithm_ids': [
