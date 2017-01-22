@@ -26,7 +26,7 @@
             <div ng-repeat="avatar in avatarsList | limitTo:MAX_AVATARS_TO_DISPLAY-1:1">
               <circular-image src="avatar.image"
                               link="avatar.link"
-                              tooltip="<[avatar.tooltipText | truncate:14]>"
+                              tooltip="<[avatar.tooltipText | truncate:40]>"
                               tooltip-placement="right">
               </circular-image>
             </div>
