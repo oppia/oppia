@@ -22,7 +22,7 @@ import pkgutil
 import feconf
 
 
-class Registry(object):
+class ClassifierRegistry(object):
     """Registry of all classification classes."""
 
     # Dict mapping algorithm ids to instances of the classification classes.
@@ -49,12 +49,12 @@ class Registry(object):
 
         all_classifier_ids = cls.get_all_classifier_ids()
 
-        # Assemble all paths to the interactions.
+        # Assemble all paths to the classifiers.
         extension_paths = [
             os.path.join(feconf.CLASSIFIERS_DIR, classifier_id)
             for classifier_id in all_classifier_ids]
 
-        # Crawl the directories and add new interaction instances to the
+        # Crawl the directories and add new classifier instances to the
         # registry.
         for loader, name, _ in pkgutil.iter_modules(path=extension_paths):
             module = loader.find_module(name).load_module(name)
