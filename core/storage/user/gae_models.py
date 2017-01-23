@@ -77,7 +77,7 @@ class UserSettingsModel(base_models.BaseModel):
             normalized_username: str. The given user's normalized username.
 
         Returns:
-            True if the normalized_username is taken, False otherwise.
+            bool. Whether the normalized_username has already been taken.
          """
         return bool(cls.get_all().filter(
             cls.normalized_username == normalized_username).get())
@@ -231,7 +231,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
             user_id: str. The user_id to be associated with the UserStatsModel.
 
         Returns:
-            A UserStatsModel instance. Either an existing one which matches the
+            UserStatsModel. Either an existing one which matches the
             given user_id, or the newly created one if it did not already exist.
         """
         entity = cls.get(user_id, strict=False)
@@ -284,7 +284,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
             exploration_id: str. The id of the exploration.
 
         Returns:
-            ExplorationUserDataModel instance. The newly created
+            ExplorationUserDataModel. The newly created
             ExplorationUserDataModel instance.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
@@ -361,7 +361,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
         Args:
             user_id: str. The id of the user.
-            exploration_id: str. The id of the exploration.
+            collection_id: str. The id of the exploration.
 
         Returns:
             CollectionProgressModel. The newly created CollectionProgressModel
@@ -378,7 +378,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
         Args:
             user_id: str. The id of the user.
-            exploration_id: str. The id of the exploration.
+            collection_id: str. The id of the exploration.
 
         Returns:
             CollectionProgressModel. The CollectionProgressModel instance which
@@ -396,10 +396,10 @@ class CollectionProgressModel(base_models.BaseModel):
 
         Args:
             user_id: str. The id of the user.
-            exploration_id: str. The id of the exploration.
+            collection_id: str. The id of the exploration.
 
         Returns:
-            A CollectionProgressModel instance. Either an existing one which
+            CollectionProgressModel. Either an existing one which
             matches the given user_id and collection_id, or the newly created
             one if it does not already exist.
         """
