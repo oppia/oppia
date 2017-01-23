@@ -33,6 +33,7 @@
 	"I18N_FOOTER_CONTRIBUTE_ALL_CAPS": "PRISIDĖTI",
 	"I18N_FOOTER_CREDITS": "Kreditai",
 	"I18N_FOOTER_DONATE": "Aukoti",
+	"I18N_FOOTER_FOLLOW_US": "Sekite Mus",
 	"I18N_FOOTER_FORUM": "Forumas",
 	"I18N_FOOTER_GET_INVOLVED": "Įsitraukite",
 	"I18N_FOOTER_GET_STARTED": "Pradėkite",
@@ -117,5 +118,7 @@
 	"I18N_LIBRARY_LAST_UPDATED": "Paskutinį kartą atnaujinta",
 	"I18N_LIBRARY_LOADING": "Įkeliama",
 	"I18N_LIBRARY_MAIN_HEADER": "Įsivaizduokite ką galima išmokti šiandien...",
-	"I18N_LIBRARY_N/A": "Nėra"
+	"I18N_LIBRARY_N/A": "Nėra",
+	"I18N_SUBSCRIBE_BUTTON_TEXT": "Prenumeruoti",
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Nutraukti prenumeratą"
 }

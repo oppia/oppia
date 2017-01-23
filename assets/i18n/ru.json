@@ -23,6 +23,7 @@
 	"I18N_ERROR_PAGE_TITLE_500": "Ошибка 500 - Oppia",
 	"I18N_FOOTER_BROWSE_LIBRARY": "Просматривать библиотеку",
 	"I18N_FOOTER_DONATE": "Пожертвовать",
+	"I18N_FOOTER_FOLLOW_US": "Следуйте за нами",
 	"I18N_FOOTER_FORUM": "Форум",
 	"I18N_FOOTER_GET_STARTED": "Начать",
 	"I18N_FOOTER_OPPIA_FOUNDATION": "Фонд Oppia",
@@ -147,6 +148,7 @@
 	"I18N_SPLASH_JAVASCRIPT_ERROR_THANKS": "Спасибо.",
 	"I18N_SPLASH_SUBTITLE": "Oppia позволяет легко создавать интерактивные уроки, которые обучают и занимают.",
 	"I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Oppia позволяет <a href=\"/dashboard?mode=create\">создавать</a> и <a href=\"/library\">делиться</a> исследованиями по широкому кругу вопросов, ограниченных только вашей фантазией.",
+	"I18N_SUBSCRIBE_BUTTON_TEXT": "Подписаться",
 	"I18N_TOPNAV_ABOUT_OPPIA": "О Oppia",
 	"I18N_TOPNAV_ADMIN_PAGE": "Страница Админа",
 	"I18N_TOPNAV_BLOG": "Блог",
@@ -160,5 +162,6 @@
 	"I18N_TOPNAV_NOTIFICATIONS": "Уведомления",
 	"I18N_TOPNAV_PREFERENCES": "Настройки",
 	"I18N_TOPNAV_SIGN_IN": "Войти",
-	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Учить с Oppia"
+	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Учить с Oppia",
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Отписаться"
 }
