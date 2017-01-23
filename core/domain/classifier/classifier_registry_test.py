@@ -16,10 +16,9 @@
 
 from core.domain.classifier import classifier_registry
 from core.tests import test_utils
-from extensions.classifiers.LDAStringClassifier import LDAStringClassifier
 
 
-class AlgorithmRegistryTest(test_utils.GenericTestBase):
+class ClassifierRegistryTest(test_utils.GenericTestBase):
     """Test the classifier registry class."""
 
     def test_get_all_classifier_ids(self):
@@ -34,11 +33,3 @@ class AlgorithmRegistryTest(test_utils.GenericTestBase):
         classifier_instances = (
             classifier_registry.ClassifierRegistry.get_all_classifiers())
         self.assertEquals(len(classifier_instances), 1)
-
-    def test_get_classifier_by_id(self):
-        classifier_id = 'LDAStringClassifier'
-        classifier_instance = (
-            classifier_registry.ClassifierRegistry.get_classifier_by_id(
-                classifier_id))
-        self.assertIsInstance(
-            classifier_instance, LDAStringClassifier.LDAStringClassifier)

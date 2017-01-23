@@ -21,8 +21,8 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import param_domain
 from core.domain import rights_manager
+from core.domain.classifier import classifier_registry
 from core.tests import test_utils
-from extensions.classifiers.LDAStringClassifier import LDAStringClassifier
 import feconf
 import utils
 
@@ -135,13 +135,15 @@ class ReaderClassifyTests(test_utils.GenericTestBase):
             exp_services.get_exploration_by_id(exploration_id).states['Home'])
 
     def _is_string_classifier_called(self, answer):
+        sc = classifier_registry.ClassifierRegistry.get_classifier_by_id(
+            feconf.DEFAULT_STRING_CLASSIFIER)
         string_classifier_predict = (
-            LDAStringClassifier.LDAStringClassifier.predict)
+            sc.__class__.predict)
         predict_counter = test_utils.CallCounter(
             string_classifier_predict)
 
         with self.swap(
-            LDAStringClassifier.LDAStringClassifier,
+            sc.__class__,
             'predict', predict_counter):
 
             response = reader.classify(self.exp_state, answer)

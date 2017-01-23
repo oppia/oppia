@@ -26,7 +26,8 @@ import time
 
 import yaml
 
-from extensions.classifiers.LDAStringClassifier.LDAStringClassifier import LDAStringClassifier  # pylint: disable=line-too-long
+import feconf
+from core.domain.classifier import classifier_registry
 
 
 def measure_runtime(func):
@@ -105,7 +106,9 @@ class LDAStringClassifierBenchmarker(object):
         Returns:
             dict. The dict representing the resulting classifier model.
         """
-        classifier = LDAStringClassifier()
+        classifier = (
+            classifier_registry.ClassifierRegistry.get_classifier_by_id(
+                feconf.DEFAULT_STRING_CLASSIFIER))
         classifier.train(self.examples[:num])
         classifier_dict = classifier.to_dict()
         return classifier_dict
@@ -126,7 +129,9 @@ class LDAStringClassifierBenchmarker(object):
         """
         if not self.classifier_model_dict:
             raise Exception('No classifier found')
-        classifier = LDAStringClassifier()
+        classifier = (
+            classifier_registry.ClassifierRegistry.get_classifier_by_id(
+                feconf.DEFAULT_STRING_CLASSIFIER))
         classifier.from_dict(self.classifier_model_dict)
         classifier.predict(self.docs_to_classify[:num])
 

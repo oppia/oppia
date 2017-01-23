@@ -14,9 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import feconf
 from core.tests import test_utils
-from extensions.classifiers.LDAStringClassifier import LDAStringClassifier
-
+from core.domain.classifier import classifier_registry
 
 # pylint: disable=protected-access
 
@@ -40,7 +40,9 @@ class LDAStringClassifierUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(LDAStringClassifierUnitTests, self).setUp()
-        self.classifier = LDAStringClassifier.LDAStringClassifier()
+        self.classifier = (
+            classifier_registry.ClassifierRegistry.get_classifier_by_id(
+                feconf.DEFAULT_STRING_CLASSIFIER))
         self.classifier.train(self._EXAMPLES_TRAIN)
 
     def _validate_instance(self):

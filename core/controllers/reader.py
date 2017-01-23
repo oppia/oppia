@@ -21,6 +21,7 @@ import random
 import jinja2
 
 from core.controllers import base
+from core.domain.classifier import classifier_registry
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import dependency_registry
@@ -36,7 +37,6 @@ from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import summary_services
-from extensions.classifiers.LDAStringClassifier import LDAStringClassifier
 import feconf
 import utils
 
@@ -88,7 +88,9 @@ def classify_string_classifier_rule(state, normalized_answer):
     best_matched_answer_group_index = len(state.interaction.answer_groups)
     best_matched_rule_spec_index = None
 
-    sc = LDAStringClassifier.LDAStringClassifier()
+    sc = classifier_registry.ClassifierRegistry.get_classifier_by_id(
+        feconf.DEFAULT_STRING_CLASSIFIER)
+
     training_examples = [
         [doc, []] for doc in state.interaction.confirmed_unclassified_answers]
     for (answer_group_index, answer_group) in enumerate(
@@ -108,7 +110,7 @@ def classify_string_classifier_rule(state, normalized_answer):
         labels = sc.predict([normalized_answer])
         predicted_label = labels[0]
         if (predicted_label !=
-                LDAStringClassifier.LDAStringClassifier.DEFAULT_LABEL):
+                sc.DEFAULT_LABEL):
             predicted_answer_group_index = int(predicted_label)
             predicted_answer_group = state.interaction.answer_groups[
                 predicted_answer_group_index]

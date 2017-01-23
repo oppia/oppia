@@ -25,12 +25,12 @@ import feconf
 class ClassifierRegistry(object):
     """Registry of all classification classes."""
 
-    # Dict mapping algorithm ids to instances of the classification classes.
+    # Dict mapping algorithm IDs to instances of the classification classes.
     _classifier_instances = {}
 
     @classmethod
     def get_all_classifier_ids(cls):
-        """Retrieves a list of all algorithm ids.
+        """Retrieves a list of all classifier IDs.
 
         Returns:
             A list containing all the classifier IDs.
@@ -42,7 +42,7 @@ class ClassifierRegistry(object):
 
     @classmethod
     def _refresh(cls):
-        """Refreshes the dict mapping algorithm ids to instances of
+        """Refreshes the dict mapping algorithm IDs to instances of
         classifiers.
         """
         cls._classifier_instances.clear()
