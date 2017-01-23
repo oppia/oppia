@@ -25,27 +25,37 @@ oppia.directive('collectionNodeCreator', [function() {
       'validatorsService', 'CollectionEditorStateService',
       'CollectionLinearizerService', 'CollectionUpdateService',
       'CollectionNodeObjectFactory', 'ExplorationSummaryBackendApiService',
-      'siteAnalyticsService', 'oppiaDebouncer',
+      'siteAnalyticsService', 'UrlInterpolationService',
       function(
           $scope, $http, $window, $filter, alertsService,
           validatorsService, CollectionEditorStateService,
           CollectionLinearizerService, CollectionUpdateService,
           CollectionNodeObjectFactory, ExplorationSummaryBackendApiService,
-          siteAnalyticsService, oppiaDebouncer) {
+          siteAnalyticsService, UrlInterpolationService) {
         $scope.collection = CollectionEditorStateService.getCollection();
         $scope.newExplorationId = '';
         $scope.newExplorationTitle = '';
         var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
-        $scope.searchQuery = '';
+        var SEARCH_EXPLORATION_URL_TEMPLATE = (
+          '/exploration/metadata_search/?q=<search_query>');
 
         var onSearchQueryChangeExec = function  () {
-          queryUrl = '/exploration/metadata_search' + '?q=' + $scope.searchQuery;
+          if($scope.newExplorationId !== '') {
+            queryUrl = UrlInterpolationService.interpolateUrl(
+              SEARCH_EXPLORATION_URL_TEMPLATE, {
+                search_query: $scope.newExplorationId
+              }
+            );
+          }
           $http.get(queryUrl).then(function(response) {
             var data = response.data;
             var options = '';
             for(var i = 0; i < data.collection_node_metadata_list.length; i++)
               if(data.collection_node_metadata_list[i]) {
-                options += '<option value=" ' + data.collection_node_metadata_list[i].id + '">' + data.collection_node_metadata_list[i].title + '</option>';
+                var item = '(#' + data.collection_node_metadata_list[i].id  +
+                  ') ' + data.collection_node_metadata_list[i].title;
+                options += '<option value=" ' + item + '">' + item +
+                  '</option>';
               }
             document.getElementById('explorations').innerHTML = options;
           });
@@ -55,12 +65,17 @@ oppia.directive('collectionNodeCreator', [function() {
           // Query immediately when the enter or space key is pressed.
           if (evt.keyCode === 13 || evt.keyCode === 32) {
             onSearchQueryChangeExec();
-          } else {
-            oppiaDebouncer.debounce(onSearchQueryChangeExec, 150)();
           }
         };
 
         var addExplorationToCollection = function(newExplorationId) {
+          if(newExplorationId.length > 1) {
+            var temp = '';
+            for(var i = 2; newExplorationId[i] != ')'; i++) {
+              temp += newExplorationId[i];
+            }
+            newExplorationId = temp;
+          }
           if (!newExplorationId) {
             alertsService.addWarning('Cannot add an empty exploration ID.');
             return;
