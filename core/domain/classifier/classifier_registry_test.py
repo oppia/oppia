@@ -26,7 +26,8 @@ class AlgorithmRegistryTest(test_utils.GenericTestBase):
         expected_algorithm_ids = [
             'LDAStringClassifier'
         ]
-        algorithm_ids = classifier_registry.ClassifierRegistry.get_all_classifier_ids()
+        algorithm_ids = (
+            classifier_registry.ClassifierRegistry.get_all_classifier_ids())
         self.assertItemsEqual(expected_algorithm_ids, algorithm_ids)
 
     def test_get_all_classifiers(self):
@@ -37,10 +38,7 @@ class AlgorithmRegistryTest(test_utils.GenericTestBase):
     def test_get_classifier_by_id(self):
         classifier_id = 'LDAStringClassifier'
         classifier_instance = (
-            classifier_registry.ClassifierRegistry.get_classifier_by_id(classifier_id))
-        print isinstance(classifier_instance, LDAStringClassifier.LDAStringClassifier)
-        print type(classifier_instance)
-        print type(LDAStringClassifier.LDAStringClassifier)
-        print LDAStringClassifier.LDAStringClassifier.__class__
+            classifier_registry.ClassifierRegistry.get_classifier_by_id(
+                classifier_id))
         self.assertIsInstance(
             classifier_instance, LDAStringClassifier.LDAStringClassifier)
