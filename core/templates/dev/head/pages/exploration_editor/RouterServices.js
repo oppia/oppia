@@ -167,7 +167,7 @@ oppia.factory('routerService', [
         if (_tabs.active === MAIN_TAB) {
           $('.oppia-editor-cards-container').fadeOut(function() {
             _actuallyNavigate(SLUG_GUI, stateName);
-            $rootScope.$apply();
+            $rootScope.$applyAsync();
             $timeout(function() {
               $('.oppia-editor-cards-container').fadeIn();
             }, 150);
