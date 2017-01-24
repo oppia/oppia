@@ -21,3 +21,10 @@ oppia.constant('CONTENT_FOCUS_LABEL_PREFIX', 'content-focus-label-');
 oppia.constant('TWO_CARD_THRESHOLD_PX', 960);
 
 oppia.constant('CONTINUE_BUTTON_FOCUS_LABEL', 'continueButton');
+
+oppia.constant(
+    'EXPLORATION_DATA_URL_TEMPLATE', '/createhandler/data/<exploration_id>');
+
+oppia.constant(
+    'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
+    '/editable_createhandler/data/<exploration_id>');

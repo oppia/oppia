@@ -18,8 +18,10 @@
 
 // Service for handling all interactions with the exploration editor backend.
 oppia.factory('explorationData', [
-  '$http', '$log', 'alertsService', '$q',
-  function($http, $log, alertsService, $q) {
+  '$http', '$log', 'alertsService', 'ReadOnlyExplorationBackendApiService',
+  'EditableExplorationBackendApiService', '$q',
+  function($http, $log, alertsService, ReadOnlyExplorationBackendApiService,
+    EditableExplorationBackendApiService, $q) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
     var pathnameArray = window.location.pathname.split('/');
@@ -37,7 +39,6 @@ oppia.factory('explorationData', [
       return {};
     }
 
-    var explorationDataUrl = '/createhandler/data/' + explorationId;
     var resolvedAnswersUrlPrefix = (
       '/createhandler/resolved_answers/' + explorationId);
     var explorationDraftAutosaveUrl = (
@@ -85,28 +86,26 @@ oppia.factory('explorationData', [
           // changes applied. This makes a force-refresh necessary when changes
           // are discarded, otherwise the exploration-with-draft-changes
           // (which is cached here) will be reused.
-          return $http.get(explorationDataUrl, {
-            params: {
-              apply_draft: true
-            }
-          }).then(function(response) {
+          return ReadOnlyExplorationBackendApiService.loadExploration(
+            explorationId, true).then(function(data) {
             $log.info('Retrieved exploration data.');
-            $log.info(response.data);
+            $log.info(data);
 
-            explorationData.data = response.data;
+            explorationData.data = data;
 
-            return response.data;
+            return data;
           });
         }
       },
       // Returns a promise supplying the last saved version for the current
       // exploration.
       getLastSavedData: function() {
-        return $http.get(explorationDataUrl).then(function(response) {
+        return ReadOnlyExplorationBackendApiService.loadExploration(
+          explorationId).then(function(data) {
           $log.info('Retrieved saved exploration data.');
-          $log.info(response.data);
+          $log.info(data);
 
-          return response.data;
+          return data;
         });
       },
       resolveAnswers: function(stateName, resolvedAnswersList) {
@@ -128,17 +127,15 @@ oppia.factory('explorationData', [
        */
       save: function(
           changeList, commitMessage, successCallback, errorCallback) {
-        $http.put(explorationDataUrl, {
-          change_list: changeList,
-          commit_message: commitMessage,
-          version: explorationData.data.version
-        }).then(function(response) {
+        EditableExplorationBackendApiService.updateExploration(explorationId,
+          explorationData.data.version, commitMessage, changeList).then(
+            function(data) {
           alertsService.clearWarnings();
-          explorationData.data = response.data;
+          explorationData.data = data;
           if (successCallback) {
             successCallback(
-              response.data.is_version_of_draft_valid,
-              response.data.draft_changes);
+              data.is_version_of_draft_valid,
+              data.draft_changes);
           }
         }, function() {
           if (errorCallback) {

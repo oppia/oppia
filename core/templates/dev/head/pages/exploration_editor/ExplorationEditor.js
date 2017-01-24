@@ -69,7 +69,6 @@ oppia.controller('ExplorationEditor', [
 
     $scope.explorationId = explorationContextService.getExplorationId();
     $scope.explorationUrl = '/create/' + $scope.explorationId;
-    $scope.explorationDataUrl = '/createhandler/data/' + $scope.explorationId;
     $scope.explorationDownloadUrl = (
       '/createhandler/download/' + $scope.explorationId);
     $scope.revertExplorationUrl = (

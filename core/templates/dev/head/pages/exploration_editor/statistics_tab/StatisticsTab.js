@@ -20,9 +20,11 @@
 oppia.controller('StatisticsTab', [
   '$scope', '$http', '$modal', 'alertsService', 'explorationStatesService',
   'explorationData', 'computeGraphService', 'oppiaDatetimeFormatter',
+  'ReadOnlyExplorationBackendApiService',
   function(
       $scope, $http, $modal, alertsService, explorationStatesService,
-      explorationData, computeGraphService, oppiaDatetimeFormatter) {
+      explorationData, computeGraphService, oppiaDatetimeFormatter,
+      ReadOnlyExplorationBackendApiService) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
       chartAreaWidth: 300,
       colors: ['green', 'firebrick'],
@@ -55,12 +57,10 @@ oppia.controller('StatisticsTab', [
         '/createhandler/statistics/' + explorationData.explorationId +
         '/' + version);
       $http.get($scope.explorationStatisticsUrl).then(function(response) {
-        var explorationDataUrl = (
-          '/createhandler/data/' + explorationData.explorationId);
-
-        $http.get(explorationDataUrl).then(function(response) {
-          var states = response.data.states;
-          var initStateName = response.data.init_state_name;
+        ReadOnlyExplorationBackendApiService.loadExploration(
+          explorationData.explorationId).then(function(data) {
+          var states = data.states;
+          var initStateName = data.init_state_name;
           $scope.statsGraphData = computeGraphService.compute(
             initStateName, states);
         });
