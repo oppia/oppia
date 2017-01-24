@@ -140,9 +140,9 @@ oppia.directive('topNavigationBar', [function() {
         };
 
         /**
-         * Sets the min-width for the tabs part of the navbar, then checks
+         * Checks if window is >768px and i18n is completed, then checks
          * for overflow. If overflow is detected hides the least important
-         * tab and then calls itself again after a 10ms delay.
+         * tab and then calls itself again after a 50ms delay.
          */
         var truncateNavbar = function() {
           // If the window is narrow, the standard nav tabs are not shown.
@@ -166,6 +166,7 @@ oppia.directive('topNavigationBar', [function() {
                 $scope.navElementsVisibilityStatus[element] = false;
                 // Force a digest cycle to hide element immediately.
                 // Otherwise it would be hidden after the next call.
+                // This is due to setTimeout use in debounce.
                 $scope.$apply();
                 $timeout(truncateNavbar, 50);
                 return false;

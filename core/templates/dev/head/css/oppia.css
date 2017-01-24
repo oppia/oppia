@@ -2533,7 +2533,6 @@ div#ng-curtain {
   white-space: nowrap;
 }
 .nav, .oppia-navbar-tabs > li, .oppia-navbar-tabs > create-activity-button {
-  /* background: #F00; */
   display: inline-block;
   vertical-align: top;
 }
