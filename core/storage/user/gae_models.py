@@ -361,7 +361,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
         Args:
             user_id: str. The id of the user.
-            collection_id: str. The id of the exploration.
+            collection_id: str. The id of the collection.
 
         Returns:
             CollectionProgressModel. The newly created CollectionProgressModel
@@ -378,7 +378,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
         Args:
             user_id: str. The id of the user.
-            collection_id: str. The id of the exploration.
+            collection_id: str. The id of the collection.
 
         Returns:
             CollectionProgressModel. The CollectionProgressModel instance which
@@ -396,7 +396,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
         Args:
             user_id: str. The id of the user.
-            collection_id: str. The id of the exploration.
+            collection_id: str. The id of the collection.
 
         Returns:
             CollectionProgressModel. Either an existing one which
