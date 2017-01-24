@@ -139,53 +139,6 @@ oppia.directive('topNavigationBar', [function() {
           return i18nCompleted;
         };
 
-        var calculateNavWidth = function() {
-          var navWidth = 0;
-          $('ul.oppia-navbar-tabs').children().each(function(i, element) {
-            // The "create" button has a 0 width on its top-level element.
-            // The <li> tag from the Donate button has a large/invalid width.
-            // Use widths of their first-level child elements instead.
-            if (element.clientWidth === 0 || element.clientWidth >= 176) {
-              $(element).children().each(function(i, element) {
-                // Adding a small padding accounts for any unexpected padding
-                // or font differences. It may be possible to safely eliminate
-                // the extra by using Web Font Loader.
-                navWidth += 5;
-                navWidth += element.clientWidth;
-              });
-            } else {
-              navWidth += 5;
-              navWidth += element.clientWidth;
-            }
-          });
-
-          // Add the width of the gravatar or sign in button.
-          navWidth += $('ul.nav.oppia-navbar-profile').width();
-
-          return navWidth;
-        };
-
-        var setNavbarTabsWidth = function() {
-          $('ul.nav.oppia-navbar-tabs').css('min-width', calculateNavWidth());
-        };
-
-        var hideNavbarElement = function() {
-          // Measured non-overflowed navbar height under 60px via inspector.
-          if ($('div.collapse.navbar-collapse').height() > 60) {
-            for (element in $scope.navElementsVisibilityStatus) {
-              if ($scope.navElementsVisibilityStatus[element]) {
-                // Hide one element, then check again after 10ms.
-                // This gives the browser time to render the visibility change.
-                console.log('Hiding:', element);
-                $scope.navElementsVisibilityStatus[element] = false;
-                $timeout(setNavbarTabsWidth, 10);
-                $timeout(truncateNavbar, 50);
-                return false;
-              }
-            }
-          }
-        };
-
         /**
          * Sets the min-width for the tabs part of the navbar, then checks
          * for overflow. If overflow is detected hides the least important
@@ -204,12 +157,27 @@ oppia.directive('topNavigationBar', [function() {
             return false;
           }
 
-          setNavbarTabsWidth();
 
-          $timeout(hideNavbarElement, 10);
+
+          // Measured non-overflowed navbar height under 60px via inspector.
+          if ($('div.collapse.navbar-collapse').height() > 60) {
+            for (element in $scope.navElementsVisibilityStatus) {
+              if ($scope.navElementsVisibilityStatus[element]) {
+                // Hide one element, then check again after 50ms.
+                // This gives the browser time to render the visibility change.
+                console.log(Date.now(), 'Hiding:', element);
+                $scope.navElementsVisibilityStatus[element] = false;
+                // Force a digest cycle to hide element immediately.
+                // Otherwise it would be hidden after the next call.
+                $scope.$apply();
+                $timeout(truncateNavbar, 50);
+                return false;
+              }
+            }
+          }
         };
 
-        var truncateNavbarDebounced = oppiaDebouncer.debounce(truncateNavbar, 500);
+        var truncateNavbarDebounced = oppiaDebouncer.debounce(truncateNavbar, 100);
 
         // For Chrome, timeout 0 appears to run after i18n.
         $timeout(truncateNavbar, 0);
