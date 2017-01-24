@@ -28,13 +28,17 @@ oppia.factory('ReadOnlyCollectionBackendApiService', [
   var _collectionCache = [];
 
   var _fetchCollection = function(
-      collectionId, successCallback, errorCallback) {
+      collectionId, apply_draft, successCallback, errorCallback) {
     var collectionDataUrl = UrlInterpolationService.interpolateUrl(
       COLLECTION_DATA_URL_TEMPLATE, {
         collection_id: collectionId
       });
-
-    $http.get(collectionDataUrl).then(function(response) {
+    apply_draft = apply_draft || false;
+    $http.get(collectionDataUrl, {
+      params: {
+        apply_draft: apply_draft
+      }
+    }).then(function(response) {
       var collection = angular.copy(response.data.collection);
       if (successCallback) {
         successCallback(collection);
@@ -61,9 +65,9 @@ oppia.factory('ReadOnlyCollectionBackendApiService', [
      * called instead, if present. The rejection callback function is passed the
      * error that occurred and the collection ID.
      */
-    fetchCollection: function(collectionId) {
+    fetchCollection: function(collectionId, apply_draft) {
       return $q(function(resolve, reject) {
-        _fetchCollection(collectionId, resolve, reject);
+        _fetchCollection(collectionId, apply_draft, resolve, reject);
       });
     },
 
@@ -76,14 +80,15 @@ oppia.factory('ReadOnlyCollectionBackendApiService', [
      * will store it in the cache to avoid requests from the backend in further
      * function calls.
      */
-    loadCollection: function(collectionId) {
+    loadCollection: function(collectionId, apply_draft) {
       return $q(function(resolve, reject) {
         if (_isCached(collectionId)) {
           if (resolve) {
             resolve(angular.copy(_collectionCache[collectionId]));
           }
         } else {
-          _fetchCollection(collectionId, function(collection) {
+          _fetchCollection(collectionId, apply_draft,
+            function(collection) {
             // Save the fetched collection to avoid future fetches.
             _collectionCache[collectionId] = collection;
             if (resolve) {
