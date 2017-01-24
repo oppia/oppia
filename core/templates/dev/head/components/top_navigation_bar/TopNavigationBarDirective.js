@@ -118,7 +118,7 @@ oppia.directive('topNavigationBar', [function() {
             }
           }
           currentWindowWidth = windowDimensionsService.getWidth();
-          oppiaDebouncer.debounce(truncateNavbar, 500)();
+          truncateNavbarDebounced();
         });
 
         /**
@@ -159,12 +159,31 @@ oppia.directive('topNavigationBar', [function() {
             }
           });
 
-          // If the user is logged in, add the width of the gravatar section.
-          if ($scope.username) {
-            navWidth += $('ul.nav.oppia-navbar-profile').width();
-          }
+          // Add the width of the gravatar or sign in button.
+          navWidth += $('ul.nav.oppia-navbar-profile').width();
 
           return navWidth;
+        };
+
+        var setNavbarTabsWidth = function() {
+          $('ul.nav.oppia-navbar-tabs').css('min-width', calculateNavWidth());
+        };
+
+        var hideNavbarElement = function() {
+          // Measured non-overflowed navbar height under 60px via inspector.
+          if ($('div.collapse.navbar-collapse').height() > 60) {
+            for (element in $scope.navElementsVisibilityStatus) {
+              if ($scope.navElementsVisibilityStatus[element]) {
+                // Hide one element, then check again after 10ms.
+                // This gives the browser time to render the visibility change.
+                console.log('Hiding:', element);
+                $scope.navElementsVisibilityStatus[element] = false;
+                $timeout(setNavbarTabsWidth, 10);
+                $timeout(truncateNavbar, 50);
+                return false;
+              }
+            }
+          }
         };
 
         /**
@@ -185,21 +204,12 @@ oppia.directive('topNavigationBar', [function() {
             return false;
           }
 
-          $('ul.nav.oppia-navbar-tabs').css('min-width', calculateNavWidth());
+          setNavbarTabsWidth();
 
-          // Measured non-overflowed navbar height under 60px via inspector.
-          if ($('div.collapse.navbar-collapse').height() > 60) {
-            for (element in $scope.navElementsVisibilityStatus) {
-              if ($scope.navElementsVisibilityStatus[element]) {
-                // Hide one element, then check again after 10ms.
-                // This gives the browser time to render the visibility change.
-                $scope.navElementsVisibilityStatus[element] = false;
-                $timeout(truncateNavbar, 10);
-                return false;
-              }
-            }
-          }
+          $timeout(hideNavbarElement, 10);
         };
+
+        var truncateNavbarDebounced = oppiaDebouncer.debounce(truncateNavbar, 500);
 
         // For Chrome, timeout 0 appears to run after i18n.
         $timeout(truncateNavbar, 0);
