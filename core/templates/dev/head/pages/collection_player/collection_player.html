@@ -103,12 +103,11 @@
               </a>
             </td>
             <td class="hidden-md hidden-sm hidden-xs oppia-exploration-list-table-item">
-              <a ng-href="/explore/<[node.getExplorationId()]>"
-                 ng-mouseover="updateExplorationPreview(node.getExplorationId())"
-                 ng-mouseleave="togglePreviewCard()"
-                 class="oppia-dashboard-list-summary">
-                <[node.getExplorationSummaryObject().objective]>
-              </a>
+              <p>
+                <[node.getExplorationSummaryObject().objective
+                  .charAt(0).toUpperCase() +
+                  node.getExplorationSummaryObject().objective.slice(1)]>
+              </p>
             </td>
           </tr>
         </table>
