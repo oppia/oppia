@@ -1105,7 +1105,8 @@ class State(object):
         'classifier_model_id': None
     }
 
-    def __init__(self, content, param_changes, interaction, classifier_model_id=None):
+    def __init__(self, content, param_changes, interaction,
+                 classifier_model_id=None):
         # The content displayed to the reader in this state.
         self.content = [Content(item.type, item.value) for item in content]
         # Parameter changes associated with this state.
