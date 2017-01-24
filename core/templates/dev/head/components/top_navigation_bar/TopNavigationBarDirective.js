@@ -129,8 +129,8 @@ oppia.directive('topNavigationBar', [function() {
          */
         var checkIfI18NCompleted = function() {
           var i18nCompleted = true;
-          $('.oppia-navbar-tabs a[translate], ' +
-            '.oppia-navbar-tabs span[translate]').each(function(i, element) {
+          document.querySelectorAll('.oppia-navbar-tabs a[translate], ' +
+            '.oppia-navbar-tabs span[translate]').forEach(function(element){
             if (element.innerText.length === 0) {
               i18nCompleted = false;
               return false;
@@ -145,7 +145,6 @@ oppia.directive('topNavigationBar', [function() {
          * tab and then calls itself again after a 10ms delay.
          */
         var truncateNavbar = function() {
-          console.log('Called at', Date.now());
           // If the window is narrow, the standard nav tabs are not shown.
           if (windowDimensionsService.isWindowNarrow()) {
             return false;
@@ -157,15 +156,13 @@ oppia.directive('topNavigationBar', [function() {
             return false;
           }
 
-
-
           // Measured non-overflowed navbar height under 60px via inspector.
-          if ($('div.collapse.navbar-collapse').height() > 60) {
+          if (document.querySelector('div.collapse.navbar-collapse')
+            .clientHeight > 60) {
             for (element in $scope.navElementsVisibilityStatus) {
               if ($scope.navElementsVisibilityStatus[element]) {
                 // Hide one element, then check again after 50ms.
                 // This gives the browser time to render the visibility change.
-                console.log(Date.now(), 'Hiding:', element);
                 $scope.navElementsVisibilityStatus[element] = false;
                 // Force a digest cycle to hide element immediately.
                 // Otherwise it would be hidden after the next call.
