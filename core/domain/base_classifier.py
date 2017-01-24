@@ -45,8 +45,6 @@ class BaseClassifier(object):
 
     __metaclass__ = abc.ABCMeta
 
-    DEFAULT_LABEL = '_default'
-
     def __init__(self):
         pass
 

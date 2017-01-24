@@ -14,7 +14,7 @@
 
 """Tests for classifier registry."""
 
-from core.domain.classifier import classifier_registry
+from core.domain import classifier_registry
 from core.tests import test_utils
 
 

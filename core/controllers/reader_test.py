@@ -17,11 +17,11 @@
 import os
 
 from core.controllers import reader
+from core.domain import classifier_registry
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import param_domain
 from core.domain import rights_manager
-from core.domain.classifier import classifier_registry
 from core.tests import test_utils
 import feconf
 import utils
@@ -142,10 +142,7 @@ class ReaderClassifyTests(test_utils.GenericTestBase):
         predict_counter = test_utils.CallCounter(
             string_classifier_predict)
 
-        with self.swap(
-            sc.__class__,
-            'predict', predict_counter):
-
+        with self.swap(sc.__class__, 'predict', predict_counter):
             response = reader.classify(self.exp_state, answer)
 
         answer_group_index = response['answer_group_index']

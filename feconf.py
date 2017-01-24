@@ -72,6 +72,9 @@ RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
 # The ID of the classifier to be used as a default string classifier.
 DEFAULT_STRING_CLASSIFIER = 'LDAStringClassifier'
 
+# Default label for classification algorithms.
+DEFAULT_CLASSIFIER_LABEL = '_default'
+
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
 
@@ -352,15 +355,12 @@ ALLOWED_RTE_EXTENSIONS = {
     },
 }
 
-# The list contains dicts with category of the classifier i.e.
-# 'StringClassifiers' or 'CodeClassifiers' and the IDs of the
-# corresponding classifiers.
-ANSWER_CLASSIFIER_CLASSES = [{
-    'category': 'StringClassifiers',
-    'algorithm_ids': [
-        'LDAStringClassifier',
-    ],
-}]
+
+# This list contains the IDs of the classifiers used for obtaining instances
+# class of classifiers using classifier_registry.
+ANSWER_CLASSIFIER_CLASS_IDS = [
+    'LDAStringClassifier',
+]
 
 # These categories and interactions are displayed in the order in which they
 # appear in the interaction selector.

@@ -16,9 +16,9 @@
 
 """Registry for classification algorithms/classifiers."""
 
-import itertools
 import os
 import pkgutil
+
 import feconf
 
 
@@ -35,10 +35,8 @@ class ClassifierRegistry(object):
         Returns:
             A list containing all the classifier IDs.
         """
-        return list(itertools.chain(*[
-            classifier_class['algorithm_ids']
-            for classifier_class in feconf.ANSWER_CLASSIFIER_CLASSES
-        ]))
+        return [classifier_id
+                for classifier_id in feconf.ANSWER_CLASSIFIER_CLASS_IDS]
 
     @classmethod
     def _refresh(cls):

@@ -23,11 +23,10 @@ Run this script from the Oppia root directory:
 
 import os
 import time
-
 import yaml
 
+from core.domain import classifier_registry
 import feconf
-from core.domain.classifier import classifier_registry
 
 
 def measure_runtime(func):

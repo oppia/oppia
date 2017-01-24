@@ -14,9 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import feconf
+from core.domain import classifier_registry
 from core.tests import test_utils
-from core.domain.classifier import classifier_registry
+import feconf
 
 # pylint: disable=protected-access
 

@@ -20,8 +20,10 @@ import random
 
 import jinja2
 
+import feconf
+import utils
 from core.controllers import base
-from core.domain.classifier import classifier_registry
+from core.domain import classifier_registry
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import dependency_registry
@@ -37,8 +39,6 @@ from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import summary_services
-import feconf
-import utils
 
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
@@ -109,8 +109,7 @@ def classify_string_classifier_rule(state, normalized_answer):
         sc.train(training_examples)
         labels = sc.predict([normalized_answer])
         predicted_label = labels[0]
-        if (predicted_label !=
-                sc.DEFAULT_LABEL):
+        if predicted_label != feconf.DEFAULT_CLASSIFIER_LABEL:
             predicted_answer_group_index = int(predicted_label)
             predicted_answer_group = state.interaction.answer_groups[
                 predicted_answer_group_index]
@@ -185,9 +184,9 @@ def _get_exploration_player_data(
             interaction_templates),
         'is_private': rights_manager.is_exploration_private(
             exploration_id),
-        # Note that this overwrites the value in base.py.
+        # Note that this overwrites the value in base_classifier.py.
         'meta_name': exploration.title,
-        # Note that this overwrites the value in base.py.
+        # Note that this overwrites the value in base_classifier.py.
         'meta_description': utils.capitalize_string(exploration.objective),
         'nav_mode': feconf.NAV_MODE_EXPLORE,
     }
@@ -311,7 +310,6 @@ class ExplorationPage(base.BaseHandler):
         self.values['iframed'] = False
         self.render_template(
             'pages/exploration_player/exploration_player.html')
-
 
 
 class ExplorationHandler(base.BaseHandler):
@@ -590,7 +588,7 @@ class RecommendationsHandler(base.BaseHandler):
         auto_recommended_exp_ids = []
         if self.user_id and collection_id:
             next_exp_ids_in_collection = (
-                collection_services.get_next_exploration_ids_to_complete_by_user( # pylint: disable=line-too-long
+                collection_services.get_next_exploration_ids_to_complete_by_user(  # pylint: disable=line-too-long
                     self.user_id, collection_id))
             auto_recommended_exp_ids = list(
                 set(next_exp_ids_in_collection) -
