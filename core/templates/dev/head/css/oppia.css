@@ -2529,28 +2529,27 @@ div#ng-curtain {
   margin-left: 6px;
 }
 
-@media (min-width: 500px) {
-  .oppia-navbar-tabs {
-    white-space: nowrap;
-  }
-  .nav, .oppia-navbar-tabs > li, .oppia-navbar-tabs > create-activity-button {
-    /* background: #F00; */
-    display: inline-block;
-    vertical-align: top;
-  }
-  .oppia-navbar-clickable-dropdown:hover ul.dropdown-menu, .oppia-clickable-navbar-element:hover {
-    /* Should this be changed at line 852? */
-    display: inline-block;
-  }
-  .oppia-navbar-nav .dropdown-menu {
-    left: auto;
-    right: 0;
-  }
-  .navbar-header {
-    /* Prevent whitespace from inline-block elements from adding space. */
-    font-size: 0;
-  }
+.oppia-navbar-tabs {
+  white-space: nowrap;
 }
+.nav, .oppia-navbar-tabs > li, .oppia-navbar-tabs > create-activity-button {
+  /* background: #F00; */
+  display: inline-block;
+  vertical-align: top;
+}
+.oppia-navbar-clickable-dropdown:hover ul.dropdown-menu, .oppia-clickable-navbar-element:hover {
+  /* Should this be changed at line 852? */
+  display: inline-block;
+}
+.oppia-navbar-nav .dropdown-menu {
+  left: auto;
+  right: 0;
+}
+.navbar-header {
+  /* Prevent whitespace from inline-block elements from adding space. */
+  font-size: 0;
+}
+
 .nav > li > a.oppia-navbar-tab {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 14px;
