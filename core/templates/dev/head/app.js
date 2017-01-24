@@ -673,7 +673,6 @@ oppia.factory('oppiaDebouncer', [function() {
   };
 }]);
 
-
 // Shim service for functions on $window that allows these functions to be
 // mocked in unit tests.
 oppia.factory('currentLocationService', ['$window', function($window) {

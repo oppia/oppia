@@ -111,7 +111,7 @@ oppia.directive('topNavigationBar', [function() {
 
           // If the window is resized larger, try displaying the hidden elements
           if (currentWindowWidth < windowDimensionsService.getWidth()) {
-            for(element in $scope.navElementsVisibilityStatus) {
+            for (element in $scope.navElementsVisibilityStatus) {
               if (!$scope.navElementsVisibilityStatus[element]) {
                 $scope.navElementsVisibilityStatus[element] = true;
               }
@@ -130,7 +130,7 @@ oppia.directive('topNavigationBar', [function() {
         var checkIfI18NCompleted = function() {
           var i18nCompleted = true;
           document.querySelectorAll('.oppia-navbar-tabs a[translate], ' +
-            '.oppia-navbar-tabs span[translate]').forEach(function(element){
+            '.oppia-navbar-tabs span[translate]').forEach(function(element) {
             if (element.innerText.length === 0) {
               i18nCompleted = false;
               return false;
@@ -174,7 +174,8 @@ oppia.directive('topNavigationBar', [function() {
           }
         };
 
-        var truncateNavbarDebounced = oppiaDebouncer.debounce(truncateNavbar, 500);
+        var truncateNavbarDebounced =
+          oppiaDebouncer.debounce(truncateNavbar, 500);
 
         // For Chrome, timeout 0 appears to run after i18n.
         $timeout(truncateNavbar, 0);
