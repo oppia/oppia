@@ -133,6 +133,7 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
 
     # If the exploration uses the latest states schema version, no conversion
     # is necessary.
+
     if (run_conversion and exploration_model.states_schema_version !=
             feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
         _migrate_states_schema(versioned_exploration_states)
