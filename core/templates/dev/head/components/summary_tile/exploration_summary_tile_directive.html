@@ -14,7 +14,7 @@
             <circular-image ng-if="avatarsList.length > 0"
                             src="avatarsList[0].image"
                             link="avatarsList[0].link"
-                            tooltip="<[avatarsList[0].tooltipText | truncate:14]>"
+                            tooltip="<[avatarsList[0].tooltipText | truncate:40]>"
                             tooltip-placement="right">
             </circular-image>
           </div>
@@ -26,7 +26,7 @@
             <div ng-repeat="avatar in avatarsList | limitTo:MAX_AVATARS_TO_DISPLAY-1:1">
               <circular-image src="avatar.image"
                               link="avatar.link"
-                              tooltip="<[avatar.tooltipText | truncate:40]>"
+                              tooltip="<[avatar.tooltipText | truncate:14]>"
                               tooltip-placement="right">
               </circular-image>
             </div>
@@ -43,13 +43,15 @@
       <div class="title-section-mask"></div>
 
       <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>">
-        <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
-          <span ng-if="getObjective()">
-            <[getObjective() | truncateAndCapitalize: 40]>
+        <span ng-if="getObjective()" class="oppia-activity-summary-popover">
+          <span  popover="<[getObjective()]>" popover-append-to-body popover-placement="top" popover-trigger="mouseenter">
+            <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
+              <[getObjective() | truncateAndCapitalize: 50]>
+            </div>
           </span>
-          <span ng-if="!getObjective()" translate="I18N_LIBRARY_NO_OBJECTIVE">
-          </span>
-        </div>
+        </span>
+        <span ng-if="!getObjective()" translate="I18N_LIBRARY_NO_OBJECTIVE">
+        </span>
         <ul layout="row" class="metrics" layout-align="space-between center">
           <li>
             <span class="protractor-test-exp-summary-tile-rating" ng-class="{'rating-disabled': !getAverageRating()}">
@@ -81,3 +83,19 @@
     </a>
   </md-card>
 </script>
+<style>
+  .oppia-activity-summary-popover .popover.right {
+    bottom: -10px;
+    min-width: 197px;
+  }
+
+
+  .oppia-activity-summary-popover .popover.top {
+    margin-top: 20px;
+    padding: 4px;
+  }
+
+  .oppia-activity-summary-popover .popover-inner {
+    max-width: 197px;
+  }
+</style>
