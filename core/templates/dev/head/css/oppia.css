@@ -2530,13 +2530,6 @@ div#ng-curtain {
 }
 
 @media (min-width: 500px) {
-  .oppia-navbar-tabs-narrow {
-    /*
-      This needs to take i18n of the "Create" and "Sign in" buttons into
-      account.
-    */
-    min-width: 260px;
-  }
   .oppia-navbar-tabs {
     white-space: nowrap;
   }
@@ -2552,6 +2545,10 @@ div#ng-curtain {
   .oppia-navbar-nav .dropdown-menu {
     left: auto;
     right: 0;
+  }
+  .navbar-header {
+    /* Prevent whitespace from inline-block elements from adding space. */
+    font-size: 0;
   }
 }
 .nav > li > a.oppia-navbar-tab {
