@@ -174,7 +174,7 @@ oppia.directive('topNavigationBar', [function() {
           }
         };
 
-        var truncateNavbarDebounced = oppiaDebouncer.debounce(truncateNavbar, 100);
+        var truncateNavbarDebounced = oppiaDebouncer.debounce(truncateNavbar, 500);
 
         // For Chrome, timeout 0 appears to run after i18n.
         $timeout(truncateNavbar, 0);

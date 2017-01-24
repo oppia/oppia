@@ -641,14 +641,14 @@ oppia.factory('oppiaDebouncer', [function() {
     // for `wait` milliseconds.
     debounce: function(func, millisecsToWait) {
       var timeout;
-      var context;
-      var args;
+      var context = this;
+      var args = arguments;
       var timestamp;
       var result;
 
       var later = function() {
         var last = new Date().getTime() - timestamp;
-        if (last < millisecsToWait && last > 0) {
+        if (last < millisecsToWait) {
           timeout = setTimeout(later, millisecsToWait - last);
         } else {
           timeout = null;
