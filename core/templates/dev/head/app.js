@@ -463,17 +463,8 @@ oppia.factory('windowDimensionsService', ['$window', function($window) {
       onResizeHooks.push(hookFn);
     },
     isWindowNarrow: function() {
-      var NAVBAR_WITH_SEARCH_CUTOFF_WIDTH_PX = 1171;
       var NORMAL_NAVBAR_CUTOFF_WIDTH_PX = 768;
-      var navbarHasSearchBar = (
-        $window.location.pathname.indexOf('/search') === 0 ||
-        $window.location.pathname.indexOf('/library') === 0);
-
-      var navbarCutoffWidthPx = (
-        navbarHasSearchBar ?
-        NAVBAR_WITH_SEARCH_CUTOFF_WIDTH_PX :
-        NORMAL_NAVBAR_CUTOFF_WIDTH_PX);
-      return this.getWidth() <= navbarCutoffWidthPx;
+      return this.getWidth() <= NORMAL_NAVBAR_CUTOFF_WIDTH_PX;
     }
   };
 }]);
@@ -681,6 +672,7 @@ oppia.factory('oppiaDebouncer', [function() {
     }
   };
 }]);
+
 
 // Shim service for functions on $window that allows these functions to be
 // mocked in unit tests.
