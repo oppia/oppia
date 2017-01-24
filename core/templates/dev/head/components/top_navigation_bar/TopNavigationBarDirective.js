@@ -100,6 +100,7 @@ oppia.directive('topNavigationBar', [function() {
           $scope.$apply();
           // Close the sidebar, if necessary.
           SidebarStatusService.closeSidebar();
+          $scope.sidebarIsShown = SidebarStatusService.isSidebarShown();
         });
 
         $scope.toggleSidebar = (function() {
