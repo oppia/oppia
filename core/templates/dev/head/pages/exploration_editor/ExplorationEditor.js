@@ -23,6 +23,12 @@ oppia.constant('PANEL_SPECS', GLOBALS.PANEL_SPECS);
 oppia.constant(
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
   'explorationTitleInputFocusLabel');
+oppia.constant(
+  'EXPLORATION_DATA_URL_TEMPLATE',
+  '/createhandler/data/<exploration_id>');
+oppia.constant(
+  'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
+  '/editable_createhandler/data/<exploration_id>');
 
 oppia.controller('ExplorationEditor', [
   '$scope', '$http', '$window', '$rootScope', '$log', '$timeout',
