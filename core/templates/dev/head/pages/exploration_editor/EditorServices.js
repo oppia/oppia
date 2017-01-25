@@ -1641,13 +1641,13 @@ oppia.factory('explorationGadgetsService', [
 // A service that returns the frontend representation of a newly-added state.
 oppia.factory('newStateTemplateService',
   ['StateObjectFactory', function(StateObjectFactory) {
-    var newStateTemplate = angular.copy(GLOBALS.NEW_STATE_TEMPLATE);
     return {
       // Returns a template for the new state with the given state name,
       // changing the default rule destination to the new state name in
       // the process.
       // NB: clients should ensure that the desired state name is valid.
       getNewStateTemplate: function(newStateName) {
+        var newStateTemplate = angular.copy(GLOBALS.NEW_STATE_TEMPLATE);
         var newState = StateObjectFactory.create(newStateName, {
           content: newStateTemplate.content,
           interaction: newStateTemplate.interaction,
