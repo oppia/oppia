@@ -50,6 +50,12 @@ class Image(base.BaseRichTextComponent):
         'description': 'Alternative text (for screen readers)',
         'schema': {
             'type': 'unicode',
+            'validators': [{
+                'id': 'is_nonempty'
+            }],
+            'ui_config': {
+                'placeholder': 'What is this image about?'
+            },
         },
         'default_value': '',
     }]
