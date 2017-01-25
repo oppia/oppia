@@ -103,8 +103,7 @@ oppia.factory('CollectionNodeObjectFactory', [
         explorationSummaryBackendObject);
     };
 
-    CollectionNode.prototype.getCapitalizedObjective = function(
-        explorationObjective) {
+    CollectionNode.prototype.getCapitalizedObjective = function() {
       return this._explorationSummaryObject.objective.charAt(0).toUpperCase() +
               this._explorationSummaryObject.objective.slice(1);
     };
