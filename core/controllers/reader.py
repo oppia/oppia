@@ -20,8 +20,6 @@ import random
 
 import jinja2
 
-import feconf
-import utils
 from core.controllers import base
 from core.domain import classifier_registry
 from core.domain import collection_services
@@ -39,7 +37,8 @@ from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import summary_services
-
+import feconf
+import utils
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
 
@@ -89,7 +88,7 @@ def classify_string_classifier_rule(state, normalized_answer):
     best_matched_rule_spec_index = None
 
     sc = classifier_registry.ClassifierRegistry.get_classifier_by_id(
-        feconf.DEFAULT_STRING_CLASSIFIER)
+        feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])
 
     training_examples = [
         [doc, []] for doc in state.interaction.confirmed_unclassified_answers]
@@ -184,9 +183,9 @@ def _get_exploration_player_data(
             interaction_templates),
         'is_private': rights_manager.is_exploration_private(
             exploration_id),
-        # Note that this overwrites the value in base_classifier.py.
+        # Note that this overwrites the value in base.py.
         'meta_name': exploration.title,
-        # Note that this overwrites the value in base_classifier.py.
+        # Note that this overwrites the value in base.py.
         'meta_description': utils.capitalize_string(exploration.objective),
         'nav_mode': feconf.NAV_MODE_EXPLORE,
     }

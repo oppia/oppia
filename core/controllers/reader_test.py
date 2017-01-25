@@ -136,7 +136,7 @@ class ReaderClassifyTests(test_utils.GenericTestBase):
 
     def _is_string_classifier_called(self, answer):
         sc = classifier_registry.ClassifierRegistry.get_classifier_by_id(
-            feconf.DEFAULT_STRING_CLASSIFIER)
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])
         string_classifier_predict = (
             sc.__class__.predict)
         predict_counter = test_utils.CallCounter(

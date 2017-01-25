@@ -69,8 +69,10 @@ OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
     os.getcwd(), 'extensions', 'interactions', 'rules.json')
 
-# The ID of the classifier to be used as a default string classifier.
-DEFAULT_STRING_CLASSIFIER = 'LDAStringClassifier'
+# A mapping of interaction ids to their default classifier.
+INTERACTION_CLASSIFIER_MAPPING = {
+    'TextInput': 'LDAStringClassifier'
+}
 
 # Default label for classification algorithms.
 DEFAULT_CLASSIFIER_LABEL = '_default'
