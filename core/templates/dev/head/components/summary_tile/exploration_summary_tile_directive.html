@@ -3,10 +3,10 @@
     <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
       <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
         <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
-        <h2 class="activity-title protractor-test-exp-summary-tile-title">
+        <h3 class="activity-title protractor-test-exp-summary-tile-title">
           <span ng-if="isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
           <span ng-if="!isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
-        </h2>
+        </h3>
 
         <!-- Note that if this is ng-if instead, the avatar area will not detect a mouseover and the tile will behave incorrectly. -->
         <div ng-show="isWindowLarge && avatarsList.length > 0" class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
@@ -84,7 +84,7 @@
   </md-card>
 </script>
 
-<style> 
+<style>
   .oppia-activity-summary-tooltip .tooltip.right {
     bottom: -10px;
     min-width: 200px;

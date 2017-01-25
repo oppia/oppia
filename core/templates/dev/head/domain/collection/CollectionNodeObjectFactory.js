@@ -103,6 +103,11 @@ oppia.factory('CollectionNodeObjectFactory', [
         explorationSummaryBackendObject);
     };
 
+    CollectionNode.prototype.getCapitalizedObjective = function() {
+      return this._explorationSummaryObject.objective.charAt(0).toUpperCase() +
+              this._explorationSummaryObject.objective.slice(1);
+    };
+
     // Static class methods. Note that "this" is not available in static
     // contexts. This function takes a JSON object which represents a backend
     // collection node python dict.
