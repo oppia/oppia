@@ -105,8 +105,8 @@ oppia.factory('CollectionNodeObjectFactory', [
 
     CollectionNode.prototype.getCapitalizedObjective = function(
         explorationObjective) {
-      return explorationObjective.charAt(0).toUpperCase() +
-              explorationObjective.slice(1);
+      return this._explorationSummaryObject.objective.charAt(0).toUpperCase() +
+              this._explorationSummaryObject.objective.slice(1);
     };
 
     // Static class methods. Note that "this" is not available in static
