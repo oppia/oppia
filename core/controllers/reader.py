@@ -21,7 +21,7 @@ import random
 import jinja2
 
 from core.controllers import base
-from core.domain.classifier import lda_string_classifier
+from core.domain import classifier_registry
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import dependency_registry
@@ -39,7 +39,6 @@ from core.domain import rte_component_registry
 from core.domain import summary_services
 import feconf
 import utils
-
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
 
@@ -88,7 +87,9 @@ def classify_string_classifier_rule(state, normalized_answer):
     best_matched_answer_group_index = len(state.interaction.answer_groups)
     best_matched_rule_spec_index = None
 
-    sc = lda_string_classifier.LDAStringClassifier()
+    sc = classifier_registry.ClassifierRegistry.get_classifier_by_id(
+        feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])
+
     training_examples = [
         [doc, []] for doc in state.interaction.confirmed_unclassified_answers]
     for (answer_group_index, answer_group) in enumerate(
@@ -107,8 +108,7 @@ def classify_string_classifier_rule(state, normalized_answer):
         sc.train(training_examples)
         labels = sc.predict([normalized_answer])
         predicted_label = labels[0]
-        if (predicted_label !=
-                lda_string_classifier.LDAStringClassifier.DEFAULT_LABEL):
+        if predicted_label != feconf.DEFAULT_CLASSIFIER_LABEL:
             predicted_answer_group_index = int(predicted_label)
             predicted_answer_group = state.interaction.answer_groups[
                 predicted_answer_group_index]
@@ -309,7 +309,6 @@ class ExplorationPage(base.BaseHandler):
         self.values['iframed'] = False
         self.render_template(
             'pages/exploration_player/exploration_player.html')
-
 
 
 class ExplorationHandler(base.BaseHandler):
@@ -588,7 +587,7 @@ class RecommendationsHandler(base.BaseHandler):
         auto_recommended_exp_ids = []
         if self.user_id and collection_id:
             next_exp_ids_in_collection = (
-                collection_services.get_next_exploration_ids_to_complete_by_user( # pylint: disable=line-too-long
+                collection_services.get_next_exploration_ids_to_complete_by_user(  # pylint: disable=line-too-long
                     self.user_id, collection_id))
             auto_recommended_exp_ids = list(
                 set(next_exp_ids_in_collection) -
