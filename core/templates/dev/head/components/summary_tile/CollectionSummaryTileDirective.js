@@ -32,13 +32,14 @@ oppia.directive('collectionSummaryTile', [function() {
       getLastUpdatedMsec: '&lastUpdatedMsec',
       getThumbnailIconUrl: '&thumbnailIconUrl',
       getThumbnailBgColor: '&thumbnailBgColor',
-      goToEditor: '=?goToEditor'
+      inCreatorDashboard: '=?inCreatorDashboard'
     },
     templateUrl: 'summaryTile/collection',
     controller: [
       '$scope', 'oppiaDatetimeFormatter', 'UrlInterpolationService',
-      'COLLECTION_VIEWER_URL', 'COLLECTION_EDITOR_URL', function($scope, oppiaDatetimeFormatter,
-      UrlInterpolationService, COLLECTION_VIEWER_URL, COLLECTION_EDITOR_URL) {
+      'COLLECTION_VIEWER_URL', 'COLLECTION_EDITOR_URL', function($scope,
+      oppiaDatetimeFormatter, UrlInterpolationService, COLLECTION_VIEWER_URL,
+      COLLECTION_EDITOR_URL) {
 
         $scope.getLastUpdatedDatetime = function() {
           return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
@@ -50,12 +51,14 @@ oppia.directive('collectionSummaryTile', [function() {
         };
 
         $scope.getCollectionLink = function() {
-          if (angular.isDefined($scope.goToEditor)) {
-            return UrlInterpolationService.interpolateUrl(
-              COLLECTION_EDITOR_URL, {
-                collection_id: $scope.getCollectionId()
-              }
-            );
+          if (angular.isDefined($scope.inCreatorDashboard)) {
+            if ($scope.inCreatorDashboard) {
+              return UrlInterpolationService.interpolateUrl(
+                COLLECTION_EDITOR_URL, {
+                  collection_id: $scope.getCollectionId()
+                }
+              );
+            }
           } else {
             return UrlInterpolationService.interpolateUrl(
               COLLECTION_VIEWER_URL, {

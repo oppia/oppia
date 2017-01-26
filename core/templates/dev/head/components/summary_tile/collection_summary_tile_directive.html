@@ -1,6 +1,6 @@
 <script type="text/ng-template" id="summaryTile/collection">
   <md-card class="oppia-activity-summary-tile">
-    <a ng-href="<[getCollectionLink()]>">
+    <a ng-href="<[getCollectionLink()]>" style="text-decoration: none;">
       <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
         <img class="collection-corner-image" ng-src="/assets/images/general/collection_corner.svg" alt="">
         <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
@@ -21,10 +21,10 @@
           </li>
 
           <li>
-            <span ng-if="!wasRecentlyUpdated()">
+            <span ng-if="!wasRecentlyUpdated() || inCreatorDashboard">
               <[getLastUpdatedDatetime()]>
             </span>
-            <span ng-if="wasRecentlyUpdated()" class="recently-updated">
+            <span ng-if="wasRecentlyUpdated() && !inCreatorDashboard" class="recently-updated">
               UPDATED
             </span>
           </li>
