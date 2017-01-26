@@ -17,7 +17,7 @@
 import os
 
 from core.domain import classifier_registry
-from core.domain import classifier_serivces
+from core.domain import classifier_services
 from core.domain import exp_services
 from core.tests import test_utils
 import feconf
@@ -57,7 +57,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             string_classifier_predict)
 
         with self.swap(sc.__class__, 'predict', predict_counter):
-            response = classifier_serivces.classify(self.exp_state, answer)
+            response = classifier_services.classify(self.exp_state, answer)
 
         answer_group_index = response['answer_group_index']
         rule_spec_index = response['rule_spec_index']

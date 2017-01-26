@@ -15,6 +15,7 @@
 """Services for classifier models"""
 
 from core.domain import classifier_registry
+from core.domain import exp_domain
 from core.domain import interaction_registry
 
 import feconf
