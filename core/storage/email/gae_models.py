@@ -145,15 +145,16 @@ class SentEmailModel(base_models.BaseModel):
 
         Args:
             email_hash: str. The hash value of the email.
-            sent_datetime_lower_bound: datetime.datetime. The lower bound on 
+            sent_datetime_lower_bound: datetime.datetime. The lower bound on
                 sent_datetime of the email to be searched.
 
         Returns:
-            list(SentEmailModel). A list of emails which have the given hash value and 
-                which were sent more recently than sent_datetime_lower_bound.
+            list(SentEmailModel). A list of emails which have the given hash
+                value and sent more recently than sent_datetime_lower_bound.
 
         Raises:
-            Exception: sent_datetime_lower_bound is not a valid datetime.datetime.
+            Exception: sent_datetime_lower_bound is not a valid
+                datetime.datetime.
         """
 
         if sent_datetime_lower_bound is not None:
@@ -174,8 +175,8 @@ class SentEmailModel(base_models.BaseModel):
 
     @classmethod
     def _generate_hash(cls, recipient_id, email_subject, email_body):
-        """Generate hash for a given recipient_id, email_subject and 
-        cleaned email_body.
+        """Generate hash for a given recipient_id, email_subject and cleaned
+        email_body.
 
         Args:
             recipient_id: str. The user ID of the email recipient.
@@ -197,13 +198,13 @@ class SentEmailModel(base_models.BaseModel):
         email_body, whether a similar message has been sent in the last
         DUPLICATE_EMAIL_INTERVAL_MINS.
 
-        Args:
+         Args:
             recipient_id: str. The user ID of the email recipient.
             email_subject: str. The subject line of the email.
             email_body: str. The HTML content of the email body.
 
         Returns:
-            bool. Whether a similar message has been sent to the same recipient 
+            bool. Whether a similar message has been sent to the same recipient
                 in the last DUPLICATE_EMAIL_INTERVAL_MINS.
         """
 
@@ -232,7 +233,7 @@ class BulkEmailModel(base_models.BaseModel):
     """Records the content of an email sent from Oppia to multiple users.
 
     This model is read-only; entries cannot be modified once created. The
-    id/key of instances of this model is a randomly generated string of 
+    id/key of instances of this model is randomly generated string of
     length 12.
     """
 
@@ -263,7 +264,7 @@ class BulkEmailModel(base_models.BaseModel):
             cls, instance_id, recipient_ids, sender_id, sender_email,
             intent, subject, html_body, sent_datetime):
         """Creates a new BulkEmailModel entry.
-        
+
         Args:
             instance_id: str. The ID of the instance.
             recipient_ids: list(str). The user IDs of the email recipients.
@@ -272,8 +273,8 @@ class BulkEmailModel(base_models.BaseModel):
             intent: str. The intent string, i.e. the purpose of the email.
             subject: str. The subject line of the email.
             html_body: str. The HTML content of the email body.
-            sent_datetime: datetime.datetime. The date and time the email was sent,
-                in UTC.
+            sent_datetime: datetime.datetime. The date and time the email
+                was sent, in UTC.
         """
         email_model_instance = cls(
             id=instance_id, recipient_ids=recipient_ids, sender_id=sender_id,
