@@ -22,11 +22,11 @@
         border-radius: 2px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
         float: left;
-        left: 10%;
+        left: -20%;
         margin-top: 20px;
         max-width: 675px;
-        padding: 20px 20px 25px 20px;
-        position: fixed;
+        padding: 20px 20px 60px 20px;
+        position: absolute;
         text-align: left;
         top: 168px;
       }
@@ -41,8 +41,14 @@
         text-align: left;
         top: 188px;
       }
-      .oppia-exploration-list-table-item {
-        min-width: 150px;
+      .collection-otter {
+        width: 100px;
+        position: absolute;
+        left: 25px;
+        top: 45px;
+      }
+      .collection-subject-icon {
+        width: 80px;
       }
     </style>
   {% endif %}
@@ -83,36 +89,67 @@
 
       <div ng-if="collection" class="oppia-exploration-list-table">
 
-        <table class="oppia-dashboard-table">
-          <tr>
-            <th>
-              <p>Exploration</p>
-            </th>
-            <th class="hidden-md hidden-sm hidden-xs">
-              <p>Objective</p>
-            </th>
-          </tr>
-          <tr ng-repeat="node in collection.getCollectionNodes()"
-              class="exploration-list-item">
-            <td class="oppia-exploration-list-table-item">
-              <a ng-href="/explore/<[node.getExplorationId()]>"
-                 ng-mouseover="updateExplorationPreview(node.getExplorationId())"
-                 ng-mouseleave="togglePreviewCard()"
-                 class="oppia-dashboard-list-summary">
-                <[node.getExplorationSummaryObject().title]>
-              </a>
-            </td>
-            <td class="hidden-md hidden-sm hidden-xs oppia-exploration-list-table-item">
-              <a ng-href="/explore/<[node.getExplorationId()]>"
-                 ng-mouseover="updateExplorationPreview(node.getExplorationId())"
-                 ng-mouseleave="togglePreviewCard()"
-                 class="oppia-dashboard-list-summary">
-                <[node.getExplorationSummaryObject().objective]>
-              </a>
-            </td>
-          </tr>
-        </table>
+        <svg width="500px" height="<[svgHeight + 'px']>" xmlns="http://www.w3.org/2000/svg">
+          <path fill="none"
+                stroke="#10301D"
+                stroke-dasharray="15,28"
+                stroke-linecap="round"
+                stroke-width="16"
+                d="M80 80 L220 80"/>
+          <path fill="none"
+                stroke="#10301D"
+                stroke-dasharray="15,28"
+                stroke-linecap="round"
+                stroke-width="16"
+                d="<[generatePathParameters()]>"/>
+        </svg>
 
+        <img ng-src="<[getStaticImageUrl('/general/collection_otter.svg')]>" class="collection-otter">
+
+        <svg width="100"
+             height="100"
+             xmlns="http://www.w3.org/2000/svg"
+             xmlns:xlink="http://www.w3.org/1999/xlink"
+             version="1.1"
+             ng-repeat="node in collection.getCollectionNodes()"
+             style="position: absolute;
+                    left: <[pathIconParameters[$index].left]>;
+                    top: <[pathIconParameters[$index].top]>;">
+          <defs>
+            <pattern id="image<[$index]>" patternUnits="userSpaceOnUse" height="100" width="100">
+              <circle cx="50"
+                      cy="50"
+                      r="50"
+                      fill="<[pathIconParameters[$index].thumbnailBgColor]>"/>
+              <image x="0"
+                     y="0"
+                     height="100"
+                     width="100"
+                     xlink:href="<[pathIconParameters[$index].thumbnailIconUrl]>"></image>
+            </pattern>
+          </defs>
+          <a xlink:href="<['/explore/' + node.getExplorationId()]>"
+             ng-mouseover="updateExplorationPreview(node.getExplorationId());
+                           setIconHighlight($index);"
+             ng-mouseleave="togglePreviewCard();
+                            unsetIconHighlight($index);">
+             <circle cx="50"
+                     cy="50"
+                     r="42"
+                     fill="url(#image<[$index]>)"
+                     stroke="#10301D"
+                     stroke-width="3"/>
+             <circle class="ng-hide"
+                     cx="50"
+                     cy="50"
+                     r="45"
+                     id="<['highlight' + $index]>"
+                     fill="none"
+                     stroke="green"
+                     stroke-width="10"
+                     stroke-opacity="0.3"/>
+          </a>
+        </svg>
 
         <div ng-if="collection" class="oppia-card-preview-panel hidden-xs">
 
@@ -136,7 +173,7 @@
                                     is-community-owned="summaryToPreview.community_owned"
                                     style="position: absolute; left: 75px; top: 30px; z-index: 10;">
           <exploration-summary-tile/>
-          
+
         </div>
       </div>
     </div>
