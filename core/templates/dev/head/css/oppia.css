@@ -3528,6 +3528,7 @@ md-card.preview-conversation-skin-supplemental-card {
   transform: translate(-150px, 10px);
   position: relative;
   width: 100%;
+  z-index: 10;
 }
 
 @media (min-width: 768px) {
