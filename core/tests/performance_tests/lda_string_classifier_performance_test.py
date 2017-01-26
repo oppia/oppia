@@ -25,7 +25,9 @@ import os
 import time
 import yaml
 
-from core.domain.classifier.lda_string_classifier import LDAStringClassifier
+from core.domain import classifier_registry
+import feconf
+
 
 def measure_runtime(func):
     """A decorator that measures the amount of time func takes to run.
@@ -53,6 +55,7 @@ def measure_runtime(func):
                                                         end - start, num)
         return result
     return time_taken
+
 
 class LDAStringClassifierBenchmarker(object):
     """Benchmark for string classifier.
@@ -102,7 +105,9 @@ class LDAStringClassifierBenchmarker(object):
         Returns:
             dict. The dict representing the resulting classifier model.
         """
-        classifier = LDAStringClassifier()
+        classifier = (
+            classifier_registry.ClassifierRegistry.get_classifier_by_id(
+                feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']))
         classifier.train(self.examples[:num])
         classifier_dict = classifier.to_dict()
         return classifier_dict
@@ -123,7 +128,9 @@ class LDAStringClassifierBenchmarker(object):
         """
         if not self.classifier_model_dict:
             raise Exception('No classifier found')
-        classifier = LDAStringClassifier()
+        classifier = (
+            classifier_registry.ClassifierRegistry.get_classifier_by_id(
+                feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']))
         classifier.from_dict(self.classifier_model_dict)
         classifier.predict(self.docs_to_classify[:num])
 

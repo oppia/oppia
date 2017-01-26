@@ -68,7 +68,7 @@
   <ul class="nav navbar-nav oppia-navbar-breadcrumb" ng-controller="LearnerViewBreadcrumb">
     <li>
       <span class="oppia-navbar-breadcrumb-separator"></span>
-      <span class="protractor-test-exploration-header oppia-exploration-header" itemprop="description">{{exploration_title}}</span>
+      <h1 class="oppia-exploration-h1"><span class="protractor-test-exploration-header oppia-exploration-header" itemprop="description">{{exploration_title}}</span></h1>
     </li>
     <li ng-click="showInformationCard()" tooltip="<['I18N_PLAYER_INFO_TOOLTIP' | translate]>" tooltip-placement="bottom" style="cursor: pointer;" class="protractor-test-exploration-info-icon">
       <i class="material-icons oppia-navbar-breadcrumb-icon" style="font-size: 20px;">&#xE88E;</i>
@@ -122,7 +122,14 @@
       <attribution-guide></attribution-guide>
     {% endif %}
   </div>
-
+  <style>
+    .oppia-exploration-h1 {
+      color: #ffffff;
+      display: inline;
+      font-size: 1em;
+      font-weight: normal;
+    }
+  </style>
   {% include 'components/attribution_guide/attribution_guide_directive.html' %}
   {% include 'components/embed_modal/embed_exploration_modal_directive.html' %}
   {% include 'components/gadget/gadget_directive.html' %}

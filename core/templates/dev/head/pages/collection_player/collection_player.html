@@ -73,13 +73,13 @@
   <div ng-controller="CollectionPlayer">
     <background-banner></background-banner>
     <div ng-if="collection" class="oppia-collection-player-tiles-container">
-      <h2 ng-if="!collectionPlaythrough.hasFinishedCollection()" class="oppia-page-heading">
+      <h1 ng-if="!collectionPlaythrough.hasFinishedCollection()" class="oppia-page-heading">
         <span ng-if="!collectionPlaythrough.hasStartedCollection()" class="oppia-collection-player-title-font">Begin <[collection.getTitle()]>:</span>
         <span ng-if="collectionPlaythrough.hasStartedCollection()">Continue <[collection.getTitle()]>:</span>
-      </h2>
-      <h2 ng-if="collectionPlaythrough.hasFinishedCollection()" class="oppia-page-heading">
+      </h1>
+      <h1 ng-if="collectionPlaythrough.hasFinishedCollection()" class="oppia-page-heading">
         <span>You have finished the collection! Feel free to replay any explorations below.</span>
-      </h2>
+      </h1>
 
       <div ng-if="collection" class="oppia-exploration-list-table">
 
@@ -103,12 +103,9 @@
               </a>
             </td>
             <td class="hidden-md hidden-sm hidden-xs oppia-exploration-list-table-item">
-              <a ng-href="/explore/<[node.getExplorationId()]>"
-                 ng-mouseover="updateExplorationPreview(node.getExplorationId())"
-                 ng-mouseleave="togglePreviewCard()"
-                 class="oppia-dashboard-list-summary">
-                <[node.getExplorationSummaryObject().objective]>
-              </a>
+              <p>
+                <[node.getCapitalizedObjective()]>
+              </p>
             </td>
           </tr>
         </table>
@@ -136,7 +133,7 @@
                                     is-community-owned="summaryToPreview.community_owned"
                                     style="position: absolute; left: 75px; top: 30px; z-index: 10;">
           <exploration-summary-tile/>
-          
+
         </div>
       </div>
     </div>
