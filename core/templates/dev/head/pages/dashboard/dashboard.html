@@ -306,7 +306,19 @@
 
         <ul class="oppia-dashboard-tiles"
             ng-if="activeTab === 'myCollections' && collectionsList.length > 0">
-          <md-card class="oppia-activity-summary-tile oppia-dashboard-collection-tile bottom-card"
+            <div ng-repeat="collection in collectionsList">
+              <collection-summary-tile collection-id="collection.id"
+                                       collection-title="collection.title"
+                                       last-updated-msec="collection.last_updated"
+                                       node-count="collection.node_count"
+                                       objective="collection.objective"
+                                       thumbnail-icon-url="collection.thumbnail_icon_url"
+                                       thumbnail-bg-color="collection.thumbnail_bg_color"
+                                       go-to-editor="true"
+                                       style="margin-right: 3px;">
+              </collection-summary-tile>
+            </div>
+          <!-- <md-card class="oppia-activity-summary-tile oppia-dashboard-collection-tile bottom-card"
                    ng-repeat="collection in collectionsList">
             <div class="title-section"
                  style="background-color: <[collection.thumbnail_bg_color]>;">
@@ -347,7 +359,7 @@
               <div class="title-section-mask"></div>
             </md-card>
             <div class="title-section-mask"></div>
-          </md-card>
+          </md-card> -->
         </ul>
       </div>
     {% endif %}
