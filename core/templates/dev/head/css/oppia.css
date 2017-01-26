@@ -118,6 +118,9 @@ body {
   width: 100%;
 }
 
+.stop-scroll {
+  overflow-y: hidden;
+}
 /* According to the Angular documentation - https://docs.angularjs.org/api/ng/directive/ngCloak -
    the following rule needs to be added to the css file in order for ng-cloak to work.  */
 [ng\:cloak], [ng-cloak], .ng-cloak {
@@ -683,6 +686,7 @@ textarea {
   box-shadow: 1px 0 3px rgba(0,0,0,0.12), 1px 0 2px rgba(0,0,0,0.24);
   overflow-y: scroll;
   -webkit-transform: translate3d(0, 0, 0);
+
   transform: translate3d(0, 0, 0);
   visibility: visible;
 }
