@@ -3528,6 +3528,7 @@ md-card.preview-conversation-skin-supplemental-card {
   transform: translate(-150px, 10px);
   position: relative;
   width: 100%;
+  z-index: 10;
 }
 
 @media (min-width: 768px) {
@@ -3824,6 +3825,7 @@ md-card.preview-conversation-skin-supplemental-card {
   color: white;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 1em;
+  font-weight: normal;
   line-height: 1.2em;
   margin: 12px;
   padding: 0;
