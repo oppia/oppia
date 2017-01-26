@@ -14,16 +14,12 @@
 
 """Tests for the page that allows learners to play through an exploration."""
 
-import os
-
-from core.controllers import reader
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import param_domain
 from core.domain import rights_manager
 from core.tests import test_utils
 import feconf
-import utils
 
 
 class ReaderPermissionsTest(test_utils.GenericTestBase):
