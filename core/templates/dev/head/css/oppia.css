@@ -3789,15 +3789,15 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-activity-summary-tile .activity-title {
-  word-break: break-all;
   bottom: 0;
   color: white;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 1em;
   line-height: 1.2em;
-  margin: 0.2em;
+  margin: 12px;
   padding: 0;
   position: absolute;
+  word-break: break-all;
 }
 
 .oppia-activity-summary-tile .objective {
