@@ -103,9 +103,9 @@ oppia.directive('topNavigationBar', [function() {
         });
         $scope.isSidebarShown = (function(){
           if(SidebarStatusService.isSidebarShown())
-            angular.element(document.body).addClass("stop-scroll");
+            angular.element(document.body).addClass('stop-scroll');
           else
-            angular.element(document.body).removeClass("stop-scroll");
+            angular.element(document.body).removeClass('stop-scroll');
           return SidebarStatusService.isSidebarShown();
         });
         $scope.toggleSidebar = (function() {
