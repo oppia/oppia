@@ -91,7 +91,6 @@ oppia.factory('ScrollSyncService', [
           if (!angular.isDefined(minPositiveTarget)) {
             minDy = dy;
             minPositiveTarget = targets[i];
-            continue;
           } else {
             if (dy < minDy) {
               minDy = dy;
