@@ -40,6 +40,7 @@ oppia.directive('collectionSummaryTile', [function() {
       'COLLECTION_VIEWER_URL', 'COLLECTION_EDITOR_URL', function($scope,
       oppiaDatetimeFormatter, UrlInterpolationService, COLLECTION_VIEWER_URL,
       COLLECTION_EDITOR_URL) {
+        $scope.DEFAULT_EMPTY_TITLE = 'Untitled';
         $scope.getLastUpdatedDatetime = function() {
           return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
             $scope.getLastUpdatedMsec());
