@@ -17,21 +17,28 @@
  * item associated to it, see ScrollSyncService.js.
  */
 
-oppia.directive('scrollSync', ['ScrollSyncService', 'QuestionHashService',
-  function(ScrollSyncService, QuestionHashService) {
+oppia.directive('scrollSync', ['ScrollSyncService', 'QuestionIdService',
+  function(ScrollSyncService, QuestionIdService) {
   return {
     restrict: 'A',
     link: function(scope, element, attrs) {
-      // Set the element hash.
-      if (!angular.isDefined(element.attr('id'))) {
-        var label = attrs.scrollSync === '' ? element.text() : attrs.scrollSync;
-        var questionId = scope.questionId || scope.question.getStateName();
-        element.attr('id',
-          QuestionHashService.getSubfieldHash(
-            questionId, label
-          )
-        );
+      if (!(element.prop('tagName') === 'H3')) {
+        console.log(element.tag, attrs.scrollSync);
+        throw Error('ScrollSync is only used with h3 elements.');
       };
+      // Set the element Id.
+      var subfieldLabels = [
+        'Multiple choice', 'Correct answer', 'Hints', 'Bridge text'];
+      var label = attrs.scrollSync;
+      var id;
+      if (!(subfieldLabels.indexOf(label) === -1)) {
+        var questionId = scope.questionId || scope.question.getId();
+        id = QuestionIdService.getSubfieldId(questionId, label);
+      } else {
+        id = label;
+      };
+      element.attr('id', id);
+
       ScrollSyncService.addTarget(element);
     }
   };

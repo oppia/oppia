@@ -1,30 +1,29 @@
 <script type="text/ng-template" id="simpleEditor/sidebar">
   <div class="sidebar">
     <ul>
-      <li id="sidebaritem-title"
-          ng-click="scrollToHeader('title')" class="sidebar-item">
+      <li id="<[ID_PREFIX + 'title']>"
+          ng-click="scrollToHeader('title')" class="sidebar-item sidebar-header">
         <strong>Title</strong>
       </li>
 
-      <li id="sidebaritem-intro"
-          ng-click="scrollToHeader('intro')" class="sidebar-item">
+      <li id="<[ID_PREFIX + 'intro']>"
+          ng-click="scrollToHeader('intro')" class="sidebar-item sidebar-header">
         <strong>Introduction</strong>
       </li>
 
       <li class="sidebar-item" ng-repeat="question in questionList.getQuestions() track by $index">
-        <div class="sidebar-item-header">
-          <i ng-click="toggleCollapse(question)" class="collapse-icon material-icons">
+        <div id="<[ID_PREFIX + question.getId()]>"class="sidebar-item-header">
+          <i ng-click="question.toggleCollapse()" class="collapse-icon material-icons">
             <[isCollapsed(question) ? '&#xE5C7;' : '&#xE5C5;']>
           </i>
-          <strong ng-click="toggleCollapse(question)">Question <[$index + 1]></strong>
-          <i class="preview-icon material-icons">&#xE8F4;</i>
+          <strong ng-click="scrollToQuestion(question)">Question <[$index + 1]></strong>
         </div>
 
-        <ul ng-hide="!isCollapsed(question)">
+        <ul ng-hide="!question.isCollapsed()">
           <li class="sidebar-item sidebar-item-indented"
               ng-repeat="subfieldLabel in SUBFIELD_LABELS track by $index"
               ng-click="scrollToField(question, subfieldLabel)"
-              id="<[getSidebarItemHash(question, subfieldLabel)]>">
+              id="<[getSidebarItemId(question, subfieldLabel)]>">
             <span>
               <a><[subfieldLabel]></a>
             </span>
@@ -112,23 +111,26 @@
   simple-editor-sidebar .highlighted {
     background-color: #c5e1a5;
   }
-  simple-editor-sidebar .sidebar-item-header strong {
-    left: -20px;
+  simple-editor-sidebar .sidebar-item-header {
+    left: -30px;
     position: relative;
+    width: 220px;
+  }
+  simple-editor-sidebar .sidebar-item-header strong {
+  left: 10px;
+  position: relative;
   }
   simple-editor-sidebar .collapse-icon {
     color: #477349;
-    left: -1.5em;
-    position: relative;
-  }
-  simple-editor-sidebar .preview-icon {
-    color: #c0dbca;
-    position: relative;
-    right: -4em;
-  }
-  simple-editor-sidebar .preview-icon,
-  simple-editor-sidebar .collapse-icon {
     font-size: 1.0em;
+    left: .5em;
     line-height: 2.5em;
+    position: relative;
+  }
+  simple-editor-sidebar .sidebar-header {
+    left: -30px;
+    position: relative;
+    text-indent: 30px;
+    width: 220px;
   }
 </style>

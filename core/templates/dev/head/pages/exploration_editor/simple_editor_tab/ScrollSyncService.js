@@ -18,24 +18,27 @@
  */
 
 oppia.factory('ScrollSyncService', [
-  '$anchorScroll', '$document', '$rootScope', 'QuestionHashService',
+  '$anchorScroll', '$document', '$rootScope', 'QuestionIdService',
   'SimpleEditorManagerService',
-  function($anchorScroll, $document, $rootScope, QuestionHashService,
+  function($anchorScroll, $document, $rootScope, QuestionIdService,
            SimpleEditorManagerService) {
     var targets = [];
     var questionList = SimpleEditorManagerService.getQuestionList();
+    var oppiaNavBarHeight = angular.element('.navbar-container').height();
+    var CSS_CLASS_HIGHLIGHTED = 'highlighted';
+    var HIGHLIGHTED_ELM_SELECTOR = 'simple-editor-sidebar .highlighted';
 
-    var clearHighlighted = function() {
-      angular.element('.highlighted').removeClass('highlighted');
+    var clearSidebarHighlight = function() {
+      angular.element(HIGHLIGHTED_ELM_SELECTOR)
+        .removeClass(CSS_CLASS_HIGHLIGHTED);
     };
 
-    var collapse = function(hash) {
+    var collapse = function(id) {
       var questions = questionList.getQuestions();
       for (var i = 0; i < questions.length; i++) {
-        if (QuestionHashService.getQuestionHash(questions[i]) === hash) {
-          $rootScope.$broadcast(
-            'SimpleEditorSidebarToggleCollapse', questions[i]
-          );
+        if (questions[i].getId() === id) {
+          questions[i].toggleCollapse();
+          $rootScope.$broadcast('SimpleEditorSidebarToggleCollapse');
           break;
         }
       };
@@ -50,28 +53,29 @@ oppia.factory('ScrollSyncService', [
         targets.push(target);
       },
       // Update the active nav link
-      updateActive: function(hash) {
-        if (!angular.isDefined(hash)) {
+      updateActive: function(id) {
+        if (!angular.isDefined(id)) {
           return;
         } else {
-          clearHighlighted();
-          var elm = angular.element('#sidebaritem-' + hash);
-
-          if (!(hash === 'intro' || hash === 'title')) {
-            elm.addClass('highlighted');
+          clearSidebarHighlight();
+          var elm = angular.element(
+            '#' + QuestionIdService.SIDEBAR_PREFIX + id);
+          elm.addClass(CSS_CLASS_HIGHLIGHTED);
+          if ((id === 'intro' || id === 'title')) {
+            return;
           };
 
           // Uncollapse the nav link in case hidden
           if (elm.is(':hidden')) {
-            collapse(QuestionHashService.getParentQuestionHash(hash));
+            collapse(QuestionIdService.getParentQuestionId(id));
           };
           // TODO(andromfins): If the nav link is not displayed when the sidebar
           // is overflown, scroll to it.
         }
       },
-      // Scroll to an element in the editor given its hash.
-      scrollTo: function(hash) {
-        $anchorScroll(hash);
+      // Scroll to an element in the editor given its id.
+      scrollTo: function(id) {
+        $anchorScroll(id);
       }
     };
 
@@ -81,13 +85,12 @@ oppia.factory('ScrollSyncService', [
       // list to the top of the editor, with a positive distance from it).
       var minPositiveTarget;
       var documentY = $document.scrollTop();
-      for (var i = 0, foundPositive = false, minDy; i < targets.length; i++) {
-        var dy = targets[i].offset().top - documentY;
+      for (var i = 0, minDy; i < targets.length; i++) {
+        var dy = targets[i].offset().top - documentY - oppiaNavBarHeight;
         if (dy > 0) {
-          if (!foundPositive) {
+          if (!angular.isDefined(minPositiveTarget)) {
             minDy = dy;
             minPositiveTarget = targets[i];
-            foundPositive = true;
             continue;
           } else {
             if (dy < minDy) {
@@ -98,12 +101,9 @@ oppia.factory('ScrollSyncService', [
         }
       };
 
-      if (!angular.isDefined(minPositiveTarget)) {
-        return;
-      } else {
-        // Update the sidebar active element.
+      if (angular.isDefined(minPositiveTarget)) {
         scrollSyncService.updateActive(minPositiveTarget.attr('id'));
-      }
+      };
     });
 
     return scrollSyncService;

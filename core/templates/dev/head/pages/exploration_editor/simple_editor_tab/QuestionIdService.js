@@ -17,27 +17,24 @@
  * unique identifiers for sidebar items and editor field headers.
  */
 
-oppia.factory('QuestionHashService', [function() {
+oppia.factory('QuestionIdService', [function() {
   // Strip the space, and set to lower case.
   var strip = function(string) {
     return string.trim().toLowerCase().split(' ').join('');
   };
   return {
-    // Returns a question hash (question stateName without spaces).
-    getQuestionHash: function(question) {
-      return strip(question.getStateName());
-    },
-    // Returns a hash used to identify a question subfield.
-    getSubfieldHash: function(questionId, label) {
+    SIDEBAR_PREFIX: 'sidebaritem-',
+    // Returns an Id used to identify a question subfield.
+    getSubfieldId: function(questionId, label) {
       return [strip(questionId), strip(label)].join('-');
     },
-    // Returns a hash used to identify a sidebar item.
-    getSidebarItemHash: function(questionId, label) {
-      return 'sidebaritem-' + this.getSubfieldHash(questionId, label);
+    // Returns an Id used to identify a sidebar item.
+    getSidebarItemId: function(questionId, label) {
+      return this.SIDEBAR_PREFIX + this.getSubfieldId(questionId, label);
     },
-    // Extracts the questionHash from a subfieldHash.
-    getParentQuestionHash: function(subfieldHash) {
-      return subfieldHash.split('-')[0];
+    // Extracts the questionId from a subfieldId.
+    getParentQuestionId: function(subfieldId) {
+      return subfieldId.split('-')[0];
     }
   };
 }]);

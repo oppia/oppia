@@ -80,6 +80,18 @@ oppia.factory('QuestionObjectFactory', [function() {
     return this._answerGroups.length > 0;
   };
 
+  Question.prototype.getId = function () {
+    return this.getStateName().toLowerCase().split(' ').join('');
+  };
+
+  Question.prototype.toggleCollapse = function() {
+    this.collapsed = !this.collapsed;
+  };
+
+  Question.prototype.isCollapsed = function() {
+    return this.collapsed;
+  };
+
   // Static class methods. Note that "this" is not available in
   // static contexts.
   Question.create = function(stateName, interactionDict, bridgeHtml) {

@@ -22,36 +22,33 @@ oppia.directive('simpleEditorSidebar', [function() {
     templateUrl: 'simpleEditor/sidebar',
     controller: [
        '$scope', 'EditorModeService', 'SimpleEditorManagerService',
-        'ScrollSyncService', 'QuestionHashService',
+        'ScrollSyncService', 'QuestionIdService',
         function($scope, EditorModeService, SimpleEditorManagerService,
-                 ScrollSyncService, QuestionHashService) {
+                 ScrollSyncService, QuestionIdService) {
       $scope.SUBFIELD_LABELS = [
         'Multiple choice', 'Correct answer', 'Hints', 'Bridge text'];
       $scope.setEditorModeToFull = EditorModeService.setModeToFull;
       $scope.questionList = SimpleEditorManagerService.getQuestionList();
-      $scope.getSidebarItemHash = function(question, subfieldLabel) {
-        return QuestionHashService.getSidebarItemHash(
+      $scope.ID_PREFIX = QuestionIdService.SIDEBAR_PREFIX;
+      $scope.getSidebarItemId = function(question, subfieldLabel) {
+        return QuestionIdService.getSidebarItemId(
           question.getStateName(), subfieldLabel
         );
       };
       $scope.scrollToField = function(question, subfieldLabel) {
         ScrollSyncService.scrollTo(
-          QuestionHashService.getSubfieldHash(
+          QuestionIdService.getSubfieldId(
             question.getStateName(), subfieldLabel
           )
         );
       };
       $scope.scrollToHeader = ScrollSyncService.scrollTo;
-      $scope.toggleCollapse = function(question) {
-        question.collapsed = !question.collapsed;
+      $scope.scrollToQuestion = function(question) {
+        ScrollSyncService.scrollTo(question.getId());
       };
-      $scope.$on('SimpleEditorSidebarToggleCollapse', function(evt, question) {
-        $scope.toggleCollapse(question);
+      $scope.$on('SimpleEditorSidebarToggleCollapse', function() {
         $scope.$apply();
       });
-      $scope.isCollapsed = function(question) {
-        return question.collapsed;
-      };
     }]
   };
 }]);
