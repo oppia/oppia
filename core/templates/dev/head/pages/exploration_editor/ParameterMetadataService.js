@@ -32,7 +32,6 @@ oppia.factory('parameterMetadataService', [
 
     var getMetadataFromParamChanges = function(paramChanges) {
       var result = [];
-
       for (var i = 0; i < paramChanges.length; i++) {
         var pc = paramChanges[i];
 
@@ -86,7 +85,7 @@ oppia.factory('parameterMetadataService', [
     var getStateParamMetadata = function(state) {
       // First, the state param changes are applied: we get their values
       // and set the params.
-      var result = getMetadataFromParamChanges(state.param_changes);
+      var result = getMetadataFromParamChanges(state.paramChanges);
 
       // Next, the content is evaluated.
       expressionInterpolationService.getParamsFromString(
@@ -161,7 +160,6 @@ oppia.factory('parameterMetadataService', [
             allParamNames.push(expParamMetadataItem.paramName);
           }
         });
-
         for (var stateName in states) {
           stateParamMetadatas[stateName] = getStateParamMetadata(
             states[stateName]);
