@@ -831,33 +831,34 @@ describe('New state template service', function() {
 
     it('should make a new state template given a state name', function() {
       expect(JSON.parse(JSON.stringify(
-        nsts.getNewStateTemplate(NEW_STATE_NAME)))).toEqual({
-        name: 'new state name',
-        content: [{
-          type: 'text',
-          value: ''
-        }],
-        interaction: {
-          answer_groups: [],
-          confirmed_unclassified_answers: [],
-          customization_args: {
-            rows: {
-              value: 1
+          nsts.getNewStateTemplate(NEW_STATE_NAME)
+        ))).toEqual({
+          name: 'new state name',
+          content: [{
+            type: 'text',
+            value: ''
+          }],
+          interaction: {
+            answer_groups: [],
+            confirmed_unclassified_answers: [],
+            customization_args: {
+              rows: {
+                value: 1
+              },
+              placeholder: {
+                value: 'Type your answer here.'
+              }
             },
-            placeholder: {
-              value: 'Type your answer here.'
-            }
+            default_outcome: {
+              dest: NEW_STATE_NAME,
+              feedback: [],
+              param_changes: []
+            },
+            fallbacks: [],
+            id: 'TextInput'
           },
-          default_outcome: {
-            dest: NEW_STATE_NAME,
-            feedback: [],
-            param_changes: []
-          },
-          fallbacks: [],
-          id: 'TextInput'
-        },
-        paramChanges: []
-      });
+          paramChanges: []
+        });
     });
   });
 });

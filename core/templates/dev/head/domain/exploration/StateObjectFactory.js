@@ -36,10 +36,10 @@ oppia.factory('StateObjectFactory', [
     this.paramChanges = paramChanges;
   };
 
-  var generateAnswerGroupsFromBackend = function(answerGroupsBackendDict) {
-    var answerGroups = answerGroupsBackendDict.map(function(answerGroup) {
+  var generateAnswerGroupsFromBackend = function(answerGroupBackendDicts) {
+    var answerGroups = answerGroupBackendDicts.map(function(answerGroupDict) {
       return AnswerGroupObjectFactory.create(
-        answerGroup.rule_specs, answerGroup.outcome);
+        answerGroupDict.rule_specs, answerGroupDict.outcome);
     });
 
     return answerGroups;

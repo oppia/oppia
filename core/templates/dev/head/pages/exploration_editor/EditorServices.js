@@ -794,11 +794,11 @@ oppia.factory('explorationStatesService', [
 
     var BACKEND_CONVERSIONS = {
       answer_groups: function(answerGroups) {
-        var answerGroupsToBackend = [];
-        for (var i = 0; i < answerGroups.length; i++) {
-          answerGroupsToBackend.push(answerGroups[i].toBackendDict());
-        }
-        return answerGroupsToBackend;
+        var answerGroupBackendDicts = [];
+        answerGroups.map(function(answerGroup) {
+          answerGroupBackendDicts.push(answerGroup.toBackendDict());
+        });
+        return answerGroupBackendDicts;
       }
     };
 
@@ -866,9 +866,9 @@ oppia.factory('explorationStatesService', [
       }
     };
 
-    var convertToBackendRepresentation = function(propertyValue, backendName) {
+    var convertToBackendRepresentation = function(frontendValue, backendName) {
       var conversionFunction = BACKEND_CONVERSIONS[backendName];
-      return conversionFunction(propertyValue);
+      return conversionFunction(frontendValue);
     };
 
     // TODO(sll): Add unit tests for all get/save methods.
@@ -876,7 +876,7 @@ oppia.factory('explorationStatesService', [
       init: function(states) {
         _states = {};
         for (var stateName in states) {
-          var stateData = states[stateName];
+          var stateData = angular.copy(states[stateName]);
           _states[stateName] = StateObjectFactory.create(
             stateName, stateData);
         }
@@ -1639,6 +1639,7 @@ oppia.factory('explorationGadgetsService', [
 ]);
 
 // A service that returns the frontend representation of a newly-added state.
+// TODO: refactor into factory as StateObjectFactory.createNewState()
 oppia.factory('newStateTemplateService',
   ['StateObjectFactory', function(StateObjectFactory) {
     return {

@@ -203,10 +203,10 @@ oppia.factory('oppiaPlayerService', [
             _loadInitialState(successCallback);
           });
         } else {
-          var explorationDataUrl = (UrlInterpolationService.interpolateUrl(
+          var explorationDataUrl = UrlInterpolationService.interpolateUrl(
             '/explorehandler/init/<exploration_id>', {
               exploration_id: _explorationId
-            }) + (version ? '?v=' + version : ''));
+            }) + (version ? '?v=' + version : '');
           $http.get(explorationDataUrl).then(function(response) {
             var data = response.data;
             exploration = ExplorationObjectFactory.create(data.exploration);
