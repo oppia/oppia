@@ -809,7 +809,7 @@ oppia.factory('explorationStatesService', [
         'interaction', 'confirmed_unclassified_answers'],
       content: ['content'],
       default_outcome: ['interaction', 'default_outcome'],
-      param_changes: ['param_changes'],
+      param_changes: ['paramChanges'],
       fallbacks: ['interaction', 'fallbacks'],
       widget_id: ['interaction', 'id'],
       widget_customization_args: ['interaction', 'customization_args']
