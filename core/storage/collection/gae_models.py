@@ -69,7 +69,8 @@ class CollectionModel(base_models.VersionedModel):
         return cls.get_all().count()
 
     def commit(self, committer_id, commit_message, commit_cmds):
-        """Updates the collection model with commit change, then saves it.
+        """Updates the collection model by applying the given commit_cmds, then
+        saves it.
 
         Args:
             committer_id: str. The user_id of the user who committed the
@@ -180,8 +181,8 @@ class CollectionRightsModel(base_models.VersionedModel):
     )
 
     def save(self, committer_id, commit_message, commit_cmds):
-        """Updates the collection rights model with commit change, then saves
-        it.
+        """Updates the collection rights model by applying the given
+        commit_cmds, then saves it.
 
         Args:
             committer_id: str. The user_id of the user who committed the
