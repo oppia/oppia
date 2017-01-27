@@ -101,17 +101,17 @@ oppia.directive('topNavigationBar', [function() {
           SidebarStatusService.closeSidebar();
           $scope.sidebarIsShown = SidebarStatusService.isSidebarShown();
         });
-        $scope.isSidebarShown = (function() {
+        $scope.isSidebarShown = function() {
           if (SidebarStatusService.isSidebarShown()) {
-            angular.element(document.body).addClass('stop-scroll');
+            angular.element(document.body).addClass('oppia-stop-scroll');
           } else {
-            angular.element(document.body).removeClass('stop-scroll');
+            angular.element(document.body).removeClass('oppia-stop-scroll');
           }
           return SidebarStatusService.isSidebarShown();
-        });
-        $scope.toggleSidebar = (function() {
+        };
+        $scope.toggleSidebar = function() {
           SidebarStatusService.toggleSidebar();
-        });
+        };
       }
     ]
   };

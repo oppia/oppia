@@ -118,7 +118,7 @@ body {
   width: 100%;
 }
 
-.stop-scroll {
+.oppia-stop-scroll {
   overflow-y: hidden;
 }
 /* According to the Angular documentation - https://docs.angularjs.org/api/ng/directive/ngCloak -
