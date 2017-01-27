@@ -140,7 +140,7 @@ oppia.directive('topNavigationBar', [function() {
 
         /**
          * Checks if window is >768px and i18n is completed, then checks
-         * for overflow. If overflow is detected hides the least important
+         * for overflow. If overflow is detected, hides the least important
          * tab and then calls itself again after a 50ms delay.
          */
         var truncateNavbar = function() {
