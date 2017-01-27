@@ -3795,7 +3795,7 @@ md-card.preview-conversation-skin-supplemental-card {
   font-size: 1em;
   line-height: 1.2em;
   margin: 0.3em 0.5em;
-  padding: 0;
+  padding: 0.2em;
   position: absolute;
   word-break: break-all;
 }
@@ -3900,8 +3900,8 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-dashboard-card-view-item .exp-private-text {
   font-size: 13px;
+  margin: 0 0.5em;
   padding: 0.2em; 
-  margin: 0 0.5em 0;
 }
 
 .oppia-dashboard-card-view-item .metrics {
