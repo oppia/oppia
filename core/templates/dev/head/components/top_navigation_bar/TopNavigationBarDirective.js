@@ -129,11 +129,10 @@ oppia.directive('topNavigationBar', [function() {
          */
         var checkIfI18NCompleted = function() {
           var i18nCompleted = true;
-          document.querySelectorAll('.oppia-navbar-tabs a[translate], ' +
-            '.oppia-navbar-tabs span[translate]').forEach(function(element) {
+          document.querySelectorAll('.oppia-navbar-tab-content')
+            .forEach(function(element) {
             if (element.innerText.length === 0) {
               i18nCompleted = false;
-              return false;
             }
           });
           return i18nCompleted;

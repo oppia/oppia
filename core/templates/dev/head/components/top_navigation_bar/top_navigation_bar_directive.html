@@ -22,29 +22,29 @@
       </ul>
       <ul ng-if="!windowIsNarrow" class="nav oppia-navbar-tabs">
         <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_LIBRARY" class="oppia-clickable-navbar-element">
-          <a class="oppia-navbar-tab" href="/library" translate="I18N_TOPNAV_LIBRARY"></a>
+          <a class="oppia-navbar-tab oppia-navbar-tab-content" href="/library" translate="I18N_TOPNAV_LIBRARY"></a>
         </li>
         <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_ABOUT" class="dropdown oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
           <a class="oppia-navbar-tab">
-            <span translate="I18N_TOPNAV_ABOUT"></span>
+            <span class="oppia-navbar-tab-content" translate="I18N_TOPNAV_ABOUT"></span>
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu oppia-navbar-dropdown"
               ng-mouseover="onMouseoverDropdownMenu($event)"
               ng-mouseleave="onMouseoutDropdownMenu($event)">
-            <li><a class="protractor-test-about-link" href="/about" translate="I18N_TOPNAV_ABOUT_OPPIA"></a></li>
-            <li><a class="protractor-test-get-started-link" href="/get_started" translate="I18N_TOPNAV_GET_STARTED"></a></li>
-            <li><a class="protractor-test-teach-link" href="/teach" translate="I18N_TOPNAV_TEACH_WITH_OPPIA"></a></li>
-            <li><a href="/blog" translate="I18N_TOPNAV_BLOG"></a></li>
-            <li><a href="/forum" translate="I18N_TOPNAV_FORUM"></a></li>
-            <li><a class="protractor-test-contact-link" href="/contact" translate="I18N_TOPNAV_CONTACT_US"></a></li>
+            <li><a class="protractor-test-about-link oppia-navbar-tab-content" href="/about" translate="I18N_TOPNAV_ABOUT_OPPIA"></a></li>
+            <li><a class="protractor-test-get-started-link oppia-navbar-tab-content" href="/get_started" translate="I18N_TOPNAV_GET_STARTED"></a></li>
+            <li><a class="protractor-test-teach-link oppia-navbar-tab-content" href="/teach" translate="I18N_TOPNAV_TEACH_WITH_OPPIA"></a></li>
+            <li><a href="/blog" class="oppia-navbar-tab-content" translate="I18N_TOPNAV_BLOG"></a></li>
+            <li><a href="/forum" class="oppia-navbar-tab-content" translate="I18N_TOPNAV_FORUM"></a></li>
+            <li><a class="protractor-test-contact-link oppia-navbar-tab-content" href="/contact" translate="I18N_TOPNAV_CONTACT_US"></a></li>
           </ul>
         </li>
         <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_DONATE">
           <div class="oppia-navbar-button-container">
             <a href="/donate"
                class="btn oppia-navbar-button oppia-navbar-hide-on-small-width protractor-test-create-activity oppia-transition-200">
-              <span translate="I18N_TOPNAV_DONATE"></span>
+              <span class="oppia-navbar-tab-content" translate="I18N_TOPNAV_DONATE"></span>
             </a>
           </div>
         </li>
