@@ -236,8 +236,10 @@ class _Validators(object):
 
     @staticmethod
     def is_nonempty(obj):
-        """Returns True iff the given object (a string) is nonempty."""
-        return bool(obj)
+        """Always returns True so that an input field can be made required
+        without adding a default value."""
+        obj = True
+        return obj
 
     @staticmethod
     def is_uniquified(obj):

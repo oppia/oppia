@@ -17,6 +17,7 @@
 from extensions.rich_text_components import base
 
 
+
 class Image(base.BaseRichTextComponent):
     """A rich-text component representing an inline image."""
 
@@ -47,14 +48,18 @@ class Image(base.BaseRichTextComponent):
         'default_value': '',
     }, {
         'name': 'alt',
-        'description': 'Alternative text (for screen readers)',
+        'description': (
+            'Briefly explain this image to a visually impaired '
+            'learner'),
         'schema': {
             'type': 'unicode',
             'validators': [{
-                'id': 'is_nonempty'
+                'id': 'is_nonempty',
             }],
             'ui_config': {
-                'placeholder': 'What is this image about?'
+                'placeholder': (
+                    'Description of Image (Example : "George Frideric, '
+                    '18th century baroque composer")'),
             },
         },
         'default_value': '',
