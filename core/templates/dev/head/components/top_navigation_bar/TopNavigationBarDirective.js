@@ -146,13 +146,13 @@ oppia.directive('topNavigationBar', [function() {
         var truncateNavbar = function() {
           // If the window is narrow, the standard nav tabs are not shown.
           if (windowDimensionsService.isWindowNarrow()) {
-            return false;
+            return;
           }
 
           // If i18n hasn't completed, retry after 100ms.
           if (!checkIfI18NCompleted()) {
             $timeout(truncateNavbar, 100);
-            return false;
+            return;
           }
 
           // Measured non-overflowed navbar height under 60px via inspector.
@@ -168,7 +168,7 @@ oppia.directive('topNavigationBar', [function() {
                 // This is due to setTimeout use in debounce.
                 $scope.$apply();
                 $timeout(truncateNavbar, 50);
-                return false;
+                return;
               }
             }
           }
