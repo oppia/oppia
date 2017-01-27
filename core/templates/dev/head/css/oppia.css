@@ -118,6 +118,9 @@ body {
   width: 100%;
 }
 
+.oppia-stop-scroll {
+  overflow-y: hidden;
+}
 /* According to the Angular documentation - https://docs.angularjs.org/api/ng/directive/ngCloak -
    the following rule needs to be added to the css file in order for ng-cloak to work.  */
 [ng\:cloak], [ng-cloak], .ng-cloak {
@@ -677,10 +680,9 @@ textarea {
   background: none;
 }
 
-
-
 .oppia-sidebar-menu-open .oppia-sidebar-menu {
   box-shadow: 1px 0 3px rgba(0,0,0,0.12), 1px 0 2px rgba(0,0,0,0.24);
+  overflow-y: scroll;
   -webkit-transform: translate3d(0, 0, 0);
   transform: translate3d(0, 0, 0);
   visibility: visible;
@@ -2497,6 +2499,11 @@ div#ng-curtain {
   opacity: 0.9;
   outline-color: transparent;
   padding-top: 20px;
+}
+.oppia-navbar-close-icon {
+  color: #fff;
+  margin-right: 4px;
+  margin-top: -10px;
 }
 .oppia-navbar-menu-icon {
   color: #fff;
@@ -4538,7 +4545,6 @@ md-card.preview-conversation-skin-supplemental-card {
     width: 100%;
   }
 }
-
 
 
 .oppia-save-exploration-wide-modal .modal-dialog {
