@@ -81,7 +81,7 @@ for arg in "$@"; do
     if [ ! -d "$TOOLS_DIR/coverage-4.0" ]; then
       echo Installing coverage
       rm -rf $TOOLS_DIR/coverage
-      curl coverage.tar.gz https://pypi.python.org/packages/source/c/coverage/coverage-4.0.tar.gz#md5=13e119b1f111c22b613c3d5cd19a95ac
+      curl -o coverage.tar.gz https://pypi.python.org/packages/source/c/coverage/coverage-4.0.tar.gz#md5=13e119b1f111c22b613c3d5cd19a95ac
       tar xvzf coverage.tar.gz -C $TOOLS_DIR
       rm coverage.tar.gz
     fi
