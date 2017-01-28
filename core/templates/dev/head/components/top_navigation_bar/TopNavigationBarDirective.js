@@ -96,16 +96,14 @@ oppia.directive('topNavigationBar', [function() {
 
         $scope.windowIsNarrow = windowDimensionsService.isWindowNarrow();
         var currentWindowWidth = windowDimensionsService.getWidth();
-        $scope.navElementsVisibilityStatus = {
-          I18N_TOPNAV_DONATE: true,
-          I18N_TOPNAV_ABOUT: true,
-          I18N_CREATE_EXPLORATION_CREATE: true,
-          I18N_TOPNAV_LIBRARY: true
-        };
+        $scope.navElementsVisibilityStatus = {};
         // The order of the elements in this array specifies the order in which
         // they will be hidden.
         navElementsOrder = ['I18N_TOPNAV_DONATE', 'I18N_TOPNAV_ABOUT',
           'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
+        for (var i = 0; i < navElementsOrder.length; i++) {
+          $scope.navElementsVisibilityStatus[navElementsOrder[i]] = true;
+        }
 
         windowDimensionsService.registerOnResizeHook(function() {
           $scope.windowIsNarrow = windowDimensionsService.isWindowNarrow();
