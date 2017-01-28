@@ -12,14 +12,14 @@
       </li>
 
       <li class="sidebar-item" ng-repeat="question in questionList.getQuestions() track by $index">
-        <div id="<[ID_PREFIX + question.getId()]>"class="sidebar-item-header">
+        <div id="<[ID_PREFIX + question.getId()]>" class="sidebar-item-header">
           <i ng-click="question.toggleCollapse()" class="collapse-icon material-icons">
             <[isCollapsed(question) ? '&#xE5C7;' : '&#xE5C5;']>
           </i>
           <strong ng-click="scrollToQuestion(question)">Question <[$index + 1]></strong>
         </div>
 
-        <ul ng-hide="!question.isCollapsed()">
+        <ul ng-show="question.isCollapsed()">
           <li class="sidebar-item sidebar-item-indented"
               ng-repeat="subfieldLabel in SUBFIELD_LABELS track by $index"
               ng-click="scrollToField(question, subfieldLabel)"
@@ -92,6 +92,7 @@
     height: 50px;
     left: 0;
     position: fixed;
+    width: 215px;
   }
   simple-editor-sidebar .full-editor-btn {
     margin-left: 30px;

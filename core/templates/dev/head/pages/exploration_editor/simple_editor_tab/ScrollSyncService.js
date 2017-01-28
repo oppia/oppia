@@ -33,7 +33,7 @@ oppia.factory('ScrollSyncService', [
         .removeClass(CSS_CLASS_HIGHLIGHTED);
     };
 
-    var collapse = function(id) {
+    var toggleCollapse = function(id) {
       var questions = questionList.getQuestions();
       for (var i = 0; i < questions.length; i++) {
         if (questions[i].getId() === id) {
@@ -58,16 +58,17 @@ oppia.factory('ScrollSyncService', [
           return;
         } else {
           clearSidebarHighlight();
-          var elm = angular.element(
-            '#' + QuestionIdService.SIDEBAR_PREFIX + id);
+          var elm = angular.element(document.getElementById(
+            QuestionIdService.SIDEBAR_PREFIX + id)
+          );
           elm.addClass(CSS_CLASS_HIGHLIGHTED);
-          if ((id === 'intro' || id === 'title')) {
+          if (id === 'intro' || id === 'title') {
             return;
           };
 
           // Uncollapse the nav link in case hidden
           if (elm.is(':hidden')) {
-            collapse(QuestionIdService.getParentQuestionId(id));
+            toggleCollapse(QuestionIdService.getParentQuestionId(id));
           };
           // TODO(andromfins): If the nav link is not displayed when the sidebar
           // is overflown, scroll to it.
@@ -87,16 +88,9 @@ oppia.factory('ScrollSyncService', [
       var documentY = $document.scrollTop();
       for (var i = 0, minDy; i < targets.length; i++) {
         var dy = targets[i].offset().top - documentY - oppiaNavBarHeight;
-        if (dy > 0) {
-          if (!angular.isDefined(minPositiveTarget)) {
-            minDy = dy;
-            minPositiveTarget = targets[i];
-          } else {
-            if (dy < minDy) {
-              minDy = dy;
-              minPositiveTarget = targets[i];
-            }
-          }
+        if (dy > 0 && (!angular.isDefined(minPositiveTarget) || dy < minDy)) {
+          minDy = dy;
+          minPositiveTarget = targets[i];
         }
       };
 

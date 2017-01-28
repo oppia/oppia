@@ -80,8 +80,8 @@ oppia.factory('QuestionObjectFactory', [function() {
     return this._answerGroups.length > 0;
   };
 
-  Question.prototype.getId = function () {
-    return this.getStateName().toLowerCase().split(' ').join('');
+  Question.prototype.getId = function() {
+    return this.getStateName().split(' ').join('_');
   };
 
   Question.prototype.toggleCollapse = function() {

@@ -23,10 +23,10 @@ oppia.factory('QuestionIdService', [function() {
     return string.trim().toLowerCase().split(' ').join('');
   };
   return {
-    SIDEBAR_PREFIX: 'sidebaritem-',
+    SIDEBAR_PREFIX: 'sidebaritem:',
     // Returns an Id used to identify a question subfield.
     getSubfieldId: function(questionId, label) {
-      return [strip(questionId), strip(label)].join('-');
+      return [questionId, strip(label)].join(':');
     },
     // Returns an Id used to identify a sidebar item.
     getSidebarItemId: function(questionId, label) {
@@ -34,7 +34,7 @@ oppia.factory('QuestionIdService', [function() {
     },
     // Extracts the questionId from a subfieldId.
     getParentQuestionId: function(subfieldId) {
-      return subfieldId.split('-')[0];
+      return subfieldId.split(':')[0];
     }
   };
 }]);

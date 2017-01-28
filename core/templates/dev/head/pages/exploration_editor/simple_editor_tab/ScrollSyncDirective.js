@@ -13,33 +13,30 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive used to mark parts of the editor that have a sidebar
+ * @fileoverview Directives used to mark parts of the editor that have a sidebar
  * item associated to it, see ScrollSyncService.js.
  */
 
-oppia.directive('scrollSync', ['ScrollSyncService', 'QuestionIdService',
-  function(ScrollSyncService, QuestionIdService) {
+oppia.directive('scrollSync', ['ScrollSyncService',
+  function(ScrollSyncService) {
   return {
     restrict: 'A',
-    link: function(scope, element, attrs) {
+    link: function(scope, element) {
       if (!(element.prop('tagName') === 'H3')) {
-        console.log(element.tag, attrs.scrollSync);
         throw Error('ScrollSync is only used with h3 elements.');
       };
-      // Set the element Id.
-      var subfieldLabels = [
-        'Multiple choice', 'Correct answer', 'Hints', 'Bridge text'];
-      var label = attrs.scrollSync;
-      var id;
-      if (!(subfieldLabels.indexOf(label) === -1)) {
-        var questionId = scope.questionId || scope.question.getId();
-        id = QuestionIdService.getSubfieldId(questionId, label);
-      } else {
-        id = label;
-      };
-      element.attr('id', id);
-
       ScrollSyncService.addTarget(element);
     }
+  };
+}]);
+
+oppia.directive('anchorHeader', [function() {
+  return {
+    restrict: 'E',
+    scope: {
+      headerId: '@',
+      headerText: '@'
+    },
+    template: '<h3 id="<[headerId]>" scroll-sync><[headerText]></h3>'
   };
 }]);

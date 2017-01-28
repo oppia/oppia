@@ -32,13 +32,13 @@ oppia.directive('simpleEditorSidebar', [function() {
       $scope.ID_PREFIX = QuestionIdService.SIDEBAR_PREFIX;
       $scope.getSidebarItemId = function(question, subfieldLabel) {
         return QuestionIdService.getSidebarItemId(
-          question.getStateName(), subfieldLabel
+          question.getId(), subfieldLabel
         );
       };
       $scope.scrollToField = function(question, subfieldLabel) {
         ScrollSyncService.scrollTo(
           QuestionIdService.getSubfieldId(
-            question.getStateName(), subfieldLabel
+            question.getId(), subfieldLabel
           )
         );
       };
