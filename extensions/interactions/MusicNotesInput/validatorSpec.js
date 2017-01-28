@@ -34,7 +34,7 @@ describe('oppiaInteractiveMusicNotesInputValidator', function() {
       feedback: []
     };
     goodAnswerGroups = [{
-      rule_specs: [],
+      ruleSpecs: [],
       outcome: goodDefaultOutcome
     }];
   }));

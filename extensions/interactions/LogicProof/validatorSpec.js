@@ -40,7 +40,7 @@ describe('oppiaInteractiveLogicProofValidator', function() {
     };
 
     goodAnswerGroups = [{
-      rule_specs: [],
+      ruleSpecs: [],
       outcome: goodDefaultOutcome
     }];
   }));
