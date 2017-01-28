@@ -58,12 +58,37 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         except Exception as e:
             logging.error(e)
 
+    def _get_split_entity_count_for_answer_log_entity(
+            self, state_name, rule_spec_str, exploration_id=DEMO_EXP_ID):
+        item_id = '.'.join(
+            [exploration_id, state_name, 'submit', rule_spec_str])[:490]
+        return (
+            stats_models.LargeAnswerBucketModel.get_split_entity_count_for_answer_log_entity(item_id)) # pylint: disable=line-too-long
+
     def _get_submitted_answer_dict_list(self, state_answers):
         submitted_answer_dict_list = (
             state_answers.get_submitted_answer_dict_list())
         for submitted_answer_dict in submitted_answer_dict_list:
             del submitted_answer_dict['json_size']
         return submitted_answer_dict_list
+
+    def _run_split_large_answer_buckets_job(self):
+        """Start the SplitLargeAnswerBucketsJob to possibly split up answers in
+        StateRuleAnswerLogModel.
+        """
+        job_id = stats_jobs_one_off.SplitLargeAnswerBucketsJob.create_new()
+        stats_jobs_one_off.SplitLargeAnswerBucketsJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+        return jobs.get_job_output(job_id)
+
+    def _run_cleanup_large_bucket_labels_from_new_answers_job(self):
+        """Start the CleanupLargeBucketLabelsFromNewAnswersJob to cleanup large
+        bucket IDs in newly stored answers.
+        """
+        job_id = stats_jobs_one_off.CleanupLargeBucketLabelsFromNewAnswersJob.create_new() # pylint: disable=line-too-long
+        stats_jobs_one_off.CleanupLargeBucketLabelsFromNewAnswersJob.enqueue(job_id) # pylint: disable=line-too-long
+        self.process_and_flush_pending_tasks()
+        return jobs.get_job_output(job_id)
 
     def _run_migration_job(self):
         """Start the AnswerMigrationJob to migrate answers submitted to
@@ -94,15 +119,15 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         def proxy_insert_submitted_answers(
                 cls, exploration_id, exploration_version, state_name,
                 interaction_id, submitted_answer_dict_list):
-            if fail_predicate and fail_predicate(
-                    exploration_id, state_name, submitted_answer_dict_list):
+            if fail_predicate and fail_predicate(submitted_answer_dict_list):
                 raise Exception('Induced shard failure')
             return orig_insert_submitted_answers(
                 exploration_id, exploration_version, state_name, interaction_id,
                 submitted_answer_dict_list)
 
         state_rule_answer_logs = list(
-            stats_models.StateRuleAnswerLogModel.get_all())
+            stats_models.StateRuleAnswerLogModel.get_all()) + list(
+                stats_models.LargeAnswerBucketModel.get_all())
         state_rule_answer_logs.sort(key=lambda item: item.created_on)
         answer_migration_job = stats_jobs_one_off.AnswerMigrationJob()
         # http://stackoverflow.com/a/261677
@@ -136,7 +161,17 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                             raise ex
                         retry_count = retry_count - 1
                 output.extend(results)
-        return sorted(output)
+
+        # De-dup the output in the same way as the jobs.py.
+        unique_output_str_list = list(set(output))
+        output_str_frequency_list = [
+            output.count(output_str)
+            for output_str in unique_output_str_list]
+        return sorted([
+            line if freq == 1 else '%s (%d times)' % (line, freq)
+            for (line, freq) in zip(
+                unique_output_str_list, output_str_frequency_list)
+        ])
 
     def _run_migration_validation_job(self):
         job_id = stats_jobs_one_off.AnswerMigrationValidationJob.create_new()
@@ -514,7 +549,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
 
         job_output = self._run_migration_job()
 
-        # All 100 answers should be retrievable.
+        # All 101 answers should be retrievable.
         state_answers = self._get_state_answers(state_name)
         self.assertEqual(len(state_answers.submitted_answer_list), 101)
         self.assertEqual(job_output, [])
@@ -538,11 +573,171 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
 
         job_output = self._run_migration_job()
 
-        # All 100 answers should be retrievable.
+        # All 200 answers should be retrievable.
         state_answers = self._get_state_answers(state_name)
         self.assertEqual(len(state_answers.submitted_answer_list), 200)
         self.assertEqual(job_output, [])
         self._verify_no_migration_validation_problems()
+
+    def test_migration_job_should_migrate_100_unique_answers(self):
+        """This test ensures the migration job properly migrates 100 answers,
+        since it splits up answers in batches of 100 for less intense
+        submission.
+        """
+        state_name = self.text_input_state_name
+
+        rule_spec_str = 'Contains(ate)'
+        for i in xrange(100):
+            html_answer = 'Plate%d' % i
+            self._record_old_answer(state_name, rule_spec_str, html_answer)
+        job_output = self._run_split_large_answer_buckets_job()
+        self.assertEqual(job_output, [])
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+
+        # All 100 answers should be retrievable.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(len(state_answers.submitted_answer_list), 100)
+        self.assertEqual(job_output, [])
+        self._verify_no_migration_validation_problems()
+
+        unique_submitted_answer_strs = set([
+            state_answer.normalized_answer
+            for state_answer in state_answers.submitted_answer_list])
+        for i in xrange(100):
+            self.assertIn('Plate%d' % i, unique_submitted_answer_strs)
+
+        # 100 answers should not use the LargeAnswerBucketModel.
+        self.assertEqual(
+            self._get_split_entity_count_for_answer_log_entity(
+                state_name, rule_spec_str), 0)
+
+    def test_migration_job_should_migrate_101_unique_answers(self):
+        """This test ensures the migration job properly migrates 101 answers,
+        since it splits up answers in batches of 100 for less intense
+        submission.
+        """
+        state_name = self.text_input_state_name
+
+        rule_spec_str = 'Contains(ate)'
+        for i in xrange(101):
+            html_answer = 'Plate%d' % i
+            self._record_old_answer(state_name, rule_spec_str, html_answer)
+        job_output = self._run_split_large_answer_buckets_job()
+        self.assertEqual(len(job_output), 1)
+        self.assertIn('had 101 answers split up', job_output[0])
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+
+        # All 101 answers should be retrievable.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(len(state_answers.submitted_answer_list), 101)
+        self.assertEqual(
+            job_output, [
+                'Skipping answer bucket which is being migrated through large '
+                'answer buckets'])
+        self._verify_no_migration_validation_problems()
+
+        unique_submitted_answer_strs = set([
+            state_answer.normalized_answer
+            for state_answer in state_answers.submitted_answer_list])
+        for i in xrange(101):
+            self.assertIn('Plate%d' % i, unique_submitted_answer_strs)
+
+        # 101 answers should use the LargeAnswerBucketModel.
+        self.assertEqual(
+            self._get_split_entity_count_for_answer_log_entity(
+                state_name, rule_spec_str), 2)
+
+    def test_migration_job_should_migrate_200_unique_answers(self):
+        """This test ensures the migration job properly migrates 200 answers,
+        since it splits up answers in batches of 100 for less intense
+        submission.
+        """
+        state_name = self.text_input_state_name
+
+        rule_spec_str = 'Contains(ate)'
+        for i in xrange(200):
+            html_answer = 'Plate%d' % i
+            self._record_old_answer(state_name, rule_spec_str, html_answer)
+        job_output = self._run_split_large_answer_buckets_job()
+        self.assertEqual(len(job_output), 1)
+        self.assertIn('had 200 answers split up', job_output[0])
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+
+        # All 200 answers should be retrievable.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(len(state_answers.submitted_answer_list), 200)
+        self.assertEqual(
+            job_output, [
+                'Skipping answer bucket which is being migrated through large '
+                'answer buckets'])
+        self._verify_no_migration_validation_problems()
+
+        unique_submitted_answer_strs = set([
+            state_answer.normalized_answer
+            for state_answer in state_answers.submitted_answer_list])
+        for i in xrange(200):
+            self.assertIn('Plate%d' % i, unique_submitted_answer_strs)
+
+        # 200 answers should use the LargeAnswerBucketModel.
+        self.assertEqual(
+            self._get_split_entity_count_for_answer_log_entity(
+                state_name, rule_spec_str), 2)
+
+    def test_migration_job_should_migrate_201_unique_answers(self):
+        """This test ensures the migration job properly migrates 201 answers,
+        since it splits up answers in batches of 100 for less intense
+        submission.
+        """
+        state_name = self.text_input_state_name
+
+        rule_spec_str = 'Contains(ate)'
+        for i in xrange(201):
+            html_answer = 'Plate%d' % i
+            self._record_old_answer(state_name, rule_spec_str, html_answer)
+        job_output = self._run_split_large_answer_buckets_job()
+        self.assertEqual(len(job_output), 1)
+        self.assertIn('had 201 answers split up', job_output[0])
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+
+        # All 201 answers should be retrievable.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(len(state_answers.submitted_answer_list), 201)
+        self.assertEqual(
+            job_output, [
+                'Skipping answer bucket which is being migrated through large '
+                'answer buckets'])
+        self._verify_no_migration_validation_problems()
+
+        unique_submitted_answer_strs = set([
+            state_answer.normalized_answer
+            for state_answer in state_answers.submitted_answer_list])
+        for i in xrange(201):
+            self.assertIn('Plate%d' % i, unique_submitted_answer_strs)
+
+        # 201 answers should use the LargeAnswerBucketModel.
+        self.assertEqual(
+            self._get_split_entity_count_for_answer_log_entity(
+                state_name, rule_spec_str), 3)
 
     def test_migrated_answer_matches_to_correct_exp_version(self):
         """This test creates and updates an exploration at certain dates. It
@@ -1552,7 +1747,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # validation problem.
         self._verify_migration_validation_problems(1)
 
-    def test_reduce_shard_failure(self):
+    def test_reduce_shard_failure_properly_recovers(self):
         """If a shard executing the reduce portion of the job fails to execute,
         the shard may be automatically restarted by the mapreduce pipeline. In
         this situation, answers that have started execution may be remigrated.
@@ -1569,7 +1764,6 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'exp_id0', self.owner_id, end_state_name='End',
             interaction_id='NumericInput')
         state_name = exploration.init_state_name
-        initial_state = exploration.states[state_name]
 
         exp_services.update_exploration(self.owner_id, 'exp_id0', [{
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -1643,11 +1837,10 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             pass
 
         FailedJobState.failed = False
-        def fail_predicate(
-                exploration_id, state_name, submitted_answer_dict_list):
-            if not FailedJobState.failed and (
-                    len(submitted_answer_dict_list) == 1) and (
-                    submitted_answer_dict_list[0]['answer_str'] == (
+        def fail_predicate(submitted_answer_dict_list):
+            if (not FailedJobState.failed
+                    and len(submitted_answer_dict_list) == 1
+                    and submitted_answer_dict_list[0]['answer_str'] == (
                         html_answer2)):
                 FailedJobState.failed = True
                 return True
@@ -1675,7 +1868,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # earlier version of the exploration should also match.
         state_answers = self._get_state_answers(
             state_name, exploration_id='exp_id0', exploration_version=2)
-        submitted_answer_list = self._get_submitted_answer_dict_list(state_answers)
+        submitted_answer_list = self._get_submitted_answer_dict_list(
+            state_answers)
         self.assertEqual(sorted(submitted_answer_list), [{
             'answer': 2.5,
             'time_spent_in_sec': 0.0,
@@ -1692,7 +1886,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
 
         state_answers = self._get_state_answers(
             state_name, exploration_id='exp_id0', exploration_version=3)
-        submitted_answer_list = self._get_submitted_answer_dict_list(state_answers)
+        submitted_answer_list = self._get_submitted_answer_dict_list(
+            state_answers)
         self.assertEqual(len(submitted_answer_list), 2)
         self.assertEqual(sorted(submitted_answer_list), [{
             'answer': 'appreciate',
@@ -1740,7 +1935,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # All answers should now be properly migrated.
         state_answers = self._get_state_answers(
             state_name, exploration_id='exp_id0', exploration_version=2)
-        submitted_answer_list = self._get_submitted_answer_dict_list(state_answers)
+        submitted_answer_list = self._get_submitted_answer_dict_list(
+            state_answers)
         self.assertEqual(sorted(submitted_answer_list), [{
             'answer': 2.5,
             'time_spent_in_sec': 0.0,
@@ -1756,7 +1952,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         }])
         state_answers = self._get_state_answers(
             state_name, exploration_id='exp_id0', exploration_version=3)
-        submitted_answer_list = self._get_submitted_answer_dict_list(state_answers)
+        submitted_answer_list = self._get_submitted_answer_dict_list(
+            state_answers)
         self.assertEqual(len(submitted_answer_list), 3)
         self.assertEqual(sorted(submitted_answer_list), [{
             'answer': 'appreciate',
@@ -1796,6 +1993,232 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_str': html_answer2
         }])
         self._verify_no_migration_validation_problems()
+
+    def test_reduce_shard_failure_with_large_answers_properly_recovers(self):
+        """This performs the same as test_reduce_shard_failure_properly_recovers
+        except it includes answers which are stored in LargeAnswerBucketModel.
+        This test ensures that, if a migration fails mid-answer from a large
+        answer bucket model, the cleanup job and re-running the migration job
+        will properly recover only the answers from the failed bucket without
+        duplicating them.
+        """
+        state_name = self.text_input_state_name
+
+        rule_spec_str = 'Contains(ate)'
+        # Ensure all plates have the same number of digits so that lexigraphic
+        # sorting properly arranges the names by digit. This, along with sorting
+        # in LargeAnswerBucketModel.insert_state_rule_answer_log_entity()
+        # ensures that the first answer bucket contains exactly answers 0-99
+        # inclusively and the second bucket contains all answers above 100 in
+        # value. This test induces a failure a few items into the second bucket.
+        for i in xrange(150):
+            if i < 10:
+                html_answer = 'Plate00%d' % i
+            elif i < 100:
+                html_answer = 'Plate0%d' % i
+            else:
+                html_answer = 'Plate%d' % i
+            self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        class LargeAnswerBucketIdState(object):
+            pass
+
+        LargeAnswerBucketIdState.id = 0
+        def proxy_get_new_id(cls, partial_id):
+            LargeAnswerBucketIdState.id = LargeAnswerBucketIdState.id + 1
+            return str(LargeAnswerBucketIdState.id)
+
+        with self.swap(
+            stats_models.LargeAnswerBucketModel, 'get_new_id',
+            classmethod(proxy_get_new_id)):
+            job_output = self._run_split_large_answer_buckets_job()
+            self.assertEqual(len(job_output), 1)
+            self.assertIn('had 150 answers split up', job_output[0])
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        class FailedJobState(object):
+            pass
+
+        # Induce a failure 10 answers into the second bucket for a partial
+        # migration of that bucket. These answers will be removed later during a
+        # cleanup pass.
+        FailedJobState.failed = False
+        FailedJobState.skip_failed_count = 0
+        def fail_predicate(submitted_answer_dict_list):
+            if not FailedJobState.failed:
+                answer_str = submitted_answer_dict_list[0]['answer_str']
+                plate_number = int(answer_str[5:])
+                if plate_number >= 100:
+                    if FailedJobState.skip_failed_count == 10:
+                        FailedJobState.failed = True
+                        return True
+                    FailedJobState.skip_failed_count = (
+                        FailedJobState.skip_failed_count + 1)
+            return False
+
+        # The first job run has a failure which leads to retrying the shard.
+        job_output = self._run_migration_job_internal(
+            fail_predicate=fail_predicate, retry_count=1)
+
+        self.assertEqual(len(job_output), 3)
+        self.assertIn(
+            'Encountered a submitted large answer bucket which has already '
+            'been migrated (is this due to a shard retry?)', job_output[0])
+        self.assertIn('Large answer ID: 1', job_output[0])
+        self.assertIn(rule_spec_str, job_output[0])
+
+        self.assertIn(
+            'Encountered a submitted large answer bucket which has already '
+            'been migrated (is this due to a shard retry?)', job_output[1])
+        self.assertIn('Large answer ID: 2', job_output[1])
+        self.assertIn(rule_spec_str, job_output[1])
+
+        self.assertEqual(
+            job_output[2],
+            'Skipping answer bucket which is being migrated through large '
+            'answer buckets')
+
+        # The first answer bucket should have been properly migrated, since the
+        # shard failure happened for answers in the second large bucket.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(len(state_answers.submitted_answer_list), 110)
+        first_submitted_answer = next(
+            submitted_answer
+            for submitted_answer in state_answers.submitted_answer_list
+            if submitted_answer.normalized_answer == 'Plate000')
+
+        unique_submitted_answer_strs = set([
+            submitted_answer.normalized_answer
+            for submitted_answer in state_answers.submitted_answer_list])
+        # Do not verify the answers above 100 since it's essentially random
+        # which of Plate100-Plate149 was migrated.
+        for i in xrange(100):
+            if i < 10:
+                plate_str = 'Plate00%d' % i
+            else:
+                plate_str = 'Plate0%d' % i
+            self.assertIn(plate_str, unique_submitted_answer_strs)
+
+        first_submitted_answer_dict = first_submitted_answer.to_dict()
+        del first_submitted_answer_dict['json_size']
+        self.assertEqual(first_submitted_answer_dict, {
+            'answer': 'Plate000',
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'TextInput',
+            'params': {},
+            'rule_spec_str': rule_spec_str,
+            'answer_str': 'Plate000',
+            'large_bucket_entity_id': '1'
+        })
+
+        # There should be a validation issue because many answers were not
+        # migrated.
+        self._verify_migration_validation_problems(1)
+
+        # Run the job again. None of the answers will be remigrated because one
+        # bucket has been migrated and the other is in an error state.
+        job_output = sorted(self._run_migration_job())
+        self.assertEqual(job_output, [
+            'Encountered a submitted answer bucket which has already been '
+            'migrated',
+            'Encountered a submitted large answer bucket which has already '
+            'been migrated (2 times)'])
+
+        # Running the cleanup job should only remove the answers associated with
+        # the bucket that failed.
+        self.assertEqual(self._run_migration_cleanup_job(), [
+            'A large bucket mid-migration failed to complete and is now in an '
+            'inconsistent state. Number of cleared answer buckets which will '
+            'be reattempted the next time the job is run: 1',
+        ])
+
+        # Only the successful 100 answers should now be migrated.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(len(state_answers.submitted_answer_list), 100)
+
+        # Running the cleanup job a second time should be a no-op, since the
+        # bad answers were already removed.
+        self.assertEqual(self._run_migration_cleanup_job(), [
+            'Large buckets mid-migration cannot be removed: 1'])
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(len(state_answers.submitted_answer_list), 100)
+
+        # Run the job again. The first large answer bucket does not need to be
+        # migrated, but the second still does.
+        # TODO(bhenning): Figure out why this won't work.
+        print '@@@@@ Before _run_migration_job important'
+        #job_output = sorted(self._run_migration_job())
+        job_output = self._run_migration_job_internal()
+        self.assertEqual(job_output, [
+            'Encountered a submitted answer bucket which has already been '
+            'migrated',
+            'Encountered a submitted large answer bucket which has already '
+            'been migrated'])
+
+        print '@@@@@ After running, length: %d' % len(stats_services.get_state_answers('16', 1, state_name).submitted_answer_list)
+
+        # All answers should now be properly migrated.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(len(state_answers.submitted_answer_list), 150)
+
+        # Even though answers are properly migrated, they should be updated to
+        # strip out any large bucket IDs that were stored within them.
+        self._run_cleanup_large_bucket_labels_from_new_answers_job()
+
+        # No answers should have been completely removed as part of the ID
+        # cleanup.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(len(state_answers.submitted_answer_list), 150)
+
+        unique_submitted_answer_strs = set([
+            state_answer.normalized_answer
+            for state_answer in state_answers.submitted_answer_list])
+        for i in xrange(150):
+            if i < 10:
+                plate_str = 'Plate00%d' % i
+            elif i < 100:
+                plate_str = 'Plate0%d' % i
+            else:
+                plate_str = 'Plate%d' % i
+            self.assertIn(plate_str, unique_submitted_answer_strs)
+
+        # Verify the answer dicts no longer have large_bucket_entity_id entries.
+        first_submitted_answer_dict = first_submitted_answer.to_dict()
+        del first_submitted_answer_dict['json_size']
+        self.assertEqual(first_submitted_answer_dict, {
+            'answer': 'Plate000',
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'TextInput',
+            'params': {},
+            'rule_spec_str': rule_spec_str,
+            'answer_str': 'Plate000'
+        })
+
+        self._verify_no_migration_validation_problems()
+
+        # Run the job again. None of the answers will be remigrated because all
+        # have been successfully migrated.
+        job_output = sorted(self._run_migration_job())
+        self.assertEqual(job_output, [
+            'Encountered a submitted answer bucket which has already been '
+            'migrated',
+            'Encountered a submitted large answer bucket which has already '
+            'been migrated (2 times)'])
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(len(state_answers.submitted_answer_list), 150)
 
     def test_migrate_code_repl(self):
         state_name = 'Code Editor'

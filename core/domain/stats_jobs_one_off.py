@@ -39,6 +39,7 @@ import utils
 (base_models, stats_models, exp_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.statistics, models.NAMES.exploration
 ])
+transaction_services = models.Registry.import_transaction_services()
 
 
 # pylint: disable=W0123
@@ -616,21 +617,20 @@ class ClearMigratedAnswersJob(jobs.BaseMapReduceJobManager):
     stats_models.StateAnswersModel and all book-keeping information stored in
     stats_models.MigratedAnswerModel.
     """
-    _DELETE_KEY = 'Migrated Answer Cleared'
-
     @classmethod
     def entity_classes_to_map_over(cls):
         return [
-            stats_models.StateAnswersModel, stats_models.MigratedAnswerModel]
+            stats_models.StateAnswersModel, stats_models.MigratedAnswerModel,
+            stats_models.LargeAnswerBucketModel]
 
     @staticmethod
     def map(item):
         item.delete()
-        yield (ClearMigratedAnswersJob._DELETE_KEY, 'Deleted answer.')
+        yield (item.__class__.__name__, 'Deleted answer.')
 
     @staticmethod
     def reduce(key, stringified_values):
-        yield 'Deleted %d answer buckets' % len(stringified_values)
+        yield '%s: deleted %d answer buckets' % (key, len(stringified_values))
 
 
 class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
@@ -738,6 +738,80 @@ class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
                 'created' % removed_count)
 
 
+class SplitLargeAnswerBucketsJob(jobs.BaseMapReduceJobManager):
+    """This job deletes checks all answer buckets in
+    stats_models.StateRuleAnswerLogModel and splits them into multiple entities
+    to be stored in stats_models.LargeAnswerBucketModel if there are too many
+    entities to be migrated at once by the migration job.
+    """
+    _SPLIT_ANSWER_KEY = 'split_answer_count'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.StateRuleAnswerLogModel]
+
+    @staticmethod
+    def map(item):
+        if stats_models.LargeAnswerBucketModel.should_split_log_entity(item):
+            # pylint: disable=line-too-long
+            stats_models.LargeAnswerBucketModel.insert_state_rule_answer_log_entity(item)
+            yield (SplitLargeAnswerBucketsJob._SPLIT_ANSWER_KEY, {
+                'item_id': item.id,
+                'answer_count': len(item.answers)
+            })
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        value_dict_list = [
+            ast.literal_eval(stringified_value)
+            for stringified_value in stringified_values]
+
+        for value_dict in value_dict_list:
+            item_id = value_dict['item_id'].decode('utf-8')
+            answer_count = int(value_dict['answer_count'])
+            yield (
+                'Exploration \'%s\' had %d answers split up into a separate '
+                'storage model for migration' % (item_id, answer_count))
+
+
+class CleanupLargeBucketLabelsFromNewAnswersJob(jobs.BaseMapReduceJobManager):
+    """This job cleans up all StateAnswersModels by removing all occurrences of
+    large_bucket_entity_id and computing the sizes of each answer and answer
+    shard in these cases.
+    """
+    _IGNORED_KEY = 'skipped answer bucket without large bucket ids'
+    _UPDATED_KEY = 'remove large bucket ids from answer bucket'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.StateAnswersModel]
+
+    @staticmethod
+    def map(item):
+        submitted_answers = [
+            stats_domain.SubmittedAnswer.from_dict(submitted_answer_dict)
+            for submitted_answer_dict in item.submitted_answer_list]
+        new_submitted_answer_sizes = []
+        for submitted_answer in submitted_answers:
+            if submitted_answer.large_bucket_entity_id:
+                submitted_answer.large_bucket_entity_id = None
+                new_submitted_answer_sizes.append(submitted_answer.json_size)
+        # If any answers were submitted, update the model.
+        if new_submitted_answer_sizes:
+            item.submitted_answer_list = [
+                submitted_answer.to_dict()
+                for submitted_answer in submitted_answers]
+            item.accumulated_answer_json_size = sum(new_submitted_answer_sizes)
+            item.put()
+            yield (CleanupLargeBucketLabelsFromNewAnswersJob._UPDATED_KEY, 1)
+        else:
+            yield (CleanupLargeBucketLabelsFromNewAnswersJob._IGNORED_KEY, 1)
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        yield '%s: %d' % (key, len(stringified_values))
+
+
 class AnswerMigrationValidationJob(jobs.BaseMapReduceJobManager):
     """This job performs a strict validation to check if every answer in the old
     storage model has at least been migrated to the new model (no form of
@@ -772,8 +846,48 @@ class AnswerMigrationCleanupJob(jobs.BaseMapReduceJobManager):
     deletes any answers which have been submitted to the new data model which
     correspond to the dirty entry.
     """
-    _TOTAL_ANSWERS_REMOVED_KEY = 'Total answers removed'
-    _TOTAL_BUCKETS_REMOVED_KEY = 'Total buckets removed'
+    _ANSWERS_REMOVED_KEY = 'Total answers removed'
+    _BUCKETS_REMOVED_KEY = 'Total buckets removed'
+    _LARGE_BUCKETS_NOT_REMOVED_KEY = (
+        'Large buckets mid-migration cannot be removed')
+    _LARGE_BUCKETS_INCONSISTENT_KEY = (
+        'A large bucket mid-migration failed to complete and is now in an '
+        'inconsistent state. Number of cleared answer buckets which will be '
+        'reattempted the next time the job is run')
+
+    @classmethod
+    def _remove_partially_migrated_answers(
+            cls, all_models, incomplete_bucket_ids):
+        for state_answer_model in all_models:
+            # The answer is not being deleted, but if it
+            # contains any answers with a large bucket entity ID
+            # associated with this bucket, that answer needs to
+            # be removed.
+
+            submitted_answer_list = state_answer_model.submitted_answer_list
+            # Strip away all answers which are not associated
+            # with the current bucket
+            state_answer_model.submitted_answer_list = [
+                submitted_answer_dict
+                for submitted_answer_dict in submitted_answer_list
+                if 'large_bucket_entity_id' not in submitted_answer_dict or (
+                    submitted_answer_dict['large_bucket_entity_id']
+                    not in incomplete_bucket_ids)
+            ]
+            removed_answer_sizes = [
+                submitted_answer_dict['json_size']
+                for submitted_answer_dict in submitted_answer_list
+                if 'large_bucket_entity_id' in submitted_answer_dict and (
+                    submitted_answer_dict['large_bucket_entity_id']
+                    in incomplete_bucket_ids)
+            ]
+            # If any answers were removed, update the model's
+            # other bookkeeping information and then commit it.
+            if len(submitted_answer_list) != len(
+                    state_answer_model.submitted_answer_list):
+                state_answer_model.accumulated_answer_json_size -= sum(
+                    removed_answer_sizes)
+                state_answer_model.put()
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -782,17 +896,54 @@ class AnswerMigrationCleanupJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def map(item):
         if not item.finished_migration:
-            for exp_version in item.exploration_versions:
-                all_models = stats_models.StateAnswersModel.get_all_models(
-                    item.exploration_id, exp_version, item.state_name)
-                if not all_models:
-                    continue
-                for state_answer_model in all_models:
-                    state_answer_model.delete()
+            if item.expected_large_answer_bucket_count == 0 or len(
+                    item.started_large_answer_bucket_ids) == 0:
+                for exp_version in item.exploration_versions:
+                    all_models = stats_models.StateAnswersModel.get_all_models(
+                        item.exploration_id, exp_version, item.state_name)
+                    if not all_models:
+                        continue
+                    for state_answer_model in all_models:
+                        state_answer_model.delete()
+                        yield (
+                            AnswerMigrationCleanupJob._ANSWERS_REMOVED_KEY, 1)
+                item.delete()
+                yield (AnswerMigrationCleanupJob._BUCKETS_REMOVED_KEY, 1)
+            else:
+                if len(item.started_large_answer_bucket_ids) != len(
+                        item.finished_large_answer_bucket_ids):
+                    incomplete_bucket_ids = list(
+                        set(item.started_large_answer_bucket_ids) - set(
+                            item.finished_large_answer_bucket_ids))
+                    for exp_version in item.exploration_versions:
+                        all_models = (
+                            stats_models.StateAnswersModel.get_all_models(
+                                item.exploration_id, exp_version,
+                                item.state_name))
+                        if not all_models:
+                            continue
+                        transaction_services.run_in_transaction(
+                            AnswerMigrationCleanupJob._remove_partially_migrated_answers, # pylint: disable=line-too-long
+                            all_models, incomplete_bucket_ids)
+
+                    # Yield one inconsistent key for each answer that will be
+                    # reattempted.
+                    for _ in incomplete_bucket_ids:
+                        yield(
+                            AnswerMigrationCleanupJob._LARGE_BUCKETS_INCONSISTENT_KEY, # pylint: disable=line-too-long
+                            1)
+
+                    # Finally, the item itself needs to be updated to no longer
+                    # consider the specified large answer buckets as being
+                    # partially migrated. Don't delete the whole record,
+                    # otherwise all corresponding answers will be reattempted.
+                    item.started_large_answer_bucket_ids = (
+                        item.finished_large_answer_bucket_ids)
+                    item.put()
+                else:
                     yield (
-                        AnswerMigrationCleanupJob._TOTAL_ANSWERS_REMOVED_KEY, 1)
-            item.delete()
-            yield (AnswerMigrationCleanupJob._TOTAL_BUCKETS_REMOVED_KEY, 1)
+                        AnswerMigrationCleanupJob._LARGE_BUCKETS_NOT_REMOVED_KEY, # pylint: disable=line-too-long
+                        1)
 
     @staticmethod
     def reduce(key, stringified_values):
@@ -805,6 +956,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     """
     _ERROR_KEY = 'Answer Migration ERROR'
     _ALREADY_MIGRATED_KEY = 'Answer ALREADY MIGRATED'
+    _SKIPPED_KEY = 'Answer SKIPPED'
     _TEMPORARY_SPECIAL_RULE_PARAMETER = '__answermigrationjobparamindicator'
 
     _DEFAULT_RULESPEC_STR = 'Default'
@@ -1421,7 +1573,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # structure consists of three strings: assumptions_string,
         # target_string, and proof_string. The latter is already available
         # as the answer_str.
-        if answer_str == None:
+        if answer_str is None:
             return (
                 None,
                 'Failed to recover CheckedProof answer: \'%s\'' % answer_str)
@@ -1762,48 +1914,80 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [stats_models.StateRuleAnswerLogModel]
+        return [
+            stats_models.StateRuleAnswerLogModel,
+            stats_models.LargeAnswerBucketModel]
 
     @staticmethod
     def map(item):
+        print '@@@@@ AnswerMigrationJob map'
+
         # If this answer bucket has already been migrated, skip it.
-        if stats_models.MigratedAnswerModel.has_started_being_migrated(item.id):
-            yield (
-                AnswerMigrationJob._ALREADY_MIGRATED_KEY,
-                'Encountered a submitted answer bucket which has already been '
-                'migrated')
-            return
+        if isinstance(item, stats_models.StateRuleAnswerLogModel):
+            item_id = item.id
+            last_updated = item.last_updated
+            large_answer_bucket_id = None
+            large_answer_bucket_count = 0
+            if stats_models.MigratedAnswerModel.has_started_being_migrated(
+                    item_id):
+                yield (
+                    AnswerMigrationJob._ALREADY_MIGRATED_KEY,
+                    'Encountered a submitted answer bucket which has already '
+                    'been migrated')
+                return
+
+            if (not large_answer_bucket_id
+                    and stats_models.LargeAnswerBucketModel.get_split_entity_count_for_answer_log_entity(item_id) > 0): # pylint: disable=line-too-long
+                yield (
+                    AnswerMigrationJob._SKIPPED_KEY,
+                    'Skipping answer bucket which is being migrated through '
+                    'large answer buckets')
+                return
+        else:
+            # Otherwise, the answers are coming from LargeAnswerBucketModel
+            item_id = item.log_model_item_id.encode('utf-8')
+            last_updated = item.log_model_last_update
+            large_answer_bucket_id = item.id
+            large_answer_bucket_count = (
+                stats_models.LargeAnswerBucketModel.get_split_entity_count_for_answer_log_entity(item_id)) # pylint: disable=line-too-long
+            if stats_models.MigratedAnswerModel.has_started_being_migrated(
+                    item_id, large_answer_bucket_id=item.id):
+                yield (
+                    AnswerMigrationJob._ALREADY_MIGRATED_KEY,
+                    'Encountered a submitted large answer bucket which has '
+                    'already been migrated')
+                return
 
         # Cannot unpack the item ID with a simple split, since the rule_str
         # component can contains periods. The ID is guaranteed to always
         # contain 4 parts: exploration ID, state name, handler name, and
         # rule_str.
-        item_id = item.id
+        item_id_tokens = item_id
 
-        period_idx = item_id.index('.')
-        exp_id = item_id[:period_idx]
+        period_idx = item_id_tokens.index('.')
+        exp_id = item_id_tokens[:period_idx]
 
-        item_id = item_id[period_idx+1:]
-        handler_period_idx = item_id.index('submit') - 1
-        state_name = item_id[:handler_period_idx]
+        item_id_tokens = item_id_tokens[period_idx+1:]
+        handler_period_idx = item_id_tokens.index('submit') - 1
+        state_name = item_id_tokens[:handler_period_idx]
 
-        item_id = item_id[handler_period_idx+1:]
-        period_idx = item_id.index('.')
-        handler_name = item_id[:period_idx]
+        item_id_tokens = item_id_tokens[handler_period_idx+1:]
+        period_idx = item_id_tokens.index('.')
+        handler_name = item_id_tokens[:period_idx]
 
-        item_id = item_id[period_idx+1:]
-        rule_str = item_id
+        item_id_tokens = item_id_tokens[period_idx+1:]
+        rule_str = item_id_tokens
 
         # The exploration and state name are needed in the new data model and
         # are also needed to cross reference the answer. Since the answer is
         # not associated with a particular version, a search needs to be
         # conducted to find which version of the exploration is associated with
         # the given answer.
-        if 'submit' not in item.id or handler_name != 'submit':
+        if 'submit' not in item_id or handler_name != 'submit':
             yield (
                 AnswerMigrationJob._ERROR_KEY,
                 'Encountered submitted answer without the standard \'submit\' '
-                'handler: %s' % item.id)
+                'handler: %s' % item_id)
             return
 
         # Use get_by_id so that deleted explorations may be retrieved.
@@ -1820,22 +2004,27 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # Split up the answers across multiple shards (64) so that they may be
         # more randomly distributed.
         random.seed('%s.%s.%s' % (
-            item.id, datetime.datetime.utcnow(), os.urandom(64)))
+            item_id, datetime.datetime.utcnow(), os.urandom(64)))
         entropy = random.randint(0, 63)
         yield ('%s.%s.%s.%s' % (exp_id, max_version, state_name, entropy), {
-            'item_id': item.id,
+            'item_id': item_id,
             'exploration_id': exp_id,
             'exploration_max_version': max_version,
             'state_name': state_name,
             'rule_str': rule_str,
-            'last_updated': item.last_updated
+            'last_updated': last_updated,
+            'large_answer_bucket_id': large_answer_bucket_id,
+            'large_answer_bucket_count': large_answer_bucket_count
         })
 
     @staticmethod
     def reduce(key, stringified_values):
+        print '@@@@@ reduce: %s' % key
+
         # Output any errors or notices encountered during the map step.
-        if key == AnswerMigrationJob._ERROR_KEY or (
-                key == AnswerMigrationJob._ALREADY_MIGRATED_KEY):
+        if (key == AnswerMigrationJob._ERROR_KEY
+                or key == AnswerMigrationJob._ALREADY_MIGRATED_KEY
+                or key == AnswerMigrationJob._SKIPPED_KEY):
             for value in stringified_values:
                 yield value
             return
@@ -1880,13 +2069,23 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
         for value_dict in value_dict_list:
             item_id = value_dict['item_id'].decode('utf-8')
-            item = stats_models.StateRuleAnswerLogModel.get(item_id)
             rule_str = value_dict['rule_str']
             last_updated = value_dict['last_updated']
+            large_answer_bucket_id = value_dict['large_answer_bucket_id']
+            if large_answer_bucket_id:
+                large_answer_bucket_id = large_answer_bucket_id.decode('utf-8')
+            large_answer_bucket_count = int(
+                value_dict['large_answer_bucket_count'])
+            if large_answer_bucket_id:
+                item = stats_models.LargeAnswerBucketModel.get(
+                    large_answer_bucket_id)
+            else:
+                item = stats_models.StateRuleAnswerLogModel.get(item_id)
 
             migration_errors = AnswerMigrationJob._migrate_answers(
                 item_id, explorations, exploration_id, state_name, item.answers,
-                rule_str, last_updated)
+                rule_str, last_updated, large_answer_bucket_id,
+                large_answer_bucket_count)
 
             for error in migration_errors:
                 if error.startswith('Expected failure'):
@@ -1894,15 +2093,21 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 else:
                     yield 'Item ID: %s, error: %s' % (item_id, error)
 
+        print '@@@@@ After reduce, length: %d' % len(stats_services.get_state_answers('16', 1, state_name).submitted_answer_list)
+
     @classmethod
     def _migrate_answers(cls, item_id, explorations, exploration_id, state_name,
-                         answers, rule_str, last_updated):
+                         answers, rule_str, last_updated,
+                         large_answer_bucket_id, large_answer_bucket_count):
         # If this answer bucket has already been migrated, skip it.
         if stats_models.MigratedAnswerModel.has_started_being_migrated(
-                item_id):
+                item_id, large_answer_bucket_id=large_answer_bucket_id):
             yield (
-                'Encountered a submitted answer bucket which has already been '
-                'migrated (is this due to a shard retry?)')
+                'Encountered a submitted %sanswer bucket which has already '
+                'been migrated (is this due to a shard retry?) Large answer '
+                'ID: %s' % (
+                    'large ' if large_answer_bucket_id else '',
+                    large_answer_bucket_id))
             return
 
         # If the item ID has been truncated, the answer might not be abel to be
@@ -1919,7 +2124,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # answers failing to migrate or a major shard failure (such as due to an
         # out of memory error).
         stats_models.MigratedAnswerModel.start_migrating_answer_bucket(
-            item_id, exploration_id, state_name)
+            item_id, exploration_id, state_name, large_answer_bucket_id,
+            large_answer_bucket_count)
 
         migrated_answers = []
         matched_explorations = []
@@ -1928,7 +2134,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         migrated_answer_count = 0
         for answer_str, answer_frequency in answers.iteritems():
             migrated_answer, matched_exp, error = cls._try_migrate_answer(
-                answer_str, rule_str, last_updated, explorations, state_name)
+                answer_str, rule_str, last_updated, explorations, state_name,
+                large_answer_bucket_id)
             if not error:
                 # Split the answer into batches of 100 for frequency, to avoid
                 # saving too many answers to the datatore in one go. Simply
@@ -1964,9 +2171,9 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 # Mark the answer as migrated so it does not fail post-migration
                 # validation.
                 stats_models.MigratedAnswerModel.finish_migrating_answer(
-                    item_id, exploration_id, -1, state_name)
+                    item_id, -1)
                 stats_models.MigratedAnswerModel.finish_migration_answer_bucket(
-                    item_id)
+                    item_id, large_answer_bucket_id)
             else:
                 yield error
 
@@ -1986,13 +2193,18 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             exploration_version = exploration.version
 
             stats_models.MigratedAnswerModel.finish_migrating_answer(
-                item_id, exploration_id, exploration_version, state_name)
+                item_id, exploration_version)
 
-        stats_models.MigratedAnswerModel.finish_migration_answer_bucket(item_id)
+        print '@@@@@ After migrating, length: %d' % len(stats_services.get_state_answers('16', 1, state_name).submitted_answer_list)
+
+        stats_models.MigratedAnswerModel.finish_migration_answer_bucket(
+            item_id, large_answer_bucket_id)
+
+        print '@@@@@ After migrating2, length: %d' % len(stats_services.get_state_answers('16', 1, state_name).submitted_answer_list)
 
     @classmethod
     def _try_migrate_answer(cls, answer_str, rule_str, last_updated,
-                            explorations, state_name):
+                            explorations, state_name, large_answer_bucket_id):
         """Try to migrate the answer based on the given list of explorations.
         The explorations are descending in order by their version. More recent
         explorations (earlier in the list) are filtered out based on the
@@ -2028,7 +2240,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 continue
             try:
                 answer, error = cls._migrate_answer(
-                    answer_str, rule_str, exploration, state_name)
+                    answer_str, rule_str, exploration, state_name,
+                    large_answer_bucket_id)
             except:
                 answer = None
                 error = traceback.format_exc()
@@ -2053,7 +2266,9 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         return (matched_answer, matched_exploration, first_error)
 
     @classmethod
-    def _migrate_answer(cls, answer_str, rule_str, exploration, state_name):
+    def _migrate_answer(
+            cls, answer_str, rule_str, exploration, state_name,
+            large_answer_bucket_id):
         # Another point of failure is the state not matching due to an
         # incorrect exploration version selection.
         if state_name not in exploration.states:
@@ -2145,7 +2360,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             answer, state.interaction.id, answer_group_index,
             rule_spec_index, classification_categorization, params,
             session_id, time_spent_in_sec, rule_spec_str=rule_str,
-            answer_str=answer_str), None)
+            answer_str=answer_str,
+            large_bucket_entity_id=large_answer_bucket_id), None)
 
 
     # Following are helpers and constants related to reconstituting the

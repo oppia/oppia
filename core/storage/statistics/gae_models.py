@@ -18,6 +18,7 @@
 
 import datetime
 import logging
+import operator
 
 from core.platform import models
 import feconf
@@ -644,8 +645,18 @@ class StateAnswersModel(base_models.BaseModel):
         exploration state. Returns None if no answers have yet been submitted to
         the specified exploration state.
         """
+        # It's okay if this isn't run in a transaction. When adding new shards,
+        # it's guaranteed the master shard will be updated at the same time the
+        # new shard is added. Shard deletion is not supported, so there will
+        # never be a shard accessed after retrieving the master shard. Finally,
+        # if a new shard is added after the master shard is retrieved, it will
+        # simply be ignored in the result of this function. It will be included
+        # during the next call.
         main_shard = cls._get_model(
             exploration_id, exploration_version, state_name, 0)
+
+        print '@@@@@ [ms id: %s] get all models has main shard: %s, shard count: %d, json size: %d' % (main_shard.id if main_shard else None, main_shard is not None, 0 if not main_shard else main_shard.shard_count, main_shard.accumulated_answer_json_size if main_shard else 0)
+
         if main_shard:
             all_models = [main_shard]
             if main_shard.shard_count > 0:
@@ -668,6 +679,8 @@ class StateAnswersModel(base_models.BaseModel):
         main_shard = cls._get_model(
             exploration_id, exploration_version, state_name, 0)
         last_shard = main_shard
+
+        print '@@@@@ [ms id: %s] insert subm answer has main shard: %s, shard count: %d, json size: %d' % (main_shard.id if main_shard else None, main_shard is not None, 0 if not main_shard else main_shard.shard_count, main_shard.accumulated_answer_json_size if main_shard else 0)
 
         if not main_shard:
             entity_id = cls._get_entity_id(
@@ -838,12 +851,92 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
             calculation_id])
 
 
+class LargeAnswerBucketModel(base_models.BaseModel):
+    """Stores answers from StateRuleAnswerLogModel for entities with very large
+    numbers of answers. Those answers are copied to this model and stored in a
+    fragmented way so that the answer migration can perform the larger
+    migrations in smaller chunks.
+    """
+    # TODO(bhenning): Remove this model once the AnswerMigrationJob has
+    # successfully run in production.
+
+    _MAX_ANSWERS_PER_BUCKET = 100
+    log_model_item_id = ndb.StringProperty(indexed=True)
+    answers = ndb.JsonProperty(indexed=False)
+    log_model_last_update = ndb.DateTimeProperty(indexed=False)
+
+    @classmethod
+    def should_split_log_entity(cls, item):
+        """Returns whether the given StateRuleAnswerLogModel entity has enough
+        answers to be split up.
+        """
+        return len(item.answers) > cls._MAX_ANSWERS_PER_BUCKET
+
+    @classmethod
+    def get_split_entity_count_for_answer_log_entity(cls, item_id):
+        """Returns how many times the given StateRuleAnswerLogModel entity (by
+        ID) has been split and stored within this model in shards, or 0 if it is
+        not split at all. This will never return 1.
+        """
+        return cls.query(cls.log_model_item_id == item_id).count()
+
+    @classmethod
+    def _insert_state_rule_answer_log_entity(cls, item):
+        total_answer_count = len(item.answers)
+        if total_answer_count <= cls._MAX_ANSWERS_PER_BUCKET:
+            raise Exception(
+                'Cannot split up entity with less than max answers: %s' % (
+                    item.id))
+        full_bucket_count = total_answer_count / cls._MAX_ANSWERS_PER_BUCKET
+        remaining_answer_count = (
+            total_answer_count % cls._MAX_ANSWERS_PER_BUCKET)
+        answer_list = item.answers.items()
+        # TODO(bhenning): Figure out a better way to deal with this situation.
+        # This sort is only here for the benefit of tests, but it might be slow
+        # enough to cause the transaction to fail.
+        answer_list.sort(key=operator.itemgetter(0))
+        for i in xrange(full_bucket_count):
+            bucket_id = cls.get_new_id('')
+            start_shard_answer_index = i * cls._MAX_ANSWERS_PER_BUCKET
+            end_shard_answer_index = (i + 1) * cls._MAX_ANSWERS_PER_BUCKET
+            sharded_answer_list = answer_list[
+                start_shard_answer_index:end_shard_answer_index]
+            bucket_entity = cls(
+                id=bucket_id,
+                log_model_item_id=item.id,
+                answers=dict(sharded_answer_list),
+                log_model_last_update=item.last_updated)
+            bucket_entity.put()
+
+        if remaining_answer_count > 0:
+            bucket_id = cls.get_new_id('')
+            sharded_answer_list = answer_list[
+                full_bucket_count*cls._MAX_ANSWERS_PER_BUCKET:]
+            bucket_entity = cls(
+                id=bucket_id,
+                log_model_item_id=item.id,
+                answers=dict(sharded_answer_list),
+                log_model_last_update=item.last_updated)
+            bucket_entity.put()
+
+    @classmethod
+    def insert_state_rule_answer_log_entity(cls, item):
+        """Attemps to instance a StateRuleAnswerLogModel entity, splitting up
+        its entities as necessary. This method guarantees more than one
+        LargeAnswerBucketModel entity will be written, otherwise the entity will
+        not be split up.
+        """
+        transaction_services.run_in_transaction(
+            cls._insert_state_rule_answer_log_entity, item)
+
+
 class MigratedAnswerModel(base_models.BaseModel):
-    """A temporary model which maps answers in StateRuleAnswerLogModel to
-    answers migrated and inserted in StateAnswersModel. This model can be used
-    to verify a given answer exists (and the correct number of times) in
-    StateAnswersModel. Although the AnswerMigrationJob is not idempotent, this
-    model aims to help make it closer to idempotent.
+    """A temporary model which maps answers in StateRuleAnswerLogModel and
+    LargeAnswerBucketModel to answers migrated and inserted in
+    StateAnswersModel. This model can be used to verify a given answer exists
+    (and the correct number of times) in StateAnswersModel. Although the
+    AnswerMigrationJob is not idempotent, this model aims to help make it closer
+    to idempotent.
     """
     # TODO(bhenning): Remove this model once the AnswerMigrationJob has
     # successfully run in production.
@@ -853,25 +946,62 @@ class MigratedAnswerModel(base_models.BaseModel):
     exploration_versions = ndb.IntegerProperty(indexed=False, repeated=True)
     started_migration = ndb.BooleanProperty(indexed=False, default=False)
     finished_migration = ndb.BooleanProperty(indexed=False, default=False)
+    started_large_answer_bucket_ids = ndb.StringProperty(
+        indexed=False, repeated=True)
+    finished_large_answer_bucket_ids = ndb.StringProperty(
+        indexed=False, repeated=True)
+    expected_large_answer_bucket_count = ndb.IntegerProperty(
+        indexed=False, default=0)
 
     @classmethod
-    def start_migrating_answer_bucket(
-        cls, state_answer_log_model_item_id, exploration_id, state_name):
+    def _start_migrating_answer_bucket(
+            cls, state_answer_log_model_item_id, exploration_id, state_name,
+            large_answer_bucket_id, large_answer_bucket_count):
         model = cls.get(state_answer_log_model_item_id, strict=False)
-        if model:
+        # Only expect migration to not have been started if there aren't a group
+        # of answers being matched to this entity.
+        if not large_answer_bucket_id and model:
             raise Exception(
                 'Expected to not have started migrating answer bucket: %s' % (
                     state_answer_log_model_item_id))
-        model = cls(
-            id=state_answer_log_model_item_id, exploration_id=exploration_id,
-            state_name=state_name, exploration_versions=[],
-            started_migration=True)
+
+        if (large_answer_bucket_id and model
+                and large_answer_bucket_id
+                in model.started_large_answer_bucket_ids):
+            raise Exception(
+                'Expected to not have started migrating large answer bucket: '
+                '\'%s\' (part of group \'%s\')' % (
+                    large_answer_bucket_id, state_answer_log_model_item_id))
+        if not model:
+            started_large_answer_bucket_ids = (
+                [large_answer_bucket_id] if large_answer_bucket_id else [])
+            model = cls(
+                id=state_answer_log_model_item_id,
+                exploration_id=exploration_id, state_name=state_name,
+                exploration_versions=[], started_migration=True,
+                started_large_answer_bucket_ids=started_large_answer_bucket_ids,
+                finished_large_answer_bucket_ids=[],
+                expected_large_answer_bucket_count=large_answer_bucket_count)
+        else:
+            started_large_answer_bucket_ids = set(
+                model.started_large_answer_bucket_ids)
+            started_large_answer_bucket_ids.add(large_answer_bucket_id)
+            model.started_large_answer_bucket_ids = list(
+                started_large_answer_bucket_ids)
         model.put()
 
     @classmethod
-    def finish_migrating_answer(
-            cls, state_answer_log_model_item_id, exploration_id,
-            exploration_version, state_name):
+    def start_migrating_answer_bucket(
+            cls, state_answer_log_model_item_id, exploration_id, state_name,
+            large_answer_bucket_id, large_answer_bucket_count):
+        transaction_services.run_in_transaction(
+            cls._start_migrating_answer_bucket, state_answer_log_model_item_id,
+            exploration_id, state_name, large_answer_bucket_id,
+            large_answer_bucket_count)
+
+    @classmethod
+    def _finish_migrating_answer(
+            cls, state_answer_log_model_item_id, exploration_version):
         model = cls.get(state_answer_log_model_item_id)
         # Avoid an unnecessary put if the given version is already recorded
         if exploration_version not in model.exploration_versions:
@@ -879,15 +1009,43 @@ class MigratedAnswerModel(base_models.BaseModel):
             model.put()
 
     @classmethod
-    def finish_migration_answer_bucket(cls, state_answer_log_model_item_id):
+    def finish_migrating_answer(
+            cls, state_answer_log_model_item_id, exploration_version):
+        transaction_services.run_in_transaction(
+            cls._finish_migrating_answer, state_answer_log_model_item_id,
+            exploration_version)
+
+    @classmethod
+    def _finish_migration_answer_bucket(
+            cls, state_answer_log_model_item_id, large_answer_bucket_id):
         model = cls.get(state_answer_log_model_item_id)
-        model.finished_migration = True
+        if large_answer_bucket_id:
+            finished_large_answer_bucket_ids = set(
+                model.finished_large_answer_bucket_ids)
+            finished_large_answer_bucket_ids.add(large_answer_bucket_id)
+            expected_bucket_count = model.expected_large_answer_bucket_count
+            model.finished_migration = (
+                len(finished_large_answer_bucket_ids) >= expected_bucket_count)
+            model.finished_large_answer_bucket_ids = list(
+                finished_large_answer_bucket_ids)
+        else:
+            model.finished_migration = True
         model.put()
 
     @classmethod
-    def has_started_being_migrated(cls, state_answer_log_model_item_id):
+    def finish_migration_answer_bucket(
+            cls, state_answer_log_model_item_id, large_answer_bucket_id):
+        transaction_services.run_in_transaction(
+            cls._finish_migration_answer_bucket, state_answer_log_model_item_id,
+            large_answer_bucket_id)
+
+    @classmethod
+    def has_started_being_migrated(
+            cls, state_answer_log_model_item_id, large_answer_bucket_id=None):
         model = cls.get(state_answer_log_model_item_id, strict=False)
-        return model is not None
+        return model is not None and (
+            not large_answer_bucket_id or large_answer_bucket_id
+            in model.started_large_answer_bucket_ids)
 
     @classmethod
     def validate_answers_are_migrated(cls, state_rule_answer_log_model):
@@ -940,4 +1098,3 @@ class MigratedAnswerModel(base_models.BaseModel):
                     answer_str_list.append(
                         submitted_answer_dict.get('answer_str'))
         return answer_str_list
-
