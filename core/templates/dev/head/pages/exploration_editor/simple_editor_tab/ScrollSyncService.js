@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Service that syncs the position of the user in the simple
- * editor with the navigation sidebar, see ScrollSyncDirective.js.
+ * editor with the navigation sidebar, see AnchorHeaderDirective.js.
  */
 
 oppia.factory('ScrollSyncService', [
@@ -86,7 +86,8 @@ oppia.factory('ScrollSyncService', [
       // list to the top of the editor, with a positive distance from it).
       var minPositiveTarget;
       var documentY = $document.scrollTop();
-      for (var i = 0, minDy; i < targets.length; i++) {
+      var minDy;
+      for (var i = 0; i < targets.length; i++) {
         var dy = targets[i].offset().top - documentY - oppiaNavBarHeight;
         if (dy > 0 && (!angular.isDefined(minPositiveTarget) || dy < minDy)) {
           minDy = dy;

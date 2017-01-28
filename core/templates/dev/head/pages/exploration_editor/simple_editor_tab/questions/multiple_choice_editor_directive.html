@@ -1,5 +1,5 @@
 <script type="text/ng-template" id="simpleEditorQuestions/MultipleChoiceInput">
-  <anchor-header header-id="<[getSubfieldId('Multiple choice')]>"
+  <anchor-header header-id="getSubfieldId('Multiple choice')"
                  header-text="Multiple choice"></anchor-header>
   <div class="options-container">
     <ul style="margin-bottom: 0;">
@@ -23,7 +23,7 @@
     </button>
   </div>
 
-  <anchor-header header-id="<[getSubfieldId('Correct answer')]>"
+  <anchor-header header-id="getSubfieldId('Correct answer')"
                  header-text="Pick the correct answer"></anchor-header>
   <div class="correct-answer-picker-container">
     <button class="correct-answer-option"
@@ -50,7 +50,7 @@
     </editor-html-field>
   </div>
 
-  <anchor-header header-id="<[getSubfieldId('Hints')]>"
+  <anchor-header header-id="getSubfieldId('Hints')"
                  header-text="Provide a hint for all other answers"></anchor-header>
   <editor-html-field original-value="getDefaultOutcome().feedback[0]"
                      on-finish-editing="saveDefaultFeedback(newValue)"

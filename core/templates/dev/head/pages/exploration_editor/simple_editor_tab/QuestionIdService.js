@@ -22,11 +22,12 @@ oppia.factory('QuestionIdService', [function() {
   var strip = function(string) {
     return string.trim().toLowerCase().split(' ').join('');
   };
+  var SIDEBAR_ID_DELIMETER = ':';
   return {
-    SIDEBAR_PREFIX: 'sidebaritem:',
+    SIDEBAR_PREFIX: 'sidebaritem' + SIDEBAR_ID_DELIMETER,
     // Returns an Id used to identify a question subfield.
     getSubfieldId: function(questionId, label) {
-      return [questionId, strip(label)].join(':');
+      return [questionId, strip(label)].join(SIDEBAR_ID_DELIMETER);
     },
     // Returns an Id used to identify a sidebar item.
     getSidebarItemId: function(questionId, label) {
@@ -34,7 +35,7 @@ oppia.factory('QuestionIdService', [function() {
     },
     // Extracts the questionId from a subfieldId.
     getParentQuestionId: function(subfieldId) {
-      return subfieldId.split(':')[0];
+      return subfieldId.split(SIDEBAR_ID_DELIMETER)[0];
     }
   };
 }]);
