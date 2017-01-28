@@ -139,7 +139,7 @@
                      fill="url(#image<[$index]>)"
                      stroke="#10301D"
                      stroke-width="3"/>
-             <circle class="ng-hide"
+             <circle ng-show="($index===activeHighlightedIconIndex)?true:false"
                      cx="50"
                      cy="50"
                      r="45"

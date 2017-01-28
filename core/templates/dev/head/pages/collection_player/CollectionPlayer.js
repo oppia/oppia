@@ -43,16 +43,25 @@ oppia.controller('CollectionPlayer', [
     $scope.showingAllExplorations = !GLOBALS.isLoggedIn;
     $scope.previewCardIsShown = true;
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+    // The pathIconParameters is an array containing the co-ordinates,
+    // background color and icon url for the icons generated on the path
     $scope.pathIconParameters = [];
+    $scope.activeHighlightedIconIndex = -1;
+    $scope.MIN_HEIGHT_FOR_PATH_SVG = 220;
+    $scope.ODD_SVG_HEIGHT_OFFSET = 150;
+    $scope.EVEN_SVG_HEIGHT_OFFSET = 280;
+    $scope.ICON_Y_INITIAL = 60;
+    $scope.ICON_Y_INCREMENT = 110;
+    $scope.ICON_X_MIDDLE = 225;
+    $scope.ICON_X_LEFT = 30;
+    $scope.ICON_X_RIGHT = 420;
 
     $scope.setIconHighlight = function(index) {
-      document.getElementById('highlight' + index).setAttribute('class',
-        'ng-show');
+      $scope.activeHighlightedIconIndex = index;
     };
 
-    $scope.unsetIconHighlight = function(index) {
-      document.getElementById('highlight' + index).setAttribute('class',
-        'ng-hide');
+    $scope.unsetIconHighlight = function() {
+      $scope.activeHighlightedIconIndex = -1;
     };
 
     $scope.togglePreviewCard = function() {
@@ -120,25 +129,28 @@ oppia.controller('CollectionPlayer', [
         explorationId).getExplorationSummaryObject();
     };
 
+    // Returns the SVG parameters required to draw the curved path
     $scope.generatePathParameters = function() {
+      // The pathSvgParameters represents the final string of SVG parameters
+      // for the bezier curve to be generated. The default parameters represent
+      // the first curve. (ie. lesson 1 to lesson 3)
       var pathSvgParameters = 'M250 80  C 500 100, 500 280, 250 300';
       var collectionNodeCount = $scope.collection.getCollectionNodeCount();
+      // The sParameterExtension represents the co-ordinates following the 'S'
+      // (smooth curve to) command in SVG.
       var sParameterExtension = '';
-      $scope.svgHeight = 220;
+      $scope.svgHeight = $scope.MIN_HEIGHT_FOR_PATH_SVG;
+      $scope.pathIconParameters = $scope.generatePathIconParameters();
       if (collectionNodeCount === 1) {
-        $scope.pathIconParameters = $scope.generatePathIconParameters();
         return '';
       } else if (collectionNodeCount === 2) {
-        $scope.pathIconParameters = $scope.generatePathIconParameters();
         return pathSvgParameters;
       } else {
+        // The x and y here represent the co-ordinates of the control points
+        // for the bezier curve (path).
         var y = 500;
         for (var i = 1; i < Math.floor(collectionNodeCount / 2); i++) {
-          if (i % 2 === 0) {
-            x = 500;
-          } else {
-            x = 0;
-          }
+          var x = (i % 2) ? 0 : 500;
           sParameterExtension += x + ' ' + y + ', ';
           y += 20;
           sParameterExtension += 250 + ' ' + y + ', ';
@@ -147,18 +159,17 @@ oppia.controller('CollectionPlayer', [
         pathSvgParameters += ' S ' + sParameterExtension;
       }
       if (collectionNodeCount % 2 === 0) {
-        $scope.svgHeight = y - 280;
+        $scope.svgHeight = y - $scope.EVEN_SVG_HEIGHT_OFFSET;
       } else {
-        $scope.svgHeight = y - 150;
+        $scope.svgHeight = y - $scope.ODD_SVG_HEIGHT_OFFSET;
       }
-      $scope.pathIconParameters = $scope.generatePathIconParameters();
       return pathSvgParameters;
     };
 
     $scope.generatePathIconParameters = function() {
       var collectionNodes = $scope.collection.getCollectionNodes();
-      var arr = [];
-      arr.push({
+      var iconParametersArray = [];
+      iconParametersArray.push({
           thumbnailIconUrl:
             collectionNodes[0].getExplorationSummaryObject().thumbnail_icon_url,
           left: '225px',
@@ -166,24 +177,26 @@ oppia.controller('CollectionPlayer', [
           thumbnailBgColor:
             collectionNodes[0].getExplorationSummaryObject().thumbnail_bg_color
         });
-      var x = 225;
-      var y = 60;
-      var count = 1;
+
+      // Here x and y represent the co-ordinates for the icons in the path.
+      var x = $scope.ICON_X_MIDDLE;
+      var y = $scope.ICON_Y_INITIAL;
+      var countMiddleIcon = 1;
 
       for (var i = 1; i < $scope.collection.getCollectionNodeCount(); i++) {
-        if (count === 0 && x === 225) {
-          x = 30;
-          y += 110;
-          count = 1;
-        } else if (count === 1 && x === 225) {
-          x = 420;
-          y += 110;
-          count = 0;
+        if (countMiddleIcon === 0 && x === $scope.ICON_X_MIDDLE) {
+          x = $scope.ICON_X_LEFT;
+          y += $scope.ICON_Y_INCREMENT;
+          countMiddleIcon = 1;
+        } else if (countMiddleIcon === 1 && x === $scope.ICON_X_MIDDLE) {
+          x = $scope.ICON_X_RIGHT;
+          y += $scope.ICON_Y_INCREMENT;
+          countMiddleIcon = 0;
         } else {
-          x = 225;
-          y += 110;
+          x = $scope.ICON_X_MIDDLE;
+          y += $scope.ICON_Y_INCREMENT;
         }
-        arr.push({
+        iconParametersArray.push({
           thumbnailIconUrl:
             collectionNodes[i].getExplorationSummaryObject().thumbnail_icon_url,
           left: x + 'px',
@@ -192,7 +205,7 @@ oppia.controller('CollectionPlayer', [
             collectionNodes[i].getExplorationSummaryObject().thumbnail_bg_color
         });
       }
-      return arr;
+      return iconParametersArray;
     };
 
     $http.get('/collectionsummarieshandler/data', {
