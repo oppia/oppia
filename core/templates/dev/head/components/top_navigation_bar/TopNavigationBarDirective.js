@@ -102,6 +102,10 @@ oppia.directive('topNavigationBar', [function() {
           I18N_CREATE_EXPLORATION_CREATE: true,
           I18N_TOPNAV_LIBRARY: true
         };
+        // The order of the elements in this array specifies the order in which
+        // they will be hidden.
+        navElementsOrder = ['I18N_TOPNAV_DONATE', 'I18N_TOPNAV_ABOUT',
+          'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
 
         windowDimensionsService.registerOnResizeHook(function() {
           $scope.windowIsNarrow = windowDimensionsService.isWindowNarrow();
@@ -122,9 +126,9 @@ oppia.directive('topNavigationBar', [function() {
           };
           // If the window is resized larger, try displaying the hidden elements
           if (currentWindowWidth < windowDimensionsService.getWidth()) {
-            for (element in $scope.navElementsVisibilityStatus) {
-              if (!$scope.navElementsVisibilityStatus[element]) {
-                $scope.navElementsVisibilityStatus[element] = true;
+            for (var i = 0; i < navElementsOrder.length; i++) {
+              if (!$scope.navElementsVisibilityStatus[navElementsOrder[i]]) {
+                $scope.navElementsVisibilityStatus[navElementsOrder[i]] = true;
               }
             }
           }
@@ -172,11 +176,12 @@ oppia.directive('topNavigationBar', [function() {
           // updated.
           if (document.querySelector('div.collapse.navbar-collapse')
             .clientHeight > 60) {
-            for (element in $scope.navElementsVisibilityStatus) {
-              if ($scope.navElementsVisibilityStatus[element]) {
+            for (var i = 0; i < navElementsOrder.length; i++) {
+              if ($scope.navElementsVisibilityStatus[navElementsOrder[i]]) {
                 // Hide one element, then check again after 50ms.
                 // This gives the browser time to render the visibility change.
-                $scope.navElementsVisibilityStatus[element] = false;
+                $scope.navElementsVisibilityStatus[navElementsOrder[i]] =
+                  false;
                 // Force a digest cycle to hide element immediately.
                 // Otherwise it would be hidden after the next call.
                 // This is due to setTimeout use in debounce.
@@ -197,6 +202,9 @@ oppia.directive('topNavigationBar', [function() {
         // a timeout of 0 works for at least one browser, it is used here.
         $timeout(truncateNavbar, 0);
         $scope.toggleSidebar = SidebarStatusService.toggleSidebar;
+        $scope.$on('searchBarLoaded', function(evt, searchBarLoaded) {
+          $timeout(truncateNavbar, 100);
+        });
       }
     ]
   };

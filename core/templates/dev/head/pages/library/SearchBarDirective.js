@@ -205,6 +205,7 @@ oppia.directive('searchBar', [function() {
             }
 
             refreshSearchBarLabels();
+            $rootScope.$broadcast('searchBarLoaded', true);
           }
         );
 
