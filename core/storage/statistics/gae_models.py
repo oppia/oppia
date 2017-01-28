@@ -877,7 +877,12 @@ class LargeAnswerBucketModel(base_models.BaseModel):
         return cls.query(cls.log_model_item_id == item_id).count()
 
     @classmethod
-    def _insert_state_rule_answer_log_entity(cls, item):
+    def insert_state_rule_answer_log_entity(cls, item):
+        """Attemps to instance a StateRuleAnswerLogModel entity, splitting up
+        its entities as necessary. This method guarantees more than one
+        LargeAnswerBucketModel entity will be written, otherwise the entity will
+        not be split up.
+        """
         total_answer_count = len(item.answers)
         if total_answer_count <= cls._MAX_ANSWERS_PER_BUCKET:
             raise Exception(
@@ -914,16 +919,6 @@ class LargeAnswerBucketModel(base_models.BaseModel):
                 answers=dict(sharded_answer_list),
                 log_model_last_update=item.last_updated)
             bucket_entity.put()
-
-    @classmethod
-    def insert_state_rule_answer_log_entity(cls, item):
-        """Attemps to instance a StateRuleAnswerLogModel entity, splitting up
-        its entities as necessary. This method guarantees more than one
-        LargeAnswerBucketModel entity will be written, otherwise the entity will
-        not be split up.
-        """
-        transaction_services.run_in_transaction(
-            cls._insert_state_rule_answer_log_entity, item)
 
 
 class MigratedAnswerModel(base_models.BaseModel):

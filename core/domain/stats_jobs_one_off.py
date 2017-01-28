@@ -739,7 +739,7 @@ class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
 
 
 class SplitLargeAnswerBucketsJob(jobs.BaseMapReduceJobManager):
-    """This job deletes checks all answer buckets in
+    """This job checks all answer buckets in
     stats_models.StateRuleAnswerLogModel and splits them into multiple entities
     to be stored in stats_models.LargeAnswerBucketModel if there are too many
     entities to be migrated at once by the migration job.
@@ -772,6 +772,25 @@ class SplitLargeAnswerBucketsJob(jobs.BaseMapReduceJobManager):
             yield (
                 'Exploration \'%s\' had %d answers split up into a separate '
                 'storage model for migration' % (item_id, answer_count))
+
+
+class ClearLargeAnswerBucketsJob(jobs.BaseMapReduceJobManager):
+    """This job deletes all buckets stored in LargeAnswerBucketModel."""
+
+    _REMOVED_KEY = 'Removed large buckets'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.LargeAnswerBucketModel]
+
+    @staticmethod
+    def map(item):
+        item.delete()
+        yield (ClearLargeAnswerBucketsJob._REMOVED_KEY, 1)
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        yield '%s: %d' % (key, len(stringified_values))
 
 
 class CleanupLargeBucketLabelsFromNewAnswersJob(jobs.BaseMapReduceJobManager):
