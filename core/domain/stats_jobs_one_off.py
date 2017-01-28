@@ -2022,7 +2022,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         random.seed('%s.%s.%s' % (
             item_id, datetime.datetime.utcnow(), os.urandom(64)))
         entropy = random.randint(0, 63)
-        yield ('%s.%s.%s.%s' % (exp_id, max_version, state_name, entropy), {
+        yield ('%s.%s.%s' % (exp_id, max_version, state_name), {
             'item_id': item_id,
             'exploration_id': exp_id,
             'exploration_max_version': max_version,
