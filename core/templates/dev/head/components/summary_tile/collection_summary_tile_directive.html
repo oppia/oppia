@@ -21,11 +21,8 @@
           </li>
 
           <li>
-            <span ng-if="!wasRecentlyUpdated() || inCreatorDashboard">
+            <span>
               <[getLastUpdatedDatetime()]>
-            </span>
-            <span ng-if="wasRecentlyUpdated() && !inCreatorDashboard" class="recently-updated">
-              UPDATED
             </span>
           </li>
         </ul>

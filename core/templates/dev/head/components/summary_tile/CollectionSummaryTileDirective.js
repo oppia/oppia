@@ -32,7 +32,7 @@ oppia.directive('collectionSummaryTile', [function() {
       getLastUpdatedMsec: '&lastUpdatedMsec',
       getThumbnailIconUrl: '&thumbnailIconUrl',
       getThumbnailBgColor: '&thumbnailBgColor',
-      inCreatorDashboard: '=?inCreatorDashboard'
+      isLinkedToEditorPage: '=?isLinkedToEditorPage'
     },
     templateUrl: 'summaryTile/collection',
     controller: [
@@ -46,13 +46,9 @@ oppia.directive('collectionSummaryTile', [function() {
             $scope.getLastUpdatedMsec());
         };
 
-        $scope.wasRecentlyUpdated = function() {
-          return oppiaDatetimeFormatter.isRecent($scope.getLastUpdatedMsec());
-        };
-
         $scope.getCollectionLink = function() {
-          if (angular.isDefined($scope.inCreatorDashboard)) {
-            if ($scope.inCreatorDashboard) {
+          if (angular.isDefined($scope.isLinkedToEditorPage)) {
+            if ($scope.isLinkedToEditorPage) {
               return UrlInterpolationService.interpolateUrl(
                 COLLECTION_EDITOR_URL, {
                   collection_id: $scope.getCollectionId()
