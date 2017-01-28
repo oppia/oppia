@@ -109,7 +109,6 @@ oppia.directive('topNavigationBar', [function() {
           // Close the sidebar, if necessary.
           SidebarStatusService.closeSidebar();
           $scope.sidebarIsShown = SidebarStatusService.isSidebarShown();
-          });
           $scope.isSidebarShown = function() {
             if (SidebarStatusService.isSidebarShown()) {
               angular.element(document.body).addClass('oppia-stop-scroll');
