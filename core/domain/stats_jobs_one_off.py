@@ -620,8 +620,7 @@ class ClearMigratedAnswersJob(jobs.BaseMapReduceJobManager):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [
-            stats_models.StateAnswersModel, stats_models.MigratedAnswerModel,
-            stats_models.LargeAnswerBucketModel]
+            stats_models.StateAnswersModel, stats_models.MigratedAnswerModel]
 
     @staticmethod
     def map(item):
