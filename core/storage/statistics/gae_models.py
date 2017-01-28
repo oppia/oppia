@@ -655,8 +655,6 @@ class StateAnswersModel(base_models.BaseModel):
         main_shard = cls._get_model(
             exploration_id, exploration_version, state_name, 0)
 
-        print '@@@@@ [ms id: %s] get all models has main shard: %s, shard count: %d, json size: %d' % (main_shard.id if main_shard else None, main_shard is not None, 0 if not main_shard else main_shard.shard_count, main_shard.accumulated_answer_json_size if main_shard else 0)
-
         if main_shard:
             all_models = [main_shard]
             if main_shard.shard_count > 0:
@@ -679,8 +677,6 @@ class StateAnswersModel(base_models.BaseModel):
         main_shard = cls._get_model(
             exploration_id, exploration_version, state_name, 0)
         last_shard = main_shard
-
-        print '@@@@@ [ms id: %s] insert subm answer has main shard: %s, shard count: %d, json size: %d' % (main_shard.id if main_shard else None, main_shard is not None, 0 if not main_shard else main_shard.shard_count, main_shard.accumulated_answer_json_size if main_shard else 0)
 
         if not main_shard:
             entity_id = cls._get_entity_id(

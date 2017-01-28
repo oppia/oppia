@@ -2154,16 +2154,13 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # Run the job again. The first large answer bucket does not need to be
         # migrated, but the second still does.
         # TODO(bhenning): Figure out why this won't work.
-        print '@@@@@ Before _run_migration_job important'
-        #job_output = sorted(self._run_migration_job())
-        job_output = self._run_migration_job_internal()
+        job_output = sorted(self._run_migration_job())
+        #job_output = self._run_migration_job_internal()
         self.assertEqual(job_output, [
             'Encountered a submitted answer bucket which has already been '
             'migrated',
             'Encountered a submitted large answer bucket which has already '
             'been migrated'])
-
-        print '@@@@@ After running, length: %d' % len(stats_services.get_state_answers('16', 1, state_name).submitted_answer_list)
 
         # All answers should now be properly migrated.
         state_answers = self._get_state_answers(state_name)

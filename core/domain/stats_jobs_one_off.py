@@ -1920,8 +1920,6 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        print '@@@@@ AnswerMigrationJob map'
-
         # If this answer bucket has already been migrated, skip it.
         if isinstance(item, stats_models.StateRuleAnswerLogModel):
             item_id = item.id
@@ -2019,8 +2017,6 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
-        print '@@@@@ reduce: %s' % key
-
         # Output any errors or notices encountered during the map step.
         if (key == AnswerMigrationJob._ERROR_KEY
                 or key == AnswerMigrationJob._ALREADY_MIGRATED_KEY
@@ -2092,8 +2088,6 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                     yield error
                 else:
                     yield 'Item ID: %s, error: %s' % (item_id, error)
-
-        print '@@@@@ After reduce, length: %d' % len(stats_services.get_state_answers('16', 1, state_name).submitted_answer_list)
 
     @classmethod
     def _migrate_answers(cls, item_id, explorations, exploration_id, state_name,
@@ -2195,12 +2189,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             stats_models.MigratedAnswerModel.finish_migrating_answer(
                 item_id, exploration_version)
 
-        print '@@@@@ After migrating, length: %d' % len(stats_services.get_state_answers('16', 1, state_name).submitted_answer_list)
-
         stats_models.MigratedAnswerModel.finish_migration_answer_bucket(
             item_id, large_answer_bucket_id)
-
-        print '@@@@@ After migrating2, length: %d' % len(stats_services.get_state_answers('16', 1, state_name).submitted_answer_list)
 
     @classmethod
     def _try_migrate_answer(cls, answer_str, rule_str, last_updated,
