@@ -2537,7 +2537,6 @@ div#ng-curtain {
   vertical-align: top;
 }
 .oppia-navbar-clickable-dropdown:hover ul.dropdown-menu, .oppia-clickable-navbar-element:hover {
-  /* Should this be changed at line 852? */
   display: inline-block;
 }
 .oppia-navbar-nav .dropdown-menu {

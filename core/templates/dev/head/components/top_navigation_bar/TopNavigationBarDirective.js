@@ -155,7 +155,10 @@ oppia.directive('topNavigationBar', [function() {
             return;
           }
 
-          // Measured non-overflowed navbar height under 60px via inspector.
+          // The value of 60px used here comes from measuring the normal height
+          // of the navbar (56px) in Chrome's inspector and rounding up. If the
+          // height of the navbar is changed in the future this will need to be
+          // updated.
           if (document.querySelector('div.collapse.navbar-collapse')
             .clientHeight > 60) {
             for (element in $scope.navElementsVisibilityStatus) {
@@ -177,7 +180,10 @@ oppia.directive('topNavigationBar', [function() {
         var truncateNavbarDebounced =
           oppiaDebouncer.debounce(truncateNavbar, 500);
 
-        // For Chrome, timeout 0 appears to run after i18n.
+        // The function needs to be run after i18n. A timeout of 0 appears to
+        // run after i18n in Chrome, but not other browsers. The function will
+        // check if i18n is complete and set a new timeout if it is not. Since
+        // a timeout of 0 works for at least one browser, it is used here.
         $timeout(truncateNavbar, 0);
         $scope.toggleSidebar = SidebarStatusService.toggleSidebar;
       }
