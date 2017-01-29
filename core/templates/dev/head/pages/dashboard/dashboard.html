@@ -306,17 +306,17 @@
 
         <ul class="oppia-dashboard-tiles"
             ng-if="activeTab === 'myCollections' && collectionsList.length > 0">
-            <span ng-repeat="collection in collectionsList">
-              <collection-summary-tile collection-id="collection.id"
-                                       collection-title="collection.title"
-                                       last-updated-msec="collection.last_updated"
-                                       node-count="collection.node_count"
-                                       objective="collection.objective"
-                                       thumbnail-icon-url="collection.thumbnail_icon_url"
-                                       thumbnail-bg-color="collection.thumbnail_bg_color"
-                                       is-linked-to-editor-page="true">
-              </collection-summary-tile>
-            </span>
+          <span ng-repeat="collection in collectionsList">
+            <collection-summary-tile collection-id="collection.id"
+                                     collection-title="collection.title"
+                                     last-updated-msec="collection.last_updated"
+                                     node-count="collection.node_count"
+                                     objective="collection.objective"
+                                     thumbnail-icon-url="collection.thumbnail_icon_url"
+                                     thumbnail-bg-color="collection.thumbnail_bg_color"
+                                     is-linked-to-editor-page="true">
+            </collection-summary-tile>
+          </span>
         </ul>
       </div>
     {% endif %}

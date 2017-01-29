@@ -41,27 +41,21 @@ oppia.directive('collectionSummaryTile', [function() {
       oppiaDatetimeFormatter, UrlInterpolationService, COLLECTION_VIEWER_URL,
       COLLECTION_EDITOR_URL) {
         $scope.DEFAULT_EMPTY_TITLE = 'Untitled';
+        var targetUrl = (
+          $scope.isLinkedToEditorPage ?
+           COLLECTION_EDITOR_URL : COLLECTION_VIEWER_URL);
+
         $scope.getLastUpdatedDatetime = function() {
           return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
             $scope.getLastUpdatedMsec());
         };
 
         $scope.getCollectionLink = function() {
-          if (angular.isDefined($scope.isLinkedToEditorPage)) {
-            if ($scope.isLinkedToEditorPage) {
-              return UrlInterpolationService.interpolateUrl(
-                COLLECTION_EDITOR_URL, {
-                  collection_id: $scope.getCollectionId()
-                }
-              );
+          return UrlInterpolationService.interpolateUrl(
+            targetUrl, {
+              collection_id: $scope.getCollectionId()
             }
-          } else {
-            return UrlInterpolationService.interpolateUrl(
-              COLLECTION_VIEWER_URL, {
-                collection_id: $scope.getCollectionId()
-              }
-            );
-          }
+          );
         };
       }
     ]
