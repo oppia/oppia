@@ -125,7 +125,7 @@ oppia.directive('topNavigationBar', [function() {
         $scope.toggleSidebar = function() {
           SidebarStatusService.toggleSidebar();
         };
-        // If the window is resized larger, try displaying the hidden elements
+        // If the window is resized larger, try displaying the hidden elements.
         if (currentWindowWidth < windowDimensionsService.getWidth()) {
           for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
             if (!$scope.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]]) {
