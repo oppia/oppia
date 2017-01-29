@@ -199,7 +199,6 @@ oppia.directive('topNavigationBar', [function() {
         // check if i18n is complete and set a new timeout if it is not. Since
         // a timeout of 0 works for at least one browser, it is used here.
         $timeout(truncateNavbar, 0);
-        $scope.toggleSidebar = SidebarStatusService.toggleSidebar;
         $scope.$on('searchBarLoaded', function() {
           $timeout(truncateNavbar, 100);
         });
