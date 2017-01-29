@@ -111,28 +111,28 @@ oppia.directive('topNavigationBar', [function() {
           // Close the sidebar, if necessary.
           SidebarStatusService.closeSidebar();
           $scope.sidebarIsShown = SidebarStatusService.isSidebarShown();
-          $scope.isSidebarShown = function() {
-            if (SidebarStatusService.isSidebarShown()) {
-              angular.element(document.body).addClass('oppia-stop-scroll');
-            } else {
-              angular.element(document.body).removeClass('oppia-stop-scroll');
-            }
-            return SidebarStatusService.isSidebarShown();
-          };
-          $scope.toggleSidebar = function() {
-            SidebarStatusService.toggleSidebar();
-          };
-          // If the window is resized larger, try displaying the hidden elements
-          if (currentWindowWidth < windowDimensionsService.getWidth()) {
-            for (var i = 0; i < navElementsOrder.length; i++) {
-              if (!$scope.navElementsVisibilityStatus[navElementsOrder[i]]) {
-                $scope.navElementsVisibilityStatus[navElementsOrder[i]] = true;
-              }
-            }
-          }
           currentWindowWidth = windowDimensionsService.getWidth();
           truncateNavbarDebounced();
         });
+        $scope.isSidebarShown = function() {
+          if (SidebarStatusService.isSidebarShown()) {
+            angular.element(document.body).addClass('oppia-stop-scroll');
+          } else {
+            angular.element(document.body).removeClass('oppia-stop-scroll');
+          }
+          return SidebarStatusService.isSidebarShown();
+        };
+        $scope.toggleSidebar = function() {
+          SidebarStatusService.toggleSidebar();
+        };
+        // If the window is resized larger, try displaying the hidden elements
+        if (currentWindowWidth < windowDimensionsService.getWidth()) {
+          for (var i = 0; i < navElementsOrder.length; i++) {
+            if (!$scope.navElementsVisibilityStatus[navElementsOrder[i]]) {
+              $scope.navElementsVisibilityStatus[navElementsOrder[i]] = true;
+            }
+          }
+        }
 
         /**
          * Checks if i18n has been run.
