@@ -39,33 +39,18 @@ oppia.directive('collectionNodeCreator', [function() {
         var SEARCH_EXPLORATION_URL_TEMPLATE = (
           '/exploration/metadata_search/?q=<search_query>');
 
-        var onSearchQueryChangeExec = function  () {
-          if($scope.newExplorationId !== '') {
-            queryUrl = UrlInterpolationService.interpolateUrl(
-              SEARCH_EXPLORATION_URL_TEMPLATE, {
-                search_query: $scope.newExplorationId
-              }
-            );
-          }
-          $http.get(queryUrl).then(function(response) {
-            var data = response.data;
-            var options = '';
-            for(var i = 0; i < data.collection_node_metadata_list.length; i++)
-              if(data.collection_node_metadata_list[i]) {
-                var item = '(#' + data.collection_node_metadata_list[i].id  +
-                  ') ' + data.collection_node_metadata_list[i].title;
-                options += '<option value=" ' + item + '">' + item +
-                  '</option>';
-              }
-            document.getElementById('explorations').innerHTML = options;
+        $scope.getExplorations = function(searchQuery) {
+          queryUrl = UrlInterpolationService.interpolateUrl(
+            SEARCH_EXPLORATION_URL_TEMPLATE, {
+              search_query: searchQuery
+            }
+          );
+          return $http.get(queryUrl).then(function(response) {
+            return response.data.collection_node_metadata_list.map(
+              function(item) {
+              return '(#' + item.id + ') ' + item.title;
+            });
           });
-        };
-
-        $scope.onSearchQueryChange = function(evt) {
-          // Query immediately when the enter or space key is pressed.
-          if (evt.keyCode === 13 || evt.keyCode === 32) {
-            onSearchQueryChangeExec();
-          }
         };
 
         var addExplorationToCollection = function(newExplorationId) {
