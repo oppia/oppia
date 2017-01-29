@@ -99,10 +99,10 @@ oppia.directive('topNavigationBar', [function() {
         $scope.navElementsVisibilityStatus = {};
         // The order of the elements in this array specifies the order in which
         // they will be hidden.
-        navElementsOrder = ['I18N_TOPNAV_DONATE', 'I18N_TOPNAV_ABOUT',
+        NAV_ELEMENTS_ORDER = ['I18N_TOPNAV_DONATE', 'I18N_TOPNAV_ABOUT',
           'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
-        for (var i = 0; i < navElementsOrder.length; i++) {
-          $scope.navElementsVisibilityStatus[navElementsOrder[i]] = true;
+        for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
+          $scope.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] = true;
         }
 
         windowDimensionsService.registerOnResizeHook(function() {
@@ -127,9 +127,9 @@ oppia.directive('topNavigationBar', [function() {
         };
         // If the window is resized larger, try displaying the hidden elements
         if (currentWindowWidth < windowDimensionsService.getWidth()) {
-          for (var i = 0; i < navElementsOrder.length; i++) {
-            if (!$scope.navElementsVisibilityStatus[navElementsOrder[i]]) {
-              $scope.navElementsVisibilityStatus[navElementsOrder[i]] = true;
+          for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
+            if (!$scope.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]]) {
+              $scope.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] = true;
             }
           }
         }
@@ -174,11 +174,11 @@ oppia.directive('topNavigationBar', [function() {
           // updated.
           if (document.querySelector('div.collapse.navbar-collapse')
             .clientHeight > 60) {
-            for (var i = 0; i < navElementsOrder.length; i++) {
-              if ($scope.navElementsVisibilityStatus[navElementsOrder[i]]) {
+            for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
+              if ($scope.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]]) {
                 // Hide one element, then check again after 50ms.
                 // This gives the browser time to render the visibility change.
-                $scope.navElementsVisibilityStatus[navElementsOrder[i]] =
+                $scope.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] =
                   false;
                 // Force a digest cycle to hide element immediately.
                 // Otherwise it would be hidden after the next call.
