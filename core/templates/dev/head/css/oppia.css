@@ -1507,7 +1507,7 @@ md-card.oppia-dashboard-tile {
 }
 
 .oppia-cc-icon {
-  bottom: 34px;
+  bottom: 50px;
   opacity: 0.4;
   position: fixed;
   right: 25px;
@@ -1515,6 +1515,7 @@ md-card.oppia-dashboard-tile {
 
 .oppia-cc-icon:hover {
   opacity: 0.7;
+  text-decoration: none;
 }
 
 .oppia-wide-panel {
