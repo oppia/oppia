@@ -22,7 +22,6 @@
         border-radius: 2px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
         float: left;
-        left: -20%;
         margin-top: 20px;
         max-width: 675px;
         padding: 20px 20px 60px 20px;
@@ -39,7 +38,7 @@
         position: fixed;
         right: 70px;
         text-align: left;
-        top: 188px;
+        top: 244px;
       }
       .collection-otter {
         width: 100px;
@@ -101,7 +100,8 @@
                 stroke-dasharray="15,28"
                 stroke-linecap="round"
                 stroke-width="16"
-                d="<[generatePathParameters()]>"/>
+                ng-init="generatePathParameters()"
+                d="<[pathSvgParameters]>"/>
         </svg>
 
         <img ng-src="<[getStaticImageUrl('/general/collection_otter.svg')]>" class="collection-otter">
@@ -121,10 +121,10 @@
                       cy="50"
                       r="50"
                       fill="<[pathIconParameters[$index].thumbnailBgColor]>"/>
-              <image x="0"
-                     y="0"
-                     height="100"
-                     width="100"
+              <image x="10"
+                     y="10"
+                     height="80"
+                     width="80"
                      xlink:href="<[pathIconParameters[$index].thumbnailIconUrl]>"></image>
             </pattern>
           </defs>
@@ -137,8 +137,8 @@
                      cy="50"
                      r="42"
                      fill="url(#image<[$index]>)"
-                     stroke="#10301D"
-                     stroke-width="3"/>
+                     stroke="#006553"
+                     stroke-width="2"/>
              <circle ng-show="($index===activeHighlightedIconIndex)?true:false"
                      cx="50"
                      cy="50"
@@ -151,7 +151,7 @@
           </a>
         </svg>
 
-        <div ng-if="collection" class="oppia-card-preview-panel hidden-xs">
+        <div ng-if="collection" class="oppia-card-preview-panel hidden-sm hidden-xs">
 
           <md-card class="oppia-activity-summary-tile md-default-theme">
             <div class="title-section" style="background-color: <[collectionSummary.thumbnail_bg_color]>; z-index: 1;">
