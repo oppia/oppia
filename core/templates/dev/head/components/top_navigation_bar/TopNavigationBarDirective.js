@@ -108,6 +108,15 @@ oppia.directive('topNavigationBar', [function() {
         windowDimensionsService.registerOnResizeHook(function() {
           $scope.windowIsNarrow = windowDimensionsService.isWindowNarrow();
           $scope.$apply();
+          // If the window is resized larger, try displaying the hidden elements.
+          if (currentWindowWidth < windowDimensionsService.getWidth()) {
+            for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
+              if (!$scope.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]]) {
+                $scope.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] = true;
+              }
+            }
+          }
+
           // Close the sidebar, if necessary.
           SidebarStatusService.closeSidebar();
           $scope.sidebarIsShown = SidebarStatusService.isSidebarShown();
@@ -125,14 +134,7 @@ oppia.directive('topNavigationBar', [function() {
         $scope.toggleSidebar = function() {
           SidebarStatusService.toggleSidebar();
         };
-        // If the window is resized larger, try displaying the hidden elements.
-        if (currentWindowWidth < windowDimensionsService.getWidth()) {
-          for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
-            if (!$scope.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]]) {
-              $scope.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] = true;
-            }
-          }
-        }
+
 
         /**
          * Checks if i18n has been run.
