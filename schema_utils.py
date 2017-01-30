@@ -141,10 +141,10 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
             for validator in schema[SCHEMA_KEY_VALIDATORS]:
                 kwargs = dict(validator)
                 del kwargs['id']
-                assert _Validators.get(validator['id'])(normalized_obj,
-                    **kwargs), (
-                    'Validation failed: %s (%s) for object %s' % (
-                        validator['id'], kwargs, normalized_obj))
+                assert _Validators.get(
+                    validator['id'])(normalized_obj, **kwargs), (
+                        'Validation failed: %s (%s) for object %s' % (
+                            validator['id'], kwargs, normalized_obj))
 
     return normalized_obj
 
