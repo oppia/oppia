@@ -171,13 +171,13 @@ oppia.controller('CollectionPlayer', [
       var iconParametersArray = [];
       iconParametersArray.push({
         thumbnailIconUrl:
-          collectionNodes[0].getExplorationSummaryObject().thumbnail_icon_url.replace(
-            "subjects","inverted_subjects"),
+          collectionNodes[0].getExplorationSummaryObject(
+          ).thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
         left: '225px',
         top: '60px',
         thumbnailBgColor:
           collectionNodes[0].getExplorationSummaryObject().thumbnail_bg_color
-        });
+      });
 
       // Here x and y represent the co-ordinates for the icons in the path.
       var x = $scope.ICON_X_MIDDLE_PX;
@@ -199,8 +199,8 @@ oppia.controller('CollectionPlayer', [
         }
         iconParametersArray.push({
           thumbnailIconUrl:
-            collectionNodes[i].getExplorationSummaryObject().thumbnail_icon_url.replace(
-              "subjects","inverted_subjects"),
+            collectionNodes[i].getExplorationSummaryObject(
+            ).thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
           left: x + 'px',
           top: y + 'px',
           thumbnailBgColor:
