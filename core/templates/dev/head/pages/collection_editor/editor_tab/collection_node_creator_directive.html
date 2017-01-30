@@ -6,7 +6,7 @@
   </form>
   or
   <form class="form-inline" ng-submit="addExploration()">
-    <input type="text" ng-model="newExplorationId" placeholder="Search explorations by name or id" typeahead="exploration for exploration in getExplorations($viewValue)" class="form-control">
+    <input type="text" ng-model="newExplorationId" placeholder="Search explorations by name" typeahead="exploration for exploration in getExplorations($viewValue)" class="form-control">
     <button class="btn btn-success" ng-disabled="!newExplorationId" type="submit">Add Existing Exploration</button>
   </form>
 </script>
