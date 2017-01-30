@@ -131,7 +131,7 @@ oppia.controller('CollectionPlayer', [
 
     // Returns the SVG parameters required to draw the curved path.
     $scope.generatePathParameters = function() {
-      // The $scope.pathSvgParameters represents the final string of SVG parameters
+      // The pathSvgParameters represents the final string of SVG parameters
       // for the bezier curve to be generated. The default parameters represent
       // the first curve ie. lesson 1 to lesson 3.
       $scope.pathSvgParameters = 'M250 80  C 500 100, 500 280, 250 300';
