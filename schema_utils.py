@@ -239,7 +239,7 @@ class _Validators(object):
     @staticmethod
     def is_nonempty(obj):
         """Returns True iff the given object (a string) is nonempty."""
-        return obj
+        return bool(obj)
 
     @staticmethod
     def is_uniquified(obj):

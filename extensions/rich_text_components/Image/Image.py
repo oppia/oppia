@@ -17,7 +17,6 @@
 from extensions.rich_text_components import base
 
 
-
 class Image(base.BaseRichTextComponent):
     """A rich-text component representing an inline image."""
 
