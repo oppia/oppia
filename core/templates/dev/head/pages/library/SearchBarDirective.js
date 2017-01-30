@@ -205,6 +205,9 @@ oppia.directive('searchBar', [function() {
             }
 
             refreshSearchBarLabels();
+
+            // Notify the function that handles overflow in case the search
+            // elements load after it has already been run.
             $rootScope.$broadcast('searchBarLoaded', true);
           }
         );
