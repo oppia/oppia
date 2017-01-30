@@ -177,7 +177,7 @@ if [ ! -d "$NODE_PATH" ]; then
     fi
   fi
 
-  curl --silent http://nodejs.org/dist/v6.9.1/$NODE_FILE_NAME.tar.gz -o node-download.tgz
+  curl -o node-download.tgz http://nodejs.org/dist/v6.9.1/$NODE_FILE_NAME.tar.gz
   tar xzf node-download.tgz --directory $TOOLS_DIR
   mv $TOOLS_DIR/$NODE_FILE_NAME $NODE_PATH
   rm node-download.tgz

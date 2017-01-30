@@ -2,16 +2,18 @@
   <div class="navbar-header protractor-test-navbar-header pull-left">
     <a ng-if="windowIsNarrow" ng-click="toggleSidebar()"
        class="navbar-brand oppia-navbar-menu oppia-transition-200">
-      <i class="material-icons oppia-navbar-menu-icon">&#xE5D2;</i>
+      <i class="material-icons oppia-navbar-menu-icon" ng-if="!isSidebarShown()" >&#xE5D2;</i>
+      <i class="material-icons oppia-navbar-close-icon" ng-if="isSidebarShown()" >&#10005;</i>
     </a>
+
     <a class="oppia-navbar-brand-name oppia-transition-200" href="/"
        focus-on="<[::LABEL_FOR_CLEARING_FOCUS]>">
       <img ng-src="<[getStaticImageUrl('/logo/288x128_logo_white.png')]>" class="oppia-logo"
-           ng-class="windowIsNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'">
+           ng-class="windowIsNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'" alt="Oppia Home">
     </a>
     <!-- This is needed for the correct image to appear when an exploration is shared using G+. -->
     <a style="display: none;">
-      <img ng-src="<[getStaticImageUrl('/logo/288x128_logo_mint.png')]>" itemprop="image">
+      <img ng-src="<[getStaticImageUrl('/logo/288x128_logo_mint.png')]>" itemprop="image" alt="Oppia Home">
     </a>
   </div>
 
@@ -116,7 +118,7 @@
             ng-mouseleave="onMouseoutDropdownMenu($event)">
           <li>
             <a href style="padding: 0; width: 200px;" ng-click="onLoginButtonClicked()">
-              <img ng-src="<[getStaticImageUrl('/signin/Red-signin-Long-base-44dp.png')]>">
+              <img ng-src="<[getStaticImageUrl('/signin/Red-signin-Long-base-44dp.png')]>" alt="Sign in with Google">
             </a>
           </li>
         </ul>

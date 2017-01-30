@@ -101,7 +101,7 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
         });
 
         answerGroups.forEach(function(answerGroup, answerIndex) {
-          var ruleSpecs = answerGroup.rule_specs;
+          var ruleSpecs = answerGroup.ruleSpecs;
           ruleSpecs.forEach(function(ruleSpec, ruleIndex) {
             var ruleInputs = ruleSpec.inputs.x;
             ruleInputs.forEach(function(ruleInput) {

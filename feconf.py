@@ -47,6 +47,7 @@ if PLATFORM == 'gae':
 else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 
+CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
@@ -67,6 +68,14 @@ OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
     'extensions', 'interactions', 'object_defaults.json')
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
     os.getcwd(), 'extensions', 'interactions', 'rules.json')
+
+# A mapping of interaction ids to their default classifier.
+INTERACTION_CLASSIFIER_MAPPING = {
+    'TextInput': 'LDAStringClassifier'
+}
+
+# Default label for classification algorithms.
+DEFAULT_CLASSIFIER_LABEL = '_default'
 
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
@@ -350,6 +359,13 @@ ALLOWED_RTE_EXTENSIONS = {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Video')
     },
 }
+
+
+# This list contains the IDs of the classifiers used for obtaining instances
+# class of classifiers using classifier_registry.
+ANSWER_CLASSIFIER_CLASS_IDS = [
+    'LDAStringClassifier',
+]
 
 # These categories and interactions are displayed in the order in which they
 # appear in the interaction selector.
