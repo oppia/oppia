@@ -157,6 +157,8 @@
             <div class="title-section" style="background-color: <[collectionSummary.thumbnail_bg_color]>; z-index: 1;">
               <img ng-src="<[collectionSummary.thumbnail_icon_url]>" class="thumbnail-image">
             </div>
+            <div class="title-section-mask" style="padding: 5px;"></div>
+            <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>"></div>
           </md-card>
 
           <exploration-summary-tile ng-if="!previewCardIsShown"
