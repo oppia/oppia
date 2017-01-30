@@ -32,6 +32,7 @@ from core.controllers import profile
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
+from core.controllers import subscriptions
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -312,6 +313,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/moderatorrights/<exploration_id>',
         editor.ExplorationModeratorRightsHandler),
     get_redirect_route(
+        r'/createhandler/notificationpreferences/<exploration_id>',
+        editor.UserExplorationEmailsHandler),
+    get_redirect_route(
         r'/createhandler/snapshots/<exploration_id>',
         editor.ExplorationSnapshotsHandler),
     get_redirect_route(
@@ -352,6 +356,12 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.SUGGESTION_URL_PREFIX,
         feedback.SuggestionHandler),
+    get_redirect_route(
+        r'%s' % feconf.SUBSCRIBE_URL_PREFIX,
+        subscriptions.SubscribeHandler),
+    get_redirect_route(
+        r'%s' % feconf.UNSUBSCRIBE_URL_PREFIX,
+        subscriptions.UnsubscribeHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.FLAG_EXPLORATION_URL_PREFIX,
         reader.FlagExplorationHandler),

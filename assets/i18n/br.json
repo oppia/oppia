@@ -145,7 +145,6 @@
 	"I18N_LIBRARY_N_LANGUAGES": "{languagesCount, plural, =1{1 yezh} other{# yezh}}",
 	"I18N_LIBRARY_PAGE_TITLE": "Levraoueg ergezhadennoù - Oppia",
 	"I18N_LIBRARY_RATINGS_TOOLTIP": "Priziadennoù",
-	"I18N_LIBRARY_UPDATED": "HIZIVAET",
 	"I18N_LIBRARY_VIEWS_TOOLTIP": "Gweladennoù",
 	"I18N_LIBRARY_VIEW_ALL": "Gwelet pep tra",
 	"I18N_PLAYER_BACK": "Distreiñ",

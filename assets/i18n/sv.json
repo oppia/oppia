@@ -115,7 +115,6 @@
 	"I18N_LIBRARY_N_CATEGORIES": "{categoriesCount, plural, =1{1 Kategori} other{# Kategorier}}",
 	"I18N_LIBRARY_RATINGS_TOOLTIP": "Betyg",
 	"I18N_LIBRARY_SEARCH_PLACEHOLDER": "Vad är du nyfiken på?",
-	"I18N_LIBRARY_UPDATED": "UPPDATERAD",
 	"I18N_LIBRARY_VIEWS_TOOLTIP": "Visningar",
 	"I18N_LIBRARY_VIEW_ALL": "Visa alla",
 	"I18N_PLAYER_BACK": "Tillbaka",

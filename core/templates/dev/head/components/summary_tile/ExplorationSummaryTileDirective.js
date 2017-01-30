@@ -116,10 +116,6 @@ oppia.directive('explorationSummaryTile', [function() {
             $scope.getLastUpdatedMsec());
         };
 
-        $scope.wasRecentlyUpdated = function() {
-          return oppiaDatetimeFormatter.isRecent($scope.getLastUpdatedMsec());
-        };
-
         $scope.getExplorationLink = function() {
           var result = '/explore/' + $scope.getExplorationId();
           if ($scope.getCollectionId()) {

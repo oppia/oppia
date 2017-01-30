@@ -81,7 +81,6 @@
 	"I18N_LIBRARY_N_LANGUAGES": "{languagesCount, plural, =1{Eng Sprooch} other{# Sproochen}}",
 	"I18N_LIBRARY_RATINGS_TOOLTIP": "Bewäertungen",
 	"I18N_LIBRARY_SEARCH_PLACEHOLDER": "Wourop sidd Dir virwëtzeg?",
-	"I18N_LIBRARY_UPDATED": "AKTUALISEIERT",
 	"I18N_LIBRARY_VIEW_ALL": "All weisen",
 	"I18N_PLAYER_BACK": "Zréck",
 	"I18N_PLAYER_CARD_NUMBER_TOOLTIP": "Kaart #",

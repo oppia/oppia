@@ -1,17 +1,17 @@
 <script type="text/ng-template" id="components/explorationFooter">
   <div class="footer navbar-fixed-bottom oppia-exploration-footer">
     <div class="row">
-      <div class="col-sm-6">
+      <div class="col-sm-5">
         <ul class="author-profile">
           <li>
             <img ng-src="<[getStaticImageUrl('/general/apple.svg')]>" class="exploration-footer-img"
-                 ng-if="contributorNames.length > 0">
+                 ng-if="contributorNames.length > 0" alt="">
           </li>
           <li class="hover-link"
               ng-mouseenter="hovering = true"
               ng-mouseleave="hovering = false">
             <div class="dropup" ng-class="{'open':hovering}">
-              <a id="dropdownMenu2" class="dropdown-toggle" ng-class="{'hovered-text':hovering}" 
+              <a id="dropdownMenu2" class="dropdown-toggle" ng-class="{'hovered-text':hovering}"
                  data-toggle="dropdown" ng-if="contributorNames.length > 0">
                 <h4 translate="I18N_FOOTER_AUTHOR_PROFILES" class="author-profile-text"
                     ng-class="{'hovered-text':hovering, 'not-hovered' : !hovering}"></h4>
@@ -26,18 +26,18 @@
           <li></li>
         </ul>
       </div>
-      <div class="col-sm-6">
+      <div class="col-sm-7">
         <div class="pull-right">
           <ul class="author-profile">
             <li>
-              <h4 translate="I18N_PLAYER_SHARE_THIS_EXPLORATION" class="share-exploration-footer"></h4>
+              <h4 translate="I18N_PLAYER_SHARE_THIS_EXPLORATION" class="oppia-share-exploration-footer"></h4>
             </li>
             <li>
               <sharing-links ng-if="explorationStatus !== 'private'"
                              ng-click="$event.stopPropagation()"
                              twitter-text="getTwitterText()"
                              exploration-id="explorationId"
-                             layout-type="row" 
+                             layout-type="row"
                              class="oppia-exploration-footer-sharing-links">
               </sharing-links>
             </li>
@@ -49,6 +49,7 @@
 </script>
 
 <style>
+
 
   .oppia-exploration-footer {
     background-color: #094142;
@@ -69,8 +70,8 @@
 
   .oppia-exploration-footer .author-profile {
     color: #fff;
-    display: inline;
     list-style-type: none;
+    padding-left: 0;
   }
 
   .oppia-exploration-footer .author-profile a:hover {
@@ -116,7 +117,7 @@
 
   .oppia-exploration-footer .author-profile-dropdown-menu li > a {
     color: #094142;
-    padding: 3px 20px;
+    padding: 3px 6px;
   }
 
   .oppia-exploration-footer .author-profile-dropdown-menu li a:hover {
@@ -127,12 +128,12 @@
   .oppia-exploration-footer .author-profile-text {
     cursor: default;
     line-height: 0.6;
-    padding-left: 4px;
+    padding-left: 6px;
     text-overflow: clip;
     white-space: nowrap;
   }
 
-  .oppia-exploration-footer .author-profile-text.not-hovered{
+  .oppia-exploration-footer .author-profile-text.not-hovered {
     color: #fff;
     text-transform: uppercase;
   }
@@ -143,9 +144,9 @@
     text-transform: uppercase;
   }
 
-  .oppia-exploration-footer .share-exploration-footer {
+  .oppia-exploration-footer .oppia-share-exploration-footer {
     line-height: 0.6;
-    padding-right:10px;
+    padding-right: 20px;
     text-transform: uppercase;
   }
 
@@ -155,11 +156,24 @@
 
   .oppia-exploration-footer .oppia-exploration-footer-sharing-links ul {
     display: block;
-    float: left;
+    float: right;
+    padding-right: 20px;
     margin: -8px;
   }
 
   .oppia-exploration-footer .oppia-exploration-footer-sharing-links li {
     float: left;
+  }
+
+  @media (max-width: 475px) {
+    .oppia-exploration-footer-sharing-links {
+      display: none;
+    }
+  }
+
+  @media (max-width: 658px) {
+    .oppia-share-exploration-footer {
+      display: none;
+    }
   }
 </style>

@@ -46,7 +46,7 @@ _RAND_RANGE = 127 * 127
 class FeedbackThreadModel(base_models.BaseModel):
     """Threads for each exploration.
 
-    The id/key of instances of this class has the form
+    The id of instances of this class has the form
         [EXPLORATION_ID].[THREAD_ID]
     """
     # ID of the exploration the thread is about.
@@ -181,7 +181,7 @@ class FeedbackThreadModel(base_models.BaseModel):
 class FeedbackMessageModel(base_models.BaseModel):
     """Feedback messages. One or more of these messages make a thread.
 
-    The id/key of instances of this class has the form
+    The id of instances of this class has the form
         [EXPLORATION_ID].[THREAD_ID].[MESSAGE_ID]
     """
     # ID corresponding to an entry of FeedbackThreadModel in the form of

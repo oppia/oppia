@@ -14,8 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from core.domain.classifier.lda_string_classifier import LDAStringClassifier
+from core.domain import classifier_registry
 from core.tests import test_utils
+import feconf
 
 # pylint: disable=protected-access
 
@@ -39,7 +40,9 @@ class LDAStringClassifierUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(LDAStringClassifierUnitTests, self).setUp()
-        self.classifier = LDAStringClassifier()
+        self.classifier = (
+            classifier_registry.ClassifierRegistry.get_classifier_by_id(
+                feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']))
         self.classifier.train(self._EXAMPLES_TRAIN)
 
     def _validate_instance(self):

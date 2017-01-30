@@ -17,6 +17,33 @@
         background: #eeeeee no-repeat center center fixed;
         background-size: cover;
       }
+      .oppia-exploration-list-table {
+        background: #fff;
+        border-radius: 2px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
+        float: left;
+        left: 10%;
+        margin-top: 20px;
+        max-width: 675px;
+        padding: 20px 20px 25px 20px;
+        position: fixed;
+        text-align: left;
+        top: 168px;
+      }
+      .oppia-card-preview-panel {
+        background: #fff;
+        border-radius: 2px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
+        padding: 30px 75px 70px 75px;
+        pointer-events: none;
+        position: fixed;
+        right: 70px;
+        text-align: left;
+        top: 188px;
+      }
+      .oppia-exploration-list-table-item {
+        min-width: 150px;
+      }
     </style>
   {% endif %}
 {% endblock header_js %}
@@ -46,44 +73,69 @@
   <div ng-controller="CollectionPlayer">
     <background-banner></background-banner>
     <div ng-if="collection" class="oppia-collection-player-tiles-container">
-      <h2 ng-if="!collectionPlaythrough.hasFinishedCollection()" class="oppia-page-heading">
-        <span ng-if="!collectionPlaythrough.hasStartedCollection()">Begin <[collection.getTitle()]>:</span>
+      <h1 ng-if="!collectionPlaythrough.hasFinishedCollection()" class="oppia-page-heading">
+        <span ng-if="!collectionPlaythrough.hasStartedCollection()" class="oppia-collection-player-title-font">Begin <[collection.getTitle()]>:</span>
         <span ng-if="collectionPlaythrough.hasStartedCollection()">Continue <[collection.getTitle()]>:</span>
-      </h2>
-      <h2 ng-if="collectionPlaythrough.hasFinishedCollection()" class="oppia-page-heading">
+      </h1>
+      <h1 ng-if="collectionPlaythrough.hasFinishedCollection()" class="oppia-page-heading">
         <span>You have finished the collection! Feel free to replay any explorations below.</span>
-      </h2>
+      </h1>
 
-      {% if is_logged_in %}
-        <div ng-if="collectionPlaythrough.getNextRecommendedCollectionNodeCount() > 0" class="oppia-collection-player-tile-section">
-          <div class="oppia-collection-player-small-text">
-            Next exploration<span ng-if="collectionPlaythrough.getNextRecommendedCollectionNodeCount() > 1">s</span> to play
-          </div>
-          <collection-node-list collection-id="collectionId" collection-nodes="getNextRecommendedCollectionNodes()"></collection-node-list>
+      <div ng-if="collection" class="oppia-exploration-list-table">
+
+        <table class="oppia-dashboard-table">
+          <tr>
+            <th>
+              <p>Exploration</p>
+            </th>
+            <th class="hidden-md hidden-sm hidden-xs">
+              <p>Objective</p>
+            </th>
+          </tr>
+          <tr ng-repeat="node in collection.getCollectionNodes()"
+              class="exploration-list-item">
+            <td class="oppia-exploration-list-table-item">
+              <a ng-href="/explore/<[node.getExplorationId()]>"
+                 ng-mouseover="updateExplorationPreview(node.getExplorationId())"
+                 ng-mouseleave="togglePreviewCard()"
+                 class="oppia-dashboard-list-summary">
+                <[node.getExplorationSummaryObject().title]>
+              </a>
+            </td>
+            <td class="hidden-md hidden-sm hidden-xs oppia-exploration-list-table-item">
+              <p>
+                <[node.getCapitalizedObjective()]>
+              </p>
+            </td>
+          </tr>
+        </table>
+
+
+        <div ng-if="collection" class="oppia-card-preview-panel hidden-xs">
+
+          <md-card class="oppia-activity-summary-tile md-default-theme">
+            <div class="title-section" style="background-color: <[collectionSummary.thumbnail_bg_color]>; z-index: 1;">
+              <img ng-src="<[collectionSummary.thumbnail_icon_url]>" class="thumbnail-image">
+            </div>
+          </md-card>
+
+          <exploration-summary-tile ng-if="!previewCardIsShown"
+                                    collection-id="getCollectionId()"
+                                    exploration-id="currentExplorationId"
+                                    exploration-title="summaryToPreview.title"
+                                    last-updated-msec="summaryToPreview.last_updated_msec"
+                                    objective="summaryToPreview.objective"
+                                    category="summaryToPreview.category"
+                                    ratings="summaryToPreview.ratings"
+                                    num-views="summaryToPreview.num_views"
+                                    thumbnail-icon-url="summaryToPreview.thumbnail_icon_url"
+                                    thumbnail-bg-color="summaryToPreview.thumbnail_bg_color"
+                                    is-community-owned="summaryToPreview.community_owned"
+                                    style="position: absolute; left: 75px; top: 30px; z-index: 10;">
+          <exploration-summary-tile/>
+
         </div>
-
-        <div ng-if="collectionPlaythrough.getCompletedExplorationNodeCount() > 0" class="oppia-collection-player-tile-section">
-          <div class="oppia-collection-player-small-text">
-            Completed exploration<span ng-if="collectionPlaythrough.getCompletedExplorationNodeCount() > 1">s</span>
-          </div>
-          <collection-node-list collection-id="collectionId" collection-nodes="getCompletedExplorationNodes()"></collection-node-list>
-        </div>
-
-        <div ng-if="showingAllExplorations && (getNonRecommendedCollectionNodeCount() > 0)" class="oppia-collection-player-tile-section oppia-collection-animate-slide">
-          <div class="oppia-collection-player-small-text">
-            Upcoming exploration<span ng-if="getNonRecommendedCollectionNodeCount() > 1">s</span> in this collection
-          </div>
-          <collection-node-list collection-id="collectionId" collection-nodes="getNonRecommendedCollectionNodes()"></collection-node-list>
-        </div>
-
-        <a class="oppia-collection-player-small-text" ng-if="getNonRecommendedCollectionNodeCount() > 0" ng-click="toggleShowAllExplorations()">
-          <span ng-if="!showingAllExplorations"><span class="fa fa-chevron-down"></span> Show upcoming explorations</span>
-          <span ng-if="showingAllExplorations"><span class="fa fa-chevron-up"></span> Only show current progress</span>
-        </a>
-      {% else %}
-        <div class="oppia-collection-player-small-text">You must login to save your progress.</div>
-        <collection-node-list collection-id="collectionId" collection-nodes="collection.getCollectionNodes()"></collection-node-list>
-      {% endif %}
+      </div>
     </div>
   </div>
 
