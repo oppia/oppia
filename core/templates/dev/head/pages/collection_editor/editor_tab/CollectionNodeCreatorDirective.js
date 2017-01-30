@@ -40,7 +40,7 @@ oppia.directive('collectionNodeCreator', [function() {
           '/exploration/metadata_search?q=<search_query>');
 
         $scope.getExplorations = function(searchQuery) {
-          if(/^[a-zA-Z0-9- ]*$/.test(searchQuery) == true) {
+          if (/^[a-zA-Z0-9- ]*$/.test(searchQuery) == true) {
             queryUrl = UrlInterpolationService.interpolateUrl(
               SEARCH_EXPLORATION_URL_TEMPLATE, {
                 search_query: searchQuery
@@ -52,17 +52,16 @@ oppia.directive('collectionNodeCreator', [function() {
                 return '(#' + item.id + ') ' + item.title;
               });
             });
-          }
-          else {
+          } else {
             alertsService.addWarning(
               'Cannot search explorations with special characters in title.');
           }
         };
 
         var addExplorationToCollection = function(newExplorationId) {
-          if(newExplorationId.length > 1 && newExplorationId[0] == '(') {
+          if (newExplorationId.length > 1 && newExplorationId[0] == '(') {
             var temp = '';
-            for(var i = 2; newExplorationId[i] != ')'; i++) {
+            for (var i = 2; newExplorationId[i] != ')'; i++) {
               temp += newExplorationId[i];
             }
             newExplorationId = temp;
