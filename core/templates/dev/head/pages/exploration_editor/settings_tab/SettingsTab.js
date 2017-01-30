@@ -26,6 +26,7 @@ oppia.controller('SettingsTab', [
   'explorationParamChangesService', 'explorationWarningsService',
   'CATEGORY_LIST', 'explorationAdvancedFeaturesService',
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'userExplorationEmailsHandler',
+  'EditableExplorationBackendApiService',
   function(
       $scope, $http, $window, $modal, $rootScope,
       explorationData, explorationTitleService, explorationCategoryService,
@@ -35,7 +36,8 @@ oppia.controller('SettingsTab', [
       changeListService, alertsService, explorationStatesService,
       explorationParamChangesService, explorationWarningsService,
       CATEGORY_LIST, explorationAdvancedFeaturesService,
-      EXPLORATION_TITLE_INPUT_FOCUS_LABEL, userExplorationEmailsHandler) {
+      EXPLORATION_TITLE_INPUT_FOCUS_LABEL, userExplorationEmailsHandler,
+      EditableExplorationBackendApiService) {
     $scope.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
 
@@ -265,11 +267,8 @@ oppia.controller('SettingsTab', [
           }
         ]
       }).result.then(function() {
-        var deleteUrl = $scope.explorationDataUrl;
-        if (role) {
-          deleteUrl += ('?role=' + role);
-        }
-        $http['delete'](deleteUrl).then(function() {
+        EditableExplorationBackendApiService.deleteExploration(
+          $scope.explorationId, role).then(function() {
           $window.location = DASHBOARD_PAGE_URL;
         });
       });

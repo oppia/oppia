@@ -127,10 +127,10 @@ oppia.factory('versionsTreeService', [function() {
 
 oppia.factory('compareVersionsService', [
   '$http', '$q', 'versionsTreeService', 'explorationData',
-  'ExplorationDiffService',
+  'ExplorationDiffService', 'EditableExplorationBackendApiService',
   function(
       $http, $q, versionsTreeService, explorationData,
-      ExplorationDiffService) {
+      ExplorationDiffService, EditableExplorationBackendApiService) {
     /**
      * Constructs the combined list of changes needed to get from v1 to v2.
      *
@@ -192,14 +192,14 @@ oppia.factory('compareVersionsService', [
         if (v1 > v2) {
           throw new Error('Tried to compare v1 > v2.');
         }
-        var explorationDataUrl = (
-          '/createhandler/data/' + explorationData.explorationId + '?v=');
         return $q.all({
-          v1Data: $http.get(explorationDataUrl + v1),
-          v2Data: $http.get(explorationDataUrl + v2)
+          v1Data: EditableExplorationBackendApiService.fetchExploration(
+            explorationData.explorationId, null, v1),
+          v2Data: EditableExplorationBackendApiService.fetchExploration(
+            explorationData.explorationId, null, v2)
         }).then(function(response) {
-          var v1States = response.v1Data.data.states;
-          var v2States = response.v2Data.data.states;
+          var v1States = response.v1Data.states;
+          var v2States = response.v2Data.states;
 
           // Track changes from v1 to LCA, and then from LCA to v2.
           var lca = versionsTreeService.findLCA(v1, v2);
@@ -219,9 +219,9 @@ oppia.factory('compareVersionsService', [
             links: diffGraphData.links,
             finalStateIds: diffGraphData.finalStateIds,
             v1InitStateId: diffGraphData.originalStateIds[
-              response.v1Data.data.init_state_name],
+              response.v1Data.init_state_name],
             v2InitStateId: diffGraphData.stateIds[
-              response.v2Data.data.init_state_name],
+              response.v2Data.init_state_name],
             v1States: v1States,
             v2States: v2States
           };
