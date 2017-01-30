@@ -2531,27 +2531,31 @@ div#ng-curtain {
 }
 .oppia-logo-wide {
   margin-left: 25px;
+  width: 90px;
 }
 .oppia-logo-small {
   margin-left: 6px;
 }
 
-@media (min-width: 500px) {
-  .oppia-navbar-tabs-narrow {
-    /*
-      This needs to take i18n of the "Create" and "Sign in" buttons into
-      account.
-    */
-    min-width: 260px;
-  }
-  .oppia-navbar-tabs {
-    /*
-      This needs to take i18n of the "Create" and "Sign in" buttons into
-      account.
-    */
-    min-width: 580px;
-  }
+.oppia-navbar-tabs {
+  white-space: nowrap;
 }
+.nav, .oppia-navbar-tabs > li, .oppia-navbar-tabs > create-activity-button {
+  display: inline-block;
+  vertical-align: top;
+}
+.oppia-navbar-clickable-dropdown:hover ul.dropdown-menu, .oppia-clickable-navbar-element:hover {
+  display: inline-block;
+}
+.oppia-navbar-nav .dropdown-menu {
+  left: auto;
+  right: 0;
+}
+.navbar-header {
+  /* Prevent whitespace from inline-block elements from adding space. */
+  font-size: 0;
+}
+
 .nav > li > a.oppia-navbar-tab {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 14px;

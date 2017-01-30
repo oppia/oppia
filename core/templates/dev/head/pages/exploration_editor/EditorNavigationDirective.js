@@ -27,14 +27,14 @@ oppia.directive('editorNavigation', [function() {
       'explorationWarningsService',
       'stateEditorTutorialFirstTimeService',
       'threadDataService', 'siteAnalyticsService',
-      'explorationContextService',
+      'explorationContextService', 'windowDimensionsService',
       function(
           $scope, $rootScope, $timeout, $modal,
           routerService, explorationRightsService,
           explorationWarningsService,
           stateEditorTutorialFirstTimeService,
           threadDataService, siteAnalyticsService,
-          explorationContextService) {
+          explorationContextService, windowDimensionsService) {
         $scope.postTutorialHelpPopoverIsShown = false;
 
         $scope.$on('openPostTutorialHelpPopover', function() {
@@ -96,6 +96,11 @@ oppia.directive('editorNavigation', [function() {
         $scope.selectHistoryTab = routerService.navigateToHistoryTab;
         $scope.selectFeedbackTab = routerService.navigateToFeedbackTab;
         $scope.getOpenThreadsCount = threadDataService.getOpenThreadsCount;
+        $scope.isLargeScreen = (windowDimensionsService.getWidth() >= 1024);
+
+        windowDimensionsService.registerOnResizeHook(function() {
+          $scope.isLargeScreen = (windowDimensionsService.getWidth() >= 1024);
+        });
       }
     ]
   };
