@@ -52,7 +52,7 @@ SCHEMA_TYPE_LIST = 'list'
 SCHEMA_TYPE_UNICODE = 'unicode'
 
 
-def normalize_against_schema(obj, schema, apply_custom_validators = True):
+def normalize_against_schema(obj, schema):
     """Validate the given object using the schema, normalizing if necessary.
 
     Returns:
@@ -62,7 +62,7 @@ def normalize_against_schema(obj, schema, apply_custom_validators = True):
         AssertionError: if the object fails to validate against the schema.
     """
     normalized_obj = None
-     
+
     if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BOOL:
         assert isinstance(obj, bool), ('Expected bool, received %s' % obj)
         normalized_obj = obj
@@ -136,14 +136,13 @@ def normalize_against_schema(obj, schema, apply_custom_validators = True):
                 normalized_obj, **kwargs)
 
     # Validate the normalized object.
-    if apply_custom_validators:
-        if SCHEMA_KEY_VALIDATORS in schema:
-            for validator in schema[SCHEMA_KEY_VALIDATORS]:
-                kwargs = dict(validator)
-                del kwargs['id']
-                assert _Validators.get(validator['id'])(normalized_obj, **kwargs), (
-                    'Validation failed: %s (%s) for object %s' % (
-                        validator['id'], kwargs, normalized_obj))
+    if SCHEMA_KEY_VALIDATORS in schema:
+        for validator in schema[SCHEMA_KEY_VALIDATORS]:
+            kwargs = dict(validator)
+            del kwargs['id']
+            assert _Validators.get(validator['id'])(normalized_obj, **kwargs), (
+                'Validation failed: %s (%s) for object %s' % (
+                    validator['id'], kwargs, normalized_obj))
 
     return normalized_obj
 
@@ -239,6 +238,7 @@ class _Validators(object):
     def is_nonempty(obj):
         """Always returns True so that an input field can be made required
         without adding a default value."""
+        obj = True
         return obj
 
     @staticmethod
