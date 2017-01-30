@@ -44,8 +44,7 @@
 
       <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>">
         <span ng-if="getObjective()" class="oppia-activity-summary-popover">
-          <span popover="<[getObjective()| truncateAndCapitalize]>" popover-placement="top" 
-          popover-trigger="mouseenter">
+          <span popover="<[getObjective()]>" popover-placement="top" popover-trigger="mouseenter">
             <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
               <[getObjective() | truncateAndCapitalize: 40]>
             </div>
@@ -85,14 +84,13 @@
   </md-card>
 </script>
 
-
-<style> 
+<style>
   .oppia-activity-summary-popover .popover.right {
     bottom: -10px;
-    min-width: 197px;
+    min-width: 200px;
   }
   .oppia-activity-summary-popover .popover.top {
-    margin-top: 25px;
+    margin-top: 30px;
     padding: 5px;
   }
 </style>
