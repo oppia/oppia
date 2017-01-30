@@ -59,8 +59,9 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self.assertTrue(isinstance(ca_spec['description'], basestring))
             self.assertGreater(len(ca_spec['description']), 0)
 
-            #Image component has a required field whose default value is non-empty
-            #hence a False is passed as argument so that the tests pass
+            #Image component has a required field whose default value is
+            #non-empty, hence a False is passed as argument so that the tests
+            #pass
             schema_utils_test.validate_schema(ca_spec['schema'])
             self.assertEqual(
                 ca_spec['default_value'],

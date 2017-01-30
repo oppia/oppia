@@ -52,7 +52,7 @@ SCHEMA_TYPE_LIST = 'list'
 SCHEMA_TYPE_UNICODE = 'unicode'
 
 
-def normalize_against_schema(obj, schema, apply_custom_validators = True):
+def normalize_against_schema(obj, schema, apply_custom_validators=True):
     """Validate the given object using the schema, normalizing if necessary.
 
     Returns:
