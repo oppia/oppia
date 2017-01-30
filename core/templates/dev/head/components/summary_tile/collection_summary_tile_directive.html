@@ -1,15 +1,15 @@
 <script type="text/ng-template" id="summaryTile/collection">
   <md-card class="oppia-activity-summary-tile">
-    <a ng-href="<[getCollectionLink()]>">
+    <a ng-href="<[getCollectionLink()]>" style="text-decoration: none;">
       <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
         <img class="collection-corner-image" ng-src="/assets/images/general/collection_corner.svg" alt="">
         <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
-        <h3 class="activity-title"><[getCollectionTitle()]></h3>
+        <h3 class="activity-title"><[getCollectionTitle() || DEFAULT_EMPTY_TITLE]></h3>
       </div>
 
       <div>
         <div class="objective">
-          <[getObjective() | truncateAndCapitalize: 45]>
+          <span ng-if="getObjective()"><[getObjective() | truncateAndCapitalize: 45]></span>
           <span ng-if="!getObjective()">No objective specified.</span>
         </div>
 
@@ -21,11 +21,8 @@
           </li>
 
           <li>
-            <span ng-if="!wasRecentlyUpdated()">
+            <span>
               <[getLastUpdatedDatetime()]>
-            </span>
-            <span ng-if="wasRecentlyUpdated()" class="recently-updated">
-              UPDATED
             </span>
           </li>
         </ul>
