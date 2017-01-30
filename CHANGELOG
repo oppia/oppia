@@ -3,6 +3,53 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://github.com/oppia/oppia/commits/master
 
 
+v2.3.8 (10 Jan 2017)
+--------------------
+Learner view:
+* Fix tutor card icon not clickable in learner view (PR #2824)  
+* Fix #2832: Add space between footer and summary explorations container (PR #2833)  
+* Fix #2842: do not submit an answer or clear the help card if there is already a destination card defined. (PR #2843)  
+* Fix #2800: Style the author profile pop-up like about dropdown (PR #2864)  
+* Fix #2680: Ensure that the the help card can be seen (PR #2835)  
+* Fix #2588: Make LATEX smaller in learner view (PR #2854)  
+
+Splash and donations pages:
+* Add call to action links on English default splash page (PR #2818)
+* Fix #2855: Fix showing help text when javascript is not enabled (PR #2856)
+* Fix #2128: Add alt tags to about page (PR #2858)  
+* Fix #2877: splash page banner should not be able to scroll horizontally. (PR #2879)  
+* Add 'Get Started' link to the sidebar. (PR #2836)  
+* Fix #2815:add third button for credit card payment (PR #2881)  
+* Fix #2128: Add alt tags to donate, library, and splash pages (PR #2882)  
+
+Dashboard:
+* Fix #2764: Enable right clickability for all explorations in the dashboard (PR #2823)  
+* Remove the 'total number of feedback threads' statistic from the dashboard. (PR #2837)  
+* Fix #2548: Make sorting in the dashboard more intuitive. (PR #2838)  
+
+Other pages:
+* Fix #2716: Show only simple editor tools on medium screens (PR #2850)  
+* Fix #2789: Remove white panel behind exploration cards in profile page. Remove 'Portfolio' text. (PR #2810)  
+* Fix #2026: Add panel to show collection owner and permissions (PR #2865)  
+* Fix #2801: Change collection style in library and remove shadows from carousel scrolling. (PR #2876)  
+
+I18N:
+* Update various translations
+
+Emails:
+* Initial work on email muting (PR #2851)
+* Initial work on email subscription preferences (PR #2849, #2878, #2886)
+
+Code health:
+* Fix #2248: Add e2e tests for feedback on explorations (PR #2753)
+* Fix #2251: Add e2e tests for parameters (PR #2834)
+* Add tests to make sure that test email is not sent to query recipients. (#2848)  
+* Update docstrings in user_services.py (PR #2622)  
+* Remove unused images in assets/common (PR #2847)
+* Fix #2727: Refactor classifier so a BaseClassificationAlgorithm class can be used as a base for classification algorithms (PR #2743)
+* Fix #2722: Split exploration editor into several files (PR #2844)  
+
+
 v2.3.7 (4 Dec 2016)
 -------------------
 Learner view:

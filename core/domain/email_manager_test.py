@@ -135,7 +135,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
 
     def test_email_is_not_sent_if_recipient_has_declined_such_emails(self):
         user_services.update_email_preferences(
-            self.new_user_id, True, False, False)
+            self.new_user_id, True, False, False, False)
 
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             email_manager.send_role_notification_email(
@@ -1826,7 +1826,8 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         # Both users have disabled all emails globally, therefore they
         # should not receive any emails.
         for user_id in user_ids:
-            user_services.update_email_preferences(user_id, True, True, False)
+            user_services.update_email_preferences(user_id, True, True, False,
+                                                   True)
 
         self.assertListEqual(email_manager.can_users_receive_thread_email(
             user_ids, exp_id, True), [False, False])
@@ -1840,7 +1841,8 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
             user_ids[0], exp_id, mute_feedback_notifications=False)
         user_services.set_email_preferences_for_exploration(
             user_ids[1], exp_id, mute_suggestion_notifications=False)
-        user_services.update_email_preferences(user_id, True, True, False)
+        user_services.update_email_preferences(user_id, True, True, False,
+                                               True)
         self.assertListEqual(email_manager.can_users_receive_thread_email(
             user_ids, exp_id, True), [False, False])
         self.assertTrue(email_manager.can_users_receive_thread_email(
@@ -1849,7 +1851,8 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         # Both user have enabled all emails globally, therefore they should
         # receive all emails.
         for user_id in user_ids:
-            user_services.update_email_preferences(user_id, True, True, True)
+            user_services.update_email_preferences(user_id, True, True, True,
+                                                   True)
 
         self.assertListEqual(email_manager.can_users_receive_thread_email(
             user_ids, exp_id, True), [True, True])

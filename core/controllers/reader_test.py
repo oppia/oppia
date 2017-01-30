@@ -17,7 +17,7 @@
 import os
 
 from core.controllers import reader
-from core.domain.classifier import lda_string_classifier
+from core.domain import classifier_registry
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import param_domain
@@ -135,15 +135,14 @@ class ReaderClassifyTests(test_utils.GenericTestBase):
             exp_services.get_exploration_by_id(exploration_id).states['Home'])
 
     def _is_string_classifier_called(self, answer):
+        sc = classifier_registry.ClassifierRegistry.get_classifier_by_id(
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])
         string_classifier_predict = (
-            lda_string_classifier.LDAStringClassifier.predict)
+            sc.__class__.predict)
         predict_counter = test_utils.CallCounter(
             string_classifier_predict)
 
-        with self.swap(
-            lda_string_classifier.LDAStringClassifier,
-            'predict', predict_counter):
-
+        with self.swap(sc.__class__, 'predict', predict_counter):
             response = reader.classify(self.exp_state, answer)
 
         answer_group_index = response['answer_group_index']
