@@ -87,13 +87,13 @@ oppia.factory('explorationData', [
           // are discarded, otherwise the exploration-with-draft-changes
           // (which is cached here) will be reused.
           return EditableExplorationBackendApiService.fetchExploration(
-            explorationId, true, null).then(function(data) {
+            explorationId, true, null).then(function(response) {
             $log.info('Retrieved exploration data.');
-            $log.info(data);
+            $log.info(response);
 
-            explorationData.data = data;
+            explorationData.data = response;
 
-            return data;
+            return response;
           });
         }
       },
@@ -101,7 +101,7 @@ oppia.factory('explorationData', [
       // exploration.
       getLastSavedData: function() {
         return EditableExplorationBackendApiService.fetchExploration(
-          explorationId, null, null).then(function(data) {
+          explorationId, null, null).then(function(respon) {
           $log.info('Retrieved saved exploration data.');
           $log.info(data);
 
@@ -129,13 +129,13 @@ oppia.factory('explorationData', [
           changeList, commitMessage, successCallback, errorCallback) {
         EditableExplorationBackendApiService.updateExploration(explorationId,
           explorationData.data.version, commitMessage, changeList).then(
-            function(data) {
+            function(response) {
           alertsService.clearWarnings();
-          explorationData.data = data;
+          explorationData.data = response;
           if (successCallback) {
             successCallback(
-              data.is_version_of_draft_valid,
-              data.draft_changes);
+              response.is_version_of_draft_valid,
+              response.draft_changes);
           }
         }, function() {
           if (errorCallback) {
