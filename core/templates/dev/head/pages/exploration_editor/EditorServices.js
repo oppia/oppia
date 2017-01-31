@@ -18,10 +18,10 @@
 
 // Service for handling all interactions with the exploration editor backend.
 oppia.factory('explorationData', [
-  '$http', '$log', 'alertsService', 'ReadOnlyExplorationBackendApiService',
+  '$http', '$log', 'alertsService',
   'EditableExplorationBackendApiService', '$q',
-  function($http, $log, alertsService, ReadOnlyExplorationBackendApiService,
-    EditableExplorationBackendApiService, $q) {
+  function($http, $log, alertsService, EditableExplorationBackendApiService,
+    $q) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
     var pathnameArray = window.location.pathname.split('/');
@@ -101,11 +101,11 @@ oppia.factory('explorationData', [
       // exploration.
       getLastSavedData: function() {
         return EditableExplorationBackendApiService.fetchExploration(
-          explorationId, null, null).then(function(respon) {
+          explorationId, null, null).then(function(response) {
           $log.info('Retrieved saved exploration data.');
-          $log.info(data);
+          $log.info(response);
 
-          return data;
+          return response;
         });
       },
       resolveAnswers: function(stateName, resolvedAnswersList) {
