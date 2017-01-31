@@ -306,48 +306,17 @@
 
         <ul class="oppia-dashboard-tiles"
             ng-if="activeTab === 'myCollections' && collectionsList.length > 0">
-          <md-card class="oppia-activity-summary-tile oppia-dashboard-collection-tile bottom-card"
-                   ng-repeat="collection in collectionsList">
-            <div class="title-section"
-                 style="background-color: <[collection.thumbnail_bg_color]>;">
-            </div>
-            <md-card class="oppia-activity-summary-tile middle-card">
-              <div class="title-section"
-                   style="background-color: <[collection.thumbnail_bg_color]>;">
-              </div>
-              <md-card class="oppia-activity-summary-tile top-card">
-                <a ng-href="<[getCollectionUrl(collection.id)]>">
-                  <div class="title-section"
-                       style="background-color: <[collection.thumbnail_bg_color]>;">
-                    <img class="thumbnail-image" ng-src="<[collection.thumbnail_icon_url]>">
-                    <h2 class="activity-title"><[collection.title || DEFAULT_EMPTY_TITLE]></h2>
-                  </div>
-
-                  <div>
-                    <div class="objective">
-                      <span ng-if="collection.objective"><[collection.objective | truncateAndCapitalize: 45]></span>
-                      <span ng-if="!collection.objective">No objective specified.</span>
-                    </div>
-
-                    <ul layout="row" class="metrics" layout-align="space-between center">
-                      <li>
-                        <span> COLLECTION (<[collection.node_count]>)</span>
-                      </li>
-
-                      <li>
-                        <span>
-                          <[getLocaleAbbreviatedDatetimeString(collection.last_updated)]>
-                        </span>
-                      </li>
-                    </ul>
-                  </div>
-                  <div class="title-section-mask top-card-mask"></div>
-                </a>
-              </md-card>
-              <div class="title-section-mask"></div>
-            </md-card>
-            <div class="title-section-mask"></div>
-          </md-card>
+          <span ng-repeat="collection in collectionsList">
+            <collection-summary-tile collection-id="collection.id"
+                                     collection-title="collection.title"
+                                     last-updated-msec="collection.last_updated"
+                                     node-count="collection.node_count"
+                                     objective="collection.objective"
+                                     thumbnail-icon-url="collection.thumbnail_icon_url"
+                                     thumbnail-bg-color="collection.thumbnail_bg_color"
+                                     is-linked-to-editor-page="true">
+            </collection-summary-tile>
+          </span>
         </ul>
       </div>
     {% endif %}

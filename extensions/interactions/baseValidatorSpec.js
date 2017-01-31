@@ -35,7 +35,7 @@ describe('Interaction validator', function() {
       ruleSpecs = [];
     }
     return {
-      rule_specs: ruleSpecs,
+      ruleSpecs: ruleSpecs,
       outcome: outcome
     };
   };

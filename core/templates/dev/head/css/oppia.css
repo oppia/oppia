@@ -118,6 +118,9 @@ body {
   width: 100%;
 }
 
+.oppia-stop-scroll {
+  overflow-y: hidden;
+}
 /* According to the Angular documentation - https://docs.angularjs.org/api/ng/directive/ngCloak -
    the following rule needs to be added to the css file in order for ng-cloak to work.  */
 [ng\:cloak], [ng-cloak], .ng-cloak {
@@ -677,10 +680,9 @@ textarea {
   background: none;
 }
 
-
-
 .oppia-sidebar-menu-open .oppia-sidebar-menu {
   box-shadow: 1px 0 3px rgba(0,0,0,0.12), 1px 0 2px rgba(0,0,0,0.24);
+  overflow-y: scroll;
   -webkit-transform: translate3d(0, 0, 0);
   transform: translate3d(0, 0, 0);
   visibility: visible;
@@ -1505,7 +1507,7 @@ md-card.oppia-dashboard-tile {
 }
 
 .oppia-cc-icon {
-  bottom: 34px;
+  bottom: 50px;
   opacity: 0.4;
   position: fixed;
   right: 25px;
@@ -1513,6 +1515,7 @@ md-card.oppia-dashboard-tile {
 
 .oppia-cc-icon:hover {
   opacity: 0.7;
+  text-decoration: none;
 }
 
 .oppia-wide-panel {
@@ -2498,6 +2501,11 @@ div#ng-curtain {
   outline-color: transparent;
   padding-top: 20px;
 }
+.oppia-navbar-close-icon {
+  color: #fff;
+  margin-right: 4px;
+  margin-top: -10px;
+}
 .oppia-navbar-menu-icon {
   color: #fff;
   margin-top: -5px;
@@ -2523,27 +2531,31 @@ div#ng-curtain {
 }
 .oppia-logo-wide {
   margin-left: 25px;
+  width: 90px;
 }
 .oppia-logo-small {
   margin-left: 6px;
 }
 
-@media (min-width: 500px) {
-  .oppia-navbar-tabs-narrow {
-    /*
-      This needs to take i18n of the "Create" and "Sign in" buttons into
-      account.
-    */
-    min-width: 260px;
-  }
-  .oppia-navbar-tabs {
-    /*
-      This needs to take i18n of the "Create" and "Sign in" buttons into
-      account.
-    */
-    min-width: 580px;
-  }
+.oppia-navbar-tabs {
+  white-space: nowrap;
 }
+.nav, .oppia-navbar-tabs > li, .oppia-navbar-tabs > create-activity-button {
+  display: inline-block;
+  vertical-align: top;
+}
+.oppia-navbar-clickable-dropdown:hover ul.dropdown-menu, .oppia-clickable-navbar-element:hover {
+  display: inline-block;
+}
+.oppia-navbar-nav .dropdown-menu {
+  left: auto;
+  right: 0;
+}
+.navbar-header {
+  /* Prevent whitespace from inline-block elements from adding space. */
+  font-size: 0;
+}
+
 .nav > li > a.oppia-navbar-tab {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 14px;
@@ -3642,7 +3654,7 @@ md-card.preview-conversation-skin-supplemental-card {
   background-color: #fff;
   cursor: pointer;
   display: inline-block;
-  height: 258px;
+  height: inherit;
   /*
     The margin setting is so that exploration summary tiles and collection
     summary tiles would be the same widths (214px).
@@ -3710,7 +3722,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-activity-summary-tile .title-section {
-  height: 162px;
+  height: 10em;
   position: relative;
   width: 100%;
 }
@@ -3827,9 +3839,10 @@ md-card.preview-conversation-skin-supplemental-card {
   font-size: 1em;
   font-weight: normal;
   line-height: 1.2em;
-  margin: 12px;
-  padding: 0;
+  margin: 0.3em 0.5em;
+  padding: 0.2em;
   position: absolute;
+  word-break: break-all;
 }
 
 .oppia-activity-summary-tile .objective {
@@ -3879,7 +3892,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-dashboard-statistics-card-link {
   background: white;
-  height: 88px;
+  height: 25.5%;
   opacity: 0;
   position: absolute;
   width: 184px;
@@ -3917,7 +3930,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-dashboard-card-view-item {
-  height: 250px;
+  height: inherit;
   margin-left: 7.5px;
   margin-right: 7.5px;
   position: static;
@@ -3932,7 +3945,8 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-dashboard-card-view-item .exp-private-text {
   font-size: 13px;
-  margin: 13px 11px 0;
+  margin: 0 0.5em;
+  padding: 0.2em; 
 }
 
 .oppia-dashboard-card-view-item .metrics {
@@ -4538,7 +4552,6 @@ md-card.preview-conversation-skin-supplemental-card {
     width: 100%;
   }
 }
-
 
 
 .oppia-save-exploration-wide-modal .modal-dialog {
