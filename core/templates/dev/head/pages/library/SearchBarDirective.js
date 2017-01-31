@@ -127,8 +127,11 @@ oppia.directive('searchBar', [function() {
           updateSelectionDetails(itemsType);
         };
 
-        $scope.$watch('searchQuery', function() {
-          onSearchQueryChangeExec();
+        $scope.$watch('searchQuery', function(newQuery, oldQuery) {
+          // Run only if the query has changed.
+          if (newQuery !== oldQuery) {
+            onSearchQueryChangeExec();
+          }
         });
 
         var onSearchQueryChangeExec = function() {
