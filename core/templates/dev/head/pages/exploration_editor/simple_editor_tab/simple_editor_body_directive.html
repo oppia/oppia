@@ -1,23 +1,24 @@
 <script type="text/ng-template" id="simpleEditor/body">
   <div class="main">
     <div class="content">
-      <h3>What would you like to teach?</h3>
+      <anchor-header header-id="'title'" header-text="What would you like to teach?">
+      </anchor-header>
       <editor-plaintext-field original-value="data.title"
                               on-finish-editing="saveTitle(newValue)"
                               placeholder="Type the title of your exploration.">
       </editor-plaintext-field>
 
-      <h3>Introduction</h3>
+      <anchor-header header-id="'intro'" header-text="Introduction"></anchor-header>
       <editor-html-field original-value="data.introductionHtml"
                          on-finish-editing="saveIntroductionHtml(newValue)"
                          placeholder="Type an introduction.">
       </editor-html-field>
 
       <div ng-repeat="question in data.questionList.getQuestions() track by $index">
-        <h3>Question <[$index + 1]></h3>
+        <anchor-header header-id="question.getId()" header-text="Question <[$index +1]>"></anchor-header>
 
         <multiple-choice-editor ng-if="question.getInteractionId() === 'MultipleChoiceInput'"
-                                unique-id="question.getStateName()"
+                                unique-id="question.getId()"
                                 customization-args="question.getInteractionCustomizationArgs()"
                                 answer-groups="question.getAnswerGroups()"
                                 default-outcome="question.getDefaultOutcome()"
@@ -29,7 +30,8 @@
 
         <!-- TODO(sll): Update this condition when control of individual field visibility is added. -->
         <div ng-if="!$last">
-          <h3>Bridge Text</h3>
+          <anchor-header header-id="getSubfieldId(question, 'Bridge text')"
+                         header-text="Bridge text"></anchor-header>
           <editor-html-field original-value="question.getBridgeHtml()"
                              on-finish-editing="saveBridgeHtml(question.getStateName(), newValue)">
           </editor-html-field>

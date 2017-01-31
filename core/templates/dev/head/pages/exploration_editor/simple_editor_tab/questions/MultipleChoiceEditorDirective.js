@@ -19,7 +19,8 @@
 // NOTE TO DEVELOPERS: This is meant to be a reusable directive, so its only
 // dependencies should be standard utility services. It should not have any
 // concept of "state in an exploration".
-oppia.directive('multipleChoiceEditor', [function() {
+oppia.directive('multipleChoiceEditor', ['QuestionIdService',
+  function(QuestionIdService) {
   return {
     restrict: 'E',
     scope: {
@@ -41,6 +42,11 @@ oppia.directive('multipleChoiceEditor', [function() {
         // Note that a questionId generated in this way may contain spaces,
         // since it is just the state name.
         $scope.questionId = $scope.getUniqueId();
+
+        $scope.getSubfieldId = function(label) {
+          return QuestionIdService.getSubfieldId($scope.questionId, label);
+        };
+
         $scope.getFieldId = function(index) {
           return $scope.questionId + '.' + index;
         };

@@ -1,20 +1,29 @@
 <script type="text/ng-template" id="simpleEditor/sidebar">
   <div class="sidebar">
     <ul>
-      <li class="sidebar-item">
+      <li id="<[ID_PREFIX + 'title']>"
+          ng-click="scrollToHeader('title')" class="sidebar-item sidebar-header">
         <strong>Title</strong>
       </li>
 
-      <li class="sidebar-item">
+      <li id="<[ID_PREFIX + 'intro']>"
+          ng-click="scrollToHeader('intro')" class="sidebar-item sidebar-header">
         <strong>Introduction</strong>
       </li>
 
       <li class="sidebar-item" ng-repeat="question in questionList.getQuestions() track by $index">
-        <strong>Question <[$index + 1]></strong>
+        <div id="<[ID_PREFIX + question.getId()]>" class="sidebar-item-header">
+          <i ng-click="question.toggleCollapse()" class="collapse-icon material-icons">
+            <[isCollapsed(question) ? '&#xE5C7;' : '&#xE5C5;']>
+          </i>
+          <strong ng-click="scrollToQuestion(question)">Question <[$index + 1]></strong>
+        </div>
 
-        <ul>
+        <ul ng-show="question.isCollapsed()">
           <li class="sidebar-item sidebar-item-indented"
-              ng-repeat="subfieldLabel in SUBFIELD_LABELS track by $index">
+              ng-repeat="subfieldLabel in SUBFIELD_LABELS track by $index"
+              ng-click="scrollToField(question, subfieldLabel)"
+              id="<[getSidebarItemId(question, subfieldLabel)]>">
             <span>
               <a><[subfieldLabel]></a>
             </span>
@@ -33,7 +42,7 @@
 
 <style>
   simple-editor-sidebar {
-    background-color: #f3fbf1;
+    background-color: #eff8f0;
     height: 100%;
     left: 0;
     overflow: auto;
@@ -49,8 +58,9 @@
     margin-left: 0;
     padding-left: 0;
   }
-  simple-editor-sidebar a {
-    color: #333;
+  simple-editor-sidebar a,
+  simple-editor-sidebar li.sidebar-item {
+    color: #477349;
   }
   simple-editor-sidebar .sidebar-item-disabled {
     color: #ccc;
@@ -61,10 +71,17 @@
     text-decoration: underline;
   }
   simple-editor-sidebar li.sidebar-item a:hover {
+    color: #6aa03b;
     text-decoration: none;
   }
   simple-editor-sidebar li.sidebar-item-indented {
-    margin-left: 25px;
+    position: relative;
+    right: 30px;
+    text-indent: 50px;
+    width: 220px;
+  }
+  simple-editor-sidebar li.sidebar-item-indented span::before {
+    content: '-';
   }
   simple-editor-sidebar .sidebar {
     padding-bottom: 85px;
@@ -75,6 +92,7 @@
     height: 50px;
     left: 0;
     position: fixed;
+    width: 215px;
   }
   simple-editor-sidebar .full-editor-btn {
     margin-left: 30px;
@@ -82,13 +100,38 @@
     position: static;
   }
   simple-editor-sidebar::-webkit-scrollbar {
-    width: 8px;
+    width: 5px;
   }
   simple-editor-sidebar::-webkit-scrollbar-track {
-    background-color: rgba(0,0,0,.1);
+    background-color: #d3ebd5;
   }
   simple-editor-sidebar::-webkit-scrollbar-thumb {
-    background-color: rgba(0,150,136,.8);
+    background-color: #6aa03b;
     border-radius: 5px;
+  }
+  simple-editor-sidebar .highlighted {
+    background-color: #c5e1a5;
+  }
+  simple-editor-sidebar .sidebar-item-header {
+    left: -30px;
+    position: relative;
+    width: 220px;
+  }
+  simple-editor-sidebar .sidebar-item-header strong {
+  left: 10px;
+  position: relative;
+  }
+  simple-editor-sidebar .collapse-icon {
+    color: #477349;
+    font-size: 1.0em;
+    left: .5em;
+    line-height: 2.5em;
+    position: relative;
+  }
+  simple-editor-sidebar .sidebar-header {
+    left: -30px;
+    position: relative;
+    text-indent: 30px;
+    width: 220px;
   }
 </style>

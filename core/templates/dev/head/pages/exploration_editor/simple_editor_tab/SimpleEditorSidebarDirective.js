@@ -21,12 +21,34 @@ oppia.directive('simpleEditorSidebar', [function() {
     restrict: 'E',
     templateUrl: 'simpleEditor/sidebar',
     controller: [
-        '$scope', 'EditorModeService', 'SimpleEditorManagerService',
-        function($scope, EditorModeService, SimpleEditorManagerService) {
+       '$scope', 'EditorModeService', 'SimpleEditorManagerService',
+        'ScrollSyncService', 'QuestionIdService',
+        function($scope, EditorModeService, SimpleEditorManagerService,
+                 ScrollSyncService, QuestionIdService) {
       $scope.SUBFIELD_LABELS = [
         'Multiple choice', 'Correct answer', 'Hints', 'Bridge text'];
       $scope.setEditorModeToFull = EditorModeService.setModeToFull;
       $scope.questionList = SimpleEditorManagerService.getQuestionList();
+      $scope.ID_PREFIX = QuestionIdService.SIDEBAR_PREFIX;
+      $scope.getSidebarItemId = function(question, subfieldLabel) {
+        return QuestionIdService.getSidebarItemId(
+          question.getId(), subfieldLabel
+        );
+      };
+      $scope.scrollToField = function(question, subfieldLabel) {
+        ScrollSyncService.scrollTo(
+          QuestionIdService.getSubfieldId(
+            question.getId(), subfieldLabel
+          )
+        );
+      };
+      $scope.scrollToHeader = ScrollSyncService.scrollTo;
+      $scope.scrollToQuestion = function(question) {
+        ScrollSyncService.scrollTo(question.getId());
+      };
+      $scope.$on('SimpleEditorSidebarToggleCollapse', function() {
+        $scope.$apply();
+      });
     }]
   };
 }]);
