@@ -41,7 +41,6 @@ oppia.factory('EditableExplorationBackendApiService', [
         $http.get(explorationDataUrl, {
           params: params
         }).then(function(response) {
-          console.log(response);
           var exploration = angular.copy(response.data);
           if (successCallback) {
             successCallback(exploration);
