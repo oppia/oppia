@@ -18,6 +18,7 @@
 
 describe('Editable exploration backend API service', function() {
   var EditableExplorationBackendApiService = null;
+  var ReadOnlyExplorationBackendApiService = null;
   var sampleDataResults = null;
   var $rootScope = null;
   var $scope = null;
@@ -30,6 +31,8 @@ describe('Editable exploration backend API service', function() {
   beforeEach(inject(function($injector) {
     EditableExplorationBackendApiService = $injector.get(
       'EditableExplorationBackendApiService');
+    ReadOnlyExplorationBackendApiService = $injector.get(
+      'ReadOnlyExplorationBackendApiService');
     UndoRedoService = $injector.get('UndoRedoService');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
@@ -165,5 +168,82 @@ describe('Editable exploration backend API service', function() {
 
     expect(successHandler).toHaveBeenCalledWith(exploration);
     expect(failHandler).not.toHaveBeenCalled();
+  });
+
+  it('should cache exploration from the backend into read only service',
+      function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect('GET', '/editable_createhandler/data/0').respond(
+      sampleDataResults);
+
+    EditableExplorationBackendApiService.fetchExploration('0').then(
+      function(data) {
+        exploration = data;
+      });
+    $httpBackend.flush();
+
+    exploration.title = 'New Title';
+    exploration.version = '2';
+
+    $httpBackend.expect('PUT', '/editable_createhandler/data/0').respond(
+      exploration);
+
+    // Send a request to update exploration
+    EditableExplorationBackendApiService.updateExploration(
+      exploration.exploration_id, exploration.version,
+      exploration.title, []).then(
+        successHandler, failHandler);
+    $httpBackend.flush();
+
+    expect(successHandler).toHaveBeenCalledWith(exploration);
+    expect(failHandler).not.toHaveBeenCalled();
+
+    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBeTruthy();
+  });
+
+  it('should delete exploration from the backend',
+      function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect('GET', '/editable_createhandler/data/0').respond(
+      sampleDataResults);
+
+    EditableExplorationBackendApiService.fetchExploration('0').then(
+      function(data) {
+        exploration = data;
+      });
+    $httpBackend.flush();
+
+    exploration.title = 'New Title';
+    exploration.version = '2';
+
+    $httpBackend.expect('PUT', '/editable_createhandler/data/0').respond(
+      exploration);
+
+    // Send a request to update exploration
+    EditableExplorationBackendApiService.updateExploration(
+      exploration.exploration_id, exploration.version,
+      exploration.title, []).then(
+        successHandler, failHandler);
+    $httpBackend.flush();
+
+    expect(successHandler).toHaveBeenCalledWith(exploration);
+    expect(failHandler).not.toHaveBeenCalled();
+
+    $httpBackend.expect('DELETE', '/editable_createhandler/data/0').respond(
+      {});
+    EditableExplorationBackendApiService.deleteExploration(
+      exploration.exploration_id, null).then(
+        successHandler, failHandler);
+    
+    $httpBackend.flush();
+
+    expect(successHandler).toHaveBeenCalledWith({});
+    expect(failHandler).not.toHaveBeenCalled();
+
+    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBeFalsy();
   });
 });

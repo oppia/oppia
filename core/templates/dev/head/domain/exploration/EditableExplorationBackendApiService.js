@@ -112,7 +112,7 @@ oppia.factory('EditableExplorationBackendApiService', [
           explorationId);
 
         if (successCallback) {
-          successCallback(response);
+          successCallback(response.data);
         }
       }, function(errorResponse) {
         if (errorCallback) {
