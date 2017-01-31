@@ -157,16 +157,16 @@ oppia.directive('mobileFriendlyTooltip', ['$timeout', function($timeout) {
   };
 }]);
 
-oppia.directive('updateLanguage', ['$rootScope',function($rootScope) {
+oppia.directive('updateLanguage', ['$rootScope', function($rootScope) {
   return {
-    link: function( scope, element ) {
-      var listener = function( evt, translationResponse ) {
+    link: function(scope, element) {
+      var listener = function(evt, translationResponse) {
         var DEFAULT_LANG = 'en';
         var CURRENT_LANG = translationResponse.language;
         element.attr('lang', CURRENT_LANG || DEFAULT_LANG);
       };
       $rootScope.$on('$translateChangeSuccess', listener);
     }
- };
+  };
 }]);
 
