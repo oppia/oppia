@@ -18,114 +18,114 @@
  */
 
 oppia.factory('ReadOnlyExplorationBackendApiService', [
-    '$http', '$q', 'EXPLORATION_DATA_URL_TEMPLATE',
-    'UrlInterpolationService',
-    function($http, $q, EXPLORATION_DATA_URL_TEMPLATE,
-      UrlInterpolationService) {
-      // Maps previously loaded explorations to their IDs.
-      var _explorationCache = [];
+  '$http', '$q', 'EXPLORATION_DATA_URL_TEMPLATE',
+  'UrlInterpolationService',
+  function($http, $q, EXPLORATION_DATA_URL_TEMPLATE,
+    UrlInterpolationService) {
+    // Maps previously loaded explorations to their IDs.
+    var _explorationCache = [];
 
-      var _fetchExploration = function(
-          explorationId, successCallback, errorCallback) {
-        var explorationDataUrl = UrlInterpolationService.interpolateUrl(
-          EXPLORATION_DATA_URL_TEMPLATE, {
-            exploration_id: explorationId
-          });
+    var _fetchExploration = function(
+        explorationId, successCallback, errorCallback) {
+      var explorationDataUrl = UrlInterpolationService.interpolateUrl(
+        EXPLORATION_DATA_URL_TEMPLATE, {
+          exploration_id: explorationId
+        });
 
-        $http.get(explorationDataUrl).then(function(response) {
-          var exploration = angular.copy(response.data);
-          if (successCallback) {
-            successCallback(exploration);
-          }
-        }, function(errorResponse) {
-          if (errorCallback) {
-            errorCallback(errorResponse.data);
+      $http.get(explorationDataUrl).then(function(response) {
+        var exploration = angular.copy(response.data);
+        if (successCallback) {
+          successCallback(exploration);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
+    var _isCached = function(explorationId) {
+      return _explorationCache.hasOwnProperty(explorationId);
+    };
+
+    return {
+      /**
+       * Retrieves a exploration from the backend given a exploration ID.
+       * This returns a promise object that allows a success and rejection
+       *  callbacks to be registered. If the exploration is successfully
+       * loaded and a success callback function is provided to the promise
+       * object, the success callback is called with the exploration
+       * passed in as a parameter. If something goes wrong while trying to
+       * fetch the exploration, the rejection callback is called instead,
+       * if present. The rejection callback function is passed the error that
+       * occurred and the exploration ID.
+       */
+      fetchExploration: function(explorationId) {
+        return $q(function(resolve, reject) {
+          _fetchExploration(explorationId, resolve, reject);
+        });
+      },
+
+      /**
+       * Behaves in the exact same way as fetchExploration (including
+       * callback behavior and returning a promise object),
+       * except this function will attempt to see whether the given
+       * exploration has already been loaded. If it has not yet been loaded,
+       * it will fetch the exploration from the backend. If it successfully
+       * retrieves the exploration from the backend, it will store it in the
+       * cache to avoid requests from the backend in further function calls.
+       */
+      loadExploration: function(explorationId) {
+        return $q(function(resolve, reject) {
+          if (_isCached(explorationId)) {
+            if (resolve) {
+              resolve(angular.copy(_explorationCache[explorationId]));
+            }
+          } else {
+            _fetchExploration(explorationId, function(exploration) {
+              // Save the fetched exploration to avoid future fetches.
+              _explorationCache[explorationId] = exploration;
+              if (resolve) {
+                resolve(angular.copy(exploration));
+              }
+            }, reject);
           }
         });
-      };
+      },
 
-      var _isCached = function(explorationId) {
-        return _explorationCache.hasOwnProperty(explorationId);
-      };
+      /**
+       * Returns whether the given exploration is stored within the local
+       * data cache or if it needs to be retrieved from the backend upon a
+       * load.
+       */
+      isCached: function(explorationId) {
+        return _isCached(explorationId);
+      },
 
-      return {
-        /**
-         * Retrieves a exploration from the backend given a exploration ID.
-         * This returns a promise object that allows a success and rejection
-         *  callbacks to be registered. If the exploration is successfully
-         * loaded and a success callback function is provided to the promise
-         * object, the success callback is called with the exploration
-         * passed in as a parameter. If something goes wrong while trying to
-         * fetch the exploration, the rejection callback is called instead,
-         * if present. The rejection callback function is passed the error that
-         * occurred and the exploration ID.
-         */
-        fetchExploration: function(explorationId) {
-          return $q(function(resolve, reject) {
-            _fetchExploration(explorationId, resolve, reject);
-          });
-        },
+      /**
+       * Replaces the current exploration in the cache given by the specified
+       * exploration ID with a new exploration object.
+       */
+      cacheExploration: function(explorationId, exploration) {
+        _explorationCache[explorationId] = angular.copy(exploration);
+      },
 
-        /**
-         * Behaves in the exact same way as fetchExploration (including
-         * callback behavior and returning a promise object),
-         * except this function will attempt to see whether the given
-         * exploration has already been loaded. If it has not yet been loaded,
-         * it will fetch the exploration from the backend. If it successfully
-         * retrieves the exploration from the backend, it will store it in the
-         * cache to avoid requests from the backend in further function calls.
-         */
-        loadExploration: function(explorationId) {
-          return $q(function(resolve, reject) {
-            if (_isCached(explorationId)) {
-              if (resolve) {
-                resolve(angular.copy(_explorationCache[explorationId]));
-              }
-            } else {
-              _fetchExploration(explorationId, function(exploration) {
-                // Save the fetched exploration to avoid future fetches.
-                _explorationCache[explorationId] = exploration;
-                if (resolve) {
-                  resolve(angular.copy(exploration));
-                }
-              }, reject);
-            }
-          });
-        },
+      /**
+       * Clears the local exploration data cache, forcing all future loads to
+       * re-request the previously loaded explorations from the backend.
+       */
+      clearExplorationCache: function() {
+        _explorationCache = [];
+      },
 
-        /**
-         * Returns whether the given exploration is stored within the local
-         * data cache or if it needs to be retrieved from the backend upon a
-         * load.
-         */
-        isCached: function(explorationId) {
-          return _isCached(explorationId);
-        },
-
-        /**
-         * Replaces the current exploration in the cache given by the specified
-         * exploration ID with a new exploration object.
-         */
-        cacheExploration: function(explorationId, exploration) {
-          _explorationCache[explorationId] = angular.copy(exploration);
-        },
-
-        /**
-         * Clears the local exploration data cache, forcing all future loads to
-         * re-request the previously loaded explorations from the backend.
-         */
-        clearExplorationCache: function() {
-          _explorationCache = [];
-        },
-
-        /**
-         * Delete a specific exploration from the local cache
-         */
-        deleteExplorationFromCache: function(explorationId) {
-          if (_isCached(explorationId)) {
-            delete _explorationCache[explorationId];
-          }
+      /**
+       * Delete a specific exploration from the local cache
+       */
+      deleteExplorationFromCache: function(explorationId) {
+        if (_isCached(explorationId)) {
+          delete _explorationCache[explorationId];
         }
-      };
-    }
+      }
+    };
+  }
 ]);
