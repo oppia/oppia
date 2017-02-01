@@ -57,8 +57,8 @@ class Image(base.BaseRichTextComponent):
             }],
             'ui_config': {
                 'placeholder': (
-                    'Description of Image (Example : "George Frideric, '
-                    '18th century baroque composer")'),
+                    'Description of Image (Example : George Handel, '
+                    '18th century baroque composer)'),
             },
         },
         'default_value': '',
