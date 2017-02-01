@@ -469,7 +469,7 @@ def _pre_commit_linter(all_files):
 
 
 def _check_newline_character(all_files):
-    """This function is used for detecting bad patterns.
+    """This function is used to check new line characters.
     """
     print 'Starting to check new line at EOF'
     print '----------------------------------------'
@@ -483,28 +483,26 @@ def _check_newline_character(all_files):
     for filename in all_files:
         with open(filename, 'rb+') as f:
             total_files_checked += 1
-            f.seek(-2, 2)
-            if f.read(1) == '\n' and f.read(1)== '\n':
+            chars = 0
+            for line in f:
+                chars += len(line)
+            if chars == 1:
                 failed = True
-                print '%s --> Please add newline character at EOF' % filename
+                print '%s --> Error:Only one character in file' % filename
                 total_error_count += 1
-                f.seek(-2,-2)
-            elif f.read(1) != '\n' and f.read(1)!= '\n':
-                failed = True
-                print '%s --> Please add newline character at EOF' % filename
-                total_error_count += 1
-                f.seek(-2,-2)
-            elif f.read(1) == '\n' and f.read(1)!= '\n':
-                failed = True
-                print '%s --> Please add newline character at EOF' % filename
-                total_error_count += 1
+            elif chars > 1:
+                f.seek(-2, 2)
+                if not(f.read(1) != '\n' and f.read(1) == '\n'):
+                    failed = True
+                    print '%s --> Please add/remove extra newline' % filename
+                    total_error_count += 1
 
     if failed:
         summary_message = '%s   Newline character checks failed' % (
             _MESSAGE_TYPE_FAILED)
         summary_messages.append(summary_message)
     else:
-        summary_message = '%s   ewline character checks passed' % (
+        summary_message = '%s   Newline character checks passed' % (
             _MESSAGE_TYPE_SUCCESS)
         summary_messages.append(summary_message)
 
