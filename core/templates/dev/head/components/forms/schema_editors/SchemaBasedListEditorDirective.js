@@ -146,7 +146,6 @@ oppia.directive('schemaBasedListEditor', [
 
           $scope.lastElementOnBlur = function() {
             _deleteLastElementIfUndefined();
-            _deleteElementIfEmpty();
             $scope.showAddItemButton();
           };
 
@@ -158,6 +157,10 @@ oppia.directive('schemaBasedListEditor', [
           $scope.hideAddItemButton = function() {
             $scope.isAddItemButtonPresent = false;
           };
+
+          if ($scope.localValue.length === 0) {
+            $scope.addElement();
+          }
 
           $scope._onChildFormSubmit = function(evt) {
             if (!$scope.isAddItemButtonPresent) {
