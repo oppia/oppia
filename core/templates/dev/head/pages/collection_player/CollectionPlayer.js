@@ -44,7 +44,7 @@ oppia.controller('CollectionPlayer', [
     $scope.previewCardIsShown = true;
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     // The pathIconParameters is an array containing the co-ordinates,
-    // background color and icon url for the icons generated on the path
+    // background color and icon url for the icons generated on the path.
     $scope.pathIconParameters = [];
     $scope.activeHighlightedIconIndex = -1;
     $scope.MIN_HEIGHT_FOR_PATH_SVG_PX = 220;
