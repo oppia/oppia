@@ -238,7 +238,7 @@ describe('Editable exploration backend API service', function() {
     EditableExplorationBackendApiService.deleteExploration(
       exploration.exploration_id, null).then(
         successHandler, failHandler);
-    
+
     $httpBackend.flush();
 
     expect(successHandler).toHaveBeenCalledWith({});
