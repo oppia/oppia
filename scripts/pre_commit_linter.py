@@ -469,9 +469,10 @@ def _pre_commit_linter(all_files):
 
 
 def _check_newline_character(all_files):
-    """This function is used to check new line characters.
+    """This function is used to check that each file
+    ends with a single newline character.
     """
-    print 'Starting to check new line at EOF'
+    print 'Starting newline-at-EOF checks'
     print '----------------------------------------'
     total_files_checked = 0
     total_error_count = 0
@@ -481,20 +482,21 @@ def _check_newline_character(all_files):
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
     failed = False
     for filename in all_files:
-        with open(filename, 'rb+') as f:
+        with open(filename, 'rb') as f:
             total_files_checked += 1
-            chars = 0
+            total_num_chars = 0
             for line in f:
-                chars += len(line)
-            if chars == 1:
+                total_num_chars += len(line)
+            if total_num_chars == 1:
                 failed = True
-                print '%s --> Error:Only one character in file' % filename
+                print '%s --> Error: Only one character in file' % filename
                 total_error_count += 1
-            elif chars > 1:
+            elif total_num_chars > 1:
                 f.seek(-2, 2)
-                if not(f.read(1) != '\n' and f.read(1) == '\n'):
+                if not (f.read(1) != '\n' and f.read(1) == '\n'):
                     failed = True
-                    print '%s --> Please add/remove extra newline' % filename
+                    print '%s --> Please ensure that this file ends \
+                        with exactly one newline char.' % filename
                     total_error_count += 1
 
     if failed:
@@ -510,7 +512,7 @@ def _check_newline_character(all_files):
     print '----------------------------------------'
     print ''
     if total_files_checked == 0:
-        print "There are no files to be checked."
+        print 'There are no files to be checked.'
     else:
         print '(%s files checked, %s errors found)' % (
             total_files_checked, total_error_count)
