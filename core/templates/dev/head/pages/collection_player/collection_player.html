@@ -90,16 +90,16 @@
 
         <svg width="500px" height="<[svgHeight + 'px']>" xmlns="http://www.w3.org/2000/svg">
           <path fill="none"
-                stroke="#10301D"
+                stroke="#296E5F"
                 stroke-dasharray="15,28"
                 stroke-linecap="round"
-                stroke-width="16"
+                stroke-width="12"
                 d="M80 80 L220 80"/>
           <path fill="none"
-                stroke="#10301D"
+                stroke="#296E5F"
                 stroke-dasharray="15,28"
                 stroke-linecap="round"
-                stroke-width="16"
+                stroke-width="12"
                 ng-init="generatePathParameters()"
                 d="<[pathSvgParameters]>"/>
         </svg>
@@ -107,7 +107,7 @@
         <img ng-src="<[getStaticImageUrl('/general/collection_mascot.svg')]>" class="collection-otter">
 
         <svg width="100"
-             height="100"
+             height="150"
              xmlns="http://www.w3.org/2000/svg"
              xmlns:xlink="http://www.w3.org/1999/xlink"
              version="1.1"
@@ -116,13 +116,13 @@
                     left: <[pathIconParameters[$index].left]>;
                     top: <[pathIconParameters[$index].top]>;">
           <defs>
-            <pattern id="image<[$index]>" patternUnits="userSpaceOnUse" height="100" width="100">
+            <pattern id="image<[$index]>" patternUnits="userSpaceOnUse" height="150" width="100">
               <circle cx="50"
-                      cy="50"
+                      cy="65"
                       r="50"
                       fill="<[pathIconParameters[$index].thumbnailBgColor]>"/>
               <image x="10"
-                     y="10"
+                     y="25"
                      height="80"
                      width="80"
                      xlink:href="<[pathIconParameters[$index].thumbnailIconUrl]>"></image>
@@ -133,22 +133,23 @@
                            setIconHighlight($index);"
              ng-mouseleave="togglePreviewCard();
                             unsetIconHighlight($index);">
+             <circle ng-show="($index===activeHighlightedIconIndex)?true:false"
+                     cx="50"
+                     cy="65"
+                     r="45"
+                     id="<['highlight' + $index]>"
+                     fill="none"
+                     stroke="#A6DACF"
+                     stroke-width="10"
+                     stroke-opacity="0.5"/>
              <circle cx="50"
-                     cy="50"
+                     cy="65"
                      r="42"
                      fill="url(#image<[$index]>)"
                      stroke="#006553"
                      stroke-width="2"/>
-             <circle ng-show="($index===activeHighlightedIconIndex)?true:false"
-                     cx="50"
-                     cy="50"
-                     r="45"
-                     id="<['highlight' + $index]>"
-                     fill="none"
-                     stroke="green"
-                     stroke-width="10"
-                     stroke-opacity="0.3"/>
           </a>
+          <text x="50%" y="12" alignment-baseline="middle" font-family="Capriola, Roboto, Arial, sans-serif" fill="#006553" text-anchor="middle"><[$index]></text>
         </svg>
 
         <div ng-if="collection" class="oppia-card-preview-panel hidden-sm hidden-xs">

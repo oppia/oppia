@@ -50,7 +50,7 @@ oppia.controller('CollectionPlayer', [
     $scope.MIN_HEIGHT_FOR_PATH_SVG_PX = 220;
     $scope.ODD_SVG_HEIGHT_OFFSET_PX = 150;
     $scope.EVEN_SVG_HEIGHT_OFFSET_PX = 280;
-    $scope.ICON_Y_INITIAL_PX = 60;
+    $scope.ICON_Y_INITIAL_PX = 40;
     $scope.ICON_Y_INCREMENT_PX = 110;
     $scope.ICON_X_MIDDLE_PX = 225;
     $scope.ICON_X_LEFT_PX = 30;
@@ -174,7 +174,7 @@ oppia.controller('CollectionPlayer', [
           collectionNodes[0].getExplorationSummaryObject(
           ).thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
         left: '225px',
-        top: '60px',
+        top: '40px',
         thumbnailBgColor:
           collectionNodes[0].getExplorationSummaryObject().thumbnail_bg_color
       });
