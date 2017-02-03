@@ -145,7 +145,7 @@ oppia.directive('topNavigationBar', [function() {
         var checkIfI18NCompleted = function() {
           var i18nCompleted = true;
           var tabs = document.querySelectorAll('.oppia-navbar-tab-content');
-          for (i = 0; i < tabs.length; i++) {
+          for (var i = 0; i < tabs.length; i++) {
             if (tabs[i].innerText.length === 0) {
               i18nCompleted = false;
               break;
