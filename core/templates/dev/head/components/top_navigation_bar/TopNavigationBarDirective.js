@@ -127,6 +127,17 @@ oppia.directive('topNavigationBar', [function() {
         $scope.isSidebarShown = function() {
           if (SidebarStatusService.isSidebarShown()) {
             angular.element(document.body).addClass('oppia-stop-scroll');
+            /* Prevent overscrolling on mobile devices (iOS in particular) by
+            preventing user from scrolling all the way to the bottom. */
+            var sidebar = angular.querySelector('oppia-stop-overscroll');
+            sidebar.addEventListener('touchstart', function() {
+              var top = sidebar.scrollTop;
+              var scrollHeight = sidebar.scrollHeight;
+              var currentScrollPos = top + sidebar.offsetHeight;
+              if (currentScrollPos === scrollHeight) {
+                sidebar.scrollTop = top - 1;
+              }
+            });
           } else {
             angular.element(document.body).removeClass('oppia-stop-scroll');
           }
