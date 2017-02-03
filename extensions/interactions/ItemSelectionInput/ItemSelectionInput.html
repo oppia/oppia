@@ -15,6 +15,9 @@
   md-checkbox.item-selection-input-checkbox.md-default-theme .md-icon {
     border-color: #0d48a1;
   }
+  md-checkbox.item-selection-input-checkbox.md-default-theme:focus .md-icon {
+    background-color: rgba(102, 187, 106, 0.87);
+  }
 
   .item-selection-input-form-container {
     margin-top: -5px;
@@ -59,7 +62,8 @@
     color: #115FD4;
   }
 
-  .multiple-choice-option:hover .multiple-choice-inner-radio-button {
+  .multiple-choice-option:hover .multiple-choice-inner-radio-button
+  .multiple-choice-option:focus .multiple-choice-inner-radio-button {
     background-color: #115FD4;
     border-radius: 50%;
     display: block;

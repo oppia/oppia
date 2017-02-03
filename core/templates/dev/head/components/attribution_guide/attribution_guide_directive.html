@@ -5,11 +5,19 @@
     <a class="oppia-attribution-image-link" rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">
       <img alt="Creative Commons License" style="border-width: 0; height: 24px;" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png">
     </a><br>
-    <a href="/about#foundation" target="_blank" style="font-size: 10px;">Attribution Guide</a>
+    <a class="oppia-attribution-link" href="/about#foundation" target="_blank" style="font-size: 10px;">Attribution Guide</a>
   </div>
   <style>
-    a.oppia-attribution-image-link {
+    a.oppia-attribution-image-link,
+    a.oppia-attribution-link {
       text-decoration: none;
+    }
+    a.oppia-attribution-image-link:focus > img {
+      outline: 2px solid #0844aa;
+    }
+    a.oppia-attribution-link:hover,
+    a.oppia-attribution-link:focus {
+      text-decoration: underline;
     }
   </style>
 </script>

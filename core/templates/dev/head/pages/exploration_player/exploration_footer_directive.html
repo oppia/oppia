@@ -12,7 +12,7 @@
               ng-mouseleave="hovering = false">
             <div class="dropup" ng-class="{'open':hovering}">
               <a id="dropdownMenu2" class="dropdown-toggle" ng-class="{'hovered-text':hovering}"
-                 data-toggle="dropdown" ng-if="contributorNames.length > 0">
+                 data-toggle="dropdown" ng-if="contributorNames.length > 0" tabindex="0">
                 <h4 translate="I18N_FOOTER_AUTHOR_PROFILES" class="author-profile-text"
                     ng-class="{'hovered-text':hovering, 'not-hovered' : !hovering}"></h4>
               </a>
@@ -91,8 +91,7 @@
     color: #094142;
   }
 
-  .oppia-exploration-footer .author-profile .hover-link:hover,
-  .oppia-exploration-footer .author-profile .hover-link:focus {
+  .oppia-exploration-footer .author-profile .hover-link:hover {
     background-color: #fff;
     color: #094142;
   }
@@ -138,7 +137,8 @@
     text-transform: uppercase;
   }
 
-  .oppia-exploration-footer .author-profile-text.hovered-text {
+  .oppia-exploration-footer .author-profile-text.hovered-text,
+  .oppia-exploration-footer .author-profile-text:focus {
     color: #094142;
     text-decoration: none;
     text-transform: uppercase;

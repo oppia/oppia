@@ -19,7 +19,7 @@
     </li>
 
     <li>
-      <a href="" ng-click="showEmbedExplorationModal(explorationId)" tooltip="Embed" tooltip-placement="top">
+      <a ng-click="showEmbedExplorationModal(explorationId)" tooltip="Embed" tooltip-placement="top" tabindex="0">
         <i class="material-icons md-48 embed-link">&#xE86F;</i>
       </a>
     </li>
@@ -54,6 +54,13 @@
 
   .oppia-sharing-links-small ul {
     margin-bottom: 0;
+  }
+
+  .oppia-sharing-links a:focus .share-option-img,
+  .oppia-sharing-links a:focus .embed-link,
+  .oppia-sharing-links-small a:focus .share-option-img,
+  .oppia-sharing-links-small a:focus .embed-link {
+    outline: 2px solid white;
   }
 
   .oppia-sharing-links-small li:first-child a img {
