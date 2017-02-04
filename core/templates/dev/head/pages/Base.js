@@ -29,7 +29,7 @@ oppia.controller('Base', [
     $scope.isSidebarShown = SidebarStatusService.isSidebarShown;
     $scope.closeSidebarOnSwipe = SidebarStatusService.closeSidebar;
 
-    //Listner to catch the change in language prefrence
+    // Listner to catch the change in language prefrence
     var listener = function(evt, translationResponse) {
       var CURRENT_LANG = translationResponse.language;
       $scope.currentLang = CURRENT_LANG;
