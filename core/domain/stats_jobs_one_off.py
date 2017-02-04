@@ -810,12 +810,14 @@ class CleanupLargeBucketLabelsFromNewAnswersJob(jobs.BaseMapReduceJobManager):
             stats_domain.SubmittedAnswer.from_dict(submitted_answer_dict)
             for submitted_answer_dict in item.submitted_answer_list]
         new_submitted_answer_sizes = []
+        deleted_large_bucket_id = False
         for submitted_answer in submitted_answers:
             if submitted_answer.large_bucket_entity_id:
                 submitted_answer.large_bucket_entity_id = None
-                new_submitted_answer_sizes.append(submitted_answer.json_size)
+                deleted_large_bucket_id = True
+            new_submitted_answer_sizes.append(submitted_answer.json_size)
         # If any answers were submitted, update the model.
-        if new_submitted_answer_sizes:
+        if deleted_large_bucket_id:
             item.submitted_answer_list = [
                 submitted_answer.to_dict()
                 for submitted_answer in submitted_answers]

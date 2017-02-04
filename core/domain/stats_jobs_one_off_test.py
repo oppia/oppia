@@ -90,6 +90,18 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
         return jobs.get_job_output(job_id)
 
+    def _enable_memchache(self):
+        """Emabbles memcache for StateAnswersModel (default behavior)."""
+
+        stats_models.StateAnswersModel._use_memcache = True
+
+    def _disable_memchache(self):
+        """Disables memcache for StateAnswersModel since it can cause some
+        issues when switching between the enqueued migration job and the
+        migration job which runs locally.
+        """
+        stats_models.StateAnswersModel._use_memcache = False
+
     def _run_migration_job(self):
         """Start the AnswerMigrationJob to migrate answers submitted to
         StateRuleAnswerLogModel.
@@ -167,6 +179,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         output_str_frequency_list = [
             output.count(output_str)
             for output_str in unique_output_str_list]
+
         return sorted([
             line if freq == 1 else '%s (%d times)' % (line, freq)
             for (line, freq) in zip(
@@ -199,6 +212,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(AnswerMigrationJobTests, self).setUp()
+        self._enable_memchache()
         exp_services.load_demo(self.DEMO_EXP_ID)
         self.exploration = exp_services.get_exploration_by_id(self.DEMO_EXP_ID)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -1760,6 +1774,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         specific item failing mid-answer (meaning some of the answers of that
         item's bucket successfully migrated before the failure).
         """
+        self._disable_memchache()
+
         exploration = self.save_new_valid_exploration(
             'exp_id0', self.owner_id, end_state_name='End',
             interaction_id='NumericInput')
@@ -2002,6 +2018,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         will properly recover only the answers from the failed bucket without
         duplicating them.
         """
+        self._disable_memchache()
+
         state_name = self.text_input_state_name
 
         rule_spec_str = 'Contains(ate)'
@@ -2153,9 +2171,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
 
         # Run the job again. The first large answer bucket does not need to be
         # migrated, but the second still does.
-        # TODO(bhenning): Figure out why this won't work.
         job_output = sorted(self._run_migration_job())
-        #job_output = self._run_migration_job_internal()
         self.assertEqual(job_output, [
             'Encountered a submitted answer bucket which has already been '
             'migrated',
@@ -2186,6 +2202,11 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             else:
                 plate_str = 'Plate%d' % i
             self.assertIn(plate_str, unique_submitted_answer_strs)
+
+        first_submitted_answer = next(
+            submitted_answer
+            for submitted_answer in state_answers.submitted_answer_list
+            if submitted_answer.normalized_answer == 'Plate000')
 
         # Verify the answer dicts no longer have large_bucket_entity_id entries.
         first_submitted_answer_dict = first_submitted_answer.to_dict()
