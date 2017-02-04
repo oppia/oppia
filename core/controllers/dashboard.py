@@ -247,32 +247,18 @@ class DashboardHandler(base.BaseHandler):
             self.user_id)
         subscribers_list = []
         for subscriber_id in subscriber_ids:
-            subscriber_contributions = user_services.get_user_contributions(
-                subscriber_id)
             subscriber_settings = user_services.get_user_settings(subscriber_id)
             subscriber_summary = {}
 
-            total_subscriber_created_exp = (
-                summary_services.get_total_displayable_exp_matching_ids(
-                    subscriber_contributions.created_exploration_ids))
-            total_subscriber_edited_exp = (
-                summary_services.get_total_displayable_exp_matching_ids(
-                    subscriber_contributions.edited_exploration_ids))
-
+            subscriber_summary['id'] = (
+                user_services.get_user_id_from_username(
+                    subscriber_settings.username))
             subscriber_summary['subscriber_picture_data_url'] = (
                 subscriber_settings.profile_picture_data_url)
             subscriber_summary['subscriber_username'] = (
                 subscriber_settings.username)
-            subscriber_summary['subscriber_stats'] = [{
-                'title': 'Impact',
-                'value': user_services.get_user_impact_score(subscriber_id)
-            }, {
-                'title': 'Created',
-                'value': total_subscriber_created_exp
-            }, {
-                'title': 'Edited',
-                'value': total_subscriber_edited_exp
-            }]
+            subscriber_summary['subscriber_impact'] = (
+                user_services.get_user_impact_score(subscriber_id))
 
             subscribers_list.append(subscriber_summary)
 
