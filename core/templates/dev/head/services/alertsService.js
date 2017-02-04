@@ -52,6 +52,9 @@ oppia.factory('alertsService', ['$log', function($log) {
       type: 'warning',
       content: warning
     });
+    if(warning.indexOf('redirect')>=0){
+      setTimeout(function(){$window.location.href = '/splash';}, 5000);
+    }
   };
 
   /**

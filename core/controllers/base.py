@@ -250,8 +250,7 @@ class BaseHandler(webapp2.RequestHandler):
 
                 if not is_csrf_token_valid:
                     raise self.UnauthorizedUserException(
-                        'Your session has expired, and unfortunately your '
-                        'changes cannot be saved. Please refresh the page.')
+                        'Sorry, you have been logged out [probably in another window]. Please log in again.you will  redirect to main page in 5seconds !!')
             except Exception as e:
                 logging.error(
                     '%s: payload %s',
