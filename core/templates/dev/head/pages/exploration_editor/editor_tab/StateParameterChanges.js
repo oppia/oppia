@@ -24,7 +24,7 @@ oppia.controller('StateParamChangesEditor', [
 
     $scope.$on('stateEditorInitialized', function(evt, stateData) {
       stateParamChangesService.init(
-        editorContextService.getActiveStateName(), stateData.param_changes);
+        editorContextService.getActiveStateName(), stateData.paramChanges);
     });
   }
 ]);
