@@ -117,7 +117,7 @@ echo Checking if webtest is installed in third_party
 if [ ! -d "$TOOLS_DIR/webtest-1.4.2" ]; then
   echo Installing webtest framework
   # Note that the github URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl -o webtest-download.zip https://github.com/Pylons/webtest/archive/1.4.2.zip
+  curl -o webtest-download.zip -L https://github.com/Pylons/webtest/archive/1.4.2.zip
   unzip webtest-download.zip -d $TOOLS_DIR
   rm webtest-download.zip
 fi

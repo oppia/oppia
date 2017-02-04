@@ -10,7 +10,7 @@
         </div>
         <input type="text" class="form-control oppia-search-bar-input oppia-search-bar-text-input protractor-test-search-input"
                ng-attr-placeholder="<[searchBarPlaceholder]>" ng-model="searchQuery"
-               ng-keyup="onSearchQueryChange($event)">
+               ng-model-options="{ updateOn: 'default blur', debounce: { 'default': 1000, 'blur': 0 } }">
       </div>
     </div>
   </form>
