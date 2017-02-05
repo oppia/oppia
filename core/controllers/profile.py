@@ -147,34 +147,16 @@ class PreferencesHandler(base.BaseHandler):
         subscription_list = []
 
         for creator_subscribed_to in creators_subscribed_to:
-            creator_contributions = user_services.get_user_contributions(
-                creator_subscribed_to)
             creator_settings = user_services.get_user_settings(
                 creator_subscribed_to)
             subscription_summary = {}
-
-            total_creator_created_exp = (
-                summary_services.get_total_displayable_exp_matching_ids(
-                    creator_contributions.created_exploration_ids))
-            total_creator_edited_exp = (
-                summary_services.get_total_displayable_exp_matching_ids(
-                    creator_contributions.edited_exploration_ids))
 
             subscription_summary['creator_picture_data_url'] = (
                 creator_settings.profile_picture_data_url)
             subscription_summary['creator_username'] = (
                 creator_settings.username)
-            subscription_summary['creator_stats'] = [{
-                'title': 'Impact',
-                'value': user_services.get_user_impact_score(
-                    creator_subscribed_to)
-            }, {
-                'title': 'Created',
-                'value': total_creator_created_exp
-            }, {
-                'title': 'Edited',
-                'value': total_creator_edited_exp
-            }]
+            subscription_summary['creator_impact'] = (
+                user_services.get_user_impact_score(creator_subscribed_to))
 
             subscription_list.append(subscription_summary)
 
