@@ -70,12 +70,14 @@
         <li class="list-card-view-toggle dashboard-hide-mobile" ng-if="activeTab === 'myExplorations'">
           <button class="card-view-btn"
                   ng-class="{'dashboard-active-view': myExplorationsView === 'card'}"
-                  ng-click="setMyExplorationsView('card')">
+                  ng-click="setMyExplorationsView('card')"
+                  aria-label="Card View">
             <span class="fa fa-th-large fa-lg"></span>
           </button>
           <button class="list-view-btn"
                   ng-class="{'dashboard-active-view': myExplorationsView === 'list'}"
-                  ng-click="setMyExplorationsView('list')">
+                  ng-click="setMyExplorationsView('list')"
+                  aria-label="List View">
             <span class="fa fa-list fa-lg"></span>
           </button>
         </li>
@@ -84,7 +86,8 @@
           <select ng-model="currentSortType"
                   class="sort-options"
                   ng-change="setExplorationsSortingOptions(currentSortType)"
-                  ng-options="EXPLORATIONS_SORT_BY_KEYS[key] as value for (key, value) in HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS">
+                  ng-options="EXPLORATIONS_SORT_BY_KEYS[key] as value for (key, value) in HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS"
+                  aria-label="Sort Explorations By">
           </select>
           <span class="sort-order fa"
                 ng-click="setExplorationsSortingOptions(currentSortType)"
@@ -267,7 +270,7 @@
               </li>
 
               <li flex="50" style="padding-left: 8px;">
-                <img ng-src="<[unresolvedAnswersIconUrl]>" style="width: 15px; padding-top: 1px;" tooltip="Unresolved Answers" tooltip-placement="top" class="oppia-dashboard-card-statistic-icon">
+                <img ng-src="<[unresolvedAnswersIconUrl]>" style="width: 15px; padding-top: 1px;" tooltip="Unresolved Answers" tooltip-placement="top" class="oppia-dashboard-card-statistic-icon" alt="Unresolved Answers">
                 <span class="oppia-dashboard-card-statistic-value">
                   <[exploration.num_unresolved_answers]>
                 </span>
