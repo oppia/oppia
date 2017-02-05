@@ -59,11 +59,16 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self.assertTrue(isinstance(ca_spec['description'], basestring))
             self.assertGreater(len(ca_spec['description']), 0)
 
+            # The default value might not pass validation checks (e.g. the
+            # Image component has a required field whose default value is
+            # empty). Thus, when checking the default value schema, we don't
+            # apply the custom validators.
             schema_utils_test.validate_schema(ca_spec['schema'])
             self.assertEqual(
                 ca_spec['default_value'],
                 schema_utils.normalize_against_schema(
-                    ca_spec['default_value'], ca_spec['schema']))
+                    ca_spec['default_value'], ca_spec['schema'],
+                    apply_custom_validators=False))
 
             if ca_spec['schema']['type'] == 'custom':
                 obj_class = obj_services.Registry.get_object_class_by_type(

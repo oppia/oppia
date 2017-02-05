@@ -144,12 +144,13 @@ oppia.directive('topNavigationBar', [function() {
          */
         var checkIfI18NCompleted = function() {
           var i18nCompleted = true;
-          document.querySelectorAll('.oppia-navbar-tab-content')
-            .forEach(function(element) {
-            if (element.innerText.length === 0) {
+          var tabs = document.querySelectorAll('.oppia-navbar-tab-content');
+          for (var i = 0; i < tabs.length; i++) {
+            if (tabs[i].innerText.length === 0) {
               i18nCompleted = false;
+              break;
             }
-          });
+          }
           return i18nCompleted;
         };
 
