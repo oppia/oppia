@@ -29,9 +29,9 @@ oppia.controller('Base', [
     $scope.isSidebarShown = SidebarStatusService.isSidebarShown;
     $scope.closeSidebarOnSwipe = SidebarStatusService.closeSidebar;
 
-    // Listner to catch the change in language prefrence
-    $rootScope.$on('$translateChangeSuccess', function(evt, response) {
-      $scope.currentLang = translationResponse.language;
+    // Listener to catch the change in language preference
+    $rootScope.$on('$translateChangeSuccess', function(event, response) {
+      $scope.currentLang = response.language;
     });
 
     // TODO(sll): use 'touchstart' for mobile.
