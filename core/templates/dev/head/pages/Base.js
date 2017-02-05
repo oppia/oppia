@@ -29,8 +29,8 @@ oppia.controller('Base', [
     $scope.isSidebarShown = SidebarStatusService.isSidebarShown;
     $scope.closeSidebarOnSwipe = SidebarStatusService.closeSidebar;
 
-    // Listener to catch the change in language preference
-    $rootScope.$on('$translateChangeSuccess', function(event, response) {
+    // Listener to catch the change in language preference.
+    $rootScope.$on('$translateChangeSuccess', function(evt, response) {
       $scope.currentLang = response.language;
     });
 
