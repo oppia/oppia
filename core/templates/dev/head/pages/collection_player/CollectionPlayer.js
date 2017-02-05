@@ -50,11 +50,11 @@ oppia.controller('CollectionPlayer', [
     $scope.MIN_HEIGHT_FOR_PATH_SVG_PX = 220;
     $scope.ODD_SVG_HEIGHT_OFFSET_PX = 150;
     $scope.EVEN_SVG_HEIGHT_OFFSET_PX = 280;
-    $scope.ICON_Y_INITIAL_PX = 40;
+    $scope.ICON_Y_INITIAL_PX = 35;
     $scope.ICON_Y_INCREMENT_PX = 110;
     $scope.ICON_X_MIDDLE_PX = 225;
-    $scope.ICON_X_LEFT_PX = 30;
-    $scope.ICON_X_RIGHT_PX = 420;
+    $scope.ICON_X_LEFT_PX = 55;
+    $scope.ICON_X_RIGHT_PX = 395;
 
     $scope.setIconHighlight = function(index) {
       $scope.activeHighlightedIconIndex = index;
@@ -134,7 +134,7 @@ oppia.controller('CollectionPlayer', [
       // The pathSvgParameters represents the final string of SVG parameters
       // for the bezier curve to be generated. The default parameters represent
       // the first curve ie. lesson 1 to lesson 3.
-      $scope.pathSvgParameters = 'M250 80  C 500 100, 500 280, 250 300';
+      $scope.pathSvgParameters = 'M250 80  C 470 100, 470 280, 250 300';
       var collectionNodeCount = $scope.collection.getCollectionNodeCount();
       // The sParameterExtension represents the co-ordinates following the 'S'
       // (smooth curve to) command in SVG.
@@ -142,7 +142,8 @@ oppia.controller('CollectionPlayer', [
       $scope.svgHeight = $scope.MIN_HEIGHT_FOR_PATH_SVG_PX;
       $scope.pathIconParameters = $scope.generatePathIconParameters();
       if (collectionNodeCount === 1) {
-        return '';
+        $scope.pathSvgParameters = '';
+        return $scope.pathSvgParameters;
       } else if (collectionNodeCount === 2) {
         return $scope.pathSvgParameters;
       } else {
@@ -150,7 +151,7 @@ oppia.controller('CollectionPlayer', [
         // for the bezier curve (path).
         var y = 500;
         for (var i = 1; i < Math.floor(collectionNodeCount / 2); i++) {
-          var x = (i % 2) ? 0 : 500;
+          var x = (i % 2) ? 30 : 470;
           sParameterExtension += x + ' ' + y + ', ';
           y += 20;
           sParameterExtension += 250 + ' ' + y + ', ';
@@ -174,7 +175,7 @@ oppia.controller('CollectionPlayer', [
           collectionNodes[0].getExplorationSummaryObject(
           ).thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
         left: '225px',
-        top: '40px',
+        top: '35px',
         thumbnailBgColor:
           collectionNodes[0].getExplorationSummaryObject().thumbnail_bg_color
       });
