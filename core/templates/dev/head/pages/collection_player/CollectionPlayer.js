@@ -247,6 +247,6 @@ oppia.controller('CollectionPlayer', [
       if (newValue !== null) {
         $scope.generatePathParameters();
       }
-    },true);
+    }, true);
   }
 ]);
