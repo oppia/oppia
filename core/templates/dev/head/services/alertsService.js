@@ -44,7 +44,7 @@ oppia.factory('alertsService', ['$log', '$window', function($log, $window) {
    * @param {string} warning - The warning message to display.
    * @param {int} redirectTime - The time before redirecting to main page.
    */
-  alertsService.addWarning = function(warning, redirectTime = null) {
+  alertsService.addWarning = function(warning, redirectTime) {
     $log.error(warning);
     if (alertsService.warnings.length >= MAX_TOTAL_WARNINGS) {
       return;
@@ -54,7 +54,7 @@ oppia.factory('alertsService', ['$log', '$window', function($log, $window) {
       content: warning
     });
     if (redirectTime) {
-      setTimeout(function () {
+      setTimeout(function() {
         $window.location.href = '/splash';
       }, redirectTime);
     }

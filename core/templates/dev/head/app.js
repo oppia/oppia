@@ -126,7 +126,7 @@ oppia.config([
                 warningMessage = rejection.data.error;
               }
               if (rejection.data.redirectTime) {
-                var redirectTime = rejection.data.redirectTime
+                var redirectTime = rejection.data.redirectTime;
                 alertsService.addWarning(warningMessage, redirectTime);
               } else {
                 alertsService.addWarning(warningMessage);
