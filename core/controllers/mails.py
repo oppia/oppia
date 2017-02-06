@@ -24,7 +24,7 @@ from core.platform import models
 
 
 class IncomingReplyEmailHandler(base.BaseHandler):
-    """Handler task of sending emails of feedback messages."""
+    """Handler for receiving incoming reply emails."""
 
     def post(self, reply_to_id):
         incoming_mail = mail.InboundEmailMessage(self.request.body)
