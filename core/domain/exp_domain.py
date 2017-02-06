@@ -2415,7 +2415,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v10_dict_to_v11_dict(cls, exploration_dict):
-        """Converts a v10 exploration dict into a v9 exploration dict."""
+        """Converts a v10 exploration dict into a v11 exploration dict."""
 
         exploration_dict['schema_version'] = 11
 
