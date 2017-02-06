@@ -19,6 +19,7 @@ from core.domain import event_services
 from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import rating_services
+from core.domain import subscription_services
 from core.domain import rights_manager
 from core.domain import stats_jobs_continuous_test
 from core.domain import user_jobs_continuous
@@ -569,6 +570,23 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
                 response['explorations_list'][0]['num_total_threads'], 3)
 
         self.logout()
+
+    def test_can_see_subscribers(self):
+        self.save_new_default_exploration(
+            self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
+
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['subscribers_list']), 0)
+
+        subscription_services.subscribe_to_creator(
+            self.viewer_id, self.owner_id)
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['subscribers_list']), 1)
+        self.assertEqual(
+            response['subscribers_list'][0]['subscriber_username'],
+            self.VIEWER_USERNAME)
 
 
 class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
