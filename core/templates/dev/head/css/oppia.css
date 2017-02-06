@@ -1824,17 +1824,19 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-collection-player-tiles-container {
   height: 100%;
-  padding-top: 60px;
-  margin-left: auto;
+  margin-left: 5%;
   margin-right: auto;
-  max-width: 800px;
+  max-width: 100%;
   min-height: 500px;
   padding-bottom: 25px;
   padding-left: 50px;
+  padding-top: 30px;
   position: relative;
 }
 .oppia-collection-player-tiles-container .oppia-page-heading {
   color: #005048;
+  text-align: center;
+  width: 90%;
 }
 
 .oppia-collection-player-tile-section {
@@ -1851,6 +1853,7 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-collection-player-title-font {
   font-family: Capriola, Roboto, Arial, sans-serif;
+  font-size: 45px;
 }
 
 /* Styles for the statistics page. */
@@ -3946,7 +3949,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-dashboard-card-view-item .exp-private-text {
   font-size: 13px;
   margin: 0 0.5em;
-  padding: 0.2em; 
+  padding: 0.2em;
 }
 
 .oppia-dashboard-card-view-item .metrics {
