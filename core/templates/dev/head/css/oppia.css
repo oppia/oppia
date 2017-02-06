@@ -736,7 +736,7 @@ textarea {
 .oppia-footer-social a:focus {
   text-decoration: none;
 }
-.oppia-footer-social a:focus > img{
+.oppia-footer-social a:focus > img {
   outline: 2px solid white;
 }
 .oppia-footer-social a > img {
