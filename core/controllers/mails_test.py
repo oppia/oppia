@@ -21,10 +21,8 @@ import feconf
 from core.domain import feedback_services
 from core.tests import test_utils
 from core.platform import models
-import main_mail
 
 from google.appengine.api import mail
-import webtest
 
 (feedback_models, email_models) = models.Registry.import_models([
     models.NAMES.feedback, models.NAMES.email])
@@ -48,7 +46,6 @@ class IncomingReplyEmailTests(test_utils.GenericTestBase):
             feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
-        self.testapp = webtest.TestApp(main_mail.app)
 
     def test_that_reply_emails_are_added_to_thread(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
