@@ -88,7 +88,7 @@
 
       <div ng-if="collection" class="oppia-collection-path-section">
 
-        <svg width="500px" height="<[svgHeight + 'px']>" xmlns="http://www.w3.org/2000/svg">
+        <svg width="500px" ng-attr-height="<[svgHeight + 'px']>" xmlns="http://www.w3.org/2000/svg">
           <path fill="none"
                 stroke="#296E5F"
                 stroke-dasharray="15,28"
@@ -100,8 +100,7 @@
                 stroke-dasharray="15,28"
                 stroke-linecap="round"
                 stroke-width="12"
-                ng-init="generatePathParameters()"
-                d="<[pathSvgParameters]>"/>
+                ng-attr-d="<[pathSvgParameters]>"/>
         </svg>
 
         <img ng-src="<[getStaticImageUrl('/general/collection_mascot.svg')]>" class="collection-mascot">
@@ -120,12 +119,13 @@
               <circle cx="50"
                       cy="70"
                       r="50"
-                      fill="<[pathIconParameters[$index].thumbnailBgColor]>"/>
+                      ng-attr-fill="<[pathIconParameters[$index].thumbnailBgColor]>"/>
               <image x="10"
                      y="30"
                      height="80"
                      width="80"
-                     xlink:href="<[pathIconParameters[$index].thumbnailIconUrl]>"></image>
+                     ng-attr-xlink:href="<[pathIconParameters[$index].thumbnailIconUrl]>"
+                     xlink:href=""></image>
             </pattern>
           </defs>
           <a xlink:href="<['/explore/' + node.getExplorationId()]>"

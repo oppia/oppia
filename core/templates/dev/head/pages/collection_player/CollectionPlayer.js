@@ -55,6 +55,7 @@ oppia.controller('CollectionPlayer', [
     $scope.ICON_X_MIDDLE_PX = 225;
     $scope.ICON_X_LEFT_PX = 55;
     $scope.ICON_X_RIGHT_PX = 395;
+    $scope.svgHeight = $scope.MIN_HEIGHT_FOR_PATH_SVG_PX;
 
     $scope.setIconHighlight = function(index) {
       $scope.activeHighlightedIconIndex = index;
@@ -129,7 +130,7 @@ oppia.controller('CollectionPlayer', [
         explorationId).getExplorationSummaryObject();
     };
 
-    // Returns the SVG parameters required to draw the curved path.
+    // Calculates the SVG parameters required to draw the curved path.
     $scope.generatePathParameters = function() {
       // The pathSvgParameters represents the final string of SVG parameters
       // for the bezier curve to be generated. The default parameters represent
@@ -139,13 +140,11 @@ oppia.controller('CollectionPlayer', [
       // The sParameterExtension represents the co-ordinates following the 'S'
       // (smooth curve to) command in SVG.
       var sParameterExtension = '';
-      $scope.svgHeight = $scope.MIN_HEIGHT_FOR_PATH_SVG_PX;
       $scope.pathIconParameters = $scope.generatePathIconParameters();
       if (collectionNodeCount === 1) {
         $scope.pathSvgParameters = '';
-        return $scope.pathSvgParameters;
       } else if (collectionNodeCount === 2) {
-        return $scope.pathSvgParameters;
+        $scope.pathSvgParameters = 'M250 80  C 470 100, 470 280, 250 300';
       } else {
         // The x and y here represent the co-ordinates of the control points
         // for the bezier curve (path).
@@ -164,7 +163,6 @@ oppia.controller('CollectionPlayer', [
       } else {
         $scope.svgHeight = y - $scope.ODD_SVG_HEIGHT_OFFSET_PX;
       }
-      return $scope.pathSvgParameters;
     };
 
     $scope.generatePathIconParameters = function() {
@@ -244,5 +242,11 @@ oppia.controller('CollectionPlayer', [
           'There was an error loading the collection.');
       }
     );
+
+    $scope.$watch('collection', function(newValue) {
+      if (newValue !== null) {
+        $scope.generatePathParameters();
+      }
+    },true);
   }
 ]);
