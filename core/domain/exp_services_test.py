@@ -2627,6 +2627,13 @@ title: Old Title
         # converted.
         self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
 
+    def test_validating_classifier_model_id_after_conversion(self):
+        """This test aims to validate the field classifier_model_id after
+        conversion from a previous version"""
+        exploration = exp_services.get_exploration_by_id(self.OLD_EXP_ID)
+        for state_dict in exploration.states.values():
+            self.assertIsNone(state_dict.classifier_model_id)
+        self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
 
 class SuggestionActionUnitTests(test_utils.GenericTestBase):
     """Test learner suggestion action functions in exp_services."""

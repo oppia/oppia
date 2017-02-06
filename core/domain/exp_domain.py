@@ -1119,7 +1119,6 @@ class State(object):
             interaction.id, interaction.customization_args,
             interaction.answer_groups, interaction.default_outcome,
             interaction.confirmed_unclassified_answers, interaction.fallbacks)
-        # The classifier model if this state corresponds to
         self.classifier_model_id = classifier_model_id
 
     def validate(self, exp_param_specs_dict, allow_null_interaction):
@@ -2226,8 +2225,8 @@ class Exploration(object):
         """Converts from version 7 to 8. Version 8 contains classifier
         model id.
         """
-        for name in states_dict:
-            states_dict[name]['classifier_model_id'] = None
+        for state_dict in states_dict.values():
+            state_dict['classifier_model_id'] = None
         return states_dict
 
     @classmethod
