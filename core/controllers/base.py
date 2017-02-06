@@ -392,7 +392,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.write(
             self.jinja2_env.get_template(filename).render(**values))
 
-    def _render_exception(self, error_code, values, redirectTime):
+    def _render_exception(self, error_code, values, redirectTime = None):
         assert error_code in [400, 401, 404, 500]
         values['code'] = error_code
         if redirectTime:
