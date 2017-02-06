@@ -125,7 +125,12 @@ oppia.config([
               if (rejection.data && rejection.data.error) {
                 warningMessage = rejection.data.error;
               }
-              alertsService.addWarning(warningMessage);
+              if (rejection.data.redirectTime) {
+                var redirectTime = rejection.data.redirectTime
+                alertsService.addWarning(warningMessage, redirectTime);
+              } else {
+                alertsService.addWarning(warningMessage);
+              }
             }
             return $q.reject(rejection);
           }

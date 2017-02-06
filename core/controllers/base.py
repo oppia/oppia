@@ -250,8 +250,9 @@ class BaseHandler(webapp2.RequestHandler):
 
                 if not is_csrf_token_valid:
                     raise self.UnauthorizedUserException(
-                        'Your session has expired, and unfortunately your '
-                        'changes cannot be saved. Please refresh the page.')
+                        'Sorry, you have been logged out'
+                        '[probably in another window]. Please log in again.'
+                        'you will  redirect to main page in 3 seconds !!')
             except Exception as e:
                 logging.error(
                     '%s: payload %s',
@@ -391,9 +392,11 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.write(
             self.jinja2_env.get_template(filename).render(**values))
 
-    def _render_exception(self, error_code, values):
+    def _render_exception(self, error_code, values, redirectTime = None):
         assert error_code in [400, 401, 404, 500]
         values['code'] = error_code
+        if redirectTime:
+            values['redirectTime'] = redirectTime
 
         # This checks if the response should be JSON or HTML.
         # For GET requests, there is no payload, so we check against
@@ -429,7 +432,8 @@ class BaseHandler(webapp2.RequestHandler):
 
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)
-            self._render_exception(401, {'error': unicode(exception)})
+            redirectTime = 3000
+            self._render_exception(401, {'error': unicode(exception)}, redirectTime)
             return
 
         if isinstance(exception, self.InvalidInputException):

@@ -16,7 +16,7 @@
  * @fileoverview Factory for handling warnings and info messages.
  */
 
-oppia.factory('alertsService', ['$log', function($log) {
+oppia.factory('alertsService', ['$log', '$window', function($log, $window) {
   var alertsService = {
     /**
      * Each element in each of the arrays here is an object with two keys:
@@ -42,8 +42,9 @@ oppia.factory('alertsService', ['$log', function($log) {
   /**
    * Adds a warning message.
    * @param {string} warning - The warning message to display.
+   * @param {int} redirectTime - The time before redirecting to main page.
    */
-  alertsService.addWarning = function(warning) {
+  alertsService.addWarning = function(warning, redirectTime = null) {
     $log.error(warning);
     if (alertsService.warnings.length >= MAX_TOTAL_WARNINGS) {
       return;
@@ -52,6 +53,11 @@ oppia.factory('alertsService', ['$log', function($log) {
       type: 'warning',
       content: warning
     });
+    if (redirectTime) {
+      setTimeout(function () {
+        $window.location.href = '/splash';
+      }, redirectTime);
+    }
   };
 
   /**
