@@ -35,6 +35,7 @@ from core.domain import rights_manager
 from core.platform import models
 import feconf
 import main
+import main_mail
 import main_taskqueue
 import utils
 
@@ -241,13 +242,24 @@ class TestBase(unittest.TestCase):
         if csrf_token:
             data['csrf_token'] = csrf_token
 
-        json_response = self.testapp.post(
-            str(url), data, expect_errors=expect_errors,
-            upload_files=upload_files)
+        json_response = self.post(
+            url, data, expect_errors, expected_status_int, upload_files)
 
-        self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
+
+    def post(self, url, data, expect_errors=False, expected_status_int=200,
+             upload_files=None, headers=None):
+        app = (
+            webtest.TestApp(main_mail.app) if url.startswith('/_ah/mail')
+            else self.testapp)
+
+        json_response = app.post(
+            str(url), data, expect_errors=expect_errors,
+            upload_files=upload_files, headers=headers)
+
+        self.assertEqual(json_response.status_int, expected_status_int)
+        return json_response
 
     def put_json(self, url, payload, csrf_token=None, expect_errors=False,
                  expected_status_int=200):

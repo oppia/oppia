@@ -18,12 +18,13 @@
 
 import requests
 
+from core.platform.email import gae_email_services
 import feconf
 
 
 def send_mail(
         sender_email, recipient_email, subject, plaintext_body,
-        html_body, bcc_admin=False):
+        html_body, bcc_admin=False, reply_to_id=None):
     """Sends an email using mailgun api.
 
     In general this function should only be called from
@@ -68,6 +69,10 @@ def send_mail(
 
     if bcc_admin:
         data['bcc'] = feconf.ADMIN_EMAIL_ADDRESS
+
+    if reply_to_id:
+        reply_to = gae_email_services.get_reply_to_email_with_id(reply_to_id)
+        data['h:Reply-To'] = reply_to
 
     requests.post(
         mailgun_domain_name, auth=('api', feconf.MAILGUN_API_KEY),

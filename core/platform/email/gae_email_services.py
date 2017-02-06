@@ -20,9 +20,13 @@ import feconf
 
 from google.appengine.api import mail
 
+def get_reply_to_email_with_id(reply_to_id):
+    return 'reply+%s@%s' % (reply_to_id, feconf.EMAIL_DOMAIN_NAME)
+
+
 def send_mail(
         sender_email, recipient_email, subject, plaintext_body, html_body,
-        bcc_admin=False):
+        bcc_admin=False, reply_to_id=None):
     """Sends an email. The client is responsible for recording any audit logs.
 
     In general this function should only be called from
@@ -54,14 +58,17 @@ def send_mail(
     if not mail.is_email_valid(recipient_email):
         raise ValueError(
             'Malformed recipient email address: %s' % recipient_email)
+
+    msg = mail.EmailMessage(
+        sender=sender_email, to=recipient_email,
+        subject=subject, body=plaintext_body, html=html_body)
     if bcc_admin:
-        mail.send_mail(
-            sender_email, recipient_email, subject, plaintext_body,
-            html=html_body, bcc=[feconf.ADMIN_EMAIL_ADDRESS])
-    else:
-        mail.send_mail(
-            sender_email, recipient_email, subject, plaintext_body,
-            html=html_body)
+        msg.bcc = [feconf.ADMIN_EMAIL_ADDRESS]
+    if reply_to_id:
+        msg.reply_to = get_reply_to_email_with_id(reply_to_id)
+
+    # Send message.
+    msg.send()
 
 
 def send_bulk_mail(

@@ -27,7 +27,8 @@ from core.domain import email_manager
 from core.platform import models
 import feconf
 
-(feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
+(feedback_models, email_models) = models.Registry.import_models(
+    [models.NAMES.feedback, models.NAMES.email])
 taskqueue_services = models.Registry.import_taskqueue_services()
 transaction_services = models.Registry.import_transaction_services()
 
@@ -92,7 +93,7 @@ def create_thread(
 
 def create_message(
         exploration_id, thread_id, author_id, updated_status, updated_subject,
-        text):
+        text, received_via_email=False):
     """Creates a new message for the thread and subscribes the author to the
     thread.
 
@@ -138,6 +139,7 @@ def create_message(
     if updated_subject:
         msg.updated_subject = updated_subject
     msg.text = text
+    msg.received_via_email = received_via_email
     msg.put()
 
     # We do a put() even if the status and subject are not updated, so that the
@@ -178,7 +180,8 @@ def _get_message_from_model(message_model):
         message_model.id, message_model.thread_id, message_model.message_id,
         message_model.author_id, message_model.updated_status,
         message_model.updated_subject, message_model.text,
-        message_model.created_on, message_model.last_updated)
+        message_model.created_on, message_model.last_updated,
+        message_model.received_via_email)
 
 
 def get_messages(exploration_id, thread_id):
@@ -801,6 +804,19 @@ def _send_feedback_thread_status_change_emails(
                 old_status, new_status)
 
 
+def _check_unique_ids_for_recipients(user_ids, exploration_id, thread_id):
+    user_models = (
+        email_models.FeedbackEmailReplyToIDModel.get_for_multi_user_ids(
+            user_ids, exploration_id, thread_id))
+
+    for user_id in user_ids:
+        if user_models[user_id] is None:
+            user_models[user_id] = (
+                email_models.FeedbackEmailReplyToIDModel.create(
+                    user_id, exploration_id, thread_id))
+            user_models[user_id].put()
+
+
 def _add_message_to_email_buffer(
         author_id, exploration_id, thread_id, message_id, message_length,
         old_status, new_status):
@@ -827,6 +843,9 @@ def _add_message_to_email_buffer(
         exploration_id, thread_id, message_id)
     batch_recipient_ids, other_recipient_ids = (
         _get_all_recipient_ids(exploration_id, thread_id, author_id))
+
+    _check_unique_ids_for_recipients(
+        other_recipient_ids, exploration_id, thread_id)
 
     if old_status != new_status:
         # Send email for feedback thread status change.
