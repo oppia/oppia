@@ -72,7 +72,7 @@ class HomePageRedirectHandler(base.BaseHandler):
     def get(self):
         if self.user_id and user_services.has_fully_registered(self.user_id):
             
-            # Get explorations associated with the user's account
+            # Get all the explorations associated with the user's account
             user_exps = user_services.get_user_contributions(self.user_id)
             
             # If the user is not learner it will have atleast
