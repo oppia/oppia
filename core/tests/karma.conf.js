@@ -11,6 +11,12 @@ module.exports = function(config) {
     frameworks: ['jasmine'],
     files: [
       'core/tests/karma-globals.js',
+      // Constants must be loaded before everything else.
+      {
+        pattern: 'assets/constants.json',
+        included: false
+      },
+      'core/templates/dev/head/pages/load_constants.js',
       // Since jquery,jquery-ui,angular,angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.0.0/jquery.min.js',
@@ -39,6 +45,9 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*-e2e.js',
       'extensions/**/protractor.js'
     ],
+    proxies: {
+      '/assets/': 'http://localhost:9876/base/assets/'
+    },
     preprocessors: {
       'core/templates/dev/head/*.js': ['coverage'],
       // When all controllers were converted from global functions into the

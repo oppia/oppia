@@ -39,6 +39,7 @@ from core.domain import stats_services
 from core.domain import user_services
 from core.domain import value_generators_domain
 from core.platform import models
+from constants import CONSTANTS
 import feconf
 import utils
 
@@ -159,7 +160,7 @@ class ExplorationPage(EditorHandler):
 
     def get(self, exploration_id):
         """Handles GET requests."""
-        if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
+        if exploration_id in CONSTANTS.DISABLED_EXPLORATION_IDS:
             self.render_template(
                 'pages/error/disabled_exploration.html',
                 iframe_restriction=None)

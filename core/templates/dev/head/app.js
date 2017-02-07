@@ -30,6 +30,8 @@ var oppia = angular.module(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
                    : []));
 
+oppia.constant('CONSTANTS', CONSTANTS);
+
 // TODO(sll): Get this to read from a common JSON file; it's replicated in
 // feconf.
 oppia.constant('CATEGORY_LIST', GLOBALS.ALL_CATEGORIES);
