@@ -47,9 +47,19 @@ class Image(base.BaseRichTextComponent):
         'default_value': '',
     }, {
         'name': 'alt',
-        'description': 'Alternative text (for screen readers)',
+        'description': (
+            'Briefly explain this image to a visually impaired '
+            'learner'),
         'schema': {
             'type': 'unicode',
+            'validators': [{
+                'id': 'is_nonempty',
+            }],
+            'ui_config': {
+                'placeholder': (
+                    'Description of Image (Example : George Handel, '
+                    '18th century baroque composer)'),
+            },
         },
         'default_value': '',
     }]
