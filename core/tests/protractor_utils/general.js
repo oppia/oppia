@@ -66,6 +66,8 @@ var SERVER_URL_PREFIX = 'http://localhost:9001';
 var LIBRARY_URL_SUFFIX = '/library';
 var EDITOR_URL_SLICE = '/create/';
 var PLAYER_URL_SLICE = '/explore/';
+var CREATOR_DASHBOARD = '/dashboard';
+var USER_PREFERENCES = '/preferences';
 var LOGIN_URL_SUFFIX = '/_ah/login';
 var ADMIN_URL_SUFFIX = '/admin';
 var MODERATOR_URL_SUFFIX = '/moderator';
@@ -164,6 +166,8 @@ exports.checkForConsoleErrors = checkForConsoleErrors;
 
 exports.SERVER_URL_PREFIX = SERVER_URL_PREFIX;
 exports.LIBRARY_URL_SUFFIX = LIBRARY_URL_SUFFIX;
+exports.CREATOR_DASHBOARD = CREATOR_DASHBOARD;
+exports.USER_PREFERENCES = USER_PREFERENCES;
 exports.EDITOR_URL_SLICE = EDITOR_URL_SLICE;
 exports.LOGIN_URL_SUFFIX = LOGIN_URL_SUFFIX;
 exports.MODERATOR_URL_SUFFIX = MODERATOR_URL_SUFFIX;
