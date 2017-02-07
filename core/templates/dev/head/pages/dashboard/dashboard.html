@@ -125,7 +125,7 @@
         </md-card>
       </div>
 
-      <div ng-if="explorationsList.length > 0" class="oppia-dashboard-subscription-panel">
+      <div ng-if="explorationsList.length > 0" class="oppia-dashboard-subscription-panel" style="padding-top: 13px;">
         <span class="oppia-dashboard-total-elements">
           You have a total of <[explorationsList.length]> explorations.
         </span>
@@ -335,7 +335,7 @@
                   class="sort-options"
                   ng-change="setSubscriptionSortingOptions(currentSubscribersSortType)"
                   ng-options="SUBSCRIPTION_SORT_BY_KEYS[key] as value for (key, value) in HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS"
-                  style="width: 167px;">
+                  style="width: 160px;">
           </select>
           <span class="sort-order fa"
                 ng-click="setSubscriptionSortingOptions(currentSubscribersSortType)"

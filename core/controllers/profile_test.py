@@ -334,9 +334,6 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
     def test_can_see_subscriptions(self):
-        self.save_new_default_exploration(
-            self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
-
         self.login(self.VIEWER_EMAIL)
 
         response = self.get_json(feconf.PREFERENCES_DATA_URL)

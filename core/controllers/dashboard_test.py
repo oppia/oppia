@@ -572,9 +572,6 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_see_subscribers(self):
-        self.save_new_default_exploration(
-            self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
-
         self.login(self.OWNER_EMAIL)
 
         response = self.get_json(feconf.DASHBOARD_DATA_URL)
