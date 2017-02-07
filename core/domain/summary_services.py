@@ -259,30 +259,6 @@ def get_displayable_exp_summary_dicts_matching_ids(
     return get_displayable_exp_summary_dicts(filtered_exploration_summaries)
 
 
-def get_total_displayable_exp_matching_ids(exploration_ids, editor_user_id=None):
-    exploration_summaries = (
-        exp_services.get_exploration_summaries_matching_ids(exploration_ids))
-
-    total_displayable_exp = 0
-
-    filtered_exploration_summaries = []
-    for exploration_summary in exploration_summaries:
-        if exploration_summary is None:
-            continue
-        if exploration_summary.status == (
-                rights_manager.ACTIVITY_STATUS_PRIVATE):
-            if editor_user_id is None:
-                continue
-            if not rights_manager.Actor(editor_user_id).can_edit(
-                    feconf.ACTIVITY_TYPE_EXPLORATION,
-                    exploration_summary.id):
-                continue
-
-        total_displayable_exp = total_displayable_exp + 1
-
-    return total_displayable_exp
-
-
 def get_displayable_exp_summary_dicts(exploration_summaries):
     """Given a list of exploration summary domain objects, returns a list,
     with the same number of elements, of the corresponding human-readable
