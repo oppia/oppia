@@ -48,7 +48,8 @@ describe('Subscriptions functionality', function() {
         'creator2...');
     users.logout();
 
-    // Create a learner who subscribes to one creator and unsubscribes from other.
+    // Create a learner who subscribes to one creator and unsubscribes from the
+    // other.
     users.createUser('learner2@subscriptions.com', 'learner2subscriptions');
     users.login('learner2@subscriptions.com');
     browser.get('/profile/creator1subscriptions');
