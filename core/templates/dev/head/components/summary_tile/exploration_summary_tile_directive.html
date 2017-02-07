@@ -18,26 +18,6 @@
                             tooltip-placement="right">
             </circular-image>
           </div>
-          <div class="avatars-num-minus-one contributor-indicator contributor-indicator-background" ng-show="avatarsList.length > 1">
-            <span ng-if="!isCommunityOwned()">+</span><[avatarsList.length - 1]>
-          </div>
-
-          <div class="all-avatars" style="display: none;">
-            <div ng-repeat="avatar in avatarsList | limitTo:MAX_AVATARS_TO_DISPLAY-1:1">
-              <circular-image src="avatar.image"
-                              link="avatar.link"
-                              tooltip="<[avatar.tooltipText | truncate:14]>"
-                              tooltip-placement="right">
-              </circular-image>
-            </div>
-
-            <div style="position: relative;" ng-show="avatarsList.length > MAX_AVATARS_TO_DISPLAY">
-              <div class="exploration-black-profile"></div>
-              <div class="num-remaining-avatars" ng-show="avatarsList.length > MAX_AVATARS_TO_DISPLAY">
-                +<[avatarsList.length - MAX_AVATARS_TO_DISPLAY]>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
       <div class="title-section-mask"></div>
