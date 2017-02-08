@@ -71,18 +71,14 @@ class HomePageRedirectHandler(base.BaseHandler):
     """
     def get(self):
         if self.user_id and user_services.has_fully_registered(self.user_id):
-            
             # Get all the explorations associated with the user's account
-            user_exps = user_services.get_user_contributions(self.user_id)
-            
+            user_exps = user_services.get_user_contributions(self.user_id)            
             # If the user is not learner it will have atleast
             # one exloration associated with the user account
-            if len(user_exps.created_exploration_ids) >= 1:
-            
+            if len(user_exps.created_exploration_ids) >= 1:            
                 # Redirect the user to dashboard
                 self.redirect(feconf.DASHBOARD_URL)
             else:
-            
                 # Redirect to library page
                 self.redirect(feconf.LIBRARY_INDEX_URL)
         else:
