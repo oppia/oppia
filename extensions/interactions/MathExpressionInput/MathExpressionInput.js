@@ -29,16 +29,128 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
       },
       templateUrl: 'interaction/MathExpressionInput',
       controller: [
-        '$scope', '$attrs', '$timeout', '$element', 'LABEL_FOR_CLEARING_FOCUS',
-        function($scope, $attrs, $timeout, $element, LABEL_FOR_CLEARING_FOCUS) {
+        '$scope', '$attrs', '$timeout', '$element', 'LABEL_FOR_CLEARING_FOCUS', 'oppiaDebouncer',
+        function($scope, $attrs, $timeout, $element, LABEL_FOR_CLEARING_FOCUS, oppiaDebouncer) {
           var guppyDivElt = $element[0].querySelector('.guppy-div');
           var guppyInstance = new Guppy(guppyDivElt, {
             ready_callback: function() {
               Guppy.get_symbols(
                 GLOBALS.ASSET_DIR_PREFIX +
                 '/assets/overrides/guppy/oppia_symbols.json');
+
+              if (/Mobi/.test(navigator.userAgent)) {
+                $scope.isMobileOverlayShown = true;
+                // Wait for the scope change to apply.
+                $timeout(addMobileButtonOverlay, 0, false);
+              }
             }
           });
+
+          /**
+           * Adds a button overlay and invisible text field used to bring up
+           * the keyboard on mobile devices.
+           *
+           * TODO: On iOS/Safari, keyboard may only appear on first press.
+           * This may not be a significant as the MathExpressionInput is
+           * recreated if the given answer is incorrect.
+           */
+          function addMobileButtonOverlay() {
+
+            /**
+             * Checks if the guppy div has a width and height greater than 0,
+             * if not schedules a timeout to run again after 100ms. If the
+             * guppy div has a valid width/height, position the invisible
+             * button directly over the guppy div. For mobile browsers, focus()
+             * can only be called from within an onclick handler. Using a form
+             * element was more reliable than attaching the handler to the
+             * guppy div directly.
+             */
+            function positionButtonOverlay() {
+              var guppyOffset = $(guppyDivElt).position();
+              var guppySize = document.querySelector('.guppy-div').getBoundingClientRect();
+              console.log(guppySize, $('#startMathInputButton'));
+
+              // If the guppy div hasn't rendered yet, retry after 100ms.
+              if (guppySize.width === 0 || guppySize.height === 0) {
+                $timeout(positionButtonOverlay, 100)
+              } else {
+                $('#startMathInputButton').css({
+                  'top': guppyOffset.top,
+                  'left': guppyOffset.left,
+                  'width': guppySize.width,
+                  'height': guppySize.height
+                });
+              }
+            }
+            positionButtonOverlay();
+
+            // The focus() call must be in a click event handler and on a text
+            // field to make the mobile keyboard appear.
+            $('#startMathInputButton').click(function(){
+              guppyInstance.activate();
+
+              var fakeInputElement = document.
+                querySelector('#fakeInputForMathExpression');
+              fakeInputElement.focus();
+
+              // Place the cursor at the end of the text input, so that the
+              // user can use backspace to delete.
+              fakeInputElement.setSelectionRange(fakeInputElement.value.length,
+                fakeInputElement.value.length);
+            });
+
+            // Mapping characters back to Mousetrap codes.
+            // Use Mousetrap.trigger(code) to replay them.
+            k_sym_reverse_map = {
+                '^': 'shift+6',
+                '*': 'shift+8',
+                '(': 'shift+9',
+                '<': 'shift+,',
+                '>': 'shift+.',
+                '\\': 'shift+\\',
+                ' ': 'space',
+                ')': 'shift+0'
+                // Missing up/down. user needs to use [space], 'sub' instead.
+                // Mobile devices typically don't have arrow keys anyways.
+            };
+
+            function setGuppyContentFromInput() {
+              // Clear the Guppy instance by setting its content to the
+              // output of get_content when empty.
+              guppyInstance.set_content('<m><e></e></m>');
+              guppyInstance.render(true);
+
+              // Get content of the text input field as an array of characters.
+              var textContent = document
+                .querySelector('#fakeInputForMathExpression').value
+                .toLowerCase().split('');
+
+              for ( var i = 0; i < textContent.length; i++ ) {
+                var c = textContent[i];
+
+                // Replay key combination for each character on the document.
+                if ( c in k_sym_reverse_map ) {
+                    Mousetrap.trigger(k_sym_reverse_map[c]);
+                } else {
+                    Mousetrap.trigger(c);
+                }
+              }
+            }
+
+            // Debounce clear/refill cycles to 1 per 100ms.
+            $('#fakeInputForMathExpression').on(
+              'input change compositionupdate keydown',
+              oppiaDebouncer.debounce(function (e) {
+                setGuppyContentFromInput();
+            }, 100));
+
+            // Set content immediately on blur.
+            $('#fakeInputForMathExpression').on('blur', function () {
+                guppyInstance.activate();
+                setGuppyContentFromInput();
+            });
+          }
+
           var guppyDivId = guppyInstance.editor.id;
 
           var labelForFocusTarget = $attrs.labelForFocusTarget || null;
@@ -66,7 +178,6 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
 
           $scope.isCurrentAnswerValid = function() {
             var latexAnswer = Guppy.instances[guppyDivId].get_content('latex');
-
             try {
               MathExpression.fromLatex(answer.latex);
             } catch (e) {
