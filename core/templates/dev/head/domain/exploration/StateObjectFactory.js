@@ -17,12 +17,32 @@
  * domain objects.
  */
 
-oppia.factory('StateObjectFactory', [function() {
+oppia.factory('StateObjectFactory', [
+  'AnswerGroupObjectFactory',
+  function(AnswerGroupObjectFactory) {
   var State = function(name, content, interaction, paramChanges) {
     this.name = name;
     this.content = content;
-    this.interaction = interaction;
+    this.interaction = {
+      answer_groups:
+        generateAnswerGroupsFromBackend(interaction.answer_groups),
+      confirmed_unclassified_answers:
+        interaction.confirmed_unclassified_answers,
+      customization_args: interaction.customization_args,
+      default_outcome: interaction.default_outcome,
+      fallbacks: interaction.fallbacks,
+      id: interaction.id
+    };
     this.paramChanges = paramChanges;
+  };
+
+  var generateAnswerGroupsFromBackend = function(answerGroupBackendDicts) {
+    var answerGroups = answerGroupBackendDicts.map(function(answerGroupDict) {
+      return AnswerGroupObjectFactory.create(
+        answerGroupDict.rule_specs, answerGroupDict.outcome);
+    });
+
+    return answerGroups;
   };
 
   // Instance methods.

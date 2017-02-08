@@ -167,7 +167,16 @@ oppia.factory('routerService', [
         if (_tabs.active === MAIN_TAB) {
           $('.oppia-editor-cards-container').fadeOut(function() {
             _actuallyNavigate(SLUG_GUI, stateName);
-            $rootScope.$apply();
+            // jscs:disable maximumLineLength
+            // We need to use $apply to update all our bindings. However we
+            // can't directly use $apply, as there is already another $apply in
+            // progress, the one which angular itself has called at the start.
+            // So we use $applyAsync to ensure that this $apply is called just
+            // after the previous $apply is finished executing. Refer to this
+            // link for more information -
+            // http://blog.theodybrothers.com/2015/08/getting-inside-angular-scopeapplyasync.html
+            // jscs:enable maximumLineLength
+            $rootScope.$applyAsync();
             $timeout(function() {
               $('.oppia-editor-cards-container').fadeIn();
             }, 150);

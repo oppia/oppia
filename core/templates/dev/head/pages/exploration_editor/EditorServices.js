@@ -779,13 +779,28 @@ oppia.factory('explorationStatesService', [
   '$log', '$modal', '$filter', '$location', '$rootScope',
   'explorationInitStateNameService', 'alertsService', 'changeListService',
   'editorContextService', 'validatorsService', 'newStateTemplateService',
-  'explorationGadgetsService',
+  'explorationGadgetsService', 'StateObjectFactory',
   function(
       $log, $modal, $filter, $location, $rootScope,
       explorationInitStateNameService, alertsService, changeListService,
       editorContextService, validatorsService, newStateTemplateService,
-      explorationGadgetsService) {
+      explorationGadgetsService, StateObjectFactory) {
     var _states = null;
+    // Properties that have a different backend representation from the
+    // frontend and must be converted.
+    var PROPERTIES_TO_CONVERT = [
+      'answer_groups'
+    ];
+
+    var BACKEND_CONVERSIONS = {
+      answer_groups: function(answerGroups) {
+        var answerGroupBackendDicts = [];
+        answerGroups.map(function(answerGroup) {
+          answerGroupBackendDicts.push(answerGroup.toBackendDict());
+        });
+        return answerGroupBackendDicts;
+      }
+    };
 
     // Maps backend names to the corresponding frontend dict accessor lists.
     var PROPERTY_REF_DATA = {
@@ -794,7 +809,7 @@ oppia.factory('explorationStatesService', [
         'interaction', 'confirmed_unclassified_answers'],
       content: ['content'],
       default_outcome: ['interaction', 'default_outcome'],
-      param_changes: ['param_changes'],
+      param_changes: ['paramChanges'],
       fallbacks: ['interaction', 'fallbacks'],
       widget_id: ['interaction', 'id'],
       widget_customization_args: ['interaction', 'customization_args']
@@ -820,10 +835,15 @@ oppia.factory('explorationStatesService', [
 
     var saveStateProperty = function(stateName, backendName, newValue) {
       var oldValue = getStatePropertyMemento(stateName, backendName);
+      var newBackendValue = angular.copy(newValue);
+
+      if (BACKEND_CONVERSIONS.hasOwnProperty(backendName)) {
+        newBackendValue = convertToBackendRepresentation(newValue, backendName);
+      }
 
       if (!angular.equals(oldValue, newValue)) {
         changeListService.editStateProperty(
-          stateName, backendName, newValue, oldValue);
+          stateName, backendName, newBackendValue, oldValue);
 
         var newStateData = angular.copy(_states[stateName]);
         var accessorList = PROPERTY_REF_DATA[backendName];
@@ -832,6 +852,7 @@ oppia.factory('explorationStatesService', [
         for (var i = 0; i < accessorList.length - 1; i++) {
           propertyRef = propertyRef[accessorList[i]];
         }
+
         propertyRef[accessorList[accessorList.length - 1]] = angular.copy(
           newValue);
 
@@ -845,10 +866,20 @@ oppia.factory('explorationStatesService', [
       }
     };
 
+    var convertToBackendRepresentation = function(frontendValue, backendName) {
+      var conversionFunction = BACKEND_CONVERSIONS[backendName];
+      return conversionFunction(frontendValue);
+    };
+
     // TODO(sll): Add unit tests for all get/save methods.
     return {
-      init: function(value) {
-        _states = angular.copy(value);
+      init: function(states) {
+        _states = {};
+        for (var stateName in states) {
+          var stateData = angular.copy(states[stateName]);
+          _states[stateName] = StateObjectFactory.create(
+            stateName, stateData);
+        }
       },
       getStates: function() {
         return angular.copy(_states);
@@ -1608,18 +1639,27 @@ oppia.factory('explorationGadgetsService', [
 ]);
 
 // A service that returns the frontend representation of a newly-added state.
-oppia.factory('newStateTemplateService', [function() {
-  return {
-    // Returns a template for the new state with the given state name, changing
-    // the default rule destination to the new state name in the process.
-    // NB: clients should ensure that the desired state name is valid.
-    getNewStateTemplate: function(newStateName) {
-      var newStateTemplate = angular.copy(GLOBALS.NEW_STATE_TEMPLATE);
-      newStateTemplate.interaction.default_outcome.dest = newStateName;
-      return newStateTemplate;
-    }
-  };
-}]);
+// TODO: refactor into factory as StateObjectFactory.createNewState()
+oppia.factory('newStateTemplateService',
+  ['StateObjectFactory', function(StateObjectFactory) {
+    return {
+      // Returns a template for the new state with the given state name,
+      // changing the default rule destination to the new state name in
+      // the process.
+      // NB: clients should ensure that the desired state name is valid.
+      getNewStateTemplate: function(newStateName) {
+        var newStateTemplate = angular.copy(GLOBALS.NEW_STATE_TEMPLATE);
+        var newState = StateObjectFactory.create(newStateName, {
+          content: newStateTemplate.content,
+          interaction: newStateTemplate.interaction,
+          param_changes: newStateTemplate.param_changes
+        });
+        newState.interaction.default_outcome.dest = newStateName;
+        return newState;
+      }
+    };
+  }
+]);
 
 oppia.factory('computeGraphService', [
   'INTERACTION_SPECS', function(INTERACTION_SPECS) {
@@ -1891,9 +1931,9 @@ oppia.factory('explorationWarningsService', [
       var answerGroups = state.interaction.answer_groups;
       for (var i = 0; i < answerGroups.length; i++) {
         var group = answerGroups[i];
-        if (group.rule_specs.length === 1 &&
-            group.rule_specs[0].rule_type === CLASSIFIER_RULESPEC_STR &&
-            group.rule_specs[0].inputs.training_data.length === 0) {
+        if (group.ruleSpecs.length === 1 &&
+            group.ruleSpecs[0].rule_type === CLASSIFIER_RULESPEC_STR &&
+            group.ruleSpecs[0].inputs.training_data.length === 0) {
           indexes.push(i);
         }
       }
@@ -2062,7 +2102,7 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
 
   var makeRulesListHumanReadable = function(answerGroupValue) {
     var rulesList = [];
-    answerGroupValue.rule_specs.forEach(function(ruleSpec) {
+    answerGroupValue.ruleSpecs.forEach(function(ruleSpec) {
       var ruleElm = angular.element('<li></li>');
       ruleElm.html('<p>Type: ' + ruleSpec.rule_type + '</p>');
       ruleElm.append(
@@ -2234,7 +2274,7 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
                       '<div class="feedback">' + newValue.outcome.feedback +
                       '</div></div>');
                 }
-                if (!angular.equals(newValue.rule_specs, oldValue.rule_specs)) {
+                if (!angular.equals(newValue.ruleSpecs, oldValue.ruleSpecs)) {
                   var rulesList = makeRulesListHumanReadable(newValue);
                   if (rulesList.length > 0) {
                     answerGroupHtml += '<p class="sub-edit"><i>Rules: </i></p>';

@@ -21,7 +21,7 @@
 
     <div class="oppia-wide-panel oppia-error-wide-container">
       <div class="oppia-wide-panel-content protractor-test-error-container">
-        <h4>
+        <h1 class="oppia-error-h1">
           {% if code == 400 %}
             <span translate="I18N_ERROR_HEADER_400"></span>
             - Bad Request
@@ -35,27 +35,36 @@
             <span translate="I18N_ERROR_HEADER_500"></span>
             - System Error
           {% endif %}
-        </h4>
+        </h1>
 
         <br>
 
         <img ng-src="<[oopsMintImgUrl]>" alt="Oops!" width="299" height="142"/>
-        <p><h3>
+        <p>
           {% if code == 400 %}
-            <h3 translate="I18N_ERROR_MESSAGE_400"></h3>
+            <h2 class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_400"></h2>
           {% elif code == 401 %}
-            <h3 translate="I18N_ERROR_MESSAGE_401"></h3>
+            <h2 class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_401"></h2>
           {% elif code == 404 %}
-            <h3 translate="I18N_ERROR_MESSAGE_404"></h3>
+            <h2 class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_404"></h2>
           {% elif code == 500 %}
-            <h3 translate="I18N_ERROR_MESSAGE_500"></h3>
+            <h2 class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_500"></h2>
           {% endif %}
         </p>
         <p><span translate="I18N_ERROR_NEXT_STEPS" translate-values="{issueTrackerUrl: 'https://github.com/oppia/oppia/issues/new', homeUrl: '/'}"></span></p>
       </div>
     </div>
-
   </div>
+  <style>
+    .oppia-error-h1 {
+      font-size: 1em;
+      margin: 1.33em 0;
+    }
+    .oppia-error-h2 {
+      font-size: 1.17em;
+      font-weight: 700;
+    }
+  </style>
 {% endblock %}
 
 {% block footer_js %}
