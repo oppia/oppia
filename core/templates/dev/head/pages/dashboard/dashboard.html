@@ -125,7 +125,7 @@
         </md-card>
       </div>
 
-      <div ng-if="explorationsList.length > 0" class="oppia-dashboard-subscription-panel" style="padding-top: 13px;">
+      <div ng-if="explorationsList.length > 0" class="oppia-dashboard-tab-panel" style="padding-top: 13px;">
         <span class="oppia-dashboard-total-elements">
           You have a total of <[explorationsList.length]> explorations.
         </span>
@@ -322,7 +322,7 @@
     </div>
 
     <div ng-if="activeTab === 'mySubscribers'" style="margin-top: 8px;">
-      <div class="oppia-dashboard-subscription-panel">
+      <div class="oppia-dashboard-tab-panel">
         <span style="margin-top: 14px; display: inline-block;">
           You have a total of <[subscribersList.length]> subscribers.
         </span>
@@ -368,6 +368,11 @@
 
         <ul class="oppia-dashboard-tiles"
             ng-if="activeTab === 'myCollections' && collectionsList.length > 0">
+          <div class="oppia-dashboard-tab-panel">
+            <span style="margin-top: 8px; display: inline-block;">
+              You have a total of <[collectionsList.length]> collections.
+            </span>
+          </div>
           <span ng-repeat="collection in collectionsList">
             <collection-summary-tile collection-id="collection.id"
                                      collection-title="collection.title"
