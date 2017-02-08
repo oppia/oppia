@@ -1293,10 +1293,6 @@ li.sort-explorations-select, span.sort-explorations-select {
   width: auto;
 }
 
-span.sort-explorations-select-three-tabs {
-  margin-top: 10px;
-}
-
 span.sort-explorations-select .sort-by-text,
 span.sort-explorations-select .sort-options,
 span.sort-explorations-select .sort-order {
@@ -3987,7 +3983,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-dashboard-card-view-item .exp-private-text {
   font-size: 13px;
-  margin: 0 0.5em;
+  margin: 0.5em;
   padding: 0.2em;
 }
 
