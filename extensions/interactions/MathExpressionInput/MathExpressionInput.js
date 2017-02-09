@@ -34,26 +34,13 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
         function($scope, $attrs, $timeout, $element, LABEL_FOR_CLEARING_FOCUS,
           oppiaDebouncer) {
           var guppyDivElt = $element[0].querySelector('.guppy-div');
-          var guppyInstance = new Guppy(guppyDivElt, {
-            ready_callback: function() {
-              Guppy.get_symbols(
-                GLOBALS.ASSET_DIR_PREFIX +
-                '/assets/overrides/guppy/oppia_symbols.json');
-
-              if (/Mobi/.test(navigator.userAgent)) {
-                $scope.isMobileOverlayShown = true;
-                // Wait for the scope change to apply.
-                $timeout(addMobileButtonOverlay, 0, false);
-              }
-            }
-          });
 
           /**
            * Adds a button overlay and invisible text field used to bring up
            * the keyboard on mobile devices.
            *
            * TODO: On iOS/Safari, keyboard may only appear on first press.
-           * This may not be a significant as the MathExpressionInput is
+           * This may not be a significant issue as the MathExpressionInput is
            * recreated if the given answer is incorrect.
            */
           var addMobileButtonOverlay = function() {
@@ -151,6 +138,19 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
             });
           };
 
+          var guppyInstance = new Guppy(guppyDivElt, {
+            ready_callback: function() {
+              Guppy.get_symbols(
+                GLOBALS.ASSET_DIR_PREFIX +
+                '/assets/overrides/guppy/oppia_symbols.json');
+
+              if (true || /Mobi/.test(navigator.userAgent)) {
+                $scope.isMobileOverlayShown = true;
+                // Wait for the scope change to apply.
+                $timeout(addMobileButtonOverlay, 0, false);
+              }
+            }
+          });
           var guppyDivId = guppyInstance.editor.id;
 
           var labelForFocusTarget = $attrs.labelForFocusTarget || null;
