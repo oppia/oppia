@@ -106,7 +106,7 @@ oppia.controller('StateInteraction', [
 
       $rootScope.$broadcast('initializeAnswerGroups', {
         interactionId: stateData.interaction.id,
-        answerGroups: stateData.interaction.answer_groups,
+        answerGroups: stateData.interaction.answerGroups,
         defaultOutcome: stateData.interaction.default_outcome,
         confirmedUnclassifiedAnswers: (
           stateData.interaction.confirmed_unclassified_answers)

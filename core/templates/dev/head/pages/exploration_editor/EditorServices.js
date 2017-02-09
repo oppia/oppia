@@ -804,7 +804,7 @@ oppia.factory('explorationStatesService', [
 
     // Maps backend names to the corresponding frontend dict accessor lists.
     var PROPERTY_REF_DATA = {
-      answer_groups: ['interaction', 'answer_groups'],
+      answer_groups: ['interaction', 'answerGroups'],
       confirmed_unclassified_answers: [
         'interaction', 'confirmed_unclassified_answers'],
       content: ['content'],
@@ -1040,7 +1040,7 @@ oppia.factory('explorationStatesService', [
           delete _states[deleteStateName];
           for (var otherStateName in _states) {
             var interaction = _states[otherStateName].interaction;
-            var groups = interaction.answer_groups;
+            var groups = interaction.answerGroups;
             for (var i = 0; i < groups.length; i++) {
               if (groups[i].outcome.dest === deleteStateName) {
                 groups[i].outcome.dest = otherStateName;
@@ -1091,7 +1091,7 @@ oppia.factory('explorationStatesService', [
 
         for (var otherStateName in _states) {
           var interaction = _states[otherStateName].interaction;
-          var groups = interaction.answer_groups;
+          var groups = interaction.answerGroups;
           for (var i = 0; i < groups.length; i++) {
             if (groups[i].outcome.dest === oldStateName) {
               groups[i].outcome.dest = newStateName;
@@ -1676,7 +1676,7 @@ oppia.factory('computeGraphService', [
         nodes[stateName] = stateName;
 
         if (interaction.id) {
-          var groups = interaction.answer_groups;
+          var groups = interaction.answerGroups || interaction.answer_groups;
           for (var h = 0; h < groups.length; h++) {
             links.push({
               source: stateName,
@@ -1928,7 +1928,7 @@ oppia.factory('explorationWarningsService', [
 
     var _getAnswerGroupIndexesWithEmptyClassifiers = function(state) {
       var indexes = [];
-      var answerGroups = state.interaction.answer_groups;
+      var answerGroups = state.interaction.answerGroups;
       for (var i = 0; i < answerGroups.length; i++) {
         var group = answerGroups[i];
         if (group.ruleSpecs.length === 1 &&
@@ -1975,7 +1975,7 @@ oppia.factory('explorationWarningsService', [
             'Validator');
           var interactionWarnings = $filter(validatorName)(
             stateName, interaction.customization_args,
-            interaction.answer_groups, interaction.default_outcome);
+            interaction.answerGroups, interaction.default_outcome);
 
           for (var j = 0; j < interactionWarnings.length; j++) {
             if (stateWarnings.hasOwnProperty(stateName)) {
