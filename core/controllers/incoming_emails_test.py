@@ -90,7 +90,6 @@ class IncomingReplyEmailTests(test_utils.GenericTestBase):
             self.assertEqual(msg.author_id, self.user_id_a)
             self.assertTrue(msg.received_via_email)
 
-
     def test_that_assertion_is_raised_for_fake_reply_to_id(self):
         # Generate reply email.
         recipient_email = 'reply+%s@%s' % (

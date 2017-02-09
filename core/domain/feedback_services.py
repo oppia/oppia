@@ -805,9 +805,19 @@ def _send_feedback_thread_status_change_emails(
                 old_status, new_status)
 
 
-def _check_reply_to_ids_for_recipients(user_ids, exploration_id, thread_id):
+def _ensure_each_recipient_has_reply_to_id(user_ids, exploration_id, thread_id):
+    """Ensures that instance of FeedbackEmailReplyToIdModel exists
+    for each user in user_ids.
+
+    Args:
+        user_ids: list of str. A list of user_ids.
+        exploration_id: str. The id of exploration used to obtain
+            FeedbackEmailReplyToIdModel for given user.
+        thread_id: str. The id of thread used to obtain
+            FeedbackEmailReplyToIdModel for given user.
+    """
     feedback_email_id_models = (
-        email_models.FeedbackEmailReplyToIdModel.get_for_multi_user_ids(
+        email_models.FeedbackEmailReplyToIdModel.get_multi_by_user_ids(
             user_ids, exploration_id, thread_id))
 
     # Users are added to thread incrementally. Therefore at a time there can be
@@ -846,7 +856,7 @@ def _add_message_to_email_buffer(
     batch_recipient_ids, other_recipient_ids = (
         _get_all_recipient_ids(exploration_id, thread_id, author_id))
 
-    _check_reply_to_ids_for_recipients(
+    _ensure_each_recipient_has_reply_to_id(
         other_recipient_ids, exploration_id, thread_id)
 
     if old_status != new_status:

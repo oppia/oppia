@@ -224,7 +224,7 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
     suggestion emails. The id/key of instances of this model has form of
     [USER_ID].[EXPLORATION_ID].[THREAD_ID]
     """
-    # The reply-to ID that is used in the repy-to email address.
+    # The reply-to ID that is used in the reply-to email address.
     reply_to_id = ndb.StringProperty(indexed=True, required=True)
 
     @classmethod
@@ -281,7 +281,7 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
             FeedbackEmailReplyToIdModel, cls).get(instance_id, strict=strict)
 
     @classmethod
-    def get_for_multi_user_ids(cls, user_ids, exploration_id, thread_id):
+    def get_multi_by_user_ids(cls, user_ids, exploration_id, thread_id):
         instance_ids = [cls._generate_id(user_id, exploration_id, thread_id)
                         for user_id in user_ids]
         user_models = cls.get_multi(instance_ids)
