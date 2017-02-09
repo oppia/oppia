@@ -144,7 +144,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
                 GLOBALS.ASSET_DIR_PREFIX +
                 '/assets/overrides/guppy/oppia_symbols.json');
 
-              if (true || /Mobi/.test(navigator.userAgent)) {
+              if (/Mobi/.test(navigator.userAgent)) {
                 $scope.isMobileOverlayShown = true;
                 // Wait for the scope change to apply.
                 $timeout(addMobileButtonOverlay, 0, false);
