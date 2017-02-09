@@ -99,6 +99,7 @@ def create_message(
 
     Args:
         exploration_id: str. The exploration id the thread belongs to.
+        thread_id: str. The thread id the message belongs to.
         author_id: str. The author id who creates this message.
         updated_status: str, one of STATUS_CHOICES. New thread status.
             Must be supplied if this is the first message of a thread. For the
@@ -107,8 +108,8 @@ def create_message(
             the first message of a thread. For the rest of the thread, should
             exist only when the subject changes.
         text: str. The text of the feedback message. This may be ''.
-        has_suggestion: bool. Whether this thread has a related
-            learner suggestion.
+        received_via_email: bool. Whether new message is received via email or
+            web.
     """
     from core.domain import event_services
     # Get the thread at the outset, in order to check that the thread_id passed
@@ -804,17 +805,18 @@ def _send_feedback_thread_status_change_emails(
                 old_status, new_status)
 
 
-def _check_unique_ids_for_recipients(user_ids, exploration_id, thread_id):
-    user_models = (
-        email_models.FeedbackEmailReplyToIDModel.get_for_multi_user_ids(
+def _check_reply_to_ids_for_recipients(user_ids, exploration_id, thread_id):
+    feedback_email_id_models = (
+        email_models.FeedbackEmailReplyToIdModel.get_for_multi_user_ids(
             user_ids, exploration_id, thread_id))
 
+    # Users are added to thread incrementally. Therefore at a time there can be
+    # at most one user who does not have FeedbackEmailReplyToIdModel instance.
     for user_id in user_ids:
-        if user_models[user_id] is None:
-            user_models[user_id] = (
-                email_models.FeedbackEmailReplyToIDModel.create(
-                    user_id, exploration_id, thread_id))
-            user_models[user_id].put()
+        if feedback_email_id_models[user_id] is None:
+            new_model = email_models.FeedbackEmailReplyToIdModel.create(
+                user_id, exploration_id, thread_id)
+            new_model.put()
 
 
 def _add_message_to_email_buffer(
@@ -844,7 +846,7 @@ def _add_message_to_email_buffer(
     batch_recipient_ids, other_recipient_ids = (
         _get_all_recipient_ids(exploration_id, thread_id, author_id))
 
-    _check_unique_ids_for_recipients(
+    _check_reply_to_ids_for_recipients(
         other_recipient_ids, exploration_id, thread_id)
 
     if old_status != new_status:

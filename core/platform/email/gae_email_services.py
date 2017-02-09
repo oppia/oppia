@@ -20,8 +20,8 @@ import feconf
 
 from google.appengine.api import mail
 
-def get_reply_to_email_with_id(reply_to_id):
-    return 'reply+%s@%s' % (reply_to_id, feconf.EMAIL_DOMAIN_NAME)
+def get_incoming_email_address(reply_to_id):
+    return 'reply+%s@%s' % (reply_to_id, feconf.INCOMING_EMAILS_DOMAIN_NAME)
 
 
 def send_mail(
@@ -41,6 +41,8 @@ def send_mail(
       - html_body: str. The HTML body of the email. Must fit in a datastore
           entity.
       - bcc_admin: bool. Whether to bcc feconf.ADMIN_EMAIL_ADDRESS on the email.
+      - reply_to_id: str or None. The unique reply-to id used in reply-to email
+          sent to recipient.
 
     Raises:
       Exception: if the configuration in feconf.py forbids emails from being
@@ -65,7 +67,7 @@ def send_mail(
     if bcc_admin:
         msg.bcc = [feconf.ADMIN_EMAIL_ADDRESS]
     if reply_to_id:
-        msg.reply_to = get_reply_to_email_with_id(reply_to_id)
+        msg.reply_to = get_incoming_email_address(reply_to_id)
 
     # Send message.
     msg.send()

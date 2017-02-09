@@ -71,7 +71,7 @@ def send_mail(
         data['bcc'] = feconf.ADMIN_EMAIL_ADDRESS
 
     if reply_to_id:
-        reply_to = gae_email_services.get_reply_to_email_with_id(reply_to_id)
+        reply_to = gae_email_services.get_incoming_email_address(reply_to_id)
         data['h:Reply-To'] = reply_to
 
     requests.post(
@@ -94,6 +94,8 @@ def send_bulk_mail(
       - plaintext_body: str. The plaintext body of the email.
       - html_body: str. The HTML body of the email. Must fit in a datastore
           entity.
+      - reply_to_id: str or None. The unique reply-to id used in reply-to email
+          sent to recipient.
 
     Raises:
       Exception: if the configuration in feconf.py forbids emails from being

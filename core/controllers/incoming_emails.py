@@ -28,8 +28,12 @@ class IncomingReplyEmailHandler(base.BaseHandler):
 
     def post(self, reply_to_id):
         incoming_mail = mail.InboundEmailMessage(self.request.body)
-        model = email_models.FeedbackEmailReplyToIDModel.get_by_reply_to_id(
+        model = email_models.FeedbackEmailReplyToIdModel.get_by_reply_to_id(
             reply_to_id)
+
+        if model is None:
+            raise self.PageNotFoundException
+
         user_id = model.user_id
         exploration_id = model.exploration_id
         thread_id = model.thread_id
@@ -37,6 +41,7 @@ class IncomingReplyEmailHandler(base.BaseHandler):
         # Get text message from email.
         msg = list(
             incoming_mail.bodies(content_type='text/plain'))[0][1].decode()
+
         # Add new feedback message to thread.
         feedback_services.create_message(
             exploration_id, thread_id, user_id, None, None, msg,

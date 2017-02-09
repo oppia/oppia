@@ -16,13 +16,10 @@
 
 """Tests for the incoming email handler."""
 
-import feconf
-
 from core.domain import feedback_services
-from core.tests import test_utils
 from core.platform import models
-
-from google.appengine.api import mail
+from core.tests import test_utils
+import feconf
 
 (feedback_models, email_models) = models.Registry.import_models([
     models.NAMES.feedback, models.NAMES.email])
@@ -68,22 +65,19 @@ class IncomingReplyEmailTests(test_utils.GenericTestBase):
                 self.exploration.id, thread_id)
             self.assertEqual(len(messages), 2)
 
+            # Check that received_via_email is set to False.
+            self.assertFalse(messages[0].received_via_email)
+
             # Get reply_to id for user A.
-            model = email_models.FeedbackEmailReplyToIDModel.get(
+            model = email_models.FeedbackEmailReplyToIdModel.get(
                 self.user_id_a, self.exploration.id, thread_id)
 
-            # Generate reply email.
             recipient_email = 'reply+%s@%s' % (
-                model.reply_to_id, feconf.EMAIL_DOMAIN_NAME)
-            email = mail.EmailMessage(
-                sender=self.USER_A_EMAIL, body='New reply',
-                to=recipient_email, subject='feedback email reply')
-            mime_email = email.to_mime_message().as_string()
-
+                model.reply_to_id, feconf.INCOMING_EMAILS_DOMAIN_NAME)
             # Send email to Oppia.
-            self.post(
-                '/_ah/mail/%s' % recipient_email, mime_email,
-                headers={'content-type':'multipart/mixed'})
+            self.post_email(
+                str(recipient_email), self.USER_A_EMAIL, 'feedback email reply',
+                'New reply')
 
             # Check that new message is added.
             messages = feedback_services.get_messages(
@@ -96,17 +90,12 @@ class IncomingReplyEmailTests(test_utils.GenericTestBase):
             self.assertEqual(msg.author_id, self.user_id_a)
             self.assertTrue(msg.received_via_email)
 
+
     def test_that_assertion_is_raised_for_fake_reply_to_id(self):
         # Generate reply email.
         recipient_email = 'reply+%s@%s' % (
-            'fake_id', feconf.EMAIL_DOMAIN_NAME)
-        email = mail.EmailMessage(
-            sender=self.USER_A_EMAIL, body='New reply',
-            to=recipient_email, subject='feedback email reply')
-        mime_email = email.to_mime_message().as_string()
-
+            'fake_id', feconf.INCOMING_EMAILS_DOMAIN_NAME)
         # Send email to Oppia.
-        self.post(
-            '/_ah/mail/%s' % recipient_email, mime_email,
-            headers={'content-type':'multipart/mixed'}, expect_errors=True,
-            expected_status_int=500)
+        self.post_email(
+            recipient_email, self.USER_A_EMAIL, 'feedback email reply',
+            'New reply', expect_errors=True, expected_status_int=404)

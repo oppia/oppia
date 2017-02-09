@@ -16,7 +16,7 @@
 
 # pylint: disable=relative-import
 
-from core.controllers import mails
+from core.controllers import incoming_emails
 from core.platform import models
 import feconf
 import main
@@ -29,8 +29,8 @@ transaction_services = models.Registry.import_transaction_services()
 # Register the URLs with the classes responsible for handling them.
 URLS = [
     main.get_redirect_route(
-        '/_ah/mail/reply+<reply_to_id>@%s' % feconf.EMAIL_DOMAIN_NAME,
-        mails.IncomingReplyEmailHandler),
+        '/_ah/mail/reply+<reply_to_id>@%s' % feconf.INCOMING_EMAILS_DOMAIN_NAME,
+        incoming_emails.IncomingReplyEmailHandler),
 ]
 
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name

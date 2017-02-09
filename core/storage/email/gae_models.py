@@ -214,7 +214,9 @@ class BulkEmailModel(base_models.BaseModel):
         email_model_instance.put()
 
 
-class FeedbackEmailReplyToIDModel(base_models.BaseModel):
+REPLY_TO_ID_LENGTH = 84
+
+class FeedbackEmailReplyToIdModel(base_models.BaseModel):
     """This model stores unique_id for each <user, exploration, thread>
     combination.
 
@@ -222,7 +224,7 @@ class FeedbackEmailReplyToIDModel(base_models.BaseModel):
     suggestion emails. The id/key of instances of this model has form of
     [USER_ID].[EXPLORATION_ID].[THREAD_ID]
     """
-    # reply_to ID that is used in repy-to email address.
+    # The reply-to ID that is used in the repy-to email address.
     reply_to_id = ndb.StringProperty(indexed=True, required=True)
 
     @classmethod
@@ -234,7 +236,7 @@ class FeedbackEmailReplyToIDModel(base_models.BaseModel):
         for _ in range(base_models.MAX_RETRIES):
             new_id = utils.convert_to_hash(
                 '%s' % (utils.get_random_int(base_models.RAND_RANGE)),
-                base_models.ID_LENGTH)
+                REPLY_TO_ID_LENGTH)
             if not cls.get_by_reply_to_id(new_id):
                 return new_id
 
@@ -259,8 +261,8 @@ class FeedbackEmailReplyToIDModel(base_models.BaseModel):
 
         instance_id = cls._generate_id(user_id, exploration_id, thread_id)
         if cls.get_by_id(instance_id):
-            raise Exception('Unique ID for given user, exploration and thread '
-                            'already exists.')
+            raise Exception('Unique reply-to ID for given user, exploration and'
+                            ' thread already exists.')
 
         reply_to_id = cls._generate_unique_reply_to_id()
         return cls(id=instance_id, reply_to_id=reply_to_id)
@@ -276,7 +278,7 @@ class FeedbackEmailReplyToIDModel(base_models.BaseModel):
     def get(cls, user_id, exploration_id, thread_id, strict=True):
         instance_id = cls._generate_id(user_id, exploration_id, thread_id)
         return super(
-            FeedbackEmailReplyToIDModel, cls).get(instance_id, strict=strict)
+            FeedbackEmailReplyToIdModel, cls).get(instance_id, strict=strict)
 
     @classmethod
     def get_for_multi_user_ids(cls, user_ids, exploration_id, thread_id):
@@ -284,7 +286,7 @@ class FeedbackEmailReplyToIDModel(base_models.BaseModel):
                         for user_id in user_ids]
         user_models = cls.get_multi(instance_ids)
         return {
-            user_id : model for user_id, model in zip(user_ids, user_models)}
+            user_id: model for user_id, model in zip(user_ids, user_models)}
 
     @property
     def user_id(self):

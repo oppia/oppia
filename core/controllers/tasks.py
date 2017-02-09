@@ -103,7 +103,7 @@ class InstantFeedbackMessageEmailHandler(base.BaseHandler):
         thread = feedback_services.get_thread(
             reference_dict['exploration_id'], reference_dict['thread_id'])
 
-        model = email_models.FeedbackEmailReplyToIDModel.get(
+        model = email_models.FeedbackEmailReplyToIdModel.get(
             user_id, reference_dict['exploration_id'],
             reference_dict['thread_id'])
         reply_to_id = model.reply_to_id

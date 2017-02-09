@@ -650,10 +650,10 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
                 self.exploration.id, thread_id, self.user_id_b, None, None,
                 'user b message')
             # Check that reply_to id is created for user A.
-            model = email_models.FeedbackEmailReplyToIDModel.get(
+            model = email_models.FeedbackEmailReplyToIdModel.get(
                 self.user_id_a, self.exploration.id, thread_id)
             cross_model = (
-                email_models.FeedbackEmailReplyToIDModel.get_by_reply_to_id(
+                email_models.FeedbackEmailReplyToIdModel.get_by_reply_to_id(
                     model.reply_to_id))
             self.assertEqual(model, cross_model)
             self.assertEqual(cross_model.user_id, self.user_id_a)
@@ -662,10 +662,10 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
                 self.exploration.id, thread_id, self.user_id_a, None, None,
                 'user a message')
             # Check that reply_to id is created for user B.
-            model = email_models.FeedbackEmailReplyToIDModel.get(
+            model = email_models.FeedbackEmailReplyToIdModel.get(
                 self.user_id_b, self.exploration.id, thread_id)
             cross_model = (
-                email_models.FeedbackEmailReplyToIDModel.get_by_reply_to_id(
+                email_models.FeedbackEmailReplyToIdModel.get_by_reply_to_id(
                     model.reply_to_id))
             self.assertEqual(model, cross_model)
             self.assertEqual(cross_model.user_id, self.user_id_b)

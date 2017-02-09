@@ -218,6 +218,8 @@ def _send_email(
             email address.
         sender_name: str or None. The name to be shown in the "sender" field of
             the email.
+        reply_to_id: str or None. The unique reply-to id used in reply-to email
+            address sent to recipient.
     """
 
     if sender_name is None:
@@ -763,6 +765,8 @@ def send_instant_feedback_message_email(
         exploration_title: str. The title of the exploration.
         exploration_id: str. ID of the exploration the feedback thread is about.
         thread_title: str. The title of the feedback thread.
+        reply_to_id: str or None. The unique reply-to id used in reply-to email
+            sent to recipient.
     """
 
     email_body_template = (
