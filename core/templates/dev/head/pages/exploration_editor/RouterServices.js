@@ -44,13 +44,19 @@ oppia.factory('routerService', [
       return $location.path();
     }, function(newPath, oldPath) {
       if (newPath === '') {
-        $location.path(oldPath);
+        if (oldPath === '/' || oldPath === '/gui/Introduction') {
+          $window.history.go(-1);
+        } else {
+          $location.path(oldPath);
+        }
         return;
       }
-
       if (!oldPath) {
         // This can happen when clicking on links whose href is "#".
         return;
+      }
+      if (newPath === '/' && oldPath === '/gui/Introduction') {
+        $window.history.go(-1);
       }
 
       // TODO(oparry): Determine whether this is necessary, since
