@@ -347,20 +347,20 @@
             </label>
             <span class="col-lg-2 col-md-2 col-sm-2">
               <button type="button" class="btn btn-default protractor-test-enable-fallbacks"
-                      ng-click="muteFeedbackNotifications()" ng-if="!userExplorationEmailsHandler.areFeedbackNotificationsMuted()">
+                      ng-click="muteFeedbackNotifications()" ng-if="!UserEmailPreferencesService.areFeedbackNotificationsMuted()">
                  Mute
               </button>
               <button type="button" class="btn btn-default protractor-test-enable-fallbacks"
-                      ng-click="unmuteFeedbackNotifications()" ng-if="userExplorationEmailsHandler.areFeedbackNotificationsMuted()">
+                      ng-click="unmuteFeedbackNotifications()" ng-if="UserEmailPreferencesService.areFeedbackNotificationsMuted()">
                  Unmute
               </button>
             </span>
             <span class="col-lg-7 col-md-7 col-sm-7 help-block" style="font-size: smaller;"
-                  ng-if="!userExplorationEmailsHandler.areFeedbackNotificationsMuted()">
+                  ng-if="!UserEmailPreferencesService.areFeedbackNotificationsMuted()">
               You are currently receiving notifications of new feedback for this exploration.
             </span>
             <span class="col-lg-7 col-md-7 col-sm-7 help-block" style="font-size: smaller;"
-                  ng-if="userExplorationEmailsHandler.areFeedbackNotificationsMuted()">
+                  ng-if="UserEmailPreferencesService.areFeedbackNotificationsMuted()">
               You have muted feedback notifications for this exploration. You will not receive an email when new feedback is submitted.
             </span>
           </div>
@@ -375,20 +375,20 @@
             </label>
             <span class="col-lg-2 col-md-2 col-sm-2">
               <button type="button" class="btn btn-default protractor-test-enable-fallbacks"
-                      ng-click="muteSuggestionNotifications()" ng-if="!userExplorationEmailsHandler.areSuggestionNotificationsMuted()">
+                      ng-click="muteSuggestionNotifications()" ng-if="!UserEmailPreferencesService.areSuggestionNotificationsMuted()">
                  Mute
               </button>
               <button type="button" class="btn btn-default protractor-test-enable-fallbacks"
-                      ng-click="unmuteSuggestionNotifications()" ng-if="userExplorationEmailsHandler.areSuggestionNotificationsMuted()">
+                      ng-click="unmuteSuggestionNotifications()" ng-if="UserEmailPreferencesService.areSuggestionNotificationsMuted()">
                  Unmute
               </button>
             </span>
             <span class="col-lg-7 col-md-7 col-sm-7 help-block" style="font-size: smaller;"
-                  ng-if="!userExplorationEmailsHandler.areSuggestionNotificationsMuted()">
+                  ng-if="!UserEmailPreferencesService.areSuggestionNotificationsMuted()">
               You are currently receiving notifications of new suggestions for this exploration.
             </span>
             <span class="col-lg-7 col-md-7 col-sm-7 help-block" style="font-size: smaller;"
-                  ng-if="userExplorationEmailsHandler.areSuggestionNotificationsMuted()">
+                  ng-if="UserEmailPreferencesService.areSuggestionNotificationsMuted()">
               You have muted suggestion notifications for this exploration. You will not receive an email when new suggestion is submitted.
             </span>
           </div>
