@@ -29,8 +29,10 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
       },
       templateUrl: 'interaction/MathExpressionInput',
       controller: [
-        '$scope', '$attrs', '$timeout', '$element', 'LABEL_FOR_CLEARING_FOCUS', 'oppiaDebouncer',
-        function($scope, $attrs, $timeout, $element, LABEL_FOR_CLEARING_FOCUS, oppiaDebouncer) {
+        '$scope', '$attrs', '$timeout', '$element', 'LABEL_FOR_CLEARING_FOCUS',
+        'oppiaDebouncer',
+        function($scope, $attrs, $timeout, $element, LABEL_FOR_CLEARING_FOCUS,
+          oppiaDebouncer) {
           var guppyDivElt = $element[0].querySelector('.guppy-div');
           var guppyInstance = new Guppy(guppyDivElt, {
             ready_callback: function() {
@@ -54,8 +56,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
            * This may not be a significant as the MathExpressionInput is
            * recreated if the given answer is incorrect.
            */
-          function addMobileButtonOverlay() {
-
+          var addMobileButtonOverlay = function() {
             /**
              * Checks if the guppy div has a width and height greater than 0,
              * if not schedules a timeout to run again after 100ms. If the
@@ -65,28 +66,29 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
              * element was more reliable than attaching the handler to the
              * guppy div directly.
              */
-            function positionButtonOverlay() {
+            var positionButtonOverlay = function() {
               var guppyOffset = $(guppyDivElt).position();
-              var guppySize = document.querySelector('.guppy-div').getBoundingClientRect();
+              var guppySize = document.querySelector('.guppy-div')
+                .getBoundingClientRect();
               console.log(guppySize, $('#startMathInputButton'));
 
               // If the guppy div hasn't rendered yet, retry after 100ms.
               if (guppySize.width === 0 || guppySize.height === 0) {
-                $timeout(positionButtonOverlay, 100)
+                $timeout(positionButtonOverlay, 100);
               } else {
                 $('#startMathInputButton').css({
-                  'top': guppyOffset.top,
-                  'left': guppyOffset.left,
-                  'width': guppySize.width,
-                  'height': guppySize.height
+                  top: guppyOffset.top,
+                  left: guppyOffset.left,
+                  width: guppySize.width,
+                  height: guppySize.height
                 });
               }
-            }
+            };
             positionButtonOverlay();
 
             // The focus() call must be in a click event handler and on a text
             // field to make the mobile keyboard appear.
-            $('#startMathInputButton').click(function(){
+            $('#startMathInputButton').click(function() {
               guppyInstance.activate();
 
               var fakeInputElement = document.
@@ -101,20 +103,20 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
 
             // Mapping characters back to Mousetrap codes.
             // Use Mousetrap.trigger(code) to replay them.
-            k_sym_reverse_map = {
-                '^': 'shift+6',
-                '*': 'shift+8',
-                '(': 'shift+9',
-                '<': 'shift+,',
-                '>': 'shift+.',
-                '\\': 'shift+\\',
-                ' ': 'space',
-                ')': 'shift+0'
-                // Missing up/down. user needs to use [space], 'sub' instead.
-                // Mobile devices typically don't have arrow keys anyways.
+            var K_SYM_REVERSE_MAP = {
+              '^': 'shift+6',
+              '*': 'shift+8',
+              '(': 'shift+9',
+              '<': 'shift+,',
+              '>': 'shift+.',
+              '\\': 'shift+\\',
+              ' ': 'space',
+              ')': 'shift+0'
+              // Missing up/down. user needs to use [space], 'sub' instead.
+              // Mobile devices typically don't have arrow keys anyways.
             };
 
-            function setGuppyContentFromInput() {
+            var setGuppyContentFromInput = function() {
               // Clear the Guppy instance by setting its content to the
               // output of get_content when empty.
               guppyInstance.set_content('<m><e></e></m>');
@@ -125,31 +127,29 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
                 .querySelector('#fakeInputForMathExpression').value
                 .toLowerCase().split('');
 
-              for ( var i = 0; i < textContent.length; i++ ) {
-                var c = textContent[i];
-
+              for (var i = 0; i < textContent.length; i++) {
                 // Replay key combination for each character on the document.
-                if ( c in k_sym_reverse_map ) {
-                    Mousetrap.trigger(k_sym_reverse_map[c]);
+                if (textContent[i] in K_SYM_REVERSE_MAP) {
+                  Mousetrap.trigger(K_SYM_REVERSE_MAP[textContent[i]]);
                 } else {
-                    Mousetrap.trigger(c);
+                  Mousetrap.trigger(textContent[i]);
                 }
               }
-            }
+            };
 
             // Debounce clear/refill cycles to 1 per 100ms.
             $('#fakeInputForMathExpression').on(
               'input change compositionupdate keydown',
-              oppiaDebouncer.debounce(function (e) {
+              oppiaDebouncer.debounce(function() {
                 setGuppyContentFromInput();
-            }, 100));
+              }, 100))
 
             // Set content immediately on blur.
-            $('#fakeInputForMathExpression').on('blur', function () {
-                guppyInstance.activate();
-                setGuppyContentFromInput();
+            .on('blur', function() {
+              guppyInstance.activate();
+              setGuppyContentFromInput();
             });
-          }
+          };
 
           var guppyDivId = guppyInstance.editor.id;
 
