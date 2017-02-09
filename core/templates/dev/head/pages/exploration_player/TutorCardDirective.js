@@ -35,47 +35,6 @@ oppia.animation('.conversation-skin-responses-animate-slide', function() {
   };
 });
 
-oppia.animation('.conversation-skin-animate-tutor-card-content', function() {
-  var animateCardChange = function(element, className, done) {
-    if (className !== 'animate-card-change') {
-      return;
-    }
-
-    var currentHeight = element.height();
-    var expectedNextHeight = $(
-      '.conversation-skin-future-tutor-card ' +
-      '.conversation-skin-tutor-card-content'
-    ).height();
-
-    // Fix the current card height, so that it does not change during the
-    // animation, even though its contents might.
-    element.css('height', currentHeight);
-
-    jQuery(element).animate({
-      opacity: 0
-    }, TIME_FADEOUT_MSEC).animate({
-      height: expectedNextHeight
-    }, TIME_HEIGHT_CHANGE_MSEC).animate({
-      opacity: 1
-    }, TIME_FADEIN_MSEC, function() {
-      element.css('height', '');
-      done();
-    });
-
-    return function(cancel) {
-      if (cancel) {
-        element.css('opacity', '1.0');
-        element.css('height', '');
-        element.stop();
-      }
-    };
-  };
-
-  return {
-    addClass: animateCardChange
-  };
-});
-
 oppia.directive('tutorCard', [function() {
   return {
     restrict: 'E',
@@ -167,17 +126,6 @@ oppia.directive('tutorCard', [function() {
 
         $scope.$on(EVENT_ACTIVE_CARD_CHANGED, function() {
           updateActiveCard();
-        });
-
-        $scope.$on('destinationCardAvailable', function(event, card) {
-          $scope.upcomingContentHtml = card.upcomingContentHtml;
-          $scope.upcomingParams = card.upcomingParams;
-          $scope.upcomingStateName = card.upcomingStateName;
-          $scope.upcomingInlineInteractionHtml = (
-            card.upcomingInlineInteractionHtml);
-          $scope.upcomingInteractionInstructions = (
-            ExplorationPlayerStateService.getInteractionInstructions(
-              $scope.upcomingStateName));
         });
 
         $scope.$on('oppiaFeedbackAvailable', function() {

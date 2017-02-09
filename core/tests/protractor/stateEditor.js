@@ -70,7 +70,6 @@ describe('State editor', function() {
   it('should create content and multiple choice interactions', function() {
     users.createUser('user2@stateEditor.com', 'user2StateEditor');
     users.login('user2@stateEditor.com');
-
     workflow.createExploration();
     editor.setContent(function(richTextEditor) {
       richTextEditor.appendBoldText('bold text');

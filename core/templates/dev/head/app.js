@@ -463,17 +463,8 @@ oppia.factory('windowDimensionsService', ['$window', function($window) {
       onResizeHooks.push(hookFn);
     },
     isWindowNarrow: function() {
-      var NAVBAR_WITH_SEARCH_CUTOFF_WIDTH_PX = 1171;
-      var NORMAL_NAVBAR_CUTOFF_WIDTH_PX = 800;
-      var navbarHasSearchBar = (
-        $window.location.pathname.indexOf('/search') === 0 ||
-        $window.location.pathname.indexOf('/library') === 0);
-
-      var navbarCutoffWidthPx = (
-        navbarHasSearchBar ?
-        NAVBAR_WITH_SEARCH_CUTOFF_WIDTH_PX :
-        NORMAL_NAVBAR_CUTOFF_WIDTH_PX);
-      return this.getWidth() <= navbarCutoffWidthPx;
+      var NORMAL_NAVBAR_CUTOFF_WIDTH_PX = 768;
+      return this.getWidth() <= NORMAL_NAVBAR_CUTOFF_WIDTH_PX;
     }
   };
 }]);
@@ -650,14 +641,14 @@ oppia.factory('oppiaDebouncer', [function() {
     // for `wait` milliseconds.
     debounce: function(func, millisecsToWait) {
       var timeout;
-      var context;
-      var args;
+      var context = this;
+      var args = arguments;
       var timestamp;
       var result;
 
       var later = function() {
         var last = new Date().getTime() - timestamp;
-        if (last < millisecsToWait && last > 0) {
+        if (last < millisecsToWait) {
           timeout = setTimeout(later, millisecsToWait - last);
         } else {
           timeout = null;

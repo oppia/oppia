@@ -121,6 +121,9 @@ body {
   width: 100%;
 }
 
+.oppia-stop-scroll {
+  overflow-y: hidden;
+}
 /* According to the Angular documentation - https://docs.angularjs.org/api/ng/directive/ngCloak -
    the following rule needs to be added to the css file in order for ng-cloak to work.  */
 [ng\:cloak], [ng-cloak], .ng-cloak {
@@ -150,6 +153,26 @@ body {
   padding-top: 30px;
   position: relative;
   width: 90%;
+}
+
+.oppia-subscription-button,
+.oppia-subscription-button:focus,
+.oppia-subscription-button:active {
+  background-color: #015c54;
+  border-radius: 0;
+  color: white;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 14px;
+  margin-bottom: 20px;
+  margin-left: 54px;
+  margin-top: 20px;
+  text-transform: uppercase;
+  width: 129.42px;
+}
+
+.oppia-subscription-button:hover {
+  background-color: #05beb2;
+  color: white;
 }
 
 .oppia-profile-user-card {
@@ -260,15 +283,20 @@ body {
 }
 
 .oppia-profile-content-card {
-  background-color: #fff;
-  float: left;
+  box-shadow: none;
+  float: right;
   min-height: 630px;
-  padding: 30px;
+  padding: 0 30px 30px 30px;
   position: relative;
   width: -webkit-calc(100% - 280px);
   width: -moz-calc(100% - 280px);
   width: -o-calc(100% - 280px);
   width: calc(100% - 280px);
+}
+
+md-card.oppia-profile-content-card {
+  margin-top: 0;
+  padding-top: 0;
 }
 
 /* For issue #1867 (https://github.com/oppia/oppia/issues/1867)
@@ -283,12 +311,17 @@ body {
   width: 100%;
 }
 
+md-content.oppia-profile-portfolio-container {
+  background-color: transparent;
+}
+
 .oppia-profile-portfolio-pages {
   bottom: 0;
   display: block;
-  font-size: .7em;
-  margin-bottom: 20px;
-  margin-right: 40px;
+  font-size: .9em;
+  font-weight: bold;
+  margin-bottom: 60px;
+  margin-right: 65px;
   position: absolute;
   right: 0;
   text-align: right;
@@ -650,12 +683,9 @@ textarea {
   background: none;
 }
 
-.oppia-sidebar-footer a > img {
-  width: 26px;
-}
-
 .oppia-sidebar-menu-open .oppia-sidebar-menu {
   box-shadow: 1px 0 3px rgba(0,0,0,0.12), 1px 0 2px rgba(0,0,0,0.24);
+  overflow-y: scroll;
   -webkit-transform: translate3d(0, 0, 0);
   transform: translate3d(0, 0, 0);
   visibility: visible;
@@ -705,7 +735,12 @@ textarea {
   list-style-position: inside;
   list-style-type: none;
 }
-
+.oppia-footer-social a:hover {
+  text-decoration: none;
+}
+.oppia-footer-social a > img {
+  width: 30px;
+}
 .oppia-footer-padding {
   height: 198px;
 }
@@ -716,15 +751,23 @@ textarea {
 
 @media (max-width: 768px) {
   .oppia-footer-padding {
-    height: 464px;
+    height: 554px;
   }
-
   .oppia-footer-container {
     padding: 30px;
   }
 
 }
-
+@media only screen and (min-width: 700px) and (max-width: 768px){
+  .oppia-footer-padding-below-banner{
+    height: 270px;
+  }
+}
+@media (max-width: 440px) {
+  .oppia-footer-padding-below-banner{
+    height: 250px;
+  }
+}
 /*
   This is needed for proper display of tabs. See
 
@@ -863,6 +906,24 @@ textarea {
   border: none;
 }
 
+@media(max-width: 768px) {
+  .oppia-navbar-breadcrumb > li, .oppia-navbar-breadcrumb {
+    float: left;
+  }
+  .oppia-navbar-breadcrumb {
+    margin-top: 0;
+    margin-left: 5px;
+  }
+  .navbar-nav.oppia-navbar-nav > li > a {
+    display: none;
+  }
+}
+@media(max-width: 600px) {
+  .oppia-navbar-breadcrumb {
+    margin-top: 3px;
+  }
+}
+
 /* Show the navbar submenu dropdowns on-hover rather than on-click, if the
    screen size is large enough. */
 @media (min-width: 768px) {
@@ -965,6 +1026,11 @@ textarea {
     display: none;
   }
 }
+@media (max-width: 1023px) {
+  div.navbar-container .oppia-navbar-hide-on-medium-width {
+    display: none;
+  }
+}
 
 .btn.oppia-unresolved-answer-button {
   background-color: white;
@@ -992,6 +1058,7 @@ textarea {
   padding-top: 24px;
   width: 100vw;
 }
+
 /* Ensure that the summary tiles tiles remain centered. Note that these values
    would need to be updated if the summary tiles are changed. */
 @media (max-width: 844px) {
@@ -1124,34 +1191,6 @@ textarea {
   max-width: 848px;
   overflow: hidden;
   position: relative;
-}
-
-.oppia-library-carousel-overlay-left,
-.oppia-library-carousel-overlay-right {
-  /*The display is set in Library.js*/
-  display: none;
-  height: 258px;
-  margin-top: 12px;
-  position: absolute;
-  top: 0;
-  width: 20px;
-  z-index: 99;
-}
-
-.oppia-library-carousel-overlay-left {
-  background: #b5bdc8;
-  background: -moz-linear-gradient(left, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%);
-  background: -webkit-linear-gradient(left, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%);
-  background: linear-gradient(to right, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%);
-  left: 0;
-}
-
-.oppia-library-carousel-overlay-right {
-  background: #b5bdc8;
-  background: -moz-linear-gradient(left, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%);
-  background: -webkit-linear-gradient(left, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%);
-  background: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%);
-  right: 0;
 }
 
 .oppia-dashboard-aggregated-stats md-card {
@@ -1471,7 +1510,7 @@ md-card.oppia-dashboard-tile {
 }
 
 .oppia-cc-icon {
-  bottom: 34px;
+  bottom: 50px;
   opacity: 0.4;
   position: fixed;
   right: 25px;
@@ -1479,6 +1518,7 @@ md-card.oppia-dashboard-tile {
 
 .oppia-cc-icon:hover {
   opacity: 0.7;
+  text-decoration: none;
 }
 
 .oppia-wide-panel {
@@ -1783,17 +1823,19 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-collection-player-tiles-container {
   height: 100%;
-  padding-top: 60px;
-  margin-left: auto;
+  margin-left: 5%;
   margin-right: auto;
-  max-width: 800px;
+  max-width: 100%;
   min-height: 500px;
   padding-bottom: 25px;
   padding-left: 50px;
+  padding-top: 30px;
   position: relative;
 }
 .oppia-collection-player-tiles-container .oppia-page-heading {
   color: #005048;
+  text-align: center;
+  width: 90%;
 }
 
 .oppia-collection-player-tile-section {
@@ -1806,6 +1848,11 @@ pre.oppia-pre-wrapped-text {
   font-size: 1em;
   margin-top: 12px;
   margin-bottom: 6px;
+}
+
+.oppia-collection-player-title-font {
+  font-family: Capriola, Roboto, Arial, sans-serif;
+  font-size: 45px;
 }
 
 /* Styles for the statistics page. */
@@ -2456,6 +2503,11 @@ div#ng-curtain {
   outline-color: transparent;
   padding-top: 20px;
 }
+.oppia-navbar-close-icon {
+  color: #fff;
+  margin-right: 4px;
+  margin-top: -10px;
+}
 .oppia-navbar-menu-icon {
   color: #fff;
   margin-top: -5px;
@@ -2481,27 +2533,31 @@ div#ng-curtain {
 }
 .oppia-logo-wide {
   margin-left: 25px;
+  width: 90px;
 }
 .oppia-logo-small {
   margin-left: 6px;
 }
 
-@media (min-width: 500px) {
-  .oppia-navbar-tabs-narrow {
-    /*
-      This needs to take i18n of the "Create" and "Sign in" buttons into
-      account.
-    */
-    min-width: 260px;
-  }
-  .oppia-navbar-tabs {
-    /*
-      This needs to take i18n of the "Create" and "Sign in" buttons into
-      account.
-    */
-    min-width: 580px;
-  }
+.oppia-navbar-tabs {
+  white-space: nowrap;
 }
+.nav, .oppia-navbar-tabs > li, .oppia-navbar-tabs > create-activity-button {
+  display: inline-block;
+  vertical-align: top;
+}
+.oppia-navbar-clickable-dropdown:hover ul.dropdown-menu, .oppia-clickable-navbar-element:hover {
+  display: inline-block;
+}
+.oppia-navbar-nav .dropdown-menu {
+  left: auto;
+  right: 0;
+}
+.navbar-header {
+  /* Prevent whitespace from inline-block elements from adding space. */
+  font-size: 0;
+}
+
 .nav > li > a.oppia-navbar-tab {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 14px;
@@ -3337,7 +3393,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-splash-section-one {
   background-color: #afd2eb;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .oppia-splash-h1, .oppia-splash-h2 {
@@ -3486,6 +3542,7 @@ md-card.preview-conversation-skin-supplemental-card {
   transform: translate(-150px, 10px);
   position: relative;
   width: 100%;
+  z-index: 10;
 }
 
 @media (min-width: 768px) {
@@ -3599,12 +3656,12 @@ md-card.preview-conversation-skin-supplemental-card {
   background-color: #fff;
   cursor: pointer;
   display: inline-block;
-  height: 258px;
+  height: inherit;
   /*
     The margin setting is so that exploration summary tiles and collection
     summary tiles would be the same widths (214px).
   */
-  margin: 12px 5.5px;
+  margin: 8px 5.5px;
   padding: 0;
   position: relative;
   text-align: left;
@@ -3667,7 +3724,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-activity-summary-tile .title-section {
-  height: 162px;
+  height: 10em;
   position: relative;
   width: 100%;
 }
@@ -3782,10 +3839,12 @@ md-card.preview-conversation-skin-supplemental-card {
   color: white;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 1em;
+  font-weight: normal;
   line-height: 1.2em;
-  margin: 12px;
-  padding: 0;
+  margin: 0.3em 0.5em;
+  padding: 0.2em;
   position: absolute;
+  word-break: break-all;
 }
 
 .oppia-activity-summary-tile .objective {
@@ -3820,6 +3879,31 @@ md-card.preview-conversation-skin-supplemental-card {
   text-align: center;
 }
 
+.oppia-dashboard-card-statistic-icon {
+  padding-top: 3px;
+  position: absolute;
+}
+
+.oppia-dashboard-mobile-statistics-card-link {
+  background: white;
+  height: 54px;
+  opacity: 0;
+  position: absolute;
+  width: 96%;
+}
+
+.oppia-dashboard-statistics-card-link {
+  background: white;
+  height: 25.5%;
+  opacity: 0;
+  position: absolute;
+  width: 184px;
+}
+
+.oppia-dashboard-card-statistic-value {
+  padding-left: 19px;
+}
+
 .oppia-activity-summary-tile .metrics li .fa {
   font-size: 1.1em;
   margin-right: 2px;
@@ -3848,7 +3932,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-dashboard-card-view-item {
-  height: 250px;
+  height: inherit;
   margin-left: 7.5px;
   margin-right: 7.5px;
   position: static;
@@ -3863,7 +3947,8 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-dashboard-card-view-item .exp-private-text {
   font-size: 13px;
-  margin: 13px 11px 0;
+  margin: 0 0.5em;
+  padding: 0.2em;
 }
 
 .oppia-dashboard-card-view-item .metrics {
@@ -3873,7 +3958,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-dashboard-card-view-item .metrics > li {
-  padding: 0 0 4px 14px;
+  padding: 0 0 5px 14px;
   text-align: left;
 }
 
@@ -4066,7 +4151,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-static-header {
   align-items: center;
   display: flex;
-  height: 140px;
+  height: 210px;
   position: absolute;
   text-align: center;
   width: 100%;
@@ -4078,7 +4163,7 @@ md-card.preview-conversation-skin-supplemental-card {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 3em;
   left: 50%;
-  position: absolute;
+  position: relative;
   transform: translateX(-50%);
   -webkit-transform: translateX(-50%);
   -ms-transform: translateX(-50%);
@@ -4101,9 +4186,21 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-about-extra-container {
+  margin-bottom: 20px;
   position: relative;
   top: 50px;
   width: 100%;
+}
+
+@media(max-width: 700px) {
+  .oppia-about-extra-container {
+    margin-bottom: -10px;
+  }
+}
+@media(max-width: 440px) {
+  .oppia-about-extra-container {
+    margin-bottom: 40px;
+  }
 }
 
 .oppia-static-extra-content {
@@ -4176,7 +4273,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-static-card-content {
   margin: 0 auto;
   max-width: 600px;
-  padding: 5% 0;
+  padding: 4% 0 1% 0;
 }
 
 .oppia-static-card-content-wide {
@@ -4218,15 +4315,20 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-about-extra-info {
   background-color: #009788;
   color: #fff;
+  height: 245px;
   width: 100%;
 }
 
 .oppia-about-page-extra-info {
-  height: 220px;
+  height: 245px;
 }
 
 .oppia-about-tab-content {
   display: none;
+}
+
+.oppia-teach-tab-content{
+  padding-bottom: 7%;
 }
 
 .oppia-about-visible-content {
@@ -4297,19 +4399,26 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-about-button {
-  background-color: rgba(0,0,0,0.2);
+  background-color: rgb(0, 121, 109);
   color: rgba(255,255,255,1.0);
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 18px;
-  margin: 15px;
+  margin: 0 15px 15px 15px;
+  max-width: 90%;
   padding: 15px;
   text-transform: uppercase;
   white-space: normal;
+  width: 366px;
 }
 
 .oppia-about-button:hover {
   background-color: rgba(5,190,178,1);
   color: rgba(255,255,255,1);
+}
+
+.oppia-teach-button{
+  display: block;
+  margin: 0px auto 0 auto;
 }
 
 .oppia-about-buttons-container {
@@ -4322,6 +4431,12 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-about-credits-letter-groups ul li {
   list-style-type: none;
+}
+
+.oppia-about-extra-content{
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .oppia-donation-card {
@@ -4360,7 +4475,7 @@ md-card.preview-conversation-skin-supplemental-card {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 16px;
   height: 40px;
-  margin: 15px auto;
+  margin: 10px auto;
   width: 180px;
 }
 
@@ -4374,9 +4489,13 @@ md-card.preview-conversation-skin-supplemental-card {
 */
 
 @media only screen and (min-width: 1400px) {
+  .oppia-about-extra-info {
+    height: 245px;
+  }
   .oppia-static-content, .oppia-static-extra-content {
     width: 960px;
   }
+
 }
 
 @media only screen and (max-width: 1140px) {
@@ -4406,9 +4525,7 @@ md-card.preview-conversation-skin-supplemental-card {
   .oppia-about-otter-speech-bubble {
     padding: 10px;
   }
-  .oppia-about-extra-info {
-    height: 400px;
-  }
+
 }
 
 @media only screen and (max-width: 500px) {
@@ -4433,14 +4550,11 @@ md-card.preview-conversation-skin-supplemental-card {
   .oppia-about-buttons:first-child {
     margin: 0;
   }
-  .oppia-about-extra-info {
-    height: 400px;
-  }
-
   .oppia-about-three-cols-layout {
     width: 100%;
   }
 }
+
 
 .oppia-save-exploration-wide-modal .modal-dialog {
   max-width: 1200px;

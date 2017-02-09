@@ -50,12 +50,12 @@ oppia.factory('StatesToQuestionsService', [
 
     // Invariants to check:
     // - The exploration is linear.
-    // - The param_changes for all states are empty.
+    // - The paramChanges for all states are empty.
     // - The states in the chain use only allowed interaction IDs, with the
     //     interaction ID of the last state potentially being EndExploration.
     // - Based on the interaction ID of each state:
     //   - Check that the customization_args are valid.
-    //   - Check that the rule_specs for each answer group are valid.
+    //   - Check that the ruleSpecs for each answer group are valid.
     // - The confirmed_unclassified_answers array is empty.
     // - The fallbacks array is empty.
     // - For the default outcome, and for each answer group:
@@ -99,7 +99,7 @@ oppia.factory('StatesToQuestionsService', [
           return null;
         }
 
-        // Check that the customization_args and the rule_specs for each answer
+        // Check that the customization_args and the ruleSpecs for each answer
         // group are valid.
         var checkerService = $injector.get(interactionId + 'CheckerService');
         if (!checkerService.isValid(
@@ -121,7 +121,7 @@ oppia.factory('StatesToQuestionsService', [
         }
 
         // Check that other properties of the state are empty.
-        if (stateData.param_changes.length > 0 ||
+        if (stateData.paramChanges.length > 0 ||
             interactionData.fallbacks.length > 0 ||
             interactionData.confirmed_unclassified_answers.length > 0) {
           return null;

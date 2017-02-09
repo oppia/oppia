@@ -17,6 +17,38 @@
         background: #eeeeee no-repeat center center fixed;
         background-size: cover;
       }
+      .oppia-collection-path-section {
+        background: #fff;
+        border-radius: 2px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
+        float: left;
+        margin-top: 20px;
+        max-width: 675px;
+        padding: 20px 20px 60px 20px;
+        position: absolute;
+        text-align: left;
+        top: 168px;
+      }
+      .oppia-card-preview-panel {
+        background: #fff;
+        border-radius: 2px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
+        padding: 30px 85px 70px 85px;
+        pointer-events: none;
+        position: fixed;
+        right: 10%;
+        text-align: left;
+        top: 244px;
+      }
+      .collection-mascot {
+        width: 120px;
+        position: absolute;
+        left: 40px;
+        top: 40px;
+      }
+      .collection-subject-icon {
+        width: 80px;
+      }
     </style>
   {% endif %}
 {% endblock header_js %}
@@ -46,44 +78,114 @@
   <div ng-controller="CollectionPlayer">
     <background-banner></background-banner>
     <div ng-if="collection" class="oppia-collection-player-tiles-container">
-      <h2 ng-if="!collectionPlaythrough.hasFinishedCollection()" class="oppia-page-heading">
-        <span ng-if="!collectionPlaythrough.hasStartedCollection()">Begin <[collection.getTitle()]>:</span>
-        <span ng-if="collectionPlaythrough.hasStartedCollection()">Continue <[collection.getTitle()]>:</span>
+      <h2 ng-if="!collectionPlaythrough.hasFinishedCollection()" class="oppia-page-heading" align="center">
+        <span ng-if="!collectionPlaythrough.hasStartedCollection()" class="oppia-collection-player-title-font">Begin <[collection.getTitle()]>:</span>
+        <span ng-if="collectionPlaythrough.hasStartedCollection()" class="oppia-collection-player-title-font">Continue <[collection.getTitle()]>:</span>
       </h2>
       <h2 ng-if="collectionPlaythrough.hasFinishedCollection()" class="oppia-page-heading">
         <span>You have finished the collection! Feel free to replay any explorations below.</span>
       </h2>
 
-      {% if is_logged_in %}
-        <div ng-if="collectionPlaythrough.getNextRecommendedCollectionNodeCount() > 0" class="oppia-collection-player-tile-section">
-          <div class="oppia-collection-player-small-text">
-            Next exploration<span ng-if="collectionPlaythrough.getNextRecommendedCollectionNodeCount() > 1">s</span> to play
-          </div>
-          <collection-node-list collection-id="collectionId" collection-nodes="getNextRecommendedCollectionNodes()"></collection-node-list>
-        </div>
+      <div ng-if="collection" class="oppia-collection-path-section">
 
-        <div ng-if="collectionPlaythrough.getCompletedExplorationNodeCount() > 0" class="oppia-collection-player-tile-section">
-          <div class="oppia-collection-player-small-text">
-            Completed exploration<span ng-if="collectionPlaythrough.getCompletedExplorationNodeCount() > 1">s</span>
-          </div>
-          <collection-node-list collection-id="collectionId" collection-nodes="getCompletedExplorationNodes()"></collection-node-list>
-        </div>
+        <svg width="500px" ng-attr-height="<[svgHeight + 'px']>" xmlns="http://www.w3.org/2000/svg">
+          <path fill="none"
+                stroke="#296E5F"
+                stroke-dasharray="15,28"
+                stroke-linecap="round"
+                stroke-width="12"
+                d="M80 80 L220 80"/>
+          <path fill="none"
+                stroke="#296E5F"
+                stroke-dasharray="15,28"
+                stroke-linecap="round"
+                stroke-width="12"
+                ng-attr-d="<[pathSvgParameters]>"/>
+        </svg>
 
-        <div ng-if="showingAllExplorations && (getNonRecommendedCollectionNodeCount() > 0)" class="oppia-collection-player-tile-section oppia-collection-animate-slide">
-          <div class="oppia-collection-player-small-text">
-            Upcoming exploration<span ng-if="getNonRecommendedCollectionNodeCount() > 1">s</span> in this collection
-          </div>
-          <collection-node-list collection-id="collectionId" collection-nodes="getNonRecommendedCollectionNodes()"></collection-node-list>
-        </div>
+        <img ng-src="<[getStaticImageUrl('/general/collection_mascot.svg')]>" class="collection-mascot">
 
-        <a class="oppia-collection-player-small-text" ng-if="getNonRecommendedCollectionNodeCount() > 0" ng-click="toggleShowAllExplorations()">
-          <span ng-if="!showingAllExplorations"><span class="fa fa-chevron-down"></span> Show upcoming explorations</span>
-          <span ng-if="showingAllExplorations"><span class="fa fa-chevron-up"></span> Only show current progress</span>
-        </a>
-      {% else %}
-        <div class="oppia-collection-player-small-text">You must login to save your progress.</div>
-        <collection-node-list collection-id="collectionId" collection-nodes="collection.getCollectionNodes()"></collection-node-list>
-      {% endif %}
+        <svg width="100"
+             height="150"
+             xmlns="http://www.w3.org/2000/svg"
+             xmlns:xlink="http://www.w3.org/1999/xlink"
+             version="1.1"
+             ng-repeat="node in collection.getCollectionNodes()"
+             style="position: absolute;
+                    left: <[pathIconParameters[$index].left]>;
+                    top: <[pathIconParameters[$index].top]>;">
+          <defs>
+            <pattern id="image<[$index]>" patternUnits="userSpaceOnUse" height="150" width="100">
+              <circle cx="50"
+                      cy="70"
+                      r="50"
+                      ng-attr-fill="<[pathIconParameters[$index].thumbnailBgColor]>"/>
+              <image x="10"
+                     y="30"
+                     height="80"
+                     width="80"
+                     ng-attr-xlink:href="<[pathIconParameters[$index].thumbnailIconUrl]>"
+                     xlink:href=""></image>
+            </pattern>
+          </defs>
+          <a xlink:href="<['/explore/' + node.getExplorationId()]>"
+             ng-mouseover="updateExplorationPreview(node.getExplorationId());
+                           setIconHighlight($index);"
+             ng-mouseleave="togglePreviewCard();
+                            unsetIconHighlight($index);">
+             <circle ng-show="($index===activeHighlightedIconIndex)?true:false"
+                     cx="50"
+                     cy="70"
+                     r="45"
+                     id="<['highlight' + $index]>"
+                     fill="none"
+                     stroke="#A6DACF"
+                     stroke-width="10"
+                     stroke-opacity="0.5"/>
+             <circle cx="50"
+                     cy="70"
+                     r="42"
+                     fill="url(#image<[$index]>)"
+                     stroke="#006553"
+                     stroke-width="2"/>
+          </a>
+          <text x="50%"
+                y="15"
+                alignment-baseline="middle"
+                font-family="Capriola, Roboto, Arial, sans-serif"
+                font-size="20"
+                fill="#006553"
+                text-anchor="middle">
+             <[$index + 1]>
+          </text>
+        </svg>
+
+        <div ng-if="collection" class="oppia-card-preview-panel hidden-sm hidden-xs">
+
+          <md-card class="oppia-activity-summary-tile md-default-theme">
+            <div class="title-section" style="background-color: <[collectionSummary.thumbnail_bg_color]>; z-index: 1;">
+              <img ng-src="<[collectionSummary.thumbnail_icon_url]>" class="thumbnail-image">
+            </div>
+            <div class="title-section-mask" style="padding: 45px;"></div>
+          </md-card>
+
+          <exploration-summary-tile ng-if="!previewCardIsShown"
+                                    collection-id="getCollectionId()"
+                                    exploration-id="currentExplorationId"
+                                    exploration-title="summaryToPreview.title"
+                                    last-updated-msec="summaryToPreview.last_updated_msec"
+                                    objective="summaryToPreview.objective"
+                                    category="summaryToPreview.category"
+                                    ratings="summaryToPreview.ratings"
+                                    num-views="summaryToPreview.num_views"
+                                    thumbnail-icon-url="summaryToPreview.thumbnail_icon_url"
+                                    thumbnail-bg-color="summaryToPreview.thumbnail_bg_color"
+                                    is-community-owned="summaryToPreview.community_owned"
+                                    style="position: absolute; left: 85px; top: 30px; z-index: 10;">
+          <exploration-summary-tile/>
+
+        </div>
+      </div>
     </div>
   </div>
 
