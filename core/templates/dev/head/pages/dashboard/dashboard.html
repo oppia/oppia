@@ -205,7 +205,7 @@
         <md-card ng-repeat="exploration in explorationsList | orderBy:sortByFunction:isCurrentSortDescending track by exploration.id"
                  class="oppia-activity-summary-tile oppia-dashboard-card-view-item protractor-test-exploration-dashboard-card"
                  is-private="exploration.status === 'private'">
-          <a ng-href="/create/<[exploration.id]>#/gui/Introduction">
+          <a ng-href="/create/<[exploration.id]>">
             <div class="title-section"
                  style="background-color: <[exploration.thumbnail_bg_color]>;">
               <img class="thumbnail-image"

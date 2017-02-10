@@ -23,9 +23,11 @@ oppia.directive('createActivityButton', [function() {
     controller: [
       '$scope', '$timeout', '$window', '$modal', 'ExplorationCreationService',
       'CollectionCreationService', 'siteAnalyticsService', 'urlService',
+      '$location',
       function(
           $scope, $timeout, $window, $modal, ExplorationCreationService,
-          CollectionCreationService, siteAnalyticsService, urlService) {
+          CollectionCreationService, siteAnalyticsService, urlService,
+          $location) {
         $scope.creationInProgress = false;
 
         $scope.showUploadExplorationModal = (
@@ -92,6 +94,7 @@ oppia.directive('createActivityButton', [function() {
         // editor if the create modal does not need to be shown).
         if (urlService.getUrlParams().mode === 'create') {
           if (!GLOBALS.can_create_collections) {
+            $location.path('created=true').replace;
             ExplorationCreationService.createNewExploration();
           } else {
             $scope.initCreationProcess();
