@@ -46,7 +46,7 @@ module.exports = function(config) {
       'extensions/**/protractor.js'
     ],
     proxies: {
-      '/assets/': 'http://localhost:9876/base/assets/'
+      '/assets/': '/base/assets/'
     },
     preprocessors: {
       'core/templates/dev/head/*.js': ['coverage'],

@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var request = new XMLHttpRequest();
-request.overrideMimeType('application/json');
-request.open('GET', '/assets/constants.json', false);
-request.send(null);
-var CONSTANTS = JSON.parse(request.responseText);
+(function() {
+  var request = new XMLHttpRequest();
+  request.overrideMimeType('application/json');
+  request.open(
+    'GET', GLOBALS.ASSET_DIR_PREFIX + '/assets/constants.json', false);
+  request.send(null);
+  CONSTANTS = JSON.parse(request.responseText);
+})();

@@ -24,7 +24,7 @@ oppia.controller('SettingsTab', [
   'explorationInitStateNameService', 'explorationParamSpecsService',
   'changeListService', 'alertsService', 'explorationStatesService',
   'explorationParamChangesService', 'explorationWarningsService',
-  'explorationAdvancedFeaturesService', 'CONSTANTS',
+  'explorationAdvancedFeaturesService', 'ALL_CATEGORIES',
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'userExplorationEmailsHandler',
   function(
       $scope, $http, $window, $modal, $rootScope,
@@ -34,16 +34,16 @@ oppia.controller('SettingsTab', [
       explorationInitStateNameService, explorationParamSpecsService,
       changeListService, alertsService, explorationStatesService,
       explorationParamChangesService, explorationWarningsService,
-      explorationAdvancedFeaturesService, CONSTANTS,
+      explorationAdvancedFeaturesService, ALL_CATEGORIES,
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL, userExplorationEmailsHandler) {
     $scope.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
 
     $scope.CATEGORY_LIST_FOR_SELECT2 = [];
-    for (var i = 0; i < CONSTANTS.ALL_CATEGORIES.length; i++) {
+    for (var i = 0; i < ALL_CATEGORIES.length; i++) {
       $scope.CATEGORY_LIST_FOR_SELECT2.push({
-        id: CONSTANTS.ALL_CATEGORIES[i],
-        text: CONSTANTS.ALL_CATEGORIES[i]
+        id: ALL_CATEGORIES[i],
+        text: ALL_CATEGORIES[i]
       });
     }
 

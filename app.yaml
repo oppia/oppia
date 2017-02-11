@@ -40,13 +40,6 @@ handlers:
     # WARNING TO DEVELOPERS: Files in this folder may be stale for
     # up to 10 mins after a code release.
     Cache-Control: 'public, max-age=600'
-- url: /assets/(constants\.json)
-  static_files: assets/\1
-  upload: assets/(constants\.json)
-  secure: always
-  application_readable: true
-  http_headers:
-    Cache-Control: 'public, max-age=2592000'
 - url: /assets
   static_dir: assets
   secure: always

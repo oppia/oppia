@@ -30,11 +30,10 @@ var oppia = angular.module(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
                    : []));
 
-oppia.constant('CONSTANTS', CONSTANTS);
+for (var constantName in CONSTANTS) {
+  oppia.constant(constantName, CONSTANTS[constantName]);
+}
 
-// TODO(sll): Get this to read from a common JSON file; it's replicated in
-// feconf.
-oppia.constant('CATEGORY_LIST', GLOBALS.ALL_CATEGORIES);
 oppia.constant(
   'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', '/explorationsummarieshandler/data');
 

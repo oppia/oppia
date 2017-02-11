@@ -72,8 +72,6 @@
       {% include 'pages/header_css_libs.html' %}
     {% endblock header_css %}
 
-    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/load_constants.js"></script>
-
     <script>
       var GLOBALS = {
         ACTIVITY_STATUS_PRIVATE: JSON.parse(
@@ -120,6 +118,10 @@
           '{{additional_angular_modules|js_string}}');
       {% endif %}
     </script>
+
+    <!-- Note to developers: This script needs to be loaded before external
+         libraries.-->
+    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/load_constants.js"></script>
 
     {% block header_js %}
       {% include 'pages/header_js_libs.html' %}

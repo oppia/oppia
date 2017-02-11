@@ -21,9 +21,7 @@ import os
 
 class Constants(dict):
     """Transforms dict to object, attributes can be accesed by dot notation"""
-    def __init__(self, *args, **kwargs):
-        super(Constants, self).__init__(*args, **kwargs)
-        self.__dict__ = self
+    __getattr__ = dict.__getitem__
 
 with open(os.path.join('assets', 'constants.json'), 'r') as f:
     CONSTANTS = Constants(json.load(f))
