@@ -2565,6 +2565,10 @@ div#ng-curtain {
   padding: 17px 12px 10px 12px;
   text-transform: uppercase;
 }
+.oppia-option-list {
+  display: block;
+  vertical-align: initial;
+}
 .oppia-navbar-dropdown-toggle,
 .oppia-navbar-tab {
   height: 56px;
