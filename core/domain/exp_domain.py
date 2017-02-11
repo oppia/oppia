@@ -1102,7 +1102,6 @@ class State(object):
         },
         'confirmed_unclassified_answers': [],
         'fallbacks': [],
-        'classifier_model_id': None
     }
 
     def __init__(self, content, param_changes, interaction,
@@ -2251,7 +2250,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 10
+    CURRENT_EXP_SCHEMA_VERSION = 11
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -2490,6 +2489,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v9_dict_to_v10_dict(
                 exploration_dict, title, category)
             exploration_schema_version = 10
+
+        if exploration_schema_version == 10:
+            exploration_dict = cls._convert_v10_dict_to_v11_dict(
+                exploration_dict)
+            exploration_schema_version = 11
 
         return (exploration_dict, initial_schema_version)
 
