@@ -737,7 +737,8 @@ textarea {
   text-decoration: none;
 }
 .oppia-footer-social a:focus > img {
-  outline: 2px solid white;
+  outline: auto 2px Highlight;
+  outline: auto 5px -webkit-focus-ring-color;
 }
 .oppia-footer-social a > img {
   width: 30px;
