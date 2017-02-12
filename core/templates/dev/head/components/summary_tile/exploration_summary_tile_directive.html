@@ -43,10 +43,10 @@
       <div class="title-section-mask"></div>
 
       <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>">
-        <span ng-if="getObjective()" class="oppia-activity-summary-tooltip">
-          <span tooltip="<[getObjective()]>" tooltip-placement="top">
+        <span ng-if="getObjective()" class="oppia-activity-summary-popover">
+          <span popover="<[getObjective()]>" popover-placement="top" popover-trigger="mouseenter">
             <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
-              <[getObjective() | truncateAndCapitalize: 40]>
+              <[getObjective() | truncateAndCapitalize: 25]>
             </div>
           </span>
         </span>
@@ -83,17 +83,21 @@
 </script>
 
 <style>
-  .oppia-activity-summary-tooltip .tooltip.right {
+  .oppia-activity-summary-popover .popover.right {
     bottom: -10px;
     min-width: 200px;
   }
 
-  .oppia-activity-summary-tooltip .tooltip.top {
+  .oppia-activity-summary-popover .popover.top {
     margin-top: 10px;
-    padding: 5px;
   }
 
-  .oppia-activity-summary-tooltip .tooltip-inner {
-    min-width: 200px;
+  .oppia-activity-summary-popover .popover-content {
+    padding: 8px 8px;
+  }
+
+  .oppia-activity-summary-popover .popover {
+    font-size: 14px;
+    line-height: 1.42857143;
   }
 </style>
