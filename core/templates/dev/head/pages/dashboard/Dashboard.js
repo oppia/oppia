@@ -147,9 +147,8 @@ oppia.controller('Dashboard', [
 
     $scope.sortSubscriptionFunction = function(entity) {
       // This function is passed as a custom comparator function to `orderBy`,
-      // so that special cases can be handled while sorting explorations.
+      // so that special cases can be handled while sorting subscriptions.
       var value = entity[$scope.currentSubscribersSortType];
-      console.log(value);
       if ($scope.currentSubscribersSortType ===
           SUBSCRIPTION_SORT_BY_KEYS.IMPACT) {
         value = (value || 0);

@@ -144,11 +144,11 @@ class PreferencesHandler(base.BaseHandler):
 
         creators_subscribed_to = subscription_services.get_all_creators_to_which_learner_has_subscribed( # pylint: disable=line-too-long
             self.user_id)
+        creators_settings = user_services.get_users_settings(
+            creators_subscribed_to)
         subscription_list = []
 
-        for creator_subscribed_to in creators_subscribed_to:
-            creator_settings = user_services.get_user_settings(
-                creator_subscribed_to)
+        for index, creator_settings in enumerate(creators_settings):
             subscription_summary = {}
 
             subscription_summary['creator_picture_data_url'] = (
@@ -156,7 +156,8 @@ class PreferencesHandler(base.BaseHandler):
             subscription_summary['creator_username'] = (
                 creator_settings.username)
             subscription_summary['creator_impact'] = (
-                user_services.get_user_impact_score(creator_subscribed_to))
+                user_services.get_user_impact_score(
+                    creators_subscribed_to[index]))
 
             subscription_list.append(subscription_summary)
 

@@ -577,6 +577,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(len(response['subscribers_list']), 0)
 
+        # Subscribe to creator.
         subscription_services.subscribe_to_creator(
             self.viewer_id, self.owner_id)
         response = self.get_json(feconf.DASHBOARD_DATA_URL)
@@ -584,6 +585,12 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['subscribers_list'][0]['subscriber_username'],
             self.VIEWER_USERNAME)
+
+        # Unsubscribe from creator.
+        subscription_services.unsubscribe_from_creator(
+            self.viewer_id, self.owner_id)
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['subscribers_list']), 0)
 
 
 class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
