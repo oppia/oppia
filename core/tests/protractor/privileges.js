@@ -46,9 +46,14 @@ describe('Permissions for private explorations', function() {
 
       users.login('eve@privileges.com');
       general.openEditor(explorationId);
+
       // Eve is redirected to the homepage.
-      expect(browser.getCurrentUrl()).toEqual(
-        general.SERVER_URL_PREFIX + '/dashboard');
+      var curr = browser.getCurrentUrl();
+
+      // homepage can be either dashboard or library dependin on learner status
+      var atHomeFlag = curr ==  general.SERVER_URL_PREFIX + '/dashboard'||
+         curr ==  general.SERVER_URL_PREFIX + '/library';
+      expect(atHomeFlag).toBe(true);
       users.logout();
     });
   });

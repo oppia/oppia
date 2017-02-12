@@ -42,9 +42,24 @@ PADDING = 1
 
 class BaseHandlerTest(test_utils.GenericTestBase):
 
+    TEST_LEARNER_EMAIL = "test.learner@example.com"
+    TEST_LEARNER_USERNAME = "test_learner_user"
+    TEST_CREATOR_EMAIL = "test.cretator@example.com"
+    TEST_CREATOR_USERNAME = "test_creator_user"
+
     def setUp(self):
         super(BaseHandlerTest, self).setUp()
         self.signup('user@example.com', 'user')
+
+        # create a learner user to test learner redirect behavior
+        # learner is a user with no explorations associated with it
+        self.signup(self.TEST_LEARNER_EMAIL, self.TEST_LEARNER_USERNAME)
+
+        # create a creator user to test creator redirect behavior
+        # creator is a user atleast one exploration associated with it
+        self.signup(self.TEST_CREATOR_EMAIL, self.TEST_CREATOR_USERNAME)
+        
+
 
     def test_dev_indicator_appears_in_dev_and_not_in_production(self):
         """Test dev indicator appears in dev and not in production."""
@@ -107,8 +122,36 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         self.login('user@example.com')
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 302)
-        self.assertIn('dashboard', response.headers['location'])
+
+        # homepage is either dashboard or library based on user's learner 
+        # status, this homepage redirect rule behavior is seperately tested
+        atHome = 'dashboard' in response.headers['location'] 
+            or 'library' in response.headers['location']
+        self.assertTrue(atHome, msg="user must be at library or dashboard")
         self.logout()
+
+    def test_root_redirect_rules_for_learners_creators(self):
+        self.login(self.TEST_LEARNER_EMAIL)
+        response = self.testapp.get('/')
+        self.assertIn('library',response.headers['location'])
+        self.logout()
+
+        # Test creator behavior. Login as creator
+        self.login(self.TEST_CREATOR_EMAIL)
+
+        # create a test exploration
+        EXP_ID = '0_en_test_exploration'
+        self.save_new_valid_exploration(
+            EXP_ID, self.TEST_CREATOR_USERNAME, title='Test Root',
+            category='Test', language_code='en')
+
+        # go to root url
+        response = self.testapp.get('/')
+
+        # Must and on dashboard
+        self.assertIn('dashboard',response.headers['location'])
+        self.logout()
+        
 
 
 class CsrfTokenManagerTest(test_utils.GenericTestBase):
