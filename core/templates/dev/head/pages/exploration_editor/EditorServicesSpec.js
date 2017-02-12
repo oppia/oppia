@@ -839,7 +839,7 @@ describe('New state template service', function() {
             value: ''
           }],
           interaction: {
-            answer_groups: [],
+            answerGroups: [],
             confirmed_unclassified_answers: [],
             customization_args: {
               rows: {

@@ -239,6 +239,8 @@ oppia.factory('trainingDataService', [
     // show up again.
     var _removeAnswer = function(answer) {
       var answerGroups = responsesService.getAnswerGroups();
+      console.log('answerGroups');
+      console.log(angular.copy(answerGroups));
       var confirmedUnclassifiedAnswers = (
         responsesService.getConfirmedUnclassifiedAnswers());
       var updatedAnswerGroups = false;
