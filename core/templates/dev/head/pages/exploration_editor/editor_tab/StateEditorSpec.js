@@ -262,17 +262,13 @@ describe('State Editor controller', function() {
       });
 
       var state = ess.getState('State');
-      console.log('state');
-      console.log(angular.copy(state));
-      console.log('passing in');
-      console.log(angular.copy(state.interaction.answerGroups));
+      
       rs.init({
         answerGroups: state.interaction.answerGroups,
         defaultOutcome: state.interaction.default_outcome,
         confirmedUnclassifiedAnswers: (
           state.interaction.confirmed_unclassified_answers)
       });
-      console.log(angular.copy(rs.getAnswerGroups()));
 
       ecs.setActiveStateName('State');
 
