@@ -262,7 +262,6 @@ describe('State Editor controller', function() {
       });
 
       var state = ess.getState('State');
-      
       rs.init({
         answerGroups: state.interaction.answerGroups,
         defaultOutcome: state.interaction.default_outcome,
