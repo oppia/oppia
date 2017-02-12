@@ -38,16 +38,6 @@ oppia.factory('InteractionObjectFactory', [
     return answerGroups;
   };
 
-  // Interaction.prototype.toBackendDict = function() {
-  //   return {
-  //     answer_groups: this.answer_groups;
-  //     confirmed_unclassified_answers: this.confirmed_unclassified_answers;
-  //     customization_args: this.customization_args;
-  //     default_outcome: this.default_outcome;
-  //     fallbacks: this.fallbacks;
-  //   };
-  // };
-
   Interaction.create = function(interactionDict) {
     return new Interaction(interactionDict.answer_groups,
       interactionDict.confirmed_unclassified_answers,
