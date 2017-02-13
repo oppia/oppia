@@ -70,8 +70,9 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
           });
 
           $scope.reset = function() {
-            var userSureToReset = confirm("Are You sure you want to reset the editor to initial state");
-            if(userSureToReset) {
+            var userSureToReset = confirm(
+              'Are You sure you want to reset the editor to initial state');
+            if (userSureToReset) {
               $scope.trackResetCode = pce.getCode();
               pce.setCode($scope.initialCode);
             }
