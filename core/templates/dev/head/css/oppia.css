@@ -1824,9 +1824,9 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-collection-player-tiles-container {
   height: 100%;
-  margin-left: 5%;
+  margin-left: 10%;
   margin-right: auto;
-  max-width: 100%;
+  max-width: 78%;
   min-height: 500px;
   padding-bottom: 25px;
   padding-left: 50px;
@@ -1836,7 +1836,7 @@ pre.oppia-pre-wrapped-text {
 .oppia-collection-player-tiles-container .oppia-page-heading {
   color: #005048;
   text-align: center;
-  width: 90%;
+  width: 100%;
 }
 
 .oppia-collection-player-tile-section {

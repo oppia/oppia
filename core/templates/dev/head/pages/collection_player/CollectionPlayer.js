@@ -209,6 +209,17 @@ oppia.controller('CollectionPlayer', [
       return iconParametersArray;
     };
 
+    $scope.isCompletedExploration = function(explorationId) {
+      var completedExplorationIds = (
+        $scope.collectionPlaythrough.getCompletedExplorationIds());
+      if ( completedExplorationIds.indexOf(explorationId) > -1) {
+        return true;
+      }
+      else {
+        return false;
+      }
+    }
+
     $http.get('/collectionsummarieshandler/data', {
       params: {
         stringified_collection_ids: JSON.stringify([$scope.collectionId])
