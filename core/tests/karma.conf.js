@@ -16,7 +16,7 @@ module.exports = function(config) {
         pattern: 'assets/constants.json',
         included: false
       },
-      'core/templates/dev/head/pages/load_constants.js',
+      'core/tests/karma-constants.js',
       // Since jquery,jquery-ui,angular,angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.0.0/jquery.min.js',

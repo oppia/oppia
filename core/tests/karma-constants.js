@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2016 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,11 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-(function() {
+/**
+ * @fileoverview Loads constants for the Karma test environment.
+ */
+
+/* This should be kept in parity with how CONSTANTS is set in base.html */
+var CONSTANTS = (function() {
   var request = new XMLHttpRequest();
   request.overrideMimeType('application/json');
   request.open(
-    'GET', GLOBALS.ASSET_DIR_PREFIX + '/assets/constants.json', false);
+   'GET', GLOBALS.ASSET_DIR_PREFIX + '/assets/constants.json', false);
   request.send(null);
-  CONSTANTS = JSON.parse(request.responseText);
+  return JSON.parse(request.responseText);
 })();

@@ -22,6 +22,7 @@ import logging
 
 import jinja2
 
+from constants import CONSTANTS
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import dependency_registry
@@ -39,7 +40,6 @@ from core.domain import stats_services
 from core.domain import user_services
 from core.domain import value_generators_domain
 from core.platform import models
-from constants import CONSTANTS
 import feconf
 import utils
 

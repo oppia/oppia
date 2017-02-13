@@ -120,8 +120,18 @@
     </script>
 
     <!-- Note to developers: This script needs to be loaded before external
-         libraries.-->
-    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/load_constants.js"></script>
+         libraries. Also, if you modify this script, please change
+         core/tests/karma-constants.js accordingly -->
+    <script>
+      var CONSTANTS = (function() {
+        var request = new XMLHttpRequest();
+        request.overrideMimeType('application/json');
+        request.open(
+          'GET', GLOBALS.ASSET_DIR_PREFIX + '/assets/constants.json', false);
+        request.send(null);
+        return JSON.parse(request.responseText);
+      })();
+    </script>
 
     {% block header_js %}
       {% include 'pages/header_js_libs.html' %}
