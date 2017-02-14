@@ -23,24 +23,24 @@ oppia.factory('SidebarHighlightingService', [
     var ERROR_CLASS = 'error';
 
     return {
-        errorHighlight: function(id) {
+      errorHighlight: function(id) {
           if (!angular.isDefined(id)) {
             return;
-          }else {
+          } else {
             var elm = angular.element(document.getElementById(
               QuestionIdService.SIDEBAR_PREFIX + id)
             );
             elm.addClass(ERROR_CLASS);
           }
         },
-        undoErrorHighlight: function(id) {
+      undoErrorHighlight: function(id) {
           if (!angular.isDefined(id)) {
             return;
-          }else {
+          } else {
             angular.element(ERROR_SELECTOR)
               .removeClass('error');
           }
-        },
+        }
     };
   }
 ]);
