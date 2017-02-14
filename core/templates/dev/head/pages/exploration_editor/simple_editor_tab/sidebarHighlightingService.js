@@ -19,7 +19,7 @@
 
 oppia.factory('SidebarHighlightingService', [
   function() {
-    var ERROR_ SELECTOR = 'simple-editor-sidebar .error';
+    var ERROR_SELECTOR = 'simple-editor-sidebar .error';
     var ERROR_CLASS = 'error';
 
     return {
