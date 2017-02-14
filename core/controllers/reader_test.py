@@ -14,17 +14,12 @@
 
 """Tests for the page that allows learners to play through an exploration."""
 
-import os
-
-from core.controllers import reader
-from core.domain.classifier import lda_string_classifier
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import param_domain
 from core.domain import rights_manager
 from core.tests import test_utils
 import feconf
-import utils
 
 
 class ReaderPermissionsTest(test_utils.GenericTestBase):
@@ -107,69 +102,6 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
             expect_errors=True)
         self.assertEqual(response.status_int, 200)
-
-
-class ReaderClassifyTests(test_utils.GenericTestBase):
-    """Test reader.classify using the sample explorations.
-
-    Since the end to end tests cover correct classification, and frontend tests
-    test hard rules, ReaderClassifyTests is only checking that the string
-    classifier is actually called.
-    """
-
-    def setUp(self):
-        super(ReaderClassifyTests, self).setUp()
-        self._init_classify_inputs('16')
-
-    def _init_classify_inputs(self, exploration_id):
-        test_exp_filepath = os.path.join(
-            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
-        yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list = []
-        exp_services.save_new_exploration_from_yaml_and_assets(
-            feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
-            assets_list)
-
-        self.exp_id = exploration_id
-        self.exp_state = (
-            exp_services.get_exploration_by_id(exploration_id).states['Home'])
-
-    def _is_string_classifier_called(self, answer):
-        string_classifier_predict = (
-            lda_string_classifier.LDAStringClassifier.predict)
-        predict_counter = test_utils.CallCounter(
-            string_classifier_predict)
-
-        with self.swap(
-            lda_string_classifier.LDAStringClassifier,
-            'predict', predict_counter):
-
-            response = reader.classify(self.exp_state, answer)
-
-        answer_group_index = response['answer_group_index']
-        rule_spec_index = response['rule_spec_index']
-        answer_groups = self.exp_state.interaction.answer_groups
-        if answer_group_index == len(answer_groups):
-            return 'default'
-
-        answer_group = answer_groups[answer_group_index]
-        return (answer_group.get_classifier_rule_index() == rule_spec_index and
-                predict_counter.times_called == 1)
-
-    def test_string_classifier_classification(self):
-        """All these responses trigger the string classifier."""
-        with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
-            self.assertTrue(
-                self._is_string_classifier_called(
-                    'it\'s a permutation of 3 elements'))
-            self.assertTrue(
-                self._is_string_classifier_called(
-                    'There are 3 options for the first ball, and 2 for the '
-                    'remaining two. So 3*2=6.'))
-            self.assertTrue(
-                self._is_string_classifier_called('abc acb bac bca cbb cba'))
-            self.assertTrue(
-                self._is_string_classifier_called('dunno, just guessed'))
 
 
 class FeedbackIntegrationTest(test_utils.GenericTestBase):

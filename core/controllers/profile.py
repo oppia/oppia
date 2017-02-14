@@ -16,6 +16,7 @@
 
 from core.controllers import base
 from core.domain import email_manager
+from core.domain import subscription_services
 from core.domain import summary_services
 from core.domain import user_services
 import feconf
@@ -78,6 +79,11 @@ class ProfileHandler(base.BaseHandler):
         created_exp_summary_dicts = []
         edited_exp_summary_dicts = []
 
+        subscriber_ids = subscription_services.get_all_subscribers_of_creator(
+            user_settings.user_id)
+        is_already_subscribed = (self.user_id in subscriber_ids)
+        is_user_visiting_own_profile = (self.user_id == user_settings.user_id)
+
         user_contributions = user_services.get_user_contributions(
             user_settings.user_id)
         if user_contributions:
@@ -102,6 +108,8 @@ class ProfileHandler(base.BaseHandler):
                 user_settings.user_id),
             'created_exp_summary_dicts': created_exp_summary_dicts,
             'edited_exp_summary_dicts': edited_exp_summary_dicts,
+            'is_already_subscribed': is_already_subscribed,
+            'is_user_visiting_own_profile': is_user_visiting_own_profile
         })
         self.render_json(self.values)
 
@@ -141,11 +149,13 @@ class PreferencesHandler(base.BaseHandler):
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests,
             'can_receive_email_updates': (
-                user_email_preferences['can_receive_email_updates']),
+                user_email_preferences.can_receive_email_updates),
             'can_receive_editor_role_email': (
-                user_email_preferences['can_receive_editor_role_email']),
+                user_email_preferences.can_receive_editor_role_email),
             'can_receive_feedback_message_email': (
-                user_email_preferences['can_receive_feedback_message_email'])
+                user_email_preferences.can_receive_feedback_message_email),
+            'can_receive_subscription_email': (
+                user_email_preferences.can_receive_subscription_email)
         })
         self.render_json(self.values)
 
@@ -170,7 +180,8 @@ class PreferencesHandler(base.BaseHandler):
             user_services.update_email_preferences(
                 self.user_id, data['can_receive_email_updates'],
                 data['can_receive_editor_role_email'],
-                data['can_receive_feedback_message_email'])
+                data['can_receive_feedback_message_email'],
+                data['can_receive_subscription_email'])
         else:
             raise self.InvalidInputException(
                 'Invalid update type: %s' % update_type)
@@ -288,7 +299,8 @@ class SignupHandler(base.BaseHandler):
             user_services.update_email_preferences(
                 self.user_id, can_receive_email_updates,
                 feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
-                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
+                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
         # Note that an email is only sent when the user registers for the first
         # time.

@@ -86,7 +86,7 @@ oppia.filter('oppiaInteractiveImageClickInputValidator', [
 
     // Check that each rule refers to a valid region string.
     for (var i = 0; i < answerGroups.length; i++) {
-      var ruleSpecs = answerGroups[i].rule_specs;
+      var ruleSpecs = answerGroups[i].ruleSpecs;
       for (var j = 0; j < ruleSpecs.length; j++) {
         if (ruleSpecs[j].rule_type === 'IsInRegion') {
           var label = ruleSpecs[j].inputs.x;

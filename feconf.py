@@ -47,6 +47,7 @@ if PLATFORM == 'gae':
 else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 
+CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
@@ -67,6 +68,14 @@ OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
     'extensions', 'interactions', 'object_defaults.json')
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
     os.getcwd(), 'extensions', 'interactions', 'rules.json')
+
+# A mapping of interaction ids to their default classifier.
+INTERACTION_CLASSIFIER_MAPPING = {
+    'TextInput': 'LDAStringClassifier'
+}
+
+# Default label for classification algorithms.
+DEFAULT_CLASSIFIER_LABEL = '_default'
 
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
@@ -189,6 +198,8 @@ MAILGUN_API_KEY = None
 # If the Mailgun email API is used, the "None" below should be replaced
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
+# Domain name for email address.
+INCOMING_EMAILS_DOMAIN_NAME = 'example.com'
 # Committer id for system actions.
 SYSTEM_COMMITTER_ID = 'admin'
 SYSTEM_EMAIL_ADDRESS = 'system@example.com'
@@ -256,6 +267,9 @@ BULK_EMAIL_INTENT_CREATE_EXPLORATION = 'bulk_email_create_exploration'
 BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT = 'bulk_email_creator_reengagement'
 BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT = 'bulk_email_learner_reengagement'
 BULK_EMAIL_INTENT_TEST = 'bulk_email_test'
+
+MESSAGE_TYPE_FEEDBACK = 'feedback'
+MESSAGE_TYPE_SUGGESTION = 'suggestion'
 
 MODERATOR_ACTION_PUBLICIZE_EXPLORATION = 'publicize_exploration'
 MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
@@ -347,6 +361,13 @@ ALLOWED_RTE_EXTENSIONS = {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Video')
     },
 }
+
+
+# This list contains the IDs of the classifiers used for obtaining instances
+# class of classifiers using classifier_registry.
+ANSWER_CLASSIFIER_CLASS_IDS = [
+    'LDAStringClassifier',
+]
 
 # These categories and interactions are displayed in the order in which they
 # appear in the interaction selector.
@@ -497,7 +518,10 @@ SPLASH_URL = '/splash'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
+SUBSCRIBE_URL_PREFIX = '/subscribehandler'
+UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
+USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 
 NAV_MODE_ABOUT = 'about'

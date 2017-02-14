@@ -18,6 +18,8 @@
 
 oppia.constant(
   'COLLECTION_VIEWER_URL', '/collection/<collection_id>');
+oppia.constant(
+  'COLLECTION_EDITOR_URL', '/collection_editor/create/<collection_id>');
 
 oppia.directive('collectionSummaryTile', [function() {
   return {
@@ -29,25 +31,28 @@ oppia.directive('collectionSummaryTile', [function() {
       getNodeCount: '&nodeCount',
       getLastUpdatedMsec: '&lastUpdatedMsec',
       getThumbnailIconUrl: '&thumbnailIconUrl',
-      getThumbnailBgColor: '&thumbnailBgColor'
+      getThumbnailBgColor: '&thumbnailBgColor',
+      isLinkedToEditorPage: '=?isLinkedToEditorPage'
     },
     templateUrl: 'summaryTile/collection',
     controller: [
       '$scope', 'oppiaDatetimeFormatter', 'UrlInterpolationService',
-      'COLLECTION_VIEWER_URL', function($scope, oppiaDatetimeFormatter,
-      UrlInterpolationService, COLLECTION_VIEWER_URL) {
+      'COLLECTION_VIEWER_URL', 'COLLECTION_EDITOR_URL', function($scope,
+      oppiaDatetimeFormatter, UrlInterpolationService, COLLECTION_VIEWER_URL,
+      COLLECTION_EDITOR_URL) {
+        $scope.DEFAULT_EMPTY_TITLE = 'Untitled';
+        var targetUrl = (
+          $scope.isLinkedToEditorPage ?
+           COLLECTION_EDITOR_URL : COLLECTION_VIEWER_URL);
+
         $scope.getLastUpdatedDatetime = function() {
           return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
             $scope.getLastUpdatedMsec());
         };
 
-        $scope.wasRecentlyUpdated = function() {
-          return oppiaDatetimeFormatter.isRecent($scope.getLastUpdatedMsec());
-        };
-
         $scope.getCollectionLink = function() {
           return UrlInterpolationService.interpolateUrl(
-            COLLECTION_VIEWER_URL, {
+            targetUrl, {
               collection_id: $scope.getCollectionId()
             }
           );

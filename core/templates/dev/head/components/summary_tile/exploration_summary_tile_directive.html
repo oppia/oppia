@@ -3,10 +3,10 @@
     <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
       <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
         <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
-        <h2 class="activity-title protractor-test-exp-summary-tile-title">
+        <h3 class="activity-title protractor-test-exp-summary-tile-title">
           <span ng-if="isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
           <span ng-if="!isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
-        </h2>
+        </h3>
 
         <!-- Note that if this is ng-if instead, the avatar area will not detect a mouseover and the tile will behave incorrectly. -->
         <div ng-show="isWindowLarge && avatarsList.length > 0" class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
@@ -43,13 +43,15 @@
       <div class="title-section-mask"></div>
 
       <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>">
-        <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
-          <span ng-if="getObjective()">
-            <[getObjective() | truncateAndCapitalize: 40]>
+        <span ng-if="getObjective()" class="oppia-activity-summary-popover">
+          <span popover="<[getObjective()]>" popover-placement="top" popover-trigger="mouseenter">
+            <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
+              <[getObjective() | truncateAndCapitalize: 25]>
+            </div>
           </span>
-          <span ng-if="!getObjective()" translate="I18N_LIBRARY_NO_OBJECTIVE">
-          </span>
-        </div>
+        </span>
+        <span ng-if="!getObjective()" translate="I18N_LIBRARY_NO_OBJECTIVE">
+        </span>
         <ul layout="row" class="metrics" layout-align="space-between center">
           <li>
             <span class="protractor-test-exp-summary-tile-rating" ng-class="{'rating-disabled': !getAverageRating()}">
@@ -70,10 +72,8 @@
           </li>
 
           <li>
-            <span ng-if="!wasRecentlyUpdated()">
+            <span>
               <[getLastUpdatedDatetime()]>
-            </span>
-            <span ng-if="wasRecentlyUpdated()" class="recently-updated" translate="I18N_LIBRARY_UPDATED">
             </span>
           </li>
         </ul>
@@ -81,3 +81,23 @@
     </a>
   </md-card>
 </script>
+
+<style>
+  .oppia-activity-summary-popover .popover.right {
+    bottom: -10px;
+    min-width: 200px;
+  }
+
+  .oppia-activity-summary-popover .popover.top {
+    margin-top: 10px;
+  }
+
+  .oppia-activity-summary-popover .popover-content {
+    padding: 8px 8px;
+  }
+
+  .oppia-activity-summary-popover .popover {
+    font-size: 14px;
+    line-height: 1.42857143;
+  }
+</style>

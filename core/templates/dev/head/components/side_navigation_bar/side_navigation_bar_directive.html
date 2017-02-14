@@ -43,7 +43,7 @@
 
       <li ng-class="{'active': NAV_MODE === 'blog'}">
         <a href="/blog">
-          <img ng-src="<[getStaticImageUrl('/sidebar/blogger.png')]>" class="oppia-sidebar-menu-icon">
+          <img ng-src="<[getStaticImageUrl('/sidebar/blogger.png')]>" class="oppia-sidebar-menu-icon" alt="Oppia Blog">
           <span translate="I18N_SIDEBAR_BLOG"></span>
         </a>
       </li>
@@ -56,22 +56,5 @@
       </li>
     </ul>
 
-    <div class="oppia-sidebar-footer">
-      <div>
-        <span translate="I18N_SIDEBAR_FOLLOW_US"></span>:
-      </div>
-      <a href="https://plus.google.com/109898456505810251700/about" target="_blank">
-        <img ng-src="<[getStaticImageUrl('/social/gplus.png')]>">
-      </a>
-      <a href="https://www.youtube.com/channel/UC5c1G7BNDCfv1rczcBp9FPw" target="_blank">
-        <img ng-src="<[getStaticImageUrl('/social/youtube.png')]>">
-      </a>
-      <a href="https://www.facebook.com/oppiaorg" target="_blank">
-        <img ng-src="<[getStaticImageUrl('/social/fb.png')]>">
-      </a>
-      <a href="https://twitter.com/oppiaorg" target="_blank">
-        <img ng-src="<[getStaticImageUrl('/social/twitter.png')]>">
-      </a>
-    </div>
   </nav>
 </script>

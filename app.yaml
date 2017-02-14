@@ -1,5 +1,5 @@
 application: oppiaserver
-version: 2-3-8
+version: 2-3-9
 runtime: python27
 api_version: 1
 threadsafe: false
@@ -12,6 +12,7 @@ builtins:
 
 inbound_services:
 - warmup
+- mail
 
 handlers:
 - url: /favicon.ico
@@ -113,6 +114,10 @@ handlers:
 - url: /task/.*
   login: admin
   script: main_taskqueue.app
+  secure: always
+- url: /_ah/mail/.*
+  login: admin
+  script: main_mail.app
   secure: always
 - url: /.*
   script: main.app

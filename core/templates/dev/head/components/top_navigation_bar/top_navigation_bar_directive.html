@@ -2,22 +2,59 @@
   <div class="navbar-header protractor-test-navbar-header pull-left">
     <a ng-if="windowIsNarrow" ng-click="toggleSidebar()"
        class="navbar-brand oppia-navbar-menu oppia-transition-200">
-      <i class="material-icons oppia-navbar-menu-icon">&#xE5D2;</i>
+      <i class="material-icons oppia-navbar-menu-icon" ng-if="!isSidebarShown()" >&#xE5D2;</i>
+      <i class="material-icons oppia-navbar-close-icon" ng-if="isSidebarShown()" >&#10005;</i>
     </a>
+
     <a class="oppia-navbar-brand-name oppia-transition-200" href="/"
        focus-on="<[::LABEL_FOR_CLEARING_FOCUS]>">
       <img ng-src="<[getStaticImageUrl('/logo/288x128_logo_white.png')]>" class="oppia-logo"
-           ng-class="windowIsNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'">
+           ng-class="windowIsNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'" alt="Oppia Home">
     </a>
     <!-- This is needed for the correct image to appear when an exploration is shared using G+. -->
     <a style="display: none;">
-      <img ng-src="<[getStaticImageUrl('/logo/288x128_logo_mint.png')]>" itemprop="image">
+      <img ng-src="<[getStaticImageUrl('/logo/288x128_logo_mint.png')]>" itemprop="image" alt="Oppia Home">
     </a>
   </div>
 
   <div ng-cloak class="navbar-header pull-right" ng-if="userMenuIsShown">
+    <ul class="nav oppia-navbar-nav" ng-if="standardNavIsShown">
+      <ul ng-if="windowIsNarrow" class="nav oppia-navbar-tabs-narrow">
+        <create-activity-button></create-activity-button>
+      </ul>
+      <ul ng-if="!windowIsNarrow" class="nav oppia-navbar-tabs">
+        <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_LIBRARY" class="oppia-clickable-navbar-element">
+          <a class="oppia-navbar-tab oppia-navbar-tab-content" href="/library" translate="I18N_TOPNAV_LIBRARY"></a>
+        </li>
+        <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_ABOUT" class="dropdown oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
+          <a class="oppia-navbar-tab">
+            <span class="oppia-navbar-tab-content" translate="I18N_TOPNAV_ABOUT"></span>
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu oppia-navbar-dropdown"
+              ng-mouseover="onMouseoverDropdownMenu($event)"
+              ng-mouseleave="onMouseoutDropdownMenu($event)">
+            <li><a class="protractor-test-about-link oppia-navbar-tab-content" href="/about" translate="I18N_TOPNAV_ABOUT_OPPIA"></a></li>
+            <li><a class="protractor-test-get-started-link oppia-navbar-tab-content" href="/get_started" translate="I18N_TOPNAV_GET_STARTED"></a></li>
+            <li><a class="protractor-test-teach-link oppia-navbar-tab-content" href="/teach" translate="I18N_TOPNAV_TEACH_WITH_OPPIA"></a></li>
+            <li><a href="/blog" class="oppia-navbar-tab-content" translate="I18N_TOPNAV_BLOG"></a></li>
+            <li><a href="/forum" class="oppia-navbar-tab-content" translate="I18N_TOPNAV_FORUM"></a></li>
+            <li><a class="protractor-test-contact-link oppia-navbar-tab-content" href="/contact" translate="I18N_TOPNAV_CONTACT_US"></a></li>
+          </ul>
+        </li>
+        <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_DONATE">
+          <div class="oppia-navbar-button-container">
+            <a href="/donate"
+               class="btn oppia-navbar-button oppia-navbar-hide-on-small-width oppia-transition-200">
+              <span class="oppia-navbar-tab-content" translate="I18N_TOPNAV_DONATE"></span>
+            </a>
+          </div>
+        </li>
+        <create-activity-button ng-show="navElementsVisibilityStatus.I18N_CREATE_EXPLORATION_CREATE"></create-activity-button>
+      </ul>
+    </ul>
     <ul class="nav oppia-navbar-nav oppia-navbar-profile">
-      <li ng-if="username" class="dropdown pull-right protractor-test-profile-dropdown">
+      <li ng-if="username" class="dropdown protractor-test-profile-dropdown">
         <a class="dropdown-toggle oppia-navbar-dropdown-toggle" data-toggle="dropdown"
            ng-mouseover="onMouseoverProfilePictureOrDropdown($event)"
            ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
@@ -102,7 +139,7 @@
         </ul>
       </li>
 
-      <li ng-if="!username" class="dropdown oppia-navbar-clickable-dropdown pull-right">
+      <li ng-if="!username" class="dropdown oppia-navbar-clickable-dropdown">
         <div class="oppia-navbar-button-container" style="margin-right: 10px;">
           <button class="btn oppia-navbar-button"
                   ng-click="onLoginButtonClicked()">
@@ -116,48 +153,11 @@
             ng-mouseleave="onMouseoutDropdownMenu($event)">
           <li>
             <a href style="padding: 0; width: 200px;" ng-click="onLoginButtonClicked()">
-              <img ng-src="<[getStaticImageUrl('/signin/Red-signin-Long-base-44dp.png')]>">
+              <img ng-src="<[getStaticImageUrl('/signin/Red-signin-Long-base-44dp.png')]>" alt="Sign in with Google">
             </a>
           </li>
         </ul>
       </li>
-    </ul>
-
-    <ul class="nav oppia-navbar-nav" ng-if="standardNavIsShown">
-      <ul ng-if="windowIsNarrow" class="nav oppia-navbar-tabs-narrow">
-        <create-activity-button></create-activity-button>
-      </ul>
-      <ul ng-if="!windowIsNarrow" class="nav oppia-navbar-tabs">
-        <create-activity-button></create-activity-button>
-        <li>
-          <div class="pull-right oppia-navbar-button-container">
-            <a href="/donate"
-               class="btn oppia-navbar-button oppia-navbar-hide-on-small-width protractor-test-create-activity oppia-transition-200">
-              <span translate="I18N_TOPNAV_DONATE"></span>
-            </a>
-          </div>
-        </li>
-
-        <li class="dropdown oppia-navbar-clickable-dropdown pull-right protractor-test-about-oppia-list-item">
-          <a class="oppia-navbar-tab">
-            <span translate="I18N_TOPNAV_ABOUT"></span>
-            <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu oppia-navbar-dropdown"
-              ng-mouseover="onMouseoverDropdownMenu($event)"
-              ng-mouseleave="onMouseoutDropdownMenu($event)">
-            <li><a class="protractor-test-about-link" href="/about" translate="I18N_TOPNAV_ABOUT_OPPIA"></a></li>
-            <li><a class="protractor-test-get-started-link" href="/get_started" translate="I18N_TOPNAV_GET_STARTED"></a></li>
-            <li><a class="protractor-test-teach-link" href="/teach" translate="I18N_TOPNAV_TEACH_WITH_OPPIA"></a></li>
-            <li><a href="/blog" translate="I18N_TOPNAV_BLOG"></a></li>
-            <li><a href="/forum" translate="I18N_TOPNAV_FORUM"></a></li>
-            <li><a class="protractor-test-contact-link" href="/contact" translate="I18N_TOPNAV_CONTACT_US"></a></li>
-          </ul>
-        </li>
-        <li class="oppia-clickable-navbar-element pull-right">
-          <a class="oppia-navbar-tab" href="/library" translate="I18N_TOPNAV_LIBRARY"></a>
-        </li>
-      </ul>
     </ul>
   </div>
 </script>

@@ -18,7 +18,7 @@
       <span class="oppia-navbar-breadcrumb-separator"></span>
       Profile
       <span class="oppia-navbar-breadcrumb-separator" style="padding-left: 10px;"></span>
-      {{PROFILE_USERNAME}}
+      <h1 class="oppia-profile-h1">{{PROFILE_USERNAME}}</h1>
     </li>
   </ul>
 {% endblock navbar_breadcrumb %}
@@ -37,11 +37,11 @@
               </div>
             </div>
           </a>
-          <img ng-src="<[profilePictureDataUrl]>" class="oppia-profile-picture-fullsize">
+          <img ng-src="<[profilePictureDataUrl]>" class="oppia-profile-picture-fullsize" alt="">
         </div>
 
         <img ng-if="!profileIsOfCurrentUser" ng-src="<[profilePictureDataUrl]>"
-             class="oppia-profile-picture-fullsize">
+             class="oppia-profile-picture-fullsize" alt="">
       </div>
 
       <h2 class="oppia-profile-username-large-screen">
@@ -128,7 +128,27 @@
         <i class="material-icons md-18" ng-disabled="(currentPageNumber + 1) * PAGE_SIZE >= userEditedExplorations.length" ng-click="goToNextPage()">&#xE5C8;</i>
       </span>
     </md-card>
+
+    <div ng-if="!isUserVisitingOwnProfile">
+      <button class="btn oppia-subscription-button oppia-transition-200"
+              ng-click="changeSubscriptionStatus()"
+              popover-placement="right"
+              ng-attr-popover="<[subscriptionButtonPopoverText]>"
+              popover-append-to-body
+              popover-trigger="mouseenter">
+              <span translate="I18N_SUBSCRIBE_BUTTON_TEXT" ng-if="!isAlreadySubscribed"></span>
+              <span translate="I18N_UNSUBSCRIBE_BUTTON_TEXT" ng-if="isAlreadySubscribed"></span>
+      </button>
+    </div>
   </div>
+  <style>
+    .oppia-profile-h1 {
+      color: #ffffff;
+      display: inline;
+      font-size: 1em;
+      font-weight: normal;
+    }
+  </style>
 {% endblock %}
 
 {% block footer %}

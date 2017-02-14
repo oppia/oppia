@@ -31,7 +31,7 @@
 {%- endmacro %}
 
 <!DOCTYPE html>
-<html ng-app="oppia" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
   <head>
     {% block prerender %}
     {% endblock prerender %}
@@ -140,7 +140,7 @@
                 <div class="navbar-container">
                   <top-navigation-bar></top-navigation-bar>
 
-                  <div class="collapse navbar-collapse ng-cloak">
+                  <div class="collapse navbar-collapse oppia-navbar-collapse ng-cloak">
                     {% block navbar_breadcrumb %}
                     {% endblock navbar_breadcrumb %}
 
@@ -226,6 +226,7 @@
     {% include 'components/rating_display.html' %}
     {% include 'components/side_navigation_bar/side_navigation_bar_directive.html' %}
     {% include 'components/top_navigation_bar/top_navigation_bar_directive.html' %}
+    {% include 'components/social_buttons/social_buttons_directive.html' %}
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/app.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/directives.js"></script>
@@ -269,6 +270,7 @@
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/side_navigation_bar/SideNavigationBarDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/social_buttons/SocialButtonsDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/top_navigation_bar/TopNavigationBarDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CircularImageDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CollectionSummaryTileDirective.js"></script>

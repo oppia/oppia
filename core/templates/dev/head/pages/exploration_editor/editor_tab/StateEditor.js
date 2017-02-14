@@ -247,7 +247,7 @@ oppia.factory('trainingDataService', [
       // Remove the answer from all answer groups.
       for (var i = 0; i < answerGroups.length; i++) {
         var answerGroup = answerGroups[i];
-        var ruleSpecs = answerGroup.rule_specs;
+        var ruleSpecs = answerGroup.ruleSpecs;
         var trainingData = null;
         var classifierIndex = -1;
         for (var j = 0; j < ruleSpecs.length; j++) {
@@ -336,7 +336,7 @@ oppia.factory('trainingDataService', [
         _removeAnswer(answer);
 
         var answerGroup = responsesService.getAnswerGroup(answerGroupIndex);
-        var rules = answerGroup.rule_specs;
+        var rules = answerGroup.ruleSpecs;
 
         // Ensure the answer group has a classifier rule.
         var classifierRule = null;
@@ -464,10 +464,8 @@ oppia.directive('trainingPanel', [function() {
           if ($scope.classification.newOutcome) {
             // Create a new answer group with the given feedback.
             var answerGroups = responsesService.getAnswerGroups();
-            answerGroups.push({
-              rule_specs: [],
-              outcome: angular.copy($scope.classification.newOutcome)
-            });
+            answerGroups.push(AnswerGroupObjectFactory.create(
+              [], angular.copy($scope.classification.newOutcome)));
             responsesService.save(
               answerGroups, responsesService.getDefaultOutcome());
 
