@@ -22,7 +22,8 @@
 {% endblock navbar_breadcrumb %}
 
 {% block content %}
-  <div class="oppia-dashboard-container" ng-controller="Dashboard">
+  <background-banner></background-banner>
+  <div class="oppia-dashboard-container" ng-controller="Dashboard" style="position: relative;">
     <div class="oppia-dashboard-aggregated-stats" ng-if="explorationsList.length > 0 || subscribersList.length > 0">
       <md-card layout="row">
         <div class="average-ratings stats-card">
@@ -97,8 +98,7 @@
     </div>
 
     <div ng-if="explorationsList.length === 0 && collectionsList.length === 0 && subscribersList.length === 0">
-      <h2 style="margin-bottom: -20px;
-                 font-family: 'Capriola', 'Roboto', Arial, sans-serif;">
+      <h2 class="oppia-dashboard-title">
         Creator Dashboard
       </h2>
     </div>

@@ -134,7 +134,7 @@ body {
 }
 
 .oppia-dashboard-container {
-  margin: 60px auto 30px auto;
+  margin: 0 auto 30px auto;
   max-width: 800px;
 }
 
@@ -1190,9 +1190,13 @@ textarea {
   position: relative;
 }
 
+.oppia-dashboard-aggregated-stats {
+  padding-top: 55px;
+}
+
 .oppia-dashboard-aggregated-stats md-card {
   background: #fff;
-  margin: 0 7.5px 40px 7.5px;
+  margin: 0 7.5px 70px 7.5px;
 }
 
 .oppia-dashboard-aggregated-stats .stats-card {
@@ -1253,7 +1257,15 @@ textarea {
 }
 
 .oppia-dashboard-empty-text {
-  padding-top: 50px;
+  padding-top: 15px;
+}
+
+.oppia-dashboard-title {
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 30px;
+  margin-top: 0px;
+  padding-top: 91.5px;
+  text-align: center;
 }
 
 .oppia-dashboard-tabs .list-card-view-toggle {
