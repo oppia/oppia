@@ -142,7 +142,7 @@ class PreferencesHandler(base.BaseHandler):
         user_email_preferences = user_services.get_email_preferences(
             self.user_id)
 
-        creators_subscribed_to = subscription_services.get_all_creators_to_which_learner_has_subscribed( # pylint: disable=line-too-long
+        creators_subscribed_to = subscription_services.get_all_creators_subscribed_to( # pylint: disable=line-too-long
             self.user_id)
         creators_settings = user_services.get_users_settings(
             creators_subscribed_to)

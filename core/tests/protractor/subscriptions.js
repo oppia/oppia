@@ -39,13 +39,13 @@ describe('Subscriptions functionality', function() {
     browser.get('/profile/creator2subscriptions');
     browser.waitForAngular();
     element(by.css('.protractor-test-subscription-button')).click();
-    browser.get(general.USER_PREFERENCES);
+    browser.get(general.USER_PREFERENCES_URL);
     expect(element.all(by.css(
-        '.protractor-test-subscription-name')).first().getText()).toMatch(
-        'creator1...');
+      '.protractor-test-subscription-name')).first().getText()).toMatch(
+      'creator1...');
     expect(element.all(by.css(
-        '.protractor-test-subscription-name')).last().getText()).toMatch(
-        'creator2...');
+      '.protractor-test-subscription-name')).last().getText()).toMatch(
+      'creator2...');
     users.logout();
 
     // Create a learner who subscribes to one creator and unsubscribes from the
@@ -61,35 +61,35 @@ describe('Subscriptions functionality', function() {
     element(by.css('.protractor-test-subscription-button')).click();
     browser.waitForAngular();
     element(by.css('.protractor-test-subscription-button')).click();
-    browser.get(general.USER_PREFERENCES);
+    browser.get(general.USER_PREFERENCES_URL);
     expect(element.all(by.css(
-        '.protractor-test-subscription-name')).count()).toEqual(1);
+      '.protractor-test-subscription-name')).count()).toEqual(1);
     expect(element.all(by.css(
-        '.protractor-test-subscription-name')).first().getText()).toMatch(
-        'creator1...');
+      '.protractor-test-subscription-name')).first().getText()).toMatch(
+      'creator1...');
     users.logout();
 
     users.login('creator1@subscriptions.com');
-    browser.get(general.CREATOR_DASHBOARD);
+    browser.get(general.CREATOR_DASHBOARD_URL);
     browser.waitForAngular();
     element(by.css('.protractor-test-subscription-tab')).click();
     expect(element.all(by.css(
-        '.protractor-test-subscription-name')).first().getText()).toMatch(
-        'learner2...');
+      '.protractor-test-subscription-name')).first().getText()).toMatch(
+      'learner2...');
     expect(element.all(by.css(
-        '.protractor-test-subscription-name')).last().getText()).toMatch(
-        'learner1...');
+      '.protractor-test-subscription-name')).last().getText()).toMatch(
+      'learner1...');
     users.logout();
 
     users.login('creator2@subscriptions.com');
-    browser.get(general.CREATOR_DASHBOARD);
+    browser.get(general.CREATOR_DASHBOARD_URL);
     browser.waitForAngular();
     element(by.css('.protractor-test-subscription-tab')).click();
     expect(element.all(by.css(
-        '.protractor-test-subscription-name')).count()).toEqual(1);
+      '.protractor-test-subscription-name')).count()).toEqual(1);
     expect(element.all(by.css(
-        '.protractor-test-subscription-name')).last().getText()).toMatch(
-        'learner1...');
+      '.protractor-test-subscription-name')).last().getText()).toMatch(
+      'learner1...');
     users.logout();
   });
 
