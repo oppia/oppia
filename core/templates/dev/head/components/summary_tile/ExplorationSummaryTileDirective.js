@@ -112,14 +112,21 @@ oppia.directive('explorationSummaryTile', [function() {
         };
 
         $scope.getLastUpdatedDatetime = function() {
+          if (!$scope.getLastUpdatedMsec()) {
+            return false;
+          }
           return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
             $scope.getLastUpdatedMsec());
         };
 
         $scope.getExplorationLink = function() {
-          var result = '/explore/' + $scope.getExplorationId();
-          if ($scope.getCollectionId()) {
-            result += ('?collection_id=' + $scope.getCollectionId());
+          if (!$scope.getExplorationId()) {
+            return false;
+          } else {
+            var result = '/explore/' + $scope.getExplorationId();
+            if ($scope.getCollectionId()) {
+              result += ('?collection_id=' + $scope.getCollectionId());
+            }
           }
           return result;
         };

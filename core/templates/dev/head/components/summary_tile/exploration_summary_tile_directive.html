@@ -1,6 +1,6 @@
 <script type="text/ng-template" id="summaryTile/exploration">
   <md-card class="oppia-activity-summary-tile" ng-class="{'small-width': !isWindowLarge}">
-    <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
+      <a ng-if="getExplorationLink()" ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>"></a>
       <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
         <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
         <h3 class="activity-title protractor-test-exp-summary-tile-title">
@@ -60,7 +60,7 @@
               <span ng-if="getAverageRating()">
                 <[getAverageRating() | number:1]>
               </span>
-              <span ng-if="!getAverageRating()" translate="I18N_LIBRARY_N/A">
+              <span ng-if="!getAverageRating()" translate="I18N_LIBRARY_N/A" class="grayout">
               </span>
             </span>
           </li>
@@ -68,12 +68,18 @@
           <li>
             <span class="fa fa-eye fa-lg" tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>" tooltip-placement="top">
             </span>
+            <span ng-if="getNumViews()">
             <[getNumViews() | summarizeNonnegativeNumber]>
+            </span>
+            <span ng-if="!getNumViews()" translate="I18N_LIBRARY_N/A" class="grayout">
+            </span>
           </li>
 
           <li>
-            <span>
+            <span ng-if="getLastUpdatedDatetime()">
               <[getLastUpdatedDatetime()]>
+            </span>
+            <span ng-if="!getLastUpdatedDatetime()" translate="I18N_LIBRARY_N/A" class="grayout">
             </span>
           </li>
         </ul>
@@ -95,5 +101,10 @@
 
   .oppia-activity-summary-tooltip .tooltip-inner {
     min-width: 200px;
+  }
+
+  .grayout {
+    opacity: 0.5;
+    filter: alpha(opacity = 50); /*IE*/
   }
 </style>
