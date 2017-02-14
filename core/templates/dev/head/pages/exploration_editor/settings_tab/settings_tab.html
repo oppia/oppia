@@ -86,6 +86,13 @@
                 </span>
               </div>
             </div>
+            <div class="text-right">
+              <button type="button" class="btn btn-success"
+                      ng-click="previewSummaryTile('')"
+                      title="Preview this exploration's summary tile">
+                Preview Summary
+              </button>
+          </div>
           </div>
         </div>
 
@@ -584,5 +591,25 @@
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     <button class="btn btn-danger" ng-click="reallyDelete()">Delete Exploration</button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="modals/previewSummaryTile">
+  <div class="modal-header">
+    <h3>A preview for your summary tile.</h3>
+  </div>
+
+  <div class="modal-body text-center">
+    <exploration-summary-tile exploration-title="getExplorationTitle()"
+                              objective="getExplorationObjective()"
+                              category="getExplorationCategory()"
+                              thumbnail-icon-url="getThumbnailIconUrl()"
+                              thumbnail-bg-color="getThumbnailBgColor()"
+                              class="protractor-test-exp-summary-tile">
+    <exploration-summary-tile/>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">Close</button>
   </div>
 </script>

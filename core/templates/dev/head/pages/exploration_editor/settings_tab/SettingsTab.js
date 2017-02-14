@@ -226,6 +226,40 @@ oppia.controller('SettingsTab', [
     /********************************************
     * Methods relating to control buttons.
     ********************************************/
+    $scope.previewSummaryTile = function() {
+      alertsService.clearWarnings();
+      $modal.open({
+        templateUrl: 'modals/previewSummaryTile',
+        backdrop: true,
+        controller: [
+          '$scope', '$modalInstance', function($scope, $modalInstance) {
+            $scope.getExplorationTitle = function() {
+              return explorationTitleService.displayed;
+            };
+            $scope.getExplorationObjective = function() {
+              return explorationObjectiveService.displayed;
+            };
+            $scope.getExplorationCategory = function() {
+              return explorationCategoryService.displayed;
+            };
+            $scope.getThumbnailIconUrl = function() {
+              return '/assets/images/subjects/' +
+                explorationCategoryService.displayed + '.svg';
+            };
+            $scope.getThumbnailBgColor = function() {
+              var category = explorationCategoryService.displayed;
+              return GLOBALS.CATEGORIES_TO_COLORS[category];
+            };
+
+            $scope.cancel = function() {
+              $modalInstance.dismiss('cancel');
+              alertsService.clearWarnings();
+            };
+          }
+        ]
+      });
+    };
+
     $scope.showTransferExplorationOwnershipModal = function() {
       alertsService.clearWarnings();
       $modal.open({
