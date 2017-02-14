@@ -2879,8 +2879,9 @@ div#ng-curtain {
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 80px;
-  margin-top: 40px;
+  margin-top: 35px;
   padding: 30px 55px 30px 45px;
+  position: relative;
 }
 .oppia-page-card li {
   margin-bottom: 10px;
