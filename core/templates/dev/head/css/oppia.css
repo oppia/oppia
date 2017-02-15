@@ -1261,10 +1261,12 @@ textarea {
 }
 
 .oppia-dashboard-title {
+  color: #01645c;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-  font-size: 30px;
+  font-size: 3em;
   margin-top: 0px;
-  padding-top: 91.5px;
+  margin-bottom: 25px;
+  padding-top: 78.5px;
   text-align: center;
 }
 
@@ -1844,6 +1846,26 @@ pre.oppia-pre-wrapped-text {
   padding-top: 30px;
   position: relative;
 }
+
+.oppia-preferences-page-heading {
+  color: #01645c;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 3em;
+  margin-top: 0;
+  margin-bottom: 10px;
+  padding-top: 45px;
+  position: relative;
+  text-align: center;
+}
+
+.oppia-preferences-page-heading-subtext {
+  color: #01645c;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 1.2em;
+  position: relative;
+  text-align: center;
+}
+
 .oppia-collection-player-tiles-container .oppia-page-heading {
   color: #005048;
   text-align: center;
@@ -2879,7 +2901,7 @@ div#ng-curtain {
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 80px;
-  margin-top: 35px;
+  margin-top: 40px;
   padding: 30px 55px 30px 45px;
   position: relative;
 }
