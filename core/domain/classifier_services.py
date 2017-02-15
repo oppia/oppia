@@ -18,9 +18,11 @@ from core.domain import classifier_registry
 from core.domain import classifier_domain
 from core.domain import exp_domain
 from core.domain import interaction_registry
-
+from core.platform import models
 
 import feconf
+
+classifier_models = models.Registry.import_models(models.NAMES.classifier)
 
 def classify(state, answer):
     """Classify the answer using the string classifier.
@@ -132,3 +134,21 @@ def get_classifier_from_model(classifier_model):
         classifier_model.state_name, classifier_model.algorithm_id,
         classifier_model.cached_classifier_data,
         classifier_model.data_schema_version)
+
+def _save_classifier(classifier):
+    """
+    
+    """
+    classifier_model = classifier_models.ClassifierModel.get(
+        classifier.id, strict=False)
+    if classifier_model is None:
+        return None
+    else:
+        classifier_model.exp_version_when_created = (
+            classifier.exp_version_when_created)
+        classifier_model.state_name = classifier.state_name
+        classifier_model.algorithm_id = classifier.algorithm_id
+        classifier_model.cached_classifier_data = (
+            classifier.cached_classifier_data)
+        classifier_model.data_schema_version = classifier.data_schema_version
+        classifier_model.put()
