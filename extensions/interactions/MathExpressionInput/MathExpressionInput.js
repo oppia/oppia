@@ -55,9 +55,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
              */
             var positionButtonOverlay = function() {
               var guppyOffset = $(guppyDivElt).position();
-              var guppySize = document.querySelector('.guppy-div')
-                .getBoundingClientRect();
-              console.log(guppySize, $('#startMathInputButton'));
+              var guppySize = guppyDivElt.getBoundingClientRect();
 
               // If the guppy div hasn't rendered yet, retry after 100ms.
               if (guppySize.width === 0 || guppySize.height === 0) {
