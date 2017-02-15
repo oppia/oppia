@@ -3951,7 +3951,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-dashboard-card-view-item {
-  height: inherit;
+  height: 250px;
   margin-left: 7.5px;
   margin-right: 7.5px;
   position: static;
