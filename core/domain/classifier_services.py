@@ -15,8 +15,10 @@
 """Services for classifier models"""
 
 from core.domain import classifier_registry
+from core.domain import classifier_domain
 from core.domain import exp_domain
 from core.domain import interaction_registry
+
 
 import feconf
 
@@ -118,3 +120,15 @@ def classify_string_classifier_rule(state, normalized_answer):
             return None
 
     return None
+
+def get_classifier_from_model(classifier_model):
+    """
+    Returns a classifier domian object given a classifier model loaded
+    from datastore.
+    """
+    return classifier_domain.Classifier(
+        classifier_model.id, classifier_model.exp_id,
+        classifier_model.exp_version_when_created,
+        classifier_model.state_name, classifier_model.algorithm_id,
+        classifier_model.cached_classifier_data,
+        classifier_model.data_schema_version)
