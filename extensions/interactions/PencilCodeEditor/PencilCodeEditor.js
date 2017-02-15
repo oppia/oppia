@@ -21,7 +21,7 @@
  */
 
 oppia.directive('oppiaInteractivePencilCodeEditor', [
-  'oppiaHtmlEscaper', '$modal', function(oppiaHtmlEscaper, $modal) {
+  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
     return {
       restrict: 'E',
       scope: {
@@ -71,21 +71,21 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
 
           $scope.reset = function() {
             var userSureToReset = $modal.open({
-              templateUrl : 'modals/confirmationModal',
-              backdrop : 'static',
-              keyboard : false,
-              controller : [
+              templateUrl: 'modals/confirmationModal',
+              backdrop: 'static',
+              keyboard: false,
+              controller: [
                 '$scope', '$modalInstance', function($scope, $modalInstance) {
                   $scope.close = function(result) {
-                    if(result) {
+                    if (result) {
                       $modalInstance.close(true);
                     } else {
                       $modalInstance.close(false);
                     }
                   };
-                }],
+                }]
             });
-            userSureToReset.result.then( function(result) {
+            userSureToReset.result.then(function(result) {
               if (result) {
                 $scope.trackResetCode = pce.getCode();
                 pce.setCode($scope.initialCode);
