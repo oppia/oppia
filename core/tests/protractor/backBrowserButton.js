@@ -33,7 +33,7 @@ describe('backBrowserButton', function() {
   };
   var nextpage = function() {
     browser.get(general.SERVER_URL_PREFIX + '/dashboard?mode=create');
-  }
+  };
 
   it('Checks Back Button Functionality', function() {
     visitSplashPage();
@@ -56,7 +56,6 @@ describe('backBrowserButton', function() {
     general.waitForSystem();
     browser.navigate().forward();
     general.waitForSystem();
-
   });
 
   afterEach(function() {
