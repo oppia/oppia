@@ -59,9 +59,10 @@ md-input-group.md-default-theme label
   padding: 6px 12px;
 }
 
-button.md-button.md-default-theme.oppia-learner-continue-button:focus,
-button.md-button.md-default-theme.oppia-learner-continue-button:hover {
+.md-button.md-default-theme.oppia-learner-continue-button:focus,
+.md-button.md-default-theme.oppia-learner-continue-button:hover {
   background-color: #115FD4;
+  text-decoration: none;
 }
 
 /* Attributes for material-icons. */
@@ -736,7 +737,8 @@ textarea {
 .oppia-footer-social a:focus {
   text-decoration: none;
 }
-.oppia-footer-social a:focus > img {
+.oppia-footer-social a:focus > img,
+.protractor-test-i18n-language-selector:focus {
   outline: auto 2px Highlight;
   outline: auto 5px -webkit-focus-ring-color;
 }
@@ -907,6 +909,10 @@ textarea {
 
 .nav .dropdown:hover > .dropdown-menu {
   border: none;
+}
+
+.nav > li > a:hover, .nav > li > a:focus {
+  background: white;
 }
 
 @media(max-width: 768px) {
@@ -2005,7 +2011,10 @@ pre.oppia-pre-wrapped-text {
   opacity: 1;
 }
 
-
+.oppia-close-popover-button:focus {
+  outline: auto 2px Highlight;
+  outline: auto 5px -webkit-focus-ring-color;
+}
 
 .oppia-graph-resize-button {
   border: 0;
@@ -2945,7 +2954,8 @@ div#ng-curtain {
   opacity: 0.7;
 }
 
-.oppia-rating-star-active {
+.oppia-rating-star-active,
+.protractor-test-rating-star:focus {
   color: #FFD700;
 }
 
@@ -3228,6 +3238,11 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-info-card-exploration-contributors-profile {
   padding: 0;
+}
+
+.oppia-info-card-exploration-contributors-profile li a:focus .img-circle {
+  outline: auto 2px Highlight;
+  outline: auto 5px -webkit-focus-ring-color;
 }
 
 .oppia-info-card-community-editable-icon {
@@ -3791,18 +3806,6 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-activity-summary-tile .exploration-summary-avatars profile-link-image {
   display: block;
   margin-bottom: 3px;
-}
-
-.oppia-activity-summary-tile .avatars-num-minus-one {
-  color: white;
-  font-family: Roboto;
-  font-size: 0.55em;
-  font-weight: bold;
-  left: 12px;
-  position: absolute;
-  padding-left: 2px;
-  padding-right: 2px;
-  top: 17px;
 }
 
 .oppia-activity-summary-tile .contributor-indicator {

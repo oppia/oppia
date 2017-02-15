@@ -3,10 +3,8 @@
 
 <script type="text/ng-template" id="interaction/EndExploration">
   <div ng-if="!isIframed && !isInEditorPreviewMode">
-    <a href="/library">
-      <md-button class="oppia-learner-continue-button" ng-if="!collectionId"
-                 translate="I18N_PLAYER_GO_TO_LIBRARY">
-      </md-button>
+    <a class="md-button md-default-theme oppia-learner-continue-button" ng-if="!collectionId" href="/library">
+      <span translate="I18N_PLAYER_GO_TO_LIBRARY"></span>
     </a>
   </div>
   <div ng-if="isInEditorPage" style="color: red; font-size: 0.8em; margin-top: 20px;">
