@@ -13,16 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service that highlights the color of the question
- * depending on wheather it is finished or unfinished .
+ * @fileoverview Service for managing the sidebar items
+ * highlighting.
  */
 
 oppia.factory('SidebarHighlightingService', [
-  function() {
-    var ERROR_SELECTOR = 'simple-editor-sidebar .error';
+  'QuestionIdService',
+  function(QuestionIdService) {
     var ERROR_CLASS = 'error';
-
+    // any file using this service has access to both
+    // errorHighlight and undoErrorHighlight functions.
     return {
+      // highlights the sidebar item with error status
       errorHighlight: function(id) {
           if (!angular.isDefined(id)) {
             return;
@@ -33,12 +35,15 @@ oppia.factory('SidebarHighlightingService', [
             elm.addClass(ERROR_CLASS);
           }
         },
+      // returns the sidebar item to safe state(original state)
       undoErrorHighlight: function(id) {
           if (!angular.isDefined(id)) {
             return;
           } else {
-            angular.element(ERROR_SELECTOR)
-              .removeClass('error');
+            var elm = angular.element(document.getElementById(
+              QuestionIdService.SIDEBAR_PREFIX + id)
+            );
+            elm.removeClass(ERROR_CLASS);
           }
         }
     };
