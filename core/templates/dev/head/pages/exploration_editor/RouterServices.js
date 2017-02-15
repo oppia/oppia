@@ -44,7 +44,7 @@ oppia.factory('routerService', [
       return $location.path();
     }, function(newPath, oldPath) {
       if (newPath === '') {
-        if (oldPath === '/' || oldPath === '/gui/Introduction') {
+        if (oldPath === '/') {
           $window.history.go(-1);
         } else {
           $location.path(oldPath);

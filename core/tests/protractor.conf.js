@@ -92,7 +92,8 @@ exports.config = {
       'protractor/loginFlow.js',
       'protractor/libraryPagesTour.js',
       'protractor/collections.js',
-      'protractor/explorationFeedback.js'
+      'protractor/explorationFeedback.js',
+      'protractor/backBrowserButton.js'
     ],
 
     i18n: [
