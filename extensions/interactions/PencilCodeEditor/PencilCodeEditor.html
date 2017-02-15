@@ -40,3 +40,17 @@
 <script type="text/ng-template" id="shortResponse/PencilCodeEditor">
   <pre><[answerCode | truncateAtFirstLine]></pre>
 </script>
+
+<script type="text/ng-template" id="modals/confirmationModal">    
+  <div class="modal-header">
+    <button type="button" class="close" ng-click="close(false)" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h4 class="modal-title">Confirmation Required</h4>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure you want to reset your code?</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" ng-click="close(false)" class="btn btn-default" data-dismiss="modal">No</button>
+    <button type="button" ng-click="close(true)" class="btn btn-primary" data-dismiss="modal">Yes</button>
+  </div>
+</script>

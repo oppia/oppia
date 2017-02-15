@@ -21,7 +21,7 @@
  */
 
 oppia.directive('oppiaInteractivePencilCodeEditor', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'oppiaHtmlEscaper', '$modal', function(oppiaHtmlEscaper, $modal) {
     return {
       restrict: 'E',
       scope: {
@@ -30,9 +30,9 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
       templateUrl: 'interaction/PencilCodeEditor',
       controller: [
         '$scope', '$attrs', '$element', '$timeout', 'focusService',
-        'pencilCodeEditorRulesService',
+        'pencilCodeEditorRulesService', '$modal',
         function($scope, $attrs, $element, $timeout, focusService,
-            pencilCodeEditorRulesService) {
+            pencilCodeEditorRulesService, $modal) {
           $scope.initialCode = oppiaHtmlEscaper.escapedJsonToObj(
             $attrs.initialCodeWithValue);
           $scope.trackResetCode = '';
@@ -70,16 +70,30 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
           });
 
           $scope.reset = function() {
-            var userSureToReset = confirm(
-              'Are You sure you want to reset the editor to initial state');
-            if (userSureToReset) {
-              $scope.trackResetCode = pce.getCode();
-              pce.setCode($scope.initialCode);
-            }
+            var userSureToReset = $modal.open({
+              templateUrl : 'modals/confirmationModal',
+              backdrop : 'static',
+              keyboard : false,
+              controller : [
+                '$scope', '$modalInstance', function($scope, $modalInstance) {
+                  $scope.close = function(result) {
+                    if(result) {
+                      $modalInstance.close(true);
+                    } else {
+                      $modalInstance.close(false);
+                    }
+                  };
+                }],
+            });
+            userSureToReset.result.then( function(result) {
+              if (result) {
+                $scope.trackResetCode = pce.getCode();
+                pce.setCode($scope.initialCode);
+              }
+            });
           };
 
           $scope.undoReset = function() {
-            console.log($scope.trackResetCode);
             pce.setCode($scope.trackResetCode);
             $scope.trackResetCode = '';
           };
