@@ -394,10 +394,10 @@ describe('Testing filters', function() {
     expect(filter('  a')).toEqual('A');
     expect(filter('  a  ')).toEqual('A');
 
-    expect(filter('a  b ')).toEqual('A b');
-    expect(filter('  a  b ')).toEqual('A b');
+    expect(filter('a  b ')).toEqual('A  b');
+    expect(filter('  a  b ')).toEqual('A  b');
     expect(filter('  ab c ')).toEqual('Ab c');
-    expect(filter('  only First lettEr is Affected ')).toEqual(
-      'Only First lettEr is Affected');
+    expect(filter('  only First lettEr is  Affected ')).toEqual(
+      'Only First lettEr is  Affected');
   }));
 });
