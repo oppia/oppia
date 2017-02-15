@@ -208,7 +208,7 @@ oppia.factory('explorationSaveService', [
                 if (result) {
                   $modalInstance.close(true);
                 } else {
-                    $modalInstance.close(false);
+                  $modalInstance.close(false);
                 }
               };
             }]
