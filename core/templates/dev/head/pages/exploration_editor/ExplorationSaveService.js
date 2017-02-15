@@ -198,36 +198,51 @@ oppia.factory('explorationSaveService', [
       },
 
       discardChanges: function() {
-        var confirmDiscard = confirm(
-          'Are you sure you want to discard your changes?');
+        var confirmDiscard = $modal.open({
+          templateUrl: 'modals/confirmationModal',
+          backdrop: 'static',
+          keyboard: false,
+          controller: [
+            '$scope', '$modalInstance', function($scope, $modalInstance) {
+              $scope.close = function(result) {
+                if (result) {
+                  $modalInstance.close(true);
+                } else {
+                    $modalInstance.close(false);
+                }
+              };
+            }]
+        });
 
-        if (confirmDiscard) {
-          alertsService.clearWarnings();
-          $rootScope.$broadcast('externalSave');
+        confirmDiscard.result.then(function(result) {
+          if (result) {
+            alertsService.clearWarnings();
+            $rootScope.$broadcast('externalSave');
 
-          $modal.open({
-            templateUrl: 'modals/reloadingEditor',
-            backdrop: 'static',
-            keyboard: false,
-            controller: [
-              '$scope', '$modalInstance', function($scope, $modalInstance) {
-                $timeout(function() {
-                  $modalInstance.dismiss('cancel');
-                }, 2500);
-              }
-            ],
-            windowClass: 'oppia-loading-modal'
-          });
+            $modal.open({
+              templateUrl: 'modals/reloadingEditor',
+              backdrop: 'static',
+              keyboard: false,
+              controller: [
+                '$scope', '$modalInstance', function($scope, $modalInstance) {
+                  $timeout(function() {
+                    $modalInstance.dismiss('cancel');
+                  }, 2500);
+                }
+              ],
+              windowClass: 'oppia-loading-modal'
+            });
 
-          changeListService.discardAllChanges();
-          alertsService.addSuccessMessage('Changes discarded.');
-          $rootScope.$broadcast('initExplorationPage');
+            changeListService.discardAllChanges();
+            alertsService.addSuccessMessage('Changes discarded.');
+            $rootScope.$broadcast('initExplorationPage');
 
-          // The reload is necessary because, otherwise, the
-          // exploration-with-draft-changes will be reloaded
-          // (since it is already cached in explorationData).
-          location.reload();
-        }
+            // The reload is necessary because, otherwise, the
+            // exploration-with-draft-changes will be reloaded
+            // (since it is already cached in explorationData).
+            location.reload();
+          }
+        });
       },
 
       showPublishExplorationModal: function(
