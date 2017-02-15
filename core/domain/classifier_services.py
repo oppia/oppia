@@ -123,6 +123,7 @@ def classify_string_classifier_rule(state, normalized_answer):
 
     return None
 
+
 def get_classifier_from_model(classifier_model):
     """
     Returns a classifier domian object given a classifier model loaded
@@ -135,9 +136,23 @@ def get_classifier_from_model(classifier_model):
         classifier_model.cached_classifier_data,
         classifier_model.data_schema_version)
 
+def get_classifier_from_id(classifier_id):
+    """
+    Returns a classifier domain object given a classifier id.
+    """
+    classifier_model = classifier_models.ClassifierModel.get(
+        classifier_id, strict=False)
+    if classifier_model is None:
+        return None
+    else:
+        classifier = get_classifier_from_model(classifier_model)
+        return classifier
+
+
 def _save_classifier(classifier):
     """
-    
+    Updates classifier model in the datastore given a classifier
+    domain object.
     """
     classifier_model = classifier_models.ClassifierModel.get(
         classifier.id, strict=False)
