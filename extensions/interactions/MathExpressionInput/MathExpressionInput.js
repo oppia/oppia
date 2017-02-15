@@ -142,7 +142,6 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
 
               if (deviceInfoService.isMobileUserAgent() &&
                 deviceInfoService.hasTouchEvents()) {
-
                 $scope.mobileOverlayIsShown = true;
                 // Wait for the scope change to apply. Since we interact with
                 // the DOM elements, they need to be added by angular before
