@@ -30,9 +30,9 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
       templateUrl: 'interaction/MathExpressionInput',
       controller: [
         '$scope', '$attrs', '$timeout', '$element', 'LABEL_FOR_CLEARING_FOCUS',
-        'oppiaDebouncer',
+        'oppiaDebouncer', 'deviceInfoService',
         function($scope, $attrs, $timeout, $element, LABEL_FOR_CLEARING_FOCUS,
-          oppiaDebouncer) {
+          oppiaDebouncer, deviceInfoService) {
           var guppyDivElt = $element[0].querySelector('.guppy-div');
 
           /**
@@ -76,14 +76,14 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
             $('#startMathInputButton').click(function() {
               guppyInstance.activate();
 
-              var fakeInputElement = document.
-                querySelector('#fakeInputForMathExpression');
+              var fakeInputElement = document.querySelector(
+                '#fakeInputForMathExpression');
               fakeInputElement.focus();
 
               // Place the cursor at the end of the text input, so that the
               // user can use backspace to delete.
-              fakeInputElement.setSelectionRange(fakeInputElement.value.length,
-                fakeInputElement.value.length);
+              fakeInputElement.setSelectionRange(
+                fakeInputElement.value.length, fakeInputElement.value.length);
             });
 
             // Mapping characters back to Mousetrap codes.
@@ -127,10 +127,8 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
               'input change compositionupdate keydown',
               oppiaDebouncer.debounce(function() {
                 setGuppyContentFromInput();
-              }, 100))
-
-            // Set content immediately on blur.
-            .on('blur', function() {
+              }, 100)
+            ).on('blur', function() {
               guppyInstance.activate();
               setGuppyContentFromInput();
             });
@@ -142,9 +140,16 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
                 GLOBALS.ASSET_DIR_PREFIX +
                 '/assets/overrides/guppy/oppia_symbols.json');
 
-              if (/Mobi/.test(navigator.userAgent)) {
+              if (deviceInfoService.isMobileUserAgent() &&
+                deviceInfoService.hasTouchEvents()) {
+
                 $scope.mobileOverlayIsShown = true;
-                // Wait for the scope change to apply.
+                // Wait for the scope change to apply. Since we interact with
+                // the DOM elements, they need to be added by angular before
+                // the function is called. Timeout of 0 to wait until the end
+                // of the current digest cycle, false to not start a new digest
+                // cycle. A new cycle is not needed since no angular variables
+                // are changed within the function.
                 $timeout(makeGuppyMobileFriendly, 0, false);
               }
             }
