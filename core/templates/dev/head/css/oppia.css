@@ -1682,6 +1682,10 @@ pre.oppia-pre-wrapped-text {
   padding: 20px 50px 20px 35px;
 }
 
+.oppia-editor-page-container{
+  padding: 0px;
+}
+
 .oppia-state-content {
   min-height: 20px;
   padding: 5px 0 15px 10px;
