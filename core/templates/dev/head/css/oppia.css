@@ -3653,8 +3653,22 @@ md-card.preview-conversation-skin-supplemental-card {
     transform: translateY(-50%);
     float: right;
   }
+}
 
-
+/* Styles for the popover on the exploration and collection summary tiles. */
+.oppia-activity-summary-popover .popover.right {
+  bottom: -10px;
+  min-width: 200px;
+}
+.oppia-activity-summary-popover .popover.top {
+  margin-top: 10px;
+}
+.oppia-activity-summary-popover .popover-content {
+  padding: 8px 8px;
+}
+.oppia-activity-summary-popover .popover {
+  font-size: 14px;
+  line-height: 1.42857143;
 }
 
 .oppia-activity-summary-tile {
