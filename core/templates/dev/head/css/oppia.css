@@ -4580,11 +4580,11 @@ md-card.preview-conversation-skin-supplemental-card {
   /* In some versions of Chrome on Android, typing in a 0px input
   field can cause the previous character to be selected.
   Set to 1px and 0 opacity instead of 0px to prevent this issue. */
-  width: 1px;
+  border: 0;
   height: 1px;
+  margin: 0;
+  margin-left: -5px;
   opacity: 0;
   padding: 0;
-  margin: 0;
-  border: 0;
-  margin-left: -5px;
+  width: 1px;
 }
