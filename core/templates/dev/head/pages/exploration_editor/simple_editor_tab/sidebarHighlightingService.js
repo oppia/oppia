@@ -21,10 +21,10 @@ oppia.factory('SidebarHighlightingService', [
   'QuestionIdService',
   function(QuestionIdService) {
     var ERROR_CLASS = 'error';
-    // any file using this service has access to both
+    // Any file using this service has access to both
     // errorHighlight and undoErrorHighlight functions.
     return {
-      // highlights the sidebar item with error status
+      // Highlights the sidebar item with error status
       errorHighlight: function(id) {
           if (!angular.isDefined(id)) {
             return;
@@ -35,7 +35,7 @@ oppia.factory('SidebarHighlightingService', [
             elm.addClass(ERROR_CLASS);
           }
         },
-      // returns the sidebar item to safe state(original state)
+      // Returns the sidebar item to safe state(original state)
       undoErrorHighlight: function(id) {
           if (!angular.isDefined(id)) {
             return;
