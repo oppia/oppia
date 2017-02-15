@@ -50,13 +50,13 @@
         width: 80px;
       }
       .highlight-location-text {
+        bottom: 30px;
         color: #005048;
         font-family: Capriola, Roboto, Arial, sans-serif;
         font-size: 18px;
         font-style: italic;
-        position: absolute;
-        bottom: 30px;
         left: 42px;
+        position: absolute;
       }
     </style>
   {% endif %}
@@ -145,7 +145,7 @@
                      xlink:href=""></image>
             </pattern>
           </defs>
-          <a xlink:href="<['/explore/' + node.getExplorationId() + '?collection_id=' + collectionId]>"
+          <a xlink:href="<[getExplorationUrl(node.getExplorationId())]>"
              ng-mouseover="updateExplorationPreview(node.getExplorationId());
                            setIconHighlight($index);"
              ng-mouseleave="togglePreviewCard();

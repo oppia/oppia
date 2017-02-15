@@ -212,11 +212,12 @@ oppia.controller('CollectionPlayer', [
     $scope.isCompletedExploration = function(explorationId) {
       var completedExplorationIds = (
         $scope.collectionPlaythrough.getCompletedExplorationIds());
-      if (completedExplorationIds.indexOf(explorationId) > -1) {
-        return true;
-      } else {
-        return false;
-      }
+      return completedExplorationIds.indexOf(explorationId) > -1;
+    };
+
+    $scope.getExplorationUrl = function(explorationId) {
+      return (
+        '/explore/' + explorationId + '?collection_id=' + $scope.collectionId);
     };
 
     $http.get('/collectionsummarieshandler/data', {
