@@ -1552,6 +1552,8 @@ md-card.oppia-dashboard-tile {
   padding-top: 4px;
 }
 
+
+
 .oppia-placeholder {
   color: #888;
   font-style: italic;
@@ -1680,6 +1682,10 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-editor-card-section {
   padding: 20px 50px 20px 35px;
+}
+
+.oppia-editor-page-container{
+  padding: 0px;
 }
 
 .oppia-state-content {
