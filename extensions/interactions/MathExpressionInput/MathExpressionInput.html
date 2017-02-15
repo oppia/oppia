@@ -5,11 +5,8 @@
   <div class="guppy-div"
        style="width: 100%; height: 100px; padding: 5px;">
   </div>
-  <button ng-if="isMobileOverlayShown" id="startMathInputButton" style="opacity: 0; position: absolute; z-index: 2;"></button>
-  <!-- In some versions of Chrome on Android, typing in a 0px input
-    field can cause the previous character to be selected.
-      Set to 1px and 0 opacity instead of 0px to prevent this issue. -->
-  <textarea ng-if="isMobileOverlayShown" id="fakeInputForMathExpression" style="width: 1px; height: 1px; opacity: 0; padding: 0; margin: 0; border: 0; margin-left: -5px;"></textarea>
+  <button ng-if="mobileOverlayIsShown" id="startMathInputButton" class="oppia-math-input-mobile-overlay"></button>
+  <textarea ng-if="mobileOverlayIsShown" id="fakeInputForMathExpression" class="oppia-mathexpression-input-hidden-text"></textarea>
   <button type="button" class="btn btn-default"
           ng-click="submitAnswer()" style="margin-top: 10px;">
     Submit

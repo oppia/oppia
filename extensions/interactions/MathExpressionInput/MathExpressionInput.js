@@ -43,7 +43,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
            * This may not be a significant issue as the MathExpressionInput is
            * recreated if the given answer is incorrect.
            */
-          var addMobileButtonOverlay = function() {
+          var makeGuppyMobileFriendly = function() {
             /**
              * Checks if the guppy div has a width and height greater than 0,
              * if not schedules a timeout to run again after 100ms. If the
@@ -145,9 +145,9 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
                 '/assets/overrides/guppy/oppia_symbols.json');
 
               if (/Mobi/.test(navigator.userAgent)) {
-                $scope.isMobileOverlayShown = true;
+                $scope.mobileOverlayIsShown = true;
                 // Wait for the scope change to apply.
-                $timeout(addMobileButtonOverlay, 0, false);
+                $timeout(makeGuppyMobileFriendly, 0, false);
               }
             }
           });
