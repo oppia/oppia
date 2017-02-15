@@ -3,6 +3,82 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://github.com/oppia/oppia/commits/master
 
 
+v2.3.8 (14 Feb 2017)
+--------------------
+Collection Learner View
+* Fix #2526: Path version of the collection learner view (PR #2979)
+
+UI Tweaks
+* Fix #2874: Show the exploration name in the mobile view (PR #2888)
+* Fix #2894: Align the footer properly for exploration player in mobile view (PR #2897)
+* Fix #2893: Modify buttons on Teach page to make width uniform (PR #2898)
+* Fix #2817: Move Call to action buttion in Teach Page and fixes on about page bar on small screens
+* Fix #2816: Add call to action buttons to the Foundation page (PR #2903)
+* Fix #2817, Move Call to action buttion in Teach Page and fixes on about page bar on small screens (PR #2911)
+* Fix alphabetical ordering of authors (PR #2912)
+* Fix #2821: Fixed vertical alignment of headers (PR #2909)
+* Fix #2914: Improve spacing of buttons on Teach and About pages
+* Fix #2868: Fix social icons positioning in hamburger menu (PR #2932 and PR #2949)
+* Fix #2551: Add full objective in the library tiles as tooltip (PR #2934)
+* Remove links from collection page objectives in table and capitalize first letter of first word in objective
+* Fix #2944: Changed z-index on splash button container so browse button is clickable. (PR #2970)
+* Fix button text size on splash page (PR #2928)
+* Merge branch 'develop' into translatewiki
+* Fix #2620 : Fix exploration card height and deadzone (PR #2971)
+* Fix #2918: Fix collection tile in creator dashboard. (PR #2973)
+* Fix #2975 Adds full objective in the library tiles as popovers
+
+Site Reliability/Assessibility
+* Add -L for curl redirect (PR #3021)
+* Fix #3010: Replace nodelist.forEach use with for loop for better compatability. (PR #3019)
+* Fix #3003: Use Angular's debouncer for Library search. (PR #3006)
+* Fix #2830: update styles in footer sharing links to allow them to show in IE (PR #2917)
+* Add h1 on collection page and add ARIA role to footer tag (PR #2959)
+* Refactor capitalizing the exploration objectives on the collection page to remove javascript from the html.
+* Fix #2922: Hide hamburger menu >768px, add function to handle navbar overflow (PR #2927)
+* Fixes #2956: Images in explorations have descriptive alt attributes (PR #2972)
+* Fix part of #2862: Add alt attributes to images (PR #2957)
+* Fix #2954: add appropriate lang attribute to site pages (PR #3004)
+* Fix #2919: Fix the loading of the editor page. (PR #2958)
+
+Emails
+* Fix part of #2557:  Refactoring of email preferences and add functionality to incorporate user's preferences of feedback / suggestions  (PR #2892)
+* FIx #2768: Implement email receiving functionality for feedback messages. (PR #3029)
+* Rename userExplorationEmailsHandler service to UserEmailPreferencesService (PR #3040)
+
+Frontend Refactor
+* Fix #2722: Split exploration save and publish button to directive (PR #2896)
+* Fix part of #2863: Create AnswerGroup domain object (PR #2883)
+* Add dependencies to collection editor html (PR #2996)
+
+Subscriptions
+* Fix part of #2287: Email preferences for subscriptions
+* Fix part of #2287: Add handlers for subscription and unsubscription (PR #2886)
+* Fix part of #2287: Add subscribe and unsubscribe button to profile of authors
+
+Machine Learning
+* Fix #2726: Create domain & storage classes for classifier model & tests (PR #2846)
+* Fix #2728: Add AlgorithmRegistry and test class. (PR #2926)
+* Fix #2950: Moved classifier methods and test from reader to classifier_services (PR #2974)
+
+Dev tools/code health
+* Add travis retry all tests except for backend and linting (PR #2890)
+* Add Docstrings in exploration/gae_models.py (PR #2889)
+* Fix #2455: Add lockfile functionality to fix inconsistent directory permissions in Vagrant (PR #2749)
+* Update release info output to fit format of changelog (PR #2908)
+* Fix #2857: Added excluded_dirs in Lint pattern matching (PR #2905)
+* Fix #2064: Add a test for keys present in source code and not in en.json (PR #2933)
+* Fix #2394: Add docstring to core/storage/user/gae_models.py (PR #2962)
+* Docstrings added in the file core/storage/email/gae_models.py (PR #2900)
+* Fix part of #2394: Update docstrings in core.storage.collection.gae_models (PR #2982)
+
+Other
+* Update translations from translatewiki
+* Fix translatewiki attirbution in credits (PR #2916)
+* Fix #2662: Upgrade math-expressions to 370a77. (PR #2984)
+* Update guppy to the version f6e0bbf in order to prevent a startsWith() error in IE. (PR #3041)
+
+
 v2.3.8 (10 Jan 2017)
 --------------------
 Learner view:
