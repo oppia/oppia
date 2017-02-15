@@ -36,7 +36,7 @@
         padding: 30px 85px 70px 85px;
         pointer-events: none;
         position: fixed;
-        right: 10%;
+        right: 12%;
         text-align: left;
         top: 244px;
       }
@@ -48,6 +48,15 @@
       }
       .collection-subject-icon {
         width: 80px;
+      }
+      .highlight-location-text {
+        bottom: 30px;
+        color: #005048;
+        font-family: Capriola, Roboto, Arial, sans-serif;
+        font-size: 18px;
+        font-style: italic;
+        left: 42px;
+        position: absolute;
       }
     </style>
   {% endif %}
@@ -120,7 +129,15 @@
                       cy="70"
                       r="50"
                       ng-attr-fill="<[pathIconParameters[$index].thumbnailBgColor]>"/>
-              <image x="10"
+              <image ng-if="isCompletedExploration(node.getExplorationId())"
+                     x="0"
+                     y="20"
+                     height="100"
+                     width="100"
+                     ng-attr-xlink:href="<[getStaticImageUrl('/general/collection_paw.svg')]>"
+                     xlink:href=""></image>
+              <image ng-if="!isCompletedExploration(node.getExplorationId())"
+                     x="10"
                      y="30"
                      height="80"
                      width="80"
@@ -128,7 +145,7 @@
                      xlink:href=""></image>
             </pattern>
           </defs>
-          <a xlink:href="<['/explore/' + node.getExplorationId()]>"
+          <a xlink:href="<[getExplorationUrl(node.getExplorationId())]>"
              ng-mouseover="updateExplorationPreview(node.getExplorationId());
                            setIconHighlight($index);"
              ng-mouseleave="togglePreviewCard();
@@ -161,14 +178,13 @@
         </svg>
 
         <div ng-if="collection" class="oppia-card-preview-panel hidden-sm hidden-xs">
-
           <md-card class="oppia-activity-summary-tile md-default-theme">
             <div class="title-section" style="background-color: <[collectionSummary.thumbnail_bg_color]>; z-index: 1;">
               <img ng-src="<[collectionSummary.thumbnail_icon_url]>" class="thumbnail-image">
             </div>
             <div class="title-section-mask" style="padding: 45px;"></div>
           </md-card>
-
+          <span class="highlight-location-text">Highlight location to see lesson.</span>
           <exploration-summary-tile ng-if="!previewCardIsShown"
                                     collection-id="getCollectionId()"
                                     exploration-id="currentExplorationId"
@@ -183,7 +199,6 @@
                                     is-community-owned="summaryToPreview.community_owned"
                                     style="position: absolute; left: 85px; top: 30px; z-index: 10;">
           <exploration-summary-tile/>
-
         </div>
       </div>
     </div>
