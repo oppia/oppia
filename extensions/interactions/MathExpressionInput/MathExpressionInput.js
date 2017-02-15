@@ -39,9 +39,9 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
            * Adds a button overlay and invisible text field used to bring up
            * the keyboard on mobile devices.
            *
-           * TODO: On iOS/Safari, keyboard may only appear on first press.
-           * This may not be a significant issue as the MathExpressionInput is
-           * recreated if the given answer is incorrect.
+           * TODO(Oishikatta): On iOS/Safari, keyboard may only appear on first
+           * press. This may not be a significant issue as the
+           * MathExpressionInput is recreated if the given answer is incorrect.
            */
           var makeGuppyMobileFriendly = function() {
             /**
