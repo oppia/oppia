@@ -73,7 +73,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
 
             // The focus() call must be in a click event handler and on a text
             // field to make the mobile keyboard appear.
-            $('#startMathInputButton').click(function() {
+            $scope.startMobileMathInput = function() {
               guppyInstance.activate();
 
               var fakeInputElement = document.querySelector(
@@ -84,7 +84,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
               // user can use backspace to delete.
               fakeInputElement.setSelectionRange(
                 fakeInputElement.value.length, fakeInputElement.value.length);
-            });
+            };
 
             // Mapping characters back to Mousetrap codes.
             // Use Mousetrap.trigger(code) to replay them.
