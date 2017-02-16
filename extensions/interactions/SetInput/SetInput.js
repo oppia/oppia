@@ -32,7 +32,8 @@ oppia.directive('oppiaInteractiveSetInput', [function() {
       $scope.schema = {
         type: 'list',
         items: {
-          type: 'unicode'
+          type: 'unicode',
+          value: 'setInput'
         },
         ui_config: {
           // TODO(mili): Translate this in the HTML.

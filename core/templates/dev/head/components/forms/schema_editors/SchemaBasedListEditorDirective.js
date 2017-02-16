@@ -158,9 +158,11 @@ oppia.directive('schemaBasedListEditor', [
             $scope.isAddItemButtonPresent = false;
           };
 
-          if ($scope.localValue.length === 0) {
-            $scope.addElement();
-          }
+          if ($scope.itemSchema().value === 'setInput') {
+            if ($scope.localValue.length === 0) {
+              $scope.addElement();
+            }
+          };
 
           $scope._onChildFormSubmit = function(evt) {
             if (!$scope.isAddItemButtonPresent) {
