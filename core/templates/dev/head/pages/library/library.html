@@ -218,11 +218,13 @@
 
 {% block footer_js %}
   {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/profile_link/ProfileLinkImageDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/library/Library.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/library/LibraryFooter.js"></script>
-
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/library/ActivityTilesInfinityGridDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/library/SearchBarDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/library/SearchResultsDirective.js"></script>
