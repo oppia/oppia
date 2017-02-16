@@ -1,7 +1,7 @@
 <script type="text/ng-template" id="components/topNavigationBar">
   <div class="navbar-header protractor-test-navbar-header pull-left">
     <a ng-if="windowIsNarrow" ng-click="toggleSidebar()"
-       class="navbar-brand oppia-navbar-menu oppia-transition-200">
+       class="navbar-brand oppia-navbar-menu oppia-transition-200" tabindex="0">
       <i class="material-icons oppia-navbar-menu-icon" ng-if="!isSidebarShown()" >&#xE5D2;</i>
       <i class="material-icons oppia-navbar-close-icon" ng-if="isSidebarShown()" >&#10005;</i>
     </a>
@@ -27,7 +27,7 @@
           <a class="oppia-navbar-tab oppia-navbar-tab-content" href="/library" translate="I18N_TOPNAV_LIBRARY"></a>
         </li>
         <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_ABOUT" class="dropdown oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
-          <a class="oppia-navbar-tab">
+          <a class="oppia-navbar-tab" tabindex="0">
             <span class="oppia-navbar-tab-content" translate="I18N_TOPNAV_ABOUT"></span>
             <span class="caret"></span>
           </a>
@@ -57,10 +57,10 @@
       <li ng-if="username" class="dropdown protractor-test-profile-dropdown">
         <a class="dropdown-toggle oppia-navbar-dropdown-toggle" data-toggle="dropdown"
            ng-mouseover="onMouseoverProfilePictureOrDropdown($event)"
-           ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
+           ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)" tabindex="0">
           <div class="oppia-navbar-profile-picture-container">
             <span ng-if="profilePictureDataUrl">
-              <img ng-src="<[profilePictureDataUrl]>" class="oppia-navbar-profile-picture img-circle">
+              <img ng-src="<[profilePictureDataUrl]>" class="oppia-navbar-profile-picture img-circle" alt="User Avatar">
               <span class="caret" style="margin-top: 10px;"></span>
             </span>
             <span ng-if="!profilePictureDataUrl">
@@ -160,4 +160,10 @@
       </li>
     </ul>
   </div>
+  <style>
+    .oppia-navbar-brand-name:focus {
+      outline: 1px dotted #fff;
+      outline: auto 5px -webkit-focus-ring-color;
+    }
+  </style>
 </script>

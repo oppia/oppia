@@ -5,7 +5,7 @@
       <strong>
         If the learner's answer...
       </strong>
-      <ul class="nav nav-stacked nav-pills" role="tablist" ng-model="rules">
+      <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist" ng-model="rules">
         <li ng-repeat="rule in rules" ng-class="{'active': activeRuleIndex === $index}" class="oppia-rule-block oppia-sortable-rule-block protractor-test-rule-block" style="margin-top: 0;" ng-style="$last ? {'border-bottom': '1px solid #ccc'} : {}">
           <a ng-click="openRuleEditor($index)" ng-hide="activeRuleIndex === $index" class="oppia-rule-tab protractor-test-answer-tab" ng-class="{'oppia-rule-tab-disabled': !isEditable}">
             <div class="oppia-rule-header">
