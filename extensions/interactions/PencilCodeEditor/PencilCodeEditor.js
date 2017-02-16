@@ -35,7 +35,6 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
             pencilCodeEditorRulesService, $modal) {
           $scope.initialCode = oppiaHtmlEscaper.escapedJsonToObj(
             $attrs.initialCodeWithValue);
-          $scope.codeBeforeReset = '';
           var iframeDiv = $element.find('.pencil-code-editor-iframe').get(0);
           var pce = new PencilCodeEmbed(iframeDiv);
           pce.beginLoad($scope.initialCode);
@@ -87,15 +86,9 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
             });
             resetConfirmed.result.then(function(result) {
               if (result) {
-                $scope.codeBeforeReset = pce.getCode();
                 pce.setCode($scope.initialCode);
               }
             });
-          };
-
-          $scope.undoReset = function() {
-            pce.setCode($scope.codeBeforeReset);
-            $scope.codeBeforeReset = '';
           };
 
           var getNormalizedCode = function() {
