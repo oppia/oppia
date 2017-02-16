@@ -69,22 +69,21 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
           });
 
           $scope.reset = function() {
-            var resetConfirmed = $modal.open({
+            $modal.open({
               templateUrl: 'modals/pencilCodeResetConfirmation',
               backdrop: 'static',
               keyboard: false,
               controller: [
                 '$scope', '$modalInstance', function($scope, $modalInstance) {
-                  $scope.close = function(result) {
-                    if (result) {
-                      $modalInstance.close(true);
-                    } else {
-                      $modalInstance.close(false);
-                    }
+                  $scope.cancel = function() {
+                    $modalInstance.dismiss();
+                  };
+
+                  $scope.resetCode = function() {
+                    $modalInstance.close(true);
                   };
                 }]
-            });
-            resetConfirmed.result.then(function(result) {
+            }).result.then(function(result) {
               if (result) {
                 pce.setCode($scope.initialCode);
               }
