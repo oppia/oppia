@@ -3662,6 +3662,13 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 .oppia-activity-summary-popover .popover.top {
   margin-top: 10px;
+  /*
+    This moves the base of the popover down to the second line of the
+    objective. Unfortunately, the !important is needed here because the styles
+    on the popover are set inline, so they override any CSS selectors in this
+    file regardless of how specific they are.
+  */
+  top: 100px !important;
 }
 .oppia-activity-summary-popover .popover-content {
   padding: 8px 8px;
