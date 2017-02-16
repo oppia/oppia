@@ -92,7 +92,10 @@ UI_CONFIG_SPECS = {
         'coding_mode': {
             'type': SCHEMA_TYPE_UNICODE,
             'choices': ['none', 'python', 'coffeescript'],
-        }
+        },
+        'placeholder': {
+            'type': SCHEMA_TYPE_UNICODE,
+        },
     },
 }
 
