@@ -40,13 +40,16 @@
 
 <script type="text/ng-template" id="modals/pencilCodeResetConfirmation">    
   <div class="modal-header">
-    <h4 class="modal-title">Confirmation Required</h4>
+    <h4 class="modal-title">
+      <span translate="I18N_INTERACTIONS_PENCILCODEEDITOR_CONFIRMATION_REQUIRED"></span>
+    </h4>
   </div>
   <div class="modal-body">
-    <p>Are you sure you want to reset your code?</p>
+    <span translate="I18N_INTERACTIONS_PENCILCODEEDITOR_ARE_YOU_SURE_YOU_WANT_TO_RESET_YOUR_CODE?">
+    </span>
   </div>
   <div class="modal-footer">
-    <button type="button" ng-click="cancel()" class="btn btn-default" data-dismiss="modal">Cancel</button>
-    <button type="button" ng-click="resetCode()" class="btn btn-danger" data-dismiss="modal">Reset Code</button>
+    <button type="button" ng-click="cancel()" class="btn btn-default" data-dismiss="modal" translate="I18N_INTERACTIONS_PENCILCODEEDITOR_CANCEL"></button>
+    <button type="button" ng-click="resetCode()" class="btn btn-danger" data-dismiss="modal" translate="I18N_INTERACTIONS_PENCILCODEEDITOR_RESET_CODE"></button>
   </div>
 </script>
