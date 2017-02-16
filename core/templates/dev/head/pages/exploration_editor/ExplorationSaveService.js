@@ -199,7 +199,7 @@ oppia.factory('explorationSaveService', [
 
       discardChanges: function() {
         var confirmDiscard = $modal.open({
-          templateUrl: 'modals/confirmationModal',
+          templateUrl: 'modals/confirmDiscardChanges',
           backdrop: 'static',
           keyboard: false,
           controller: [
