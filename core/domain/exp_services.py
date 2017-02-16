@@ -244,7 +244,6 @@ def get_exploration_summary_by_id(exploration_id):
     Returns:
         ExplorationSummary. The summary domain object corresponding to the
         given exploration.
-
     """
     # TODO(msl): Maybe use memcache similarly to get_exploration_by_id.
     exp_summary_model = exp_models.ExpSummaryModel.get(
@@ -331,7 +330,7 @@ def is_exp_summary_editable(exp_summary, user_id=None):
 
     Args:
         exp_summary: ExplorationSummary. An ExplorationSummary domain object.
-        user_id: str. ID of the user whose permissions are being checked.
+        user_id: str. The id of the user whose permissions are being checked.
 
     Returns:
         bool. Whether the user has permissions to edit the exploration.
@@ -354,7 +353,7 @@ def get_exploration_titles_and_categories(exp_ids):
 
     Args:
         exp_ids: list(str). A list of exploration ids of exploration domain
-        objects.
+            objects.
 
     Returns:
         dict. The keys are exploration ids and the corresponding values are
@@ -540,7 +539,8 @@ def export_to_zip_file(exploration_id, version=None):
             exploration is exported.
 
     Returns:
-        zipfile. A ZIP archive of the exploration.
+        str. The contents of the ZIP archive of the exploration (which can be
+        subsequently converted into a zip file via zipfile.ZipFile()).
     """
     exploration = get_exploration_by_id(exploration_id, version=version)
     yaml_repr = exploration.to_yaml()
@@ -818,7 +818,7 @@ def _create_exploration(
 
     Args:
         committer_id: str. The id of the user who made the commit.
-        exploration: exploration. The exploration domain object.
+        exploration: Exploration. The exploration domain object.
         commit_message: str. The commit description message.
         commit_cmds: list(dict). A list of commands, describing changes
             made in this model, which should give sufficient information to
@@ -858,7 +858,7 @@ def save_new_exploration(committer_id, exploration):
     """Saves a newly created exploration.
 
     Args:
-        committer_id: str. ID of the user who made the commit.
+        committer_id: str. The id of the user who made the commit.
         exploration: Exploration. The exploration domain object to be saved.
     """
     commit_message = (
@@ -886,8 +886,8 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     datastore. This last option is the preferred one.
 
     Args:
-        committer_id: str. ID of the user who made the commit.
-        exploration_id: str. ID of the exploration to be deleted.
+        committer_id: str. The id of the user who made the commit.
+        exploration_id: str. The id of the exploration to be deleted.
         force_deletion: bool. If True, completely deletes the storage models
             corresponding to the exploration. Otherwise, marks them as deleted
             but keeps the corresponding models in the datastore.
@@ -976,7 +976,7 @@ def publish_exploration_and_update_user_profiles(committer_id, exp_id):
     valid prior to publication.
 
     Args:
-        committer_id: str. ID of the user who made the commit.
+        committer_id: str. The id of the user who made the commit.
         exp_id: str. The id of the exploration to be published.
     """
     rights_manager.publish_exploration(committer_id, exp_id)
@@ -1235,8 +1235,8 @@ def revert_exploration(
     """Reverts an exploration to the given version number. Commits changes.
 
     Args:
-        committer_id: str. ID of the user who made the commit.
-        exploration_id: str. ID of the exploration to be reverted to the
+        committer_id: str. The id of the user who made the commit.
+        exploration_id: str. The id of the exploration to be reverted to the
             current version.
         current_version: int. The current version of the exploration.
         revert_to_version: int. The version to which the given exploration
@@ -1390,7 +1390,7 @@ def load_demo(exploration_id):
     its initial creation and one for its subsequent modification.)
 
     Args:
-        exploration_id: str. ID of the demo exploration.
+        exploration_id: str. The id of the demo exploration.
 
     Raises:
         Exception: The exploration id provided is invalid.
@@ -1419,7 +1419,7 @@ def get_next_page_of_all_commits(
         page_size=feconf.COMMIT_LIST_PAGE_SIZE, urlsafe_start_cursor=None):
     """Returns a page of commits to all explorations in reverse time order.
 
-    The return value is a triple (results, cursor, more) as described in
+    The return value is a tuple (results, cursor, more) as described in
     fetch_page() at:
 
         https://developers.google.com/appengine/docs/python/ndb/queryclass
@@ -1431,8 +1431,13 @@ def get_next_page_of_all_commits(
             the beginning of the list of commits.
 
     Returns:
-        list(ExplorationCommitLogEntry),str. A list containing
-        ExplorationCommitlogEntry domain object, the position of the cursor.
+        tuple. A 3-tuple consisting of:
+            - list(ExplorationCommitLogEntry). A list containing
+              ExplorationCommitlogEntry domain objects.
+            - str. The postion of the cursor.
+            - bool. indicating whether there are (likely) more results after
+              this batch. If False, there are no more results; if True, there
+              are probably more results.
     """
     results, new_urlsafe_start_cursor, more = (
         exp_models.ExplorationCommitLogEntryModel.get_all_commits(
@@ -1452,7 +1457,7 @@ def get_next_page_of_all_non_private_commits(
     """Returns a page of non-private commits in reverse time order. If max_age
     is given, it should be a datetime.timedelta instance.
 
-    The return value is a triple (results, cursor, more) as described in
+    The return value is a tuple (results, cursor, more) as described in
     fetch_page() at:
 
         https://developers.google.com/appengine/docs/python/ndb/queryclass
@@ -1464,11 +1469,13 @@ def get_next_page_of_all_non_private_commits(
             beginning of the list of commits.
 
     Returns:
-        tuple. A 2-tuple consisting of:
-            -list(ExplorationCommitLogEntry). A list containing
-                ExplorationCommitlogEntry domain object
-            -str. The postion of the cursor.
-
+        tuple. A 3-tuple consisting of:
+            - list(ExplorationCommitLogEntry). A list containing
+              ExplorationCommitlogEntry domain objects.
+            - str. The postion of the cursor.
+            - bool. indicating whether there are (likely) more results after
+              this batch. If False, there are no more results; if True, there
+              are probably more results.
     Raises:
         ValueError: The argument max_age is not datetime.timedelta or None.
     """
@@ -1490,12 +1497,15 @@ def get_next_page_of_all_non_private_commits(
 
 def _exp_rights_to_search_dict(rights):
     # Allow searches like "is:featured".
-    """
+    """Returns a search dict with information about the exploration rights. This
+    allows searches like "is:featured".
     Args:
         rights: ActivityRights. Domain object for the rights/publication status
             of the exploration.
 
     Returns:
+        dict.  If the status of the given exploration is publicized then it
+        returns a dict with a key "is" and value as "featured" else an empty
         dict.
     """
     doc = {}
@@ -1676,7 +1686,7 @@ def patch_exploration_search_document(exp_id, update):
     from the 'update' dictionary.
 
     Args:
-        exp_id: str. ID of the exploration to be patched.
+        exp_id: str. The id of the exploration to be patched.
         update: dict. Key-value pairs to patch the exploration's search
             document with.
     """
@@ -1731,10 +1741,10 @@ def search_explorations(query, limit, sort=None, cursor=None):
 
     Returns:
         tuple. A 2-tuple consisting of:
-        - list(str). A list of exploration ids that match the query.
-        - str or None. A cursor if there are more matching explorations to
-        fetch, None otherwise. If a cursor is returned, it will be a web-safe
-        string that can be used in URLs.
+            - list(str). A list of exploration ids that match the query.
+            - str or None. A cursor if there are more matching explorations to
+              fetch, None otherwise. If a cursor is returned, it will be a
+              web-safe string that can be used in URLs.
     """
     return search_services.search(
         query, SEARCH_INDEX_EXPLORATIONS, cursor, limit, sort, ids_only=True)
@@ -1748,7 +1758,7 @@ def _is_suggestion_valid(thread_id, exploration_id):
     Args:
         thread_id: str. Thread id of the feedback thread containing the
             suggestion.
-        exploration_id: str. ID of the exploration.
+        exploration_id: str. The id of the exploration.
 
     Returns:
         bool. Whether the suggestion is still valid.
@@ -1767,7 +1777,7 @@ def _is_suggestion_handled(thread_id, exploration_id):
     Args:
         thread_id: str. Thread id of the feedback thread containing the
             suggestion.
-        exploration_id: str. ID of the exploration.
+        exploration_id: str. The id of the exploration.
 
     Returns:
         bool. Whether the current suggestion has already been acted upon (i.e.,
@@ -1835,8 +1845,9 @@ def accept_suggestion(editor_id, thread_id, exploration_id, commit_message):
 
     Args:
         editor_id: str. The user id of the editor.
-        thread_id: str. ID of the suggestion thread.
-        exploration_id: str. ID of the exploration that the suggestion is for.
+        thread_id: str. The id of the suggestion thread.
+        exploration_id: str. The id of the exploration that the suggestion is
+            for.
         commit_message: str. The commit message.
 
     Raises:
@@ -1873,8 +1884,9 @@ def reject_suggestion(editor_id, thread_id, exploration_id):
 
     Args:
         editor_id: str. User id of the editor.
-        thread_id: str. ID of the suggestion thread.
-        exploration_id: str. ID of the exploration that the suggestion is for.
+        thread_id: str. The id of the suggestion thread.
+        exploration_id: str. The id of the exploration that the suggestion is
+            for.
 
     Raises:
         Exception: The suggestion has already been accepted or rejected.
@@ -1896,7 +1908,7 @@ def is_version_of_draft_valid(exp_id, version):
     exploration.
 
     Args:
-        exp_id: str. ID of the exploration.
+        exp_id: str. The id of the exploration.
         version: int. The draft version which is to be validate.
 
     Returns:
@@ -1917,8 +1929,8 @@ def create_or_update_draft(
     given user and exploration.
 
     Args:
-        exp_id: str. ID of the exploration.
-        user_id: str. ID of the user.
+        exp_id: str. The id of the exploration.
+        user_id: str. The id of the user.
         change_list: list(str). A list that contains the changes to be made to
             the ExplorationUserDataModel object.
         exp_version: int. The current version of the exploration.
@@ -1947,7 +1959,7 @@ def get_exp_with_draft_applied(exp_id, user_id):
     apply it to the exploration.
 
     Args:
-        exp_id: str. ID of the exploration.
+        exp_id: str. The id of the exploration.
         user_id: str. The id of the user whose draft is to be applied.
     """
 
