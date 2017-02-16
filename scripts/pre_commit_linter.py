@@ -495,8 +495,9 @@ def _check_newline_character(all_files):
                 f.seek(-2, 2)
                 if not (f.read(1) != '\n' and f.read(1) == '\n'):
                     failed = True
-                    print '%s --> Please ensure that this file ends \
-                        with exactly one newline char.' % filename
+                    print (
+                        '%s --> Please ensure that this file ends'
+                        'with exactly one newline char.' % filename
                     total_error_count += 1
 
     if failed:
