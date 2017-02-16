@@ -30,7 +30,7 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
       templateUrl: 'interaction/PencilCodeEditor',
       controller: [
         '$scope', '$attrs', '$element', '$timeout', 'focusService',
-        '$modal','pencilCodeEditorRulesService',
+        '$modal', 'pencilCodeEditorRulesService',
         function($scope, $attrs, $element, $timeout, focusService,
           $modal, pencilCodeEditorRulesService) {
           $scope.initialCode = oppiaHtmlEscaper.escapedJsonToObj(
