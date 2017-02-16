@@ -55,7 +55,7 @@ oppia.factory('routerService', [
         // This can happen when clicking on links whose href is "#".
         return;
       }
-      if (newPath === '/' && oldPath === '/gui/Introduction') {
+      if (newPath === '/' && oldPath.includes('/gui/')) {
         $window.history.go(-1);
       }
 
