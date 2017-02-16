@@ -168,7 +168,8 @@ body {
   width: 129.42px;
 }
 
-.oppia-subscription-button:hover {
+.oppia-subscription-button:hover,
+.oppia-subscription-button:focus {
   background-color: #05beb2;
   color: white;
 }
@@ -635,7 +636,8 @@ textarea {
   padding: 1em 0 1em 18px;
   text-decoration: none;
 }
-.oppia-sidebar-menu a:hover {
+.oppia-sidebar-menu a:hover,
+.oppia-sidebar-menu a:focus {
   background: rgb(243, 248, 255);
 }
 .oppia-sidebar-menu li.active a {
@@ -738,8 +740,8 @@ textarea {
   text-decoration: none;
 }
 .oppia-footer-social a:focus > img,
-.protractor-test-i18n-language-selector:focus {
-  outline: auto 2px Highlight;
+.oppia-language-selector:focus {
+  outline: 1px dotted #FFF;
   outline: auto 5px -webkit-focus-ring-color;
 }
 .oppia-footer-social a > img {
@@ -2012,7 +2014,7 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-close-popover-button:focus {
-  outline: auto 2px Highlight;
+  outline: 1px dotted #212121;
   outline: auto 5px -webkit-focus-ring-color;
 }
 
@@ -2531,7 +2533,8 @@ div#ng-curtain {
   opacity: 1;
 }
 .oppia-navbar-menu:focus {
-  outline: 2px solid white;
+  outline: 1px dotted #212121;
+  outline: auto 5px -webkit-focus-ring-color;
 }
 
 .oppia-navbar-brand-name {
@@ -2955,7 +2958,7 @@ div#ng-curtain {
 }
 
 .oppia-rating-star-active,
-.protractor-test-rating-star:focus {
+.oppia-rating-star:focus {
   color: #FFD700;
 }
 
@@ -3241,7 +3244,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-info-card-exploration-contributors-profile li a:focus .img-circle {
-  outline: auto 2px Highlight;
+  outline: 1px dotted #212121;
   outline: auto 5px -webkit-focus-ring-color;
 }
 
