@@ -30,9 +30,9 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
       templateUrl: 'interaction/PencilCodeEditor',
       controller: [
         '$scope', '$attrs', '$element', '$timeout', 'focusService',
-        'pencilCodeEditorRulesService', '$modal',
+        '$modal','pencilCodeEditorRulesService',
         function($scope, $attrs, $element, $timeout, focusService,
-            pencilCodeEditorRulesService, $modal) {
+          $modal, pencilCodeEditorRulesService) {
           $scope.initialCode = oppiaHtmlEscaper.escapedJsonToObj(
             $attrs.initialCodeWithValue);
           var iframeDiv = $element.find('.pencil-code-editor-iframe').get(0);
@@ -70,7 +70,7 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
 
           $scope.reset = function() {
             var resetConfirmed = $modal.open({
-              templateUrl: 'modals/confirmationModal',
+              templateUrl: 'modals/pencilCodeResetConfirmation',
               backdrop: 'static',
               keyboard: false,
               controller: [
