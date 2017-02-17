@@ -90,10 +90,10 @@ class ParamChange(object):
 
         Args:
             name: unicode. The name of the parameter.
-            generator_id: unicode. The type of generator used to create the parameter.
-                eg. Copier
-            customization_args: dict. A dict containing all the arguments including the
-                value of the parameter.
+            generator_id: unicode. The type of generator used to create the
+            parameter. eg. Copier
+            customization_args: dict. A dict containing all the arguments 
+            including the value of the parameter.
         """
         # TODO(sll): Check that all required args for customization exist in
         # customization_args.
