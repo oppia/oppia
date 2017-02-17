@@ -113,7 +113,7 @@ oppia.directive('explorationSummaryTile', [function() {
 
         $scope.getLastUpdatedDatetime = function() {
           if (!$scope.getLastUpdatedMsec()) {
-            return false;
+            return null;
           }
           return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
             $scope.getLastUpdatedMsec());
@@ -121,7 +121,7 @@ oppia.directive('explorationSummaryTile', [function() {
 
         $scope.getExplorationLink = function() {
           if (!$scope.getExplorationId()) {
-            return false;
+            return null;
           } else {
             var result = '/explore/' + $scope.getExplorationId();
             if ($scope.getCollectionId()) {

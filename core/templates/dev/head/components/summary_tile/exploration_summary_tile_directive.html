@@ -69,7 +69,7 @@
             <span class="fa fa-eye fa-lg" tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>" tooltip-placement="top">
             </span>
             <span ng-if="getNumViews()">
-            <[getNumViews() | summarizeNonnegativeNumber]>
+              <[getNumViews() | summarizeNonnegativeNumber]>
             </span>
             <span ng-if="!getNumViews()" translate="I18N_LIBRARY_N/A" class="grayout">
             </span>
@@ -79,7 +79,7 @@
             <span ng-if="getLastUpdatedDatetime()">
               <[getLastUpdatedDatetime()]>
             </span>
-            <span ng-if="!getLastUpdatedDatetime()" translate="I18N_LIBRARY_N/A" class="grayout">
+            <span ng-if="!getLastUpdatedDatetime()" translate="I18N_LIBRARY_N/A" class="oppia-activity-summary-tile inactive-summary-tile-attribute">
             </span>
           </li>
         </ul>
@@ -103,8 +103,7 @@
     min-width: 200px;
   }
 
-  .grayout {
+  .oppia-activity-summary-tile .inactive-summary-tile-attribute {
     opacity: 0.5;
-    filter: alpha(opacity = 50); /*IE*/
   }
 </style>
