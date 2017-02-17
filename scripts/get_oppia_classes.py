@@ -3,13 +3,13 @@ import re
 import bs4
 
 
-def return_all_files(dir):
+def return_all_files(di):
     """
     expects a directory name to search in
     returns all the files in the directory and subdirectories
     """
     val = []
-    for root, subdir, files in os.walk(dir):
+    for root, subdir, files in os.walk(di):
         for f in files:
             val.append(os.path.join(root, f))
 
@@ -53,7 +53,7 @@ def file_find_matching_classes(file_name, pattern):
 
     list_oppia_classes = []
 
-    #iterating through the list and output the result if there is a match
+    # iterating through the list and output the result if there is a match
     for i in all_classes:
         if i is None:
             continue
@@ -70,7 +70,7 @@ def print_output(file_dict):
     expects file dictionary with file as keys and classes as values
     outputs in proper format
     """
-    for i in file_dict.keys() :
+    for i in file_dict.keys():
         if len(file_dict[i]) == 0:
             continue
         print '$ ',
@@ -83,14 +83,15 @@ def print_output(file_dict):
 def give_unique_classes(file_dict):
     """
     expects file dictionary with file as keys and classes as values
-    return dict with file as keys and only those classes that are present uniquely in the file
+    return dict with file as keys and only those classes that are
+    present uniquely in the file
     """
     val = {}
     for i in file_dict.keys():
         val[i] = []
         for j in file_dict[i]:
             check_if_class_exist_in_some_other_file = 0
-            for k in file_dict.keys() :
+            for k in file_dict.keys():
                 if k == i:
                     continue
                 for z in file_dict[k]:
@@ -104,11 +105,11 @@ def give_unique_classes(file_dict):
 
 DIRECTORY = raw_input('Enter path to directory  ')
 
-#pattern for matching directive html files
-FILE_PATTERN = re.compile('.*directive\.html')
+# pattern for matching directive html files
+FILE_PATTERN = re.compile(r'.*directive\.html')
 
-#pattern for matching the classes
-FIND_PATTERN = re.compile('.*oppia.*')
+# pattern for matching the classes
+FIND_PATTERN = re.compile(r'.*oppia.*')
 
 ALL_FILES_IN_PATH = return_all_files(DIRECTORY)
 
@@ -116,10 +117,11 @@ DIRECTIVE_FILES = return_matched_files(ALL_FILES_IN_PATH, FILE_PATTERN)
 
 LIST_FILE_CLASSES = {}
 
-for file in DIRECTIVE_FILES:
-    LIST_FILE_CLASSES[file] = file_find_matching_classes(file, FIND_PATTERN)
+for fl in DIRECTIVE_FILES:
+    LIST_FILE_CLASSES[fl] = file_find_matching_classes(fl, FIND_PATTERN)
 
 # print_output(LIST_FILE_CLASSES)
 
 print_output(give_unique_classes(LIST_FILE_CLASSES))
+
 
