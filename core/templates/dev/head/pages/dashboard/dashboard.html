@@ -24,7 +24,7 @@
 {% block content %}
   <background-banner></background-banner>
   <div class="oppia-dashboard-container" ng-controller="Dashboard" style="position: relative;">
-    <div class="oppia-dashboard-aggregated-stats" ng-if="explorationsList.length > 0 || subscribersList.length > 0">
+    <div class="oppia-dashboard-aggregated-stats" ng-if="explorationsList.length > 0 || collectionsList.length > 0">
       <md-card layout="row">
         <div class="average-ratings stats-card">
           <p class="stat-description">Average Rating</p>
@@ -51,9 +51,10 @@
       </md-card>
     </div>
 
-    <div ng-if="explorationsList.length > 0 || collectionsList.length > 0 || subscribersList.length > 0">
+    <div ng-if="explorationsList.length > 0 || collectionsList.length > 0">
       <ul class="oppia-dashboard-tabs">
-        <li ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myExplorations'}">
+        <li ng-if="explorationsList.length > 0"
+            ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myExplorations'}">
           <a class="oppia-dashboard-tabs-text"
              ng-click="setActiveTab('myExplorations')"
              translate="I18N_DASHBOARD_EXPLORATIONS">
@@ -97,14 +98,14 @@
       </ul>
     </div>
 
-    <div ng-if="explorationsList.length === 0 && collectionsList.length === 0 && subscribersList.length === 0">
+    <div ng-if="explorationsList.length === 0 && collectionsList.length === 0">
       <h2 class="oppia-dashboard-title">
         Creator Dashboard
       </h2>
     </div>
 
     <div ng-if="activeTab === 'myExplorations'">
-      <div ng-if="explorationsList.length === 0" class="oppia-dashboard-empty-text">
+      <div ng-if="explorationsList.length === 0 && collectionsList.length === 0" class="oppia-dashboard-empty-text">
         <md-card layout="row"
                  class="oppia-page-card oppia-dashboard-intro-card"
                  style="margin-top: 0;">
@@ -125,10 +126,7 @@
         </md-card>
       </div>
 
-      <div ng-if="explorationsList.length > 0" class="oppia-dashboard-tab-panel" style="padding-top: 13px;">
-        <span class="oppia-dashboard-total-elements">
-          You have a total of <[explorationsList.length]> explorations.
-        </span>
+      <div ng-if="explorationsList.length > 0" class="oppia-dashboard-tab-panel" style="padding-top: 13px; padding-bottom: 46px;">
         <span class="sort-explorations-select"
               ng-if="activeTab === 'myExplorations'" 
               ng-class="{'sort-explorations-select-three-tabs': (collectionsList.length !== 0 && subscribersList.length !== 0)}"
@@ -323,8 +321,14 @@
 
     <div ng-if="activeTab === 'mySubscribers'" style="margin-top: 8px;">
       <div class="oppia-dashboard-tab-panel">
-        <span style="margin-top: 14px; display: inline-block;">
-          You have a total of <[subscribersList.length]> subscribers.
+        <span ng-if="subscribersList.length > 1"
+              style="margin-top: 14px; display: inline-block;"
+              translate="I18N_TOTAL_SUBSCRIBERS_TEXT"
+              translate-values="{totalSubscribers: <[subscribersList.length]>}">>
+        </span>
+        <span ng-if="subscribersList.length === 1"
+              style="margin-top: 14px; display: inline-block;"
+              translate="I18N_ONE_SUBSCRIBER_TEXT">
         </span>
         <span class="sort-explorations-select"
               ng-if="activeTab === 'mySubscribers'"
@@ -368,11 +372,6 @@
 
         <ul class="oppia-dashboard-tiles"
             ng-if="activeTab === 'myCollections' && collectionsList.length > 0">
-          <div class="oppia-dashboard-tab-panel">
-            <span style="margin-top: 8px; display: inline-block;">
-              You have a total of <[collectionsList.length]> collections.
-            </span>
-          </div>
           <span ng-repeat="collection in collectionsList">
             <collection-summary-tile collection-id="collection.id"
                                      collection-title="collection.title"

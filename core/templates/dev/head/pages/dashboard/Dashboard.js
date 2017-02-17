@@ -92,7 +92,6 @@ oppia.controller('Dashboard', [
     $scope.unresolvedAnswersIconUrl = UrlInterpolationService.getStaticImageUrl(
       '/icons/unresolved_answers.svg');
 
-    $scope.activeTab = 'myExplorations';
     $scope.setActiveTab = function(newActiveTabName) {
       $scope.activeTab = newActiveTabName;
     };
@@ -199,6 +198,12 @@ oppia.controller('Dashboard', [
           $scope.relativeChangeInTotalPlays = (
             $scope.dashboardStats.total_plays - $scope.lastWeekStats.total_plays
           );
+        }
+        if ($scope.explorationsList.length === 0 &&
+          $scope.collectionsList.length > 0) {
+          $scope.activeTab = 'myCollections';
+        } else {
+          $scope.activeTab = 'myExplorations';
         }
         $rootScope.loadingMessage = '';
       },
