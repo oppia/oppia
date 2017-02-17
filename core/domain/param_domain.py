@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Classes relating to parameters."""
+"""Domain object relating to parameters."""
 
 import re
 
@@ -26,19 +26,48 @@ import utils
 
 class ParamSpec(object):
     """Value object for an exploration parameter specification."""
+
     def __init__(self, obj_type):
+        """Initializes a ParamSpec object with the specified object type
+
+        Args:
+            obj_type: unicode. The object type with which the parameter is initialized.
+        """
         self.obj_type = obj_type
 
+    
+
     def to_dict(self):
+        """Adds the object type to a dict, with the key as `obj_type`
+        and the value as the type of the object eg.(UnicodeString). 
+
+        Returns:
+            dict. The key of the dict is `obj_type` and the value is the type of the 
+                parameter.
+        """
         return {
             'obj_type': self.obj_type,
         }
 
+
     @classmethod
     def from_dict(cls, param_spec_dict):
+        """Object from param_spec_dict.
+
+        Args:
+            param_spec_dict: dict. The dictionary containing specifications of all the
+                parameters.
+
+        Returns: 
+            ParamSpec object: A ParamSpec object created from the specified object type.
+        """
+
         return cls(param_spec_dict['obj_type'])
 
+
     def validate(self):
+        """Validate the existence of the object class. """
+
         # Ensure that this object class exists.
         obj_services.Registry.get_object_class_by_type(self.obj_type)
 
@@ -57,25 +86,49 @@ class ParamChange(object):
     """Value object for a parameter change."""
 
     def __init__(self, name, generator_id, customization_args):
+        """Initialze a ParamChange object with the specified arguments
 
+        Args:
+            name: unicode. The name of the parameter.
+            generator_id: unicode. The type of generator used to create the parameter.
+                eg. Copier
+            customization_args: dict. A dict containing all the arguments including the
+                value of the parameter.
+        """
         # TODO(sll): Check that all required args for customization exist in
         # customization_args.
-
         self._name = name
         self._generator_id = generator_id
         self._customization_args = customization_args
 
+
     @property
     def name(self):
+        """The name of the changing parameter.
+
+        Returns:
+            self.name: unicode. The name of the parameter.
+        """
         return self._name
 
     @property
     def generator(self):
+        """The generator of the changing parameter
+
+        Returns:
+            generator object: The generator object for the parameter.
+        """
         return value_generators_domain.Registry.get_generator_class_by_id(
             self._generator_id)()
 
     @property
     def customization_args(self):
+        """The customization arguments of the changing parameter
+
+        Returns:
+            dict: A dict specifying the customization arguments for the 
+            parameter.
+        """
         return self._customization_args
 
     def to_dict(self):
@@ -87,6 +140,14 @@ class ParamChange(object):
 
     @classmethod
     def from_dict(cls, param_change_dict):
+        """Create a ParamChange object with the specified arguments.
+
+        Args:
+            param_change_dict: dict. A dict containing data about the changing parameter
+                (customization arguments, name, generator).
+        Returns:
+            ParamChange object: An object of class ParamChange. 
+        """
         return cls(
             param_change_dict['name'], param_change_dict['generator_id'],
             param_change_dict['customization_args']
@@ -104,6 +165,7 @@ class ParamChange(object):
             obj_type).normalize(raw_value)
 
     def validate(self):
+        """Validate the ParamChange object against multiple checks"""
         if not isinstance(self.name, basestring):
             raise utils.ValidationError(
                 'Expected param_change name to be a string, received %s'
