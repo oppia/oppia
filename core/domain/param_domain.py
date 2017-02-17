@@ -143,8 +143,9 @@ class ParamChange(object):
         """Create a ParamChange object with the specified arguments.
 
         Args:
-            param_change_dict: dict. A dict containing data about the changing parameter
-                (customization arguments, name, generator).
+            param_change_dict: dict. A dict containing data about the 
+            changing parameter (customization arguments, name, generator).
+                
         Returns:
             ParamChange object: An object of class ParamChange. 
         """
