@@ -3685,8 +3685,29 @@ md-card.preview-conversation-skin-supplemental-card {
     transform: translateY(-50%);
     float: right;
   }
+}
 
-
+/* Styles for the popover on the exploration and collection summary tiles. */
+.oppia-activity-summary-popover .popover.right {
+  bottom: -10px;
+  min-width: 200px;
+}
+.oppia-activity-summary-popover .popover.top {
+  margin-top: 10px;
+  /*
+    This moves the base of the popover down to the second line of the
+    objective. Unfortunately, the !important is needed here because the styles
+    on the popover are set inline, so they override any CSS selectors in this
+    file regardless of how specific they are.
+  */
+  top: 100px !important;
+}
+.oppia-activity-summary-popover .popover-content {
+  padding: 8px 8px;
+}
+.oppia-activity-summary-popover .popover {
+  font-size: 14px;
+  line-height: 1.42857143;
 }
 
 .oppia-activity-summary-tile {
@@ -3959,7 +3980,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-dashboard-card-view-item {
-  height: inherit;
+  height: 250px;
   margin-left: 7.5px;
   margin-right: 7.5px;
   position: static;
