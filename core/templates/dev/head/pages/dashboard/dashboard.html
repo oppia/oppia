@@ -60,7 +60,7 @@
           </a>
         </li>
         {% if not can_create_collections %}
-          <!-- A layout fix when the 'My Collections' tab is absent -->
+          <!-- A layout fix when the 'My Collections' tab is absent. -->
           <li ng-if="collectionsList.length === 0 && subscribersList.length === 0"></li>
         {% endif %}
         {% if can_create_collections %}

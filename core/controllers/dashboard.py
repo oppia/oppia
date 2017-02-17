@@ -248,14 +248,13 @@ class DashboardHandler(base.BaseHandler):
         subscribers_settings = user_services.get_users_settings(subscriber_ids)
         subscribers_list = []
         for index, subscriber_settings in enumerate(subscribers_settings):
-            subscriber_summary = {}
-
-            subscriber_summary['subscriber_picture_data_url'] = (
-                subscriber_settings.profile_picture_data_url)
-            subscriber_summary['subscriber_username'] = (
-                subscriber_settings.username)
-            subscriber_summary['subscriber_impact'] = (
-                user_services.get_user_impact_score(subscriber_ids[index]))
+            subscriber_summary = {
+                'subscriber_picture_data_url': (
+                    subscriber_settings.profile_picture_data_url),
+                'subscriber_username': subscriber_settings.username,
+                'subscriber_impact': (
+                    user_services.get_user_impact_score(subscriber_ids[index]))
+            }
 
             subscribers_list.append(subscriber_summary)
 

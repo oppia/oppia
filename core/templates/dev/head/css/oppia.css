@@ -1301,7 +1301,7 @@ textarea {
   color: #fff;
 }
 
-li.sort-explorations-select, span.sort-explorations-select {
+span.sort-explorations-select {
   display: inline-block;
   margin-right: auto;
   width: auto;

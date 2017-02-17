@@ -149,15 +149,14 @@ class PreferencesHandler(base.BaseHandler):
         subscription_list = []
 
         for index, creator_settings in enumerate(creators_settings):
-            subscription_summary = {}
-
-            subscription_summary['creator_picture_data_url'] = (
-                creator_settings.profile_picture_data_url)
-            subscription_summary['creator_username'] = (
-                creator_settings.username)
-            subscription_summary['creator_impact'] = (
-                user_services.get_user_impact_score(
-                    creators_subscribed_to[index]))
+            subscription_summary = {
+                'creator_picture_data_url': (
+                    creator_settings.profile_picture_data_url),
+                'creator_username': creator_settings.username,
+                'creator_impact': (
+                    user_services.get_user_impact_score(
+                        creators_subscribed_to[index]))
+            }
 
             subscription_list.append(subscription_summary)
 
