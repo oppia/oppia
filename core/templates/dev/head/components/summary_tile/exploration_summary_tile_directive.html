@@ -60,7 +60,7 @@
               <span ng-if="getAverageRating()">
                 <[getAverageRating() | number:1]>
               </span>
-              <span ng-if="!getAverageRating()" translate="I18N_LIBRARY_N/A" class="grayout">
+              <span ng-if="!getAverageRating()" translate="I18N_LIBRARY_N/A" class=".oppia-activity-summary-tile .inactive-summary-tile-attribute ">
               </span>
             </span>
           </li>
@@ -71,7 +71,7 @@
             <span ng-if="getNumViews()">
               <[getNumViews() | summarizeNonnegativeNumber]>
             </span>
-            <span ng-if="!getNumViews()" translate="I18N_LIBRARY_N/A" class="grayout">
+            <span ng-if="!getNumViews()" translate="I18N_LIBRARY_N/A" class=".oppia-activity-summary-tile .inactive-summary-tile-attribute ">
             </span>
           </li>
 
