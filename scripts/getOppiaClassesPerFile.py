@@ -31,7 +31,7 @@ for i in all_classes:
     else:
         for j in i:
             if find_match.match(j):
-            list_oppia_classes.append(j)
+                list_oppia_classes.append(j)
 
 for i in set(list_oppia_classes):
     print i
