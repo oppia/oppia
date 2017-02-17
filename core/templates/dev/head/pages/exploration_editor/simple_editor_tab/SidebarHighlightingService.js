@@ -21,6 +21,7 @@ oppia.factory('SidebarHighlightingService', [
   'QuestionIdService',
   function(QuestionIdService) {
     var ERROR_CLASS = 'error';
+    var ICON_ELM = '<i class="material-icons">&#xE001;</i>';
     // Any file using this service has access to both
     // errorHighlight and undoErrorHighlight functions.
     return {
@@ -29,9 +30,8 @@ oppia.factory('SidebarHighlightingService', [
           if (!angular.isDefined(id)) {
             return;
           } else {
-            var elm = angular.element(document.getElementById(
-              QuestionIdService.SIDEBAR_PREFIX + id)
-            );
+            var elm = angular.element(document.getElementById(id));
+            elm.append(ICON_ELM);
             elm.addClass(ERROR_CLASS);
           }
         },
@@ -40,10 +40,9 @@ oppia.factory('SidebarHighlightingService', [
           if (!angular.isDefined(id)) {
             return;
           } else {
-            var elm = angular.element(document.getElementById(
-              QuestionIdService.SIDEBAR_PREFIX + id)
-            );
+            var elm = angular.element(document.getElementById(id));
             elm.removeClass(ERROR_CLASS);
+            elm.remove(ICON_ELM);
           }
         }
     };
