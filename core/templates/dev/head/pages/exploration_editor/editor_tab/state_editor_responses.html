@@ -6,7 +6,7 @@
   <md-card class="oppia-editor-card-with-avatar">
     <div class="oppia-editor-card-body">
       <div ng-if="answerGroups.length > 0">
-        <ul class="nav nav-stacked nav-pills" role="tablist" ui-sortable="ANSWER_GROUP_LIST_SORTABLE_OPTIONS" ng-model="answerGroups">
+        <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist" ui-sortable="ANSWER_GROUP_LIST_SORTABLE_OPTIONS" ng-model="answerGroups">
           <!-- An HTML element marked ui-sortable should contain only one element,
           and this element should have an ng-repeat defined on it. See the
           ui-sortable documentation for more details. -->
@@ -53,7 +53,7 @@
       </div>
 
       <div>
-        <ul class="nav nav-stacked nav-pills" role="tablist">
+        <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
           <li ng-class="{'active': activeAnswerGroupIndex === answerGroups.length}" class="oppia-rule-block">
             <div class="oppia-rule-header-warning-placement" ng-if="isSelfLoopWithNoFeedback(defaultOutcome) && !suppressDefaultAnswerGroupWarnings()" ng-click="changeActiveAnswerGroupIndex(answerGroups.length)"
                  tooltip="<[getOutcomeTooltip(defaultOutcome)]>" tooltip-placement="bottom">

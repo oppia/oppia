@@ -281,3 +281,90 @@ class BulkEmailModel(base_models.BaseModel):
             sender_email=sender_email, intent=intent, subject=subject,
             html_body=html_body, sent_datetime=sent_datetime)
         email_model_instance.put()
+
+
+REPLY_TO_ID_LENGTH = 84
+
+class FeedbackEmailReplyToIdModel(base_models.BaseModel):
+    """This model stores unique_id for each <user, exploration, thread>
+    combination.
+
+    This unique_id is used in reply-to email address in outgoing feedback and
+    suggestion emails. The id/key of instances of this model has form of
+    [USER_ID].[EXPLORATION_ID].[THREAD_ID]
+    """
+    # The reply-to ID that is used in the reply-to email address.
+    reply_to_id = ndb.StringProperty(indexed=True, required=True)
+
+    @classmethod
+    def _generate_id(cls, user_id, exploration_id, thread_id):
+        return '.'.join([user_id, exploration_id, thread_id])
+
+    @classmethod
+    def _generate_unique_reply_to_id(cls):
+        for _ in range(base_models.MAX_RETRIES):
+            new_id = utils.convert_to_hash(
+                '%s' % (utils.get_random_int(base_models.RAND_RANGE)),
+                REPLY_TO_ID_LENGTH)
+            if not cls.get_by_reply_to_id(new_id):
+                return new_id
+
+        raise Exception('Unique id generator is producing too many collisions.')
+
+    @classmethod
+    def create(cls, user_id, exploration_id, thread_id):
+        """Creates a new FeedbackEmailUniqueIDModel entry.
+
+        Args:
+            user_id: str. ID of the corresponding user.
+            exploration_id: str. ID of the corresponding exploration.
+            thread_id: str. ID of the corresponding thread.
+
+        Returns:
+            str. A unique ID that can be used in 'reply-to' email address.
+
+        Raises:
+            Exception: Model instance for given user_id, exploration_id and
+                thread_id already exists.
+        """
+
+        instance_id = cls._generate_id(user_id, exploration_id, thread_id)
+        if cls.get_by_id(instance_id):
+            raise Exception('Unique reply-to ID for given user, exploration and'
+                            ' thread already exists.')
+
+        reply_to_id = cls._generate_unique_reply_to_id()
+        return cls(id=instance_id, reply_to_id=reply_to_id)
+
+    @classmethod
+    def get_by_reply_to_id(cls, reply_to_id):
+        model = cls.query(cls.reply_to_id == reply_to_id).fetch()
+        if not model:
+            return None
+        return model[0]
+
+    @classmethod
+    def get(cls, user_id, exploration_id, thread_id, strict=True):
+        instance_id = cls._generate_id(user_id, exploration_id, thread_id)
+        return super(
+            FeedbackEmailReplyToIdModel, cls).get(instance_id, strict=strict)
+
+    @classmethod
+    def get_multi_by_user_ids(cls, user_ids, exploration_id, thread_id):
+        instance_ids = [cls._generate_id(user_id, exploration_id, thread_id)
+                        for user_id in user_ids]
+        user_models = cls.get_multi(instance_ids)
+        return {
+            user_id: model for user_id, model in zip(user_ids, user_models)}
+
+    @property
+    def user_id(self):
+        return self.id.split('.')[0]
+
+    @property
+    def exploration_id(self):
+        return self.id.split('.')[1]
+
+    @property
+    def thread_id(self):
+        return self.id.split('.')[2]

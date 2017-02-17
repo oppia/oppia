@@ -445,7 +445,8 @@ class DownloadIntegrationTest(BaseEditorControllerTest):
     """Test handler for exploration and state download."""
 
     SAMPLE_JSON_CONTENT = {
-        'State A': ("""content:
+        'State A': ("""classifier_model_id: null
+content:
 - type: text
   value: ''
 interaction:
@@ -464,7 +465,8 @@ interaction:
   id: TextInput
 param_changes: []
 """),
-        'State B': ("""content:
+        'State B': ("""classifier_model_id: null
+content:
 - type: text
   value: ''
 interaction:
@@ -483,7 +485,8 @@ interaction:
   id: TextInput
 param_changes: []
 """),
-        feconf.DEFAULT_INIT_STATE_NAME: ("""content:
+        feconf.DEFAULT_INIT_STATE_NAME: ("""classifier_model_id: null
+content:
 - type: text
   value: ''
 interaction:
@@ -504,7 +507,8 @@ param_changes: []
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
 
-    SAMPLE_STATE_STRING = ("""content:
+    SAMPLE_STATE_STRING = ("""classifier_model_id: null
+content:
 - type: text
   value: ''
 interaction:
@@ -572,7 +576,6 @@ param_changes: []
                   'rb') as f:
             golden_zipfile = f.read()
         zf_gold = zipfile.ZipFile(StringIO.StringIO(golden_zipfile))
-
         # Compare saved with golden file
         self.assertEqual(
             zf_saved.open(
