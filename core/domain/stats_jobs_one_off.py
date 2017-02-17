@@ -644,6 +644,8 @@ class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
     _REMOVED_PERM_DELETED_EXP = 'rem_perm_deleted_exp'
     _REMOVED_DELETED_EXP = 'rem_deleted_exp'
     _REMOVED_IMPOSSIBLE_AGE = 'rem_impossible_age'
+    _REMOVED_PLANNED_MC_ANSWER = 'rem_planned_mc_answer'
+    _TRIMMED_PLANNED_MC_ANSWER = 'trim_planned_mc_answer'
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -710,6 +712,22 @@ class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
             item.delete()
             return
 
+        # TODO(bhenning): Verify these buckets are okay to delete before running
+        # the final production job.
+        buckets_ids_to_remove = [
+            'oJW92mLvzIXE.A-Q (PhET 1).submit.Default',
+            'S3r1vS0QJlF_.How Data Brokers are Tracking you!.submit.Default']
+        if item.id in buckets_ids_to_remove:
+            yield (PurgeInconsistentAnswersJob._REMOVED_PLANNED_MC_ANSWER, {})
+            item.delete()
+
+        bucket_ids_to_trim = ['iU0HabVmWRNk.er1step1.submit.Default']
+        if item.id in bucket_ids_to_trim:
+            if item.answers.pop('', None) is not None:
+                yield (
+                    PurgeInconsistentAnswersJob._TRIMMED_PLANNED_MC_ANSWER, {})
+                item.put()
+
     @staticmethod
     def reduce(key, stringified_values):
         removed_count = len(stringified_values)
@@ -735,6 +753,16 @@ class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
             yield (
                 'Removed %d answer(s) submitted before its exploration was '
                 'created' % removed_count)
+        elif key == PurgeInconsistentAnswersJob._REMOVED_PLANNED_MC_ANSWER:
+            yield (
+                'Removed %d answer buckets which were manually verified to '
+                'break the migration job and do not contain any migratable '
+                'answers' % removed_count)
+        elif key == PurgeInconsistentAnswersJob._TRIMMED_PLANNED_MC_ANSWER:
+            yield (
+                'Trimmed %d answer buckets by removing empty multiple choice '
+                'answers which were manually verified to break the migration '
+                'job and do not contain any migratable answers' % removed_count)
 
 
 class SplitLargeAnswerBucketsJob(jobs.BaseMapReduceJobManager):
@@ -1684,8 +1712,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 outcome = interaction.answer_groups[answer_group_index].outcome
                 temporary_special_param = next(
                     (param_change for param_change in outcome.param_changes
-                    if param_change.name == (
-                        AnswerMigrationJob._TEMPORARY_SPECIAL_RULE_PARAMETER)),
+                     if param_change.name == (
+                         AnswerMigrationJob._TEMPORARY_SPECIAL_RULE_PARAMETER)),
                     None)
 
             # If the subject type is not an answer, then the index is extracted
@@ -1696,10 +1724,19 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             # submitted answer itself.
             if rule_str == cls._DEFAULT_RULESPEC_STR or temporary_special_param:
                 if answer_str not in choices:
-                    return (
-                        None,
-                        'Answer \'%s\' was not found among the choices in the '
-                        'exploration: %s' % (answer_str, choices))
+                    # Formatting changed for math expressions, so try to perform
+                    # a conversion from the old format to the new one.
+                    if (len(answer_str) >= 2
+                            and answer_str[0] == '$' and answer_str[-1] == '$'):
+                        answer_str = '%s%s%s' % (
+                            '<oppia-noninteractive-math raw_latex-with-value='
+                            '"&amp;quot;', answer_str[1:-1],
+                            '&amp;quot;"></oppia-noninteractive-math>')
+                    if answer_str not in choices:
+                        return (
+                            None,
+                            'Answer \'%s\' was not found among the choices in '
+                            'the exploration: %s' % (answer_str, choices))
                 clicked_index = choices.index(answer_str)
             else:
                 # Extract the clicked index from the rule string.
@@ -1711,7 +1748,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                         'choices in the exploration: %s (len=%d)' % (
                             clicked_index, choices, len(choices)))
                 if answer_str != choices[clicked_index]:
-                    rte_latex_start= (
+                    rte_latex_start = (
                         '<oppia-noninteractive-math '
                         'raw_latex-with-value="&amp;quot;')
                     rte_latex_end = '&amp;quot;"></oppia-noninteractive-math>'

@@ -2897,6 +2897,48 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         }])
         self._verify_no_migration_validation_problems()
 
+    def test_migrate_multiple_choice_old_latex_answer(self):
+        exp_id = '3'
+        exp_services.load_demo(exp_id)
+        exploration = exp_services.get_exploration_by_id(exp_id)
+        state_name = 'Particular coefficients (part 2)'
+
+        rule_spec_str = 'Default'
+        html_answer = '$a_1 + a_2 + a_3 + ... + a_n$'
+        self._record_old_answer(
+            state_name, rule_spec_str, html_answer, exploration_id=exp_id)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id=exp_id,
+            exploration_version=exploration.version)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
+
+        # The answer should have been properly migrated to the new storage
+        # model. This corresponds to answer index 1, since that's the multiple
+        # choice option which corresponds to the translated version of the
+        # stored html answer.
+        state_answers = self._get_state_answers(
+            state_name, exploration_id=exp_id,
+            exploration_version=exploration.version)
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
+            'answer': 1,
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 1,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'MultipleChoiceInput',
+            'params': {},
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+        self._verify_no_migration_validation_problems()
+
     def test_migrate_music_notes_input(self):
         state_name = 'Music Notes Input'
 
