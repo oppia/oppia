@@ -86,12 +86,14 @@
             ng-if="activeTab === 'myExplorations' && explorationsList.length > 0">
           <button class="card-view-btn"
                   ng-class="{'dashboard-active-view': myExplorationsView === 'card'}"
-                  ng-click="setMyExplorationsView('card')">
+                  ng-click="setMyExplorationsView('card')"
+                  aria-label="Card View">
             <span class="fa fa-th-large fa-lg"></span>
           </button>
           <button class="list-view-btn"
                   ng-class="{'dashboard-active-view': myExplorationsView === 'list'}"
-                  ng-click="setMyExplorationsView('list')">
+                  ng-click="setMyExplorationsView('list')"
+                  aria-label="List View">
             <span class="fa fa-list fa-lg"></span>
           </button>
         </li>
@@ -288,7 +290,7 @@
               </li>
 
               <li flex="50" style="padding-left: 8px;">
-                <img ng-src="<[unresolvedAnswersIconUrl]>" style="width: 15px; padding-top: 1px;" tooltip="Unresolved Answers" tooltip-placement="top" class="oppia-dashboard-card-statistic-icon">
+                <img ng-src="<[unresolvedAnswersIconUrl]>" style="width: 15px; padding-top: 1px;" tooltip="Unresolved Answers" tooltip-placement="top" class="oppia-dashboard-card-statistic-icon" alt="Unresolved Answers">
                 <span class="oppia-dashboard-card-statistic-value">
                   <[exploration.num_unresolved_answers]>
                 </span>
@@ -397,6 +399,7 @@
 
 {% block footer_js %}
   {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/embed_modal/ExplorationEmbedButtonService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/share/SharingLinksDirective.js"></script>
 

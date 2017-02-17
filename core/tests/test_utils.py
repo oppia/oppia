@@ -35,11 +35,13 @@ from core.domain import rights_manager
 from core.platform import models
 import feconf
 import main
+import main_mail
 import main_taskqueue
 import utils
 
 from google.appengine.api import apiproxy_stub
 from google.appengine.api import apiproxy_stub_map
+from google.appengine.api import mail
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 current_user_services = models.Registry.import_current_user_services()
@@ -135,7 +137,8 @@ class TestBase(unittest.TestCase):
                         'definition': {'rule_type': 'default'}
                     }]
                 }]
-            }
+            },
+            'classifier_model_id': None,
         }
     }
 
@@ -241,13 +244,41 @@ class TestBase(unittest.TestCase):
         if csrf_token:
             data['csrf_token'] = csrf_token
 
-        json_response = self.testapp.post(
-            str(url), data, expect_errors=expect_errors,
-            upload_files=upload_files)
+        json_response = self._send_post_request(
+            self.testapp, url, data, expect_errors, expected_status_int,
+            upload_files)
 
-        self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
+
+    def _send_post_request(
+            self, app, url, data, expect_errors=False, expected_status_int=200,
+            upload_files=None, headers=None):
+        json_response = app.post(
+            str(url), data, expect_errors=expect_errors,
+            upload_files=upload_files, headers=headers)
+        self.assertEqual(json_response.status_int, expected_status_int)
+        return json_response
+
+    def post_email(
+            self, recipient_email, sender_email, subject, body, html_body=None,
+            expect_errors=False, expected_status_int=200):
+        email = mail.EmailMessage(
+            sender=sender_email, to=recipient_email, subject=subject,
+            body=body)
+        if html_body is not None:
+            email.html = html_body
+
+        mime_email = email.to_mime_message()
+        headers = {'content-type': mime_email.get_content_type()}
+        data = mime_email.as_string()
+        app = webtest.TestApp(main_mail.app)
+        incoming_email_url = '/_ah/mail/%s' % recipient_email
+
+        return self._send_post_request(
+            app, incoming_email_url, data, headers=headers,
+            expect_errors=expect_errors,
+            expected_status_int=expected_status_int)
 
     def put_json(self, url, payload, csrf_token=None, expect_errors=False,
                  expected_status_int=200):

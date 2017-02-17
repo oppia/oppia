@@ -201,6 +201,9 @@ class FeedbackMessageModel(base_models.BaseModel):
     updated_subject = ndb.StringProperty(indexed=False)
     # Message text. Allowed not to exist (e.g. post only to update the status).
     text = ndb.StringProperty(indexed=False)
+    # Whether the incoming message is received by email (as opposed to via
+    # the web).
+    received_via_email = ndb.BooleanProperty(default=False, indexed=True)
 
     @classmethod
     def _generate_id(cls, exploration_id, thread_id, message_id):
