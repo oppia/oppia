@@ -55,11 +55,12 @@ class ParamSpec(object):
         """Object from param_spec_dict.
 
         Args:
-            param_spec_dict: dict. The dictionary containing specifications of all the
-                parameters.
+            param_spec_dict: dict. The dictionary containing specifications of
+            all the parameters.
 
-        Returns: 
-            ParamSpec object: A ParamSpec object created from the specified object type.
+        Returns:
+            ParamSpec object: A ParamSpec object created from the specified object
+            type.
         """
 
         return cls(param_spec_dict['obj_type'])
@@ -92,7 +93,7 @@ class ParamChange(object):
             name: unicode. The name of the parameter.
             generator_id: unicode. The type of generator used to create the
             parameter. eg. Copier
-            customization_args: dict. A dict containing all the arguments 
+            customization_args: dict. A dict containing all the arguments
             including the value of the parameter.
         """
         # TODO(sll): Check that all required args for customization exist in
