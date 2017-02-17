@@ -644,8 +644,9 @@ class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
     _REMOVED_PERM_DELETED_EXP = 'rem_perm_deleted_exp'
     _REMOVED_DELETED_EXP = 'rem_deleted_exp'
     _REMOVED_IMPOSSIBLE_AGE = 'rem_impossible_age'
-    _REMOVED_PLANNED_MC_ANSWER = 'rem_planned_mc_answer'
-    _TRIMMED_PLANNED_MC_ANSWER = 'trim_planned_mc_answer'
+    _REMOVED_PLANNED_MC_ANSWER = 'rem_planned_multiple_choice_answer'
+    _TRIMMED_PLANNED_MC_ANSWER = 'trim_planned_multiple_choice_answer'
+    _TRIMMED_PLANNED_NUM_ANSWER = 'trim_planned_numeric_input_answer'
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -714,19 +715,49 @@ class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
 
         # TODO(bhenning): Verify these buckets are okay to delete before running
         # the final production job.
-        buckets_ids_to_remove = [
+        buckets_ids_to_remove_multiple_choice = [
             'oJW92mLvzIXE.A-Q (PhET 1).submit.Default',
             'S3r1vS0QJlF_.How Data Brokers are Tracking you!.submit.Default']
-        if item.id in buckets_ids_to_remove:
+        if item.id in buckets_ids_to_remove_multiple_choice:
             yield (PurgeInconsistentAnswersJob._REMOVED_PLANNED_MC_ANSWER, {})
             item.delete()
 
-        bucket_ids_to_trim = ['iU0HabVmWRNk.er1step1.submit.Default']
-        if item.id in bucket_ids_to_trim:
+        bucket_ids_to_trim_multiple_choice = [
+            'iU0HabVmWRNk.er1step1.submit.Default']
+        if item.id in bucket_ids_to_trim_multiple_choice:
             if item.answers.pop('', None) is not None:
                 yield (
                     PurgeInconsistentAnswersJob._TRIMMED_PLANNED_MC_ANSWER, {})
                 item.put()
+
+        # Answer strings which were submitted to P68_sbYDON5s.4.submit.Default
+        # somehow; these cannot be reconstituted but they've been manually
+        # verified and should not prevent other answers in the group from being
+        # migrated.
+        bucket_ids_to_trim_numeric_input = ['P68_sbYDON5s.4.submit.Default']
+        ignored_answer_strs = [
+            'UXVhbmcgVmFuIGhhaQ==',
+            'SG93IHRvIHVwbG9hZCBCbG9nZ2VyIHRlbXBsYXRlcw0KDQoxLiBEb3dubG9hZCB5b3'
+            'VyIEJsb2dnZXIgWE1MIHRlbXBsYXRlIGZyb20gQlRlbXBsYXRlcy5jb20uIA0KVGhl'
+            'IHRlbXBsYXRlIGlzIGNvbnRhaW5lZCBpbiBhIHppcCBmaWxlICh3aW56aXAsIHdpbn'
+            'JhciksIGVuc3VyZSB5b3UgaGF2ZSBleHRyYWN0ZWQgdGhlIFhNTCB0ZW1wbGF0ZS4N'
+            'CjIuIExvZyBpbiB0byB5b3VyIEJsb2dnZXIgZGFzaGJvYXJkIGFuZCBnbyB0byBMYX'
+            'lvdXQgPiBFZGl0IEhUTUwNCjMuIEVuc3VyZSB5b3UgYmFjayB1cCB5b3VyIG9sZCB0'
+            'ZW1wbGF0ZSBpbiBjYXNlIHlvdSBkZWNpZGUgdG8gdXNlIGl0IGFnYWluLiBUbyBkby'
+            'B0aGlzLCBjbGljayBvbiB0aGUgImRvd25sb2FkIGZ1bGwgdGVtcGxhdGUiIGxpbmsg'
+            'YW5kIHNhdmUgdGhlIGZpbGUgdG8geW91ciBoYXJkIGRyaXZlLg0KNC4gTG9vayBmb3'
+            'IgdGhlIHNlY3Rpb24gbmVhciB0aGUgdG9wIHdoZXJlIHlvdSBjYW4gYnJvd3NlIGZv'
+            'ciB5b3VyIFhNTCB0ZW1wbGF0ZToNCjUuIEVudGVyIHRoZSBsb2NhdGlvbiBvZiB5b3'
+            'VyIHRlbXBsYXRlIGFuZCBwcmVzcyAidXBsb2FkIi4NCjYuIFRoZSBIVE1MIG9mIHlv'
+            'dXIgbmV3IHRlbXBsYXRlIHdpbGwgbm93IGFwcGVhciBpbiB0aGUgYm94IGJlbG93Li'
+            'BZb3UgY2FuIHByZXZpZXcgeW91ciB0ZW1wbGF0ZSBvciBzaW1wbHkgc2F2ZSB0byBz'
+            'dGFydCB1c2luZyBpdCENCjcuIEVuam95IQ0KDQoNClRlbXBsYXRlcy9MYXlvdXRzIG'
+            'luIGh0dHA6Ly9idGVtcGxhdGVzLmNvbQ==']
+        if item.id in bucket_ids_to_trim_numeric_input:
+            for ignored_answer_str in ignored_answer_strs:
+                item.answers.pop(ignored_answer_str, None)
+            yield (PurgeInconsistentAnswersJob._TRIMMED_PLANNED_NUM_ANSWER, {})
+            item.put()
 
     @staticmethod
     def reduce(key, stringified_values):
@@ -762,7 +793,12 @@ class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
             yield (
                 'Trimmed %d answer buckets by removing empty multiple choice '
                 'answers which were manually verified to break the migration '
-                'job and do not contain any migratable answers' % removed_count)
+                'job and are not migratable' % removed_count)
+        elif key == PurgeInconsistentAnswersJob._TRIMMED_PLANNED_NUM_ANSWER:
+            yield (
+                'Trimmed %d answer buckets by removing non-numeric answer '
+                'strings that were manually verified to break the migration '
+                'job and are not migratable' % removed_count)
 
 
 class SplitLargeAnswerBucketsJob(jobs.BaseMapReduceJobManager):
@@ -1499,8 +1535,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # reconstitution of the graph object.
         return (
             None,
-            'Expected failure: Unsupported answer type: \'%s\' for graph '
-            'answer \'%s\'' % (rule_str, answer_str))
+            'Unsupported answer type: \'%s\' for graph answer \'%s\'' % (
+                rule_str, answer_str))
 
     @classmethod
     def _cb_reconstitute_image_click_input(
@@ -1841,32 +1877,6 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                     'Unsupported rule type encountered while attempting to '
                     'reconstitute NumericInput object: %s' % (
                         rule_spec.rule_type))
-        # Answer strings which were submitted to P68_sbYDON5s.4.submit.Default
-        # somehow; these cannot be reconstituted but they've been manually
-        # verified and should not prevent other answers in the group from being
-        # migrated.
-        ignored_answer_strs = [
-            'UXVhbmcgVmFuIGhhaQ==',
-            'SG93IHRvIHVwbG9hZCBCbG9nZ2VyIHRlbXBsYXRlcw0KDQoxLiBEb3dubG9hZCB5b3'
-            'VyIEJsb2dnZXIgWE1MIHRlbXBsYXRlIGZyb20gQlRlbXBsYXRlcy5jb20uIA0KVGhl'
-            'IHRlbXBsYXRlIGlzIGNvbnRhaW5lZCBpbiBhIHppcCBmaWxlICh3aW56aXAsIHdpbn'
-            'JhciksIGVuc3VyZSB5b3UgaGF2ZSBleHRyYWN0ZWQgdGhlIFhNTCB0ZW1wbGF0ZS4N'
-            'CjIuIExvZyBpbiB0byB5b3VyIEJsb2dnZXIgZGFzaGJvYXJkIGFuZCBnbyB0byBMYX'
-            'lvdXQgPiBFZGl0IEhUTUwNCjMuIEVuc3VyZSB5b3UgYmFjayB1cCB5b3VyIG9sZCB0'
-            'ZW1wbGF0ZSBpbiBjYXNlIHlvdSBkZWNpZGUgdG8gdXNlIGl0IGFnYWluLiBUbyBkby'
-            'B0aGlzLCBjbGljayBvbiB0aGUgImRvd25sb2FkIGZ1bGwgdGVtcGxhdGUiIGxpbmsg'
-            'YW5kIHNhdmUgdGhlIGZpbGUgdG8geW91ciBoYXJkIGRyaXZlLg0KNC4gTG9vayBmb3'
-            'IgdGhlIHNlY3Rpb24gbmVhciB0aGUgdG9wIHdoZXJlIHlvdSBjYW4gYnJvd3NlIGZv'
-            'ciB5b3VyIFhNTCB0ZW1wbGF0ZToNCjUuIEVudGVyIHRoZSBsb2NhdGlvbiBvZiB5b3'
-            'VyIHRlbXBsYXRlIGFuZCBwcmVzcyAidXBsb2FkIi4NCjYuIFRoZSBIVE1MIG9mIHlv'
-            'dXIgbmV3IHRlbXBsYXRlIHdpbGwgbm93IGFwcGVhciBpbiB0aGUgYm94IGJlbG93Li'
-            'BZb3UgY2FuIHByZXZpZXcgeW91ciB0ZW1wbGF0ZSBvciBzaW1wbHkgc2F2ZSB0byBz'
-            'dGFydCB1c2luZyBpdCENCjcuIEVuam95IQ0KDQoNClRlbXBsYXRlcy9MYXlvdXRzIG'
-            'luIGh0dHA6Ly9idGVtcGxhdGVzLmNvbQ==']
-        if answer_str in ignored_answer_strs:
-            return (
-                None,
-                'Expected failure: Cannot convert non-string answer to float')
         input_value = float(answer_str)
         return cls._normalize_raw_answer_object(
             objects.Real, input_value, answer_str)
@@ -2148,10 +2158,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 large_answer_bucket_count)
 
             for error in migration_errors:
-                if error.startswith('Expected failure'):
-                    yield error
-                else:
-                    yield 'Item ID: %s, error: %s' % (item_id, error)
+                yield 'Item ID: %s, error: %s' % (item_id, error)
 
     @classmethod
     def _migrate_answers(cls, item_id, explorations, exploration_id, state_name,
@@ -2218,20 +2225,6 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                         remaining_answers)
 
                 migrated_answer_count = migrated_answer_count + 1
-            elif error.startswith('Expected failure'):
-                # Expected failures are considered migrations. These are rare
-                # cases where it doesn't make sense to migrate the answer since
-                # there is no meaningful exploration or state to which the
-                # answer matches.
-                migrated_answer_count = migrated_answer_count + 1
-                yield '%s (answer freq: %d)' % (error, answer_frequency)
-
-                # Mark the answer as migrated so it does not fail post-migration
-                # validation.
-                stats_models.MigratedAnswerModel.finish_migrating_answer(
-                    item_id, -1)
-                stats_models.MigratedAnswerModel.finish_migration_answer_bucket(
-                    item_id, large_answer_bucket_id)
             else:
                 yield error
 
