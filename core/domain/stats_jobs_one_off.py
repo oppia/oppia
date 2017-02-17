@@ -1599,6 +1599,10 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             return (
                 None,
                 'Bad answer string in ItemSelectionInput Equals rule.')
+        # Ensure the option list is uniquified. If any elements of the set are
+        # duplicated, we can lose that information without ruining the answer
+        # since sets should never have duplicates.
+        option_list = list(set(option_list))
         return cls._normalize_raw_answer_object(
             objects.SetOfHtmlString, option_list, answer_str)
 
@@ -1906,6 +1910,10 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         unicode_string_list = ast.literal_eval(answer_str)
         if not isinstance(unicode_string_list, list):
             return (None, 'Failed to recover set: \'%s\'' % answer_str)
+        # Ensure the string list is uniquified. If any elements of the set are
+        # duplicated, we can lose that information without ruining the answer
+        # since sets should never have duplicates.
+        unicode_string_list = list(set(unicode_string_list))
         return cls._normalize_raw_answer_object(
             objects.SetOfUnicodeString, unicode_string_list, answer_str)
 

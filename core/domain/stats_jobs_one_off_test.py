@@ -2574,7 +2574,6 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'exp_id0', self.owner_id, end_state_name='End',
             interaction_id='ItemSelectionInput')
         state_name = exploration.init_state_name
-        initial_state = exploration.states[state_name]
         exp_services.update_exploration(self.owner_id, 'exp_id0', [{
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': state_name,
@@ -2643,6 +2642,40 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         }])
         self._verify_no_migration_validation_problems()
 
+    def test_migrate_item_selection_input_with_duplicate_answers(self):
+        state_name = 'Item Selection'
+
+        rule_spec_str = (
+            'Equals([u\'<p>Good option A.</p>\', u\'<p>Good option C.</p>\'])')
+        html_answer = (
+            '[u\'<p>Good option A.</p>\', u\'<p>Good option C.</p>\', '
+            'u\'<p>Good option A.</p>\']')
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
+
+        # The answer should have been properly migrated to the new storage
+        # model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
+            'answer': ['<p>Good option A.</p>', '<p>Good option C.</p>'],
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'ItemSelectionInput',
+            'params': {},
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+        self._verify_no_migration_validation_problems()
 
     def test_migrate_logic_proof(self):
         state_name = 'Logic Proof'
@@ -3318,6 +3351,39 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_index': 0,
             'classification_categorization': (
                 exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'SetInput',
+            'params': {},
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+        self._verify_no_migration_validation_problems()
+
+    def test_migrate_set_input_with_duplicate_answers(self):
+        state_name = 'Set Input'
+
+        rule_spec_str = (
+            'HasElementsIn([u\'orange\', u\'purple\', u\'silver\'])')
+        html_answer = '[u\'purple\', u\'silver\', u\'silver\']'
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+        self.assertEqual(job_output, [])
+
+        # The answer should have been properly migrated to the new storage
+        # model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
+            'answer': ['purple', 'silver'],
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'SetInput',
             'params': {},
