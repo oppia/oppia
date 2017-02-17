@@ -218,8 +218,8 @@ oppia.controller('CollectionPlayer', [
     $scope.isNextExploration = function(explorationId) {
       var nextExplorationId = (
         $scope.collectionPlaythrough.getNextExplorationIds()[0]);
-      return (nextExplorationId === explorationId)?true:false;
-    }
+      return (nextExplorationId === explorationId) ? true : false;
+    };
 
     $scope.getExplorationUrl = function(explorationId) {
       return (
