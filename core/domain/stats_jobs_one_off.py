@@ -1383,7 +1383,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         #   {{answer.code}}
 
         rule_types_without_output = [
-            'CodeContains', 'CodeDoesNotContain', 'ResultsInError'
+            'CodeContains', 'CodeDoesNotContain', 'ResultsInError',
+            'OutputContains'
         ]
         # NOTE: Not all of CodeEvaluation can be reconstituted. Evaluation,
         # error, and output (with one rule_type exception) cannot be recovered
@@ -1396,7 +1397,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
         # TODO(bhenning): Should something more significant (like None) be used
         # for sentinel values for output/evaluation/error instead?
-        if answer_str == None:
+        if answer_str is None:
             return (None, 'Failed to recover code: \'%s\'' % answer_str)
         if rule_str != cls._DEFAULT_RULESPEC_STR:
             if rule_spec.rule_type != 'OutputEquals' and (
@@ -1404,8 +1405,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 return (
                     None,
                     'Cannot reconstitute a CodeEvaluation object without '
-                    'OutputEquals, CodeContains, CodeDoesNotContain, or '
-                    'ResultsInError rules.')
+                    'OutputEquals, CodeContains, CodeDoesNotContain, '
+                    'ResultsInError, or OutputContains rules.')
             if rule_spec.rule_type == 'OutputEquals':
                 code_output = rule_spec.inputs['x']
                 code_evaluation_dict = {
@@ -1418,7 +1419,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                     objects.CodeEvaluation, code_evaluation_dict, answer_str)
 
         # Otherwise the answer is a default answer, or the rule type is one of
-        # CodeContains, CodeDoesNotContain, or ResultsInError.
+        # CodeContains, CodeDoesNotContain, ResultsInError, or OutputContains.
         code_evaluation_dict = {
             'code': answer_str,
             'output': '',
@@ -1836,7 +1837,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             supported_rule_types = [
                 'CodeEquals', 'CodeContains', 'CodeDoesNotContain',
                 'OutputEquals', 'OutputRoughlyEquals', 'ResultsInError',
-                'ErrorContains'
+                'ErrorContains', 'OutputContains'
             ]
             if rule_spec.rule_type not in supported_rule_types:
                 return (
