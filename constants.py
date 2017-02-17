@@ -24,4 +24,4 @@ class Constants(dict):
     __getattr__ = dict.__getitem__
 
 with open(os.path.join('assets', 'constants.json'), 'r') as f:
-    CONSTANTS = Constants(json.load(f))
+    constants = Constants(json.load(f)) #pylint: disable=invalid-name

@@ -1,3 +1,16 @@
+<!-- Note to developers: This script needs to be loaded before external
+     libraries. Also, if you modify this script, please change
+     core/tests/karma-constants.js accordingly -->
+<script>
+  var constants = (function() {
+    var request = new XMLHttpRequest();
+    request.overrideMimeType('application/json');
+    request.open(
+      'GET', GLOBALS.ASSET_DIR_PREFIX + '/assets/constants.json', false);
+    request.send(null);
+    return JSON.parse(request.responseText);
+  })();
+</script>
 <!-- jquery.js, angular.js and jquery-ui.js are removed from bundled js because
 they need to be at the header. Including bundled js at the header will block
 rendering.-->

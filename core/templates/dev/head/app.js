@@ -15,7 +15,6 @@
 /**
  * @fileoverview Initialization and basic configuration for the Oppia module.
  */
-
 // TODO(sll): Remove the check for window.GLOBALS. This check is currently
 // only there so that the Karma tests run, since it looks like Karma doesn't
 // 'see' the GLOBALS variable that is defined in base.html. We should fix this
@@ -30,8 +29,8 @@ var oppia = angular.module(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
                    : []));
 
-for (var constantName in CONSTANTS) {
-  oppia.constant(constantName, CONSTANTS[constantName]);
+for (var constantName in constants) {
+  oppia.constant(constantName, constants[constantName]);
 }
 
 oppia.constant(

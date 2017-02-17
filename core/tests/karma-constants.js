@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
  */
 
 /* This should be kept in parity with how CONSTANTS is set in base.html */
-var CONSTANTS = (function() {
+var constants = (function() {
   var request = new XMLHttpRequest();
   request.overrideMimeType('application/json');
   request.open(
