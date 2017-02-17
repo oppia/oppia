@@ -86,8 +86,12 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
                 fakeInputElement.value.length, fakeInputElement.value.length);
             };
 
-            // Mapping characters back to Mousetrap codes.
-            // Use Mousetrap.trigger(code) to replay them.
+            // Guppy uses the Mousetrap (ccampbell/mousetrap) library for
+            // keyboard input. Mousetrap has a function call which allows
+            // sending key events, but for symbols like "^" they need to be
+            // sent as "shift+6" to be recognized. This object is used to
+            // convert symbols into strings that Mousetrap accepts via the
+            // Mousetrap.trigger() function.
             var K_SYM_REVERSE_MAP = {
               '^': 'shift+6',
               '*': 'shift+8',
