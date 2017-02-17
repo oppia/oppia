@@ -1499,14 +1499,15 @@ def _exp_rights_to_search_dict(rights):
     # Allow searches like "is:featured".
     """Returns a search dict with information about the exploration rights. This
     allows searches like "is:featured".
+
     Args:
         rights: ActivityRights. Domain object for the rights/publication status
             of the exploration.
 
     Returns:
-        dict.  If the status of the given exploration is publicized then it
-        returns a dict with a key "is" and value as "featured" else an empty
-        dict.
+        dict. If the status of the given exploration is publicized then it
+        returns a dict with a key "is", and the value "featured". Otherwise, it
+        returns an empty dict.
     """
     doc = {}
     if rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED:
