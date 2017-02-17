@@ -31,19 +31,19 @@ class ParamSpec(object):
         """Initializes a ParamSpec object with the specified object type
 
         Args:
-            obj_type: unicode. The object type with which the parameter is initialized.
+            obj_type: unicode. The object type with which the parameter is
+            initialized.
         """
         self.obj_type = obj_type
 
-    
 
     def to_dict(self):
         """Adds the object type to a dict, with the key as `obj_type`
-        and the value as the type of the object eg.(UnicodeString). 
+        and the value as the type of the object eg.(UnicodeString).
 
         Returns:
-            dict. The key of the dict is `obj_type` and the value is the type of the 
-                parameter.
+            dict. The key of the dict is `obj_type` and the value is the type
+            of the parameter.
         """
         return {
             'obj_type': self.obj_type,
@@ -59,8 +59,8 @@ class ParamSpec(object):
             all the parameters.
 
         Returns:
-            ParamSpec object: A ParamSpec object created from the specified object
-            type.
+            ParamSpec object: A ParamSpec object created from the specified
+            object type.
         """
 
         return cls(param_spec_dict['obj_type'])
