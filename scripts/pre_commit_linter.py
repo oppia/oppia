@@ -468,6 +468,60 @@ def _pre_commit_linter(all_files):
     return summary_messages
 
 
+def _check_newline_character(all_files):
+    """This function is used to check that each file
+    ends with a single newline character.
+    """
+    print 'Starting newline-at-EOF checks'
+    print '----------------------------------------'
+    total_files_checked = 0
+    total_error_count = 0
+    summary_messages = []
+    all_files = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
+    failed = False
+    for filename in all_files:
+        with open(filename, 'rb') as f:
+            total_files_checked += 1
+            total_num_chars = 0
+            for line in f:
+                total_num_chars += len(line)
+            if total_num_chars == 1:
+                failed = True
+                print '%s --> Error: Only one character in file' % filename
+                total_error_count += 1
+            elif total_num_chars > 1:
+                f.seek(-2, 2)
+                if not (f.read(1) != '\n' and f.read(1) == '\n'):
+                    failed = True
+                    print (
+                        '%s --> Please ensure that this file ends'
+                        'with exactly one newline char.' % filename)
+                    total_error_count += 1
+
+    if failed:
+        summary_message = '%s   Newline character checks failed' % (
+            _MESSAGE_TYPE_FAILED)
+        summary_messages.append(summary_message)
+    else:
+        summary_message = '%s   Newline character checks passed' % (
+            _MESSAGE_TYPE_SUCCESS)
+        summary_messages.append(summary_message)
+
+    print ''
+    print '----------------------------------------'
+    print ''
+    if total_files_checked == 0:
+        print 'There are no files to be checked.'
+    else:
+        print '(%s files checked, %s errors found)' % (
+            total_files_checked, total_error_count)
+        print summary_message
+
+    return summary_messages
+
+
 def _check_bad_patterns(all_files):
     """This function is used for detecting bad patterns.
     """
@@ -541,9 +595,10 @@ def _check_bad_patterns(all_files):
 
 def main():
     all_files = _get_all_files()
+    newline_messages = _check_newline_character(all_files)
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
-    all_messages = linter_messages + pattern_messages
+    all_messages = linter_messages + newline_messages + pattern_messages
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)
