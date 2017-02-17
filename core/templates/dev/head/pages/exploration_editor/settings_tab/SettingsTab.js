@@ -251,8 +251,8 @@ oppia.controller('SettingsTab', [
               return GLOBALS.CATEGORIES_TO_COLORS[category];
             };
 
-            $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+            $scope.close = function() {
+              $modalInstance.dismiss('close');
               alertsService.clearWarnings();
             };
           }
