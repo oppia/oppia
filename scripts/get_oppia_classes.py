@@ -2,102 +2,107 @@ import os
 import re
 import bs4
 
+
 def return_all_files(dir):
-	"""
-	expects a directory name to search in
-	returns all the files in the directory and subdirectories
-	"""
-	val = []
-	for root, subdir, files in os.walk(dir):
-		for f in files:
-			val.append(os.path.join(root, f))
+    """
+    expects a directory name to search in
+    returns all the files in the directory and subdirectories 
+    """
+    val = []
+    for root, subdir, files in os.walk(dir):
+        for f in files:
+            val.append(os.path.join(root, f))
 
-		for d in subdir:
-			val.append(return_all_files(d))
+        for d in subdir:
+            val.append(return_all_files(d))
 
-	return val
+    return val
+
 
 def return_matched_files(files, pattern):
-	"""
-	expects a list of files
-	returns all the files matching the pattern
-	"""
-	val = []
-	for f in files:
-		if pattern.match(str(f)) is not None:
-			val.append(f)
-	return val
+    """
+    expects a list of files
+    returns all the files matching the pattern
+    """
+    val = []
+    for f in files:
+        if pattern.match(str(f)) is not None:
+            val.append(f)
+    return val
+
 
 def file_find_matching_classes(file_name, pattern):
-	"""
-	expects the file name and pattern of class to find
-	returns all the classes that have same pattern as specified
-	"""
-	f = open(file_name)
+    """
+    expects the file name and pattern of class to find
+    returns all the classes that have same pattern as specified
+    """
+    f = open(file_name)
 
-	#making BeautifulSoup object of file then extracting the script tag and
-	# making BeautifulSoup object of text inside script tag
-	MY_SOUP = bs4.BeautifulSoup(f.read(), 'html.parser').find('script')
+    #making BeautifulSoup object of file then extracting the script tag and
+    # making BeautifulSoup object of text inside script tag
+    MY_SOUP = bs4.BeautifulSoup(f.read(), 'html.parser').find('script')
 
-	INSIDE_SCRIPT_CONTENT = str(MY_SOUP.contents)
+    INSIDE_SCRIPT_CONTENT = str(MY_SOUP.contents)
 
-	SOUP_FROM_TEXT_INSIDE_SCRIPT = bs4.BeautifulSoup(
-	    INSIDE_SCRIPT_CONTENT, 'html.parser')
+    SOUP_FROM_TEXT_INSIDE_SCRIPT = bs4.BeautifulSoup(
+        INSIDE_SCRIPT_CONTENT, 'html.parser')
 
-	#extracting list of all the classes per tag
-	ALL_CLASSES = [
-	    tag.attrs.get('class') for tag in SOUP_FROM_TEXT_INSIDE_SCRIPT.findAll()]
+    #extracting list of all the classes per tag
+    ALL_CLASSES = [
+        tag.attrs.get('class') for tag in SOUP_FROM_TEXT_INSIDE_SCRIPT.findAll()]
 
-	LIST_OPPIA_CLASSES = []
+    LIST_OPPIA_CLASSES = []
 
-	#iterating through the list and output the result if there is a match
-	for i in ALL_CLASSES:
-	    if i is None:
-	        continue
-	    else:
-	        for j in i:
-	            if pattern.match(j):
-	                LIST_OPPIA_CLASSES.append(j)
+    #iterating through the list and output the result if there is a match
+    for i in ALL_CLASSES:
+        if i is None:
+            continue
+        else:
+            for j in i:
+                if pattern.match(j):
+                    LIST_OPPIA_CLASSES.append(j)
 
-	return set(LIST_OPPIA_CLASSES)
+    return set(LIST_OPPIA_CLASSES)
+
 
 def print_output(file_dict):
-	"""
-	expects file dictionary with file as keys and classes as values
-	outputs in proper format
-	"""
-	for i in file_dict.keys() :
-		if len(file_dict[i]) == 0:
-			continue
-		print '$ ',
-		print i
-		for j in file_dict[i]:
-			print j,
-		print '\n\n'
+    """
+    expects file dictionary with file as keys and classes as values
+    outputs in proper format
+    """
+    for i in file_dict.keys() :
+        if len(file_dict[i]) == 0:
+            continue
+        print '$ ',
+        print i
+        for j in file_dict[i]:
+            print j,
+        print '\n\n'
+
 
 def give_unique_classes(file_dict):
-	"""
-	expects file dictionary with file as keys and classes as values
-	return dict with file as keys and only those classes that are present uniquely in the file
-	"""
-	val = {}
-	for i in file_dict.keys():
-		val[i] = []
-		for j in file_dict[i]:
-			check_if_class_exist_in_some_other_file = 0
-			for k in file_dict.keys() :
-				if k == i:
-					continue
-				for z in file_dict[k]:
-					if z == j:
-						check_if_class_exist_in_some_other_file = 1
-			if check_if_class_exist_in_some_other_file == 0:
-				val[i].append(j)
+    """
+    expects file dictionary with file as keys and classes as values
+    return dict with file as keys and only those classes that are present uniquely in the file
+    """
+    val = {}
+    for i in file_dict.keys():
+        val[i] = []
+        for j in file_dict[i]:
+            check_if_class_exist_in_some_other_file = 0
+            for k in file_dict.keys() :
+                if k == i:
+                    continue
+                for z in file_dict[k]:
+                    if z == j:
+                        check_if_class_exist_in_some_other_file = 1
+            if check_if_class_exist_in_some_other_file == 0:
+                val[i].append(j)
 
-	return val
+    return val
 
 
-DIRECTORY = raw_input('Enter path to directory you want to perform changes to   ')
+DIRECTORY = raw_input('Enter path to directory  ')
 
 #pattern for matching directive html files
 FILE_PATTERN = re.compile('.*directive\.html')
@@ -112,8 +117,9 @@ DIRECTIVE_FILES = return_matched_files(ALL_FILES_IN_PATH, FILE_PATTERN)
 LIST_FILE_CLASSES = {}
 
 for i in DIRECTIVE_FILES:
-	LIST_FILE_CLASSES[i] = file_find_matching_classes(i, FIND_PATTERN)
+    LIST_FILE_CLASSES[i] = file_find_matching_classes(i, FIND_PATTERN)
 
-#print_output(LIST_FILE_CLASSES)
+# print_output(LIST_FILE_CLASSES)
 
 print_output(give_unique_classes(LIST_FILE_CLASSES))
+
