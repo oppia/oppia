@@ -6,7 +6,7 @@ import bs4
 def return_all_files(dir):
     """
     expects a directory name to search in
-    returns all the files in the directory and subdirectories 
+    returns all the files in the directory and subdirectories
     """
     val = []
     for root, subdir, files in os.walk(dir):
@@ -38,31 +38,31 @@ def file_find_matching_classes(file_name, pattern):
     """
     f = open(file_name)
 
-    #making BeautifulSoup object of file then extracting the script tag and
+    # making BeautifulSoup object of file then extracting the script tag and
     # making BeautifulSoup object of text inside script tag
-    MY_SOUP = bs4.BeautifulSoup(f.read(), 'html.parser').find('script')
+    my_soup = bs4.BeautifulSoup(f.read(), 'html.parser').find('script')
 
-    INSIDE_SCRIPT_CONTENT = str(MY_SOUP.contents)
+    inside_script_content = str(my_soup.contents)
 
-    SOUP_FROM_TEXT_INSIDE_SCRIPT = bs4.BeautifulSoup(
-        INSIDE_SCRIPT_CONTENT, 'html.parser')
+    soup_from_text_inside_script = bs4.BeautifulSoup(
+        inside_script_content, 'html.parser')
 
-    #extracting list of all the classes per tag
-    ALL_CLASSES = [
-        tag.attrs.get('class') for tag in SOUP_FROM_TEXT_INSIDE_SCRIPT.findAll()]
+    # extracting list of all the classes per tag
+    all_classes = [
+        t.attrs.get('class') for t in soup_from_text_inside_script.findAll()]
 
-    LIST_OPPIA_CLASSES = []
+    list_oppia_classes = []
 
     #iterating through the list and output the result if there is a match
-    for i in ALL_CLASSES:
+    for i in all_classes:
         if i is None:
             continue
         else:
             for j in i:
                 if pattern.match(j):
-                    LIST_OPPIA_CLASSES.append(j)
+                    list_oppia_classes.append(j)
 
-    return set(LIST_OPPIA_CLASSES)
+    return set(list_oppia_classes)
 
 
 def print_output(file_dict):
@@ -116,8 +116,8 @@ DIRECTIVE_FILES = return_matched_files(ALL_FILES_IN_PATH, FILE_PATTERN)
 
 LIST_FILE_CLASSES = {}
 
-for i in DIRECTIVE_FILES:
-    LIST_FILE_CLASSES[i] = file_find_matching_classes(i, FIND_PATTERN)
+for file in DIRECTIVE_FILES:
+    LIST_FILE_CLASSES[file] = file_find_matching_classes(file, FIND_PATTERN)
 
 # print_output(LIST_FILE_CLASSES)
 
