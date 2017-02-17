@@ -126,7 +126,7 @@ class ParamChange(object):
         """The customization arguments of the changing parameter
 
         Returns:
-            dict: A dict specifying the customization arguments for the 
+            dict: A dict specifying the customization arguments for the
             parameter.
         """
         return self._customization_args
@@ -143,11 +143,10 @@ class ParamChange(object):
         """Create a ParamChange object with the specified arguments.
 
         Args:
-            param_change_dict: dict. A dict containing data about the 
+            param_change_dict: dict. A dict containing data about the
             changing parameter (customization arguments, name, generator).
-                
         Returns:
-            ParamChange object: An object of class ParamChange. 
+            ParamChange object: An object of class ParamChange.
         """
         return cls(
             param_change_dict['name'], param_change_dict['generator_id'],
