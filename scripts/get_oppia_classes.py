@@ -3,13 +3,13 @@ import re
 import bs4
 
 
-def return_all_files(di):
+def return_all_files(dir_to_scan):
     """
     expects a directory name to search in
     returns all the files in the directory and subdirectories
     """
     val = []
-    for root, subdir, files in os.walk(di):
+    for root, subdir, files in os.walk(dir_to_scan):
         for f in files:
             val.append(os.path.join(root, f))
 
