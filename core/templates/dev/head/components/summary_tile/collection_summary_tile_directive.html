@@ -8,10 +8,15 @@
       </div>
 
       <div>
-        <div class="objective">
-          <span ng-if="getObjective()"><[getObjective() | truncateAndCapitalize: 45]></span>
-          <span ng-if="!getObjective()">No objective specified.</span>
-        </div>
+        <span ng-if="getObjective()" class="oppia-activity-summary-popover">
+          <span popover="<[getObjective()|capitalize]>" popover-placement="top" popover-trigger="mouseenter">
+            <div class="objective">
+              <[getObjective() | truncateAndCapitalize: 40]>
+            </div>
+          </span>
+        </span>
+
+        <span ng-if="!getObjective()">No objective specified.</span>
 
         <ul layout="row" class="metrics" layout-align="space-between center">
           <li>
