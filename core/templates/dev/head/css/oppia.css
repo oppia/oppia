@@ -1853,12 +1853,10 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-collection-player-tiles-container {
   height: 100%;
-  margin-left: 10%;
-  margin-right: auto;
-  max-width: 78%;
+  margin: 0 auto;
+  max-width: 975px;
   min-height: 500px;
   padding-bottom: 25px;
-  padding-left: 50px;
   padding-top: 30px;
   position: relative;
 }

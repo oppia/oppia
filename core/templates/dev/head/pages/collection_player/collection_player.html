@@ -29,22 +29,35 @@
         text-align: left;
         top: 168px;
       }
+      .oppia-collection-table {
+        background: #fff;
+        border-radius: 2px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
+        margin: 0 auto;
+        max-width: 80%;
+        padding: 20px 20px 60px 20px;
+        position: relative;
+        text-align: left;
+        top: 35px;
+        width: 100%;
+      }
       .oppia-card-preview-panel {
         background: #fff;
         border-radius: 2px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
+        left: 50%;
         padding: 30px 85px 70px 85px;
         pointer-events: none;
         position: fixed;
-        right: 12%;
         text-align: left;
         top: 244px;
+        transform: translateX(29%);
       }
       .collection-mascot {
-        width: 120px;
-        position: absolute;
         left: 40px;
+        position: absolute;
         top: 40px;
+        width: 120px;
       }
       .collection-subject-icon {
         width: 80px;
@@ -57,6 +70,113 @@
         font-style: italic;
         left: 42px;
         position: absolute;
+      }
+      @media only screen and (max-width : 600px) {
+        .oppia-collection-player-title-font {
+          font-size: 32px;
+        }
+      }
+      <!-- To avoid double shadows caused by overlaying preview card
+      over the blank preview card -->
+      exploration-summary-tile md-card {
+        box-shadow: none;
+      }
+
+      @-webkit-keyframes next-exploration-animation-effect {
+        from, 3.7%, to {
+          -webkit-transform: none;
+          transform: none;
+        }
+
+        7.4% {
+          -webkit-transform: skewX(-12.5deg) skewY(-12.5deg);
+          transform: skewX(-12.5deg) skewY(-12.5deg);
+        }
+
+        11.1% {
+          -webkit-transform: skewX(6.25deg) skewY(6.25deg);
+          transform: skewX(6.25deg) skewY(6.25deg);
+        }
+
+        14.8% {
+          -webkit-transform: skewX(-3.125deg) skewY(-3.125deg);
+          transform: skewX(-3.125deg) skewY(-3.125deg);
+        }
+
+        18.5% {
+          -webkit-transform: skewX(1.5625deg) skewY(1.5625deg);
+          transform: skewX(1.5625deg) skewY(1.5625deg);
+        }
+
+        22.2% {
+          -webkit-transform: skewX(-0.78125deg) skewY(-0.78125deg);
+          transform: skewX(-0.78125deg) skewY(-0.78125deg);
+        }
+
+        25.9% {
+          -webkit-transform: skewX(0.390625deg) skewY(0.390625deg);
+          transform: skewX(0.390625deg) skewY(0.390625deg);
+        }
+
+        29.6% {
+          -webkit-transform: skewX(-0.1953125deg) skewY(-0.1953125deg);
+          transform: skewX(-0.1953125deg) skewY(-0.1953125deg);
+        }
+        100% {
+          -webkit-transform: none;
+          transform: none;
+        }
+      }
+
+      @keyframes next-exploration-animation-effect {
+        from, 3.7%, to {
+          -webkit-transform: none;
+          transform: none;
+        }
+
+        7.4% {
+          -webkit-transform: skewX(-12.5deg) skewY(-12.5deg);
+          transform: skewX(-12.5deg) skewY(-12.5deg);
+        }
+
+        11.1% {
+          -webkit-transform: skewX(6.25deg) skewY(6.25deg);
+          transform: skewX(6.25deg) skewY(6.25deg);
+        }
+
+        14.8% {
+          -webkit-transform: skewX(-3.125deg) skewY(-3.125deg);
+          transform: skewX(-3.125deg) skewY(-3.125deg);
+        }
+
+        18.5% {
+          -webkit-transform: skewX(1.5625deg) skewY(1.5625deg);
+          transform: skewX(1.5625deg) skewY(1.5625deg);
+        }
+
+        22.2% {
+          -webkit-transform: skewX(-0.78125deg) skewY(-0.78125deg);
+          transform: skewX(-0.78125deg) skewY(-0.78125deg);
+        }
+
+        25.9% {
+          -webkit-transform: skewX(0.390625deg) skewY(0.390625deg);
+          transform: skewX(0.390625deg) skewY(0.390625deg);
+        }
+
+        29.6% {
+          -webkit-transform: skewX(-0.1953125deg) skewY(-0.1953125deg);
+          transform: skewX(-0.1953125deg) skewY(-0.1953125deg);
+        }
+        100% {
+          -webkit-transform: none;
+          transform: none;
+        }
+      }
+      .animate-next-exploration {
+        animation: next-exploration-animation-effect 3s infinite;
+        transform-origin: center;
+        -webkit-transform-origin: center;
       }
     </style>
   {% endif %}
@@ -95,8 +215,7 @@
         <span>You have finished the collection! Feel free to replay any explorations below.</span>
       </h2>
 
-      <div ng-if="collection" class="oppia-collection-path-section">
-
+      <div ng-if="collection" class="oppia-collection-path-section hidden-sm hidden-xs">
         <svg width="500px" ng-attr-height="<[svgHeight + 'px']>" xmlns="http://www.w3.org/2000/svg">
           <path fill="none"
                 stroke="#296E5F"
@@ -149,16 +268,15 @@
              ng-mouseover="updateExplorationPreview(node.getExplorationId());
                            setIconHighlight($index);"
              ng-mouseleave="togglePreviewCard();
-                            unsetIconHighlight($index);">
+                            unsetIconHighlight($index);"
+             ng-class="{'animate-next-exploration': node.getExplorationId() === nextExplorationId}">
              <circle ng-show="($index===activeHighlightedIconIndex)?true:false"
                      cx="50"
                      cy="70"
-                     r="45"
+                     r="50"
                      id="<['highlight' + $index]>"
-                     fill="none"
-                     stroke="#A6DACF"
-                     stroke-width="10"
-                     stroke-opacity="0.5"/>
+                     fill="#A6DACF"
+                     fill-opacity="0.5"/>
              <circle cx="50"
                      cy="70"
                      r="42"
@@ -176,30 +294,63 @@
              <[$index + 1]>
           </text>
         </svg>
+      </div>
 
-        <div ng-if="collection" class="oppia-card-preview-panel hidden-sm hidden-xs">
-          <md-card class="oppia-activity-summary-tile md-default-theme">
-            <div class="title-section" style="background-color: <[collectionSummary.thumbnail_bg_color]>; z-index: 1;">
-              <img ng-src="<[collectionSummary.thumbnail_icon_url]>" class="thumbnail-image">
-            </div>
-            <div class="title-section-mask" style="padding: 45px;"></div>
-          </md-card>
-          <span class="highlight-location-text">Highlight location to see lesson.</span>
-          <exploration-summary-tile ng-if="!previewCardIsShown"
-                                    collection-id="getCollectionId()"
-                                    exploration-id="currentExplorationId"
-                                    exploration-title="summaryToPreview.title"
-                                    last-updated-msec="summaryToPreview.last_updated_msec"
-                                    objective="summaryToPreview.objective"
-                                    category="summaryToPreview.category"
-                                    ratings="summaryToPreview.ratings"
-                                    num-views="summaryToPreview.num_views"
-                                    thumbnail-icon-url="summaryToPreview.thumbnail_icon_url"
-                                    thumbnail-bg-color="summaryToPreview.thumbnail_bg_color"
-                                    is-community-owned="summaryToPreview.community_owned"
-                                    style="position: absolute; left: 85px; top: 30px; z-index: 10;">
-          <exploration-summary-tile/>
-        </div>
+      <div ng-if="collection" class="oppia-collection-table hidden-md hidden-lg hidden-xl">
+        <table class="oppia-dashboard-table">
+          <tr>
+            <th>
+              <p>Exploration</p>
+            </th>
+            <th class="hidden-xs">
+              <p>Objective</p>
+            </th>
+          </tr>
+          <tr ng-repeat="node in collection.getCollectionNodes()"
+              class="exploration-list-item">
+            <td class="oppia-exploration-list-table-item">
+              <a ng-href="/explore/<[node.getExplorationId()]>"
+                 ng-mouseover="updateExplorationPreview(node.getExplorationId())"
+                 ng-mouseleave="togglePreviewCard()"
+                 class="oppia-dashboard-list-summary">
+                <[node.getExplorationSummaryObject().title]>
+              </a>
+            </td>
+            <td class="hidden-xs oppia-exploration-list-table-item">
+              <a ng-href="/explore/<[node.getExplorationId()]>"
+                 ng-mouseover="updateExplorationPreview(node.getExplorationId())"
+                 ng-mouseleave="togglePreviewCard()"
+                 class="oppia-dashboard-list-summary">
+                <[node.getExplorationSummaryObject().objective]>
+              </a>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div ng-if="collection" class="oppia-card-preview-panel hidden-sm hidden-xs">
+        <md-card class="oppia-activity-summary-tile md-default-theme">
+          <div class="title-section" style="background-color: <[collectionSummary.thumbnail_bg_color]>; z-index: 1;">
+            <img ng-src="<[collectionSummary.thumbnail_icon_url]>" class="thumbnail-image">
+          </div>
+          <div class="title-section-mask" style="padding: 22px;">
+            <span style="font-size: 14px;">Highlight an icon to preview an exploration.</span>
+          </div>
+        </md-card>
+        <exploration-summary-tile ng-if="!previewCardIsShown"
+                                  collection-id="getCollectionId()"
+                                  exploration-id="currentExplorationId"
+                                  exploration-title="summaryToPreview.title"
+                                  last-updated-msec="summaryToPreview.last_updated_msec"
+                                  objective="summaryToPreview.objective"
+                                  category="summaryToPreview.category"
+                                  ratings="summaryToPreview.ratings"
+                                  num-views="summaryToPreview.num_views"
+                                  thumbnail-icon-url="summaryToPreview.thumbnail_icon_url"
+                                  thumbnail-bg-color="summaryToPreview.thumbnail_bg_color"
+                                  is-community-owned="summaryToPreview.community_owned"
+                                  style="position: absolute; left: 85px; top: 30px; z-index: 10;">
+        <exploration-summary-tile/>
       </div>
     </div>
   </div>
@@ -214,7 +365,7 @@
   {{ super() }}
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_player/CollectionPlayer.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_player/CollectionNodeListDirective.js"></script>
-  
+
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionNodeObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionPlaythroughObjectFactory.js"></script>

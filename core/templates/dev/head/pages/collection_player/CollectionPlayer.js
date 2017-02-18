@@ -56,6 +56,7 @@ oppia.controller('CollectionPlayer', [
     $scope.ICON_X_LEFT_PX = 55;
     $scope.ICON_X_RIGHT_PX = 395;
     $scope.svgHeight = $scope.MIN_HEIGHT_FOR_PATH_SVG_PX;
+    $scope.nextExplorationId = null;
 
     $scope.setIconHighlight = function(index) {
       $scope.activeHighlightedIconIndex = index;
@@ -159,7 +160,11 @@ oppia.controller('CollectionPlayer', [
         $scope.pathSvgParameters += ' S ' + sParameterExtension;
       }
       if (collectionNodeCount % 2 === 0) {
-        $scope.svgHeight = y - $scope.EVEN_SVG_HEIGHT_OFFSET_PX;
+        if (collectionNodeCount === 2) {
+          $scope.svgHeight = $scope.MIN_HEIGHT_FOR_PATH_SVG_PX;
+        } else {
+          $scope.svgHeight = y - $scope.EVEN_SVG_HEIGHT_OFFSET_PX;
+        }
       } else {
         $scope.svgHeight = y - $scope.ODD_SVG_HEIGHT_OFFSET_PX;
       }
@@ -243,6 +248,12 @@ oppia.controller('CollectionPlayer', [
         $scope.collectionPlaythrough = (
           CollectionPlaythroughObjectFactory.create(
             collectionBackendObject.playthrough_dict));
+        if ($scope.collectionPlaythrough.getNextExplorationIds()[0] !== null) {
+          $scope.nextExplorationId = (
+            $scope.collectionPlaythrough.getNextExplorationIds()[0]);
+        } else {
+          $scope.nextExplorationId = null;
+        }
       },
       function() {
         // TODO(bhenning): Handle not being able to load the collection.
