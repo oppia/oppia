@@ -153,9 +153,10 @@ describe('Full exploration editor', function() {
       editor.navigateToMainTab();
       editor.expectCurrentStateToBe('final card');
       editor.moveToState('second');
-      
-      //check settings tab summary card preview
+
+      // Check settings tab summary card preview
       editor.previewSummaryTile();
+      
       // Check editor preview tab
       editor.navigateToPreviewTab();
       player.expectContentToMatch(function(richTextEditor) {
