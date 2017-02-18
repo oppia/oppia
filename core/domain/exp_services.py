@@ -32,6 +32,7 @@ import StringIO
 import zipfile
 
 from core.domain import activity_services
+from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import feedback_services
 from core.domain import fs_domain
@@ -970,7 +971,9 @@ def _get_last_updated_by_human_ms(exp_id):
 
 def publish_exploration_and_update_user_profiles(committer_id, exp_id):
     """Publishes the exploration with publish_exploration() function in
-    rights_manager.py, as well as updates first_contribution_msec.
+    rights_manager.py, as well as updates first_contribution_msec. Sends an
+    email to the subscribers of the commiter informing them that an exploration
+    has been published.
 
     It is the responsibility of the caller to check that the exploration is
     valid prior to publication.
@@ -980,6 +983,9 @@ def publish_exploration_and_update_user_profiles(committer_id, exp_id):
         exp_id: str. The id of the exploration to be published.
     """
     rights_manager.publish_exploration(committer_id, exp_id)
+    exp_title = get_exploration_by_id(exp_id).title
+    email_subscription_services.inform_subscribers(
+        committer_id, exp_id, exp_title)
     contribution_time_msec = utils.get_current_time_in_millisecs()
     contributor_ids = get_exploration_summary_by_id(exp_id).contributor_ids
     for contributor in contributor_ids:

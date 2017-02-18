@@ -16,6 +16,7 @@
 
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import subscription_services
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
@@ -318,6 +319,40 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         self.assertFalse(email_preferences.can_receive_editor_role_email)
         self.assertFalse(email_preferences.can_receive_feedback_message_email)
         self.assertFalse(email_preferences.can_receive_subscription_email)
+
+
+class PreferencesHandlerTests(test_utils.GenericTestBase):
+    EXP_ID = 'exp_id'
+    EXP_TITLE = 'Exploration title'
+
+    def setUp(self):
+        super(PreferencesHandlerTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+    def test_can_see_subscriptions(self):
+        self.login(self.VIEWER_EMAIL)
+
+        response = self.get_json(feconf.PREFERENCES_DATA_URL)
+        self.assertEqual(len(response['subscription_list']), 0)
+
+        # Subscribe to user.
+        subscription_services.subscribe_to_creator(
+            self.viewer_id, self.owner_id)
+        response = self.get_json(feconf.PREFERENCES_DATA_URL)
+        self.assertEqual(len(response['subscription_list']), 1)
+        self.assertEqual(
+            response['subscription_list'][0]['creator_username'],
+            self.OWNER_USERNAME)
+
+        # Unsubscribe from user.
+        subscription_services.unsubscribe_from_creator(
+            self.viewer_id, self.owner_id)
+        response = self.get_json(feconf.PREFERENCES_DATA_URL)
+        self.assertEqual(len(response['subscription_list']), 0)
 
 
 class ProfileLinkTests(test_utils.GenericTestBase):

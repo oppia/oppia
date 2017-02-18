@@ -135,7 +135,7 @@ body {
 }
 
 .oppia-dashboard-container {
-  margin: 60px auto 30px auto;
+  margin: 0 auto 30px auto;
   max-width: 800px;
 }
 
@@ -1206,9 +1206,13 @@ textarea {
   position: relative;
 }
 
+.oppia-dashboard-aggregated-stats {
+  padding-top: 55px;
+}
+
 .oppia-dashboard-aggregated-stats md-card {
   background: #fff;
-  margin: 0 7.5px 40px 7.5px;
+  margin: 0 7.5px 70px 7.5px;
 }
 
 .oppia-dashboard-aggregated-stats .stats-card {
@@ -1269,7 +1273,17 @@ textarea {
 }
 
 .oppia-dashboard-empty-text {
-  padding-top: 50px;
+  padding-top: 15px;
+}
+
+.oppia-dashboard-title {
+  color: #01645c;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 3em;
+  margin-top: 0px;
+  margin-bottom: 25px;
+  padding-top: 78.5px;
+  text-align: center;
 }
 
 .oppia-dashboard-tabs .list-card-view-toggle {
@@ -1303,31 +1317,30 @@ textarea {
   color: #fff;
 }
 
-li.sort-explorations-select {
-  display: block;
-  margin-left: auto;
+span.sort-explorations-select {
+  display: inline-block;
   margin-right: auto;
   width: auto;
 }
 
-li.sort-explorations-select .sort-by-text,
-li.sort-explorations-select .sort-options,
-li.sort-explorations-select .sort-order {
+span.sort-explorations-select .sort-by-text,
+span.sort-explorations-select .sort-options,
+span.sort-explorations-select .sort-order {
   display: inline-block;
 }
 
-li.sort-explorations-select .sort-by-text {
+span.sort-explorations-select .sort-by-text {
   margin: 8px 8px 0 ;
 }
 
-li.sort-explorations-select .sort-options {
+span.sort-explorations-select .sort-options {
   background: #fff;
   border-color: #ddd;
   height: 32px;
   margin: 7px 7px 0 0;
 }
 
-li.sort-explorations-select .sort-order {
+span.sort-explorations-select .sort-order {
   cursor: pointer;
   margin: 14px 8px 0 0;
 }
@@ -1849,6 +1862,26 @@ pre.oppia-pre-wrapped-text {
   padding-top: 30px;
   position: relative;
 }
+
+.oppia-preferences-page-heading {
+  color: #01645c;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 3em;
+  margin-top: 0;
+  margin-bottom: 10px;
+  padding-top: 45px;
+  position: relative;
+  text-align: center;
+}
+
+.oppia-preferences-page-heading-subtext {
+  color: #01645c;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 1.2em;
+  position: relative;
+  text-align: center;
+}
+
 .oppia-collection-player-tiles-container .oppia-page-heading {
   color: #005048;
   text-align: center;
@@ -2900,6 +2933,7 @@ div#ng-curtain {
   margin-bottom: 80px;
   margin-top: 40px;
   padding: 30px 55px 30px 45px;
+  position: relative;
 }
 .oppia-page-card li {
   margin-bottom: 10px;
@@ -3966,8 +4000,44 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-card-view-wrap {
-  margin-top: 8px;
   position: relative;
+}
+
+.oppia-subscription-card {
+  background-color: #fff;
+  display: inline-block;
+  height: 90px;
+  padding: 0;
+  width: 184px;
+}
+
+.oppia-dashboard-tab-panel {
+  font-size: 15px;
+  padding: 5px 0 20px 10px;
+}
+
+.oppia-dashboard-total-elements {
+  display: inline-block;
+  margin-top: 14px;
+}
+
+.oppia-subscription-profile-link {
+  display: block;
+  height: inherit;
+  width: 100%;
+}
+
+.oppia-subscription-card-profile-picture {
+  float: left;
+  margin-left: 14px;
+  margin-top: 14px;
+  width: 60px;
+}
+
+.oppia-subscription-card-summary {
+  float: left;
+  margin-left: 14px;
+  margin-top: 19.5px;
 }
 
 .oppia-activity-summary-tile.oppia-dashboard-collection-tile {
@@ -3995,7 +4065,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-dashboard-card-view-item .exp-private-text {
   font-size: 13px;
-  margin: 0 0.5em;
+  margin: 0.5em;
   padding: 0.2em;
 }
 

@@ -15,9 +15,10 @@
 	"I18N_CREATE_EXPLORATION_UPLOAD": "अपलोड",
 	"I18N_CREATE_NO_THANKS": "नहीं, धन्यवाद",
 	"I18N_CREATE_YES_PLEASE": "हाँ!",
-	"I18N_DASHBOARD_MY_COLLECTIONS": "मेरे कलेक्शन्स",
-	"I18N_DASHBOARD_MY_EXPLORATIONS": "मेरे एक्सप्लोरेशन्स",
+	"I18N_DASHBOARD_COLLECTIONS": "कलेक्शन्स",
+	"I18N_DASHBOARD_EXPLORATIONS": "एक्सप्लोरेशन्स",
 	"I18N_DASHBOARD_OPEN_FEEDBACK": "फीडबैक देखे",
+	"I18N_DASHBOARD_SUBSCRIBERS": "ग्राहकों",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "यहाँ छवि को खींचें",
 	"I18N_DIRECTIVES_OR_SELECT_FILE": "या एक छवि फ़ाइल को चुने:",
 	"I18N_ERROR_DISABLED_EXPLORATION": "निर्योग्य एक्सप्लोरेशन",
@@ -158,6 +159,7 @@
 	"I18N_LIBRARY_SUB_HEADER": "हमारे एक्सप्लोरेशन्स ब्राउज़ कर अपनी यात्रा शुरू करे।",
 	"I18N_LIBRARY_VIEWS_TOOLTIP": "मत",
 	"I18N_LIBRARY_VIEW_ALL": "सभी को देखें",
+	"I18N_ONE_SUBSCRIBER_TEXT": "आपके पास 1 ग्राहक है।",
 	"I18N_PLAYER_BACK": "वापस",
 	"I18N_PLAYER_CARD_NUMBER_TOOLTIP": "कार्ड #",
 	"I18N_PLAYER_COMMUNITY_EDITABLE_TOOLTIP": "समुदाय संपादन योग्य",
@@ -297,5 +299,6 @@
 	"I18N_TOPNAV_PREFERENCES": "प्राथमिकताएं",
 	"I18N_TOPNAV_SIGN_IN": "खाता खोले",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Oppia के साथ  सिखाये",
+	"I18N_TOTAL_SUBSCRIBERS_TEXT": "आपके पास <[totalSubscribers]> ग्राहकों है।",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "सदस्यता समाप्त"
 }
