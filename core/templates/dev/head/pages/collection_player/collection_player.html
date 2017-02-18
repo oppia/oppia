@@ -34,12 +34,12 @@
         border-radius: 2px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
         margin: 0 auto;
-        width: 100%;
         max-width: 80%;
         padding: 20px 20px 60px 20px;
         position: relative;
         text-align: left;
         top: 35px;
+        width: 100%;
       }
       .oppia-card-preview-panel {
         background: #fff;
@@ -54,10 +54,10 @@
         transform: translateX(29%);
       }
       .collection-mascot {
-        width: 120px;
-        position: absolute;
         left: 40px;
+        position: absolute;
         top: 40px;
+        width: 120px;
       }
       .collection-subject-icon {
         width: 80px;
@@ -71,10 +71,8 @@
         left: 42px;
         position: absolute;
       }
-      @media only screen and (max-width : 600px)
-      {
-        .oppia-collection-player-title-font
-        {
+      @media only screen and (max-width : 600px) {
+        .oppia-collection-player-title-font {
           font-size: 32px;
         }
       }
@@ -83,42 +81,42 @@
       }
 
       @-webkit-keyframes next-exploration-animation-effect {
-        from, 2.22%, to {
+        from, 5.55%, to {
           -webkit-transform: none;
           transform: none;
         }
 
-        4.44% {
+        11.1% {
           -webkit-transform: skewX(-12.5deg) skewY(-12.5deg);
           transform: skewX(-12.5deg) skewY(-12.5deg);
         }
 
-        6.66% {
+        16.65% {
           -webkit-transform: skewX(6.25deg) skewY(6.25deg);
           transform: skewX(6.25deg) skewY(6.25deg);
         }
 
-        8.88% {
+        22.2% {
           -webkit-transform: skewX(-3.125deg) skewY(-3.125deg);
           transform: skewX(-3.125deg) skewY(-3.125deg);
         }
 
-        11.1% {
+        27.75% {
           -webkit-transform: skewX(1.5625deg) skewY(1.5625deg);
           transform: skewX(1.5625deg) skewY(1.5625deg);
         }
 
-        13.32% {
+        33.3% {
           -webkit-transform: skewX(-0.78125deg) skewY(-0.78125deg);
           transform: skewX(-0.78125deg) skewY(-0.78125deg);
         }
 
-        15.54% {
+        38.85% {
           -webkit-transform: skewX(0.390625deg) skewY(0.390625deg);
           transform: skewX(0.390625deg) skewY(0.390625deg);
         }
 
-        17.76% {
+        44.4% {
           -webkit-transform: skewX(-0.1953125deg) skewY(-0.1953125deg);
           transform: skewX(-0.1953125deg) skewY(-0.1953125deg);
         }
@@ -129,42 +127,42 @@
       }
 
       @keyframes next-exploration-animation-effect {
-        from, 2.22%, to {
+        from, 5.55%, to {
           -webkit-transform: none;
           transform: none;
         }
 
-        4.44% {
+        11.1% {
           -webkit-transform: skewX(-12.5deg) skewY(-12.5deg);
           transform: skewX(-12.5deg) skewY(-12.5deg);
         }
 
-        6.66% {
+        16.65% {
           -webkit-transform: skewX(6.25deg) skewY(6.25deg);
           transform: skewX(6.25deg) skewY(6.25deg);
         }
 
-        8.88% {
+        22.2% {
           -webkit-transform: skewX(-3.125deg) skewY(-3.125deg);
           transform: skewX(-3.125deg) skewY(-3.125deg);
         }
 
-        11.1% {
+        27.75% {
           -webkit-transform: skewX(1.5625deg) skewY(1.5625deg);
           transform: skewX(1.5625deg) skewY(1.5625deg);
         }
 
-        13.32% {
+        33.3% {
           -webkit-transform: skewX(-0.78125deg) skewY(-0.78125deg);
           transform: skewX(-0.78125deg) skewY(-0.78125deg);
         }
 
-        15.54% {
+        38.85% {
           -webkit-transform: skewX(0.390625deg) skewY(0.390625deg);
           transform: skewX(0.390625deg) skewY(0.390625deg);
         }
 
-        17.76% {
+        44.4% {
           -webkit-transform: skewX(-0.1953125deg) skewY(-0.1953125deg);
           transform: skewX(-0.1953125deg) skewY(-0.1953125deg);
         }
@@ -174,7 +172,7 @@
         }
       }
       .animate-next-exploration {
-        animation: 5s next-exploration-animation-effect 5s infinite;
+        animation: next-exploration-animation-effect 2s infinite;
         transform-origin: center;
         -webkit-transform-origin: center;
       }
@@ -277,7 +275,7 @@
                      fill="#A6DACF"
                      fill-opacity="0.5"
                      />
-             <circle ng-class="(isNextExploration(node.getExplorationId()))?'animate-next-exploration':''"
+             <circle ng-class="{'animate-next-exploration': node.getExplorationId() === nextExplorationId}"
                      cx="50"
                      cy="70"
                      r="42"
@@ -329,7 +327,6 @@
         </table>
       </div>
 
-
       <div ng-if="collection" class="oppia-card-preview-panel hidden-sm hidden-xs">
         <md-card class="oppia-activity-summary-tile md-default-theme">
           <div class="title-section" style="background-color: <[collectionSummary.thumbnail_bg_color]>; z-index: 1;">
@@ -367,7 +364,7 @@
   {{ super() }}
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_player/CollectionPlayer.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_player/CollectionNodeListDirective.js"></script>
-  
+
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionNodeObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionPlaythroughObjectFactory.js"></script>
