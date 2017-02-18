@@ -644,6 +644,7 @@ class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
     _REMOVED_PERM_DELETED_EXP = 'rem_perm_deleted_exp'
     _REMOVED_DELETED_EXP = 'rem_deleted_exp'
     _REMOVED_IMPOSSIBLE_AGE = 'rem_impossible_age'
+    _REMOVED_PLANNED_GI_ANSWER = 'rem_planned_graph_input_answer'
     _REMOVED_PLANNED_MC_ANSWER = 'rem_planned_multiple_choice_answer'
     _TRIMMED_PLANNED_MC_ANSWER = 'trim_planned_multiple_choice_answer'
     _TRIMMED_PLANNED_NUM_ANSWER = 'trim_planned_numeric_input_answer'
@@ -715,6 +716,22 @@ class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
 
         # TODO(bhenning): Verify these buckets are okay to delete before running
         # the final production job.
+        bucket_ids_to_remove_graph_input = [
+            '11.Bosses question.submit.Default',
+            '11.Cities question.submit.Default',
+            '11.Friends question.submit.Default',
+            '11.Friends question.submit.IsIsomorphicTo({u\'isWeighted\': '
+            'False, u\'isDirected\': False, u\'edges\': [], u\'isLabeled\': '
+            'True, u\'vertices\': [{u\'y\': 85, u\'x\': 115.09375, u\'label\': '
+            'u\'Alice\'}, {u\'y\': 110, u\'x\': 184.09375, u\'label\': '
+            'u\'Bob\'}, {u\'y\': 156, u\'x\': 164.09375, u\'label\': '
+            'u\'Charlie\'}, {u\'y\': 185, u\'x\': 109.09375, u\'label\': '
+            'u\'David\'}, {u\'y\': 138, u\'x\': 80.09375, u\'label\': '
+            'u\'Emily\'}]})']
+        if item.id in bucket_ids_to_remove_graph_input:
+            yield (PurgeInconsistentAnswersJob._REMOVED_PLANNED_GI_ANSWER, {})
+            item.delete()
+
         buckets_ids_to_remove_multiple_choice = [
             'oJW92mLvzIXE.A-Q (PhET 1).submit.Default',
             'S3r1vS0QJlF_.How Data Brokers are Tracking you!.submit.Default']
@@ -784,6 +801,10 @@ class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
             yield (
                 'Removed %d answer(s) submitted before its exploration was '
                 'created' % removed_count)
+        elif key == PurgeInconsistentAnswersJob._REMOVED_PLANNED_GI_ANSWER:
+            yield (
+                'Removed %d answer buckets which are impossible to '
+                'reconstitute (GraphInput)' % removed_count)
         elif key == PurgeInconsistentAnswersJob._REMOVED_PLANNED_MC_ANSWER:
             yield (
                 'Removed %d answer buckets which were manually verified to '
