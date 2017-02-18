@@ -252,9 +252,10 @@ oppia.controller('CollectionPlayer', [
         $scope.collectionPlaythrough = (
           CollectionPlaythroughObjectFactory.create(
             collectionBackendObject.playthrough_dict));
-        if ($scope.collectionPlaythrough.getNextExplorationIds().length > 0) {
-          $scope.nextExplorationId = (
-            $scope.collectionPlaythrough.getNextExplorationIds()[0]);
+        var nextExplorationIds = (
+          $scope.collectionPlaythrough.getNextExplorationIds());
+        if (nextExplorationIds.length > 0) {
+          $scope.nextExplorationId = (nextExplorationIds[0]);
         } else {
           $scope.nextExplorationId = null;
         }
