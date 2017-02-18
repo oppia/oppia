@@ -166,7 +166,11 @@ oppia.controller('CollectionPlayer', [
           $scope.svgHeight = y - $scope.EVEN_SVG_HEIGHT_OFFSET_PX;
         }
       } else {
-        $scope.svgHeight = y - $scope.ODD_SVG_HEIGHT_OFFSET_PX;
+        if (collectionNodeCount === 1) {
+          $scope.svgHeight = $scope.MIN_HEIGHT_FOR_PATH_SVG_PX;
+        } else {
+          $scope.svgHeight = y - $scope.ODD_SVG_HEIGHT_OFFSET_PX;
+        }
       }
     };
 
@@ -248,7 +252,7 @@ oppia.controller('CollectionPlayer', [
         $scope.collectionPlaythrough = (
           CollectionPlaythroughObjectFactory.create(
             collectionBackendObject.playthrough_dict));
-        if ($scope.collectionPlaythrough.getNextExplorationIds()[0] !== null) {
+        if ($scope.collectionPlaythrough.getNextExplorationIds().length > 0) {
           $scope.nextExplorationId = (
             $scope.collectionPlaythrough.getNextExplorationIds()[0]);
         } else {
