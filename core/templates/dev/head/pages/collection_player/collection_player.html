@@ -81,42 +81,42 @@
       }
 
       @-webkit-keyframes next-exploration-animation-effect {
-        from, 5.55%, to {
+        from, 3.7%, to {
           -webkit-transform: none;
           transform: none;
         }
 
-        11.1% {
+        7.4% {
           -webkit-transform: skewX(-12.5deg) skewY(-12.5deg);
           transform: skewX(-12.5deg) skewY(-12.5deg);
         }
 
-        16.65% {
+        11.1% {
           -webkit-transform: skewX(6.25deg) skewY(6.25deg);
           transform: skewX(6.25deg) skewY(6.25deg);
         }
 
-        22.2% {
+        14.8% {
           -webkit-transform: skewX(-3.125deg) skewY(-3.125deg);
           transform: skewX(-3.125deg) skewY(-3.125deg);
         }
 
-        27.75% {
+        18.5% {
           -webkit-transform: skewX(1.5625deg) skewY(1.5625deg);
           transform: skewX(1.5625deg) skewY(1.5625deg);
         }
 
-        33.3% {
+        22.2% {
           -webkit-transform: skewX(-0.78125deg) skewY(-0.78125deg);
           transform: skewX(-0.78125deg) skewY(-0.78125deg);
         }
 
-        38.85% {
+        25.9% {
           -webkit-transform: skewX(0.390625deg) skewY(0.390625deg);
           transform: skewX(0.390625deg) skewY(0.390625deg);
         }
 
-        44.4% {
+        29.6% {
           -webkit-transform: skewX(-0.1953125deg) skewY(-0.1953125deg);
           transform: skewX(-0.1953125deg) skewY(-0.1953125deg);
         }
@@ -127,42 +127,42 @@
       }
 
       @keyframes next-exploration-animation-effect {
-        from, 5.55%, to {
+        from, 3.7%, to {
           -webkit-transform: none;
           transform: none;
         }
 
-        11.1% {
+        7.4% {
           -webkit-transform: skewX(-12.5deg) skewY(-12.5deg);
           transform: skewX(-12.5deg) skewY(-12.5deg);
         }
 
-        16.65% {
+        11.1% {
           -webkit-transform: skewX(6.25deg) skewY(6.25deg);
           transform: skewX(6.25deg) skewY(6.25deg);
         }
 
-        22.2% {
+        14.8% {
           -webkit-transform: skewX(-3.125deg) skewY(-3.125deg);
           transform: skewX(-3.125deg) skewY(-3.125deg);
         }
 
-        27.75% {
+        18.5% {
           -webkit-transform: skewX(1.5625deg) skewY(1.5625deg);
           transform: skewX(1.5625deg) skewY(1.5625deg);
         }
 
-        33.3% {
+        22.2% {
           -webkit-transform: skewX(-0.78125deg) skewY(-0.78125deg);
           transform: skewX(-0.78125deg) skewY(-0.78125deg);
         }
 
-        38.85% {
+        25.9% {
           -webkit-transform: skewX(0.390625deg) skewY(0.390625deg);
           transform: skewX(0.390625deg) skewY(0.390625deg);
         }
 
-        44.4% {
+        29.6% {
           -webkit-transform: skewX(-0.1953125deg) skewY(-0.1953125deg);
           transform: skewX(-0.1953125deg) skewY(-0.1953125deg);
         }
@@ -172,7 +172,7 @@
         }
       }
       .animate-next-exploration {
-        animation: next-exploration-animation-effect 2s infinite;
+        animation: next-exploration-animation-effect 3s infinite;
         transform-origin: center;
         -webkit-transform-origin: center;
       }
@@ -266,17 +266,16 @@
              ng-mouseover="updateExplorationPreview(node.getExplorationId());
                            setIconHighlight($index);"
              ng-mouseleave="togglePreviewCard();
-                            unsetIconHighlight($index);">
+                            unsetIconHighlight($index);"
+             ng-class="{'animate-next-exploration': node.getExplorationId() === nextExplorationId}">
              <circle ng-show="($index===activeHighlightedIconIndex)?true:false"
                      cx="50"
                      cy="70"
                      r="50"
                      id="<['highlight' + $index]>"
                      fill="#A6DACF"
-                     fill-opacity="0.5"
-                     />
-             <circle ng-class="{'animate-next-exploration': node.getExplorationId() === nextExplorationId}"
-                     cx="50"
+                     fill-opacity="0.5"/>
+             <circle cx="50"
                      cy="70"
                      r="42"
                      fill="url(#image<[$index]>)"
