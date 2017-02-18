@@ -18,16 +18,19 @@
 
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
+var workflow = require('../protractor_utils/workflow.js');
 
 describe('Subscriptions functionality', function() {
   it('handle subscriptions to creators correctly', function() {
     // Create two creators.
     users.createUser('creator1@subscriptions.com', 'creator1subscriptions');
     users.login('creator1@subscriptions.com');
+    workflow.createExploration();
     users.logout();
 
     users.createUser('creator2@subscriptions.com', 'creator2subscriptions');
     users.login('creator2@subscriptions.com');
+    workflow.createExploration();
     users.logout();
 
     // Create a learner who subscribes to both the creators.
