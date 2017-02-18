@@ -75,7 +75,7 @@ class InformSubscribersTest(test_utils.GenericTestBase):
 
         with self.can_send_emails_ctx, self.can_send_subscription_email_ctx:
             email_subscription_services.inform_subscribers(
-                self.editor_id, 'A')
+                self.editor_id, 'A', 'Title')
 
             # make sure correct number of emails is sent and no email is sent
             # to the person who has unsubscribed from subscription emails.

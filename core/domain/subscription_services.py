@@ -104,7 +104,7 @@ def unsubscribe_from_creator(user_id, creator_id):
         subscriptions_model_user.put()
 
 
-def get_all_creators_to_which_learner_has_subscribed(user_id):
+def get_all_creators_subscribed_to(user_id):
     """Returns a list with ids of all the creators to which this learner has
     subscribed.
 

@@ -182,6 +182,9 @@ oppia.factory('deviceInfoService', ['$window', function($window) {
     isMobileDevice: function() {
       return typeof $window.orientation !== 'undefined';
     },
+    isMobileUserAgent: function() {
+      return /Mobi/.test(navigator.userAgent);
+    },
     hasTouchEvents: function() {
       return 'ontouchstart' in $window;
     }

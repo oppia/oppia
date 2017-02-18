@@ -53,6 +53,7 @@ current_user_services = models.Registry.import_current_user_services()
 # state name and the destination of the default rule should first be
 # changed to the desired new state name.
 NEW_STATE_TEMPLATE = {
+    'classifier_model_id': None,
     'content': [{
         'type': 'text',
         'value': ''

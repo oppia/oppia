@@ -31,7 +31,7 @@
 {%- endmacro %}
 
 <!DOCTYPE html>
-<html ng-app="oppia" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
   <head>
     {% block prerender %}
     {% endblock prerender %}
@@ -249,37 +249,14 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/ImageUploaderDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/ObjectEditorDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/Select2DropdownDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedCustomEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedDictEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedExpressionEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedFloatEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedHtmlEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedIntEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedListEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedCustomViewerDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedDictViewerDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedListViewerDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedViewerDirective.js"></script>
-
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/side_navigation_bar/SideNavigationBarDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/social_buttons/SocialButtonsDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/top_navigation_bar/TopNavigationBarDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CircularImageDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CollectionSummaryTileDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/CollectionCreationService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/ExplorationCreationService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingDisplayDirective.js"></script>
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/domain/sidebar/SidebarStatusService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/UrlInterpolationService.js"></script>

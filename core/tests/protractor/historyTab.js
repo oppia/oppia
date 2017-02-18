@@ -54,94 +54,98 @@ describe('Exploration history', function() {
 
     var VERSION_1_STATE_1_CONTENTS = {
       1: {
-        text: 'content:',
+        text: 'classifier_model_id: null',
         highlighted: false
       },
       2: {
-        text: '- type: text',
+        text: 'content:',
         highlighted: false
       },
       3: {
+        text: '- type: text',
+        highlighted: false
+      },
+      4: {
         text: '  value: <p>enter 6 to continue</p>',
         highlighted: true
       },
-      4: {
+      5: {
         text: 'interaction:',
         highlighted: false
       },
-      5: {
+      6: {
         text: '  answer_groups:',
         highlighted: true
       },
-      6: {
+      7: {
         text: '  - outcome:',
         highlighted: true
       },
-      7: {
+      8: {
         text: '      dest: second',
         highlighted: true
       },
-      8: {
+      9: {
         text: '      feedback: []',
         highlighted: true
       },
-      9: {
+      10: {
         text: '      param_changes: []',
         highlighted: true
       },
-      10: {
+      11: {
         text: '    rule_specs:',
         highlighted: true
       },
-      11: {
+      12: {
         text: '    - inputs:',
         highlighted: true
       },
-      12: {
+      13: {
         text: '        x: 6',
         highlighted: true
       },
-      13: {
+      14: {
         text: '      rule_type: Equals',
         highlighted: true
       },
-      14: {
+      15: {
         text: '  confirmed_unclassified_answers: []',
         highlighted: false
       },
-      15: {
+      16: {
         text: '  customization_args: {}',
         highlighted: false
       },
-      16: {
+      17: {
         text: '  default_outcome:',
         highlighted: false
       },
-      17: {
+      18: {
         text: '    dest: first',
         highlighted: true
       },
-      18: {
+      19: {
         text: '    feedback: []',
         highlighted: false
       },
-      19: {
+      20: {
         text: '    param_changes: []',
         highlighted: false
       },
-      20: {
+      21: {
         text: '  fallbacks: []',
         highlighted: false
       },
-      21: {
+      22: {
         text: '  id: NumericInput',
         highlighted: true
       },
-      22: {
+      23: {
         text: 'param_changes: []',
         highlighted: false
       },
-      23: {
+      24: {
         text: ' ',
         highlighted: false
       }
@@ -149,70 +153,75 @@ describe('Exploration history', function() {
 
     var VERSION_2_STATE_1_CONTENTS = {
       1: {
-        text: 'content:',
+        text: 'classifier_model_id: null',
         highlighted: false
       },
       2: {
-        text: '- type: text',
+        text: 'content:',
         highlighted: false
       },
       3: {
+        text: '- type: text',
+        highlighted: false
+      },
+      4: {
         text: '  value: \'\'',
         highlighted: true
       },
-      4: {
+      5: {
         text: 'interaction:',
         highlighted: false
       },
-      5: {
+      6: {
         text: '  answer_groups: []',
         highlighted: true
       },
-      6: {
+      7: {
         text: '  confirmed_unclassified_answers: []',
         highlighted: false
       },
-      7: {
+      8: {
         text: '  customization_args: {}',
         highlighted: false
       },
-      8: {
+      9: {
         text: '  default_outcome:',
         highlighted: false
       },
       // Note that highlighting *underneath* a line is still considered a
       // highlight.
-      9: {
+      10: {
         text: '    dest: ' + general.FIRST_STATE_DEFAULT_NAME,
         highlighted: true
       },
-      10: {
+      11: {
         text: '    feedback: []',
         highlighted: false
       },
-      11: {
+      12: {
         text: '    param_changes: []',
         highlighted: false
       },
-      12: {
+      13: {
         text: '  fallbacks: []',
         highlighted: false
       },
-      13: {
+      14: {
         text: '  id: null',
         highlighted: true
       },
-      14: {
+      15: {
         text: 'param_changes: []',
         highlighted: false
       },
-      15: {
+      16: {
         text: ' ',
         highlighted: false
       }
     };
 
     var STATE_2_STRING =
+      'classifier_model_id: null\n' +
       'content:\n' +
       '- type: text\n' +
       '  value: <p>this is card 2</p>\n' +
