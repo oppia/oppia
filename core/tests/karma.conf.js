@@ -46,9 +46,9 @@ module.exports = function(config) {
       'extensions/**/protractor.js'
     ],
     proxies: {
-      // Karma serves files are under the /base directory.
-      // We need to access files in assets folder, without modifiing the code,
-      // so ween need to proxy the requests from /assets/ to /base/assets/.
+      // Karma serves files under the /base directory.
+      // We need to access files in assets folder, without modifying the code,
+      // so we need to proxy the requests from /assets/ to /base/assets/.
       '/assets/': '/base/assets/'
     },
     preprocessors: {

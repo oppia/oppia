@@ -244,7 +244,7 @@ describe('Constants Generating', function() {
 
   it('should transform all key value pairs to angular constants', function() {
     for (var constantName in constants) {
-      expect($injector.has(constantName)).toBeTruthy();
+      expect($injector.has(constantName)).toBe(true);
       expect($injector.get(constantName)).toBe(constants[constantName]);
     }
   });
