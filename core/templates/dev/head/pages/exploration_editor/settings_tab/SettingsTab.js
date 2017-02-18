@@ -254,7 +254,7 @@ oppia.controller('SettingsTab', [
               var category = explorationCategoryService.displayed;
               var color = GLOBALS.CATEGORIES_TO_COLORS[category];
               if (!color) {
-                color = GLOBALS.CATEGORIES_TO_COLORS['Default'];
+                color = GLOBALS.CATEGORIES_TO_COLORS.Default;
               }
               return color;
             };

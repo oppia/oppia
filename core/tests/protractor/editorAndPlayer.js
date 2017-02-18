@@ -156,7 +156,7 @@ describe('Full exploration editor', function() {
 
       // Check settings tab summary card preview
       editor.previewSummaryTile();
-      
+
       // Check editor preview tab
       editor.navigateToPreviewTab();
       player.expectContentToMatch(function(richTextEditor) {
