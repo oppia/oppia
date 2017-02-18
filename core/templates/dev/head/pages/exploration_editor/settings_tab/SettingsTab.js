@@ -243,16 +243,24 @@ oppia.controller('SettingsTab', [
               return explorationCategoryService.displayed;
             };
             $scope.getThumbnailIconUrl = function() {
+              var category = explorationCategoryService.displayed;
+              if (!GLOBALS.ALL_CATEGORIES[category]) {
+                category = 'Lightbulb';
+              }
               return '/assets/images/subjects/' +
-                explorationCategoryService.displayed + '.svg';
+                 category + '.svg';
             };
             $scope.getThumbnailBgColor = function() {
               var category = explorationCategoryService.displayed;
-              return GLOBALS.CATEGORIES_TO_COLORS[category];
+              var color = GLOBALS.CATEGORIES_TO_COLORS[category];
+              if (!color) {
+                color = GLOBALS.CATEGORIES_TO_COLORS['Default'];
+              }
+              return color;
             };
 
             $scope.close = function() {
-              $modalInstance.dismiss('close');
+              $modalInstance.dismiss();
               alertsService.clearWarnings();
             };
           }

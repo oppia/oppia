@@ -1066,6 +1066,13 @@ var enableFallbacks = function() {
   });
 };
 
+var previewSummaryTile = function() {
+  runFromSettingsTab(function() {
+    element(by.css('.protractor-test-open-preview-summary-modal')).click();
+    expect(element(by.css(
+      '.protractor-test-exploration-summary-tile')).isPresent()).toBeTruthy();
+  })
+}
 // CONTROLS
 
 var saveChanges = function(commitMessage) {

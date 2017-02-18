@@ -651,6 +651,8 @@ CATEGORIES_TO_COLORS = {
     'Puzzles': '#a8554a',
     'Sport': '#893327',
     'Welcome': '#992a2b',
+
+    'Default': '#a33f40',
 }
 
 # Types of activities that can be created with Oppia.
