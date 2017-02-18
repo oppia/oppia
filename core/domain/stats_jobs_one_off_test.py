@@ -459,29 +459,6 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self.assertEqual(len(state_answers2.submitted_answer_list), 1)
         self.assertEqual(validation_output, [])
 
-    def test_migration_job_catches_answer_which_fails_normalization(self):
-        state_name = 'Set Input'
-
-        rule_spec_str = (
-            'HasElementsIn([u\'orange\', u\'purple\', u\'silver\'])')
-        html_answer = '[u\'purple\', u\'orange\', u\'purple\']'
-        self._record_old_answer(state_name, rule_spec_str, html_answer)
-
-        # There should be no answers in the new data storage model.
-        state_answers = self._get_state_answers(state_name)
-        self.assertIsNone(state_answers)
-
-        job_output = sorted(self._run_migration_job())
-
-        # The answer should fail to migrate because it cannot be normalized.
-        state_answers = self._get_state_answers(state_name)
-        self.assertIsNone(state_answers)
-
-        self.assertEqual(len(job_output), 2)
-        self.assertIn('Failed to migrate all answers', job_output[0])
-        self.assertIn('Failed to normalize', job_output[1])
-        self._verify_migration_validation_problems(1)
-
     def test_migration_job_should_support_very_large_answers(self):
         """This test ensures the migration job does not fail when submitting
         large numbers of answers to the new data store that would require the
@@ -2002,6 +1979,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         will properly recover only the answers from the failed bucket without
         duplicating them.
         """
+        stats_models.StateAnswersModel._use_memcache = False
         state_name = self.text_input_state_name
 
         rule_spec_str = 'Contains(ate)'
@@ -2153,9 +2131,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
 
         # Run the job again. The first large answer bucket does not need to be
         # migrated, but the second still does.
-        # TODO(bhenning): Figure out why this won't work.
         job_output = sorted(self._run_migration_job())
-        #job_output = self._run_migration_job_internal()
         self.assertEqual(job_output, [
             'Encountered a submitted answer bucket which has already been '
             'migrated',
@@ -2174,6 +2150,10 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # cleanup.
         state_answers = self._get_state_answers(state_name)
         self.assertEqual(len(state_answers.submitted_answer_list), 150)
+        first_submitted_answer = next(
+            submitted_answer
+            for submitted_answer in state_answers.submitted_answer_list
+            if submitted_answer.normalized_answer == 'Plate000')
 
         unique_submitted_answer_strs = set([
             state_answer.normalized_answer
