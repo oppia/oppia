@@ -164,7 +164,6 @@ class ParamChange(object):
                 `name` is the name of the parameter. `generator_id` is the
                 type of value generator used to generate the new value for
                 the parameter.
-        
         Returns:
             ParamChange. The ParamChange object created from the
                 `param_change_dict` dict, which specifies the name,
