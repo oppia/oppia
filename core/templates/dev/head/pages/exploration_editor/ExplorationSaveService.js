@@ -210,7 +210,8 @@ oppia.factory('explorationSaveService', [
               $scope.discard = function() {
                 $modalInstance.close();
               };
-          }]
+            }
+          ]
         }).result.then(function() {
           alertsService.clearWarnings();
           $rootScope.$broadcast('externalSave');
