@@ -15,9 +15,10 @@
     "I18N_CREATE_EXPLORATION_UPLOAD": "Upload",
     "I18N_CREATE_NO_THANKS": "No, Thanks",
     "I18N_CREATE_YES_PLEASE": "Yes, please!",
-    "I18N_DASHBOARD_MY_COLLECTIONS": "My Collections",
-    "I18N_DASHBOARD_MY_EXPLORATIONS": "My Explorations",
+    "I18N_DASHBOARD_COLLECTIONS": "Collections",
+    "I18N_DASHBOARD_EXPLORATIONS": "Explorations",
     "I18N_DASHBOARD_OPEN_FEEDBACK": "Open Feedback",
+    "I18N_DASHBOARD_SUBSCRIBERS": "Subscribers",
     "I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Drag image here",
     "I18N_DIRECTIVES_OR_SELECT_FILE": "or select an image file:",
     "I18N_ERROR_DISABLED_EXPLORATION": "Disabled Exploration",
@@ -158,6 +159,7 @@
     "I18N_LIBRARY_SUB_HEADER": "Begin your adventure by browsing our explorations.",
     "I18N_LIBRARY_VIEWS_TOOLTIP": "Views",
     "I18N_LIBRARY_VIEW_ALL": "View all",
+    "I18N_ONE_SUBSCRIBER_TEXT": "You have 1 subscriber.",
     "I18N_PLAYER_BACK": "Back",
     "I18N_PLAYER_CARD_NUMBER_TOOLTIP": "Card #",
     "I18N_PLAYER_COMMUNITY_EDITABLE_TOOLTIP": "Community editable",
@@ -297,5 +299,6 @@
     "I18N_TOPNAV_PREFERENCES": "Preferences",
     "I18N_TOPNAV_SIGN_IN": "Sign in",
     "I18N_TOPNAV_TEACH_WITH_OPPIA": "Teach with Oppia",
+    "I18N_TOTAL_SUBSCRIBERS_TEXT": "You have a total of <[totalSubscribers]> subscribers.",
     "I18N_UNSUBSCRIBE_BUTTON_TEXT": "Unsubscribe"
 }

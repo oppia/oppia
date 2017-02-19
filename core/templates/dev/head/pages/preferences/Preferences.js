@@ -198,6 +198,7 @@ oppia.controller('Preferences', [
       $scope.canReceiveFeedbackMessageEmail = (
         data.can_receive_feedback_message_email);
       $scope.preferredSiteLanguageCode = data.preferred_site_language_code;
+      $scope.subscriptionList = data.subscription_list;
       $scope.hasPageLoaded = true;
       _forceSelect2Refresh();
     });

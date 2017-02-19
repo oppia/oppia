@@ -3,7 +3,29 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://github.com/oppia/oppia/commits/master
 
 
-v2.3.8 (14 Feb 2017)
+v2.4.0 (18 Feb 2017)
+--------------------
+Collection Player
+* Fix #3031: track user progress and minor UI changes to match original mocks (#3054)
+* Fix bugs and improve UI
+
+Subscribers
+* Fix part of #2287: Display subscribers and subscriptions and send emails on publishing. (#3036)
+
+Creator Dashboard
+* Standardize truncation of objectives and display of titles on summary tiles. (#3067)
+
+Accessibility
+* Standardize focus styles across site
+
+Other
+* Fix #2990: Implement workaround to make MathExpressionInput usable on mobile devices. (#3039)
+* Fix #2989: Check if all files end with exactly one newline character. (#3005)
+* Added docstring to "core.domain.exp_services" (#2924)
+* Add Classifier model id (#2961)
+
+
+v2.3.9 (14 Feb 2017)
 --------------------
 Collection Learner View
 * Fix #2526: Path version of the collection learner view (PR #2979)
