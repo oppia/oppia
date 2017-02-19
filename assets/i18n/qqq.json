@@ -15,9 +15,10 @@
 	"I18N_CREATE_EXPLORATION_UPLOAD": "Text displayed in a button in the navigation bar\n{{Identical|Upload}}",
 	"I18N_CREATE_NO_THANKS": "Text of the cancel button of a dialog. - see I18N_CREATE_EXPLORATION_CREATE.\n{{Identical|No thanks}}",
 	"I18N_CREATE_YES_PLEASE": "Text of the confirmation button of a dialog. - see I18N_CREATE_EXPLORATION_CREATE.",
-	"I18N_DASHBOARD_MY_COLLECTIONS": "Title shown in a tab header in the user's dashboard page. - Clicking on this tab header shows a list of the collections the user has created.",
-	"I18N_DASHBOARD_MY_EXPLORATIONS": "Title shown in a tab header in the user's dashboard page. - Clicking on this tab header shows a list of the explorations the user has created.",
+	"I18N_DASHBOARD_COLLECTIONS": "Title shown in a tab header in the user's dashboard page. - Clicking on this tab header shows a list of the collections the user has created.",
+	"I18N_DASHBOARD_EXPLORATIONS": "Title shown in a tab header in the user's dashboard page. - Clicking on this tab header shows a list of the explorations the user has created.",
 	"I18N_DASHBOARD_OPEN_FEEDBACK": "Text of feedback icon shown in summary tile of an exploration in card view in the user's dashboard page.",
+	"I18N_DASHBOARD_SUBSCRIBERS": "Title shown in a tab header in the user's dashboard page. - Clicking on this tab header shows the list of users who have subscribed to the user.",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Text displayed in the preferences page. - Text shown in the dialog shown to upload a profile picture. The user can upload the picture by dragging a file to the area with this text.",
 	"I18N_DIRECTIVES_OR_SELECT_FILE": "Text displayed in the preferences page. - Text shown in the dialog shown to upload a profile picture below the area where user can upload the picture by dragging a file and up the button to upload a picture from the local file system.",
 	"I18N_ERROR_DISABLED_EXPLORATION": "Text displayed as title when an exploration is unavailable due to having been disabled.",
@@ -158,6 +159,7 @@
 	"I18N_LIBRARY_SUB_HEADER": "Subtitle title of the library page. - The library page shows all the explorations and collections available. It should be a single phrase and fit in one line.",
 	"I18N_LIBRARY_VIEWS_TOOLTIP": "Tooltip displayed inside the exploration card in the library - It's on top of the number of times the exploration has been viewed for the users.\n{{Identical|View}}",
 	"I18N_LIBRARY_VIEW_ALL": "Text of a button shown to the side of the exploration group. - When clicked, it shows all the explorations included on the associated group. It should be a small text.\n{{Identical|View all}}",
+	"I18N_ONE_SUBSCRIBER_TEXT": "Text displayed under the subscribers tab in creator dashboard. If the creator has one subscriber, this text is displayed which informs him/her about the same.",
 	"I18N_PLAYER_BACK": "Text read to users with screenreaders when they navigate through an exploration. - This labels the leftward-pointing arrow that is used to go backward by one card in the exploration.\n{{Identical|Back}}",
 	"I18N_PLAYER_CARD_NUMBER_TOOLTIP": "Text displayed when the user is playing an exploration. - On top of the player there are buttons that allow the user to navigate to the previous cards he has completed. This text is shown as a part of the tooltip of this button.\n{{Identical|Card}}",
 	"I18N_PLAYER_COMMUNITY_EDITABLE_TOOLTIP": "Text displayed as a tooltip when the user views a dialog with information about the exploration. - This labels the globe icon that indicates that an exploration is editable by the community.",
@@ -297,5 +299,6 @@
 	"I18N_TOPNAV_PREFERENCES": "Text displayed inside a drop-down menu. - The list is shown after the user hovers over their profile picture. When the option is clicked, the preference page is loaded where the user can modify the account information.\n{{Identical|Preferences}}",
 	"I18N_TOPNAV_SIGN_IN": "Text displayed in the top right corner of the page. - When clicked, the user is redirected to the sign in page where he can access his account.\n{{Identical|Sign in}}",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Text displayed inside drop-down menu - The list is shown after the user hovers over the I18N_TOPNAV_ABOUT button. When the option is clicked, the teach with oppia page is loaded which contains information specific for teachers who would like to create explorations.",
+	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Text displayed under the subscribers tab in creator dashboard. Tells the creator the total number of subscribers he/she has.",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "The text that appears on the unsubscribe button, which allows users to unsubscribe from creators.\n{{Identical|Unsubscribe}}"
 }

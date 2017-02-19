@@ -137,7 +137,8 @@ class TestBase(unittest.TestCase):
                         'definition': {'rule_type': 'default'}
                     }]
                 }]
-            }
+            },
+            'classifier_model_id': None,
         }
     }
 

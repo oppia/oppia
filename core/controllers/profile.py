@@ -141,6 +141,25 @@ class PreferencesHandler(base.BaseHandler):
         user_settings = user_services.get_user_settings(self.user_id)
         user_email_preferences = user_services.get_email_preferences(
             self.user_id)
+
+        creators_subscribed_to = subscription_services.get_all_creators_subscribed_to( # pylint: disable=line-too-long
+            self.user_id)
+        creators_settings = user_services.get_users_settings(
+            creators_subscribed_to)
+        subscription_list = []
+
+        for index, creator_settings in enumerate(creators_settings):
+            subscription_summary = {
+                'creator_picture_data_url': (
+                    creator_settings.profile_picture_data_url),
+                'creator_username': creator_settings.username,
+                'creator_impact': (
+                    user_services.get_user_impact_score(
+                        creators_subscribed_to[index]))
+            }
+
+            subscription_list.append(subscription_summary)
+
         self.values.update({
             'preferred_language_codes': user_settings.preferred_language_codes,
             'preferred_site_language_code': (
@@ -155,7 +174,8 @@ class PreferencesHandler(base.BaseHandler):
             'can_receive_feedback_message_email': (
                 user_email_preferences.can_receive_feedback_message_email),
             'can_receive_subscription_email': (
-                user_email_preferences.can_receive_subscription_email)
+                user_email_preferences.can_receive_subscription_email),
+            'subscription_list': subscription_list
         })
         self.render_json(self.values)
 
