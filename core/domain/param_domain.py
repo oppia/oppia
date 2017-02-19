@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Domain object relating to parameters."""
+"""Domain objects relating to parameters."""
 
 import re
 
@@ -28,22 +28,21 @@ class ParamSpec(object):
     """Value object for an exploration parameter specification."""
 
     def __init__(self, obj_type):
-        """Initializes a ParamSpec object with the specified object type
+        """Initializes a ParamSpec object with the specified object type.
 
         Args:
             obj_type: unicode. The object type with which the parameter is
-            initialized.
+                initialized.
         """
         self.obj_type = obj_type
 
 
     def to_dict(self):
-        """Adds the object type to a dict, with the key as `obj_type`
-        and the value as the type of the object eg.(UnicodeString).
+        """Returns a dict representation of this ParamSpec.
 
         Returns:
-            dict. The key of the dict is `obj_type` and the value is the type
-            of the parameter.
+            dict. A dict with a single key, whose value is the type
+                of the parameter represented by this ParamSpec.
         """
         return {
             'obj_type': self.obj_type,
@@ -52,22 +51,22 @@ class ParamSpec(object):
 
     @classmethod
     def from_dict(cls, param_spec_dict):
-        """Object from param_spec_dict.
+        """Creates a ParamSpec object from its dict representation.
 
         Args:
-            param_spec_dict: dict. The dictionary containing specifications of
-            all the parameters.
+            param_spec_dict: dict. The dictionary containing the specification of
+                the parameter.
 
         Returns:
-            ParamSpec object: A ParamSpec object created from the specified
-            object type.
+            ParamSpec. A ParamSpec object created from the specified
+                object type.
         """
 
         return cls(param_spec_dict['obj_type'])
 
 
     def validate(self):
-        """Validate the existence of the object class. """
+        """Validate the existence of the object class."""
 
         # Ensure that this object class exists.
         obj_services.Registry.get_object_class_by_type(self.obj_type)
@@ -87,14 +86,18 @@ class ParamChange(object):
     """Value object for a parameter change."""
 
     def __init__(self, name, generator_id, customization_args):
-        """Initialze a ParamChange object with the specified arguments
+        """Initialize a ParamChange object with the specified arguments.
 
         Args:
             name: unicode. The name of the parameter.
-            generator_id: unicode. The type of generator used to create the
-            parameter. eg. Copier
-            customization_args: dict. A dict containing all the arguments
-            including the value of the parameter.
+                generator_id: unicode. The type of generator used to create the
+                parameter, e.g.,"Copier".
+            customization_args: dict. A dict containing the following keys: 
+                (value, parse_with_jinja). `value` specifies the value of the
+                parameter, and `parse_with_jinja` indicates whether parsing is 
+                to be done with the Jinja template engine. If the parameter is
+                changed to one amongst several values, this dict contains a
+                list (`list_of_values`) of possible values.     
         """
         # TODO(sll): Check that all required args for customization exist in
         # customization_args.
@@ -102,34 +105,40 @@ class ParamChange(object):
         self._generator_id = generator_id
         self._customization_args = customization_args
 
-
     @property
     def name(self):
         """The name of the changing parameter.
 
         Returns:
-            self.name: unicode. The name of the parameter.
+            unicode. The name of the parameter.
         """
         return self._name
 
     @property
     def generator(self):
-        """The generator of the changing parameter
+        """The value generator used to define the new value of the 
+            changing parameter.
 
         Returns:
-            generator object: The generator object for the parameter.
+            generators.Copier. The generator object for the parameter.
         """
         return value_generators_domain.Registry.get_generator_class_by_id(
             self._generator_id)()
 
     @property
     def customization_args(self):
-        """The customization arguments of the changing parameter
+        """A dict containing several arguments that determine the changing value
+            of the parameter.
 
         Returns:
-            dict: A dict specifying the customization arguments for the
-            parameter.
-        """
+            dict: A dict specifying the following customization arguments for
+             the parameter. In case of a parameter change to a single value,
+             this dict contains the value of the parameter and a key-value
+             pair specifying whether parsing is done using the Jinja template
+             engine. If the parameter is changed to one amongst several values,
+             this dict contains a list of possible values.
+         """
+        print self._customization_args
         return self._customization_args
 
     def to_dict(self):
@@ -145,9 +154,20 @@ class ParamChange(object):
 
         Args:
             param_change_dict: dict. A dict containing data about the
-            changing parameter (customization arguments, name, generator).
+                following keys: (customization_args(dict), name, generator_id).
+                `customization_args` is a dict with the following keys:
+                (value, parse_with_jinja). `value` specifies the value of the
+                parameter and `parse_with_jinja` indicates whether parsing change
+                be performed using the Jinja template engine. If the parameter
+                changed to one amongst several values, this dict contains a list
+                of possible values.
+                `name` is the name of the parameter. `generator_id` is the type of
+                value generator used to generate the new value for the parameter.  
+        
         Returns:
-            ParamChange object: An object of class ParamChange.
+            ParamChange. The ParamChange object created from the 
+                `param_change_dict` dict, which specifies the name, customization
+                arguments and the generator used.
         """
         return cls(
             param_change_dict['name'], param_change_dict['generator_id'],
@@ -166,7 +186,7 @@ class ParamChange(object):
             obj_type).normalize(raw_value)
 
     def validate(self):
-        """Validate the ParamChange object against multiple checks"""
+        """Checks that the properties of this ParamChange object are valid."""
         if not isinstance(self.name, basestring):
             raise utils.ValidationError(
                 'Expected param_change name to be a string, received %s'
