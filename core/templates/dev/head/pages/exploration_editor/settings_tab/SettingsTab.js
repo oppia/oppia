@@ -244,7 +244,7 @@ oppia.controller('SettingsTab', [
             };
             $scope.getThumbnailIconUrl = function() {
               var category = explorationCategoryService.displayed;
-              if (!GLOBALS.ALL_CATEGORIES[category]) {
+              if (GLOBALS.ALL_CATEGORIES.indexOf(category) === -1) {
                 category = 'Lightbulb';
               }
               return '/assets/images/subjects/' +
