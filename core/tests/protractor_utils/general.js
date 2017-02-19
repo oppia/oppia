@@ -66,6 +66,8 @@ var SERVER_URL_PREFIX = 'http://localhost:9001';
 var LIBRARY_URL_SUFFIX = '/library';
 var EDITOR_URL_SLICE = '/create/';
 var PLAYER_URL_SLICE = '/explore/';
+var CREATOR_DASHBOARD_URL = '/dashboard';
+var USER_PREFERENCES_URL = '/preferences';
 var LOGIN_URL_SUFFIX = '/_ah/login';
 var ADMIN_URL_SUFFIX = '/admin';
 var MODERATOR_URL_SUFFIX = '/moderator';
@@ -139,8 +141,11 @@ var ensurePageHasNoTranslationIds = function() {
       // not displayed
       var REGEX_TRANSLATE_ATTR = new RegExp('translate="I18N_', 'g');
       var REGEX_NG_VARIABLE = new RegExp('<\\[\'I18N_', 'g');
+      var REGEX_NG_TOP_NAV_VISIBILITY =
+        new RegExp('ng-show="navElementsVisibilityStatus.I18N_', 'g');
       expect(promiseValue.replace(REGEX_TRANSLATE_ATTR, '')
-        .replace(REGEX_NG_VARIABLE, '')).not.toContain('I18N');
+        .replace(REGEX_NG_VARIABLE, '')
+        .replace(REGEX_NG_TOP_NAV_VISIBILITY, '')).not.toContain('I18N');
     });
 };
 
@@ -164,6 +169,8 @@ exports.checkForConsoleErrors = checkForConsoleErrors;
 
 exports.SERVER_URL_PREFIX = SERVER_URL_PREFIX;
 exports.LIBRARY_URL_SUFFIX = LIBRARY_URL_SUFFIX;
+exports.CREATOR_DASHBOARD_URL = CREATOR_DASHBOARD_URL;
+exports.USER_PREFERENCES_URL = USER_PREFERENCES_URL;
 exports.EDITOR_URL_SLICE = EDITOR_URL_SLICE;
 exports.LOGIN_URL_SUFFIX = LOGIN_URL_SUFFIX;
 exports.MODERATOR_URL_SUFFIX = MODERATOR_URL_SUFFIX;

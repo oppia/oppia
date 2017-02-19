@@ -36,6 +36,7 @@ oppia.controller('ExplorationEditor', [
   'explorationWarningsService', '$templateCache', 'explorationContextService',
   'explorationAdvancedFeaturesService', '$modal', 'changeListService',
   'autosaveInfoModalsService', 'siteAnalyticsService',
+  'UserEmailPreferencesService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       explorationData, editorContextService, explorationTitleService,
@@ -47,7 +48,8 @@ oppia.controller('ExplorationEditor', [
       explorationParamSpecsService, explorationParamChangesService,
       explorationWarningsService, $templateCache, explorationContextService,
       explorationAdvancedFeaturesService, $modal, changeListService,
-      autosaveInfoModalsService, siteAnalyticsService) {
+      autosaveInfoModalsService, siteAnalyticsService,
+      UserEmailPreferencesService) {
     $scope.editabilityService = editabilityService;
     $scope.editorContextService = editorContextService;
 
@@ -123,6 +125,9 @@ oppia.controller('ExplorationEditor', [
           data.rights.viewer_names, data.rights.status,
           data.rights.cloned_from, data.rights.community_owned,
           data.rights.viewable_if_private);
+        UserEmailPreferencesService.init(
+          data.email_preferences.mute_feedback_notifications,
+          data.email_preferences.mute_suggestion_notifications);
 
         if (GLOBALS.can_edit) {
           editabilityService.markEditable();
@@ -395,4 +400,3 @@ oppia.controller('ExplorationEditor', [
     $scope.$on('openEditorTutorial', $scope.startTutorial);
   }
 ]);
-

@@ -19,7 +19,8 @@
 import copy
 import numpy
 
-from core.domain.classifier.base import BaseClassifier
+from core.domain.base_classifier import BaseClassifier
+import feconf
 
 
 class LDAStringClassifier(BaseClassifier):
@@ -214,7 +215,7 @@ class LDAStringClassifier(BaseClassifier):
         label_vector = numpy.zeros(self._num_labels)
         for label in labels:
             label_vector[self._get_label_id(label)] = 1
-        label_vector[self._label_to_id[self.DEFAULT_LABEL]] = 1
+        label_vector[self._label_to_id[feconf.DEFAULT_CLASSIFIER_LABEL]] = 1
         return label_vector
 
     def _update_counting_matrices(self, d, w, l, val):
@@ -317,7 +318,7 @@ class LDAStringClassifier(BaseClassifier):
         predict DEFAULT_LABEL. This will make non-default predictions more
         accurate, but result in fewer of them.
         """
-        default_label_id = self._get_label_id(self.DEFAULT_LABEL)
+        default_label_id = self._get_label_id(feconf.DEFAULT_CLASSIFIER_LABEL)
         prediction_label_id = default_label_id
         prediction_confidence = 0
         label_probabilities = self._get_label_probabilities(d)
@@ -474,7 +475,7 @@ class LDAStringClassifier(BaseClassifier):
         """
         if (self._num_docs < self._DEFAULT_MIN_DOCS_TO_PREDICT or
                 self._num_labels < self._DEFAULT_MIN_LABELS_TO_PREDICT):
-            return self.DEFAULT_LABEL
+            return feconf.DEFAULT_CLASSIFIER_LABEL
         return self._get_prediction_report_for_doc(
             sample)['prediction_label_name']
 
@@ -550,7 +551,7 @@ class LDAStringClassifier(BaseClassifier):
         docs, labels_list = self._parse_examples(training_data)
 
         label_set = set(
-            [self.DEFAULT_LABEL] +
+            [feconf.DEFAULT_CLASSIFIER_LABEL] +
             [label for labels in labels_list for label in labels])
 
         self._num_labels = len(label_set)

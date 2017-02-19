@@ -33,7 +33,7 @@ oppia.factory('ExplorationObjectFactory', [
       this.title = title;
       this.languageCode = languageCode;
 
-      this.states = [];
+      this.states = {};
       for (var stateName in states) {
         this.states[stateName] = StateObjectFactory.create(
           stateName, states[stateName]);
@@ -115,6 +115,10 @@ oppia.factory('ExplorationObjectFactory', [
 
     Exploration.prototype.getInitialState = function() {
       return this.getState(this.initStateName);
+    };
+
+    Exploration.prototype.setInitialStateName = function(stateName) {
+      this.initStateName = stateName;
     };
 
     Exploration.prototype.getUninterpolatedContentHtml = function(stateName) {

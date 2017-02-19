@@ -228,7 +228,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/profilehandler/data/<username>', profile.ProfileHandler),
     get_redirect_route(r'/preferences', profile.PreferencesPage),
     get_redirect_route(
-        r'/preferenceshandler/data', profile.PreferencesHandler),
+        feconf.PREFERENCES_DATA_URL, profile.PreferencesHandler),
     get_redirect_route(
         r'/preferenceshandler/profile_picture', profile.ProfilePictureHandler),
     get_redirect_route(
@@ -312,6 +312,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/createhandler/moderatorrights/<exploration_id>',
         editor.ExplorationModeratorRightsHandler),
+    get_redirect_route(
+        r'/createhandler/notificationpreferences/<exploration_id>',
+        editor.UserExplorationEmailsHandler),
     get_redirect_route(
         r'/createhandler/snapshots/<exploration_id>',
         editor.ExplorationSnapshotsHandler),

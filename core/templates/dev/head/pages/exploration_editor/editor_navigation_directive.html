@@ -33,7 +33,7 @@
       </li>
     {% endif %}
 
-    <li ng-class="{'active': getTabStatuses().active === 'settings'}">
+    <li ng-if="isLargeScreen" ng-class="{'active': getTabStatuses().active === 'settings'}">
       <a href="#" tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()"
          class="oppia-editor-navbar-tab-anchor protractor-test-settings-tab">
         <i class="material-icons">&#xE8B8;</i>
@@ -41,7 +41,7 @@
     </li>
 
     {% if username %}
-      <li ng-class="{'active': getTabStatuses().active === 'stats'}">
+      <li ng-if="isLargeScreen" ng-class="{'active': getTabStatuses().active === 'stats'}">
         <a href="#" tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()"
            class="oppia-editor-navbar-tab-anchor">
           <i class="material-icons">&#xE24B;</i>
@@ -49,7 +49,7 @@
       </li>
     {% endif %}
 
-    <li ng-class="{'active': getTabStatuses().active === 'history'}">
+    <li ng-if="isLargeScreen" ng-class="{'active': getTabStatuses().active === 'history'}">
       <a href="#" tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()"
          disabled="explorationRightsService.isCloned()"
          class="oppia-editor-navbar-tab-anchor protractor-test-history-tab">
@@ -57,7 +57,7 @@
       </a>
     </li>
 
-    <li ng-class="{'active': getTabStatuses().active === 'feedback'}" ng-click="selectFeedbackTab()">
+    <li ng-if="isLargeScreen" ng-class="{'active': getTabStatuses().active === 'feedback'}" ng-click="selectFeedbackTab()">
       <a href="#" tooltip="Feedback" tooltip-placement="bottom"
          class="oppia-editor-navbar-tab-anchor protractor-test-feedback-tab">
         <i class="material-icons">&#xE87F;</i>
@@ -70,7 +70,7 @@
     </li>
 
     {% if username %}
-      <li class="dropdown" popover-is-open="postTutorialHelpPopoverIsShown"
+      <li ng-if="isLargeScreen" class="dropdown" popover-is-open="postTutorialHelpPopoverIsShown"
           popover-placement="bottom" popover-trigger="none"
           popover="To get help in the future, click here!">
         <a href="#" tooltip="Help" tooltip-placement="bottom"

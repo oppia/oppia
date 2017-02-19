@@ -92,3 +92,18 @@ class UserExplorationPrefs(object):
         return cls(
             feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE,
             feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
+
+    def to_dict(self):
+        """Return dictionary representation of UserExplorationPrefs.
+
+        Return:
+            dict. The keys of the dict are:
+                'mute_feedback_notifications': bool. Whether the given user has
+                    muted feedback emails.
+                'mute_suggestion_notifications': bool. Whether the given user
+                    has muted suggestion emails.
+        """
+        return {
+            'mute_feedback_notifications': self.mute_feedback_notifications,
+            'mute_suggestion_notifications': self.mute_suggestion_notifications
+        }
