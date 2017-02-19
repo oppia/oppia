@@ -42,7 +42,7 @@ oppia.factory('SidebarHighlightingService', [
           } else {
             var elm = angular.element(document.getElementById(id));
             elm.removeClass(ERROR_CLASS);
-            $("#icon_elm").remove();
+            $('#icon_elm').remove();
           }
         }
     };
