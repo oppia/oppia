@@ -350,7 +350,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                         'training_data': ['Test']
                     },
                     'rule_type': 'FuzzyMatches'
-                }]
+                }],
+                'correct': False,
             })
         )
 
@@ -381,7 +382,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                         'x': 'Test'
                     },
                     'rule_type': 'Contains'
-                }]
+                }],
+                'correct': False,
             })
         )
         exploration.validate()
@@ -1762,7 +1764,8 @@ states:
       value: ''
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: END
           feedback:
           - Correct!
