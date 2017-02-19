@@ -48,13 +48,16 @@ describe('Permissions for private explorations', function() {
       general.openEditor(explorationId);
 
       // Eve is redirected to the homepage.
-      var curr = browser.getCurrentUrl();
+      browser.getCurrentUrl().then(function(curUrl) {
+        var dashboardURL = general.SERVER_URL_PREFIX + '/dashboard';
+        var libraryURL = general.SERVER_URL_PREFIX + '/library';
 
-      // homepage can be either dashboard or library dependin on learner status
-      var atHomeFlag = curr ==  general.SERVER_URL_PREFIX + '/dashboard'||
-         curr ==  general.SERVER_URL_PREFIX + '/library';
-      expect(atHomeFlag).toBe(true);
-      users.logout();
+        // Homepage can be either dashboard or library dependin on learner
+        // Status
+        var atHomeFlag = (curUrl === libraryURL) || (curUrl === dashboardURL);
+        expect(atHomeFlag).toBe(true);
+        users.logout();
+      });
     });
   });
 

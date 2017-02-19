@@ -43,9 +43,9 @@ PADDING = 1
 class BaseHandlerTest(test_utils.GenericTestBase):
 
     TEST_LEARNER_EMAIL = "test.learner@example.com"
-    TEST_LEARNER_USERNAME = "test_learner_user"
-    TEST_CREATOR_EMAIL = "test.cretator@example.com"
-    TEST_CREATOR_USERNAME = "test_creator_user"
+    TEST_LEARNER_USERNAME = "testlearneruser"
+    TEST_CREATOR_EMAIL = "test.creator@example.com"
+    TEST_CREATOR_USERNAME = "testcreatoruser"
 
     def setUp(self):
         super(BaseHandlerTest, self).setUp()
@@ -58,8 +58,6 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         # create a creator user to test creator redirect behavior
         # creator is a user atleast one exploration associated with it
         self.signup(self.TEST_CREATOR_EMAIL, self.TEST_CREATOR_USERNAME)
-        
-
 
     def test_dev_indicator_appears_in_dev_and_not_in_production(self):
         """Test dev indicator appears in dev and not in production."""
@@ -123,35 +121,53 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 302)
 
-        # homepage is either dashboard or library based on user's learner 
+        # Homepage is either dashboard or library based on user's learner
         # status, this homepage redirect rule behavior is seperately tested
-        atHome = 'dashboard' in response.headers['location'] 
-            or 'library' in response.headers['location']
+        atHome = ('dashboard' in response.headers['location'] or
+                  'library' in response.headers['location'])
         self.assertTrue(atHome, msg="user must be at library or dashboard")
         self.logout()
 
-    def test_root_redirect_rules_for_learners_creators(self):
+    def test_root_redirect_rules_for_learners(self):
+        # Test learner behavior. Login as learner
         self.login(self.TEST_LEARNER_EMAIL)
+
+        # Dont create any exploration and simply go to root
         response = self.testapp.get('/')
-        self.assertIn('library',response.headers['location'])
+        self.assertIn('library', response.headers['location'])
         self.logout()
 
+    def test_root_redirect_for_creators(self):
         # Test creator behavior. Login as creator
         self.login(self.TEST_CREATOR_EMAIL)
+        creator_user_id = self.get_user_id_from_email(self.TEST_CREATOR_EMAIL)
+        exploration_id = '0_en_test_exploration'
 
-        # create a test exploration
-        EXP_ID = '0_en_test_exploration'
+        # Create a test exploration
         self.save_new_valid_exploration(
-            EXP_ID, self.TEST_CREATOR_USERNAME, title='Test Root',
+            exploration_id, creator_user_id, title='Test',
             category='Test', language_code='en')
 
         # go to root url
         response = self.testapp.get('/')
 
-        # Must and on dashboard
-        self.assertIn('dashboard',response.headers['location'])
+        # Must be on dashboard
+        self.assertIn('dashboard', response.headers['location'])
+
+        # Delete the exploration
+        exp_services.delete_exploration(creator_user_id, exploration_id)
         self.logout()
-        
+
+        # Login again
+        self.login(self.TEST_CREATOR_EMAIL)
+
+        # Go to root url
+        response = self.testapp.get('/')
+
+        # Must be on dashboard even though exploration is deleted because even
+        # deleted explorations are associated with creators thus the user is
+        # expected to be creator
+        self.assertIn('dashboard', response.headers['location'])
 
 
 class CsrfTokenManagerTest(test_utils.GenericTestBase):
