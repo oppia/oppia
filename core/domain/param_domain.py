@@ -54,8 +54,8 @@ class ParamSpec(object):
         """Creates a ParamSpec object from its dict representation.
 
         Args:
-            param_spec_dict: dict. The dictionary containing the specification of
-                the parameter.
+            param_spec_dict: dict. The dictionary containing the specification
+             of the parameter.
 
         Returns:
             ParamSpec. A ParamSpec object created from the specified
@@ -92,12 +92,12 @@ class ParamChange(object):
             name: unicode. The name of the parameter.
                 generator_id: unicode. The type of generator used to create the
                 parameter, e.g.,"Copier".
-            customization_args: dict. A dict containing the following keys: 
+            customization_args: dict. A dict containing the following keys:
                 (value, parse_with_jinja). `value` specifies the value of the
-                parameter, and `parse_with_jinja` indicates whether parsing is 
+                parameter, and `parse_with_jinja` indicates whether parsing is
                 to be done with the Jinja template engine. If the parameter is
                 changed to one amongst several values, this dict contains a
-                list (`list_of_values`) of possible values.     
+                list (`list_of_values`) of possible values.
         """
         # TODO(sll): Check that all required args for customization exist in
         # customization_args.
@@ -116,7 +116,7 @@ class ParamChange(object):
 
     @property
     def generator(self):
-        """The value generator used to define the new value of the 
+        """The value generator used to define the new value of the
             changing parameter.
 
         Returns:
@@ -157,17 +157,18 @@ class ParamChange(object):
                 following keys: (customization_args(dict), name, generator_id).
                 `customization_args` is a dict with the following keys:
                 (value, parse_with_jinja). `value` specifies the value of the
-                parameter and `parse_with_jinja` indicates whether parsing change
-                be performed using the Jinja template engine. If the parameter
-                changed to one amongst several values, this dict contains a list
-                of possible values.
-                `name` is the name of the parameter. `generator_id` is the type of
-                value generator used to generate the new value for the parameter.  
+                parameter and `parse_with_jinja` indicates whether parsing
+                change be performed using the Jinja template engine. If the
+                parameter changed to one amongst several values, this dict
+                contains a list of possible values.
+                `name` is the name of the parameter. `generator_id` is the
+                type of value generator used to generate the new value for
+                the parameter.
         
         Returns:
-            ParamChange. The ParamChange object created from the 
-                `param_change_dict` dict, which specifies the name, customization
-                arguments and the generator used.
+            ParamChange. The ParamChange object created from the
+                `param_change_dict` dict, which specifies the name,
+                customization arguments and the generator used.
         """
         return cls(
             param_change_dict['name'], param_change_dict['generator_id'],
