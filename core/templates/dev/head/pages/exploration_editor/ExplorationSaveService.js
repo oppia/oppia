@@ -206,37 +206,37 @@ oppia.factory('explorationSaveService', [
             '$scope', '$modalInstance', function($scope, $modalInstance) {
               $scope.cancel = function() {
                 $modalInstance.dismiss();
-              }
+              };
               $scope.discard = function() {
                 $modalInstance.close();
-              }
+              };
           }]
         }).result.then(function() {
-            alertsService.clearWarnings();
-            $rootScope.$broadcast('externalSave');
+          alertsService.clearWarnings();
+          $rootScope.$broadcast('externalSave');
 
-            $modal.open({
-              templateUrl: 'modals/reloadingEditor',
-              backdrop: 'static',
-              keyboard: false,
-              controller: [
-                '$scope', '$modalInstance', function($scope, $modalInstance) {
-                  $timeout(function() {
-                    $modalInstance.dismiss('cancel');
-                  }, 2500);
-                }
-              ],
-              windowClass: 'oppia-loading-modal'
-            });
+          $modal.open({
+            templateUrl: 'modals/reloadingEditor',
+            backdrop: 'static',
+            keyboard: false,
+            controller: [
+              '$scope', '$modalInstance', function($scope, $modalInstance) {
+                $timeout(function() {
+                  $modalInstance.dismiss('cancel');
+                }, 2500);
+              }
+            ],
+            windowClass: 'oppia-loading-modal'
+          });
 
-            changeListService.discardAllChanges();
-            alertsService.addSuccessMessage('Changes discarded.');
-            $rootScope.$broadcast('initExplorationPage');
+          changeListService.discardAllChanges();
+          alertsService.addSuccessMessage('Changes discarded.');
+          $rootScope.$broadcast('initExplorationPage');
 
-            // The reload is necessary because, otherwise, the
-            // exploration-with-draft-changes will be reloaded
-            // (since it is already cached in explorationData).
-            location.reload();
+          // The reload is necessary because, otherwise, the
+          // exploration-with-draft-changes will be reloaded
+          // (since it is already cached in explorationData).
+          location.reload();
         });
       },
 
