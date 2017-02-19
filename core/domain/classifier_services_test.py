@@ -19,9 +19,12 @@ import os
 from core.domain import classifier_registry
 from core.domain import classifier_services
 from core.domain import exp_services
+from core.platform import models
 from core.tests import test_utils
 import feconf
 import utils
+
+(classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
 
 class ClassifierServicesTests(test_utils.GenericTestBase):
     """Test reader.classify using the sample explorations.
@@ -30,7 +33,6 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
     test hard rules, ReaderClassifyTests is only checking that the string
     classifier is actually called.
     """
-
     def setUp(self):
         super(ClassifierServicesTests, self).setUp()
         self._init_classify_inputs('16')
@@ -83,3 +85,25 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
                 self._is_string_classifier_called('abc acb bac bca cbb cba'))
             self.assertTrue(
                 self._is_string_classifier_called('dunno, just guessed'))
+
+    def test_retrieval_and_update_of_classifiers(self):
+        """ Test the get_classifier_by_id and _save_classifier methods"""
+        response = classifier_services.get_classifier_by_id('fake_id')
+        self.assertEqual(response, None)
+        
+        exp_id = u'1'
+        state = 'Home'
+        test_state = 'Test'
+        classifier_id = classifier_models.ClassifierModel.create(
+            exp_id, 1, state, feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'],
+            [], 1)
+        classifier = classifier_services.get_classifier_by_id(
+            classifier_id)
+        self.assertEqual(classifier.exp_id, exp_id)
+        self.assertEqual(classifier.state_name, state)
+        classifier.state = test_state
+        classifier_services._save_classifier(classifier)
+        classifier = classifier_services.get_classifier_by_id(
+            classifier_id)
+        self.assertEqual(classifier.exp_id, exp_id)
+        self.assertEqual(classifier.state_name, state)

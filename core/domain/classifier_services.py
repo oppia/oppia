@@ -22,7 +22,7 @@ from core.platform import models
 
 import feconf
 
-classifier_models = models.Registry.import_models(models.NAMES.classifier)
+(classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
 
 def classify(state, answer):
     """Classify the answer using the string classifier.
@@ -136,7 +136,7 @@ def get_classifier_from_model(classifier_model):
         classifier_model.cached_classifier_data,
         classifier_model.data_schema_version)
 
-def get_classifier_from_id(classifier_id):
+def get_classifier_by_id(classifier_id):
     """
     Returns a classifier domain object given a classifier id.
     """
