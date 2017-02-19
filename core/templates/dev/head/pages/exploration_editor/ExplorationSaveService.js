@@ -198,24 +198,20 @@ oppia.factory('explorationSaveService', [
       },
 
       discardChanges: function() {
-        var confirmDiscard = $modal.open({
+        $modal.open({
           templateUrl: 'modals/confirmDiscardChanges',
           backdrop: 'static',
           keyboard: false,
           controller: [
             '$scope', '$modalInstance', function($scope, $modalInstance) {
-              $scope.close = function(result) {
-                if (result) {
-                  $modalInstance.close(true);
-                } else {
-                  $modalInstance.close(false);
-                }
-              };
-            }]
-        });
-
-        confirmDiscard.result.then(function(result) {
-          if (result) {
+              $scope.cancel = function() {
+                $modalInstance.dismiss();
+              }
+              $scope.discard = function() {
+                $modalInstance.close();
+              }
+          }]
+        }).result.then(function() {
             alertsService.clearWarnings();
             $rootScope.$broadcast('externalSave');
 
@@ -241,7 +237,6 @@ oppia.factory('explorationSaveService', [
             // exploration-with-draft-changes will be reloaded
             // (since it is already cached in explorationData).
             location.reload();
-          }
         });
       },
 
