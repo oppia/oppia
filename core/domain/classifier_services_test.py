@@ -90,13 +90,13 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         """ Test the get_classifier_by_id and _save_classifier methods"""
         response = classifier_services.get_classifier_by_id('fake_id')
         self.assertEqual(response, None)
-        
+
         exp_id = u'1'
         state = 'Home'
         test_state = 'Test'
         classifier_id = classifier_models.ClassifierModel.create(
-            exp_id, 1, state, feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'],
-            [], 1)
+            exp_id, 1, state,
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'], [], 1)
         classifier = classifier_services.get_classifier_by_id(
             classifier_id)
         self.assertEqual(classifier.exp_id, exp_id)
