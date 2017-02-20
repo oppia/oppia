@@ -138,7 +138,6 @@ class ParamChange(object):
              engine. If the parameter is changed to one amongst several values,
              this dict contains a list of possible values.
          """
-        print self._customization_args
         return self._customization_args
 
     def to_dict(self):
