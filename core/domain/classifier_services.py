@@ -153,7 +153,7 @@ def _create_classifier(classifier):
     """
     classifier_models.ClassifierModel.create(
         classifier.exp_id, classifier.exp_version_when_created,
-        classifier.state_name, classifer.algorithm_id,
+        classifier.state_name, classifier.algorithm_id,
         classifier.cached_classifier_data, classifier.data_schema_version,
         )
 

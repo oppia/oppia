@@ -125,7 +125,6 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         """Test the delete_classifier method."""
         exp_id = u'1'
         state = 'Home'
-        test_state = 'State'
         classifier_id = classifier_models.ClassifierModel.create(
             exp_id, 1, state,
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'], [], 1)
