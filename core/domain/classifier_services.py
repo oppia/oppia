@@ -188,9 +188,8 @@ def delete_classifier(classifier_id):
     """Deletes classifier model in the datastore given classifier_id.
     """
     classifier_model = classifier_models.ClassifierModel.get(
-        classifier.id, strict=False)
+        classifier_id, strict=False)
     if classifier_model is None:
         raise Exception("No classifier found for the classifer's id.")
     else:
         classifier_model.delete()
-

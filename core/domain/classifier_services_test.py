@@ -119,3 +119,18 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             classifier_id)
         self.assertEqual(classifier.exp_id, exp_id)
         self.assertEqual(classifier.state_name, test_state)
+
+
+    def test_deletion_of_classifiers(self):
+        """Test the delete_classifier method."""
+        exp_id = u'1'
+        state = 'Home'
+        test_state = 'State'
+        classifier_id = classifier_models.ClassifierModel.create(
+            exp_id, 1, state,
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'], [], 1)
+        classifier_services.delete_classifier(classifier_id)
+        with self.assertRaisesRegexp(Exception, (
+            "No classifier found for the classifer's id.")):
+            classifier_services.get_classifier_by_id(classifier_id)
+
