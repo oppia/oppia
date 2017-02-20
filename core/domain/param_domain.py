@@ -52,16 +52,15 @@ class ParamSpec(object):
     @classmethod
     def from_dict(cls, param_spec_dict):
         """Creates a ParamSpec object from its dict representation.
-
         Args:
             param_spec_dict: dict. The dictionary containing the specification
-             of the parameter.
+                of the parameter. It contains the following key (object_type).
+                `object_type` determines the data type of the parameter.
 
         Returns:
             ParamSpec. A ParamSpec object created from the specified
                 object type.
         """
-
         return cls(param_spec_dict['obj_type'])
 
 
@@ -91,13 +90,14 @@ class ParamChange(object):
         Args:
             name: unicode. The name of the parameter.
                 generator_id: unicode. The type of generator used to create the
-                parameter, e.g.,"Copier".
+                parameter, e.g., "Copier".
             customization_args: dict. A dict containing the following keys:
                 (value, parse_with_jinja). `value` specifies the value of the
                 parameter, and `parse_with_jinja` indicates whether parsing is
                 to be done with the Jinja template engine. If the parameter is
-                changed to one amongst several values, this dict contains a
-                list (`list_of_values`) of possible values.
+                specified using one of several possible values, this dict
+                contains a list (`list_of_values`) of possible values (instead
+                of `value`).
         """
         # TODO(sll): Check that all required args for customization exist in
         # customization_args.
@@ -117,10 +117,11 @@ class ParamChange(object):
     @property
     def generator(self):
         """The value generator used to define the new value of the
-            changing parameter.
+        changing parameter.
 
         Returns:
-            generators.Copier. The generator object for the parameter.
+            subclass of BaseValueGenerator. The generator object for the
+            parameter.
         """
         return value_generators_domain.Registry.get_generator_class_by_id(
             self._generator_id)()
@@ -128,15 +129,15 @@ class ParamChange(object):
     @property
     def customization_args(self):
         """A dict containing several arguments that determine the changing value
-            of the parameter.
+        of the parameter.
 
         Returns:
             dict: A dict specifying the following customization arguments for
-             the parameter. In case of a parameter change to a single value,
-             this dict contains the value of the parameter and a key-value
-             pair specifying whether parsing is done using the Jinja template
-             engine. If the parameter is changed to one amongst several values,
-             this dict contains a list of possible values.
+            the parameter. In case of a parameter change to a single value,
+            this dict contains the value of the parameter and a key-value
+            pair specifying whether parsing is done using the Jinja template
+            engine. If the parameter is changed to one amongst several values,
+            this dict contains a list of possible values.
          """
         return self._customization_args
 
@@ -160,9 +161,10 @@ class ParamChange(object):
                 change be performed using the Jinja template engine. If the
                 parameter changed to one amongst several values, this dict
                 contains a list of possible values.
-                `name` is the name of the parameter. `generator_id` is the
-                type of value generator used to generate the new value for
-                the parameter.
+                `name` is the name of the parameter.
+                `generator_id` is the type of value generator used to
+                generate the new value for the parameter.
+
         Returns:
             ParamChange. The ParamChange object created from the
                 `param_change_dict` dict, which specifies the name,
