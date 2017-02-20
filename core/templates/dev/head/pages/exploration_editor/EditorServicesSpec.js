@@ -800,14 +800,14 @@ describe('New state template service', function() {
     var NEW_STATE_NAME = 'new state name';
 
     beforeEach(inject(function($injector) {
-      // TODO(sll): Find a way to have this and the backend dict read from the
-      // same single source of truth.
       GLOBALS.NEW_STATE_TEMPLATE = {
         content: [{
           type: 'text',
           value: ''
         }],
         interaction: {
+          answer_groups: [],
+          confirmed_unclassified_answers: [],
           customization_args: {
             rows: {
               value: 1
@@ -821,39 +821,44 @@ describe('New state template service', function() {
             feedback: [],
             param_changes: []
           },
+          fallbacks: [],
           id: 'TextInput'
         },
-        param_changes: [],
-        unresolved_answers: {}
+        param_changes: []
       };
       nsts = $injector.get('newStateTemplateService');
     }));
 
     it('should make a new state template given a state name', function() {
-      expect(nsts.getNewStateTemplate(NEW_STATE_NAME)).toEqual({
-        content: [{
-          type: 'text',
-          value: ''
-        }],
-        interaction: {
-          customization_args: {
-            rows: {
-              value: 1
+      expect(JSON.parse(JSON.stringify(
+          nsts.getNewStateTemplate(NEW_STATE_NAME)
+        ))).toEqual({
+          name: 'new state name',
+          content: [{
+            type: 'text',
+            value: ''
+          }],
+          interaction: {
+            answer_groups: [],
+            confirmed_unclassified_answers: [],
+            customization_args: {
+              rows: {
+                value: 1
+              },
+              placeholder: {
+                value: 'Type your answer here.'
+              }
             },
-            placeholder: {
-              value: 'Type your answer here.'
-            }
+            default_outcome: {
+              dest: NEW_STATE_NAME,
+              feedback: [],
+              param_changes: []
+            },
+            fallbacks: [],
+            id: 'TextInput'
           },
-          default_outcome: {
-            dest: NEW_STATE_NAME,
-            feedback: [],
-            param_changes: []
-          },
-          id: 'TextInput'
-        },
-        param_changes: [],
-        unresolved_answers: {}
-      });
+          paramChanges: []
+        });
     });
   });
 });

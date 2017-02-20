@@ -35,7 +35,12 @@ then
   echo ""
   echo "     bash $0"
   echo ""
-  return 1
+  exit 1
+fi
+
+if [ -e "/etc/is_vagrant_vm" ]
+then
+  source $(dirname $0)/vagrant_lock.sh || exit 1
 fi
 
 set -e

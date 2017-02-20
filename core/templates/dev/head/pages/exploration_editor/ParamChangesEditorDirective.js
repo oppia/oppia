@@ -92,7 +92,6 @@ oppia.directive('paramChangesEditor', [function() {
             $scope.paramNameChoices.length > 0 ?
             $scope.paramNameChoices[0].id : 'x');
           var newParamChange = getDefaultParameterChange(newParamName);
-
           // Add the new param name to $scope.paramNameChoices, if necessary,
           // so that it shows up in the dropdown.
           if (!$scope.paramNameChoices.hasOwnProperty(newParamChange.name)) {

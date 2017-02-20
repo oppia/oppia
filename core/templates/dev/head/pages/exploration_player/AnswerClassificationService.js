@@ -44,8 +44,8 @@ oppia.factory('AnswerClassificationService', [
         answer, answerGroups, defaultOutcome, interactionRulesService) {
       // Find the first group that contains a rule which returns true
       for (var i = 0; i < answerGroups.length; i++) {
-        for (var j = 0; j < answerGroups[i].rule_specs.length; j++) {
-          var ruleSpec = answerGroups[i].rule_specs[j];
+        for (var j = 0; j < answerGroups[i].ruleSpecs.length; j++) {
+          var ruleSpec = answerGroups[i].ruleSpecs[j];
           if (ruleSpec.rule_type !== CLASSIFIER_RULESPEC_STR &&
               interactionRulesService[ruleSpec.rule_type](
                 answer, ruleSpec.inputs)) {
@@ -100,7 +100,6 @@ oppia.factory('AnswerClassificationService', [
         var result = null;
         var answerGroups = oldState.interaction.answer_groups;
         var defaultOutcome = oldState.interaction.default_outcome;
-
         if (interactionRulesService) {
           result = classifyAnswer(
             answer, answerGroups, defaultOutcome, interactionRulesService);

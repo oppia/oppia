@@ -1,0 +1,6 @@
+<script type="text/ng-template" id="schemaBasedEditor/choices">
+  <select class="form-control" ng-model="$parent.$parent.localValue"
+          ng-options="choice as choice for choice in choices()" required
+          ng-disabled="isDisabled()">
+  </select>
+</script>

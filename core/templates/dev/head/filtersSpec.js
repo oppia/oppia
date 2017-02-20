@@ -35,6 +35,7 @@ describe('Testing filters', function() {
     'summarizeDefaultOutcome',
     'summarizeNonnegativeNumber',
     'truncateAndCapitalize',
+    'capitalize',
     'stripFormatting'
   ];
 
@@ -379,5 +380,24 @@ describe('Testing filters', function() {
     expect(
       $filter('stripFormatting')(ITALIC_TEXT, whitelistedImgClasses)
     ).toEqual('<i>MVP Ben Zobrist pictured</i>');
+  }));
+
+  it('should correctly capitalize strings', inject(function($filter) {
+    var filter = $filter('capitalize');
+
+    expect(filter('')).toEqual('');
+    expect(filter(null)).toEqual(null);
+    expect(filter(undefined)).toEqual(undefined);
+
+    expect(filter('a')).toEqual('A');
+    expect(filter('a  ')).toEqual('A');
+    expect(filter('  a')).toEqual('A');
+    expect(filter('  a  ')).toEqual('A');
+
+    expect(filter('a  b ')).toEqual('A  b');
+    expect(filter('  a  b ')).toEqual('A  b');
+    expect(filter('  ab c ')).toEqual('Ab c');
+    expect(filter('  only First lettEr is  Affected ')).toEqual(
+      'Only First lettEr is  Affected');
   }));
 });

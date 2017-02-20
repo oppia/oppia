@@ -3,10 +3,10 @@
     <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
       <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
         <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
-        <h2 class="activity-title protractor-test-exp-summary-tile-title">
+        <h3 class="activity-title protractor-test-exp-summary-tile-title">
           <span ng-if="isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
           <span ng-if="!isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
-        </h2>
+        </h3>
 
         <!-- Note that if this is ng-if instead, the avatar area will not detect a mouseover and the tile will behave incorrectly. -->
         <div ng-show="isWindowLarge && avatarsList.length > 0" class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
@@ -18,38 +18,20 @@
                             tooltip-placement="right">
             </circular-image>
           </div>
-          <div class="avatars-num-minus-one contributor-indicator contributor-indicator-background" ng-show="avatarsList.length > 1">
-            <span ng-if="!isCommunityOwned()">+</span><[avatarsList.length - 1]>
-          </div>
-
-          <div class="all-avatars" style="display: none;">
-            <div ng-repeat="avatar in avatarsList | limitTo:MAX_AVATARS_TO_DISPLAY-1:1">
-              <circular-image src="avatar.image"
-                              link="avatar.link"
-                              tooltip="<[avatar.tooltipText | truncate:14]>"
-                              tooltip-placement="right">
-              </circular-image>
-            </div>
-
-            <div style="position: relative;" ng-show="avatarsList.length > MAX_AVATARS_TO_DISPLAY">
-              <div class="exploration-black-profile"></div>
-              <div class="num-remaining-avatars" ng-show="avatarsList.length > MAX_AVATARS_TO_DISPLAY">
-                +<[avatarsList.length - MAX_AVATARS_TO_DISPLAY]>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
       <div class="title-section-mask"></div>
 
       <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>">
-        <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
-          <span ng-if="getObjective()">
-            <[getObjective() | truncateAndCapitalize: 40]>
+        <span ng-if="getObjective()" class="oppia-activity-summary-popover">
+          <span popover="<[getObjective()|capitalize]>" popover-placement="top" popover-trigger="mouseenter">
+            <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
+              <[getObjective() | truncateAndCapitalize: 40]>
+            </div>
           </span>
-          <span ng-if="!getObjective()" translate="I18N_LIBRARY_NO_OBJECTIVE">
-          </span>
-        </div>
+        </span>
+        <span ng-if="!getObjective()" translate="I18N_LIBRARY_NO_OBJECTIVE">
+        </span>
         <ul layout="row" class="metrics" layout-align="space-between center">
           <li>
             <span class="protractor-test-exp-summary-tile-rating" ng-class="{'rating-disabled': !getAverageRating()}">
@@ -70,10 +52,8 @@
           </li>
 
           <li>
-            <span ng-if="!wasRecentlyUpdated()">
+            <span>
               <[getLastUpdatedDatetime()]>
-            </span>
-            <span ng-if="wasRecentlyUpdated()" class="recently-updated" translate="I18N_LIBRARY_UPDATED">
             </span>
           </li>
         </ul>

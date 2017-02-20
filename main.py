@@ -32,6 +32,7 @@ from core.controllers import profile
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
+from core.controllers import subscriptions
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -227,7 +228,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/profilehandler/data/<username>', profile.ProfileHandler),
     get_redirect_route(r'/preferences', profile.PreferencesPage),
     get_redirect_route(
-        r'/preferenceshandler/data', profile.PreferencesHandler),
+        feconf.PREFERENCES_DATA_URL, profile.PreferencesHandler),
     get_redirect_route(
         r'/preferenceshandler/profile_picture', profile.ProfilePictureHandler),
     get_redirect_route(
@@ -312,6 +313,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/moderatorrights/<exploration_id>',
         editor.ExplorationModeratorRightsHandler),
     get_redirect_route(
+        r'/createhandler/notificationpreferences/<exploration_id>',
+        editor.UserExplorationEmailsHandler),
+    get_redirect_route(
         r'/createhandler/snapshots/<exploration_id>',
         editor.ExplorationSnapshotsHandler),
     get_redirect_route(
@@ -353,6 +357,12 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<exploration_id>' % feconf.SUGGESTION_URL_PREFIX,
         feedback.SuggestionHandler),
     get_redirect_route(
+        r'%s' % feconf.SUBSCRIBE_URL_PREFIX,
+        subscriptions.SubscribeHandler),
+    get_redirect_route(
+        r'%s' % feconf.UNSUBSCRIBE_URL_PREFIX,
+        subscriptions.UnsubscribeHandler),
+    get_redirect_route(
         r'%s/<exploration_id>' % feconf.FLAG_EXPLORATION_URL_PREFIX,
         reader.FlagExplorationHandler),
     get_redirect_route(
@@ -392,6 +402,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/emaildashboardcancelresult/<query_id>',
         email_dashboard.EmailDashboardCancelEmailHandler),
+    get_redirect_route(
+        r'/emaildashboardtestbulkemailhandler/<query_id>',
+        email_dashboard.EmailDashboardTestBulkEmailHandler),
     get_redirect_route(
         r'%s' % feconf.EXPLORATION_METADATA_SEARCH_URL,
         collection_editor.ExplorationMetadataSearchHandler),
