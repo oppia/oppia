@@ -90,7 +90,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         """Test the get_classifier_by_id method."""
         with self.assertRaisesRegexp(Exception, (
             "No classifier found for the classifer's id.")):
-            exp_services.get_classifier_by_id('fake_id')
+            classifier_services.get_classifier_by_id('fake_id')
 
         exp_id = u'1'
         state = 'Home'
@@ -101,3 +101,21 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             classifier_id)
         self.assertEqual(classifier.exp_id, exp_id)
         self.assertEqual(classifier.state_name, state)
+
+
+    def test_update_of_classifiers(self):
+        """Test the update_classifier method."""
+        exp_id = u'1'
+        state = 'Home'
+        test_state = 'State'
+        classifier_id = classifier_models.ClassifierModel.create(
+            exp_id, 1, state,
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'], [], 1)
+        classifier = classifier_services.get_classifier_by_id(
+            classifier_id)
+        classifier.state_name = test_state
+        classifier_services.update_classifier(classifier)
+        classifier = classifier_services.get_classifier_by_id(
+            classifier_id)
+        self.assertEqual(classifier.exp_id, exp_id)
+        self.assertEqual(classifier.state_name, test_state)
