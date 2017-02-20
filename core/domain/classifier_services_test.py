@@ -86,10 +86,11 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             self.assertTrue(
                 self._is_string_classifier_called('dunno, just guessed'))
 
-    def test_retrieval_and_update_of_classifiers(self):
-        """ Test the get_classifier_by_id method"""
-        response = classifier_services.get_classifier_by_id('fake_id')
-        self.assertEqual(response, None)
+    def test_retrieval_of_classifiers(self):
+        """Test the get_classifier_by_id method."""
+        with self.assertRaisesRegexp(Exception, (
+            "No classifier found for the classifer's id.")):
+            exp_services.get_classifier_by_id('fake_id')
 
         exp_id = u'1'
         state = 'Home'

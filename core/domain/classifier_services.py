@@ -125,8 +125,7 @@ def classify_string_classifier_rule(state, normalized_answer):
 
 
 def get_classifier_from_model(classifier_model):
-    """
-    Returns a classifier domian object given a classifier model loaded
+    """Returns a classifier domian object given a classifier model loaded
     from datastore.
     """
     return classifier_domain.Classifier(
@@ -137,33 +136,49 @@ def get_classifier_from_model(classifier_model):
         classifier_model.data_schema_version)
 
 def get_classifier_by_id(classifier_id):
-    """
-    Returns a classifier domain object given a classifier id.
+    """Returns a classifier domain object given a classifier id.
     """
     classifier_model = classifier_models.ClassifierModel.get(
         classifier_id, strict=False)
     if classifier_model is None:
-        return None
+        raise Exception("No classifier found for the classifer's id.")
     else:
         classifier = get_classifier_from_model(classifier_model)
         return classifier
 
 
-def _save_classifier(classifier):
+def _create_classifier(classifier):
+    """Creates classifier model in the datastoer given a classifier
+       domain object.
     """
-    Updates classifier model in the datastore given a classifier
+    classifier_models.ClassifierModel.create(
+        classifier.exp_id, classifier.exp_version_when_created,
+        classifier.state_name, classifer.algorithm_id,
+        classifier.cached_classifier_data, classifier.data_schema_version,
+        )
+
+
+def _save_classifier(classifier_model, classifier):
+    """Updates classifier model in the datastore given a classifier
     domain object.
+    """
+    classifier_model.exp_version_when_created = (
+        classifier.exp_version_when_created)
+    classifier_model.state_name = classifier.state_name
+    classifier_model.algorithm_id = classifier.algorithm_id
+    classifier_model.cached_classifier_data = (
+        classifier.cached_classifier_data)
+    classifier_model.data_schema_version = classifier.data_schema_version
+    classifier_model.put()
+
+
+def update_classifier(classifier):
+    """Checks if model exists and updates the classifier model using
+    _save_classifier method.
     """
     classifier_model = classifier_models.ClassifierModel.get(
         classifier.id, strict=False)
     if classifier_model is None:
-        return None
+        raise Exception("No classifier found for the classifer's id.")
     else:
-        classifier_model.exp_version_when_created = (
-            classifier.exp_version_when_created)
-        classifier_model.state_name = classifier.state_name
-        classifier_model.algorithm_id = classifier.algorithm_id
-        classifier_model.cached_classifier_data = (
-            classifier.cached_classifier_data)
-        classifier_model.data_schema_version = classifier.data_schema_version
-        classifier_model.put()
+        _save_classifier(classifier_model, classifier)
