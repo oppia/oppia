@@ -130,7 +130,7 @@
 
       <div ng-if="explorationsList.length > 0" class="oppia-dashboard-tab-panel" style="padding-top: 13px; padding-bottom: 46px;">
         <span class="sort-explorations-select"
-              ng-if="activeTab === 'myExplorations'" 
+              ng-if="activeTab === 'myExplorations'"
               ng-class="{'sort-explorations-select-three-tabs': (collectionsList.length !== 0 && subscribersList.length !== 0)}"
               style="float: right;">
           <p class="sort-by-text">Sort By</p>
@@ -402,6 +402,8 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/embed_modal/ExplorationEmbedButtonService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/share/SharingLinksDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CollectionSummaryTileDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/dashboard/DashboardBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/dashboard/Dashboard.js"></script>
