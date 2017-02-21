@@ -86,18 +86,17 @@ class ParamChange(object):
 
     def __init__(self, name, generator_id, customization_args):
         """Initialize a ParamChange object with the specified arguments.
-
         Args:
             name: unicode. The name of the parameter.
-                generator_id: unicode. The type of generator used to create the
-                parameter, e.g., "Copier".
+            generator_id: unicode. The type of generator used to create the
+            parameter, e.g., "Copier".
             customization_args: dict. A dict containing the following keys:
-                (value, parse_with_jinja). `value` specifies the value of the
-                parameter, and `parse_with_jinja` indicates whether parsing is
-                to be done with the Jinja template engine. If the parameter is
-                specified using one of several possible values, this dict
-                contains a list (`list_of_values`) of possible values (instead
-                of `value`).
+            (value, parse_with_jinja). `value` specifies the value of the
+            parameter, and `parse_with_jinja` indicates whether parsing is
+            to be done with the Jinja template engine. If the parameter is
+            specified using one of several possible values, this dict
+            contains a list (`list_of_values`) of possible values (instead
+            of `value`).
         """
         # TODO(sll): Check that all required args for customization exist in
         # customization_args.
