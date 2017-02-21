@@ -632,6 +632,14 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
     registerVisitOppiaFromIframeEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
         'VisitOppiaFromIframe', 'click', explorationId);
+    },
+    registerNewCard: function(cardNum) {
+      if (cardNum <= 10 || card % 10 == 0) {
+        _sendEventToGoogleAnalytics('PlayerNewCard', 'click', cardNum);
+      }
+    },
+    registerFinishExploration: function() {
+      _sendEventToGoogleAnalytics('PlayerFinishExploration', 'click', '');
     }
   };
 }]);
