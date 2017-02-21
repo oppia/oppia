@@ -564,7 +564,7 @@ textarea {
 }
 
 .oppia-sidebar-menu-open .oppia-content-container::after {
-  height: 100%;
+  height: 100vh;
   opacity: 1;
   -webkit-transition: opacity 0.5s;
   transition: opacity 0.5s;
