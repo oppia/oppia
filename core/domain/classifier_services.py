@@ -14,8 +14,8 @@
 
 """Services for classifier models"""
 
-from core.domain import classifier_registry
 from core.domain import classifier_domain
+from core.domain import classifier_registry
 from core.domain import exp_domain
 from core.domain import interaction_registry
 from core.platform import models
@@ -125,7 +125,7 @@ def classify_string_classifier_rule(state, normalized_answer):
 
 
 def get_classifier_from_model(classifier_model):
-    """Returns a classifier domian object given a classifier model loaded
+    """Returns a classifier domain object given a classifier model loaded
     from datastore.
     """
     return classifier_domain.Classifier(
@@ -148,7 +148,7 @@ def get_classifier_by_id(classifier_id):
 
 
 def _create_classifier(classifier):
-    """Creates classifier model in the datastoer given a classifier
+    """Creates classifier model in the datastore given a classifier
        domain object.
     """
     classifier_models.ClassifierModel.create(
@@ -162,13 +162,7 @@ def _save_classifier(classifier_model, classifier):
     """Updates classifier model in the datastore given a classifier
     domain object.
     """
-    classifier_model.exp_version_when_created = (
-        classifier.exp_version_when_created)
     classifier_model.state_name = classifier.state_name
-    classifier_model.algorithm_id = classifier.algorithm_id
-    classifier_model.cached_classifier_data = (
-        classifier.cached_classifier_data)
-    classifier_model.data_schema_version = classifier.data_schema_version
     classifier_model.put()
 
 

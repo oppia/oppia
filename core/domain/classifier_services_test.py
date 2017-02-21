@@ -102,7 +102,6 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self.assertEqual(classifier.exp_id, exp_id)
         self.assertEqual(classifier.state_name, state)
 
-
     def test_update_of_classifiers(self):
         """Test the update_classifier method."""
         exp_id = u'1'
@@ -120,7 +119,6 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self.assertEqual(classifier.exp_id, exp_id)
         self.assertEqual(classifier.state_name, test_state)
 
-
     def test_deletion_of_classifiers(self):
         """Test the delete_classifier method."""
         exp_id = u'1'
@@ -132,4 +130,3 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, (
             "No classifier found for the classifer's id.")):
             classifier_services.get_classifier_by_id(classifier_id)
-
