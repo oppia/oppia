@@ -144,6 +144,12 @@ oppia.directive('schemaBasedListEditor', [
             }
           };
 
+          if ($scope.localValue.length === 1) {
+            if ($scope.localValue[$scope.localValue.length - 1].length === 0) {
+              $scope.isAddItemButtonPresent = false;
+            }
+          }
+
           $scope.lastElementOnBlur = function() {
             _deleteLastElementIfUndefined();
             $scope.showAddItemButton();
@@ -156,12 +162,6 @@ oppia.directive('schemaBasedListEditor', [
 
           $scope.hideAddItemButton = function() {
             $scope.isAddItemButtonPresent = false;
-          };
-
-          if ($scope.itemSchema().value === 'setInput') {
-            if ($scope.localValue.length === 0) {
-              $scope.addElement();
-            }
           };
 
           $scope._onChildFormSubmit = function(evt) {

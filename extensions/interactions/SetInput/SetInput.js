@@ -32,8 +32,7 @@ oppia.directive('oppiaInteractiveSetInput', [function() {
       $scope.schema = {
         type: 'list',
         items: {
-          type: 'unicode',
-          value: 'setInput'
+          type: 'unicode'
         },
         ui_config: {
           // TODO(mili): Translate this in the HTML.
@@ -42,7 +41,8 @@ oppia.directive('oppiaInteractiveSetInput', [function() {
         }
       };
 
-      $scope.answer = [];
+      // Adds an input field by default
+      $scope.answer = [''];
 
       var hasDuplicates = function(answer) {
         for (var i = 0; i < answer.length; i++) {
