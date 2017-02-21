@@ -106,7 +106,7 @@ oppia.factory('StatsReportingService', [
           paramValues: oldParams
         });
 
-        if (!(newStateName in statesVisited)) {
+        if (!statesVisited.hasOwnProperty(newStateName)) {
           statesVisited[newStateName] = true;
           numStatesVisited++;
           siteAnalyticsService.registerNewCard(numStatesVisited);
