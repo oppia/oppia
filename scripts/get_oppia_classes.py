@@ -14,8 +14,7 @@ def return_all_files(dir_to_scan):
             val.append(os.path.join(root, f))
 
         for d in subdir:
-            val.append(return_all_files(d))
-
+            val.extend(return_all_files(d))
     return val
 
 
@@ -37,30 +36,34 @@ def file_find_matching_classes(file_name, pattern):
     returns all the classes that have same pattern as specified
     """
     f = open(file_name)
-
-    # making BeautifulSoup object of file then extracting the script tag and
-    # making BeautifulSoup object of text inside script tag
-    my_soup = bs4.BeautifulSoup(f.read(), 'html.parser').find('script')
-
-    inside_script_content = str(my_soup.contents)
-
-    soup_from_text_inside_script = bs4.BeautifulSoup(
-        inside_script_content, 'html.parser')
-
-    # extracting list of all the classes per tag
-    all_classes = [
-        t.attrs.get('class') for t in soup_from_text_inside_script.findAll()]
+    # making BeautifulSoup object of file then extracting all classes
+    # and if the tag is script we further make BeautifulSoup object to
+    # take case of ng-template
+    file_soup = bs4.BeautifulSoup(f.read(), 'html.parser')
 
     list_oppia_classes = []
 
-    # iterating through the list and output the result if there is a match
-    for i in all_classes:
-        if i is None:
-            continue
+    for i in file_soup.findAll():
+        if i.name == 'script' and i.attrs.get('type') == 'text/ng-template':
+            inside_script_content = str(i.contents)
+            soup_from_text_inside_script = bs4.BeautifulSoup(
+                inside_script_content, 'html.parser')
+            for t in soup_from_text_inside_script.findAll():
+                cur_classes = t.attrs.get('class')
+                if cur_classes is None:
+                    continue
+                else:
+                    for j in cur_classes:
+                        if pattern.match(j):
+                            list_oppia_classes.append(j)
         else:
-            for j in i:
-                if pattern.match(j):
-                    list_oppia_classes.append(j)
+            cur_classes = i.attrs.get('class')
+            if cur_classes is None:
+                continue
+            else:
+                for j in cur_classes:
+                    if pattern.match(j):
+                        list_oppia_classes.append(j)
 
     return set(list_oppia_classes)
 
@@ -80,7 +83,7 @@ def print_output(file_dict):
         print '\n\n'
 
 
-def give_unique_classes(file_dict):
+def give_unique_classes(file_dict, file_store):
     """
     expects file dictionary with file as keys and classes as values
     return dict with file as keys and only those classes that are
@@ -91,12 +94,13 @@ def give_unique_classes(file_dict):
         val[i] = []
         for j in file_dict[i]:
             check_if_class_exist_in_some_other_file = 0
-            for k in file_dict.keys():
+            for k in file_store.keys():
                 if k == i:
                     continue
-                for z in file_dict[k]:
+                for z in file_store[k]:
                     if z == j:
                         check_if_class_exist_in_some_other_file = 1
+
             if check_if_class_exist_in_some_other_file == 0:
                 val[i].append(j)
 
@@ -105,23 +109,31 @@ def give_unique_classes(file_dict):
 
 DIRECTORY = raw_input('Enter path to directory  ')
 
+# pattern for all html files
+HTML_PATTERN = re.compile(r'.*\.html')
+
 # pattern for matching directive html files
-FILE_PATTERN = re.compile(r'.*directive\.html')
+DIRECTIVE_PATTERN = re.compile(r'.*directive\.html')
 
 # pattern for matching the classes
-FIND_PATTERN = re.compile(r'.*oppia.*')
+FIND_CLASS_PATTERN = re.compile(r'.*oppia.*')
 
 ALL_FILES_IN_PATH = return_all_files(DIRECTORY)
+HTML_FILES = return_matched_files(ALL_FILES_IN_PATH, HTML_PATTERN)
+DIRECTIVE_FILES = return_matched_files(ALL_FILES_IN_PATH, DIRECTIVE_PATTERN)
 
-DIRECTIVE_FILES = return_matched_files(ALL_FILES_IN_PATH, FILE_PATTERN)
+LIST_ALL_FILE_CLASSES = {}
+LIST_DIRECTIVE_FILE_CLASSES = {}
 
-LIST_FILE_CLASSES = {}
+for fl in HTML_FILES:
+    LIST_ALL_FILE_CLASSES[fl] = file_find_matching_classes(
+        fl, FIND_CLASS_PATTERN)
 
 for fl in DIRECTIVE_FILES:
-    LIST_FILE_CLASSES[fl] = file_find_matching_classes(fl, FIND_PATTERN)
+    LIST_DIRECTIVE_FILE_CLASSES[fl] = file_find_matching_classes(
+        fl, FIND_CLASS_PATTERN)
 
-# print_output(LIST_FILE_CLASSES)
-
-print_output(give_unique_classes(LIST_FILE_CLASSES))
+print_output(
+    give_unique_classes(LIST_DIRECTIVE_FILE_CLASSES, LIST_ALL_FILE_CLASSES))
 
 
