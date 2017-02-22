@@ -15,8 +15,7 @@
 /**
  * @fileoverview Unit tests for the SimpleEditorShimService.js
  */
- describe('Simple Editor Shim Service', function() {
-
+describe('Simple Editor Shim Service', function() {
   var currentStateName;
   var srv;
   var titleMemento;
@@ -31,17 +30,29 @@
       state1: {
         name: 'state1',
         content: [
-        { value: 'introduction HTML for state1' },
-        { value: 'st1html1' },
-        { value: 'st1html2' }
+          {
+            value: 'introduction HTML for state1'
+          },
+          {
+            value: 'st1html1'
+          },
+          {
+            value: 'st1html2'
+          }
         ]
       },
       state2: {
         name: 'state2',
         content: [
-        { value: 'introduction HTML for state2' },
-        { value: 'st2html1' },
-        { value: 'st2html2' }
+          {
+            value: 'introduction HTML for state2'
+          },
+          {
+            value: 'st2html1'
+          },
+          {
+            value: 'st2html2'
+          }
         ]
       }
     };
@@ -50,7 +61,7 @@
       explorationTitleService: {
         savedMemento: titleMemento,
         displayed: titleMemento,
-        saveDisplayedValue: function() {}
+        saveDisplayedValue: function() { }
       },
       explorationInitStateNameService: {
         savedMemento: currentStateName
@@ -62,12 +73,12 @@
         getStates: function() {
           return states;
         },
-        saveStateContent: function(stateName, stateContent) {},
-        saveInteractionId: function(stateName, newInteractionId) {},
-        saveInteractionCustomizationArgs: function(stateName, newCustomizationArgs) {},
-        saveInteractionAnswerGroups: function(stateName, newAnswerGroups) {},
-        saveInteractionDefaultOutcome: function(stateName, newDefaultOutcome) {},
-        addState: function(newStateName) {}
+        saveStateContent: function() { },
+        saveInteractionId: function() { },
+        saveInteractionCustomizationArgs: function() { },
+        saveInteractionAnswerGroups: function() { },
+        saveInteractionDefaultOutcome: function() { },
+        addState: function() { }
       }
     };
 
@@ -77,7 +88,6 @@
       $provide.value('explorationInitStateNameService', stubs.explorationInitStateNameService);
       $provide.value('explorationStatesService', stubs.explorationStatesService);
     });
-
   });
 
   beforeEach(inject(function($injector) {
