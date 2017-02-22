@@ -52,6 +52,7 @@ class ParamSpec(object):
     @classmethod
     def from_dict(cls, param_spec_dict):
         """Creates a ParamSpec object from its dict representation.
+
         Args:
             param_spec_dict: dict. The dictionary containing the specification
                 of the parameter. It contains the following key (object_type).
@@ -86,6 +87,7 @@ class ParamChange(object):
 
     def __init__(self, name, generator_id, customization_args):
         """Initialize a ParamChange object with the specified arguments.
+
         Args:
             name: unicode. The name of the parameter.
             generator_id: unicode. The type of generator used to create the
