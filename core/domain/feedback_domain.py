@@ -139,9 +139,6 @@ class FeedbackMessage(object):
         self.last_updated = last_updated
         self.received_via_email = received_via_email
         
-        raise Exception(created_on)
-        raise Exception(last_updated)
-        raise Exception(received_via_email)
     @property
     def exploration_id(self):
         """Returns the exploration ID.
