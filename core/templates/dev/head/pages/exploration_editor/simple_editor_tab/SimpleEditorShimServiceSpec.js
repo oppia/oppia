@@ -85,8 +85,10 @@ describe('Simple Editor Shim Service', function() {
     module('oppia');
     module(function($provide) {
       $provide.value('explorationTitleService', stubs.explorationTitleService);
-      $provide.value('explorationInitStateNameService', stubs.explorationInitStateNameService);
-      $provide.value('explorationStatesService', stubs.explorationStatesService);
+      $provide.value('explorationInitStateNameService', stubs.
+        explorationInitStateNameService);
+      $provide.value('explorationStatesService', stubs.explorationStatesService
+        );
     });
   });
 
@@ -140,7 +142,8 @@ describe('Simple Editor Shim Service', function() {
     var newTitle = 'NewTitle';
     srv.saveTitle(newTitle);
     expect(stubs.explorationTitleService.displayed).toEqual(newTitle);
-    expect(stubs.explorationTitleService.saveDisplayedValue).toHaveBeenCalled();
+    expect(stubs.explorationTitleService.saveDisplayedValue)
+    .toHaveBeenCalled();
   });
 
   it('should save the introduction HTML', function() {
@@ -150,35 +153,40 @@ describe('Simple Editor Shim Service', function() {
       value: newIntroductionHtml
     }];
     srv.saveIntroductionHtml(newIntroductionHtml);
-    expect(stubs.explorationStatesService.saveStateContent).toHaveBeenCalledWith(currentStateName, stateNewContent);
+    expect(stubs.explorationStatesService.saveStateContent)
+    .toHaveBeenCalledWith(currentStateName, stateNewContent);
   });
 
   it('should save the interaction ID', function() {
     var newInteractionID = 'abc123';
     var stateName = currentStateName;
     srv.saveInteractionId(stateName, newInteractionID);
-    expect(stubs.explorationStatesService.saveInteractionId).toHaveBeenCalledWith(stateName, newInteractionID);
+    expect(stubs.explorationStatesService.saveInteractionId)
+    .toHaveBeenCalledWith(stateName, newInteractionID);
   });
 
   it('should save the Customization Args', function() {
     var newCustomizationArgs = '-a -b -c';
     var stateName = currentStateName;
     srv.saveCustomizationArgs(stateName, newCustomizationArgs);
-    expect(stubs.explorationStatesService.saveInteractionCustomizationArgs).toHaveBeenCalledWith(stateName, newCustomizationArgs);
+    expect(stubs.explorationStatesService.saveInteractionCustomizationArgs)
+    .toHaveBeenCalledWith(stateName, newCustomizationArgs);
   });
 
   it('should save the Answer Groups', function() {
     var newAnswerGroups = ['g1', 'g2'];
     var stateName = currentStateName;
     srv.saveAnswerGroups(stateName, newAnswerGroups);
-    expect(stubs.explorationStatesService.saveInteractionAnswerGroups).toHaveBeenCalledWith(stateName, newAnswerGroups);
+    expect(stubs.explorationStatesService.saveInteractionAnswerGroups)
+    .toHaveBeenCalledWith(stateName, newAnswerGroups);
   });
 
   it('should save the Default Outcome', function() {
     var newDefaultOutcome = 20;
     var stateName = currentStateName;
     srv.saveDefaultOutcome(stateName, newDefaultOutcome);
-    expect(stubs.explorationStatesService.saveInteractionDefaultOutcome).toHaveBeenCalledWith(stateName, newDefaultOutcome);
+    expect(stubs.explorationStatesService.saveInteractionDefaultOutcome)
+    .toHaveBeenCalledWith(stateName, newDefaultOutcome);
   });
 
   it('should save the Bridge HTML', function() {
@@ -189,12 +197,14 @@ describe('Simple Editor Shim Service', function() {
     }];
     var stateName = currentStateName;
     srv.saveBridgeHtml(stateName, newHtml);
-    expect(stubs.explorationStatesService.saveStateContent).toHaveBeenCalledWith(stateName, bridgeNewContent);
+    expect(stubs.explorationStatesService.saveStateContent)
+    .toHaveBeenCalledWith(stateName, bridgeNewContent);
   });
 
   it('should add new state', function() {
     var newStateName = 'newState';
     srv.addState(newStateName);
-    expect(stubs.explorationStatesService.addState).toHaveBeenCalledWith(newStateName);
+    expect(stubs.explorationStatesService.addState).toHaveBeenCalledWith(
+      newStateName);
   });
 });
