@@ -145,7 +145,7 @@ oppia.directive('schemaBasedListEditor', [
           };
 
           if ($scope.localValue.length === 1) {
-            if ($scope.localValue[$scope.localValue.length - 1].length === 0) {
+            if ($scope.localValue[0].length === 0) {
               $scope.isAddItemButtonPresent = false;
             }
           }
