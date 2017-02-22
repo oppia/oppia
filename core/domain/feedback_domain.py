@@ -118,6 +118,11 @@ class FeedbackMessage(object):
             thread.
         updated_subject: str. The new feedback thread subject.
         text: This is the text for the full feedback thread message.
+        created_on: str. The date in which the feedback thread was created. 
+        last_updated: str. The date in which the feedback thread was last 
+            updated.
+        received_via_email: bool. Whether the feedback message was received via
+            email.
     """
 
     def __init__(self, full_message_id, full_thread_id, message_id, author_id,
@@ -133,7 +138,10 @@ class FeedbackMessage(object):
         self.created_on = created_on
         self.last_updated = last_updated
         self.received_via_email = received_via_email
-
+        
+        raise Exception(created_on)
+        raise Exception(last_updated)
+        raise Exception(received_via_email)
     @property
     def exploration_id(self):
         """Returns the exploration ID.
