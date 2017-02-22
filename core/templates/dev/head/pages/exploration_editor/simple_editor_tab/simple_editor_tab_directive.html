@@ -4,3 +4,23 @@
     <simple-editor-body></simple-editor-body>
   </div>
 </script>
+
+<link rel="stylesheet" href="/third_party/static/perfectscrollbar-0.6.16/css/perfect-scrollbar.css" />
+<style>
+.ps-container:hover > .ps-scrollbar-y-rail:hover > .ps-scrollbar-y {
+  background-color: #8AD178;
+}
+.ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y {
+  background-color: #8AD178;
+}
+.ps-container:hover > .ps-scrollbar-y-rail:hover {
+  background-color: #c5e1a5;
+}
+</style>
+<script src="/third_party/static/perfectscrollbar-0.6.16/js/perfect-scrollbar.js"></script>
+<script type="text/javascript">
+
+window.onload = function() {
+        Ps.initialize(document.querySelector('simple-editor-sidebar'));
+    };
+</script>

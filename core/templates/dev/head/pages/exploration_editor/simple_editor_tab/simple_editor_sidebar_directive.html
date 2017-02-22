@@ -1,5 +1,5 @@
 <script type="text/ng-template" id="simpleEditor/sidebar">
-  <div class="sidebar">
+  <div class="sidebar always-visible">
     <ul>
       <li id="<[ID_PREFIX + 'title']>"
           ng-click="scrollToHeader('title')" class="sidebar-item sidebar-header">
@@ -45,7 +45,6 @@
     background-color: #eff8f0;
     height: 100%;
     left: 0;
-    overflow: auto;
     padding: 30px;
     position: fixed;
     /* This must match the 'margin-left' of the simple-editor-body class. */
@@ -99,16 +98,6 @@
     margin-top: 10px;
     position: static;
   }
-  simple-editor-sidebar::-webkit-scrollbar {
-    width: 5px;
-  }
-  simple-editor-sidebar::-webkit-scrollbar-track {
-    background-color: #d3ebd5;
-  }
-  simple-editor-sidebar::-webkit-scrollbar-thumb {
-    background-color: #6aa03b;
-    border-radius: 5px;
-  }
   simple-editor-sidebar .highlighted {
     background-color: #c5e1a5;
   }
@@ -135,3 +124,23 @@
     width: 220px;
   }
 </style>
+
+<link rel="stylesheet" href="/third_party/static/perfectscrollbar-0.6.16/css/perfect-scrollbar.css" />
+<style>
+  .ps-container:hover > .ps-scrollbar-y-rail:hover > .ps-scrollbar-y {
+    background-color: #689F38;
+  }
+  .ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y {
+    background-color: #689F38;
+  }
+  .ps-container:hover > .ps-scrollbar-y-rail:hover {
+    background-color: #c5e1a5;
+  }
+</style>
+<script src="/third_party/static/perfectscrollbar-0.6.16/js/perfect-scrollbar.js"></script>
+<script type="text/javascript">
+window.onload = function() {
+        console.log(document.querySelector('simple-editor-sidebar'));
+        Ps.initialize(document.querySelector('simple-editor-sidebar'));
+      };
+</script>
