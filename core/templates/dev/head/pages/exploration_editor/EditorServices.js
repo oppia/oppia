@@ -1676,7 +1676,7 @@ oppia.factory('computeGraphService', [
         nodes[stateName] = stateName;
 
         if (interaction.id) {
-          var groups = interaction.answerGroups || interaction.answer_groups;
+          var groups = interaction.answerGroups;
           for (var h = 0; h < groups.length; h++) {
             links.push({
               source: stateName,
