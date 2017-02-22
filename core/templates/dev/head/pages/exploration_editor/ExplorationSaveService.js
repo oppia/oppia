@@ -207,7 +207,7 @@ oppia.factory('explorationSaveService', [
               $scope.cancel = function() {
                 $modalInstance.dismiss();
               };
-              $scope.discard = function() {
+              $scope.confirmDiscard = function() {
                 $modalInstance.close();
               };
             }
