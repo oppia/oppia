@@ -57,7 +57,9 @@ describe('Cache Slugs', function() {
     browser.get(ERROR_PAGE_URL_SUFFIX);
     var expectedErrors = [
       'http://localhost:9001/build/fail/logo/288x128_logo_white.png',
-      // Warning fired by synchronous AJAX request for constatns
+      // Warning fired by synchronous AJAX request in
+      // core/templates/dev/head/pages/header_js_libs.html this warning is
+      // expected and it's needed for constants loading.
       'Synchronous XMLHttpRequest on the main thread'
     ];
     checkConsoleErrorsExist(expectedErrors);
