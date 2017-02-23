@@ -89,7 +89,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
     def test_retrieval_of_classifiers(self):
         """Test the get_classifier_by_id method."""
         with self.assertRaisesRegexp(Exception, (
-            "No classifier found for the classifer's id.")):
+            "Entity for class ClassifierModel with id fake_id not found")):
             classifier_services.get_classifier_by_id('fake_id')
 
         exp_id = u'1'
@@ -128,5 +128,6 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'], [], 1)
         classifier_services.delete_classifier(classifier_id)
         with self.assertRaisesRegexp(Exception, (
-            "No classifier found for the classifer's id.")):
+            "Entity for class ClassifierModel with id %s not found" %(
+                classifier_id))):
             classifier_services.get_classifier_by_id(classifier_id)

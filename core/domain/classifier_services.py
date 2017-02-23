@@ -139,12 +139,9 @@ def get_classifier_by_id(classifier_id):
     """Returns a classifier domain object given a classifier id.
     """
     classifier_model = classifier_models.ClassifierModel.get(
-        classifier_id, strict=False)
-    if classifier_model is None:
-        raise Exception("No classifier found for the classifer's id.")
-    else:
-        classifier = get_classifier_from_model(classifier_model)
-        return classifier
+        classifier_id)
+    classifier = get_classifier_from_model(classifier_model)
+    return classifier
 
 
 def _create_classifier(classifier):
@@ -171,19 +168,13 @@ def update_classifier(classifier):
     _save_classifier method.
     """
     classifier_model = classifier_models.ClassifierModel.get(
-        classifier.id, strict=False)
-    if classifier_model is None:
-        raise Exception("No classifier found for the classifer's id.")
-    else:
-        _save_classifier(classifier_model, classifier)
+        classifier.id)
+    _save_classifier(classifier_model, classifier)
 
 
 def delete_classifier(classifier_id):
     """Deletes classifier model in the datastore given classifier_id.
     """
     classifier_model = classifier_models.ClassifierModel.get(
-        classifier_id, strict=False)
-    if classifier_model is None:
-        raise Exception("No classifier found for the classifer's id.")
-    else:
-        classifier_model.delete()
+        classifier_id)
+    classifier_model.delete()
