@@ -11,6 +11,7 @@
 	"I18N_CREATE_YES_PLEASE": "Ja, tack!",
 	"I18N_DASHBOARD_COLLECTIONS": "Samlingar",
 	"I18N_DASHBOARD_OPEN_FEEDBACK": "Skicka återkoppling",
+	"I18N_DASHBOARD_SUBSCRIBERS": "Prenumeranter",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Dra bild hit",
 	"I18N_DIRECTIVES_OR_SELECT_FILE": "eller välj en bildfil:",
 	"I18N_ERROR_HEADER_400": "Fel 400",
@@ -196,5 +197,6 @@
 	"I18N_TOPNAV_NOTIFICATIONS": "Notifikationer",
 	"I18N_TOPNAV_PREFERENCES": "Inställningar",
 	"I18N_TOPNAV_SIGN_IN": "Logga in",
-	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Undervisa med Oppia"
+	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Undervisa med Oppia",
+	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Du har totalt <[totalSubscribers]> prenumeranter."
 }

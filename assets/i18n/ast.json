@@ -18,6 +18,7 @@
 	"I18N_DASHBOARD_COLLECTIONS": "Colecciones",
 	"I18N_DASHBOARD_EXPLORATIONS": "Esploraciones",
 	"I18N_DASHBOARD_OPEN_FEEDBACK": "Abrir los comentarios",
+	"I18N_DASHBOARD_SUBSCRIBERS": "Suscriptores",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Abasna una imaxe equí",
 	"I18N_DIRECTIVES_OR_SELECT_FILE": "o escueye un ficheru d'imaxe:",
 	"I18N_ERROR_DISABLED_EXPLORATION": "Esploración desactivada",
@@ -158,6 +159,7 @@
 	"I18N_LIBRARY_SUB_HEADER": "Empieza l'aventura restolando ente les nueses esploraciones.",
 	"I18N_LIBRARY_VIEWS_TOOLTIP": "Vistes",
 	"I18N_LIBRARY_VIEW_ALL": "Ver toes",
+	"I18N_ONE_SUBSCRIBER_TEXT": "Tienes 1 suscriptor.",
 	"I18N_PLAYER_BACK": "Anterior",
 	"I18N_PLAYER_CARD_NUMBER_TOOLTIP": "Tarxeta #",
 	"I18N_PLAYER_COMMUNITY_EDITABLE_TOOLTIP": "Editable pola comunidá",
@@ -297,5 +299,6 @@
 	"I18N_TOPNAV_PREFERENCES": "Preferencies",
 	"I18N_TOPNAV_SIGN_IN": "Entrar",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Enseñar con Oppia",
+	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Tienes un total de <[totalSubscribers]> suscriptores.",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Quitar la suscripción"
 }

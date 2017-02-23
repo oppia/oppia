@@ -18,6 +18,7 @@
 	"I18N_DASHBOARD_COLLECTIONS": "Colecciones",
 	"I18N_DASHBOARD_EXPLORATIONS": "Exploraciones",
 	"I18N_DASHBOARD_OPEN_FEEDBACK": "Retroalimentación abierta",
+	"I18N_DASHBOARD_SUBSCRIBERS": "Suscriptores",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Arrastra una imagen aquí",
 	"I18N_DIRECTIVES_OR_SELECT_FILE": "o selecciona un archivo de imagen:",
 	"I18N_ERROR_DISABLED_EXPLORATION": "Exploración deshabilitada",
@@ -158,6 +159,7 @@
 	"I18N_LIBRARY_SUB_HEADER": "Comienza tu aventura dando un vistazo a nuestras exploraciones.",
 	"I18N_LIBRARY_VIEWS_TOOLTIP": "Visitas",
 	"I18N_LIBRARY_VIEW_ALL": "Ver todo",
+	"I18N_ONE_SUBSCRIBER_TEXT": "Tienes 1 suscriptor.",
 	"I18N_PLAYER_BACK": "Volver",
 	"I18N_PLAYER_CARD_NUMBER_TOOLTIP": "Carta #",
 	"I18N_PLAYER_COMMUNITY_EDITABLE_TOOLTIP": "Editable por la comunidad",
@@ -280,6 +282,7 @@
 	"I18N_SPLASH_SUBTITLE": "Con Oppia es fácil crear lecciones interactivas que educan y entretienen.",
 	"I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Oppia te permite <a href=\"/dashboard?mode=create\">crear</a> y <a href=\"/library\">compartir</a> exploraciones en una gran variedad de temas, limitado sólo por tu imaginación.",
 	"I18N_SPLASH_TITLE": "Piensa más allá de los libros.",
+	"I18N_SUBSCRIBE_BUTTON_TEXT": "Suscribirse",
 	"I18N_TOPNAV_ABOUT": "Acerca de",
 	"I18N_TOPNAV_ABOUT_OPPIA": "Acerca de Oppia",
 	"I18N_TOPNAV_ADMIN_PAGE": "Página de administración",
@@ -295,5 +298,7 @@
 	"I18N_TOPNAV_NOTIFICATIONS": "Notificaciones",
 	"I18N_TOPNAV_PREFERENCES": "Preferencias",
 	"I18N_TOPNAV_SIGN_IN": "Acceder",
-	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Enseña con Oppia"
+	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Enseña con Oppia",
+	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Tienes un total de <[totalSubscribers]> suscriptores.",
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Desuscribirse"
 }
