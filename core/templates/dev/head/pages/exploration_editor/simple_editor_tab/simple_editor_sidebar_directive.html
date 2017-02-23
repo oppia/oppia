@@ -139,11 +139,9 @@
   .ps-container.ps-in-scrolling.ps-y > .ps-scrollbar-y-rail > .ps-scrollbar-y {
     background-color: #689F38;
   }
+  .ps-container.ps-in-scrolling.ps-y:hover > .ps-scrollbar-y-rail > .ps-scrollbar-y{
+    background-color: #689F38;
+  }
 </style>
+
 <script src="/third_party/static/perfectscrollbar-0.6.16/js/perfect-scrollbar.js"></script>
-<script type="text/javascript">
-window.onload = function() {
-        console.log(document.querySelector('simple-editor-sidebar'));
-        Ps.initialize(document.querySelector('simple-editor-sidebar'));
-      };
-</script>

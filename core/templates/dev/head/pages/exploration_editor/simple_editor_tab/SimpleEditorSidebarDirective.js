@@ -25,6 +25,8 @@ oppia.directive('simpleEditorSidebar', [function() {
         'ScrollSyncService', 'QuestionIdService',
         function($scope, EditorModeService, SimpleEditorManagerService,
                  ScrollSyncService, QuestionIdService) {
+
+      Ps.initialize(document.querySelector('simple-editor-sidebar'));
       $scope.SUBFIELD_LABELS = [
         'Multiple choice', 'Correct answer', 'Hints', 'Bridge text'];
       $scope.setEditorModeToFull = EditorModeService.setModeToFull;
