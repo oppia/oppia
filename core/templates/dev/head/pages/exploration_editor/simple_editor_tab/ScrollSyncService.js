@@ -101,4 +101,4 @@ oppia.factory('ScrollSyncService', [
     });
 
     return scrollSyncService;
-}]);
+  }]);
