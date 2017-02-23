@@ -35,7 +35,7 @@ oppia.factory('StateObjectFactory', [
   State.prototype.toBackendDict = function() {
     return {
       content: this.content,
-      interaction: this.interaction,
+      interaction: this.interaction.toBackendDict(),
       param_changes: this.paramChanges
     };
   };
