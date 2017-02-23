@@ -109,7 +109,9 @@
                          ng-hide="leftmostCardIndices[$index] == 0">
                 <i class="material-icons">&#xE314;</i>
               </md-button>
-              <div class="oppia-library-carousel-scroller" ng-if="leftmostCardIndices[$index] == 0"></div>
+              <div class="oppia-library-carousel-scroller" ng-if="leftmostCardIndices[$index] == 0">
+                <span class="oppia-icon-btn-label">Scroll left</span>
+              </div>
 
               <div class="oppia-library-carousel"
                    ng-swipe-right="scroll($index, true)"
@@ -146,6 +148,7 @@
                          ng-click="scroll($index, false)"
                          ng-hide="(group.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[$index]">
                 <i class="material-icons">&#xE315;</i>
+                <span class="oppia-icon-btn-label">Scroll right</span>
               </md-button>
               <div class="oppia-library-carousel-scroller"
                    ng-if="(group.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[$index]"></div>
