@@ -1,31 +1,64 @@
+# coding: utf-8
+#
+# Copyright 2014 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""get_oppia_classes.py
+This script is used to get a dictionary with directive files as keys and
+oppia classes(belonging to them uniquely) as values.
+This can be used to shift all the classes which are used only in single
+files from oppia.css to respective files
+The scripts ask for the path to directory in which you want to run it.
+The script will search among all the files that lie below that directory
+in file structure i.e it will search in subdirs recursively also.
+
+====================================
+CUSTOMIZATION OPTIONS FOR DEVELOPERS
+====================================
+You can also use this script for similar use cases but different type of
+files by changing the variables html_pattern, directive_pattern and class
+_pattern respectively
+"""
+
 import os
 import re
 import bs4
-import resource, sys
-resource.setrlimit(resource.RLIMIT_STACK, (2**29,-1))
-sys.setrecursionlimit(10**6)
-
-
-NUM_CALLS = 0
 
 
 def return_all_files(dir_to_scan):
     """
-    expects a directory name to search in
-    returns all the files in the directory and subdirectories
+    returns all files that lie below that directory in file structure
+
+    ARGS: directory name
+    RETURNS: all files in the path
     """
-    global NUM_CALLS
-    val = []
+    file_result = []
+    subdirs = []
     for root, subdir, files in os.walk(dir_to_scan):
         for f in files:
-            val.append(os.path.join(root, f))
-    return val
+            file_result.append(os.path.join(root, f))
+        for d in subdir:
+            subdirs.append(d)
+    return file_result
 
 
 def return_matched_files(files, pattern):
     """
-    expects a list of files
-    returns all the files matching the pattern
+    returns all the files matching given pattern
+
+    ARGS: list of files to search from, pattern to search
+    RETURNS: list of files matching pattern
     """
     val = []
     for f in files:
@@ -35,6 +68,12 @@ def return_matched_files(files, pattern):
 
 
 def match_classes_pattern(classes, pattern):
+    """
+    return the classes which match given pattern
+
+    ARGS: list of classes to search from, pattern
+    RETURNS: list of classes matching pattern
+    """
     matched_classes = []
     if classes is None:
         return matched_classes
@@ -47,8 +86,10 @@ def match_classes_pattern(classes, pattern):
 
 def file_find_matching_classes(file_name, pattern):
     """
-    expects the file name and pattern of class to find
-    returns all the classes that have same pattern as specified
+    returns all the classes matching the pattern in a file
+
+    ARGS: file name, pattern to match
+    RETURNS: list of classes matching pattern
     """
     f = open(file_name)
     # making BeautifulSoup object of file then extracting all classes
@@ -77,8 +118,9 @@ def file_find_matching_classes(file_name, pattern):
 
 def print_output(file_dict):
     """
-    expects file dictionary with file as keys and classes as values
-    outputs in proper format
+    prints the file-class dictionary on the screen
+    ARGS: dictionary of file as keys and classes as values
+    RETURNS: none
     """
     for i in file_dict.keys():
         if len(file_dict[i]) == 0:
@@ -92,9 +134,12 @@ def print_output(file_dict):
 
 def give_classes_unique_per_file(file_dict, file_store):
     """
-    expects file dictionary with file as keys and classes as values
-    return dict with file as keys and only those classes that are
-    present uniquely in the file
+    takes out all the classes that contain reused classes and returns
+    dictionary with files only with unique classes as values
+
+    ARGS: dictionary from which files are to be removed, dictionary in
+    which files are to be checked
+    RETURNS: dictionary with files and unique classes
     """
     val = {}
     for i in file_dict.keys():
@@ -115,7 +160,6 @@ def give_classes_unique_per_file(file_dict, file_store):
 
 
 def main():
-    global NUM_CALLS
     dir_to_scan = raw_input('Enter path to directory  ')
 
     # pattern for all html files
@@ -142,8 +186,6 @@ def main():
     for fl in directive_files:
         directive_file_css_classes[fl] = file_find_matching_classes(
             fl, class_pattern)
-
-    print str(NUM_CALLS) + " $ "
 
     print_output(
         give_classes_unique_per_file(
