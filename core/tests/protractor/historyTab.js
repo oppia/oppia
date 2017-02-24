@@ -94,7 +94,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       11: {
-        text: '    ruleSpecs:',
+        text: '    rule_specs:',
         highlighted: true
       },
       12: {
