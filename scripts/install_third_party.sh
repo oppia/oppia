@@ -91,9 +91,9 @@ if [ ! -d "$THIRD_PARTY_DIR/static/perfectscrollbar-0.6.16" ]; then
   echo Extracting Perfect Scrollbar
   # Deleting zip File
   rm -f perfectscrollbar-0.6.16.zip
+  
   # Return to the Oppia root folder.
   cd $OPPIA_DIR
-
 fi
 
 # Checking if pip is installed. If you are having
