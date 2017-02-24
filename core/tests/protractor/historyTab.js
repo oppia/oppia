@@ -70,7 +70,7 @@ describe('Exploration history', function() {
         highlighted: false
       },
       5: {
-        text: '  answer_groups:',
+        text: '  answerGroups:',
         highlighted: true
       },
       6: {
@@ -90,7 +90,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       10: {
-        text: '    rule_specs:',
+        text: '    ruleSpecs:',
         highlighted: true
       },
       11: {
@@ -138,7 +138,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       22: {
-        text: 'param_changes: []',
+        text: 'paramChanges: []',
         highlighted: false
       },
       23: {
@@ -165,7 +165,7 @@ describe('Exploration history', function() {
         highlighted: false
       },
       5: {
-        text: '  answer_groups: []',
+        text: '  answerGroups: []',
         highlighted: true
       },
       6: {
@@ -203,7 +203,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       14: {
-        text: 'param_changes: []',
+        text: 'paramChanges: []',
         highlighted: false
       },
       15: {
@@ -217,7 +217,7 @@ describe('Exploration history', function() {
       '- type: text\n' +
       '  value: <p>this is card 2</p>\n' +
       'interaction:\n' +
-      '  answer_groups: []\n' +
+      '  answerGroups: []\n' +
       '  confirmed_unclassified_answers: []\n' +
       '  customization_args:\n' +
       '    buttonText:\n' +
@@ -228,7 +228,7 @@ describe('Exploration history', function() {
       '    param_changes: []\n' +
       '  fallbacks: []\n' +
       '  id: Continue\n' +
-      'param_changes: []\n' +
+      'paramChanges: []\n' +
       ' ';
 
     editor.expectGraphComparisonOf(1, 2).toBe([{
