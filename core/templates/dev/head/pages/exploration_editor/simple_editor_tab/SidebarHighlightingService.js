@@ -32,8 +32,8 @@ oppia.factory('SidebarHighlightingService', [
             var elm = angular.element(document.getElementById(id));
             // Append the id to the icon so that we can uniquely identify
             // the icon tag.
-            var ICON_ELM = '<i id="icon_elm_'+id+
-            '" class="material-icons error-outline-icon"'+
+            var ICON_ELM = '<i id="icon_elm_' + id +
+            '" class="material-icons error-outline-icon"' +
             '>&#xE001;</i>';
             elm.append(ICON_ELM);
             elm.addClass(ERROR_CLASS);
@@ -45,11 +45,11 @@ oppia.factory('SidebarHighlightingService', [
             return;
           } else {
             var elm = angular.element(document.getElementById(id));
-            var ICON_ID = 'icon_elm_'+id;
+            var ICON_ID = 'icon_elm_'+ id;
             // Get the icon unique id.
-            var icon_elm = angular.element(document.getElementById(ICON_ID));
+            var iconElm = angular.element(document.getElementById(ICON_ID));
             elm.removeClass(ERROR_CLASS);
-            icon_elm.remove();
+            iconElm.remove();
           }
         }
     };
