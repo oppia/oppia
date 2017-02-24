@@ -22,8 +22,9 @@
 {% endblock navbar_breadcrumb %}
 
 {% block content %}
-  <div class="oppia-dashboard-container" ng-controller="Dashboard">
-    <div class="oppia-dashboard-aggregated-stats" ng-if="explorationsList.length > 0">
+  <background-banner></background-banner>
+  <div class="oppia-dashboard-container" ng-controller="Dashboard" style="position: relative;">
+    <div class="oppia-dashboard-aggregated-stats" ng-if="explorationsList.length > 0 || collectionsList.length > 0">
       <md-card layout="row">
         <div class="average-ratings stats-card">
           <p class="stat-description">Average Rating</p>
@@ -43,66 +44,70 @@
           <p class="stat-description">Open feedback</p>
           <h1 class="stat-value"><[dashboardStats.total_open_feedback]></h1>
         </div>
+        <div class="total-open-feedback stats-card">
+          <p class="stat-description">Subscribers</p>
+          <h1 class="stat-value"><[subscribersList.length]></h1>
+        </div>
       </md-card>
     </div>
 
     <div ng-if="explorationsList.length > 0 || collectionsList.length > 0">
       <ul class="oppia-dashboard-tabs">
-        <li ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myExplorations'}">
+        <li ng-if="explorationsList.length > 0"
+            ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myExplorations'}">
           <a class="oppia-dashboard-tabs-text"
              ng-click="setActiveTab('myExplorations')"
-             translate="I18N_DASHBOARD_MY_EXPLORATIONS">
+             translate="I18N_DASHBOARD_EXPLORATIONS">
           </a>
         </li>
         {% if not can_create_collections %}
-          <!-- A layout fix when the 'My Collections' tab is absent -->
-          <li ng-if="collectionsList.length == 0"></li>
+          <!-- A layout fix when the 'My Collections' tab is absent. -->
+          <li ng-if="collectionsList.length === 0 && subscribersList.length === 0"></li>
         {% endif %}
         {% if can_create_collections %}
           <li ng-if="collectionsList.length > 0"
               ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myCollections'}">
             <a class="oppia-dashboard-tabs-text"
                ng-click="setActiveTab('myCollections')"
-               translate="I18N_DASHBOARD_MY_COLLECTIONS">
+               translate="I18N_DASHBOARD_COLLECTIONS">
             </a>
           </li>
         {% endif %}
-        <li class="list-card-view-toggle dashboard-hide-mobile" ng-if="activeTab === 'myExplorations'">
+        <li ng-if="subscribersList.length > 0"
+            class="protractor-test-subscription-tab"
+            ng-class="{'oppia-dashboard-tabs-active': activeTab === 'mySubscribers'}">
+          <a class="oppia-dashboard-tabs-text"
+             ng-click="setActiveTab('mySubscribers')"
+             translate="I18N_DASHBOARD_SUBSCRIBERS">
+          </a>
+        </li>
+
+        <li class="list-card-view-toggle dashboard-hide-mobile"
+            ng-if="activeTab === 'myExplorations' && explorationsList.length > 0">
           <button class="card-view-btn"
                   ng-class="{'dashboard-active-view': myExplorationsView === 'card'}"
-                  ng-click="setMyExplorationsView('card')">
+                  ng-click="setMyExplorationsView('card')"
+                  aria-label="Card View">
             <span class="fa fa-th-large fa-lg"></span>
           </button>
           <button class="list-view-btn"
                   ng-class="{'dashboard-active-view': myExplorationsView === 'list'}"
-                  ng-click="setMyExplorationsView('list')">
+                  ng-click="setMyExplorationsView('list')"
+                  aria-label="List View">
             <span class="fa fa-list fa-lg"></span>
           </button>
-        </li>
-        <li class="sort-explorations-select" ng-if="activeTab === 'myExplorations'">
-          <p class="sort-by-text">Sort By</p>
-          <select ng-model="currentSortType"
-                  class="sort-options"
-                  ng-change="setExplorationsSortingOptions(currentSortType)"
-                  ng-options="EXPLORATIONS_SORT_BY_KEYS[key] as value for (key, value) in HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS">
-          </select>
-          <span class="sort-order fa"
-                ng-click="setExplorationsSortingOptions(currentSortType)"
-                ng-class="isCurrentSortDescending ? 'fa-long-arrow-up': 'fa-long-arrow-down'">
-          </span>
         </li>
       </ul>
     </div>
 
     <div ng-if="explorationsList.length === 0 && collectionsList.length === 0">
-      <h2 style="margin-bottom: -20px;
-                 font-family: 'Capriola', 'Roboto', Arial, sans-serif;">
+      <h2 class="oppia-dashboard-title">
         Creator Dashboard
       </h2>
     </div>
 
     <div ng-if="activeTab === 'myExplorations'">
-      <div ng-if="explorationsList.length === 0" class="oppia-dashboard-empty-text">
+      <div ng-if="explorationsList.length === 0 && collectionsList.length === 0" class="oppia-dashboard-empty-text">
         <md-card layout="row"
                  class="oppia-page-card oppia-dashboard-intro-card"
                  style="margin-top: 0;">
@@ -121,6 +126,24 @@
             <img ng-src="<[emptyDashboardImgUrl]>">
           </div>
         </md-card>
+      </div>
+
+      <div ng-if="explorationsList.length > 0" class="oppia-dashboard-tab-panel" style="padding-top: 13px; padding-bottom: 46px;">
+        <span class="sort-explorations-select"
+              ng-if="activeTab === 'myExplorations'" 
+              ng-class="{'sort-explorations-select-three-tabs': (collectionsList.length !== 0 && subscribersList.length !== 0)}"
+              style="float: right;">
+          <p class="sort-by-text">Sort By</p>
+          <select ng-model="currentSortType"
+                  class="sort-options"
+                  ng-change="setExplorationsSortingOptions(currentSortType)"
+                  ng-options="EXPLORATIONS_SORT_BY_KEYS[key] as value for (key, value) in HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS">
+          </select>
+          <span class="sort-order fa"
+                ng-click="setExplorationsSortingOptions(currentSortType)"
+                ng-class="isCurrentSortDescending ? 'fa-long-arrow-up': 'fa-long-arrow-down'">
+          </span>
+        </span>
       </div>
 
       <div ng-if="myExplorationsView === 'list' && explorationsList.length > 0">
@@ -267,7 +290,7 @@
               </li>
 
               <li flex="50" style="padding-left: 8px;">
-                <img ng-src="<[unresolvedAnswersIconUrl]>" style="width: 15px; padding-top: 1px;" tooltip="Unresolved Answers" tooltip-placement="top" class="oppia-dashboard-card-statistic-icon">
+                <img ng-src="<[unresolvedAnswersIconUrl]>" style="width: 15px; padding-top: 1px;" tooltip="Unresolved Answers" tooltip-placement="top" class="oppia-dashboard-card-statistic-icon" alt="Unresolved Answers">
                 <span class="oppia-dashboard-card-statistic-value">
                   <[exploration.num_unresolved_answers]>
                 </span>
@@ -296,6 +319,51 @@
           </div>
         </md-card>
       </div>
+    </div>
+
+    <div ng-if="activeTab === 'mySubscribers'" style="margin-top: 8px;">
+      <div class="oppia-dashboard-tab-panel">
+        <span ng-if="subscribersList.length > 1"
+              style="margin-top: 14px; display: inline-block;"
+              translate="I18N_TOTAL_SUBSCRIBERS_TEXT"
+              translate-values="{totalSubscribers: <[subscribersList.length]>}">>
+        </span>
+        <span ng-if="subscribersList.length === 1"
+              style="margin-top: 14px; display: inline-block;"
+              translate="I18N_ONE_SUBSCRIBER_TEXT">
+        </span>
+        <span class="sort-explorations-select"
+              ng-if="activeTab === 'mySubscribers'"
+              ng-class="{'sort-explorations-select-three-tabs': (collectionsList.length !== 0 && subscribersList.length !== 0)}"
+              style="float: right;">
+          <p class="sort-by-text">Sort By</p>
+          <select ng-model="currentSubscribersSortType"
+                  class="sort-options"
+                  ng-change="setSubscriptionSortingOptions(currentSubscribersSortType)"
+                  ng-options="SUBSCRIPTION_SORT_BY_KEYS[key] as value for (key, value) in HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS"
+                  style="width: 160px;">
+          </select>
+          <span class="sort-order fa"
+                ng-click="setSubscriptionSortingOptions(currentSubscribersSortType)"
+                ng-class="isCurrentSubscriptionSortDescending ? 'fa-long-arrow-up': 'fa-long-arrow-down'">
+          </span>
+        </span>
+      </div>
+      <md-card class="oppia-subscription-card protractor-test-subscription-card"
+               ng-repeat="subscriber in subscribersList | orderBy:sortSubscriptionFunction:isCurrentSubscriptionSortDescending">
+        <a class="oppia-subscription-profile-link" href="/profile/<[subscriber.subscriber_username]>" target="_blank">
+          <img ng-src="<[subscriber.subscriber_picture_data_url]>" class="oppia-subscription-card-profile-picture img-circle">
+          <span class="oppia-subscription-card-summary">
+            <div style="margin-bottom: 5px; font-size: 17.5px;">
+              <strong class="protractor-test-subscription-name"><[subscriber.subscriber_username| truncate:11]></strong>
+            </div>
+            <div style="font-size: 14.5px;">
+              <span>Impact</span>
+              <span><[subscriber.subscriber_impact || 0]></span>
+            </div>
+          </span>
+        </a>
+      </md-card>
     </div>
 
     {% if can_create_collections %}
@@ -331,6 +399,7 @@
 
 {% block footer_js %}
   {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/embed_modal/ExplorationEmbedButtonService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/share/SharingLinksDirective.js"></script>
 
