@@ -55,6 +55,5 @@ oppia.directive('simpleEditorSidebar', [function() {
             $scope.$apply();
           });
         }]
-
   };
 }]);
