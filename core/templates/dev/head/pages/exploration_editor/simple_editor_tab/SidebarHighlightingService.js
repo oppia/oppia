@@ -45,7 +45,7 @@ oppia.factory('SidebarHighlightingService', [
             return;
           } else {
             var elm = angular.element(document.getElementById(id));
-            var ICON_ID = 'icon_elm_'+ id;
+            var ICON_ID = 'icon_elm_' + id;
             // Get the icon unique id.
             var iconElm = angular.element(document.getElementById(ICON_ID));
             elm.removeClass(ERROR_CLASS);
