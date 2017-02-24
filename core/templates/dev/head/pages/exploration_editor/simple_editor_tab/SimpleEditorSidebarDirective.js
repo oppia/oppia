@@ -27,7 +27,7 @@ oppia.directive('simpleEditorSidebar', [function() {
                  ScrollSyncService, QuestionIdService) {
 
           /* This initializes Perfect Scrollbar on the simple editor sidebar.
-           Perfect scrollbar is needed to show scrollbar on all major browsera.
+           Perfect scrollbar is needed to show scrollbar on all major browsers.
            */
           Ps.initialize(document.querySelector('simple-editor-sidebar'));
           $scope.SUBFIELD_LABELS = [
