@@ -74,7 +74,7 @@ describe('Exploration history', function() {
         highlighted: false
       },
       6: {
-        text: '  answerGroups:',
+        text: '  answer_groups:',
         highlighted: true
       },
       7: {
@@ -142,7 +142,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       23: {
-        text: 'paramChanges: []',
+        text: 'param_changes: []',
         highlighted: false
       },
       24: {
@@ -173,7 +173,7 @@ describe('Exploration history', function() {
         highlighted: false
       },
       6: {
-        text: '  answerGroups: []',
+        text: '  answer_groups: []',
         highlighted: true
       },
       7: {
@@ -211,7 +211,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       15: {
-        text: 'paramChanges: []',
+        text: 'param_changes: []',
         highlighted: false
       },
       16: {
@@ -226,7 +226,7 @@ describe('Exploration history', function() {
       '- type: text\n' +
       '  value: <p>this is card 2</p>\n' +
       'interaction:\n' +
-      '  answerGroups: []\n' +
+      '  answer_groups: []\n' +
       '  confirmed_unclassified_answers: []\n' +
       '  customization_args:\n' +
       '    buttonText:\n' +
@@ -237,7 +237,7 @@ describe('Exploration history', function() {
       '    param_changes: []\n' +
       '  fallbacks: []\n' +
       '  id: Continue\n' +
-      'paramChanges: []\n' +
+      'param_changes: []\n' +
       ' ';
 
     editor.expectGraphComparisonOf(1, 2).toBe([{
