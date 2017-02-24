@@ -76,7 +76,7 @@ if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt-0.10.0" ]; then
   cp -r $TOOLS_DIR/skulpt-0.10.0/skulpt/dist/* $THIRD_PARTY_DIR/static/skulpt-0.10.0
 fi
 
-# Download and install Perfect Scrollar. Perfect Scrollbar contains 2 root folder
+# Download and install Perfect Scrollbar. Perfect Scrollbar contains 2 root folder
 # in zip file. So we're creating a directory, downloading and unzipping zip file in that
 # directory.
 echo Checking whether Perfect Scrollbar is installed in third_party
@@ -89,9 +89,9 @@ if [ ! -d "$THIRD_PARTY_DIR/static/perfectscrollbar-0.6.16" ]; then
   # Extracting Perfect Scrollbar
   unzip perfectscrollbar-0.6.16.zip
   echo Extracting Perfect Scrollbar
-  # Deleting zip File
+  # Deleting zip file
   rm -f perfectscrollbar-0.6.16.zip
-  
+
   # Return to the Oppia root folder.
   cd $OPPIA_DIR
 fi
