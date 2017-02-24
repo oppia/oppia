@@ -116,6 +116,11 @@
   </style>
 {% endblock %}
 
+{% block footer_js %}
+  {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
+{% endblock footer_js %}
+
 {% block footer%}
   {% include 'pages/footer.html' %}
 {% endblock %}
