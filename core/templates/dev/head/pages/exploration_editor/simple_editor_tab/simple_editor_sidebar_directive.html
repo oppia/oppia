@@ -83,7 +83,9 @@
   simple-editor-sidebar li.sidebar-item-indented span::before {
     content: '-';
   }
-  simple-editor-sidebar .error a{
+  simple-editor-sidebar .error a,
+  simple-editor-sidebar .error strong,
+  simple-editor-sidebar .error span::before{
     color: #f82d4e;
   }
   simple-editor-sidebar .sidebar {
@@ -140,10 +142,11 @@
     text-indent: 30px;
     width: 220px;
   }
-  .material-icons.md-18 {
+  .material-icons.error-outline-icon {
     font-size: 18px;
     left: 60%;
     color: #f82d4e;
     position: absolute;
+    top : 25%;
   }
 </style>
