@@ -26,31 +26,32 @@ oppia.directive('simpleEditorSidebar', [function() {
         function($scope, EditorModeService, SimpleEditorManagerService,
                  ScrollSyncService, QuestionIdService) {
 
-      Ps.initialize(document.querySelector('simple-editor-sidebar'));
-      $scope.SUBFIELD_LABELS = [
-        'Multiple choice', 'Correct answer', 'Hints', 'Bridge text'];
-      $scope.setEditorModeToFull = EditorModeService.setModeToFull;
-      $scope.questionList = SimpleEditorManagerService.getQuestionList();
-      $scope.ID_PREFIX = QuestionIdService.SIDEBAR_PREFIX;
-      $scope.getSidebarItemId = function(question, subfieldLabel) {
-        return QuestionIdService.getSidebarItemId(
-          question.getId(), subfieldLabel
-        );
-      };
-      $scope.scrollToField = function(question, subfieldLabel) {
-        ScrollSyncService.scrollTo(
-          QuestionIdService.getSubfieldId(
-            question.getId(), subfieldLabel
-          )
-        );
-      };
-      $scope.scrollToHeader = ScrollSyncService.scrollTo;
-      $scope.scrollToQuestion = function(question) {
-        ScrollSyncService.scrollTo(question.getId());
-      };
-      $scope.$on('SimpleEditorSidebarToggleCollapse', function() {
-        $scope.$apply();
-      });
-    }]
+          Ps.initialize(document.querySelector('simple-editor-sidebar'));
+          $scope.SUBFIELD_LABELS = [
+            'Multiple choice', 'Correct answer', 'Hints', 'Bridge text'];
+          $scope.setEditorModeToFull = EditorModeService.setModeToFull;
+          $scope.questionList = SimpleEditorManagerService.getQuestionList();
+          $scope.ID_PREFIX = QuestionIdService.SIDEBAR_PREFIX;
+          $scope.getSidebarItemId = function(question, subfieldLabel) {
+            return QuestionIdService.getSidebarItemId(
+              question.getId(), subfieldLabel
+            );
+          };
+          $scope.scrollToField = function(question, subfieldLabel) {
+            ScrollSyncService.scrollTo(
+              QuestionIdService.getSubfieldId(
+                question.getId(), subfieldLabel
+              )
+            );
+          };
+          $scope.scrollToHeader = ScrollSyncService.scrollTo;
+          $scope.scrollToQuestion = function(question) {
+            ScrollSyncService.scrollTo(question.getId());
+          };
+          $scope.$on('SimpleEditorSidebarToggleCollapse', function() {
+            $scope.$apply();
+          });
+        }]
+
   };
 }]);
