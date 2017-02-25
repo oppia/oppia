@@ -1087,7 +1087,7 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
             'A', self.editor_id, 'Title')
 
         self.expected_email_subject = (
-            'You\'ve received a new message on your explorations')
+            'You\'ve received 3 new messages on your explorations')
 
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
@@ -1098,8 +1098,10 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
         expected_email_html_body = (
             'Hi editor,<br>'
             '<br>'
-            'You\'ve received a new message on your Oppia explorations:<br>'
-            '<ul><li><a href="https://www.oppia.org/explore/A">Title</a>:<br>'
+            'You\'ve received 3 new messages on your Oppia explorations:<br>'
+            '<ul>'
+            '<li><a href="https://www.oppia.org/create/A#/feedback">Title</a>:'
+            '<br>'
             '<ul><li>Message 1.1<br></li>'
             '<li>Message 1.2<br></li>'
             '<li>Message 1.3<br></li>'
@@ -1118,7 +1120,7 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
         expected_email_text_body = (
             'Hi editor,\n'
             '\n'
-            'You\'ve received a new message on your Oppia explorations:\n'
+            'You\'ve received 3 new messages on your Oppia explorations:\n'
             '- Title:\n'
             '- Message 1.1\n'
             '- Message 1.2\n'
