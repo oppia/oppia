@@ -46,6 +46,27 @@
     }
   </style>
 
+  <link rel="stylesheet" href="/third_party/static/perfectscrollbar-0.6.16/css/perfect-scrollbar.css">
+  <style>
+    .ps-container:hover > .ps-scrollbar-y-rail:hover > .ps-scrollbar-y {
+      background-color: #689F38;
+    }
+    .ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y {
+      background-color: #689F38;
+    }
+    .ps-container:hover > .ps-scrollbar-y-rail:hover {
+      background-color: #c5e1a5;
+    }
+    .ps-container.ps-in-scrolling.ps-y > .ps-scrollbar-y-rail > .ps-scrollbar-y {
+      background-color: #689F38;
+    }
+    .ps-container.ps-in-scrolling.ps-y:hover > .ps-scrollbar-y-rail > .ps-scrollbar-y {
+      background-color: #689F38;
+    }
+  </style>
+
+  <script src="/third_party/static/perfectscrollbar-0.6.16/js/perfect-scrollbar.js"></script>
+
   {{dependencies_html}}
 {% endblock header_js %}
 
