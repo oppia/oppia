@@ -107,13 +107,16 @@ oppia.directive('explorationSummaryTile', [function() {
         $scope.MAX_AVATARS_TO_DISPLAY = 5;
 
         $scope.getAverageRating = function() {
+          if (!$scope.getRatings()) {
+            return false;
+          }
           return RatingComputationService.computeAverageRating(
             $scope.getRatings());
         };
 
         $scope.getLastUpdatedDatetime = function() {
           if (!$scope.getLastUpdatedMsec()) {
-            return null;
+            return false;
           }
           return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
             $scope.getLastUpdatedMsec());
@@ -121,7 +124,7 @@ oppia.directive('explorationSummaryTile', [function() {
 
         $scope.getExplorationLink = function() {
           if (!$scope.getExplorationId()) {
-            return null;
+            return false;
           } else {
             var result = '/explore/' + $scope.getExplorationId();
             if ($scope.getCollectionId()) {

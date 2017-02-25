@@ -245,13 +245,16 @@ oppia.controller('SettingsTab', [
             $scope.getThumbnailIconUrl = function() {
               var category = explorationCategoryService.displayed;
               if (GLOBALS.ALL_CATEGORIES.indexOf(category) === -1) {
+                //TODO: get from back-end.
                 category = 'Lightbulb';
               }
+              //TODO:use UrlInterpolationService
               return '/assets/images/subjects/' +
                  category + '.svg';
             };
             $scope.getThumbnailBgColor = function() {
               var category = explorationCategoryService.displayed;
+              //TODO:use hasOwnProperty
               var color = GLOBALS.CATEGORIES_TO_COLORS[category];
               if (!color) {
                 color = GLOBALS.CATEGORIES_TO_COLORS.Default;
