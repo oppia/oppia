@@ -3997,6 +3997,7 @@ md-card.preview-conversation-skin-supplemental-card {
   font-size: 0;
   height: 1px;
   overflow: hidden;
+  width: 0px;
 }
 
 .oppia-activity-summary-tile .recently-updated {
