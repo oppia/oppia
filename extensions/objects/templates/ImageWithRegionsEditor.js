@@ -18,10 +18,10 @@
 
 // TODO(czx): Uniquify the labels of image regions
 oppia.directive('imageWithRegionsEditor', [
-  '$modal','$sce','$compile', 'alertsService', '$document', 'explorationContextService',
-  'OBJECT_EDITOR_URL_PREFIX',
-  function($modal,$sce, $compile, alertsService, $document, explorationContextService,
-           OBJECT_EDITOR_URL_PREFIX) {
+  '$modal', '$sce', '$compile', 'alertsService', '$document',
+  'explorationContextService', 'OBJECT_EDITOR_URL_PREFIX',
+  function($modal, $sce, $compile, alertsService, $document,
+           explorationContextService, OBJECT_EDITOR_URL_PREFIX) {
     return {
       link: function(scope, element) {
         scope.getTemplateUrl = function() {
@@ -316,7 +316,7 @@ oppia.directive('imageWithRegionsEditor', [
                 };
               }
             ]
-          }).result.then(function(){
+          }).result.then(function() {
             $scope.$parent.value.imagePath = '';
             $scope.$parent.value.labeledRegions = [];
           });
