@@ -22,10 +22,24 @@ oppia.directive('collectionPermissionsCard', [function() {
     restrict: 'E',
     templateUrl: 'inline/collection_permissions_card_directive',
     controller: [
-      '$scope',
-      function($scope) {
-        $scope.ownerNames = GLOBALS.ownerNames;
-        $scope.isPrivate = GLOBALS.isPrivate;
+      '$scope', 'CollectionRightsObjectFactory',
+      'CollectionRightsBackendApiService',
+      function($scope, CollectionRightsObjectFactory,
+        CollectionRightsBackendApiService) {
+        $scope.collectionId = GLOBALS.collectionId;
+        $scope.collectionRightsObject = null;
+        $scope.hasRightsLoaded = false;
+        $scope.isPrivate =
+          CollectionRightsBackendApiService.isCollectionPrivate;
+        var refreshPermissionsCard = function() {
+          CollectionRightsBackendApiService.loadCollectionRights(
+            $scope.collectionId).then(function(data) {
+            $scope.collectionRightsObject =
+              CollectionRightsObjectFactory.create(data);
+            $scope.hasRightsLoaded = true;
+          });
+        };
+        refreshPermissionsCard();
       }
     ]
   };

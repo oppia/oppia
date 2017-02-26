@@ -47,8 +47,11 @@ describe('Collection rights backend API service', function() {
     // PUT request. The typical expect() syntax with a passed-in object payload
     // does not seem to be working correctly.
     $httpBackend.expect(
-      'PUT', '/collection_editor_handler/rights/0').respond(
-      200);
+      'PUT', '/collection_editor_handler/rights/0').respond(200, {
+        data: {
+          is_private: false
+        }
+      });
     CollectionRightsBackendApiService.setCollectionPublic('0', 1).then(
       successHandler, failHandler);
     $httpBackend.flush();
@@ -72,5 +75,81 @@ describe('Collection rights backend API service', function() {
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalled();
+  });
+
+  it('should call the provided fail handler if isPrivate response is false ' +
+     'when setting collection public', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect(
+      'PUT', '/collection_editor_handler/rights/0').respond(200, {
+        status: 'private'
+      });
+    CollectionRightsBackendApiService.setCollectionPublic('0', 1).then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+    $rootScope.$digest();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  });
+
+  it('should call the provided fail handler if isPrivate response is true ' +
+     'when setting collection private', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect(
+      'PUT', '/collection_editor_handler/rights/0').respond(200, {
+        status: 'public'
+      });
+    CollectionRightsBackendApiService.setCollectionPrivate('0', 1).then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+    $rootScope.$digest();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  });
+
+  it('should return true if the collection is private', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect(
+      'GET', '/collection_editor_handler/rights/0').respond(200, {
+        is_private: true
+      });
+
+    CollectionRightsBackendApiService.loadCollectionRights('0').then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+    $rootScope.$digest();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+    expect(
+      CollectionRightsBackendApiService.isCollectionPrivate('0')).toBe(true);
+  });
+
+  it('should return false if the collection is not private', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect(
+      'GET', '/collection_editor_handler/rights/0').respond(200, {
+        is_private: false
+      });
+
+    CollectionRightsBackendApiService.loadCollectionRights('0').then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+    $rootScope.$digest();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+    expect(
+      CollectionRightsBackendApiService.isCollectionPrivate('0')).toBe(false);
   });
 });
