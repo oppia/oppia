@@ -269,6 +269,7 @@ oppia.directive('graphViz', function() {
               y: $scope.state.mouseY,
               label: ''
             });
+            setMode0(_MODES.MOVE);
           }
           if ($scope.state.hoveredVertex === null) {
             $scope.state.selectedVertex = null;
@@ -334,14 +335,18 @@ oppia.directive('graphViz', function() {
           }
           $scope.graph[option] = !$scope.graph[option];
         };
-        $scope.setMode = function(mode, $event) {
-          // Prevents new vertex from being added in add edge mode
-          $event.preventDefault();
-          $event.stopPropagation();
+
+        var setMode0 = function(mode) {
           $scope.state.currentMode = mode;
           $scope.state.addEdgeVertex = null;
           $scope.state.selectedVertex = null;
           $scope.state.selectedEdge = null;
+        };
+        $scope.setMode = function(mode, $event) {
+          // Prevents new vertex from being added in add edge mode
+          $event.preventDefault();
+          $event.stopPropagation();
+          setMode0(mode);
         };
 
         // TODO(czx): Consider if there's a neat way to write a reset()
