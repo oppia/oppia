@@ -39,8 +39,9 @@ oppia.factory('StateObjectFactory', [
   var generateAnswerGroupsFromBackend = function(answerGroupBackendDicts) {
     var answerGroups = answerGroupBackendDicts.map(function(answerGroupDict) {
       return AnswerGroupObjectFactory.create(
-        answerGroupDict.rule_specs, answerGroupDict.outcome,
-          answerGroupDict.correct);
+        answerGroupDict.rule_specs,
+        answerGroupDict.outcome,
+        answerGroupDict.correct);
     });
 
     return answerGroups;
