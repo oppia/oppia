@@ -249,11 +249,11 @@ oppia.factory('explorationSaveService', [
             controller: [
               '$scope', '$modalInstance', 'explorationObjectiveService',
               'explorationTitleService', 'explorationCategoryService',
-              'explorationStatesService', 'CATEGORY_LIST',
+              'explorationStatesService', 'ALL_CATEGORIES',
               'explorationLanguageCodeService', 'explorationTagsService',
               function($scope, $modalInstance, explorationObjectiveService,
               explorationTitleService, explorationCategoryService,
-              explorationStatesService, CATEGORY_LIST,
+              explorationStatesService, ALL_CATEGORIES,
               explorationLanguageCodeService, explorationTagsService) {
                 $scope.explorationTitleService = explorationTitleService;
                 $scope.explorationObjectiveService =
@@ -283,10 +283,10 @@ oppia.factory('explorationSaveService', [
 
                 $scope.CATEGORY_LIST_FOR_SELECT2 = [];
 
-                for (var i = 0; i < CATEGORY_LIST.length; i++) {
+                for (var i = 0; i < ALL_CATEGORIES.length; i++) {
                   $scope.CATEGORY_LIST_FOR_SELECT2.push({
-                    id: CATEGORY_LIST[i],
-                    text: CATEGORY_LIST[i]
+                    id: ALL_CATEGORIES[i],
+                    text: ALL_CATEGORIES[i]
                   });
                 }
 

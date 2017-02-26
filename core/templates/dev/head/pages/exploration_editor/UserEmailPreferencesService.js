@@ -16,7 +16,7 @@
  * @fileoverview User exploration emails service for the exploration settings.
  */
 
-oppia.factory('userExplorationEmailsHandler', [
+oppia.factory('UserEmailPreferencesService', [
   '$http', '$q', 'explorationData', 'alertsService',
   'UrlInterpolationService',
   function(
