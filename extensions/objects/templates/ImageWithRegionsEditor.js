@@ -302,8 +302,12 @@ oppia.directive('imageWithRegionsEditor', [
         };
 
         $scope.resetEditor = function() {
-          $scope.$parent.value.imagePath = '';
-          $scope.$parent.value.labeledRegions = [];
+                var confirmReset = confirm("Are you sure you want to clear image and regions");
+                if(confirmReset){
+                        $scope.$parent.value.imagePath = '';
+                        $scope.$parent.value.labeledRegions = [];
+
+                }
         };
         $scope.deleteRegion = function(index) {
           if ($scope.selectedRegion === index) {
