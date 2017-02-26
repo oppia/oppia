@@ -3875,7 +3875,8 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-activity-summary-tile .objective {
-  height: 60px;
+  height: 70px;
+  line-height: 1.35;
   font-family: "Rubik", "Roboto", Arial, sans-serif;
   font-size: 0.85em;
   padding: 12px;
