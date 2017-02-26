@@ -32,11 +32,9 @@ describe('Simple Editor Shim Service', function() {
         content: [
           {
             value: 'introduction HTML for state1'
-          },
-          {
+          }, {
             value: 'st1html1'
-          },
-          {
+          }, {
             value: 'st1html2'
           }
         ]
@@ -46,11 +44,9 @@ describe('Simple Editor Shim Service', function() {
         content: [
           {
             value: 'introduction HTML for state2'
-          },
-          {
+          }, {
             value: 'st2html1'
-          },
-          {
+          }, {
             value: 'st2html2'
           }
         ]
@@ -85,10 +81,10 @@ describe('Simple Editor Shim Service', function() {
     module('oppia');
     module(function($provide) {
       $provide.value('explorationTitleService', stubs.explorationTitleService);
-      $provide.value('explorationInitStateNameService', stubs.
-        explorationInitStateNameService);
-      $provide.value('explorationStatesService', stubs.explorationStatesService
-        );
+      $provide.value('explorationInitStateNameService',
+        stubs.explorationInitStateNameService);
+      $provide.value('explorationStatesService',
+        stubs.explorationStatesService);
     });
   });
 
@@ -121,7 +117,7 @@ describe('Simple Editor Shim Service', function() {
     expect(name).toEqual(currentStateName);
   });
 
-  it('should return All States Name', function() {
+  it('should return all state names', function() {
     var names = srv.getAllStateNames();
     expect(names).toEqual(Object.keys(states));
   });
@@ -143,7 +139,7 @@ describe('Simple Editor Shim Service', function() {
     srv.saveTitle(newTitle);
     expect(stubs.explorationTitleService.displayed).toEqual(newTitle);
     expect(stubs.explorationTitleService.saveDisplayedValue)
-    .toHaveBeenCalled();
+      .toHaveBeenCalled();
   });
 
   it('should save the introduction HTML', function() {
@@ -154,39 +150,59 @@ describe('Simple Editor Shim Service', function() {
     }];
     srv.saveIntroductionHtml(newIntroductionHtml);
     expect(stubs.explorationStatesService.saveStateContent)
-    .toHaveBeenCalledWith(currentStateName, stateNewContent);
+      .toHaveBeenCalledWith(currentStateName, stateNewContent);
   });
 
   it('should save the interaction ID', function() {
-    var newInteractionID = 'abc123';
+    var newInteractionID = 'MultipleChoiceInput';
     var stateName = currentStateName;
     srv.saveInteractionId(stateName, newInteractionID);
     expect(stubs.explorationStatesService.saveInteractionId)
-    .toHaveBeenCalledWith(stateName, newInteractionID);
+      .toHaveBeenCalledWith(stateName, newInteractionID);
   });
 
   it('should save the Customization Args', function() {
-    var newCustomizationArgs = '-a -b -c';
+    var newCustomizationArgs = {
+      choices: {
+        value: ['<p>Option 1</p>', '<p>Option 1</p>']
+      }
+    };
     var stateName = currentStateName;
     srv.saveCustomizationArgs(stateName, newCustomizationArgs);
     expect(stubs.explorationStatesService.saveInteractionCustomizationArgs)
-    .toHaveBeenCalledWith(stateName, newCustomizationArgs);
+      .toHaveBeenCalledWith(stateName, newCustomizationArgs);
   });
 
   it('should save the Answer Groups', function() {
-    var newAnswerGroups = ['g1', 'g2'];
+    var newAnswerGroups = [{
+      outcome: {
+        dest: 'Question 2',
+        feedback: ['<p>6 is 3 times 2</p>'],
+        param_changes: []
+      },
+      rule_specs: [{
+        inputs: {
+          x: 0
+        },
+        rule_type: 'Equals'
+      }]
+    }];
     var stateName = currentStateName;
     srv.saveAnswerGroups(stateName, newAnswerGroups);
     expect(stubs.explorationStatesService.saveInteractionAnswerGroups)
-    .toHaveBeenCalledWith(stateName, newAnswerGroups);
+      .toHaveBeenCalledWith(stateName, newAnswerGroups);
   });
 
   it('should save the Default Outcome', function() {
-    var newDefaultOutcome = 20;
+    var newDefaultOutcome = {
+      dest: 'Question 1',
+      feedback: ['<p>7 is not 3 times 2</p>'],
+      param_changes: []
+    };
     var stateName = currentStateName;
     srv.saveDefaultOutcome(stateName, newDefaultOutcome);
     expect(stubs.explorationStatesService.saveInteractionDefaultOutcome)
-    .toHaveBeenCalledWith(stateName, newDefaultOutcome);
+      .toHaveBeenCalledWith(stateName, newDefaultOutcome);
   });
 
   it('should save the Bridge HTML', function() {
@@ -198,13 +214,13 @@ describe('Simple Editor Shim Service', function() {
     var stateName = currentStateName;
     srv.saveBridgeHtml(stateName, newHtml);
     expect(stubs.explorationStatesService.saveStateContent)
-    .toHaveBeenCalledWith(stateName, bridgeNewContent);
+      .toHaveBeenCalledWith(stateName, bridgeNewContent);
   });
 
   it('should add new state', function() {
     var newStateName = 'newState';
     srv.addState(newStateName);
-    expect(stubs.explorationStatesService.addState).toHaveBeenCalledWith(
-      newStateName);
+    expect(stubs.explorationStatesService.addState)
+      .toHaveBeenCalledWith(newStateName);
   });
 });
