@@ -1087,7 +1087,7 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
             'A', self.editor_id, 'Title')
 
         self.expected_email_subject = (
-            'You\'ve received 1 new message on your explorations')
+            'You\'ve received 3 new messages on your explorations')
 
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
@@ -1098,12 +1098,18 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
         expected_email_html_body = (
             'Hi editor,<br>'
             '<br>'
-            'You\'ve received 1 new message on your Oppia explorations:<br>'
-            '<ul><li>Title: A message<br></li></ul>'
+            'You\'ve received 3 new messages on your Oppia explorations:<br>'
+            '<ul>'
+            '<li><a href="https://www.oppia.org/create/A#/feedback">Title</a>:'
+            '<br>'
+            '<ul><li>Message 1.1<br></li>'
+            '<li>Message 1.2<br></li>'
+            '<li>Message 1.3<br></li>'
+            '</ul></li></ul>'
             'You can view and reply to your messages from your '
             '<a href="https://www.oppia.org/dashboard">dashboard</a>.'
             '<br>'
-            'Thanks, and happy teaching!<br>'
+            '<br>Thanks, and happy teaching!<br>'
             '<br>'
             'Best wishes,<br>'
             'The Oppia Team<br>'
@@ -1114,9 +1120,12 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
         expected_email_text_body = (
             'Hi editor,\n'
             '\n'
-            'You\'ve received 1 new message on your Oppia explorations:\n'
-            '- Title: A message\n'
-            'You can view and reply to your messages from your dashboard.'
+            'You\'ve received 3 new messages on your Oppia explorations:\n'
+            '- Title:\n'
+            '- Message 1.1\n'
+            '- Message 1.2\n'
+            '- Message 1.3\n'
+            'You can view and reply to your messages from your dashboard.\n'
             '\n'
             'Thanks, and happy teaching!\n'
             '\n'
@@ -1128,7 +1137,7 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
         feedback_messages = {
             self.exploration.id : {
                 'title': self.exploration.title,
-                'messages': ['A message']}
+                'messages': ['Message 1.1', 'Message 1.2', 'Message 1.3']}
         }
 
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
