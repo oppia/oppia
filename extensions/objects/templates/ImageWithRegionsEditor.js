@@ -302,8 +302,27 @@ oppia.directive('imageWithRegionsEditor', [
         };
 
         $scope.resetEditor = function() {
-          $scope.$parent.value.imagePath = '';
-          $scope.$parent.value.labeledRegions = [];
+
+                $modal.open({
+                  templateUrl: 'modals/clearImageRegions',
+                  backdrop: true,
+                  controller: [
+                    '$scope', '$modalInstance', function($scope, $modalInstance) {
+                      $scope.confirmClear = function() {
+                        $modalInstance.close();
+                        alertsService.clearWarnings();
+                      };
+
+                      $scope.cancel = function() {
+                        $modalInstance.dismiss('cancel');
+                        alertsService.clearWarnings();
+                      };
+                    }
+                  ]
+                }).result.then(function(){
+                  $scope.$parent.value.imagePath = '';
+                  $scope.$parent.value.labeledRegions = [];
+                });
         };
         $scope.deleteRegion = function(index) {
           if ($scope.selectedRegion === index) {
