@@ -81,7 +81,8 @@ describe('Simple Editor Shim Service', function() {
     module('oppia');
     module(function($provide) {
       $provide.value('explorationTitleService', stubs.explorationTitleService);
-      $provide.value('explorationInitStateNameService',
+      $provide.value(
+        'explorationInitStateNameService',
         stubs.explorationInitStateNameService);
       $provide.value('explorationStatesService',
         stubs.explorationStatesService);
