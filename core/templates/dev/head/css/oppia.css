@@ -1899,33 +1899,8 @@ pre.oppia-pre-wrapped-text {
   opacity: 1;
 }
 
-.oppia-add-rule-button {
-  background-color: rgba(165,165,165,0.9);
-  border: 0;
-  border-radius: 0;
-  color: white;
-  opacity: 0.9;
-  padding: 7px;
-  width: 100%;
-}
-
-.oppia-add-rule-button:active,
-.oppia-add-rule-button:focus,
-.oppia-add-rule-button:hover {
-  background-color: rgba(165,165,165,1);
-  color: white;
-  opacity: 1;
-}
-
 /* Workaround to ensure that single-line paragraphs comprising multiple-choice
    options are displayed inline. */
-.oppia-multiple-choice-rule p {
-  display: inline;
-}
-.oppia-multiple-choice-rule p::before {
-  content: ' ';
-}
-
 .oppia-interaction-tile {
   cursor: pointer;
   display: inline-block;
@@ -1978,8 +1953,7 @@ pre.oppia-pre-wrapped-text {
   right: -30px;
   top: 0;
 }
-.oppia-delete-response-button,
-.oppia-delete-rule-button {
+.oppia-delete-response-button {
   cursor: pointer;
   opacity: 0.5;
   position: absolute;
@@ -1991,8 +1965,7 @@ pre.oppia-pre-wrapped-text {
 .oppia-delete-param-change-button:hover,
 .oppia-delete-interaction-button:hover,
 .oppia-close-popover-button:hover,
-.oppia-delete-response-button:hover,
-.oppia-delete-rule-button:hover {
+.oppia-delete-response-button:hover {
   opacity: 1;
 }
 
@@ -2091,14 +2064,6 @@ pre.oppia-pre-wrapped-text {
   text-overflow: ellipsis;
   white-space: nowrap;
   width: 500px;
-}
-
-.oppia-rule-header {
-  color: rgb(120, 120, 120);
-  overflow: hidden;
-  padding-left: 0;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .oppia-rule-sort-handle, .oppia-fallback-sort-handle {
