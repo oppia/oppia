@@ -79,8 +79,8 @@ describe('Exploration history', function() {
       },
       7: {
         text: '  - correct: false',
-        highlighted: false
-      }
+        highlighted: true
+      },
       8: {
         text: '    outcome:',
         highlighted: true
