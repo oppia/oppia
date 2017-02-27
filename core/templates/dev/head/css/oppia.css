@@ -37,10 +37,6 @@ md-input-group.long > input {
   height: 45px;
 }
 
-md-input-group.oppia-blue-on-focus > input:focus {
-  border-bottom-color: rgb(63, 81, 181);
-  border-bottom-width: 2px;
-}
 
 md-input-group.md-default-theme label
 {
