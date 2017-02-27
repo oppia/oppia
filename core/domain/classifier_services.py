@@ -125,8 +125,13 @@ def classify_string_classifier_rule(state, normalized_answer):
 
 
 def get_classifier_from_model(classifier_model):
-    """Returns a classifier domain object given a classifier model loaded
-    from datastore.
+    """Gets a classifier domain object from a classifier model.
+
+    Args:
+        classifier_model: Classifier model instance in datastore.
+
+    Returns:
+        classifier: Domain object for the classifier.
     """
     return classifier_domain.Classifier(
         classifier_model.id, classifier_model.exp_id,
@@ -136,7 +141,13 @@ def get_classifier_from_model(classifier_model):
         classifier_model.data_schema_version)
 
 def get_classifier_by_id(classifier_id):
-    """Returns a classifier domain object given a classifier id.
+    """Gets a classifier from a classifier id.
+
+    Args:
+        classifier_id: Str. Id of the classifier.
+
+    Returns:
+        classifier: Domain object for the classifier.
     """
     classifier_model = classifier_models.ClassifierModel.get(
         classifier_id)
@@ -147,6 +158,10 @@ def get_classifier_by_id(classifier_id):
 def _create_classifier(classifier):
     """Creates classifier model in the datastore given a classifier
        domain object.
+       
+    Args:
+        classifier: Domain object for the classifier.
+
     """
     classifier_models.ClassifierModel.create(
         classifier.exp_id, classifier.exp_version_when_created,
@@ -158,6 +173,19 @@ def _create_classifier(classifier):
 def _save_classifier(classifier_model, classifier):
     """Updates classifier model in the datastore given a classifier
     domain object.
+
+    Args:
+        classifier_model: Classifier model instance in datastore.
+        classifier: Domain object for the classifier.
+    
+    Note: Most of the properties of a classifier are immutable.
+    The only property that can change is the state_name. Since,
+    exp_version_when_created will never change, algorithm_id of
+    the algorithm used to generate this model will not change,
+    cached_classifier_data is essentially the model generated
+    which won't change (if you change that you will have to
+    create a new ClassifierModel instance itself!) and
+    data_schema_version should also not change.
     """
     classifier_model.state_name = classifier.state_name
     classifier_model.put()
@@ -166,6 +194,9 @@ def _save_classifier(classifier_model, classifier):
 def update_classifier(classifier):
     """Checks if model exists and updates the classifier model using
     _save_classifier method.
+
+    Args:
+        classifier: Domain object for the classifier.
     """
     classifier_model = classifier_models.ClassifierModel.get(
         classifier.id)
@@ -174,6 +205,9 @@ def update_classifier(classifier):
 
 def delete_classifier(classifier_id):
     """Deletes classifier model in the datastore given classifier_id.
+    
+    Args:
+        classifier_id: Str. Id of the classifier.
     """
     classifier_model = classifier_models.ClassifierModel.get(
         classifier_id)
