@@ -158,7 +158,7 @@ def get_classifier_by_id(classifier_id):
 def _create_classifier(classifier):
     """Creates classifier model in the datastore given a classifier
        domain object.
-       
+
     Args:
         classifier: Domain object for the classifier.
 
@@ -177,7 +177,7 @@ def _save_classifier(classifier_model, classifier):
     Args:
         classifier_model: Classifier model instance in datastore.
         classifier: Domain object for the classifier.
-    
+
     Note: Most of the properties of a classifier are immutable.
     The only property that can change is the state_name. Since,
     exp_version_when_created will never change, algorithm_id of
@@ -205,7 +205,7 @@ def update_classifier(classifier):
 
 def delete_classifier(classifier_id):
     """Deletes classifier model in the datastore given classifier_id.
-    
+
     Args:
         classifier_id: Str. Id of the classifier.
     """
