@@ -4526,6 +4526,7 @@ md-card.preview-conversation-skin-supplemental-card {
   text-transform: uppercase;
   white-space: normal;
   width: 366px;
+  min-width: 200px;
 }
 
 .oppia-about-button:hover,
