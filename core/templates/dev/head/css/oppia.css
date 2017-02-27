@@ -1955,8 +1955,7 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-delete-param-change-button,
 .oppia-delete-interaction-button,
-.oppia-close-popover-button,
-.oppia-delete-list-entry-button {
+.oppia-close-popover-button {
   background: none;
   border: 0;
   color: #000;
@@ -1988,15 +1987,12 @@ pre.oppia-pre-wrapped-text {
   top: 8px;
   width: 20px;
 }
-.oppia-delete-list-entry-button {
-  margin-top: 6px;
-}
+
 .oppia-delete-param-change-button:hover,
 .oppia-delete-interaction-button:hover,
 .oppia-close-popover-button:hover,
 .oppia-delete-response-button:hover,
-.oppia-delete-rule-button:hover,
-.oppia-delete-list-entry-button:hover {
+.oppia-delete-rule-button:hover {
   opacity: 1;
 }
 
