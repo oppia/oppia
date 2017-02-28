@@ -32,7 +32,8 @@ oppia.directive('collectionSummaryTile', [function() {
       getLastUpdatedMsec: '&lastUpdatedMsec',
       getThumbnailIconUrl: '&thumbnailIconUrl',
       getThumbnailBgColor: '&thumbnailBgColor',
-      isLinkedToEditorPage: '=?isLinkedToEditorPage'
+      isLinkedToEditorPage: '=?isLinkedToEditorPage',
+      getCategory: '&category'
     },
     templateUrl: 'summaryTile/collection',
     controller: [
