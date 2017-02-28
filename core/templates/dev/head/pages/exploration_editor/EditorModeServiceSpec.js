@@ -16,25 +16,25 @@
  * @fileoverview Unit tests for the EditorModeService.js
  */
 describe('Editor Mode Service', function() {
-  var srv;
+  var editorModeService;
 
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
-    srv = $injector.get('EditorModeService');
+    editorModeService = $injector.get('EditorModeService');
   }));
 
   it('should default to full mode', function() {
-    expect(srv.isEditorInFullMode()).toEqual(true);
+    expect(editorModeService.isEditorInFullMode()).toEqual(true);
   });
 
   it('should change to simple mode', function() {
-    srv.setModeToSimple();
-    expect(srv.isEditorInSimpleMode()).toEqual(true);
+    editorModeService.setModeToSimple();
+    expect(editorModeService.isEditorInSimpleMode()).toEqual(true);
   });
 
   it('should change to full mode', function() {
-    srv.setModeToFull();
-    expect(srv.isEditorInFullMode()).toEqual(true);
+    editorModeService.setModeToFull();
+    expect(editorModeService.isEditorInFullMode()).toEqual(true);
   });
 });
