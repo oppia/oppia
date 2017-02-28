@@ -127,6 +127,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         # Since no explorations have been created, going to '/' should redirect
         # to the library page.
         response = self.testapp.get('/')
+        self.assertEqual(response.status_int, 302)
         self.assertIn('library', response.headers['location'])
         self.logout()
 
@@ -150,6 +151,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         # Must be on dashboard even though exploration is deleted because even
         # deleted explorations are associated with creators thus the user is
         # expected to be creator
+        self.assertEqual(response.status_int, 302)
         self.assertIn('dashboard', response.headers['location'])
 
     def test_root_redirect_rules_for_logged_in_editors(self):
@@ -179,6 +181,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         # Since user has edited one explorations created by another user
         # going to '/' should redirect to the dashboard page.
         response = self.testapp.get('/')
+        self.assertEqual(response.status_int, 302)
         self.assertIn('dashboard', response.headers['location'])
         self.logout()
 
