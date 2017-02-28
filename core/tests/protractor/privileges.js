@@ -46,18 +46,11 @@ describe('Permissions for private explorations', function() {
 
       users.login('eve@privileges.com');
       general.openEditor(explorationId);
-
       // Eve is redirected to the homepage.
-      browser.getCurrentUrl().then(function(curUrl) {
-        var dashboardURL = general.SERVER_URL_PREFIX + '/dashboard';
-        var libraryURL = general.SERVER_URL_PREFIX + '/library';
-
-        // Homepage can be either dashboard or library dependin on learner
-        // Status
-        var atHomeFlag = (curUrl === libraryURL) || (curUrl === dashboardURL);
-        expect(atHomeFlag).toBe(true);
-        users.logout();
-      });
+      expect(browser.getCurrentUrl()).toEqual(
+        general.SERVER_URL_PREFIX + '/library');
+      users.logout();
+      
     });
   });
 
