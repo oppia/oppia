@@ -108,7 +108,7 @@ oppia.directive('explorationSummaryTile', [function() {
 
         $scope.getAverageRating = function() {
           if (!$scope.getRatings()) {
-            return false;
+            return null;
           }
           return RatingComputationService.computeAverageRating(
             $scope.getRatings());
@@ -116,7 +116,7 @@ oppia.directive('explorationSummaryTile', [function() {
 
         $scope.getLastUpdatedDatetime = function() {
           if (!$scope.getLastUpdatedMsec()) {
-            return false;
+            return null;
           }
           return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
             $scope.getLastUpdatedMsec());
