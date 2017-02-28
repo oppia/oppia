@@ -3557,6 +3557,23 @@ md-card.preview-conversation-skin-supplemental-card {
   width: 10%;
 }
 
+.oppia-splash-button-container button {
+  bottom: 210px;
+  left: -webkit-calc(130px + 15%);
+  left: -moz-calc(130px + 15%);
+  left: -o-calc(130px + 15%);
+  left: calc(130px + 15%);
+  z-index: 10;
+}
+
+@media (max-width: 380px) {
+  .oppia-splash-button-container button {
+    left: 50%;
+    width: 90%;
+    font-size: 14px;
+  }
+}
+
 .oppia-splash-books {
   left: 50%;
   position: absolute;
