@@ -71,7 +71,11 @@ class HomePageRedirectHandler(base.BaseHandler):
     """
     def get(self):
         if self.user_id and user_services.has_fully_registered(self.user_id):
-            self.redirect(feconf.DASHBOARD_URL)
+            user_contributions = user_services.get_user_contributions(self.user_id, strict=False)    # pylint: disable=line-too-long
+            if user_contributions.created_exploration_ids:
+                self.redirect(feconf.DASHBOARD_URL)
+            else:
+                self.redirect(feconf.LIBRARY_INDEX_URL)
         else:
             self.redirect(feconf.SPLASH_URL)
 
