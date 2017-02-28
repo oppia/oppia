@@ -171,9 +171,11 @@
 
 {% block footer_js %}
   {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
   <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/MathLatexStringEditor.js"></script>
   <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/SanitizedUrlEditor.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/autoplayedVideosService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/explorationServices.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/messengerService.js"></script>
 
@@ -210,6 +212,9 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ProgressDotsDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/StatsReportingService.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionSyntaxTree.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/evaluator.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/parser.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionInterpolationService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>
