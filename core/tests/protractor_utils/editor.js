@@ -1087,7 +1087,7 @@ var saveChanges = function(commitMessage) {
 var discardChanges = function() {
   element(by.css('.protractor-test-save-discard-toggle')).click();
   element(by.css('.protractor-test-discard-changes')).click();
-  general.acceptAlert();
+  element(by.css('.protractor-test-confirm-discard-changes')).click();
   general.waitForSystem();
   browser.waitForAngular();
 };
