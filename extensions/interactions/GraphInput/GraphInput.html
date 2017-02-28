@@ -147,7 +147,7 @@
           ng-attr-y="<[10 + 50 * $index]>"
           rx="5"
           ry="5"
-          ng-click="setMode(button.mode, $event)"
+          ng-click="onClickModeButton(button.mode, $event)"
           ng-mouseenter="state.hoveredModeButton = button.mode"
           ng-mouseleave="state.hoveredModeButton = (state.hoveredModeButton == button.mode) ? null : state.hoveredModeButton"
           ng-attr-style="fill: white; stroke: black; stroke-width: <[(state.currentMode == button.mode) ? 3 : 1]>;">
