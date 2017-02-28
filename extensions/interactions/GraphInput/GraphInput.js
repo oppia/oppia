@@ -343,7 +343,6 @@ oppia.directive('graphViz', function() {
           $scope.state.selectedEdge = null;
         };
         $scope.onClickModeButton = function(mode, $event) {
-          // Prevents new vertex from being added in add edge mode
           $event.preventDefault();
           $event.stopPropagation();
           setMode(mode);
