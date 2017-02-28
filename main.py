@@ -71,19 +71,16 @@ class HomePageRedirectHandler(base.BaseHandler):
     """
     def get(self):
         if self.user_id and user_services.has_fully_registered(self.user_id):
+            user_contributions = user_services.get_user_contributions(
+                self.user_id)
 
-            # Get all the explorations associated with the user's account
-            user_exps = user_services.get_user_contributions(self.user_id)
-
-            # If the user is not learner it will have atleast
-            # one exloration associated with the user account
-            if len(user_exps.created_exploration_ids) >= 1:
-
-                # Redirect the user to dashboard
+            # 'Creator' is a user who have created or edited an exploration.
+            userIsCreator = (
+                len(user_contributions.created_exploration_ids) > 0 or
+                len(user_contributions.edited_exploration_ids) > 0)
+            if userIsCreator:
                 self.redirect(feconf.DASHBOARD_URL)
             else:
-
-                # Redirect to library page
                 self.redirect(feconf.LIBRARY_INDEX_URL)
         else:
             self.redirect(feconf.SPLASH_URL)
