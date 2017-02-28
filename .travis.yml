@@ -19,6 +19,7 @@ branches:
   only:
   - master
   - develop
+  - simple-editor
 
 env:
   matrix:
