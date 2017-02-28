@@ -24,6 +24,7 @@ import types
 
 from core.controllers import base
 from core.domain import exp_services
+from core.domain import rights_manager
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -46,18 +47,23 @@ class BaseHandlerTest(test_utils.GenericTestBase):
     TEST_LEARNER_USERNAME = "testlearneruser"
     TEST_CREATOR_EMAIL = "test.creator@example.com"
     TEST_CREATOR_USERNAME = "testcreatoruser"
+    TEST_EDITOR_EMAIL = "test.editor@example.com"
+    TEST_EDITOR_USERNAME = "testeditoruser"
 
     def setUp(self):
         super(BaseHandlerTest, self).setUp()
         self.signup('user@example.com', 'user')
 
-        # create a learner user to test learner redirect behavior
-        # learner is a user with no explorations associated with it
+        # Create a user to test redirect behavior for the learner.
+        # A "learner" is defined as a user who has not created or contributed
+        # to any exploration ever.
         self.signup(self.TEST_LEARNER_EMAIL, self.TEST_LEARNER_USERNAME)
 
-        # create a creator user to test creator redirect behavior
-        # creator is a user atleast one exploration associated with it
+        # Create two users to test redirect behavior for the creators.
+        # A "creator" is defined as a user who has created, edited or
+        # contributed to any exploration at present or in past.
         self.signup(self.TEST_CREATOR_EMAIL, self.TEST_CREATOR_USERNAME)
+        self.signup(self.TEST_EDITOR_EMAIL, self.TEST_EDITOR_USERNAME)
 
     def test_dev_indicator_appears_in_dev_and_not_in_production(self):
         """Test dev indicator appears in dev and not in production."""
@@ -108,66 +114,73 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         response = self.testapp.put('/library/extra', {}, expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
-    def test_redirect_in_both_logged_in_and_logged_out_states(self):
-        "Test for a redirect in both logged in and logged out states on '/'."
+    def test_redirect_in_logged_out_states(self):
+        """Test for a redirect in logged out state on '/'."""
 
-        # Logged out state
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 302)
         self.assertIn('splash', response.headers['location'])
 
-        # Login and assert that there is a redirect
-        self.login('user@example.com')
-        response = self.testapp.get('/')
-        self.assertEqual(response.status_int, 302)
-
-        # Homepage is either dashboard or library based on user's learner
-        # status, this homepage redirect rule behavior is seperately tested
-        atHome = ('dashboard' in response.headers['location'] or
-                  'library' in response.headers['location'])
-        self.assertTrue(atHome, msg="user must be at library or dashboard")
-        self.logout()
-
-    def test_root_redirect_rules_for_learners(self):
-        # Test learner behavior. Login as learner
+    def test_root_redirect_rules_for_logged_in_learners(self):
         self.login(self.TEST_LEARNER_EMAIL)
 
-        # Dont create any exploration and simply go to root
+        # Since no explorations have been created, going to '/' should redirect
+        # to the library page.
         response = self.testapp.get('/')
         self.assertIn('library', response.headers['location'])
         self.logout()
 
-    def test_root_redirect_for_creators(self):
-        # Test creator behavior. Login as creator
+    def test_root_redirect_rules_for_logged_in_creators(self):
         self.login(self.TEST_CREATOR_EMAIL)
         creator_user_id = self.get_user_id_from_email(self.TEST_CREATOR_EMAIL)
         exploration_id = '0_en_test_exploration'
-
-        # Create a test exploration
         self.save_new_valid_exploration(
             exploration_id, creator_user_id, title='Test',
             category='Test', language_code='en')
 
-        # go to root url
+        # Since atleast one explorations have been created, going to '/' should
+        # redirect to the dashboard page.
         response = self.testapp.get('/')
-
-        # Must be on dashboard
         self.assertIn('dashboard', response.headers['location'])
-
-        # Delete the exploration
         exp_services.delete_exploration(creator_user_id, exploration_id)
         self.logout()
-
-        # Login again
         self.login(self.TEST_CREATOR_EMAIL)
-
-        # Go to root url
         response = self.testapp.get('/')
 
         # Must be on dashboard even though exploration is deleted because even
         # deleted explorations are associated with creators thus the user is
         # expected to be creator
         self.assertIn('dashboard', response.headers['location'])
+
+    def test_root_redirect_rules_for_logged_in_editors(self):
+        self.login(self.TEST_CREATOR_EMAIL)
+        creator_user_id = self.get_user_id_from_email(self.TEST_CREATOR_EMAIL)
+        editor_user_id = self.get_user_id_from_email(self.TEST_EDITOR_EMAIL)
+        exploration_id = '1_en_test_exploration'
+        self.save_new_valid_exploration(
+            exploration_id, creator_user_id, title='Test',
+            category='Test', language_code='en')
+        rights_manager.assign_role_for_exploration(
+            creator_user_id, exploration_id, editor_user_id,
+            rights_manager.ROLE_EDITOR)
+        self.logout()
+        self.login(self.TEST_EDITOR_EMAIL)
+        exp_services.update_exploration(
+            editor_user_id, exploration_id, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'edited title'
+            }, {
+                'cmd': 'edit_exploration_property',
+                'property_name': 'category',
+                'new_value': 'edited category'
+            }], 'Change title and category')
+
+        # Since User Editor has edited one explorations created by another user
+        # going to '/' should redirect to the dashboard page.
+        response = self.testapp.get('/')
+        self.assertIn('dashboard', response.headers['location'])
+        self.logout()
 
 
 class CsrfTokenManagerTest(test_utils.GenericTestBase):
