@@ -1,4 +1,48 @@
 <script type="text/ng-template" id="inline/answer_group_editor">
+  <style>
+    .oppia-rule-header {
+      color: rgb(120, 120, 120);
+      overflow: hidden;
+      padding-left: 0;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .oppia-multiple-choice-rule p {
+      display: inline;
+    }
+    .oppia-multiple-choice-rule p::before {
+      content: ' ';
+    }
+    .oppia-add-rule-button {
+      background-color: rgba(165,165,165,0.9);
+      border: 0;
+      border-radius: 0;
+      color: white;
+      opacity: 0.9;
+      padding: 7px;
+      width: 100%;
+    }
+
+    .oppia-add-rule-button:active,
+    .oppia-add-rule-button:focus,
+    .oppia-add-rule-button:hover {
+      background-color: rgba(165,165,165,1);
+      color: white;
+      opacity: 1;
+    }
+    .oppia-delete-rule-button {
+      cursor: pointer;
+      opacity: 0.5;
+      position: absolute;
+      right: 8px;
+      top: 8px;
+      width: 20px;
+    }
+    .oppia-delete-rule-button:hover {
+      opacity: 1;
+    }
+  </style>
+ 
   <div style="height: 100%;">
     <!-- For the default answer group, 'rules' is null. Otherwise, 'rules' is a list of rules. -->
     <div ng-if="rules">
@@ -50,47 +94,4 @@
                     suppress-warnings="suppressWarnings()">
     </outcome-editor>
   </div>
-  <style>
-    .oppia-rule-header {
-      color: rgb(120, 120, 120);
-      overflow: hidden;
-      padding-left: 0;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .oppia-multiple-choice-rule p {
-      display: inline;
-    }
-    .oppia-multiple-choice-rule p::before {
-      content: ' ';
-    }
-    .oppia-add-rule-button {
-      background-color: rgba(165,165,165,0.9);
-      border: 0;
-      border-radius: 0;
-      color: white;
-      opacity: 0.9;
-      padding: 7px;
-      width: 100%;
-    }
-
-    .oppia-add-rule-button:active,
-    .oppia-add-rule-button:focus,
-    .oppia-add-rule-button:hover {
-      background-color: rgba(165,165,165,1);
-      color: white;
-      opacity: 1;
-    }
-    .oppia-delete-rule-button {
-      cursor: pointer;
-      opacity: 0.5;
-      position: absolute;
-      right: 8px;
-      top: 8px;
-      width: 20px;
-    }
-    .oppia-delete-rule-button:hover {
-      opacity: 1;
-    }
-  </style>
 </script>

@@ -570,14 +570,6 @@ textarea {
   transition: opacity 0.5s;
 }
 
-.oppia-sidebar-section-header {
-  color: #888;
-  display: block;
-  margin-left: 10px;
-  padding: 1em 0 0 0;
-  text-decoration: none;
-}
-
 .oppia-sidebar-logo {
   height: 32px;
   margin-bottom: 5px;
@@ -605,20 +597,6 @@ textarea {
   background: none;
 }
 
-.oppia-sidebar-menu-open {
-  box-shadow: 1px 0 3px rgba(0,0,0,0.12), 1px 0 2px rgba(0,0,0,0.24);
-  overflow-y: scroll;
-  -webkit-transform: translate3d(0, 0, 0);
-  transform: translate3d(0, 0, 0);
-  visibility: visible;
-}
-.oppia-sidebar-menu-open {
-  height: 0;
-  opacity: 0;
-  -webkit-transition: opacity 0.5s, width 0.1s 0.5s, height 0.1s 0.5s;
-  transition: opacity 0.5s, width 0.1s 0.5s, height 0.1s 0.5s;
-  width: 0;
-}
 
 /*
   Styles for footer
