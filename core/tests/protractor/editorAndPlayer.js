@@ -154,9 +154,6 @@ describe('Full exploration editor', function() {
       editor.expectCurrentStateToBe('final card');
       editor.moveToState('second');
 
-      // Check settings tab summary card preview
-      editor.previewSummaryTile();
-
       // Check editor preview tab
       editor.navigateToPreviewTab();
       player.expectContentToMatch(function(richTextEditor) {
@@ -208,6 +205,7 @@ describe('Full exploration editor', function() {
       editor.setTitle('Testing multiple rules');
       editor.setCategory('Answer Groups');
       editor.setObjective('To assess happiness.');
+      editor.previewSummaryTile();
       editor.saveChanges();
       workflow.publishExploration();
 

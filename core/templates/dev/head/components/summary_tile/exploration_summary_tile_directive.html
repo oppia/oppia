@@ -1,6 +1,6 @@
 <script type="text/ng-template" id="summaryTile/exploration">
   <md-card class="oppia-activity-summary-tile" ng-class="{'small-width': !isWindowLarge}">
-      <a ng-if="getExplorationLink()" ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>"></a>
+    <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
       <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
         <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
         <h3 class="activity-title protractor-test-exp-summary-tile-title">
@@ -40,7 +40,7 @@
               <span ng-if="getAverageRating()">
                 <[getAverageRating() | number:1]>
               </span>
-              <span ng-if="!getAverageRating()" translate="I18N_LIBRARY_N/A" class="inactive-summary-tile-attribute ">
+              <span ng-if="!getAverageRating()" translate="I18N_LIBRARY_N/A" class="oppia-inactive-summary-tile-attribute">
               </span>
             </span>
           </li>
@@ -51,7 +51,7 @@
             <span ng-if="getNumViews()">
               <[getNumViews() | summarizeNonnegativeNumber]>
             </span>
-            <span ng-if="!getNumViews()" translate="I18N_LIBRARY_N/A" class="inactive-summary-tile-attribute ">
+            <span ng-if="!getNumViews()" translate="I18N_LIBRARY_N/A" class="oppia-inactive-summary-tile-attribute">
             </span>
           </li>
 
@@ -59,7 +59,7 @@
             <span ng-if="getLastUpdatedDatetime()">
               <[getLastUpdatedDatetime()]>
             </span>
-            <span ng-if="!getLastUpdatedDatetime()" translate="I18N_LIBRARY_N/A" class="inactive-summary-tile-attribute">
+            <span ng-if="!getLastUpdatedDatetime()" translate="I18N_LIBRARY_N/A" class="oppia-inactive-summary-tile-attribute">
             </span>
           </li>
         </ul>
@@ -69,7 +69,7 @@
 </script>
 
 <style>
-.oppia-activity-summary-tile .inactive-summary-tile-attribute {
-  opacity: 0.5;
-  }
+  .oppia-activity-summary-tile .oppia-inactive-summary-tile-attribute {
+    opacity: 0.5;
+   }
 </style>

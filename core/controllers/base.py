@@ -304,6 +304,8 @@ class BaseHandler(webapp2.RequestHandler):
             'CAN_SEND_ANALYTICS_EVENTS': feconf.CAN_SEND_ANALYTICS_EVENTS,
             'CATEGORIES_TO_COLORS': feconf.CATEGORIES_TO_COLORS,
             'DEFAULT_LANGUAGE_CODE': feconf.ALL_LANGUAGE_CODES[0]['code'],
+            'DEFAULT_CATEGORY_ICON': feconf.DEFAULT_THUMBNAIL_ICON,
+            'DEFAULT_COLOR': feconf.DEFAULT_COLOR,
             'DEV_MODE': feconf.DEV_MODE,
             'MINIFICATION': feconf.IS_MINIFIED,
             'DOMAIN_URL': '%s://%s' % (scheme, netloc),

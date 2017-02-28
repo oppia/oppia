@@ -1069,8 +1069,13 @@ var enableFallbacks = function() {
 var previewSummaryTile = function() {
   runFromSettingsTab(function() {
     element(by.css('.protractor-test-open-preview-summary-modal')).click();
+    general.waitForSystem();
     expect(element(by.css(
       '.protractor-test-exploration-summary-tile')).isPresent()).toBeTruthy();
+    element(by.css('.protractor-test-close-preview-summary-modal')).click();
+    general.waitForSystem();
+    expect(element(by.css(
+      '.protractor-test-exploration-summary-tile')).isPresent()).toBeFalsy();
   });
 };
 // CONTROLS
@@ -1452,6 +1457,7 @@ exports.setFirstState = setFirstState;
 exports.enableParameters = enableParameters;
 exports.enableGadgets = enableGadgets;
 exports.enableFallbacks = enableFallbacks;
+exports.previewSummaryTile = previewSummaryTile;
 
 exports.saveChanges = saveChanges;
 exports.discardChanges = discardChanges;

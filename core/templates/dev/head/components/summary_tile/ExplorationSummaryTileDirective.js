@@ -124,7 +124,7 @@ oppia.directive('explorationSummaryTile', [function() {
 
         $scope.getExplorationLink = function() {
           if (!$scope.getExplorationId()) {
-            return false;
+            return '#';
           } else {
             var result = '/explore/' + $scope.getExplorationId();
             if ($scope.getCollectionId()) {
