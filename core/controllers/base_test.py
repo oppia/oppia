@@ -176,7 +176,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
                 'new_value': 'edited category'
             }], 'Change title and category')
 
-        # Since User Editor has edited one explorations created by another user
+        # Since user has edited one explorations created by another user
         # going to '/' should redirect to the dashboard page.
         response = self.testapp.get('/')
         self.assertIn('dashboard', response.headers['location'])
