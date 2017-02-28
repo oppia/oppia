@@ -50,7 +50,6 @@ describe('Permissions for private explorations', function() {
       expect(browser.getCurrentUrl()).toEqual(
         general.SERVER_URL_PREFIX + '/library');
       users.logout();
-      
     });
   });
 
