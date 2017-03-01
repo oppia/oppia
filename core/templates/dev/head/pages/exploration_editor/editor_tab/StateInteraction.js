@@ -397,3 +397,31 @@ oppia.directive('testInteractionPanel', [function() {
     ]
   };
 }]);
+
+oppia.directive('heightWatcher', [function() {
+  return {
+    restrict: 'A',
+    link:function(scope, element, attrs) {
+    scope.$watch(
+      function() {
+        return element[0].offsetHeight;
+      },
+      function(newVal,oldVal) {
+        if (newVal!==oldVal) {
+          if (newVal>630 - 40) {
+            if(angular.element(element[0]).find("#heightchecker").length == 0) {
+              angular.element(element[0]).append(
+                '<span id="heightchecker"'
+                +'style="color:#0277BD">'
+                +'<i class="material-icons">&#xE88F;</i>'
+                +'You have reached suggested card height'
+                +'</span>');
+            }
+          } else {
+            angular.element(element[0]).find("#heightchecker").remove();
+          }
+        }
+      },true);
+    }
+  };
+}]);
