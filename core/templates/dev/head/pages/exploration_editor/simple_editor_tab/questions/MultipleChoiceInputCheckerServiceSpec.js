@@ -27,10 +27,10 @@
    }));
 
    it('Should return true if interaction data is compatible', function() {
-     expect(multipleChoiceInputCheckerService.isValid()).toEqual(true);
+     expect(multipleChoiceInputCheckerService.isValid()).toBe(true);
    });
 
    it('Should return flase if interaction data is not compatible', function() {
-     expect(multipleChoiceInputCheckerService.isValid()).toEqual(false);
+     expect(multipleChoiceInputCheckerService.isValid()).toBe(false);
    });
  });
