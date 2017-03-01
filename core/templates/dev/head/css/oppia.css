@@ -2788,6 +2788,59 @@ div#ng-curtain {
   margin-left: -3px;
 }
 
+/* Oppia Exploration Switch Button */
+.switch-button-down {
+  color: #477349;
+  display: none;
+}
+.switch-button-up {
+  color: #477349;
+}
+.switch-editor-btn-container {
+  bottom: -37px;
+  position: fixed;
+  right: 31px;
+  width: 158px;
+}
+.switch-editor-btn-container:hover {
+  bottom: 0px;
+  position: fixed;
+  right: 31px;
+}
+.switch-editor-btn-container:hover .switch-button-up {
+  display: none;
+}
+.switch-editor-btn-container:hover .switch-button-down {
+  display: block;
+}
+.switch-editor-btn, .switch-editor-btn-container:hover .switch-editor-btn {
+  background-color: #eff8f0;
+  border-color: #477349;
+  border-radius: 0px;
+  border-width: 6px 0 0 0;
+  color: #009688;
+  min-width: 160px;
+}
+.switch-editor-btn-container:hover .switch-editor-btn {
+  border-width: 0 0 6px 0;
+}
+.switch-editor-btn:focus, .switch-editor-btn:active {
+  box-shadow: none;
+  -webkit-box-shadow: none;
+  outline: none;
+}
+.switch-editor-btn-head {
+  height: 25px;
+  text-align: center;
+  width: 160px;
+}
+
+@media (max-width: 768px) {
+  .switch-editor-btn-container{
+    display: none;
+  }
+}
+
 .oppia-exploration-open-threads-indicator {
   border-radius: 10%;
   bottom: 10px;
