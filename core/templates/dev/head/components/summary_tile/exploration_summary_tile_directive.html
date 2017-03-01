@@ -30,8 +30,10 @@
             </div>
           </span>
         </span>
-        <span ng-if="!getObjective()" translate="I18N_LIBRARY_NO_OBJECTIVE">
-        </span>
+        <div ng-if="!getObjective()" class="objective">
+          <span translate="I18N_LIBRARY_NO_OBJECTIVE">
+          </span>
+        </div>
         <ul layout="row" class="metrics" layout-align="space-between center">
           <li>
             <span class="protractor-test-exp-summary-tile-rating" ng-class="{'rating-disabled': !getAverageRating()}">
