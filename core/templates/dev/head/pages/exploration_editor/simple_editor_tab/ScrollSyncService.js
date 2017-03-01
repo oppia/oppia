@@ -77,7 +77,7 @@ oppia.factory('ScrollSyncService', [
       scrollTo: function(id) {
         var element = angular.element($document[0].getElementById(id));
         if (element && element.offset()) {
-          $('body').animate({
+          $('html, body').animate({
             scrollTop: element.offset().top - Y_OFFSET_SMOOTH_SCROLL
           }, 'slow');
         }
