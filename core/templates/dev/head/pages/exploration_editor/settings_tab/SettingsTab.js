@@ -34,7 +34,7 @@ oppia.controller('SettingsTab', [
       explorationTagsService, explorationRightsService,
       explorationInitStateNameService, explorationParamSpecsService,
       changeListService, alertsService, explorationStatesService,
-      explorationParamChangesService, explorationWarningsService,      
+      explorationParamChangesService, explorationWarningsService,
       explorationAdvancedFeaturesService, ALL_CATEGORIES,
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL, UserEmailPreferencesService,
       UrlInterpolationService) {
@@ -250,8 +250,8 @@ oppia.controller('SettingsTab', [
               if (GLOBALS.ALL_CATEGORIES.indexOf(category) === -1) {
                 category = GLOBALS.DEFAULT_CATEGORY_ICON;
               }
-              return UrlInterpolationService.getStaticImageUrl('/subjects/' +
-                category + '.svg');
+              return UrlInterpolationService.getStaticImageUrl(
+                '/subjects/' + category + '.svg');
             };
             $scope.getThumbnailBgColor = function() {
               var category = explorationCategoryService.displayed;
