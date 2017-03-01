@@ -1066,7 +1066,7 @@ var enableFallbacks = function() {
   });
 };
 
-var previewSummaryTile = function() {
+var openAndClosePreviewSummaryTile = function() {
   runFromSettingsTab(function() {
     element(by.css('.protractor-test-open-preview-summary-modal')).click();
     general.waitForSystem();
@@ -1458,7 +1458,7 @@ exports.setFirstState = setFirstState;
 exports.enableParameters = enableParameters;
 exports.enableGadgets = enableGadgets;
 exports.enableFallbacks = enableFallbacks;
-exports.previewSummaryTile = previewSummaryTile;
+exports.openAndClosePreviewSummaryTile = openAndClosePreviewSummaryTile;
 
 exports.saveChanges = saveChanges;
 exports.discardChanges = discardChanges;
