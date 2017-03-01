@@ -1066,12 +1066,29 @@ var enableFallbacks = function() {
   });
 };
 
-var previewSummaryTile = function() {
+var openPreviewSummaryTile = function() {
   runFromSettingsTab(function() {
     element(by.css('.protractor-test-open-preview-summary-modal')).click();
     general.waitForSystem();
     expect(element(by.css(
       '.protractor-test-exploration-summary-tile')).isPresent()).toBeTruthy();
+    element(by.css('.protractor-test-close-preview-summary-modal')).click();
+    general.waitForSystem();
+    expect(element(by.css(
+      '.protractor-test-exploration-summary-tile')).isPresent()).toBeFalsy();
+  });
+};
+var openPreviewSummaryTile = function() {
+  runFromSettingsTab(function() {
+    element(by.css('.protractor-test-open-preview-summary-modal')).click();
+    general.waitForSystem();
+    expect(element(by.css(
+      '.protractor-test-exploration-summary-tile')).isPresent()).toBeTruthy();
+  });
+};
+
+var closePreviewSummaryTile = function() {
+  runFromSettingsTab(function() {
     element(by.css('.protractor-test-close-preview-summary-modal')).click();
     general.waitForSystem();
     expect(element(by.css(
@@ -1457,7 +1474,8 @@ exports.setFirstState = setFirstState;
 exports.enableParameters = enableParameters;
 exports.enableGadgets = enableGadgets;
 exports.enableFallbacks = enableFallbacks;
-exports.previewSummaryTile = previewSummaryTile;
+exports.openPreviewSummaryTile = openPreviewSummaryTile;
+exports.closePreviewSummaryTile = closePreviewSummaryTile;
 
 exports.saveChanges = saveChanges;
 exports.discardChanges = discardChanges;
