@@ -205,7 +205,7 @@ describe('Full exploration editor', function() {
       editor.setTitle('Testing multiple rules');
       editor.setCategory('Answer Groups');
       editor.setObjective('To assess happiness.');
-      editor.previewSummaryTile();
+      editor.openAndClosePreviewSummaryTile();
       editor.saveChanges();
       workflow.publishExploration();
 
