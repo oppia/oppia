@@ -33,6 +33,7 @@
         ng-attr-style="<[getRegionStyle($index)]>"
         ng-mouseover="onMouseoverRegion($index)"
         ng-mouseout="onMouseoutRegion($index)"
+        ng-mousemove="onMouseMoveRegion($index)"
         ng-mousedown="onMousedownRegion($index)">
       </rect>
       <text ng-repeat="labeledRegion in $parent.$parent.value.labeledRegions"
