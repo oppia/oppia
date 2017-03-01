@@ -3924,7 +3924,6 @@ md-card.preview-conversation-skin-supplemental-card {
   margin: 0.3em 0.5em;
   padding: 0.2em;
   position: absolute;
-  word-break: break-all;
 }
 
 .oppia-activity-summary-tile .objective {
