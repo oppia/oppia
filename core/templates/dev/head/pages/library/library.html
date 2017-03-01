@@ -218,6 +218,8 @@
 
 {% block footer_js %}
   {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/searchService.js"></script>
+  
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/profile_link/ProfileLinkImageDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>

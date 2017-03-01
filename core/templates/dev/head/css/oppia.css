@@ -4522,6 +4522,7 @@ md-card.preview-conversation-skin-supplemental-card {
   font-size: 18px;
   margin: 0 15px 15px 15px;
   max-width: 90%;
+  min-width: 200px;
   padding: 15px;
   text-transform: uppercase;
   white-space: normal;

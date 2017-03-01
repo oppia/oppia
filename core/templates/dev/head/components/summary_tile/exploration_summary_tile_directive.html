@@ -2,7 +2,7 @@
   <md-card class="oppia-activity-summary-tile" ng-class="{'small-width': !isWindowLarge}">
     <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
       <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
-        <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
+        <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>" alt="<[getCategory()]>">
         <h3 class="activity-title protractor-test-exp-summary-tile-title">
           <span ng-if="isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
           <span ng-if="!isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
