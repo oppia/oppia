@@ -634,7 +634,7 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
         'VisitOppiaFromIframe', 'click', explorationId);
     },
     registerNewCard: function(cardNum) {
-      if (cardNum <= 10 || card % 10 === 0) {
+      if (cardNum <= 10 || cardNum % 10 === 0) {
         _sendEventToGoogleAnalytics('PlayerNewCard', 'click', cardNum);
       }
     },
