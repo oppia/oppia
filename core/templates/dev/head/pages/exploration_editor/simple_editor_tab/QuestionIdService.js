@@ -27,8 +27,6 @@ oppia.factory('QuestionIdService', [function() {
     SIDEBAR_PREFIX: 'sidebaritem' + SIDEBAR_ID_DELIMETER,
     // Returns an Id used to identify a question subfield.
     getSubfieldId: function(questionId, label) {
-      console.log(questionId);
-      console.log(label);
       return [questionId, strip(label)].join(SIDEBAR_ID_DELIMETER);
     },
     // Returns an Id used to identify a sidebar item.
