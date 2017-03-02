@@ -3933,6 +3933,12 @@ md-card.preview-conversation-skin-supplemental-card {
   font-family: "Rubik", "Roboto", Arial, sans-serif;
   font-size: 0.85em;
   padding: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3; /* Truncating to 3 lines*/
+  max-height: 1.35*3; /* For non-webkit browsers
 }
 
 .oppia-activity-summary-tile .rating-disabled {
