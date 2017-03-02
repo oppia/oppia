@@ -149,7 +149,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         response = self.testapp.get('/')
 
         # Even though the exploration is deleted, the user is still redirected
-        # to the dashboard. This is because deleted explorations are still 
+        # to the dashboard. This is because deleted explorations are still
         # associated with their creators.
         self.assertEqual(response.status_int, 302)
         self.assertIn('dashboard', response.headers['location'])
