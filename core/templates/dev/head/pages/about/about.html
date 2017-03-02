@@ -41,9 +41,8 @@
           <div class="about oppia-about-tab-content oppia-about-visible-content">
             <div class="oppia-static-card-content oppia-static-card-content-narrow">
               <h2>About Oppia</h2>
-              <div class="pull-right">
-                <em>Oppia "O-pee-yah" (Finnish) - "to learn"</em>
-              </div>
+	      <center><em>Oppia "O-pee-yah" (Finnish) - "to learn"</em></center> 
+              
               <br>
               <p>
                 Oppia's mission is to help anyone learn anything
@@ -464,7 +463,6 @@
       var activeTabClass = 'oppia-about-tabs-active';
       var hash = window.location.hash.slice(1);
       var visibleContent = 'oppia-about-visible-content';
-
       function activateTab(tabName) {
         $("a[name='" + tabName + "']").parent().addClass(
           activeTabClass
@@ -472,15 +470,12 @@
         $('.' + tabName).addClass(visibleContent).siblings().removeClass(
           visibleContent);
       }
-
       if (hash === 'foundation') {
         activateTab('foundation');
       }
-
       if (hash === 'credits') {
         activateTab('credits');
       }
-
       window.onhashchange = function() {
         var hashChange = window.location.hash.slice(1);
         if (hashChange === 'foundation') {
@@ -489,7 +484,6 @@
           activateTab('credits');
         }
       };
-
       $('.oppia-about-tabs li').on('click', function(evt) {
         evt.preventDefault();
         $(this).addClass(activeTabClass).siblings().removeClass(activeTabClass);
