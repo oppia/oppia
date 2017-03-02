@@ -7,7 +7,7 @@
     </div>
   </md-card>
 
-  <div ng-if="interactionId">
+  <div height-watcher ng-if="interactionId">
     <md-card class="oppia-editor-card-with-avatar">
       <div class="oppia-editor-card-body" title="<[getCurrentInteractionName()]>">
         <img ng-src="<[userBlueImgUrl]>" alt="" class="oppia-editor-card-avatar">
@@ -27,9 +27,17 @@
         </div>
       </div>
     </md-card>
+    <div ng-if="notifyHeight" style="padding-top:4px">
+      <height-guide></height-guide>
+    </div>
   </div>
 </div>
-
+<script type="text/ng-template" id="notify/heightGuide">
+  <span style="color:#0277BD">
+    <i class="material-icons" style="padding-top:5px">&#xE88F;</i>
+    You have reached suggested card height
+  </span>
+</script>
 <script type="text/ng-template" id="modals/customizeInteraction">
   <div class="modal-header" style="border-bottom: 0; padding-bottom: 0;">
     <h3 ng-if="!stateInteractionIdService.displayed">
