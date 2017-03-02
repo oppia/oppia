@@ -124,7 +124,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
     def test_root_redirect_rules_for_logged_in_learners(self):
         self.login(self.TEST_LEARNER_EMAIL)
 
-        # Since no explorations has been created, going to '/' should redirect
+        # Since no exploration has been created, going to '/' should redirect
         # to the library page.
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 302)
