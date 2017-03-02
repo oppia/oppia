@@ -14,7 +14,7 @@
       <ul layout="row" class="card-metrics" layout-align="space-between center">
         <li class="protractor-test-info-card-rating">
           <span class="fa fa-star fa-lg" tooltip="<['I18N_PLAYER_RATINGS_TOOLTIP' | translate]>" tooltip-placement="top">
-            <span class="oppia-icon-btn-label"><['I18N_PLAYER_RATINGS_TOOLTIP' | translate]></span>
+            <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_RATINGS_TOOLTIP' | translate]></span>
           </span>
           <span ng-if="!averageRating" translate="I18N_PLAYER_UNRATED">Unrated</span>
           <span ng-if="averageRating"><[averageRating | number:1]></span>
@@ -22,21 +22,21 @@
 
         <li>
           <span class="fa fa-eye fa-lg" tooltip="<['I18N_PLAYER_VIEWS_TOOLTIP' | translate]>" tooltip-placement="top">
-            <span class="oppia-icon-btn-label"><['I18N_PLAYER_VIEWS_TOOLTIP' | translate]></span>
+            <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_VIEWS_TOOLTIP' | translate]></span>
           </span>
           <[numViews | summarizeNonnegativeNumber]>
         </li>
 
         <li>
           <span class="fa fa-clock-o fa-lg" tooltip="<['I18N_PLAYER_LAST_UPDATED_TOOLTIP' | translate]>" tooltip-placement="top">
-            <span class="oppia-icon-btn-label"><['I18N_PLAYER_LAST_UPDATED_TOOLTIP' | translate]></span>
+            <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_LAST_UPDATED_TOOLTIP' | translate]></span>
           </span>
           <[lastUpdatedString]>
         </li>
 
         <ul layout="row" layout-align="space-between center" class="oppia-info-card-exploration-contributors-profile">
           <i class="material-icons" tooltip="<['I18N_PLAYER_CONTRIBUTORS_TOOLTIP' | translate]>" tooltip-placement="top" style="cursor: default; margin-right: 5px;">&#xE7EF;</i>
-          <span class="oppia-icon-btn-label"><['I18N_PLAYER_CONTRIBUTORS_TOOLTIP' | translate]></span>
+          <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_CONTRIBUTORS_TOOLTIP' | translate]></span>
           <li ng-repeat="name in contributorNames| limitTo: 2"
             tooltip="<[name]>" tooltip-placement="top">
             <profile-link-image username="name">
@@ -62,7 +62,7 @@
               <span class="fa fa-tags fa-lg" tooltip-append-to-body="true"
                     tooltip="<['I18N_PLAYER_TAGS_TOOLTIP' | translate]>"
                     tooltip-placement="top">
-                <span class="oppia-icon-btn-label"><['I18N_PLAYER_TAGS_TOOLTIP' | translate]></span>
+                <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_TAGS_TOOLTIP' | translate]></span>
               </span>
             </div>
             <md-chips layout-align="center center">
@@ -92,7 +92,7 @@
     </div>
     <button type="button" class="oppia-close-popover-button" ng-click="cancel()">
       <i class="material-icons md-18" style="color: white;">&#xE5CD;</i>
-      <span class="oppia-icon-btn-label">Close</span>
+      <span class="oppia-icon-accessibility-label">Close</span>
     </button>
   </md-card>
 </script>

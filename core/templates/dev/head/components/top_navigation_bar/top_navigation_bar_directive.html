@@ -66,6 +66,7 @@
            role="menuitem"
            aria-haspopup="true"
            aria-expanded="false"
+           aria-label="User Menu"
            tabindex="0">
           <div class="oppia-navbar-profile-picture-container">
             <span ng-if="profilePictureDataUrl">
@@ -74,6 +75,7 @@
             </span>
             <span ng-if="!profilePictureDataUrl">
               <i class="material-icons md-40" style="margin-top: -1px;">&#xE853;</i>
+              <span class="oppia-icon-accessibility-label">User Avatar</span>
               <span class="caret" style="margin-top: -26px;"></span>
             </span>
 

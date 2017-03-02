@@ -14,8 +14,13 @@
               aria-haspopup="true"
               aria-expanded="false">
             <div class="dropup" ng-class="{'open':hovering}">
-              <a id="dropdownMenu2" class="dropdown-toggle" ng-class="{'hovered-text':hovering}"
-                 data-toggle="dropdown" ng-if="contributorNames.length > 0">
+              <a id="dropdownMenu2" class="dropdown-toggle"
+                 ng-class="{'hovered-text':hovering}"
+                 data-toggle="dropdown" 
+                 ng-if="contributorNames.length > 0"
+                 role="menuitem"
+                 aria-haspopup="true"
+                 aria-expanded="false">
                 <h4 translate="I18N_FOOTER_AUTHOR_PROFILES" class="author-profile-text"
                     ng-class="{'hovered-text':hovering, 'not-hovered' : !hovering}"></h4>
               </a>
