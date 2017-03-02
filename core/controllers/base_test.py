@@ -139,7 +139,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
             exploration_id, creator_user_id, title='Test',
             category='Test', language_code='en')
 
-        # Since atleast one exploration has been created, going to '/' should
+        # Since at least one exploration has been created, going to '/' should
         # redirect to the dashboard page.
         response = self.testapp.get('/')
         self.assertIn('dashboard', response.headers['location'])
@@ -178,7 +178,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
                 'new_value': 'edited category'
             }], 'Change title and category')
 
-        # Since user has edited one exploration created by another user
+        # Since user has edited one exploration created by another user,
         # going to '/' should redirect to the dashboard page.
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 302)
