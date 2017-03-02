@@ -124,7 +124,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
     def test_root_redirect_rules_for_logged_in_learners(self):
         self.login(self.TEST_LEARNER_EMAIL)
 
-        # Since no explorations have been created, going to '/' should redirect
+        # Since no explorations has been created, going to '/' should redirect
         # to the library page.
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 302)
@@ -139,7 +139,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
             exploration_id, creator_user_id, title='Test',
             category='Test', language_code='en')
 
-        # Since atleast one explorations have been created, going to '/' should
+        # Since atleast one exploration has been created, going to '/' should
         # redirect to the dashboard page.
         response = self.testapp.get('/')
         self.assertIn('dashboard', response.headers['location'])
@@ -148,9 +148,9 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         self.login(self.TEST_CREATOR_EMAIL)
         response = self.testapp.get('/')
 
-        # Must be on dashboard even though exploration is deleted because even
-        # deleted explorations are associated with creators thus the user is
-        # expected to be creator
+        # Even though the exploration is deleted, the user is still redirected
+        # to the dashboard. This is because deleted explorations are still 
+        # associated with their creators.
         self.assertEqual(response.status_int, 302)
         self.assertIn('dashboard', response.headers['location'])
 
@@ -178,7 +178,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
                 'new_value': 'edited category'
             }], 'Change title and category')
 
-        # Since user has edited one explorations created by another user
+        # Since user has edited one exploration created by another user
         # going to '/' should redirect to the dashboard page.
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 302)

@@ -74,8 +74,8 @@ class HomePageRedirectHandler(base.BaseHandler):
             user_contributions = user_services.get_user_contributions(
                 self.user_id)
 
-            # 'Creator' is a user who have created or edited an exploration.
-            userIsCreator = (
+            # 'Creator' is a user who has created or edited an exploration.
+            user_is_creator = (
                 len(user_contributions.created_exploration_ids) > 0 or
                 len(user_contributions.edited_exploration_ids) > 0)
             if userIsCreator:
