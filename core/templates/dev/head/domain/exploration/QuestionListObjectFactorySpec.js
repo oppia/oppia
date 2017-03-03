@@ -174,7 +174,7 @@ describe('Question List Object Factory', function() {
     expect(questionList.getNextStateName(curState)).toEqual(expectedState);
   });
 
-  it('should throw error instead of next state name', function() {
+  it('should throw error instead of returning next state name', function() {
     var randomState = 'Random State';
     expect(function() {
       questionList.getNextStateName(randomState);
@@ -182,10 +182,19 @@ describe('Question List Object Factory', function() {
   });
 
   it('should return bindable question', function() {
-    var expectedQuestion = sampleQuestions[0];
-    var returnedQuestion = questionList.getLastQuestion(
-      expectedQuestion.getStateName());
-    expect(returnedQuestion === expectedQuestion);
+    var stateName = sampleQuestions[0].getStateName();
+    var returnedQuestion1 = questionList.getBindableQuestion(stateName);
+    var returnedQuestion2 = questionList.getBindableQuestion(stateName);
+    expect(returnedQuestion1 === returnedQuestion2).toBe(true);
+  });
+
+  it('should throw error instead of returning bindable question', function() {
+    var randomState = 'Random State';
+    expect(function() {
+      questionList.getBindableQuestion(randomState);
+    }).toThrow(
+      'Cannot find question corresponding to state named: ' + randomState
+    );
   });
 
   it('should return last question', function() {
