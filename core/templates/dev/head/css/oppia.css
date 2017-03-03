@@ -2687,7 +2687,7 @@ div#ng-curtain {
 .oppia-navbar-role-text {
   bottom: 0;
   color: white;
-  font-size: 0.7em;
+  font-size: 1.12rem;
   font-weight: bold;
   position: absolute;
   right: 3px;
@@ -2705,7 +2705,7 @@ div#ng-curtain {
 .oppia-navbar-dashboard-indicator-text {
   bottom: 0;
   color: white;
-  font-size: 0.7em;
+  font-size: 1.12rem;
   font-weight: bold;
   position: absolute;
   right: 4px;
