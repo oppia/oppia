@@ -3988,6 +3988,17 @@ md-card.preview-conversation-skin-supplemental-card {
   margin-right: 2px;
   vertical-align: initial;
 }
+/* Accessibility workaround for icon buttons and links
+  Taken from:
+  https://www.nczonline.net/blog/2013/04/01/making-accessible-icon-buttons/
+  Use for all links and buttons that only use an icon */
+.oppia-icon-accessibility-label {
+  display: block;
+  font-size: 0;
+  height: 1px;
+  overflow: hidden;
+  width: 0px;
+}
 
 .oppia-activity-summary-tile .recently-updated {
   color: rgb(19,105,193);

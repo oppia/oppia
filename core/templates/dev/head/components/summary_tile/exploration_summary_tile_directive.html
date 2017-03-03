@@ -36,6 +36,7 @@
           <li>
             <span class="protractor-test-exp-summary-tile-rating" ng-class="{'rating-disabled': !getAverageRating()}">
               <span class="fa fa-star fa-lg" tooltip="<['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]>" tooltip-placement="top">
+                <span class="oppia-icon-accessibility-label"><['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]></span>
               </span>
               <span ng-if="getAverageRating()">
                 <[getAverageRating() | number:1]>
@@ -47,12 +48,14 @@
 
           <li>
             <span class="fa fa-eye fa-lg" tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>" tooltip-placement="top">
+              <span class="oppia-icon-accessibility-label"><['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]></span>
             </span>
             <[getNumViews() | summarizeNonnegativeNumber]>
           </li>
 
           <li>
             <span>
+              <span class="oppia-icon-accessibility-label">Last Updated</span>
               <[getLastUpdatedDatetime()]>
             </span>
           </li>
