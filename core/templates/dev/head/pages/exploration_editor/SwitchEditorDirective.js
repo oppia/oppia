@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for showing Editor Navigation
- * in editor.
+ * @fileoverview Directive for Editor switch button.
  */
 
 oppia.directive('switchEditor', [function() {
