@@ -403,9 +403,6 @@ oppia.controller('ExplorationEditor', [
       });
     };
 
-    // For switching exploration editor
-    $scope.setEditorModeToFull = EditorModeService.setModeToFull;
-    $scope.setEditorModeToSimple = EditorModeService.setModeToSimple;
 
     $scope.$on(
       'enterEditorForTheFirstTime', $scope.showWelcomeExplorationModal);

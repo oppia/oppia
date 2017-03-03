@@ -128,19 +128,8 @@
         {% include 'pages/exploration_editor/feedback_tab/thread_table_directive.html' %}
       </div>
     </div>
+    <switch-editor></switch-editor>
 
-    <div class="switch-editor-btn-container">
-      <div class="switch-editor-btn-head">
-        <i class="fa fa-chevron-up switch-button-up" aria-hidden="true"></i>
-        <i class="fa fa-chevron-down switch-button-down" aria-hidden="true"></i>
-      </div>
-      <button type="button" class="btn btn-default switch-editor-btn" ng-click="setEditorModeToFull()" ng-if="isEditorInSimpleMode()">
-        Use Advanced Editor
-      </button>
-      <button type="button" class="btn btn-default switch-editor-btn" ng-click="setEditorModeToSimple()" ng-if="isEditorInFullMode()">
-        Use Simple Editor
-      </button>
-    </div>
   </div>
 
   <!-- These definitions must be included exactly once on the page for the graph SVGs to work in Firefox. -->
@@ -185,6 +174,8 @@
 
   {% include 'pages/exploration_player/tutor_card_directive.html' %}
   {% include 'pages/exploration_player/supplemental_card_directive.html' %}
+
+  {% include 'pages/exploration_editor/switch_editor_directive.html' %}
   {% include 'pages/exploration_editor/editor_navigation_directive.html' %}
   {% include 'pages/exploration_editor/editor_navbar_breadcrumb_directive.html' %}
   {% include 'pages/exploration_editor/editor_reloading_modal_directive.html' %}
@@ -291,6 +282,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/messengerService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/utilsService.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/SwitchEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationEditor.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorModeService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorNavbarBreadcrumbDirective.js"></script>
