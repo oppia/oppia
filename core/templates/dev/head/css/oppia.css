@@ -3929,7 +3929,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-activity-summary-tile .objective {
   height: 70px;
-  line-height: 1.35;
+  line-height: 1.26;
   font-family: "Rubik", "Roboto", Arial, sans-serif;
   font-size: 0.85em;
   padding: 12px;
@@ -3938,7 +3938,7 @@ md-card.preview-conversation-skin-supplemental-card {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3; /* Truncating to 3 lines*/
-  max-height: 1.35*3; /* For non-webkit browsers
+  max-height: 4.41176471em; /*1.26 (line-height) * 3 / 0.85 (font-size) */
 }
 
 .oppia-activity-summary-tile .rating-disabled {
@@ -3957,6 +3957,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-activity-summary-tile .metrics {
   height: 30px;
   margin: 0 12px;
+  margin-top: 10px;
   padding: 0;
 }
 
