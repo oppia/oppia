@@ -10,7 +10,7 @@
         </div>
         <input type="text" class="form-control oppia-search-bar-input oppia-search-bar-text-input protractor-test-search-input"
                ng-attr-placeholder="<[searchBarPlaceholder]>" ng-model="searchQuery"
-               ng-model-options="{ updateOn: 'default blur', debounce: { 'default': 1000, 'blur': 0 } }">
+               ng-model-options="{ updateOn: 'default blur', debounce: { 'default': 1000, 'blur': 0 } }" aria-label="Search bar">
       </div>
     </div>
   </form>
@@ -94,8 +94,14 @@
   .oppia-search-bar-input.btn {
     color: rgba(255,255,255,0.7);
   }
-  .oppia-search-bar-input.btn:hover {
+  .oppia-search-bar-input.btn:hover,
+  .oppia-search-bar-input.btn:focus {
     color: #fff;
+  }
+
+  .oppia-search-bar-input.btn:focus {
+    outline: 1px dotted #fff;
+    outline: auto 5px -webkit-focus-ring-color;
   }
 
   .oppia-search-bar-input::-webkit-input-placeholder {
@@ -138,4 +144,3 @@
     }
   }
 </style>
-

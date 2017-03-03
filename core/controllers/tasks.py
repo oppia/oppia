@@ -23,7 +23,8 @@ from core.domain import feedback_services
 from core.domain import rights_manager
 from core.platform import models
 
-(job_models,) = models.Registry.import_models([models.NAMES.job])
+(job_models, email_models) = models.Registry.import_models(
+    [models.NAMES.job, models.NAMES.email])
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -102,10 +103,16 @@ class InstantFeedbackMessageEmailHandler(base.BaseHandler):
         thread = feedback_services.get_thread(
             reference_dict['exploration_id'], reference_dict['thread_id'])
 
+        model = email_models.FeedbackEmailReplyToIdModel.get(
+            user_id, reference_dict['exploration_id'],
+            reference_dict['thread_id'])
+        reply_to_id = model.reply_to_id
+
         subject = 'New Oppia message in "%s"' % thread.subject
         email_manager.send_instant_feedback_message_email(
             user_id, message.author_id, message.text, subject,
-            exploration.title, reference_dict['exploration_id'], thread.subject)
+            exploration.title, reference_dict['exploration_id'],
+            thread.subject, reply_to_id)
 
 
 class FeedbackThreadStatusChangeEmailHandler(base.BaseHandler):

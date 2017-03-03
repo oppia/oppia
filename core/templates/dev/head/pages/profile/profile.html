@@ -29,7 +29,7 @@
     <md-card class="oppia-profile-user-card">
       <div class="oppia-profile-picture-container">
         <div ng-if="profileIsOfCurrentUser" class="oppia-profile-picture">
-          <a href="/preferences">
+          <a href="/preferences" class="oppia-profile-prefererences">
             <div class="oppia-profile-picture-mask">
               <div class="oppia-profile-picture-edit-prompt">
                 Edit avatar
@@ -130,7 +130,7 @@
     </md-card>
 
     <div ng-if="!isUserVisitingOwnProfile">
-      <button class="btn oppia-subscription-button oppia-transition-200"
+      <button class="btn oppia-subscription-button oppia-transition-200 protractor-test-subscription-button"
               ng-click="changeSubscriptionStatus()"
               popover-placement="right"
               ng-attr-popover="<[subscriptionButtonPopoverText]>"
@@ -158,4 +158,9 @@
 {% block footer_js %}
   {{ super() }}
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/profile/Profile.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CircularImageDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
 {% endblock footer_js %}

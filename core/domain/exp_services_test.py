@@ -570,6 +570,7 @@ skin_customizations:
     bottom: []
 states:
   %s:
+    classifier_model_id: null
     content:
     - type: text
       value: ''
@@ -589,6 +590,7 @@ states:
       id: TextInput
     param_changes: []
   New state:
+    classifier_model_id: null
     content:
     - type: text
       value: ''
@@ -631,6 +633,7 @@ skin_customizations:
     bottom: []
 states:
   %s:
+    classifier_model_id: null
     content:
     - type: text
       value: ''
@@ -650,6 +653,7 @@ states:
       id: TextInput
     param_changes: []
   Renamed state:
+    classifier_model_id: null
     content:
     - type: text
       value: ''
@@ -762,7 +766,8 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
     are state names and whose values are YAML strings representing the state's
     contents."""
 
-    _SAMPLE_INIT_STATE_CONTENT = ("""content:
+    _SAMPLE_INIT_STATE_CONTENT = ("""classifier_model_id: null
+content:
 - type: text
   value: ''
 interaction:
@@ -784,7 +789,8 @@ param_changes: []
 
     SAMPLE_EXPORTED_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
-        'New state': ("""content:
+        'New state': ("""classifier_model_id: null
+content:
 - type: text
   value: ''
 interaction:
@@ -807,7 +813,8 @@ param_changes: []
 
     UPDATED_SAMPLE_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
-        'Renamed state': ("""content:
+        'Renamed state': ("""classifier_model_id: null
+content:
 - type: text
   value: ''
 interaction:
@@ -2377,6 +2384,7 @@ skin_customizations:
     bottom: []
 states:
   END:
+    classifier_model_id: null
     content:
     - type: text
       value: Congratulations, you have finished!
@@ -2391,6 +2399,7 @@ states:
       id: EndExploration
     param_changes: []
   %s:
+    classifier_model_id: null
     content:
     - type: text
       value: ''
@@ -2617,7 +2626,6 @@ title: Old Title
         # The converted exploration should be up-to-date and properly
         # converted.
         self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
-
 
 class SuggestionActionUnitTests(test_utils.GenericTestBase):
     """Test learner suggestion action functions in exp_services."""
