@@ -27,7 +27,7 @@ import utils
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
 
 class ClassifierServicesTests(test_utils.GenericTestBase):
-    """Test reader.classify using the sample explorations.
+    """Test classify using the sample explorations.
 
     Since the end to end tests cover correct classification, and frontend tests
     test hard rules, ReaderClassifyTests is only checking that the string
@@ -73,6 +73,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
     def test_string_classifier_classification(self):
         """All these responses trigger the string classifier."""
+
         with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
             self.assertTrue(
                 self._is_string_classifier_called(
@@ -88,6 +89,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
     def test_retrieval_of_classifiers(self):
         """Test the get_classifier_by_id method."""
+
         with self.assertRaisesRegexp(Exception, (
             "Entity for class ClassifierModel with id fake_id not found")):
             classifier_services.get_classifier_by_id('fake_id')
@@ -104,6 +106,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
     def test_update_of_classifiers(self):
         """Test the update_classifier method."""
+
         exp_id = u'1'
         state = 'Home'
         test_state = 'State'
@@ -121,6 +124,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
     def test_deletion_of_classifiers(self):
         """Test the delete_classifier method."""
+
         exp_id = u'1'
         state = 'Home'
         classifier_id = classifier_models.ClassifierModel.create(

@@ -24,6 +24,7 @@ import feconf
 
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
 
+
 def classify(state, answer):
     """Classify the answer using the string classifier.
 
@@ -140,11 +141,12 @@ def get_classifier_from_model(classifier_model):
         classifier_model.cached_classifier_data,
         classifier_model.data_schema_version)
 
+
 def get_classifier_by_id(classifier_id):
     """Gets a classifier from a classifier id.
 
     Args:
-        classifier_id: Str. Id of the classifier.
+        classifier_id: str. ID of the classifier.
 
     Returns:
         classifier: Domain object for the classifier.
@@ -179,13 +181,7 @@ def _save_classifier(classifier_model, classifier):
         classifier: Domain object for the classifier.
 
     Note: Most of the properties of a classifier are immutable.
-    The only property that can change is the state_name. Since,
-    exp_version_when_created will never change, algorithm_id of
-    the algorithm used to generate this model will not change,
-    cached_classifier_data is essentially the model generated
-    which won't change (if you change that you will have to
-    create a new ClassifierModel instance itself!) and
-    data_schema_version should also not change.
+    state_name is the only mutable property.
     """
     classifier_model.state_name = classifier.state_name
     classifier_model.put()
