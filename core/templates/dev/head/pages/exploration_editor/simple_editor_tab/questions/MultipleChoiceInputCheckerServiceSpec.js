@@ -18,19 +18,82 @@
 
  describe('Multiple Choice Input Checker Service', function() {
    var multipleChoiceInputCheckerService;
+   var stubs ;
+   var validInput ;
+   var invalidInput;
 
-   beforeEach(module('oppia'));
+   beforeEach(function() {
+     validInput = {
+       answerGroups = [
+         {
+           ruleSpecs : [
+             {
+               inputs : {
+                 x : 1;
+               },
+               rule_type : "Equals";
+             }
+           ],
+           outcome : {
+             dest : "Question 1";
+           }
+         }
+       ],
+       customizationArgs = {
+         choices : {
+           value : [
+             "<p>Option 1</p>"
+           ]
+         }
+       }
+     };
+
+     invalidInput  = {
+       answerGroups = [
+         {
+           ruleSpecs : [
+             {
+               inputs : {
+                 x : 1;
+               }
+             }
+           ],
+           outcome : {
+             dest : "Question 1";
+           }
+         }
+       ],
+       customizationArgs = {
+         choices : {
+           valueOpt : [
+             "<p>Option 1</p>"
+           ]
+         }
+       }
+     };
+
+     stubs = {
+       valid : validInput,
+       invalid : invalidInput
+     };
+
+     module('oppia'));
+   });
 
    beforeEach(inject(function($injector) {
      multipleChoiceInputCheckerService =
      $injector.get('MultipleChoiceInputCheckerService');
    }));
 
-   it('Should return true if interaction data is compatible', function() {
-     expect(multipleChoiceInputCheckerService.isValid()).toEqual(true);
+   it('should return true if interaction data is compatible', function() {
+     expect(multipleChoiceInputCheckerService
+       .isValid(stubs.valid.customizationArgs, stubs.valid.answerGroups))
+       .toEqual(true);
    });
 
-   it('Should return flase if interaction data is not compatible', function() {
-     expect(multipleChoiceInputCheckerService.isValid()).toEqual(false);
+   it('should return false if interaction data is not compatible', function() {
+     expect(multipleChoiceInputCheckerService
+       .isValid(stubs.invalid.customizationArgs, stubs.invalid.answerGroups))
+       .toEqual(false);
    });
  });
