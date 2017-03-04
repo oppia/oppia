@@ -3926,19 +3926,21 @@ md-card.preview-conversation-skin-supplemental-card {
   position: absolute;
   word-break: break-all;
 }
-
 .oppia-activity-summary-tile .objective {
-  height: 70px;
-  line-height: 1.26;
+  display: -webkit-box;
   font-family: "Rubik", "Roboto", Arial, sans-serif;
   font-size: 0.85em;
-  padding: 12px;
+  height: 70px;
+  line-height: 1.26;
+  /*`max-height` is calculated as: 1.26 (line-height) * 3 (lines) / 0.85
+  (font-size). An additional (1.26 (line-height) * 0.85 (font-size) * 0.25) is added
+  toaccount for letters (like y,jand g) that fall beneath the baseline. */
+  max-height: 4.68em;
   overflow: hidden;
+  padding: 12px;
   text-overflow: ellipsis;
-  display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3; /* Truncating to 3 lines*/
-  max-height: 4.41176471em; /*1.26 (line-height) * 3 / 0.85 (font-size) */
+  -webkit-line-clamp: 3; /* Truncating to 3 lines. */
 }
 
 .oppia-activity-summary-tile .rating-disabled {
@@ -3956,8 +3958,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-activity-summary-tile .metrics {
   height: 30px;
-  margin: 0 12px;
-  margin-top: 10px;
+  margin: 10px 12px 0;
   padding: 0;
 }
 
