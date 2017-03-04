@@ -172,7 +172,7 @@ def _create_classifier(classifier):
         )
 
 
-def _save_classifier(classifier_model, classifier):
+def _update_classifier(classifier_model, classifier):
     """Updates classifier model in the datastore given a classifier
     domain object.
 
@@ -187,9 +187,9 @@ def _save_classifier(classifier_model, classifier):
     classifier_model.put()
 
 
-def update_classifier(classifier):
+def save_classifier(classifier):
     """Checks if model exists and updates the classifier model using
-    _save_classifier method.
+    _update_classifier method.
 
     Args:
         classifier: Domain object for the classifier.
@@ -203,7 +203,7 @@ def delete_classifier(classifier_id):
     """Deletes classifier model in the datastore given classifier_id.
 
     Args:
-        classifier_id: Str. Id of the classifier.
+        classifier_id: str. ID of the classifier.
     """
     classifier_model = classifier_models.ClassifierModel.get(
         classifier_id)

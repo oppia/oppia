@@ -116,7 +116,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         classifier = classifier_services.get_classifier_by_id(
             classifier_id)
         classifier.state_name = test_state
-        classifier_services.update_classifier(classifier)
+        classifier_services.save_classifier(classifier)
         classifier = classifier_services.get_classifier_by_id(
             classifier_id)
         self.assertEqual(classifier.exp_id, exp_id)
