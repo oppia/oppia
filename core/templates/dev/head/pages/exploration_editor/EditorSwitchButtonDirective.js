@@ -16,10 +16,10 @@
  * @fileoverview Directive for Editor switch button.
  */
 
-oppia.directive('switchEditor', [function() {
+oppia.directive('editorSwitchButton', [function() {
   return {
     restrict: 'E',
-    templateUrl: 'inline/switch_editor_directive',
+    templateUrl: 'inline/editor_switch_button_directive',
     controller: [
       '$scope', 'EditorModeService',
       function(
