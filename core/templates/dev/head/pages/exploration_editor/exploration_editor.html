@@ -128,6 +128,8 @@
         {% include 'pages/exploration_editor/feedback_tab/thread_table_directive.html' %}
       </div>
     </div>
+    <editor-switch-button></editor-switch-button>
+
   </div>
 
   <!-- These definitions must be included exactly once on the page for the graph SVGs to work in Firefox. -->
@@ -172,6 +174,8 @@
 
   {% include 'pages/exploration_player/tutor_card_directive.html' %}
   {% include 'pages/exploration_player/supplemental_card_directive.html' %}
+
+  {% include 'pages/exploration_editor/editor_switch_button_directive.html' %}
   {% include 'pages/exploration_editor/editor_navigation_directive.html' %}
   {% include 'pages/exploration_editor/editor_navbar_breadcrumb_directive.html' %}
   {% include 'pages/exploration_editor/editor_reloading_modal_directive.html' %}
@@ -278,6 +282,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/messengerService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/utilsService.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorSwitchButtonDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationEditor.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorModeService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorNavbarBreadcrumbDirective.js"></script>
