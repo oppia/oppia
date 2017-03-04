@@ -312,6 +312,7 @@ md-card.oppia-profile-content-card {
 
 md-content.oppia-profile-portfolio-container {
   background-color: transparent;
+  text-align: -webkit-center;
 }
 
 .oppia-profile-portfolio-pages {

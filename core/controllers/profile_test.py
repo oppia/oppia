@@ -15,6 +15,7 @@
 """Tests for the profile page."""
 
 from core.domain import exp_services
+from core.domain import collection_services
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
@@ -499,6 +500,7 @@ class UserContributionsTests(test_utils.GenericTestBase):
     USERNAME_B = 'b'
     EMAIL_B = 'b@example.com'
     EXP_ID_1 = 'exp_id_1'
+    COLLECTION_ID_1 = 'collection_id_1'
 
     def test_null_case(self):
         # Check that the profile page for a user with no contributions shows
@@ -534,6 +536,31 @@ class UserContributionsTests(test_utils.GenericTestBase):
             response_dict['edited_exp_summary_dicts'][0]['id'],
             self.EXP_ID_1)
 
+
+    def test_created_collection(self):
+        # check that the profile page for a user who has created
+        # a single collection shows 2 created and 2 edited.
+        self.signup(self.EMAIL_A, self.USERNAME_A)
+        user_a_id = self.get_user_id_from_email(self.EMAIL_A)
+
+        self.save_new_valid_collection(
+            self.COLLECTION_ID_1, user_a_id, end_state_name='End')
+        rights_manager.publish_collection(user_a_id, self.COLLECTION_ID_1)
+
+        response_dict = self.get_json(
+            '/profilehandler/data/%s' % self.USERNAME_A)
+
+        self.assertEqual(len(
+            response_dict['created_collection_summary_dicts']), 1)
+        self.assertEqual(len(
+            response_dict['edited_collection_summary_dicts']), 1)
+        self.assertEqual(
+            response_dict['created_collection_summary_dicts'][0]['id'],
+            self.COLLECTION_ID_1)
+        self.assertEqual(
+            response_dict['edited_collection_summary_dicts'][0]['id'],
+            self.COLLECTION_ID_1)
+
     def test_edited(self):
         # Check that the profile page for a user who has created
         # a single exploration shows 0 created and 1 edited exploration.
@@ -565,6 +592,46 @@ class UserContributionsTests(test_utils.GenericTestBase):
         self.assertEqual(
             response_dict['edited_exp_summary_dicts'][0]['objective'],
             'the objective')
+
+
+    def test_edited_collection(self):
+        # Check that the profile page for a user who has edited
+        # a single collection shows 0 created and 1 edited.
+        self.signup(self.EMAIL_A, self.USERNAME_A)
+        user_a_id = self.get_user_id_from_email(self.EMAIL_A)
+
+        self.signup(self.EMAIL_B, self.USERNAME_B)
+        user_b_id = self.get_user_id_from_email(self.EMAIL_B)
+
+        self.save_new_valid_collection(
+            self.COLLECTION_ID_1, user_a_id, end_state_name='End',
+            exploration_id='an_exploration_id')
+
+        rights_manager.publish_exploration(user_a_id,
+                                           exploration_id='an_exploration_id')
+        rights_manager.publish_collection(user_a_id, self.COLLECTION_ID_1)
+
+        collection_services.update_collection(user_b_id, self.COLLECTION_ID_1, [{        #pylint:disable=line-too-long
+            'cmd': 'edit_collection_property',
+            'property_name': 'objective',
+            'new_value': 'the objective',
+            }], 'Test edit')
+
+        response_dict = self.get_json(
+            '/profilehandler/data/%s' % self.USERNAME_B)
+        self.assertEqual(len(
+            response_dict['created_collection_summary_dicts']), 0)
+        self.assertEqual(len(
+            response_dict['edited_collection_summary_dicts']), 1)
+        self.assertEqual(
+            response_dict['edited_collection_summary_dicts'][0]['id'],
+            self.COLLECTION_ID_1)
+        self.assertEqual(
+            response_dict['edited_collection_summary_dicts'][0]['objective'],
+            'the objective')
+
+
+
 
 
 class SiteLanguageHandlerTests(test_utils.GenericTestBase):

@@ -50,6 +50,8 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
 
         created_exploration_ids = set()
         edited_exploration_ids = set()
+        created_collection_ids = set()
+        edited_collection_ids = set()
 
         edits = [ast.literal_eval(v) for v in version_and_exp_ids]
 
@@ -61,11 +63,13 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
         if user_services.get_user_contributions(key, strict=False) is not None:
             user_services.update_user_contributions(
                 key, list(created_exploration_ids), list(
-                    edited_exploration_ids))
+                    edited_exploration_ids), list(created_collection_ids),
+                list(edited_collection_ids))
         else:
             user_services.create_user_contributions(
                 key, list(created_exploration_ids), list(
-                    edited_exploration_ids))
+                    edited_exploration_ids), list(created_collection_ids),
+                list(edited_collection_ids))
 
 
 class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
