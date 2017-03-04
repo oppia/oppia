@@ -63,12 +63,6 @@ oppia.factory('CollectionEditorStateService', [
     };
     var _setCollectionRights = function(collectionRights) {
       _collectionRights.copyFromCollectionRights(collectionRights);
-      if (_collectionIsInitialized) {
-        $rootScope.$broadcast(EVENT_COLLECTION_REINITIALIZED);
-      } else {
-        $rootScope.$broadcast(EVENT_COLLECTION_INITIALIZED);
-        _collectionIsInitialized = true;
-      }
     };
     var _updateCollectionRights = function(newBackendCollectionRightsObject) {
       _setCollectionRights(CollectionRightsObjectFactory.create(
@@ -107,6 +101,7 @@ oppia.factory('CollectionEditorStateService', [
             alertsService.addWarning(
               error ||
               'There was an error when loading the collection rights.');
+            _isLoadingCollection = false;
           });
       },
 

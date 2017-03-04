@@ -43,6 +43,24 @@ describe('Collection rights object factory', function() {
     expect(sampleCollectionRights.getOwnerNames()).toEqual(['A']);
   });
 
+  it('should accept accept changes to the bindable list of collection nodes',
+     function() {
+    var initialCollectionRightsBackendObject = {
+      collection_id: 0,
+      can_edit: true,
+      can_unpublish: false,
+      is_private: true,
+      owner_names: ['A']
+    };
+
+    sampleCollectionRights = CollectionRightsObjectFactory.create(
+      initialCollectionRightsBackendObject);
+    var ownerNames = sampleCollectionRights.getBindableOwnerNames();
+    ownerNames.push('B');
+
+    expect(sampleCollectionRights.getOwnerNames()).toEqual(['A', 'B']);
+  });
+
   it('should be able to set public when canEdit is true', function() {
     var initialCollectionRightsBackendObject = {
       collection_id: 0,

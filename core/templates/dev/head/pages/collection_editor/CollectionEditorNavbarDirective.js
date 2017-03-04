@@ -39,7 +39,8 @@ oppia.directive('collectionEditorNavbar', [function() {
         $scope.collectionRights = (
           CollectionEditorStateService.getCollectionRights());
 
-        $scope.isPageLoading = CollectionEditorStateService.isLoadingCollection;
+        $scope.isCollectionLoading = (
+          CollectionEditorStateService.isLoadingCollection);
         $scope.validationIssues = [];
         $scope.isSaveInProgress = (
           CollectionEditorStateService.isSavingCollection);
@@ -71,9 +72,6 @@ oppia.directive('collectionEditorNavbar', [function() {
           CollectionRightsBackendApiService.setCollectionPublic(
             $scope.collectionId, $scope.collection.getVersion()).then(
             function() {
-              // TODO(bhenning): There should be a scope-level rights object
-              // used, instead. The rights object should be loaded with the
-              // collection.
               $scope.collectionRights.setPublic();
               CollectionEditorStateService.setCollectionRights(
                 $scope.collectionRights);

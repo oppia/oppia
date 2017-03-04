@@ -54,17 +54,18 @@ oppia.factory('CollectionRightsObjectFactory', [
       return !this._isPrivate;
     };
 
+    // Sets isPrivate to false only if canEdit in is true.
     CollectionRights.prototype.setPublic = function() {
-      if (this._canEdit) {
+      if (this.canEdit()) {
         this._isPrivate = false;
       } else {
         throw new Error('User is not allowed to edit this collection.');
       }
     };
 
-    // Sets isPrivate to true only if canUnpublish in is true.
+    // Sets isPrivate to true only if canUnpublish and canEdit are both true.
     CollectionRights.prototype.setPrivate = function() {
-      if (this.canUnpublish()) {
+      if (this.canEdit() && this.canUnpublish()) {
         this._isPrivate = true;
       } else {
         throw new Error('User is not allowed to unpublish this collection.');
@@ -74,6 +75,16 @@ oppia.factory('CollectionRightsObjectFactory', [
     // Returns the owner names of the collection. This property is immutable.
     CollectionRights.prototype.getOwnerNames = function() {
       return angular.copy(this._ownerNames);
+    };
+
+    // Returns the reference to the internal ownerNames array; this function is
+    // only meant to be used for Angular bindings and should never be used in
+    // code. Please use getOwnerNames() and related functions, instead. Please
+    // also be aware this exposes internal state of the collection rights domain
+    // object, so changes to the array itself may internally break the domain
+    // object.
+    CollectionRights.prototype.getBindableOwnerNames = function() {
+      return this._ownerNames;
     };
 
     // Static class methods. Note that "this" is not available in static
@@ -97,8 +108,8 @@ oppia.factory('CollectionRightsObjectFactory', [
       this._ownerNames = otherCollectionRights.getOwnerNames();
     };
 
-    // Create a new, empty collection rights. This is not guaranteed to pass
-    // validation tests.
+    // Create a new, empty collection rights object. This is not guaranteed to
+    // pass validation tests.
     CollectionRights.createEmptyCollectionRights = function() {
       return new CollectionRights({
         owner_names: []

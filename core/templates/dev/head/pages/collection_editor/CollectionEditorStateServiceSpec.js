@@ -52,14 +52,14 @@ describe('Collection editor state service', function() {
     var _fetchCollectionRights = function() {
       return $q(function(resolve, reject) {
         if (!self.failure) {
-          resolve(self.newBackendCollectionRightsObject);
+          resolve(self.backendCollectionRightsObject);
         } else {
           reject();
         }
       });
     };
 
-    self.newBackendCollectionRightsObject = {};
+    self.backendCollectionRightsObject = {};
     self.failure = null;
     self.fetchCollectionRights = _fetchCollectionRights;
 
@@ -126,16 +126,19 @@ describe('Collection editor state service', function() {
       }]
     };
 
-    fakeCollectionRightsBackendApiService.newBackendCollectionRightsObject = {
+    privateCollectionRightsObject = {
       collection_id: '5',
       can_edit: 'true',
       can_unpublish: 'false',
       is_private: 'true',
       owner_names: ['A']
     };
-    secondBackendCollectionRightsObject = {
+    fakeCollectionRightsBackendApiService.backendCollectionRightsObject = (
+      privateCollectionRightsObject);
+
+    unpublishablePublicCollectionRightsObject = {
       collection_id: '5',
-      can_edit: 'false',
+      can_edit: 'true',
       can_unpublish: 'true',
       is_private: 'false',
       owner_names: ['A']
@@ -153,7 +156,7 @@ describe('Collection editor state service', function() {
   });
 
   it('should request to load the collection rights from the backend',
-    function() {
+      function() {
     spyOn(
       fakeCollectionRightsBackendApiService,
       'fetchCollectionRights').andCallThrough();
@@ -274,7 +277,7 @@ describe('Collection editor state service', function() {
     var previousCollectionRights = (
       CollectionEditorStateService.getCollectionRights());
     var expectedCollectionRights = CollectionRightsObjectFactory.create(
-      fakeCollectionRightsBackendApiService.newBackendCollectionRightsObject);
+      fakeCollectionRightsBackendApiService.backendCollectionRightsObject);
     expect(previousCollectionRights).not.toEqual(expectedCollectionRights);
 
     CollectionEditorStateService.loadCollection(5);
@@ -315,7 +318,7 @@ describe('Collection editor state service', function() {
     var previousCollectionRights = (
       CollectionEditorStateService.getCollectionRights());
     var expectedCollectionRights = CollectionRightsObjectFactory.create(
-      secondBackendCollectionRightsObject);
+      unpublishablePublicCollectionRightsObject);
     expect(previousCollectionRights).not.toEqual(expectedCollectionRights);
 
     CollectionEditorStateService.setCollectionRights(expectedCollectionRights);
@@ -342,22 +345,6 @@ describe('Collection editor state service', function() {
     var newCollection = CollectionObjectFactory.create(
       secondBackendCollectionObject);
     CollectionEditorStateService.setCollection(newCollection);
-
-    expect($rootScope.$broadcast).toHaveBeenCalledWith(
-      'collectionReinitialized');
-  });
-
-  it('should fire an update event after setting the new collection rights',
-      function() {
-    // Load initial collection.
-    CollectionEditorStateService.loadCollection(5);
-    $rootScope.$apply();
-
-    spyOn($rootScope, '$broadcast').andCallThrough();
-
-    var newCollectionRights = CollectionRightsObjectFactory.create(
-      secondBackendCollectionRightsObject);
-    CollectionEditorStateService.setCollectionRights(newCollectionRights);
 
     expect($rootScope.$broadcast).toHaveBeenCalledWith(
       'collectionReinitialized');

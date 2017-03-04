@@ -72,7 +72,6 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
             '%s/%s?v=1' % (feconf.COLLECTION_DATA_URL_PREFIX,
                            self.COLLECTION_ID))
         self.assertEqual(response.status_int, 200)
-        self.assertIn('Introduction to Collections in Oppia', response.body)
 
         # Check that non-editors cannot access the editor page. This is due
         # to them not being whitelisted.
@@ -87,7 +86,6 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
             '%s/%s' % (feconf.COLLECTION_EDITOR_URL_PREFIX,
                        self.COLLECTION_ID))
         self.assertEqual(response.status_int, 200)
-        self.assertIn('Introduction to Collections in Oppia', response.body)
         self.logout()
 
     def test_editable_collection_handler_get(self):
@@ -111,9 +109,6 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
             '%s/%s' % (feconf.EDITABLE_COLLECTION_DATA_URL_PREFIX,
                        self.COLLECTION_ID))
         self.assertEqual(self.COLLECTION_ID, json_response['collection']['id'])
-        self.assertEqual(
-            'Introduction to Collections in Oppia',
-            json_response['collection']['title'])
         self.logout()
 
     def test_editable_collection_handler_put_cannot_access(self):
@@ -178,8 +173,6 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
 
         self.assertEqual(self.COLLECTION_ID, json_response['collection']['id'])
         self.assertEqual(2, json_response['collection']['version'])
-        self.assertEqual(
-            'A new title', json_response['collection']['title'])
         self.logout()
 
     def test_collection_rights_handler(self):

@@ -89,10 +89,10 @@ oppia.factory('CollectionRightsBackendApiService', [
         },
 
         /**
-         * Behaves in the exactly as fetchCollectionRights (including callback
+         * Behaves exactly as fetchCollectionRights (including callback
          * behavior and returning a promise object), except this function will
-         * attempt to see whether the given collection rights has already been
-         * loaded. If it has not yet been loaded, it will fetch the collection
+         * attempt to see whether the given collection rights has been
+         * cached. If it has not yet been cached, it will fetch the collection
          * rights from the backend. If it successfully retrieves the collection
          * rights from the backend, it will store it in the cache to avoid
          * requests from the backend in further function calls.

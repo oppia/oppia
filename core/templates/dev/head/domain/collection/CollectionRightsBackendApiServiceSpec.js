@@ -100,7 +100,7 @@ describe('Collection rights backend API service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     // The collection should not currently be cached.
-    expect(CollectionRightsBackendApiService.isCached('0')).toBeFalsy();
+    expect(CollectionRightsBackendApiService.isCached('0')).toBe(false);
 
     // Cache a collection.
     CollectionRightsBackendApiService.cacheCollectionRights('0', {
@@ -112,7 +112,7 @@ describe('Collection rights backend API service', function() {
     });
 
     // It should now be cached.
-    expect(CollectionRightsBackendApiService.isCached('0')).toBeTruthy();
+    expect(CollectionRightsBackendApiService.isCached('0')).toBe(true);
 
     // A new collection should not have been fetched from the backend. Also,
     // the returned collection should match the expected collection object.
