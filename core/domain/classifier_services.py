@@ -196,7 +196,7 @@ def save_classifier(classifier):
     """
     classifier_model = classifier_models.ClassifierModel.get(
         classifier.id)
-    _save_classifier(classifier_model, classifier)
+    _update_classifier(classifier_model, classifier)
 
 
 def delete_classifier(classifier_id):
