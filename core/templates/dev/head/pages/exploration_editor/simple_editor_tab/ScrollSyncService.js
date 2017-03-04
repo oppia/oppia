@@ -18,15 +18,16 @@
  */
 
 oppia.factory('ScrollSyncService', [
-  '$anchorScroll', '$document', '$rootScope', 'QuestionIdService',
+  '$document', '$rootScope', 'QuestionIdService',
   'SimpleEditorManagerService',
-  function($anchorScroll, $document, $rootScope, QuestionIdService,
+  function($document, $rootScope, QuestionIdService,
            SimpleEditorManagerService) {
     var targets = [];
     var questionList = SimpleEditorManagerService.getQuestionList();
     var oppiaNavBarHeight = angular.element('.navbar-container').height();
     var CSS_CLASS_HIGHLIGHTED = 'highlighted';
     var HIGHLIGHTED_ELM_SELECTOR = 'simple-editor-sidebar .highlighted';
+    var Y_OFFSET_SMOOTH_SCROLL = 80;
 
     var clearSidebarHighlight = function() {
       angular.element(HIGHLIGHTED_ELM_SELECTOR)
@@ -43,8 +44,6 @@ oppia.factory('ScrollSyncService', [
         }
       };
     };
-
-    $anchorScroll.yOffset = 80;
 
     var scrollSyncService = {
       // Add an element to the targets list, when a user scrolls to an element
@@ -76,7 +75,12 @@ oppia.factory('ScrollSyncService', [
       },
       // Scroll to an element in the editor given its id.
       scrollTo: function(id) {
-        $anchorScroll(id);
+        var element = angular.element($document[0].getElementById(id));
+        if (element && element.offset()) {
+          $('html, body').animate({
+            scrollTop: element.offset().top - Y_OFFSET_SMOOTH_SCROLL
+          }, 'slow');
+        }
       }
     };
 
