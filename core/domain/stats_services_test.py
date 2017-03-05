@@ -328,7 +328,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
         init_interaction = exp.init_state.interaction
         init_interaction.answer_groups.append(exp_domain.AnswerGroup(
             exp_domain.Outcome(exp.init_state_name, [], {}),
-            [not_default_rule_spec]))
+            [not_default_rule_spec], False))
         init_interaction.default_outcome = exp_domain.Outcome(
             'End', [], {})
         exp_services._save_exploration(  # pylint: disable=protected-access
