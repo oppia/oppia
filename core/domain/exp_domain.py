@@ -2438,7 +2438,7 @@ class Exploration(object):
 
         exploration_dict['schema_version'] = 12
         states = exploration_dict['states']
-        for (name, state) in states.iteritems():
+        for state in states.itervalues():
             answer_groups = state['interaction']['answer_groups']
             for answer_group in answer_groups:
                 answer_group['correct'] = False
