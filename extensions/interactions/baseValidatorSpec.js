@@ -34,13 +34,10 @@ describe('Interaction validator', function() {
     if (!ruleSpecs) {
       ruleSpecs = [];
     }
-    if (!correct) {
-      correct = false;
-    }
     return {
       ruleSpecs: ruleSpecs,
       outcome: outcome,
-      correct: correct
+      correct: !!correct
     };
   };
 

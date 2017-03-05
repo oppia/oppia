@@ -2257,7 +2257,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 11
+    CURRENT_EXP_SCHEMA_VERSION = 12
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -2433,6 +2433,18 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v11_dict_to_v12_dict(cls, exploration_dict):
+        """Converts a v11 exploration dict into a v12 exploration dict."""
+
+        exploration_dict['schema_version'] = 12
+        states = exploration_dict['states']
+        for (name, state) in states.iteritems():
+            answer_groups = state['interaction']['answer_groups']
+            for answer_group in answer_groups:
+                answer_group['correct'] = False
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         try:
@@ -2501,6 +2513,12 @@ class Exploration(object):
             exploration_dict = cls._convert_v10_dict_to_v11_dict(
                 exploration_dict)
             exploration_schema_version = 11
+
+        if exploration_schema_version == 11:
+            exploration_dict = cls._convert_v11_dict_to_v12_dict(
+                exploration_dict)
+            exploration_schema_version = 12
+
 
         return (exploration_dict, initial_schema_version)
 
