@@ -7,7 +7,6 @@
           <span ng-if="isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
           <span ng-if="!isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
         </h3>
-
         <!-- Note that if this is ng-if instead, the avatar area will not detect a mouseover and the tile will behave incorrectly. -->
         <div ng-show="isWindowLarge && avatarsList.length > 0" class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
           <div>
@@ -22,14 +21,10 @@
       </div>
       <div class="title-section-mask"></div>
 
-      <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>">
-        <span ng-if="getObjective()" class="oppia-activity-summary-popover">
-          <span popover="<[getObjective()|capitalize]>" popover-placement="top" popover-trigger="mouseenter">
-            <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
-              <[getObjective() | truncateAndCapitalize: 40]>
-            </div>
-          </span>
-        </span>
+      <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>">  
+        <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
+          <[getObjective() | truncateAndCapitalize: 95]>
+        </div>
         <span ng-if="!getObjective()" translate="I18N_LIBRARY_NO_OBJECTIVE">
         </span>
         <ul layout="row" class="metrics" layout-align="space-between center">
@@ -45,14 +40,12 @@
               </span>
             </span>
           </li>
-
           <li>
             <span class="fa fa-eye fa-lg" tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>" tooltip-placement="top">
               <span class="oppia-icon-accessibility-label"><['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]></span>
             </span>
             <[getNumViews() | summarizeNonnegativeNumber]>
           </li>
-
           <li>
             <span>
               <span class="oppia-icon-accessibility-label">Last Updated</span>

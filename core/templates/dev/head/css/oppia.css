@@ -3925,12 +3925,22 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 0.2em;
   position: absolute;
 }
-
 .oppia-activity-summary-tile .objective {
-  height: 60px;
+  display: -webkit-box;
   font-family: "Rubik", "Roboto", Arial, sans-serif;
   font-size: 0.85em;
+  height: 70px;
+  line-height: 1.26;
+  /* `max-height` is calculated as: 1.26 (line-height) * 3 (lines) / 0.85
+  (font-size). An additional (1.26 (line-height) * 0.85 (font-size) * 0.25) is added
+  to account for letters (like y,j and g) that fall beneath the baseline.
+  This is done to limit the text to 3 lines for non-webkit browsers. */
+  max-height: 4.71em;
+  overflow: hidden;
   padding: 12px;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3; /* Truncating to 3 lines. */
 }
 
 .oppia-activity-summary-tile .rating-disabled {
@@ -3948,7 +3958,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-activity-summary-tile .metrics {
   height: 30px;
-  margin: 0 12px;
+  margin: 5px 12px 0;
   padding: 0;
 }
 
