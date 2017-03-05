@@ -105,6 +105,7 @@
             ng-if="$index === currentDotIndex" ng-show="dots.length > 1"
             tooltip="<['I18N_PLAYER_CARD_NUMBER_TOOLTIP' | translate]><[$index +1]>" tooltip-placement="left"
             tooltip-trigger="none" tooltip-is-open="opened" mobile-friendly-tooltip tabindex="0">
+        <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_CARD_NUMBER_TOOLTIP' | translate]><[$index +1]></span>
       </span>
       <span class="oppia-progress-dot oppia-progress-dot-inactive"
             ng-class="$index === leftmostVisibleDotIndex && $index !== 0 ? 'oppia-progress-dot-gradient-left':
@@ -114,6 +115,7 @@
             ng-click="changeActiveDot($index)"
             tooltip="<['I18N_PLAYER_CARD_NUMBER_TOOLTIP' | translate]><[$index +1]>" tooltip-placement="left"
             tooltip-trigger="none" tooltip-is-open="opened" mobile-friendly-tooltip tabindex="0">
+        <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_CARD_NUMBER_TOOLTIP' | translate]><[$index +1]></span>
       </span>
     </li>
     <li class="oppia-progress-arrow" ng-show="dots.length > 1"
