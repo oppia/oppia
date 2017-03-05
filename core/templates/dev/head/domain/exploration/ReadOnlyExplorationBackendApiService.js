@@ -14,25 +14,35 @@
 
 /**
  * @fileoverview Service to retrieve read only information
- * about exploraions from the backend.
+ * about explorations from the backend.
  */
 
 oppia.factory('ReadOnlyExplorationBackendApiService', [
   '$http', '$q', 'EXPLORATION_DATA_URL_TEMPLATE',
-  'UrlInterpolationService',
+  'EXPLORATION_VERSION_DATA_URL_TEMPLATE', 'UrlInterpolationService',
   function($http, $q, EXPLORATION_DATA_URL_TEMPLATE,
-    UrlInterpolationService) {
+    EXPLORATION_VERSION_DATA_URL_TEMPLATE, UrlInterpolationService) {
     // Maps previously loaded explorations to their IDs.
     var _explorationCache = [];
 
     var _fetchExploration = function(
-        explorationId, successCallback, errorCallback) {
-      var explorationDataUrl = UrlInterpolationService.interpolateUrl(
+        explorationId, version, successCallback, errorCallback) {
+      var explorationDataUrl = '';
+      if (version) {
+        explorationDataUrl = UrlInterpolationService.interpolateUrl(
+        EXPLORATION_VERSION_DATA_URL_TEMPLATE, {
+          exploration_id: String(explorationId),
+          v: String(version)
+        });
+      } else {
+        explorationDataUrl = UrlInterpolationService.interpolateUrl(
         EXPLORATION_DATA_URL_TEMPLATE, {
           exploration_id: explorationId
         });
+      }
 
-      $http.get(explorationDataUrl).then(function(response) {
+      $http.get(explorationDataUrl).then(
+        function(response) {
         var exploration = angular.copy(response.data);
         if (successCallback) {
           successCallback(exploration);
@@ -50,19 +60,19 @@ oppia.factory('ReadOnlyExplorationBackendApiService', [
 
     return {
       /**
-       * Retrieves a exploration from the backend given a exploration ID.
+       * Retrieves an exploration from the backend given an exploration ID.
        * This returns a promise object that allows a success and rejection
-       *  callbacks to be registered. If the exploration is successfully
+       * callbacks to be registered. If the exploration is successfully
        * loaded and a success callback function is provided to the promise
        * object, the success callback is called with the exploration
        * passed in as a parameter. If something goes wrong while trying to
        * fetch the exploration, the rejection callback is called instead,
-       * if present. The rejection callback function is passed the error that
-       * occurred and the exploration ID.
+       * if present. The rejection callback function is passed an error
+       * message using this format 'Error loading exploration x'.
        */
-      fetchExploration: function(explorationId) {
+      fetchExploration: function(explorationId, version) {
         return $q(function(resolve, reject) {
-          _fetchExploration(explorationId, resolve, reject);
+          _fetchExploration(explorationId, version, resolve, reject);
         });
       },
 
@@ -75,16 +85,19 @@ oppia.factory('ReadOnlyExplorationBackendApiService', [
        * retrieves the exploration from the backend, it will store it in the
        * cache to avoid requests from the backend in further function calls.
        */
-      loadExploration: function(explorationId) {
+      loadExploration: function(explorationId, version) {
         return $q(function(resolve, reject) {
-          if (_isCached(explorationId)) {
+          if (_isCached(explorationId) && !version) {
             if (resolve) {
               resolve(angular.copy(_explorationCache[explorationId]));
             }
           } else {
-            _fetchExploration(explorationId, function(exploration) {
+            _fetchExploration(explorationId, version, function(exploration) {
               // Save the fetched exploration to avoid future fetches.
-              _explorationCache[explorationId] = exploration;
+              // Excludes version for now.
+              if (!version) {
+                _explorationCache[explorationId] = exploration;
+              }
               if (resolve) {
                 resolve(angular.copy(exploration));
               }
@@ -119,7 +132,7 @@ oppia.factory('ReadOnlyExplorationBackendApiService', [
       },
 
       /**
-       * Delete a specific exploration from the local cache
+       * Deletes a specific exploration from the local cache
        */
       deleteExplorationFromCache: function(explorationId) {
         if (_isCached(explorationId)) {

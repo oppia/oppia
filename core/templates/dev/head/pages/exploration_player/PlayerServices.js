@@ -35,14 +35,16 @@ oppia.factory('oppiaPlayerService', [
   'PAGE_CONTEXT', 'oppiaExplorationHtmlFormatterService',
   'playerTranscriptService', 'ExplorationObjectFactory',
   'expressionInterpolationService', 'StatsReportingService',
-  'UrlInterpolationService',
+  'UrlInterpolationService', 'ReadOnlyExplorationBackendApiService',
+  'EditableExplorationBackendApiService',
   function(
       $http, $rootScope, $q, LearnerParamsService,
       alertsService, AnswerClassificationService, explorationContextService,
       PAGE_CONTEXT, oppiaExplorationHtmlFormatterService,
       playerTranscriptService, ExplorationObjectFactory,
       expressionInterpolationService, StatsReportingService,
-      UrlInterpolationService) {
+      UrlInterpolationService, ReadOnlyExplorationBackendApiService,
+      EditableExplorationBackendApiService) {
     var _explorationId = explorationContextService.getExplorationId();
     var _editorPreviewMode = (
       explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
@@ -188,39 +190,30 @@ oppia.factory('oppiaPlayerService', [
         playerTranscriptService.init();
 
         if (_editorPreviewMode) {
-          var explorationDataUrl = UrlInterpolationService.interpolateUrl(
-            '/createhandler/data/<exploration_id>', {
-              exploration_id: _explorationId
-            });
-          $http.get(explorationDataUrl, {
-            params: {
-              apply_draft: true
-            }
-          }).then(function(response) {
-            exploration = ExplorationObjectFactory.create(response.data);
+          EditableExplorationBackendApiService.fetchExploration(
+            _explorationId, true).then(function(data) {
+            exploration = ExplorationObjectFactory.create(data);
             exploration.setInitialStateName(initStateName);
             initParams(manualParamChanges);
             _loadInitialState(successCallback);
           });
         } else {
-          var explorationDataUrl = UrlInterpolationService.interpolateUrl(
-            '/explorehandler/init/<exploration_id>', {
-              exploration_id: _explorationId
-            }) + (version ? '?v=' + version : '');
-          $http.get(explorationDataUrl).then(function(response) {
-            var data = response.data;
-            exploration = ExplorationObjectFactory.create(data.exploration);
-            version = data.version;
+          ReadOnlyExplorationBackendApiService.loadExploration(
+            _explorationId, version ? version : null).then(
+            function(data) {
+              exploration = ExplorationObjectFactory.create(data.exploration);
+              version = data.version;
 
-            initParams([]);
+              initParams([]);
 
-            StatsReportingService.initSession(
-              _explorationId, data.version, data.session_id,
-              GLOBALS.collectionId);
+              StatsReportingService.initSession(
+                _explorationId, data.version, data.session_id,
+                GLOBALS.collectionId);
 
-            _loadInitialState(successCallback);
-            $rootScope.$broadcast('playerServiceInitialized');
-          });
+              _loadInitialState(successCallback);
+              $rootScope.$broadcast('playerServiceInitialized');
+            }
+          );
         }
       },
       getExplorationId: function() {

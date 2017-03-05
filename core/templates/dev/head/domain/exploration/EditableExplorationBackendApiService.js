@@ -24,7 +24,7 @@ oppia.factory('EditableExplorationBackendApiService', [
     EDITABLE_EXPLORATION_DATA_URL_TEMPLATE, UrlInterpolationService,
     ReadOnlyExplorationBackendApiService) {
     var _fetchExploration = function(
-        explorationId, applyDraft, v, successCallback, errorCallback) {
+        explorationId, applyDraft, successCallback, errorCallback) {
       var explorationDataUrl = UrlInterpolationService.interpolateUrl(
         EDITABLE_EXPLORATION_DATA_URL_TEMPLATE, {
           exploration_id: String(explorationId)
@@ -33,9 +33,6 @@ oppia.factory('EditableExplorationBackendApiService', [
       params = {};
       if (applyDraft) {
         params.apply_draft = applyDraft;
-      }
-      if (v || v === 0) {
-        params.v = v;
       }
 
       $http.get(explorationDataUrl, {
@@ -58,7 +55,7 @@ oppia.factory('EditableExplorationBackendApiService', [
       var editableExplorationDataUrl = (
         UrlInterpolationService.interpolateUrl(
         EDITABLE_EXPLORATION_DATA_URL_TEMPLATE, {
-          exploration_id: explorationId
+          exploration_id: String(explorationId)
         })
       );
 
@@ -102,17 +99,12 @@ oppia.factory('EditableExplorationBackendApiService', [
 
       $http['delete'](editableExplorationDataUrl, {
         params: params
-      }).then(function(response) {
-        // What does this return? What happens on Fail?
-        // What happens wtih ReadOnlyExplorationBackendApiService
-        // on success or fail.
-
+      }).then(function() {
         // Delete item from the ReadOnlyExplorationBackendApiService's cache
         ReadOnlyExplorationBackendApiService.deleteExplorationFromCache(
           explorationId);
-
         if (successCallback) {
-          successCallback(response.data);
+          successCallback({});
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -122,14 +114,14 @@ oppia.factory('EditableExplorationBackendApiService', [
     };
 
     return {
-      fetchExploration: function(explorationId, applyDraft, v) {
+      fetchExploration: function(explorationId, applyDraft) {
         return $q(function(resolve, reject) {
-          _fetchExploration(explorationId, applyDraft, v, resolve, reject);
+          _fetchExploration(explorationId, applyDraft, resolve, reject);
         });
       },
 
       /**
-       * Updates a exploration in the backend with the provided exploration
+       * Updates an exploration in the backend with the provided exploration
        * ID. The changes only apply to the exploration of the given version
        * and the request to update the exploration will fail if the provided
        * exploration version is older than the current version stored in the
@@ -139,7 +131,7 @@ oppia.factory('EditableExplorationBackendApiService', [
        * if one is provided to the returned promise object. Errors are passed
        * to the error callback, if one is provided. Finally, if the update is
        * successful, the returned exploration will be cached within the
-       * ExplorationBackendApiService to ensure the cache is
+       * ReadOnlyExplorationBackendApiService to ensure the cache is
        * not out-of-date with any updates made by this backend API service.
        */
       updateExploration: function(
@@ -151,6 +143,12 @@ oppia.factory('EditableExplorationBackendApiService', [
         });
       },
 
+      /**
+       * Deletes an exploration in the backend with the provided exploration
+       * ID. If successful, the exploration will also be deleted from the
+       * ReadOnlyExplorationBackendApiService cache as well. Errors are passed
+       * to the error callback, if one is provided.
+       */
       deleteExploration: function(
         explorationId, role) {
         return $q(function(resolve, reject) {

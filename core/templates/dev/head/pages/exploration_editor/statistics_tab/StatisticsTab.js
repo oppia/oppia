@@ -58,7 +58,7 @@ oppia.controller('StatisticsTab', [
         '/' + version);
       $http.get($scope.explorationStatisticsUrl).then(function(response) {
         ReadOnlyExplorationBackendApiService.loadExploration(
-          explorationData.explorationId).then(function(response) {
+          explorationData.explorationId, null).then(function(response) {
           var states = response.states;
           var initStateName = response.init_state_name;
           $scope.statsGraphData = computeGraphService.compute(

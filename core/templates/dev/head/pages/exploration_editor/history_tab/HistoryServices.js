@@ -127,10 +127,10 @@ oppia.factory('versionsTreeService', [function() {
 
 oppia.factory('compareVersionsService', [
   '$http', '$q', 'versionsTreeService', 'explorationData',
-  'ExplorationDiffService', 'EditableExplorationBackendApiService',
+  'ExplorationDiffService', 'ReadOnlyExplorationBackendApiService',
   function(
       $http, $q, versionsTreeService, explorationData,
-      ExplorationDiffService, EditableExplorationBackendApiService) {
+      ExplorationDiffService, ReadOnlyExplorationBackendApiService) {
     /**
      * Constructs the combined list of changes needed to get from v1 to v2.
      *
@@ -193,10 +193,10 @@ oppia.factory('compareVersionsService', [
           throw new Error('Tried to compare v1 > v2.');
         }
         return $q.all({
-          v1Data: EditableExplorationBackendApiService.fetchExploration(
-            explorationData.explorationId, null, v1),
-          v2Data: EditableExplorationBackendApiService.fetchExploration(
-            explorationData.explorationId, null, v2)
+          v1Data: ReadOnlyExplorationBackendApiService.loadExploration(
+            explorationData.explorationId, v1),
+          v2Data: ReadOnlyExplorationBackendApiService.loadExploration(
+            explorationData.explorationId, v2)
         }).then(function(response) {
           var v1States = response.v1Data.states;
           var v2States = response.v2Data.states;

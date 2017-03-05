@@ -23,8 +23,11 @@ oppia.constant('TWO_CARD_THRESHOLD_PX', 960);
 oppia.constant('CONTINUE_BUTTON_FOCUS_LABEL', 'continueButton');
 
 oppia.constant(
-    'EXPLORATION_DATA_URL_TEMPLATE', '/createhandler/data/<exploration_id>');
-
+    'EXPLORATION_DATA_URL_TEMPLATE',
+    '/explorehandler/init/<exploration_id>');
+oppia.constant(
+  'EXPLORATION_VERSION_DATA_URL_TEMPLATE',
+  '/explorehandler/init/<exploration_id>?v=<v>');
 oppia.constant(
     'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
-    '/editable_createhandler/data/<exploration_id>');
+    '/createhandler/data/<exploration_id>');

@@ -40,21 +40,9 @@ describe('Editable exploration backend API service', function() {
 
     // Sample exploration object returnable from the backend
     sampleDataResults = {
-      param_specs: {},
-      param_changes: [],
-      is_super_admin: false,
-      category: '',
-      rights: {
-        viewable_if_private: false,
-        status: 'private',
-        editor_names: [],
-        viewer_names: [],
-        cloned_from: null,
-        community_owned: false,
-        owner_names: ['jeaske']
-      },
-      is_admin: false,
-      objective: '',
+      exploration_id: '0',
+      init_state_name: 'Introduction',
+      language_code: 'en',
       states: {
         Introduction: {
           param_changes: [],
@@ -77,28 +65,9 @@ describe('Editable exploration backend API service', function() {
           }
         }
       },
-      is_version_of_draft_valid: null,
-      version: 1,
-      user_email: 'test@example.com',
-      is_moderator: false,
-      language_code: 'en',
-      init_state_name: 'Introduction',
       username: 'test',
-      tags: [],
-      title: '',
-      exploration_id: '0',
-      draft_changes: null,
-      profile_picture_data_url: '',
-      email_preferences: {
-        mute_feedback_notifications: false,
-        mute_suggestion_notifications: false
-      },
-      skin_customizations: {
-        panels_contents: {
-          bottom: []
-        }
-      },
-      show_state_editor_tutorial_on_load: true
+      user_email: 'test@example.com',
+      version: 1
     };
   }));
 
@@ -112,7 +81,7 @@ describe('Editable exploration backend API service', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expect('GET', '/editable_createhandler/data/0').respond(
+    $httpBackend.expect('GET', '/createhandler/data/0').respond(
       sampleDataResults);
     EditableExplorationBackendApiService.fetchExploration('0').then(
       successHandler, failHandler);
@@ -128,7 +97,7 @@ describe('Editable exploration backend API service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     // Loading a exploration the first time should fetch it from the backend.
-    $httpBackend.expect('GET', '/editable_createhandler/data/1').respond(
+    $httpBackend.expect('GET', '/createhandler/data/1').respond(
       500, 'Error loading exploration 1.');
     EditableExplorationBackendApiService.fetchExploration('1').then(
       successHandler, failHandler);
@@ -144,7 +113,7 @@ describe('Editable exploration backend API service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     // Loading a exploration the first time should fetch it from the backend.
-    $httpBackend.expect('GET', '/editable_createhandler/data/0').respond(
+    $httpBackend.expect('GET', '/createhandler/data/0').respond(
       sampleDataResults);
 
     EditableExplorationBackendApiService.fetchExploration('0').then(
@@ -156,7 +125,7 @@ describe('Editable exploration backend API service', function() {
     exploration.title = 'New Title';
     exploration.version = '2';
 
-    $httpBackend.expect('PUT', '/editable_createhandler/data/0').respond(
+    $httpBackend.expect('PUT', '/createhandler/data/0').respond(
       exploration);
 
     // Send a request to update exploration
@@ -175,7 +144,7 @@ describe('Editable exploration backend API service', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expect('GET', '/editable_createhandler/data/0').respond(
+    $httpBackend.expect('GET', '/createhandler/data/0').respond(
       sampleDataResults);
 
     EditableExplorationBackendApiService.fetchExploration('0').then(
@@ -187,7 +156,7 @@ describe('Editable exploration backend API service', function() {
     exploration.title = 'New Title';
     exploration.version = '2';
 
-    $httpBackend.expect('PUT', '/editable_createhandler/data/0').respond(
+    $httpBackend.expect('PUT', '/createhandler/data/0').respond(
       exploration);
 
     // Send a request to update exploration
@@ -200,7 +169,7 @@ describe('Editable exploration backend API service', function() {
     expect(successHandler).toHaveBeenCalledWith(exploration);
     expect(failHandler).not.toHaveBeenCalled();
 
-    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBeTruthy();
+    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(true);
   });
 
   it('should delete exploration from the backend',
@@ -208,7 +177,7 @@ describe('Editable exploration backend API service', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expect('GET', '/editable_createhandler/data/0').respond(
+    $httpBackend.expect('GET', '/createhandler/data/0').respond(
       sampleDataResults);
 
     EditableExplorationBackendApiService.fetchExploration('0').then(
@@ -220,20 +189,20 @@ describe('Editable exploration backend API service', function() {
     exploration.title = 'New Title';
     exploration.version = '2';
 
-    $httpBackend.expect('PUT', '/editable_createhandler/data/0').respond(
+    $httpBackend.expect('PUT', '/createhandler/data/0').respond(
       exploration);
 
     // Send a request to update exploration
     EditableExplorationBackendApiService.updateExploration(
       exploration.exploration_id, exploration.version,
-      exploration.title, []).then(
+      'Minor edits', []).then(
         successHandler, failHandler);
     $httpBackend.flush();
 
     expect(successHandler).toHaveBeenCalledWith(exploration);
     expect(failHandler).not.toHaveBeenCalled();
 
-    $httpBackend.expect('DELETE', '/editable_createhandler/data/0').respond(
+    $httpBackend.expect('DELETE', '/createhandler/data/0').respond(
       {});
     EditableExplorationBackendApiService.deleteExploration(
       exploration.exploration_id, null).then(
@@ -244,6 +213,6 @@ describe('Editable exploration backend API service', function() {
     expect(successHandler).toHaveBeenCalledWith({});
     expect(failHandler).not.toHaveBeenCalled();
 
-    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBeFalsy();
+    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(false);
   });
 });

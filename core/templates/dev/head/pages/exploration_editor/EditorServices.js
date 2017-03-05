@@ -19,9 +19,10 @@
 // Service for handling all interactions with the exploration editor backend.
 oppia.factory('explorationData', [
   '$http', '$log', 'alertsService',
-  'EditableExplorationBackendApiService', '$q',
+  'EditableExplorationBackendApiService',
+  'ReadOnlyExplorationBackendApiService', '$q',
   function($http, $log, alertsService, EditableExplorationBackendApiService,
-    $q) {
+    ReadOnlyExplorationBackendApiService, $q) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
     var pathnameArray = window.location.pathname.split('/');
@@ -87,7 +88,7 @@ oppia.factory('explorationData', [
           // are discarded, otherwise the exploration-with-draft-changes
           // (which is cached here) will be reused.
           return EditableExplorationBackendApiService.fetchExploration(
-            explorationId, true, null).then(function(response) {
+            explorationId, true).then(function(response) {
             $log.info('Retrieved exploration data.');
             $log.info(response);
 
@@ -100,8 +101,8 @@ oppia.factory('explorationData', [
       // Returns a promise supplying the last saved version for the current
       // exploration.
       getLastSavedData: function() {
-        return EditableExplorationBackendApiService.fetchExploration(
-          explorationId, null, null).then(function(response) {
+        return ReadOnlyExplorationBackendApiService.loadExploration(
+          explorationId, null).then(function(response) {
           $log.info('Retrieved saved exploration data.');
           $log.info(response);
 
