@@ -200,7 +200,7 @@ def save_classifier(classifier):
     """
     classifier_model = classifier_models.ClassifierModel.get(
         classifier.id, False)
-    if(classifier_model is None):
+    if classifier_model is None:
         classifier.id = _create_classifier(classifier)
     else:
         _update_classifier(classifier_model, classifier)
