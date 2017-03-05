@@ -104,24 +104,6 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self.assertEqual(classifier.exp_id, exp_id)
         self.assertEqual(classifier.state_name, state)
 
-    def test_update_of_classifiers(self):
-        """Test the update_classifier method."""
-
-        exp_id = u'1'
-        state = 'Home'
-        test_state = 'State'
-        classifier_id = classifier_models.ClassifierModel.create(
-            exp_id, 1, state,
-            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'], [], 1)
-        classifier = classifier_services.get_classifier_by_id(
-            classifier_id)
-        classifier.state_name = test_state
-        classifier_services.save_classifier(classifier)
-        classifier = classifier_services.get_classifier_by_id(
-            classifier_id)
-        self.assertEqual(classifier.exp_id, exp_id)
-        self.assertEqual(classifier.state_name, test_state)
-
     def test_deletion_of_classifiers(self):
         """Test the delete_classifier method."""
 
@@ -135,3 +117,31 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             "Entity for class ClassifierModel with id %s not found" %(
                 classifier_id))):
             classifier_services.get_classifier_by_id(classifier_id)
+
+    def test_update_of_classifiers(self):
+        """Test the save_classifier method."""
+
+        exp_id = u'1'
+        state = 'Home'
+        test_state = 'State'
+        classifier = type('', (), {})()
+        classifier.id = '1'
+        classifier.exp_id = exp_id
+        classifier.exp_version_when_created = 1
+        classifier.state_name = state
+        classifier.algorithm_id = (
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])
+        classifier.cached_classifier_data = []
+        classifier.data_schema_version = 1
+        classifier_id = (
+            classifier_services.save_classifier(classifier))
+        classifier = classifier_services.get_classifier_by_id(
+            classifier_id)
+        self.assertEqual(classifier.exp_id, exp_id)
+        self.assertEqual(classifier.state_name, state)
+        classifier.state_name = test_state
+        classifier_services.save_classifier(classifier)
+        classifier = classifier_services.get_classifier_by_id(
+            classifier_id)
+        self.assertEqual(classifier.exp_id, exp_id)
+        self.assertEqual(classifier.state_name, test_state)

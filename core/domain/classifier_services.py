@@ -165,11 +165,12 @@ def _create_classifier(classifier):
         classifier: Domain object for the classifier.
 
     """
-    classifier_models.ClassifierModel.create(
+    classifier_id = classifier_models.ClassifierModel.create(
         classifier.exp_id, classifier.exp_version_when_created,
         classifier.state_name, classifier.algorithm_id,
         classifier.cached_classifier_data, classifier.data_schema_version,
         )
+    return classifier_id
 
 
 def _update_classifier(classifier_model, classifier):
@@ -193,10 +194,17 @@ def save_classifier(classifier):
 
     Args:
         classifier: Domain object for the classifier.
+
+    Returns:
+        classifier_id: str. ID of the classifier.
     """
     classifier_model = classifier_models.ClassifierModel.get(
-        classifier.id)
-    _update_classifier(classifier_model, classifier)
+        classifier.id, False)
+    if(classifier_model is None):
+        classifier.id = _create_classifier(classifier)
+    else:
+        _update_classifier(classifier_model, classifier)
+    return classifier.id
 
 
 def delete_classifier(classifier_id):
