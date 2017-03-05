@@ -26,46 +26,32 @@ oppia.directive('collectionNodeCreator', [function() {
       'CollectionLinearizerService', 'CollectionUpdateService',
       'CollectionNodeObjectFactory', 'ExplorationSummaryBackendApiService',
       'siteAnalyticsService', 'UrlInterpolationService',
+      'SearchExplorationsBackendApiService',
       function(
           $scope, $http, $window, $filter, alertsService,
           validatorsService, CollectionEditorStateService,
           CollectionLinearizerService, CollectionUpdateService,
           CollectionNodeObjectFactory, ExplorationSummaryBackendApiService,
-          siteAnalyticsService, UrlInterpolationService) {
+          siteAnalyticsService, UrlInterpolationService,
+          SearchExplorationsBackendApiService) {
         $scope.collection = CollectionEditorStateService.getCollection();
         $scope.newExplorationId = '';
         $scope.newExplorationTitle = '';
         var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
-        var SEARCH_EXPLORATION_URL_TEMPLATE = (
-          '/exploration/metadata_search?q=<search_query>');
 
-        $scope.getExplorations = function(searchQuery) {
-          if (/^[a-zA-Z0-9- ]*$/.test(searchQuery) == true) {
-            queryUrl = UrlInterpolationService.interpolateUrl(
-              SEARCH_EXPLORATION_URL_TEMPLATE, {
-                search_query: searchQuery
-              }
-            );
-            return $http.get(queryUrl).then(function(response) {
-              return response.data.collection_node_metadata_list.map(
-                function(item) {
+        $scope.fetchExplorationsMetadata = function(searchQuery) {
+          return SearchExplorationsBackendApiService.getExplorations(searchQuery).then(
+          function(explorationMetadataObject) {
+            return explorationMetadataObject.map(function(item) {
                 return '(#' + item.id + ') ' + item.title;
-              });
             });
-          } else {
-            alertsService.addWarning(
-              'Cannot search explorations with special characters in title.');
-          }
+          },
+          function(error) {
+            alertsService.addWarning('There was an error when searching the explorations.');
+          });
         };
 
         var addExplorationToCollection = function(newExplorationId) {
-          if (newExplorationId.length > 1 && newExplorationId[0] == '(') {
-            var temp = '';
-            for (var i = 2; newExplorationId[i] != ')'; i++) {
-              temp += newExplorationId[i];
-            }
-            newExplorationId = temp;
-          }
           if (!newExplorationId) {
             alertsService.addWarning('Cannot add an empty exploration ID.');
             return;
@@ -100,6 +86,16 @@ oppia.directive('collectionNodeCreator', [function() {
             });
         };
 
+        var cleanExplorationId = function(newExplorationId) {
+          if (newExplorationId.length > 1 && newExplorationId[0] === '(') {
+            var temp = '';
+            for (var i = 2; newExplorationId[i] !== ')'; i++) {
+              temp += newExplorationId[i];
+            }
+            $scope.newExplorationId = temp;
+          }
+        };
+
         // Creates a new exploration, then adds it to the collection.
         $scope.createNewExploration = function() {
           var title = $filter('normalizeWhitespace')(
@@ -123,6 +119,7 @@ oppia.directive('collectionNodeCreator', [function() {
         };
 
         $scope.addExploration = function() {
+          cleanExplorationId($scope.newExplorationId);
           addExplorationToCollection($scope.newExplorationId);
           $scope.newExplorationId = '';
         };
