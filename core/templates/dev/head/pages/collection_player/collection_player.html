@@ -195,8 +195,18 @@
   {% include 'pages/collection_player/collection_node_list_directive.html' %}
 {% endblock %}
 
+{% block footer %}
+  {% if not iframed %}
+    {% include 'pages/collection_player/collection_footer_directive.html' %}
+    {% include 'components/share/sharing_collection_links_directive.html' %}
+    <collection-footer twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></collection-footer>
+  {% endif %}
+{% endblock %}
+
 {% block footer_js %}
   {{ super() }}
+
+  
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_player/CollectionPlayer.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_player/CollectionNodeListDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionNodeObjectFactory.js"></script>
@@ -204,6 +214,12 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionPlaythroughObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/ReadOnlyCollectionBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/SkillListObjectFactory.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_player/collectionFooterDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/embed_modal/ExplorationEmbedButtonService.js"></script>
+
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/share/SharingCollectionLinksDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/attribution_guide/AttributionGuideDirective.js"></script>
 {% endblock footer_js %}
