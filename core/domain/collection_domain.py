@@ -129,6 +129,31 @@ class CollectionCommitLogEntry(object):
             commit_type, commit_message, commit_cmds, version,
             post_commit_status, post_commit_community_owned,
             post_commit_is_private):
+        """Constructs an CollectionCommitLogEntry domain object.
+
+        Args:
+            created_on: datetime.datetime. Date and time when the collection
+                commits were created.
+            last_updated: datetime.datetime. Date and time when the collection
+                commits were lastly updated.
+            user_id: str. User id of the user.
+            username: str.  Username of the user who has made the commit.
+            collection_id: str. Id of the collection.
+            commit_type: str.
+            commit_message: str. A description of changes made to the
+                collection.
+            commit_cmds: list(dict). A list of change commands made to the given
+                collection.
+            version: int. The version of the collection.
+            post_commit_status: str. The status of the post commit made to the
+                collection.
+            post_commit_community_owned: bool. A boolean value true if the post
+                commit is made by the community owned that collection,
+                else false.
+            post_commit_is_private: bool. A boolean value true if the post
+                commit to the collection is private, else false.
+        """
+
         self.created_on = created_on
         self.last_updated = last_updated
         self.user_id = user_id
@@ -169,15 +194,18 @@ class CollectionNode(object):
         """Constructs a new CollectionNode object.
 
         Args:
-        - exploration_id: A valid ID of an exploration referenced by this node.
-        - prerequisite_skills: A list of skills (strings).
-        - acquired_skills: A list of skills (strings).
+            exploration_id: str. A valid ID of an exploration referenced by this
+                node.
+            prerequisite_skills: list(str). A list of skills (strings).
+            acquired_skills: list(str). A list of skills (strings).
         """
         self.exploration_id = exploration_id
         self.prerequisite_skills = prerequisite_skills
         self.acquired_skills = acquired_skills
 
     def to_dict(self):
+        """Returns a dictionary representation of CollectionNode domain object.
+        """
         return {
             'exploration_id': self.exploration_id,
             'prerequisite_skills': self.prerequisite_skills,
@@ -186,6 +214,11 @@ class CollectionNode(object):
 
     @classmethod
     def from_dict(cls, node_dict):
+        """Return a Collection domain object from a dict.
+
+        Args:
+            node_dict: dict. The dict representation of CollectionNode object.
+        """
         return cls(
             copy.deepcopy(node_dict['exploration_id']),
             copy.deepcopy(node_dict['prerequisite_skills']),
@@ -199,9 +232,21 @@ class CollectionNode(object):
         return set(self.prerequisite_skills) | set(self.acquired_skills)
 
     def update_prerequisite_skills(self, prerequisite_skills):
+        """Updates the prerequisite skills of the node.
+
+        Args:
+            prerequisite_skills: str. The prerequisite skills for the collection
+                which is to be updated.
+        """
         self.prerequisite_skills = copy.deepcopy(prerequisite_skills)
 
     def update_acquired_skills(self, acquired_skills):
+        """Updates the skills acquired by the node.
+
+        Args:
+            acquired_skills: str. The prerequisite skills for the collection
+                which is to be updated.
+        """
         self.acquired_skills = copy.deepcopy(acquired_skills)
 
     def validate(self):
@@ -254,6 +299,13 @@ class CollectionNode(object):
 
     @classmethod
     def create_default_node(cls, exploration_id):
+        """Returns a CollectionNode domain object with default values.
+        Args:
+            exploration_id: str. The id of the exploration.
+
+        Returns:
+            CollectionNode. The node domain object with the default values.
+        """
         return cls(exploration_id, [], [])
 
 
@@ -277,6 +329,23 @@ class Collection(object):
         feconf.CURRENT_COLLECTION_SCHEMA_VERSION should be incremented and the
         new value should be saved in the collection after the migration
         process, ensuring it represents the latest schema version.
+
+        Args:
+            collection_id: str. The unique id of the collection.
+            title: str. The title of the collection.
+            category: str. The category of the collection.
+            objective: str. The objective of the collection.
+            language_code: str. The language caode of the collection (like 'en'
+                for English).
+            tags: list. The tags given to the collection.
+            schema_version: int. The schema version for the collection.
+            nodes: list(CollectionNode). The list of nodes present in the
+                collection.
+            version: int. The version of the collection.
+            created_on: datetime.datetime. Date and time on which the collection
+                is created.
+            last_updated: datetime.datetime. Date and time on which the
+                collection is lastly updated.
         """
         self.id = collection_id
         self.title = title
@@ -291,6 +360,7 @@ class Collection(object):
         self.last_updated = last_updated
 
     def to_dict(self):
+        """Return dictionary representation of Collection domain object."""
         return {
             'id': self.id,
             'title': self.title,
@@ -310,6 +380,16 @@ class Collection(object):
             category=feconf.DEFAULT_COLLECTION_CATEGORY,
             objective=feconf.DEFAULT_COLLECTION_OBJECTIVE,
             language_code=feconf.DEFAULT_LANGUAGE_CODE):
+        """Returns a Collection domain object with default values.
+
+        Args:
+            collection_id: str. The unique id of the collection.
+            title: str. The title of the collection.
+            category: str. The category of the collection.
+            objective: str. The objective of the collection.
+            language_code: str. The language code of the collection (like 'en'
+                for English).
+        """
         return cls(
             collection_id, title, category, objective, language_code, [],
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION, [], 0)
@@ -318,6 +398,18 @@ class Collection(object):
     def from_dict(
             cls, collection_dict, collection_version=0,
             collection_created_on=None, collection_last_updated=None):
+        """Return a Collection domain object from a dict.
+
+        Args:
+            collection_dict: dict. The dictionary representation of collection.
+            collection_version: int. The version of the collection, default
+                value is 0.
+            collection_created_on: datetime.datetime. Date and time on which the
+                collection is created, default value is None.
+            collection_last_updated: datetime.datetime. Date and time on which
+                the collection is lastly updated, default value is None.
+
+        """
         collection = cls(
             collection_dict['id'], collection_dict['title'],
             collection_dict['category'], collection_dict['objective'],
@@ -332,6 +424,7 @@ class Collection(object):
         return collection
 
     def to_yaml(self):
+        """Return YAML representation of Collection domain object."""
         collection_dict = self.to_dict()
 
         # The ID is the only property which should not be stored within the
@@ -342,7 +435,15 @@ class Collection(object):
 
     @classmethod
     def _convert_v1_dict_to_v2_dict(cls, collection_dict):
-        """Converts a v1 collection dict into a v2 collection dict."""
+        """Converts a v1 collection dict into a v2 collection dict.
+
+        Args:
+            collection_dict: dict. The dictionary representation of collection.
+
+        Returns:
+            dict. The dictionary representation of Collection domain object in
+            v2 version.
+        """
         collection_dict['schema_version'] = 2
         collection_dict['language_code'] = feconf.DEFAULT_LANGUAGE_CODE
         collection_dict['tags'] = []
@@ -350,6 +451,13 @@ class Collection(object):
 
     @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):
+        """Return the YAML content of the collection in the latest version of
+        YAML.
+
+        Args:
+            yaml_content: str. The YAML representation of the collection.
+
+        """
         try:
             collection_dict = utils.dict_from_yaml(yaml_content)
         except Exception as e:
@@ -375,6 +483,16 @@ class Collection(object):
 
     @classmethod
     def from_yaml(cls, collection_id, yaml_content):
+        """Converts a YAML to Collection domain object.
+
+        Args:
+            collection_id: str. The id of the collection as yaml doesn't
+                contains id.
+            yaml_content: str. The YAML representation of the collection.
+
+        Returns:
+            Collection. Returns a collection domain object.
+        """
         collection_dict = cls._migrate_to_latest_yaml_version(yaml_content)
 
         collection_dict['id'] = collection_id
@@ -419,6 +537,13 @@ class Collection(object):
         list is empty, then only explorations with no prerequisite skills are
         returned. The order of the exploration IDs is given by the order in
         which each exploration was added to the collection.
+
+        Args:
+            completed_exploration_ids: list. List of the exploration ids of the
+                explorations which the user has completed.
+        Returns:
+            list(str). A list of exploration IDs for which the prerequisite
+            skills are satisfied.
         """
         acquired_skills = set()
         for completed_exp_id in completed_exploration_ids:
@@ -443,12 +568,22 @@ class Collection(object):
         'learned skills' and the current exploration's acquired skills,
         returns either a list of exploration ids that have either just
         unlocked or the user is qualified to explore.  If neither of these
-        lists can be generated a blank list is returned instead."""
+        lists can be generated a blank list is returned instead.
+
+        Args:
+            current_exploration: str. The id of the exploration through which
+                the currently completed.
+        """
         skills_learned_by_exp_id = {}
 
         def _recursively_find_learned_skills(node):
             """Given a node, returns the skills that the user must have
-            acquired by the time they've completed it."""
+            acquired by the time they've completed it.
+
+            Arg:
+                node: CollectionNode. The node in the exploration graph of a
+                    collection.
+            """
             if node.exploration_id in skills_learned_by_exp_id:
                 return skills_learned_by_exp_id[node.exploration_id]
 
@@ -490,7 +625,11 @@ class Collection(object):
 
     @classmethod
     def is_demo_collection_id(cls, collection_id):
-        """Whether the collection id is that of a demo collection."""
+        """Whether the collection id is that of a demo collection.
+
+        Args:
+            collection_id: str. The id of the collection.
+        """
         return collection_id in feconf.DEMO_COLLECTIONS
 
     @property
@@ -499,29 +638,73 @@ class Collection(object):
         return self.is_demo_collection_id(self.id)
 
     def update_title(self, title):
+        """Updates the title of the collection.
+
+        Args:
+            title: str. The new title for the collection which is to be updated.
+        """
         self.title = title
 
     def update_category(self, category):
+        """Updates the category of the collection.
+
+        Args:
+            category: str. The category of the collection which is to be
+                updated.
+        """
         self.category = category
 
     def update_objective(self, objective):
+        """Updates the objective of the collection.
+
+        Args:
+            title: str. The objective of the collection which is to be updated.
+        """
         self.objective = objective
 
     def update_language_code(self, language_code):
+        """Updates the language code of the collection.
+
+        Args:
+            title: str. The language code of the collection which is to be
+                updated.
+        """
         self.language_code = language_code
 
     def update_tags(self, tags):
+        """Updates the tags of the collection.
+
+        Args:
+            title: list. The tags of the collection which is to be updated.
+        """
         self.tags = tags
 
     def _find_node(self, exploration_id):
-        for ind, node in enumerate(self.nodes):
+        """Returns the index of the collection node with the given exploration
+        id and None if the exploration id is not in the nodes list.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+
+        Returns:
+            int. if the list of nodes contain the given exploration id
+                then it will return the index of that node, else None.
+        """
+        for index, node in enumerate(self.nodes):
             if node.exploration_id == exploration_id:
-                return ind
+                return index
         return None
 
     def get_node(self, exploration_id):
         """Retrieves a collection node from the collection based on an
         exploration ID.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+
+        Returns:
+            ColectionNode. if the list of nodes contain the given exploration
+                then it will return the node, else None.
         """
         for node in self.nodes:
             if node.exploration_id == exploration_id:
@@ -529,6 +712,12 @@ class Collection(object):
         return None
 
     def add_node(self, exploration_id):
+        """Adds a collection node to the collection based on an
+        exploration id.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+        """
         if self.get_node(exploration_id) is not None:
             raise ValueError(
                 'Exploration is already part of this collection: %s' %
@@ -536,6 +725,12 @@ class Collection(object):
         self.nodes.append(CollectionNode.create_default_node(exploration_id))
 
     def delete_node(self, exploration_id):
+        """Delets a collection node from the collection based on an
+        exploration id.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+        """
         node_index = self._find_node(exploration_id)
         if node_index is None:
             raise ValueError(
@@ -691,6 +886,35 @@ class CollectionSummary(object):
                  viewer_ids, contributor_ids, contributors_summary, version,
                  node_count, collection_model_created_on,
                  collection_model_last_updated):
+        """Constructs an CollectionSummary domain object.
+
+        Args:
+            collection_id: str. The unique id of the collection.
+            title: str. The title of the collection.
+            category: str. The category of the collection.
+            objective: str. The objective of the collection.
+            language_code: str. The language code of the collection (like 'en'
+                for English).
+            tags: list. The tags given to the collection.
+            status: str. The status of the collection.
+            community_owned: str. The community owned by the collection.
+            owner_ids: list(str). List of the user ids who are the owner of this
+                collection.
+            editor_ids: list(str). List of the user ids of the users who have
+                access to edit this collection.
+            viewer_ids: lsit(str). List of the user ids of the users who have
+                access to edit this collection.
+            contributor_ids: list(str). List of the user ids of the user who
+                have contributed to  this collection.
+            contributors_summary: dict. The summary given by the contributors to
+                the collection, user id as the key and summary as value.
+            version: int. The version of the collection.
+            node_count: int. The number of nodes present in the collection.
+            collection_model_created_on: datetime.datetime. Date and time on
+                which the collection model is created.
+            collection_model_last_updated: datetime.datetime. Date and time on
+                which the collection model is lastly updated.
+        """
         self.id = collection_id
         self.title = title
         self.category = category
@@ -710,6 +934,9 @@ class CollectionSummary(object):
         self.collection_model_last_updated = collection_model_last_updated
 
     def to_dict(self):
+        """Returns a dictionary representation of CollectionSummary domain
+        object.
+        """
         return {
             'id': self.id,
             'title': self.title,
