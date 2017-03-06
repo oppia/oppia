@@ -18,13 +18,13 @@
 
  describe('QuestionId Service ', function() {
   var QuestionIdService;
-  var stubs ;
+  var stubs;
 
   beforeEach(function() {
     stubs = {
-      questionId : "Introduction",
-      label : "Hints",
-      subfieldId : "Introduction:Hints"
+      questionId:"Introduction",
+      label:"Hints",
+      subfieldId:"Introduction:Hints"
     };
 
     module('oppia');
