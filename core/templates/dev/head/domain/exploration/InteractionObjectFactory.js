@@ -22,7 +22,7 @@ oppia.factory('InteractionObjectFactory', [
   var Interaction = function(answerGroups, confirmedUnclassifiedAnswers,
     customizationArgs, defaultOutcome, fallbacks, id) {
     this.answerGroups = generateAnswerGroupsFromBackend(answerGroups);
-    this.confirmed_unclassified_answers = confirmedUnclassifiedAnswers;
+    this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
     this.customization_args = customizationArgs;
     this.default_outcome = defaultOutcome;
     this.fallbacks = fallbacks;

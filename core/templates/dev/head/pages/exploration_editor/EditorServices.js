@@ -806,7 +806,7 @@ oppia.factory('explorationStatesService', [
     var PROPERTY_REF_DATA = {
       answer_groups: ['interaction', 'answerGroups'],
       confirmed_unclassified_answers: [
-        'interaction', 'confirmed_unclassified_answers'],
+        'interaction', 'confirmedUnclassifiedAnswers'],
       content: ['content'],
       default_outcome: ['interaction', 'default_outcome'],
       param_changes: ['paramChanges'],

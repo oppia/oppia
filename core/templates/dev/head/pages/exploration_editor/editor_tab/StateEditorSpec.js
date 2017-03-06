@@ -266,7 +266,7 @@ describe('State Editor controller', function() {
         answerGroups: state.interaction.answerGroups,
         defaultOutcome: state.interaction.default_outcome,
         confirmedUnclassifiedAnswers: (
-          state.interaction.confirmed_unclassified_answers)
+          state.interaction.confirmedUnclassifiedAnswers)
       });
 
       ecs.setActiveStateName('State');

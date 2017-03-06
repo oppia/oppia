@@ -109,7 +109,7 @@ oppia.controller('StateInteraction', [
         answerGroups: stateData.interaction.answerGroups,
         defaultOutcome: stateData.interaction.default_outcome,
         confirmedUnclassifiedAnswers: (
-          stateData.interaction.confirmed_unclassified_answers)
+          stateData.interaction.confirmedUnclassifiedAnswers)
       });
 
       _updateInteractionPreviewAndAnswerChoices();
