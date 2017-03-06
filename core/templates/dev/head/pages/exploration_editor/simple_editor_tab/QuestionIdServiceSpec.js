@@ -22,9 +22,9 @@
 
   beforeEach(function() {
     stubs = {
-      questionId:"Introduction",
-      label:"Hints",
-      subfieldId:"Introduction:Hints"
+      questionId: 'Introduction'
+      label: 'Hints',
+      subfieldId: 'Introduction:Hints'
     };
 
     module('oppia');
