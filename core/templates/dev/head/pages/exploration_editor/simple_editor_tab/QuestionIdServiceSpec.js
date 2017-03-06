@@ -22,7 +22,7 @@
 
   beforeEach(function() {
     stubs = {
-      questionId: 'Introduction'
+      questionId: 'Introduction',
       label: 'Hints',
       subfieldId: 'Introduction:Hints'
     };
