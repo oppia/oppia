@@ -71,8 +71,9 @@
       <span class="oppia-navbar-breadcrumb-separator"></span>
       <h1 class="oppia-exploration-h1"><span class="protractor-test-exploration-header oppia-exploration-header" itemprop="description">{{exploration_title}}</span></h1>
     </li>
-    <li ng-click="showInformationCard()" tooltip="<['I18N_PLAYER_INFO_TOOLTIP' | translate]>" tooltip-placement="bottom" style="cursor: pointer;" class="protractor-test-exploration-info-icon">
+    <li ng-click="showInformationCard()" tooltip="<['I18N_PLAYER_INFO_TOOLTIP' | translate]>" tooltip-placement="bottom" style="cursor: pointer;" class="oppia-exploration-info-icon protractor-test-exploration-info-icon" tabindex="0">
       <i class="material-icons oppia-navbar-breadcrumb-icon" style="font-size: 20px;">&#xE88E;</i>
+      <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_INFO_TOOLTIP' | translate]></span>
     </li>
   </ul>
 {% endblock navbar_breadcrumb %}
@@ -129,6 +130,13 @@
       display: inline;
       font-size: 1em;
       font-weight: normal;
+    }
+    .oppia-exploration-info-icon:focus {
+      background: #fff;
+      color: #009688;
+      margin-top: -13px;
+      height: 56px;
+      padding-top: 12px;
     }
   </style>
   {% include 'components/attribution_guide/attribution_guide_directive.html' %}
@@ -204,6 +212,35 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/StatsReportingService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionInterpolationService.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedCustomEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedDictEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedExpressionEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedFloatEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedHtmlEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedIntEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedListEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedCustomViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedDictViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedListViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedViewerDirective.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingDisplayDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CollectionSummaryTileDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CircularImageDirective.js"></script>
+
 
   {{ interaction_templates }}
   {{ gadget_templates }}

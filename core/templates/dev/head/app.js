@@ -15,7 +15,6 @@
 /**
  * @fileoverview Initialization and basic configuration for the Oppia module.
  */
-
 // TODO(sll): Remove the check for window.GLOBALS. This check is currently
 // only there so that the Karma tests run, since it looks like Karma doesn't
 // 'see' the GLOBALS variable that is defined in base.html. We should fix this
@@ -30,9 +29,10 @@ var oppia = angular.module(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
                    : []));
 
-// TODO(sll): Get this to read from a common JSON file; it's replicated in
-// feconf.
-oppia.constant('CATEGORY_LIST', GLOBALS.ALL_CATEGORIES);
+for (var constantName in constants) {
+  oppia.constant(constantName, constants[constantName]);
+}
+
 oppia.constant(
   'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', '/explorationsummarieshandler/data');
 
@@ -181,6 +181,9 @@ oppia.factory('deviceInfoService', ['$window', function($window) {
   return {
     isMobileDevice: function() {
       return typeof $window.orientation !== 'undefined';
+    },
+    isMobileUserAgent: function() {
+      return /Mobi/.test(navigator.userAgent);
     },
     hasTouchEvents: function() {
       return 'ontouchstart' in $window;
@@ -629,6 +632,14 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
     registerVisitOppiaFromIframeEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
         'VisitOppiaFromIframe', 'click', explorationId);
+    },
+    registerNewCard: function(cardNum) {
+      if (cardNum <= 10 || cardNum % 10 === 0) {
+        _sendEventToGoogleAnalytics('PlayerNewCard', 'click', cardNum);
+      }
+    },
+    registerFinishExploration: function() {
+      _sendEventToGoogleAnalytics('PlayerFinishExploration', 'click', '');
     }
   };
 }]);

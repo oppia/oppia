@@ -101,7 +101,7 @@
             </p>
           </div>
           <a ng-click="onApplyToTeachWithOppia()" class="btn oppia-about-button oppia-teach-button"
-             translate="I18N_ACTION_APPLY_TO_TEACH_WITH_OPPIA" target="_blank"></a>
+             translate="I18N_ACTION_APPLY_TO_TEACH_WITH_OPPIA" target="_blank" tabindex="0"></a>
         </div>
 
           <div class="playbook oppia-about-tab-content">
@@ -274,6 +274,7 @@
 {% block footer_js %}
   {{ super() }}
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/teach/Teach.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
 {% endblock footer_js %}
 
 {% block footer%}

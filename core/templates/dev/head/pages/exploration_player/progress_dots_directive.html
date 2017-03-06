@@ -36,6 +36,11 @@
       color: rgba(2,84,78,1);
       cursor: pointer;
     }
+    .oppia-progress-arrow:focus,
+    .oppia-progress-dot:focus {
+      outline: 1px dotted #212121;
+      outline: auto 5px -webkit-focus-ring-color;
+    }
 
     .oppia-progress-dot {
       position: relative;
@@ -88,7 +93,7 @@
   <ul class="oppia-progress-dot-list">
     <li class="oppia-progress-arrow" ng-show="dots.length > 1"
         ng-class="{'oppia-progress-arrow-active' : currentDotIndex > 0}"
-        ng-click="decrementCurrentDotIndex()">
+        ng-click="decrementCurrentDotIndex()" tabindex="0">
       <span class="sr-only" translate="I18N_PLAYER_BACK"></span>
       <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C4;</i>
     </li>
@@ -99,7 +104,8 @@
       <span class="oppia-progress-dot oppia-progress-dot-active"
             ng-if="$index === currentDotIndex" ng-show="dots.length > 1"
             tooltip="<['I18N_PLAYER_CARD_NUMBER_TOOLTIP' | translate]><[$index +1]>" tooltip-placement="left"
-            tooltip-trigger="none" tooltip-is-open="opened" mobile-friendly-tooltip>
+            tooltip-trigger="none" tooltip-is-open="opened" mobile-friendly-tooltip tabindex="0">
+        <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_CARD_NUMBER_TOOLTIP' | translate]><[$index +1]></span>
       </span>
       <span class="oppia-progress-dot oppia-progress-dot-inactive"
             ng-class="$index === leftmostVisibleDotIndex && $index !== 0 ? 'oppia-progress-dot-gradient-left':
@@ -108,12 +114,13 @@
             ng-if="$index !== currentDotIndex"
             ng-click="changeActiveDot($index)"
             tooltip="<['I18N_PLAYER_CARD_NUMBER_TOOLTIP' | translate]><[$index +1]>" tooltip-placement="left"
-            tooltip-trigger="none" tooltip-is-open="opened" mobile-friendly-tooltip>
+            tooltip-trigger="none" tooltip-is-open="opened" mobile-friendly-tooltip tabindex="0">
+        <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_CARD_NUMBER_TOOLTIP' | translate]><[$index +1]></span>
       </span>
     </li>
     <li class="oppia-progress-arrow" ng-show="dots.length > 1"
         ng-class="{'oppia-progress-arrow-active' : currentDotIndex != dots.length - 1}"
-        ng-click="incrementCurrentDotIndex()">
+        ng-click="incrementCurrentDotIndex()" tabindex="0">
       <span class="sr-only" translate="I18N_PLAYER_FORWARD"></span>
       <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C8;</i>
       </span>
