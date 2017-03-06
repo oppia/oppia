@@ -27,7 +27,7 @@
       subfieldId : "Introduction:Hints"
     };
 
-    module('oppia'));
+    module('oppia');
   });
 
   beforeEach(inject(function($injector) {
