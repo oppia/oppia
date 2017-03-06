@@ -16,7 +16,7 @@
  * @fileoverview Directive for the Social Sharing Links.
  */
 
-oppia.directive('sharingLinks', [function() {
+oppia.directive('sharingCollectionLinks', [function() {
   return {
     restrict: 'E',
     scope: {

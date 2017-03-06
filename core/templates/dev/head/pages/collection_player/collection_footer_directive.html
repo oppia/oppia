@@ -4,8 +4,7 @@
       <div class="col-sm-5">
         <ul class="author-profile">
           <li>
-            <img ng-src="<[getStaticImageUrl('/general/apple.svg')]>" class="collection-footer-img"
-                 ng-if="contributorNames.length > 0" alt="">
+            <img ng-src="<[getStaticImageUrl('/general/apple.svg')]>" class="collection-footer-img" alt="">
           </li>
           <li></li>
         </ul>
@@ -17,12 +16,12 @@
               <h4 translate="I18N_PLAYER_SHARE_THIS_COLLECTION" class="oppia-share-collection-footer"></h4>
             </li>
             <li>
-              <sharing-links ng-click="$event.stopPropagation()"
+              <sharing-collection-links ng-click="$event.stopPropagation()"
                              twitter-text="getTwitterText()"
-                             exploration-id="collectionId"
+                             collection-id="collectionId"
                              layout-type="row"
                              class="oppia-collection-footer-sharing-links">
-              </sharing-links>
+              </sharing-collection-links>
             </li>
           </ul>
         </div>

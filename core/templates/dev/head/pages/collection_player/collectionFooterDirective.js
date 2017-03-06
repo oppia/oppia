@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Directive for showing author/share footer
- * in exploration player.
+ * in collection player.
  */
 
 oppia.directive('collectionFooter', [function() {
@@ -25,81 +25,16 @@ oppia.directive('collectionFooter', [function() {
     },
     templateUrl: 'components/collectionFooter',
     controller: [
-      '$scope', '$http', '$log', 'CollectionObjectFactory',
-      'UrlInterpolationService', 'ReadOnlyCollectionBackendApiService',
-      'CollectionPlaythroughObjectFactory',
-      function(
-          $scope, $http, $log, CollectionObjectFactory,
-          UrlInterpolationService, ReadOnlyCollectionBackendApiService,
-          CollectionPlaythroughObjectFactory) {
+      '$scope', 'UrlInterpolationService', 
+      function($scope, UrlInterpolationService) {
         $scope.collectionId = GLOBALS.collectionId;
 
-        $scope.collection = null;
-
-        $scope.collectionPlaythrough = null;
-
         $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-
-        $scope.contributorNames = ['hello_sample'];
 
         $scope.getTwitterText = function() {
           return $scope.twitterText;
         };
-
-        $http.get('/collectionsummarieshandler/data', {
-          params: {
-            stringified_collection_ids: JSON.stringify([$scope.collectionId])
-          }
-        }).then(
-          function(response) {
-            console.log(response);
-            $scope.collectionAuthor = response.data.username;
-            console.log($scope.collectionAuthor);
-          },
-          function() {
-            allertsService.addWarning(
-              'There was an error while fetching the collection summary.');
-          });
-
-        
-        // ReadOnlyCollectionBackendApiService
-        //   .loadCollection($scope.collectionId).then(
-        //     function(collectionBackendObject) {
-        //       $scope.collection = CollectionObjectFactory.create(
-        //       collectionBackendObject);
-        //       $scope.collectionPlaythrough = (
-        //         CollectionPlaythroughObjectFactory.create(
-        //           collectionBackendObject.playthrough_dict));
-
-        //       $scope.collectionNodes = $scope.collection.getCollectionNodes();
-
-        //       for(var i = 0; i < $scope.collectionNodes.length; i++) {
-        //         console.log($scope.collectionNodes[i].getExplorationSummaryObject());
-        //         console.log('hello');
-        //       }
-
-        //      // console.log('hello world');
-        //      // console.log($scope.collection);
-
-        //      // for(var i in $scope.collection) {
-        //      //  console.log(i);
-        //      //  console.log('hello');
-        //      //}
-        //      // var summaryBackendObject = null;
-        //      // if (summaries.length > 0) {
-        //         // var contributorSummary = (
-        //         //   summaries[0].human_readable_contributors_summary);
-        //         // $scope.contributorNames = (
-        //         //   Object.keys(contributorSummary).sort(
-        //         //       function(contributorUsername1, contributorUsername2) {
-        //         //         var commitsOfContributor1 = contributorSummary[
-        //         //           contributorUsername1].num_commits;
-        //         //         var commitsOfContributor2 = contributorSummary[
-        //         //           contributorUsername2].num_commits;
-        //         //         return commitsOfContributor2 - commitsOfContributor1;
-        //         //       }));
-        //       });
-        }
+      }
     ]
   };
 }]);
