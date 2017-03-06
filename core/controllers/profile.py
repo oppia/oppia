@@ -78,8 +78,8 @@ class ProfileHandler(base.BaseHandler):
 
         created_exp_summary_dicts = []
         edited_exp_summary_dicts = []
-        created_collection_summary_dicts = []
-        edited_collection_summary_dicts = []
+        created_coll_summary_dicts = []
+        edited_coll_summary_dicts = []
 
         subscriber_ids = subscription_services.get_all_subscribers_of_creator(
             user_settings.user_id)
@@ -95,17 +95,17 @@ class ProfileHandler(base.BaseHandler):
             edited_exp_summary_dicts = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
                     user_contributions.edited_exploration_ids))
-            created_collection_summary_dicts = (
-                summary_services.get_displayable_collection_summary_dicts_matching_ids(       #pylint: disable=line-too-long
+            created_coll_summary_dicts = (
+                summary_services.get_displayable_collection_summary_dicts_matching_ids(        # pylint: disable=line-too-long
                     user_contributions.created_collection_ids))
-            edited_collection_summary_dicts = (
-                summary_services.get_displayable_collection_summary_dicts_matching_ids(       #pylint: disable=line-too-long
+            edited_coll_summary_dicts = (
+                summary_services.get_displayable_collection_summary_dicts_matching_ids(        # pylint: disable=line-too-long
                     user_contributions.edited_collection_ids))
 
-            profile_is_of_current_user = (self.username == username)
+            is_profile_of_current_user = (self.username == username)
 
         self.values.update({
-            'profile_is_of_current_user': profile_is_of_current_user,
+            'is_profile_of_current_user': is_profile_of_current_user,
             'profile_username': user_settings.username,
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests,
@@ -117,8 +117,8 @@ class ProfileHandler(base.BaseHandler):
                 user_settings.user_id),
             'created_exp_summary_dicts': created_exp_summary_dicts,
             'edited_exp_summary_dicts': edited_exp_summary_dicts,
-            'created_collection_summary_dicts': created_collection_summary_dicts,    #pylint: disable=line-too-long
-            'edited_collection_summary_dicts': edited_collection_summary_dicts,
+            'created_coll_summary_dicts': created_coll_summary_dicts,
+            'edited_coll_summary_dicts': edited_coll_summary_dicts,
             'is_already_subscribed': is_already_subscribed,
             'is_user_visiting_own_profile': is_user_visiting_own_profile
         })

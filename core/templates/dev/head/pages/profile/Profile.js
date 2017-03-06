@@ -49,11 +49,11 @@ oppia.controller('Profile', [
       }, {
         title: 'Created',
         value: data.created_exp_summary_dicts.length +
-               data.created_collection_summary_dicts.length
+               data.created_coll_summary_dicts.length
       }, {
         title: 'Edited',
         value: data.edited_exp_summary_dicts.length +
-               data.edited_collection_summary_dicts.length
+               data.edited_coll_summary_dicts.length
       }];
 
       $scope.userEditedExplorations = data.edited_exp_summary_dicts.sort(
@@ -73,7 +73,7 @@ oppia.controller('Profile', [
         }
       });
 
-      $scope.userEditedCollections = data.edited_collection_summary_dicts;
+      $scope.userEditedCollections = data.edited_coll_summary_dicts;
 
       $scope.userNotLoggedIn = !data.username;
 
@@ -87,7 +87,7 @@ oppia.controller('Profile', [
       $scope.startingActivityNumber = 1;
       $scope.endingActivityNumber = 6;
       $scope.Math = window.Math;
-      $scope.profileIsOfCurrentUser = data.profile_is_of_current_user;
+      $scope.profileIsOfCurrentUser = data.is_profile_of_current_user;
 
       $scope.changeSubscriptionStatus = function() {
         if ($scope.userNotLoggedIn) {
@@ -140,19 +140,19 @@ oppia.controller('Profile', [
         }
       };
 
-      $scope.Activites = [];
+      $scope.activities = [];
       for (var i = 0; i < $scope.userEditedExplorations.length; i++) {
-        $scope.Activites.push($scope.userEditedExplorations[i]);
+        $scope.activities.push($scope.userEditedExplorations[i]);
       }
 
       for (var k = 0; k < $scope.userEditedCollections.length; k++) {
-        $scope.Activites.push($scope.userEditedCollections[k]);
+        $scope.activities.push($scope.userEditedCollections[k]);
       }
 
       $scope.getActivityToDisplay = function() {
-        $scope.ActivitiesOnPage = [];
-        if ($scope.Activites.length === 0) {
-          return $scope.ActivitiesOnPage;
+        $scope.activitiesOnPage = [];
+        if ($scope.activities.length === 0) {
+          return $scope.activitiesOnPage;
         }
         $scope.activityIndexStart = (
           $scope.currentPageNumber * $scope.PAGE_SIZE);
@@ -160,17 +160,17 @@ oppia.controller('Profile', [
           $scope.activityIndexStart + $scope.PAGE_SIZE - 1);
         for (var ind = $scope.activityIndexStart;
             ind <= $scope.activityIndexEnd; ind++) {
-          $scope.ActivitiesOnPage.push($scope.Activites[ind]);
-          if (ind === $scope.Activites.length - 1) {
+          $scope.activitiesOnPage.push($scope.activities[ind]);
+          if (ind === $scope.activities.length - 1) {
             break;
           }
         }
-        return $scope.ActivitiesOnPage;
+        return $scope.activitiesOnPage;
       };
 
       $scope.numUserPortfolioActivity = (
         data.edited_exp_summary_dicts.length +
-        data.edited_collection_summary_dicts.length);
+        data.edited_coll_summary_dicts.length);
       $scope.subjectInterests = data.subject_interests;
       $scope.firstContributionMsec = data.first_contribution_msec;
       $scope.profilePictureDataUrl = (

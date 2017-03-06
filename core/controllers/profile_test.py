@@ -537,9 +537,10 @@ class UserContributionsTests(test_utils.GenericTestBase):
             self.EXP_ID_1)
 
 
-    def test_created_collection(self):
-        # check that the profile page for a user who has created
-        # a single collection shows 2 created and 2 edited.
+    def test_created_collections(self):
+        """check that the profile page for a user who has created
+        a single collection shows 2 created and 2 edited.
+        """
         self.signup(self.EMAIL_A, self.USERNAME_A)
         user_a_id = self.get_user_id_from_email(self.EMAIL_A)
 
@@ -594,9 +595,10 @@ class UserContributionsTests(test_utils.GenericTestBase):
             'the objective')
 
 
-    def test_edited_collection(self):
-        # Check that the profile page for a user who has edited
-        # a single collection shows 0 created and 1 edited.
+    def test_edited_collections(self):
+        """Check that the profile page for a user who has edited
+        a single collection shows 0 created and 1 edited.
+        """
         self.signup(self.EMAIL_A, self.USERNAME_A)
         user_a_id = self.get_user_id_from_email(self.EMAIL_A)
 

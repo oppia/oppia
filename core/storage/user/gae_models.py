@@ -47,9 +47,9 @@ class UserSettingsModel(base_models.BaseModel):
     last_edited_an_exploration = ndb.DateTimeProperty(default=None)
     # When the user last created an exploration.
     last_created_an_exploration = ndb.DateTimeProperty(default=None)
-    # when the user last created an collection
+    # When the user last created an collection
     last_created_an_collection = ndb.DateTimeProperty(default=None)
-    # when the user last edited an collection
+    # When the user last edited an collection
     last_edited_an_collection = ndb.DateTimeProperty(default=None)
     # User uploaded profile picture as a dataURI string. May be None.
     profile_picture_data_url = ndb.TextProperty(default=None, indexed=False)
@@ -116,7 +116,7 @@ class UserContributionsModel(base_models.BaseModel):
     edited_exploration_ids = ndb.StringProperty(
         repeated=True, indexed=True, default=None)
     # IDs of collection that this user has created
-    #Includes subsequently deleted and private collections.
+    # Includes subsequently deleted and private collections.
     created_collection_ids = ndb.StringProperty(repeated=True, indexed=True)
     #Ids of collection that this user has made a positive
     # (i.e. non-revert) commit to.

@@ -862,8 +862,8 @@ def record_user_created_an_exploration(user_id):
         _save_user_settings(user_settings)
 
 def record_user_created_an_collection(user_id):
-    """
-    adfnasn
+    """Updates last_created _an_collection to the current datetime
+    for the user with given user_id.
     """
     user_settings = get_user_settings(user_id)
     if user_settings:
@@ -871,8 +871,8 @@ def record_user_created_an_collection(user_id):
         _save_user_settings(user_settings)
 
 def record_user_edited_an_collection(user_id):
-    """
-    knd n svcbnsac
+    """Updates last_edited_an_collection to the current datetime
+    for the user with given user_id.
     """
     user_settings = get_user_settings(user_id)
     if user_settings:
@@ -1059,7 +1059,6 @@ class UserContributions(object):
         edited_exploration_ids: list(str). IDs of explorations that this
             user has edited.
     """
-
     def __init__(
             self, user_id, created_exploration_ids, edited_exploration_ids,
             created_collection_ids, edited_collection_ids):
@@ -1247,8 +1246,12 @@ def add_edited_exploration_id(user_id, exploration_id):
 
 
 def add_created_collection_id(user_id, collection_id):
-    """
-    s;dfns q
+    """Adds an collection_id to a user_id's UserContributionalModel collection
+    of created collection.
+
+    Args:
+        user_id: str. The user id.
+        collection_id: str. The collection_id.
     """
     user_contributions = get_user_contributions(user_id, strict=False)
 
@@ -1261,8 +1264,12 @@ def add_created_collection_id(user_id, collection_id):
 
 
 def add_edited_collection_id(user_id, collection_id):
-    """
-    dfn sdf aldnf
+    """Adds an collection_id to a user_id's UserContributionalModel collection
+    of edited collection.
+
+    Args:
+        user_id: str. The user id.
+        collection_id: str. The collection_id.
     """
     user_contributions = get_user_contributions(user_id, strict=False)
 
