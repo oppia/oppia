@@ -299,9 +299,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<exploration_id>' % feconf.EXPLORATION_DATA_PREFIX,
         editor.ExplorationHandler),
     get_redirect_route(
-        r'%s/<exploration_id>' % feconf.EDITABLE_EXPLORATION_DATA_PREFIX,
-        editor.ExplorationHandler),
-    get_redirect_route(
         r'/createhandler/download/<exploration_id>',
         editor.ExplorationDownloadHandler),
     get_redirect_route(
