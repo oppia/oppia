@@ -25,7 +25,7 @@ oppia.directive('collectionFooter', [function() {
     },
     templateUrl: 'components/collectionFooter',
     controller: [
-      '$scope', 'UrlInterpolationService', 
+      '$scope', 'UrlInterpolationService',
       function($scope, UrlInterpolationService) {
         $scope.collectionId = GLOBALS.collectionId;
 
