@@ -93,7 +93,7 @@
           <div class="oppia-library-group" ng-repeat="group in libraryGroups track by $index" ng-mouseenter="setActiveGroup($index)" ng-mouseleave="clearActiveGroup()">
             <div class="row oppia-library-group-header-container">
               <h2 ng-class="{'active': activeGroupIndex === $index}" class="oppia-library-group-header">
-                <a ng-if="group.has_full_results_page" class="protractor-test-library-<[group.protractor_id]>" ng-click="showFullResultsPage(group.categories, group.full_results_url)">
+                <a ng-if="group.has_full_results_page" class="protractor-test-library-<[group.protractor_id]>" ng-click="showFullResultsPage(group.categories, group.full_results_url)" tabindex="0">
                   <span translate="<[group.header_i18n_id]>"></span>
                   <span ng-show="activeGroupIndex === $index"><i class="material-icons md-32">&#xE315;</i></span>
                 </a>
@@ -109,7 +109,8 @@
                          ng-hide="leftmostCardIndices[$index] == 0">
                 <i class="material-icons">&#xE314;</i>
               </md-button>
-              <div class="oppia-library-carousel-scroller" ng-if="leftmostCardIndices[$index] == 0"></div>
+              <div class="oppia-library-carousel-scroller" ng-if="leftmostCardIndices[$index] == 0" aria-hidden="true">
+              </div>
 
               <div class="oppia-library-carousel"
                    ng-swipe-right="scroll($index, true)"
@@ -144,7 +145,8 @@
 
               <md-button class="md-no-ink oppia-library-carousel-scroller"
                          ng-click="scroll($index, false)"
-                         ng-hide="(group.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[$index]">
+                         ng-hide="(group.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[$index]"
+                         aria-hidden="true">
                 <i class="material-icons">&#xE315;</i>
               </md-button>
               <div class="oppia-library-carousel-scroller"
@@ -154,7 +156,8 @@
             <div ng-if="libraryWindowIsNarrow && leftmostCardIndices">
               <md-button class="md-no-ink oppia-library-carousel-scroller"
                          ng-click="decrementLeftmostCardIndex($index)"
-                         ng-hide="leftmostCardIndices[$index] == 0">
+                         ng-hide="leftmostCardIndices[$index] == 0"
+                         aria-hidden="true">
                 <i class="material-icons">&#xE314;</i>
               </md-button>
               <div class="oppia-library-carousel-scroller" ng-if="leftmostCardIndices[$index] == 0"></div>
@@ -218,11 +221,17 @@
 
 {% block footer_js %}
   {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/searchService.js"></script>
+  
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/profile_link/ProfileLinkImageDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CollectionSummaryTileDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CircularImageDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/library/Library.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/library/LibraryFooter.js"></script>
-
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/library/ActivityTilesInfinityGridDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/library/SearchBarDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/library/SearchResultsDirective.js"></script>

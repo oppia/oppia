@@ -30,7 +30,7 @@ EXPECTED_THREAD_KEYS = [
     'thread_id', 'subject', 'last_updated']
 EXPECTED_MESSAGE_KEYS = [
     'author_username', 'created_on', 'exploration_id', 'message_id',
-    'text', 'updated_status', 'updated_subject']
+    'text', 'updated_status', 'updated_subject', 'received_via_email']
 
 
 class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
