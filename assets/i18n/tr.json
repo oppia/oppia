@@ -18,6 +18,7 @@
 	"I18N_DASHBOARD_COLLECTIONS": "Koleksiyonlarım",
 	"I18N_DASHBOARD_EXPLORATIONS": "Konu Anlatımlarım",
 	"I18N_DASHBOARD_OPEN_FEEDBACK": "Dönütleri aç",
+	"I18N_DASHBOARD_SUBSCRIBERS": "Aboneler",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Resmi buraya sürükleyin",
 	"I18N_DIRECTIVES_OR_SELECT_FILE": "veya bir resim dosyası seçin",
 	"I18N_ERROR_DISABLED_EXPLORATION": "Kapalı Konu Anlatımı",
@@ -86,6 +87,10 @@
 	"I18N_INTERACTIONS_MUSIC_PLAY": "Oynat",
 	"I18N_INTERACTIONS_MUSIC_PLAY_SEQUENCE": "Hedef Diziyi Oynat",
 	"I18N_INTERACTIONS_MUSIC_SUBMIT": "Gönder",
+	"I18N_INTERACTIONS_PENCILCODEEDITOR_ARE_YOU_SURE_YOU_WANT_TO_RESET_YOUR_CODE": "Kodunuzu sıfırlamak istediğinizden emin misiniz?",
+	"I18N_INTERACTIONS_PENCILCODEEDITOR_CANCEL": "İptal",
+	"I18N_INTERACTIONS_PENCILCODEEDITOR_CONFIRMATION_REQUIRED": "Onay Gerekiyor",
+	"I18N_INTERACTIONS_PENCILCODEEDITOR_RESET_CODE": "Kodu Sıfırla",
 	"I18N_INTERACTIONS_SET_INPUT_ADD_ITEM": "Madde ekle",
 	"I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR": "Eyvah, setinde kopyalar var gibi gözüküyor!",
 	"I18N_INTERACTIONS_SET_INPUT_EMPTY_SET": "(Her satıra bir madde ekle.)",
@@ -158,6 +163,7 @@
 	"I18N_LIBRARY_SUB_HEADER": "Konu anlatımlarını inceleyerek macerana başla.",
 	"I18N_LIBRARY_VIEWS_TOOLTIP": "Görüntülenme",
 	"I18N_LIBRARY_VIEW_ALL": "Hepsini görüntüle",
+	"I18N_ONE_SUBSCRIBER_TEXT": "1 abonen var.",
 	"I18N_PLAYER_BACK": "Geri",
 	"I18N_PLAYER_CARD_NUMBER_TOOLTIP": "Kart #",
 	"I18N_PLAYER_COMMUNITY_EDITABLE_TOOLTIP": "Birlikte düzenlenebilir",
@@ -297,5 +303,6 @@
 	"I18N_TOPNAV_PREFERENCES": "Tercihler",
 	"I18N_TOPNAV_SIGN_IN": "Gİrİş Yap",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Oppia ile Öğret",
+	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Toplam <[totalSubscribers]> aboneniz var.",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Abonelikten çık"
 }
