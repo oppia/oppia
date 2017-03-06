@@ -93,6 +93,7 @@ exports.config = {
       'protractor/libraryPagesTour.js',
       'protractor/collections.js',
       'protractor/explorationFeedback.js',
+       'protractor/subscriptions.js',
       'protractor/backBrowserButton.js'
     ],
 

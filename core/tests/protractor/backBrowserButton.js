@@ -38,24 +38,33 @@ describe('backBrowserButton', function() {
   it('Checks Back Button Functionality', function() {
     visitSplashPage();
     element(by.css('.protractor-test-create-activity')).click();
-    users.createUser('user1@ExplorationFeedback.com',
-                     'creatorExplorationFeedback');
-    users.login('user1@ExplorationFeedback.com');
+    users.createUser('user1@backBrowserButton.com',
+                     'creatorBackBrowserButton');
+    users.login('user1@backBrowserButton.com');
     general.waitForSystem();
     nextpage();
     editor.exitTutorialIfNecessary();
     browser.navigate().back();
+    expect(browser.getCurrentUrl()).
+      toEqual('http://localhost:9001/dashboard?mode=create#/created=true');
     general.waitForSystem();
-    workflow.createAndPublishExploration(EXPLORATION_TITLE,
-                                         EXPLORATION_CATEGORY,
-                                         EXPLORATION_OBJECTIVE,
-                                         EXPLORATION_LANGUAGE);
     browser.get(general.LIBRARY_URL_SUFFIX);
-    library.playExploration(EXPLORATION_TITLE);
+    workflow.createExploration();
     browser.navigate().back();
     general.waitForSystem();
+    expect(browser.getCurrentUrl()).
+      toEqual('http://localhost:9001/dashboard?mode=create#/created=true');
+    browser.navigate().back();
+    general.waitForSystem();
+    expect(browser.getCurrentUrl()).
+      toEqual('http://localhost:9001/library');
     browser.navigate().forward();
     general.waitForSystem();
+    expect(browser.getCurrentUrl()).
+      toEqual('http://localhost:9001/dashboard?mode=create#/created=true');
+    browser.navigate().forward();
+    general.waitForSystem();
+    expect(browser.getLocationAbsUrl()).toEqual('/gui/Introduction');
   });
 
   afterEach(function() {
