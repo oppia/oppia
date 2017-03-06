@@ -102,12 +102,12 @@ oppia.controller('StateInteraction', [
       stateInteractionIdService.init(
         $scope.stateName, stateData.interaction.id);
       stateCustomizationArgsService.init(
-        $scope.stateName, stateData.interaction.customization_args);
+        $scope.stateName, stateData.interaction.customizationArgs);
 
       $rootScope.$broadcast('initializeAnswerGroups', {
         interactionId: stateData.interaction.id,
         answerGroups: stateData.interaction.answerGroups,
-        defaultOutcome: stateData.interaction.default_outcome,
+        defaultOutcome: stateData.interaction.defaultOutcome,
         confirmedUnclassifiedAnswers: (
           stateData.interaction.confirmedUnclassifiedAnswers)
       });

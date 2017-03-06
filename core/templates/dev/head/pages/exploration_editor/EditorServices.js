@@ -808,11 +808,11 @@ oppia.factory('explorationStatesService', [
       confirmed_unclassified_answers: [
         'interaction', 'confirmedUnclassifiedAnswers'],
       content: ['content'],
-      default_outcome: ['interaction', 'default_outcome'],
+      default_outcome: ['interaction', 'defaultOutcome'],
       param_changes: ['paramChanges'],
       fallbacks: ['interaction', 'fallbacks'],
       widget_id: ['interaction', 'id'],
-      widget_customization_args: ['interaction', 'customization_args']
+      widget_customization_args: ['interaction', 'customizationArgs']
     };
 
     var _setState = function(stateName, stateData, refreshGraph) {
@@ -1046,9 +1046,9 @@ oppia.factory('explorationStatesService', [
                 groups[i].outcome.dest = otherStateName;
               }
             }
-            if (interaction.default_outcome) {
-              if (interaction.default_outcome.dest === deleteStateName) {
-                interaction.default_outcome.dest = otherStateName;
+            if (interaction.defaultOutcome) {
+              if (interaction.defaultOutcome.dest === deleteStateName) {
+                interaction.defaultOutcome.dest = otherStateName;
               }
             }
 
@@ -1097,9 +1097,9 @@ oppia.factory('explorationStatesService', [
               groups[i].outcome.dest = newStateName;
             }
           }
-          if (interaction.default_outcome) {
-            if (interaction.default_outcome.dest === oldStateName) {
-              interaction.default_outcome.dest = newStateName;
+          if (interaction.defaultOutcome) {
+            if (interaction.defaultOutcome.dest === oldStateName) {
+              interaction.defaultOutcome.dest = newStateName;
             }
           }
 
@@ -1654,7 +1654,7 @@ oppia.factory('newStateTemplateService',
           interaction: newStateTemplate.interaction,
           param_changes: newStateTemplate.param_changes
         });
-        newState.interaction.default_outcome.dest = newStateName;
+        newState.interaction.defaultOutcome.dest = newStateName;
         return newState;
       }
     };
@@ -1685,10 +1685,10 @@ oppia.factory('computeGraphService', [
             });
           }
 
-          if (interaction.default_outcome) {
+          if (interaction.defaultOutcome) {
             links.push({
               source: stateName,
-              target: interaction.default_outcome.dest,
+              target: interaction.defaultOutcome.dest,
               isFallback: false
             });
           }
@@ -1974,8 +1974,8 @@ oppia.factory('explorationWarningsService', [
             'oppiaInteractive' + _states[stateName].interaction.id +
             'Validator');
           var interactionWarnings = $filter(validatorName)(
-            stateName, interaction.customization_args,
-            interaction.answerGroups, interaction.default_outcome);
+            stateName, interaction.customizationArgs,
+            interaction.answerGroups, interaction.defaultOutcome);
 
           for (var j = 0; j < interactionWarnings.length; j++) {
             if (stateWarnings.hasOwnProperty(stateName)) {

@@ -264,7 +264,7 @@ describe('State Editor controller', function() {
       var state = ess.getState('State');
       rs.init({
         answerGroups: state.interaction.answerGroups,
-        defaultOutcome: state.interaction.default_outcome,
+        defaultOutcome: state.interaction.defaultOutcome,
         confirmedUnclassifiedAnswers: (
           state.interaction.confirmedUnclassifiedAnswers)
       });
@@ -451,7 +451,7 @@ describe('State Editor controller', function() {
       ess.setState('State', state);
       rs.init({
         answerGroups: state.interaction.answerGroups,
-        defaultOutcome: state.interaction.default_outcome,
+        defaultOutcome: state.interaction.defaultOutcome,
         confirmedUnclassifiedAnswers: (
           state.interaction.confirmedUnclassifiedAnswers)
       });

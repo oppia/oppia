@@ -324,9 +324,9 @@ oppia.factory('trainingDataService', [
           potentialOutcomes.push(interaction.answerGroups[i].outcome);
         }
 
-        if (interaction.default_outcome) {
-          var outcome = interaction.default_outcome;
-          potentialOutcomes.push(interaction.default_outcome);
+        if (interaction.defaultOutcome) {
+          var outcome = interaction.defaultOutcome;
+          potentialOutcomes.push(interaction.defaultOutcome);
         }
 
         return potentialOutcomes;

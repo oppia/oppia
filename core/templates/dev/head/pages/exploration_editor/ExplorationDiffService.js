@@ -232,8 +232,8 @@ oppia.factory('ExplorationDiffService', [
           var dest = groups[h].outcome.dest;
           adjMatrix[stateIds[stateName]][stateIds[dest]] = true;
         }
-        if (interaction.default_outcome) {
-          var defaultDest = interaction.default_outcome.dest;
+        if (interaction.defaultOutcome) {
+          var defaultDest = interaction.defaultOutcome.dest;
           adjMatrix[stateIds[stateName]][stateIds[defaultDest]] = true;
         }
       }

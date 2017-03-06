@@ -99,7 +99,7 @@ oppia.factory('AnswerClassificationService', [
         var deferred = $q.defer();
         var result = null;
         var answerGroups = oldState.interaction.answerGroups;
-        var defaultOutcome = oldState.interaction.default_outcome;
+        var defaultOutcome = oldState.interaction.defaultOutcome;
         if (interactionRulesService) {
           result = classifyAnswer(
             answer, answerGroups, defaultOutcome, interactionRulesService);

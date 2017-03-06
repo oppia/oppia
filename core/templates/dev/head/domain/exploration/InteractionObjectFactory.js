@@ -23,8 +23,8 @@ oppia.factory('InteractionObjectFactory', [
     customizationArgs, defaultOutcome, fallbacks, id) {
     this.answerGroups = generateAnswerGroupsFromBackend(answerGroups);
     this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
-    this.customization_args = customizationArgs;
-    this.default_outcome = defaultOutcome;
+    this.customizationArgs = customizationArgs;
+    this.defaultOutcome = defaultOutcome;
     this.fallbacks = fallbacks;
     this.id = id;
   };
@@ -44,8 +44,8 @@ oppia.factory('InteractionObjectFactory', [
         return answerGroup.toBackendDict();
       }),
       confirmed_unclassified_answers: this.confirmed_unclassified_answers,
-      customization_args: this.customization_args,
-      default_outcome: this.default_outcome,
+      customization_args: this.customizationArgs,
+      default_outcome: this.defaultOutcome,
       fallbacks: this.fallbacks,
       id: this.id
     };

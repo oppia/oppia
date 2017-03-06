@@ -842,7 +842,7 @@ describe('New state template service', function() {
           interaction: {
             answerGroups: [],
             confirmedUnclassifiedAnswers: [],
-            customization_args: {
+            customizationArgs: {
               rows: {
                 value: 1
               },
@@ -850,7 +850,7 @@ describe('New state template service', function() {
                 value: 'Type your answer here.'
               }
             },
-            default_outcome: {
+            defaultOutcome: {
               dest: NEW_STATE_NAME,
               feedback: [],
               param_changes: []
