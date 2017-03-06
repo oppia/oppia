@@ -28,12 +28,12 @@
            ruleSpecs : [
              {
                inputs : {
-                 x : 1;
+                 x : 1
                },
-               rule_type : "Equals";
+               rule_type : "Equals"
            }],
            outcome : {
-             dest : "Question 1";
+             dest : "Question 1"
            }
          }
        ],
@@ -51,13 +51,13 @@
            ruleSpecs : [
              {
                inputs : {
-                 x : 1;
+                 x : 1
                }
               //  I have deleted the rule_type to make it invalid
              }
            ],
            outcome : {
-             dest : "Question 1";
+             dest : "Question 1"
            }
          }],
        customizationArgs = {
