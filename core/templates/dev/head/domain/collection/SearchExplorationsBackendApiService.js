@@ -24,7 +24,6 @@ oppia.factory('SearchExplorationsBackendApiService', [
       '/exploration/metadata_search?q=<query>');
 
     var _getExplorations = function(searchQuery, successCallback, errorCallback) {
-      if (/^[a-zA-Z0-9- ]*$/.test(searchQuery)) {
         queryUrl = UrlInterpolationService.interpolateUrl(
           SEARCH_EXPLORATION_URL_TEMPLATE, {
             query: searchQuery
@@ -39,7 +38,6 @@ oppia.factory('SearchExplorationsBackendApiService', [
             errorCallback(errorResponse.data);
           }
         });
-      }
     };
     return {
       getExplorations: function(searchQuery) {

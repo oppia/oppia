@@ -25,30 +25,32 @@ oppia.directive('collectionNodeCreator', [function() {
       'validatorsService', 'CollectionEditorStateService',
       'CollectionLinearizerService', 'CollectionUpdateService',
       'CollectionNodeObjectFactory', 'ExplorationSummaryBackendApiService',
-      'siteAnalyticsService', 'UrlInterpolationService',
-      'SearchExplorationsBackendApiService',
+      'SearchExplorationsBackendApiService','siteAnalyticsService',
+      'UrlInterpolationService',
       function(
           $scope, $http, $window, $filter, alertsService,
           validatorsService, CollectionEditorStateService,
           CollectionLinearizerService, CollectionUpdateService,
           CollectionNodeObjectFactory, ExplorationSummaryBackendApiService,
-          siteAnalyticsService, UrlInterpolationService,
-          SearchExplorationsBackendApiService) {
+          SearchExplorationsBackendApiService, siteAnalyticsService,
+          UrlInterpolationService) {
         $scope.collection = CollectionEditorStateService.getCollection();
         $scope.newExplorationId = '';
         $scope.newExplorationTitle = '';
         var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
 
         $scope.fetchExplorationsMetadata = function(searchQuery) {
-          return SearchExplorationsBackendApiService.getExplorations(searchQuery).then(
-          function(explorationMetadataObject) {
-            return explorationMetadataObject.map(function(item) {
-                return '(#' + item.id + ') ' + item.title;
+          if (/^[a-zA-Z0-9- ]*$/.test(searchQuery)) {
+            return SearchExplorationsBackendApiService.getExplorations(searchQuery).then(
+            function(explorationMetadataObject) {
+              return explorationMetadataObject.map(function(item) {
+                  return '(#' + item.id + ') ' + item.title;
+              });
+            },
+            function(error) {
+              alertsService.addWarning('There was an error when searching the explorations.');
             });
-          },
-          function(error) {
-            alertsService.addWarning('There was an error when searching the explorations.');
-          });
+          }
         };
 
         var addExplorationToCollection = function(newExplorationId) {
