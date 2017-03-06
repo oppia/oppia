@@ -47,7 +47,8 @@ describe('oppiaInteractiveEndExplorationValidator', function() {
         outcome: {
           dest: 'Second State',
           feedback: []
-        }
+        },
+        correct: false
       }
     ];
   }));
