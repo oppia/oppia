@@ -334,7 +334,7 @@ describe('State Editor controller', function() {
       // unclassified answers.
       tds.trainDefaultResponse('third answer');
       state = ess.getState('State');
-      expect(state.interaction.confirmed_unclassified_answers).toEqual([
+      expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
         'third answer'
       ]);
     });
@@ -355,7 +355,7 @@ describe('State Editor controller', function() {
           training_data: ['text answer', 'second answer']
         }
       });
-      expect(state.interaction.confirmed_unclassified_answers).toEqual([
+      expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
         'third answer'
       ]);
 
@@ -368,7 +368,7 @@ describe('State Editor controller', function() {
           training_data: ['text answer']
         }
       });
-      expect(state.interaction.confirmed_unclassified_answers).toEqual([
+      expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
         'third answer', 'second answer'
       ]);
 
@@ -381,7 +381,7 @@ describe('State Editor controller', function() {
           training_data: ['text answer', 'third answer']
         }
       });
-      expect(state.interaction.confirmed_unclassified_answers).toEqual([
+      expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
         'second answer'
       ]);
     });
@@ -399,7 +399,7 @@ describe('State Editor controller', function() {
           training_data: ['text answer']
         }
       });
-      expect(state.interaction.confirmed_unclassified_answers).toEqual([
+      expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
         'second answer'
       ]);
 
@@ -412,7 +412,7 @@ describe('State Editor controller', function() {
           training_data: ['text answer', 'second answer']
         }
       });
-      expect(state.interaction.confirmed_unclassified_answers).toEqual([]);
+      expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([]);
 
       // Ensure emptying the answer group's classifier properly deletes the rule
       // since there is another rule in the group.
@@ -425,7 +425,7 @@ describe('State Editor controller', function() {
           x: 'Test'
         }
       }]);
-      expect(state.interaction.confirmed_unclassified_answers).toEqual([
+      expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
         'second answer', 'text answer'
       ]);
 
@@ -453,7 +453,7 @@ describe('State Editor controller', function() {
         answerGroups: state.interaction.answerGroups,
         defaultOutcome: state.interaction.default_outcome,
         confirmedUnclassifiedAnswers: (
-          state.interaction.confirmed_unclassified_answers)
+          state.interaction.confirmedUnclassifiedAnswers)
       });
 
       tds.trainDefaultResponse('second answer');
@@ -479,7 +479,7 @@ describe('State Editor controller', function() {
           training_data: ['text answer']
         }
       });
-      expect(state.interaction.confirmed_unclassified_answers).toEqual([
+      expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
         'second answer'
       ]);
 

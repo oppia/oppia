@@ -841,7 +841,7 @@ describe('New state template service', function() {
           }],
           interaction: {
             answerGroups: [],
-            confirmed_unclassified_answers: [],
+            confirmedUnclassifiedAnswers: [],
             customization_args: {
               rows: {
                 value: 1
