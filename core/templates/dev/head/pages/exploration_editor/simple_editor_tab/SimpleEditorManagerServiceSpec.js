@@ -19,7 +19,7 @@
 describe('Simple Editor Manager Service', function() {
   var stubs;
   var pageData;
-  var srv;
+  var simpleEditorManagerService;
   var questionList;
 
   beforeEach(function() {
@@ -137,7 +137,7 @@ describe('Simple Editor Manager Service', function() {
   }));
 
   beforeEach(inject(function($injector) {
-    srv = $injector.get('SimpleEditorManagerService');
+    simpleEditorManagerService = $injector.get('SimpleEditorManagerService');
   }));
 
   beforeEach(function() {
@@ -183,14 +183,14 @@ describe('Simple Editor Manager Service', function() {
   });
 
   it('should initialize the local data variables', function() {
-    var returnedValue = srv.tryToInit();
-    expect(srv.getData()).not.toBeNull();
-    expect(srv.getIntroductionHtml()).not.toBeNull();
-    expect(srv.getQuestionList()).not.toBeNull();
+    var returnedValue = simpleEditorManagerService.tryToInit();
+    expect(simpleEditorManagerService.getData()).not.toBeNull();
+    expect(simpleEditorManagerService.getIntroductionHtml()).not.toBeNull();
+    expect(simpleEditorManagerService.getQuestionList()).not.toBeNull();
     expect(returnedValue).toBeTruthy();
 
     pageData.questions = null;
-    returnedValue = srv.tryToInit();
+    returnedValue = simpleEditorManagerService.tryToInit();
     expect(returnedValue).toBeFalsy();
   });
 
@@ -202,44 +202,44 @@ describe('Simple Editor Manager Service', function() {
     };
     // In most of the cases data will be used after they have been initialized
     // by calling tryToInit().
-    srv.tryToInit();
-    expect(srv.getData()).toEqual(fakeData);
+    simpleEditorManagerService.tryToInit();
+    expect(simpleEditorManagerService.getData()).toEqual(fakeData);
   });
 
   it('should return title', function() {
     var fakeTitle = pageData.title;
     // In most of the cases Title wil be valid only after it has been
     // initialized by calling tryToInit().
-    srv.tryToInit();
-    expect(srv.getTitle()).toEqual(fakeTitle);
+    simpleEditorManagerService.tryToInit();
+    expect(simpleEditorManagerService.getTitle()).toEqual(fakeTitle);
   });
 
   it('should return introduction html', function() {
     var fakeIntroductionHtml = pageData.introductionHtml;
-    srv.tryToInit();
-    expect(srv.getIntroductionHtml()).toEqual(fakeIntroductionHtml);
+    simpleEditorManagerService.tryToInit();
+    expect(simpleEditorManagerService.getIntroductionHtml()).toEqual(fakeIntroductionHtml);
   });
 
   it('should return question list', function() {
     var fakeQuestionList = questionList;
-    srv.tryToInit();
-    expect(srv.getQuestionList()).toEqual(questionList);
+    simpleEditorManagerService.tryToInit();
+    expect(simpleEditorManagerService.getQuestionList()).toEqual(questionList);
   });
 
   it('should save the given new title', function() {
     var fakeNewTitle = 'ExpNewTitle';
-    srv.saveTitle(fakeNewTitle);
+    simpleEditorManagerService.saveTitle(fakeNewTitle);
     expect(stubs.SimpleEditorShimService.saveTitle)
       .toHaveBeenCalledWith(fakeNewTitle);
-    expect(srv.getTitle()).toEqual(fakeNewTitle);
+    expect(simpleEditorManagerService.getTitle()).toEqual(fakeNewTitle);
   });
 
   it('should save the given new introduction html', function() {
     var fakeNewIntroductionHtml = '<p> new intro </p>';
-    srv.saveIntroductionHtml(fakeNewIntroductionHtml);
+    simpleEditorManagerService.saveIntroductionHtml(fakeNewIntroductionHtml);
     expect(stubs.SimpleEditorShimService.saveIntroductionHtml)
       .toHaveBeenCalledWith(fakeNewIntroductionHtml);
-    expect(srv.getIntroductionHtml()).toEqual(fakeNewIntroductionHtml);
+    expect(simpleEditorManagerService.getIntroductionHtml()).toEqual(fakeNewIntroductionHtml);
   });
 
   it('should save the customization args', function() {
@@ -251,8 +251,8 @@ describe('Simple Editor Manager Service', function() {
         ]
       }
     };
-    srv.tryToInit();
-    srv.saveCustomizationArgs(stateName, newCustomizationArgs);
+    simpleEditorManagerService.tryToInit();
+    simpleEditorManagerService.saveCustomizationArgs(stateName, newCustomizationArgs);
     expect(stubs.SimpleEditorShimService.saveCustomizationArgs)
       .toHaveBeenCalledWith(stateName, newCustomizationArgs);
     expect(questionList.getBindableQuestion).toHaveBeenCalledWith(stateName);
@@ -268,8 +268,8 @@ describe('Simple Editor Manager Service', function() {
         }
       }]
     }];
-    srv.tryToInit();
-    srv.saveAnswerGroups(stateName, newAnswerGroups);
+    simpleEditorManagerService.tryToInit();
+    simpleEditorManagerService.saveAnswerGroups(stateName, newAnswerGroups);
     expect(stubs.SimpleEditorShimService.saveAnswerGroups)
       .toHaveBeenCalledWith(stateName, newAnswerGroups);
     expect(questionList.getBindableQuestion).toHaveBeenCalledWith(stateName);
@@ -283,8 +283,8 @@ describe('Simple Editor Manager Service', function() {
         '<p>One is wrong bcz ofisEmpty many reasons</p>'
       ]
     };
-    srv.tryToInit();
-    srv.saveDefaultOutcome(stateName, newDefaultOutcome);
+    simpleEditorManagerService.tryToInit();
+    simpleEditorManagerService.saveDefaultOutcome(stateName, newDefaultOutcome);
     expect(stubs.SimpleEditorShimService.saveDefaultOutcome)
       .toHaveBeenCalledWith(stateName, newDefaultOutcome);
     expect(questionList.getBindableQuestion).toHaveBeenCalledWith(stateName);
@@ -293,8 +293,8 @@ describe('Simple Editor Manager Service', function() {
   it('should save the bridge html', function() {
     var stateName = 'Introduction';
     var newBridgeHtml = '<p> lets move to next Qsn </p>';
-    srv.tryToInit();
-    srv.saveBridgeHtml(stateName, newBridgeHtml);
+    simpleEditorManagerService.tryToInit();
+    simpleEditorManagerService.saveBridgeHtml(stateName, newBridgeHtml);
     expect(stubs.SimpleEditorShimService.saveBridgeHtml)
       .toHaveBeenCalledWith(questionList.getNextStateName(stateName),
         newBridgeHtml);
@@ -321,8 +321,8 @@ describe('Simple Editor Manager Service', function() {
       param_changes: []
     };
 
-    srv.tryToInit();
-    srv.addNewQuestion();
+    simpleEditorManagerService.tryToInit();
+    simpleEditorManagerService.addNewQuestion();
 
     expect(stubs.SimpleEditorShimService.saveInteractionId)
       .toHaveBeenCalledWith(lastStateName, DEFAULT_INTERACTION.ID);
@@ -336,8 +336,8 @@ describe('Simple Editor Manager Service', function() {
   });
 
   it('should add state', function() {
-    srv.tryToInit();
-    srv.addState();
+    simpleEditorManagerService.tryToInit();
+    simpleEditorManagerService.addState();
     expect(stubs.SimpleEditorShimService.addState).toHaveBeenCalled();
     expect(stubs.SimpleEditorShimService.saveInteractionId).toHaveBeenCalled();
     expect(stubs.SimpleEditorShimService.saveCustomizationArgs)
