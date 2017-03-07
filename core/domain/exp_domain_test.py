@@ -350,7 +350,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                         'training_data': ['Test']
                     },
                     'rule_type': 'FuzzyMatches'
-                }]
+                }],
+                'correct': False,
             })
         )
 
@@ -381,7 +382,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                         'x': 'Test'
                     },
                     'rule_type': 'Contains'
-                }]
+                }],
+                'correct': False,
             })
         )
         exploration.validate()
@@ -1823,7 +1825,89 @@ states_schema_version: 8
 tags: []
 title: Title
 """)
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V11
+    YAML_CONTENT_V12 = ("""author_notes: ''
+blurb: ''
+category: Category
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 12
+skin_customizations:
+  panels_contents:
+    bottom: []
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+    - type: text
+      value: ''
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: END
+          feedback:
+          - Correct!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      id: TextInput
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      fallbacks: []
+      id: EndExploration
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+    - type: text
+      value: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      id: TextInput
+    param_changes: []
+states_schema_version: 8
+tags: []
+title: Title
+""")
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V12
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -1889,6 +1973,12 @@ title: Title
         """Test direct loading from a v11 yaml file."""
         exploration = exp_domain.Exploration.from_yaml(
             'eid', self.YAML_CONTENT_V11)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v12(self):
+        """Test direct loading from a v12 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V12)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
 class ConversionUnitTests(test_utils.GenericTestBase):

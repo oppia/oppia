@@ -465,7 +465,7 @@ oppia.directive('trainingPanel', [function() {
             // Create a new answer group with the given feedback.
             var answerGroups = responsesService.getAnswerGroups();
             answerGroups.push(AnswerGroupObjectFactory.create(
-              [], angular.copy($scope.classification.newOutcome)));
+              [], angular.copy($scope.classification.newOutcome), false));
             responsesService.save(
               answerGroups, responsesService.getDefaultOutcome());
 

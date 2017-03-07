@@ -1066,6 +1066,19 @@ var enableFallbacks = function() {
   });
 };
 
+var openAndClosePreviewSummaryTile = function() {
+  runFromSettingsTab(function() {
+    element(by.css('.protractor-test-open-preview-summary-modal')).click();
+    general.waitForSystem();
+    expect(element(by.css(
+      '.protractor-test-exploration-summary-tile')).isPresent()).toBeTruthy();
+    element(by.css('.protractor-test-close-preview-summary-modal')).click();
+    general.waitForSystem();
+    expect(element(by.css(
+      '.protractor-test-exploration-summary-tile')).isPresent()).toBeFalsy();
+  });
+};
+
 // CONTROLS
 
 var saveChanges = function(commitMessage) {
@@ -1087,7 +1100,7 @@ var saveChanges = function(commitMessage) {
 var discardChanges = function() {
   element(by.css('.protractor-test-save-discard-toggle')).click();
   element(by.css('.protractor-test-discard-changes')).click();
-  general.acceptAlert();
+  element(by.css('.protractor-test-confirm-discard-changes')).click();
   general.waitForSystem();
   browser.waitForAngular();
 };
@@ -1445,6 +1458,7 @@ exports.setFirstState = setFirstState;
 exports.enableParameters = enableParameters;
 exports.enableGadgets = enableGadgets;
 exports.enableFallbacks = enableFallbacks;
+exports.openAndClosePreviewSummaryTile = openAndClosePreviewSummaryTile;
 
 exports.saveChanges = saveChanges;
 exports.discardChanges = discardChanges;

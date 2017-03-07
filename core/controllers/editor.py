@@ -340,7 +340,6 @@ class ExplorationHandler(EditorHandler):
 
         commit_message = self.payload.get('commit_message')
         change_list = self.payload.get('change_list')
-
         try:
             exp_services.update_exploration(
                 self.user_id, exploration_id, change_list, commit_message)
