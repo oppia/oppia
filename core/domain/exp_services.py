@@ -638,7 +638,6 @@ def apply_change_list(exploration_id, change_list):
     try:
         changes = [exp_domain.ExplorationChange(change_dict)
                    for change_dict in change_list]
-
         for change in changes:
             if change.cmd == exp_domain.CMD_ADD_STATE:
                 exploration.add_states([change.state_name])

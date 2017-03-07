@@ -59,7 +59,8 @@ describe('oppiaInteractiveMultipleChoiceInputValidator', function() {
           x: 1
         }
       }],
-      outcome: goodDefaultOutcome
+      outcome: goodDefaultOutcome,
+      correct: false
     }];
   }));
 
