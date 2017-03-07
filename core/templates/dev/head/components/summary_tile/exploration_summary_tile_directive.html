@@ -20,13 +20,15 @@
         </div>
       </div>
       <div class="title-section-mask"></div>
-
       <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>">  
         <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
           <[getObjective() | truncateAndCapitalize: 95]>
         </div>
-        <span ng-if="!getObjective()" translate="I18N_LIBRARY_NO_OBJECTIVE">
-        </span>
+        <div ng-if="!getObjective()" class="objective">
+          <span translate="I18N_LIBRARY_NO_OBJECTIVE">
+          </span>
+        </div>
+
         <ul layout="row" class="metrics" layout-align="space-between center">
           <li>
             <span class="protractor-test-exp-summary-tile-rating" ng-class="{'rating-disabled': !getAverageRating()}">
@@ -36,7 +38,7 @@
               <span ng-if="getAverageRating()">
                 <[getAverageRating() | number:1]>
               </span>
-              <span ng-if="!getAverageRating()" translate="I18N_LIBRARY_N/A">
+              <span ng-if="!getAverageRating()" translate="I18N_LIBRARY_N/A" class="oppia-inactive-summary-tile-attribute">
               </span>
             </span>
           </li>
@@ -44,12 +46,18 @@
             <span class="fa fa-eye fa-lg" tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>" tooltip-placement="top">
               <span class="oppia-icon-accessibility-label"><['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]></span>
             </span>
-            <[getNumViews() | summarizeNonnegativeNumber]>
+            <span ng-if="getNumViews()">
+              <[getNumViews() | summarizeNonnegativeNumber]>
+            </span>
+            <span ng-if="!getNumViews()" translate="I18N_LIBRARY_N/A" class="oppia-inactive-summary-tile-attribute">
+            </span>
           </li>
           <li>
-            <span>
+            <span ng-if="getLastUpdatedDatetime()">
               <span class="oppia-icon-accessibility-label">Last Updated</span>
               <[getLastUpdatedDatetime()]>
+            </span>
+            <span ng-if="!getLastUpdatedDatetime()" translate="I18N_LIBRARY_N/A" class="oppia-inactive-summary-tile-attribute">
             </span>
           </li>
         </ul>
@@ -57,3 +65,9 @@
     </a>
   </md-card>
 </script>
+
+<style>
+  .oppia-activity-summary-tile .oppia-inactive-summary-tile-attribute {
+    opacity: 0.5;
+  }
+</style>
