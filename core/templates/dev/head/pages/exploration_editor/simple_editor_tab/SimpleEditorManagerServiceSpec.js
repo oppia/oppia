@@ -217,7 +217,8 @@ describe('Simple Editor Manager Service', function() {
   it('should return introduction html', function() {
     var fakeIntroductionHtml = pageData.introductionHtml;
     simpleEditorManagerService.tryToInit();
-    expect(simpleEditorManagerService.getIntroductionHtml()).toEqual(fakeIntroductionHtml);
+    expect(simpleEditorManagerService.getIntroductionHtml())
+      .toEqual(fakeIntroductionHtml);
   });
 
   it('should return question list', function() {
@@ -239,7 +240,8 @@ describe('Simple Editor Manager Service', function() {
     simpleEditorManagerService.saveIntroductionHtml(fakeNewIntroductionHtml);
     expect(stubs.SimpleEditorShimService.saveIntroductionHtml)
       .toHaveBeenCalledWith(fakeNewIntroductionHtml);
-    expect(simpleEditorManagerService.getIntroductionHtml()).toEqual(fakeNewIntroductionHtml);
+    expect(simpleEditorManagerService.getIntroductionHtml())
+      .toEqual(fakeNewIntroductionHtml);
   });
 
   it('should save the customization args', function() {
@@ -252,7 +254,8 @@ describe('Simple Editor Manager Service', function() {
       }
     };
     simpleEditorManagerService.tryToInit();
-    simpleEditorManagerService.saveCustomizationArgs(stateName, newCustomizationArgs);
+    simpleEditorManagerService.saveCustomizationArgs(stateName,
+      newCustomizationArgs);
     expect(stubs.SimpleEditorShimService.saveCustomizationArgs)
       .toHaveBeenCalledWith(stateName, newCustomizationArgs);
     expect(questionList.getBindableQuestion).toHaveBeenCalledWith(stateName);
@@ -284,7 +287,8 @@ describe('Simple Editor Manager Service', function() {
       ]
     };
     simpleEditorManagerService.tryToInit();
-    simpleEditorManagerService.saveDefaultOutcome(stateName, newDefaultOutcome);
+    simpleEditorManagerService.saveDefaultOutcome(stateName,
+      newDefaultOutcome);
     expect(stubs.SimpleEditorShimService.saveDefaultOutcome)
       .toHaveBeenCalledWith(stateName, newDefaultOutcome);
     expect(questionList.getBindableQuestion).toHaveBeenCalledWith(stateName);
