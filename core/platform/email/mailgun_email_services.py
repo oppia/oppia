@@ -18,12 +18,13 @@
 
 import requests
 
+from core.platform.email import gae_email_services
 import feconf
 
 
 def send_mail(
         sender_email, recipient_email, subject, plaintext_body,
-        html_body, bcc_admin=False):
+        html_body, bcc_admin=False, reply_to_id=None):
     """Sends an email using mailgun api.
 
     In general this function should only be called from
@@ -69,6 +70,10 @@ def send_mail(
     if bcc_admin:
         data['bcc'] = feconf.ADMIN_EMAIL_ADDRESS
 
+    if reply_to_id:
+        reply_to = gae_email_services.get_incoming_email_address(reply_to_id)
+        data['h:Reply-To'] = reply_to
+
     requests.post(
         mailgun_domain_name, auth=('api', feconf.MAILGUN_API_KEY),
         data=data)
@@ -89,6 +94,8 @@ def send_bulk_mail(
       - plaintext_body: str. The plaintext body of the email.
       - html_body: str. The HTML body of the email. Must fit in a datastore
           entity.
+      - reply_to_id: str or None. The unique reply-to id used in reply-to email
+          sent to recipient.
 
     Raises:
       Exception: if the configuration in feconf.py forbids emails from being

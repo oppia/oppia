@@ -28,10 +28,10 @@ oppia.constant('LIBRARY_PAGE_MODES', {
 
 oppia.controller('Library', [
   '$scope', '$http', '$rootScope', '$window', '$timeout', 'i18nIdService',
-  'urlService', 'CATEGORY_LIST', 'searchService', 'windowDimensionsService',
+  'urlService', 'ALL_CATEGORIES', 'searchService', 'windowDimensionsService',
   'UrlInterpolationService', 'LIBRARY_PAGE_MODES', function(
       $scope, $http, $rootScope, $window, $timeout, i18nIdService,
-      urlService, CATEGORY_LIST, searchService, windowDimensionsService,
+      urlService, ALL_CATEGORIES, searchService, windowDimensionsService,
       UrlInterpolationService, LIBRARY_PAGE_MODES) {
     $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
     var possibleBannerFilenames = [

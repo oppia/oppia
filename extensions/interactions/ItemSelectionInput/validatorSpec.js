@@ -53,7 +53,8 @@ describe('oppiaInteractiveItemSelectionInputValidator', function() {
           x: ['Selection 1', 'Selection 2']
         }
       }],
-      outcome: goodDefaultOutcome
+      outcome: goodDefaultOutcome,
+      correct: false
     }];
   }));
 

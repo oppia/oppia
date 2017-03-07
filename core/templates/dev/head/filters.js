@@ -372,6 +372,17 @@ oppia.filter('truncateAndCapitalize', [function() {
   };
 }]);
 
+oppia.filter('capitalize', [function() {
+  return function(input) {
+    if (!input) {
+      return input;
+    }
+
+    var trimmedInput = input.trim();
+    return trimmedInput.charAt(0).toUpperCase() + trimmedInput.slice(1);
+  };
+}]);
+
 oppia.filter('removeDuplicatesInArray', [function() {
   return function(input) {
     return input.filter(function(val, pos) {

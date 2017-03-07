@@ -24,12 +24,12 @@ oppia.directive('collectionDetailsEditor', [function() {
     templateUrl: 'inline/collection_details_editor_directive',
     controller: [
       '$scope', 'CollectionEditorStateService', 'CollectionUpdateService',
-      'CollectionValidationService', 'alertsService', 'CATEGORY_LIST',
+      'CollectionValidationService', 'alertsService', 'ALL_CATEGORIES',
       'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
       'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
       function(
           $scope, CollectionEditorStateService, CollectionUpdateService,
-          CollectionValidationService, alertsService, CATEGORY_LIST,
+          CollectionValidationService, alertsService, ALL_CATEGORIES,
           EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED,
           COLLECTION_TITLE_INPUT_FOCUS_LABEL) {
         $scope.collection = CollectionEditorStateService.getCollection();
@@ -37,7 +37,7 @@ oppia.directive('collectionDetailsEditor', [function() {
           COLLECTION_TITLE_INPUT_FOCUS_LABEL);
         $scope.hasPageLoaded = (
           CollectionEditorStateService.hasLoadedCollection);
-        $scope.CATEGORY_LIST_FOR_SELECT2 = CATEGORY_LIST.map(
+        $scope.CATEGORY_LIST_FOR_SELECT2 = ALL_CATEGORIES.map(
           function(category) {
             return {
               id: category,

@@ -64,8 +64,8 @@ class FeedbackMessage(object):
     """Domain object for a feedback message."""
 
     def __init__(self, full_message_id, full_thread_id, message_id, author_id,
-                 updated_status, updated_subject, text,
-                 created_on, last_updated):
+                 updated_status, updated_subject, text, created_on,
+                 last_updated, received_via_email):
         self.id = full_message_id
         self.full_thread_id = full_thread_id
         self.message_id = message_id
@@ -75,6 +75,7 @@ class FeedbackMessage(object):
         self.text = text
         self.created_on = created_on
         self.last_updated = last_updated
+        self.received_via_email = received_via_email
 
     @property
     def exploration_id(self):
@@ -91,6 +92,7 @@ class FeedbackMessage(object):
             'text': self.text,
             'updated_status': self.updated_status,
             'updated_subject': self.updated_subject,
+            'received_via_email': self.received_via_email
         }
 
 
