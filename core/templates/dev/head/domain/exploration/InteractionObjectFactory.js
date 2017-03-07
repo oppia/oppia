@@ -43,7 +43,7 @@ oppia.factory('InteractionObjectFactory', [
       answer_groups: this.answerGroups.map(function(answerGroup) {
         return answerGroup.toBackendDict();
       }),
-      confirmed_unclassified_answers: this.confirmed_unclassified_answers,
+      confirmed_unclassified_answers: this.confirmedUnclassifiedAnswers,
       customization_args: this.customizationArgs,
       default_outcome: this.defaultOutcome,
       fallbacks: this.fallbacks,
