@@ -52,8 +52,9 @@ oppia.directive('createActivityButton', [function() {
           if (!GLOBALS.can_create_collections) {
             if (urlService.getPathname() !== '/dashboard') {
               $window.location.href = '/dashboard?mode=create';
+            } else {
+              ExplorationCreationService.createNewExploration();
             }
-            ExplorationCreationService.createNewExploration();
           } else if (urlService.getPathname() !== '/dashboard') {
             $window.location.replace('/dashboard?mode=create');
           } else {

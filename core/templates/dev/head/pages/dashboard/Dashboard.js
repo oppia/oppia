@@ -40,14 +40,14 @@ oppia.constant('HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', {
 });
 
 oppia.controller('Dashboard', [
-  '$scope', '$rootScope', '$window', 'oppiaDatetimeFormatter', 'alertsService',
-  'DashboardBackendApiService', 'RatingComputationService',
+  '$scope', '$rootScope', '$window', '$location', 'oppiaDatetimeFormatter',
+  'alertsService', 'DashboardBackendApiService', 'RatingComputationService',
   'ExplorationCreationService', 'UrlInterpolationService', 'FATAL_ERROR_CODES',
   'EXPLORATION_DROPDOWN_STATS', 'EXPLORATIONS_SORT_BY_KEYS',
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS',
   function(
-      $scope, $rootScope, $window, oppiaDatetimeFormatter, alertsService,
-      DashboardBackendApiService, RatingComputationService,
+      $scope, $rootScope, $window, $location, oppiaDatetimeFormatter,
+      alertsService, DashboardBackendApiService, RatingComputationService,
       ExplorationCreationService, UrlInterpolationService, FATAL_ERROR_CODES,
       EXPLORATION_DROPDOWN_STATS, EXPLORATIONS_SORT_BY_KEYS,
       HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS) {
@@ -76,6 +76,17 @@ oppia.controller('Dashboard', [
 
     $scope.unresolvedAnswersIconUrl = UrlInterpolationService.getStaticImageUrl(
       '/icons/unresolved_answers.svg');
+
+    // Refreshes the dashboard page whenever the back button is pressed
+    $scope.$watch(function() {
+      return $location.path();
+    }, function(newPath, oldPath) {
+      if (newPath === '/created=true' && oldPath === '/created=true') {
+        $window.location.reload();
+        $location.path('');
+        return;
+      }
+    });
 
     $scope.activeTab = 'myExplorations';
     $scope.setActiveTab = function(newActiveTabName) {
