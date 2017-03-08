@@ -578,7 +578,7 @@ textarea {
 
 .oppia-sidebar-menu {
   background: #fff;
-  height: 100%;
+  height: 100vh;
   left: 0;
   position: fixed;
   top: 0;
@@ -595,7 +595,7 @@ textarea {
   background: rgba(0,0,0,0.2);
   content: '';
   display: none;
-  height: 100%;
+  height: 100vh;
   opacity: 1;
   position: absolute;
   right: 0;
