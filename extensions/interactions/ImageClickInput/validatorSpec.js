@@ -59,7 +59,8 @@ describe('oppiaInteractiveImageClickInputValidator', function() {
           x: 'SecondLabel'
         }
       }],
-      outcome: goodDefaultOutcome
+      outcome: goodDefaultOutcome,
+      correct: false
     }];
   }));
 

@@ -4,7 +4,7 @@
     <title>Oppia Admin Panel</title>
 
     {% include 'pages/header_css_libs.html' %}
-    {% include 'pages/header_js_libs.html' %}
+
     <script>
       var GLOBALS = {
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
@@ -28,6 +28,8 @@
         DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}')
       }
     </script>
+    
+    {% include 'pages/header_js_libs.html' %}
   </head>
 
   <body>
