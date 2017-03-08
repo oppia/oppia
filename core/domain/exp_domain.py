@@ -2237,7 +2237,9 @@ class Exploration(object):
 
     @classmethod
     def _convert_states_v8_dict_to_v9_dict(cls, states_dict):
-        """Converts from version 8 to 9. Version 9 contains correct"""
+        """Converts from version 8 to 9. Version 9 contains 'correct'
+        field in answer groups.
+        """
         for state_dict in states_dict.values():
             answer_groups = state_dict['interaction']['answer_groups']
             for answer_group in answer_groups:
