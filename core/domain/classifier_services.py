@@ -150,6 +150,9 @@ def get_classifier_by_id(classifier_id):
 
     Returns:
         classifier: Domain object for the classifier.
+
+    Raises:
+        Exception: Entity for class ClassifierModel with id not found.
     """
     classifier_model = classifier_models.ClassifierModel.get(
         classifier_id)
@@ -168,12 +171,11 @@ def _create_classifier(classifier):
     classifier_id = classifier_models.ClassifierModel.create(
         classifier.exp_id, classifier.exp_version_when_created,
         classifier.state_name, classifier.algorithm_id,
-        classifier.cached_classifier_data, classifier.data_schema_version,
-        )
+        classifier.cached_classifier_data, classifier.data_schema_version)
     return classifier_id
 
 
-def _update_classifier(classifier_model, classifier):
+def _update_classifier(classifier_model, state_name):
     """Updates classifier model in the datastore given a classifier
     domain object.
 
@@ -181,16 +183,17 @@ def _update_classifier(classifier_model, classifier):
         classifier_model: Classifier model instance in datastore.
         classifier: Domain object for the classifier.
 
-    Note: Most of the properties of a classifier are immutable.
-    state_name is the only mutable property.
+    Note: All of the properties of a classifier are immutable,
+    except for state_name.
     """
-    classifier_model.state_name = classifier.state_name
+    classifier_model.state_name = state_name
     classifier_model.put()
 
 
 def save_classifier(classifier):
-    """Checks if model exists and updates the classifier model using
-    _update_classifier method.
+    """Checks for the existence of the model.
+    If the model exists, it is updated using _update_classifier method.
+    If the model doesn't exist, it is created using _create_classifier method. 
 
     Args:
         classifier: Domain object for the classifier.
@@ -203,7 +206,7 @@ def save_classifier(classifier):
     if classifier_model is None:
         classifier.id = _create_classifier(classifier)
     else:
-        _update_classifier(classifier_model, classifier)
+        _update_classifier(classifier_model, classifier.state_name)
     return classifier.id
 
 

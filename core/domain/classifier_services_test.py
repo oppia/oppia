@@ -16,6 +16,7 @@
 
 import os
 
+from core.domain import classifier_domain
 from core.domain import classifier_registry
 from core.domain import classifier_services
 from core.domain import exp_services
@@ -27,7 +28,7 @@ import utils
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
 
 class ClassifierServicesTests(test_utils.GenericTestBase):
-    """Test classify using the sample explorations.
+    """Test "classify" using the sample explorations.
 
     Since the end to end tests cover correct classification, and frontend tests
     test hard rules, ReaderClassifyTests is only checking that the string
@@ -107,6 +108,10 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
     def test_deletion_of_classifiers(self):
         """Test the delete_classifier method."""
 
+        with self.assertRaisesRegexp(Exception, (
+            "Entity for class ClassifierModel with id fake_id not found")):
+            classifier_services.delete_classifier('fake_id')
+
         exp_id = u'1'
         state = 'Home'
         classifier_id = classifier_models.ClassifierModel.create(
@@ -124,15 +129,9 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         exp_id = u'1'
         state = 'Home'
         test_state = 'State'
-        classifier = type('', (), {})()
-        classifier.id = '1'
-        classifier.exp_id = exp_id
-        classifier.exp_version_when_created = 1
-        classifier.state_name = state
-        classifier.algorithm_id = (
-            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])
-        classifier.cached_classifier_data = []
-        classifier.data_schema_version = 1
+        classifier = classifier_domain.Classifier(
+        '1', exp_id, 1, state,
+        feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'], [], 1)
         classifier_id = (
             classifier_services.save_classifier(classifier))
         classifier = classifier_services.get_classifier_by_id(
