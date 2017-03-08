@@ -193,7 +193,7 @@ def _update_classifier(classifier_model, state_name):
 def save_classifier(classifier):
     """Checks for the existence of the model.
     If the model exists, it is updated using _update_classifier method.
-    If the model doesn't exist, it is created using _create_classifier method. 
+    If the model doesn't exist, it is created using _create_classifier method.
 
     Args:
         classifier: Domain object for the classifier.
