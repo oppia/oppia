@@ -41,7 +41,8 @@ oppia.directive('oppiaInteractiveSetInput', [function() {
         }
       };
 
-      $scope.answer = [];
+      // Adds an input field by default
+      $scope.answer = [''];
 
       var hasDuplicates = function(answer) {
         for (var i = 0; i < answer.length; i++) {

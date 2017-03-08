@@ -86,6 +86,13 @@
                 </span>
               </div>
             </div>
+            <div class="text-right">
+              <button type="button" class="btn btn-default protractor-test-open-preview-summary-modal"
+                      ng-click="previewSummaryTile()"
+                      title="Preview this exploration's summary card">
+                Preview Summary
+              </button>
+            </div>
           </div>
         </div>
 
@@ -347,20 +354,20 @@
             </label>
             <span class="col-lg-2 col-md-2 col-sm-2">
               <button type="button" class="btn btn-default protractor-test-enable-fallbacks"
-                      ng-click="muteFeedbackNotifications()" ng-if="!userExplorationEmailsHandler.areFeedbackNotificationsMuted()">
+                      ng-click="muteFeedbackNotifications()" ng-if="!UserEmailPreferencesService.areFeedbackNotificationsMuted()">
                  Mute
               </button>
               <button type="button" class="btn btn-default protractor-test-enable-fallbacks"
-                      ng-click="unmuteFeedbackNotifications()" ng-if="userExplorationEmailsHandler.areFeedbackNotificationsMuted()">
+                      ng-click="unmuteFeedbackNotifications()" ng-if="UserEmailPreferencesService.areFeedbackNotificationsMuted()">
                  Unmute
               </button>
             </span>
             <span class="col-lg-7 col-md-7 col-sm-7 help-block" style="font-size: smaller;"
-                  ng-if="!userExplorationEmailsHandler.areFeedbackNotificationsMuted()">
+                  ng-if="!UserEmailPreferencesService.areFeedbackNotificationsMuted()">
               You are currently receiving notifications of new feedback for this exploration.
             </span>
             <span class="col-lg-7 col-md-7 col-sm-7 help-block" style="font-size: smaller;"
-                  ng-if="userExplorationEmailsHandler.areFeedbackNotificationsMuted()">
+                  ng-if="UserEmailPreferencesService.areFeedbackNotificationsMuted()">
               You have muted feedback notifications for this exploration. You will not receive an email when new feedback is submitted.
             </span>
           </div>
@@ -375,20 +382,20 @@
             </label>
             <span class="col-lg-2 col-md-2 col-sm-2">
               <button type="button" class="btn btn-default protractor-test-enable-fallbacks"
-                      ng-click="muteSuggestionNotifications()" ng-if="!userExplorationEmailsHandler.areSuggestionNotificationsMuted()">
+                      ng-click="muteSuggestionNotifications()" ng-if="!UserEmailPreferencesService.areSuggestionNotificationsMuted()">
                  Mute
               </button>
               <button type="button" class="btn btn-default protractor-test-enable-fallbacks"
-                      ng-click="unmuteSuggestionNotifications()" ng-if="userExplorationEmailsHandler.areSuggestionNotificationsMuted()">
+                      ng-click="unmuteSuggestionNotifications()" ng-if="UserEmailPreferencesService.areSuggestionNotificationsMuted()">
                  Unmute
               </button>
             </span>
             <span class="col-lg-7 col-md-7 col-sm-7 help-block" style="font-size: smaller;"
-                  ng-if="!userExplorationEmailsHandler.areSuggestionNotificationsMuted()">
+                  ng-if="!UserEmailPreferencesService.areSuggestionNotificationsMuted()">
               You are currently receiving notifications of new suggestions for this exploration.
             </span>
             <span class="col-lg-7 col-md-7 col-sm-7 help-block" style="font-size: smaller;"
-                  ng-if="userExplorationEmailsHandler.areSuggestionNotificationsMuted()">
+                  ng-if="UserEmailPreferencesService.areSuggestionNotificationsMuted()">
               You have muted suggestion notifications for this exploration. You will not receive an email when new suggestion is submitted.
             </span>
           </div>
@@ -584,5 +591,27 @@
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     <button class="btn btn-danger" ng-click="reallyDelete()">Delete Exploration</button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="modals/previewSummaryTile">
+  <div class="modal-header">
+    <h3>Preview Summary Card</h3>
+  </div>
+
+  <div class="modal-body text-center">
+    This is how your activity will appear to learners in search results
+    or the library.
+    <exploration-summary-tile exploration-title="getExplorationTitle()"
+                              objective="getExplorationObjective()"
+                              category="getExplorationCategory()"
+                              thumbnail-icon-url="getThumbnailIconUrl()"
+                              thumbnail-bg-color="getThumbnailBgColor()"
+                              class="protractor-test-exploration-summary-tile">
+    </exploration-summary-tile>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default protractor-test-close-preview-summary-modal" ng-click="close()">Return to editor</button>
   </div>
 </script>

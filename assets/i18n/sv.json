@@ -9,7 +9,7 @@
 	"I18N_CREATE_EXPLORATION_UPLOAD": "Ladda upp",
 	"I18N_CREATE_NO_THANKS": "Nej, tack",
 	"I18N_CREATE_YES_PLEASE": "Ja, tack!",
-	"I18N_DASHBOARD_MY_COLLECTIONS": "Mina samlingar",
+	"I18N_DASHBOARD_COLLECTIONS": "Samlingar",
 	"I18N_DASHBOARD_OPEN_FEEDBACK": "Skicka återkoppling",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Dra bild hit",
 	"I18N_DIRECTIVES_OR_SELECT_FILE": "eller välj en bildfil:",

@@ -56,6 +56,7 @@ oppia.controller('CollectionPlayer', [
     $scope.ICON_X_LEFT_PX = 55;
     $scope.ICON_X_RIGHT_PX = 395;
     $scope.svgHeight = $scope.MIN_HEIGHT_FOR_PATH_SVG_PX;
+    $scope.nextExplorationId = null;
 
     $scope.setIconHighlight = function(index) {
       $scope.activeHighlightedIconIndex = index;
@@ -159,9 +160,17 @@ oppia.controller('CollectionPlayer', [
         $scope.pathSvgParameters += ' S ' + sParameterExtension;
       }
       if (collectionNodeCount % 2 === 0) {
-        $scope.svgHeight = y - $scope.EVEN_SVG_HEIGHT_OFFSET_PX;
+        if (collectionNodeCount === 2) {
+          $scope.svgHeight = $scope.MIN_HEIGHT_FOR_PATH_SVG_PX;
+        } else {
+          $scope.svgHeight = y - $scope.EVEN_SVG_HEIGHT_OFFSET_PX;
+        }
       } else {
-        $scope.svgHeight = y - $scope.ODD_SVG_HEIGHT_OFFSET_PX;
+        if (collectionNodeCount === 1) {
+          $scope.svgHeight = $scope.MIN_HEIGHT_FOR_PATH_SVG_PX;
+        } else {
+          $scope.svgHeight = y - $scope.ODD_SVG_HEIGHT_OFFSET_PX;
+        }
       }
     };
 
@@ -209,6 +218,17 @@ oppia.controller('CollectionPlayer', [
       return iconParametersArray;
     };
 
+    $scope.isCompletedExploration = function(explorationId) {
+      var completedExplorationIds = (
+        $scope.collectionPlaythrough.getCompletedExplorationIds());
+      return completedExplorationIds.indexOf(explorationId) > -1;
+    };
+
+    $scope.getExplorationUrl = function(explorationId) {
+      return (
+        '/explore/' + explorationId + '?collection_id=' + $scope.collectionId);
+    };
+
     $http.get('/collectionsummarieshandler/data', {
       params: {
         stringified_collection_ids: JSON.stringify([$scope.collectionId])
@@ -232,6 +252,13 @@ oppia.controller('CollectionPlayer', [
         $scope.collectionPlaythrough = (
           CollectionPlaythroughObjectFactory.create(
             collectionBackendObject.playthrough_dict));
+        var nextExplorationIds = (
+          $scope.collectionPlaythrough.getNextExplorationIds());
+        if (nextExplorationIds.length > 0) {
+          $scope.nextExplorationId = (nextExplorationIds[0]);
+        } else {
+          $scope.nextExplorationId = null;
+        }
       },
       function() {
         // TODO(bhenning): Handle not being able to load the collection.
