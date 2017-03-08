@@ -98,9 +98,9 @@ oppia.directive('createActivityButton', [function() {
         // editor if the create modal does not need to be shown).
         if (urlService.getUrlParams().mode === 'create') {
           if (!GLOBALS.can_create_collections) {
-            // It appends created=true to the url so that the creation loop is
+            // It appends '/' to the url so that the creation loop is
             // prevented when the user presses the back button.
-            $location.path('created=true').replace;
+            $location.path('').replace;
             ExplorationCreationService.createNewExploration();
           } else {
             $scope.initCreationProcess();

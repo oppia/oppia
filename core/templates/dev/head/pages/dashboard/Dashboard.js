@@ -81,9 +81,14 @@ oppia.controller('Dashboard', [
     $scope.$watch(function() {
       return $location.path();
     }, function(newPath, oldPath) {
-      if (newPath === '/created=true' && oldPath === '/created=true') {
+      if (newPath === '' && oldPath === '') {
+        $location.path('').replace;
+        return;
+      } else if (newPath === '/back' && oldPath === '/back') {
+        $location.path('').replace;
+      } else if (newPath === '/' && oldPath === '/') {
+        $location.path('back').replace;
         $window.location.reload();
-        $location.path('');
         return;
       }
     });
