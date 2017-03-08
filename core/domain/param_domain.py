@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Classes relating to parameters."""
+"""Domain objects relating to parameters."""
 
 import re
 
@@ -26,19 +26,48 @@ import utils
 
 class ParamSpec(object):
     """Value object for an exploration parameter specification."""
+
     def __init__(self, obj_type):
+        """Initializes a ParamSpec object with the specified object type.
+
+        Args:
+            obj_type: unicode. The object type with which the parameter is
+                initialized.
+        """
         self.obj_type = obj_type
 
+
     def to_dict(self):
+        """Returns a dict representation of this ParamSpec.
+
+        Returns:
+            dict. A dict with a single key, whose value is the type
+                of the parameter represented by this ParamSpec.
+        """
         return {
             'obj_type': self.obj_type,
         }
 
+
     @classmethod
     def from_dict(cls, param_spec_dict):
+        """Creates a ParamSpec object from its dict representation.
+
+        Args:
+            param_spec_dict: dict. The dictionary containing the specification
+                of the parameter. It contains the following key (object_type).
+                `object_type` determines the data type of the parameter.
+
+        Returns:
+            ParamSpec. A ParamSpec object created from the specified
+                object type.
+        """
         return cls(param_spec_dict['obj_type'])
 
+
     def validate(self):
+        """Validate the existence of the object class."""
+
         # Ensure that this object class exists.
         obj_services.Registry.get_object_class_by_type(self.obj_type)
 
@@ -57,25 +86,60 @@ class ParamChange(object):
     """Value object for a parameter change."""
 
     def __init__(self, name, generator_id, customization_args):
+        """Initialize a ParamChange object with the specified arguments.
 
+        Args:
+            name: unicode. The name of the parameter.
+            generator_id: unicode. The type of generator used to create the
+                parameter, e.g., "Copier".
+            customization_args: dict. A dict containing the following keys:
+                (value, parse_with_jinja). `value` specifies the value of the
+                parameter, and `parse_with_jinja` indicates whether parsing is
+                to be done with the Jinja template engine. If the parameter is
+                specified using one of several possible values, this dict
+                contains a list (`list_of_values`) of possible values (instead
+                of `value`).
+        """
         # TODO(sll): Check that all required args for customization exist in
         # customization_args.
-
         self._name = name
         self._generator_id = generator_id
         self._customization_args = customization_args
 
     @property
     def name(self):
+        """The name of the changing parameter.
+
+        Returns:
+            unicode. The name of the parameter.
+        """
         return self._name
 
     @property
     def generator(self):
+        """The value generator used to define the new value of the
+        changing parameter.
+
+        Returns:
+            subclass of BaseValueGenerator. The generator object for the
+            parameter.
+        """
         return value_generators_domain.Registry.get_generator_class_by_id(
             self._generator_id)()
 
     @property
     def customization_args(self):
+        """A dict containing several arguments that determine the changing value
+        of the parameter.
+
+        Returns:
+            dict: A dict specifying the following customization arguments for
+            the parameter. In case of a parameter change to a single value,
+            this dict contains the value of the parameter and a key-value
+            pair specifying whether parsing is done using the Jinja template
+            engine. If the parameter is changed to one amongst several values,
+            this dict contains a list of possible values.
+         """
         return self._customization_args
 
     def to_dict(self):
@@ -87,6 +151,26 @@ class ParamChange(object):
 
     @classmethod
     def from_dict(cls, param_change_dict):
+        """Create a ParamChange object with the specified arguments.
+
+        Args:
+            param_change_dict: dict. A dict containing data about the
+                following keys: (customization_args(dict), name, generator_id).
+                `customization_args` is a dict with the following keys:
+                (value, parse_with_jinja). `value` specifies the value of the
+                parameter and `parse_with_jinja` indicates whether parsing
+                change be performed using the Jinja template engine. If the
+                parameter changed to one amongst several values, this dict
+                contains a list of possible values.
+                `name` is the name of the parameter.
+                `generator_id` is the type of value generator used to
+                generate the new value for the parameter.
+
+        Returns:
+            ParamChange. The ParamChange object created from the
+                `param_change_dict` dict, which specifies the name,
+                customization arguments and the generator used.
+        """
         return cls(
             param_change_dict['name'], param_change_dict['generator_id'],
             param_change_dict['customization_args']
@@ -104,6 +188,7 @@ class ParamChange(object):
             obj_type).normalize(raw_value)
 
     def validate(self):
+        """Checks that the properties of this ParamChange object are valid."""
         if not isinstance(self.name, basestring):
             raise utils.ValidationError(
                 'Expected param_change name to be a string, received %s'

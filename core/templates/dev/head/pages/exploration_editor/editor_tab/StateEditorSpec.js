@@ -249,7 +249,8 @@ describe('State Editor controller', function() {
               outcome: {
                 feedback: 'Feedback',
                 dest: 'State'
-              }
+              },
+              correct: false
             }],
             default_outcome: {
               feedback: 'Default',

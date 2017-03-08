@@ -615,10 +615,8 @@ def send_feedback_message_email(recipient_id, feedback_messages):
                 }
             }
     """
-
-    email_subject = (
-        'You\'ve received %s new message%s on your explorations' %
-        (len(feedback_messages), 's' if len(feedback_messages) > 1 else ''))
+    email_subject_template = (
+        'You\'ve received %s new message%s on your explorations')
 
     email_body_template = (
         'Hi %s,<br>'
@@ -628,7 +626,7 @@ def send_feedback_message_email(recipient_id, feedback_messages):
         'You can view and reply to your messages from your '
         '<a href="https://www.oppia.org/dashboard">dashboard</a>.'
         '<br>'
-        'Thanks, and happy teaching!<br>'
+        '<br>Thanks, and happy teaching!<br>'
         '<br>'
         'Best wishes,<br>'
         'The Oppia Team<br>'
@@ -648,15 +646,23 @@ def send_feedback_message_email(recipient_id, feedback_messages):
     recipient_user_settings = user_services.get_user_settings(recipient_id)
 
     messages_html = ''
-    for _, reference in feedback_messages.iteritems():
+    count_messages = 0
+    for exp_id, reference in feedback_messages.iteritems():
+        messages_html += (
+            '<li><a href="https://www.oppia.org/create/%s#/feedback">'
+            '%s</a>:<br><ul>' % (exp_id, reference['title']))
         for message in reference['messages']:
-            messages_html += (
-                '<li>%s: %s<br></li>' % (reference['title'], message))
+            messages_html += ('<li>%s<br></li>' % message)
+            count_messages += 1
+        messages_html += '</ul></li>'
+
+    email_subject = email_subject_template % (
+        (count_messages, 's') if count_messages > 1 else ('a', ''))
 
     email_body = email_body_template % (
-        recipient_user_settings.username, len(feedback_messages),
-        's' if len(feedback_messages) > 1 else '',
-        messages_html, EMAIL_FOOTER.value)
+        recipient_user_settings.username, count_messages if count_messages > 1
+        else 'a', 's' if count_messages > 1 else '', messages_html,
+        EMAIL_FOOTER.value)
 
     _send_email(
         recipient_id, feconf.SYSTEM_COMMITTER_ID,

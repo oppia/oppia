@@ -1853,12 +1853,10 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-collection-player-tiles-container {
   height: 100%;
-  margin-left: 10%;
-  margin-right: auto;
-  max-width: 78%;
+  margin: 0 auto;
+  max-width: 975px;
   min-height: 500px;
   padding-bottom: 25px;
-  padding-left: 50px;
   padding-top: 30px;
   position: relative;
 }
@@ -2689,7 +2687,7 @@ div#ng-curtain {
 .oppia-navbar-role-text {
   bottom: 0;
   color: white;
-  font-size: 0.7em;
+  font-size: 1.12rem;
   font-weight: bold;
   position: absolute;
   right: 3px;
@@ -2707,7 +2705,7 @@ div#ng-curtain {
 .oppia-navbar-dashboard-indicator-text {
   bottom: 0;
   color: white;
-  font-size: 0.7em;
+  font-size: 1.12rem;
   font-weight: bold;
   position: absolute;
   right: 4px;
@@ -3926,14 +3924,23 @@ md-card.preview-conversation-skin-supplemental-card {
   margin: 0.3em 0.5em;
   padding: 0.2em;
   position: absolute;
-  word-break: break-all;
 }
-
 .oppia-activity-summary-tile .objective {
-  height: 60px;
+  display: -webkit-box;
   font-family: "Rubik", "Roboto", Arial, sans-serif;
   font-size: 0.85em;
+  height: 70px;
+  line-height: 1.26;
+  /* `max-height` is calculated as: 1.26 (line-height) * 3 (lines) / 0.85
+  (font-size). An additional (1.26 (line-height) * 0.85 (font-size) * 0.25) is added
+  to account for letters (like y,j and g) that fall beneath the baseline.
+  This is done to limit the text to 3 lines for non-webkit browsers. */
+  max-height: 4.71em;
+  overflow: hidden;
   padding: 12px;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3; /* Truncating to 3 lines. */
 }
 
 .oppia-activity-summary-tile .rating-disabled {
@@ -3951,7 +3958,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-activity-summary-tile .metrics {
   height: 30px;
-  margin: 0 12px;
+  margin: 5px 12px 0;
   padding: 0;
 }
 
@@ -3990,6 +3997,17 @@ md-card.preview-conversation-skin-supplemental-card {
   font-size: 1.1em;
   margin-right: 2px;
   vertical-align: initial;
+}
+/* Accessibility workaround for icon buttons and links
+  Taken from:
+  https://www.nczonline.net/blog/2013/04/01/making-accessible-icon-buttons/
+  Use for all links and buttons that only use an icon */
+.oppia-icon-accessibility-label {
+  display: block;
+  font-size: 0;
+  height: 1px;
+  overflow: hidden;
+  width: 0px;
 }
 
 .oppia-activity-summary-tile .recently-updated {
@@ -4524,6 +4542,7 @@ md-card.preview-conversation-skin-supplemental-card {
   font-size: 18px;
   margin: 0 15px 15px 15px;
   max-width: 90%;
+  min-width: 200px;
   padding: 15px;
   text-transform: uppercase;
   white-space: normal;

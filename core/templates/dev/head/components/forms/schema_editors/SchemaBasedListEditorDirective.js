@@ -135,12 +135,28 @@ oppia.directive('schemaBasedListEditor', [
             }
           };
 
+          var deleteEmptyElements = function() {
+            for (var i = 0; i < $scope.localValue.length - 1; i++) {
+              if ($scope.localValue[i].length === 0) {
+                $scope.deleteElement(i);
+                i--;
+              }
+            }
+          };
+
+          if ($scope.localValue.length === 1) {
+            if ($scope.localValue[0].length === 0) {
+              $scope.isAddItemButtonPresent = false;
+            }
+          }
+
           $scope.lastElementOnBlur = function() {
             _deleteLastElementIfUndefined();
             $scope.showAddItemButton();
           };
 
           $scope.showAddItemButton = function() {
+            deleteEmptyElements();
             $scope.isAddItemButtonPresent = true;
           };
 

@@ -27,13 +27,18 @@
           <a class="oppia-navbar-tab oppia-navbar-tab-content" href="/library" translate="I18N_TOPNAV_LIBRARY"></a>
         </li>
         <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_ABOUT" class="dropdown oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
-          <a class="oppia-navbar-tab" tabindex="0">
+          <a class="oppia-navbar-tab"
+             role="menuitem"
+             aria-haspopup="true"
+             aria-expanded="false"
+             tabindex="0">
             <span class="oppia-navbar-tab-content" translate="I18N_TOPNAV_ABOUT"></span>
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu oppia-navbar-dropdown"
               ng-mouseover="onMouseoverDropdownMenu($event)"
-              ng-mouseleave="onMouseoutDropdownMenu($event)">
+              ng-mouseleave="onMouseoutDropdownMenu($event)"
+              role="menu">
             <li><a class="protractor-test-about-link oppia-navbar-tab-content" href="/about" translate="I18N_TOPNAV_ABOUT_OPPIA"></a></li>
             <li><a class="protractor-test-get-started-link oppia-navbar-tab-content" href="/get_started" translate="I18N_TOPNAV_GET_STARTED"></a></li>
             <li><a class="protractor-test-teach-link oppia-navbar-tab-content" href="/teach" translate="I18N_TOPNAV_TEACH_WITH_OPPIA"></a></li>
@@ -57,7 +62,12 @@
       <li ng-if="username" class="dropdown protractor-test-profile-dropdown">
         <a class="dropdown-toggle oppia-navbar-dropdown-toggle" data-toggle="dropdown"
            ng-mouseover="onMouseoverProfilePictureOrDropdown($event)"
-           ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)" tabindex="0">
+           ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)"
+           role="menuitem"
+           aria-haspopup="true"
+           aria-expanded="false"
+           aria-label="User Menu"
+           tabindex="0">
           <div class="oppia-navbar-profile-picture-container">
             <span ng-if="profilePictureDataUrl">
               <img ng-src="<[profilePictureDataUrl]>" class="oppia-navbar-profile-picture img-circle" alt="User Avatar">
@@ -65,6 +75,7 @@
             </span>
             <span ng-if="!profilePictureDataUrl">
               <i class="material-icons md-40" style="margin-top: -1px;">&#xE853;</i>
+              <span class="oppia-icon-accessibility-label">User Avatar</span>
               <span class="caret" style="margin-top: -26px;"></span>
             </span>
 

@@ -86,25 +86,6 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
                 fakeInputElement.value.length, fakeInputElement.value.length);
             };
 
-            // Guppy uses the Mousetrap (ccampbell/mousetrap) library for
-            // keyboard input. Mousetrap has a function call which allows
-            // sending key events, but for symbols like "^" they need to be
-            // sent as "shift+6" to be recognized. This object is used to
-            // convert symbols into strings that Mousetrap accepts via the
-            // Mousetrap.trigger() function.
-            var K_SYM_REVERSE_MAP = {
-              '^': 'shift+6',
-              '*': 'shift+8',
-              '(': 'shift+9',
-              '<': 'shift+,',
-              '>': 'shift+.',
-              '\\': 'shift+\\',
-              ' ': 'space',
-              ')': 'shift+0'
-              // Missing up/down. user needs to use [space], 'sub' instead.
-              // Mobile devices typically don't have arrow keys anyways.
-            };
-
             var setGuppyContentFromInput = function() {
               // Clear the Guppy instance by setting its content to the
               // output of get_content when empty.
@@ -116,10 +97,12 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
                 .querySelector('#fakeInputForMathExpression').value
                 .toLowerCase().split('');
 
+              // Replay key combination for each character on the document.
               for (var i = 0; i < textContent.length; i++) {
-                // Replay key combination for each character on the document.
-                if (textContent[i] in K_SYM_REVERSE_MAP) {
-                  Mousetrap.trigger(K_SYM_REVERSE_MAP[textContent[i]]);
+                // If the character is a space, send a 'right' to enable mobile
+                // users to complete expressions without arrow keys.
+                if (textContent[i] === ' ') {
+                  Mousetrap.trigger('right');
                 } else {
                   Mousetrap.trigger(textContent[i]);
                 }
