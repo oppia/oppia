@@ -568,14 +568,14 @@ oppia.controller('StateResponses', [
           '$scope', '$modalInstance', 'oppiaExplorationHtmlFormatterService',
           'stateInteractionIdService', 'stateCustomizationArgsService',
           'explorationContextService', 'editorContextService',
-          'explorationStatesService', 'trainingDataService',
+          'explorationStatesService', 'trainingDataService', 'textInputRulesService',
           'AnswerClassificationService', 'focusService', 'DEFAULT_RULE_NAME',
           'CLASSIFIER_RULESPEC_STR',
           function(
               $scope, $modalInstance, oppiaExplorationHtmlFormatterService,
               stateInteractionIdService, stateCustomizationArgsService,
               explorationContextService, editorContextService,
-              explorationStatesService, trainingDataService,
+              explorationStatesService, trainingDataService, textInputRulesService,
               AnswerClassificationService, focusService, DEFAULT_RULE_NAME,
               CLASSIFIER_RULESPEC_STR) {
             var _explorationId = explorationContextService.getExplorationId();
@@ -617,7 +617,7 @@ oppia.controller('StateResponses', [
                   stateCustomizationArgsService.savedMemento));
 
               AnswerClassificationService.getMatchingClassificationResult(
-                _explorationId, _state, answer, true).then(
+                _explorationId, _state, answer, true, textInputRulesService).then(
                     function(classificationResult) {
                   var feedback = 'Nothing';
                   var dest = classificationResult.outcome.dest;
