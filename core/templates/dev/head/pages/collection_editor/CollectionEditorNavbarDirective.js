@@ -141,10 +141,10 @@ oppia.directive('collectionEditorNavbar', [function() {
               backdrop: true,
               controller: [
                 '$scope', '$modalInstance', 'CollectionEditorStateService',
-                'CollectionUpdateService', 'CATEGORY_LIST',
+                'CollectionUpdateService', 'ALL_CATEGORIES',
                 function(
                     $scope, $modalInstance, CollectionEditorStatesService,
-                    CollectionUpdateService, CATEGORY_LIST) {
+                    CollectionUpdateService, ALL_CATEGORIES) {
                   var collection = (
                     CollectionEditorStateService.getCollection());
 
@@ -159,10 +159,10 @@ oppia.directive('collectionEditorNavbar', [function() {
                   $scope.newCategory = collection.getCategory();
 
                   $scope.CATEGORY_LIST_FOR_SELECT2 = [];
-                  for (var i = 0; i < CATEGORY_LIST.length; i++) {
+                  for (var i = 0; i < ALL_CATEGORIES.length; i++) {
                     $scope.CATEGORY_LIST_FOR_SELECT2.push({
-                      id: CATEGORY_LIST[i],
-                      text: CATEGORY_LIST[i]
+                      id: ALL_CATEGORIES[i],
+                      text: ALL_CATEGORIES[i]
                     });
                   }
 

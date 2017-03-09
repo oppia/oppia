@@ -41,7 +41,8 @@ describe('oppiaInteractiveLogicProofValidator', function() {
 
     goodAnswerGroups = [{
       ruleSpecs: [],
-      outcome: goodDefaultOutcome
+      outcome: goodDefaultOutcome,
+      correct: false
     }];
   }));
 

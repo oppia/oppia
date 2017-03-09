@@ -54,7 +54,8 @@ describe('oppiaInteractiveInteractiveMapValidator', function() {
           d: 50
         }
       }],
-      outcome: goodDefaultOutcome
+      outcome: goodDefaultOutcome,
+      correct: false
     }];
   }));
 

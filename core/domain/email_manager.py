@@ -198,7 +198,7 @@ def _require_sender_id_is_valid(intent, sender_id):
 
 def _send_email(
         recipient_id, sender_id, intent, email_subject, email_html_body,
-        sender_email, bcc_admin=False, sender_name=None):
+        sender_email, bcc_admin=False, sender_name=None, reply_to_id=None):
     """Sends an email to the given recipient.
 
     This function should be used for sending all user-facing emails.
@@ -218,6 +218,8 @@ def _send_email(
             email address.
         sender_name: str or None. The name to be shown in the "sender" field of
             the email.
+        reply_to_id: str or None. The unique reply-to id used in reply-to email
+            address sent to recipient.
     """
 
     if sender_name is None:
@@ -251,7 +253,8 @@ def _send_email(
 
         email_services.send_mail(
             sender_name_email, recipient_email, email_subject,
-            cleaned_plaintext_body, cleaned_html_body, bcc_admin)
+            cleaned_plaintext_body, cleaned_html_body, bcc_admin,
+            reply_to_id=reply_to_id)
         email_models.SentEmailModel.create(
             recipient_id, recipient_email, sender_id, sender_name_email, intent,
             email_subject, cleaned_html_body, datetime.datetime.utcnow())
@@ -612,10 +615,8 @@ def send_feedback_message_email(recipient_id, feedback_messages):
                 }
             }
     """
-
-    email_subject = (
-        'You\'ve received %s new message%s on your explorations' %
-        (len(feedback_messages), 's' if len(feedback_messages) > 1 else ''))
+    email_subject_template = (
+        'You\'ve received %s new message%s on your explorations')
 
     email_body_template = (
         'Hi %s,<br>'
@@ -625,7 +626,7 @@ def send_feedback_message_email(recipient_id, feedback_messages):
         'You can view and reply to your messages from your '
         '<a href="https://www.oppia.org/dashboard">dashboard</a>.'
         '<br>'
-        'Thanks, and happy teaching!<br>'
+        '<br>Thanks, and happy teaching!<br>'
         '<br>'
         'Best wishes,<br>'
         'The Oppia Team<br>'
@@ -645,15 +646,23 @@ def send_feedback_message_email(recipient_id, feedback_messages):
     recipient_user_settings = user_services.get_user_settings(recipient_id)
 
     messages_html = ''
-    for _, reference in feedback_messages.iteritems():
+    count_messages = 0
+    for exp_id, reference in feedback_messages.iteritems():
+        messages_html += (
+            '<li><a href="https://www.oppia.org/create/%s#/feedback">'
+            '%s</a>:<br><ul>' % (exp_id, reference['title']))
         for message in reference['messages']:
-            messages_html += (
-                '<li>%s: %s<br></li>' % (reference['title'], message))
+            messages_html += ('<li>%s<br></li>' % message)
+            count_messages += 1
+        messages_html += '</ul></li>'
+
+    email_subject = email_subject_template % (
+        (count_messages, 's') if count_messages > 1 else ('a', ''))
 
     email_body = email_body_template % (
-        recipient_user_settings.username, len(feedback_messages),
-        's' if len(feedback_messages) > 1 else '',
-        messages_html, EMAIL_FOOTER.value)
+        recipient_user_settings.username, count_messages if count_messages > 1
+        else 'a', 's' if count_messages > 1 else '', messages_html,
+        EMAIL_FOOTER.value)
 
     _send_email(
         recipient_id, feconf.SYSTEM_COMMITTER_ID,
@@ -750,7 +759,7 @@ def send_suggestion_email(
 
 def send_instant_feedback_message_email(
         recipient_id, sender_id, message, email_subject, exploration_title,
-        exploration_id, thread_title):
+        exploration_id, thread_title, reply_to_id=None):
     """Send an email when a new message is posted to a feedback thread, or when
     the thread's status is changed.
 
@@ -762,6 +771,8 @@ def send_instant_feedback_message_email(
         exploration_title: str. The title of the exploration.
         exploration_id: str. ID of the exploration the feedback thread is about.
         thread_title: str. The title of the feedback thread.
+        reply_to_id: str or None. The unique reply-to id used in reply-to email
+            sent to recipient.
     """
 
     email_body_template = (
@@ -795,7 +806,7 @@ def send_instant_feedback_message_email(
         _send_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION, email_subject,
-            email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+            email_body, feconf.NOREPLY_EMAIL_ADDRESS, reply_to_id=reply_to_id)
 
 
 def send_flag_exploration_email(
