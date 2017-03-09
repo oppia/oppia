@@ -37,7 +37,16 @@ MAX_JOBS_TO_REPORT_ON = 50
 
 def require_cron_or_superadmin(handler):
     """Decorator to ensure that the handler is being called by cron or by a
-    superadmin of the application.
+    superadmin of the application.    
+    
+    Args:
+        handler: A handler instance
+    
+    Returns:
+        handler: handler instance if it is authorized
+    
+    Raises: 
+        UnauthorizedUserException: Raised when an unauthorized user accesses this page
     """
     def _require_cron_or_superadmin(self, *args, **kwargs):
         if (self.request.headers.get('X-AppEngine-Cron') is None
