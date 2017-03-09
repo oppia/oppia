@@ -18,6 +18,7 @@
 	"I18N_DASHBOARD_COLLECTIONS": "Collections",
 	"I18N_DASHBOARD_EXPLORATIONS": "Explorations",
 	"I18N_DASHBOARD_OPEN_FEEDBACK": "Ouvrir les commentaires",
+	"I18N_DASHBOARD_SUBSCRIBERS": "Abonnés",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Faire glisser l’image ici",
 	"I18N_DIRECTIVES_OR_SELECT_FILE": "ou sélectionner un fichier image :",
 	"I18N_ERROR_DISABLED_EXPLORATION": "Exploration désactivée",
@@ -86,6 +87,10 @@
 	"I18N_INTERACTIONS_MUSIC_PLAY": "Jouer",
 	"I18N_INTERACTIONS_MUSIC_PLAY_SEQUENCE": "Jouer la séquence cible",
 	"I18N_INTERACTIONS_MUSIC_SUBMIT": "Soumettre",
+	"I18N_INTERACTIONS_PENCILCODEEDITOR_ARE_YOU_SURE_YOU_WANT_TO_RESET_YOUR_CODE": "Êtes-vous sûr de vouloir réinitialiser votre code ?",
+	"I18N_INTERACTIONS_PENCILCODEEDITOR_CANCEL": "Annuler",
+	"I18N_INTERACTIONS_PENCILCODEEDITOR_CONFIRMATION_REQUIRED": "Confirmation demandée",
+	"I18N_INTERACTIONS_PENCILCODEEDITOR_RESET_CODE": "Effacer le code",
 	"I18N_INTERACTIONS_SET_INPUT_ADD_ITEM": "Ajouter l’élément",
 	"I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR": "Oups, il semble que votre ensemble a des doublons !",
 	"I18N_INTERACTIONS_SET_INPUT_EMPTY_SET": "(Ajouter un élément par ligne.)",
@@ -158,6 +163,7 @@
 	"I18N_LIBRARY_SUB_HEADER": "Commencez votre aventure en parcourant nos explorations.",
 	"I18N_LIBRARY_VIEWS_TOOLTIP": "Vues",
 	"I18N_LIBRARY_VIEW_ALL": "Afficher tout",
+	"I18N_ONE_SUBSCRIBER_TEXT": "Vous avez 1 abonné.",
 	"I18N_PLAYER_BACK": "Retour",
 	"I18N_PLAYER_CARD_NUMBER_TOOLTIP": "Numéro de carte",
 	"I18N_PLAYER_COMMUNITY_EDITABLE_TOOLTIP": "Modifiable par la communauté",
@@ -297,5 +303,6 @@
 	"I18N_TOPNAV_PREFERENCES": "Préférences",
 	"I18N_TOPNAV_SIGN_IN": "Connexion",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Enseigner avec Oppia",
+	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Vous avez un total de <[totalSubscribers]> abonnés.",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Se désabonner"
 }
