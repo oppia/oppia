@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the Social Sharing Links.
+ * @fileoverview Directive for the Social Sharing Collection Player Links.
  */
 
 oppia.directive('sharingCollectionLinks', [function() {
