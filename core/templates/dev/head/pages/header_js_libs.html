@@ -4,7 +4,9 @@
 <script>
   var constants = (function() {
     var request = new XMLHttpRequest();
-    request.overrideMimeType('application/json');
+    if (request.overrideMimeType) {
+      request.overrideMimeType('application/json');
+    }
     request.open(
       'GET', GLOBALS.ASSET_DIR_PREFIX + '/assets/constants.json', false);
     request.send(null);
