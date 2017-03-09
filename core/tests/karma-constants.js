@@ -19,6 +19,7 @@
 /* This should be kept in parity with how CONSTANTS is set in base.html */
 var constants = (function() {
   var request = new XMLHttpRequest();
+  // The overrideMimeType method was not implemented in IE prior to IE11.
   if (request.overrideMimeType) {
     request.overrideMimeType('application/json');
   }
