@@ -202,6 +202,7 @@ oppia.controller('StateInteraction', [
               $scope.stateInteractionIdService = stateInteractionIdService;
               $scope.stateCustomizationArgsService = (
                 stateCustomizationArgsService);
+              $scope.hasCustomizationArgs = true;
 
               $scope.getInteractionThumbnailImageUrl = (
                 UrlInterpolationService.getInteractionThumbnailImageUrl);
@@ -248,7 +249,6 @@ oppia.controller('StateInteraction', [
                 $scope.customizationArgSpecs = (
                   interactionSpec.customization_arg_specs);
 
-                stateInteractionIdService.displayed = newInteractionId;
                 stateCustomizationArgsService.displayed = {};
                 if (interactionDetailsCache.contains(newInteractionId)) {
                   stateCustomizationArgsService.displayed = (
@@ -261,6 +261,15 @@ oppia.controller('StateInteraction', [
                     };
                   });
                 }
+
+                if (Object.keys(
+                  stateCustomizationArgsService.displayed).length === 0) {
+                  $scope.save();
+                  $scope.hasCustomizationArgs = false;
+                } else {
+                  $scope.hasCustomizationArgs = true;
+                }
+                stateInteractionIdService.displayed = newInteractionId;
 
                 $scope.$broadcast('schemaBasedFormsShown');
                 $scope.form = {};
