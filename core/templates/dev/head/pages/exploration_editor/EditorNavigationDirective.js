@@ -44,6 +44,10 @@ oppia.directive('editorNavigation', [function() {
           }, 5000);
         });
 
+        $scope.closePop = function() {
+          $scope.postTutorialHelpPopoverIsShown = false;
+        }
+
         $scope.showUserHelpModal = function() {
           var explorationId = explorationContextService.getExplorationId();
           siteAnalyticsService.registerClickHelpButtonEvent(explorationId);
