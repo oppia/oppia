@@ -409,7 +409,8 @@ oppia.directive('trainingPanel', [function() {
     controller: [
       '$scope', 'oppiaExplorationHtmlFormatterService', 'editorContextService',
       'explorationStatesService', 'trainingDataService', 'responsesService',
-      'stateInteractionIdService', 'stateCustomizationArgsService', 'AnswerGroupObjectFactory', 
+      'stateInteractionIdService', 'stateCustomizationArgsService',
+      'AnswerGroupObjectFactory',
       function($scope, oppiaExplorationHtmlFormatterService,
           editorContextService, explorationStatesService, trainingDataService,
           responsesService, stateInteractionIdService,
