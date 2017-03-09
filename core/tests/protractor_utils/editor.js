@@ -235,8 +235,6 @@ var customizeInteraction = function(interactionId) {
       saveInteraction.click();
       // Wait for the customization modal to close.
       general.waitForSystem();
-    } else {
-      // do nothing.
     }
   });
 };
