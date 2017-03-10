@@ -69,25 +69,21 @@ oppia.directive('imageWithRegionsEditor', [
         $scope.rectY = 0;
         $scope.rectWidth = 0;
         $scope.rectHeight = 0;
-        // Flags for the cursor direction in which region is to be resized
-        $scope.nResize = false;
-        $scope.sResize = false;
-        $scope.eResize = false;
-        $scope.wResize = false;
-        $scope.neResize = false;
-        $scope.nwResize = false;
-        $scope.seResize = false;
-        $scope.nwResize = false;
-        // A flag to check direction change while resizing
-        $scope.flag = 0;
         // Is user currently drawing a new region?
         $scope.userIsCurrentlyDrawing = false;
         // Is user currently dragging an existing region?
         $scope.userIsCurrentlyDragging = false;
         // Is user currently resizing an existing region?
         $scope.userIsCurrentlyResizing = false;
-        // The region is being resized along which direction?
-        $scope.resizeDirection = '';
+        // The horizontal direction along which user resize occurs
+        // 1 -> Left -1 -> Right 0 -> No resize
+        $scope.xDirection = 0;
+        // The vertical direction along which user resize occurs
+        // 1 -> Top -1 -> Bottom 0 -> No resize
+        $scope.yDirection = 0;
+        // Flags to check whether the direction changes while resizing
+        $scope.yDirectionToggled = 0;
+        $scope.xDirectionToggled = 0;
         // The region along borders which when hovered provides resize cursor
         $scope.resizeRegionBorder = 10;
         // Dimensions of original image
@@ -97,8 +93,6 @@ oppia.directive('imageWithRegionsEditor', [
         $scope.regionDrawMode = false;
         // Index of region currently hovered over
         $scope.hoveredRegion = null;
-        // Index of region currently moved over
-        $scope.moveRegion = null;
         // Index of region currently selected
         $scope.selectedRegion = null;
 
@@ -168,18 +162,6 @@ oppia.directive('imageWithRegionsEditor', [
           return false;
         };
 
-        // Called whenever the direction cursor is to be hidden
-        $scope.hideDirectionCursor = function() {
-          $scope.nResize = false;
-          $scope.eResize = false;
-          $scope.wResize = false;
-          $scope.sResize = false;
-          $scope.neResize = false;
-          $scope.nwResize = false;
-          $scope.seResize = false;
-          $scope.swResize = false;
-        };
-
         $scope.regionLabelGetterSetter = function(index) {
           return function(label) {
             if (angular.isDefined(label)) {
@@ -224,318 +206,47 @@ oppia.directive('imageWithRegionsEditor', [
             height: (area[1][1] - area[0][1]) * $scope.getImageHeight()
           };
         };
-
         var resizeRegion = function() {
           var labeledRegions = $scope.$parent.value.labeledRegions;
           var resizedRegion = labeledRegions[$scope.selectedRegion].region;
           var deltaX = $scope.mouseX - $scope.originalMouseX;
           var deltaY = $scope.mouseY - $scope.originalMouseY;
-          if ($scope.resizeDirection === 'n') {
-            if ($scope.originalRectArea.height - deltaY <= 0) {
-              $scope.flag = 1;
-              $scope.sResize = true;
-              $scope.nResize = false;
-              resizedRegion.area = regionAreaFromCornerAndDimensions(
-                $scope.originalRectArea.x,
-                $scope.originalMouseY + $scope.originalRectArea.height,
-                $scope.originalRectArea.width,
-                $scope.originalRectArea.height - deltaY
-              );
-            } else {
-              $scope.flag = 0;
-              $scope.sResize = false;
-              $scope.nResize = true;
-              resizedRegion.area = regionAreaFromCornerAndDimensions(
-                $scope.originalRectArea.x,
-                $scope.originalRectArea.y + deltaY,
-                $scope.originalRectArea.width,
-                $scope.originalRectArea.height - deltaY
-              );
-            }
-          } else if ($scope.resizeDirection === 's') {
-            if ($scope.originalRectArea.height + deltaY <= 0) {
-              $scope.sResize = false;
-              $scope.nResize = true;
-              $scope.flag = 1;
-              resizedRegion.area = regionAreaFromCornerAndDimensions(
-                $scope.originalRectArea.x,
-                $scope.originalRectArea.y + deltaY +
-                  $scope.originalRectArea.height,
-                $scope.originalRectArea.width,
-                $scope.originalRectArea.height + deltaY
-              );
-            } else {
-              $scope.sResize = true;
-              $scope.nResize = false;
-              $scope.flag = 0;
-              resizedRegion.area = regionAreaFromCornerAndDimensions(
-                $scope.originalRectArea.x,
-                $scope.originalRectArea.y,
-                $scope.originalRectArea.width,
-                $scope.originalRectArea.height + deltaY
-              );
-            }
-          } else if ($scope.resizeDirection === 'e') {
-            if ($scope.originalRectArea.width + deltaX <= 0) {
-              $scope.eResize = false;
-              $scope.wResize = true;
-              $scope.flag = 1;
-              resizedRegion.area = regionAreaFromCornerAndDimensions(
-                $scope.originalRectArea.x + deltaX +
-                  $scope.originalRectArea.width,
-                $scope.originalRectArea.y,
-                $scope.originalRectArea.width + deltaX,
-                $scope.originalRectArea.height
-              );
-            } else {
-              $scope.eResize = true;
-              $scope.wResize = false;
-              $scope.flag = 0;
-              resizedRegion.area = regionAreaFromCornerAndDimensions(
-                $scope.originalRectArea.x,
-                $scope.originalRectArea.y,
-                $scope.originalRectArea.width + deltaX,
-                $scope.originalRectArea.height
-              );
-            }
-          } else if ($scope.resizeDirection === 'w') {
-            if ($scope.originalRectArea.width - deltaX <= 0) {
-              $scope.eResize = true;
-              $scope.wResize = false;
-              $scope.flag = 1;
-              resizedRegion.area = regionAreaFromCornerAndDimensions(
-                $scope.originalRectArea.x + $scope.originalRectArea.width,
-                $scope.originalRectArea.y,
-                $scope.originalRectArea.width - deltaX,
-                $scope.originalRectArea.height
-              );
-            } else {
-              $scope.eResize = false;
-              $scope.wResize = true;
-              $scope.flag = 0;
-              resizedRegion.area = regionAreaFromCornerAndDimensions(
-                $scope.originalRectArea.x + deltaX,
-                $scope.originalRectArea.y,
-                $scope.originalRectArea.width - deltaX,
-                $scope.originalRectArea.height
-              );
-            }
-          } else if ($scope.resizeDirection === 'ne') {
-            if ($scope.originalRectArea.height - deltaY <= 0 &&
-                $scope.originalRectArea.width + deltaX <= 0) {
-              $scope.swResize = true;
-              $scope.neResize = false;
-              $scope.nwResize = false;
-              $scope.seResize = false;
-              $scope.flag = 1;
-              resizedRegion.area = regionAreaFromCornerAndDimensions(
-                $scope.originalRectArea.x + deltaX +
-                  $scope.originalRectArea.width,
-                $scope.originalRectArea.y + $scope.originalRectArea.height,
-                $scope.originalRectArea.width + deltaX,
-                $scope.originalRectArea.height - deltaY
-              );
-            } else if ($scope.originalRectArea.width + deltaX <= 0) {
-              $scope.swResize = false;
-              $scope.neResize = false;
-              $scope.nwResize = true;
-              $scope.seResize = false;
-              $scope.flag = 1;
-              resizedRegion.area = regionAreaFromCornerAndDimensions(
-                $scope.originalRectArea.x + deltaX +
-                  $scope.originalRectArea.width,
-                $scope.originalRectArea.y + deltaY,
-                $scope.originalRectArea.width + deltaX,
-                $scope.originalRectArea.height - deltaY
-              );
-            } else if ($scope.originalRectArea.height - deltaY <= 0) {
-              $scope.swResize = false;
-              $scope.neResize = false;
-              $scope.nwResize = false;
-              $scope.seResize = true;
-              $scope.flag = 1;
-              resizedRegion.area = regionAreaFromCornerAndDimensions(
-                $scope.originalRectArea.x,
-                $scope.originalMouseY + $scope.originalRectArea.height,
-                $scope.originalRectArea.width + deltaX,
-                $scope.originalRectArea.height - deltaY
-              );
-            } else {
-              $scope.swResize = false;
-              $scope.neResize = true;
-              $scope.nwResize = false;
-              $scope.seResize = false;
-              $scope.flag = 0;
-              resizedRegion.area = regionAreaFromCornerAndDimensions(
-                $scope.originalRectArea.x,
-                $scope.originalRectArea.y + deltaY,
-                $scope.originalRectArea.width + deltaX,
-                $scope.originalRectArea.height - deltaY
-              );
-            }
-          } else if ($scope.resizeDirection === 'nw') {
-            if ($scope.originalRectArea.height - deltaY <= 0 &&
-                $scope.originalRectArea.width - deltaX <= 0) {
-              $scope.swResize = false;
-              $scope.neResize = false;
-              $scope.nwResize = false;
-              $scope.seResize = true;
-              $scope.flag = 1;
-              resizedRegion.area = regionAreaFromCornerAndDimensions(
-                $scope.originalRectArea.x + $scope.originalRectArea.width,
-                $scope.originalRectArea.y + $scope.originalRectArea.height,
-                $scope.originalRectArea.width - deltaX,
-                $scope.originalRectArea.height - deltaY
-              );
-            } else if ($scope.originalRectArea.width - deltaX <= 0) {
-              $scope.swResize = false;
-              $scope.neResize = true;
-              $scope.nwResize = false;
-              $scope.seResize = false;
-              $scope.flag = 1;
-              resizedRegion.area = regionAreaFromCornerAndDimensions(
-                $scope.originalRectArea.x + $scope.originalRectArea.width,
-                $scope.originalRectArea.y + deltaY,
-                $scope.originalRectArea.width - deltaX,
-                $scope.originalRectArea.height - deltaY
-              );
-            } else if ($scope.originalRectArea.height - deltaY <= 0) {
-              $scope.swResize = true;
-              $scope.neResize = false;
-              $scope.nwResize = false;
-              $scope.seResize = false;
-              $scope.flag = 1;
-              resizedRegion.area = regionAreaFromCornerAndDimensions(
-                $scope.originalRectArea.x + deltaX,
-                $scope.originalRectArea.y + $scope.originalRectArea.height,
-                $scope.originalRectArea.width - deltaX,
-                $scope.originalRectArea.height - deltaY
-              );
-            } else {
-              $scope.swResize = false;
-              $scope.neResize = false;
-              $scope.nwResize = true;
-              $scope.seResize = false;
-              $scope.flag = 0;
-              resizedRegion.area = regionAreaFromCornerAndDimensions(
-                $scope.originalRectArea.x + deltaX,
-                $scope.originalRectArea.y + deltaY,
-                $scope.originalRectArea.width - deltaX,
-                $scope.originalRectArea.height - deltaY
-              );
-            }
-          } else if ($scope.resizeDirection === 'se') {
-            if ($scope.originalRectArea.height + deltaY <= 0 &&
-                $scope.originalRectArea.width + deltaX <= 0) {
-              $scope.swResize = false;
-              $scope.neResize = false;
-              $scope.nwResize = true;
-              $scope.seResize = false;
-              $scope.flag = 1;
-              resizedRegion.area = regionAreaFromCornerAndDimensions(
-                $scope.originalRectArea.x + deltaX +
-                  $scope.originalRectArea.width,
-                $scope.originalRectArea.y + deltaY +
-                  $scope.originalRectArea.height,
-                $scope.originalRectArea.width + deltaX,
-                $scope.originalRectArea.height + deltaY
-              );
-            } else if ($scope.originalRectArea.width + deltaX <= 0) {
-              $scope.swResize = true;
-              $scope.neResize = false;
-              $scope.nwResize = false;
-              $scope.seResize = false;
-              $scope.flag = 1;
-              resizedRegion.area = regionAreaFromCornerAndDimensions(
-                $scope.originalRectArea.x + deltaX +
-                  $scope.originalRectArea.width,
-                $scope.originalRectArea.y,
-                $scope.originalRectArea.width + deltaX,
-                $scope.originalRectArea.height + deltaY
-              );
-            } else if ($scope.originalRectArea.height + deltaY <= 0) {
-              $scope.swResize = false;
-              $scope.neResize = true;
-              $scope.nwResize = false;
-              $scope.seResize = false;
-              $scope.flag = 1;
-              resizedRegion.area = regionAreaFromCornerAndDimensions(
-                $scope.originalRectArea.x,
-                $scope.originalRectArea.y + deltaY +
-                  $scope.originalRectArea.height,
-                $scope.originalRectArea.width + deltaX,
-                $scope.originalRectArea.height + deltaY
-              );
-            } else {
-              $scope.swResize = false;
-              $scope.neResize = false;
-              $scope.nwResize = false;
-              $scope.seResize = true;
-              $scope.flag = 0;
-              resizedRegion.area = regionAreaFromCornerAndDimensions(
-                $scope.originalRectArea.x,
-                $scope.originalRectArea.y,
-                $scope.originalRectArea.width + deltaX,
-                $scope.originalRectArea.height + deltaY
-              );
-            }
-          } else if ($scope.resizeDirection === 'sw') {
-            if ($scope.originalRectArea.height + deltaY <= 0 &&
-                $scope.originalRectArea.width - deltaX <= 0) {
-              $scope.swResize = false;
-              $scope.neResize = true;
-              $scope.nwResize = false;
-              $scope.seResize = false;
-              $scope.flag = 1;
-              resizedRegion.area = regionAreaFromCornerAndDimensions(
-                $scope.originalRectArea.x + $scope.originalRectArea.width,
-                $scope.originalRectArea.y + deltaY +
-                  $scope.originalRectArea.height,
-                $scope.originalRectArea.width - deltaX,
-                $scope.originalRectArea.height + deltaY
-              );
-            } else if ($scope.originalRectArea.width - deltaX <= 0) {
-              $scope.swResize = false;
-              $scope.neResize = false;
-              $scope.nwResize = false;
-              $scope.seResize = true;
-              $scope.flag = 1;
-              resizedRegion.area = regionAreaFromCornerAndDimensions(
-                $scope.originalRectArea.x + $scope.originalRectArea.width,
-                $scope.originalRectArea.y,
-                $scope.originalRectArea.width - deltaX,
-                $scope.originalRectArea.height + deltaY
-              );
-            } else if ($scope.originalRectArea.height + deltaY <= 0) {
-              $scope.swResize = false;
-              $scope.neResize = false;
-              $scope.nwResize = true;
-              $scope.seResize = false;
-              $scope.flag = 1;
-              resizedRegion.area = regionAreaFromCornerAndDimensions(
-                $scope.originalRectArea.x + deltaX,
-                $scope.originalRectArea.y + deltaY +
-                  $scope.originalRectArea.height,
-                $scope.originalRectArea.width - deltaX,
-                $scope.originalRectArea.height + deltaY
-              );
-            } else {
-              $scope.swResize = true;
-              $scope.neResize = false;
-              $scope.nwResize = false;
-              $scope.seResize = false;
-              $scope.flag = 1;
-              resizedRegion.area = regionAreaFromCornerAndDimensions(
-                $scope.originalRectArea.x + deltaX,
-                $scope.originalRectArea.y,
-                $scope.originalRectArea.width - deltaX,
-                $scope.originalRectArea.height + deltaY
-              );
-            }
-          } else {
-            $scope.resizeDirection = '';
-            $scope.userIsCurrentlyResizing = false;
+          var x = $scope.originalRectArea.x;
+          var y = $scope.originalRectArea.y;
+          var width = $scope.originalRectArea.width;
+          var height = $scope.originalRectArea.height;
+          if (height - $scope.yDirection * deltaY <= 0 &&
+              $scope.yDirectionToggled === 0) {
+            $scope.yDirectionToggled = 1;
+          } else if (height - $scope.yDirection * deltaY >= 0 &&
+            $scope.yDirectionToggled === 1) {
+            $scope.yDirectionToggled = 0;
           }
+          if ($scope.yDirection === 1) {
+            y = y + !$scope.yDirectionToggled * deltaY +
+              $scope.yDirectionToggled * height;
+          } else if ($scope.yDirection === -1) {
+            y = y + $scope.yDirectionToggled * deltaY +
+            $scope.yDirectionToggled * height;
+          }
+          if (width - $scope.xDirection * deltaX <= 0 &&
+              $scope.xDirectionToggled === 0) {
+            $scope.xDirectionToggled = 1;
+          } else if (width - $scope.xDirection * deltaX >= 0 &&
+            $scope.xDirectionToggled === 1) {
+            $scope.xDirectionToggled = 0;
+          }
+          if ($scope.xDirection === 1) {
+            x = x + !$scope.xDirectionToggled * deltaX +
+              $scope.xDirectionToggled * width;
+          } else if ($scope.xDirection === -1) {
+            x = x + $scope.xDirectionToggled * deltaX +
+              $scope.xDirectionToggled * width;
+          }
+          height = height - $scope.yDirection * deltaY;
+          width = width - $scope.xDirection * deltaX;
+          resizedRegion.area = regionAreaFromCornerAndDimensions(x, y,
+                                width, height);
         };
 
         $scope.onSvgMouseMove = function(evt) {
@@ -581,8 +292,12 @@ oppia.directive('imageWithRegionsEditor', [
           $scope.userIsCurrentlyDrawing = false;
           $scope.userIsCurrentlyDragging = false;
           $scope.userIsCurrentlyResizing = false;
-          $scope.flag = 0;
-          $scope.hideDirectionCursor();
+          if ($scope.xDirectionToggled || $scope.yDirectionToggled) {
+            $scope.xDirection = 0;
+            $scope.yDirection = 0;
+          }
+          $scope.yDirectionToggled = 0;
+          $scope.xDirectionToggled = 0;
           if ($scope.regionDrawMode) {
             $scope.regionDrawMode = false;
             if ($scope.rectWidth !== 0 && $scope.rectHeight !== 0) {
@@ -622,68 +337,61 @@ oppia.directive('imageWithRegionsEditor', [
         $scope.onMouseoverRegion = function(index) {
           if ($scope.hoveredRegion === null) {
             $scope.hoveredRegion = index;
-            $scope.moveRegion = index;
           }
         };
-        $scope.onMouseMoveRegion = function(index) {
-          if ($scope.moveRegion !== index) {
-            hideDirectionCursor();
+        $scope.onMouseMoveRegion = function() {
+          if ($scope.userIsCurrentlyDragging ||
+              $scope.userIsCurrentlyResizing) {
+            return;
           }
           region = reg = cornerAndDimensionsFromRegionArea(
             $scope.$parent.value.labeledRegions[
               $scope.hoveredRegion].region.area);
-          if ($scope.mouseY <= region.y + $scope.resizeRegionBorder &&
+          if (!$scope.xDirectionToggled && !$scope.yDirectionToggled) {
+            if ($scope.mouseY <= region.y + $scope.resizeRegionBorder &&
                 $scope.mouseX >= region.width + region.x -
-                $scope.resizeRegionBorder && $scope.flag === 0 &&
-                $scope.resizeDirection !== 'nw' &&
-                $scope.resizeDirection !== 'se') {
-            $scope.resizeDirection = 'ne';
-            $scope.nResize = false;
-            $scope.eResize = false;
-            $scope.neResize = true;
-          } else if ($scope.mouseY <= region.y + $scope.resizeRegionBorder &&
-              $scope.mouseX <= region.x + $scope.resizeRegionBorder &&
-              $scope.flag === 0 && $scope.resizeDirection !== 'se') {
-            $scope.resizeDirection = 'nw';
-            $scope.nResize = false;
-            $scope.wResize = false;
-            $scope.nwResize = true;
-          } else if ($scope.mouseY >= region.height + region.y -
-              $scope.resizeRegionBorder && $scope.mouseX >= region.width +
-              region.x - $scope.resizeRegionBorder && $scope.flag === 0) {
-            $scope.resizeDirection = 'se';
-            $scope.sResize = false;
-            $scope.eResize = false;
-            $scope.seResize = true;
-          } else if ($scope.mouseY >= region.height + region.y -
-              $scope.resizeRegionBorder && $scope.mouseX <= region.x +
-              $scope.resizeRegionBorder && $scope.flag === 0) {
-            $scope.resizeDirection = 'sw';
-            $scope.sResize = false;
-            $scope.wResize = false;
-            $scope.swResize = true;
-          } else if ($scope.mouseY <= region.y + $scope.resizeRegionBorder &&
-              $scope.flag === 0 && $scope.resizeDirection !== 's' &&
-              $scope.resizeDirection !== 'se') {
-            $scope.resizeDirection = 'n';
-            $scope.nResize = true;
-          } else if ($scope.mouseX <= region.x + $scope.resizeRegionBorder &&
-              $scope.flag === 0 && $scope.resizeDirection !== 'e') {
-            $scope.resizeDirection = 'w';
-            $scope.wResize = true;
-          } else if ($scope.mouseX >= region.width + region.x -
-              $scope.resizeRegionBorder && $scope.flag === 0 &&
-              $scope.resizeDirection !== 'se') {
-            $scope.resizeDirection = 'e';
-            $scope.eResize = true;
-          } else if ($scope.mouseY >= region.height + region.y -
-              $scope.resizeRegionBorder && $scope.flag === 0) {
-            $scope.resizeDirection = 's';
-            $scope.sResize = true;
-          } else {
-            $scope.hideDirectionCursor();
-            if ($scope.flag === 0) {
-              $scope.resizeDirection = '';
+                $scope.resizeRegionBorder) {
+              // Along top right
+              $scope.xDirection = -1;
+              $scope.yDirection = 1;
+            } else if ($scope.mouseY <= region.y + $scope.resizeRegionBorder &&
+                $scope.mouseX <= region.x + $scope.resizeRegionBorder) {
+              // Along top left
+              $scope.xDirection = 1;
+              $scope.yDirection = 1;
+            } else if ($scope.mouseY >= region.height + region.y -
+                $scope.resizeRegionBorder && $scope.mouseX >= region.width +
+                region.x - $scope.resizeRegionBorder) {
+              // Along bottom right
+              $scope.xDirection = -1;
+              $scope.yDirection = -1;
+            } else if ($scope.mouseY >= region.height + region.y -
+                $scope.resizeRegionBorder && $scope.mouseX <= region.x +
+                $scope.resizeRegionBorder) {
+              // Along bottom left
+              $scope.xDirection = 1;
+              $scope.yDirection = -1;
+            } else if ($scope.mouseY <= region.y + $scope.resizeRegionBorder) {
+              // Along top
+              $scope.yDirection = 1;
+              $scope.xDirection = 0;
+            } else if ($scope.mouseX <= region.x + $scope.resizeRegionBorder) {
+              // Along left
+              $scope.yDirection = 0;
+              $scope.xDirection = 1;
+            } else if ($scope.mouseX >= region.width + region.x -
+                $scope.resizeRegionBorder) {
+              // Along right
+              $scope.yDirection = 0;
+              $scope.xDirection = -1;
+            } else if ($scope.mouseY >= region.height + region.y -
+                $scope.resizeRegionBorder) {
+              // Along bottom
+              $scope.xDirection = 0;
+              $scope.yDirection = -1;
+            } else {
+              $scope.xDirection = 0;
+              $scope.yDirection = 0;
             }
           }
         };
@@ -691,11 +399,14 @@ oppia.directive('imageWithRegionsEditor', [
           if ($scope.hoveredRegion === index) {
             $scope.hoveredRegion = null;
           }
-          $scope.hideDirectionCursor();
+          if (!$scope.userIsCurrentlyResizing) {
+            $scope.xDirection = 0;
+            $scope.yDirection = 0;
+          }
         };
         $scope.onMousedownRegion = function() {
           $scope.userIsCurrentlyDragging = true;
-          if ($scope.resizeDirection !== '') {
+          if ($scope.xDirection || $scope.yDirection) {
             $scope.userIsCurrentlyDragging = false;
             $scope.userIsCurrentlyResizing = true;
           }
@@ -715,22 +426,30 @@ oppia.directive('imageWithRegionsEditor', [
           $scope.regionDrawMode = true;
         };
         $scope.getCursorStyle = function() {
-          if ($scope.nResize) {
-            return 'n-resize';
-          } else if ($scope.eResize) {
-            return 'e-resize';
-          } else if ($scope.wResize) {
-            return 'w-resize';
-          } else if ($scope.sResize) {
-            return 's-resize';
-          } else if ($scope.neResize) {
-            return 'ne-resize';
-          } else if ($scope.seResize) {
-            return 'se-resize';
-          } else if ($scope.nwResize) {
-            return 'nw-resize';
-          } else if ($scope.swResize) {
-            return 'sw-resize';
+          var xDirectionCursor = '';
+          var yDirectionCursor = '';
+          if ($scope.xDirection || $scope.yDirection) {
+            if (($scope.xDirection === 1 && $scope.xDirectionToggled === 0) ||
+                ($scope.xDirection === -1 && $scope.xDirectionToggled === 1)) {
+              xDirectionCursor = 'w';
+            } else if (($scope.xDirection === -1 &&
+              $scope.xDirectionToggled === 0) || ($scope.xDirection === 1 &&
+              $scope.xDirectionToggled === 1)) {
+              xDirectionCursor = 'e';
+            } else {
+              xDirectionCursor = '';
+            }
+            if (($scope.yDirection === 1 && $scope.yDirectionToggled === 0) ||
+                ($scope.yDirection === -1 && $scope.yDirectionToggled === 1)) {
+              yDirectionCursor = 'n';
+            } else if (($scope.yDirection === -1 &&
+              $scope.yDirectionToggled === 0) || ($scope.yDirection === 1 &&
+              $scope.yDirectionToggled === 1)) {
+              yDirectionCursor = 's';
+            } else {
+              yDirectionCursor = '';
+            }
+            return yDirectionCursor + xDirectionCursor + '-resize';
           }
           return ($scope.regionDrawMode) ? 'crosshair' : 'default';
         };
