@@ -151,4 +151,3 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
     };
   }
 ]);
-  
