@@ -564,7 +564,7 @@ oppia.controller('StateResponses', [
 
       $modal.open({
         templateUrl: 'modals/teachOppia',
-        backdrop: true,
+        backdrop: false,
         controller: [
           '$scope', '$modalInstance', 'oppiaExplorationHtmlFormatterService',
           'stateInteractionIdService', 'stateCustomizationArgsService',
