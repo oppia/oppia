@@ -36,16 +36,16 @@
 
   it('should return an Id used to identify a question subfield', function() {
     expect(questionIdService.getSubfieldId(stubs.questionId, stubs.label))
-      .toEqual(true);
+      .toBeDefined(true);
   });
 
   it('should return an Id used to identify a sidebar item', function() {
     expect(questionIdService.getSidebarItemId(stubs.questionId, stubs.label))
-      .toEqual(true);
+      .toBeDefined(true);
   });
 
   it('should Extract the questionId from a subfieldId', function() {
     expect(questionIdService.getParentQuestionId(stubs.subfieldId))
-      .toEqual(true);
+      .toBeDefined(true);
   });
 });
