@@ -101,7 +101,7 @@ class Classifier(object):
         if not isinstance(self.exp_version_when_created, int):
             raise utils.ValidationError(
                 ('Expected exp_version_when_created to be a integer,') + (
-                'received %d' % self.exp_version_when_created))
+                    'received %d' % self.exp_version_when_created))
 
         if not isinstance(self.state_name, basestring):
             raise utils.ValidationError(
@@ -115,8 +115,8 @@ class Classifier(object):
                     self.algorithm_id))
         utils.require_valid_name(
             self.algorithm_id, 'the algorithm id')
-        if not (self.algorithm_id == (
-            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])):
+        if (self.algorithm_id != (
+                feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])):
             raise utils.ValidationError(
                 'Invalid algorithm_id: %s' % self.algorithm_id)
 
