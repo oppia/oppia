@@ -19,9 +19,11 @@
 
 oppia.factory('InteractionObjectFactory', [
   'AnswerGroupObjectFactory', function(AnswerGroupObjectFactory) {
-  var Interaction = function(answerGroups, confirmedUnclassifiedAnswers,
-    customizationArgs, defaultOutcome, fallbacks, id) {
-    this.answerGroups = generateAnswerGroupsFromBackend(answerGroups);
+  var Interaction = function(answerGroupBackendDicts,
+    confirmedUnclassifiedAnswers, customizationArgs, defaultOutcome,
+    fallbacks, id) {
+    this.answerGroups = generateAnswerGroupsFromBackend(
+      answerGroupBackendDicts);
     this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
     this.customizationArgs = customizationArgs;
     this.defaultOutcome = defaultOutcome;
@@ -52,7 +54,8 @@ oppia.factory('InteractionObjectFactory', [
   };
 
   Interaction.create = function(interactionDict) {
-    return new Interaction(interactionDict.answer_groups,
+    return new Interaction(
+      interactionDict.answer_groups,
       interactionDict.confirmed_unclassified_answers,
       interactionDict.customization_args,
       interactionDict.default_outcome,

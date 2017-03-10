@@ -834,7 +834,7 @@ describe('New state template service', function() {
           nsts.getNewStateTemplate(NEW_STATE_NAME)
         ))).toEqual({
           name: 'new state name',
-          classifier_model_id: null,
+          classifierModelId: null,
           content: [{
             type: 'text',
             value: ''
