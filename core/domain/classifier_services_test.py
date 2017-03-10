@@ -129,9 +129,10 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         exp_id = u'1'
         state = 'Home'
         test_state = 'State'
+        empty_dict = {}
         classifier = classifier_domain.Classifier(
             '1', exp_id, 1, state,
-            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'], [], 1)
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'], empty_dict, 1)
         classifier_id = (
             classifier_services.save_classifier(classifier))
         classifier = classifier_services.get_classifier_by_id(

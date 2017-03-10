@@ -203,6 +203,7 @@ def save_classifier(classifier):
     """
     classifier_model = classifier_models.ClassifierModel.get(
         classifier.id, False)
+    classifier.validate()
     if classifier_model is None:
         classifier.id = _create_classifier(classifier)
     else:

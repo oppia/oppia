@@ -15,6 +15,8 @@
 """Domain objects for classifier models"""
 
 import copy
+import feconf
+import utils
 
 class Classifier(object):
     """Domain object for a classifier.
@@ -45,7 +47,7 @@ class Classifier(object):
         Args:
             classifier_id: str. The unique id of the classifier.
             exp_id: str. The exploration id to which the classifier belongs.
-            exp_version_when_created: str. The version of the exploration when
+            exp_version_when_created: int. The version of the exploration when
                 this classification model was created.
             state_name: str. The name of the state to which the classifier
                 belongs.
@@ -80,3 +82,45 @@ class Classifier(object):
             'cached_classifier_data': self.cached_classifier_data,
             'data_schema_version': self.data_schema_version
         }
+
+    def validate(self):
+        """Validates the classifier before it is saved to storage."""
+
+        if not isinstance(self.id, basestring):
+            raise utils.ValidationError(
+                'Expected id to be a string, received %s' % self.id)
+        utils.require_valid_name(
+            self.id, 'the classifier id')
+
+        if not isinstance(self.exp_id, basestring):
+            raise utils.ValidationError(
+                'Expected exp_id to be a string, received %s' % self.exp_id)
+        utils.require_valid_name(
+            self.exp_id, 'the exploration id')
+
+        if not isinstance(self.exp_version_when_created, int):
+            raise utils.ValidationError(
+                ('Expected exp_version_when_created to be a integer,') + (
+                'received %d' % self.exp_version_when_created))
+
+        if not isinstance(self.state_name, basestring):
+            raise utils.ValidationError(
+                'Expected id to be a string, received %s' % self.state_name)
+        utils.require_valid_name(
+            self.state_name, 'the state name')
+
+        if not isinstance(self.algorithm_id, basestring):
+            raise utils.ValidationError(
+                'Expected algorithm_id to be a string, received %s' %(
+                    self.algorithm_id))
+        utils.require_valid_name(
+            self.algorithm_id, 'the algorithm id')
+        if not (self.algorithm_id == (
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])):
+            raise utils.ValidationError(
+                'Invalid algorithm_id: %s' % self.algorithm_id)
+
+        if not isinstance(self.cached_classifier_data, dict):
+            raise utils.ValidationError(
+                'Expected cached_classifier_data to be a dict, received %s' %(
+                    self.cached_classifier_data))
