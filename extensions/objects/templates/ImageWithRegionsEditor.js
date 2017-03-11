@@ -82,8 +82,11 @@ oppia.directive('imageWithRegionsEditor', [
         // 1 -> Top -1 -> Bottom 0 -> No resize
         $scope.yDirection = 0;
         // Flags to check whether the direction changes while resizing
-        $scope.yDirectionToggled = 0;
-        $scope.xDirectionToggled = 0;
+        $scope.yDirectionToggled = false;
+        $scope.xDirectionToggled = false;
+        // A boolean that is set whenever the cursor moves out of the
+        // rectangular region while resizing.
+        $scope.outOfRegion = false;
         // The region along borders which when hovered provides resize cursor
         $scope.resizeRegionBorder = 10;
         // Dimensions of original image
@@ -216,32 +219,28 @@ oppia.directive('imageWithRegionsEditor', [
           var width = $scope.originalRectArea.width;
           var height = $scope.originalRectArea.height;
           if (height - $scope.yDirection * deltaY <= 0 &&
-              $scope.yDirectionToggled === 0) {
-            $scope.yDirectionToggled = 1;
+              !$scope.yDirectionToggled) {
+            $scope.yDirectionToggled = true;
           } else if (height - $scope.yDirection * deltaY >= 0 &&
-            $scope.yDirectionToggled === 1) {
-            $scope.yDirectionToggled = 0;
+            $scope.yDirectionToggled) {
+            $scope.yDirectionToggled = false;
           }
           if ($scope.yDirection === 1) {
-            y = y + !$scope.yDirectionToggled * deltaY +
-              $scope.yDirectionToggled * height;
+            y += $scope.yDirectionToggled ? height : deltaY;
           } else if ($scope.yDirection === -1) {
-            y = y + $scope.yDirectionToggled * deltaY +
-            $scope.yDirectionToggled * height;
+            y += $scope.yDirectionToggled * (deltaY + height);
           }
           if (width - $scope.xDirection * deltaX <= 0 &&
-              $scope.xDirectionToggled === 0) {
-            $scope.xDirectionToggled = 1;
+              !$scope.xDirectionToggled) {
+            $scope.xDirectionToggled = true;
           } else if (width - $scope.xDirection * deltaX >= 0 &&
-            $scope.xDirectionToggled === 1) {
-            $scope.xDirectionToggled = 0;
+            $scope.xDirectionToggled) {
+            $scope.xDirectionToggled = false;
           }
           if ($scope.xDirection === 1) {
-            x = x + !$scope.xDirectionToggled * deltaX +
-              $scope.xDirectionToggled * width;
+            x += $scope.xDirectionToggled ? width : deltaX;
           } else if ($scope.xDirection === -1) {
-            x = x + $scope.xDirectionToggled * deltaX +
-              $scope.xDirectionToggled * width;
+            x += $scope.xDirectionToggled * (deltaX + width);
           }
           height = height - $scope.yDirection * deltaY;
           width = width - $scope.xDirection * deltaX;
@@ -292,12 +291,13 @@ oppia.directive('imageWithRegionsEditor', [
           $scope.userIsCurrentlyDrawing = false;
           $scope.userIsCurrentlyDragging = false;
           $scope.userIsCurrentlyResizing = false;
-          if ($scope.xDirectionToggled || $scope.yDirectionToggled) {
+          if ($scope.outOfRegion) {
             $scope.xDirection = 0;
             $scope.yDirection = 0;
           }
-          $scope.yDirectionToggled = 0;
-          $scope.xDirectionToggled = 0;
+          $scope.outOfRegion = false;
+          $scope.yDirectionToggled = false;
+          $scope.xDirectionToggled = false;
           if ($scope.regionDrawMode) {
             $scope.regionDrawMode = false;
             if ($scope.rectWidth !== 0 && $scope.rectHeight !== 0) {
@@ -338,6 +338,7 @@ oppia.directive('imageWithRegionsEditor', [
           if ($scope.hoveredRegion === null) {
             $scope.hoveredRegion = index;
           }
+          $scope.outOfRegion = false;
         };
         $scope.onMouseMoveRegion = function() {
           if ($scope.userIsCurrentlyDragging ||
@@ -348,50 +349,21 @@ oppia.directive('imageWithRegionsEditor', [
             $scope.$parent.value.labeledRegions[
               $scope.hoveredRegion].region.area);
           if (!$scope.xDirectionToggled && !$scope.yDirectionToggled) {
-            if ($scope.mouseY <= region.y + $scope.resizeRegionBorder &&
-                $scope.mouseX >= region.width + region.x -
-                $scope.resizeRegionBorder) {
-              // Along top right
-              $scope.xDirection = -1;
-              $scope.yDirection = 1;
-            } else if ($scope.mouseY <= region.y + $scope.resizeRegionBorder &&
-                $scope.mouseX <= region.x + $scope.resizeRegionBorder) {
-              // Along top left
-              $scope.xDirection = 1;
+            if ($scope.mouseY <= region.y + $scope.resizeRegionBorder) {
               $scope.yDirection = 1;
             } else if ($scope.mouseY >= region.height + region.y -
-                $scope.resizeRegionBorder && $scope.mouseX >= region.width +
-                region.x - $scope.resizeRegionBorder) {
-              // Along bottom right
-              $scope.xDirection = -1;
-              $scope.yDirection = -1;
-            } else if ($scope.mouseY >= region.height + region.y -
-                $scope.resizeRegionBorder && $scope.mouseX <= region.x +
                 $scope.resizeRegionBorder) {
-              // Along bottom left
-              $scope.xDirection = 1;
               $scope.yDirection = -1;
-            } else if ($scope.mouseY <= region.y + $scope.resizeRegionBorder) {
-              // Along top
-              $scope.yDirection = 1;
-              $scope.xDirection = 0;
-            } else if ($scope.mouseX <= region.x + $scope.resizeRegionBorder) {
-              // Along left
+            } else {
               $scope.yDirection = 0;
+            }
+            if ($scope.mouseX <= region.x + $scope.resizeRegionBorder) {
               $scope.xDirection = 1;
             } else if ($scope.mouseX >= region.width + region.x -
                 $scope.resizeRegionBorder) {
-              // Along right
-              $scope.yDirection = 0;
               $scope.xDirection = -1;
-            } else if ($scope.mouseY >= region.height + region.y -
-                $scope.resizeRegionBorder) {
-              // Along bottom
-              $scope.xDirection = 0;
-              $scope.yDirection = -1;
             } else {
               $scope.xDirection = 0;
-              $scope.yDirection = 0;
             }
           }
         };
@@ -403,6 +375,7 @@ oppia.directive('imageWithRegionsEditor', [
             $scope.xDirection = 0;
             $scope.yDirection = 0;
           }
+          $scope.outOfRegion = true;
         };
         $scope.onMousedownRegion = function() {
           $scope.userIsCurrentlyDragging = true;
@@ -429,22 +402,22 @@ oppia.directive('imageWithRegionsEditor', [
           var xDirectionCursor = '';
           var yDirectionCursor = '';
           if ($scope.xDirection || $scope.yDirection) {
-            if (($scope.xDirection === 1 && $scope.xDirectionToggled === 0) ||
-                ($scope.xDirection === -1 && $scope.xDirectionToggled === 1)) {
+            if (($scope.xDirection === 1 && !$scope.xDirectionToggled) ||
+                ($scope.xDirection === -1 && $scope.xDirectionToggled)) {
               xDirectionCursor = 'w';
             } else if (($scope.xDirection === -1 &&
-              $scope.xDirectionToggled === 0) || ($scope.xDirection === 1 &&
-              $scope.xDirectionToggled === 1)) {
+              !$scope.xDirectionToggled) || ($scope.xDirection === 1 &&
+              $scope.xDirectionToggled)) {
               xDirectionCursor = 'e';
             } else {
               xDirectionCursor = '';
             }
-            if (($scope.yDirection === 1 && $scope.yDirectionToggled === 0) ||
-                ($scope.yDirection === -1 && $scope.yDirectionToggled === 1)) {
+            if (($scope.yDirection === 1 && !$scope.yDirectionToggled) ||
+                ($scope.yDirection === -1 && $scope.yDirectionToggled)) {
               yDirectionCursor = 'n';
             } else if (($scope.yDirection === -1 &&
-              $scope.yDirectionToggled === 0) || ($scope.yDirection === 1 &&
-              $scope.yDirectionToggled === 1)) {
+              !$scope.yDirectionToggled) || ($scope.yDirection === 1 &&
+              $scope.yDirectionToggled)) {
               yDirectionCursor = 's';
             } else {
               yDirectionCursor = '';
