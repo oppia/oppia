@@ -26,10 +26,10 @@
           stateName, statesDict[stateName]);
       }
       return stateObjectsDict;
- 		};
+    };
 
     return {
       create: create
     };
- 	}
+  }
 ]);

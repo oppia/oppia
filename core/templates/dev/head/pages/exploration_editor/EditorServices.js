@@ -1650,6 +1650,7 @@ oppia.factory('newStateTemplateService',
       getNewStateTemplate: function(newStateName) {
         var newStateTemplate = angular.copy(GLOBALS.NEW_STATE_TEMPLATE);
         var newState = StateObjectFactory.create(newStateName, {
+          classifier_model_id: newStateTemplate.classifier_model_id,
           content: newStateTemplate.content,
           interaction: newStateTemplate.interaction,
           param_changes: newStateTemplate.param_changes

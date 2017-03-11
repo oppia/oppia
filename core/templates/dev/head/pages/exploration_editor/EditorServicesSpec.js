@@ -801,6 +801,7 @@ describe('New state template service', function() {
 
     beforeEach(inject(function($injector) {
       GLOBALS.NEW_STATE_TEMPLATE = {
+        classifier_model_id: null,
         content: [{
           type: 'text',
           value: ''
