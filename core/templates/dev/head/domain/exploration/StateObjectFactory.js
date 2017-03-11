@@ -20,9 +20,10 @@
 oppia.factory('StateObjectFactory', [
   'AnswerGroupObjectFactory', 'InteractionObjectFactory',
   function(AnswerGroupObjectFactory, InteractionObjectFactory) {
-  var State = function(name, content, interactionBackendDict, paramChanges) {
+  var State = function(name, classifierModelId, content,
+    interactionBackendDict, paramChanges) {
     this.name = name;
-    this.classifierModelId = null;
+    this.classifierModelId = classifierModelId;
     this.content = content;
     this.interaction = InteractionObjectFactory.create(interactionBackendDict);
     this.paramChanges = paramChanges;
@@ -43,6 +44,7 @@ oppia.factory('StateObjectFactory', [
   State.create = function(stateName, stateDict) {
     return new State(
       stateName,
+      stateDict.classifier_model_id,
       stateDict.content,
       stateDict.interaction,
       stateDict.param_changes);

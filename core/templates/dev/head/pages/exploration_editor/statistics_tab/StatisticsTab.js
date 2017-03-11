@@ -20,11 +20,11 @@
 oppia.controller('StatisticsTab', [
   '$scope', '$http', '$modal', 'alertsService', 'explorationStatesService',
   'explorationData', 'computeGraphService', 'oppiaDatetimeFormatter',
-  'StateObjectFactory',
+  'StateObjectFactory', 'StatesObjectFactory',
   function(
       $scope, $http, $modal, alertsService, explorationStatesService,
       explorationData, computeGraphService, oppiaDatetimeFormatter,
-      StateObjectFactory) {
+      StateObjectFactory, StatesObjectFactory) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
       chartAreaWidth: 300,
       colors: ['green', 'firebrick'],
@@ -62,11 +62,7 @@ oppia.controller('StatisticsTab', [
 
         $http.get(explorationDataUrl).then(function(response) {
           var statesDict = response.data.states;
-          var states = {};
-          for (var stateName in statesDict) {
-            states[stateName] = StateObjectFactory.create(
-              stateName, statesDict[stateName]);
-          }
+          var states = StatesObjectFactory.create(statesDict);
           var initStateName = response.data.init_state_name;
           $scope.statsGraphData = computeGraphService.compute(
             initStateName, states);
