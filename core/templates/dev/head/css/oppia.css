@@ -3592,10 +3592,11 @@ md-card.preview-conversation-skin-supplemental-card {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 18px;
   margin-top: -20px;
-  padding: 10px;
+  padding: 10px 0;
   position: absolute;
   text-transform: uppercase;
   transform: translateX(-50%);
+  width: 360px;
 }
 
 .oppia-splash-button:hover,
