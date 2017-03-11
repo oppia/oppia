@@ -707,7 +707,7 @@ textarea {
   color: #fff;
   font-size: 13px;
   line-height: 20px;
-  position: absolute;
+  position: relative;
   width: 100%;
 }
 
@@ -770,8 +770,8 @@ textarea {
   }
 }
 @media (max-width: 440px) {
-  .oppia-footer-padding-below-banner{
-    height: 250px;
+  .oppia-footer-padding-below-banner {
+    height: 270px;
   }
 }
 /*
