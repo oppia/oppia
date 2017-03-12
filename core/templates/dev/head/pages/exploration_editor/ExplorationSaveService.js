@@ -25,6 +25,7 @@ oppia.factory('explorationSaveService', [
   'explorationWarningsService', 'ExplorationDiffService',
   'explorationInitStateNameService', 'routerService',
   'focusService', 'changeListService', 'siteAnalyticsService',
+  'StateObjectFactory',
   function(
       $modal, $timeout, $rootScope, $log, $q,
       alertsService, explorationData, explorationStatesService,
@@ -33,7 +34,8 @@ oppia.factory('explorationSaveService', [
       explorationLanguageCodeService, explorationRightsService,
       explorationWarningsService, ExplorationDiffService,
       explorationInitStateNameService, routerService,
-      focusService, changeListService, siteAnalyticsService) {
+      focusService, changeListService, siteAnalyticsService,
+      StateObjectFactory) {
     // Whether or not a save action is currently in progress
     // (request has been sent to backend but no reply received yet)
     var saveIsInProgress = false;
@@ -448,7 +450,11 @@ oppia.factory('explorationSaveService', [
         }
 
         explorationData.getLastSavedData().then(function(data) {
-          var oldStates = data.states;
+          var oldStates = {};
+          for (var stateName in data.states) {
+            oldStates[stateName] =
+              (StateObjectFactory.create(stateName, data.states[stateName]));
+          }
           var newStates = explorationStatesService.getStates();
           var diffGraphData = ExplorationDiffService.getDiffGraphData(
             oldStates, newStates, [{
