@@ -1,4 +1,19 @@
 <script type="text/ng-template" id="components/socialButtons">
+<style type="text/css">
+  
+.fa {
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    padding-right: 4px;
+    font-size: 23px;
+    text-rendering: auto;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    top: -10px;
+}
+  
+</style>
   <div class="oppia-footer-social">
     <div>
       <h4>
@@ -6,16 +21,16 @@
       </h4>
     </div>
     <a href="https://plus.google.com/109898456505810251700/about" target="_blank">
-      <img ng-src="<[getStaticImageUrl('/social/gplus.png')]>" alt="Google+">
+      <i class="fa fa-google-plus-square" aria-hidden="true"></i>
     </a>
     <a href="https://www.youtube.com/channel/UC5c1G7BNDCfv1rczcBp9FPw" target="_blank">
-      <img ng-src="<[getStaticImageUrl('/social/youtube.png')]>" alt="YouTube">
+      <i class="fa fa-youtube-play" aria-hidden="true"></i>
     </a>
     <a href="https://www.facebook.com/oppiaorg" target="_blank">
-      <img ng-src="<[getStaticImageUrl('/social/fb.png')]>" alt="Facebook">
+      <i class="fa fa-facebook" aria-hidden="true"></i>
     </a>
     <a href="https://twitter.com/oppiaorg" target="_blank">
-      <img ng-src="<[getStaticImageUrl('/social/twitter.png')]>" alt="Twitter">
+      <i class="fa fa-twitter" aria-hidden="true"></i>
     </a>
   </div>
 </script>
