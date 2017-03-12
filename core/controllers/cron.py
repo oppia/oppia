@@ -47,7 +47,7 @@ def require_cron_or_superadmin(func):
 
     Raises:
         UnauthorizedUserException: An unauthorized user accesses the
-		handler URL
+        handler URL
     """
     def _require_cron_or_superadmin(self, *args, **kwargs):
         if (self.request.headers.get('X-AppEngine-Cron') is None
