@@ -226,11 +226,9 @@ oppia.directive('imageWithRegionsEditor', [
             $scope.originalMouseX);
           var marginY = Math.abs($scope.originalRectArea.y -
             $scope.originalMouseY);
-          if (height - $scope.yDirection * deltaY <= 0 &&
-              !$scope.yDirectionToggled) {
+          if (newHeight <= 0 && !$scope.yDirectionToggled) {
             $scope.yDirectionToggled = true;
-          } else if (height - $scope.yDirection * deltaY >= 0 &&
-            $scope.yDirectionToggled) {
+          } else if (newHeight >= 0 && $scope.yDirectionToggled) {
             $scope.yDirectionToggled = false;
           }
           if ($scope.yDirection === 1) {
@@ -238,11 +236,9 @@ oppia.directive('imageWithRegionsEditor', [
           } else if ($scope.yDirection === -1) {
             y += $scope.yDirectionToggled * (deltaY + marginY);
           }
-          if (width - $scope.xDirection * deltaX <= 0 &&
-              !$scope.xDirectionToggled) {
+          if (newWidth <= 0 && !$scope.xDirectionToggled) {
             $scope.xDirectionToggled = true;
-          } else if (width - $scope.xDirection * deltaX >= 0 &&
-            $scope.xDirectionToggled) {
+          } else if (newWidth >= 0 && $scope.xDirectionToggled) {
             $scope.xDirectionToggled = false;
           }
           if ($scope.xDirection === 1) {
@@ -298,18 +294,10 @@ oppia.directive('imageWithRegionsEditor', [
           $scope.userIsCurrentlyDragging = false;
           $scope.userIsCurrentlyResizing = false;
           if ($scope.yDirectionToggled) {
-            if ($scope.yDirection === 1) {
-              $scope.yDirection = -1;
-            } else {
-              $scope.yDirection = 1;
-            }
+            $scope.yDirection = ($scope.yDirection === 1) ? -1 : 1;
           }
           if ($scope.xDirectionToggled) {
-            if ($scope.xDirection === 1) {
-              $scope.xDirection = -1;
-            } else {
-              $scope.xDirection = 1;
-            }
+            $scope.xDirection = ($scope.xDirection === 1) ? -1 : 1;
           }
           if ($scope.outOfRegion) {
             $scope.xDirection = 0;
