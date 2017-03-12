@@ -31,7 +31,8 @@ describe('oppiaInteractiveCodeReplValidator', function() {
     };
     goodAnswerGroups = [{
       ruleSpecs: [],
-      outcome: goodDefaultOutcome
+      outcome: goodDefaultOutcome,
+      correct: false
     }];
   }));
 

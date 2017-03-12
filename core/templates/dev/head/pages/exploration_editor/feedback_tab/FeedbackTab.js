@@ -20,12 +20,12 @@ oppia.controller('FeedbackTab', [
   '$scope', '$http', '$modal', '$timeout', '$rootScope', 'alertsService',
   'oppiaDatetimeFormatter', 'threadStatusDisplayService',
   'threadDataService', 'explorationStatesService', 'explorationData',
-  'changeListService',
+  'changeListService', 'StateObjectFactory',
   function(
     $scope, $http, $modal, $timeout, $rootScope, alertsService,
     oppiaDatetimeFormatter, threadStatusDisplayService,
     threadDataService, explorationStatesService, explorationData,
-    changeListService) {
+    changeListService, StateObjectFactory) {
     var ACTION_ACCEPT_SUGGESTION = 'accept';
     var ACTION_REJECT_SUGGESTION = 'reject';
     $scope.STATUS_CHOICES = threadStatusDisplayService.STATUS_CHOICES;
@@ -211,7 +211,8 @@ oppia.controller('FeedbackTab', [
             if (result.action === ACTION_ACCEPT_SUGGESTION) {
               var suggestion = $scope.activeThread.suggestion;
               var stateName = suggestion.state_name;
-              var state = explorationData.data.states[stateName];
+              var stateDict = explorationData.data.states[stateName];
+              var state = StateObjectFactory.create(stateName, stateDict);
               state.content[0].value = suggestion.state_content.value;
               explorationData.data.version += 1;
               explorationStatesService.setState(stateName, state);
