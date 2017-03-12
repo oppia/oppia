@@ -18,6 +18,7 @@
 	"I18N_DASHBOARD_COLLECTIONS": "збирки",
 	"I18N_DASHBOARD_EXPLORATIONS": "истражувања",
 	"I18N_DASHBOARD_OPEN_FEEDBACK": "Отвори мислења",
+	"I18N_DASHBOARD_SUBSCRIBERS": "Претплатници",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Овде довлечете ја сликата",
 	"I18N_DIRECTIVES_OR_SELECT_FILE": "или изберете податотека:",
 	"I18N_ERROR_DISABLED_EXPLORATION": "Оневозможено истражување",
@@ -86,6 +87,10 @@
 	"I18N_INTERACTIONS_MUSIC_PLAY": "Пушти",
 	"I18N_INTERACTIONS_MUSIC_PLAY_SEQUENCE": "Пушти ја целната низа",
 	"I18N_INTERACTIONS_MUSIC_SUBMIT": "Поднеси",
+	"I18N_INTERACTIONS_PENCILCODEEDITOR_ARE_YOU_SURE_YOU_WANT_TO_RESET_YOUR_CODE": "Дали сте сигурни дека сакате да го вратите кодот по основно?",
+	"I18N_INTERACTIONS_PENCILCODEEDITOR_CANCEL": "Откажи",
+	"I18N_INTERACTIONS_PENCILCODEEDITOR_CONFIRMATION_REQUIRED": "Се бара потврда",
+	"I18N_INTERACTIONS_PENCILCODEEDITOR_RESET_CODE": "Врати го кодот",
 	"I18N_INTERACTIONS_SET_INPUT_ADD_ITEM": "Додај ставка",
 	"I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR": "Се чини дека вашиот збир има дупликати!",
 	"I18N_INTERACTIONS_SET_INPUT_EMPTY_SET": "(Ставајте по една ставка во секој нов ред.)",
@@ -158,6 +163,7 @@
 	"I18N_LIBRARY_SUB_HEADER": "Почнете ја вашата авантура прелистувајќи по нашите истражувања.",
 	"I18N_LIBRARY_VIEWS_TOOLTIP": "Посети",
 	"I18N_LIBRARY_VIEW_ALL": "Сите",
+	"I18N_ONE_SUBSCRIBER_TEXT": "Имате 1 претплатник.",
 	"I18N_PLAYER_BACK": "Назад",
 	"I18N_PLAYER_CARD_NUMBER_TOOLTIP": "Картичка бр.",
 	"I18N_PLAYER_COMMUNITY_EDITABLE_TOOLTIP": "Уредливо од заедницата",
@@ -297,5 +303,6 @@
 	"I18N_TOPNAV_PREFERENCES": "Поставки",
 	"I18N_TOPNAV_SIGN_IN": "Најава",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Подучувајте со Опија",
+	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Имате вкупно <[totalSubscribers]> претплатници.",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Отпиши ме"
 }

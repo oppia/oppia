@@ -35,9 +35,19 @@ TWENTY_FIVE_HOURS_IN_MSECS = 25 * 60 * 60 * 1000
 MAX_JOBS_TO_REPORT_ON = 50
 
 
-def require_cron_or_superadmin(handler):
+def require_cron_or_superadmin(func):
     """Decorator to ensure that the handler is being called by cron or by a
     superadmin of the application.
+
+    Args:
+        func: function. The cron function to be decorated.
+
+    Returns:
+        function: The decorated cron function.
+
+    Raises:
+        UnauthorizedUserException: An unauthorized user accesses the
+        handler URL.
     """
     def _require_cron_or_superadmin(self, *args, **kwargs):
         if (self.request.headers.get('X-AppEngine-Cron') is None
@@ -45,7 +55,7 @@ def require_cron_or_superadmin(handler):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
         else:
-            return handler(self, *args, **kwargs)
+            return func(self, *args, **kwargs)
 
     return _require_cron_or_superadmin
 

@@ -923,6 +923,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'feedback': ['Try again'],
                 'param_changes': []
             },
+            'correct': False,
         }]
         # Default outcome specification for an interaction.
         self.interaction_default_outcome = {
