@@ -54,10 +54,10 @@ oppia.directive('imageWithRegionsEditor', [
         // Current mouse position in SVG coordinates
         $scope.mouseX = 0;
         $scope.mouseY = 0;
-        // Original mouse click position for rectangle drawing
+        // Original mouse click position for rectangle drawing.
         $scope.originalMouseX = 0;
         $scope.originalMouseY = 0;
-        // Original position and dimensions for dragged rectangle
+        // Original position and dimensions for dragged rectangle.
         $scope.originalRectArea = {
           x: 0,
           y: 0,
@@ -75,28 +75,28 @@ oppia.directive('imageWithRegionsEditor', [
         $scope.userIsCurrentlyDragging = false;
         // Is user currently resizing an existing region?
         $scope.userIsCurrentlyResizing = false;
-        // The horizontal direction along which user resize occurs
-        // 1 -> Left -1 -> Right 0 -> No resize
+        // The horizontal direction along which user resize occurs.
+        // 1 -> Left     -1 -> Right     0 -> No resize
         $scope.xDirection = 0;
-        // The vertical direction along which user resize occurs
-        // 1 -> Top -1 -> Bottom 0 -> No resize
+        // The vertical direction along which user resize occurs.
+        // 1 -> Top     -1 -> Bottom     0 -> No resize
         $scope.yDirection = 0;
-        // Flags to check whether the direction changes while resizing
+        // Flags to check whether the direction changes while resizing.
         $scope.yDirectionToggled = false;
         $scope.xDirectionToggled = false;
         // A boolean that is set whenever the cursor moves out of the
         // rectangular region while resizing.
-        $scope.outOfRegion = false;
-        // The region along borders which when hovered provides resize cursor
-        $scope.resizeRegionBorder = 10;
-        // Dimensions of original image
+        $scope.movedOutOfRegion = false;
+        // The region along borders which when hovered provides resize cursor.
+        $scope.resizableBorderWidthPx = 10;
+        // Dimensions of original image.
         $scope.originalImageWidth = 0;
         $scope.originalImageHeight = 0;
         // Is the user preparing to draw a rectangle?
         $scope.regionDrawMode = false;
-        // Index of region currently hovered over
+        // Index of region currently hovered over.
         $scope.hoveredRegion = null;
-        // Index of region currently selected
+        // Index of region currently selected.
         $scope.selectedRegion = null;
 
         // Temporary label list
@@ -188,8 +188,6 @@ oppia.directive('imageWithRegionsEditor', [
         // Convert to and from region area (which is stored as a fraction of
         // image width and height) and actual width and height
         var regionAreaFromCornerAndDimensions = function(x, y, width, height) {
-          height = Math.abs(height);
-          width = Math.abs(width);
           return [
             convertCoordsToFraction(
               [x, y],
@@ -220,12 +218,14 @@ oppia.directive('imageWithRegionsEditor', [
           var height = $scope.originalRectArea.height;
           var newWidth = width - $scope.xDirection * deltaX;
           var newHeight = height - $scope.yDirection * deltaY;
-          // Margin between the position mouse is pressed to resize and the y
-          // or the x co-ordinate.
-          var marginX = Math.abs($scope.originalRectArea.x -
-            $scope.originalMouseX);
-          var marginY = Math.abs($scope.originalRectArea.y -
-            $scope.originalMouseY);
+          // The distance between where the mouse was first clicked to initiate
+          // the resize action and the left-most x co-ordinate of rectangle.
+          var marginX = Math.abs(
+            $scope.originalRectArea.x - $scope.originalMouseX);
+          // The distance between where the mouse was first clicked to initiate
+          // the resize action and the top-most y co-ordinate of rectangle.
+          var marginY = Math.abs(
+            $scope.originalRectArea.y - $scope.originalMouseY);
           if (newHeight <= 0 && !$scope.yDirectionToggled) {
             $scope.yDirectionToggled = true;
           } else if (newHeight >= 0 && $scope.yDirectionToggled) {
@@ -246,8 +246,10 @@ oppia.directive('imageWithRegionsEditor', [
           } else if ($scope.xDirection === -1) {
             x += $scope.xDirectionToggled * (deltaX + marginX);
           }
-          resizedRegion.area = regionAreaFromCornerAndDimensions(x, y,
-                                newWidth, newHeight);
+          // Whenever the direction changes the value of newHeight and newWidth
+          // computed is negative, hence the absolute value is taken.
+          resizedRegion.area = regionAreaFromCornerAndDimensions(
+            x, y, Math.abs(newWidth), Math.abs(newHeight));
         };
 
         $scope.onSvgMouseMove = function(evt) {
@@ -299,11 +301,11 @@ oppia.directive('imageWithRegionsEditor', [
           if ($scope.xDirectionToggled) {
             $scope.xDirection = ($scope.xDirection === 1) ? -1 : 1;
           }
-          if ($scope.outOfRegion) {
+          if ($scope.movedOutOfRegion) {
             $scope.xDirection = 0;
             $scope.yDirection = 0;
           }
-          $scope.outOfRegion = false;
+          $scope.movedOutOfRegion = false;
           $scope.yDirectionToggled = false;
           $scope.xDirectionToggled = false;
           if ($scope.regionDrawMode) {
@@ -346,29 +348,32 @@ oppia.directive('imageWithRegionsEditor', [
           if ($scope.hoveredRegion === null) {
             $scope.hoveredRegion = index;
           }
-          $scope.outOfRegion = false;
+          $scope.movedOutOfRegion = false;
         };
         $scope.onMouseMoveRegion = function() {
-          if ($scope.userIsCurrentlyDragging ||
+          if (
+              $scope.userIsCurrentlyDragging ||
               $scope.userIsCurrentlyResizing) {
             return;
           }
-          region = reg = cornerAndDimensionsFromRegionArea(
+          region = cornerAndDimensionsFromRegionArea(
             $scope.$parent.value.labeledRegions[
               $scope.hoveredRegion].region.area);
           if (!$scope.xDirectionToggled && !$scope.yDirectionToggled) {
-            if ($scope.mouseY <= region.y + $scope.resizeRegionBorder) {
+            if ($scope.mouseY <= region.y + $scope.resizableBorderWidthPx) {
               $scope.yDirection = 1;
-            } else if ($scope.mouseY >= region.height + region.y -
-                $scope.resizeRegionBorder) {
+            } else if (
+                $scope.mouseY >= region.height + region.y -
+                $scope.resizableBorderWidthPx) {
               $scope.yDirection = -1;
             } else {
               $scope.yDirection = 0;
             }
-            if ($scope.mouseX <= region.x + $scope.resizeRegionBorder) {
+            if ($scope.mouseX <= region.x + $scope.resizableBorderWidthPx) {
               $scope.xDirection = 1;
-            } else if ($scope.mouseX >= region.width + region.x -
-                $scope.resizeRegionBorder) {
+            } else if (
+                $scope.mouseX >= region.width + region.x -
+                $scope.resizableBorderWidthPx) {
               $scope.xDirection = -1;
             } else {
               $scope.xDirection = 0;
@@ -383,7 +388,7 @@ oppia.directive('imageWithRegionsEditor', [
             $scope.xDirection = 0;
             $scope.yDirection = 0;
           }
-          $scope.outOfRegion = true;
+          $scope.movedOutOfRegion = true;
         };
         $scope.onMousedownRegion = function() {
           if ($scope.xDirection || $scope.yDirection) {
@@ -410,22 +415,24 @@ oppia.directive('imageWithRegionsEditor', [
           var xDirectionCursor = '';
           var yDirectionCursor = '';
           if ($scope.xDirection || $scope.yDirection) {
-            if (($scope.xDirection === 1 && !$scope.xDirectionToggled) ||
+            if (
+                ($scope.xDirection === 1 && !$scope.xDirectionToggled) ||
                 ($scope.xDirection === -1 && $scope.xDirectionToggled)) {
               xDirectionCursor = 'w';
-            } else if (($scope.xDirection === -1 &&
-              !$scope.xDirectionToggled) || ($scope.xDirection === 1 &&
-              $scope.xDirectionToggled)) {
+            } else if (
+              ($scope.xDirection === -1 && !$scope.xDirectionToggled) ||
+              ($scope.xDirection === 1 && $scope.xDirectionToggled)) {
               xDirectionCursor = 'e';
             } else {
               xDirectionCursor = '';
             }
-            if (($scope.yDirection === 1 && !$scope.yDirectionToggled) ||
+            if (
+                ($scope.yDirection === 1 && !$scope.yDirectionToggled) ||
                 ($scope.yDirection === -1 && $scope.yDirectionToggled)) {
               yDirectionCursor = 'n';
-            } else if (($scope.yDirection === -1 &&
-              !$scope.yDirectionToggled) || ($scope.yDirection === 1 &&
-              $scope.yDirectionToggled)) {
+            } else if (
+              ($scope.yDirection === -1 && !$scope.yDirectionToggled) ||
+              ($scope.yDirection === 1 && $scope.yDirectionToggled)) {
               yDirectionCursor = 's';
             } else {
               yDirectionCursor = '';
