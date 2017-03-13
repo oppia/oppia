@@ -31,12 +31,14 @@ oppia.animation('.oppia-collection-animate-slide', function() {
 });
 
 oppia.controller('CollectionPlayer', [
-  '$scope', '$anchorScroll', '$location', '$http', 'ReadOnlyCollectionBackendApiService',
+  '$scope', '$anchorScroll', '$location', '$http',
+  'ReadOnlyCollectionBackendApiService',
   'CollectionObjectFactory', 'CollectionPlaythroughObjectFactory',
   'alertsService', 'UrlInterpolationService',
-  function($scope, $anchorScroll, $location, $http, ReadOnlyCollectionBackendApiService,
-    CollectionObjectFactory, CollectionPlaythroughObjectFactory,
-    alertsService, UrlInterpolationService) {
+  function($scope, $anchorScroll, $location,
+           $http, ReadOnlyCollectionBackendApiService,
+           CollectionObjectFactory, CollectionPlaythroughObjectFactory,
+           alertsService, UrlInterpolationService) {
     $scope.collection = null;
     $scope.collectionPlaythrough = null;
     $scope.collectionId = GLOBALS.collectionId;
@@ -284,10 +286,10 @@ oppia.controller('CollectionPlayer', [
       $anchorScroll();
     };
 
-    document.addEventListener("touchstart", function () {
-        if ($scope.previewCardMobileIsShown === false) {
-          $scope.previewCardMobileIsShown = true;
-        }
+    document.addEventListener('touchstart', function() {
+      if ($scope.previewCardMobileIsShown === false) {
+        $scope.previewCardMobileIsShown = true;
+      }
     });
   }
 ]);
