@@ -229,10 +229,10 @@ var customizeInteraction = function(interactionId) {
 
   // The save interaction button doesn't appear for interactions having no
   // options to customize.
-  var saveInteraction = element(by.css('.protractor-test-save-interaction'));
-  saveInteraction.isPresent().then(function(result) {
+  var saveInteractionBtn = element(by.css('.protractor-test-save-interaction'));
+  saveInteractionBtn.isPresent().then(function(result) {
     if (result) {
-      saveInteraction.click();
+      saveInteractionBtn.click();
       // Wait for the customization modal to close.
       general.waitForSystem();
     }

@@ -36,7 +36,7 @@
       Choose Interaction
     </h3>
 
-    <h3 ng-if="stateInteractionIdService.displayed && hasCustomizationArgs">
+    <h3 ng-if="stateInteractionIdService.displayed">
       Customize Interaction (<[INTERACTION_SPECS[stateInteractionIdService.displayed].name]>)
     </h3>
   </div>
@@ -70,6 +70,10 @@
         </div>
       </div>
     </form>
+
+    <form ng-if="stateInteractionIdService.displayed && !hasCustomizationArgs">
+      This interaction has no customization options. If you'd like to change the interaction type, click the 'x' button to delete this interaction.
+    </form>
   </div>
 
   <div class="modal-footer">
@@ -78,8 +82,14 @@
 
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     <button class="btn btn-success protractor-test-save-interaction" ng-click="save()"
-            ng-disabled="!stateInteractionIdService.displayed || form.schemaForm.$invalid">
+            ng-disabled="!stateInteractionIdService.displayed || form.schemaForm.$invalid"
+            ng-if="hasCustomizationArgs">
       Save Interaction
+    </button>
+    <button class="btn btn-success protractor-test-save-interaction"
+            ng-disabled="!stateInteractionIdService.displayed || form.schemaForm.$invalid && hasCustomizationArgs"
+            ng-if="!hasCustomizationArgs">
+      Got it
     </button>
   </div>
 </script>

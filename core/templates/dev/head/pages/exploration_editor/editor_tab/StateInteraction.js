@@ -202,7 +202,6 @@ oppia.controller('StateInteraction', [
               $scope.stateInteractionIdService = stateInteractionIdService;
               $scope.stateCustomizationArgsService = (
                 stateCustomizationArgsService);
-              $scope.hasCustomizationArgs = true;
 
               $scope.getInteractionThumbnailImageUrl = (
                 UrlInterpolationService.getInteractionThumbnailImageUrl);
@@ -239,6 +238,8 @@ oppia.controller('StateInteraction', [
 
                 $scope.$broadcast('schemaBasedFormsShown');
                 $scope.form = {};
+                $scope.hasCustomizationArgs = (Object.keys(
+                  stateCustomizationArgsService.displayed).length > 0);
               }
 
               $scope.onChangeInteractionId = function(newInteractionId) {
