@@ -36,7 +36,7 @@
       Choose Interaction
     </h3>
 
-    <h3 ng-if="stateInteractionIdService.displayed">
+    <h3 ng-if="stateInteractionIdService.displayed && customizationModalReopened">
       Customize Interaction (<[INTERACTION_SPECS[stateInteractionIdService.displayed].name]>)
     </h3>
   </div>
@@ -71,7 +71,7 @@
       </div>
     </form>
 
-    <form ng-if="stateInteractionIdService.displayed && !hasCustomizationArgs">
+    <form ng-if="stateInteractionIdService.displayed && !hasCustomizationArgs && customizationModalReopened">
       This interaction has no customization options. If you'd like to delete this interaction, click the 'x' button on the top right corner.
     </form>
   </div>

@@ -65,6 +65,7 @@ oppia.controller('StateInteraction', [
 
     $scope.stateInteractionIdService = stateInteractionIdService;
     $scope.hasLoaded = false;
+    $scope.customizationModalReopened = false;
 
     $scope.userBlueImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/avatar/user_blue_72px.png');
@@ -211,6 +212,7 @@ oppia.controller('StateInteraction', [
                 GLOBALS.ALLOWED_INTERACTION_CATEGORIES);
 
               if (stateInteractionIdService.savedMemento) {
+                $scope.customizationModalReopened = true;
                 var interactionSpec = INTERACTION_SPECS[
                   stateInteractionIdService.savedMemento];
                 $scope.customizationArgSpecs = (
