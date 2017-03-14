@@ -291,6 +291,10 @@ oppia.controller('StateInteraction', [
                 $modalInstance.close();
               };
 
+              $scope.okay = function() {
+                $modalInstance.close('okay');
+              };
+
               $scope.cancel = function() {
                 $modalInstance.dismiss('cancel');
               };
