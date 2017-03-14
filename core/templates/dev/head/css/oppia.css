@@ -3441,8 +3441,9 @@ md-card.preview-conversation-skin-supplemental-card {
   border-radius: 0;
   color: #fff;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   margin-top: -20px;
+  min-width: 360px;
   padding: 10px;
   position: absolute;
   text-transform: uppercase;
