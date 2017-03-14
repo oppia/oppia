@@ -86,10 +86,9 @@
             ng-if="hasCustomizationArgs">
       Save Interaction
     </button>
-    <button class="btn btn-success protractor-test-save-interaction"
+    <button class="btn btn-success"
             ng-click="okay()"
-            ng-disabled="!stateInteractionIdService.displayed || form.schemaForm.$invalid && hasCustomizationArgs"
-            ng-if="!hasCustomizationArgs">
+            ng-if="!hasCustomizationArgs && customizationModalReopened">
       Okay
     </button>
   </div>
