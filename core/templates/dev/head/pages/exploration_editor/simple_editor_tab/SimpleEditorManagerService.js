@@ -41,13 +41,26 @@ oppia.factory('SimpleEditorManagerService', [
       }
     };
 
+    var DEFAULT_ITEM_INTERACTION = {
+      ID: 'ItemSelectionInput',
+      CUSTOMIZATION_ARGS: {
+        choices: {
+          value: ['<p>Good Option A</p>'],
+          value: ['<p>Bad Option B</p>']
+        },
+        minAllowableSelectionCount: 2,
+        maxAllowableSelectionCount: 2
+
+      }
+    };
+
     var END_EXPLORATION_INTERACTION = {
       ID: 'EndExploration',
       CUSTOMIZATION_ARGS: {
         recommendedExplorationIds: []
       }
     };
-
+    console.log(data);
     var getNewStateName = function() {
       var allStateNames = data.questionList.getAllStateNames();
 
@@ -117,27 +130,37 @@ oppia.factory('SimpleEditorManagerService', [
         data.questionList.getBindableQuestion(
           stateName).setBridgeHtml(newHtml);
       },
-      addNewQuestion: function() {
+      addNewQuestion: function(type) {
         // This effectively adds a new multiple-choice interaction to the
         // latest state in the chain.
-        var lastStateName = (
-          data.questionList.isEmpty() ?
-          SimpleEditorShimService.getInitStateName() :
-          data.questionList.getLastQuestion().getDestinationStateName());
 
-        SimpleEditorShimService.saveInteractionId(
-          lastStateName, DEFAULT_INTERACTION.ID);
-        SimpleEditorShimService.saveCustomizationArgs(
-          lastStateName, DEFAULT_INTERACTION.CUSTOMIZATION_ARGS);
-        SimpleEditorShimService.saveDefaultOutcome(lastStateName, {
-          dest: lastStateName,
-          feedback: [''],
-          param_changes: []
-        });
+          var lastStateName = (
+            data.questionList.isEmpty() ?
+            SimpleEditorShimService.getInitStateName() :
+            data.questionList.getLastQuestion().getDestinationStateName());
 
-        var stateData = SimpleEditorShimService.getState(lastStateName);
-        data.questionList.addQuestion(QuestionObjectFactory.create(
-          lastStateName, stateData.interaction, ''));
+            if(type == "multiple"){
+              SimpleEditorShimService.saveInteractionId(
+                lastStateName, DEFAULT_INTERACTION.ID);
+              SimpleEditorShimService.saveCustomizationArgs(
+                lastStateName, DEFAULT_INTERACTION.CUSTOMIZATION_ARGS);
+            }
+            if(type == "itemSelection"){
+              SimpleEditorShimService.saveInteractionId(
+                lastStateName, "ItemSelectionInput");
+              SimpleEditorShimService.saveCustomizationArgs(
+                lastStateName, DEFAULT_ITEM_INTERACTION .CUSTOMIZATION_ARGS);
+            }
+          SimpleEditorShimService.saveDefaultOutcome(lastStateName, {
+            dest: lastStateName,
+            feedback: [''],
+            param_changes: []
+          });
+
+          var stateData = SimpleEditorShimService.getState(lastStateName);
+          data.questionList.addQuestion(QuestionObjectFactory.create(
+            lastStateName, stateData.interaction, ''));
+
       },
       canAddNewQuestion: function() {
         // Requirements:

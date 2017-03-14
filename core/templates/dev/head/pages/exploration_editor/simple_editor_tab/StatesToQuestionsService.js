@@ -24,6 +24,10 @@ oppia.factory('StatesToQuestionsService', [
     var SUPPORTED_INTERACTION_TYPES = [{
       id: 'MultipleChoiceInput',
       name: 'Multiple choice'
+    },
+    {
+      id: 'ItemSelectionInput',
+      name: 'Item Selection Input'
     }];
     var INTERACTION_ID_END_EXPLORATION = 'EndExploration';
 

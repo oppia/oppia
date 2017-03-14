@@ -1973,6 +1973,7 @@ oppia.factory('explorationWarningsService', [
           var validatorName = (
             'oppiaInteractive' + _states[stateName].interaction.id +
             'Validator');
+            
           var interactionWarnings = $filter(validatorName)(
             stateName, interaction.customization_args,
             interaction.answer_groups, interaction.default_outcome);
