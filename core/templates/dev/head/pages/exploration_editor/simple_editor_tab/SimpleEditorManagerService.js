@@ -32,6 +32,7 @@ oppia.factory('SimpleEditorManagerService', [
       questionList: null
     };
 
+
     var DEFAULT_INTERACTION = {
       ID: 'MultipleChoiceInput',
       CUSTOMIZATION_ARGS: {
@@ -45,8 +46,7 @@ oppia.factory('SimpleEditorManagerService', [
       ID: 'ItemSelectionInput',
       CUSTOMIZATION_ARGS: {
         choices: {
-          value: ['<p>Good Option A</p>'],
-          value: ['<p>Bad Option B</p>']
+          value: ['<p>Good Option A</p>']
         },
         minAllowableSelectionCount: 2,
         maxAllowableSelectionCount: 2
@@ -70,7 +70,6 @@ oppia.factory('SimpleEditorManagerService', [
       }
       return 'Question ' + minimumStateNumber;
     };
-
     return {
       // Attempts to initialize the local data variables. Returns true if
       // the initialization is successful (judged by the success of
@@ -81,6 +80,7 @@ oppia.factory('SimpleEditorManagerService', [
         var questions = StatesToQuestionsService.getQuestions();
         if (!questions) {
           return false;
+
         }
 
         data.questionList = QuestionListObjectFactory.create(questions);
@@ -161,6 +161,7 @@ oppia.factory('SimpleEditorManagerService', [
           data.questionList.addQuestion(QuestionObjectFactory.create(
             lastStateName, stateData.interaction, ''));
 
+
       },
       canAddNewQuestion: function() {
         // Requirements:
@@ -168,11 +169,13 @@ oppia.factory('SimpleEditorManagerService', [
         //   introduction.
         // - Otherwise, the requirement is that, for the last question in the
         //   list, there is at least one answer group.
+        console.log(data);
         if (data.questionList.isEmpty()) {
           return Boolean(data.introductionHtml);
         } else {
           return data.questionList.getLastQuestion().hasAnswerGroups();
         }
+
       },
       canTryToFinishExploration: function() {
         return (
