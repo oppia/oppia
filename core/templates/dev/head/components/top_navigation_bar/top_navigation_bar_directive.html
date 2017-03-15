@@ -164,8 +164,8 @@
             ng-mouseleave="onMouseoutDropdownMenu($event)">
           <li>
             <a href style="padding: 0; width: 200px;" ng-click="onLoginButtonClicked()">
-              <div class="signin-google-color">
-                <i class="oppia-signin fa fa-google-plus"></i><b>Sign in with Google</b>
+              <div class="oppia-signin-google">
+                <i class="oppia-signin-google-icon fa fa-google-plus"></i><b>Sign in with Google</b>
               </div>
             </a>
           </li>
@@ -178,11 +178,7 @@
       outline: 1px dotted #fff;
       outline: auto 5px -webkit-focus-ring-color;
     }
-    .oppia-navbar-brand-name:focus {
-      outline: 1px dotted #fff;
-      outline: auto 5px -webkit-focus-ring-color;
-    }
-    .signin-google-color {
+    .oppia-signin-google {
      background: #dd4b39;
      color: white;
      font-family: Roboto;
@@ -190,7 +186,7 @@
      margin: 3px 3px 3px;
      padding: 9px;
     }
-    .signin-google-color i.oppia-signin.fa.fa-google-plus {
+    .oppia-signin-google i.oppia-signin-google-icon.fa.fa-google-plus {
      font-size: 22px;
      margin-right: 17px;
      padding-right: 3px;
