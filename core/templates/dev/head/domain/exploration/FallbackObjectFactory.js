@@ -17,22 +17,22 @@
  * domain objects.
  */
 
- oppia.factory('FallbackObjectFactory', [function() {
- 	var Fallback = function(trigger, outcome) {
- 		this.trigger = trigger;
- 		this.outcome = outcome;
- 	};
+oppia.factory('FallbackObjectFactory', [function() {
+  var Fallback = function(trigger, outcome) {
+    this.trigger = trigger;
+    this.outcome = outcome;
+  };
 
- 	Fallback.prototype.toBackendDict = function() {
- 		return {
- 			trigger: this.trigger,
- 			outcome: this.outcome
- 		};
- 	};
+  Fallback.prototype.toBackendDict = function() {
+    return {
+      trigger: this.trigger,
+      outcome: this.outcome
+    };
+  };
 
- 	Fallback.create = function(fallbackDict) {
- 		return new Fallback(fallbackDict.trigger, fallbackDict.outcome);
- 	};
+  Fallback.create = function(fallbackDict) {
+    return new Fallback(fallbackDict.trigger, fallbackDict.outcome);
+  };
 
- 	return Fallback;
- }]);
+  return Fallback;
+}]);
