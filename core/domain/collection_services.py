@@ -73,8 +73,8 @@ def _migrate_collection_to_latest_schema(versioned_collection):
     Args:
         versioned_collection: A dict with two keys:
           - schema_version: str. The schema version for the collection.
-          - nodes: list(dict). The list of collection node dicts comprising the
-                collection.
+          - collection_content: dict. The dict comprising the collection
+              contents.
 
     Raises:
         Exception: The schema version of the collection is outside of what is
@@ -136,8 +136,13 @@ def get_collection_from_model(collection_model, run_conversion=True):
     # Ensure the original collection model does not get altered.
     versioned_collection = {
         'schema_version': collection_model.schema_version,
-        'nodes': copy.deepcopy(collection_model.nodes)
+        'collection_content': copy.deepcopy(collection_model.collection_content)
     }
+
+    # If collection_content is empty, attempt to retrieve nodes data from nodes
+    # instead. This is temporary, and intended to not break backwards
+    # compatibility before the migration job is run.
+    # TODO(wxy): Remove this after collection migration is completed.
 
     # Migrate the collection if it is not using the latest schema version.
     if (run_conversion and collection_model.schema_version !=
@@ -150,7 +155,8 @@ def get_collection_from_model(collection_model, run_conversion=True):
         collection_model.language_code, collection_model.tags,
         versioned_collection['schema_version'], [
             collection_domain.CollectionNode.from_dict(collection_node_dict)
-            for collection_node_dict in versioned_collection['nodes']
+            for collection_node_dict in
+            versioned_collection['collection_content']['nodes']
         ],
         collection_model.version, collection_model.created_on,
         collection_model.last_updated)
@@ -688,9 +694,11 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     collection_model.language_code = collection.language_code
     collection_model.tags = collection.tags
     collection_model.schema_version = collection.schema_version
-    collection_model.nodes = [
-        collection_node.to_dict() for collection_node in collection.nodes
-    ]
+    collection_model.collection_content = {
+        'nodes': [
+            collection_node.to_dict() for collection_node in collection.nodes
+        ]
+    }
     collection_model.node_count = len(collection_model.nodes)
     collection_model.commit(committer_id, commit_message, change_list)
     memcache_services.delete(_get_collection_memcache_key(collection.id))
@@ -723,9 +731,12 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
         language_code=collection.language_code,
         tags=collection.tags,
         schema_version=collection.schema_version,
-        nodes=[
-            collection_node.to_dict() for collection_node in collection.nodes
-        ],
+        collection_content={
+            'nodes': [
+                collection_node.to_dict()
+                for collection_node in collection.nodes
+            ]
+        }
     )
     model.commit(committer_id, commit_message, commit_cmds)
     collection.version += 1

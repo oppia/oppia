@@ -1,30 +1,31 @@
 category: Welcome
+collection_content:
+  nodes:
+  - acquired_skills:
+    - Welcome to Oppia!
+    exploration_id: '0'
+    prerequisite_skills: []
+  - acquired_skills:
+    - The Solar System
+    exploration_id: '13'
+    prerequisite_skills:
+    - Welcome to Oppia!
+  - acquired_skills:
+    - Three Balls
+    exploration_id: '4'
+    prerequisite_skills:
+    - The Solar System
+  - acquired_skills:
+    - About Oppia
+    exploration_id: '14'
+    prerequisite_skills:
+    - Demonstrating fuzzy rules
+  - acquired_skills:
+    - Demonstrating fuzzy rules
+    exploration_id: '15'
+    prerequisite_skills:
+    - Three Balls
 language_code: en
-nodes:
-- acquired_skills:
-  - Welcome to Oppia!
-  exploration_id: '0'
-  prerequisite_skills: []
-- acquired_skills:
-  - The Solar System
-  exploration_id: '13'
-  prerequisite_skills:
-  - Welcome to Oppia!
-- acquired_skills:
-  - Three Balls
-  exploration_id: '4'
-  prerequisite_skills:
-  - The Solar System
-- acquired_skills:
-  - About Oppia
-  exploration_id: '14'
-  prerequisite_skills:
-  - Demonstrating fuzzy rules
-- acquired_skills:
-  - Demonstrating fuzzy rules
-  exploration_id: '15'
-  prerequisite_skills:
-  - Three Balls
 objective: To introduce collections using demo explorations.
 schema_version: 2
 tags: []

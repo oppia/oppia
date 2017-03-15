@@ -124,7 +124,7 @@ def get_learner_collection_dict_by_id(
 
     # Insert an 'exploration' dict into each collection node, where the
     # dict includes meta information about the exploration (ID and title).
-    for collection_node in collection_dict['nodes']:
+    for collection_node in collection_dict['collection_content']['nodes']:
         exploration_id = collection_node['exploration_id']
         summary_dict = exp_summaries_dict_map.get(exploration_id)
         if not allow_invalid_explorations:

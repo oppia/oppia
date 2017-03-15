@@ -63,6 +63,11 @@ class CollectionModel(base_models.VersionedModel):
     # A dict representing all explorations belonging to this collection.
     nodes = ndb.JsonProperty(default={}, indexed=False)
 
+    # A dict representing the contents of a collection. Currently, this
+    # contains the list of nodes. This dict should contain collection data
+    # whose structure might need to be changed in the future.
+    collection_content = ndb.JsonProperty(default={}, indexed=False)
+
     @classmethod
     def get_collection_count(cls):
         """Returns the total number of collections."""

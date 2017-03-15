@@ -30,13 +30,14 @@ import utils
 # utils.dict_from_yaml can isolate differences quickly.
 
 SAMPLE_YAML_CONTENT = ("""category: A category
+collection_content:
+  nodes:
+  - acquired_skills:
+    - Skill0a
+    - Skill0b
+    exploration_id: an_exploration_id
+    prerequisite_skills: []
 language_code: en
-nodes:
-- acquired_skills:
-  - Skill0a
-  - Skill0b
-  exploration_id: an_exploration_id
-  prerequisite_skills: []
 objective: An objective
 schema_version: %d
 tags: []
@@ -577,24 +578,26 @@ class SchemaMigrationUnitTests(test_utils.GenericTestBase):
     """Test migration methods for yaml content."""
 
     YAML_CONTENT_V1 = ("""category: A category
-nodes:
-- acquired_skills:
-  - Skill1
-  - Skill2
-  exploration_id: Exp1
-  prerequisite_skills: []
+collection_content:
+  nodes:
+  - acquired_skills:
+    - Skill1
+    - Skill2
+    exploration_id: Exp1
+    prerequisite_skills: []
 objective: ''
 schema_version: 1
 title: A title
 """)
     YAML_CONTENT_V2 = ("""category: A category
+collection_content:
+  nodes:
+  - acquired_skills:
+    - Skill1
+    - Skill2
+    exploration_id: Exp1
+    prerequisite_skills: []
 language_code: en
-nodes:
-- acquired_skills:
-  - Skill1
-  - Skill2
-  exploration_id: Exp1
-  prerequisite_skills: []
 objective: ''
 schema_version: 2
 tags: []

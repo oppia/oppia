@@ -299,9 +299,9 @@ class Collection(object):
             'language_code': self.language_code,
             'tags': self.tags,
             'schema_version': self.schema_version,
-            'nodes': [
-                node.to_dict() for node in self.nodes
-            ]
+            'collection_content': {
+                'nodes': [node.to_dict() for node in self.nodes]
+            }
         }
 
     @classmethod
@@ -325,7 +325,7 @@ class Collection(object):
             collection_dict['schema_version'], [], collection_version,
             collection_created_on, collection_last_updated)
 
-        for node_dict in collection_dict['nodes']:
+        for node_dict in collection_dict['collection_content']['nodes']:
             collection.nodes.append(
                 CollectionNode.from_dict(node_dict))
 
