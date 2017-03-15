@@ -565,19 +565,21 @@ oppia.controller('StateResponses', [
         templateUrl: 'modals/teachOppia',
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', 'oppiaExplorationHtmlFormatterService',
+          '$scope', '$injector', '$modalInstance',
+          'oppiaExplorationHtmlFormatterService',
           'stateInteractionIdService', 'stateCustomizationArgsService',
           'explorationContextService', 'editorContextService',
           'explorationStatesService', 'trainingDataService',
-          'textInputRulesService', 'AnswerClassificationService',
-          'focusService', 'DEFAULT_RULE_NAME', 'CLASSIFIER_RULESPEC_STR',
+          'AnswerClassificationService', 'focusService', 'DEFAULT_RULE_NAME',
+          'CLASSIFIER_RULESPEC_STR',
           function(
-              $scope, $modalInstance, oppiaExplorationHtmlFormatterService,
+              $scope, $injector, $modalInstance,
+              oppiaExplorationHtmlFormatterService,
               stateInteractionIdService, stateCustomizationArgsService,
               explorationContextService, editorContextService,
               explorationStatesService, trainingDataService,
-              textInputRulesService, AnswerClassificationService,
-              focusService, DEFAULT_RULE_NAME, CLASSIFIER_RULESPEC_STR) {
+              AnswerClassificationService, focusService, DEFAULT_RULE_NAME,
+              CLASSIFIER_RULESPEC_STR) {
             var _explorationId = explorationContextService.getExplorationId();
             var _stateName = editorContextService.getActiveStateName();
             var _state = explorationStatesService.getState(_stateName);
@@ -594,6 +596,9 @@ oppia.controller('StateResponses', [
             $scope.trainingDataAnswer = '';
             $scope.trainingDataFeedback = '';
             $scope.trainingDataOutcomeDest = '';
+
+            // Inject textInputRulesService dynamically
+            textInputRulesService = $injector.get('textInputRulesService');
 
             // See the training panel directive in StateEditor for an
             // explanation on the structure of this object.
