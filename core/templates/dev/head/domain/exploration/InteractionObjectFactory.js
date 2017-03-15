@@ -41,11 +41,13 @@ oppia.factory('InteractionObjectFactory', [
   };
 
   var generateFallbacksFromBackend = function(fallbackBackendDicts) {
-    console.log(angular.copy(fallbackBackendDicts));
-    var fallbacks = fallbackBackendDicts.map(function(fallbackDict) {
-      return FallbackObjectFactory.create(fallbackDict);
-    });
-    return fallbacks;
+    if (fallbackBackendDicts !== undefined) {
+      var fallbacks = fallbackBackendDicts.map(function(fallbackDict) {
+        return FallbackObjectFactory.create(fallbackDict);
+      });
+      return fallbacks;
+    }
+    return undefined;
   };
 
   Interaction.prototype.toBackendDict = function() {
@@ -56,7 +58,8 @@ oppia.factory('InteractionObjectFactory', [
       confirmed_unclassified_answers: this.confirmedUnclassifiedAnswers,
       customization_args: this.customizationArgs,
       default_outcome: this.defaultOutcome,
-      fallbacks: this.fallbacks.map(function(fallback) {
+      fallbacks: this.fallbacks === undefined ? undefined :
+        this.fallbacks.map(function(fallback) {
         return fallback.toBackendDict();
       }),
       id: this.id
