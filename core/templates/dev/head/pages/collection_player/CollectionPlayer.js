@@ -44,7 +44,7 @@ oppia.controller('CollectionPlayer', [
     $scope.collectionId = GLOBALS.collectionId;
     $scope.showingAllExplorations = !GLOBALS.isLoggedIn;
     $scope.previewCardIsShown = true;
-    $scope.previewCardMobileIsShown = true;
+    $scope.previewCardMobileIsHidden = true;
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     // The pathIconParameters is an array containing the co-ordinates,
     // background color and icon url for the icons generated on the path.
@@ -130,7 +130,7 @@ oppia.controller('CollectionPlayer', [
 
     $scope.updateExplorationPreview = function(explorationId) {
       $scope.previewCardIsShown = false;
-      $scope.previewCardMobileIsShown = false;
+      $scope.previewCardMobileIsHidden = false;
       $scope.currentExplorationId = explorationId;
       $scope.summaryToPreview = $scope.getCollectionNodeForExplorationId(
         explorationId).getExplorationSummaryObject();
@@ -285,10 +285,10 @@ oppia.controller('CollectionPlayer', [
       $location.hash(id);
       $anchorScroll();
     };
-
+    // Touching anywhere outside the mobile preview should hide it.
     document.addEventListener('touchstart', function() {
-      if ($scope.previewCardMobileIsShown === false) {
-        $scope.previewCardMobileIsShown = true;
+      if ($scope.previewCardMobileIsHidden === false) {
+        $scope.previewCardMobileIsHidden = true;
       }
     });
   }
