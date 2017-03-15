@@ -18,7 +18,8 @@
  */
 
 oppia.factory('InteractionObjectFactory', [
-  'AnswerGroupObjectFactory', function(AnswerGroupObjectFactory) {
+  'AnswerGroupObjectFactory', 'FallbackObjectFactory',
+  function(AnswerGroupObjectFactory, FallbackObjectFactory) {
   var Interaction = function(answerGroupBackendDicts,
     confirmedUnclassifiedAnswers, customizationArgs, defaultOutcome,
     fallbacks, id) {
@@ -27,7 +28,7 @@ oppia.factory('InteractionObjectFactory', [
     this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
     this.customizationArgs = customizationArgs;
     this.defaultOutcome = defaultOutcome;
-    this.fallbacks = fallbacks;
+    this.fallbacks = generateFallbacksFromBackend(fallbacks);
     this.id = id;
   };
 
@@ -36,8 +37,15 @@ oppia.factory('InteractionObjectFactory', [
       return AnswerGroupObjectFactory.create(
         answerGroupDict.rule_specs, answerGroupDict.outcome, false);
     });
-
     return answerGroups;
+  };
+
+  var generateFallbacksFromBackend = function(fallbackBackendDicts) {
+    console.log(angular.copy(fallbackBackendDicts));
+    var fallbacks = fallbackBackendDicts.map(function(fallbackDict) {
+      return FallbackObjectFactory.create(fallbackDict);
+    });
+    return fallbacks;
   };
 
   Interaction.prototype.toBackendDict = function() {
@@ -48,7 +56,9 @@ oppia.factory('InteractionObjectFactory', [
       confirmed_unclassified_answers: this.confirmedUnclassifiedAnswers,
       customization_args: this.customizationArgs,
       default_outcome: this.defaultOutcome,
-      fallbacks: this.fallbacks,
+      fallbacks: this.fallbacks.map(function(fallback) {
+        return fallback.toBackendDict();
+      }),
       id: this.id
     };
   };
