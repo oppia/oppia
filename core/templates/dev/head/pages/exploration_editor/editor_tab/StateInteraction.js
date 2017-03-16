@@ -252,6 +252,7 @@ oppia.controller('StateInteraction', [
                 $scope.customizationArgSpecs = (
                   interactionSpec.customization_arg_specs);
 
+                stateInteractionIdService.displayed = newInteractionId;
                 stateCustomizationArgsService.displayed = {};
                 if (interactionDetailsCache.contains(newInteractionId)) {
                   stateCustomizationArgsService.displayed = (
@@ -272,7 +273,6 @@ oppia.controller('StateInteraction', [
                 } else {
                   $scope.hasCustomizationArgs = true;
                 }
-                stateInteractionIdService.displayed = newInteractionId;
 
                 $scope.$broadcast('schemaBasedFormsShown');
                 $scope.form = {};
