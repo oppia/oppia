@@ -33,7 +33,7 @@ oppia.factory('CollectionObjectFactory', [
       // This map acts as a fast way of looking up a collection node for a given
       // exploration ID.
       this._explorationIdToNodeIndexMap = {};
-      var collectionContent = collectionBackendObject.collection_content
+      var collectionContent = collectionBackendObject.collection_content;
       for (var i = 0; i < collectionContent.nodes.length; i++) {
         this._nodes[i] = CollectionNodeObjectFactory.create(
           collectionContent.nodes[i]);

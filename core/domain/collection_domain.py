@@ -388,23 +388,20 @@ class Collection(object):
 
     @classmethod
     def update_collection_content_from_model(
-            cls, versioned_collection_content,
-            current_collection_content_version):
+            cls, versioned_collection_content, current_version):
         """Converts the states blob contained in the given
-        versioned_collection_content dict from
-        current_collection_content_version to
-        current_collection_content_version + 1.
+        versioned_collection_content dict from current_version to
+        current_version + 1.
 
         Note that the versioned_collection_content being passed in is modified
         in-place.
         """
         versioned_collection_content['schema_version'] = (
-            current_collection_content_version + 1)
+            current_version + 1)
 
         conversion_fn = getattr(
             cls, '_convert_collection_content_v%s_dict_to_v%s_dict' % (
-            current_collection_content_version,
-            current_collection_content_version + 1))
+                current_version, current_version + 1))
         versioned_collection_content['collection_content'] = conversion_fn(
             versioned_collection_content['collection_content'])
 

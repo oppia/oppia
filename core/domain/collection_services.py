@@ -148,7 +148,6 @@ def get_collection_from_model(collection_model, run_conversion=True):
     # compatibility before the migration job is run.
     # TODO(wxy): Remove this after collection migration is completed.
     if versioned_collection_content['collection_content'] == {}:
-        print('hi')
         versioned_collection_content['collection_content'] = {
             'nodes': copy.deepcopy(collection_model.nodes)
         }
