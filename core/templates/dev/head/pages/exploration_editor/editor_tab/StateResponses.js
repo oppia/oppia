@@ -600,13 +600,11 @@ oppia.controller('StateResponses', [
             // Retrieve the interaction ID
             interactionId = stateInteractionIdService.savedMemento;
 
-            rulesServiceName = interactionId.charAt(0).toLowerCase() 
-              + interactionId.slice(1)
-              + 'RulesService';
-            
+            rulesServiceName = interactionId.charAt(0).toLowerCase() +
+              interactionId.slice(1) + 'RulesService';
+
             // Inject RulesService dynamically
             rulesService = $injector.get(rulesServiceName);
-
 
             // See the training panel directive in StateEditor for an
             // explanation on the structure of this object.
