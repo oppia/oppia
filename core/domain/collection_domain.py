@@ -49,8 +49,8 @@ CMD_EDIT_COLLECTION_PROPERTY = 'edit_collection_property'
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
 CMD_EDIT_COLLECTION_NODE_PROPERTY = 'edit_collection_node_property'
-# This takes additional 'from_version' and 'to_version' parameters for logging.
-CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION = 'migrate_schema_to_latest_version'
+# This takes additional 'version' parameter for logging.
+CMD_MIGRATE_SCHEMA = 'migrate_schema'
 
 
 class CollectionChange(object):
@@ -85,7 +85,7 @@ class CollectionChange(object):
             property_name, new_value and, optionally, old_value)
         - 'edit_collection_property' (with property_name, new_value and,
             optionally, old_value)
-        - 'migrate_schema' (with from_version and to_version)
+        - 'migrate_schema' (with version)
 
         For a collection node, property_name must be one of
         COLLECTION_NODE_PROPERTIES. For a collection, property_name must be
@@ -114,9 +114,8 @@ class CollectionChange(object):
             self.property_name = change_dict['property_name']
             self.new_value = change_dict['new_value']
             self.old_value = change_dict.get('old_value')
-        elif self.cmd == CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION:
-            self.from_version = change_dict['from_version']
-            self.to_version = change_dict['to_version']
+        elif self.cmd == CMD_MIGRATE_SCHEMA:
+            self.version = change_dict['version']
         else:
             raise Exception('Invalid change_dict: %s' % change_dict)
 
@@ -273,7 +272,7 @@ class Collection(object):
         function will need to be added to this class to convert from the
         current schema version to the new one. This function should be called
         in both from_yaml in this class and
-        collection_services._migrate_collection_to_latest_schema.
+        collection_services._migrate_collection_content_to_latest_schema.
         feconf.CURRENT_COLLECTION_SCHEMA_VERSION should be incremented and the
         new value should be saved in the collection after the migration
         process, ensuring it represents the latest schema version.
@@ -379,6 +378,35 @@ class Collection(object):
 
         collection_dict['id'] = collection_id
         return Collection.from_dict(collection_dict)
+
+    @classmethod
+    def _convert_collection_content_v1_dict_to_v2_dict(cls, collection_content):
+        """Converts from version 1 to 2. Does nothing since this migration only
+        changes the language code.
+        """
+        return collection_content
+
+    @classmethod
+    def update_collection_content_from_model(
+            cls, versioned_collection_content,
+            current_collection_content_version):
+        """Converts the states blob contained in the given
+        versioned_collection_content dict from
+        current_collection_content_version to
+        current_collection_content_version + 1.
+
+        Note that the versioned_collection_content being passed in is modified
+        in-place.
+        """
+        versioned_collection_content['schema_version'] = (
+            current_collection_content_version + 1)
+
+        conversion_fn = getattr(
+            cls, '_convert_collection_content_v%s_dict_to_v%s_dict' % (
+            current_collection_content_version,
+            current_collection_content_version + 1))
+        versioned_collection_content['collection_content'] = conversion_fn(
+            versioned_collection_content['collection_content'])
 
     @property
     def skills(self):

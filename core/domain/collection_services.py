@@ -62,7 +62,7 @@ _STATUS_PUBLICIZED_BONUS = 30
 _DEFAULT_RANK = 20
 
 
-def _migrate_collection_to_latest_schema(versioned_collection):
+def _migrate_collection_content_to_latest_schema(versioned_collection_content):
     """Holds the responsibility of performing a step-by-step, sequential update
     of the collection structure based on the schema version of the input
     collection dictionary. This is very similar to the exploration migration
@@ -71,7 +71,7 @@ def _migrate_collection_to_latest_schema(versioned_collection):
     this function to account for that new version.
 
     Args:
-        versioned_collection: A dict with two keys:
+        versioned_collection_content: A dict with two keys:
           - schema_version: str. The schema version for the collection.
           - collection_content: dict. The dict comprising the collection
               contents.
@@ -80,18 +80,22 @@ def _migrate_collection_to_latest_schema(versioned_collection):
         Exception: The schema version of the collection is outside of what is
         supported at present.
     """
-    collection_schema_version = versioned_collection['schema_version']
+    collection_schema_version = versioned_collection_content['schema_version']
     if not (1 <= collection_schema_version
             <= feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d collection schemas at '
             'present.' % feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
-    # This is where conversion functions will be placed once updates to the
-    # collection schemas happen.
     # TODO(sll): Ensure that there is a test similar to
     # exp_domain_test.SchemaMigrationMethodsUnitTests to ensure that the
     # appropriate migration functions are declared.
+
+    while (collection_schema_version <
+           feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
+        collection_domain.Collection.update_collection_content_from_model(
+            versioned_collection_content, collection_schema_version)
+        collection_schema_version += 1
 
 
 # Repository GET methods.
@@ -134,7 +138,7 @@ def get_collection_from_model(collection_model, run_conversion=True):
     """
 
     # Ensure the original collection model does not get altered.
-    versioned_collection = {
+    versioned_collection_content = {
         'schema_version': collection_model.schema_version,
         'collection_content': copy.deepcopy(collection_model.collection_content)
     }
@@ -143,20 +147,26 @@ def get_collection_from_model(collection_model, run_conversion=True):
     # instead. This is temporary, and intended to not break backwards
     # compatibility before the migration job is run.
     # TODO(wxy): Remove this after collection migration is completed.
+    if versioned_collection_content['collection_content'] == {}:
+        print('hi')
+        versioned_collection_content['collection_content'] = {
+            'nodes': copy.deepcopy(collection_model.nodes)
+        }
 
     # Migrate the collection if it is not using the latest schema version.
     if (run_conversion and collection_model.schema_version !=
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
-        _migrate_collection_to_latest_schema(versioned_collection)
+        _migrate_collection_content_to_latest_schema(
+            versioned_collection_content)
 
     return collection_domain.Collection(
         collection_model.id, collection_model.title,
         collection_model.category, collection_model.objective,
         collection_model.language_code, collection_model.tags,
-        versioned_collection['schema_version'], [
+        versioned_collection_content['schema_version'], [
             collection_domain.CollectionNode.from_dict(collection_node_dict)
             for collection_node_dict in
-            versioned_collection['collection_content']['nodes']
+            versioned_collection_content['collection_content']['nodes']
         ],
         collection_model.version, collection_model.created_on,
         collection_model.last_updated)
@@ -587,7 +597,7 @@ def apply_change_list(collection_id, change_list):
                     collection.update_tags(change.new_value)
             elif (
                     change.cmd ==
-                    collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
+                    collection_domain.CMD_MIGRATE_SCHEMA):
                 # Loading the collection model from the datastore into an
                 # Collection domain object automatically converts it to use the
                 # latest schema version. As a result, simply resaving the
