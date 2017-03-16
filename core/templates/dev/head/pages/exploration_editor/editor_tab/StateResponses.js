@@ -597,8 +597,16 @@ oppia.controller('StateResponses', [
             $scope.trainingDataFeedback = '';
             $scope.trainingDataOutcomeDest = '';
 
-            // Inject textInputRulesService dynamically
-            textInputRulesService = $injector.get('textInputRulesService');
+            // Retrieve the interaction ID
+            interactionId = stateInteractionIdService.savedMemento;
+
+            rulesServiceName = interactionId.charAt(0).toLowerCase() 
+              + interactionId.slice(1)
+              + 'RulesService';
+            
+            // Inject RulesService dynamically
+            rulesService = $injector.get(rulesServiceName);
+
 
             // See the training panel directive in StateEditor for an
             // explanation on the structure of this object.
@@ -623,7 +631,7 @@ oppia.controller('StateResponses', [
 
               AnswerClassificationService.getMatchingClassificationResult(
                 _explorationId, _state, answer, true,
-                textInputRulesService).then(
+                rulesService).then(
                     function(classificationResult) {
                   var feedback = 'Nothing';
                   var dest = classificationResult.outcome.dest;
