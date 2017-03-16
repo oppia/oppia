@@ -18,9 +18,10 @@
  */
 
 oppia.factory('AnswerGroupObjectFactory', [function() {
-  var AnswerGroup = function(ruleSpecs, outcome, correct) {
-    this.ruleSpecs = ruleSpecs;
-    this.outcome = outcome;
+  var AnswerGroup = function(ruleSpecsBackendList, outcomeBackendDict,
+    correct) {
+    this.ruleSpecs = ruleSpecsBackendList;
+    this.outcome = outcomeBackendDict;
     this.correct = correct;
   };
 

@@ -24,19 +24,20 @@ oppia.factory('ExplorationObjectFactory', [
       INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE, StateObjectFactory,
       UrlInterpolationService) {
     var Exploration = function(
-        initStateName, paramChanges, paramSpecs, skinCustomizations, states,
-        title, languageCode) {
+        initStateName, paramChangesBackendList, paramSpecsBackendDict,
+        skinCustomizationsBackendDict, statesBackendDict, title,
+        languageCode) {
       this.initStateName = initStateName;
-      this.paramChanges = paramChanges;
-      this.paramSpecs = paramSpecs;
-      this.skinCustomizations = skinCustomizations;
+      this.paramChanges = paramChangesBackendList;
+      this.paramSpecs = paramSpecsBackendDict;
+      this.skinCustomizations = skinCustomizationsBackendDict;
       this.title = title;
       this.languageCode = languageCode;
 
       this.states = {};
-      for (var stateName in states) {
+      for (var stateName in statesBackendDict) {
         this.states[stateName] = StateObjectFactory.create(
-          stateName, states[stateName]);
+          stateName, statesBackendDict[stateName]);
       }
     };
 

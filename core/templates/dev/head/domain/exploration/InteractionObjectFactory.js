@@ -21,14 +21,14 @@ oppia.factory('InteractionObjectFactory', [
   'AnswerGroupObjectFactory', 'FallbackObjectFactory',
   function(AnswerGroupObjectFactory, FallbackObjectFactory) {
   var Interaction = function(answerGroupBackendDicts,
-    confirmedUnclassifiedAnswers, customizationArgs, defaultOutcome,
-    fallbacks, id) {
+    confirmedUnclassifiedAnswers, customizationArgs, defaultOutcomeBackendDict,
+    fallbacksBackendList, id) {
     this.answerGroups = generateAnswerGroupsFromBackend(
       answerGroupBackendDicts);
     this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
     this.customizationArgs = customizationArgs;
-    this.defaultOutcome = defaultOutcome;
-    this.fallbacks = generateFallbacksFromBackend(fallbacks);
+    this.defaultOutcome = defaultOutcomeBackendDict;
+    this.fallbacks = generateFallbacksFromBackend(fallbacksBackendList);
     this.id = id;
   };
 

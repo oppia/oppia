@@ -19,11 +19,11 @@
 
  oppia.factory('StatesObjectFactory', ['StateObjectFactory',
   function(StateObjectFactory) {
-    var create = function(statesDict) {
+    var create = function(statesBackendDict) {
       var stateObjectsDict = {};
-      for (var stateName in statesDict) {
+      for (var stateName in statesBackendDict) {
         stateObjectsDict[stateName] = StateObjectFactory.create(
-          stateName, statesDict[stateName]);
+          stateName, statesBackendDict[stateName]);
       }
       return stateObjectsDict;
     };
