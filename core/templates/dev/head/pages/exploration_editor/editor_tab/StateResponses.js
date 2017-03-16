@@ -597,14 +597,14 @@ oppia.controller('StateResponses', [
             $scope.trainingDataFeedback = '';
             $scope.trainingDataOutcomeDest = '';
 
-            // Retrieve the interaction ID
-            interactionId = stateInteractionIdService.savedMemento;
+            // Retrieve the interaction ID.
+            var interactionId = stateInteractionIdService.savedMemento;
 
-            rulesServiceName = interactionId.charAt(0).toLowerCase() +
+            var rulesServiceName = interactionId.charAt(0).toLowerCase() +
               interactionId.slice(1) + 'RulesService';
 
-            // Inject RulesService dynamically
-            rulesService = $injector.get(rulesServiceName);
+            // Inject RulesService dynamically.
+            var rulesService = $injector.get(rulesServiceName);
 
             // See the training panel directive in StateEditor for an
             // explanation on the structure of this object.
