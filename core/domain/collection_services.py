@@ -878,7 +878,8 @@ def update_collection(
     _save_collection(committer_id, collection, commit_message, change_list)
     update_collection_summary(collection.id, committer_id)
 
-    if not rights_manager.is_collection_private(collection.id):
+    if (not rights_manager.is_collection_private(collection.id) and
+            committer_id != feconf.MIGRATION_BOT_USER_ID):
         user_services.update_first_contribution_msec_if_not_set(
             committer_id, utils.get_current_time_in_millisecs())
 
