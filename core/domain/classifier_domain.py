@@ -89,14 +89,11 @@ class Classifier(object):
         if not isinstance(self.id, basestring):
             raise utils.ValidationError(
                 'Expected id to be a string, received %s' % self.id)
-        utils.require_valid_name(
-            self.id, 'the classifier id')
 
         if not isinstance(self.exp_id, basestring):
             raise utils.ValidationError(
                 'Expected exp_id to be a string, received %s' % self.exp_id)
-        utils.require_valid_name(
-            self.exp_id, 'the exploration id')
+        utils.require_valid_name(self.exp_id, 'the exploration id')
 
         if not isinstance(self.exp_version_when_created, int):
             raise utils.ValidationError(
@@ -106,8 +103,7 @@ class Classifier(object):
         if not isinstance(self.state_name, basestring):
             raise utils.ValidationError(
                 'Expected id to be a string, received %s' % self.state_name)
-        utils.require_valid_name(
-            self.state_name, 'the state name')
+        utils.require_valid_name(self.state_name, 'the state name')
 
         if not isinstance(self.algorithm_id, basestring):
             raise utils.ValidationError(
@@ -115,8 +111,8 @@ class Classifier(object):
                     self.algorithm_id))
         utils.require_valid_name(
             self.algorithm_id, 'the algorithm id')
-        if (self.algorithm_id != (
-                feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])):
+        if (self.algorithm_id !=
+                feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']):
             raise utils.ValidationError(
                 'Invalid algorithm_id: %s' % self.algorithm_id)
 
