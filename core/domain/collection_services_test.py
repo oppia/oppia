@@ -643,9 +643,11 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
         self.assertEqual(
             retrieved_collection_summary.category, 'A new category')
 
-    def test_update_exploration_by_migration_bot(self):
+    def test_update_collection_by_migration_bot(self):
+        exp_id = 'exp_id'
         self.save_new_valid_collection(
-            self.COLLECTION_ID, self.owner_id)
+            self.COLLECTION_ID, self.owner_id, exploration_id=exp_id)
+        rights_manager.publish_exploration(self.owner_id, exp_id)
         rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
 
         # This should not give an error.
