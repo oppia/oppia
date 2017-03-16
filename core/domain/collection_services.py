@@ -87,10 +87,6 @@ def _migrate_collection_content_to_latest_schema(versioned_collection_content):
             'Sorry, we can only process v1-v%d collection schemas at '
             'present.' % feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
-    # TODO(sll): Ensure that there is a test similar to
-    # exp_domain_test.SchemaMigrationMethodsUnitTests to ensure that the
-    # appropriate migration functions are declared.
-
     while (collection_schema_version <
            feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
         collection_domain.Collection.update_collection_content_from_model(
