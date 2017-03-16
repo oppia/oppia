@@ -70,15 +70,17 @@ describe('Collection editor state service', function() {
       objective: 'To pass',
       schema_version: '1',
       version: '1',
-      nodes: [{
-        exploration_id: '0',
-        prerequisite_skills: [],
-        acquired_skills: ['skill2']
-      }, {
-        exploration_id: '1',
-        prerequisite_skills: ['skill2'],
-        acquired_skills: ['skill1']
-      }]
+      collection_content: {
+        nodes: [{
+          exploration_id: '0',
+          prerequisite_skills: [],
+          acquired_skills: ['skill2']
+        }, {
+          exploration_id: '1',
+          prerequisite_skills: ['skill2'],
+          acquired_skills: ['skill1']
+        }]
+      }
     };
     secondBackendCollectionObject = {
       id: '5',
@@ -89,11 +91,13 @@ describe('Collection editor state service', function() {
       tags: [],
       schema_version: '2',
       version: '3',
-      nodes: [{
-        exploration_id: '0',
-        prerequisite_skills: [],
-        acquired_skills: ['interest']
-      }]
+      collection_content: {
+        nodes: [{
+          exploration_id: '0',
+          prerequisite_skills: [],
+          acquired_skills: ['interest']
+        }]
+      }
     };
   }));
 

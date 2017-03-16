@@ -33,7 +33,9 @@ describe('Collection object factory', function() {
       objective: 'an objective',
       category: 'a category',
       version: '1',
-      nodes: []
+      collection_content: {
+        nodes: []
+      }
     };
     _sampleCollection = CollectionObjectFactory.create(
       sampleCollectionBackendObject);
@@ -76,7 +78,9 @@ describe('Collection object factory', function() {
     };
     var collection = CollectionObjectFactory.create({
       id: 'collection_id',
-      nodes: [collectionNodeBackendObject]
+      collection_content: {
+        nodes: [collectionNodeBackendObject]
+      }
     });
     expect(collection.containsCollectionNode('exp_id0')).toBe(true);
     expect(collection.getCollectionNodes()).toEqual([
@@ -322,7 +326,9 @@ describe('Collection object factory', function() {
       category: 'Another category',
       language_code: 'en',
       version: '15',
-      nodes: []
+      collection_content: {
+        nodes: []
+      }
     });
     secondCollection.addCollectionNode(CollectionNodeObjectFactory.create({
       exploration_id: 'exp_id5',

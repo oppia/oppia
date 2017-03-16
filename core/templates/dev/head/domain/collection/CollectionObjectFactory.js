@@ -236,7 +236,9 @@ oppia.factory('CollectionObjectFactory', [
     // tests.
     Collection.createEmptyCollection = function() {
       return new Collection({
-        nodes: []
+        collection_content: {
+          nodes: []
+        }
       });
     };
 

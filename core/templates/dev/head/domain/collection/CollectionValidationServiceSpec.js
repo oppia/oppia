@@ -39,7 +39,9 @@ describe('Collection validation service', function() {
       objective: 'an objective',
       category: 'a category',
       version: '1',
-      nodes: []
+      collection_content: {
+        nodes: []
+      }
     };
     _sampleCollection = CollectionObjectFactory.create(
       sampleCollectionBackendObject);
