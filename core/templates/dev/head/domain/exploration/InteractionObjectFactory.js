@@ -55,8 +55,7 @@ oppia.factory('InteractionObjectFactory', [
       confirmed_unclassified_answers: this.confirmedUnclassifiedAnswers,
       customization_args: this.customizationArgs,
       default_outcome: this.defaultOutcome,
-      fallbacks:
-        this.fallbacks.map(function(fallback) {
+      fallbacks: this.fallbacks.map(function(fallback) {
         return fallback.toBackendDict();
       }),
       id: this.id

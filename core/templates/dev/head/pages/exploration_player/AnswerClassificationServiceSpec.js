@@ -83,7 +83,8 @@ describe('Answer classification service with string classifier disabled',
           }],
           correct: false
         }],
-        default_outcome: 'default'
+        default_outcome: 'default',
+        fallbacks: []
       },
       param_changes: []
     });
@@ -176,7 +177,8 @@ describe('Answer classification service with string classifier disabled',
             rule_type: 'Equals'
           }],
           correct: false
-        }]
+        }],
+        fallbacks: []
       },
       param_changes: []
     });
@@ -254,7 +256,8 @@ describe('Answer classification service with string classifier enabled',
           }],
           correct: false
         }],
-        default_outcome: 'default'
+        default_outcome: 'default',
+        fallbacks: []
       },
       param_changes: []
     });
