@@ -1,5 +1,5 @@
 application: oppiaserver
-version: 2-4-0
+version: 2-4-1
 runtime: python27
 api_version: 1
 threadsafe: false
@@ -44,6 +44,7 @@ handlers:
 - url: /assets
   static_dir: assets
   secure: always
+  application_readable: true
   http_headers:
     Cache-Control: 'public, max-age=60'
 - url: /css

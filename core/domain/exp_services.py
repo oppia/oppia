@@ -638,7 +638,6 @@ def apply_change_list(exploration_id, change_list):
     try:
         changes = [exp_domain.ExplorationChange(change_dict)
                    for change_dict in change_list]
-
         for change in changes:
             if change.cmd == exp_domain.CMD_ADD_STATE:
                 exploration.add_states([change.state_name])
@@ -1047,7 +1046,8 @@ def update_exploration(
     user_services.add_edited_exploration_id(committer_id, exploration.id)
     user_services.record_user_edited_an_exploration(committer_id)
 
-    if not rights_manager.is_exploration_private(exploration.id):
+    if (not rights_manager.is_exploration_private(exploration.id) and
+            committer_id != feconf.MIGRATION_BOT_USER_ID):
         user_services.update_first_contribution_msec_if_not_set(
             committer_id, utils.get_current_time_in_millisecs())
 

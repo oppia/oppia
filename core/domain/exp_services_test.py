@@ -514,6 +514,18 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(retrieved_exp_summary.category, 'A new category')
         self.assertEqual(retrieved_exp_summary.contributor_ids, [self.owner_id])
 
+    def test_update_exploration_by_migration_bot(self):
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='end')
+        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+
+        exp_services.update_exploration(
+            feconf.MIGRATION_BOT_USER_ID, self.EXP_ID, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'New title'
+            }], 'Did migration.')
+
 
 class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
 
@@ -923,6 +935,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'feedback': ['Try again'],
                 'param_changes': []
             },
+            'correct': False,
         }]
         # Default outcome specification for an interaction.
         self.interaction_default_outcome = {

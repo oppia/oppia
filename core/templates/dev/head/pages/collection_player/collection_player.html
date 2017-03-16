@@ -197,6 +197,7 @@
       <li>
         <a ng-href="/collection_editor/create/{{collection_id}}" tooltip="Edit" tooltip-placement="bottom" target="_blank">
           <i class="material-icons">&#xE254;</i>
+          <span class="oppia-icon-accessibility-label">Edit</span>
         </a>
       </li>
     {% endif %}
@@ -374,6 +375,8 @@
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/attribution_guide/AttributionGuideDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CircularImageDirective.js"></script>
 {% endblock footer_js %}

@@ -22,6 +22,7 @@ import logging
 
 import jinja2
 
+from constants import constants
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import dependency_registry
@@ -160,7 +161,7 @@ class ExplorationPage(EditorHandler):
 
     def get(self, exploration_id):
         """Handles GET requests."""
-        if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
+        if exploration_id in constants.DISABLED_EXPLORATION_IDS:
             self.render_template(
                 'pages/error/disabled_exploration.html',
                 iframe_restriction=None)
@@ -339,7 +340,6 @@ class ExplorationHandler(EditorHandler):
 
         commit_message = self.payload.get('commit_message')
         change_list = self.payload.get('change_list')
-
         try:
             exp_services.update_exploration(
                 self.user_id, exploration_id, change_list, commit_message)

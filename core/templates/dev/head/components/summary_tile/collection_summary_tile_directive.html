@@ -3,30 +3,24 @@
     <a ng-href="<[getCollectionLink()]>" style="text-decoration: none;">
       <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
         <img class="collection-corner-image" ng-src="/assets/images/general/collection_corner.svg" alt="">
-        <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
+        <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>" alt="<[getCategory()]>">
         <h3 class="activity-title"><[getCollectionTitle() || DEFAULT_EMPTY_TITLE]></h3>
       </div>
 
-      <div>
-        <span ng-if="getObjective()" class="oppia-activity-summary-popover">
-          <span popover="<[getObjective()|capitalize]>" popover-placement="top" popover-trigger="mouseenter">
-            <div class="objective">
-              <[getObjective() | truncateAndCapitalize: 40]>
-            </div>
-          </span>
-        </span>
-
+      <div> 
+        <div class="objective">
+          <[getObjective() | truncateAndCapitalize: 95]>
+        </div>
         <span ng-if="!getObjective()">No objective specified.</span>
-
         <ul layout="row" class="metrics" layout-align="space-between center">
           <li>
             <span>
               COLLECTION (<[getNodeCount()]>)
             </span>
           </li>
-
           <li>
             <span>
+              <span class="oppia-icon-accessibility-label">Last Updated</span>
               <[getLastUpdatedDatetime()]>
             </span>
           </li>
@@ -36,6 +30,7 @@
     </a>
   </md-card>
 </script>
+
 
 <style>
   .oppia-activity-summary-tile .thumbnail-image {
