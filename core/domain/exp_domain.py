@@ -515,7 +515,7 @@ class AnswerGroup(object):
             answer_group_dict['correct'],
         )
 
-    def __init__(self, outcome, rule_specs, correct):
+    def __init__(self, outcome, rule_specs, correct=False):
         self.rule_specs = [RuleSpec(
             rule_spec.rule_type, rule_spec.inputs
         ) for rule_spec in rule_specs]
