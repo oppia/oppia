@@ -29,7 +29,7 @@
     };
 
     return {
-      create: create
+      createFromBackendDict: createFromBackendDict
     };
   }
 ]);
