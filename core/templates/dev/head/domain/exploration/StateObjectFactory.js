@@ -41,7 +41,7 @@ oppia.factory('StateObjectFactory', [
 
   // Static class methods. Note that "this" is not available in
   // static contexts.
-  State.create = function(stateName, stateDict) {
+  State.createFromBackendDict = function(stateName, stateDict) {
     return new State(
       stateName,
       stateDict.classifier_model_id,

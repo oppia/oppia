@@ -877,7 +877,7 @@ oppia.factory('explorationStatesService', [
         _states = {};
         for (var stateName in states) {
           var stateData = angular.copy(states[stateName]);
-          _states[stateName] = StateObjectFactory.create(
+          _states[stateName] = StateObjectFactory.createFromBackendDict(
             stateName, stateData);
         }
       },
@@ -1639,7 +1639,6 @@ oppia.factory('explorationGadgetsService', [
 ]);
 
 // A service that returns the frontend representation of a newly-added state.
-// TODO: refactor into factory as StateObjectFactory.createNewState()
 oppia.factory('newStateTemplateService',
   ['StateObjectFactory', function(StateObjectFactory) {
     return {
@@ -1649,7 +1648,7 @@ oppia.factory('newStateTemplateService',
       // NB: clients should ensure that the desired state name is valid.
       getNewStateTemplate: function(newStateName) {
         var newStateTemplate = angular.copy(GLOBALS.NEW_STATE_TEMPLATE);
-        var newState = StateObjectFactory.create(newStateName, {
+        var newState = StateObjectFactory.createFromBackendDict(newStateName, {
           classifier_model_id: newStateTemplate.classifier_model_id,
           content: newStateTemplate.content,
           interaction: newStateTemplate.interaction,

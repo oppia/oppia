@@ -62,7 +62,7 @@ oppia.controller('StatisticsTab', [
 
         $http.get(explorationDataUrl).then(function(response) {
           var statesDict = response.data.states;
-          var states = StatesObjectFactory.create(statesDict);
+          var states = StatesObjectFactory.createFromBackendDict(statesDict);
           var initStateName = response.data.init_state_name;
           $scope.statsGraphData = computeGraphService.compute(
             initStateName, states);

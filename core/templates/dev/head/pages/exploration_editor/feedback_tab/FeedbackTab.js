@@ -212,7 +212,8 @@ oppia.controller('FeedbackTab', [
               var suggestion = $scope.activeThread.suggestion;
               var stateName = suggestion.state_name;
               var stateDict = explorationData.data.states[stateName];
-              var state = StateObjectFactory.create(stateName, stateDict);
+              var state = StateObjectFactory.createFromBackendDict(
+                stateName, stateDict);
               state.content[0].value = suggestion.state_content.value;
               explorationData.data.version += 1;
               explorationStatesService.setState(stateName, state);

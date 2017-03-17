@@ -42,7 +42,7 @@ describe('Answer classification service with string classifier disabled',
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
 
-    state = sof.create('stateName', {
+    state = sof.createFromBackendDict('stateName', {
       content: [{
         type: 'text',
         value: 'content'
@@ -161,7 +161,7 @@ describe('Answer classification service with string classifier disabled',
 
   it('should fail if no answer group matches and no default rule is ' +
      'provided', function() {
-    var state2 = sof.create('stateName', {
+    var state2 = sof.createFromBackendDict('stateName', {
       content: [{
         type: 'text',
         value: 'content'
@@ -220,7 +220,7 @@ describe('Answer classification service with string classifier enabled',
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
 
-    state = sof.create('stateName', {
+    state = sof.createFromBackendDict('stateName', {
       content: [{
         type: 'text',
         value: 'content'

@@ -729,7 +729,7 @@ oppia.controller('StateResponses', [
         ]
       }).result.then(function(result) {
         // Create a new answer group.
-        $scope.answerGroups.push(AnswerGroupObjectFactory.create(
+        $scope.answerGroups.push(AnswerGroupObjectFactory.createNew(
           [result.tmpRule], result.tmpOutcome, false));
         responsesService.save($scope.answerGroups, $scope.defaultOutcome);
         $scope.changeActiveAnswerGroupIndex($scope.answerGroups.length - 1);

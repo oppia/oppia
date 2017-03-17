@@ -33,16 +33,17 @@ oppia.factory('InteractionObjectFactory', [
   };
 
   var generateAnswerGroupsFromBackend = function(answerGroupBackendDicts) {
-    var answerGroups = answerGroupBackendDicts.map(function(answerGroupDict) {
-      return AnswerGroupObjectFactory.create(
-        answerGroupDict.rule_specs, answerGroupDict.outcome, false);
+    var answerGroups = answerGroupBackendDicts.map(function(
+      answerGroupBackendDict) {
+      return AnswerGroupObjectFactory.createFromBackendDict(
+        answerGroupBackendDict);
     });
     return answerGroups;
   };
 
   var generateFallbacksFromBackend = function(fallbackBackendDicts) {
-    var fallbacks = fallbackBackendDicts.map(function(fallbackDict) {
-      return FallbackObjectFactory.create(fallbackDict);
+    var fallbacks = fallbackBackendDicts.map(function(fallbackBackendDict) {
+      return FallbackObjectFactory.createFromBackendDict(fallbackBackendDict);
     });
     return fallbacks;
   };
