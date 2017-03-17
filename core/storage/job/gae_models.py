@@ -112,7 +112,7 @@ class JobModel(base_models.BaseModel):
 
     @classmethod
     def get_all_unfinished_jobs(cls, limit):
-        """Get limit number of unfinished jobs.
+        """Gets limit number of unfinished jobs.
 
         Args:
             limit: int. A limit on the number of jobs to return.
@@ -127,7 +127,7 @@ class JobModel(base_models.BaseModel):
 
     @classmethod
     def get_unfinished_jobs(cls, job_type):
-        """Get jobs that are unfinished.
+        """Gets jobs that are unfinished.
 
         Args:
             job_type: str. The type of jobs that may be unfinished.
@@ -143,7 +143,7 @@ class JobModel(base_models.BaseModel):
         """Checks if unfinished jobs exist.
 
         Returns:
-            bool. True if unfinished jobs exits otherwise false.
+            bool. True if unfinished jobs exists otherwise false.
         """
         return bool(cls.get_unfinished_jobs(job_type).count(limit=1))
 
