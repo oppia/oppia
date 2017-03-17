@@ -13,23 +13,28 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of State
- * domain objects given a list of backend state dictionaries.
+ * @fileoverview Factory for creating new frontend instances of Fallback
+ * domain objects.
  */
 
- oppia.factory('StatesObjectFactory', ['StateObjectFactory',
-  function(StateObjectFactory) {
-    var createFromBackendDict = function(statesBackendDict) {
-      var stateObjectsDict = {};
-      for (var stateName in statesBackendDict) {
-        stateObjectsDict[stateName] = StateObjectFactory.createFromBackendDict(
-          stateName, statesBackendDict[stateName]);
-      }
-      return stateObjectsDict;
-    };
+oppia.factory('FallbackObjectFactory', [function() {
+  var Fallback = function(triggerBackendDict, outcomeBackendDict) {
+    this.trigger = triggerBackendDict;
+    this.outcome = outcomeBackendDict;
+  };
 
+  Fallback.prototype.toBackendDict = function() {
     return {
-      createFromBackendDict: createFromBackendDict
+      trigger: this.trigger,
+      outcome: this.outcome
     };
-  }
-]);
+  };
+
+  Fallback.createFromBackendDict = function(fallbackBackendDict) {
+    return new Fallback(
+      fallbackBackendDict.trigger,
+      fallbackBackendDict.outcome);
+  };
+
+  return Fallback;
+}]);

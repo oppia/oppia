@@ -77,7 +77,8 @@ describe('State Interaction controller', function() {
               ruleSpecs: [{
                 dest: 'End State'
               }]
-            }]
+            }],
+            fallbacks: []
           },
           param_changes: []
         },
@@ -92,7 +93,8 @@ describe('State Interaction controller', function() {
               ruleSpecs: [{
                 dest: 'End State'
               }]
-            }]
+            }],
+            fallbacks: []
           },
           param_changes: []
         }

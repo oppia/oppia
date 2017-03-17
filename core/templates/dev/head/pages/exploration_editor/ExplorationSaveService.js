@@ -453,7 +453,8 @@ oppia.factory('explorationSaveService', [
           var oldStates = {};
           for (var stateName in data.states) {
             oldStates[stateName] =
-              (StateObjectFactory.create(stateName, data.states[stateName]));
+              (StateObjectFactory.createFromBackendDict(
+                stateName, data.states[stateName]));
           }
           var newStates = explorationStatesService.getStates();
           var diffGraphData = ExplorationDiffService.getDiffGraphData(

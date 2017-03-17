@@ -18,26 +18,34 @@
  */
 
 oppia.factory('InteractionObjectFactory', [
-  'AnswerGroupObjectFactory', function(AnswerGroupObjectFactory) {
+  'AnswerGroupObjectFactory', 'FallbackObjectFactory',
+  function(AnswerGroupObjectFactory, FallbackObjectFactory) {
   var Interaction = function(answerGroupBackendDicts,
-    confirmedUnclassifiedAnswers, customizationArgs, defaultOutcome,
-    fallbacks, id) {
+    confirmedUnclassifiedAnswers, customizationArgs, defaultOutcomeBackendDict,
+    fallbacksBackendList, id) {
     this.answerGroups = generateAnswerGroupsFromBackend(
       answerGroupBackendDicts);
     this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
     this.customizationArgs = customizationArgs;
-    this.defaultOutcome = defaultOutcome;
-    this.fallbacks = fallbacks;
+    this.defaultOutcome = defaultOutcomeBackendDict;
+    this.fallbacks = generateFallbacksFromBackend(fallbacksBackendList);
     this.id = id;
   };
 
   var generateAnswerGroupsFromBackend = function(answerGroupBackendDicts) {
-    var answerGroups = answerGroupBackendDicts.map(function(answerGroupDict) {
-      return AnswerGroupObjectFactory.create(
-        answerGroupDict.rule_specs, answerGroupDict.outcome, false);
+    var answerGroups = answerGroupBackendDicts.map(function(
+      answerGroupBackendDict) {
+      return AnswerGroupObjectFactory.createFromBackendDict(
+        answerGroupBackendDict);
     });
-
     return answerGroups;
+  };
+
+  var generateFallbacksFromBackend = function(fallbackBackendDicts) {
+    var fallbacks = fallbackBackendDicts.map(function(fallbackBackendDict) {
+      return FallbackObjectFactory.createFromBackendDict(fallbackBackendDict);
+    });
+    return fallbacks;
   };
 
   Interaction.prototype.toBackendDict = function() {
@@ -48,7 +56,9 @@ oppia.factory('InteractionObjectFactory', [
       confirmed_unclassified_answers: this.confirmedUnclassifiedAnswers,
       customization_args: this.customizationArgs,
       default_outcome: this.defaultOutcome,
-      fallbacks: this.fallbacks,
+      fallbacks: this.fallbacks.map(function(fallback) {
+        return fallback.toBackendDict();
+      }),
       id: this.id
     };
   };

@@ -20,13 +20,13 @@
 oppia.factory('StateObjectFactory', [
   'AnswerGroupObjectFactory', 'InteractionObjectFactory',
   function(AnswerGroupObjectFactory, InteractionObjectFactory) {
-  var State = function(name, classifierModelId, content,
-    interactionBackendDict, paramChanges) {
+  var State = function(name, classifierModelId, contentBackendList,
+    interactionBackendDict, paramChangesBackendList) {
     this.name = name;
     this.classifierModelId = classifierModelId;
-    this.content = content;
+    this.content = contentBackendList;
     this.interaction = InteractionObjectFactory.create(interactionBackendDict);
-    this.paramChanges = paramChanges;
+    this.paramChanges = paramChangesBackendList;
   };
 
   // Instance methods.
@@ -41,7 +41,7 @@ oppia.factory('StateObjectFactory', [
 
   // Static class methods. Note that "this" is not available in
   // static contexts.
-  State.create = function(stateName, stateDict) {
+  State.createFromBackendDict = function(stateName, stateDict) {
     return new State(
       stateName,
       stateDict.classifier_model_id,

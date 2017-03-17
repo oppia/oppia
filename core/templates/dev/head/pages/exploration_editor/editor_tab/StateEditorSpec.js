@@ -67,7 +67,8 @@ describe('State Editor controller', function() {
               ruleSpecs: [{
                 dest: 'Second State'
               }]
-            }]
+            }],
+            fallbacks: []
           },
           param_changes: []
         },
@@ -82,7 +83,8 @@ describe('State Editor controller', function() {
               ruleSpecs: [{
                 dest: 'Second State'
               }]
-            }]
+            }],
+            fallbacks: []
           },
           param_changes: []
         },
@@ -97,7 +99,8 @@ describe('State Editor controller', function() {
               ruleSpecs: [{
                 dest: 'Second State'
               }]
-            }]
+            }],
+            fallbacks: []
           },
           param_changes: [{
             name: 'comparison',
@@ -256,6 +259,7 @@ describe('State Editor controller', function() {
               feedback: 'Default',
               dest: 'State'
             },
+            fallbacks: [],
             confirmed_unclassified_answers: []
           },
           param_changes: []
