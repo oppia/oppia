@@ -93,14 +93,16 @@ class JobModel(base_models.BaseModel):
 
     @classmethod
     def get_recent_jobs(cls, limit, recency_msec):
-        """Gets at most limit number of jobs with respect to a time after recency_msec.
+        """Gets at most limit jobs with respect to a time after recency_msec.
 
         Args:
             limit: int. A limit on the number of jobs to return.
-            recency_msec: int. A time in milliseconds. After this time a job is considered recent.
+            recency_msec: int. A time in milliseconds. After this time a
+                job is considered recent.
 
         Returns:
-            list(Jobs) or None. A list of at most limit jobs that come after recency_msec time.
+            list(Jobs) or None. A list of at most limit jobs
+            that come after recency_msec time.
         """
         earliest_time_msec = (
             utils.get_current_time_in_millisecs() - recency_msec)
@@ -116,7 +118,8 @@ class JobModel(base_models.BaseModel):
             limit: int. A limit on the number of jobs to return.
 
         Returns:
-            list(Jobs) or None. A list of at most limit number of unfinished jobs.
+            list(Jobs) or None. A list of at most limit number
+            of unfinished jobs.
         """
         return cls.query().filter(
             JobModel.status_code.IN([STATUS_CODE_QUEUED, STATUS_CODE_STARTED])
