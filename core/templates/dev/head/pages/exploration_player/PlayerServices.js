@@ -210,7 +210,7 @@ oppia.factory('oppiaPlayerService', [
             }) + (version ? '?v=' + version : '');
           $http.get(explorationDataUrl).then(function(response) {
             var data = response.data;
-            exploration = ExplorationObjectFactory.create(data.exploration);
+            exploration = ExplorationObjectFactory.createFromBackendDict(data.exploration);
             version = data.version;
 
             initParams([]);
