@@ -3,6 +3,46 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://github.com/oppia/oppia/commits/master
 
 
+v2.4.1 (12 Mar 2017)
+--------------------
+Interactions:
+* Fix #3027: Update Add Vertex functionality in GraphInput, when vertex is added mode is changed to "MOVE". (#3115)
+* Fix #3102: Update Guppy to 260da66 to enable better compatibility with non-US keyboards (#3103)
+* Fix #2964: remove reset icon and add undo reset functionality in pencil code editor (#3055)
+
+Accessibility:
+* Add span text with special class  for several icon buttons and links; fix focus styles issue for seach bar; no focus style fix required for language select element
+* Update icon button text width to address spacing issue in Chrome; Add ARIA role to About, Profile, and exploration Author profile to offer screenreaders some indication that these are menus; Update delete icon on select input to have icon button text; Remove aria-label from item selection to allow for clearer labels
+* Add aria-label to user menu so that it is properly read as user menu instead of as user avatar; add role to author profile dropup menu so that it is recognized as a menu; update icon accessibility span class name to be more descriptive and add more to the comment above the style in oppia.css
+* Fix #2955: add alt tag equal to value of getCategory() (#3023)
+
+UI tweaks:
+* Fix #2814: Add new items button visibility in the SetInput interaction on mobile (#2951)
+* Fix #3120: Buttons on About page have text overflow on mobile. (#3123)
+* Fix #3037: changed the height of the dropdown save button and width of the discard draft button. (#3100)
+* Fix #3063: change the default confirmation box in "discard draft" to modal (#3068)
+* Remove word-break so that lesson titles don't break unnecessarily across lines. Reverts part of #2971. (#3130)
+* Fix #3129: Make navbar text items visible again by changing to rem. (#3150)
+* Fix #3066: fixed summary tiles to show the full objective. (#3128)
+* Fixes #3136 alignment of oppia meaning text in about page after doing required changes (#3153)
+
+Code health:
+* Convert state dictionary data in FeedbackTab to State objects (#3125)
+* Add docstrings for core.domain.param_domain.py (#3078)
+* remove image uploader directive from base.html (#3090)
+* Remove more js files from base.html (#3087)
+* Fixes #1695: Way to automatically provide backend constants to the frontend. (#3033)
+* Fix #1858 Added source-maps for better debugging (#3086)
+
+Other:
+* Fix #3094: Change the license terms URL link to go to foundation tab of about page. (#3105)
+* Fix part of #3073: Add exploration link to feedback email. (#3108)
+* Change http to https in some places in setup.sh, particularly for downloading node. (#3133)
+* Add analytics tracking for card-transition and completion in the player. (#3088)
+* Fix #2987: add a "correct" field to each answer group (#3084)
+* Fix #2966: modified the the redirection rules when the user goes to root url (#3034)
+
+
 v2.4.0 (18 Feb 2017)
 --------------------
 Collection Player
