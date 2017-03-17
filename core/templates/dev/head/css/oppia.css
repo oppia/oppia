@@ -3457,6 +3457,12 @@ md-card.preview-conversation-skin-supplemental-card {
   color: #fff;
 }
 
+@media only screen and (max-width: 500px) {
+    button.btn.oppia-splash-button {
+        font-size: 3.6vw;
+    }
+}
+
 .oppia-splash-button-container {
   margin-left: auto;
   margin-right: auto;
