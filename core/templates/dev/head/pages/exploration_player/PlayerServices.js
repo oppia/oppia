@@ -197,7 +197,8 @@ oppia.factory('oppiaPlayerService', [
               apply_draft: true
             }
           }).then(function(response) {
-            exploration = ExplorationObjectFactory.create(response.data);
+            exploration = ExplorationObjectFactory.createFromBackendDict(
+              response.data);
             exploration.setInitialStateName(initStateName);
             initParams(manualParamChanges);
             _loadInitialState(successCallback);
