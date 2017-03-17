@@ -635,8 +635,8 @@ oppia.controller('StateResponses', [
                   var answerGroupIndex = classificationResult.answerGroupIndex;
                   var ruleSpecIndex = classificationResult.ruleSpecIndex;
                   if (answerGroupIndex !==
-                        _state.interaction.answer_groups.length &&
-                      _state.interaction.answer_groups[
+                        _state.interaction.answerGroups.length &&
+                      _state.interaction.answerGroups[
                         answerGroupIndex].ruleSpecs[
                           ruleSpecIndex].rule_type !==
                             CLASSIFIER_RULESPEC_STR) {

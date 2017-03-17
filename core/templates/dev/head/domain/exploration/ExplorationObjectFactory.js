@@ -68,7 +68,7 @@ oppia.factory('ExplorationObjectFactory', [
 
     Exploration.prototype.getInteractionCustomizationArgs =
       function(stateName) {
-        return this.states[stateName].interaction.customization_args;
+        return this.states[stateName].interaction.customizationArgs;
       };
 
     Exploration.prototype.getInteractionInstructions = function(stateName) {

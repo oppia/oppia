@@ -320,13 +320,13 @@ oppia.factory('trainingDataService', [
         var potentialOutcomes = [];
         var interaction = state.interaction;
 
-        for (var i = 0; i < interaction.answer_groups.length; i++) {
-          potentialOutcomes.push(interaction.answer_groups[i].outcome);
+        for (var i = 0; i < interaction.answerGroups.length; i++) {
+          potentialOutcomes.push(interaction.answerGroups[i].outcome);
         }
 
-        if (interaction.default_outcome) {
-          var outcome = interaction.default_outcome;
-          potentialOutcomes.push(interaction.default_outcome);
+        if (interaction.defaultOutcome) {
+          var outcome = interaction.defaultOutcome;
+          potentialOutcomes.push(interaction.defaultOutcome);
         }
 
         return potentialOutcomes;

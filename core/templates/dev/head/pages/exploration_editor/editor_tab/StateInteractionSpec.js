@@ -137,7 +137,7 @@ describe('State Interaction controller', function() {
       siis.init(
         'First State', state.interaction.id, state.interaction, 'widget_id');
       scas.init(
-        'First State', state.interaction.customization_args,
+        'First State', state.interaction.customizationArgs,
         state.interaction, 'widget_customization_args');
 
       siis.displayed = 'TerminalInteraction';
@@ -158,7 +158,7 @@ describe('State Interaction controller', function() {
       siis.init(
         'End State', state.interaction.id, state.interaction, 'widget_id');
       scas.init(
-        'End State', state.interaction.customization_args,
+        'End State', state.interaction.customizationArgs,
         state.interaction, 'widget_customization_args');
 
       siis.displayed = 'TerminalInteraction';
@@ -180,7 +180,7 @@ describe('State Interaction controller', function() {
       siis.init(
         'End State', state.interaction.id, state.interaction, 'widget_id');
       scas.init(
-        'End State', state.interaction.customization_args,
+        'End State', state.interaction.customizationArgs,
         state.interaction, 'widget_customization_args');
 
       siis.displayed = 'TextInput';
