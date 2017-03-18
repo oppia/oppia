@@ -26,6 +26,7 @@ oppia.controller('SettingsTab', [
   'explorationParamChangesService', 'explorationWarningsService',
   'explorationAdvancedFeaturesService', 'ALL_CATEGORIES',
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'UserEmailPreferencesService',
+  'UrlInterpolationService',
   function(
       $scope, $http, $window, $modal, $rootScope,
       explorationData, explorationTitleService, explorationCategoryService,
@@ -35,7 +36,8 @@ oppia.controller('SettingsTab', [
       changeListService, alertsService, explorationStatesService,
       explorationParamChangesService, explorationWarningsService,
       explorationAdvancedFeaturesService, ALL_CATEGORIES,
-      EXPLORATION_TITLE_INPUT_FOCUS_LABEL, UserEmailPreferencesService) {
+      EXPLORATION_TITLE_INPUT_FOCUS_LABEL, UserEmailPreferencesService,
+      UrlInterpolationService) {
     $scope.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
 
@@ -226,6 +228,49 @@ oppia.controller('SettingsTab', [
     /********************************************
     * Methods relating to control buttons.
     ********************************************/
+    $scope.previewSummaryTile = function() {
+      alertsService.clearWarnings();
+      $modal.open({
+        templateUrl: 'modals/previewSummaryTile',
+        backdrop: true,
+        controller: [
+          '$scope', '$modalInstance', function($scope, $modalInstance) {
+            $scope.getExplorationTitle = function() {
+              return explorationTitleService.displayed;
+            };
+            $scope.getExplorationObjective = function() {
+              return explorationObjectiveService.displayed;
+            };
+            $scope.getExplorationCategory = function() {
+              return explorationCategoryService.displayed;
+            };
+            $scope.getThumbnailIconUrl = function() {
+              var category = explorationCategoryService.displayed;
+              if (GLOBALS.ALL_CATEGORIES.indexOf(category) === -1) {
+                category = GLOBALS.DEFAULT_CATEGORY_ICON;
+              }
+              return UrlInterpolationService.getStaticImageUrl(
+                '/subjects/' + category + '.svg');
+            };
+            $scope.getThumbnailBgColor = function() {
+              var category = explorationCategoryService.displayed;
+              if (!GLOBALS.CATEGORIES_TO_COLORS.hasOwnProperty(category)) {
+                var color = GLOBALS.DEFAULT_COLOR;
+              } else {
+                var color = GLOBALS.CATEGORIES_TO_COLORS[category];
+              }
+              return color;
+            };
+
+            $scope.close = function() {
+              $modalInstance.dismiss();
+              alertsService.clearWarnings();
+            };
+          }
+        ]
+      });
+    };
+
     $scope.showTransferExplorationOwnershipModal = function() {
       alertsService.clearWarnings();
       $modal.open({
