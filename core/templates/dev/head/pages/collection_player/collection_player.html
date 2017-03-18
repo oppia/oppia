@@ -363,11 +363,9 @@
 {% endblock %}
 
 {% block footer %}
-  {% if not iframed %}
-    {% include 'pages/collection_player/collection_footer_directive.html' %}
-    {% include 'components/share/sharing_links_directive.html' %}
-    <collection-footer twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></collection-footer>
-  {% endif %}
+  {% include 'pages/collection_player/collection_footer_directive.html' %}
+  {% include 'components/share/sharing_links_directive.html' %}
+  <collection-footer twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></collection-footer>
 {% endblock %}
 
 {% block footer_js %}

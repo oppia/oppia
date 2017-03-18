@@ -2,16 +2,15 @@
   <div class="footer navbar-fixed-bottom oppia-collection-footer">
     <div class="row">
       <div class="col-sm-5">
-        <ul class="author-profile">
+        <ul>
           <li>
             <img ng-src="<[getStaticImageUrl('/general/apple.svg')]>" class="collection-footer-img" alt="">
           </li>
-          <li></li>
         </ul>
       </div>
       <div class="col-sm-7">
         <div class="pull-right">
-          <ul class="author-profile">
+          <ul>
             <li>
               <h4 translate="I18N_PLAYER_SHARE_THIS_COLLECTION" class="oppia-share-collection-footer"></h4>
             </li>
@@ -51,80 +50,14 @@
     width: 60px;
   }
 
-  .oppia-collection-footer .author-profile {
+  .oppia-collection-footer ul {
     color: #fff;
     list-style-type: none;
     padding-left: 0;
   }
-
-  .oppia-collection-footer .author-profile a:hover {
-    text-decoration: none;
-  }
-
-  .author-profile li {
+  
+  .oppia-collection-footer li {
     float: left;
-  }
-
-  .oppia-collection-footer .author-profile .hover-link {
-    background-color: #094142;
-    width: 190px;
-  }
-
-  .oppia-collection-footer .author-profile.hovered-text h4 {
-    color: #094142;
-  }
-
-  .oppia-collection-footer .author-profile .hover-link:hover,
-  .oppia-collection-footer .author-profile .hover-link:focus {
-    background-color: #fff;
-    color: #094142;
-  }
-
-  .oppia-collection-footer .dropdown-menu.author-profile-dropdown-menu {
-    border: none;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    box-shadow: 0 -6px 12px rgba(0, 0, 0, 0.176);
-    float: left;
-    list-style-type: none;
-    margin:0 0 16px 0;
-  }
-
-  .oppia-collection-footer .author-profile-dropdown-menu li {
-    color: #094142;
-    float: none;
-    text-overflow: clip;
-    white-space: nowrap;
-    width: 100%;
-  }
-
-  .oppia-collection-footer .author-profile-dropdown-menu li > a {
-    color: #094142;
-    padding: 3px 6px;
-  }
-
-  .oppia-collection-footer .author-profile-dropdown-menu li a:hover {
-    background-color: #eee;
-    color: #888;
-  }
-
-  .oppia-collection-footer .author-profile-text {
-    cursor: default;
-    line-height: 0.6;
-    padding-left: 6px;
-    text-overflow: clip;
-    white-space: nowrap;
-  }
-
-  .oppia-collection-footer .author-profile-text.not-hovered {
-    color: #fff;
-    text-transform: uppercase;
-  }
-
-  .oppia-collection-footer .author-profile-text.hovered-text {
-    color: #094142;
-    text-decoration: none;
-    text-transform: uppercase;
   }
 
   .oppia-collection-footer .oppia-share-collection-footer {
