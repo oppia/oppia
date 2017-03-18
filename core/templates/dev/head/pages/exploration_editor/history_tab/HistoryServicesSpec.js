@@ -174,7 +174,7 @@ describe('Compare versions service', function() {
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
     beforeEach(function() {
       mockExplorationData = {
-        explorationId: 0
+        explorationId: '0'
       };
       module(function($provide) {
         $provide.value('explorationData', mockExplorationData);

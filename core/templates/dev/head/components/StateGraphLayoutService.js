@@ -135,6 +135,8 @@ oppia.factory('StateGraphLayoutService', [
         var currentPath = [];
 
         var backtrack = function(currentNodeId) {
+          console.log(bestPath);
+          console.log(currentNodeId);
           currentPath.push(currentNodeId);
 
           // If the current node leads to no other nodes, we consider it a

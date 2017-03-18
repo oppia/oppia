@@ -27,22 +27,9 @@ oppia.factory('ReadOnlyExplorationBackendApiService', [
 
     var _fetchExploration = function(
         explorationId, version, successCallback, errorCallback) {
-      var explorationDataUrl = '';
-      if (version) {
-        explorationDataUrl = UrlInterpolationService.interpolateUrl(
-        EXPLORATION_VERSION_DATA_URL_TEMPLATE, {
-          exploration_id: String(explorationId),
-          v: String(version)
-        });
-      } else {
-        explorationDataUrl = UrlInterpolationService.interpolateUrl(
-        EXPLORATION_DATA_URL_TEMPLATE, {
-          exploration_id: explorationId
-        });
-      }
+      var explorationDataUrl = _getExplorationUrl(explorationId, version);
 
-      $http.get(explorationDataUrl).then(
-        function(response) {
+      $http.get(explorationDataUrl).then(function(response) {
         var exploration = angular.copy(response.data);
         if (successCallback) {
           successCallback(exploration);
@@ -58,17 +45,33 @@ oppia.factory('ReadOnlyExplorationBackendApiService', [
       return _explorationCache.hasOwnProperty(explorationId);
     };
 
+    var _getExplorationUrl = function(explorationId, version) {
+      if (version) {
+        return UrlInterpolationService.interpolateUrl(
+        EXPLORATION_VERSION_DATA_URL_TEMPLATE, {
+          exploration_id: explorationId,
+          v: String(version)
+        });
+      }
+      return UrlInterpolationService.interpolateUrl(
+        EXPLORATION_DATA_URL_TEMPLATE, {
+          exploration_id: explorationId
+        }
+      );
+    };
+
     return {
       /**
-       * Retrieves an exploration from the backend given an exploration ID.
-       * This returns a promise object that allows a success and rejection
-       * callbacks to be registered. If the exploration is successfully
-       * loaded and a success callback function is provided to the promise
-       * object, the success callback is called with the exploration
-       * passed in as a parameter. If something goes wrong while trying to
-       * fetch the exploration, the rejection callback is called instead,
-       * if present. The rejection callback function is passed an error
-       * message using this format 'Error loading exploration x'.
+       * Retrieves an exploration from the backend given an exploration ID
+       * and version number (or none). This returns a promise object that
+       * allows success and rejection callbacks to be registered. If the
+       * exploration is successfully loaded and a success callback function
+       * is provided to the promise object, the success callback is called
+       * with the exploration passed in as a parameter. If something goes
+       * wrong while trying to fetch the exploration, the rejection callback
+       * is called instead, if present. The rejection callback function is
+       * passed an error message using this format
+       * 'Error loading exploration x'.
        */
       fetchExploration: function(explorationId, version) {
         return $q(function(resolve, reject) {
@@ -79,31 +82,48 @@ oppia.factory('ReadOnlyExplorationBackendApiService', [
       /**
        * Behaves in the exact same way as fetchExploration (including
        * callback behavior and returning a promise object),
-       * except this function will attempt to see whether the given
-       * exploration has already been loaded. If it has not yet been loaded,
-       * it will fetch the exploration from the backend. If it successfully
-       * retrieves the exploration from the backend, it will store it in the
-       * cache to avoid requests from the backend in further function calls.
+       * except this function will attempt to see whether the latest version
+       * of the given exploration has already been loaded. If it has not yet
+       * been loaded, it will fetch the exploration from the backend. If it
+       * successfully retrieves the exploration from the backend, this method
+       * will store the exploration in the cache to avoid requests from the
+       * backend in further function calls.
        */
-      loadExploration: function(explorationId, version) {
+      loadLatestExploration: function(explorationId) {
         return $q(function(resolve, reject) {
-          if (_isCached(explorationId) && !version) {
+          if (_isCached(explorationId)) {
             if (resolve) {
               resolve(angular.copy(_explorationCache[explorationId]));
             }
           } else {
-            _fetchExploration(explorationId, version, function(exploration) {
+            _fetchExploration(explorationId, null, function(exploration) {
               // Save the fetched exploration to avoid future fetches.
-              // Excludes version for now.
-              if (!version) {
-                _explorationCache[explorationId] = exploration;
-              }
+              _explorationCache[explorationId] = exploration;
               if (resolve) {
                 resolve(angular.copy(exploration));
               }
             }, reject);
           }
         });
+      },
+
+      /**
+       * Retrieves an exploration from the backend given an exploration ID
+       * and version number. This method does not interact with any cache
+       * and using this method will not overwrite or touch the state of the
+       * cache. All previous data in the cache will still be retained after
+       * this call.
+       */
+      loadExploration: function(explorationId, version) {
+        return $q(function(resolve, reject) {
+            _fetchExploration(explorationId, version, function(exploration) {
+              console.log(exploration);
+              if (resolve) {
+                resolve(angular.copy(exploration));
+              }
+            }, reject);
+          }
+        );
       },
 
       /**
@@ -121,6 +141,23 @@ oppia.factory('ReadOnlyExplorationBackendApiService', [
        */
       cacheExploration: function(explorationId, exploration) {
         _explorationCache[explorationId] = angular.copy(exploration);
+      },
+
+      /**
+       * Replaces the current exploration in the cache given by the specified
+       * exploration ID with a new exploration object passed in from the 
+       * EditableExplorationBackendApiService. The reason for the additional 
+       * method is that there are conflicting versions of the learner view,
+       * the one returned by reader.py contains the following subset of fields
+       * that are passed over by editor.py:
+       * [language_code, param_changes, param_specs, skin_customizations,
+       * states, title]. These fields must be extracted from the editable
+       * Exploration and stored in cache. Along with these fields we need to
+       * extract version and exploration_id to the surrounding 
+       */
+      cacheEditableExploration: function(explorationId, exploration) {
+        _explorationCache[explorationId] = (
+          convertEditableToReadOnlyExploration(exploration))
       },
 
       /**

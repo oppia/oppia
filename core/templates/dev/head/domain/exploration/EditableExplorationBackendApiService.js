@@ -68,9 +68,9 @@ oppia.factory('EditableExplorationBackendApiService', [
         // The returned data is an updated exploration dict.
         var exploration = angular.copy(response.data);
 
-        // Update the ReadOnlyExplorationBackendApiService's cache with the
-        // new exploration.
-        ReadOnlyExplorationBackendApiService.cacheExploration(
+        // Delete from the ReadOnlyExplorationBackendApiService's cache
+        // As the two versions of the data (learner and editor) now differ
+        ReadOnlyExplorationBackendApiService.deleteExplorationFromCache(
           explorationId, exploration);
 
         if (successCallback) {

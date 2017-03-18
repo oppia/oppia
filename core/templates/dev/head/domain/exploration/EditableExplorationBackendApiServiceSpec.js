@@ -23,7 +23,6 @@ describe('Editable exploration backend API service', function() {
   var $rootScope = null;
   var $scope = null;
   var $httpBackend = null;
-  var UndoRedoService = null;
 
   beforeEach(module('oppia'));
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
@@ -33,7 +32,6 @@ describe('Editable exploration backend API service', function() {
       'EditableExplorationBackendApiService');
     ReadOnlyExplorationBackendApiService = $injector.get(
       'ReadOnlyExplorationBackendApiService');
-    UndoRedoService = $injector.get('UndoRedoService');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
@@ -139,19 +137,21 @@ describe('Editable exploration backend API service', function() {
     expect(failHandler).not.toHaveBeenCalled();
   });
 
-  it('should cache exploration from the backend into read only service',
+  it('should not cache exploration from backend into read only service',
       function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expect('GET', '/createhandler/data/0').respond(
+    $httpBackend.expect('GET', '/explorehandler/init/0').respond(
       sampleDataResults);
 
-    EditableExplorationBackendApiService.fetchExploration('0').then(
+    ReadOnlyExplorationBackendApiService.loadLatestExploration('0').then(
       function(data) {
         exploration = data;
       });
     $httpBackend.flush();
+
+    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(true);
 
     exploration.title = 'New Title';
     exploration.version = '2';
@@ -169,7 +169,7 @@ describe('Editable exploration backend API service', function() {
     expect(successHandler).toHaveBeenCalledWith(exploration);
     expect(failHandler).not.toHaveBeenCalled();
 
-    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(true);
+    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(false);
   });
 
   it('should delete exploration from the backend',

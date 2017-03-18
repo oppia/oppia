@@ -198,22 +198,30 @@ oppia.factory('oppiaPlayerService', [
             _loadInitialState(successCallback);
           });
         } else {
-          ReadOnlyExplorationBackendApiService.loadExploration(
-            _explorationId, version ? version : null).then(
-            function(data) {
-              exploration = ExplorationObjectFactory.create(data.exploration);
-              version = data.version;
-
-              initParams([]);
-
-              StatsReportingService.initSession(
-                _explorationId, data.version, data.session_id,
-                GLOBALS.collectionId);
-
-              _loadInitialState(successCallback);
-              $rootScope.$broadcast('playerServiceInitialized');
+            loadedExploration = null;
+            if (version) {
+              loadedExploration = (
+                ReadOnlyExplorationBackendApiService.loadExploration(
+                  _explorationId, version));
+            } else {
+              loadedExploration = (
+                ReadOnlyExplorationBackendApiService.loadLatestExploration(
+                  _explorationId));
             }
-          );
+            loadedExploration.then(function(data) {
+                exploration = ExplorationObjectFactory.create(data.exploration);
+                version = exploration.version;
+
+                initParams([]);
+
+                StatsReportingService.initSession(
+                  _explorationId, exploration.version, data.session_id,
+                  GLOBALS.collectionId);
+
+                _loadInitialState(successCallback);
+                $rootScope.$broadcast('playerServiceInitialized');
+              }
+            );
         }
       },
       getExplorationId: function() {

@@ -228,13 +228,13 @@ class ExplorationHandler(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
-        states = {}
-        for state_name in exploration.states:
-            state_dict = exploration.states[state_name].to_dict()
-            state_dict['unresolved_answers'] = (
-                stats_services.get_top_unresolved_answers_for_default_rule(
-                    exploration_id, state_name))
-            states[state_name] = state_dict
+        # states = {}
+        # for state_name in exploration.states:
+        #     state_dict = exploration.states[state_name].to_dict()
+        #     state_dict['unresolved_answers'] = (
+        #         stats_services.get_top_unresolved_answers_for_default_rule(
+        #             exploration_id, state_name))
+        #     states[state_name] = state_dict
         self.values.update({
             'can_edit': (
                 self.user_id and
@@ -242,11 +242,9 @@ class ExplorationHandler(base.BaseHandler):
                     feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id)),
             'exploration': exploration.to_player_dict(),
             'exploration_id': exploration_id,
-            'init_state_name': exploration.init_state_name,
-            'states': states,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
-            'version': exploration.version,
+            'version': exploration.version
         })
         self.render_json(self.values)
 

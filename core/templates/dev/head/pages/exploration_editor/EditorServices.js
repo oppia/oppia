@@ -101,12 +101,12 @@ oppia.factory('explorationData', [
       // Returns a promise supplying the last saved version for the current
       // exploration.
       getLastSavedData: function() {
-        return ReadOnlyExplorationBackendApiService.loadExploration(
-          explorationId, null).then(function(response) {
+        return ReadOnlyExplorationBackendApiService.loadLatestExploration(
+          explorationId).then(function(response) {
           $log.info('Retrieved saved exploration data.');
           $log.info(response);
 
-          return response;
+          return response.exploration;
         });
       },
       resolveAnswers: function(stateName, resolvedAnswersList) {
