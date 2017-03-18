@@ -36,11 +36,40 @@ STATUS_CODE_CANCELED = 'canceled'
 
 
 class JobModel(base_models.BaseModel):
-    """Class representing a datastore entity for a long-running job."""
+    """Class representing a datastore entity for a long-running job.
+
+    Attributes:
+        job_type: The job type.
+        time_queued_msec: The time at which the job was queued, in milliseconds since the epoch.
+        time_started_msec: The time at which the job was started, in milliseconds since the epoch.
+            This is never set if the job was canceled before it was started.
+        time_finished_msec: The time at which the job was completed, failed or canceled, in
+            milliseconds since the epoch.
+        status_code: The current status code for the job.
+        metadata: Any metadata for the job, such as the root pipeline id for mapreduce
+            jobs.
+        output: The output of the job. This is only populated if the job has status code
+            STATUS_CODE_COMPLETED, and is None otherwise.
+        error: The error message, if applicable. Only populated if the job has status
+            code STATUS_CODE_FAILED or STATUS_CODE_CANCELED; None otherwise.
+        has_been_cleaned_up:  Whether the datastore models associated with this job have been cleaned
+            up (i.e., deleted).
+        additional_job_params: Store additional params passed with job.
+    """
 
     @classmethod
     def get_new_id(cls, entity_name):
-        """Overwrites superclass method."""
+        """Overwrites superclass method.
+
+        This method is used to generate a new id for the job.
+
+        Args:
+            entity_name: a name for the running job.
+        Returns:
+            A string representation of the new id. It consists of the 
+            job type, current time, and a random integer.
+        """
+
         job_type = entity_name
         current_time_str = str(int(utils.get_current_time_in_millisecs()))
         random_int = random.randint(0, 1000)
@@ -81,11 +110,30 @@ class JobModel(base_models.BaseModel):
 
     @property
     def is_cancelable(self):
+        """Determines if the running job can be canceled.
+
+        If a job is in queued or started state, then it can be canceled.
+
+        Returns:
+            A boolean the indicates whether the job is currently in 'queued' or 
+            'started' status.
+        """
+
         # Whether the job is currently in 'queued' or 'started' status.
         return self.status_code in [STATUS_CODE_QUEUED, STATUS_CODE_STARTED]
 
     @classmethod
     def get_recent_jobs(cls, limit, recency_msec):
+        """Get recently run jobs.
+
+        Args:
+            limit: The maximum number of jobs to return.
+            recency_msec: the time range in milliseconds
+                for resent jobs.
+        Returns:
+            A sequence of jobs.
+        """
+
         earliest_time_msec = (
             utils.get_current_time_in_millisecs() - recency_msec)
         return cls.query().filter(
@@ -94,17 +142,43 @@ class JobModel(base_models.BaseModel):
 
     @classmethod
     def get_all_unfinished_jobs(cls, limit):
+        """Gets all unfinished jobs.
+
+        Args:
+            limit: The maximum number of jobs to return. 
+        Returns:
+            A sequence of unfinished jobs.
+        """
+
         return cls.query().filter(
             JobModel.status_code.IN([STATUS_CODE_QUEUED, STATUS_CODE_STARTED])
         ).order(-cls.time_queued_msec).fetch(limit)
 
     @classmethod
     def get_unfinished_jobs(cls, job_type):
+        """Gets all unifished job of a particular job_type.
+
+        All unfished jobs whos type match the given job_type
+        will be returned.
+        Args:
+            job_type: The job type.
+        Returns:
+            A sequence of jobs whose type match job_type.
+        """
+
         return cls.query().filter(cls.job_type == job_type).filter(
             JobModel.status_code.IN([STATUS_CODE_QUEUED, STATUS_CODE_STARTED]))
 
     @classmethod
     def do_unfinished_jobs_exist(cls, job_type):
+        """Checks for existence of unfinished jobs.
+
+        Args:
+            job_type: The job type.
+        Returns:
+            A boolean that indicates if there are unfinished jobs
+            of the particular job_type.
+        """
         return bool(cls.get_unfinished_jobs(job_type).count(limit=1))
 
 
@@ -119,6 +193,18 @@ class ContinuousComputationModel(base_models.BaseModel):
 
     The id of each instance of this model is the name of the continuous
     computation manager class.
+
+    Attributes:
+        status_code: The current status code for the computation.
+        active_realtime_layer_index: The realtime layer that is currently 'active' 
+            (i.e., the one that is going to be cleared immediately after the current batch job run
+            completes).
+        last_started_msec: The time at which a batch job for this computation was last kicked off,
+            in milliseconds since the epoch.
+        last_finished_msec: The time at which a batch job for this computation was last completed or
+            failed, in milliseconds since the epoch.
+        last_stopped_msec: The time at which a halt signal was last sent to this batch job, in
+            milliseconds since the epoch.
     """
     # The current status code for the computation.
     status_code = ndb.StringProperty(
