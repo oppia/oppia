@@ -16,12 +16,13 @@
               <h4 translate="I18N_PLAYER_SHARE_THIS_COLLECTION" class="oppia-share-collection-footer"></h4>
             </li>
             <li>
-              <sharing-collection-links ng-click="$event.stopPropagation()"
+              <sharing-links ng-click="$event.stopPropagation()"
                              twitter-text="getTwitterText()"
                              collection-id="collectionId"
                              layout-type="row"
+                             share-type="collection"
                              class="oppia-collection-footer-sharing-links">
-              </sharing-collection-links>
+              </sharing-links>
             </li>
           </ul>
         </div>

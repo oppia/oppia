@@ -365,7 +365,7 @@
 {% block footer %}
   {% if not iframed %}
     {% include 'pages/collection_player/collection_footer_directive.html' %}
-    {% include 'components/share/sharing_collection_links_directive.html' %}
+    {% include 'components/share/sharing_links_directive.html' %}
     <collection-footer twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></collection-footer>
   {% endif %}
 {% endblock %}
@@ -384,7 +384,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/SkillListObjectFactory.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_player/collectionFooterDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/share/SharingCollectionLinksDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/share/SharingLinksDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/attribution_guide/AttributionGuideDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
