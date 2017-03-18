@@ -101,7 +101,7 @@ oppia.directive('multipleChoiceEditor', [
             }
 
             if (foundEmptyField) {
-              return;
+              return false;
             }
 
             var newChoiceIndex = choiceNames.length;
@@ -136,7 +136,10 @@ oppia.directive('multipleChoiceEditor', [
           $scope.saveChoice = function(index, newChoiceValue) {
             if (!newChoiceValue) {
               alertsService.addWarning('Cannot save an empty choice.');
-              return;
+              return {
+                reason: 'Cannot save an empty choice',
+                value: false
+              };
             }
 
             var newCustomizationArgs = $scope.getCustomizationArgs();
@@ -144,13 +147,19 @@ oppia.directive('multipleChoiceEditor', [
 
             if (newChoiceValue === choiceNames[index]) {
               // No change has been made.
-              return;
+              return {
+                reason: 'No choice has been made',
+                value: false
+              };
             }
 
             if (choiceNames.indexOf('newChoiceValue') !== -1) {
               alertsService.addWarning(
                 'Cannot save: this duplicates an existing choice.');
-              return;
+              return {
+                reason: 'This duplicates an existing choice',
+                value: false
+              };
             }
 
             newCustomizationArgs.choices.value[index] = newChoiceValue;

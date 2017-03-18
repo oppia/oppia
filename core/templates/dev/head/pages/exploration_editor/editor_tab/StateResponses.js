@@ -90,6 +90,7 @@ oppia.factory('responsesService', [
       if (updates.dest) {
         answerGroup.outcome.dest = updates.dest;
       }
+      answerGroup.correct = false;
       _saveAnswerGroups(_answerGroups);
     };
 
@@ -563,7 +564,7 @@ oppia.controller('StateResponses', [
 
       $modal.open({
         templateUrl: 'modals/teachOppia',
-        backdrop: true,
+        backdrop: false,
         controller: [
           '$scope', '$modalInstance', 'oppiaExplorationHtmlFormatterService',
           'stateInteractionIdService', 'stateCustomizationArgsService',
@@ -634,8 +635,8 @@ oppia.controller('StateResponses', [
                   var answerGroupIndex = classificationResult.answerGroupIndex;
                   var ruleSpecIndex = classificationResult.ruleSpecIndex;
                   if (answerGroupIndex !==
-                        _state.interaction.answer_groups.length &&
-                      _state.interaction.answer_groups[
+                        _state.interaction.answerGroups.length &&
+                      _state.interaction.answerGroups[
                         answerGroupIndex].ruleSpecs[
                           ruleSpecIndex].rule_type !==
                             CLASSIFIER_RULESPEC_STR) {
@@ -729,7 +730,7 @@ oppia.controller('StateResponses', [
       }).result.then(function(result) {
         // Create a new answer group.
         $scope.answerGroups.push(AnswerGroupObjectFactory.create(
-          [result.tmpRule], result.tmpOutcome));
+          [result.tmpRule], result.tmpOutcome, false));
         responsesService.save($scope.answerGroups, $scope.defaultOutcome);
         $scope.changeActiveAnswerGroupIndex($scope.answerGroups.length - 1);
 
