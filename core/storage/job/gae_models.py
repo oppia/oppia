@@ -97,11 +97,11 @@ class JobModel(base_models.BaseModel):
 
         Args:
             limit: int. A limit on the number of jobs to return.
-            recency_msec: int. A time in milliseconds. After this time a
-                job is considered recent.
+            recency_msec: int. The number of milliseconds eariler
+                than the current time.
 
         Returns:
-            list(Jobs) or None. A list of at most limit jobs
+            list(JobModel) or None. A list of at most limit jobs
             that come after recency_msec time.
         """
         earliest_time_msec = (
@@ -112,13 +112,13 @@ class JobModel(base_models.BaseModel):
 
     @classmethod
     def get_all_unfinished_jobs(cls, limit):
-        """Gets limit number of unfinished jobs.
+        """Gets at most `limit` unfinished jobs.
 
         Args:
             limit: int. A limit on the number of jobs to return.
 
         Returns:
-            list(Jobs) or None. A list of at most limit number
+            list(JobModel) or None. A list of at most limit number
             of unfinished jobs.
         """
         return cls.query().filter(
@@ -133,7 +133,8 @@ class JobModel(base_models.BaseModel):
             job_type: str. The type of jobs that may be unfinished.
 
         Returns:
-            list(Jobs) or None. A list of all jobs that belong to a job_type
+            list(JobModel) or None. A list of all jobs that belong
+            to the given job_type.
         """
         return cls.query().filter(cls.job_type == job_type).filter(
             JobModel.status_code.IN([STATUS_CODE_QUEUED, STATUS_CODE_STARTED]))
@@ -143,7 +144,7 @@ class JobModel(base_models.BaseModel):
         """Checks if unfinished jobs exist.
 
         Returns:
-            bool. True if unfinished jobs exists otherwise false.
+            bool. True if unfinished jobs exist, otherwise false.
         """
         return bool(cls.get_unfinished_jobs(job_type).count(limit=1))
 
