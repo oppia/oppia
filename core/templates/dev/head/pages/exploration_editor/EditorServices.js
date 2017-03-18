@@ -802,15 +802,15 @@ oppia.factory('explorationStatesService', [
 
     // Maps backend names to the corresponding frontend dict accessor lists.
     var PROPERTY_REF_DATA = {
-      answer_groups: ['interaction', 'answer_groups'],
+      answer_groups: ['interaction', 'answerGroups'],
       confirmed_unclassified_answers: [
-        'interaction', 'confirmed_unclassified_answers'],
+        'interaction', 'confirmedUnclassifiedAnswers'],
       content: ['content'],
-      default_outcome: ['interaction', 'default_outcome'],
+      default_outcome: ['interaction', 'defaultOutcome'],
       param_changes: ['paramChanges'],
       fallbacks: ['interaction', 'fallbacks'],
       widget_id: ['interaction', 'id'],
-      widget_customization_args: ['interaction', 'customization_args']
+      widget_customization_args: ['interaction', 'customizationArgs']
     };
 
     var _setState = function(stateName, stateData, refreshGraph) {
@@ -875,7 +875,7 @@ oppia.factory('explorationStatesService', [
         _states = {};
         for (var stateName in states) {
           var stateData = angular.copy(states[stateName]);
-          _states[stateName] = StateObjectFactory.create(
+          _states[stateName] = StateObjectFactory.createFromBackendDict(
             stateName, stateData);
         }
       },
@@ -1038,15 +1038,15 @@ oppia.factory('explorationStatesService', [
           delete _states[deleteStateName];
           for (var otherStateName in _states) {
             var interaction = _states[otherStateName].interaction;
-            var groups = interaction.answer_groups;
+            var groups = interaction.answerGroups;
             for (var i = 0; i < groups.length; i++) {
               if (groups[i].outcome.dest === deleteStateName) {
                 groups[i].outcome.dest = otherStateName;
               }
             }
-            if (interaction.default_outcome) {
-              if (interaction.default_outcome.dest === deleteStateName) {
-                interaction.default_outcome.dest = otherStateName;
+            if (interaction.defaultOutcome) {
+              if (interaction.defaultOutcome.dest === deleteStateName) {
+                interaction.defaultOutcome.dest = otherStateName;
               }
             }
 
@@ -1089,15 +1089,15 @@ oppia.factory('explorationStatesService', [
 
         for (var otherStateName in _states) {
           var interaction = _states[otherStateName].interaction;
-          var groups = interaction.answer_groups;
+          var groups = interaction.answerGroups;
           for (var i = 0; i < groups.length; i++) {
             if (groups[i].outcome.dest === oldStateName) {
               groups[i].outcome.dest = newStateName;
             }
           }
-          if (interaction.default_outcome) {
-            if (interaction.default_outcome.dest === oldStateName) {
-              interaction.default_outcome.dest = newStateName;
+          if (interaction.defaultOutcome) {
+            if (interaction.defaultOutcome.dest === oldStateName) {
+              interaction.defaultOutcome.dest = newStateName;
             }
           }
 
@@ -1637,7 +1637,6 @@ oppia.factory('explorationGadgetsService', [
 ]);
 
 // A service that returns the frontend representation of a newly-added state.
-// TODO: refactor into factory as StateObjectFactory.createNewState()
 oppia.factory('newStateTemplateService',
   ['StateObjectFactory', function(StateObjectFactory) {
     return {
@@ -1647,12 +1646,13 @@ oppia.factory('newStateTemplateService',
       // NB: clients should ensure that the desired state name is valid.
       getNewStateTemplate: function(newStateName) {
         var newStateTemplate = angular.copy(GLOBALS.NEW_STATE_TEMPLATE);
-        var newState = StateObjectFactory.create(newStateName, {
+        var newState = StateObjectFactory.createFromBackendDict(newStateName, {
+          classifier_model_id: newStateTemplate.classifier_model_id,
           content: newStateTemplate.content,
           interaction: newStateTemplate.interaction,
           param_changes: newStateTemplate.param_changes
         });
-        newState.interaction.default_outcome.dest = newStateName;
+        newState.interaction.defaultOutcome.dest = newStateName;
         return newState;
       }
     };
@@ -1674,7 +1674,7 @@ oppia.factory('computeGraphService', [
         nodes[stateName] = stateName;
 
         if (interaction.id) {
-          var groups = interaction.answer_groups;
+          var groups = interaction.answerGroups;
           for (var h = 0; h < groups.length; h++) {
             links.push({
               source: stateName,
@@ -1683,10 +1683,10 @@ oppia.factory('computeGraphService', [
             });
           }
 
-          if (interaction.default_outcome) {
+          if (interaction.defaultOutcome) {
             links.push({
               source: stateName,
-              target: interaction.default_outcome.dest,
+              target: interaction.defaultOutcome.dest,
               isFallback: false
             });
           }
@@ -1926,7 +1926,7 @@ oppia.factory('explorationWarningsService', [
 
     var _getAnswerGroupIndexesWithEmptyClassifiers = function(state) {
       var indexes = [];
-      var answerGroups = state.interaction.answer_groups;
+      var answerGroups = state.interaction.answerGroups;
       for (var i = 0; i < answerGroups.length; i++) {
         var group = answerGroups[i];
         if (group.ruleSpecs.length === 1 &&
@@ -1972,8 +1972,8 @@ oppia.factory('explorationWarningsService', [
             'oppiaInteractive' + _states[stateName].interaction.id +
             'Validator');
           var interactionWarnings = $filter(validatorName)(
-            stateName, interaction.customization_args,
-            interaction.answer_groups, interaction.default_outcome);
+            stateName, interaction.customizationArgs,
+            interaction.answerGroups, interaction.defaultOutcome);
 
           for (var j = 0; j < interactionWarnings.length; j++) {
             if (stateWarnings.hasOwnProperty(stateName)) {

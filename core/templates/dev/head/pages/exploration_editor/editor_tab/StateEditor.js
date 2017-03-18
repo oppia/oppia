@@ -320,13 +320,13 @@ oppia.factory('trainingDataService', [
         var potentialOutcomes = [];
         var interaction = state.interaction;
 
-        for (var i = 0; i < interaction.answer_groups.length; i++) {
-          potentialOutcomes.push(interaction.answer_groups[i].outcome);
+        for (var i = 0; i < interaction.answerGroups.length; i++) {
+          potentialOutcomes.push(interaction.answerGroups[i].outcome);
         }
 
-        if (interaction.default_outcome) {
-          var outcome = interaction.default_outcome;
-          potentialOutcomes.push(interaction.default_outcome);
+        if (interaction.defaultOutcome) {
+          var outcome = interaction.defaultOutcome;
+          potentialOutcomes.push(interaction.defaultOutcome);
         }
 
         return potentialOutcomes;
@@ -464,7 +464,7 @@ oppia.directive('trainingPanel', [function() {
           if ($scope.classification.newOutcome) {
             // Create a new answer group with the given feedback.
             var answerGroups = responsesService.getAnswerGroups();
-            answerGroups.push(AnswerGroupObjectFactory.create(
+            answerGroups.push(AnswerGroupObjectFactory.createNew(
               [], angular.copy($scope.classification.newOutcome), false));
             responsesService.save(
               answerGroups, responsesService.getDefaultOutcome());
