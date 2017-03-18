@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2017 The Oppia Authors. All Rights Reserved.
+# Copyright 201/c7 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import feconf
 search_services = models.Registry.import_search_services()
 
 
-class CollectionMigrationJobManagerTest(test_utils.GenericTestBase):
+class CollectionMigrationJobTest(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -38,7 +38,7 @@ class CollectionMigrationJobManagerTest(test_utils.GenericTestBase):
     EXP_ID = 'exp_id'
 
     def setUp(self):
-        super(CollectionMigrationJobManagerTest, self).setUp()
+        super(CollectionMigrationJobTest, self).setUp()
 
         # Setup user who will own the test collections.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -110,16 +110,15 @@ class CollectionMigrationJobManagerTest(test_utils.GenericTestBase):
 
     def test_migration_job_migrates_collection_nodes(self):
         """Tests that the collection migration job migrates content from
-        nodes to collection_content if collection_content is empty.
+        nodes to collection_contents if collection_contents is empty.
         """
         # Create an exploration to put in the collection.
-        self.save_new_valid_exploration(
-            self.EXP_ID, self.albert_id, title='Exploration Title')
+        self.save_new_default_exploration(self.EXP_ID, self.albert_id)
         node = collection_domain.CollectionNode.create_default_node(self.EXP_ID)
 
         # Create a collection directly using the model, so that the collection
         # nodes are stored in the 'nodes' property rather than the
-        # 'collection_content' property.
+        # 'collection_contents' property.
         collection_title = 'A title'
         collection_category = 'A category'
         rights_manager.create_new_collection_rights(
@@ -139,10 +138,10 @@ class CollectionMigrationJobManagerTest(test_utils.GenericTestBase):
             'category': collection_category,
         }])
 
-        # Check that collection_content is empty
-        self.assertEqual(model.collection_content, {})
+        # Check that collection_contents is empty
+        self.assertEqual(model.collection_contents, {})
 
-        # Run the job. This should populate collection_content.
+        # Run the job. This should populate collection_contents.
         job_id = (
             collection_jobs_one_off.CollectionMigrationJobManager.create_new())
         collection_jobs_one_off.CollectionMigrationJobManager.enqueue(job_id)
@@ -150,4 +149,4 @@ class CollectionMigrationJobManagerTest(test_utils.GenericTestBase):
 
         new_model = collection_models.CollectionModel.get(self.COLLECTION_ID)
         self.assertEqual(
-            new_model.collection_content, {'nodes': [node.to_dict()]})
+            new_model.collection_contents, {'nodes': [node.to_dict()]})

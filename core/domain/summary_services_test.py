@@ -509,7 +509,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         # The author's private exploration will be contained in the public
         # collection since invalid explorations are being allowed, but the
         # private exploration of another author will not.
-        collection_node_dicts = collection_dict['collection_content']['nodes']
+        collection_node_dicts = collection_dict['nodes']
         self.assertEqual(
             collection_node_dicts[0]['exploration_summary']['id'],
             self.EXP_ID)

@@ -658,6 +658,11 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
                 'new_value': 'New title'
             }], 'Did migration.')
 
+        # Check that the version of the collection is incremented
+        collection = collection_services.get_collection_by_id(
+            self.COLLECTION_ID)
+        self.assertEqual(collection.version, 2)
+
 
 class LoadingAndDeletionOfCollectionDemosTest(CollectionServicesUnitTests):
 

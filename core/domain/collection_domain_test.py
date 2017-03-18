@@ -30,13 +30,12 @@ import utils
 # utils.dict_from_yaml can isolate differences quickly.
 
 SAMPLE_YAML_CONTENT = ("""category: A category
-collection_content:
-  nodes:
-  - acquired_skills:
-    - Skill0a
-    - Skill0b
-    exploration_id: an_exploration_id
-    prerequisite_skills: []
+nodes:
+- acquired_skills:
+- Skill0a
+- Skill0b
+  exploration_id: an_exploration_id
+  prerequisite_skills: []
 language_code: en
 objective: An objective
 schema_version: %d
@@ -579,8 +578,8 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
     Collection domain object class.
     """
 
-    def test_correct_collection_content_schema_conversion_methods_exist(self):
-        """Test that the right collection_content schema conversion methods
+    def test_correct_collection_contents_schema_conversion_methods_exist(self):
+        """Test that the right collection_contents schema conversion methods
         exist.
         """
         current_collection_schema_version = (
@@ -588,12 +587,12 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         for version_num in range(1, current_collection_schema_version):
             self.assertTrue(hasattr(
                 collection_domain.Collection,
-                '_convert_collection_content_v%s_dict_to_v%s_dict' % (
+                '_convert_collection_contents_v%s_dict_to_v%s_dict' % (
                     version_num, version_num + 1)))
 
         self.assertFalse(hasattr(
             collection_domain.Collection,
-            '_convert_collection_content_v%s_dict_to_v%s_dict' % (
+            '_convert_collection_contents_v%s_dict_to_v%s_dict' % (
                 current_collection_schema_version,
                 current_collection_schema_version + 1)))
 
@@ -619,11 +618,10 @@ class SchemaMigrationUnitTests(test_utils.GenericTestBase):
     """Test migration methods for yaml content."""
 
     YAML_CONTENT_V1 = ("""category: A category
-collection_content:
-  nodes:
-  - acquired_skills:
-    - Skill1
-    - Skill2
+nodes:
+- acquired_skills:
+  - Skill1
+  - Skill2
     exploration_id: Exp1
     prerequisite_skills: []
 objective: ''
@@ -631,11 +629,10 @@ schema_version: 1
 title: A title
 """)
     YAML_CONTENT_V2 = ("""category: A category
-collection_content:
-  nodes:
-  - acquired_skills:
-    - Skill1
-    - Skill2
+nodes:
+- acquired_skills:
+  - Skill1
+  - Skill2
     exploration_id: Exp1
     prerequisite_skills: []
 language_code: en

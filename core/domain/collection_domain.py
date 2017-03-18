@@ -272,7 +272,7 @@ class Collection(object):
         function will need to be added to this class to convert from the
         current schema version to the new one. This function should be called
         in both from_yaml in this class and
-        collection_services._migrate_collection_content_to_latest_schema.
+        collection_services._migrate_collection_contents_to_latest_schema.
         feconf.CURRENT_COLLECTION_SCHEMA_VERSION should be incremented and the
         new value should be saved in the collection after the migration
         process, ensuring it represents the latest schema version.
@@ -298,9 +298,9 @@ class Collection(object):
             'language_code': self.language_code,
             'tags': self.tags,
             'schema_version': self.schema_version,
-            'collection_content': {
-                'nodes': [node.to_dict() for node in self.nodes]
-            }
+            'nodes': [
+                node.to_dict() for node in self.nodes
+            ]
         }
 
     @classmethod
@@ -324,7 +324,7 @@ class Collection(object):
             collection_dict['schema_version'], [], collection_version,
             collection_created_on, collection_last_updated)
 
-        for node_dict in collection_dict['collection_content']['nodes']:
+        for node_dict in collection_dict['nodes']:
             collection.nodes.append(
                 CollectionNode.from_dict(node_dict))
 
@@ -380,30 +380,31 @@ class Collection(object):
         return Collection.from_dict(collection_dict)
 
     @classmethod
-    def _convert_collection_content_v1_dict_to_v2_dict(cls, collection_content):
+    def _convert_collection_contents_v1_dict_to_v2_dict(
+            cls, collection_contents):
         """Converts from version 1 to 2. Does nothing since this migration only
         changes the language code.
         """
-        return collection_content
+        return collection_contents
 
     @classmethod
-    def update_collection_content_from_model(
-            cls, versioned_collection_content, current_version):
+    def update_collection_contents_from_model(
+            cls, versioned_collection_contents, current_version):
         """Converts the states blob contained in the given
-        versioned_collection_content dict from current_version to
+        versioned_collection_contents dict from current_version to
         current_version + 1.
 
-        Note that the versioned_collection_content being passed in is modified
+        Note that the versioned_collection_contents being passed in is modified
         in-place.
         """
-        versioned_collection_content['schema_version'] = (
+        versioned_collection_contents['schema_version'] = (
             current_version + 1)
 
         conversion_fn = getattr(
-            cls, '_convert_collection_content_v%s_dict_to_v%s_dict' % (
+            cls, '_convert_collection_contents_v%s_dict_to_v%s_dict' % (
                 current_version, current_version + 1))
-        versioned_collection_content['collection_content'] = conversion_fn(
-            versioned_collection_content['collection_content'])
+        versioned_collection_contents['collection_contents'] = conversion_fn(
+            versioned_collection_contents['collection_contents'])
 
     @property
     def skills(self):

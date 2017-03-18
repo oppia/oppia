@@ -130,7 +130,7 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
         # Verify there are 5 explorations in this collection, the initial
         # explorations to be completed, and that there are no explorations
         # currently completed within the context of this collection.
-        self.assertEqual(len(collection_dict['collection_content']['nodes']), 5)
+        self.assertEqual(len(collection_dict['nodes']), 5)
 
         playthrough_dict = collection_dict['playthrough_dict']
         self.assertEqual(playthrough_dict['next_exploration_ids'], ['0'])

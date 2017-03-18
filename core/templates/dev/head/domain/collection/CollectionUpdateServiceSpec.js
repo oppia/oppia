@@ -43,14 +43,12 @@ describe('Collection update service', function() {
       tags: [],
       category: 'a category',
       version: '1',
-      collection_content: {
-        nodes: [{
-          exploration_id: 'exp_id0',
-          prerequisite_skills: [],
-          acquired_skills: [],
-          exploration: {}
-        }]
-      }
+      nodes: [{
+        exploration_id: 'exp_id0',
+        prerequisite_skills: [],
+        acquired_skills: [],
+        exploration: {}
+      }]
     };
     _sampleCollection = CollectionObjectFactory.create(
       sampleCollectionBackendObject);
