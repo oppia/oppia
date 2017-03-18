@@ -22,10 +22,10 @@ oppia.directive('sharingLinks', [function() {
     scope: {
       layoutType: '@',
       layoutAlignType: '@',
-      shareType : '@',
+      shareType: '@',
       getTwitterText: '&twitterText',
       getExplorationId: '&explorationId',
-      getCollectionId: '&collectionId',
+      getCollectionId: '&collectionId'
     },
     templateUrl: 'components/sharingLinks',
     controller: [
@@ -34,11 +34,10 @@ oppia.directive('sharingLinks', [function() {
       function(
           $scope, $window, $injector, oppiaHtmlEscaper,
           siteAnalyticsService, UrlInterpolationService) {
-
-        if($scope.shareType === "exploration") {
-
+        if ($scope.shareType === 'exploration') {
           $scope.explorationId = $scope.getExplorationId();
-          var ExplorationEmbedButtonService = $injector.get('ExplorationEmbedButtonService'); 
+          var ExplorationEmbedButtonService = $injector.get(
+            'ExplorationEmbedButtonService');
 
           $scope.registerShareExplorationEvent = function(network) {
             siteAnalyticsService.registerShareExplorationEvent(network);
@@ -46,8 +45,7 @@ oppia.directive('sharingLinks', [function() {
 
           $scope.showEmbedExplorationModal = (
             ExplorationEmbedButtonService.showModal);
-        }
-        else {
+        } else {
           $scope.collectionId = $scope.getCollectionId();
 
           $scope.registerShareCollectionEvent = function(network) {
@@ -58,18 +56,17 @@ oppia.directive('sharingLinks', [function() {
         $scope.serverName = (
           $window.location.protocol + '//' + $window.location.host);
 
-          $scope.escapedTwitterText = (
+        $scope.escapedTwitterText = (
             oppiaHtmlEscaper.unescapedStrToEscapedStr($scope.getTwitterText()));
 
-          $scope.gplusUrl = UrlInterpolationService.getStaticImageUrl(
+        $scope.gplusUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/gplus.png');
 
-          $scope.fbUrl = UrlInterpolationService.getStaticImageUrl(
+        $scope.fbUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/fb.png');
 
-          $scope.twitterUrl = UrlInterpolationService.getStaticImageUrl(
+        $scope.twitterUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/twitter.png');
-
       }
     ]
   };
