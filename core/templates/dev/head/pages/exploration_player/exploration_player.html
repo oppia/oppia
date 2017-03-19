@@ -99,16 +99,16 @@
       <h3>Suggest a Change</h3>
     </div>
 
-    <div class="modal-body">
+    <div class="modal-body protractor-test-exploration-suggestion-modal">
       <text-angular-rte ng-show="showEditor" html-content="suggestionContent"></text-angular-rte>
       <br>
       Briefly describe your changes (required):
-      <input type="text" ng-model="description" style="width: 100%">
+      <input type="text" ng-model="description" class="protractor-test-suggestion-description-input" style="width: 100%">
     </div>
 
     <div class="modal-footer">
       <button class="btn btn-default" ng-click="cancelSuggestion()">Cancel</button>
-      <button class="btn btn-success" ng-click="submitSuggestion()" ng-disabled="(initContent == suggestionContent) || !description">
+      <button class="btn btn-success protractor-test-suggestion-submit-btn" ng-click="submitSuggestion()" ng-disabled="(initContent == suggestionContent) || !description">
         Submit Suggestion
       </button>
     </div>
