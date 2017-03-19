@@ -1046,7 +1046,8 @@ def update_exploration(
     user_services.add_edited_exploration_id(committer_id, exploration.id)
     user_services.record_user_edited_an_exploration(committer_id)
 
-    if not rights_manager.is_exploration_private(exploration.id):
+    if (not rights_manager.is_exploration_private(exploration.id) and
+            committer_id != feconf.MIGRATION_BOT_USER_ID):
         user_services.update_first_contribution_msec_if_not_set(
             committer_id, utils.get_current_time_in_millisecs())
 
