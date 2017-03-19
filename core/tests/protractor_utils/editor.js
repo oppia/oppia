@@ -1066,6 +1066,19 @@ var enableFallbacks = function() {
   });
 };
 
+var openAndClosePreviewSummaryTile = function() {
+  runFromSettingsTab(function() {
+    element(by.css('.protractor-test-open-preview-summary-modal')).click();
+    general.waitForSystem();
+    expect(element(by.css(
+      '.protractor-test-exploration-summary-tile')).isPresent()).toBeTruthy();
+    element(by.css('.protractor-test-close-preview-summary-modal')).click();
+    general.waitForSystem();
+    expect(element(by.css(
+      '.protractor-test-exploration-summary-tile')).isPresent()).toBeFalsy();
+  });
+};
+
 // CONTROLS
 
 var saveChanges = function(commitMessage) {
@@ -1349,6 +1362,42 @@ var _runFromFeedbackTab = function(callbackFunction) {
   return result;
 };
 
+var getSuggestionThreads = function() {
+  return _runFromFeedbackTab(function() {
+    var suggestionRowClassName = '.protractor-test-oppia-feedback-tab-row';
+    var threads = [];
+
+    return element.all(by.css(suggestionRowClassName)).then(function(rows) {
+      rows.forEach(function() {
+        element(by.css('.protractor-test-exploration-feedback-subject'))
+          .getText().then(function(subject) {
+            threads.push(subject);
+          });
+      });
+      return threads;
+    });
+  });
+};
+
+var acceptSuggestion = function(suggestionDescription) {
+  return _runFromFeedbackTab(function() {
+    var suggestionRowClassName = '.protractor-test-oppia-feedback-tab-row';
+    element.all(by.css(suggestionRowClassName)).then(function(rows) {
+      var matchingSuggestionRows = rows.filter(function() {
+        return element(by.css('.protractor-test-exploration-feedback-subject')).
+          getText().then(function(subject) {
+            return suggestionDescription.indexOf(subject) !== -1;
+          });
+      });
+
+      matchingSuggestionRows[0].click();
+      element(by.css('.protractor-test-view-suggestion-btn')).click();
+      element(by.css('.protractor-test-exploration-accept-suggestion-btn')).
+        click();
+    });
+  });
+};
+
 var readFeedbackMessages = function() {
   return _runFromFeedbackTab(function() {
     var feedbackRowClassName = '.protractor-test-oppia-feedback-tab-row';
@@ -1445,6 +1494,7 @@ exports.setFirstState = setFirstState;
 exports.enableParameters = enableParameters;
 exports.enableGadgets = enableGadgets;
 exports.enableFallbacks = enableFallbacks;
+exports.openAndClosePreviewSummaryTile = openAndClosePreviewSummaryTile;
 
 exports.saveChanges = saveChanges;
 exports.discardChanges = discardChanges;
@@ -1456,3 +1506,6 @@ exports.revertToVersion = revertToVersion;
 
 exports.readFeedbackMessages = readFeedbackMessages;
 exports.sendResponseToLatestFeedback = sendResponseToLatestFeedback;
+
+exports.getSuggestionThreads = getSuggestionThreads;
+exports.acceptSuggestion = acceptSuggestion;

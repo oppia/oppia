@@ -107,19 +107,29 @@ oppia.directive('explorationSummaryTile', [function() {
         $scope.MAX_AVATARS_TO_DISPLAY = 5;
 
         $scope.getAverageRating = function() {
+          if (!$scope.getRatings()) {
+            return null;
+          }
           return RatingComputationService.computeAverageRating(
             $scope.getRatings());
         };
 
         $scope.getLastUpdatedDatetime = function() {
+          if (!$scope.getLastUpdatedMsec()) {
+            return null;
+          }
           return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
             $scope.getLastUpdatedMsec());
         };
 
         $scope.getExplorationLink = function() {
-          var result = '/explore/' + $scope.getExplorationId();
-          if ($scope.getCollectionId()) {
-            result += ('?collection_id=' + $scope.getCollectionId());
+          if (!$scope.getExplorationId()) {
+            return '#';
+          } else {
+            var result = '/explore/' + $scope.getExplorationId();
+            if ($scope.getCollectionId()) {
+              result += ('?collection_id=' + $scope.getCollectionId());
+            }
           }
           return result;
         };

@@ -24,19 +24,20 @@ oppia.factory('ExplorationObjectFactory', [
       INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE, StateObjectFactory,
       UrlInterpolationService) {
     var Exploration = function(
-        initStateName, paramChanges, paramSpecs, skinCustomizations, states,
-        title, languageCode) {
+        initStateName, paramChangesBackendList, paramSpecsBackendDict,
+        skinCustomizationsBackendDict, statesBackendDict, title,
+        languageCode) {
       this.initStateName = initStateName;
-      this.paramChanges = paramChanges;
-      this.paramSpecs = paramSpecs;
-      this.skinCustomizations = skinCustomizations;
+      this.paramChanges = paramChangesBackendList;
+      this.paramSpecs = paramSpecsBackendDict;
+      this.skinCustomizations = skinCustomizationsBackendDict;
       this.title = title;
       this.languageCode = languageCode;
 
       this.states = {};
-      for (var stateName in states) {
-        this.states[stateName] = StateObjectFactory.create(
-          stateName, states[stateName]);
+      for (var stateName in statesBackendDict) {
+        this.states[stateName] = StateObjectFactory.createFromBackendDict(
+          stateName, statesBackendDict[stateName]);
       }
     };
 
@@ -68,7 +69,7 @@ oppia.factory('ExplorationObjectFactory', [
 
     Exploration.prototype.getInteractionCustomizationArgs =
       function(stateName) {
-        return this.states[stateName].interaction.customization_args;
+        return this.states[stateName].interaction.customizationArgs;
       };
 
     Exploration.prototype.getInteractionInstructions = function(stateName) {
@@ -127,15 +128,15 @@ oppia.factory('ExplorationObjectFactory', [
 
     // Static class methods. Note that "this" is not available in
     // static contexts.
-    Exploration.create = function(explorationDict) {
+    Exploration.createFromBackendDict = function(explorationBackendDict) {
       return new Exploration(
-        explorationDict.init_state_name,
-        explorationDict.param_changes,
-        explorationDict.param_specs,
-        explorationDict.skin_customizations,
-        explorationDict.states,
-        explorationDict.title,
-        explorationDict.language_code);
+        explorationBackendDict.init_state_name,
+        explorationBackendDict.param_changes,
+        explorationBackendDict.param_specs,
+        explorationBackendDict.skin_customizations,
+        explorationBackendDict.states,
+        explorationBackendDict.title,
+        explorationBackendDict.language_code);
     };
 
     return Exploration;
