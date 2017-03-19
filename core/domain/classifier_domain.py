@@ -165,4 +165,3 @@ class Classifier(object):
         sc = classifier_registry.ClassifierRegistry.get_classifier_by_id(
             self.algorithm_id)
         sc.validate(self.cached_classifier_data)
-
