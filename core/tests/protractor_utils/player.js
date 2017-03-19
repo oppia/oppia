@@ -156,7 +156,7 @@ var fillInSuggestion = function(suggestion) {
   richTextEditor.setPlainText(suggestion);
 };
 
-var addsuggestionDescription = function(description) {
+var addSuggestionDescription = function(description) {
   element(by.css('.protractor-test-suggestion-description-input')).
     sendKeys(description);
 };
@@ -164,7 +164,7 @@ var addsuggestionDescription = function(description) {
 var submitSuggestion = function(suggestion, description) {
   openSuggestionPopup();
   fillInSuggestion(suggestion);
-  addsuggestionDescription(description);
+  addSuggestionDescription(description);
   element(by.css('.protractor-test-suggestion-submit-btn')).click();
   general.waitForSystem();
 };
