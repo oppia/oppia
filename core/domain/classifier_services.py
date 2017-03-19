@@ -181,7 +181,7 @@ def _update_classifier(classifier_model, state_name):
 
     Args:
         classifier_model: Classifier model instance in datastore.
-        classifier: Domain object for the classifier.
+        state_name: The name of the state.
 
     Note: All of the properties of a classifier are immutable,
     except for state_name.
@@ -201,14 +201,15 @@ def save_classifier(classifier):
     Returns:
         classifier_id: str. ID of the classifier.
     """
+    classifier_id = classifier.id
     classifier_model = classifier_models.ClassifierModel.get(
-        classifier.id, False)
+        classifier_id, False)
     classifier.validate()
     if classifier_model is None:
-        classifier.id = _create_classifier(classifier)
+        classifier_id = _create_classifier(classifier)
     else:
         _update_classifier(classifier_model, classifier.state_name)
-    return classifier.id
+    return classifier_id
 
 
 def delete_classifier(classifier_id):

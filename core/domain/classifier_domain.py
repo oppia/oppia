@@ -17,6 +17,9 @@
 import copy
 import feconf
 import utils
+from core.platform import models
+
+(classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
 
 class Classifier(object):
     """Domain object for a classifier.
@@ -58,13 +61,51 @@ class Classifier(object):
             data_schema_version: int. Schema version of the
                 data used by the classifier.
         """
-        self.id = classifier_id
-        self.exp_id = exp_id
-        self.exp_version_when_created = exp_version_when_created
-        self.state_name = state_name
-        self.algorithm_id = algorithm_id
-        self.cached_classifier_data = copy.deepcopy(cached_classifier_data)
-        self.data_schema_version = data_schema_version
+        self._id = classifier_id
+        self._exp_id = exp_id
+        self._exp_version_when_created = exp_version_when_created
+        self._state_name = state_name
+        self._algorithm_id = algorithm_id
+        self._cached_classifier_data = copy.deepcopy(cached_classifier_data)
+        self._data_schema_version = data_schema_version
+
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def exp_id(self):
+        return self._exp_id
+
+    @property
+    def exp_version_when_created(self):
+        return self._exp_version_when_created
+
+    @property
+    def state_name(self):
+        return self._state_name
+
+    @property
+    def algorithm_id(self):
+        return self._algorithm_id
+
+    @property
+    def cached_classifier_data(self):
+        return self._cached_classifier_data
+
+    @property
+    def data_schema_version(self):
+        return self._data_schema_version
+
+    def update_state_name(self, state_name):
+        """Updates the state_name attribute of the Classifier domain object.
+        
+        Args:
+            state_name: str. The name of the updated state to which the
+            classifier belongs.
+        """
+
+        self._state_name = state_name
 
     def to_dict(self):
         """Constructs a dict representation of Classifier domain object.
@@ -74,13 +115,13 @@ class Classifier(object):
         """
 
         return {
-            'classifier_id': self.id,
-            'exp_id': self.exp_id,
-            'exp_version_when_created': self.exp_version_when_created,
-            'state_name': self.state_name,
-            'algorithm_id': self.algorithm_id,
-            'cached_classifier_data': self.cached_classifier_data,
-            'data_schema_version': self.data_schema_version
+            'classifier_id': self._id,
+            'exp_id': self._exp_id,
+            'exp_version_when_created': self._exp_version_when_created,
+            'state_name': self._state_name,
+            'algorithm_id': self._algorithm_id,
+            'cached_classifier_data': self._cached_classifier_data,
+            'data_schema_version': self._data_schema_version
         }
 
     def validate(self):

@@ -139,7 +139,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             classifier_id)
         self.assertEqual(classifier.exp_id, exp_id)
         self.assertEqual(classifier.state_name, state)
-        classifier.state_name = test_state
+        classifier.update_state_name(test_state)
         classifier_services.save_classifier(classifier)
         classifier = classifier_services.get_classifier_by_id(
             classifier_id)
