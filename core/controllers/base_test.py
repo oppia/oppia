@@ -25,6 +25,7 @@ import types
 from core.controllers import base
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -36,6 +37,7 @@ import webapp2
 import webtest
 
 current_user_services = models.Registry.import_current_user_services()
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 FORTY_EIGHT_HOURS_IN_SECS = 48 * 60 * 60
 PADDING = 1
@@ -123,6 +125,23 @@ class BaseHandlerTest(test_utils.GenericTestBase):
 
     def test_root_redirect_rules_for_logged_in_learners(self):
         self.login(self.TEST_LEARNER_EMAIL)
+
+        # Since no exploration has been created, going to '/' should redirect
+        # to the library page.
+        response = self.testapp.get('/')
+        self.assertEqual(response.status_int, 302)
+        self.assertIn('library', response.headers['location'])
+        self.logout()
+
+    def test_root_redirect_rules_for_users_with_no_user_contribution_model(
+            self):
+        self.login(self.TEST_LEARNER_EMAIL)
+        # delete the UserContributionModel
+        user_id = user_services.get_user_id_from_username(
+            self.TEST_LEARNER_USERNAME)
+        user_contribution_model = user_models.UserContributionsModel.get(
+            user_id)
+        user_contribution_model.delete()
 
         # Since no exploration has been created, going to '/' should redirect
         # to the library page.

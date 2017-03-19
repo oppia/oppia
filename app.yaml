@@ -32,6 +32,7 @@ handlers:
 - url: /build
   static_dir: build
   secure: always
+  expiration: 30d
   http_headers:
     Cache-Control: 'public, max-age=2592000'
 - url: /assets/common
