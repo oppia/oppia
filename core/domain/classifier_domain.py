@@ -99,7 +99,7 @@ class Classifier(object):
 
     def update_state_name(self, state_name):
         """Updates the state_name attribute of the Classifier domain object.
-        
+
         Args:
             state_name: str. The name of the updated state to which the
             classifier belongs.
