@@ -566,14 +566,16 @@ oppia.controller('StateResponses', [
         templateUrl: 'modals/teachOppia',
         backdrop: false,
         controller: [
-          '$scope', '$modalInstance', 'oppiaExplorationHtmlFormatterService',
+          '$scope', '$injector', '$modalInstance',
+          'oppiaExplorationHtmlFormatterService',
           'stateInteractionIdService', 'stateCustomizationArgsService',
           'explorationContextService', 'editorContextService',
           'explorationStatesService', 'trainingDataService',
           'AnswerClassificationService', 'focusService', 'DEFAULT_RULE_NAME',
           'CLASSIFIER_RULESPEC_STR',
           function(
-              $scope, $modalInstance, oppiaExplorationHtmlFormatterService,
+              $scope, $injector, $modalInstance,
+              oppiaExplorationHtmlFormatterService,
               stateInteractionIdService, stateCustomizationArgsService,
               explorationContextService, editorContextService,
               explorationStatesService, trainingDataService,
@@ -595,6 +597,15 @@ oppia.controller('StateResponses', [
             $scope.trainingDataAnswer = '';
             $scope.trainingDataFeedback = '';
             $scope.trainingDataOutcomeDest = '';
+
+            // Retrieve the interaction ID.
+            var interactionId = stateInteractionIdService.savedMemento;
+
+            var rulesServiceName = interactionId.charAt(0).toLowerCase() +
+              interactionId.slice(1) + 'RulesService';
+
+            // Inject RulesService dynamically.
+            var rulesService = $injector.get(rulesServiceName);
 
             // See the training panel directive in StateEditor for an
             // explanation on the structure of this object.
@@ -618,7 +629,8 @@ oppia.controller('StateResponses', [
                   stateCustomizationArgsService.savedMemento));
 
               AnswerClassificationService.getMatchingClassificationResult(
-                _explorationId, _state, answer, true).then(
+                _explorationId, _state, answer, true,
+                rulesService).then(
                     function(classificationResult) {
                   var feedback = 'Nothing';
                   var dest = classificationResult.outcome.dest;
