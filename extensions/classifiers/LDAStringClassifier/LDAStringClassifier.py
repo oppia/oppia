@@ -610,79 +610,79 @@ class LDAStringClassifier(BaseClassifier):
         if not isinstance(classifier_data['_alpha'], float):
             raise utils.ValidationError(
                 ('Expected alpha to be a float, received %f' %
-                classifier_data['_alpha']))
+                 classifier_data['_alpha']))
 
         if not isinstance(classifier_data['_beta'], float):
             raise utils.ValidationError(
                 ('Expected beta to be a float, received %f' %
-                classifier_data['_beta']))
+                 classifier_data['_beta']))
 
         if not isinstance(classifier_data['_prediction_threshold'], float):
             raise utils.ValidationError(
                 ('Expected prediction_threshold to be a float, received %f' %
-                classifier_data['_prediction_threshold']))
+                 classifier_data['_prediction_threshold']))
 
         if not isinstance(classifier_data['_training_iterations'], int):
             raise utils.ValidationError(
                 ('Expected training_iterations to be a int, received %d' %
-                classifier_data['_training_iterations']))
+                 classifier_data['_training_iterations']))
 
         if not isinstance(classifier_data['_prediction_iterations'], int):
             raise utils.ValidationError(
                 ('Expected prediction_iterations to be a int, received %d' %
-                classifier_data['_prediction_iterations']))
+                 classifier_data['_prediction_iterations']))
 
         if not isinstance(classifier_data['_num_labels'], int):
             raise utils.ValidationError(
                 ('Expected num_labels to be a int, received %d' %
-                classifier_data['_num_labels']))
+                 classifier_data['_num_labels']))
 
         if not isinstance(classifier_data['_num_docs'], int):
             raise utils.ValidationError(
                 ('Expected num_docs to be a int, received %d' %
-                classifier_data['_num_docs']))
+                 classifier_data['_num_docs']))
 
         if not isinstance(classifier_data['_num_words'], int):
             raise utils.ValidationError(
                 ('Expected num_words to be a int, received %d' %
-                classifier_data['_num_words']))
+                 classifier_data['_num_words']))
 
         if not isinstance(classifier_data['_label_to_id'], dict):
             raise utils.ValidationError(
                 ('Expected label_to_id to be a dict, received %s' %
-                classifier_data['_label_to_id']))
+                 classifier_data['_label_to_id']))
 
         if not isinstance(classifier_data['_word_to_id'], dict):
             raise utils.ValidationError(
                 ('Expected word_to_id to be a dict, received %s' %
-                classifier_data['_word_to_id']))
+                 classifier_data['_word_to_id']))
 
         if not isinstance(classifier_data['_w_dp'], list):
             raise utils.ValidationError(
                 ('Expected w_dp to be a list, received %s' %
-                classifier_data['_w_dp']))
+                 classifier_data['_w_dp']))
 
         if not isinstance(classifier_data['_b_dl'], list):
             raise utils.ValidationError(
                 ('Expected b_dl to be a list, received %s' %
-                classifier_data['_b_dl']))
+                 classifier_data['_b_dl']))
 
         if not isinstance(classifier_data['_l_dp'], list):
             raise utils.ValidationError(
                 ('Expected l_dp to be a list, received %s' %
-                classifier_data['_l_dp']))
+                 classifier_data['_l_dp']))
 
         if not isinstance(classifier_data['_c_dl'], list):
             raise utils.ValidationError(
                 ('Expected c_dl to be a list, received %s' %
-                classifier_data['_c_dl']))
+                 classifier_data['_c_dl']))
 
         if not isinstance(classifier_data['_c_lw'], list):
             raise utils.ValidationError(
                 ('Expected c_lw to be a list, received %s' %
-                classifier_data['_c_lw']))
+                 classifier_data['_c_lw']))
 
         if not isinstance(classifier_data['_c_l'], list):
             raise utils.ValidationError(
                 ('Expected c_l to be a list, received %s' %
-                classifier_data['_c_l']))
+                 classifier_data['_c_l']))
