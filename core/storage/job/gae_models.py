@@ -97,11 +97,11 @@ class JobModel(base_models.BaseModel):
 
         Args:
             limit: int. A limit on the number of jobs to return.
-            recency_msec: int. The number of milliseconds eariler
+            recency_msec: int. The number of milliseconds earlier
                 than the current time.
 
         Returns:
-            list(JobModel) or None. A list of at most limit jobs
+            list(JobModel) or None. A list of at most `limit` jobs
             that come after recency_msec time.
         """
         earliest_time_msec = (
@@ -118,7 +118,7 @@ class JobModel(base_models.BaseModel):
             limit: int. A limit on the number of jobs to return.
 
         Returns:
-            list(JobModel) or None. A list of at most limit number
+            list(JobModel) or None. A list of at most `limit` number
             of unfinished jobs.
         """
         return cls.query().filter(
