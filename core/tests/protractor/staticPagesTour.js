@@ -25,6 +25,7 @@ describe('Oppia static pages tour', function() {
   });
 
   it('visits the links in About dropdown', function() {
+    general.waitForSystem();
     var dropdown = element(by.css('.protractor-test-about-oppia-list-item'));
     var linkClassNames = ['.protractor-test-about-link',
                           '.protractor-test-teach-link',
