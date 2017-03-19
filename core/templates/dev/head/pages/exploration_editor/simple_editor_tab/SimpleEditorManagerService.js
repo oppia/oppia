@@ -48,8 +48,12 @@ oppia.factory('SimpleEditorManagerService', [
         choices: {
           value: ['<p>Good Option A</p>']
         },
-        minAllowableSelectionCount: 2,
-        maxAllowableSelectionCount: 2
+        minAllowableSelectionCount: {
+          value: 1
+        },
+        maxAllowableSelectionCount: {
+          value: 1
+        }
 
       }
     };
@@ -158,8 +162,8 @@ oppia.factory('SimpleEditorManagerService', [
           });
 
           var stateData = SimpleEditorShimService.getState(lastStateName);
-          data.questionList.addQuestion(QuestionObjectFactory.create(
-            lastStateName, stateData.interaction, ''));
+          console.log(data.questionList.addQuestion(QuestionObjectFactory.create(
+            lastStateName, stateData.interaction, '')));
 
 
       },

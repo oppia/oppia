@@ -28,7 +28,7 @@
                                 add-state="addState()">
         </multiple-choice-editor>
 
-        <check-box-editor ng-if="question.getInteractionId() === 'CheckboxInput'"
+        <check-box-editor ng-if="question.getInteractionId() === 'ItemSelectionInput'"
                                 unique-id="question.getId()"
                                 customization-args="question.getInteractionCustomizationArgs()"
                                 answer-groups="question.getAnswerGroups()"
@@ -50,7 +50,7 @@
         </div>
       </div>
 
-      <div ng-show="chooseQuestionType" class="question-type-wrapper">
+      <div ng-show="chooseQuestionType" class="question-type-wrapper" ng-if="canAddNewQuestion()">
         <button type="button" class="oppia-question-button btn btn-primary" ng-click="addNewQuestion('multiple');">Multiple Choice Input</button>
         <button type="button" class="oppia-question-button btn btn-primary" ng-click="addNewQuestion('itemSelection');">Check Box</button>
         <button type="button" class="oppia-question-button btn btn-primary">Number Interaction</button>
