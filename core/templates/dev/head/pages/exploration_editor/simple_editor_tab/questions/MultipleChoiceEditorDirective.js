@@ -211,7 +211,10 @@ oppia.directive('multipleChoiceEditor', [
             if (answerGroups.length === 0) {
               var newStateName = $scope.addState();
 
-              newAnswerGroups.push(AnswerGroupObjectFactory.create([{
+              // Note that we do not use the 'correct' field of the answer
+              // group in explorations. Instead, 'correctness' is determined by
+              // whether the answer group is the first in the list.
+              newAnswerGroups.push(AnswerGroupObjectFactory.createNew([{
                 inputs: {
                   x: index
                 },
@@ -220,7 +223,7 @@ oppia.directive('multipleChoiceEditor', [
                 dest: newStateName,
                 feedback: [''],
                 param_changes: []
-              }));
+              }, false));
 
               $scope.saveAnswerGroups({
                 newValue: newAnswerGroups

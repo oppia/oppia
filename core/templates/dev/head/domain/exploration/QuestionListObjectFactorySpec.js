@@ -17,77 +17,89 @@
  */
 
 describe('Question List Object Factory', function() {
-  var questionListObjectFactory;
-  var questionObjectFactory;
+  var InteractionObjectFactory;
+  var QuestionListObjectFactory;
+  var QuestionObjectFactory;
   var sampleQuestions;
   var questionList;
 
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
-    questionObjectFactory = $injector.get('QuestionObjectFactory');
-    questionListObjectFactory = $injector.get('QuestionListObjectFactory');
+    InteractionObjectFactory = $injector.get('InteractionObjectFactory');
+    QuestionObjectFactory = $injector.get('QuestionObjectFactory');
+    QuestionListObjectFactory = $injector.get('QuestionListObjectFactory');
   }));
 
   beforeEach(function() {
     sampleQuestions = [
-      questionObjectFactory.create('First state', {
-        answer_groups: [{
-          outcome: {
+      QuestionObjectFactory.create(
+        'First state',
+        InteractionObjectFactory.create({
+          answer_groups: [{
+            correct: false,
+            outcome: {
+              dest: 'Second state',
+              feedback: ['Some feedback'],
+              param_changes: []
+            },
+            rule_specs: [{
+              inputs: {
+                x: 0
+              }
+            }]
+          }],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            choices: {
+              value: ['Choice 1', 'Choice 2', 'Choice3']
+            }
+          },
+          default_outcome: {
+            dest: 'First state',
+            feedback: ['Try again.'],
+            param_changes: []
+          },
+          fallbacks: [],
+          id: 'MultipleChoiceInput'
+        }),
+        'Second state content'
+      ),
+      QuestionObjectFactory.create(
+        'Second state',
+        InteractionObjectFactory.create({
+          answer_groups: [{
+            correct: false,
+            outcome: {
+              dest: 'End state',
+              feedback: ['Some feedback'],
+              param_changes: []
+            },
+            rule_specs: [{
+              inputs: {
+                x: 1
+              }
+            }]
+          }],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            choices: {
+              value: ['Choice 1', 'Choice 2']
+            }
+          },
+          default_outcome: {
             dest: 'Second state',
-            feedback: ['Some feedback'],
+            feedback: ['Try again.'],
             param_changes: []
           },
-          rule_specs: [{
-            inputs: {
-              x: 0
-            }
-          }]
-        }],
-        confirmed_unclassified_answers: [],
-        customization_args: {
-          choices: {
-            value: ['Choice 1', 'Choice 2', 'Choice3']
-          }
-        },
-        default_outcome: {
-          dest: 'First state',
-          feedback: ['Try again.'],
-          param_changes: []
-        },
-        fallbacks: [],
-        id: 'MultipleChoiceInput'
-      }, 'Second state content'),
-      questionObjectFactory.create('Second state', {
-        answer_groups: [{
-          outcome: {
-            dest: 'End state',
-            feedback: ['Some feedback'],
-            param_changes: []
-          },
-          rule_specs: [{
-            inputs: {
-              x: 1
-            }
-          }]
-        }],
-        confirmed_unclassified_answers: [],
-        customization_args: {
-          choices: {
-            value: ['Choice 1', 'Choice 2']
-          }
-        },
-        default_outcome: {
-          dest: 'Second state',
-          feedback: ['Try again.'],
-          param_changes: []
-        },
-        fallbacks: [],
-        id: 'MultipleChoiceInput'
-      }, 'Third state content')
+          fallbacks: [],
+          id: 'MultipleChoiceInput'
+        }),
+        'Third state content'
+      )
     ];
 
-    questionList = questionListObjectFactory.create(sampleQuestions);
+    questionList = QuestionListObjectFactory.create(sampleQuestions);
   });
 
   it('should return copy of list instance', function() {
@@ -107,33 +119,37 @@ describe('Question List Object Factory', function() {
   });
 
   it('should add question', function() {
-    var newQuestion = questionObjectFactory.create('Third state', {
-      answer_groups: [{
-        outcome: {
-          dest: 'Second state',
-          feedback: ['Some feedback'],
+    var newQuestion = QuestionObjectFactory.create(
+      'Third state',
+      InteractionObjectFactory.create({
+        answer_groups: [{
+          correct: false,
+          outcome: {
+            dest: 'Second state',
+            feedback: ['Some feedback'],
+            param_changes: []
+          },
+          rule_specs: [{
+            inputs: {
+              x: 0
+            }
+          }]
+        }],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          choices: {
+            value: ['Choice 1', 'Choice 2']
+          }
+        },
+        default_outcome: {
+          dest: 'First state',
+          feedback: ['Try again.'],
           param_changes: []
         },
-        rule_specs: [{
-          inputs: {
-            x: 0
-          }
-        }]
-      }],
-      confirmed_unclassified_answers: [],
-      customization_args: {
-        choices: {
-          value: ['Choice 1', 'Choice 2']
-        }
-      },
-      default_outcome: {
-        dest: 'First state',
-        feedback: ['Try again.'],
-        param_changes: []
-      },
-      fallbacks: [],
-      id: 'MultipleChoiceInput'
-    }, 'Fourth state content');
+        fallbacks: [],
+        id: 'MultipleChoiceInput'
+      }),
+      'Fourth state content');
 
     questionList.addQuestion(newQuestion);
     var returnedQuestionList = questionList.getQuestions();
