@@ -197,7 +197,8 @@ oppia.factory('oppiaPlayerService', [
               apply_draft: true
             }
           }).then(function(response) {
-            exploration = ExplorationObjectFactory.create(response.data);
+            exploration = ExplorationObjectFactory.createFromBackendDict(
+              response.data);
             exploration.setInitialStateName(initStateName);
             initParams(manualParamChanges);
             _loadInitialState(successCallback);
@@ -209,7 +210,8 @@ oppia.factory('oppiaPlayerService', [
             }) + (version ? '?v=' + version : '');
           $http.get(explorationDataUrl).then(function(response) {
             var data = response.data;
-            exploration = ExplorationObjectFactory.create(data.exploration);
+            exploration = ExplorationObjectFactory.createFromBackendDict(
+              data.exploration);
             version = data.version;
 
             initParams([]);

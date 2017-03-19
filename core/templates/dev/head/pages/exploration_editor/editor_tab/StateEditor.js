@@ -320,13 +320,13 @@ oppia.factory('trainingDataService', [
         var potentialOutcomes = [];
         var interaction = state.interaction;
 
-        for (var i = 0; i < interaction.answer_groups.length; i++) {
-          potentialOutcomes.push(interaction.answer_groups[i].outcome);
+        for (var i = 0; i < interaction.answerGroups.length; i++) {
+          potentialOutcomes.push(interaction.answerGroups[i].outcome);
         }
 
-        if (interaction.default_outcome) {
-          var outcome = interaction.default_outcome;
-          potentialOutcomes.push(interaction.default_outcome);
+        if (interaction.defaultOutcome) {
+          var outcome = interaction.defaultOutcome;
+          potentialOutcomes.push(interaction.defaultOutcome);
         }
 
         return potentialOutcomes;
@@ -407,13 +407,14 @@ oppia.directive('trainingPanel', [function() {
     },
     templateUrl: 'teaching/trainingPanel',
     controller: [
-      '$scope', 'oppiaExplorationHtmlFormatterService', 'editorContextService',
-      'explorationStatesService', 'trainingDataService', 'responsesService',
-      'stateInteractionIdService', 'stateCustomizationArgsService',
+      '$scope', 'oppiaExplorationHtmlFormatterService',
+      'editorContextService', 'explorationStatesService',
+      'trainingDataService', 'responsesService', 'stateInteractionIdService',
+      'stateCustomizationArgsService', 'AnswerGroupObjectFactory',
       function($scope, oppiaExplorationHtmlFormatterService,
-          editorContextService, explorationStatesService, trainingDataService,
-          responsesService, stateInteractionIdService,
-          stateCustomizationArgsService) {
+          editorContextService, explorationStatesService,
+          trainingDataService, responsesService, stateInteractionIdService,
+          stateCustomizationArgsService, AnswerGroupObjectFactory) {
         $scope.changingAnswerGroupIndex = false;
         $scope.addingNewResponse = false;
 
@@ -464,8 +465,8 @@ oppia.directive('trainingPanel', [function() {
           if ($scope.classification.newOutcome) {
             // Create a new answer group with the given feedback.
             var answerGroups = responsesService.getAnswerGroups();
-            answerGroups.push(AnswerGroupObjectFactory.create(
-              [], angular.copy($scope.classification.newOutcome)));
+            answerGroups.push(AnswerGroupObjectFactory.createNew(
+              [], angular.copy($scope.classification.newOutcome), false));
             responsesService.save(
               answerGroups, responsesService.getDefaultOutcome());
 

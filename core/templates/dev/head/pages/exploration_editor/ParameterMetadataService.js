@@ -105,7 +105,7 @@ oppia.factory('parameterMetadataService', [
       });
 
       // Finally, the rule feedback strings are evaluated.
-      state.interaction.answer_groups.forEach(function(group) {
+      state.interaction.answerGroups.forEach(function(group) {
         for (var k = 0; k < group.outcome.feedback.length; k++) {
           expressionInterpolationService.getParamsFromString(
               group.outcome.feedback[k]).forEach(function(paramName) {
