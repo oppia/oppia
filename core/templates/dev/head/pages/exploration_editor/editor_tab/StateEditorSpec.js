@@ -145,7 +145,8 @@ describe('State Editor controller', function() {
       ecs.setActiveStateName('First State');
       scope.initStateEditor();
       expect(scope.contentEditorIsOpen).toBe(false);
-      expect(scope.content).toEqual(scope.getContent('First State Content'));
+      expect(angular.equals(
+        scope.content, scope.getContent('First State Content'))).toBe(true);
       scope.openStateContentEditor();
       expect(scope.contentEditorIsOpen).toBe(true);
       scope.content = scope.getContent('First State Content');

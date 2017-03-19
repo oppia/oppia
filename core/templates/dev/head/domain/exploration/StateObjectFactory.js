@@ -19,36 +19,47 @@
 
 oppia.factory('StateObjectFactory', [
   'AnswerGroupObjectFactory', 'InteractionObjectFactory',
-  function(AnswerGroupObjectFactory, InteractionObjectFactory) {
-  var State = function(name, classifierModelId, contentBackendList,
-    interactionBackendDict, paramChangesBackendList) {
-    this.name = name;
-    this.classifierModelId = classifierModelId;
-    this.content = contentBackendList;
-    this.interaction = InteractionObjectFactory.create(interactionBackendDict);
-    this.paramChanges = paramChangesBackendList;
-  };
-
-  // Instance methods.
-  State.prototype.toBackendDict = function() {
-    return {
-      content: this.content,
-      classifier_model_id: this.classifierModelId,
-      interaction: this.interaction.toBackendDict(),
-      param_changes: this.paramChanges
+  'ContentObjectFactory',
+  function(AnswerGroupObjectFactory, InteractionObjectFactory,
+    ContentObjectFactory) {
+    var State = function(name, classifierModelId, contentBackendList,
+      interactionBackendDict, paramChangesBackendList) {
+      this.name = name;
+      this.classifierModelId = classifierModelId;
+      this.content = generateContentFromBackend(contentBackendList);
+      this.interaction = InteractionObjectFactory.create(
+        interactionBackendDict);
+      this.paramChanges = paramChangesBackendList;
     };
-  };
 
-  // Static class methods. Note that "this" is not available in
-  // static contexts.
-  State.createFromBackendDict = function(stateName, stateDict) {
-    return new State(
-      stateName,
-      stateDict.classifier_model_id,
-      stateDict.content,
-      stateDict.interaction,
-      stateDict.param_changes);
-  };
+    var generateContentFromBackend = function(contentBackendList) {
+      var content = contentBackendList.map(function(contentBackendDict) {
+        return ContentObjectFactory.createFromBackendDict(contentBackendDict);
+      });
+      return content;
+    };
 
-  return State;
-}]);
+    // Instance methods.
+    State.prototype.toBackendDict = function() {
+      return {
+        content: this.content,
+        classifier_model_id: this.classifierModelId,
+        interaction: this.interaction.toBackendDict(),
+        param_changes: this.paramChanges
+      };
+    };
+
+    // Static class methods. Note that "this" is not available in
+    // static contexts.
+    State.createFromBackendDict = function(stateName, stateDict) {
+      return new State(
+        stateName,
+        stateDict.classifier_model_id,
+        stateDict.content,
+        stateDict.interaction,
+        stateDict.param_changes);
+    };
+
+    return State;
+  }
+]);
