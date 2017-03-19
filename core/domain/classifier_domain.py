@@ -17,6 +17,7 @@
 import copy
 import feconf
 import utils
+from core.domain import classifier_registry
 from core.platform import models
 
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
@@ -161,3 +162,7 @@ class Classifier(object):
             raise utils.ValidationError(
                 'Expected cached_classifier_data to be a dict, received %s' %(
                     self.cached_classifier_data))
+        sc = classifier_registry.ClassifierRegistry.get_classifier_by_id(
+        self.algorithm_id)
+        sc.validate(self.cached_classifier_data)
+
