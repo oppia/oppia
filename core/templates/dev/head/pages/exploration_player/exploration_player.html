@@ -99,16 +99,16 @@
       <h3>Suggest a Change</h3>
     </div>
 
-    <div class="modal-body">
+    <div class="modal-body protractor-test-exploration-suggestion-modal">
       <text-angular-rte ng-show="showEditor" html-content="suggestionContent"></text-angular-rte>
       <br>
       Briefly describe your changes (required):
-      <input type="text" ng-model="description" style="width: 100%">
+      <input type="text" ng-model="description" class="protractor-test-suggestion-description-input" style="width: 100%">
     </div>
 
     <div class="modal-footer">
       <button class="btn btn-default" ng-click="cancelSuggestion()">Cancel</button>
-      <button class="btn btn-success" ng-click="submitSuggestion()" ng-disabled="(initContent == suggestionContent) || !description">
+      <button class="btn btn-success protractor-test-suggestion-submit-btn" ng-click="submitSuggestion()" ng-disabled="(initContent == suggestionContent) || !description">
         Submit Suggestion
       </button>
     </div>
@@ -175,6 +175,7 @@
   <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/MathLatexStringEditor.js"></script>
   <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/SanitizedUrlEditor.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/autoplayedVideosService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/explorationServices.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/messengerService.js"></script>
 
@@ -187,7 +188,9 @@
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ExplorationObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StateObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/InteractionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/AnswerGroupObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/FallbackObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/summary/ExplorationSummaryBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/StopwatchObjectFactory.js"></script>
 
@@ -211,6 +214,9 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ProgressDotsDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/StatsReportingService.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionSyntaxTree.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/evaluator.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/parser.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionInterpolationService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>

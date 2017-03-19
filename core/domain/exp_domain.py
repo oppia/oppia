@@ -2236,6 +2236,17 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v8_dict_to_v9_dict(cls, states_dict):
+        """Converts from version 8 to 9. Version 9 contains 'correct'
+        field in answer groups.
+        """
+        for state_dict in states_dict.values():
+            answer_groups = state_dict['interaction']['answer_groups']
+            for answer_group in answer_groups:
+                answer_group['correct'] = False
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version):
         """Converts the states blob contained in the given
@@ -2437,11 +2448,12 @@ class Exploration(object):
         """Converts a v11 exploration dict into a v12 exploration dict."""
 
         exploration_dict['schema_version'] = 12
-        states = exploration_dict['states']
-        for state in states.itervalues():
-            answer_groups = state['interaction']['answer_groups']
-            for answer_group in answer_groups:
-                answer_group['correct'] = False
+
+        exploration_dict['states'] = cls._convert_states_v8_dict_to_v9_dict(
+            exploration_dict['states'])
+
+        exploration_dict['states_schema_version'] = 9
+
         return exploration_dict
 
     @classmethod

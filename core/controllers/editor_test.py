@@ -1335,7 +1335,9 @@ class EditorAutosaveTest(BaseEditorControllerTest):
     EXP_ID1 = '1'
     EXP_ID2 = '2'
     EXP_ID3 = '3'
-    NEWER_DATETIME = datetime.datetime.strptime('2017-03-16', '%Y-%m-%d')
+    # 30 days into the future.
+    NEWER_DATETIME = datetime.datetime.utcnow() + datetime.timedelta(30)
+    # A date in the past.
     OLDER_DATETIME = datetime.datetime.strptime('2015-03-16', '%Y-%m-%d')
     DRAFT_CHANGELIST = [{
         'cmd': 'edit_exploration_property',

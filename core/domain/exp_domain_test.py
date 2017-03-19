@@ -1903,7 +1903,7 @@ states:
       fallbacks: []
       id: TextInput
     param_changes: []
-states_schema_version: 8
+states_schema_version: 9
 tags: []
 title: Title
 """)
