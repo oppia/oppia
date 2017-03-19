@@ -163,6 +163,6 @@ class Classifier(object):
                 'Expected cached_classifier_data to be a dict, received %s' %(
                     self.cached_classifier_data))
         sc = classifier_registry.ClassifierRegistry.get_classifier_by_id(
-        self.algorithm_id)
+            self.algorithm_id)
         sc.validate(self.cached_classifier_data)
 
