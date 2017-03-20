@@ -1391,6 +1391,7 @@ var acceptSuggestion = function(suggestionDescription) {
       });
 
       matchingSuggestionRows[0].click();
+      general.waitForSystem();
       element(by.css('.protractor-test-view-suggestion-btn')).click();
       element(by.css('.protractor-test-exploration-accept-suggestion-btn')).
         click();
