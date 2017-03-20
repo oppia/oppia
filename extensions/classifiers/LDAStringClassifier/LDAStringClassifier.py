@@ -633,17 +633,17 @@ class LDAStringClassifier(BaseClassifier):
             ]
 
         for float_property in float_properties:
-            if not float_property in classifier_data.keys():
+            if float_property not in classifier_data.keys():
                 raise utils.ValidationError(
                     'Expected %s to be a key in classifier_data' %
                     float_property)
             if not isinstance(classifier_data[float_property], float):
                 raise utils.ValidationError(
                     ('Expected %s to be a float, received %f' %
-                    float_property, classifier_data[float_property]))
+                     float_property, classifier_data[float_property]))
 
         for int_property in int_properties:
-            if not int_property in classifier_data.keys():
+            if int_property not in classifier_data.keys():
                 raise utils.ValidationError(
                     'Expected %s to be a key in classifier_data' %
                     int_property)
@@ -653,7 +653,7 @@ class LDAStringClassifier(BaseClassifier):
                      int_property, classifier_data[int_property]))
 
         for dict_property in dict_properties:
-            if not dict_property in classifier_data.keys():
+            if dict_property not in classifier_data.keys():
                 raise utils.ValidationError(
                     'Expected %s to be a key in classifier_data' %
                     dict_property)
@@ -663,10 +663,10 @@ class LDAStringClassifier(BaseClassifier):
                      dict_property, classifier_data[dict_property]))
 
         for list_property in list_properties:
-            if not list_property in classifier_data.keys():
+            if list_property not in classifier_data.keys():
                 raise utils.ValidationError(
                     'Expected %s to be a key in classifier_data' %
-                    float_property)
+                    list_property)
             if not isinstance(classifier_data[list_property], list):
                 raise utils.ValidationError(
                     ('Expected %s to be a list, received %s' %
