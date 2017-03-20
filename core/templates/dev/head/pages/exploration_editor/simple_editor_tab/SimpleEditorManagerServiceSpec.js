@@ -131,8 +131,8 @@ describe('Simple Editor Manager Service', function() {
   beforeEach(module(function($provide) {
     $provide.value('SimpleEditorShimService', stubs.SimpleEditorShimService);
     $provide.value('StatesToQuestionsService', stubs.StatesToQuestionsService);
-    $provide.value('QuestionListObjectFactory',
-      stubs.QuestionListObjectFactory);
+    $provide.value(
+      'QuestionListObjectFactory', stubs.QuestionListObjectFactory);
     $provide.value('QuestionObjectFactory', stubs.QuestionObjectFactory);
   }));
 
@@ -166,8 +166,8 @@ describe('Simple Editor Manager Service', function() {
       setBridgeHtml: function() {}
     });
     spyOn(questionList, 'getNextStateName').andReturn('Question1');
-    // As the dummy question list has atleast one question corrosponding to
-    // Introduction State.
+    // As the dummy question list has at least one existing question
+    // corresponding to Introduction State.
     spyOn(questionList, 'isEmpty').andReturn(false);
     spyOn(questionList, 'getLastQuestion').andReturn({
       // Assuming last state is Introduction and destination to be Question1.
@@ -254,8 +254,8 @@ describe('Simple Editor Manager Service', function() {
       }
     };
     simpleEditorManagerService.tryToInit();
-    simpleEditorManagerService.saveCustomizationArgs(stateName,
-      newCustomizationArgs);
+    simpleEditorManagerService.saveCustomizationArgs(
+      stateName, newCustomizationArgs);
     expect(stubs.SimpleEditorShimService.saveCustomizationArgs)
       .toHaveBeenCalledWith(stateName, newCustomizationArgs);
     expect(questionList.getBindableQuestion).toHaveBeenCalledWith(stateName);
@@ -287,8 +287,8 @@ describe('Simple Editor Manager Service', function() {
       ]
     };
     simpleEditorManagerService.tryToInit();
-    simpleEditorManagerService.saveDefaultOutcome(stateName,
-      newDefaultOutcome);
+    simpleEditorManagerService.saveDefaultOutcome(
+      stateName, newDefaultOutcome);
     expect(stubs.SimpleEditorShimService.saveDefaultOutcome)
       .toHaveBeenCalledWith(stateName, newDefaultOutcome);
     expect(questionList.getBindableQuestion).toHaveBeenCalledWith(stateName);
@@ -300,8 +300,8 @@ describe('Simple Editor Manager Service', function() {
     simpleEditorManagerService.tryToInit();
     simpleEditorManagerService.saveBridgeHtml(stateName, newBridgeHtml);
     expect(stubs.SimpleEditorShimService.saveBridgeHtml)
-      .toHaveBeenCalledWith(questionList.getNextStateName(stateName),
-        newBridgeHtml);
+      .toHaveBeenCalledWith(
+        questionList.getNextStateName(stateName), newBridgeHtml);
     expect(questionList.getBindableQuestion).toHaveBeenCalledWith(stateName);
   });
 
@@ -315,9 +315,9 @@ describe('Simple Editor Manager Service', function() {
       }
     };
 
-    var lastStateName = (questionList.isEmpty() ? SimpleEditorShimService
-        .getInitStateName() : questionList.getLastQuestion()
-          .getDestinationStateName());
+    var lastStateName = (
+      questionList.isEmpty() ? SimpleEditorShimService.getInitStateName() :
+        questionList.getLastQuestion().getDestinationStateName());
 
     var defaultOutcome = {
       dest: lastStateName,
@@ -331,8 +331,8 @@ describe('Simple Editor Manager Service', function() {
     expect(stubs.SimpleEditorShimService.saveInteractionId)
       .toHaveBeenCalledWith(lastStateName, DEFAULT_INTERACTION.ID);
     expect(stubs.SimpleEditorShimService.saveCustomizationArgs)
-      .toHaveBeenCalledWith(lastStateName,
-        DEFAULT_INTERACTION.CUSTOMIZATION_ARGS);
+      .toHaveBeenCalledWith(
+        lastStateName, DEFAULT_INTERACTION.CUSTOMIZATION_ARGS);
     expect(stubs.SimpleEditorShimService.saveDefaultOutcome)
       .toHaveBeenCalledWith(lastStateName, defaultOutcome);
     expect(questionList.addQuestion).toHaveBeenCalled();
