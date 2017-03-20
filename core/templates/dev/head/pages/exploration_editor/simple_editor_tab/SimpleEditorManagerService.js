@@ -64,7 +64,7 @@ oppia.factory('SimpleEditorManagerService', [
         recommendedExplorationIds: []
       }
     };
-    console.log(data);
+    //console.log(data);
     var getNewStateName = function() {
       var allStateNames = data.questionList.getAllStateNames();
 
@@ -173,7 +173,7 @@ oppia.factory('SimpleEditorManagerService', [
         //   introduction.
         // - Otherwise, the requirement is that, for the last question in the
         //   list, there is at least one answer group.
-        console.log(data);
+      //  console.log(data);
         if (data.questionList.isEmpty()) {
           return Boolean(data.introductionHtml);
         } else {

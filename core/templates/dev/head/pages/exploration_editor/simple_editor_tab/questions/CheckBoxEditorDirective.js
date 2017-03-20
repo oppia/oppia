@@ -204,16 +204,15 @@ oppia.directive('checkBoxEditor', [
             });
           };
 
-          $scope.selectCorrectAnswer = function(index) {
+          $scope.selectCorrectAnswer = function(value) {
             var answerGroups = $scope.getAnswerGroups();
             var newAnswerGroups = [];
 
             if (answerGroups.length === 0) {
               var newStateName = $scope.addState();
-
               newAnswerGroups.push(AnswerGroupObjectFactory.create([{
                 inputs: {
-                  x: index
+                  x: [value]
                 },
                 rule_type: 'Equals'
               }], {
@@ -221,20 +220,26 @@ oppia.directive('checkBoxEditor', [
                 feedback: [''],
                 param_changes: []
               }));
+              console.log(newAnswerGroups);
 
               $scope.saveAnswerGroups({
                 newValue: newAnswerGroups
               });
-            } else {
-              newAnswerGroups.push(answerGroups[0]);
-              newAnswerGroups[0].ruleSpecs[0].inputs.x = index;
 
-              // If some other answer group has this answer, remove it.
+
+
+            }
+            else{
+
+              newAnswerGroups.push(answerGroups[0]);
+              newAnswerGroups[0].ruleSpecs[0].inputs.x.push(value);
+
+              /* If some other answer group has this answer, remove it.
               for (var i = 1; i < answerGroups.length; i++) {
                 if (answerGroups[i].ruleSpecs[0].inputs.x !== index) {
                   newAnswerGroups.push(answerGroups[i]);
                 }
-              }
+              }*/
 
               $scope.saveAnswerGroups({
                 newValue: newAnswerGroups
@@ -245,6 +250,7 @@ oppia.directive('checkBoxEditor', [
               $scope.$broadcast('openEditorHtmlField', {
                 fieldId: $scope.getFieldId('correct-response')
               });
+
             }
           };
 

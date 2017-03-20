@@ -28,8 +28,8 @@
     <div class="correct-answer-picker-container">
       <button class="correct-answer-option"
               ng-repeat="choice in getChoices() track by $index"
-              ng-click="selectCorrectAnswer($index)"
-              ng-class="{'correct-answer-option-selected': isCorrectAnswer($index)}">
+              ng-click="selectCorrectAnswer(choice)"
+              ng-class="{'correct-answer-option-selected': isCorrectAnswer(choice)}">
         <div class="correct-answer-check-button-container">
           <span class="correct-answer-outer-check-button">
             <span class="correct-answer-inner-check-button"></span>
