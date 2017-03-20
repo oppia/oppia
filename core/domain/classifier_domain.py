@@ -15,10 +15,11 @@
 """Domain objects for classifier models"""
 
 import copy
-import feconf
-import utils
+
 from core.domain import classifier_registry
 from core.platform import models
+import feconf
+import utils
 
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
 
@@ -135,12 +136,11 @@ class Classifier(object):
         if not isinstance(self.exp_id, basestring):
             raise utils.ValidationError(
                 'Expected exp_id to be a string, received %s' % self.exp_id)
-        utils.require_valid_name(self.exp_id, 'the exploration id')
 
         if not isinstance(self.exp_version_when_created, int):
             raise utils.ValidationError(
-                ('Expected exp_version_when_created to be a integer,') + (
-                    'received %d' % self.exp_version_when_created))
+                'Expected exp_version_when_created to be a int received %d' %
+                    self.exp_version_when_created)
 
         if not isinstance(self.state_name, basestring):
             raise utils.ValidationError(

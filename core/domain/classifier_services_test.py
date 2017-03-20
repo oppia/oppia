@@ -127,8 +127,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         """Test the save_classifier method."""
 
         exp_id = u'1'
-        state = 'Home'
-        test_state = 'State'
+        state_name = 'Home'
+        test_state_name = 'State'
         cached_data = {
             "_alpha": 0.1,
             "_beta": 0.001,
@@ -148,15 +148,15 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             "_c_l": []
         }
         classifier = classifier_domain.Classifier(
-            '1', exp_id, 1, state,
+            '1', exp_id, 1, state_name,
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'], cached_data, 1)
         classifier_id = (
             classifier_services.save_classifier(classifier))
         classifier = classifier_services.get_classifier_by_id(
             classifier_id)
         self.assertEqual(classifier.exp_id, exp_id)
-        self.assertEqual(classifier.state_name, state)
-        classifier.update_state_name(test_state)
+        self.assertEqual(classifier.state_name, state_name)
+        classifier.update_state_name(test_state_name)
         classifier_services.save_classifier(classifier)
         classifier = classifier_services.get_classifier_by_id(
             classifier_id)
