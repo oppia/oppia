@@ -52,6 +52,7 @@ describe('State Editor controller', function() {
       cls = $injector.get('changeListService');
       ess = $injector.get('explorationStatesService');
       IS = $injector.get('INTERACTION_SPECS');
+      cof = $injector.get('ContentObjectFactory');
 
       GLOBALS.INVALID_NAME_CHARS = '#@&^%$';
 
@@ -114,10 +115,10 @@ describe('State Editor controller', function() {
       });
 
       scope.getContent = function(contentString) {
-        return [{
+        return [cof.createFromBackendDict({
           type: 'text',
           value: contentString
-        }];
+        })];
       };
 
       ctrl = $controller('StateEditor', {
@@ -145,8 +146,7 @@ describe('State Editor controller', function() {
       ecs.setActiveStateName('First State');
       scope.initStateEditor();
       expect(scope.contentEditorIsOpen).toBe(false);
-      expect(angular.equals(
-        scope.content, scope.getContent('First State Content'))).toBe(true);
+      expect(scope.content).toEqual(scope.getContent('First State Content'));
       scope.openStateContentEditor();
       expect(scope.contentEditorIsOpen).toBe(true);
       scope.content = scope.getContent('First State Content');
