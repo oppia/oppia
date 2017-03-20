@@ -41,7 +41,7 @@ class LDAStringClassifierUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(LDAStringClassifierUnitTests, self).setUp()
         self.classifier = (
-            classifier_registry.ClassifierRegistry.get_classifier_by_id(
+            classifier_registry.Registry.get_classifier_by_id(
                 feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']))
         self.classifier.train(self._EXAMPLES_TRAIN)
 

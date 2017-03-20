@@ -52,7 +52,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             exp_services.get_exploration_by_id(exploration_id).states['Home'])
 
     def _is_string_classifier_called(self, answer):
-        sc = classifier_registry.ClassifierRegistry.get_classifier_by_id(
+        sc = classifier_registry.Registry.get_classifier_by_id(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])
         string_classifier_predict = (
             sc.__class__.predict)

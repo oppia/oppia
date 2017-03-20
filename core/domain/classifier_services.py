@@ -83,7 +83,7 @@ def classify_string_classifier_rule(state, normalized_answer):
     best_matched_answer_group_index = len(state.interaction.answer_groups)
     best_matched_rule_spec_index = None
 
-    sc = classifier_registry.ClassifierRegistry.get_classifier_by_id(
+    sc = classifier_registry.Registry.get_classifier_by_id(
         feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])
 
     training_examples = [
