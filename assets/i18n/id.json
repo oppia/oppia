@@ -18,6 +18,7 @@
 	"I18N_DASHBOARD_COLLECTIONS": "Koleksi",
 	"I18N_DASHBOARD_EXPLORATIONS": "Eksplorasi",
 	"I18N_DASHBOARD_OPEN_FEEDBACK": "Umpan Balik Terbuka",
+	"I18N_DASHBOARD_SUBSCRIBERS": "Pelanggan",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Tarik gambar ke sini",
 	"I18N_DIRECTIVES_OR_SELECT_FILE": "atau pilih file gambar:",
 	"I18N_ERROR_DISABLED_EXPLORATION": "Eksplorasi Nonaktif",
@@ -86,6 +87,10 @@
 	"I18N_INTERACTIONS_MUSIC_PLAY": "Mainkan",
 	"I18N_INTERACTIONS_MUSIC_PLAY_SEQUENCE": "Mainkan Rangkaian Target",
 	"I18N_INTERACTIONS_MUSIC_SUBMIT": "Simpan",
+	"I18N_INTERACTIONS_PENCILCODEEDITOR_ARE_YOU_SURE_YOU_WANT_TO_RESET_YOUR_CODE": "Apakah Anda yakin ingin mengatur ulang kode Anda?",
+	"I18N_INTERACTIONS_PENCILCODEEDITOR_CANCEL": "Batal",
+	"I18N_INTERACTIONS_PENCILCODEEDITOR_CONFIRMATION_REQUIRED": "Konfirmasi diperlukan",
+	"I18N_INTERACTIONS_PENCILCODEEDITOR_RESET_CODE": "Atur ulang kode",
 	"I18N_INTERACTIONS_SET_INPUT_ADD_ITEM": "Tambah isian",
 	"I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR": "Ups, sepertinya isian anda mengandung duplikat!",
 	"I18N_INTERACTIONS_SET_INPUT_EMPTY_SET": "(Tambahkan satu isian per baris.)",
@@ -158,6 +163,7 @@
 	"I18N_LIBRARY_SUB_HEADER": "Mulai petualangan anda dengan melihat koleksi eksplorasi kami.",
 	"I18N_LIBRARY_VIEWS_TOOLTIP": "Dilihat",
 	"I18N_LIBRARY_VIEW_ALL": "Lihat semua",
+	"I18N_ONE_SUBSCRIBER_TEXT": "Anda mempunyai 1 pelanggan",
 	"I18N_PLAYER_BACK": "Kembali",
 	"I18N_PLAYER_CARD_NUMBER_TOOLTIP": "Kartu #",
 	"I18N_PLAYER_COMMUNITY_EDITABLE_TOOLTIP": "Dapat diubah komunitas",
@@ -279,6 +285,7 @@
 	"I18N_SPLASH_SUBTITLE": "Oppia mempermudah penciptaan pelajaran interaktif yang mendidik dan menarik.",
 	"I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Oppia memungkinkan Anda untuk <a href=\"/dashboard?mode=create\">menciptakan</a> dan <a href=\"/library\">membagikan</a> eksplorasi dalam berbagai subjek, terbatas hanya pada imajinasi Anda.",
 	"I18N_SPLASH_TITLE": "Berpikir di luar buku.",
+	"I18N_SUBSCRIBE_BUTTON_TEXT": "Berlangganan",
 	"I18N_TOPNAV_ABOUT": "Tentang",
 	"I18N_TOPNAV_ABOUT_OPPIA": "Tentang Oppia",
 	"I18N_TOPNAV_ADMIN_PAGE": "Halaman Admin",
@@ -294,5 +301,6 @@
 	"I18N_TOPNAV_NOTIFICATIONS": "Notifikasi",
 	"I18N_TOPNAV_PREFERENCES": "Preferensi",
 	"I18N_TOPNAV_SIGN_IN": "Masuk",
-	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Mengajar dengan Oppia"
+	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Mengajar dengan Oppia",
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Berhenti berlangganan"
 }
