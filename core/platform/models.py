@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Interface for storage model switching."""
+"""Interface for storage model switching. """
 
 import feconf
 import utils
@@ -33,9 +33,25 @@ class _Platform(object):
 
 
 class _Gae(_Platform):
+	"""
+	Google App Engine Model.
+	Super model of the Registry Model and implements all the methods of Registry.
+	"""
     @classmethod
     def import_models(cls, model_names):
+		"""
+		Method that imports the required storage models from their particular modules.
+		Appends to an empty list according to If-Elif branching.
 
+		Args:
+			model_names: [str]. List of storage model names.
+
+		Returns:
+			tuple(returned_models): Tuple of Strings. Immutable Sequence of storage models
+
+		Raises:
+			Exception: Invalid model name
+		"""
         returned_models = []
         for name in model_names:
             if name == NAMES.activity:
@@ -84,16 +100,34 @@ class _Gae(_Platform):
 
     @classmethod
     def import_transaction_services(cls):
+		"""
+		Importing the required transaction services
+
+		Returns:
+			Module gae_transation_services from core.platform.transactions
+		"""
         from core.platform.transactions import gae_transaction_services
         return gae_transaction_services
 
     @classmethod
     def import_current_user_services(cls):
+		"""
+		Importing the required current user services
+
+		Returns:
+			Module gae_current_user_services from core.platform.users
+		"""
         from core.platform.users import gae_current_user_services
         return gae_current_user_services
 
     @classmethod
     def import_app_identity_services(cls):
+		"""
+		Importing the required app identity services
+
+		Returns:
+			Module gae_identity_services from core.platform.app_identity
+		"""
         from core.platform.app_identity import gae_app_identity_services
         return gae_app_identity_services
 
@@ -113,16 +147,34 @@ class _Gae(_Platform):
 
     @classmethod
     def import_memcache_services(cls):
+		"""
+		Importing the required memcache services
+
+		Returns:
+			Module gae_memcache_services from core.platform.memcache
+		"""
         from core.platform.memcache import gae_memcache_services
         return gae_memcache_services
 
     @classmethod
     def import_taskqueue_services(cls):
+		"""
+		Importing the required task queue services
+
+		Returns:
+			Module gae_taskqueue_services from core.platform.taskqueue
+		"""
         from core.platform.taskqueue import gae_taskqueue_services
         return gae_taskqueue_services
 
     @classmethod
     def import_search_services(cls):
+		"""
+		Importing the required search services
+
+		Returns:
+			Module gae_search_services from core.platform.search
+		"""
         from core.platform.search import gae_search_services
         return gae_search_services
 
@@ -130,42 +182,105 @@ class _Gae(_Platform):
 
 
 class Registry(object):
+	"""
+	Model through which _Gae_ model's methods are accessed.
+	This is the model accessed by all submodules
+
+	"""
+	
+	#mapping methods of this model to the methods of _Gae_ model
     _PLATFORM_MAPPING = {
         _Gae.NAME: _Gae,
     }
 
     @classmethod
     def _get(cls):
+		"""
+		Accessor method through which super class's methods can be accessed
+
+		Returns: corresponding method of the super class
+		"""
         return cls._PLATFORM_MAPPING.get(feconf.PLATFORM)
 
     @classmethod
     def import_models(cls, model_names):
+		"""
+		Importing the required storage models.
+
+		Args:
+			model_names: [str]. List of storage models
+
+		Returns:
+			import_models() of _Gae_ model
+		"""
         return cls._get().import_models(model_names)
 
     @classmethod
     def import_current_user_services(cls):
+		"""
+		Importing the required user services
+
+		Returns:
+			import_current_user_services() of _Gae_ model
+		"""
         return cls._get().import_current_user_services()
 
     @classmethod
     def import_transaction_services(cls):
+		"""
+		Importing the required transaction services
+
+		Returns:
+			import_transaction_services() of _Gae_ model
+		"""
         return cls._get().import_transaction_services()
 
     @classmethod
     def import_app_identity_services(cls):
+		"""
+		Importing the required app identity services
+
+		Returns:
+			import_app_identity_services() of _Gae_ model
+		"""
         return cls._get().import_app_identity_services()
 
     @classmethod
     def import_email_services(cls):
+		"""
+		Importing the required email services
+
+		Returns:
+			import_email_services() of _Gae_ model
+		"""
         return cls._get().import_email_services()
 
     @classmethod
     def import_memcache_services(cls):
+		"""
+		Importing the required memcache services
+
+		Returns:
+			import_memcache_services() of _Gae_ model
+		"""
         return cls._get().import_memcache_services()
 
     @classmethod
     def import_taskqueue_services(cls):
+		"""
+		Importing the required taskqueue services
+
+		Returns:
+			import_taskqueue_services() of _Gae_ model
+		"""
         return cls._get().import_taskqueue_services()
 
     @classmethod
     def import_search_services(cls):
+		"""
+		Importing the required search services
+
+		Returns:
+			import_search_services() of _Gae_ model
+		"""
         return cls._get().import_search_services()
