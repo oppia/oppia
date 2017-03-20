@@ -607,82 +607,67 @@ class LDAStringClassifier(BaseClassifier):
                 classifier.
         """
 
-        if not isinstance(classifier_data['_alpha'], float):
-            raise utils.ValidationError(
-                ('Expected alpha to be a float, received %f' %
-                 classifier_data['_alpha']))
+        float_properties = [
+            "_alpha",
+            "_beta",
+            "_prediction_threshold"
+            ]
+        int_properties = [
+            "_training_iterations",
+            "_prediction_iterations",
+            "_num_labels",
+            "_num_docs",
+            "_num_words"
+            ]
+        dict_properties = [
+            "_label_to_id",
+            "_word_to_id"
+            ]
+        list_properties = [
+            "_w_dp",
+            "_b_dl",
+            "_l_dp",
+            "_c_dl",
+            "_c_lw",
+            "_c_l"
+            ]
 
-        if not isinstance(classifier_data['_beta'], float):
-            raise utils.ValidationError(
-                ('Expected beta to be a float, received %f' %
-                 classifier_data['_beta']))
+        for float_property in float_properties:
+            if not float_property in classifier_data.keys():
+                raise utils.ValidationError(
+                    'Expected %s to be a key in classifier_data' %
+                    float_property)
+            if not isinstance(classifier_data[float_property], float):
+                raise utils.ValidationError(
+                    ('Expected %s to be a float, received %f' %
+                    float_property, classifier_data[float_property]))
 
-        if not isinstance(classifier_data['_prediction_threshold'], float):
-            raise utils.ValidationError(
-                ('Expected prediction_threshold to be a float, received %f' %
-                 classifier_data['_prediction_threshold']))
+        for int_property in int_properties:
+            if not int_property in classifier_data.keys():
+                raise utils.ValidationError(
+                    'Expected %s to be a key in classifier_data' %
+                    int_property)
+            if not isinstance(classifier_data[int_property], int):
+                raise utils.ValidationError(
+                    ('Expected %s to be a int, received %d' %
+                     int_property, classifier_data[int_property]))
 
-        if not isinstance(classifier_data['_training_iterations'], int):
-            raise utils.ValidationError(
-                ('Expected training_iterations to be a int, received %d' %
-                 classifier_data['_training_iterations']))
+        for dict_property in dict_properties:
+            if not dict_property in classifier_data.keys():
+                raise utils.ValidationError(
+                    'Expected %s to be a key in classifier_data' %
+                    dict_property)
+            if not isinstance(classifier_data[dict_property], dict):
+                raise utils.ValidationError(
+                    ('Expected %s to be a dict, received %s' %
+                     dict_property, classifier_data[dict_property]))
 
-        if not isinstance(classifier_data['_prediction_iterations'], int):
-            raise utils.ValidationError(
-                ('Expected prediction_iterations to be a int, received %d' %
-                 classifier_data['_prediction_iterations']))
-
-        if not isinstance(classifier_data['_num_labels'], int):
-            raise utils.ValidationError(
-                ('Expected num_labels to be a int, received %d' %
-                 classifier_data['_num_labels']))
-
-        if not isinstance(classifier_data['_num_docs'], int):
-            raise utils.ValidationError(
-                ('Expected num_docs to be a int, received %d' %
-                 classifier_data['_num_docs']))
-
-        if not isinstance(classifier_data['_num_words'], int):
-            raise utils.ValidationError(
-                ('Expected num_words to be a int, received %d' %
-                 classifier_data['_num_words']))
-
-        if not isinstance(classifier_data['_label_to_id'], dict):
-            raise utils.ValidationError(
-                ('Expected label_to_id to be a dict, received %s' %
-                 classifier_data['_label_to_id']))
-
-        if not isinstance(classifier_data['_word_to_id'], dict):
-            raise utils.ValidationError(
-                ('Expected word_to_id to be a dict, received %s' %
-                 classifier_data['_word_to_id']))
-
-        if not isinstance(classifier_data['_w_dp'], list):
-            raise utils.ValidationError(
-                ('Expected w_dp to be a list, received %s' %
-                 classifier_data['_w_dp']))
-
-        if not isinstance(classifier_data['_b_dl'], list):
-            raise utils.ValidationError(
-                ('Expected b_dl to be a list, received %s' %
-                 classifier_data['_b_dl']))
-
-        if not isinstance(classifier_data['_l_dp'], list):
-            raise utils.ValidationError(
-                ('Expected l_dp to be a list, received %s' %
-                 classifier_data['_l_dp']))
-
-        if not isinstance(classifier_data['_c_dl'], list):
-            raise utils.ValidationError(
-                ('Expected c_dl to be a list, received %s' %
-                 classifier_data['_c_dl']))
-
-        if not isinstance(classifier_data['_c_lw'], list):
-            raise utils.ValidationError(
-                ('Expected c_lw to be a list, received %s' %
-                 classifier_data['_c_lw']))
-
-        if not isinstance(classifier_data['_c_l'], list):
-            raise utils.ValidationError(
-                ('Expected c_l to be a list, received %s' %
-                 classifier_data['_c_l']))
+        for list_property in list_properties:
+            if not list_property in classifier_data.keys():
+                raise utils.ValidationError(
+                    'Expected %s to be a key in classifier_data' %
+                    float_property)
+            if not isinstance(classifier_data[list_property], list):
+                raise utils.ValidationError(
+                    ('Expected %s to be a list, received %s' %
+                     list_property, classifier_data[list_property]))
