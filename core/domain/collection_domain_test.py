@@ -30,13 +30,13 @@ import utils
 # utils.dict_from_yaml can isolate differences quickly.
 
 SAMPLE_YAML_CONTENT = ("""category: A category
+language_code: en
 nodes:
 - acquired_skills:
-- Skill0a
-- Skill0b
+  - Skill0a
+  - Skill0b
   exploration_id: an_exploration_id
   prerequisite_skills: []
-language_code: en
 objective: An objective
 schema_version: %d
 tags: []
@@ -622,20 +622,20 @@ nodes:
 - acquired_skills:
   - Skill1
   - Skill2
-    exploration_id: Exp1
-    prerequisite_skills: []
+  exploration_id: Exp1
+  prerequisite_skills: []
 objective: ''
 schema_version: 1
 title: A title
 """)
     YAML_CONTENT_V2 = ("""category: A category
+language_code: en
 nodes:
 - acquired_skills:
   - Skill1
   - Skill2
-    exploration_id: Exp1
-    prerequisite_skills: []
-language_code: en
+  exploration_id: Exp1
+  prerequisite_skills: []
 objective: ''
 schema_version: 2
 tags: []
