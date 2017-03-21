@@ -28,8 +28,8 @@ oppia.factory('StatesToQuestionsService', [
     var INTERACTION_ID_END_EXPLORATION = 'EndExploration';
 
     var allowedInteractionIds = SUPPORTED_INTERACTION_TYPES.map(
-      function(interactionData) {
-        return interactionData.id;
+      function(interactionTypeData) {
+        return interactionTypeData.id;
       }
     );
 
@@ -54,16 +54,16 @@ oppia.factory('StatesToQuestionsService', [
     // - The states in the chain use only allowed interaction IDs, with the
     //     interaction ID of the last state potentially being EndExploration.
     // - Based on the interaction ID of each state:
-    //   - Check that the customization_args are valid.
+    //   - Check that the customizationArgs are valid.
     //   - Check that the ruleSpecs for each answer group are valid.
-    // - The confirmed_unclassified_answers array is empty.
+    // - The confirmedUnclassifiedAnswers array is empty.
     // - The fallbacks array is empty.
     // - For the default outcome, and for each answer group:
     //   - The feedback array contains only one element.
     //   - The destination is a self-loop, UNLESS this is the first answer
     //     group, in which case the destination is a new state (the next along
     //     the chain).
-    //   - The param_changes are empty.
+    //   - The paramChanges are empty.
     var getQuestions = function() {
       var stateNamesInOrder = [];
       var allStateNames = SimpleEditorShimService.getAllStateNames();
@@ -84,11 +84,11 @@ oppia.factory('StatesToQuestionsService', [
         }
         stateNamesInOrder.push(currentStateName);
 
-        var stateData = SimpleEditorShimService.getState(currentStateName);
-        var interactionData = stateData.interaction;
+        var state = SimpleEditorShimService.getState(currentStateName);
+        var interaction = state.interaction;
 
         // Check that the interaction ID is valid.
-        var interactionId = interactionData.id;
+        var interactionId = interaction.id;
         if (!interactionId ||
             interactionId === INTERACTION_ID_END_EXPLORATION) {
           // The end of the chain has been reached.
@@ -99,45 +99,43 @@ oppia.factory('StatesToQuestionsService', [
           return null;
         }
 
-        // Check that the customization_args and the ruleSpecs for each answer
+        // Check that the customizationArgs and the ruleSpecs for each answer
         // group are valid.
         var checkerService = $injector.get(interactionId + 'CheckerService');
         if (!checkerService.isValid(
-            interactionData.customization_args,
-            interactionData.answer_groups)) {
+            interaction.customizationArgs, interaction.answerGroups)) {
           return null;
         }
 
         // Check that the answer groups and the default outcome are valid.
-        for (var i = 0; i < interactionData.answer_groups.length; i++) {
-          var outcome = interactionData.answer_groups[i].outcome;
+        for (var i = 0; i < interaction.answerGroups.length; i++) {
+          var outcome = interaction.answerGroups[i].outcome;
           var expectSelfLoop = (i !== 0);
           if (!isOutcomeValid(outcome, currentStateName, expectSelfLoop)) {
             return null;
           }
         }
-        if (!isOutcomeValid(interactionData.default_outcome)) {
+        if (!isOutcomeValid(interaction.defaultOutcome)) {
           return null;
         }
 
         // Check that other properties of the state are empty.
-        if (stateData.paramChanges.length > 0 ||
-            interactionData.fallbacks.length > 0 ||
-            interactionData.confirmed_unclassified_answers.length > 0) {
+        if (state.paramChanges.length > 0 || interaction.fallbacks.length > 0 ||
+            interaction.confirmedUnclassifiedAnswers.length > 0) {
           return null;
         }
 
         // Determine the name of the next state, if there is one.
         var correctAnswerDest = null;
-        if (interactionData.answer_groups.length > 0) {
-          correctAnswerDest = interactionData.answer_groups[0].outcome.dest;
+        if (interaction.answerGroups.length > 0) {
+          correctAnswerDest = interaction.answerGroups[0].outcome.dest;
         }
 
         var bridgeHtml = (
           correctAnswerDest ?
           SimpleEditorShimService.getContentHtml(correctAnswerDest) : '');
         questions.push(QuestionObjectFactory.create(
-          currentStateName, interactionData, bridgeHtml));
+          currentStateName, interaction, bridgeHtml));
 
         if (!correctAnswerDest) {
           // The question we just added is the last one in the chain.
@@ -160,8 +158,8 @@ oppia.factory('StatesToQuestionsService', [
       } else if (missingStateNames.length === 1) {
         // The interaction ID for that last state should be null or
         // EndExploration.
-        var stateData = SimpleEditorShimService.getState(missingStateNames[0]);
-        var interactionId = stateData.interaction.id;
+        var state = SimpleEditorShimService.getState(missingStateNames[0]);
+        var interactionId = state.interaction.id;
         if (interactionId && interactionId !== INTERACTION_ID_END_EXPLORATION) {
           return null;
         }

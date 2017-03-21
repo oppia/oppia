@@ -141,8 +141,8 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
           warningsList.push({
             type: WARNING_TYPES.ERROR,
             message: (
-              'Please clarify the default outcome so it is less confusing to ' +
-              'the user.')
+              'Please add something for Oppia to say in the ' +
+              '\"All other answers\" response.')
           });
         }
       }

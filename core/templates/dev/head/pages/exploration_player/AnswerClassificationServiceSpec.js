@@ -42,7 +42,7 @@ describe('Answer classification service with string classifier disabled',
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
 
-    state = sof.create('stateName', {
+    state = sof.createFromBackendDict('stateName', {
       content: [{
         type: 'text',
         value: 'content'
@@ -56,7 +56,8 @@ describe('Answer classification service with string classifier disabled',
               x: 10
             },
             rule_type: 'Equals'
-          }]
+          }],
+          correct: false
         }, {
           outcome: 'outcome 2',
           rule_specs: [{
@@ -79,9 +80,11 @@ describe('Answer classification service with string classifier disabled',
               x: 7
             },
             rule_type: 'FuzzyMatches'
-          }]
+          }],
+          correct: false
         }],
-        default_outcome: 'default'
+        default_outcome: 'default',
+        fallbacks: []
       },
       param_changes: []
     });
@@ -158,7 +161,7 @@ describe('Answer classification service with string classifier disabled',
 
   it('should fail if no answer group matches and no default rule is ' +
      'provided', function() {
-    var state2 = sof.create('stateName', {
+    var state2 = sof.createFromBackendDict('stateName', {
       content: [{
         type: 'text',
         value: 'content'
@@ -172,8 +175,10 @@ describe('Answer classification service with string classifier disabled',
               x: 10
             },
             rule_type: 'Equals'
-          }]
-        }]
+          }],
+          correct: false
+        }],
+        fallbacks: []
       },
       param_changes: []
     });
@@ -215,7 +220,7 @@ describe('Answer classification service with string classifier enabled',
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
 
-    state = sof.create('stateName', {
+    state = sof.createFromBackendDict('stateName', {
       content: [{
         type: 'text',
         value: 'content'
@@ -229,7 +234,8 @@ describe('Answer classification service with string classifier enabled',
               x: 10
             },
             rule_type: 'Equals'
-          }]
+          }],
+          correct: false
         }, {
           outcome: 'outcome 2',
           rule_specs: [{
@@ -247,9 +253,11 @@ describe('Answer classification service with string classifier enabled',
               x: 7
             },
             rule_type: 'FuzzyMatches'
-          }]
+          }],
+          correct: false
         }],
-        default_outcome: 'default'
+        default_outcome: 'default',
+        fallbacks: []
       },
       param_changes: []
     });

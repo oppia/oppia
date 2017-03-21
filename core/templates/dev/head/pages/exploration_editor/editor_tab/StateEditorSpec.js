@@ -67,7 +67,8 @@ describe('State Editor controller', function() {
               ruleSpecs: [{
                 dest: 'Second State'
               }]
-            }]
+            }],
+            fallbacks: []
           },
           param_changes: []
         },
@@ -82,7 +83,8 @@ describe('State Editor controller', function() {
               ruleSpecs: [{
                 dest: 'Second State'
               }]
-            }]
+            }],
+            fallbacks: []
           },
           param_changes: []
         },
@@ -97,7 +99,8 @@ describe('State Editor controller', function() {
               ruleSpecs: [{
                 dest: 'Second State'
               }]
-            }]
+            }],
+            fallbacks: []
           },
           param_changes: [{
             name: 'comparison',
@@ -249,12 +252,14 @@ describe('State Editor controller', function() {
               outcome: {
                 feedback: 'Feedback',
                 dest: 'State'
-              }
+              },
+              correct: false
             }],
             default_outcome: {
               feedback: 'Default',
               dest: 'State'
             },
+            fallbacks: [],
             confirmed_unclassified_answers: []
           },
           param_changes: []
@@ -262,12 +267,11 @@ describe('State Editor controller', function() {
       });
 
       var state = ess.getState('State');
-
       rs.init({
-        answerGroups: state.interaction.answer_groups,
-        defaultOutcome: state.interaction.default_outcome,
+        answerGroups: state.interaction.answerGroups,
+        defaultOutcome: state.interaction.defaultOutcome,
         confirmedUnclassifiedAnswers: (
-          state.interaction.confirmed_unclassified_answers)
+          state.interaction.confirmedUnclassifiedAnswers)
       });
 
       ecs.setActiveStateName('State');
@@ -313,7 +317,7 @@ describe('State Editor controller', function() {
       // Training the first answer of a group should add a new classifier.
       tds.trainAnswerGroup(0, 'text answer');
       var state = ess.getState('State');
-      expect(state.interaction.answer_groups[0].ruleSpecs[1]).toEqual({
+      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual({
         rule_type: CLASSIFIER_RULESPEC_STR,
         inputs: {
           training_data: ['text answer']
@@ -324,7 +328,7 @@ describe('State Editor controller', function() {
       // the training data.
       tds.trainAnswerGroup(0, 'second answer');
       state = ess.getState('State');
-      expect(state.interaction.answer_groups[0].ruleSpecs[1]).toEqual({
+      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual({
         rule_type: CLASSIFIER_RULESPEC_STR,
         inputs: {
           training_data: ['text answer', 'second answer']
@@ -335,7 +339,7 @@ describe('State Editor controller', function() {
       // unclassified answers.
       tds.trainDefaultResponse('third answer');
       state = ess.getState('State');
-      expect(state.interaction.confirmed_unclassified_answers).toEqual([
+      expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
         'third answer'
       ]);
     });
@@ -350,39 +354,39 @@ describe('State Editor controller', function() {
 
       // Verify initial state.
       var state = ess.getState('State');
-      expect(state.interaction.answer_groups[0].ruleSpecs[1]).toEqual({
+      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual({
         rule_type: CLASSIFIER_RULESPEC_STR,
         inputs: {
           training_data: ['text answer', 'second answer']
         }
       });
-      expect(state.interaction.confirmed_unclassified_answers).toEqual([
+      expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
         'third answer'
       ]);
 
       // Try to retrain the second answer (answer group -> default response).
       tds.trainDefaultResponse('second answer');
       state = ess.getState('State');
-      expect(state.interaction.answer_groups[0].ruleSpecs[1]).toEqual({
+      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual({
         rule_type: CLASSIFIER_RULESPEC_STR,
         inputs: {
           training_data: ['text answer']
         }
       });
-      expect(state.interaction.confirmed_unclassified_answers).toEqual([
+      expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
         'third answer', 'second answer'
       ]);
 
       // Try to retrain the third answer (default response -> answer group).
       tds.trainAnswerGroup(0, 'third answer');
       state = ess.getState('State');
-      expect(state.interaction.answer_groups[0].ruleSpecs[1]).toEqual({
+      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual({
         rule_type: CLASSIFIER_RULESPEC_STR,
         inputs: {
           training_data: ['text answer', 'third answer']
         }
       });
-      expect(state.interaction.confirmed_unclassified_answers).toEqual([
+      expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
         'second answer'
       ]);
     });
@@ -394,46 +398,46 @@ describe('State Editor controller', function() {
 
       // Verify initial state.
       var state = ess.getState('State');
-      expect(state.interaction.answer_groups[0].ruleSpecs[1]).toEqual({
+      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual({
         rule_type: CLASSIFIER_RULESPEC_STR,
         inputs: {
           training_data: ['text answer']
         }
       });
-      expect(state.interaction.confirmed_unclassified_answers).toEqual([
+      expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
         'second answer'
       ]);
 
       // Ensure emptying the default unclassified answers is handled properly.
       tds.trainAnswerGroup(0, 'second answer');
       state = ess.getState('State');
-      expect(state.interaction.answer_groups[0].ruleSpecs[1]).toEqual({
+      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual({
         rule_type: CLASSIFIER_RULESPEC_STR,
         inputs: {
           training_data: ['text answer', 'second answer']
         }
       });
-      expect(state.interaction.confirmed_unclassified_answers).toEqual([]);
+      expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([]);
 
       // Ensure emptying the answer group's classifier properly deletes the rule
       // since there is another rule in the group.
       tds.trainDefaultResponse('second answer');
       tds.trainDefaultResponse('text answer');
       state = ess.getState('State');
-      expect(state.interaction.answer_groups[0].ruleSpecs).toEqual([{
+      expect(state.interaction.answerGroups[0].ruleSpecs).toEqual([{
         rule_type: 'Contains',
         inputs: {
           x: 'Test'
         }
       }]);
-      expect(state.interaction.confirmed_unclassified_answers).toEqual([
+      expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
         'second answer', 'text answer'
       ]);
 
       // Training the answer group should add the classifier back.
       tds.trainAnswerGroup(0, 'second answer');
       state = ess.getState('State');
-      expect(state.interaction.answer_groups[0].ruleSpecs).toEqual([{
+      expect(state.interaction.answerGroups[0].ruleSpecs).toEqual([{
           rule_type: 'Contains',
           inputs: {
             x: 'Test'
@@ -448,18 +452,18 @@ describe('State Editor controller', function() {
 
       // Removing the the 'contains' rule from the group and then removing the
       // training data should not remove the classifier.
-      state.interaction.answer_groups[0].ruleSpecs.splice(0, 1);
+      state.interaction.answerGroups[0].ruleSpecs.splice(0, 1);
       ess.setState('State', state);
       rs.init({
-        answerGroups: state.interaction.answer_groups,
-        defaultOutcome: state.interaction.default_outcome,
+        answerGroups: state.interaction.answerGroups,
+        defaultOutcome: state.interaction.defaultOutcome,
         confirmedUnclassifiedAnswers: (
-          state.interaction.confirmed_unclassified_answers)
+          state.interaction.confirmedUnclassifiedAnswers)
       });
 
       tds.trainDefaultResponse('second answer');
       state = ess.getState('State');
-      expect(state.interaction.answer_groups[0].ruleSpecs).toEqual([{
+      expect(state.interaction.answerGroups[0].ruleSpecs).toEqual([{
           rule_type: CLASSIFIER_RULESPEC_STR,
           inputs: {
             training_data: []
@@ -474,20 +478,20 @@ describe('State Editor controller', function() {
 
       // Verify initial state.
       var state = ess.getState('State');
-      expect(state.interaction.answer_groups[0].ruleSpecs[1]).toEqual({
+      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual({
         rule_type: CLASSIFIER_RULESPEC_STR,
         inputs: {
           training_data: ['text answer']
         }
       });
-      expect(state.interaction.confirmed_unclassified_answers).toEqual([
+      expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
         'second answer'
       ]);
 
       // Training a duplicate answer for the answer group should change nothing.
       tds.trainAnswerGroup(0, 'text answer');
       state = ess.getState('State');
-      expect(state.interaction.answer_groups[0].ruleSpecs[1]).toEqual({
+      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual({
         rule_type: CLASSIFIER_RULESPEC_STR,
         inputs: {
           training_data: ['text answer']
@@ -498,7 +502,7 @@ describe('State Editor controller', function() {
       // nothing.
       tds.trainDefaultResponse('second answer');
       state = ess.getState('State');
-      expect(state.interaction.answer_groups[0].ruleSpecs[1]).toEqual({
+      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual({
         rule_type: CLASSIFIER_RULESPEC_STR,
         inputs: {
           training_data: ['text answer']

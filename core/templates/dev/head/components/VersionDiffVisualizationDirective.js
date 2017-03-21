@@ -258,7 +258,7 @@ oppia.directive('versionDiffVisualization', [function() {
 
               if (newState) {
                 $http.post(STATE_YAML_URL, {
-                  state_dict: newState,
+                  state_dict: newState.toBackendDict(),
                   width: 50
                 }).then(function(response) {
                   $scope.yamlStrs.leftPane = response.data.yaml;
@@ -274,7 +274,7 @@ oppia.directive('versionDiffVisualization', [function() {
 
               if (oldState) {
                 $http.post(STATE_YAML_URL, {
-                  state_dict: oldState,
+                  state_dict: oldState.toBackendDict(),
                   width: 50
                 }).then(function(response) {
                   $scope.yamlStrs.rightPane = response.data.yaml;

@@ -3,7 +3,7 @@
 	"I18N_ACTION_APPLY_TO_TEACH_WITH_OPPIA": "Aanmelden voor \"Teach With Oppia\"",
 	"I18N_ACTION_BROWSE_EXPLORATIONS": "Onze verkenningen bekijken",
 	"I18N_ACTION_BROWSE_LESSONS": "Onze lessen bekijken",
-	"I18N_ACTION_CREATE_EXPLORATION": "Uw eigen verkenning maken",
+	"I18N_ACTION_CREATE_EXPLORATION": "Maak een verkenning",
 	"I18N_ACTION_CREATE_LESSON": "Uw eigen les maken",
 	"I18N_CREATE_ACTIVITY_QUESTION": "Wat wilt u maken?",
 	"I18N_CREATE_ACTIVITY_TITLE": "Activiteit maken",
@@ -210,6 +210,7 @@
 	"I18N_PREFERENCES_EMAIL": "E-mailadres",
 	"I18N_PREFERENCES_EMAIL_EXPLAIN": "Alleen moderators en beheerders kunnen dit zien.",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_NEWS": "Nieuws en updates over de site ontvangen",
+	"I18N_PREFERENCES_EMAIL_RECEIVE_SUBSCRIPTION_NEWS": "E-mails ontvangen als de maker waarop u geabonneerd bent een nieuwe verkenning publiceert",
 	"I18N_PREFERENCES_HEADING": "Voorkeuren",
 	"I18N_PREFERENCES_HEADING_SUBTEXT": "Alle wijzigingen die u op deze pagina maakt worden automatisch opgeslagen.",
 	"I18N_PREFERENCES_PAGE_TITLE": "Uw profielvoorkeuren wijzigen - Oppia",
@@ -277,8 +278,9 @@
 	"I18N_SPLASH_SECOND_EXPLORATION_DESCRIPTION": "Verkenningen zijn eenvoudig te maken. Ze kunnen gemakkelijk aangepast worden op basis van terugkoppeling van individuele studenten en trends in de ervaring van uw leerlingen over de hele wereld.",
 	"I18N_SPLASH_SITE_FEEDBACK": "Terugkoppeling over de site",
 	"I18N_SPLASH_SUBTITLE": "Oppia maakt het makkelijk om interactieve lessen te maken die informeren en betrekken.",
-	"I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Met Oppia kunt u verkenningen maken en delen over een breed scala aan onderwerpen, alleen beperkt door uw verbeelding.",
+	"I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Met Oppia kunt u verkenningen <a href=\"/dashboard?mode=create\">maken</a> en <a href=\"/library\">delen</a> over een breed scala aan onderwerpen, alleen beperkt door uw verbeelding.",
 	"I18N_SPLASH_TITLE": "Denk buiten de boeken.",
+	"I18N_SUBSCRIBE_BUTTON_TEXT": "Abonneren",
 	"I18N_TOPNAV_ABOUT": "Over",
 	"I18N_TOPNAV_ABOUT_OPPIA": "Over Oppia",
 	"I18N_TOPNAV_ADMIN_PAGE": "Beheerderspagina",
@@ -294,5 +296,6 @@
 	"I18N_TOPNAV_NOTIFICATIONS": "Meldingen",
 	"I18N_TOPNAV_PREFERENCES": "Voorkeuren",
 	"I18N_TOPNAV_SIGN_IN": "Aanmelden",
-	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Onderwijzen met Oppia"
+	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Onderwijzen met Oppia",
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Uitschrijven"
 }

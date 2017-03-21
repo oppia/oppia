@@ -78,74 +78,78 @@ describe('Exploration history', function() {
         highlighted: true
       },
       7: {
-        text: '  - outcome:',
+        text: '  - correct: false',
         highlighted: true
       },
       8: {
-        text: '      dest: second',
+        text: '    outcome:',
         highlighted: true
       },
       9: {
-        text: '      feedback: []',
+        text: '      dest: second',
         highlighted: true
       },
       10: {
-        text: '      param_changes: []',
+        text: '      feedback: []',
         highlighted: true
       },
       11: {
-        text: '    rule_specs:',
+        text: '      param_changes: []',
         highlighted: true
       },
       12: {
-        text: '    - inputs:',
+        text: '    rule_specs:',
         highlighted: true
       },
       13: {
-        text: '        x: 6',
+        text: '    - inputs:',
         highlighted: true
       },
       14: {
-        text: '      rule_type: Equals',
+        text: '        x: 6',
         highlighted: true
       },
       15: {
+        text: '      rule_type: Equals',
+        highlighted: true
+      },
+      16: {
         text: '  confirmed_unclassified_answers: []',
         highlighted: false
       },
-      16: {
+      17: {
         text: '  customization_args: {}',
         highlighted: false
       },
-      17: {
+      18: {
         text: '  default_outcome:',
         highlighted: false
       },
-      18: {
+      19: {
         text: '    dest: first',
         highlighted: true
       },
-      19: {
+      20: {
         text: '    feedback: []',
         highlighted: false
       },
-      20: {
+      21: {
         text: '    param_changes: []',
         highlighted: false
       },
-      21: {
+      22: {
         text: '  fallbacks: []',
         highlighted: false
       },
-      22: {
+      23: {
         text: '  id: NumericInput',
         highlighted: true
       },
-      23: {
+      24: {
         text: 'param_changes: []',
         highlighted: false
       },
-      24: {
+      25: {
         text: ' ',
         highlighted: false
       }
