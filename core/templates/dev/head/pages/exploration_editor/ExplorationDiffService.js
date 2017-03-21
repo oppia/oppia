@@ -34,7 +34,6 @@ oppia.factory('ExplorationDiffService', [
     };
 
     var _generateInitialStateIdsAndData = function(statesDict) {
-      console.log(statesDict);
       var result = {
         stateIds: {},
         stateData: {}
@@ -133,10 +132,6 @@ oppia.factory('ExplorationDiffService', [
       var stateIds = v1Info.stateIds;
       var originalStateIds = angular.copy(stateIds);
 
-      console.log(v1States);
-      console.log(v2States);
-      console.log(v1Info);
-
       changeListData.forEach(function(changeListDatum) {
         var changeList = changeListDatum.changeList;
         var directionForwards = changeListDatum.directionForwards;
@@ -149,7 +144,6 @@ oppia.factory('ExplorationDiffService', [
               stateIds[change.state_name] = newId;
             }
             var currentStateId = stateIds[change.state_name];
-
             if (stateData.hasOwnProperty(currentStateId) &&
                 stateData[currentStateId].stateProperty ==
                   STATE_PROPERTY_DELETED) {

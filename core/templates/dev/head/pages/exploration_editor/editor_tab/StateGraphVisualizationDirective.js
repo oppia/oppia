@@ -73,7 +73,6 @@ oppia.directive('stateGraphViz', [function() {
         var redrawGraph = function() {
           if ($scope.graphData()) {
             $scope.graphLoaded = false;
-            console.log($scope.graphData());
             $scope.drawGraph(
               $scope.graphData().nodes, $scope.graphData().links,
               $scope.graphData().initStateId, $scope.graphData().finalStateIds

@@ -117,7 +117,6 @@ oppia.factory('ReadOnlyExplorationBackendApiService', [
       loadExploration: function(explorationId, version) {
         return $q(function(resolve, reject) {
             _fetchExploration(explorationId, version, function(exploration) {
-              console.log(exploration);
               if (resolve) {
                 resolve(angular.copy(exploration));
               }
@@ -141,23 +140,6 @@ oppia.factory('ReadOnlyExplorationBackendApiService', [
        */
       cacheExploration: function(explorationId, exploration) {
         _explorationCache[explorationId] = angular.copy(exploration);
-      },
-
-      /**
-       * Replaces the current exploration in the cache given by the specified
-       * exploration ID with a new exploration object passed in from the 
-       * EditableExplorationBackendApiService. The reason for the additional 
-       * method is that there are conflicting versions of the learner view,
-       * the one returned by reader.py contains the following subset of fields
-       * that are passed over by editor.py:
-       * [language_code, param_changes, param_specs, skin_customizations,
-       * states, title]. These fields must be extracted from the editable
-       * Exploration and stored in cache. Along with these fields we need to
-       * extract version and exploration_id to the surrounding 
-       */
-      cacheEditableExploration: function(explorationId, exploration) {
-        _explorationCache[explorationId] = (
-          convertEditableToReadOnlyExploration(exploration))
       },
 
       /**

@@ -190,64 +190,38 @@ oppia.factory('oppiaPlayerService', [
         playerTranscriptService.init();
 
         if (_editorPreviewMode) {
-<<<<<<< HEAD
           EditableExplorationBackendApiService.fetchExploration(
             _explorationId, true).then(function(data) {
-            exploration = ExplorationObjectFactory.create(data);
-=======
-          var explorationDataUrl = UrlInterpolationService.interpolateUrl(
-            '/createhandler/data/<exploration_id>', {
-              exploration_id: _explorationId
-            });
-          $http.get(explorationDataUrl, {
-            params: {
-              apply_draft: true
-            }
-          }).then(function(response) {
             exploration = ExplorationObjectFactory.createFromBackendDict(
-              response.data);
->>>>>>> upstream/develop
+              data);
             exploration.setInitialStateName(initStateName);
             initParams(manualParamChanges);
             _loadInitialState(successCallback);
           });
         } else {
-<<<<<<< HEAD
-            loadedExploration = null;
-            if (version) {
-              loadedExploration = (
-                ReadOnlyExplorationBackendApiService.loadExploration(
-                  _explorationId, version));
-            } else {
-              loadedExploration = (
-                ReadOnlyExplorationBackendApiService.loadLatestExploration(
-                  _explorationId));
-            }
-            loadedExploration.then(function(data) {
-                exploration = ExplorationObjectFactory.create(data.exploration);
-                version = exploration.version;
-=======
-          var explorationDataUrl = UrlInterpolationService.interpolateUrl(
-            '/explorehandler/init/<exploration_id>', {
-              exploration_id: _explorationId
-            }) + (version ? '?v=' + version : '');
-          $http.get(explorationDataUrl).then(function(response) {
-            var data = response.data;
+          loadedExploration = null;
+          if (version) {
+            loadedExploration = (
+              ReadOnlyExplorationBackendApiService.loadExploration(
+                _explorationId, version));
+          } else {
+            loadedExploration = (
+              ReadOnlyExplorationBackendApiService.loadLatestExploration(
+                _explorationId));
+          }
+          loadedExploration.then(function(data) {
             exploration = ExplorationObjectFactory.createFromBackendDict(
               data.exploration);
-            version = data.version;
->>>>>>> upstream/develop
+            version = exploration.version;
+            initParams([]);
 
-                initParams([]);
+            StatsReportingService.initSession(
+              _explorationId, exploration.version, data.session_id,
+              GLOBALS.collectionId);
 
-                StatsReportingService.initSession(
-                  _explorationId, exploration.version, data.session_id,
-                  GLOBALS.collectionId);
-
-                _loadInitialState(successCallback);
-                $rootScope.$broadcast('playerServiceInitialized');
-              }
-            );
+            _loadInitialState(successCallback);
+            $rootScope.$broadcast('playerServiceInitialized');
+          });
         }
       },
       getExplorationId: function() {

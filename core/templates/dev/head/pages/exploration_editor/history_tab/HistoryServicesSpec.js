@@ -200,8 +200,10 @@ describe('Compare versions service', function() {
     // Only information accessed by getDiffGraphData is included in the return
     // value
     var _getStatesData = function(statesDetails) {
-      var statesData = {
-        states: {}
+      var data = {
+        exploration: {
+          states: {}
+        }
       };
       for (var stateName in statesDetails) {
         var newStateData = {
@@ -222,9 +224,9 @@ describe('Compare versions service', function() {
               }
             };
           });
-        statesData.states[stateName] = newStateData;
+        data.exploration.states[stateName] = newStateData;
       }
-      return statesData;
+      return data;
     };
 
     var testSnapshots1 = [{

@@ -200,8 +200,8 @@ oppia.factory('compareVersionsService', [
           v2Data: ReadOnlyExplorationBackendApiService.loadExploration(
             explorationData.explorationId, v2)
         }).then(function(response) {
-          var v1States = response.v1Data.exploration.states;
-          var v2States = response.v2Data.exploration.states;
+          var v1StatesDict = response.v1Data.exploration.states;
+          var v2StatesDict = response.v2Data.exploration.states;
 
           // Track changes from v1 to LCA, and then from LCA to v2.
           var lca = versionsTreeService.findLCA(v1, v2);
@@ -220,7 +220,6 @@ oppia.factory('compareVersionsService', [
               directionForwards: true
             }]
           );
-          console.log(diffGraphData);
 
           return {
             nodes: diffGraphData.nodes,

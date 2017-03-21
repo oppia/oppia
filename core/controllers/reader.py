@@ -36,7 +36,6 @@ from core.domain import rating_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
-from core.domain import stats_services
 from core.domain import summary_services
 import feconf
 import utils
@@ -228,13 +227,6 @@ class ExplorationHandler(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
-        # states = {}
-        # for state_name in exploration.states:
-        #     state_dict = exploration.states[state_name].to_dict()
-        #     state_dict['unresolved_answers'] = (
-        #         stats_services.get_top_unresolved_answers_for_default_rule(
-        #             exploration_id, state_name))
-        #     states[state_name] = state_dict
         self.values.update({
             'can_edit': (
                 self.user_id and
