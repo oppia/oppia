@@ -608,32 +608,32 @@ class LDAStringClassifier(BaseClassifier):
         """
 
         float_properties = [
-            "_alpha",
-            "_beta",
-            "_prediction_threshold"
-            ]
+            '_alpha',
+            '_beta',
+            '_prediction_threshold'
+        ]
         int_properties = [
-            "_training_iterations",
-            "_prediction_iterations",
-            "_num_labels",
-            "_num_docs",
-            "_num_words"
-            ]
+            '_training_iterations',
+            '_prediction_iterations',
+            '_num_labels',
+            '_num_docs',
+            '_num_words'
+        ]
         dict_properties = [
-            "_label_to_id",
-            "_word_to_id"
-            ]
+            '_label_to_id',
+            '_word_to_id'
+        ]
         list_properties = [
-            "_w_dp",
-            "_b_dl",
-            "_l_dp",
-            "_c_dl",
-            "_c_lw",
-            "_c_l"
-            ]
+            '_w_dp',
+            '_b_dl',
+            '_l_dp',
+            '_c_dl',
+            '_c_lw',
+            '_c_l'
+        ]
 
         for float_property in float_properties:
-            if float_property not in classifier_data.keys():
+            if float_property not in classifier_data:
                 raise utils.ValidationError(
                     'Expected %s to be a key in classifier_data' %
                     float_property)
@@ -643,7 +643,7 @@ class LDAStringClassifier(BaseClassifier):
                      float_property, classifier_data[float_property]))
 
         for int_property in int_properties:
-            if int_property not in classifier_data.keys():
+            if int_property not in classifier_data:
                 raise utils.ValidationError(
                     'Expected %s to be a key in classifier_data' %
                     int_property)
@@ -653,7 +653,7 @@ class LDAStringClassifier(BaseClassifier):
                      int_property, classifier_data[int_property]))
 
         for dict_property in dict_properties:
-            if dict_property not in classifier_data.keys():
+            if dict_property not in classifier_data:
                 raise utils.ValidationError(
                     'Expected %s to be a key in classifier_data' %
                     dict_property)
@@ -663,7 +663,7 @@ class LDAStringClassifier(BaseClassifier):
                      dict_property, classifier_data[dict_property]))
 
         for list_property in list_properties:
-            if list_property not in classifier_data.keys():
+            if list_property not in classifier_data:
                 raise utils.ValidationError(
                     'Expected %s to be a key in classifier_data' %
                     list_property)

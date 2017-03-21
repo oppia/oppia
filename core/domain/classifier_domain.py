@@ -139,7 +139,7 @@ class Classifier(object):
 
         if not isinstance(self.exp_version_when_created, int):
             raise utils.ValidationError(
-                'Expected exp_version_when_created to be a int received %d' %
+                'Expected exp_version_when_created to be a int, received %d' %
                 self.exp_version_when_created)
 
         if not isinstance(self.state_name, basestring):
