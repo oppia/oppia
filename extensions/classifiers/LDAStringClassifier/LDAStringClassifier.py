@@ -664,13 +664,13 @@ class LDAStringClassifier(BaseClassifier):
             for key, value in classifier_data[dict_property].items():
                 if not isinstance(key, basestring):
                     raise utils.ValidationError(
-                    ('Expected key of %s to be a string, received %s' %
-                     dict_property, key))
+                        ('Expected key of %s to be a string, received %s' %
+                         dict_property, key))
                 if not isinstance(value, int):
                     raise utils.ValidationError(
-                    ('Expected value of %s to be a int, received %s' %
-                     dict_property, value))
- 
+                        ('Expected value of %s to be a int, received %s' %
+                         dict_property, value))
+
         for list_property in list_properties:
             if list_property not in classifier_data:
                 raise utils.ValidationError(
