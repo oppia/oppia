@@ -18,11 +18,11 @@
  */
 
 oppia.factory('ExplorationObjectFactory', [
-  'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE',
-  'StateObjectFactory', 'UrlInterpolationService',
+  'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE', 'StateObjectFactory',
+  'StatesObjectFactory', 'UrlInterpolationService',
   function(
       INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE, StateObjectFactory,
-      UrlInterpolationService) {
+      StatesObjectFactory, UrlInterpolationService) {
     var Exploration = function(
         initStateName, paramChanges, paramSpecs, skinCustomizations,
         states, title, languageCode) {
@@ -128,18 +128,10 @@ oppia.factory('ExplorationObjectFactory', [
         explorationBackendDict.param_changes,
         explorationBackendDict.param_specs,
         explorationBackendDict.skin_customizations,
-        generateStatesFromBackendDict(explorationBackendDict.states),
+        StatesObjectFactory.createFromBackendDict(
+          explorationBackendDict.states),
         explorationBackendDict.title,
         explorationBackendDict.language_code);
-    };
-
-    var generateStatesFromBackendDict = function(statesBackendDict) {
-      var states = {};
-      for (var stateName in statesBackendDict) {
-        states[stateName] = StateObjectFactory.createFromBackendDict(
-          stateName, statesBackendDict[stateName]);
-      }
-      return states;
     };
 
     return Exploration;

@@ -20,9 +20,9 @@
 oppia.factory('InteractionObjectFactory', [
   'AnswerGroupObjectFactory', 'FallbackObjectFactory',
   function(AnswerGroupObjectFactory, FallbackObjectFactory) {
-  var Interaction = function(answerGroups, confirmedUnclassifiedAnswers,
-    customizationArgs, defaultOutcome,
-    fallbacks, id) {
+  var Interaction = function(
+    answerGroups, confirmedUnclassifiedAnswers, customizationArgs,
+    defaultOutcome, fallbacks, id) {
     this.answerGroups = answerGroups;
     this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
     this.customizationArgs = customizationArgs;
