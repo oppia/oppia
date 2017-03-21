@@ -34,7 +34,7 @@ class _Platform(object):
 
 class _Gae(_Platform):
     """Google App Engine Model.
-    Super model of the Registry Model and implements all the 
+    Super model of the Registry Model and implements all the
     methods of Registry.
     """
     @classmethod
@@ -128,21 +128,21 @@ class _Gae(_Platform):
 
     @classmethod
     def import_email_services(cls):
-        """Importing the correct email services module according to 
+        """Importing the correct email services module according to
         the feconf values
 
         Returns:
-            Module gae_email_services from core.platform.email / 
+            Module gae_email_services from core.platform.email /
             Module mailgun_email_services from core.platform.email
 
         Raises:
-            Exception: Invalid email service 
+            Exception: Invalid email service
             provider 'feconf.EMAIL_SERVICE_PROVIDER'
         """
         if feconf.EMAIL_SERVICE_PROVIDER == feconf.EMAIL_SERVICE_PROVIDER_GAE:
             from core.platform.email import gae_email_services
             return gae_email_services
-        elif (feconf.EMAIL_SERVICE_PROVIDER == feconf.EMAIL_SERVICE_PROVIDER_MAILGUN):  # pylint: disable=line-too-long
+        elif feconf.EMAIL_SERVICE_PROVIDER == feconf.EMAIL_SERVICE_PROVIDER_MAILGUN:  # pylint: disable=line-too-long
             from core.platform.email import mailgun_email_services
             return mailgun_email_services
         else:
@@ -188,7 +188,7 @@ class Registry(object):
     This is the model accessed by all submodules
 
     """
-    
+
     #mapping methods of this model to the methods of _Gae_ model
     _PLATFORM_MAPPING = {
         _Gae.NAME: _Gae,
