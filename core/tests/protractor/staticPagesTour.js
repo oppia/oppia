@@ -25,15 +25,18 @@ describe('Oppia static pages tour', function() {
   });
 
   it('visits the links in About dropdown', function() {
-    var dropdown = element(by.css('.protractor-test-about-oppia-list-item'));
-    var linkClassNames = ['.protractor-test-about-link',
-                          '.protractor-test-teach-link',
-                          '.protractor-test-contact-link'
-                         ];
+    var LINKS_CLASS_NAMES = [
+      '.protractor-test-about-link',
+      '.protractor-test-get-started-link',
+      '.protractor-test-teach-link',
+      '.protractor-test-contact-link'
+    ];
 
-    linkClassNames.forEach(function(className) {
+    LINKS_CLASS_NAMES.forEach(function(className) {
+      var dropdown = element(by.css('.protractor-test-about-oppia-list-item'));
       browser.actions().mouseMove(dropdown).perform();
       dropdown.element(by.css(className)).click();
+      general.waitForSystem();
     });
   });
 

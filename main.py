@@ -76,8 +76,9 @@ class HomePageRedirectHandler(base.BaseHandler):
 
             # 'Creator' is a user who has created or edited an exploration.
             user_is_creator = (
-                len(user_contributions.created_exploration_ids) > 0 or
-                len(user_contributions.edited_exploration_ids) > 0)
+                user_contributions is not None and
+                (len(user_contributions.created_exploration_ids) > 0 or
+                 len(user_contributions.edited_exploration_ids) > 0))
             if user_is_creator:
                 self.redirect(feconf.DASHBOARD_URL)
             else:
