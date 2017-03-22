@@ -130,22 +130,22 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         state_name = 'Home'
         test_state_name = 'State'
         cached_data = {
-            "_alpha": 0.1,
-            "_beta": 0.001,
-            "_prediction_threshold": 0.5,
-            "_training_iterations": 25,
-            "_prediction_iterations": 5,
-            "_num_labels": 10,
-            "_num_docs": 12,
-            "_num_words": 20,
-            "_label_to_id": {"text": 1},
-            "_word_to_id": {"hello": 2},
-            "_w_dp": [],
-            "_b_dl": [],
-            "_l_dp": [],
-            "_c_dl": [],
-            "_c_lw": [],
-            "_c_l": []
+            '_alpha': 0.1,
+            '_beta': 0.001,
+            '_prediction_threshold': 0.5,
+            '_training_iterations': 25,
+            '_prediction_iterations': 5,
+            '_num_labels': 10,
+            '_num_docs': 12,
+            '_num_words': 20,
+            '_label_to_id': {'text': 1},
+            '_word_to_id': {'hello': 2},
+            '_w_dp': [],
+            '_b_dl': [],
+            '_l_dp': [],
+            '_c_dl': [],
+            '_c_lw': [],
+            '_c_l': []
         }
         classifier = classifier_domain.Classifier(
             '1', exp_id, 1, state_name,

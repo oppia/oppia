@@ -45,8 +45,11 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
                              observed_classifier.to_dict())
 
     def test_validation(self):
+        """Tests to verify validate method of classifier domain."""
+
+        # Verify no errors are raised for correct data.
         classifier_dict = {
-            'classifier_id': 1,
+            'classifier_id': 'exp_id1.SOME_RANDOM_STRING',
             'exp_id': 'exp_id1',
             'exp_version_when_created': 1,
             'state_name': 'a state name',
@@ -62,8 +65,24 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
             classifier_dict['algorithm_id'],
             classifier_dict['cached_classifier_data'],
             classifier_dict['data_schema_version'])
+        classifier.validate()
+
+        # Verify Validation error is raised when int is provided instead of
+        # string.
+        classifier_dict['classifier_id'] = 1
+        classifier = classifier_domain.Classifier(
+            classifier_dict['classifier_id'],
+            classifier_dict['exp_id'],
+            classifier_dict['exp_version_when_created'],
+            classifier_dict['state_name'],
+            classifier_dict['algorithm_id'],
+            classifier_dict['cached_classifier_data'],
+            classifier_dict['data_schema_version'])
         with self.assertRaises(utils.ValidationError):
             classifier.validate()
+
+        # Verify Type error is raised when string is provided instead of
+        # int.
         classifier_dict['classifier_id'] = 'exp_id1.SOME_RANDOM_STRING'
         classifier_dict['exp_version_when_created'] = 'abc'
         classifier = classifier_domain.Classifier(
@@ -76,6 +95,8 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
             classifier_dict['data_schema_version'])
         with self.assertRaises(TypeError):
             classifier.validate()
+
+        # Verify Valdation error is raised when invalid state_name is provided.
         classifier_dict['exp_version_when_created'] = 1
         classifier_dict['state_name'] = 'A string #'
         classifier = classifier_domain.Classifier(
@@ -88,6 +109,9 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
             classifier_dict['data_schema_version'])
         with self.assertRaises(utils.ValidationError):
             classifier.validate()
+
+        # Verify Validation error is raised when invalid algorithm_id is
+        # provided.
         classifier_dict['state_name'] = 'a state name'
         classifier_dict['algorithm_id'] = 'abc'
         classifier = classifier_domain.Classifier(
@@ -100,6 +124,8 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
             classifier_dict['data_schema_version'])
         with self.assertRaises(utils.ValidationError):
             classifier.validate()
+
+        # Verify Validation error is raised when list is provided for dict.
         classifier_dict['algorithm_id'] = "LDAStringClassifier"
         classifier_dict['cached_classifier_data'] = []
         classifier = classifier_domain.Classifier(

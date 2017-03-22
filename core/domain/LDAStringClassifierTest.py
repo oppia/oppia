@@ -231,3 +231,62 @@ class LDAStringClassifierUnitTests(test_utils.GenericTestBase):
         labels = self.classifier.predict(self._EXAMPLES_TEST)
         self.assertEquals(labels[2], '_default')
         self._validate_instance()
+
+    def test_validate(self):
+        """Test to verify validate method of LDAStringClassifier."""
+
+        # Verify no errors are raised for correct data.
+        classifier_data = {
+            '_alpha': 0.1,
+            '_beta': 0.001,
+            '_prediction_threshold': 0.5,
+            '_training_iterations': 25,
+            '_prediction_iterations': 5,
+            '_num_labels': 10,
+            '_num_docs': 12,
+            '_num_words': 20,
+            '_label_to_id': {'text': 1},
+            '_word_to_id': {'hello': 2},
+            '_w_dp': [],
+            '_b_dl': [],
+            '_l_dp': [],
+            '_c_dl': [],
+            '_c_lw': [],
+            '_c_l': []
+        }
+        self.classifier.validate(classifier_data)
+
+        # Verify Type error is raised when string is provided instead of int.
+        classifier_data['_alpha'] = 'abc'
+        with self.assertRaises(TypeError):
+            self.classifier.validate(classifier_data)
+
+        # Verify Type error is raised when float is provided instead of int.
+        classifier_data['_alpha'] = 0.1
+        classifier_data['_training_iterations'] = 1.2
+        with self.assertRaises(TypeError):
+            self.classifier.validate(classifier_data)
+
+        # Verify Type error is raised when list is provided instead of dict.
+        classifier_data['_training_iterations'] = 25
+        classifier_data['_label_to_id'] = []
+        with self.assertRaises(TypeError):
+            self.classifier.validate(classifier_data)
+
+        # Verify Type error is raised when key of dict is int instead of
+        # string.
+        classifier_data['_label_to_id'] = {1: 1}
+        with self.assertRaises(TypeError):
+            self.classifier.validate(classifier_data)
+
+        # Verify Type error is raised when value of dict is string instead of
+        # int.
+        classifier_data['_label_to_id'] = {'text': '1'}
+        with self.assertRaises(TypeError):
+            self.classifier.validate(classifier_data)
+
+        # Verify Type error is raised when dict is provided instead of list.
+        classifier_data['_label_to_id'] = {'text': 1}
+        classifier_data['_w_dp'] = {}
+        with self.assertRaises(TypeError):
+            self.classifier.validate(classifier_data)
