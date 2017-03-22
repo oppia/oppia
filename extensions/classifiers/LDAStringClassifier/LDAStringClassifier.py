@@ -640,7 +640,7 @@ class LDAStringClassifier(BaseClassifier):
             if not isinstance(classifier_data[float_property], float):
                 raise utils.ValidationError(
                     ('Expected %s to be a float, received %s' %(
-                     float_property, classifier_data[float_property])))
+                        float_property, classifier_data[float_property])))
 
         for int_property in int_properties:
             if int_property not in classifier_data:
@@ -650,7 +650,7 @@ class LDAStringClassifier(BaseClassifier):
             if not isinstance(classifier_data[int_property], int):
                 raise utils.ValidationError(
                     ('Expected %s to be a int, received %s' %(
-                     int_property, classifier_data[int_property])))
+                        int_property, classifier_data[int_property])))
 
         for dict_property in dict_properties:
             if dict_property not in classifier_data:
@@ -660,16 +660,16 @@ class LDAStringClassifier(BaseClassifier):
             if not isinstance(classifier_data[dict_property], dict):
                 raise utils.ValidationError(
                     ('Expected %s to be a dict, received %s' %(
-                     dict_property, classifier_data[dict_property])))
+                        dict_property, classifier_data[dict_property])))
             for key, value in classifier_data[dict_property].iteritems():
                 if not isinstance(key, basestring):
                     raise utils.ValidationError(
                         ('Expected key of %s to be a string, received %s' %(
-                         dict_property, key)))
+                            dict_property, key)))
                 if not isinstance(value, int):
                     raise utils.ValidationError(
                         ('Expected value of %s to be a int, received %s' %(
-                         dict_property, value)))
+                            dict_property, value)))
 
         for list_property in list_properties:
             if list_property not in classifier_data:
@@ -679,9 +679,9 @@ class LDAStringClassifier(BaseClassifier):
             if not isinstance(classifier_data[list_property], list):
                 raise utils.ValidationError(
                     ('Expected %s to be a list, received %s' %(
-                     list_property, classifier_data[list_property])))
+                        list_property, classifier_data[list_property])))
             for value in classifier_data[list_property]:
                 if not isinstance(value, int):
                     raise utils.ValidationError(
                     ('Expected values of %s to be a int, received %s' %(
-                     list_property, value)))
+                        list_property, value)))

@@ -288,20 +288,21 @@ class LDAStringClassifierUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(utils.ValidationError, "string"):
             self.classifier.validate(classifier_data)
 
-        # Verify Validation error is raised when value of dict is string instead of
-        # int.
+        # Verify Validation error is raised when value of dict is string
+        # instead of int.
         classifier_data['_label_to_id'] = {'text': '1'}
         with self.assertRaisesRegexp(utils.ValidationError, "int"):
             self.classifier.validate(classifier_data)
 
-        # Verify Validation error is raised when dict is provided instead of list.
+        # Verify Validation error is raised when dict is provided instead of
+        # list.
         classifier_data['_label_to_id'] = {'text': 1}
         classifier_data['_w_dp'] = {}
         with self.assertRaisesRegexp(utils.ValidationError, "list"):
             self.classifier.validate(classifier_data)
 
-        # Verify Validation error is raised when the list values are string instead
-        # of int.
+        # Verify Validation error is raised when the list values are string
+        # instead of int.
         classifier_data['_w_dp'] = ['abc']
         with self.assertRaisesRegexp(utils.ValidationError, "int"):
             self.classifier.validate(classifier_data)
