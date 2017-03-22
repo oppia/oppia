@@ -18,27 +18,21 @@
  */
 
 oppia.factory('ExplorationObjectFactory', [
-  'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE',
-  'StateObjectFactory', 'UrlInterpolationService',
+  'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE', 'StateObjectFactory',
+  'StatesObjectFactory', 'UrlInterpolationService',
   function(
       INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE, StateObjectFactory,
-      UrlInterpolationService) {
+      StatesObjectFactory, UrlInterpolationService) {
     var Exploration = function(
-        initStateName, paramChangesBackendList, paramSpecsBackendDict,
-        skinCustomizationsBackendDict, statesBackendDict, title,
-        languageCode) {
+        initStateName, paramChanges, paramSpecs, skinCustomizations,
+        states, title, languageCode) {
       this.initStateName = initStateName;
-      this.paramChanges = paramChangesBackendList;
-      this.paramSpecs = paramSpecsBackendDict;
-      this.skinCustomizations = skinCustomizationsBackendDict;
+      this.paramChanges = paramChanges;
+      this.paramSpecs = paramSpecs;
+      this.skinCustomizations = skinCustomizations;
+      this.states = states;
       this.title = title;
       this.languageCode = languageCode;
-
-      this.states = {};
-      for (var stateName in statesBackendDict) {
-        this.states[stateName] = StateObjectFactory.createFromBackendDict(
-          stateName, statesBackendDict[stateName]);
-      }
     };
 
     // Instance methods
@@ -134,7 +128,8 @@ oppia.factory('ExplorationObjectFactory', [
         explorationBackendDict.param_changes,
         explorationBackendDict.param_specs,
         explorationBackendDict.skin_customizations,
-        explorationBackendDict.states,
+        StatesObjectFactory.createFromBackendDict(
+          explorationBackendDict.states),
         explorationBackendDict.title,
         explorationBackendDict.language_code);
     };
