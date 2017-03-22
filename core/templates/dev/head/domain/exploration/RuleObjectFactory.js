@@ -21,7 +21,7 @@ oppia.factory('RuleObjectFactory', [function() {
   var Rule = function(ruleType, inputs) {
     this.ruleType = ruleType;
     this.inputs = inputs;
-  }
+  };
 
   Rule.prototype.toBackendDict = function() {
     return {
