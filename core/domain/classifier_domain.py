@@ -139,7 +139,7 @@ class Classifier(object):
 
         if not isinstance(self.exp_version_when_created, int):
             raise utils.ValidationError(
-                'Expected exp_version_when_created to be a int, received %d' %
+                'Expected exp_version_when_created to be a int, received %s' %
                 self.exp_version_when_created)
 
         if not isinstance(self.state_name, basestring):
@@ -156,7 +156,7 @@ class Classifier(object):
         if self.algorithm_id not in (
                 feconf.INTERACTION_CLASSIFIER_MAPPING.values()):
             raise utils.ValidationError(
-                'Invalid algorithm_id: %s' % self.algorithm_id)
+                'Invalid algorithm id: %s' % self.algorithm_id)
 
         if not isinstance(self.cached_classifier_data, dict):
             raise utils.ValidationError(

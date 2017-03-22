@@ -17,6 +17,7 @@
 from core.domain import classifier_registry
 from core.tests import test_utils
 import feconf
+import utils
 
 # pylint: disable=protected-access
 
@@ -256,37 +257,51 @@ class LDAStringClassifierUnitTests(test_utils.GenericTestBase):
         }
         self.classifier.validate(classifier_data)
 
-        # Verify Type error is raised when string is provided instead of int.
-        classifier_data['_alpha'] = 'abc'
-        with self.assertRaises(TypeError):
+        # Verify validation error is raised when key is not present.
+        classifier_data.pop('_alpha', None)
+        with self.assertRaisesRegexp(utils.ValidationError, "key"):
             self.classifier.validate(classifier_data)
 
-        # Verify Type error is raised when float is provided instead of int.
+        # Verify Validation error is raised when string is provided instead of
+        # int.
+        classifier_data['_alpha'] = 'abc'
+        with self.assertRaisesRegexp(utils.ValidationError, "float"):
+            self.classifier.validate(classifier_data)
+
+        # Verify Validation error is raised when float is provided instead of
+        # int.
         classifier_data['_alpha'] = 0.1
         classifier_data['_training_iterations'] = 1.2
-        with self.assertRaises(TypeError):
+        with self.assertRaisesRegexp(utils.ValidationError, "int"):
             self.classifier.validate(classifier_data)
 
-        # Verify Type error is raised when list is provided instead of dict.
+        # Verify Validation error is raised when list is provided instead of
+        # dict.
         classifier_data['_training_iterations'] = 25
         classifier_data['_label_to_id'] = []
-        with self.assertRaises(TypeError):
+        with self.assertRaisesRegexp(utils.ValidationError, "dict"):
             self.classifier.validate(classifier_data)
 
-        # Verify Type error is raised when key of dict is int instead of
+        # Verify Validation error is raised when key of dict is int instead of
         # string.
         classifier_data['_label_to_id'] = {1: 1}
-        with self.assertRaises(TypeError):
+        with self.assertRaisesRegexp(utils.ValidationError, "string"):
             self.classifier.validate(classifier_data)
 
-        # Verify Type error is raised when value of dict is string instead of
+        # Verify Validation error is raised when value of dict is string instead of
         # int.
         classifier_data['_label_to_id'] = {'text': '1'}
-        with self.assertRaises(TypeError):
+        with self.assertRaisesRegexp(utils.ValidationError, "int"):
             self.classifier.validate(classifier_data)
 
-        # Verify Type error is raised when dict is provided instead of list.
+        # Verify Validation error is raised when dict is provided instead of list.
         classifier_data['_label_to_id'] = {'text': 1}
         classifier_data['_w_dp'] = {}
-        with self.assertRaises(TypeError):
+        with self.assertRaisesRegexp(utils.ValidationError, "list"):
+            self.classifier.validate(classifier_data)
+
+        # Verify Validation error is raised when the list values are string instead
+        # of int.
+        classifier_data['_w_dp'] = ['abc']
+        with self.assertRaisesRegexp(utils.ValidationError, "int"):
             self.classifier.validate(classifier_data)
