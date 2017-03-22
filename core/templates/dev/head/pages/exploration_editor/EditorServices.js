@@ -1931,9 +1931,9 @@ oppia.factory('explorationWarningsService', [
       var answerGroups = state.interaction.answerGroups;
       for (var i = 0; i < answerGroups.length; i++) {
         var group = answerGroups[i];
-        if (group.ruleSpecs.length === 1 &&
-            group.ruleSpecs[0].ruleType === CLASSIFIER_RULESPEC_STR &&
-            group.ruleSpecs[0].inputs.training_data.length === 0) {
+        if (group.rules.length === 1 &&
+            group.rules[0].ruleType === CLASSIFIER_RULESPEC_STR &&
+            group.rules[0].inputs.training_data.length === 0) {
           indexes.push(i);
         }
       }
@@ -2102,13 +2102,13 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
 
   var makeRulesListHumanReadable = function(answerGroupValue) {
     var rulesList = [];
-    answerGroupValue.ruleSpecs.forEach(function(ruleSpec) {
+    answerGroupValue.rules.forEach(function(rule) {
       var ruleElm = angular.element('<li></li>');
-      ruleElm.html('<p>Type: ' + ruleSpec.ruleType + '</p>');
+      ruleElm.html('<p>Type: ' + rule.ruleType + '</p>');
       ruleElm.append(
         '<p>Value: ' + (
-          Object.keys(ruleSpec.inputs).map(function(input) {
-            return ruleSpec.inputs[input];
+          Object.keys(rule.inputs).map(function(input) {
+            return rule.inputs[input];
           })
         ).toString() + '</p>');
       rulesList.push(ruleElm);
@@ -2274,7 +2274,7 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
                       '<div class="feedback">' + newValue.outcome.feedback +
                       '</div></div>');
                 }
-                if (!angular.equals(newValue.ruleSpecs, oldValue.ruleSpecs)) {
+                if (!angular.equals(newValue.rules, oldValue.rules)) {
                   var rulesList = makeRulesListHumanReadable(newValue);
                   if (rulesList.length > 0) {
                     answerGroupHtml += '<p class="sub-edit"><i>Rules: </i></p>';

@@ -53,7 +53,7 @@ describe('oppiaInteractiveImageClickInputValidator', function() {
       }
     };
     goodAnswerGroups = [{
-      ruleSpecs: [{
+      rules: [{
         ruleType: 'IsInRegion',
         inputs: {
           x: 'SecondLabel'
@@ -66,7 +66,7 @@ describe('oppiaInteractiveImageClickInputValidator', function() {
 
   it('should expect a customization argument for image and regions',
     function() {
-      goodAnswerGroups[0].ruleSpecs = [];
+      goodAnswerGroups[0].rules = [];
       expect(function() {
         validator(currentState, {}, goodAnswerGroups, goodDefaultOutcome);
       }).toThrow(
@@ -122,7 +122,7 @@ describe('oppiaInteractiveImageClickInputValidator', function() {
       }]);
 
       customizationArguments.imageAndRegions.value.labeledRegions = [];
-      goodAnswerGroups[0].ruleSpecs = [];
+      goodAnswerGroups[0].rules = [];
       warnings = validator(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
@@ -133,7 +133,7 @@ describe('oppiaInteractiveImageClickInputValidator', function() {
     });
 
   it('should expect rule types to reference valid region labels', function() {
-    goodAnswerGroups[0].ruleSpecs[0].inputs.x = 'FakeLabel';
+    goodAnswerGroups[0].rules[0].inputs.x = 'FakeLabel';
     var warnings = validator(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);

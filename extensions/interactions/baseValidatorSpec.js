@@ -30,12 +30,12 @@ describe('Interaction validator', function() {
   var currentState, otherState, goodOutcomeDest, goodOutcomeFeedback;
   var badOutcome, goodAnswerGroups, goodDefaultOutcome;
 
-  var createAnswerGroup = function(outcome, ruleSpecs, correct) {
-    if (!ruleSpecs) {
-      ruleSpecs = [];
+  var createAnswerGroup = function(outcome, rules, correct) {
+    if (!rules) {
+      rules = [];
     }
     return {
-      ruleSpecs: ruleSpecs,
+      rules: rules,
       outcome: outcome,
       correct: !!correct
     };

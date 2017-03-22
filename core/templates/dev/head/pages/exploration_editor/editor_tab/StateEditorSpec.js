@@ -319,7 +319,7 @@ describe('State Editor controller', function() {
       // Training the first answer of a group should add a new classifier.
       tds.trainAnswerGroup(0, 'text answer');
       var state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual(
+      expect(state.interaction.answerGroups[0].rules[1]).toEqual(
         rof.createNew(CLASSIFIER_RULESPEC_STR, {
           training_data: ['text answer']
         })
@@ -329,7 +329,7 @@ describe('State Editor controller', function() {
       // the training data.
       tds.trainAnswerGroup(0, 'second answer');
       state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual(
+      expect(state.interaction.answerGroups[0].rules[1]).toEqual(
         rof.createNew(CLASSIFIER_RULESPEC_STR, {
           training_data: ['text answer', 'second answer']
         })
@@ -354,7 +354,7 @@ describe('State Editor controller', function() {
 
       // Verify initial state.
       var state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual(
+      expect(state.interaction.answerGroups[0].rules[1]).toEqual(
         rof.createNew(CLASSIFIER_RULESPEC_STR, {
           training_data: ['text answer', 'second answer']
         })
@@ -366,7 +366,7 @@ describe('State Editor controller', function() {
       // Try to retrain the second answer (answer group -> default response).
       tds.trainDefaultResponse('second answer');
       state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual(
+      expect(state.interaction.answerGroups[0].rules[1]).toEqual(
         rof.createNew(CLASSIFIER_RULESPEC_STR, {
           training_data: ['text answer']
         })
@@ -378,7 +378,7 @@ describe('State Editor controller', function() {
       // Try to retrain the third answer (default response -> answer group).
       tds.trainAnswerGroup(0, 'third answer');
       state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual(
+      expect(state.interaction.answerGroups[0].rules[1]).toEqual(
         rof.createNew(CLASSIFIER_RULESPEC_STR, {
           training_data: ['text answer', 'third answer']
         })
@@ -395,7 +395,7 @@ describe('State Editor controller', function() {
 
       // Verify initial state.
       var state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual(
+      expect(state.interaction.answerGroups[0].rules[1]).toEqual(
         rof.createNew(CLASSIFIER_RULESPEC_STR, {
           training_data: ['text answer']
         })
@@ -407,7 +407,7 @@ describe('State Editor controller', function() {
       // Ensure emptying the default unclassified answers is handled properly.
       tds.trainAnswerGroup(0, 'second answer');
       state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual(
+      expect(state.interaction.answerGroups[0].rules[1]).toEqual(
         rof.createNew(CLASSIFIER_RULESPEC_STR, {
           training_data: ['text answer', 'second answer']
         })
@@ -419,7 +419,7 @@ describe('State Editor controller', function() {
       tds.trainDefaultResponse('second answer');
       tds.trainDefaultResponse('text answer');
       state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].ruleSpecs).toEqual([
+      expect(state.interaction.answerGroups[0].rules).toEqual([
         rof.createNew('Contains', {
           x: 'Test'
         })
@@ -431,7 +431,7 @@ describe('State Editor controller', function() {
       // Training the answer group should add the classifier back.
       tds.trainAnswerGroup(0, 'second answer');
       state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].ruleSpecs).toEqual([
+      expect(state.interaction.answerGroups[0].rules).toEqual([
         rof.createNew('Contains', {
           x: 'Test'
         }),
@@ -442,7 +442,7 @@ describe('State Editor controller', function() {
 
       // Removing the the 'contains' rule from the group and then removing the
       // training data should not remove the classifier.
-      state.interaction.answerGroups[0].ruleSpecs.splice(0, 1);
+      state.interaction.answerGroups[0].rules.splice(0, 1);
       ess.setState('State', state);
       rs.init({
         answerGroups: state.interaction.answerGroups,
@@ -453,7 +453,7 @@ describe('State Editor controller', function() {
 
       tds.trainDefaultResponse('second answer');
       state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].ruleSpecs).toEqual([
+      expect(state.interaction.answerGroups[0].rules).toEqual([
         rof.createNew(CLASSIFIER_RULESPEC_STR, {
           training_data: []
         })
@@ -466,7 +466,7 @@ describe('State Editor controller', function() {
 
       // Verify initial state.
       var state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual(
+      expect(state.interaction.answerGroups[0].rules[1]).toEqual(
         rof.createNew(CLASSIFIER_RULESPEC_STR, {
           training_data: ['text answer']
         })
@@ -478,7 +478,7 @@ describe('State Editor controller', function() {
       // Training a duplicate answer for the answer group should change nothing.
       tds.trainAnswerGroup(0, 'text answer');
       state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual(
+      expect(state.interaction.answerGroups[0].rules[1]).toEqual(
         rof.createNew(CLASSIFIER_RULESPEC_STR, {
           training_data: ['text answer']
         })
@@ -488,7 +488,7 @@ describe('State Editor controller', function() {
       // nothing.
       tds.trainDefaultResponse('second answer');
       state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual(
+      expect(state.interaction.answerGroups[0].rules[1]).toEqual(
         rof.createNew(CLASSIFIER_RULESPEC_STR, {
           training_data: ['text answer']
         })

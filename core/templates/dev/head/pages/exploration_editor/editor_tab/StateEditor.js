@@ -247,24 +247,24 @@ oppia.factory('trainingDataService', [
       // Remove the answer from all answer groups.
       for (var i = 0; i < answerGroups.length; i++) {
         var answerGroup = answerGroups[i];
-        var ruleSpecs = answerGroup.ruleSpecs;
+        var rules = answerGroup.rules;
         var trainingData = null;
         var classifierIndex = -1;
-        for (var j = 0; j < ruleSpecs.length; j++) {
-          var ruleSpec = ruleSpecs[j];
-          if (ruleSpec.ruleType === CLASSIFIER_RULESPEC_STR) {
-            trainingData = ruleSpec.inputs.training_data;
+        for (var j = 0; j < rules.length; j++) {
+          var rule = rules[j];
+          if (rule.ruleType === CLASSIFIER_RULESPEC_STR) {
+            trainingData = rule.inputs.training_data;
             classifierIndex = j;
             break;
           }
         }
         if (trainingData &&
             _removeAnswerFromTrainingData(answer, trainingData) !== -1) {
-          if (trainingData.length === 0 && ruleSpecs.length > 1) {
+          if (trainingData.length === 0 && rules.length > 1) {
             // If the last of the training data for a classifier has been
             // removed and the classifier is not the only rule in the group,
             // remove the rule since it is no longer doing anything.
-            ruleSpecs.splice(classifierIndex, 1);
+            rules.splice(classifierIndex, 1);
           }
           updatedAnswerGroups = true;
         }
@@ -336,7 +336,7 @@ oppia.factory('trainingDataService', [
         _removeAnswer(answer);
 
         var answerGroup = responsesService.getAnswerGroup(answerGroupIndex);
-        var rules = answerGroup.ruleSpecs;
+        var rules = answerGroup.rules;
 
         // Ensure the answer group has a classifier rule.
         var classifierRule = null;
