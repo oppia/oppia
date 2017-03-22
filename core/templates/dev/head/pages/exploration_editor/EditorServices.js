@@ -1932,7 +1932,7 @@ oppia.factory('explorationWarningsService', [
       for (var i = 0; i < answerGroups.length; i++) {
         var group = answerGroups[i];
         if (group.ruleSpecs.length === 1 &&
-            group.ruleSpecs[0].rule_type === CLASSIFIER_RULESPEC_STR &&
+            group.ruleSpecs[0].ruleType === CLASSIFIER_RULESPEC_STR &&
             group.ruleSpecs[0].inputs.training_data.length === 0) {
           indexes.push(i);
         }
@@ -2104,7 +2104,7 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
     var rulesList = [];
     answerGroupValue.ruleSpecs.forEach(function(ruleSpec) {
       var ruleElm = angular.element('<li></li>');
-      ruleElm.html('<p>Type: ' + ruleSpec.rule_type + '</p>');
+      ruleElm.html('<p>Type: ' + ruleSpec.ruleType + '</p>');
       ruleElm.append(
         '<p>Value: ' + (
           Object.keys(ruleSpec.inputs).map(function(input) {

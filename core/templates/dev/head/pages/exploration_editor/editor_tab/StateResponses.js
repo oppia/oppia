@@ -409,10 +409,10 @@ oppia.controller('StateResponses', [
               var ruleInputs = ruleSpec.inputs.x;
               ruleInputs.forEach(function(ruleInput) {
                 var choiceIndex = answerChoiceToIndex[ruleInput];
-                if (ruleSpec.rule_type === 'Equals' ||
-                    ruleSpec.rule_type === 'ContainsAtLeastOneOf') {
+                if (ruleSpec.ruleType === 'Equals' ||
+                    ruleSpec.ruleType === 'ContainsAtLeastOneOf') {
                   handledAnswersArray[choiceIndex] = true;
-                } else if (ruleSpec.rule_type ===
+                } else if (ruleSpec.ruleType ===
                   'DoesNotContainAtLeastOneOf') {
                   for (var i = 0; i < handledAnswersArray.length; i++) {
                     if (i !== choiceIndex) {
@@ -650,7 +650,7 @@ oppia.controller('StateResponses', [
                         _state.interaction.answerGroups.length &&
                       _state.interaction.answerGroups[
                         answerGroupIndex].ruleSpecs[
-                          ruleSpecIndex].rule_type !==
+                          ruleSpecIndex].ruleType !==
                             CLASSIFIER_RULESPEC_STR) {
                     $scope.classification.answerGroupIndex = -1;
                   } else {
@@ -679,17 +679,16 @@ oppia.controller('StateResponses', [
         controller: [
           '$scope', '$modalInstance', 'responsesService',
           'editorContextService', 'editorFirstTimeEventsService',
+          'RuleObjectFactory',
           function(
               $scope, $modalInstance, responsesService,
-              editorContextService, editorFirstTimeEventsService) {
+              editorContextService, editorFirstTimeEventsService,
+              RuleObjectFactory) {
             $scope.feedbackEditorIsOpen = false;
             $scope.openFeedbackEditor = function() {
               $scope.feedbackEditorIsOpen = true;
             };
-            $scope.tmpRule = {
-              rule_type: null,
-              inputs: {}
-            };
+            $scope.tmpRule = RuleObjectFactory.createNew(null, {});
             $scope.tmpOutcome = {
               dest: editorContextService.getActiveStateName(),
               feedback: [''],

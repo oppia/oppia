@@ -219,7 +219,8 @@ describe('Compare versions service', function() {
             return {
               outcome: {
                 dest: ruleDestName
-              }
+              },
+              rule_specs: []
             };
           });
         statesData.states[stateName] = newStateData;

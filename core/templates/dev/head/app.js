@@ -51,6 +51,7 @@ oppia.constant('DEFAULT_CLASSIFIER_RULE_SPEC', {
     training_data: []
   }
 });
+
 oppia.constant('PARAMETER_TYPES', {
   REAL: 'Real',
   UNICODE_STRING: 'UnicodeString'

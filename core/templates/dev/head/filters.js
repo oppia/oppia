@@ -165,12 +165,11 @@ oppia.filter('parameterizeRuleDescription', [
       console.error('Cannot find interaction with id ' + interactionId);
       return '';
     }
-
     var description = INTERACTION_SPECS[interactionId].rule_descriptions[
-      rule.rule_type];
+      rule.ruleType];
     if (!description) {
       console.error(
-        'Cannot find description for rule ' + rule.rule_type +
+        'Cannot find description for rule ' + rule.ruleType +
         ' for interaction ' + interactionId);
       return '';
     }

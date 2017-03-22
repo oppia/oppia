@@ -17,7 +17,8 @@
  * domain objects.
  */
 
-oppia.factory('AnswerGroupObjectFactory', [function() {
+oppia.factory('AnswerGroupObjectFactory', ['RuleObjectFactory',
+  function(RuleObjectFactory) {
   var AnswerGroup = function(ruleSpecs, outcome, correct) {
     this.ruleSpecs = ruleSpecs;
     this.outcome = outcome;
@@ -26,7 +27,9 @@ oppia.factory('AnswerGroupObjectFactory', [function() {
 
   AnswerGroup.prototype.toBackendDict = function() {
     return {
-      rule_specs: this.ruleSpecs,
+      rule_specs: this.ruleSpecs.map(function(ruleSpec) {
+        return ruleSpec.toBackendDict();
+      }),
       outcome: this.outcome,
       correct: this.correct
     };
@@ -40,9 +43,15 @@ oppia.factory('AnswerGroupObjectFactory', [function() {
 
   AnswerGroup.createFromBackendDict = function(answerGroupBackendDict) {
     return new AnswerGroup(
-      answerGroupBackendDict.rule_specs,
+      generateRulesFromBackend(answerGroupBackendDict.rule_specs),
       answerGroupBackendDict.outcome,
       false);
+  };
+
+  var generateRulesFromBackend = function(ruleBackendDicts) {
+    return ruleBackendDicts.map(function(ruleBackendDict) {
+      return RuleObjectFactory.createFromDict(ruleBackendDict);
+    });
   };
 
   return AnswerGroup;

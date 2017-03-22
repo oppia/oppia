@@ -47,14 +47,14 @@ oppia.directive('ruleEditor', ['$log', function($log) {
 
         // This returns the rule description string.
         var computeRuleDescriptionFragments = function() {
-          if (!$scope.rule.rule_type) {
+          if (!$scope.rule.ruleType) {
             $scope.ruleDescriptionFragments = [];
             return '';
           }
 
           var ruleDescription = (
             INTERACTION_SPECS[$scope.currentInteractionId].rule_descriptions[
-              $scope.rule.rule_type]);
+              $scope.rule.ruleType]);
 
           var PATTERN = /\{\{\s*(\w+)\s*\|\s*(\w+)\s*\}\}/;
           var finalInputArray = ruleDescription.split(PATTERN);
@@ -146,7 +146,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           var oldRuleInputs = angular.copy($scope.rule.inputs) || {};
           var oldRuleInputTypes = angular.copy($scope.rule.inputTypes) || {};
 
-          $scope.rule.rule_type = newRuleType;
+          $scope.rule.ruleType = newRuleType;
           $scope.rule.inputs = {};
           $scope.rule.inputTypes = {};
 
@@ -193,7 +193,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         };
 
         $scope.onDeleteTrainingDataEntry = function(index) {
-          if ($scope.rule.rule_type === CLASSIFIER_RULESPEC_STR) {
+          if ($scope.rule.ruleType === CLASSIFIER_RULESPEC_STR) {
             var trainingData = $scope.rule.inputs.training_data;
             if (index < trainingData.length) {
               trainingData.splice(index, 1);
@@ -211,8 +211,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
 
         $scope.init = function() {
           // Select a default rule type, if one isn't already selected.
-          if ($scope.rule.rule_type === null) {
-            $scope.onSelectNewRuleType($scope.rule.rule_type);
+          if ($scope.rule.ruleType === null) {
+            $scope.onSelectNewRuleType($scope.rule.ruleType);
           }
           computeRuleDescriptionFragments();
         };

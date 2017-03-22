@@ -53,10 +53,9 @@ oppia.factory('StateObjectFactory', [
     };
 
     var generateContentFromBackend = function(contentBackendList) {
-      var content = contentBackendList.map(function(contentBackendDict) {
+      return contentBackendList.map(function(contentBackendDict) {
         return ContentObjectFactory.createFromBackendDict(contentBackendDict);
       });
-      return content;
     };
 
     return State;

@@ -204,10 +204,10 @@ oppia.factory('trainingModalService', ['$rootScope', '$modal', 'alertsService',
 // as part of any classifier training models.
 oppia.factory('trainingDataService', [
   '$rootScope', '$http', 'responsesService', 'CLASSIFIER_RULESPEC_STR',
-  'DEFAULT_CLASSIFIER_RULE_SPEC',
+  'DEFAULT_CLASSIFIER_RULE_SPEC', 'RuleObjectFactory',
   function(
       $rootScope, $http, responsesService, CLASSIFIER_RULESPEC_STR,
-      DEFAULT_CLASSIFIER_RULE_SPEC) {
+      DEFAULT_CLASSIFIER_RULE_SPEC, RuleObjectFactory) {
     var _trainingDataAnswers = [];
     var _trainingDataCounts = [];
 
@@ -252,7 +252,7 @@ oppia.factory('trainingDataService', [
         var classifierIndex = -1;
         for (var j = 0; j < ruleSpecs.length; j++) {
           var ruleSpec = ruleSpecs[j];
-          if (ruleSpec.rule_type === CLASSIFIER_RULESPEC_STR) {
+          if (ruleSpec.ruleType === CLASSIFIER_RULESPEC_STR) {
             trainingData = ruleSpec.inputs.training_data;
             classifierIndex = j;
             break;
@@ -342,7 +342,7 @@ oppia.factory('trainingDataService', [
         var classifierRule = null;
         for (var i = 0; i < rules.length; i++) {
           var rule = rules[i];
-          if (rule.rule_type === CLASSIFIER_RULESPEC_STR) {
+          if (rule.ruleType === CLASSIFIER_RULESPEC_STR) {
             classifierRule = rule;
             break;
           }
@@ -350,7 +350,8 @@ oppia.factory('trainingDataService', [
         if (!classifierRule) {
           // Create new classifier rule for classification. All classifiers
           // should match this schema.
-          classifierRule = angular.copy(DEFAULT_CLASSIFIER_RULE_SPEC);
+          classifierRule = RuleObjectFactory.createFromDict(
+              angular.copy(DEFAULT_CLASSIFIER_RULE_SPEC));
           rules.push(classifierRule);
         }
 

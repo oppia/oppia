@@ -49,12 +49,12 @@ describe('oppiaInteractiveMultipleChoiceInputValidator', function() {
 
     goodAnswerGroups = [{
       ruleSpecs: [{
-        rule_type: 'Equals',
+        ruleType: 'Equals',
         inputs: {
           x: 0
         }
       }, {
-        rule_type: 'Equals',
+        ruleType: 'Equals',
         inputs: {
           x: 1
         }

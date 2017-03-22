@@ -46,8 +46,8 @@ oppia.factory('AnswerClassificationService', [
       for (var i = 0; i < answerGroups.length; i++) {
         for (var j = 0; j < answerGroups[i].ruleSpecs.length; j++) {
           var ruleSpec = answerGroups[i].ruleSpecs[j];
-          if (ruleSpec.rule_type !== CLASSIFIER_RULESPEC_STR &&
-              interactionRulesService[ruleSpec.rule_type](
+          if (ruleSpec.ruleType !== CLASSIFIER_RULESPEC_STR &&
+              interactionRulesService[ruleSpec.ruleType](
                 answer, ruleSpec.inputs)) {
             return {
               outcome: answerGroups[i].outcome,
