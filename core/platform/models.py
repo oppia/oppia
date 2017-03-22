@@ -193,7 +193,7 @@ class Registry(object):
 
     @classmethod
     def _get(cls):
-        """Method to access the _Gae Model.
+        """Method to retrieve the _Gae Model.
 
         Returns:
             model. _Gae Model.
