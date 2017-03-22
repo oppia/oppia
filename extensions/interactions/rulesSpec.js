@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests to check that all the relevant rule specs exist.
+ * @fileoverview Unit tests to check that all the relevant rules exist.
  */
 
 describe('Rule spec services', function() {
-  var ruleSpecsServices = {};
+  var rulesServices = {};
   var rulesJson;
-  var CLASSIFIER_RULESPEC_STR = 'FuzzyMatches';
+  var CLASSIFIER_RULE_STR = 'FuzzyMatches';
 
   beforeEach(function() {
     module('oppia');
@@ -35,7 +35,7 @@ describe('Rule spec services', function() {
     rulesJson = window.__fixtures__['extensions/interactions/rules'];
     Object.keys(rulesJson).forEach(function(interactionId) {
       var serviceName = getRulesServiceName(interactionId);
-      ruleSpecsServices[serviceName] = $injector.get(serviceName);
+      rulesServices[serviceName] = $injector.get(serviceName);
     });
   }));
 
@@ -43,8 +43,8 @@ describe('Rule spec services', function() {
     Object.keys(rulesJson).forEach(function(interactionId) {
       var serviceName = getRulesServiceName(interactionId);
       Object.keys(rulesJson[interactionId]).forEach(function(ruleName) {
-        if (ruleName !== CLASSIFIER_RULESPEC_STR) {
-          expect(ruleSpecsServices[serviceName][ruleName]).toBeDefined(
+        if (ruleName !== CLASSIFIER_RULE_STR) {
+          expect(rulesServices[serviceName][ruleName]).toBeDefined(
             '. ERROR: ' + ruleName + ' not found in service ' + serviceName);
         }
       });

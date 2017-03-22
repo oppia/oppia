@@ -35,11 +35,11 @@ oppia.directive('ruleEditor', ['$log', function($log) {
       '$scope', '$timeout', 'editorContextService',
       'explorationStatesService', 'routerService', 'validatorsService',
       'responsesService', 'stateInteractionIdService', 'INTERACTION_SPECS',
-      'CLASSIFIER_RULESPEC_STR', function(
+      'CLASSIFIER_RULE_STR', function(
           $scope, $timeout, editorContextService,
           explorationStatesService, routerService, validatorsService,
           responsesService, stateInteractionIdService, INTERACTION_SPECS,
-          CLASSIFIER_RULESPEC_STR) {
+          CLASSIFIER_RULE_STR) {
         var DEFAULT_OBJECT_VALUES = GLOBALS.DEFAULT_OBJECT_VALUES;
 
         $scope.currentInteractionId = stateInteractionIdService.savedMemento;
@@ -193,7 +193,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         };
 
         $scope.onDeleteTrainingDataEntry = function(index) {
-          if ($scope.rule.ruleType === CLASSIFIER_RULESPEC_STR) {
+          if ($scope.rule.ruleType === CLASSIFIER_RULE_STR) {
             var trainingData = $scope.rule.inputs.training_data;
             if (index < trainingData.length) {
               trainingData.splice(index, 1);

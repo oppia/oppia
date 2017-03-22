@@ -572,7 +572,7 @@ oppia.controller('StateResponses', [
           'explorationContextService', 'editorContextService',
           'explorationStatesService', 'trainingDataService',
           'AnswerClassificationService', 'focusService', 'DEFAULT_RULE_NAME',
-          'CLASSIFIER_RULESPEC_STR',
+          'CLASSIFIER_RULE_STR',
           function(
               $scope, $injector, $modalInstance,
               oppiaExplorationHtmlFormatterService,
@@ -580,7 +580,7 @@ oppia.controller('StateResponses', [
               explorationContextService, editorContextService,
               explorationStatesService, trainingDataService,
               AnswerClassificationService, focusService, DEFAULT_RULE_NAME,
-              CLASSIFIER_RULESPEC_STR) {
+              CLASSIFIER_RULE_STR) {
             var _explorationId = explorationContextService.getExplorationId();
             var _stateName = editorContextService.getActiveStateName();
             var _state = explorationStatesService.getState(_stateName);
@@ -651,7 +651,7 @@ oppia.controller('StateResponses', [
                       _state.interaction.answerGroups[
                         answerGroupIndex].rules[
                           ruleIndex].ruleType !==
-                            CLASSIFIER_RULESPEC_STR) {
+                            CLASSIFIER_RULE_STR) {
                     $scope.classification.answerGroupIndex = -1;
                   } else {
                     $scope.classification.answerGroupIndex = (

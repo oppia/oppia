@@ -18,9 +18,9 @@
 
 oppia.factory('AnswerClassificationService', [
   '$http', '$q', 'LearnerParamsService', 'alertsService', 'INTERACTION_SPECS',
-  'ENABLE_STRING_CLASSIFIER', 'CLASSIFIER_RULESPEC_STR',
+  'ENABLE_STRING_CLASSIFIER', 'CLASSIFIER_RULE_STR',
   function($http, $q, LearnerParamsService, alertsService, INTERACTION_SPECS,
-      ENABLE_STRING_CLASSIFIER, CLASSIFIER_RULESPEC_STR) {
+      ENABLE_STRING_CLASSIFIER, CLASSIFIER_RULE_STR) {
     /**
      * Finds the first answer group with a rule that returns true.
      *
@@ -46,7 +46,7 @@ oppia.factory('AnswerClassificationService', [
       for (var i = 0; i < answerGroups.length; i++) {
         for (var j = 0; j < answerGroups[i].rules.length; j++) {
           var rule = answerGroups[i].rules[j];
-          if (rule.ruleType !== CLASSIFIER_RULESPEC_STR &&
+          if (rule.ruleType !== CLASSIFIER_RULE_STR &&
               interactionRulesService[rule.ruleType](
                 answer, rule.inputs)) {
             return {

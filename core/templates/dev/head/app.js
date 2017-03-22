@@ -40,7 +40,7 @@ oppia.constant(
 oppia.constant('PLACEHOLDER_OUTCOME_DEST', '/');
 oppia.constant('INTERACTION_DISPLAY_MODE_INLINE', 'inline');
 oppia.constant('DEFAULT_RULE_NAME', 'Default');
-oppia.constant('CLASSIFIER_RULESPEC_STR', 'FuzzyMatches');
+oppia.constant('CLASSIFIER_RULE_STR', 'FuzzyMatches');
 oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');
 // Feature still in development.
 // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.

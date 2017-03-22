@@ -203,10 +203,10 @@ oppia.factory('trainingModalService', ['$rootScope', '$modal', 'alertsService',
 // answers which do not have certain classification and are not currently used
 // as part of any classifier training models.
 oppia.factory('trainingDataService', [
-  '$rootScope', '$http', 'responsesService', 'CLASSIFIER_RULESPEC_STR',
+  '$rootScope', '$http', 'responsesService', 'CLASSIFIER_RULE_STR',
   'DEFAULT_CLASSIFIER_RULE_SPEC', 'RuleObjectFactory',
   function(
-      $rootScope, $http, responsesService, CLASSIFIER_RULESPEC_STR,
+      $rootScope, $http, responsesService, CLASSIFIER_RULE_STR,
       DEFAULT_CLASSIFIER_RULE_SPEC, RuleObjectFactory) {
     var _trainingDataAnswers = [];
     var _trainingDataCounts = [];
@@ -252,7 +252,7 @@ oppia.factory('trainingDataService', [
         var classifierIndex = -1;
         for (var j = 0; j < rules.length; j++) {
           var rule = rules[j];
-          if (rule.ruleType === CLASSIFIER_RULESPEC_STR) {
+          if (rule.ruleType === CLASSIFIER_RULE_STR) {
             trainingData = rule.inputs.training_data;
             classifierIndex = j;
             break;
@@ -342,7 +342,7 @@ oppia.factory('trainingDataService', [
         var classifierRule = null;
         for (var i = 0; i < rules.length; i++) {
           var rule = rules[i];
-          if (rule.ruleType === CLASSIFIER_RULESPEC_STR) {
+          if (rule.ruleType === CLASSIFIER_RULE_STR) {
             classifierRule = rule;
             break;
           }
