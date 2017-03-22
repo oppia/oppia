@@ -683,5 +683,5 @@ class LDAStringClassifier(BaseClassifier):
             for value in classifier_data[list_property]:
                 if not isinstance(value, int):
                     raise utils.ValidationError(
-                    ('Expected values of %s to be a int, received %s' %(
-                        list_property, value)))
+                        ('Expected values of %s to be a int, received %s' %(
+                            list_property, value)))
