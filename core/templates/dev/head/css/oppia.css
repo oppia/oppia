@@ -624,7 +624,7 @@ textarea {
   color: #fff;
   font-size: 13px;
   line-height: 20px;
-  position: absolute;
+  position: relative;
   width: 100%;
 }
 
@@ -687,8 +687,8 @@ textarea {
   }
 }
 @media (max-width: 440px) {
-  .oppia-footer-padding-below-banner{
-    height: 250px;
+  .oppia-footer-padding-below-banner {
+    height: 270px;
   }
 }
 /*
@@ -4190,7 +4190,6 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-about-extra-container {
-  margin-bottom: 20px;
   position: relative;
   top: 50px;
   width: 100%;
@@ -4203,7 +4202,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 @media(max-width: 440px) {
   .oppia-about-extra-container {
-    margin-bottom: 40px;
+    margin-bottom: 30px;
   }
 }
 
