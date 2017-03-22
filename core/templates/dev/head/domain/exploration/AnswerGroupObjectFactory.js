@@ -18,10 +18,9 @@
  */
 
 oppia.factory('AnswerGroupObjectFactory', [function() {
-  var AnswerGroup = function(ruleSpecsList, outcomeDict,
-    correct) {
-    this.ruleSpecs = ruleSpecsList;
-    this.outcome = outcomeDict;
+  var AnswerGroup = function(ruleSpecs, outcome, correct) {
+    this.ruleSpecs = ruleSpecs;
+    this.outcome = outcome;
     this.correct = correct;
   };
 
@@ -35,8 +34,8 @@ oppia.factory('AnswerGroupObjectFactory', [function() {
 
   // Static class methods. Note that "this" is not available in
   // static contexts.
-  AnswerGroup.createNew = function(ruleSpecsList, outcomeDict, correct) {
-    return new AnswerGroup(ruleSpecsList, outcomeDict, correct);
+  AnswerGroup.createNew = function(ruleSpecs, outcome, correct) {
+    return new AnswerGroup(ruleSpecs, outcome, correct);
   };
 
   AnswerGroup.createFromBackendDict = function(answerGroupBackendDict) {
