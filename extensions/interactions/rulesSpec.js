@@ -18,7 +18,7 @@
 
 describe('Rule spec services', function() {
   var rulesServices = {};
-  var rulesJson;
+  var ruleTemplates;
   var CLASSIFIER_RULE_STR = 'FuzzyMatches';
 
   beforeEach(function() {
@@ -32,17 +32,18 @@ describe('Rule spec services', function() {
   };
 
   beforeEach(inject(function($rootScope, $controller, $injector) {
-    rulesJson = window.__fixtures__['extensions/interactions/rules'];
-    Object.keys(rulesJson).forEach(function(interactionId) {
+    ruleTemplates =
+      window.__fixtures__['extensions/interactions/rule_templates'];
+    Object.keys(ruleTemplates).forEach(function(interactionId) {
       var serviceName = getRulesServiceName(interactionId);
       rulesServices[serviceName] = $injector.get(serviceName);
     });
   }));
 
   it('should include evaluation methods for all explicit rules', function() {
-    Object.keys(rulesJson).forEach(function(interactionId) {
+    Object.keys(ruleTemplates).forEach(function(interactionId) {
       var serviceName = getRulesServiceName(interactionId);
-      Object.keys(rulesJson[interactionId]).forEach(function(ruleName) {
+      Object.keys(ruleTemplates[interactionId]).forEach(function(ruleName) {
         if (ruleName !== CLASSIFIER_RULE_STR) {
           expect(rulesServices[serviceName][ruleName]).toBeDefined(
             '. ERROR: ' + ruleName + ' not found in service ' + serviceName);

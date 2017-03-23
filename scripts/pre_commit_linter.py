@@ -209,7 +209,8 @@ def _get_changed_filenames():
         a list of filenames of modified files.
     """
     unstaged_files = subprocess.check_output([
-        'git', 'diff', '--name-only']).splitlines()
+        'git', 'diff', '--name-only',
+        '--diff-filter=ACM']).splitlines()
     staged_files = subprocess.check_output([
         'git', 'diff', '--cached', '--name-only',
         '--diff-filter=ACM']).splitlines()
