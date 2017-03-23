@@ -133,7 +133,7 @@ class _Gae(_Platform):
             setting.
 
         Raises:
-            Exception: feconf.EMAIL_SERVICE_PROVIDER does not correspond 
+            Exception: feconf.EMAIL_SERVICE_PROVIDER does not correspond
             to a valid email_services module.
         """
         if feconf.EMAIL_SERVICE_PROVIDER == feconf.EMAIL_SERVICE_PROVIDER_GAE:
