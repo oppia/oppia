@@ -97,7 +97,7 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
             classifier_dict['cached_classifier_data'],
             classifier_dict['data_schema_version'])
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected id to be a string')):
+                'Expected id to be a string')):
             classifier.validate()
 
         # Verify validation error is raised when string is provided instead of
@@ -113,7 +113,7 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
             classifier_dict['cached_classifier_data'],
             classifier_dict['data_schema_version'])
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected exp_version_when_created to be a int')):
+                'Expected exp_version_when_created to be a int')):
             classifier.validate()
 
         # Verify valdation error is raised when invalid state_name is provided.
@@ -128,7 +128,7 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
             classifier_dict['cached_classifier_data'],
             classifier_dict['data_schema_version'])
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Invalid character # in the state name')):
+                'Invalid character # in the state name')):
             classifier.validate()
 
         # Verify validation error is raised when invalid algorithm_id is
@@ -144,7 +144,7 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
             classifier_dict['cached_classifier_data'],
             classifier_dict['data_schema_version'])
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Invalid algorithm id')):
+                'Invalid algorithm id')):
             classifier.validate()
 
         # Verify validation error is raised when list is provided for dict.
@@ -159,5 +159,5 @@ class ClassifierDomainTests(test_utils.GenericTestBase):
             classifier_dict['cached_classifier_data'],
             classifier_dict['data_schema_version'])
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected cached_classifier_data to be a dict')):
+                'Expected cached_classifier_data to be a dict')):
             classifier.validate()
