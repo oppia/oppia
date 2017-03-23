@@ -17,25 +17,32 @@
  * domain objects.
  */
 
-oppia.factory('RuleObjectFactory', [function() {
-  var Rule = function(ruleType, inputs) {
-    this.ruleType = ruleType;
+oppia.factory('RuleObjectFactory', ['DEFAULT_CLASSIFIER_RULE',
+  function(DEFAULT_CLASSIFIER_RULE) {
+  var Rule = function(type, inputs) {
+    this.type = type;
     this.inputs = inputs;
   };
 
   Rule.prototype.toBackendDict = function() {
     return {
-      rule_type: this.ruleType,
+      rule_type: this.type,
       inputs: this.inputs
     };
   };
 
-  Rule.createNew = function(ruleType, inputs) {
-    return new Rule(ruleType, inputs);
+  Rule.createNew = function(type, inputs) {
+    return new Rule(type, inputs);
   };
 
-  Rule.createFromDict = function(ruleDict) {
+  Rule.createFromBackendDict = function(ruleDict) {
     return new Rule(ruleDict.rule_type, ruleDict.inputs);
+  };
+
+  Rule.createNewClassifierRule = function() {
+    return new Rule(
+      angular.copy(DEFAULT_CLASSIFIER_RULE.rule_type),
+      angular.copy(DEFAULT_CLASSIFIER_RULE.inputs));
   };
 
   return Rule;

@@ -33,11 +33,11 @@ oppia.directive('answerGroupEditor', [function() {
     controller: [
       '$scope', 'stateInteractionIdService', 'responsesService',
       'editorContextService', 'alertsService', 'INTERACTION_SPECS',
-      'CLASSIFIER_RULE_STR', 'RuleObjectFactory',
+      'RULE_TYPE_CLASSIFIER', 'RuleObjectFactory',
       function(
           $scope, stateInteractionIdService, responsesService,
           editorContextService, alertsService, INTERACTION_SPECS,
-          CLASSIFIER_RULE_STR, RuleObjectFactory) {
+          RULE_TYPE_CLASSIFIER, RuleObjectFactory) {
         $scope.rulesMemento = null;
         $scope.activeRuleIndex = responsesService.getActiveRuleIndex();
         $scope.editAnswerGroupForm = {};
@@ -157,7 +157,7 @@ oppia.directive('answerGroupEditor', [function() {
           var ruleTypes = Object.keys(ruleDescriptions);
           var ruleType = null;
           for (var i = 0; i < ruleTypes.length; i++) {
-            if (ruleTypes[i] !== CLASSIFIER_RULE_STR) {
+            if (ruleTypes[i] !== RULE_TYPE_CLASSIFIER) {
               ruleType = ruleTypes[i];
               break;
             }

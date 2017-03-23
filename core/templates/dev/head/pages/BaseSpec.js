@@ -33,8 +33,8 @@ describe('Base controller', function() {
 
     it('should have matching classifier constants',
         inject(function($injector) {
-      expect($injector.get('DEFAULT_CLASSIFIER_RULE_SPEC').rule_type).toEqual(
-        $injector.get('CLASSIFIER_RULE_STR'));
+      expect($injector.get('DEFAULT_CLASSIFIER_RULE').rule_type).toEqual(
+        $injector.get('RULE_TYPE_CLASSIFIER'));
     }));
   });
 });

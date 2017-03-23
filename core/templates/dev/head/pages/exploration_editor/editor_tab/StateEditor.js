@@ -203,11 +203,11 @@ oppia.factory('trainingModalService', ['$rootScope', '$modal', 'alertsService',
 // answers which do not have certain classification and are not currently used
 // as part of any classifier training models.
 oppia.factory('trainingDataService', [
-  '$rootScope', '$http', 'responsesService', 'CLASSIFIER_RULE_STR',
-  'DEFAULT_CLASSIFIER_RULE_SPEC', 'RuleObjectFactory',
+  '$rootScope', '$http', 'responsesService', 'RULE_TYPE_CLASSIFIER',
+  'DEFAULT_CLASSIFIER_RULE', 'RuleObjectFactory',
   function(
-      $rootScope, $http, responsesService, CLASSIFIER_RULE_STR,
-      DEFAULT_CLASSIFIER_RULE_SPEC, RuleObjectFactory) {
+      $rootScope, $http, responsesService, RULE_TYPE_CLASSIFIER,
+      DEFAULT_CLASSIFIER_RULE, RuleObjectFactory) {
     var _trainingDataAnswers = [];
     var _trainingDataCounts = [];
 
@@ -252,7 +252,7 @@ oppia.factory('trainingDataService', [
         var classifierIndex = -1;
         for (var j = 0; j < rules.length; j++) {
           var rule = rules[j];
-          if (rule.ruleType === CLASSIFIER_RULE_STR) {
+          if (rule.type === RULE_TYPE_CLASSIFIER) {
             trainingData = rule.inputs.training_data;
             classifierIndex = j;
             break;
@@ -342,16 +342,14 @@ oppia.factory('trainingDataService', [
         var classifierRule = null;
         for (var i = 0; i < rules.length; i++) {
           var rule = rules[i];
-          if (rule.ruleType === CLASSIFIER_RULE_STR) {
+          if (rule.type === RULE_TYPE_CLASSIFIER) {
             classifierRule = rule;
             break;
           }
         }
         if (!classifierRule) {
-          // Create new classifier rule for classification. All classifiers
-          // should match this schema.
-          classifierRule = RuleObjectFactory.createFromDict(
-              angular.copy(DEFAULT_CLASSIFIER_RULE_SPEC));
+          // Create new classifier rule for classification.
+          classifierRule = RuleObjectFactory.createNewClassifierRule();
           rules.push(classifierRule);
         }
 

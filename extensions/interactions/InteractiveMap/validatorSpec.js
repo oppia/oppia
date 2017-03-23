@@ -44,12 +44,12 @@ describe('oppiaInteractiveInteractiveMapValidator', function() {
     };
     goodAnswerGroups = [{
       rules: [{
-        ruleType: 'Within',
+        type: 'Within',
         inputs: {
           d: 100
         }
       }, {
-        ruleType: 'NotWithin',
+        type: 'NotWithin',
         inputs: {
           d: 50
         }

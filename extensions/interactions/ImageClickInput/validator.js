@@ -88,7 +88,7 @@ oppia.filter('oppiaInteractiveImageClickInputValidator', [
     for (var i = 0; i < answerGroups.length; i++) {
       var rules = answerGroups[i].rules;
       for (var j = 0; j < rules.length; j++) {
-        if (rules[j].ruleType === 'IsInRegion') {
+        if (rules[j].type === 'IsInRegion') {
           var label = rules[j].inputs.x;
           if (seenRegionStrings.indexOf(label) === -1) {
             warningsList.push({

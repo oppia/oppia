@@ -54,7 +54,7 @@ describe('oppiaInteractiveImageClickInputValidator', function() {
     };
     goodAnswerGroups = [{
       rules: [{
-        ruleType: 'IsInRegion',
+        type: 'IsInRegion',
         inputs: {
           x: 'SecondLabel'
         }

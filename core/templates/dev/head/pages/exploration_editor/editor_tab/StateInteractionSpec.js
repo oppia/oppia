@@ -74,9 +74,7 @@ describe('State Interaction controller', function() {
           interaction: {
             id: 'TextInput',
             answer_groups: [{
-              rule_specs: [{
-                dest: 'End State'
-              }]
+              rule_specs: []
             }],
             fallbacks: []
           },
@@ -90,9 +88,7 @@ describe('State Interaction controller', function() {
           interaction: {
             id: 'TextInput',
             answer_groups: [{
-              rule_specs: [{
-                dest: 'End State'
-              }]
+              rule_specs: []
             }],
             fallbacks: []
           },

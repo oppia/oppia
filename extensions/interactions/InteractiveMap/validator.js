@@ -46,8 +46,8 @@ oppia.filter('oppiaInteractiveInteractiveMapValidator', [
     for (var i = 0; i < answerGroups.length; i++) {
       var rules = answerGroups[i].rules;
       for (var j = 0; j < rules.length; j++) {
-        if (rules[j].ruleType === 'Within' ||
-            rules[j].ruleType === 'NotWithin') {
+        if (rules[j].type === 'Within' ||
+            rules[j].type === 'NotWithin') {
           if (rules[j].inputs.d < 0) {
             warningsList.push({
               type: WARNING_TYPES.CRITICAL,

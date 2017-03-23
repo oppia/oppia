@@ -106,7 +106,7 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
             var ruleInputs = rule.inputs.x;
             ruleInputs.forEach(function(ruleInput) {
               var choiceIndex = answerChoiceToIndex[ruleInput];
-              if (rule.ruleType === 'Equals') {
+              if (rule.type === 'Equals') {
                 handledAnswers[choiceIndex] = true;
                 if (ruleInputs.length > 1) {
                   warningsList.push({
@@ -117,9 +117,9 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
                       'please select only one answer choice.')
                   });
                 }
-              } else if (rule.ruleType === 'ContainsAtLeastOneOf') {
+              } else if (rule.type === 'ContainsAtLeastOneOf') {
                 handledAnswers[choiceIndex] = true;
-              } else if (rule.ruleType ===
+              } else if (rule.type ===
                 'DoesNotContainAtLeastOneOf') {
                 for (var i = 0; i < handledAnswers.length; i++) {
                   if (i !== choiceIndex) {

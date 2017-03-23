@@ -19,7 +19,7 @@
 describe('Rule spec services', function() {
   var rulesServices = {};
   var ruleTemplates;
-  var CLASSIFIER_RULE_STR = 'FuzzyMatches';
+  var RULE_TYPE_CLASSIFIER;
 
   beforeEach(function() {
     module('oppia');
@@ -32,6 +32,7 @@ describe('Rule spec services', function() {
   };
 
   beforeEach(inject(function($rootScope, $controller, $injector) {
+    RULE_TYPE_CLASSIFIER = $injector.get('RULE_TYPE_CLASSIFIER');
     ruleTemplates =
       window.__fixtures__['extensions/interactions/rule_templates'];
     Object.keys(ruleTemplates).forEach(function(interactionId) {
@@ -44,7 +45,7 @@ describe('Rule spec services', function() {
     Object.keys(ruleTemplates).forEach(function(interactionId) {
       var serviceName = getRulesServiceName(interactionId);
       Object.keys(ruleTemplates[interactionId]).forEach(function(ruleName) {
-        if (ruleName !== CLASSIFIER_RULE_STR) {
+        if (ruleName !== RULE_TYPE_CLASSIFIER) {
           expect(rulesServices[serviceName][ruleName]).toBeDefined(
             '. ERROR: ' + ruleName + ' not found in service ' + serviceName);
         }

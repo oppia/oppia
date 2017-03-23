@@ -50,7 +50,7 @@ oppia.factory('AnswerGroupObjectFactory', ['RuleObjectFactory',
 
   var generateRulesFromBackend = function(ruleBackendDicts) {
     return ruleBackendDicts.map(function(ruleBackendDict) {
-      return RuleObjectFactory.createFromDict(ruleBackendDict);
+      return RuleObjectFactory.createFromBackendDict(ruleBackendDict);
     });
   };
 

@@ -409,10 +409,10 @@ oppia.controller('StateResponses', [
               var ruleInputs = rule.inputs.x;
               ruleInputs.forEach(function(ruleInput) {
                 var choiceIndex = answerChoiceToIndex[ruleInput];
-                if (rule.ruleType === 'Equals' ||
-                    rule.ruleType === 'ContainsAtLeastOneOf') {
+                if (rule.type === 'Equals' ||
+                    rule.type === 'ContainsAtLeastOneOf') {
                   handledAnswersArray[choiceIndex] = true;
-                } else if (rule.ruleType ===
+                } else if (rule.type ===
                   'DoesNotContainAtLeastOneOf') {
                   for (var i = 0; i < handledAnswersArray.length; i++) {
                     if (i !== choiceIndex) {
@@ -572,7 +572,7 @@ oppia.controller('StateResponses', [
           'explorationContextService', 'editorContextService',
           'explorationStatesService', 'trainingDataService',
           'AnswerClassificationService', 'focusService', 'DEFAULT_RULE_NAME',
-          'CLASSIFIER_RULE_STR',
+          'RULE_TYPE_CLASSIFIER',
           function(
               $scope, $injector, $modalInstance,
               oppiaExplorationHtmlFormatterService,
@@ -580,7 +580,7 @@ oppia.controller('StateResponses', [
               explorationContextService, editorContextService,
               explorationStatesService, trainingDataService,
               AnswerClassificationService, focusService, DEFAULT_RULE_NAME,
-              CLASSIFIER_RULE_STR) {
+              RULE_TYPE_CLASSIFIER) {
             var _explorationId = explorationContextService.getExplorationId();
             var _stateName = editorContextService.getActiveStateName();
             var _state = explorationStatesService.getState(_stateName);
@@ -647,11 +647,9 @@ oppia.controller('StateResponses', [
                   var answerGroupIndex = classificationResult.answerGroupIndex;
                   var ruleIndex = classificationResult.ruleIndex;
                   if (answerGroupIndex !==
-                        _state.interaction.answerGroups.length &&
-                      _state.interaction.answerGroups[
-                        answerGroupIndex].rules[
-                          ruleIndex].ruleType !==
-                            CLASSIFIER_RULE_STR) {
+                    _state.interaction.answerGroups.length &&
+                      _state.interaction.answerGroups[answerGroupIndex]
+                      .rules[ruleIndex].type !== RULE_TYPE_CLASSIFIER) {
                     $scope.classification.answerGroupIndex = -1;
                   } else {
                     $scope.classification.answerGroupIndex = (

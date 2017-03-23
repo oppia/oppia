@@ -1815,12 +1815,12 @@ oppia.factory('explorationWarningsService', [
   '$filter', 'graphDataService', 'explorationStatesService',
   'expressionInterpolationService', 'explorationParamChangesService',
   'parameterMetadataService', 'INTERACTION_SPECS', 'WARNING_TYPES',
-  'STATE_ERROR_MESSAGES', 'CLASSIFIER_RULE_STR',
+  'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
   function(
       $filter, graphDataService, explorationStatesService,
       expressionInterpolationService, explorationParamChangesService,
       parameterMetadataService, INTERACTION_SPECS, WARNING_TYPES,
-      STATE_ERROR_MESSAGES, CLASSIFIER_RULE_STR) {
+      STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
     var _warningsList = [];
     var stateWarnings = {};
     var hasCriticalStateWarning = false;
@@ -1932,7 +1932,7 @@ oppia.factory('explorationWarningsService', [
       for (var i = 0; i < answerGroups.length; i++) {
         var group = answerGroups[i];
         if (group.rules.length === 1 &&
-            group.rules[0].ruleType === CLASSIFIER_RULE_STR &&
+            group.rules[0].type === RULE_TYPE_CLASSIFIER &&
             group.rules[0].inputs.training_data.length === 0) {
           indexes.push(i);
         }
@@ -2104,7 +2104,7 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
     var rulesList = [];
     answerGroupValue.rules.forEach(function(rule) {
       var ruleElm = angular.element('<li></li>');
-      ruleElm.html('<p>Type: ' + rule.ruleType + '</p>');
+      ruleElm.html('<p>Type: ' + rule.type + '</p>');
       ruleElm.append(
         '<p>Value: ' + (
           Object.keys(rule.inputs).map(function(input) {

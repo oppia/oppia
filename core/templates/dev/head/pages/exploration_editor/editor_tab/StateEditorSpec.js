@@ -193,7 +193,7 @@ describe('State Editor controller', function() {
 
   describe('TrainingDataService', function() {
     var $httpBackend;
-    var scope, siis, ecs, cls, rs, tds, ess, IS, CLASSIFIER_RULE_STR;
+    var scope, siis, ecs, cls, rs, tds, ess, IS, RULE_TYPE_CLASSIFIER, rof;
     var mockExplorationData;
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
@@ -230,7 +230,7 @@ describe('State Editor controller', function() {
       rs = $injector.get('responsesService');
       tds = $injector.get('trainingDataService');
       IS = $injector.get('INTERACTION_SPECS');
-      CLASSIFIER_RULE_STR = $injector.get('CLASSIFIER_RULE_STR');
+      RULE_TYPE_CLASSIFIER = $injector.get('RULE_TYPE_CLASSIFIER');
       rof = $injector.get('RuleObjectFactory');
 
       // Set the currently loaded interaction ID.
@@ -320,7 +320,7 @@ describe('State Editor controller', function() {
       tds.trainAnswerGroup(0, 'text answer');
       var state = ess.getState('State');
       expect(state.interaction.answerGroups[0].rules[1]).toEqual(
-        rof.createNew(CLASSIFIER_RULE_STR, {
+        rof.createNew(RULE_TYPE_CLASSIFIER, {
           training_data: ['text answer']
         })
       );
@@ -330,7 +330,7 @@ describe('State Editor controller', function() {
       tds.trainAnswerGroup(0, 'second answer');
       state = ess.getState('State');
       expect(state.interaction.answerGroups[0].rules[1]).toEqual(
-        rof.createNew(CLASSIFIER_RULE_STR, {
+        rof.createNew(RULE_TYPE_CLASSIFIER, {
           training_data: ['text answer', 'second answer']
         })
       );
@@ -355,7 +355,7 @@ describe('State Editor controller', function() {
       // Verify initial state.
       var state = ess.getState('State');
       expect(state.interaction.answerGroups[0].rules[1]).toEqual(
-        rof.createNew(CLASSIFIER_RULE_STR, {
+        rof.createNew(RULE_TYPE_CLASSIFIER, {
           training_data: ['text answer', 'second answer']
         })
       );
@@ -367,7 +367,7 @@ describe('State Editor controller', function() {
       tds.trainDefaultResponse('second answer');
       state = ess.getState('State');
       expect(state.interaction.answerGroups[0].rules[1]).toEqual(
-        rof.createNew(CLASSIFIER_RULE_STR, {
+        rof.createNew(RULE_TYPE_CLASSIFIER, {
           training_data: ['text answer']
         })
       );
@@ -379,7 +379,7 @@ describe('State Editor controller', function() {
       tds.trainAnswerGroup(0, 'third answer');
       state = ess.getState('State');
       expect(state.interaction.answerGroups[0].rules[1]).toEqual(
-        rof.createNew(CLASSIFIER_RULE_STR, {
+        rof.createNew(RULE_TYPE_CLASSIFIER, {
           training_data: ['text answer', 'third answer']
         })
       );
@@ -396,7 +396,7 @@ describe('State Editor controller', function() {
       // Verify initial state.
       var state = ess.getState('State');
       expect(state.interaction.answerGroups[0].rules[1]).toEqual(
-        rof.createNew(CLASSIFIER_RULE_STR, {
+        rof.createNew(RULE_TYPE_CLASSIFIER, {
           training_data: ['text answer']
         })
       );
@@ -408,7 +408,7 @@ describe('State Editor controller', function() {
       tds.trainAnswerGroup(0, 'second answer');
       state = ess.getState('State');
       expect(state.interaction.answerGroups[0].rules[1]).toEqual(
-        rof.createNew(CLASSIFIER_RULE_STR, {
+        rof.createNew(RULE_TYPE_CLASSIFIER, {
           training_data: ['text answer', 'second answer']
         })
       );
@@ -435,7 +435,7 @@ describe('State Editor controller', function() {
         rof.createNew('Contains', {
           x: 'Test'
         }),
-        rof.createNew(CLASSIFIER_RULE_STR, {
+        rof.createNew(RULE_TYPE_CLASSIFIER, {
           training_data: ['second answer']
         })
       ]);
@@ -454,7 +454,7 @@ describe('State Editor controller', function() {
       tds.trainDefaultResponse('second answer');
       state = ess.getState('State');
       expect(state.interaction.answerGroups[0].rules).toEqual([
-        rof.createNew(CLASSIFIER_RULE_STR, {
+        rof.createNew(RULE_TYPE_CLASSIFIER, {
           training_data: []
         })
       ]);
@@ -467,7 +467,7 @@ describe('State Editor controller', function() {
       // Verify initial state.
       var state = ess.getState('State');
       expect(state.interaction.answerGroups[0].rules[1]).toEqual(
-        rof.createNew(CLASSIFIER_RULE_STR, {
+        rof.createNew(RULE_TYPE_CLASSIFIER, {
           training_data: ['text answer']
         })
       );
@@ -479,7 +479,7 @@ describe('State Editor controller', function() {
       tds.trainAnswerGroup(0, 'text answer');
       state = ess.getState('State');
       expect(state.interaction.answerGroups[0].rules[1]).toEqual(
-        rof.createNew(CLASSIFIER_RULE_STR, {
+        rof.createNew(RULE_TYPE_CLASSIFIER, {
           training_data: ['text answer']
         })
       );
@@ -489,7 +489,7 @@ describe('State Editor controller', function() {
       tds.trainDefaultResponse('second answer');
       state = ess.getState('State');
       expect(state.interaction.answerGroups[0].rules[1]).toEqual(
-        rof.createNew(CLASSIFIER_RULE_STR, {
+        rof.createNew(RULE_TYPE_CLASSIFIER, {
           training_data: ['text answer']
         })
       );

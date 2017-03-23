@@ -59,7 +59,7 @@ oppia.filter('oppiaInteractiveMultipleChoiceInputValidator', [
     for (var i = 0; i < answerGroups.length; i++) {
       var rules = answerGroups[i].rules;
       for (var j = 0; j < rules.length; j++) {
-        if (rules[j].ruleType === 'Equals') {
+        if (rules[j].type === 'Equals') {
           var choicePreviouslySelected = (
             selectedEqualsChoices.indexOf(rules[j].inputs.x) !== -1);
           if (!choicePreviouslySelected) {
