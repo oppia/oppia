@@ -37,6 +37,10 @@ class CollectionMigrationJob(jobs.BaseMapReduceJobManager):
     improving the load time of new collections.
     """
 
+    _DELETED_KEY = 'collection_deleted'
+    _ERROR_KEY = 'validation_error'
+    _MIGRATED_KEY = 'collection_migrated'
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [collection_models.CollectionModel]
@@ -44,7 +48,8 @@ class CollectionMigrationJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def map(item):
         if item.deleted:
-            return
+            yield (CollectionMigrationJob._DELETED_KEY,
+                   'Encountered deleted collection.')
 
         # Note: the read will bring the collection up to the newest version.
         collection = collection_services.get_collection_by_id(item.id)
@@ -54,7 +59,8 @@ class CollectionMigrationJob(jobs.BaseMapReduceJobManager):
             logging.error(
                 'Collection %s failed validation: %s' %
                 (item.id, e))
-            return
+            yield (CollectionMigrationJob._ERROR_KEY,
+                   'Collection validation error.')
 
         # Write the new collection into the datastore if it's different from
         # the old version.
@@ -69,6 +75,8 @@ class CollectionMigrationJob(jobs.BaseMapReduceJobManager):
                 feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
                 'Update collection schema version to %d.' % (
                     feconf.CURRENT_COLLECTION_SCHEMA_VERSION))
+            yield (CollectionMigrationJob._MIGRATED_KEY,
+                   'Collection successfully migrated.')
 
     @staticmethod
     def reduce(key, values):
