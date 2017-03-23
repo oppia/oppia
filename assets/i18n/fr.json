@@ -215,6 +215,8 @@
 	"I18N_PREFERENCES_CHANGE_PICTURE": "Modifier l’image du profil",
 	"I18N_PREFERENCES_EMAIL": "Courriel",
 	"I18N_PREFERENCES_EMAIL_EXPLAIN": "Seuls les modérateurs et les administrateurs du site peuvent voir cela.",
+	"I18N_PREFERENCES_EMAIL_RECEIVE_EDIT_RIGHTS_NEWS": "Recevoir des courriels quand quelqu’un vous donne des droits d’édition sur une exploration",
+	"I18N_PREFERENCES_EMAIL_RECEIVE_FEEDBACK_NEWS": "Recevoir des courriels quand quelqu’un vous envoie un commentaire sur une exploration",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_NEWS": "Recevoir des nouvelles et des mises à jour du site",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_SUBSCRIPTION_NEWS": "Recevoir des e-mails lorsqu'un créateur auprès de qui vous avez souscrit, publie une nouvelle exploration",
 	"I18N_PREFERENCES_HEADING": "Préférences",
