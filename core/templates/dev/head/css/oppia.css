@@ -4452,9 +4452,9 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-donation-card-content-wide {
-  margin: 0 auto;
-  min-height: 670px;
-  overflow: auto;
+    margin: 0 auto;
+    min-height: 670px;
+    overflow: auto;
 }
 
 .oppia-donate-info {
