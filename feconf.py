@@ -64,6 +64,7 @@ FRONTEND_TEMPLATES_DIR = os.path.join(
     'core', 'templates', TEMPLATES_DIR_PREFIX, 'head')
 DEPENDENCIES_TEMPLATES_DIR = os.path.join('extensions', 'dependencies')
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
+VISUALIZATIONS_DIR = os.path.join('extensions', 'visualizations')
 OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
     'extensions', 'interactions', 'object_defaults.json')
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(

@@ -255,6 +255,9 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         old_params['answer'] = answer
         # The version of the exploration.
         version = self.payload.get('version')
+        session_id = self.payload.get('session_id')
+        client_time_spent_in_secs = self.payload.get(
+            'client_time_spent_in_secs')
         # The answer group and rule spec indexes, which will be used to get
         # the rule spec string.
         answer_group_index = self.payload.get('answer_group_index')
@@ -275,10 +278,12 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         old_interaction_instance = (
             interaction_registry.Registry.get_interaction_by_id(
                 old_interaction.id))
+
         normalized_answer = old_interaction_instance.normalize_answer(answer)
-        # TODO(sll): Should this also depend on `params`?
+
         event_services.AnswerSubmissionEventHandler.record(
             exploration_id, version, old_state_name, rule_spec_string,
+            session_id, client_time_spent_in_secs, old_params,
             old_interaction_instance.get_stats_log_html(
                 old_interaction.customization_args, normalized_answer))
         self.render_json({})

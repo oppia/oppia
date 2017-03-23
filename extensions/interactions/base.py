@@ -39,6 +39,7 @@ import json
 import os
 
 from core.domain import obj_services
+from core.domain import visualization_registry
 from extensions import domain
 from extensions.objects.models import objects
 import feconf
@@ -95,6 +96,9 @@ class BaseInteraction(object):
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.
     _customization_arg_specs = []
+    # Specs for desired visualizations of recorded state answers. Overridden
+    # in subclasses.
+    _answer_visualization_specs = []
     # Instructions for using this interaction, to be shown to the learner. Only
     # relevant for supplemental interactions.
     instructions = None
@@ -120,6 +124,20 @@ class BaseInteraction(object):
         return [
             domain.CustomizationArgSpec(**cas)
             for cas in self._customization_arg_specs]
+
+    @property
+    def answer_visualization_specs(self):
+        return self._answer_visualization_specs
+
+    @property
+    def answer_visualizations(self):
+        result = []
+        for spec in self._answer_visualization_specs:
+            factory_cls = (
+                visualization_registry.Registry.get_visualization_class(
+                    spec['id']))
+            result.append(factory_cls(spec['calculation_id'], spec['options']))
+        return result
 
     @property
     def dependency_ids(self):

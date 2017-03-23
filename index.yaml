@@ -101,6 +101,11 @@ indexes:
   - name: last_updated
     direction: desc
 
+- kind: InteractionAnswerSummariesRealtimeModel
+  properties:
+  - name: realtime_layer
+  - name: created_on
+
 - kind: FeedbackThreadModel
   properties:
   - name: deleted

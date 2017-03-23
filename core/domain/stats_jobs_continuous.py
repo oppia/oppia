@@ -19,8 +19,12 @@ import collections
 import datetime
 
 from core import jobs
+from core.domain import calculation_registry
 from core.domain import exp_services
+from core.domain import interaction_registry
+from core.domain import stats_domain
 from core.platform import models
+
 import feconf
 import utils
 
@@ -218,6 +222,8 @@ class StatisticsMRJobManager(
     """Job that calculates and creates stats models for exploration view.
        Includes: * number of visits to the exploration
                  * number of completions of the exploration
+       This deals with statistics of the whole exploration. See
+       stats_domain.StateAnswers for statistics of individual states.
     """
 
     _TYPE_STATE_COUNTER_STRING = 'counter'
@@ -497,3 +503,89 @@ class StatisticsMRJobManager(
         stats_models.ExplorationAnnotationsModel.create(
             exp_id, str(version), num_starts, num_completions,
             state_hit_counts)
+
+
+class InteractionAnswerSummariesMRJobManager(
+        jobs.BaseMapReduceJobManagerForContinuousComputations):
+    """
+    Job to calculate interaction view statistics, e.g. most frequent
+    answers of multiple-choice interactions. Iterate over StateAnswer
+    objects and create StateAnswersCalcOutput objects.
+    """
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return InteractionAnswerSummariesAggregator
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.StateAnswersModel]
+
+    @staticmethod
+    def map(item):
+        if InteractionAnswerSummariesMRJobManager._entity_created_before_job_queued( # pylint: disable=line-too-long
+                item):
+
+            # All visualizations desired for the interaction.
+            visualizations = (
+                interaction_registry.Registry.get_interaction_by_id(
+                    item.interaction_id).answer_visualizations)
+
+            # Get all desired calculations for the current state interaction id.
+            calc_ids = list(set(viz.calculation_id for viz in visualizations))
+            calculations = [
+                calculation_registry.Registry.get_calculation_by_id(calc_id)
+                for calc_id in calc_ids]
+
+            # Perform each calculation, and store the output.
+            for calc in calculations:
+                calc_output = calc.calculate_from_state_answers_entity(item)
+                calc_output.save()
+
+    @staticmethod
+    def reduce(id, state_answers_model):
+        # pylint: disable=redefined-builtin
+        pass
+
+
+class InteractionAnswerSummariesRealtimeModel(
+        jobs.BaseRealtimeDatastoreClassForContinuousComputations):
+    # TODO(bhenning): Implement a real-time model for
+    # InteractionAnswerSummariesAggregator.
+    pass
+
+
+class InteractionAnswerSummariesAggregator(
+        jobs.BaseContinuousComputationManager):
+    """A continuous-computation job that listens to answers to states and
+    updates StateAnswer view calculations.
+    """
+    @classmethod
+    def get_event_types_listened_to(cls):
+        return [feconf.EVENT_TYPE_ANSWER_SUBMITTED]
+
+    @classmethod
+    def _get_realtime_datastore_class(cls):
+        return InteractionAnswerSummariesRealtimeModel
+
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return InteractionAnswerSummariesMRJobManager
+
+    # Public query methods.
+    @classmethod
+    def get_calc_output(
+            cls, exploration_id, exploration_version, state_name,
+            calculation_id):
+        """Get state answers calculation output domain object obtained from
+        StateAnswersCalcOutputModel instance stored in data store. This
+        aggregator does not have a real-time layer, which means the results
+        from this function may be out of date.
+        """
+        calc_output_model = stats_models.StateAnswersCalcOutputModel.get_model(
+            exploration_id, exploration_version, state_name, calculation_id)
+        if calc_output_model:
+            return stats_domain.StateAnswersCalcOutput(
+                exploration_id, exploration_version, state_name, calculation_id,
+                calc_output_model.calculation_output)
+        else:
+            return None

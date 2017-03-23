@@ -39,6 +39,7 @@ from core.domain import rte_component_registry
 from core.domain import stats_services
 from core.domain import user_services
 from core.domain import value_generators_domain
+from core.domain import visualization_registry
 from core.platform import models
 import feconf
 import utils
@@ -181,6 +182,8 @@ class ExplorationPage(EditorHandler):
             rights_manager.Actor(self.user_id).can_edit(
                 feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
 
+        visualizations_html = visualization_registry.Registry.get_full_html()
+
         interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
 
@@ -239,6 +242,7 @@ class ExplorationPage(EditorHandler):
             'value_generators_js': jinja2.utils.Markup(
                 get_value_generators_js()),
             'title': exploration.title,
+            'visualizations_html': jinja2.utils.Markup(visualizations_html),
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'ALLOWED_GADGETS': feconf.ALLOWED_GADGETS,
             'ALLOWED_INTERACTION_CATEGORIES': (
@@ -867,6 +871,7 @@ class StateRulesStatsHandler(EditorHandler):
         """Handles GET requests."""
         try:
             exploration = exp_services.get_exploration_by_id(exploration_id)
+            current_version = exploration.version
         except:
             raise self.PageNotFoundException
 
@@ -878,7 +883,9 @@ class StateRulesStatsHandler(EditorHandler):
 
         self.render_json({
             'rules_stats': stats_services.get_state_rules_stats(
-                exploration_id, state_name)
+                exploration_id, state_name),
+            'visualizations_info': stats_services.get_visualizations_info(
+                exploration_id, current_version, state_name),
         })
 
 

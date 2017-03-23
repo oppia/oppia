@@ -20,6 +20,7 @@ import datetime
 import time
 
 from core import jobs_registry
+from core.domain import exp_domain
 from core.domain import event_services
 from core.domain import exp_services
 from core.domain import stats_jobs_continuous
@@ -351,3 +352,136 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             views_for_all_exps = ModifiedStatisticsAggregator.get_views_multi([
                 exp_id_1, exp_id_2])
             self.assertEqual(views_for_all_exps, [3, 2])
+
+class ModifiedInteractionAnswerSummariesAggregator(
+        stats_jobs_continuous.StatisticsAggregator):
+    """A modified InteractionAnswerSummariesAggregator that does not start
+    a new batch job when the previous one has finished.
+    """
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return ModifiedInteractionAnswerSummariesMRJobManager
+
+    @classmethod
+    def _kickoff_batch_job_after_previous_one_ends(cls):
+        pass
+
+
+class ModifiedInteractionAnswerSummariesMRJobManager(
+        stats_jobs_continuous.InteractionAnswerSummariesMRJobManager):
+
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return ModifiedInteractionAnswerSummariesAggregator
+
+
+class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
+    """Tests for interaction answer view aggregations."""
+
+    CONTINUOUS_MANAGERS_FOR_TESTS = [
+        ModifiedInteractionAnswerSummariesAggregator]
+    DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
+
+    def _record_start(self, exp_id, exp_version, state_name, session_id):
+        event_services.StartExplorationEventHandler.record(
+            exp_id, exp_version, state_name, session_id, {},
+            feconf.PLAY_TYPE_NORMAL)
+
+    def test_one_answer(self):
+        with self.swap(
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.CONTINUOUS_MANAGERS_FOR_TESTS):
+
+            # setup example exploration
+            exp_id = 'eid'
+            exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
+            first_state_name = exp.init_state_name
+            second_state_name = 'State 2'
+            exp_services.update_exploration('fake@user.com', exp_id, [{
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': first_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'MultipleChoiceInput',
+            }, {
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': second_state_name,
+            }, {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': second_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'MultipleChoiceInput',
+            }], 'Add new state')
+            exp = exp_services.get_exploration_by_id(exp_id)
+            exp_version = exp.version
+
+            time_spent = 5.0
+            params = {}
+
+            self._record_start(
+                exp_id, exp_version, first_state_name, 'session1')
+            self._record_start(
+                exp_id, exp_version, first_state_name, 'session2')
+            self.process_and_flush_pending_tasks()
+
+            # add some answers
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, exp_version, first_state_name,
+                self.DEFAULT_RULESPEC_STR, 'session1', time_spent, params,
+                'answer1')
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, exp_version, first_state_name,
+                self.DEFAULT_RULESPEC_STR, 'session2', time_spent, params,
+                'answer1')
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, exp_version, first_state_name,
+                self.DEFAULT_RULESPEC_STR, 'session1', time_spent, params,
+                'answer2')
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, exp_version, second_state_name,
+                self.DEFAULT_RULESPEC_STR, 'session2', time_spent, params,
+                'answer3')
+
+            # Run job on exploration with answers
+            ModifiedInteractionAnswerSummariesAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+
+            calc_id = 'AnswerFrequencies'
+
+            # get job output of first state and check it
+            calc_output_domain_object = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
+                    exp_id, exp_version, first_state_name, calc_id))
+            self.assertEqual(
+                'AnswerFrequencies', calc_output_domain_object.calculation_id)
+
+            calculation_output = calc_output_domain_object.calculation_output
+
+            expected_calculation_output = [{
+                'answer': 'answer1',
+                'frequency': 2
+            }, {
+                'answer': 'answer2',
+                'frequency': 1
+            }]
+
+            self.assertEqual(
+                calculation_output, expected_calculation_output)
+
+            # get job output of second state and check it
+            calc_output_domain_object = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
+                    exp_id, exp_version, second_state_name, calc_id))
+
+            self.assertEqual(
+                'AnswerFrequencies', calc_output_domain_object.calculation_id)
+
+            calculation_output = calc_output_domain_object.calculation_output
+
+            expected_calculation_output = [{
+                'answer': 'answer3',
+                'frequency': 1
+            }]
+
+            self.assertEqual(calculation_output, expected_calculation_output)

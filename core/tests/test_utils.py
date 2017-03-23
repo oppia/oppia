@@ -504,7 +504,6 @@ class TestBase(unittest.TestCase):
         """
         return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
 
-
     @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):
         """Swap an object's attribute value within the context of a

@@ -20,6 +20,7 @@ import inspect
 
 from core import jobs_registry
 from core.domain import exp_domain
+from core.domain import stats_services
 from core.platform import models
 import feconf
 
@@ -73,13 +74,22 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
         pass
 
     @classmethod
-    def _handle_event(cls, exploration_id, exploration_version, state_name,
-                      rule_spec_string, answer):
+    def _handle_event(
+            cls, exploration_id, exploration_version, state_name,
+            rule_spec_string, session_id, time_spent_in_secs, params, answer):
         """Records an event when an answer triggers a rule."""
         # TODO(sll): Escape these args?
+        # TODO(msl): remove old answer recording models.
+
+        # In the old framework, answers are converted to unicode even when they
+        # are not strings. This will be removed when migrating to the new
+        # framework.
         stats_models.process_submitted_answer(
             exploration_id, exploration_version, state_name,
-            rule_spec_string, answer)
+            rule_spec_string, unicode(answer))
+        stats_services.record_answer(
+            exploration_id, exploration_version, state_name, rule_spec_string,
+            session_id, time_spent_in_secs, params, answer)
 
 
 class DefaultRuleAnswerResolutionEventHandler(BaseEventHandler):
@@ -103,8 +113,9 @@ class StartExplorationEventHandler(BaseEventHandler):
     EVENT_TYPE = feconf.EVENT_TYPE_START_EXPLORATION
 
     @classmethod
-    def _handle_event(cls, exp_id, exp_version, state_name, session_id,
-                      params, play_type):
+    def _handle_event(
+            cls, exp_id, exp_version, state_name, session_id, params,
+            play_type):
         stats_models.StartExplorationEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id, params,
             play_type)

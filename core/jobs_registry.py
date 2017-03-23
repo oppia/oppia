@@ -51,6 +51,7 @@ ONE_OFF_JOB_MANAGERS = [
 # NOTE TO DEVELOPERS: When a new ContinuousComputation manager is defined,
 # it should be registered here.
 ALL_CONTINUOUS_COMPUTATION_MANAGERS = [
+    stats_jobs_continuous.InteractionAnswerSummariesAggregator,
     stats_jobs_continuous.StatisticsAggregator,
     user_jobs_continuous.DashboardRecentUpdatesAggregator,
     user_jobs_continuous.UserStatsAggregator,
