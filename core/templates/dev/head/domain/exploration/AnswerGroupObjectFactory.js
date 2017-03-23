@@ -17,16 +17,19 @@
  * domain objects.
  */
 
-oppia.factory('AnswerGroupObjectFactory', [function() {
-  var AnswerGroup = function(ruleSpecs, outcome, correct) {
-    this.ruleSpecs = ruleSpecs;
+oppia.factory('AnswerGroupObjectFactory', ['RuleObjectFactory',
+  function(RuleObjectFactory) {
+  var AnswerGroup = function(rules, outcome, correct) {
+    this.rules = rules;
     this.outcome = outcome;
     this.correct = correct;
   };
 
   AnswerGroup.prototype.toBackendDict = function() {
     return {
-      rule_specs: this.ruleSpecs,
+      rule_specs: this.rules.map(function(rule) {
+        return rule.toBackendDict();
+      }),
       outcome: this.outcome,
       correct: this.correct
     };
@@ -34,15 +37,21 @@ oppia.factory('AnswerGroupObjectFactory', [function() {
 
   // Static class methods. Note that "this" is not available in
   // static contexts.
-  AnswerGroup.createNew = function(ruleSpecs, outcome, correct) {
-    return new AnswerGroup(ruleSpecs, outcome, correct);
+  AnswerGroup.createNew = function(rules, outcome, correct) {
+    return new AnswerGroup(rules, outcome, correct);
   };
 
   AnswerGroup.createFromBackendDict = function(answerGroupBackendDict) {
     return new AnswerGroup(
-      answerGroupBackendDict.rule_specs,
+      generateRulesFromBackend(answerGroupBackendDict.rule_specs),
       answerGroupBackendDict.outcome,
       false);
+  };
+
+  var generateRulesFromBackend = function(ruleBackendDicts) {
+    return ruleBackendDicts.map(function(ruleBackendDict) {
+      return RuleObjectFactory.createFromBackendDict(ruleBackendDict);
+    });
   };
 
   return AnswerGroup;

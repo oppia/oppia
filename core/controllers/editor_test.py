@@ -370,7 +370,7 @@ class EditorTest(BaseEditorControllerTest):
             answer_group = state['interaction']['answer_groups'][1]
             rule_spec = answer_group['rule_specs'][0]
             self.assertEqual(
-                rule_spec['rule_type'], exp_domain.CLASSIFIER_RULESPEC_STR)
+                rule_spec['rule_type'], exp_domain.RULE_TYPE_CLASSIFIER)
             rule_spec['inputs']['training_data'].append('joyful')
 
             self.put_json('/createhandler/data/%s' % exp_id, {

@@ -27,10 +27,10 @@ oppia.filter('oppiaInteractiveMathExpressionInputValidator', [
 
     // Check that each rule has a valid math expression.
     for (var i = 0; i < answerGroups.length; i++) {
-      var ruleSpecs = answerGroups[i].ruleSpecs;
-      for (var j = 0; j < ruleSpecs.length; j++) {
+      var rules = answerGroups[i].rules;
+      for (var j = 0; j < rules.length; j++) {
         try {
-          MathExpression.fromLatex(ruleSpecs[j].inputs.x);
+          MathExpression.fromLatex(rules[j].inputs.x);
         } catch (e) {
           warningsList.push({
             type: WARNING_TYPES.CRITICAL,
