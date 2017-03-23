@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the SimpleEditorManagerService.js
  */
 
-ddescribe('Simple Editor Manager Service', function() {
+describe('Simple Editor Manager Service', function() {
   var stubs;
   var data;
   var mockExplorationData = {
