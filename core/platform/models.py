@@ -214,8 +214,7 @@ class Registry(object):
 
     @classmethod
     def import_current_user_services(cls):
-        """Imports and returns current_user_services
-        module.
+        """Imports and returns current_user_services module.
 
         Returns:
             module. The current_user_services module.
