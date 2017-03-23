@@ -65,6 +65,7 @@ oppia.controller('StateInteraction', [
 
     $scope.stateInteractionIdService = stateInteractionIdService;
     $scope.hasLoaded = false;
+    $scope.customizationModalReopened = false;
 
     $scope.userBlueImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/avatar/user_blue_72px.png');
@@ -211,6 +212,7 @@ oppia.controller('StateInteraction', [
                 GLOBALS.ALLOWED_INTERACTION_CATEGORIES);
 
               if (stateInteractionIdService.savedMemento) {
+                $scope.customizationModalReopened = true;
                 var interactionSpec = INTERACTION_SPECS[
                   stateInteractionIdService.savedMemento];
                 $scope.customizationArgSpecs = (
@@ -238,6 +240,8 @@ oppia.controller('StateInteraction', [
 
                 $scope.$broadcast('schemaBasedFormsShown');
                 $scope.form = {};
+                $scope.hasCustomizationArgs = (Object.keys(
+                  stateCustomizationArgsService.displayed).length > 0);
               }
 
               $scope.onChangeInteractionId = function(newInteractionId) {
@@ -262,6 +266,14 @@ oppia.controller('StateInteraction', [
                   });
                 }
 
+                if (Object.keys(
+                  stateCustomizationArgsService.displayed).length === 0) {
+                  $scope.save();
+                  $scope.hasCustomizationArgs = false;
+                } else {
+                  $scope.hasCustomizationArgs = true;
+                }
+
                 $scope.$broadcast('schemaBasedFormsShown');
                 $scope.form = {};
               };
@@ -279,6 +291,10 @@ oppia.controller('StateInteraction', [
                 editorFirstTimeEventsService
                   .registerFirstSaveInteractionEvent();
                 $modalInstance.close();
+              };
+
+              $scope.okay = function() {
+                $modalInstance.close('okay');
               };
 
               $scope.cancel = function() {
