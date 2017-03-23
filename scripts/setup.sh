@@ -69,6 +69,7 @@ function maybeInstallDependencies {
     install_node_module protractor 4.0.11
     install_node_module protractor-screenshot-reporter 0.0.5
     install_node_module jasmine-spec-reporter 2.2.2
+    install_node_module webdriver-manager 9.0.0
 
     $NODE_MODULE_DIR/.bin/webdriver-manager update
   fi
