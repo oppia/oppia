@@ -259,58 +259,58 @@ class LDAStringClassifierUnitTests(test_utils.GenericTestBase):
 
         # Verify validation error is raised when key is not present.
         classifier_data.pop('_alpha', None)
-        with self.assertRaisesRegexp(utils.ValidationError,
-            'Expected _alpha to be a key in classifier_data'):
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected _alpha to be a key in classifier_data')):
             self.classifier.validate(classifier_data)
 
         # Verify validation error is raised when string is provided instead of
         # int.
         classifier_data['_alpha'] = 'abc'
-        with self.assertRaisesRegexp(utils.ValidationError,
-            'Expected _alpha to be a float'):
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected _alpha to be a float')):
             self.classifier.validate(classifier_data)
 
         # Verify validation error is raised when float is provided instead of
         # int.
         classifier_data['_alpha'] = 0.1
         classifier_data['_training_iterations'] = 1.2
-        with self.assertRaisesRegexp(utils.ValidationError,
-            'Expected _training_iterations to be a int'):
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected _training_iterations to be a int')):
             self.classifier.validate(classifier_data)
 
         # Verify validation error is raised when list is provided instead of
         # dict.
         classifier_data['_training_iterations'] = 25
         classifier_data['_label_to_id'] = []
-        with self.assertRaisesRegexp(utils.ValidationError,
-            'Expected _label_to_id to be a dict'):
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected _label_to_id to be a dict')):
             self.classifier.validate(classifier_data)
 
         # Verify validation error is raised when key of dict is int instead of
         # string.
         classifier_data['_label_to_id'] = {1: 1}
-        with self.assertRaisesRegexp(utils.ValidationError,
-            'Expected key of _label_to_id to be a string'):
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected key of _label_to_id to be a string')):
             self.classifier.validate(classifier_data)
 
         # Verify validation error is raised when value of dict is string
         # instead of int.
         classifier_data['_label_to_id'] = {'text': '1'}
-        with self.assertRaisesRegexp(utils.ValidationError,
-            'Expected value of _label_to_id to be a int'):
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected value of _label_to_id to be a int')):
             self.classifier.validate(classifier_data)
 
         # Verify validation error is raised when dict is provided instead of
         # list.
         classifier_data['_label_to_id'] = {'text': 1}
         classifier_data['_w_dp'] = {}
-        with self.assertRaisesRegexp(utils.ValidationError,
-            'Expected _w_dp to be a list'):
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected _w_dp to be a list')):
             self.classifier.validate(classifier_data)
 
         # Verify validation error is raised when the list values are string
         # instead of int.
         classifier_data['_w_dp'] = ['abc']
-        with self.assertRaisesRegexp(utils.ValidationError,
-            'Expected values of _w_dp to be a int'):
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected values of _w_dp to be a int')):
             self.classifier.validate(classifier_data)
