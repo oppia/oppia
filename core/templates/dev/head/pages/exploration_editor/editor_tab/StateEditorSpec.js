@@ -65,9 +65,9 @@ describe('State Editor controller', function() {
           interaction: {
             id: 'TextInput',
             answer_groups: [{
-              rule_specs: [{
-                dest: 'Second State'
-              }]
+              rule_specs: [],
+              outcome: {},
+              correct: false
             }],
             fallbacks: []
           },
@@ -81,9 +81,9 @@ describe('State Editor controller', function() {
           interaction: {
             id: 'TextInput',
             answer_groups: [{
-              rule_specs: [{
-                dest: 'Second State'
-              }]
+              rule_specs: [],
+              outcome: {},
+              correct: false
             }],
             fallbacks: []
           },
@@ -97,9 +97,9 @@ describe('State Editor controller', function() {
           interaction: {
             id: 'TextInput',
             answer_groups: [{
-              rule_specs: [{
-                dest: 'Second State'
-              }]
+              rule_specs: [],
+              outcome: {},
+              correct: false
             }],
             fallbacks: []
           },
