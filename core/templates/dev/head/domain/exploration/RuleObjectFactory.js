@@ -17,8 +17,7 @@
  * domain objects.
  */
 
-oppia.factory('RuleObjectFactory', ['DEFAULT_CLASSIFIER_RULE',
-  function(DEFAULT_CLASSIFIER_RULE) {
+oppia.factory('RuleObjectFactory', [function() {
   var Rule = function(type, inputs) {
     this.type = type;
     this.inputs = inputs;
@@ -40,9 +39,9 @@ oppia.factory('RuleObjectFactory', ['DEFAULT_CLASSIFIER_RULE',
   };
 
   Rule.createNewClassifierRule = function() {
-    return new Rule(
-      angular.copy(DEFAULT_CLASSIFIER_RULE.rule_type),
-      angular.copy(DEFAULT_CLASSIFIER_RULE.inputs));
+    return new Rule('FuzzyMatches', {
+      training_data: []
+    });
   };
 
   return Rule;

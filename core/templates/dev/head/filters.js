@@ -169,7 +169,7 @@ oppia.filter('parameterizeRuleDescription', [
       rule.type];
     if (!description) {
       console.error(
-        'Cannot find description for rule ' + rule.ruleType +
+        'Cannot find description for rule ' + rule.type +
         ' for interaction ' + interactionId);
       return '';
     }

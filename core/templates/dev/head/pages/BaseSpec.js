@@ -20,20 +20,21 @@ describe('Base controller', function() {
   beforeEach(module('oppia'));
 
   describe('BaseCtrl', function() {
-    var scope, ctrl, $httpBackend;
+    var scope, ctrl, rof;
 
-    beforeEach(inject(function($rootScope, $controller) {
+    beforeEach(inject(function($rootScope, $controller, $injector) {
       scope = $rootScope.$new();
       ctrl = $controller('Base', {
         $scope: scope,
         alertsService: null,
         messengerService: null
       });
+      rof = $injector.get('RuleObjectFactory');
     }));
 
     it('should have matching classifier constants',
         inject(function($injector) {
-      expect($injector.get('DEFAULT_CLASSIFIER_RULE').rule_type).toEqual(
+      expect(rof.createNewClassifierRule().type).toEqual(
         $injector.get('RULE_TYPE_CLASSIFIER'));
     }));
   });

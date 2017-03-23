@@ -571,7 +571,7 @@ oppia.controller('StateResponses', [
           'stateInteractionIdService', 'stateCustomizationArgsService',
           'explorationContextService', 'editorContextService',
           'explorationStatesService', 'trainingDataService',
-          'AnswerClassificationService', 'focusService', 'DEFAULT_RULE_NAME',
+          'AnswerClassificationService', 'focusService',
           'RULE_TYPE_CLASSIFIER',
           function(
               $scope, $injector, $modalInstance,
@@ -579,7 +579,7 @@ oppia.controller('StateResponses', [
               stateInteractionIdService, stateCustomizationArgsService,
               explorationContextService, editorContextService,
               explorationStatesService, trainingDataService,
-              AnswerClassificationService, focusService, DEFAULT_RULE_NAME,
+              AnswerClassificationService, focusService,
               RULE_TYPE_CLASSIFIER) {
             var _explorationId = explorationContextService.getExplorationId();
             var _stateName = editorContextService.getActiveStateName();

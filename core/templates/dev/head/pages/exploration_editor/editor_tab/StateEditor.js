@@ -204,10 +204,10 @@ oppia.factory('trainingModalService', ['$rootScope', '$modal', 'alertsService',
 // as part of any classifier training models.
 oppia.factory('trainingDataService', [
   '$rootScope', '$http', 'responsesService', 'RULE_TYPE_CLASSIFIER',
-  'DEFAULT_CLASSIFIER_RULE', 'RuleObjectFactory',
+  'RuleObjectFactory',
   function(
       $rootScope, $http, responsesService, RULE_TYPE_CLASSIFIER,
-      DEFAULT_CLASSIFIER_RULE, RuleObjectFactory) {
+      RuleObjectFactory) {
     var _trainingDataAnswers = [];
     var _trainingDataCounts = [];
 
