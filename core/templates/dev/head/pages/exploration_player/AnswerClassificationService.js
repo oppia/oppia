@@ -36,7 +36,7 @@ oppia.factory('AnswerClassificationService', [
      * <ul>
      *   <li> **outcome**: the outcome of the answer group
      *   <li> **answerGroupIndex**: the index of the matched answer group
-     *   <li> **ruleSpecIndex**: the index of the rule in the matched answer
+     *   <li> **ruleIndex**: the index of the rule in the matched answer
      *     group.
      * </ul>
      */
@@ -52,7 +52,7 @@ oppia.factory('AnswerClassificationService', [
             return {
               outcome: answerGroups[i].outcome,
               answerGroupIndex: i,
-              ruleSpecIndex: j
+              ruleIndex: j
             };
           }
         }
@@ -64,7 +64,7 @@ oppia.factory('AnswerClassificationService', [
         return {
           outcome: defaultOutcome,
           answerGroupIndex: answerGroups.length,
-          ruleSpecIndex: 0
+          ruleIndex: 0
         };
       } else {
         alertsService.addWarning('Something went wrong with the exploration.');
@@ -89,7 +89,7 @@ oppia.factory('AnswerClassificationService', [
        * <ul>
        *   <li> **outcome**: the outcome of the answer group
        *   <li> **answerGroupIndex**: the index of the matched answer group
-       *   <li> **ruleSpecIndex**: the index of the rule in the matched answer
+       *   <li> **ruleIndex**: the index of the rule in the matched answer
        *            group
        * </ul>
        */
@@ -129,7 +129,7 @@ oppia.factory('AnswerClassificationService', [
             var result = response.data;
             deferred.resolve({
               outcome: result.outcome,
-              ruleSpecIndex: result.rule_spec_index,
+              ruleIndex: result.rule_spec_index,
               answerGroupIndex: result.answer_group_index
             });
           });

@@ -645,7 +645,7 @@ oppia.controller('StateResponses', [
                   $scope.trainingDataOutcomeDest = dest;
 
                   var answerGroupIndex = classificationResult.answerGroupIndex;
-                  var ruleIndex = classificationResult.ruleSpecIndex;
+                  var ruleIndex = classificationResult.ruleIndex;
                   if (answerGroupIndex !==
                         _state.interaction.answerGroups.length &&
                       _state.interaction.answerGroups[
