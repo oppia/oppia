@@ -535,6 +535,10 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
       _sendSocialEventToGoogleAnalytics(
         network, 'share', $window.location.pathname);
     },
+    registerShareCollectionEvent: function(network) {
+      _sendSocialEventToGoogleAnalytics(
+        network, 'share', $window.location.pathname);
+    },
     registerOpenEmbedInfoEvent: function(explorationId) {
       _sendEventToGoogleAnalytics('EmbedInfoModal', 'open', explorationId);
     },
