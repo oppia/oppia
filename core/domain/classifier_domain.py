@@ -150,7 +150,7 @@ class Classifier(object):
         if not isinstance(self.algorithm_id, basestring):
             raise utils.ValidationError(
                 'Expected algorithm_id to be a string, received %s' %
-                    self.algorithm_id)
+                self.algorithm_id)
         utils.require_valid_name(
             self.algorithm_id, 'the algorithm id')
         if self.algorithm_id not in (
