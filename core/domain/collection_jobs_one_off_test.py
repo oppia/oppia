@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 201/c7 The Oppia Authors. All Rights Reserved.
+# Copyright 2017 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
         """Tests that the collection migration job does not convert an
         collection that is already the latest collection content schema version.
         """
-        # Create a new, default exploration that should not be affected by the
+        # Create a new, collection that should not be affected by the
         # job.
         collection = collection_domain.Collection.create_default_collection(
             self.COLLECTION_ID, 'A title', 'A Category', 'An Objective')
@@ -83,7 +83,7 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
         collection_services.save_new_collection(self.albert_id, collection)
 
         # Note: This creates a summary based on the upgraded model (which is
-        # fine). A summary is needed to delete the exploration.
+        # fine). A summary is needed to delete the collection.
         collection_services.create_collection_summary(
             self.COLLECTION_ID, None)
 

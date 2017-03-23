@@ -49,8 +49,8 @@ CMD_EDIT_COLLECTION_PROPERTY = 'edit_collection_property'
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
 CMD_EDIT_COLLECTION_NODE_PROPERTY = 'edit_collection_node_property'
-# This takes additional 'version' parameter for logging.
-CMD_MIGRATE_SCHEMA = 'migrate_schema'
+# This takes additional 'from_version' and 'to_version' parameters for logging.
+CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION = 'migrate_schema_to_latest_version'
 
 
 class CollectionChange(object):
@@ -85,7 +85,7 @@ class CollectionChange(object):
             property_name, new_value and, optionally, old_value)
         - 'edit_collection_property' (with property_name, new_value and,
             optionally, old_value)
-        - 'migrate_schema' (with version)
+        - 'migrate_schema' (with from_version and to_version)
 
         For a collection node, property_name must be one of
         COLLECTION_NODE_PROPERTIES. For a collection, property_name must be
@@ -114,8 +114,9 @@ class CollectionChange(object):
             self.property_name = change_dict['property_name']
             self.new_value = change_dict['new_value']
             self.old_value = change_dict.get('old_value')
-        elif self.cmd == CMD_MIGRATE_SCHEMA:
-            self.version = change_dict['version']
+        elif self.cmd == CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION:
+            self.from_version = change_dict['from_version']
+            self.to_version = change_dict['to_version']
         else:
             raise Exception('Invalid change_dict: %s' % change_dict)
 
@@ -397,6 +398,13 @@ class Collection(object):
         Note that the versioned_collection_contents being passed in is modified
         in-place.
         """
+        if (versioned_collection_contents['schema_version'] >
+                feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
+            raise Exception('Collection is version %d but current collection'
+                            ' schema version is %d' % (
+                                versioned_collection_contents['schema_version'],
+                                feconf.CURRENT_COLLECTION_SCHEMA_VERSION))
+
         versioned_collection_contents['schema_version'] = (
             current_version + 1)
 

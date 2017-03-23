@@ -145,7 +145,7 @@ def get_collection_from_model(collection_model, run_conversion=True):
     # instead. This is temporary, and intended to not break backwards
     # compatibility before the migration job is run.
     # TODO(wxy): Remove this after collection migration is completed.
-    if versioned_collection_contents['collection_contents'] == {}:
+    if not versioned_collection_contents['collection_contents']:
         versioned_collection_contents['collection_contents'] = {
             'nodes': copy.deepcopy(collection_model.nodes)
         }
@@ -594,7 +594,7 @@ def apply_change_list(collection_id, change_list):
                     collection.update_tags(change.new_value)
             elif (
                     change.cmd ==
-                    collection_domain.CMD_MIGRATE_SCHEMA):
+                    collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
                 # Loading the collection model from the datastore into an
                 # Collection domain object automatically converts it to use the
                 # latest schema version. As a result, simply resaving the
