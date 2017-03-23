@@ -43,7 +43,7 @@ class _Gae(_Platform):
             model_names: list(str). List of storage module names.
 
         Returns:
-            tuple(module): Tuple of Storage modules.
+            tuple(module): Tuple of storage modules.
 
         Raises:
             Exception: Invalid model name.
@@ -196,7 +196,7 @@ class Registry(object):
         imports.
 
         Returns:
-            model. _Gae Model.
+            class: The corresponding platform-specific interface class.
         """
         return cls._PLATFORM_MAPPING.get(feconf.PLATFORM)
 
@@ -205,7 +205,7 @@ class Registry(object):
         """Imports and returns the storage modules listed in model_names.
 
         Args:
-            model_names: list(str). List of storage modules.
+            model_names: list(str). List of storage module names.
 
         Returns:
             list(module). The corresponding storage-layer modules.
@@ -214,7 +214,7 @@ class Registry(object):
 
     @classmethod
     def import_current_user_services(cls):
-        """Imports and returns platform-specific current_user_services
+        """Imports and returns current_user_services
         module.
 
         Returns:
