@@ -37,13 +37,13 @@ class _Gae(_Platform):
     """
     @classmethod
     def import_models(cls, model_names):
-        """Imports and returns the storage models listed in model_names.
+        """Imports and returns the storage modules listed in model_names.
 
         Args:
-            model_names: list(str). List of storage model names.
+            model_names: list(str). List of storage module names.
 
         Returns:
-            tuple(ndb.Model): Tuple of Storage models.
+            tuple(module): Tuple of Storage modules.
 
         Raises:
             Exception: Invalid model name.
@@ -96,17 +96,17 @@ class _Gae(_Platform):
 
     @classmethod
     def import_transaction_services(cls):
-        """Imports and returns gae_transaction_services.
+        """Imports and returns gae_transaction_services module.
 
         Returns:
-            module. The gae_transaction_services modue.
+            module. The gae_transaction_services module.
         """
         from core.platform.transactions import gae_transaction_services
         return gae_transaction_services
 
     @classmethod
     def import_current_user_services(cls):
-        """Imports and returns gae_current_user_services.
+        """Imports and returns gae_current_user_services module.
 
         Returns:
             module. The gae_current_user_services module.
@@ -116,7 +116,7 @@ class _Gae(_Platform):
 
     @classmethod
     def import_app_identity_services(cls):
-        """Imports and returns gae_app_identity_services.
+        """Imports and returns gae_app_identity_services module.
 
         Returns:
             module. The gae_app_identity_services module.
@@ -126,16 +126,15 @@ class _Gae(_Platform):
 
     @classmethod
     def import_email_services(cls):
-        """Imports and returns the email services module
-        specified in feconf.py.
+        """Imports and returns the email services module specified in feconf.py.
 
         Returns:
-            module. The email_services module to use,
-            based on the feconf.py setting.
+            module. The email_services module to use, based on the feconf.py
+            setting.
 
         Raises:
-            Exception: Exception: feconf.EMAIL_SERVICE_PROVIDER does not
-            correspond to a valid email_services module.
+            Exception: feconf.EMAIL_SERVICE_PROVIDER does not correspond 
+            to a valid email_services module.
         """
         if feconf.EMAIL_SERVICE_PROVIDER == feconf.EMAIL_SERVICE_PROVIDER_GAE:
             from core.platform.email import gae_email_services
@@ -151,7 +150,7 @@ class _Gae(_Platform):
 
     @classmethod
     def import_memcache_services(cls):
-        """Imports and returna gae_memcache_services.
+        """Imports and returns gae_memcache_services.
 
         Returns:
             module. The gae_memcache_services module.
@@ -161,7 +160,7 @@ class _Gae(_Platform):
 
     @classmethod
     def import_taskqueue_services(cls):
-        """Imports and returns gae_taskqueue_services.
+        """Imports and returns gae_taskqueue_services module.
 
         Returns:
             module. The gae_taskqueue_services module.
@@ -171,7 +170,7 @@ class _Gae(_Platform):
 
     @classmethod
     def import_search_services(cls):
-        """Imports and returns gae_search_services.
+        """Imports and returns gae_search_services module.
 
         Returns:
             module. The gae_search_services module.
@@ -193,7 +192,8 @@ class Registry(object):
 
     @classmethod
     def _get(cls):
-        """Method to retrieve the _Gae Model.
+        """Returns the appropriate interface class for platform-specific
+        imports.
 
         Returns:
             model. _Gae Model.
@@ -202,19 +202,20 @@ class Registry(object):
 
     @classmethod
     def import_models(cls, model_names):
-        """Imports and returns the storage models listed in model_names.
+        """Imports and returns the storage modules listed in model_names.
 
         Args:
-            model_names: list(str). List of storage models.
+            model_names: list(str). List of storage modules.
 
         Returns:
-            import_models() of _Gae_ model.
+            list(module). The corresponding storage-layer modules.
         """
         return cls._get().import_models(model_names)
 
     @classmethod
     def import_current_user_services(cls):
-        """Imports and returns platform-specific current_user_services.
+        """Imports and returns platform-specific current_user_services
+        module.
 
         Returns:
             module. The current_user_services module.
