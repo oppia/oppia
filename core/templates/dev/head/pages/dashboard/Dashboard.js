@@ -96,15 +96,18 @@ oppia.controller('Dashboard', [
     $scope.$watch(function() {
       return $location.path();
     }, function(newPath, oldPath) {
-      if (newPath === '' && oldPath === '') {
+      if (performance.navigation.type !== 1) {
+        if (newPath === '' && oldPath === '') {
+          $location.path('').replace;
+          return;
+        } else if (newPath === '/' && oldPath === '/') {
+          $location.path('back').replace;
+          $window.location.reload();
+          return;
+        }
+      }
+      if (newPath === '/back' && oldPath === '/back') {
         $location.path('').replace;
-        return;
-      } else if (newPath === '/back' && oldPath === '/back') {
-        $location.path('').replace;
-      } else if (newPath === '/' && oldPath === '/') {
-        $location.path('back').replace;
-        $window.location.reload();
-        return;
       }
     });
 
@@ -222,7 +225,11 @@ oppia.controller('Dashboard', [
         } else {
           $scope.activeTab = 'myExplorations';
         }
-        $rootScope.loadingMessage = '';
+        if ($location.path() === '/back') {
+          $rootScope.loadingMessage = 'Loading';
+        } else {
+          $rootScope.loadingMessage = '';
+        }
       },
       function(errorResponse) {
         if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {

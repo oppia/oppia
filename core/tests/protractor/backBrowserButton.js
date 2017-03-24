@@ -46,14 +46,14 @@ describe('backBrowserButton', function() {
     editor.exitTutorialIfNecessary();
     browser.navigate().back();
     expect(browser.getCurrentUrl()).
-      toEqual('http://localhost:9001/dashboard?mode=create#/created=true');
+      toEqual('http://localhost:9001/dashboard?mode=create#/');
     general.waitForSystem();
     browser.get(general.LIBRARY_URL_SUFFIX);
     workflow.createExploration();
     browser.navigate().back();
     general.waitForSystem();
     expect(browser.getCurrentUrl()).
-      toEqual('http://localhost:9001/dashboard?mode=create#/created=true');
+      toEqual('http://localhost:9001/dashboard?mode=create#/');
     browser.navigate().back();
     general.waitForSystem();
     expect(browser.getCurrentUrl()).
@@ -61,7 +61,7 @@ describe('backBrowserButton', function() {
     browser.navigate().forward();
     general.waitForSystem();
     expect(browser.getCurrentUrl()).
-      toEqual('http://localhost:9001/dashboard?mode=create#/created=true');
+      toEqual('http://localhost:9001/dashboard?mode=create#/');
     browser.navigate().forward();
     general.waitForSystem();
     expect(browser.getLocationAbsUrl()).toEqual('/gui/Introduction');
