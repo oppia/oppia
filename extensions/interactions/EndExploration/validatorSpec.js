@@ -43,7 +43,7 @@ describe('oppiaInteractiveEndExplorationValidator', function() {
 
     goodAnswerGroups = [
       {
-        ruleSpecs: [],
+        rules: [],
         outcome: {
           dest: 'Second State',
           feedback: []

@@ -39,18 +39,12 @@ oppia.constant(
 // We use a slash because this character is forbidden in a state name.
 oppia.constant('PLACEHOLDER_OUTCOME_DEST', '/');
 oppia.constant('INTERACTION_DISPLAY_MODE_INLINE', 'inline');
-oppia.constant('DEFAULT_RULE_NAME', 'Default');
-oppia.constant('CLASSIFIER_RULESPEC_STR', 'FuzzyMatches');
+oppia.constant('RULE_TYPE_CLASSIFIER', 'FuzzyMatches');
 oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');
 // Feature still in development.
 // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
 oppia.constant('ENABLE_STRING_CLASSIFIER', false);
-oppia.constant('DEFAULT_CLASSIFIER_RULE_SPEC', {
-  rule_type: 'FuzzyMatches',
-  inputs: {
-    training_data: []
-  }
-});
+
 oppia.constant('PARAMETER_TYPES', {
   REAL: 'Real',
   UNICODE_STRING: 'UnicodeString'

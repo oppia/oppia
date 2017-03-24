@@ -82,7 +82,7 @@ oppia.factory('responsesService', [
     var _updateAnswerGroup = function(index, updates) {
       var answerGroup = _answerGroups[index];
       if (updates.rules) {
-        answerGroup.ruleSpecs = updates.rules;
+        answerGroup.rules = updates.rules;
       }
       if (updates.feedback) {
         answerGroup.outcome.feedback = updates.feedback;
@@ -283,7 +283,7 @@ oppia.factory('responsesService', [
           });
 
           _answerGroups.forEach(function(answerGroup, answerGroupIndex) {
-            var newRules = angular.copy(answerGroup.ruleSpecs);
+            var newRules = angular.copy(answerGroup.rules);
             newRules.forEach(function(rule) {
               for (var key in rule.inputs) {
                 var newInputValue = [];
@@ -372,8 +372,8 @@ oppia.controller('StateResponses', [
         // Collect all answers which have been handled by at least one
         // answer group.
         for (var i = 0; i < answerGroups.length; i++) {
-          for (var j = 0; j < answerGroups[i].ruleSpecs.length; j++) {
-            handledAnswersArray.push(answerGroups[i].ruleSpecs[j].inputs.x);
+          for (var j = 0; j < answerGroups[i].rules.length; j++) {
+            handledAnswersArray.push(answerGroups[i].rules[j].inputs.x);
           }
         }
         for (var i = 0; i < numChoices; i++) {
@@ -404,15 +404,15 @@ oppia.controller('StateResponses', [
           });
 
           answerGroups.forEach(function(answerGroup) {
-            var ruleSpecs = answerGroup.ruleSpecs;
-            ruleSpecs.forEach(function(ruleSpec) {
-              var ruleInputs = ruleSpec.inputs.x;
+            var rules = answerGroup.rules;
+            rules.forEach(function(rule) {
+              var ruleInputs = rule.inputs.x;
               ruleInputs.forEach(function(ruleInput) {
                 var choiceIndex = answerChoiceToIndex[ruleInput];
-                if (ruleSpec.rule_type === 'Equals' ||
-                    ruleSpec.rule_type === 'ContainsAtLeastOneOf') {
+                if (rule.type === 'Equals' ||
+                    rule.type === 'ContainsAtLeastOneOf') {
                   handledAnswersArray[choiceIndex] = true;
-                } else if (ruleSpec.rule_type ===
+                } else if (rule.type ===
                   'DoesNotContainAtLeastOneOf') {
                   for (var i = 0; i < handledAnswersArray.length; i++) {
                     if (i !== choiceIndex) {
@@ -571,16 +571,16 @@ oppia.controller('StateResponses', [
           'stateInteractionIdService', 'stateCustomizationArgsService',
           'explorationContextService', 'editorContextService',
           'explorationStatesService', 'trainingDataService',
-          'AnswerClassificationService', 'focusService', 'DEFAULT_RULE_NAME',
-          'CLASSIFIER_RULESPEC_STR',
+          'AnswerClassificationService', 'focusService',
+          'RULE_TYPE_CLASSIFIER',
           function(
               $scope, $injector, $modalInstance,
               oppiaExplorationHtmlFormatterService,
               stateInteractionIdService, stateCustomizationArgsService,
               explorationContextService, editorContextService,
               explorationStatesService, trainingDataService,
-              AnswerClassificationService, focusService, DEFAULT_RULE_NAME,
-              CLASSIFIER_RULESPEC_STR) {
+              AnswerClassificationService, focusService,
+              RULE_TYPE_CLASSIFIER) {
             var _explorationId = explorationContextService.getExplorationId();
             var _stateName = editorContextService.getActiveStateName();
             var _state = explorationStatesService.getState(_stateName);
@@ -645,13 +645,11 @@ oppia.controller('StateResponses', [
                   $scope.trainingDataOutcomeDest = dest;
 
                   var answerGroupIndex = classificationResult.answerGroupIndex;
-                  var ruleSpecIndex = classificationResult.ruleSpecIndex;
+                  var ruleIndex = classificationResult.ruleIndex;
                   if (answerGroupIndex !==
-                        _state.interaction.answerGroups.length &&
-                      _state.interaction.answerGroups[
-                        answerGroupIndex].ruleSpecs[
-                          ruleSpecIndex].rule_type !==
-                            CLASSIFIER_RULESPEC_STR) {
+                    _state.interaction.answerGroups.length &&
+                      _state.interaction.answerGroups[answerGroupIndex]
+                      .rules[ruleIndex].type !== RULE_TYPE_CLASSIFIER) {
                     $scope.classification.answerGroupIndex = -1;
                   } else {
                     $scope.classification.answerGroupIndex = (
@@ -679,17 +677,16 @@ oppia.controller('StateResponses', [
         controller: [
           '$scope', '$modalInstance', 'responsesService',
           'editorContextService', 'editorFirstTimeEventsService',
+          'RuleObjectFactory',
           function(
               $scope, $modalInstance, responsesService,
-              editorContextService, editorFirstTimeEventsService) {
+              editorContextService, editorFirstTimeEventsService,
+              RuleObjectFactory) {
             $scope.feedbackEditorIsOpen = false;
             $scope.openFeedbackEditor = function() {
               $scope.feedbackEditorIsOpen = true;
             };
-            $scope.tmpRule = {
-              rule_type: null,
-              inputs: {}
-            };
+            $scope.tmpRule = RuleObjectFactory.createNew(null, {});
             $scope.tmpOutcome = {
               dest: editorContextService.getActiveStateName(),
               feedback: [''],
@@ -853,10 +850,10 @@ oppia.filter('summarizeAnswerGroup', [
     var outcome = answerGroup.outcome;
     var hasFeedback = outcome.feedback.length > 0 && outcome.feedback[0];
 
-    if (answerGroup.ruleSpecs) {
+    if (answerGroup.rules) {
       var firstRule = $filter('convertToPlainText')(
         $filter('parameterizeRuleDescription')(
-          answerGroup.ruleSpecs[0], interactionId, answerChoices));
+          answerGroup.rules[0], interactionId, answerChoices));
       summary = 'Answer ' + firstRule;
 
       if (hasFeedback && shortenRule) {

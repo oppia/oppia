@@ -13,28 +13,26 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of Fallback
+ * @fileoverview Factory for creating new frontend instances of Content
  * domain objects.
  */
 
-oppia.factory('FallbackObjectFactory', [function() {
-  var Fallback = function(trigger, outcome) {
-    this.trigger = trigger;
-    this.outcome = outcome;
+oppia.factory('ContentObjectFactory', [function() {
+  var Content = function(type, value) {
+    this.type = type;
+    this.value = value;
   };
 
-  Fallback.prototype.toBackendDict = function() {
+  Content.prototype.toBackendDict = function() {
     return {
-      trigger: this.trigger,
-      outcome: this.outcome
+      type: this.type,
+      value: this.value
     };
   };
 
-  Fallback.createFromBackendDict = function(fallbackBackendDict) {
-    return new Fallback(
-      fallbackBackendDict.trigger,
-      fallbackBackendDict.outcome);
+  Content.createFromBackendDict = function(contentBackendDict) {
+    return new Content(contentBackendDict.type, contentBackendDict.value);
   };
 
-  return Fallback;
+  return Content;
 }]);
