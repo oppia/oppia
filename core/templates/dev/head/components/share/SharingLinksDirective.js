@@ -34,39 +34,51 @@ oppia.directive('sharingLinks', [function() {
       function(
           $scope, $window, $injector, oppiaHtmlEscaper,
           siteAnalyticsService, UrlInterpolationService) {
+        $scope.registerShareEvent = null;
+
         if ($scope.shareType === 'exploration') {
           $scope.explorationId = $scope.getExplorationId();
           var ExplorationEmbedButtonService = $injector.get(
             'ExplorationEmbedButtonService');
 
-          $scope.registerShareExplorationEvent = function(network) {
+          $scope.activityType = 'explore';
+          $scope.activityId = $scope.explorationId;
+
+          $scope.registerShareEvent = function(network) {
             siteAnalyticsService.registerShareExplorationEvent(network);
           };
 
           $scope.showEmbedExplorationModal = (
             ExplorationEmbedButtonService.showModal);
-        } else {
+        } else if ($scope.shareType === 'collection') {
           $scope.collectionId = $scope.getCollectionId();
 
-          $scope.registerShareCollectionEvent = function(network) {
+          $scope.activityType = 'collection';
+          $scope.activityId = $scope.collectionId;
+
+          $scope.registerShareEvent = function(network) {
             siteAnalyticsService.registerShareCollectionEvent(network);
           };
+        } else {
+          throw (
+            'Error: The directive can only be used either in a' +
+            'collection player or exploration player');
         }
 
         $scope.serverName = (
           $window.location.protocol + '//' + $window.location.host);
 
         $scope.escapedTwitterText = (
-            oppiaHtmlEscaper.unescapedStrToEscapedStr($scope.getTwitterText()));
+          oppiaHtmlEscaper.unescapedStrToEscapedStr($scope.getTwitterText()));
 
         $scope.gplusUrl = UrlInterpolationService.getStaticImageUrl(
-            '/general/gplus.png');
+          '/general/gplus.png');
 
         $scope.fbUrl = UrlInterpolationService.getStaticImageUrl(
-            '/general/fb.png');
+          '/general/fb.png');
 
         $scope.twitterUrl = UrlInterpolationService.getStaticImageUrl(
-            '/general/twitter.png');
+          '/general/twitter.png');
       }
     ]
   };
