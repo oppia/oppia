@@ -50,6 +50,7 @@ class CollectionMigrationJob(jobs.BaseMapReduceJobManager):
         if item.deleted:
             yield (CollectionMigrationJob._DELETED_KEY,
                    'Encountered deleted collection.')
+            return
 
         # Note: the read will bring the collection up to the newest version.
         collection = collection_services.get_collection_by_id(item.id)
@@ -60,6 +61,7 @@ class CollectionMigrationJob(jobs.BaseMapReduceJobManager):
                 'Collection %s failed validation: %s' % (item.id, e))
             yield (CollectionMigrationJob._ERROR_KEY,
                    'Collection %s failed validation: %s' % (item.id, e))
+            return
 
         # Write the new collection into the datastore if it's different from
         # the old version.
