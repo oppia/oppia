@@ -20,8 +20,8 @@
 // dependencies should be standard utility services. It should not have any
 // concept of "state in an exploration".
 oppia.directive('multipleChoiceEditor', [
-  'QuestionIdService', 'AnswerGroupObjectFactory',
-  function(QuestionIdService, AnswerGroupObjectFactory) {
+  'QuestionIdService', 'AnswerGroupObjectFactory', 'StatusObjectFactory', 
+  function(QuestionIdService, AnswerGroupObjectFactory, StatusObjectFactory) {
     return {
       restrict: 'E',
       scope: {
@@ -38,8 +38,8 @@ oppia.directive('multipleChoiceEditor', [
       },
       templateUrl: 'simpleEditorQuestions/MultipleChoiceInput',
       controller: [
-        '$scope', '$timeout', 'alertsService',
-        function($scope, $timeout, alertsService) {
+        '$scope', '$timeout', 'alertsService', 'StatusObjectFactory',
+        function($scope, $timeout, alertsService, StatusObjectFactory) {
           // Note that a questionId generated in this way may contain spaces,
           // since it is just the state name.
           $scope.questionId = $scope.getUniqueId();
@@ -101,7 +101,10 @@ oppia.directive('multipleChoiceEditor', [
             }
 
             if (foundEmptyField) {
-              return false;
+              return StatusObjectFactory.createNew(
+                'Found an empty field',
+                false
+              );
             }
 
             var newChoiceIndex = choiceNames.length;
@@ -136,10 +139,10 @@ oppia.directive('multipleChoiceEditor', [
           $scope.saveChoice = function(index, newChoiceValue) {
             if (!newChoiceValue) {
               alertsService.addWarning('Cannot save an empty choice.');
-              return {
-                reason: 'Cannot save an empty choice',
-                value: false
-              };
+              return StatusObjectFactory.createNew(
+                'Cannot save an empty choice',
+                false
+              );
             }
 
             var newCustomizationArgs = $scope.getCustomizationArgs();
@@ -147,19 +150,19 @@ oppia.directive('multipleChoiceEditor', [
 
             if (newChoiceValue === choiceNames[index]) {
               // No change has been made.
-              return {
-                reason: 'No choice has been made',
-                value: false
-              };
+              return StatusObjectFactory.createNew(
+                'No change has been made',
+                false
+              );
             }
 
             if (choiceNames.indexOf('newChoiceValue') !== -1) {
               alertsService.addWarning(
                 'Cannot save: this duplicates an existing choice.');
-              return {
-                reason: 'This duplicates an existing choice',
-                value: false
-              };
+              return StatusObjectFactory.createNew(
+                'This duplicates an existing choice',
+                false
+              );
             }
 
             newCustomizationArgs.choices.value[index] = newChoiceValue;
