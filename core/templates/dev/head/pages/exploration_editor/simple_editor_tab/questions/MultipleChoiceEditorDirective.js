@@ -20,7 +20,7 @@
 // dependencies should be standard utility services. It should not have any
 // concept of "state in an exploration".
 oppia.directive('multipleChoiceEditor', [
-  'QuestionIdService', 'AnswerGroupObjectFactory', 'StatusObjectFactory', 
+  'QuestionIdService', 'AnswerGroupObjectFactory', 'StatusObjectFactory',
   function(QuestionIdService, AnswerGroupObjectFactory, StatusObjectFactory) {
     return {
       restrict: 'E',
@@ -38,8 +38,8 @@ oppia.directive('multipleChoiceEditor', [
       },
       templateUrl: 'simpleEditorQuestions/MultipleChoiceInput',
       controller: [
-        '$scope', '$timeout', 'alertsService', 'StatusObjectFactory',
-        function($scope, $timeout, alertsService, StatusObjectFactory) {
+        '$scope', '$timeout', 'alertsService',
+        function($scope, $timeout, alertsService) {
           // Note that a questionId generated in this way may contain spaces,
           // since it is just the state name.
           $scope.questionId = $scope.getUniqueId();
