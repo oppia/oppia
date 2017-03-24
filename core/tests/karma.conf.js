@@ -33,7 +33,7 @@ module.exports = function(config) {
       'core/templates/dev/head/components/rating_display.html',
       'extensions/**/*.js',
       'extensions/interactions/**/*.html',
-      'extensions/interactions/rules.json',
+      'extensions/interactions/rule_templates.json',
       {
         pattern: 'assets/i18n/**/*.json',
         watched: true,
@@ -75,7 +75,7 @@ module.exports = function(config) {
       // list above.
       'core/templates/dev/head/components/rating_display.html': ['ng-html2js'],
       'extensions/interactions/**/*.html': ['ng-html2js'],
-      'extensions/interactions/rules.json': ['json_fixtures']
+      'extensions/interactions/rule_templates.json': ['json_fixtures']
     },
     reporters: ['progress', 'coverage'],
     coverageReporter: {

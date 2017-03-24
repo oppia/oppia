@@ -134,6 +134,63 @@ describe('State editor', function() {
     users.logout();
   });
 
+  it('should skip the customization modal for interactions having no ' +
+      'customization options', function() {
+    users.createUser('user4@stateEditor.com', 'user4StateEditor');
+    users.login('user4@stateEditor.com');
+
+    workflow.createExploration();
+    editor.setContent(forms.toRichText('some content'));
+
+    // Numeric input does not have any customization arguments. Therefore the
+    // customization modal and the save interaction button does not appear.
+    editor.openInteraction('NumericInput');
+    var saveInteractionBtn = element(
+      by.css('.protractor-test-save-interaction'));
+    expect(saveInteractionBtn.isPresent()).toBe(false);
+
+    element(by.css('.protractor-test-close-add-response-modal')).click();
+
+    // The Continue input has customization options. Therefore the
+    // customization modal does appear and so does the save interaction button.
+    editor.openInteraction('Continue');
+    expect(saveInteractionBtn.isPresent()).toBe(true);
+    users.logout();
+  });
+
+  it('should open appropriate modal on re-clicking an interaction to ' +
+     'customize it', function() {
+    users.createUser('user5@stateEditor.com', 'user5StateEditor');
+    users.login('user5@stateEditor.com');
+
+    workflow.createExploration();
+    editor.setContent(forms.toRichText('some content'));
+
+    // Numeric input does not have any customization arguments. Therefore, on
+    // re-clicking, a modal opens up informing the user that this interaction
+    // does not have any customization options. To dismiss this modal, user
+    // clicks 'Okay' implying that he/she has got the message.
+    editor.setInteraction('NumericInput');
+    element(by.css('.protractor-test-interaction')).click();
+    var okayBtn = element(
+      by.css('.protractor-test-close-no-customization-modal'));
+    expect(okayBtn.isPresent()).toBe(true);
+    okayBtn.click();
+
+    // Continue input has customization options. Therefore, on re-clicking, a
+    // modal opens up containing the customization arguments for this input.
+    // The user can dismiss this modal by clicking the 'Save Interaction'
+    // button.
+    editor.setInteraction('Continue');
+    element(by.css('.protractor-test-interaction')).click();
+    var saveInteractionBtn = element(
+      by.css('.protractor-test-save-interaction'));
+    expect(saveInteractionBtn.isPresent()).toBe(true);
+    saveInteractionBtn.click();
+
+    users.logout();
+  });
+
   it('should preserve input value when rule type changes in' +
       ' add response modal', function() {
     users.createUser('stateEditorUser1@example.com', 'stateEditorUser1');

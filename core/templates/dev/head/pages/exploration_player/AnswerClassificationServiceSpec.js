@@ -42,7 +42,7 @@ describe('Answer classification service with string classifier disabled',
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
 
-    state = sof.create('stateName', {
+    state = sof.createFromBackendDict('stateName', {
       content: [{
         type: 'text',
         value: 'content'
@@ -83,7 +83,8 @@ describe('Answer classification service with string classifier disabled',
           }],
           correct: false
         }],
-        default_outcome: 'default'
+        default_outcome: 'default',
+        fallbacks: []
       },
       param_changes: []
     });
@@ -121,7 +122,7 @@ describe('Answer classification service with string classifier disabled',
     expect(successHandler).toHaveBeenCalledWith({
       outcome: 'outcome 1',
       answerGroupIndex: 0,
-      ruleSpecIndex: 0
+      ruleIndex: 0
     });
     expect(failHandler).not.toHaveBeenCalled();
 
@@ -131,7 +132,7 @@ describe('Answer classification service with string classifier disabled',
     expect(successHandler).toHaveBeenCalledWith({
       outcome: 'outcome 2',
       answerGroupIndex: 1,
-      ruleSpecIndex: 0
+      ruleIndex: 0
     });
     expect(failHandler).not.toHaveBeenCalled();
 
@@ -141,7 +142,7 @@ describe('Answer classification service with string classifier disabled',
     expect(successHandler).toHaveBeenCalledWith({
       outcome: 'outcome 2',
       answerGroupIndex: 1,
-      ruleSpecIndex: 1
+      ruleIndex: 1
     });
     expect(failHandler).not.toHaveBeenCalled();
   });
@@ -153,14 +154,14 @@ describe('Answer classification service with string classifier disabled',
     expect(successHandler).toHaveBeenCalledWith({
       outcome: 'default',
       answerGroupIndex: 2,
-      ruleSpecIndex: 0
+      ruleIndex: 0
     });
     expect(failHandler).not.toHaveBeenCalled();
   });
 
   it('should fail if no answer group matches and no default rule is ' +
      'provided', function() {
-    var state2 = sof.create('stateName', {
+    var state2 = sof.createFromBackendDict('stateName', {
       content: [{
         type: 'text',
         value: 'content'
@@ -176,7 +177,8 @@ describe('Answer classification service with string classifier disabled',
             rule_type: 'Equals'
           }],
           correct: false
-        }]
+        }],
+        fallbacks: []
       },
       param_changes: []
     });
@@ -218,7 +220,7 @@ describe('Answer classification service with string classifier enabled',
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
 
-    state = sof.create('stateName', {
+    state = sof.createFromBackendDict('stateName', {
       content: [{
         type: 'text',
         value: 'content'
@@ -254,7 +256,8 @@ describe('Answer classification service with string classifier enabled',
           }],
           correct: false
         }],
-        default_outcome: 'default'
+        default_outcome: 'default',
+        fallbacks: []
       },
       param_changes: []
     });
@@ -289,7 +292,7 @@ describe('Answer classification service with string classifier enabled',
     var expectedClassificationResult = {
       outcome: 'outcome',
       answerGroupIndex: 0,
-      ruleSpecIndex: 0
+      ruleIndex: 0
     };
     $httpBackend.expectPOST(
       '/explorehandler/classify/' + explorationId).respond(
@@ -311,7 +314,7 @@ describe('Answer classification service with string classifier enabled',
     expect(successHandler).toHaveBeenCalledWith({
       outcome: 'default',
       answerGroupIndex: 2,
-      ruleSpecIndex: 0
+      ruleIndex: 0
     });
     expect(failHandler).not.toHaveBeenCalled();
   });

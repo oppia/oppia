@@ -2,7 +2,7 @@
   <span ng-model="localValue" ui-validate="'validate($value)'">
     <span ng-form="floatForm">
       <span ng-if="!expressionMode">
-        <input type="text" ng-model="$parent.localValue" class="form-control protractor-test-float-form-input"
+        <input type="number" step="any" ng-model="$parent.localValue" class="form-control protractor-test-float-form-input"
                name="floatValue" ng-attr-placeholder="<['I18N_FORMS_TYPE_NUMBER' | translate]>" ng-disabled="isDisabled()"
                require-is-float apply-validation="validators()"
                focus-on="<[labelForFocusTarget()]>" ng-keypress="onKeypress($event)"

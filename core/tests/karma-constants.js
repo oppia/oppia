@@ -19,7 +19,10 @@
 /* This should be kept in parity with how CONSTANTS is set in base.html */
 var constants = (function() {
   var request = new XMLHttpRequest();
-  request.overrideMimeType('application/json');
+  /* The overrideMimeType method was not implemented in IE prior to IE11. */
+  if (request.overrideMimeType) {
+    request.overrideMimeType('application/json');
+  }
   request.open(
    'GET', GLOBALS.ASSET_DIR_PREFIX + '/assets/constants.json', false);
   request.send(null);

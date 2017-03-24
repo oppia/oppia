@@ -85,7 +85,7 @@ CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION = (
 # used as an identifier for the default rule when storing which rule an answer
 # was matched against.
 DEFAULT_RULESPEC_STR = 'Default'
-CLASSIFIER_RULESPEC_STR = 'FuzzyMatches'
+RULE_TYPE_CLASSIFIER = 'FuzzyMatches'
 
 
 def _get_full_customization_args(customization_args, ca_specs):
@@ -356,7 +356,7 @@ class RuleSpec(object):
 
     def stringify_classified_rule(self):
         """Returns a string representation of a rule (for the stats log)."""
-        if self.rule_type == CLASSIFIER_RULESPEC_STR:
+        if self.rule_type == RULE_TYPE_CLASSIFIER:
             return self.rule_type
         else:
             param_list = [
@@ -547,7 +547,7 @@ class AnswerGroup(object):
                 raise utils.ValidationError(
                     'Unrecognized rule type: %s' % rule_spec.rule_type)
 
-            if rule_spec.rule_type == CLASSIFIER_RULESPEC_STR:
+            if rule_spec.rule_type == RULE_TYPE_CLASSIFIER:
                 if seen_classifier_rule:
                     raise utils.ValidationError(
                         'AnswerGroups can only have one classifier rule.')
@@ -564,7 +564,7 @@ class AnswerGroup(object):
         if it doesn't exist.
         """
         for (rule_spec_index, rule_spec) in enumerate(self.rule_specs):
-            if rule_spec.rule_type == CLASSIFIER_RULESPEC_STR:
+            if rule_spec.rule_type == RULE_TYPE_CLASSIFIER:
                 return rule_spec_index
         return None
 
@@ -2236,6 +2236,17 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v8_dict_to_v9_dict(cls, states_dict):
+        """Converts from version 8 to 9. Version 9 contains 'correct'
+        field in answer groups.
+        """
+        for state_dict in states_dict.values():
+            answer_groups = state_dict['interaction']['answer_groups']
+            for answer_group in answer_groups:
+                answer_group['correct'] = False
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version):
         """Converts the states blob contained in the given
@@ -2437,11 +2448,12 @@ class Exploration(object):
         """Converts a v11 exploration dict into a v12 exploration dict."""
 
         exploration_dict['schema_version'] = 12
-        states = exploration_dict['states']
-        for state in states.itervalues():
-            answer_groups = state['interaction']['answer_groups']
-            for answer_group in answer_groups:
-                answer_group['correct'] = False
+
+        exploration_dict['states'] = cls._convert_states_v8_dict_to_v9_dict(
+            exploration_dict['states'])
+
+        exploration_dict['states_schema_version'] = 9
+
         return exploration_dict
 
     @classmethod
