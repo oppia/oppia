@@ -91,44 +91,8 @@ describe('Simple Editor Manager Service', function() {
     };
 
     data = {
-      exploration_id: 'ON_EQsq-PcIe',
-      skin_customizations: {
-        panels_contents: {
-          bottom: []
-        }
-      },
-      user_email: 'test@example.com',
-      tags: [],
-      is_moderator: false,
-      username: 'ashish3805',
-      is_version_of_draft_valid: null,
-      version: 3,
-      param_specs: {},
       init_state_name: 'Introduction',
-      rights: {
-        editor_names: [],
-        cloned_from: null,
-        viewable_if_private: false,
-        owner_names: [
-          'ashish3805'
-        ],
-        viewer_names: [],
-        status: 'private',
-        community_owned: false
-      },
-      is_admin: false,
-      language_code: 'en',
-      param_changes: [],
-      profile_picture_data_url: 'data:image/png;base64, removed',
-      email_preferences: {
-        mute_suggestion_notifications: false,
-        mute_feedback_notifications: false
-      },
-      show_state_editor_tutorial_on_load: true,
-      draft_changes: null,
       title: 'Linear Algebra',
-      category: '',
-      is_super_admin: false,
       states: {
         'Question 1': {
           param_changes: [],
@@ -203,8 +167,7 @@ describe('Simple Editor Manager Service', function() {
           ],
           unresolved_answers: {}
         }
-      },
-      objective: ''
+      }
     };
 
     explorationStatesService.init(data.states);
@@ -216,80 +179,92 @@ describe('Simple Editor Manager Service', function() {
   });
 
   it('should initialize the local data variables', function() {
-    var returnedValue = simpleEditorManagerService.tryToInit();
+    var expectedReturnedValue;
+    // Case:1 when there are two valid states  with no error in initialized
+    // data, initialized in beforeEach block and StatesToQuestionsService
+    // .getQuestions() will return non null value.
+    expectedReturnedValue = simpleEditorManagerService.tryToInit();
     expect(simpleEditorManagerService.getTitle()).toBe(data.title);
     expect(simpleEditorManagerService.getIntroductionHtml())
       .toBe(data.states.Introduction.content[0].value);
-    var questions = statesToQuestionsService.getQuestions();
-    if (!questions) {
-      expect(returnedValue).toBeFalsy();
-    } else {
-      expect(returnedValue).toBeTruthy();
-    }
-    var questionList = questionListObjectFactory.create(questions);
-    expect(simpleEditorManagerService.getQuestionList()).toEqual(questionList);
+    // Expected questions are genereated from test data.
+    var expectedSimpleEditorManagerQuestions =
+      statesToQuestionsService.getQuestions();
+    var expectedSimpleEditorManagerQuestionList =
+      questionListObjectFactory.create(expectedSimpleEditorManagerQuestions);
+    expect(simpleEditorManagerService.getQuestionList())
+      .toEqual(expectedSimpleEditorManagerQuestionList);
+    expect(expectedReturnedValue).toBeTruthy();
+
+    // Case:2 when StatesToQuestionsService.getQuestions() will return null,
+    // may be due to errors.
+    spyOn(statesToQuestionsService, 'getQuestions').andReturn(null);
+    expectedReturnedValue = simpleEditorManagerService.tryToInit();
+    expect(expectedReturnedValue).toBeFalsy();
   });
 
   it('should return data', function() {
+    var expectedSimpleEditorManagerQuestions =
+      statesToQuestionsService.getQuestions();
     // Expected initialized data inside simpleEditorManagerService
-    var questions = statesToQuestionsService.getQuestions();
-    var serviceData = {
+    var expectedSimpleEditorManagerData = {
       title: data.title,
       introductionHtml: data.states.Introduction.content[0].value,
       questionList: null
     };
-    // In most of the cases data will be used after they have been initialized
-    // by calling tryToInit().
-    if (simpleEditorManagerService.tryToInit()) {
-      serviceData.questionList = questionListObjectFactory.create(questions);
-    }
-    expect(simpleEditorManagerService.getData()).toEqual(serviceData);
+    // Initialize simpleEditorManagerService.data
+    simpleEditorManagerService.tryToInit();
+    expectedSimpleEditorManagerData.questionList =
+      questionListObjectFactory.create(expectedSimpleEditorManagerQuestions);
+    expect(simpleEditorManagerService.getData())
+      .toEqual(expectedSimpleEditorManagerData);
   });
 
   it('should return title', function() {
-    var title = data.title;
-    // In most of the cases Title wil be valid only after it has been
-    // initialized by calling tryToInit().
+    var expectedTitle = data.title;
+    // Initialize simpleEditorManagerService.data
     simpleEditorManagerService.tryToInit();
-    expect(simpleEditorManagerService.getTitle()).toEqual(title);
+    expect(simpleEditorManagerService.getTitle()).toEqual(expectedTitle);
   });
 
   it('should return introduction html', function() {
-    var introductionHtml = data.states.Introduction.content[0].value;
+    var expectedIntroductionHtml = data.states.Introduction.content[0].value;
     simpleEditorManagerService.tryToInit();
     expect(simpleEditorManagerService.getIntroductionHtml())
-      .toEqual(introductionHtml);
+      .toEqual(expectedIntroductionHtml);
   });
 
   it('should return question list', function() {
-    var questions = statesToQuestionsService.getQuestions();
-    var questionList = null;
-    if (simpleEditorManagerService.tryToInit()) {
-      questionList = questionListObjectFactory.create(questions);
-    }
-    expect(simpleEditorManagerService.getQuestionList()).toEqual(questionList);
+    var expectedSimpleEditorManagerQuestions =
+      statesToQuestionsService.getQuestions();
+    var expectedSimpleEditorManagerQuestionList = null;
+    expectedSimpleEditorManagerQuestionList =
+      questionListObjectFactory.create(expectedSimpleEditorManagerQuestions);
+    simpleEditorManagerService.tryToInit();
+    expect(simpleEditorManagerService.getQuestionList())
+      .toEqual(expectedSimpleEditorManagerQuestionList);
   });
 
   it('should save the given new title', function() {
-    var newTitle = 'ExpNewTitle';
-    simpleEditorManagerService.saveTitle(newTitle);
-    expect(explorationTitleService.savedMemento)
-      .toEqual(newTitle);
-    expect(simpleEditorManagerService.getTitle()).toEqual(newTitle);
+    var expectedNewTitle = 'ExpNewTitle';
+    simpleEditorManagerService.saveTitle(expectedNewTitle);
+    expect(explorationTitleService.savedMemento).toEqual(expectedNewTitle);
+    expect(simpleEditorManagerService.getTitle()).toEqual(expectedNewTitle);
   });
 
   it('should save the given new introduction html', function() {
-    var newIntroductionHtml = '<p> new intro </p>';
-    simpleEditorManagerService.saveIntroductionHtml(newIntroductionHtml);
+    var expectedNewIntroductionHtmll = '<p> new intro </p>';
+    simpleEditorManagerService
+      .saveIntroductionHtml(expectedNewIntroductionHtmll);
     expect(simpleEditorShimService.getIntroductionHtml())
-      .toEqual(newIntroductionHtml);
+      .toEqual(expectedNewIntroductionHtmll);
     expect(simpleEditorManagerService.getIntroductionHtml())
-      .toEqual(newIntroductionHtml);
+      .toEqual(expectedNewIntroductionHtmll);
   });
 
   it('should save the customization args', function() {
-    var stateName = 'Introduction';
-    var newCustomizationArgs = {
+    var testStateName = 'Introduction';
+    var expectedNewCustomizationArgs = {
       choices: {
         value: [
           '<p>Option 3</p>'
@@ -298,15 +273,15 @@ describe('Simple Editor Manager Service', function() {
     };
     simpleEditorManagerService.tryToInit();
     simpleEditorManagerService.saveCustomizationArgs(
-      stateName, newCustomizationArgs);
-    expect(explorationStatesService.getState(stateName)
-      .interaction.customization_args).toEqual(newCustomizationArgs);
+      testStateName, expectedNewCustomizationArgs);
+    expect(explorationStatesService.getState(testStateName)
+      .interaction.customization_args).toEqual(expectedNewCustomizationArgs);
   });
   /**
     * Not working, needs debugging.
     It('should save the answer groups', function () {
-      var stateName = 'Introduction';
-      var newAnswerGroups = [{
+      var testStateName = 'Introduction';
+      var expectedNewAnswerGroups = [{
         rule_specs: [{
           rule_type: 'Equals',
           inputs: {
@@ -315,15 +290,16 @@ describe('Simple Editor Manager Service', function() {
         }]
       }];
       simpleEditorManagerService.tryToInit();
-      simpleEditorManagerService.saveAnswerGroups(stateName, newAnswerGroups);
-      expect(explorationStatesService.getState(stateName)
-        .interaction.answer_groups).toContain(newAnswerGroups);
+      simpleEditorManagerService.saveAnswerGroups(
+        testStateName, expectedNewAnswerGroups);
+      expect(explorationStatesService.getState(testStateName)
+        .interaction.answer_groups).toContain(expectedNewAnswerGroups);
     });
   */
 
   it('should save the default outcome', function() {
-    var stateName = 'Introduction';
-    var newDefaultOutcome = {
+    var testStateName = 'Introduction';
+    var expectedNewDefaultOutcome = {
       dest: 'Introduction',
       feedback: [
         '<p>One is wrong bcz ofisEmpty many reasons</p>'
@@ -331,33 +307,36 @@ describe('Simple Editor Manager Service', function() {
     };
     simpleEditorManagerService.tryToInit();
     simpleEditorManagerService.saveDefaultOutcome(
-      stateName, newDefaultOutcome);
-    expect(explorationStatesService.getState(stateName)
-      .interaction.default_outcome).toEqual(newDefaultOutcome);
+      testStateName, expectedNewDefaultOutcome);
+    expect(explorationStatesService.getState(testStateName)
+      .interaction.default_outcome).toEqual(expectedNewDefaultOutcome);
   });
 
   /**
     * Not working, needs debugging.
-  It('should save the bridge html', function () {
-    var stateName = 'Introduction';
-    var newBridgeHtml = '<p> lets move to next Qsn </p>';
-    var questions = statesToQuestionsService.getQuestions();
-    var questionList = null;
-    if (simpleEditorManagerService.tryToInit()) {
-      simpleEditorManagerService.saveBridgeHtml(stateName, newBridgeHtml);
-      questionList = questionListObjectFactory.create(questions);
-      expect(explorationStatesService.getState(
-        questionList.getNextStateName(stateName)).content)
-        .toEqual(newBridgeHtml);
-    }
+  it('should save the bridge html', function () {
+    var testStateName = 'Introduction';
+    var expectedNewBridgeHtml = '<p> lets move to next Qsn </p>';
+    var expectedSimpleEditorManagerQuestions =
+      statesToQuestionsService.getQuestions();
+    var expectedSimpleEditorManagerQuestionList = null;
+    simpleEditorManagerService.tryToInit()
+    simpleEditorManagerService.saveBridgeHtml(
+      testStateName, expectedNewBridgeHtml);
+    expectedSimpleEditorManagerQuestionList =
+      questionListObjectFactory.create(expectedSimpleEditorManagerQuestions);
+    expect(explorationStatesService
+      .getState(expectedSimpleEditorManagerQuestionList
+        .getNextStateName(testStateName)).content)
+          .toEqual(expectedNewBridgeHtml);
   });
-  */
-
+*/
   it('should add new question and new state', function() {
-    var questions = statesToQuestionsService.getQuestions();
-    var questionList = null;
-    var lastStateName;
-    var defaultOutcome;
+    var expectedSimpleEditorQuestions =
+      statesToQuestionsService.getQuestions();
+    var expectedSimpleEditorQuestionList = null;
+    var expectedLastStateName;
+    var expectedDefaultOutcome;
     var DEFAULT_INTERACTION = {
       ID: 'MultipleChoiceInput',
       CUSTOMIZATION_ARGS: {
@@ -367,36 +346,37 @@ describe('Simple Editor Manager Service', function() {
       }
     };
 
-    if (simpleEditorManagerService.tryToInit()) {
-      questionList = questionListObjectFactory.create(questions);
+    simpleEditorManagerService.tryToInit();
+    expectedSimpleEditorQuestionList =
+      questionListObjectFactory.create(expectedSimpleEditorQuestions);
 
-      lastStateName = (
-        questionList.isEmpty() ? SimpleEditorShimService.getInitStateName() :
-          questionList.getLastQuestion().getDestinationStateName());
+    expectedLastStateName =
+      expectedSimpleEditorQuestionList.getLastQuestion()
+        .getDestinationStateName();
 
-      defaultOutcome = {
-        dest: lastStateName,
-        feedback: [''],
-        param_changes: []
-      };
+    expectedDefaultOutcome = {
+      dest: expectedLastStateName,
+      feedback: [''],
+      param_changes: []
+    };
 
-      simpleEditorManagerService.addNewQuestion();
-      expect(explorationStatesService.getState(lastStateName)
-        .interaction.id).toEqual(DEFAULT_INTERACTION.ID);
-      expect(explorationStatesService.getState(lastStateName)
-        .interaction.customization_args)
+    simpleEditorManagerService.addNewQuestion();
+    expect(explorationStatesService.getState(expectedLastStateName)
+      .interaction.id).toEqual(DEFAULT_INTERACTION.ID);
+    expect(explorationStatesService.getState(expectedLastStateName)
+      .interaction.customization_args)
         .toEqual(DEFAULT_INTERACTION.CUSTOMIZATION_ARGS);
-      expect(explorationStatesService.getState(lastStateName)
-        .interaction.default_outcome).toEqual(defaultOutcome);
-      var stateData = simpleEditorShimService.getState(lastStateName);
-      expect(JSON.stringify(simpleEditorManagerService.getQuestionList()))
-        .toContain(JSON.stringify(questionObjectFactory.create(
-          lastStateName, stateData.interaction, '')));
+    expect(explorationStatesService.getState(expectedLastStateName)
+      .interaction.default_outcome).toEqual(expectedDefaultOutcome);
+    var expectedStateData =
+      simpleEditorShimService.getState(expectedLastStateName);
+    expect(JSON.stringify(simpleEditorManagerService.getQuestionList()))
+      .toContain(JSON.stringify(questionObjectFactory.create(
+        expectedLastStateName, expectedStateData.interaction, '')));
 
-      // It should also add the new state.
-      simpleEditorManagerService.addState();
-      var newStates = explorationStatesService.getStates();
-      expect(newStates['Question 2']).toBeDefined();
-    }
+    // It should also add the new state.
+    simpleEditorManagerService.addState();
+    var expectedAllStates = explorationStatesService.getStates();
+    expect(expectedAllStates['Question 2']).toBeDefined();
   });
 });
