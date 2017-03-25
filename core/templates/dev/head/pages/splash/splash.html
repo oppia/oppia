@@ -1,5 +1,5 @@
 {% extends 'pages/base.html' %}
-
+<!-- <script src="components/angular-dragdrop/src/angular-dragdrop.min.js"></script> -->
 {% block prerender %}
   <link rel="prerender" href="/library">
 {% endblock prerender %}
@@ -124,8 +124,10 @@
           {% if not user_is_logged_in %}
             <!-- User must complete the registration process. -->
             <button type="button"
+                              jqyoui-draggable="{animate:true}"
+                  data-drag="true" data-jqyoui-options="{revert: 'invalid'}"
                     ng-click="onRedirectToLogin('/dashboard?mode=create')"
-                    class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200"
+                    class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200 ui-draggable"
                     style="left: -webkit-calc(130px + 15%); left: -moz-calc(130px + 15%); left: -o-calc(130px + 15%); left: calc(130px + 15%); bottom: 210px; z-index: 10;"
                     translate="I18N_ACTION_CREATE_LESSON">
             </button>
@@ -143,7 +145,10 @@
                   style="left: -webkit-calc(130px + 15%); left: -moz-calc(130px + 15%); left: -o-calc(130px + 15%); left: calc(130px + 15%); bottom: 150px; z-index: 10;"
                   translate="I18N_ACTION_BROWSE_LESSONS">
           </button>
+      <!-- DRAG AND DROP BUTTON EXAMPLE -->
+      <div class="btn btn-primary" data-drag="true" data-jqyoui-options="{revert: 'invalid'}" ng-model="list1" jqyoui-draggable="{animate:true}">WOO</div>
         </div>
+
       </div>
 
       <div class="oppia-splash-h2-container">
