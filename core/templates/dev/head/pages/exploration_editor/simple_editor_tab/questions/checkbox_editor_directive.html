@@ -3,7 +3,7 @@
                  header-text="Item Selection Input"></anchor-header>
   <div class="options-container">
     <ul style="margin-bottom: 0;">
-      <li ng-repeat="choice in getChoices() track by $index" class="option" style="list-style-type: disc;">
+      <li ng-repeat="choice in getChoices() track by $index" class="option" style="list-style-type: square;">
         <button ng-click="deleteChoice($index)" class="btn-delete-option"
                 ng-if="getChoices().length > 1">
           <i class="material-icons md-18">&#xE5CD;</i>

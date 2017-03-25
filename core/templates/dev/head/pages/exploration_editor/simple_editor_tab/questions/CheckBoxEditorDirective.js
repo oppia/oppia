@@ -76,12 +76,12 @@ oppia.directive('checkBoxEditor', [
             return defaultOutcome;
           };
 
-          $scope.isCorrectAnswer = function(index) {
+          $scope.isCorrectAnswer = function(value) {
             var answerGroups = $scope.getAnswerGroups();
             if (answerGroups.length === 0) {
               return false;
             } else {
-              return answerGroups[0].ruleSpecs[0].inputs.x === index;
+              return answerGroups[0].ruleSpecs[0].inputs.x.includes(value);
             }
           };
 
@@ -205,6 +205,9 @@ oppia.directive('checkBoxEditor', [
           };
 
           $scope.selectCorrectAnswer = function(value) {
+            var newCustomizationArgs = $scope.getCustomizationArgs();
+
+
             var answerGroups = $scope.getAnswerGroups();
             var newAnswerGroups = [];
 
@@ -231,9 +234,23 @@ oppia.directive('checkBoxEditor', [
             }
             else{
 
-              newAnswerGroups.push(answerGroups[0]);
-              newAnswerGroups[0].ruleSpecs[0].inputs.x.push(value);
 
+              newAnswerGroups.push(answerGroups[0]);
+              var index = newAnswerGroups[0].ruleSpecs[0].inputs.x.indexOf(value);
+              if(index > -1){
+                 newAnswerGroups[0].ruleSpecs[0].inputs.x.splice(index, 1);
+                 newCustomizationArgs.maxAllowableSelectionCount.value--;
+                 newCustomizationArgs.minAllowableSelectionCount.value--;
+              }
+              else{
+                newAnswerGroups[0].ruleSpecs[0].inputs.x.push(value);
+                newCustomizationArgs.maxAllowableSelectionCount.value++;
+                newCustomizationArgs.minAllowableSelectionCount.value++;
+              }
+              if (answerGroups.length === 1) {
+                newCustomizationArgs.maxAllowableSelectionCount.value = 1;
+                newCustomizationArgs.minAllowableSelectionCount.value = 1;
+              }
               /* If some other answer group has this answer, remove it.
               for (var i = 1; i < answerGroups.length; i++) {
                 if (answerGroups[i].ruleSpecs[0].inputs.x !== index) {
@@ -252,6 +269,9 @@ oppia.directive('checkBoxEditor', [
               });
 
             }
+            $scope.saveCustomizationArgs({
+              newValue: newCustomizationArgs
+            });
           };
 
           $scope.saveCorrectAnswerFeedback = function(newFeedback) {
