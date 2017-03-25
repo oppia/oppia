@@ -370,7 +370,7 @@ class EditorTest(BaseEditorControllerTest):
             answer_group = state['interaction']['answer_groups'][1]
             rule_spec = answer_group['rule_specs'][0]
             self.assertEqual(
-                rule_spec['rule_type'], exp_domain.CLASSIFIER_RULESPEC_STR)
+                rule_spec['rule_type'], exp_domain.RULE_TYPE_CLASSIFIER)
             rule_spec['inputs']['training_data'].append('joyful')
 
             self.put_json('/createhandler/data/%s' % exp_id, {
@@ -445,7 +445,8 @@ class DownloadIntegrationTest(BaseEditorControllerTest):
     """Test handler for exploration and state download."""
 
     SAMPLE_JSON_CONTENT = {
-        'State A': ("""content:
+        'State A': ("""classifier_model_id: null
+content:
 - type: text
   value: ''
 interaction:
@@ -464,7 +465,8 @@ interaction:
   id: TextInput
 param_changes: []
 """),
-        'State B': ("""content:
+        'State B': ("""classifier_model_id: null
+content:
 - type: text
   value: ''
 interaction:
@@ -483,7 +485,8 @@ interaction:
   id: TextInput
 param_changes: []
 """),
-        feconf.DEFAULT_INIT_STATE_NAME: ("""content:
+        feconf.DEFAULT_INIT_STATE_NAME: ("""classifier_model_id: null
+content:
 - type: text
   value: ''
 interaction:
@@ -504,7 +507,8 @@ param_changes: []
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
 
-    SAMPLE_STATE_STRING = ("""content:
+    SAMPLE_STATE_STRING = ("""classifier_model_id: null
+content:
 - type: text
   value: ''
 interaction:
@@ -572,7 +576,6 @@ param_changes: []
                   'rb') as f:
             golden_zipfile = f.read()
         zf_gold = zipfile.ZipFile(StringIO.StringIO(golden_zipfile))
-
         # Compare saved with golden file
         self.assertEqual(
             zf_saved.open(
@@ -1332,7 +1335,9 @@ class EditorAutosaveTest(BaseEditorControllerTest):
     EXP_ID1 = '1'
     EXP_ID2 = '2'
     EXP_ID3 = '3'
-    NEWER_DATETIME = datetime.datetime.strptime('2017-03-16', '%Y-%m-%d')
+    # 30 days into the future.
+    NEWER_DATETIME = datetime.datetime.utcnow() + datetime.timedelta(30)
+    # A date in the past.
     OLDER_DATETIME = datetime.datetime.strptime('2015-03-16', '%Y-%m-%d')
     DRAFT_CHANGELIST = [{
         'cmd': 'edit_exploration_property',

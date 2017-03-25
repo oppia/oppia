@@ -4,7 +4,7 @@
     <title>Oppia Admin Panel</title>
 
     {% include 'pages/header_css_libs.html' %}
-    {% include 'pages/header_js_libs.html' %}
+
     <script>
       var GLOBALS = {
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
@@ -28,6 +28,8 @@
         DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}')
       }
     </script>
+
+    {% include 'pages/header_js_libs.html' %}
   </head>
 
   <body>
@@ -89,6 +91,7 @@
     {% include 'pages/admin/misc_tab/admin_misc_tab_directive.html' %}
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/app.js"></script>
+
     <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/Admin.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/AdminNavbarDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/AdminRouterService.js"></script>

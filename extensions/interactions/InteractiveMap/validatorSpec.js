@@ -43,18 +43,19 @@ describe('oppiaInteractiveInteractiveMapValidator', function() {
       }
     };
     goodAnswerGroups = [{
-      rule_specs: [{
-        rule_type: 'Within',
+      rules: [{
+        type: 'Within',
         inputs: {
           d: 100
         }
       }, {
-        rule_type: 'NotWithin',
+        type: 'NotWithin',
         inputs: {
           d: 50
         }
       }],
-      outcome: goodDefaultOutcome
+      outcome: goodDefaultOutcome,
+      correct: false
     }];
   }));
 
@@ -107,8 +108,8 @@ describe('oppiaInteractiveInteractiveMapValidator', function() {
 
   it('should expect all rule types to refer to positive distances',
     function() {
-      goodAnswerGroups[0].rule_specs[0].inputs.d = -90;
-      goodAnswerGroups[0].rule_specs[1].inputs.d = -180;
+      goodAnswerGroups[0].rules[0].inputs.d = -90;
+      goodAnswerGroups[0].rules[1].inputs.d = -180;
       var warnings = validator(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);

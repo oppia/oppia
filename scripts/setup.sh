@@ -20,7 +20,7 @@
 
 function maybeInstallDependencies {
   # Parse additional command line arguments.
-  # Credit: http://stackoverflow.com/questions/192249
+  # Credit: https://stackoverflow.com/questions/192249
   export SKIP_INSTALLING_THIRD_PARTY_LIBS=$DEFAULT_SKIP_INSTALLING_THIRD_PARTY_LIBS
   export RUN_MINIFIED_TESTS=$DEFAULT_RUN_MINIFIED_TESTS
   for i in "$@"; do
@@ -177,7 +177,7 @@ if [ ! -d "$NODE_PATH" ]; then
     fi
   fi
 
-  curl --silent http://nodejs.org/dist/v6.9.1/$NODE_FILE_NAME.tar.gz -o node-download.tgz
+  curl -o node-download.tgz https://nodejs.org/dist/v6.9.1/$NODE_FILE_NAME.tar.gz
   tar xzf node-download.tgz --directory $TOOLS_DIR
   mv $TOOLS_DIR/$NODE_FILE_NAME $NODE_PATH
   rm node-download.tgz
@@ -251,7 +251,7 @@ if ! test_python_version $PYTHON_CMD; then
         echo "If you have two versions of Python (ie, Python 2.7 and 3), specify 2.7 before other versions of Python when setting the PATH."
         echo "Here are some helpful articles:"
         echo "http://docs.python-guide.org/en/latest/starting/install/win/"
-        echo "http://stackoverflow.com/questions/3701646/how-to-add-to-the-pythonpath-in-windows-7"
+        echo "https://stackoverflow.com/questions/3701646/how-to-add-to-the-pythonpath-in-windows-7"
     fi
     # Exit when no suitable Python environment can be found.
     return 1

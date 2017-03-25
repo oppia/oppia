@@ -165,12 +165,11 @@ oppia.filter('parameterizeRuleDescription', [
       console.error('Cannot find interaction with id ' + interactionId);
       return '';
     }
-
     var description = INTERACTION_SPECS[interactionId].rule_descriptions[
-      rule.rule_type];
+      rule.type];
     if (!description) {
       console.error(
-        'Cannot find description for rule ' + rule.rule_type +
+        'Cannot find description for rule ' + rule.type +
         ' for interaction ' + interactionId);
       return '';
     }
@@ -369,6 +368,17 @@ oppia.filter('truncateAndCapitalize', [function() {
     }
 
     return result;
+  };
+}]);
+
+oppia.filter('capitalize', [function() {
+  return function(input) {
+    if (!input) {
+      return input;
+    }
+
+    var trimmedInput = input.trim();
+    return trimmedInput.charAt(0).toUpperCase() + trimmedInput.slice(1);
   };
 }]);
 

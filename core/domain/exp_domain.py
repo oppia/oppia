@@ -85,7 +85,7 @@ CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION = (
 # used as an identifier for the default rule when storing which rule an answer
 # was matched against.
 DEFAULT_RULESPEC_STR = 'Default'
-CLASSIFIER_RULESPEC_STR = 'FuzzyMatches'
+RULE_TYPE_CLASSIFIER = 'FuzzyMatches'
 
 
 def _get_full_customization_args(customization_args, ca_specs):
@@ -356,7 +356,7 @@ class RuleSpec(object):
 
     def stringify_classified_rule(self):
         """Returns a string representation of a rule (for the stats log)."""
-        if self.rule_type == CLASSIFIER_RULESPEC_STR:
+        if self.rule_type == RULE_TYPE_CLASSIFIER:
             return self.rule_type
         else:
             param_list = [
@@ -504,6 +504,7 @@ class AnswerGroup(object):
             'rule_specs': [rule_spec.to_dict()
                            for rule_spec in self.rule_specs],
             'outcome': self.outcome.to_dict(),
+            'correct': self.correct,
         }
 
     @classmethod
@@ -511,14 +512,16 @@ class AnswerGroup(object):
         return cls(
             Outcome.from_dict(answer_group_dict['outcome']),
             [RuleSpec.from_dict(rs) for rs in answer_group_dict['rule_specs']],
+            answer_group_dict['correct'],
         )
 
-    def __init__(self, outcome, rule_specs):
+    def __init__(self, outcome, rule_specs, correct):
         self.rule_specs = [RuleSpec(
             rule_spec.rule_type, rule_spec.inputs
         ) for rule_spec in rule_specs]
 
         self.outcome = outcome
+        self.correct = correct
 
     def validate(self, interaction, exp_param_specs_dict):
         """Rule validation.
@@ -532,8 +535,11 @@ class AnswerGroup(object):
                 % self.rule_specs)
         if len(self.rule_specs) < 1:
             raise utils.ValidationError(
-                'There must be at least one rule for each answer group.'
-                % self.rule_specs)
+                'There must be at least one rule for each answer group.')
+        if not isinstance(self.correct, bool):
+            raise utils.ValidationError(
+                'The "correct" field should be a boolean, received %s'
+                % self.correct)
 
         seen_classifier_rule = False
         for rule_spec in self.rule_specs:
@@ -541,7 +547,7 @@ class AnswerGroup(object):
                 raise utils.ValidationError(
                     'Unrecognized rule type: %s' % rule_spec.rule_type)
 
-            if rule_spec.rule_type == CLASSIFIER_RULESPEC_STR:
+            if rule_spec.rule_type == RULE_TYPE_CLASSIFIER:
                 if seen_classifier_rule:
                     raise utils.ValidationError(
                         'AnswerGroups can only have one classifier rule.')
@@ -558,7 +564,7 @@ class AnswerGroup(object):
         if it doesn't exist.
         """
         for (rule_spec_index, rule_spec) in enumerate(self.rule_specs):
-            if rule_spec.rule_type == CLASSIFIER_RULESPEC_STR:
+            if rule_spec.rule_type == RULE_TYPE_CLASSIFIER:
                 return rule_spec_index
         return None
 
@@ -1104,7 +1110,8 @@ class State(object):
         'fallbacks': [],
     }
 
-    def __init__(self, content, param_changes, interaction):
+    def __init__(self, content, param_changes, interaction,
+                 classifier_model_id=None):
         # The content displayed to the reader in this state.
         self.content = [Content(item.type, item.value) for item in content]
         # Parameter changes associated with this state.
@@ -1117,6 +1124,7 @@ class State(object):
             interaction.id, interaction.customization_args,
             interaction.answer_groups, interaction.default_outcome,
             interaction.confirmed_unclassified_answers, interaction.fallbacks)
+        self.classifier_model_id = classifier_model_id
 
     def validate(self, exp_param_specs_dict, allow_null_interaction):
         if not isinstance(self.content, list):
@@ -1179,7 +1187,7 @@ class State(object):
                     'received %s' % rule_specs_list)
 
             answer_group = AnswerGroup(Outcome.from_dict(
-                answer_group_dict['outcome']), [])
+                answer_group_dict['outcome']), [], answer_group_dict['correct'])
             answer_group.outcome.feedback = [
                 html_cleaner.clean(feedback)
                 for feedback in answer_group.outcome.feedback]
@@ -1253,7 +1261,8 @@ class State(object):
             'content': [item.to_dict() for item in self.content],
             'param_changes': [param_change.to_dict()
                               for param_change in self.param_changes],
-            'interaction': self.interaction.to_dict()
+            'interaction': self.interaction.to_dict(),
+            'classifier_model_id': self.classifier_model_id,
         }
 
     @classmethod
@@ -1263,7 +1272,9 @@ class State(object):
              for item in state_dict['content']],
             [param_domain.ParamChange.from_dict(param)
              for param in state_dict['param_changes']],
-            InteractionInstance.from_dict(state_dict['interaction']))
+            InteractionInstance.from_dict(state_dict['interaction']),
+            state_dict['classifier_model_id'],
+        )
 
     @classmethod
     def create_default_state(
@@ -1394,6 +1405,7 @@ class Exploration(object):
                         'inputs': rule_spec['inputs'],
                         'rule_type': rule_spec['rule_type'],
                     } for rule_spec in group['rule_specs']],
+                    'correct': False,
                 })
                 for group in idict['answer_groups']]
 
@@ -2215,6 +2227,26 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v7_dict_to_v8_dict(cls, states_dict):
+        """Converts from version 7 to 8. Version 8 contains classifier
+        model id.
+        """
+        for state_dict in states_dict.values():
+            state_dict['classifier_model_id'] = None
+        return states_dict
+
+    @classmethod
+    def _convert_states_v8_dict_to_v9_dict(cls, states_dict):
+        """Converts from version 8 to 9. Version 9 contains 'correct'
+        field in answer groups.
+        """
+        for state_dict in states_dict.values():
+            answer_groups = state_dict['interaction']['answer_groups']
+            for answer_group in answer_groups:
+                answer_group['correct'] = False
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version):
         """Converts the states blob contained in the given
@@ -2236,7 +2268,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 10
+    CURRENT_EXP_SCHEMA_VERSION = 12
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -2399,6 +2431,32 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v10_dict_to_v11_dict(cls, exploration_dict):
+        """Converts a v10 exploration dict into a v11 exploration dict."""
+
+        exploration_dict['schema_version'] = 11
+
+        exploration_dict['states'] = cls._convert_states_v7_dict_to_v8_dict(
+            exploration_dict['states'])
+
+        exploration_dict['states_schema_version'] = 8
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v11_dict_to_v12_dict(cls, exploration_dict):
+        """Converts a v11 exploration dict into a v12 exploration dict."""
+
+        exploration_dict['schema_version'] = 12
+
+        exploration_dict['states'] = cls._convert_states_v8_dict_to_v9_dict(
+            exploration_dict['states'])
+
+        exploration_dict['states_schema_version'] = 9
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         try:
@@ -2462,6 +2520,17 @@ class Exploration(object):
             exploration_dict = cls._convert_v9_dict_to_v10_dict(
                 exploration_dict, title, category)
             exploration_schema_version = 10
+
+        if exploration_schema_version == 10:
+            exploration_dict = cls._convert_v10_dict_to_v11_dict(
+                exploration_dict)
+            exploration_schema_version = 11
+
+        if exploration_schema_version == 11:
+            exploration_dict = cls._convert_v11_dict_to_v12_dict(
+                exploration_dict)
+            exploration_schema_version = 12
+
 
         return (exploration_dict, initial_schema_version)
 

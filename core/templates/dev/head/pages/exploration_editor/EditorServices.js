@@ -779,25 +779,40 @@ oppia.factory('explorationStatesService', [
   '$log', '$modal', '$filter', '$location', '$rootScope',
   'explorationInitStateNameService', 'alertsService', 'changeListService',
   'editorContextService', 'validatorsService', 'newStateTemplateService',
-  'explorationGadgetsService',
+  'explorationGadgetsService', 'StateObjectFactory',
   function(
       $log, $modal, $filter, $location, $rootScope,
       explorationInitStateNameService, alertsService, changeListService,
       editorContextService, validatorsService, newStateTemplateService,
-      explorationGadgetsService) {
+      explorationGadgetsService, StateObjectFactory) {
     var _states = null;
+    // Properties that have a different backend representation from the
+    // frontend and must be converted.
+    var PROPERTIES_TO_CONVERT = [
+      'answer_groups'
+    ];
+
+    var BACKEND_CONVERSIONS = {
+      answer_groups: function(answerGroups) {
+        var answerGroupBackendDicts = [];
+        answerGroups.map(function(answerGroup) {
+          answerGroupBackendDicts.push(answerGroup.toBackendDict());
+        });
+        return answerGroupBackendDicts;
+      }
+    };
 
     // Maps backend names to the corresponding frontend dict accessor lists.
     var PROPERTY_REF_DATA = {
-      answer_groups: ['interaction', 'answer_groups'],
+      answer_groups: ['interaction', 'answerGroups'],
       confirmed_unclassified_answers: [
-        'interaction', 'confirmed_unclassified_answers'],
+        'interaction', 'confirmedUnclassifiedAnswers'],
       content: ['content'],
-      default_outcome: ['interaction', 'default_outcome'],
-      param_changes: ['param_changes'],
+      default_outcome: ['interaction', 'defaultOutcome'],
+      param_changes: ['paramChanges'],
       fallbacks: ['interaction', 'fallbacks'],
       widget_id: ['interaction', 'id'],
-      widget_customization_args: ['interaction', 'customization_args']
+      widget_customization_args: ['interaction', 'customizationArgs']
     };
 
     var _setState = function(stateName, stateData, refreshGraph) {
@@ -820,10 +835,15 @@ oppia.factory('explorationStatesService', [
 
     var saveStateProperty = function(stateName, backendName, newValue) {
       var oldValue = getStatePropertyMemento(stateName, backendName);
+      var newBackendValue = angular.copy(newValue);
+
+      if (BACKEND_CONVERSIONS.hasOwnProperty(backendName)) {
+        newBackendValue = convertToBackendRepresentation(newValue, backendName);
+      }
 
       if (!angular.equals(oldValue, newValue)) {
         changeListService.editStateProperty(
-          stateName, backendName, newValue, oldValue);
+          stateName, backendName, newBackendValue, oldValue);
 
         var newStateData = angular.copy(_states[stateName]);
         var accessorList = PROPERTY_REF_DATA[backendName];
@@ -832,6 +852,7 @@ oppia.factory('explorationStatesService', [
         for (var i = 0; i < accessorList.length - 1; i++) {
           propertyRef = propertyRef[accessorList[i]];
         }
+
         propertyRef[accessorList[accessorList.length - 1]] = angular.copy(
           newValue);
 
@@ -845,10 +866,20 @@ oppia.factory('explorationStatesService', [
       }
     };
 
+    var convertToBackendRepresentation = function(frontendValue, backendName) {
+      var conversionFunction = BACKEND_CONVERSIONS[backendName];
+      return conversionFunction(frontendValue);
+    };
+
     // TODO(sll): Add unit tests for all get/save methods.
     return {
-      init: function(value) {
-        _states = angular.copy(value);
+      init: function(states) {
+        _states = {};
+        for (var stateName in states) {
+          var stateData = angular.copy(states[stateName]);
+          _states[stateName] = StateObjectFactory.createFromBackendDict(
+            stateName, stateData);
+        }
       },
       getStates: function() {
         return angular.copy(_states);
@@ -1009,15 +1040,15 @@ oppia.factory('explorationStatesService', [
           delete _states[deleteStateName];
           for (var otherStateName in _states) {
             var interaction = _states[otherStateName].interaction;
-            var groups = interaction.answer_groups;
+            var groups = interaction.answerGroups;
             for (var i = 0; i < groups.length; i++) {
               if (groups[i].outcome.dest === deleteStateName) {
                 groups[i].outcome.dest = otherStateName;
               }
             }
-            if (interaction.default_outcome) {
-              if (interaction.default_outcome.dest === deleteStateName) {
-                interaction.default_outcome.dest = otherStateName;
+            if (interaction.defaultOutcome) {
+              if (interaction.defaultOutcome.dest === deleteStateName) {
+                interaction.defaultOutcome.dest = otherStateName;
               }
             }
 
@@ -1060,15 +1091,15 @@ oppia.factory('explorationStatesService', [
 
         for (var otherStateName in _states) {
           var interaction = _states[otherStateName].interaction;
-          var groups = interaction.answer_groups;
+          var groups = interaction.answerGroups;
           for (var i = 0; i < groups.length; i++) {
             if (groups[i].outcome.dest === oldStateName) {
               groups[i].outcome.dest = newStateName;
             }
           }
-          if (interaction.default_outcome) {
-            if (interaction.default_outcome.dest === oldStateName) {
-              interaction.default_outcome.dest = newStateName;
+          if (interaction.defaultOutcome) {
+            if (interaction.defaultOutcome.dest === oldStateName) {
+              interaction.defaultOutcome.dest = newStateName;
             }
           }
 
@@ -1608,18 +1639,27 @@ oppia.factory('explorationGadgetsService', [
 ]);
 
 // A service that returns the frontend representation of a newly-added state.
-oppia.factory('newStateTemplateService', [function() {
-  return {
-    // Returns a template for the new state with the given state name, changing
-    // the default rule destination to the new state name in the process.
-    // NB: clients should ensure that the desired state name is valid.
-    getNewStateTemplate: function(newStateName) {
-      var newStateTemplate = angular.copy(GLOBALS.NEW_STATE_TEMPLATE);
-      newStateTemplate.interaction.default_outcome.dest = newStateName;
-      return newStateTemplate;
-    }
-  };
-}]);
+oppia.factory('newStateTemplateService',
+  ['StateObjectFactory', function(StateObjectFactory) {
+    return {
+      // Returns a template for the new state with the given state name,
+      // changing the default rule destination to the new state name in
+      // the process.
+      // NB: clients should ensure that the desired state name is valid.
+      getNewStateTemplate: function(newStateName) {
+        var newStateTemplate = angular.copy(GLOBALS.NEW_STATE_TEMPLATE);
+        var newState = StateObjectFactory.createFromBackendDict(newStateName, {
+          classifier_model_id: newStateTemplate.classifier_model_id,
+          content: newStateTemplate.content,
+          interaction: newStateTemplate.interaction,
+          param_changes: newStateTemplate.param_changes
+        });
+        newState.interaction.defaultOutcome.dest = newStateName;
+        return newState;
+      }
+    };
+  }
+]);
 
 oppia.factory('computeGraphService', [
   'INTERACTION_SPECS', function(INTERACTION_SPECS) {
@@ -1636,7 +1676,7 @@ oppia.factory('computeGraphService', [
         nodes[stateName] = stateName;
 
         if (interaction.id) {
-          var groups = interaction.answer_groups;
+          var groups = interaction.answerGroups;
           for (var h = 0; h < groups.length; h++) {
             links.push({
               source: stateName,
@@ -1645,10 +1685,10 @@ oppia.factory('computeGraphService', [
             });
           }
 
-          if (interaction.default_outcome) {
+          if (interaction.defaultOutcome) {
             links.push({
               source: stateName,
-              target: interaction.default_outcome.dest,
+              target: interaction.defaultOutcome.dest,
               isFallback: false
             });
           }
@@ -1775,12 +1815,12 @@ oppia.factory('explorationWarningsService', [
   '$filter', 'graphDataService', 'explorationStatesService',
   'expressionInterpolationService', 'explorationParamChangesService',
   'parameterMetadataService', 'INTERACTION_SPECS', 'WARNING_TYPES',
-  'STATE_ERROR_MESSAGES', 'CLASSIFIER_RULESPEC_STR',
+  'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
   function(
       $filter, graphDataService, explorationStatesService,
       expressionInterpolationService, explorationParamChangesService,
       parameterMetadataService, INTERACTION_SPECS, WARNING_TYPES,
-      STATE_ERROR_MESSAGES, CLASSIFIER_RULESPEC_STR) {
+      STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
     var _warningsList = [];
     var stateWarnings = {};
     var hasCriticalStateWarning = false;
@@ -1888,12 +1928,12 @@ oppia.factory('explorationWarningsService', [
 
     var _getAnswerGroupIndexesWithEmptyClassifiers = function(state) {
       var indexes = [];
-      var answerGroups = state.interaction.answer_groups;
+      var answerGroups = state.interaction.answerGroups;
       for (var i = 0; i < answerGroups.length; i++) {
         var group = answerGroups[i];
-        if (group.rule_specs.length === 1 &&
-            group.rule_specs[0].rule_type === CLASSIFIER_RULESPEC_STR &&
-            group.rule_specs[0].inputs.training_data.length === 0) {
+        if (group.rules.length === 1 &&
+            group.rules[0].type === RULE_TYPE_CLASSIFIER &&
+            group.rules[0].inputs.training_data.length === 0) {
           indexes.push(i);
         }
       }
@@ -1934,8 +1974,8 @@ oppia.factory('explorationWarningsService', [
             'oppiaInteractive' + _states[stateName].interaction.id +
             'Validator');
           var interactionWarnings = $filter(validatorName)(
-            stateName, interaction.customization_args,
-            interaction.answer_groups, interaction.default_outcome);
+            stateName, interaction.customizationArgs,
+            interaction.answerGroups, interaction.defaultOutcome);
 
           for (var j = 0; j < interactionWarnings.length; j++) {
             if (stateWarnings.hasOwnProperty(stateName)) {
@@ -2062,13 +2102,13 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
 
   var makeRulesListHumanReadable = function(answerGroupValue) {
     var rulesList = [];
-    answerGroupValue.rule_specs.forEach(function(ruleSpec) {
+    answerGroupValue.rules.forEach(function(rule) {
       var ruleElm = angular.element('<li></li>');
-      ruleElm.html('<p>Type: ' + ruleSpec.rule_type + '</p>');
+      ruleElm.html('<p>Type: ' + rule.type + '</p>');
       ruleElm.append(
         '<p>Value: ' + (
-          Object.keys(ruleSpec.inputs).map(function(input) {
-            return ruleSpec.inputs[input];
+          Object.keys(rule.inputs).map(function(input) {
+            return rule.inputs[input];
           })
         ).toString() + '</p>');
       rulesList.push(ruleElm);
@@ -2234,7 +2274,7 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
                       '<div class="feedback">' + newValue.outcome.feedback +
                       '</div></div>');
                 }
-                if (!angular.equals(newValue.rule_specs, oldValue.rule_specs)) {
+                if (!angular.equals(newValue.rules, oldValue.rules)) {
                   var rulesList = makeRulesListHumanReadable(newValue);
                   if (rulesList.length > 0) {
                     answerGroupHtml += '<p class="sub-edit"><i>Rules: </i></p>';

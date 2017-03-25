@@ -25,6 +25,7 @@ oppia.factory('explorationSaveService', [
   'explorationWarningsService', 'ExplorationDiffService',
   'explorationInitStateNameService', 'routerService',
   'focusService', 'changeListService', 'siteAnalyticsService',
+  'StateObjectFactory',
   function(
       $modal, $timeout, $rootScope, $log, $q,
       alertsService, explorationData, explorationStatesService,
@@ -33,7 +34,8 @@ oppia.factory('explorationSaveService', [
       explorationLanguageCodeService, explorationRightsService,
       explorationWarningsService, ExplorationDiffService,
       explorationInitStateNameService, routerService,
-      focusService, changeListService, siteAnalyticsService) {
+      focusService, changeListService, siteAnalyticsService,
+      StateObjectFactory) {
     // Whether or not a save action is currently in progress
     // (request has been sent to backend but no reply received yet)
     var saveIsInProgress = false;
@@ -198,10 +200,21 @@ oppia.factory('explorationSaveService', [
       },
 
       discardChanges: function() {
-        var confirmDiscard = confirm(
-          'Are you sure you want to discard your changes?');
-
-        if (confirmDiscard) {
+        $modal.open({
+          templateUrl: 'modals/confirmDiscardChanges',
+          backdrop: 'static',
+          keyboard: false,
+          controller: [
+            '$scope', '$modalInstance', function($scope, $modalInstance) {
+              $scope.cancel = function() {
+                $modalInstance.dismiss();
+              };
+              $scope.confirmDiscard = function() {
+                $modalInstance.close();
+              };
+            }
+          ]
+        }).result.then(function() {
           alertsService.clearWarnings();
           $rootScope.$broadcast('externalSave');
 
@@ -227,7 +240,7 @@ oppia.factory('explorationSaveService', [
           // exploration-with-draft-changes will be reloaded
           // (since it is already cached in explorationData).
           location.reload();
-        }
+        });
       },
 
       showPublishExplorationModal: function(
@@ -249,11 +262,11 @@ oppia.factory('explorationSaveService', [
             controller: [
               '$scope', '$modalInstance', 'explorationObjectiveService',
               'explorationTitleService', 'explorationCategoryService',
-              'explorationStatesService', 'CATEGORY_LIST',
+              'explorationStatesService', 'ALL_CATEGORIES',
               'explorationLanguageCodeService', 'explorationTagsService',
               function($scope, $modalInstance, explorationObjectiveService,
               explorationTitleService, explorationCategoryService,
-              explorationStatesService, CATEGORY_LIST,
+              explorationStatesService, ALL_CATEGORIES,
               explorationLanguageCodeService, explorationTagsService) {
                 $scope.explorationTitleService = explorationTitleService;
                 $scope.explorationObjectiveService =
@@ -283,10 +296,10 @@ oppia.factory('explorationSaveService', [
 
                 $scope.CATEGORY_LIST_FOR_SELECT2 = [];
 
-                for (var i = 0; i < CATEGORY_LIST.length; i++) {
+                for (var i = 0; i < ALL_CATEGORIES.length; i++) {
                   $scope.CATEGORY_LIST_FOR_SELECT2.push({
-                    id: CATEGORY_LIST[i],
-                    text: CATEGORY_LIST[i]
+                    id: ALL_CATEGORIES[i],
+                    text: ALL_CATEGORIES[i]
                   });
                 }
 
@@ -437,7 +450,12 @@ oppia.factory('explorationSaveService', [
         }
 
         explorationData.getLastSavedData().then(function(data) {
-          var oldStates = data.states;
+          var oldStates = {};
+          for (var stateName in data.states) {
+            oldStates[stateName] =
+              (StateObjectFactory.createFromBackendDict(
+                stateName, data.states[stateName]));
+          }
           var newStates = explorationStatesService.getStates();
           var diffGraphData = ExplorationDiffService.getDiffGraphData(
             oldStates, newStates, [{

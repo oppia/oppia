@@ -31,7 +31,7 @@
 {%- endmacro %}
 
 <!DOCTYPE html>
-<html ng-app="oppia" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
   <head>
     {% block prerender %}
     {% endblock prerender %}
@@ -88,9 +88,15 @@
           '{{can_create_collections|js_string}}'),
         CAN_SEND_ANALYTICS_EVENTS: JSON.parse(
           '{{CAN_SEND_ANALYTICS_EVENTS|js_string}}'),
+        CATEGORIES_TO_COLORS: JSON.parse(
+          '{{CATEGORIES_TO_COLORS|js_string}}'),
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
         DEFAULT_LANGUAGE_CODE: JSON.parse(
           '{{DEFAULT_LANGUAGE_CODE|js_string}}'),
+        DEFAULT_CATEGORY_ICON: JSON.parse(
+          '{{DEFAULT_CATEGORY_ICON|js_string}}'),
+        DEFAULT_COLOR: JSON.parse(
+          '{{DEFAULT_COLOR|js_string}}'),
         DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}'),
         INVALID_NAME_CHARS: JSON.parse('{{INVALID_NAME_CHARS|js_string}}'),
         MINIFICATION: JSON.parse('{{MINIFICATION|js_string}}'),
@@ -237,56 +243,22 @@
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/alertsService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/explorationContextService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/autoplayedVideosService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/searchService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/utilsService.js"></script>
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/alerts/AlertMessageDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/create_button/CreateActivityButtonDirective.js"></script>
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/ImageUploaderDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/ObjectEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/Select2DropdownDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedCustomEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedDictEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedExpressionEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedFloatEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedHtmlEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedIntEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedListEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedCustomViewerDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedDictViewerDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedListViewerDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedViewerDirective.js"></script>
-
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/side_navigation_bar/SideNavigationBarDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/social_buttons/SocialButtonsDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/top_navigation_bar/TopNavigationBarDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CircularImageDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CollectionSummaryTileDirective.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/CollectionCreationService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/ExplorationCreationService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingDisplayDirective.js"></script>
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/domain/sidebar/SidebarStatusService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/UrlInterpolationService.js"></script>
-
-    <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionSyntaxTree.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/evaluator.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/parser.js"></script>
 
     {% block footer_js %}
     {% endblock footer_js %}

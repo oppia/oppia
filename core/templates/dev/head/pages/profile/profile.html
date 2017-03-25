@@ -18,7 +18,7 @@
       <span class="oppia-navbar-breadcrumb-separator"></span>
       Profile
       <span class="oppia-navbar-breadcrumb-separator" style="padding-left: 10px;"></span>
-      {{PROFILE_USERNAME}}
+      <h1 class="oppia-profile-h1">{{PROFILE_USERNAME}}</h1>
     </li>
   </ul>
 {% endblock navbar_breadcrumb %}
@@ -29,7 +29,7 @@
     <md-card class="oppia-profile-user-card">
       <div class="oppia-profile-picture-container">
         <div ng-if="profileIsOfCurrentUser" class="oppia-profile-picture">
-          <a href="/preferences">
+          <a href="/preferences" class="oppia-profile-prefererences">
             <div class="oppia-profile-picture-mask">
               <div class="oppia-profile-picture-edit-prompt">
                 Edit avatar
@@ -37,11 +37,11 @@
               </div>
             </div>
           </a>
-          <img ng-src="<[profilePictureDataUrl]>" class="oppia-profile-picture-fullsize">
+          <img ng-src="<[profilePictureDataUrl]>" class="oppia-profile-picture-fullsize" alt="">
         </div>
 
         <img ng-if="!profileIsOfCurrentUser" ng-src="<[profilePictureDataUrl]>"
-             class="oppia-profile-picture-fullsize">
+             class="oppia-profile-picture-fullsize" alt="">
       </div>
 
       <h2 class="oppia-profile-username-large-screen">
@@ -130,7 +130,7 @@
     </md-card>
 
     <div ng-if="!isUserVisitingOwnProfile">
-      <button class="btn oppia-subscription-button oppia-transition-200"
+      <button class="btn oppia-subscription-button oppia-transition-200 protractor-test-subscription-button"
               ng-click="changeSubscriptionStatus()"
               popover-placement="right"
               ng-attr-popover="<[subscriptionButtonPopoverText]>"
@@ -141,6 +141,14 @@
       </button>
     </div>
   </div>
+  <style>
+    .oppia-profile-h1 {
+      color: #ffffff;
+      display: inline;
+      font-size: 1em;
+      font-weight: normal;
+    }
+  </style>
 {% endblock %}
 
 {% block footer %}
@@ -150,4 +158,9 @@
 {% block footer_js %}
   {{ super() }}
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/profile/Profile.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CircularImageDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
 {% endblock footer_js %}

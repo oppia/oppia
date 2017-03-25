@@ -20,6 +20,42 @@
 {% block content %}
   <div class="oppia-page-card oppia-static-content" ng-controller="Donate">
     <div class="oppia-donation-card-content-wide">
+      <div class="oppia-donate-options">
+        <div ng-if="windowIsNarrow">
+          <h1 class="oppia-donate-h1">Donate to the <br>
+          Oppia Foundation</h1>
+        </div>
+        <div ng-if="!windowIsNarrow">
+          <h1 class="oppia-donate-h1">Donate to <br>
+          The Oppia Foundation</h1>
+        </div>
+        <div style="text-align: center;">
+          <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" ng-submit="onDonateThroughPayPal()">
+            <input type="hidden" name="cmd" value="_s-xclick">
+            <input type="hidden" name="hosted_button_id" value="UWKTY87SYU766">
+            <button class="btn oppia-donate-options-button" tabindex="0">
+              PayPal
+            </button>
+          </form>
+        </div>
+        <div style="text-align: center;">
+          <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" ng-submit="onDonateThroughPayPal()">
+            <input type="hidden" name="cmd" value="_s-xclick">
+            <input type="hidden" name="hosted_button_id" value="UWKTY87SYU766">
+            <button class="btn oppia-donate-options-button" tabindex="0">
+              Credit Card
+            </button>
+          </form>
+        </div>
+        <div style="text-align: center;">
+          <a ng-click="onDonateThroughAmazon()" class="btn oppia-donate-options-button" tabindex="0">Amazon Smile</a>
+        </div>
+        <h2 style="color: #fff; font-size: 20px; margin-bottom: 20px; margin-top: 20px;">
+          Your generous gift funds:</h2>
+        <div style="margin-bottom: 16px; text-align: center;">
+          <img ng-src="<[donateImgUrl]>" alt="Server costs, student outreach, marketing">
+        </div>
+      </div>
       <div class="oppia-donate-info">
         <div style="height: 0; margin: 60px auto 0px auto; width: 70%; padding-bottom: 56.25%; position: relative;">
           <iframe title="Meet Oppia's Contributors" width="100%"
@@ -28,7 +64,7 @@
                   style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
           </iframe>
         </div>
-        <h6 style="text-align: center;"><em>Hear from our Oppia community</em></h6>
+        <h3 class="oppia-donate-h3"><em>Hear from our Oppia community</em></h3>
         <div style="margin: 0 auto; width: 70%;">
           <p style="font-size: 0.825em;">
             In 2012, Oppia started with a simple idea: to improve the education of
@@ -43,42 +79,24 @@
           </p>
         </div>
       </div>
-      <div class="oppia-donate-options">
-        <div ng-if="windowIsNarrow">
-          <h2 style="color: #fff; margin-top: 60px;">Donate to the</h2>
-          <h2 style="color: #fff; margin-top: 10px;">Oppia Foundation</h2>
-        </div>
-        <div ng-if="!windowIsNarrow">
-          <h2 style="color: #fff; margin-top: 60px;">Donate to</h2>
-          <h2 style="color: #fff; margin-top: 10px;">The Oppia Foundation</h2>
-        </div>
-        <div style="text-align: center;">
-          <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" ng-submit="onDonateThroughPayPal()">
-          <input type="hidden" name="cmd" value="_s-xclick">
-          <input type="hidden" name="hosted_button_id" value="UWKTY87SYU766">
-          <button class="btn oppia-donate-options-button">
-            PayPal
-          </button>
-        </div>
-        <div style="text-align: center;">
-          <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" ng-submit="onDonateThroughPayPal()">
-          <input type="hidden" name="cmd" value="_s-xclick">
-          <input type="hidden" name="hosted_button_id" value="UWKTY87SYU766">
-          <button class="btn oppia-donate-options-button">
-            Credit Card
-          </button>
-        </div>
-        <div style="text-align: center;">
-          <div ng-click="onDonateThroughAmazon()" class="btn oppia-donate-options-button">Amazon Smile</div>
-        </div>
-        <h2 style="color: #fff; font-size: 20px; margin-bottom: 20px; margin-top: 20px;">
-          Your generous gift funds:</h2>
-        <div style="margin-bottom: 16px; text-align: center;">
-          <img ng-src="<[donateImgUrl]>" alt="Server costs, student outreach, marketing">
-        </div>
-      </div>
+
     </div>
   </div>
+  <style>
+    h1.oppia-donate-h1 {
+      color: #fff;
+      font-size: 1.5em;
+      margin-top: 60px;
+      text-align: center;
+      line-height: 1.7em;
+    }
+    h3.oppia-donate-h3 {
+      font-size: .75em;
+      font-weight: normal;
+      margin: 2.33em 0;
+      text-align: center;
+    }
+  </style>
 {% endblock %}
 
 {% block footer_js %}

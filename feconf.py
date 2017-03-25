@@ -47,6 +47,7 @@ if PLATFORM == 'gae':
 else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 
+CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
@@ -66,7 +67,15 @@ VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
     'extensions', 'interactions', 'object_defaults.json')
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
-    os.getcwd(), 'extensions', 'interactions', 'rules.json')
+    os.getcwd(), 'extensions', 'interactions', 'rule_templates.json')
+
+# A mapping of interaction ids to their default classifier.
+INTERACTION_CLASSIFIER_MAPPING = {
+    'TextInput': 'LDAStringClassifier'
+}
+
+# Default label for classification algorithms.
+DEFAULT_CLASSIFIER_LABEL = '_default'
 
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
@@ -96,7 +105,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 7
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 9
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -189,6 +198,8 @@ MAILGUN_API_KEY = None
 # If the Mailgun email API is used, the "None" below should be replaced
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
+# Domain name for email address.
+INCOMING_EMAILS_DOMAIN_NAME = 'example.com'
 # Committer id for system actions.
 SYSTEM_COMMITTER_ID = 'admin'
 SYSTEM_EMAIL_ADDRESS = 'system@example.com'
@@ -351,6 +362,13 @@ ALLOWED_RTE_EXTENSIONS = {
     },
 }
 
+
+# This list contains the IDs of the classifiers used for obtaining instances
+# class of classifiers using classifier_registry.
+ANSWER_CLASSIFIER_CLASS_IDS = [
+    'LDAStringClassifier',
+]
+
 # These categories and interactions are displayed in the order in which they
 # appear in the interaction selector.
 ALLOWED_INTERACTION_CATEGORIES = [{
@@ -489,6 +507,7 @@ LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
 LIBRARY_TOP_RATED_URL = '/library/top_rated'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
+PREFERENCES_DATA_URL = '/preferenceshandler/data'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 ROBOTS_TXT_URL = '/robots.txt'

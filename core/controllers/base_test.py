@@ -24,6 +24,8 @@ import types
 
 from core.controllers import base
 from core.domain import exp_services
+from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -35,6 +37,7 @@ import webapp2
 import webtest
 
 current_user_services = models.Registry.import_current_user_services()
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 FORTY_EIGHT_HOURS_IN_SECS = 48 * 60 * 60
 PADDING = 1
@@ -42,9 +45,27 @@ PADDING = 1
 
 class BaseHandlerTest(test_utils.GenericTestBase):
 
+    TEST_LEARNER_EMAIL = "test.learner@example.com"
+    TEST_LEARNER_USERNAME = "testlearneruser"
+    TEST_CREATOR_EMAIL = "test.creator@example.com"
+    TEST_CREATOR_USERNAME = "testcreatoruser"
+    TEST_EDITOR_EMAIL = "test.editor@example.com"
+    TEST_EDITOR_USERNAME = "testeditoruser"
+
     def setUp(self):
         super(BaseHandlerTest, self).setUp()
         self.signup('user@example.com', 'user')
+
+        # Create a user to test redirect behavior for the learner.
+        # A "learner" is defined as a user who has not created or contributed
+        # to any exploration ever.
+        self.signup(self.TEST_LEARNER_EMAIL, self.TEST_LEARNER_USERNAME)
+
+        # Create two users to test redirect behavior for the creators.
+        # A "creator" is defined as a user who has created, edited or
+        # contributed to any exploration at present or in past.
+        self.signup(self.TEST_CREATOR_EMAIL, self.TEST_CREATOR_USERNAME)
+        self.signup(self.TEST_EDITOR_EMAIL, self.TEST_EDITOR_USERNAME)
 
     def test_dev_indicator_appears_in_dev_and_not_in_production(self):
         """Test dev indicator appears in dev and not in production."""
@@ -71,8 +92,6 @@ class BaseHandlerTest(test_utils.GenericTestBase):
 
             # Some of these will 404 or 302. This is expected.
             response = self.testapp.get(url, expect_errors=True)
-            self.log_line(
-                'Fetched %s with status code %s' % (url, response.status_int))
             self.assertIn(response.status_int, [200, 302, 401, 404])
 
         # TODO(sll): Add similar tests for POST, PUT, DELETE.
@@ -95,16 +114,89 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         response = self.testapp.put('/library/extra', {}, expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
-    def test_redirect_in_both_logged_in_and_logged_out_states(self):
-        "Test for a redirect in both logged in and logged out states on '/'."
+    def test_redirect_in_logged_out_states(self):
+        """Test for a redirect in logged out state on '/'."""
 
-        # Logged out state
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 302)
         self.assertIn('splash', response.headers['location'])
 
-        # Login and assert that there is a redirect
-        self.login('user@example.com')
+    def test_root_redirect_rules_for_logged_in_learners(self):
+        self.login(self.TEST_LEARNER_EMAIL)
+
+        # Since no exploration has been created, going to '/' should redirect
+        # to the library page.
+        response = self.testapp.get('/')
+        self.assertEqual(response.status_int, 302)
+        self.assertIn('library', response.headers['location'])
+        self.logout()
+
+    def test_root_redirect_rules_for_users_with_no_user_contribution_model(
+            self):
+        self.login(self.TEST_LEARNER_EMAIL)
+        # delete the UserContributionModel
+        user_id = user_services.get_user_id_from_username(
+            self.TEST_LEARNER_USERNAME)
+        user_contribution_model = user_models.UserContributionsModel.get(
+            user_id)
+        user_contribution_model.delete()
+
+        # Since no exploration has been created, going to '/' should redirect
+        # to the library page.
+        response = self.testapp.get('/')
+        self.assertEqual(response.status_int, 302)
+        self.assertIn('library', response.headers['location'])
+        self.logout()
+
+    def test_root_redirect_rules_for_logged_in_creators(self):
+        self.login(self.TEST_CREATOR_EMAIL)
+        creator_user_id = self.get_user_id_from_email(self.TEST_CREATOR_EMAIL)
+        exploration_id = '0_en_test_exploration'
+        self.save_new_valid_exploration(
+            exploration_id, creator_user_id, title='Test',
+            category='Test', language_code='en')
+
+        # Since at least one exploration has been created, going to '/' should
+        # redirect to the dashboard page.
+        response = self.testapp.get('/')
+        self.assertIn('dashboard', response.headers['location'])
+        exp_services.delete_exploration(creator_user_id, exploration_id)
+        self.logout()
+        self.login(self.TEST_CREATOR_EMAIL)
+        response = self.testapp.get('/')
+
+        # Even though the exploration is deleted, the user is still redirected
+        # to the dashboard. This is because deleted explorations are still
+        # associated with their creators.
+        self.assertEqual(response.status_int, 302)
+        self.assertIn('dashboard', response.headers['location'])
+
+    def test_root_redirect_rules_for_logged_in_editors(self):
+        self.login(self.TEST_CREATOR_EMAIL)
+        creator_user_id = self.get_user_id_from_email(self.TEST_CREATOR_EMAIL)
+        editor_user_id = self.get_user_id_from_email(self.TEST_EDITOR_EMAIL)
+        exploration_id = '1_en_test_exploration'
+        self.save_new_valid_exploration(
+            exploration_id, creator_user_id, title='Test',
+            category='Test', language_code='en')
+        rights_manager.assign_role_for_exploration(
+            creator_user_id, exploration_id, editor_user_id,
+            rights_manager.ROLE_EDITOR)
+        self.logout()
+        self.login(self.TEST_EDITOR_EMAIL)
+        exp_services.update_exploration(
+            editor_user_id, exploration_id, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'edited title'
+            }, {
+                'cmd': 'edit_exploration_property',
+                'property_name': 'category',
+                'new_value': 'edited category'
+            }], 'Change title and category')
+
+        # Since user has edited one exploration created by another user,
+        # going to '/' should redirect to the dashboard page.
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 302)
         self.assertIn('dashboard', response.headers['location'])
@@ -245,6 +337,10 @@ class I18nDictsTest(test_utils.GenericTestBase):
         master_key_list = self._extract_keys_from_json_file('en.json')
         self.assertGreater(len(master_key_list), 0)
 
+        supported_language_filenames = [
+            ('%s.json' % language_details['id'])
+            for language_details in feconf.SUPPORTED_SITE_LANGUAGES]
+
         filenames = os.listdir(
             os.path.join(os.getcwd(), self.get_static_asset_filepath(),
                          'assets', 'i18n'))
@@ -252,18 +348,16 @@ class I18nDictsTest(test_utils.GenericTestBase):
             if filename == 'en.json':
                 continue
 
-            self.log_line('Processing %s...' % filename)
-
             key_list = self._extract_keys_from_json_file(filename)
             # All other JSON files should have a subset of the keys in en.json.
             self.assertEqual(len(set(key_list) - set(master_key_list)), 0)
 
-            # If there are missing keys, log an error, but don't fail the
-            # tests.
-            if set(key_list) != set(master_key_list):
-                self.log_line('')
+            # If there are missing keys in supported site languages, log an
+            # error, but don't fail the tests.
+            if (filename in supported_language_filenames and
+                    set(key_list) != set(master_key_list)):
                 untranslated_keys = list(set(master_key_list) - set(key_list))
-                self.log_line('ERROR: Untranslated keys in %s:' % filename)
+                self.log_line('Untranslated keys in %s:' % filename)
                 for key in untranslated_keys:
                     self.log_line('- %s' % key)
                 self.log_line('')

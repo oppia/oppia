@@ -127,6 +127,13 @@ oppia.directive('searchBar', [function() {
           updateSelectionDetails(itemsType);
         };
 
+        $scope.$watch('searchQuery', function(newQuery, oldQuery) {
+          // Run only if the query has changed.
+          if (newQuery !== oldQuery) {
+            onSearchQueryChangeExec();
+          }
+        });
+
         var onSearchQueryChangeExec = function() {
           searchService.executeSearchQuery(
             $scope.searchQuery, $scope.selectionDetails.categories.selections,
@@ -147,15 +154,6 @@ oppia.directive('searchBar', [function() {
         for (var itemsType in $scope.selectionDetails) {
           updateSelectionDetails(itemsType);
         }
-
-        $scope.onSearchQueryChange = function(evt) {
-          // Query immediately when the enter or space key is pressed.
-          if (evt.keyCode === 13 || evt.keyCode === 32) {
-            onSearchQueryChangeExec();
-          } else {
-            oppiaDebouncer.debounce(onSearchQueryChangeExec, 1000)();
-          }
-        };
 
         var updateSearchFieldsBasedOnUrlQuery = function() {
           var oldQueryString = searchService.getCurrentUrlQueryString();
@@ -205,6 +203,10 @@ oppia.directive('searchBar', [function() {
             }
 
             refreshSearchBarLabels();
+
+            // Notify the function that handles overflow in case the search
+            // elements load after it has already been run.
+            $rootScope.$broadcast('searchBarLoaded', true);
           }
         );
 

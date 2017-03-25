@@ -26,7 +26,8 @@ var GLOBALS = {
   }, {
     id: 'en',
     text: 'English'
-  }]
+  }],
+  ASSET_DIR_PREFIX: ''
 };
 
 /* This function overwrites the translationProvider for a dummy function

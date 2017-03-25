@@ -22,6 +22,7 @@ import logging
 
 import jinja2
 
+from constants import constants
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import dependency_registry
@@ -52,6 +53,7 @@ current_user_services = models.Registry.import_current_user_services()
 # state name and the destination of the default rule should first be
 # changed to the desired new state name.
 NEW_STATE_TEMPLATE = {
+    'classifier_model_id': None,
     'content': [{
         'type': 'text',
         'value': ''
@@ -159,7 +161,7 @@ class ExplorationPage(EditorHandler):
 
     def get(self, exploration_id):
         """Handles GET requests."""
-        if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
+        if exploration_id in constants.DISABLED_EXPLORATION_IDS:
             self.render_template(
                 'pages/error/disabled_exploration.html',
                 iframe_restriction=None)
@@ -338,7 +340,6 @@ class ExplorationHandler(EditorHandler):
 
         commit_message = self.payload.get('commit_message')
         change_list = self.payload.get('change_list')
-
         try:
             exp_services.update_exploration(
                 self.user_id, exploration_id, change_list, commit_message)
@@ -648,7 +649,7 @@ class UntrainedAnswersHandler(EditorHandler):
         answers = stats_services.get_top_state_rule_answers(
             exploration_id, state_name, [
                 exp_domain.DEFAULT_RULESPEC_STR,
-                exp_domain.CLASSIFIER_RULESPEC_STR])[
+                exp_domain.RULE_TYPE_CLASSIFIER])[
                     :self.NUMBER_OF_TOP_ANSWERS_PER_RULE]
 
         interaction = state.interaction
@@ -668,7 +669,7 @@ class UntrainedAnswersHandler(EditorHandler):
                 for answer_group in interaction.answer_groups:
                     for rule_spec in answer_group.rule_specs:
                         if (rule_spec.rule_type ==
-                                exp_domain.CLASSIFIER_RULESPEC_STR):
+                                exp_domain.RULE_TYPE_CLASSIFIER):
                             trained_answers.update(
                                 interaction_instance.normalize_answer(trained)
                                 for trained

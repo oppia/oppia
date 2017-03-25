@@ -11,13 +11,19 @@ module.exports = function(config) {
     frameworks: ['jasmine'],
     files: [
       'core/tests/karma-globals.js',
+      // Constants must be loaded before everything else.
+      {
+        pattern: 'assets/constants.json',
+        included: false
+      },
+      'core/tests/karma-constants.js',
       // Since jquery,jquery-ui,angular,angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.0.0/jquery.min.js',
       'third_party/static/jqueryui-1.10.3/jquery-ui.min.js',
       'third_party/static/angularjs-1.5.8/angular.js',
       'third_party/static/angularjs-1.5.8/angular-mocks.js',
-      'third_party/static/math-expressions-10186a/build/math-expressions.js',
+      'third_party/static/math-expressions-370a77/build/math-expressions.js',
       generatedJs,
       'core/templates/dev/head/*.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of
@@ -27,7 +33,7 @@ module.exports = function(config) {
       'core/templates/dev/head/components/rating_display.html',
       'extensions/**/*.js',
       'extensions/interactions/**/*.html',
-      'extensions/interactions/rules.json',
+      'extensions/interactions/rule_templates.json',
       {
         pattern: 'assets/i18n/**/*.json',
         watched: true,
@@ -39,6 +45,12 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*-e2e.js',
       'extensions/**/protractor.js'
     ],
+    proxies: {
+      // Karma serves files under the /base directory.
+      // We need to access files in assets folder, without modifying the code,
+      // so we need to proxy the requests from /assets/ to /base/assets/.
+      '/assets/': '/base/assets/'
+    },
     preprocessors: {
       'core/templates/dev/head/*.js': ['coverage'],
       // When all controllers were converted from global functions into the
@@ -63,7 +75,7 @@ module.exports = function(config) {
       // list above.
       'core/templates/dev/head/components/rating_display.html': ['ng-html2js'],
       'extensions/interactions/**/*.html': ['ng-html2js'],
-      'extensions/interactions/rules.json': ['json_fixtures']
+      'extensions/interactions/rule_templates.json': ['json_fixtures']
     },
     reporters: ['progress', 'coverage'],
     coverageReporter: {

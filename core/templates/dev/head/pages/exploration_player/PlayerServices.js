@@ -50,6 +50,10 @@ oppia.factory('oppiaPlayerService', [
     var answerIsBeingProcessed = false;
 
     var exploration = null;
+
+    // Param changes to be used ONLY in editor preview mode.
+    var manualParamChanges = null;
+    var initialStateName = null;
     var version = GLOBALS.explorationVersion;
 
     var randomFromArray = function(arr) {
@@ -100,7 +104,6 @@ oppia.factory('oppiaPlayerService', [
     // This should only be called when 'exploration' is non-null.
     var _loadInitialState = function(successCallback) {
       var initialState = exploration.getInitialState();
-
       var oldParams = LearnerParamsService.getAllParams();
       var newParams = makeParams(
         oldParams, initialState.paramChanges, [oldParams]);
@@ -157,10 +160,11 @@ oppia.factory('oppiaPlayerService', [
       // This should only be used in editor preview mode. It sets the
       // exploration data from what's currently specified in the editor, and
       // also initializes the parameters to empty strings.
-      populateExploration: function(explorationData, manualParamChanges) {
+      initSettingsFromEditor: function(activeStateNameFromPreviewTab,
+        manualParamChangesToInit) {
         if (_editorPreviewMode) {
-          exploration = ExplorationObjectFactory.create(explorationData);
-          initParams(manualParamChanges);
+          manualParamChanges = manualParamChangesToInit;
+          initStateName = activeStateNameFromPreviewTab;
         } else {
           throw 'Error: cannot populate exploration in learner mode.';
         }
@@ -184,20 +188,30 @@ oppia.factory('oppiaPlayerService', [
         playerTranscriptService.init();
 
         if (_editorPreviewMode) {
-          if (exploration) {
+          var explorationDataUrl = UrlInterpolationService.interpolateUrl(
+            '/createhandler/data/<exploration_id>', {
+              exploration_id: _explorationId
+            });
+          $http.get(explorationDataUrl, {
+            params: {
+              apply_draft: true
+            }
+          }).then(function(response) {
+            exploration = ExplorationObjectFactory.createFromBackendDict(
+              response.data);
+            exploration.setInitialStateName(initStateName);
+            initParams(manualParamChanges);
             _loadInitialState(successCallback);
-          } else {
-            alertsService.addWarning(
-              'Could not initialize exploration, because it was not yet ' +
-              'populated.');
-          }
+          });
         } else {
-          var explorationDataUrl = (
-            '/explorehandler/init/' + _explorationId +
-            (version ? '?v=' + version : ''));
+          var explorationDataUrl = UrlInterpolationService.interpolateUrl(
+            '/explorehandler/init/<exploration_id>', {
+              exploration_id: _explorationId
+            }) + (version ? '?v=' + version : '');
           $http.get(explorationDataUrl).then(function(response) {
             var data = response.data;
-            exploration = ExplorationObjectFactory.create(data.exploration);
+            exploration = ExplorationObjectFactory.createFromBackendDict(
+              data.exploration);
             version = data.version;
 
             initParams([]);
@@ -267,7 +281,6 @@ oppia.factory('oppiaPlayerService', [
         answerIsBeingProcessed = true;
         var oldState = exploration.getState(
           playerTranscriptService.getLastStateName());
-
         AnswerClassificationService.getMatchingClassificationResult(
           _explorationId, oldState, answer, false, interactionRulesService
         ).then(function(classificationResult) {
@@ -277,7 +290,7 @@ oppia.factory('oppiaPlayerService', [
               LearnerParamsService.getAllParams(),
               answer,
               classificationResult.answerGroupIndex,
-              classificationResult.ruleSpecIndex);
+              classificationResult.ruleIndex);
           }
 
           // Use angular.copy() to clone the object

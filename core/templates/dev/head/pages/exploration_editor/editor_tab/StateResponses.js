@@ -82,7 +82,7 @@ oppia.factory('responsesService', [
     var _updateAnswerGroup = function(index, updates) {
       var answerGroup = _answerGroups[index];
       if (updates.rules) {
-        answerGroup.rule_specs = updates.rules;
+        answerGroup.rules = updates.rules;
       }
       if (updates.feedback) {
         answerGroup.outcome.feedback = updates.feedback;
@@ -90,6 +90,7 @@ oppia.factory('responsesService', [
       if (updates.dest) {
         answerGroup.outcome.dest = updates.dest;
       }
+      answerGroup.correct = false;
       _saveAnswerGroups(_answerGroups);
     };
 
@@ -282,7 +283,7 @@ oppia.factory('responsesService', [
           });
 
           _answerGroups.forEach(function(answerGroup, answerGroupIndex) {
-            var newRules = angular.copy(answerGroup.rule_specs);
+            var newRules = angular.copy(answerGroup.rules);
             newRules.forEach(function(rule) {
               for (var key in rule.inputs) {
                 var newInputValue = [];
@@ -337,13 +338,13 @@ oppia.controller('StateResponses', [
   'editorContextService', 'alertsService', 'responsesService', 'routerService',
   'explorationContextService', 'trainingDataService',
   'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
-  'INTERACTION_SPECS', 'UrlInterpolationService',
+  'INTERACTION_SPECS', 'UrlInterpolationService', 'AnswerGroupObjectFactory',
   function(
       $scope, $rootScope, $modal, $filter, stateInteractionIdService,
       editorContextService, alertsService, responsesService, routerService,
       explorationContextService, trainingDataService,
       stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
-      INTERACTION_SPECS, UrlInterpolationService) {
+      INTERACTION_SPECS, UrlInterpolationService, AnswerGroupObjectFactory) {
     $scope.editorContextService = editorContextService;
 
     $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
@@ -371,8 +372,8 @@ oppia.controller('StateResponses', [
         // Collect all answers which have been handled by at least one
         // answer group.
         for (var i = 0; i < answerGroups.length; i++) {
-          for (var j = 0; j < answerGroups[i].rule_specs.length; j++) {
-            handledAnswersArray.push(answerGroups[i].rule_specs[j].inputs.x);
+          for (var j = 0; j < answerGroups[i].rules.length; j++) {
+            handledAnswersArray.push(answerGroups[i].rules[j].inputs.x);
           }
         }
         for (var i = 0; i < numChoices; i++) {
@@ -403,15 +404,15 @@ oppia.controller('StateResponses', [
           });
 
           answerGroups.forEach(function(answerGroup) {
-            var ruleSpecs = answerGroup.rule_specs;
-            ruleSpecs.forEach(function(ruleSpec) {
-              var ruleInputs = ruleSpec.inputs.x;
+            var rules = answerGroup.rules;
+            rules.forEach(function(rule) {
+              var ruleInputs = rule.inputs.x;
               ruleInputs.forEach(function(ruleInput) {
                 var choiceIndex = answerChoiceToIndex[ruleInput];
-                if (ruleSpec.rule_type === 'Equals' ||
-                    ruleSpec.rule_type === 'ContainsAtLeastOneOf') {
+                if (rule.type === 'Equals' ||
+                    rule.type === 'ContainsAtLeastOneOf') {
                   handledAnswersArray[choiceIndex] = true;
-                } else if (ruleSpec.rule_type ===
+                } else if (rule.type ===
                   'DoesNotContainAtLeastOneOf') {
                   for (var i = 0; i < handledAnswersArray.length; i++) {
                     if (i !== choiceIndex) {
@@ -563,21 +564,23 @@ oppia.controller('StateResponses', [
 
       $modal.open({
         templateUrl: 'modals/teachOppia',
-        backdrop: true,
+        backdrop: false,
         controller: [
-          '$scope', '$modalInstance', 'oppiaExplorationHtmlFormatterService',
+          '$scope', '$injector', '$modalInstance',
+          'oppiaExplorationHtmlFormatterService',
           'stateInteractionIdService', 'stateCustomizationArgsService',
           'explorationContextService', 'editorContextService',
           'explorationStatesService', 'trainingDataService',
-          'AnswerClassificationService', 'focusService', 'DEFAULT_RULE_NAME',
-          'CLASSIFIER_RULESPEC_STR',
+          'AnswerClassificationService', 'focusService',
+          'RULE_TYPE_CLASSIFIER',
           function(
-              $scope, $modalInstance, oppiaExplorationHtmlFormatterService,
+              $scope, $injector, $modalInstance,
+              oppiaExplorationHtmlFormatterService,
               stateInteractionIdService, stateCustomizationArgsService,
               explorationContextService, editorContextService,
               explorationStatesService, trainingDataService,
-              AnswerClassificationService, focusService, DEFAULT_RULE_NAME,
-              CLASSIFIER_RULESPEC_STR) {
+              AnswerClassificationService, focusService,
+              RULE_TYPE_CLASSIFIER) {
             var _explorationId = explorationContextService.getExplorationId();
             var _stateName = editorContextService.getActiveStateName();
             var _state = explorationStatesService.getState(_stateName);
@@ -594,6 +597,15 @@ oppia.controller('StateResponses', [
             $scope.trainingDataAnswer = '';
             $scope.trainingDataFeedback = '';
             $scope.trainingDataOutcomeDest = '';
+
+            // Retrieve the interaction ID.
+            var interactionId = stateInteractionIdService.savedMemento;
+
+            var rulesServiceName = interactionId.charAt(0).toLowerCase() +
+              interactionId.slice(1) + 'RulesService';
+
+            // Inject RulesService dynamically.
+            var rulesService = $injector.get(rulesServiceName);
 
             // See the training panel directive in StateEditor for an
             // explanation on the structure of this object.
@@ -617,7 +629,8 @@ oppia.controller('StateResponses', [
                   stateCustomizationArgsService.savedMemento));
 
               AnswerClassificationService.getMatchingClassificationResult(
-                _explorationId, _state, answer, true).then(
+                _explorationId, _state, answer, true,
+                rulesService).then(
                     function(classificationResult) {
                   var feedback = 'Nothing';
                   var dest = classificationResult.outcome.dest;
@@ -632,13 +645,11 @@ oppia.controller('StateResponses', [
                   $scope.trainingDataOutcomeDest = dest;
 
                   var answerGroupIndex = classificationResult.answerGroupIndex;
-                  var ruleSpecIndex = classificationResult.ruleSpecIndex;
+                  var ruleIndex = classificationResult.ruleIndex;
                   if (answerGroupIndex !==
-                        _state.interaction.answer_groups.length &&
-                      _state.interaction.answer_groups[
-                        answerGroupIndex].rule_specs[
-                          ruleSpecIndex].rule_type !==
-                            CLASSIFIER_RULESPEC_STR) {
+                    _state.interaction.answerGroups.length &&
+                      _state.interaction.answerGroups[answerGroupIndex]
+                      .rules[ruleIndex].type !== RULE_TYPE_CLASSIFIER) {
                     $scope.classification.answerGroupIndex = -1;
                   } else {
                     $scope.classification.answerGroupIndex = (
@@ -666,17 +677,16 @@ oppia.controller('StateResponses', [
         controller: [
           '$scope', '$modalInstance', 'responsesService',
           'editorContextService', 'editorFirstTimeEventsService',
+          'RuleObjectFactory',
           function(
               $scope, $modalInstance, responsesService,
-              editorContextService, editorFirstTimeEventsService) {
+              editorContextService, editorFirstTimeEventsService,
+              RuleObjectFactory) {
             $scope.feedbackEditorIsOpen = false;
             $scope.openFeedbackEditor = function() {
               $scope.feedbackEditorIsOpen = true;
             };
-            $scope.tmpRule = {
-              rule_type: null,
-              inputs: {}
-            };
+            $scope.tmpRule = RuleObjectFactory.createNew(null, {});
             $scope.tmpOutcome = {
               dest: editorContextService.getActiveStateName(),
               feedback: [''],
@@ -728,10 +738,8 @@ oppia.controller('StateResponses', [
         ]
       }).result.then(function(result) {
         // Create a new answer group.
-        $scope.answerGroups.push({
-          rule_specs: [result.tmpRule],
-          outcome: angular.copy(result.tmpOutcome)
-        });
+        $scope.answerGroups.push(AnswerGroupObjectFactory.createNew(
+          [result.tmpRule], result.tmpOutcome, false));
         responsesService.save($scope.answerGroups, $scope.defaultOutcome);
         $scope.changeActiveAnswerGroupIndex($scope.answerGroups.length - 1);
 
@@ -842,10 +850,10 @@ oppia.filter('summarizeAnswerGroup', [
     var outcome = answerGroup.outcome;
     var hasFeedback = outcome.feedback.length > 0 && outcome.feedback[0];
 
-    if (answerGroup.rule_specs) {
+    if (answerGroup.rules) {
       var firstRule = $filter('convertToPlainText')(
         $filter('parameterizeRuleDescription')(
-          answerGroup.rule_specs[0], interactionId, answerChoices));
+          answerGroup.rules[0], interactionId, answerChoices));
       summary = 'Answer ' + firstRule;
 
       if (hasFeedback && shortenRule) {

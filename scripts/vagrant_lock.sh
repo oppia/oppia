@@ -58,4 +58,3 @@ then
 else
   touch $VAGRANT_LOCK_FILE
 fi
-
