@@ -94,9 +94,9 @@
 
         <div role="form" class="form-horizontal">
           <div class="form-group">
-            <label class="col-lg-2 col-md-2 col-sm-2">Creators you've subscribed to</label>
+            <label class="col-lg-2 col-md-2 col-sm-2"  translate="I18N_PREFERENCES_SUBSCRIBED_CREATORS"></label>
             <div class="col-lg-10 col-md-10 col-sm-10">
-              <span ng-if="subscriptionList.length === 0">You've not subscribed to any creators yet.</span>
+              <span ng-if="subscriptionList.length === 0" translate="I18N_PREFERENCES_NO_SUBSCRIPTIONS"></span>
               <md-card class="oppia-subscription-card"
                        ng-if="subscriptionList.length > 0"
                        ng-repeat="subscription in subscriptionList"
