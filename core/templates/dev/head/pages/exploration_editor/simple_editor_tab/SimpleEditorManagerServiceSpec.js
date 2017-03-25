@@ -34,6 +34,8 @@ describe('Simple Editor Manager Service', function() {
   var questionListObjectFactory;
   var validatorsService;
   var simpleEditorShimService;
+  var questions;
+  var questionList;
 
   beforeEach(module('oppia'));
 
@@ -42,32 +44,7 @@ describe('Simple Editor Manager Service', function() {
   }));
 
   beforeEach(inject(function() {
-    GLOBALS.NEW_STATE_TEMPLATE = {
-      content: [{
-        type: 'text',
-        value: ''
-      }],
-      interaction: {
-        answer_groups: [],
-        confirmed_unclassified_answers: [],
-        customization_args: {
-          rows: {
-            value: 1
-          },
-          placeholder: {
-            value: 'Type your answer here.'
-          }
-        },
-        default_outcome: {
-          dest: '(untitled state)',
-          feedback: [],
-          param_changes: []
-        },
-        fallbacks: [],
-        id: 'TextInput'
-      },
-      param_changes: []
-    };
+    GLOBALS.NEW_STATE_TEMPLATE = constants.NEW_STATE_TEMPLATE;
   }));
 
   beforeEach(inject(function($injector) {
@@ -174,6 +151,9 @@ describe('Simple Editor Manager Service', function() {
     explorationTitleService.init(data.title);
     explorationInitStateNameService.init(data.init_state_name);
 
+    questions = statesToQuestionsService.getQuestions();
+    questionList = questionListObjectFactory.create(questions);
+
     spyOn(validatorsService, 'isValidEntityName').andReturn(true);
     spyOn(mockExplorationData, 'autosaveChangeList').andReturn(true);
   });
@@ -188,10 +168,8 @@ describe('Simple Editor Manager Service', function() {
     expect(simpleEditorManagerService.getIntroductionHtml())
       .toBe(data.states.Introduction.content[0].value);
     // Expected questions are genereated from test data.
-    var expectedSimpleEditorManagerQuestions =
-      statesToQuestionsService.getQuestions();
-    var expectedSimpleEditorManagerQuestionList =
-      questionListObjectFactory.create(expectedSimpleEditorManagerQuestions);
+
+    var expectedSimpleEditorManagerQuestionList = questionList;
     expect(simpleEditorManagerService.getQuestionList())
       .toEqual(expectedSimpleEditorManagerQuestionList);
     expect(expectedReturnedValue).toBeTruthy();
@@ -204,8 +182,6 @@ describe('Simple Editor Manager Service', function() {
   });
 
   it('should return data', function() {
-    var expectedSimpleEditorManagerQuestions =
-      statesToQuestionsService.getQuestions();
     // Expected initialized data inside simpleEditorManagerService
     var expectedSimpleEditorManagerData = {
       title: data.title,
@@ -214,8 +190,7 @@ describe('Simple Editor Manager Service', function() {
     };
     // Initialize simpleEditorManagerService.data
     simpleEditorManagerService.tryToInit();
-    expectedSimpleEditorManagerData.questionList =
-      questionListObjectFactory.create(expectedSimpleEditorManagerQuestions);
+    expectedSimpleEditorManagerData.questionList = questionList;
     expect(simpleEditorManagerService.getData())
       .toEqual(expectedSimpleEditorManagerData);
   });
@@ -235,11 +210,7 @@ describe('Simple Editor Manager Service', function() {
   });
 
   it('should return question list', function() {
-    var expectedSimpleEditorManagerQuestions =
-      statesToQuestionsService.getQuestions();
-    var expectedSimpleEditorManagerQuestionList = null;
-    expectedSimpleEditorManagerQuestionList =
-      questionListObjectFactory.create(expectedSimpleEditorManagerQuestions);
+    var expectedSimpleEditorManagerQuestionList = questionList;
     simpleEditorManagerService.tryToInit();
     expect(simpleEditorManagerService.getQuestionList())
       .toEqual(expectedSimpleEditorManagerQuestionList);
@@ -317,14 +288,10 @@ describe('Simple Editor Manager Service', function() {
   it('should save the bridge html', function () {
     var testStateName = 'Introduction';
     var expectedNewBridgeHtml = '<p> lets move to next Qsn </p>';
-    var expectedSimpleEditorManagerQuestions =
-      statesToQuestionsService.getQuestions();
-    var expectedSimpleEditorManagerQuestionList = null;
+    var expectedSimpleEditorManagerQuestionList = questionList;
     simpleEditorManagerService.tryToInit()
     simpleEditorManagerService.saveBridgeHtml(
       testStateName, expectedNewBridgeHtml);
-    expectedSimpleEditorManagerQuestionList =
-      questionListObjectFactory.create(expectedSimpleEditorManagerQuestions);
     expect(explorationStatesService
       .getState(expectedSimpleEditorManagerQuestionList
         .getNextStateName(testStateName)).content)
@@ -332,9 +299,7 @@ describe('Simple Editor Manager Service', function() {
   });
 */
   it('should add new question and new state', function() {
-    var expectedSimpleEditorQuestions =
-      statesToQuestionsService.getQuestions();
-    var expectedSimpleEditorQuestionList = null;
+    var expectedSimpleEditorQuestionList = questionList;
     var expectedLastStateName;
     var expectedDefaultOutcome;
     var DEFAULT_INTERACTION = {
@@ -347,9 +312,6 @@ describe('Simple Editor Manager Service', function() {
     };
 
     simpleEditorManagerService.tryToInit();
-    expectedSimpleEditorQuestionList =
-      questionListObjectFactory.create(expectedSimpleEditorQuestions);
-
     expectedLastStateName =
       expectedSimpleEditorQuestionList.getLastQuestion()
         .getDestinationStateName();

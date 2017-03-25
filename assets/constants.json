@@ -7,5 +7,6 @@
     "Mathematics", "Medicine", "Music", "Philosophy", "Physics", "Poetry",
     "Probability", "Programming", "Puzzles", "Reading", "Spanish", "Sport",
     "Statistics", "Trigonometry", "Welcome"],
-  "DISABLED_EXPLORATION_IDS": ["5"]
+  "DISABLED_EXPLORATION_IDS": ["5"],
+  "NEW_STATE_TEMPLATE":{"content":[{"type":"text","value":""}],"interaction":{"answer_groups":[],"confirmed_unclassified_answers":[],"customization_args":{"rows":{"value":1},"placeholder":{"value":"Type your answer here."}},"default_outcome":{"dest":"(untitled state)","feedback":[],"param_changes":[]},"fallbacks":[],"id":"TextInput"},"param_changes":[]}
 }
