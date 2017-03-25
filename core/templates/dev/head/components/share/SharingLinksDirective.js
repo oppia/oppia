@@ -29,24 +29,21 @@ oppia.directive('sharingLinks', [function() {
     },
     templateUrl: 'components/sharingLinks',
     controller: [
-      '$scope', '$window', '$injector', 'oppiaHtmlEscaper',
+      '$scope', '$window', 'oppiaHtmlEscaper', 'ExplorationEmbedButtonService',
       'siteAnalyticsService', 'UrlInterpolationService',
       function(
-          $scope, $window, $injector, oppiaHtmlEscaper,
+          $scope, $window, oppiaHtmlEscaper, ExplorationEmbedButtonService,
           siteAnalyticsService, UrlInterpolationService) {
         $scope.registerShareEvent = null;
 
         if ($scope.shareType === 'exploration') {
           $scope.explorationId = $scope.getExplorationId();
-          var ExplorationEmbedButtonService = $injector.get(
-            'ExplorationEmbedButtonService');
 
           $scope.activityType = 'explore';
           $scope.activityId = $scope.explorationId;
 
-          $scope.registerShareEvent = function(network) {
-            siteAnalyticsService.registerShareExplorationEvent(network);
-          };
+          $scope.registerShareEvent =
+          siteAnalyticsService.registerShareExplorationEvent;
 
           $scope.showEmbedExplorationModal = (
             ExplorationEmbedButtonService.showModal);
@@ -56,13 +53,12 @@ oppia.directive('sharingLinks', [function() {
           $scope.activityType = 'collection';
           $scope.activityId = $scope.collectionId;
 
-          $scope.registerShareEvent = function(network) {
-            siteAnalyticsService.registerShareCollectionEvent(network);
-          };
+          $scope.registerShareEvent =
+          siteAnalyticsService.registerShareCollectionEvent;
         } else {
-          throw (
-            'Error: The directive can only be used either in a' +
-            'collection player or exploration player');
+          throw Error(
+            'SharingLinks directive can only be used either in the' +
+            'collection player or the exploration player');
         }
 
         $scope.serverName = (
