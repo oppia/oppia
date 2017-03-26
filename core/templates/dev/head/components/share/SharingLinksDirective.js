@@ -42,8 +42,8 @@ oppia.directive('sharingLinks', [function() {
           $scope.activityType = 'explore';
           $scope.activityId = $scope.explorationId;
 
-          $scope.registerShareEvent =
-          siteAnalyticsService.registerShareExplorationEvent;
+          $scope.registerShareEvent = (
+            siteAnalyticsService.registerShareExplorationEvent);
 
           $scope.showEmbedExplorationModal = (
             ExplorationEmbedButtonService.showModal);
@@ -53,8 +53,8 @@ oppia.directive('sharingLinks', [function() {
           $scope.activityType = 'collection';
           $scope.activityId = $scope.collectionId;
 
-          $scope.registerShareEvent =
-          siteAnalyticsService.registerShareCollectionEvent;
+          $scope.registerShareEvent = (
+            siteAnalyticsService.registerShareCollectionEvent);
         } else {
           throw Error(
             'SharingLinks directive can only be used either in the' +
