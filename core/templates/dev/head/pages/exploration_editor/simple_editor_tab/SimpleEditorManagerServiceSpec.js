@@ -36,6 +36,9 @@ describe('Simple Editor Manager Service', function() {
   var simpleEditorShimService;
   var questions;
   var questionList;
+  var lastStateName;
+  var DEFAULT_INTERACTION;
+  var END_EXPLORATION_INTERACTION;
 
   beforeEach(module('oppia'));
 
@@ -71,7 +74,7 @@ describe('Simple Editor Manager Service', function() {
       init_state_name: 'Introduction',
       title: 'Linear Algebra',
       states: {
-        'Question 1': {
+        'Question 2': {
           param_changes: [],
           classifier_model_id: null,
           interaction: {
@@ -91,6 +94,58 @@ describe('Simple Editor Manager Service', function() {
             }
           ],
           unresolved_answers: {}
+        },
+        'Question 1': {
+          content: [
+            {
+              value: '<p>lets move to next question.</p>',
+              type: 'text'
+            }
+          ],
+          interaction: {
+            customization_args: {
+              choices: {
+                value: [
+                  '<p>linear equation in one variable is aX+bY+c=0</p>',
+                  '<p>linear equation in one variable is bY+c=0</p>',
+                  '<p>linear equation in one variable is aY+bX+c=0</p>',
+                  '<p>None of the above.</p>'
+                ]
+              }
+            },
+            confirmed_unclassified_answers: [],
+            id: 'MultipleChoiceInput',
+            default_outcome: {
+              feedback: [
+                '<p>All others have  two variables.</p>'
+              ],
+              dest: 'Question 1',
+              param_changes: []
+            },
+            fallbacks: [],
+            answer_groups: [
+              {
+                outcome: {
+                  feedback: [
+                    '<p>Y is the only variable.</p>'
+                  ],
+                  dest: 'Question 2',
+                  param_changes: []
+                },
+                rule_specs: [
+                  {
+                    inputs: {
+                      x: 1
+                    },
+                    rule_type: 'Equals'
+                  }
+                ]
+              }
+            ]
+          },
+          param_changes: [],
+          unresolved_answers: {},
+          classifier_model_id: null
         },
         Introduction: {
           param_changes: [],
@@ -147,48 +202,59 @@ describe('Simple Editor Manager Service', function() {
       }
     };
 
+    DEFAULT_INTERACTION = {
+      ID: 'MultipleChoiceInput',
+      CUSTOMIZATION_ARGS: {
+        choices: {
+          value: ['<p>Option 1</p>']
+        }
+      }
+    };
+
+    END_EXPLORATION_INTERACTION = {
+      ID: 'EndExploration',
+      CUSTOMIZATION_ARGS: {
+        recommendedExplorationIds: []
+      }
+    };
+
     explorationStatesService.init(data.states);
     explorationTitleService.init(data.title);
     explorationInitStateNameService.init(data.init_state_name);
 
     questions = statesToQuestionsService.getQuestions();
     questionList = questionListObjectFactory.create(questions);
+    lastStateName = questionList.getLastQuestion().getDestinationStateName();
 
     spyOn(validatorsService, 'isValidEntityName').andReturn(true);
     spyOn(mockExplorationData, 'autosaveChangeList').andReturn(true);
   });
 
   it('should initialize the local data variables', function() {
-    var expectedReturnedValue;
-    // Case:1 when there are two valid states  with no error in initialized
-    // data, initialized in beforeEach block and StatesToQuestionsService
-    // .getQuestions() will return non null value.
-    expectedReturnedValue = simpleEditorManagerService.tryToInit();
+    var expectedReturnedValue = simpleEditorManagerService.tryToInit();
+    expect(expectedReturnedValue).toBeTruthy();
     expect(simpleEditorManagerService.getTitle()).toBe(data.title);
     expect(simpleEditorManagerService.getIntroductionHtml())
       .toBe(data.states.Introduction.content[0].value);
-    // Expected questions are genereated from test data.
-
+    // 'questionList' is generated from the test data.
     var expectedSimpleEditorManagerQuestionList = questionList;
     expect(simpleEditorManagerService.getQuestionList())
       .toEqual(expectedSimpleEditorManagerQuestionList);
-    expect(expectedReturnedValue).toBeTruthy();
+  });
 
-    // Case:2 when StatesToQuestionsService.getQuestions() will return null,
-    // may be due to errors.
+  it('should return false if initializing the question list fails', function() {
+    var expectedReturnedValue = simpleEditorManagerService.tryToInit();
     spyOn(statesToQuestionsService, 'getQuestions').andReturn(null);
     expectedReturnedValue = simpleEditorManagerService.tryToInit();
     expect(expectedReturnedValue).toBeFalsy();
   });
 
-  it('should return data', function() {
-    // Expected initialized data inside simpleEditorManagerService
+  it('should return data representing the exploration', function() {
     var expectedSimpleEditorManagerData = {
       title: data.title,
       introductionHtml: data.states.Introduction.content[0].value,
       questionList: null
     };
-    // Initialize simpleEditorManagerService.data
     simpleEditorManagerService.tryToInit();
     expectedSimpleEditorManagerData.questionList = questionList;
     expect(simpleEditorManagerService.getData())
@@ -197,7 +263,6 @@ describe('Simple Editor Manager Service', function() {
 
   it('should return title', function() {
     var expectedTitle = data.title;
-    // Initialize simpleEditorManagerService.data
     simpleEditorManagerService.tryToInit();
     expect(simpleEditorManagerService.getTitle()).toEqual(expectedTitle);
   });
@@ -224,13 +289,13 @@ describe('Simple Editor Manager Service', function() {
   });
 
   it('should save the given new introduction html', function() {
-    var expectedNewIntroductionHtmll = '<p> new intro </p>';
+    var expectedNewIntroductionHtml = '<p> new intro </p>';
     simpleEditorManagerService
-      .saveIntroductionHtml(expectedNewIntroductionHtmll);
+      .saveIntroductionHtml(expectedNewIntroductionHtml);
     expect(simpleEditorShimService.getIntroductionHtml())
-      .toEqual(expectedNewIntroductionHtmll);
+      .toEqual(expectedNewIntroductionHtml);
     expect(simpleEditorManagerService.getIntroductionHtml())
-      .toEqual(expectedNewIntroductionHtmll);
+      .toEqual(expectedNewIntroductionHtml);
   });
 
   it('should save the customization args', function() {
@@ -250,7 +315,7 @@ describe('Simple Editor Manager Service', function() {
   });
   /**
     * Not working, needs debugging.
-    It('should save the answer groups', function () {
+    it('should save the answer groups', function () {
       var testStateName = 'Introduction';
       var expectedNewAnswerGroups = [{
         rule_specs: [{
@@ -266,14 +331,13 @@ describe('Simple Editor Manager Service', function() {
       expect(explorationStatesService.getState(testStateName)
         .interaction.answer_groups).toContain(expectedNewAnswerGroups);
     });
-  */
-
+*/
   it('should save the default outcome', function() {
     var testStateName = 'Introduction';
     var expectedNewDefaultOutcome = {
       dest: 'Introduction',
       feedback: [
-        '<p>One is wrong bcz ofisEmpty many reasons</p>'
+        '<p>One is wrong bcz many reasons</p>'
       ]
     };
     simpleEditorManagerService.tryToInit();
@@ -283,62 +347,49 @@ describe('Simple Editor Manager Service', function() {
       .interaction.default_outcome).toEqual(expectedNewDefaultOutcome);
   });
 
-  /**
-    * Not working, needs debugging.
-  it('should save the bridge html', function () {
+  it('should save the bridge html', function() {
     var testStateName = 'Introduction';
     var expectedNewBridgeHtml = '<p> lets move to next Qsn </p>';
     var expectedSimpleEditorManagerQuestionList = questionList;
-    simpleEditorManagerService.tryToInit()
+    simpleEditorManagerService.tryToInit();
     simpleEditorManagerService.saveBridgeHtml(
       testStateName, expectedNewBridgeHtml);
-    expect(explorationStatesService
+    var nextState = explorationStatesService
       .getState(expectedSimpleEditorManagerQuestionList
-        .getNextStateName(testStateName)).content)
-          .toEqual(expectedNewBridgeHtml);
+        .getNextStateName(testStateName));
+    expect(nextState.content[0].value).toEqual(expectedNewBridgeHtml);
   });
-*/
+
   it('should add new question and new state', function() {
-    var expectedSimpleEditorQuestionList = questionList;
-    var expectedLastStateName;
-    var expectedDefaultOutcome;
-    var DEFAULT_INTERACTION = {
-      ID: 'MultipleChoiceInput',
-      CUSTOMIZATION_ARGS: {
-        choices: {
-          value: ['<p>Option 1</p>']
-        }
-      }
-    };
-
-    simpleEditorManagerService.tryToInit();
-    expectedLastStateName =
-      expectedSimpleEditorQuestionList.getLastQuestion()
-        .getDestinationStateName();
-
-    expectedDefaultOutcome = {
+    var expectedInteraction = DEFAULT_INTERACTION;
+    var expectedLastStateName = lastStateName;
+    var expectedDefaultOutcome = {
       dest: expectedLastStateName,
       feedback: [''],
       param_changes: []
     };
-
+    simpleEditorManagerService.tryToInit();
     simpleEditorManagerService.addNewQuestion();
-    expect(explorationStatesService.getState(expectedLastStateName)
-      .interaction.id).toEqual(DEFAULT_INTERACTION.ID);
-    expect(explorationStatesService.getState(expectedLastStateName)
-      .interaction.customization_args)
-        .toEqual(DEFAULT_INTERACTION.CUSTOMIZATION_ARGS);
-    expect(explorationStatesService.getState(expectedLastStateName)
-      .interaction.default_outcome).toEqual(expectedDefaultOutcome);
-    var expectedStateData =
-      simpleEditorShimService.getState(expectedLastStateName);
-    expect(JSON.stringify(simpleEditorManagerService.getQuestionList()))
-      .toContain(JSON.stringify(questionObjectFactory.create(
-        expectedLastStateName, expectedStateData.interaction, '')));
+    var state = explorationStatesService.getState(expectedLastStateName);
+    expect(state.interaction.id).toEqual(expectedInteraction.ID);
+    expect(state.interaction.customization_args)
+      .toEqual(expectedInteraction.CUSTOMIZATION_ARGS);
+    expect(state.interaction.default_outcome).toEqual(expectedDefaultOutcome);
+    var expectedQuestion = questionObjectFactory.create(
+      expectedLastStateName, state.interaction, '');
+    expect(simpleEditorManagerService.getQuestionList()._questions
+      .some(function(question) {
+        return JSON.stringify(question) === JSON.stringify(expectedQuestion);
+      })).toBe(true);
+  });
 
-    // It should also add the new state.
-    simpleEditorManagerService.addState();
-    var expectedAllStates = explorationStatesService.getStates();
-    expect(expectedAllStates['Question 2']).toBeDefined();
+  it('should add new state', function() {
+    simpleEditorManagerService.tryToInit();
+    var newStateName = simpleEditorManagerService.addState();
+    var newState = explorationStatesService.getState(newStateName);
+    expect(newState.interaction.id).toEqual(END_EXPLORATION_INTERACTION.ID);
+    expect(newState.interaction.customization_args)
+      .toEqual(END_EXPLORATION_INTERACTION.CUSTOMIZATION_ARGS);
+    expect(newState.interaction.default_outcome).toEqual(null);
   });
 });
