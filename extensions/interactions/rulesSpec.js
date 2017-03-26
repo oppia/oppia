@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests to check that all the relevant rule specs exist.
+ * @fileoverview Unit tests to check that all the relevant rules exist.
  */
 
 describe('Rule spec services', function() {
-  var ruleSpecsServices = {};
-  var rulesJson;
-  var CLASSIFIER_RULESPEC_STR = 'FuzzyMatches';
+  var rulesServices = {};
+  var ruleTemplates;
+  var RULE_TYPE_CLASSIFIER;
 
   beforeEach(function() {
     module('oppia');
@@ -32,19 +32,21 @@ describe('Rule spec services', function() {
   };
 
   beforeEach(inject(function($rootScope, $controller, $injector) {
-    rulesJson = window.__fixtures__['extensions/interactions/rules'];
-    Object.keys(rulesJson).forEach(function(interactionId) {
+    RULE_TYPE_CLASSIFIER = $injector.get('RULE_TYPE_CLASSIFIER');
+    ruleTemplates =
+      window.__fixtures__['extensions/interactions/rule_templates'];
+    Object.keys(ruleTemplates).forEach(function(interactionId) {
       var serviceName = getRulesServiceName(interactionId);
-      ruleSpecsServices[serviceName] = $injector.get(serviceName);
+      rulesServices[serviceName] = $injector.get(serviceName);
     });
   }));
 
   it('should include evaluation methods for all explicit rules', function() {
-    Object.keys(rulesJson).forEach(function(interactionId) {
+    Object.keys(ruleTemplates).forEach(function(interactionId) {
       var serviceName = getRulesServiceName(interactionId);
-      Object.keys(rulesJson[interactionId]).forEach(function(ruleName) {
-        if (ruleName !== CLASSIFIER_RULESPEC_STR) {
-          expect(ruleSpecsServices[serviceName][ruleName]).toBeDefined(
+      Object.keys(ruleTemplates[interactionId]).forEach(function(ruleName) {
+        if (ruleName !== RULE_TYPE_CLASSIFIER) {
+          expect(rulesServices[serviceName][ruleName]).toBeDefined(
             '. ERROR: ' + ruleName + ' not found in service ' + serviceName);
         }
       });

@@ -20,8 +20,8 @@
 // dependencies should be standard utility services. It should not have any
 // concept of "state in an exploration".
 oppia.directive('multipleChoiceEditor', [
-  'QuestionIdService', 'AnswerGroupObjectFactory',
-  function(QuestionIdService, AnswerGroupObjectFactory) {
+  'QuestionIdService', 'AnswerGroupObjectFactory', 'RuleObjectFactory',
+  function(QuestionIdService, AnswerGroupObjectFactory, RuleObjectFactory) {
     return {
       restrict: 'E',
       scope: {
@@ -81,7 +81,7 @@ oppia.directive('multipleChoiceEditor', [
             if (answerGroups.length === 0) {
               return false;
             } else {
-              return answerGroups[0].ruleSpecs[0].inputs.x === index;
+              return answerGroups[0].rules[0].inputs.x === index;
             }
           };
 
@@ -181,10 +181,10 @@ oppia.directive('multipleChoiceEditor', [
             var oldAnswerGroupsLength = answerGroups.length;
             var newAnswerGroups = [];
             for (var i = 0; i < answerGroups.length; i++) {
-              if (answerGroups[i].ruleSpecs[0].inputs.x < index) {
+              if (answerGroups[i].rules[0].inputs.x < index) {
                 newAnswerGroups.push(answerGroups[i]);
-              } else if (answerGroups[i].ruleSpecs[0].inputs.x > index) {
-                answerGroups[i].ruleSpecs[0].inputs.x--;
+              } else if (answerGroups[i].rules[0].inputs.x > index) {
+                answerGroups[i].rules[0].inputs.x--;
                 newAnswerGroups.push(answerGroups[i]);
               }
             }
@@ -196,7 +196,7 @@ oppia.directive('multipleChoiceEditor', [
             if (newAnswerGroups.length === 0 && oldAnswerGroupsLength > 0) {
               newAnswerGroups = [];
               newAnswerGroups.push(answerGroups[0]);
-              newAnswerGroups[0].ruleSpecs[0].inputs.x = 0;
+              newAnswerGroups[0].rules[0].inputs.x = 0;
             }
 
             $scope.saveAnswerGroups({
@@ -214,12 +214,11 @@ oppia.directive('multipleChoiceEditor', [
               // Note that we do not use the 'correct' field of the answer
               // group in explorations. Instead, 'correctness' is determined by
               // whether the answer group is the first in the list.
-              newAnswerGroups.push(AnswerGroupObjectFactory.createNew([{
-                inputs: {
+              newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
+                RuleObjectFactory.createNew('Equals', {
                   x: index
-                },
-                rule_type: 'Equals'
-              }], {
+                })
+              ], {
                 dest: newStateName,
                 feedback: [''],
                 param_changes: []
@@ -230,11 +229,11 @@ oppia.directive('multipleChoiceEditor', [
               });
             } else {
               newAnswerGroups.push(answerGroups[0]);
-              newAnswerGroups[0].ruleSpecs[0].inputs.x = index;
+              newAnswerGroups[0].rules[0].inputs.x = index;
 
               // If some other answer group has this answer, remove it.
               for (var i = 1; i < answerGroups.length; i++) {
-                if (answerGroups[i].ruleSpecs[0].inputs.x !== index) {
+                if (answerGroups[i].rules[0].inputs.x !== index) {
                   newAnswerGroups.push(answerGroups[i]);
                 }
               }

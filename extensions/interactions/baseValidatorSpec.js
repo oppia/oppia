@@ -25,21 +25,10 @@
  */
 
 describe('Interaction validator', function() {
-  var scope, filter, bivs, WARNING_TYPES;
+  var scope, filter, bivs, WARNING_TYPES, agof;
 
   var currentState, otherState, goodOutcomeDest, goodOutcomeFeedback;
   var badOutcome, goodAnswerGroups, goodDefaultOutcome;
-
-  var createAnswerGroup = function(outcome, ruleSpecs, correct) {
-    if (!ruleSpecs) {
-      ruleSpecs = [];
-    }
-    return {
-      ruleSpecs: ruleSpecs,
-      outcome: outcome,
-      correct: !!correct
-    };
-  };
 
   beforeEach(function() {
     module('oppia');
@@ -50,6 +39,7 @@ describe('Interaction validator', function() {
     filter = $injector.get('$filter');
     bivs = $injector.get('baseInteractionValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
+    agof = $injector.get('AnswerGroupObjectFactory');
 
     currentState = 'First State';
     otherState = 'Second State';
@@ -67,7 +57,8 @@ describe('Interaction validator', function() {
     };
 
     goodAnswerGroups = [
-      createAnswerGroup(goodOutcomeDest), createAnswerGroup(goodOutcomeFeedback)
+      agof.createNew([], goodOutcomeDest, false),
+      agof.createNew([], goodOutcomeFeedback, false)
     ];
     goodDefaultOutcome = goodOutcomeDest;
   }));
@@ -83,9 +74,9 @@ describe('Interaction validator', function() {
     it('should have a warning for an answer group with a confusing outcome',
         function() {
       var answerGroups = [
-        createAnswerGroup(goodOutcomeDest),
-        createAnswerGroup(badOutcome),
-        createAnswerGroup(goodOutcomeFeedback)
+        agof.createNew([], goodOutcomeDest, false),
+        agof.createNew([], badOutcome, false),
+        agof.createNew([], goodOutcomeFeedback, false)
       ];
       var warnings = bivs.getAnswerGroupWarnings(answerGroups, currentState);
       expect(warnings).toEqual([{
@@ -123,9 +114,9 @@ describe('Interaction validator', function() {
     it('should be able to concatenate warnings for both answer groups and ' +
         'the default outcome', function() {
       var badAnswerGroups = [
-        createAnswerGroup(goodOutcomeDest),
-        createAnswerGroup(badOutcome),
-        createAnswerGroup(badOutcome)
+        agof.createNew([], goodOutcomeDest, false),
+        agof.createNew([], badOutcome, false),
+        agof.createNew([], badOutcome, false)
       ];
       var warnings = bivs.getAllOutcomeWarnings(
         badAnswerGroups, badOutcome, currentState);

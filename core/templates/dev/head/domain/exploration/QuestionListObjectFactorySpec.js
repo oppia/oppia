@@ -35,7 +35,7 @@ describe('Question List Object Factory', function() {
     sampleQuestions = [
       QuestionObjectFactory.create(
         'First state',
-        InteractionObjectFactory.create({
+        InteractionObjectFactory.createFromBackendDict({
           answer_groups: [{
             correct: false,
             outcome: {
@@ -67,7 +67,7 @@ describe('Question List Object Factory', function() {
       ),
       QuestionObjectFactory.create(
         'Second state',
-        InteractionObjectFactory.create({
+        InteractionObjectFactory.createFromBackendDict({
           answer_groups: [{
             correct: false,
             outcome: {
@@ -121,7 +121,7 @@ describe('Question List Object Factory', function() {
   it('should add question', function() {
     var newQuestion = QuestionObjectFactory.create(
       'Third state',
-      InteractionObjectFactory.create({
+      InteractionObjectFactory.createFromBackendDict({
         answer_groups: [{
           correct: false,
           outcome: {

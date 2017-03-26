@@ -55,7 +55,7 @@ oppia.factory('StatesToQuestionsService', [
     //     interaction ID of the last state potentially being EndExploration.
     // - Based on the interaction ID of each state:
     //   - Check that the customizationArgs are valid.
-    //   - Check that the ruleSpecs for each answer group are valid.
+    //   - Check that the rules for each answer group are valid.
     // - The confirmedUnclassifiedAnswers array is empty.
     // - The fallbacks array is empty.
     // - For the default outcome, and for each answer group:
@@ -99,7 +99,7 @@ oppia.factory('StatesToQuestionsService', [
           return null;
         }
 
-        // Check that the customizationArgs and the ruleSpecs for each answer
+        // Check that the customizationArgs and the rules for each answer
         // group are valid.
         var checkerService = $injector.get(interactionId + 'CheckerService');
         if (!checkerService.isValid(

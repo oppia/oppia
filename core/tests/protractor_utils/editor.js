@@ -21,7 +21,8 @@ var forms = require('./forms.js');
 var gadgets = require('../../../extensions/gadgets/protractor.js');
 var general = require('./general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
-var rulesJson = require('../../../extensions/interactions/rules.json');
+var ruleTemplates = require(
+  '../../../extensions/interactions/rule_templates.json');
 
 var _NEW_STATE_OPTION = 'A New Card Called...';
 var _CURRENT_STATE_OPTION = '(try again)';
@@ -226,9 +227,18 @@ var customizeInteraction = function(interactionId) {
     interactions.getInteraction(interactionId).customizeInteraction.apply(
       null, customizationArgs);
   }
-  element(by.css('.protractor-test-save-interaction')).click();
-  // Wait for the customization modal to close.
-  general.waitForSystem();
+
+  // The save interaction button doesn't appear for interactions having no
+  // options to customize.
+  var saveInteractionBtn = element(
+    by.css('.protractor-test-save-interaction'));
+  saveInteractionBtn.isPresent().then(function(result) {
+    if (result) {
+      saveInteractionBtn.click();
+      // Wait for the customization modal to close.
+      general.waitForSystem();
+    }
+  });
 };
 
 // Likewise this can receive additional arguments.
@@ -422,9 +432,9 @@ var addExplorationLevelParameterChange = function(paramName, paramValue) {
 
 // RULES
 var _getRuleDescription = function(interactionId, ruleName) {
-  if (rulesJson.hasOwnProperty(interactionId)) {
-    if (rulesJson[interactionId].hasOwnProperty(ruleName)) {
-      return rulesJson[interactionId][ruleName].description;
+  if (ruleTemplates.hasOwnProperty(interactionId)) {
+    if (ruleTemplates[interactionId].hasOwnProperty(ruleName)) {
+      return ruleTemplates[interactionId][ruleName].description;
     } else {
       throw Error('Unknown rule: ' + ruleName);
     }
@@ -1391,6 +1401,7 @@ var acceptSuggestion = function(suggestionDescription) {
       });
 
       matchingSuggestionRows[0].click();
+      general.waitForSystem();
       element(by.css('.protractor-test-view-suggestion-btn')).click();
       element(by.css('.protractor-test-exploration-accept-suggestion-btn')).
         click();
