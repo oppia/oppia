@@ -86,6 +86,10 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
             '%s/%s' % (feconf.COLLECTION_EDITOR_URL_PREFIX,
                        self.COLLECTION_ID))
         self.assertEqual(response.status_int, 200)
+
+        json_response = self.get_json(
+            '%s/%s' % (feconf.COLLECTION_RIGHTS_PREFIX, self.COLLECTION_ID))
+        self.assertTrue(json_response['can_edit'])
         self.logout()
 
     def test_editable_collection_handler_get(self):

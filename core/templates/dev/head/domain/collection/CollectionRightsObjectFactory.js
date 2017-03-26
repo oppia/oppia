@@ -54,7 +54,8 @@ oppia.factory('CollectionRightsObjectFactory', [
       return !this._isPrivate;
     };
 
-    // Sets isPrivate to false only if canEdit in is true.
+    // Sets isPrivate to false only if the user can edit the corresponding
+    // collection.
     CollectionRights.prototype.setPublic = function() {
       if (this.canEdit()) {
         this._isPrivate = false;

@@ -39,7 +39,7 @@ oppia.directive('collectionEditorNavbar', [function() {
         $scope.collectionRights = (
           CollectionEditorStateService.getCollectionRights());
 
-        $scope.isCollectionLoading = (
+        $scope.isLoadingCollection = (
           CollectionEditorStateService.isLoadingCollection);
         $scope.validationIssues = [];
         $scope.isSaveInProgress = (
