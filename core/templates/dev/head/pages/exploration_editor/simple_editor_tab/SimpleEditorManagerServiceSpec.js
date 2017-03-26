@@ -16,13 +16,13 @@
  * @fileoverview Unit tests for the SimpleEditorManagerService.js
  */
 
-describe('Simple Editor Manager Service', function () {
+describe('Simple Editor Manager Service', function() {
   var stubs;
   var data;
   var mockExplorationData = {
     explorationId: 0,
-    autosaveChangeList: function () { },
-    discardDraft: function () { }
+    autosaveChangeList: function() { },
+    discardDraft: function() { }
   };
 
   var simpleEditorManagerService;
@@ -42,15 +42,15 @@ describe('Simple Editor Manager Service', function () {
 
   beforeEach(module('oppia'));
 
-  beforeEach(module(function ($provide) {
+  beforeEach(module(function($provide) {
     $provide.value('explorationData', mockExplorationData);
   }));
 
-  beforeEach(inject(function () {
+  beforeEach(inject(function() {
     GLOBALS.NEW_STATE_TEMPLATE = constants.NEW_STATE_TEMPLATE;
   }));
 
-  beforeEach(inject(function ($injector) {
+  beforeEach(inject(function($injector) {
     simpleEditorManagerService = $injector.get('SimpleEditorManagerService');
     questionObjectFactory = $injector.get('QuestionObjectFactory');
     explorationStatesService = $injector.get('explorationStatesService');
@@ -63,10 +63,10 @@ describe('Simple Editor Manager Service', function () {
     simpleEditorShimService = $injector.get('SimpleEditorShimService');
   }));
 
-  beforeEach(function () {
+  beforeEach(function() {
     stubs = {
       validatorsService: {
-        isValidEntityName: function () { }
+        isValidEntityName: function() { }
       }
     };
 
@@ -230,7 +230,7 @@ describe('Simple Editor Manager Service', function () {
     spyOn(mockExplorationData, 'autosaveChangeList').andReturn(true);
   });
 
-  it('should initialize the local data variables', function () {
+  it('should initialize the local data variables', function() {
     var expectedReturnedValue = simpleEditorManagerService.tryToInit();
     expect(expectedReturnedValue).toBeTruthy();
     expect(simpleEditorManagerService.getTitle()).toBe(data.title);
@@ -243,14 +243,14 @@ describe('Simple Editor Manager Service', function () {
   });
 
   it('should return false if initializing the question list fails',
-    function () {
+    function() {
       var expectedReturnedValue = simpleEditorManagerService.tryToInit();
       spyOn(statesToQuestionsService, 'getQuestions').andReturn(null);
       expectedReturnedValue = simpleEditorManagerService.tryToInit();
       expect(expectedReturnedValue).toBeFalsy();
     });
 
-  it('should return data representing the exploration', function () {
+  it('should return data representing the exploration', function() {
     var expectedSimpleEditorManagerData = {
       title: data.title,
       introductionHtml: data.states.Introduction.content[0].value,
@@ -262,34 +262,34 @@ describe('Simple Editor Manager Service', function () {
       .toEqual(expectedSimpleEditorManagerData);
   });
 
-  it('should return title', function () {
+  it('should return title', function() {
     var expectedTitle = data.title;
     simpleEditorManagerService.tryToInit();
     expect(simpleEditorManagerService.getTitle()).toEqual(expectedTitle);
   });
 
-  it('should return introduction html', function () {
+  it('should return introduction html', function() {
     var expectedIntroductionHtml = data.states.Introduction.content[0].value;
     simpleEditorManagerService.tryToInit();
     expect(simpleEditorManagerService.getIntroductionHtml())
       .toEqual(expectedIntroductionHtml);
   });
 
-  it('should return question list', function () {
+  it('should return question list', function() {
     var expectedSimpleEditorManagerQuestionList = questionList;
     simpleEditorManagerService.tryToInit();
     expect(simpleEditorManagerService.getQuestionList())
       .toEqual(expectedSimpleEditorManagerQuestionList);
   });
 
-  it('should save the given new title', function () {
+  it('should save the given new title', function() {
     var expectedNewTitle = 'ExpNewTitle';
     simpleEditorManagerService.saveTitle(expectedNewTitle);
     expect(explorationTitleService.savedMemento).toEqual(expectedNewTitle);
     expect(simpleEditorManagerService.getTitle()).toEqual(expectedNewTitle);
   });
 
-  it('should save the given new introduction html', function () {
+  it('should save the given new introduction html', function() {
     var expectedNewIntroductionHtml = '<p> new intro </p>';
     simpleEditorManagerService
       .saveIntroductionHtml(expectedNewIntroductionHtml);
@@ -299,7 +299,7 @@ describe('Simple Editor Manager Service', function () {
       .toEqual(expectedNewIntroductionHtml);
   });
 
-  it('should save the customization args', function () {
+  it('should save the customization args', function() {
     var testStateName = 'Introduction';
     var expectedNewCustomizationArgs = {
       choices: {
@@ -333,7 +333,7 @@ describe('Simple Editor Manager Service', function () {
         .interaction.answer_groups).toContain(expectedNewAnswerGroups);
     });
 */
-  it('should save the default outcome', function () {
+  it('should save the default outcome', function() {
     var testStateName = 'Introduction';
     var expectedNewDefaultOutcome = {
       dest: 'Introduction',
@@ -348,7 +348,7 @@ describe('Simple Editor Manager Service', function () {
       .interaction.default_outcome).toEqual(expectedNewDefaultOutcome);
   });
 
-  it('should save the bridge html', function () {
+  it('should save the bridge html', function() {
     var testStateName = 'Introduction';
     var expectedNewBridgeHtml = '<p> lets move to next Qsn </p>';
     var expectedSimpleEditorManagerQuestionList = questionList;
@@ -361,7 +361,7 @@ describe('Simple Editor Manager Service', function () {
     expect(nextState.content[0].value).toEqual(expectedNewBridgeHtml);
   });
 
-  it('should add new question', function () {
+  it('should add new question', function() {
     var expectedInteraction = DEFAULT_INTERACTION;
     var expectedLastStateName = lastStateName;
     var expectedDefaultOutcome = {
@@ -379,12 +379,12 @@ describe('Simple Editor Manager Service', function () {
     var expectedQuestion = questionObjectFactory.create(
       expectedLastStateName, state.interaction, '');
     expect(simpleEditorManagerService.getQuestionList()._questions
-      .some(function (question) {
+      .some(function(question) {
         return JSON.stringify(question) === JSON.stringify(expectedQuestion);
       })).toBe(true);
   });
 
-  it('should add new state', function () {
+  it('should add new state', function() {
     simpleEditorManagerService.tryToInit();
     var newStateName = simpleEditorManagerService.addState();
     var newState = explorationStatesService.getState(newStateName);
