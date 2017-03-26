@@ -203,11 +203,11 @@ oppia.factory('trainingModalService', ['$rootScope', '$modal', 'alertsService',
 // answers which do not have certain classification and are not currently used
 // as part of any classifier training models.
 oppia.factory('trainingDataService', [
-  '$rootScope', '$http', 'responsesService', 'CLASSIFIER_RULESPEC_STR',
-  'DEFAULT_CLASSIFIER_RULE_SPEC',
+  '$rootScope', '$http', 'responsesService', 'RULE_TYPE_CLASSIFIER',
+  'RuleObjectFactory',
   function(
-      $rootScope, $http, responsesService, CLASSIFIER_RULESPEC_STR,
-      DEFAULT_CLASSIFIER_RULE_SPEC) {
+      $rootScope, $http, responsesService, RULE_TYPE_CLASSIFIER,
+      RuleObjectFactory) {
     var _trainingDataAnswers = [];
     var _trainingDataCounts = [];
 
@@ -247,24 +247,24 @@ oppia.factory('trainingDataService', [
       // Remove the answer from all answer groups.
       for (var i = 0; i < answerGroups.length; i++) {
         var answerGroup = answerGroups[i];
-        var ruleSpecs = answerGroup.ruleSpecs;
+        var rules = answerGroup.rules;
         var trainingData = null;
         var classifierIndex = -1;
-        for (var j = 0; j < ruleSpecs.length; j++) {
-          var ruleSpec = ruleSpecs[j];
-          if (ruleSpec.rule_type === CLASSIFIER_RULESPEC_STR) {
-            trainingData = ruleSpec.inputs.training_data;
+        for (var j = 0; j < rules.length; j++) {
+          var rule = rules[j];
+          if (rule.type === RULE_TYPE_CLASSIFIER) {
+            trainingData = rule.inputs.training_data;
             classifierIndex = j;
             break;
           }
         }
         if (trainingData &&
             _removeAnswerFromTrainingData(answer, trainingData) !== -1) {
-          if (trainingData.length === 0 && ruleSpecs.length > 1) {
+          if (trainingData.length === 0 && rules.length > 1) {
             // If the last of the training data for a classifier has been
             // removed and the classifier is not the only rule in the group,
             // remove the rule since it is no longer doing anything.
-            ruleSpecs.splice(classifierIndex, 1);
+            rules.splice(classifierIndex, 1);
           }
           updatedAnswerGroups = true;
         }
@@ -336,21 +336,20 @@ oppia.factory('trainingDataService', [
         _removeAnswer(answer);
 
         var answerGroup = responsesService.getAnswerGroup(answerGroupIndex);
-        var rules = answerGroup.ruleSpecs;
+        var rules = answerGroup.rules;
 
         // Ensure the answer group has a classifier rule.
         var classifierRule = null;
         for (var i = 0; i < rules.length; i++) {
           var rule = rules[i];
-          if (rule.rule_type === CLASSIFIER_RULESPEC_STR) {
+          if (rule.type === RULE_TYPE_CLASSIFIER) {
             classifierRule = rule;
             break;
           }
         }
         if (!classifierRule) {
-          // Create new classifier rule for classification. All classifiers
-          // should match this schema.
-          classifierRule = angular.copy(DEFAULT_CLASSIFIER_RULE_SPEC);
+          // Create new classifier rule for classification.
+          classifierRule = RuleObjectFactory.createNewClassifierRule();
           rules.push(classifierRule);
         }
 

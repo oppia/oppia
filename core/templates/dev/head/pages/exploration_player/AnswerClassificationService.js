@@ -18,9 +18,9 @@
 
 oppia.factory('AnswerClassificationService', [
   '$http', '$q', 'LearnerParamsService', 'alertsService', 'INTERACTION_SPECS',
-  'ENABLE_STRING_CLASSIFIER', 'CLASSIFIER_RULESPEC_STR',
+  'ENABLE_STRING_CLASSIFIER', 'RULE_TYPE_CLASSIFIER',
   function($http, $q, LearnerParamsService, alertsService, INTERACTION_SPECS,
-      ENABLE_STRING_CLASSIFIER, CLASSIFIER_RULESPEC_STR) {
+      ENABLE_STRING_CLASSIFIER, RULE_TYPE_CLASSIFIER) {
     /**
      * Finds the first answer group with a rule that returns true.
      *
@@ -36,7 +36,7 @@ oppia.factory('AnswerClassificationService', [
      * <ul>
      *   <li> **outcome**: the outcome of the answer group
      *   <li> **answerGroupIndex**: the index of the matched answer group
-     *   <li> **ruleSpecIndex**: the index of the rule in the matched answer
+     *   <li> **ruleIndex**: the index of the rule in the matched answer
      *     group.
      * </ul>
      */
@@ -44,15 +44,15 @@ oppia.factory('AnswerClassificationService', [
         answer, answerGroups, defaultOutcome, interactionRulesService) {
       // Find the first group that contains a rule which returns true
       for (var i = 0; i < answerGroups.length; i++) {
-        for (var j = 0; j < answerGroups[i].ruleSpecs.length; j++) {
-          var ruleSpec = answerGroups[i].ruleSpecs[j];
-          if (ruleSpec.rule_type !== CLASSIFIER_RULESPEC_STR &&
-              interactionRulesService[ruleSpec.rule_type](
-                answer, ruleSpec.inputs)) {
+        for (var j = 0; j < answerGroups[i].rules.length; j++) {
+          var rule = answerGroups[i].rules[j];
+          if (rule.type !== RULE_TYPE_CLASSIFIER &&
+              interactionRulesService[rule.type](
+                answer, rule.inputs)) {
             return {
               outcome: answerGroups[i].outcome,
               answerGroupIndex: i,
-              ruleSpecIndex: j
+              ruleIndex: j
             };
           }
         }
@@ -64,7 +64,7 @@ oppia.factory('AnswerClassificationService', [
         return {
           outcome: defaultOutcome,
           answerGroupIndex: answerGroups.length,
-          ruleSpecIndex: 0
+          ruleIndex: 0
         };
       } else {
         alertsService.addWarning('Something went wrong with the exploration.');
@@ -89,7 +89,7 @@ oppia.factory('AnswerClassificationService', [
        * <ul>
        *   <li> **outcome**: the outcome of the answer group
        *   <li> **answerGroupIndex**: the index of the matched answer group
-       *   <li> **ruleSpecIndex**: the index of the rule in the matched answer
+       *   <li> **ruleIndex**: the index of the rule in the matched answer
        *            group
        * </ul>
        */
@@ -129,7 +129,7 @@ oppia.factory('AnswerClassificationService', [
             var result = response.data;
             deferred.resolve({
               outcome: result.outcome,
-              ruleSpecIndex: result.rule_spec_index,
+              ruleIndex: result.rule_spec_index,
               answerGroupIndex: result.answer_group_index
             });
           });

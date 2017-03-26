@@ -290,7 +290,7 @@ oppia.factory('oppiaPlayerService', [
               LearnerParamsService.getAllParams(),
               answer,
               classificationResult.answerGroupIndex,
-              classificationResult.ruleSpecIndex);
+              classificationResult.ruleIndex);
           }
 
           // Use angular.copy() to clone the object

@@ -67,7 +67,7 @@ VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
     'extensions', 'interactions', 'object_defaults.json')
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
-    os.getcwd(), 'extensions', 'interactions', 'rules.json')
+    os.getcwd(), 'extensions', 'interactions', 'rule_templates.json')
 
 # A mapping of interaction ids to their default classifier.
 INTERACTION_CLASSIFIER_MAPPING = {
