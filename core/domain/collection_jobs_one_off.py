@@ -60,7 +60,7 @@ class CollectionMigrationJob(jobs.BaseMapReduceJobManager):
             logging.error(
                 'Collection %s failed validation: %s' % (item.id, e))
             yield (CollectionMigrationJob._ERROR_KEY,
-                   'Collection %s failed validation: %s' % (item.id, e))
+                   'Collection failed validation.')
             return
 
         # Write the new collection into the datastore if it's different from

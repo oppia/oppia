@@ -398,7 +398,7 @@ class Collection(object):
         Note that the versioned_collection_contents being passed in is modified
         in-place.
         """
-        if (versioned_collection_contents['schema_version'] >
+        if (versioned_collection_contents['schema_version'] + 1 >
                 feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
             raise Exception('Collection is version %d but current collection'
                             ' schema version is %d' % (
