@@ -22,8 +22,10 @@ oppia.directive('sharingLinks', [function() {
     scope: {
       layoutType: '@',
       layoutAlignType: '@',
+      shareType: '@',
       getTwitterText: '&twitterText',
-      getExplorationId: '&explorationId'
+      getExplorationId: '&explorationId',
+      getCollectionId: '&collectionId'
     },
     templateUrl: 'components/sharingLinks',
     controller: [
@@ -32,14 +34,32 @@ oppia.directive('sharingLinks', [function() {
       function(
           $scope, $window, oppiaHtmlEscaper, ExplorationEmbedButtonService,
           siteAnalyticsService, UrlInterpolationService) {
-        $scope.explorationId = $scope.getExplorationId();
+        $scope.registerShareEvent = null;
 
-        $scope.registerShareExplorationEvent = function(network) {
-          siteAnalyticsService.registerShareExplorationEvent(network);
-        };
+        if ($scope.shareType === 'exploration') {
+          $scope.explorationId = $scope.getExplorationId();
 
-        $scope.showEmbedExplorationModal = (
-          ExplorationEmbedButtonService.showModal);
+          $scope.activityType = 'explore';
+          $scope.activityId = $scope.explorationId;
+
+          $scope.registerShareEvent = (
+            siteAnalyticsService.registerShareExplorationEvent);
+
+          $scope.showEmbedExplorationModal = (
+            ExplorationEmbedButtonService.showModal);
+        } else if ($scope.shareType === 'collection') {
+          $scope.collectionId = $scope.getCollectionId();
+
+          $scope.activityType = 'collection';
+          $scope.activityId = $scope.collectionId;
+
+          $scope.registerShareEvent = (
+            siteAnalyticsService.registerShareCollectionEvent);
+        } else {
+          throw Error(
+            'SharingLinks directive can only be used either in the' +
+            'collection player or the exploration player');
+        }
 
         $scope.serverName = (
           $window.location.protocol + '//' + $window.location.host);

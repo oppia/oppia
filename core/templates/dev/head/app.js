@@ -39,18 +39,12 @@ oppia.constant(
 // We use a slash because this character is forbidden in a state name.
 oppia.constant('PLACEHOLDER_OUTCOME_DEST', '/');
 oppia.constant('INTERACTION_DISPLAY_MODE_INLINE', 'inline');
-oppia.constant('DEFAULT_RULE_NAME', 'Default');
-oppia.constant('CLASSIFIER_RULESPEC_STR', 'FuzzyMatches');
+oppia.constant('RULE_TYPE_CLASSIFIER', 'FuzzyMatches');
 oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');
 // Feature still in development.
 // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
 oppia.constant('ENABLE_STRING_CLASSIFIER', false);
-oppia.constant('DEFAULT_CLASSIFIER_RULE_SPEC', {
-  rule_type: 'FuzzyMatches',
-  inputs: {
-    training_data: []
-  }
-});
+
 oppia.constant('PARAMETER_TYPES', {
   REAL: 'Real',
   UNICODE_STRING: 'UnicodeString'
@@ -541,6 +535,10 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
       _sendSocialEventToGoogleAnalytics(
         network, 'share', $window.location.pathname);
     },
+    registerShareCollectionEvent: function(network) {
+      _sendSocialEventToGoogleAnalytics(
+        network, 'share', $window.location.pathname);
+    },
     registerOpenEmbedInfoEvent: function(explorationId) {
       _sendEventToGoogleAnalytics('EmbedInfoModal', 'open', explorationId);
     },
@@ -632,6 +630,14 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
     registerVisitOppiaFromIframeEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
         'VisitOppiaFromIframe', 'click', explorationId);
+    },
+    registerNewCard: function(cardNum) {
+      if (cardNum <= 10 || cardNum % 10 === 0) {
+        _sendEventToGoogleAnalytics('PlayerNewCard', 'click', cardNum);
+      }
+    },
+    registerFinishExploration: function() {
+      _sendEventToGoogleAnalytics('PlayerFinishExploration', 'click', '');
     }
   };
 }]);
