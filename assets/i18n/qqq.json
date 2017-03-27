@@ -20,7 +20,7 @@
 	"I18N_DASHBOARD_EXPLORATIONS_SORT_BY": "Text shown next to the drop down list for sorting explorations - This text is a label for the drop down input field for sorting explorations.",
 	"I18N_DASHBOARD_EXPLORATIONS_SORT_BY_AVERAGE_RATING" : "Option in drop down list for sorting explorations - This is an option for sorting explorations by Average Rating", 
 	"I18N_DASHBOARD_EXPLORATIONS_SORT_BY_LAST_UPDATED": "Option in drop down list for sorting explorations - This is an option for sorting explorations by Last Updated",
-	"I18N_DASHBOARD_EXPLORATIONS_SORT_BY_OPENF_EEDBACK": "Option in drop down list for sorting explorations - This is an option for sorting explorations by the number of Open Feedback threads.",
+	"I18N_DASHBOARD_EXPLORATIONS_SORT_BY_OPEN_FEEDBACK": "Option in drop down list for sorting explorations - This is an option for sorting explorations by the number of Open Feedback threads.",
 	"I18N_DASHBOARD_EXPLORATIONS_SORT_BY_TITLE": "Option in drop down list for sorting explorations - This is an option for sorting explorations by Title.",
 	"I18N_DASHBOARD_EXPLORATIONS_SORT_BY_TOTAL_PLAYS": "Option in drop down list for sorting explorations - This is an option for sorting explorations by total number of plays.",
 	"I18N_DASHBOARD_EXPLORATIONS_SORT_BY_UNRESOLVED_ANSWERS" :"Option in drop down list for sorting explorations - This is an option for sorting explorations by total number of Unresolved Answers.",
