@@ -22,8 +22,8 @@
 oppia.directive('multipleChoiceEditor', [
   'QuestionIdService', 'AnswerGroupObjectFactory', 'RuleObjectFactory',
   'StatusObjectFactory',
-  function(
-    QuestionIdService, AnswerGroupObjectFactory, RuleObjectFactory, StatusObjectFactory) {
+  function(QuestionIdService, AnswerGroupObjectFactory, RuleObjectFactory,
+   StatusObjectFactory) {
     return {
       restrict: 'E',
       scope: {
