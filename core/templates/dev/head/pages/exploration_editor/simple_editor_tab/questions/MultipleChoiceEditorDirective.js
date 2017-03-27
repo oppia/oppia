@@ -20,8 +20,10 @@
 // dependencies should be standard utility services. It should not have any
 // concept of "state in an exploration".
 oppia.directive('multipleChoiceEditor', [
-  'QuestionIdService', 'AnswerGroupObjectFactory', 'RuleObjectFactory', 'StatusObjectFactory',
-  function(QuestionIdService, AnswerGroupObjectFactory, RuleObjectFactory, StatusObjectFactory) {
+  'QuestionIdService', 'AnswerGroupObjectFactory', 'RuleObjectFactory',
+  'StatusObjectFactory',
+  function(
+    QuestionIdService, AnswerGroupObjectFactory, RuleObjectFactory, StatusObjectFactory) {
     return {
       restrict: 'E',
       scope: {
