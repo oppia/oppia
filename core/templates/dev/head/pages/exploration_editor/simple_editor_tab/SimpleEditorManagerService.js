@@ -61,7 +61,9 @@ oppia.factory('SimpleEditorManagerService', [
     var END_EXPLORATION_INTERACTION = {
       ID: 'EndExploration',
       CUSTOMIZATION_ARGS: {
-        recommendedExplorationIds: []
+        recommendedExplorationIds: {
+          value: []
+        }
       }
     };
     //console.log(data);

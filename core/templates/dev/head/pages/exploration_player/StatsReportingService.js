@@ -29,15 +29,17 @@ oppia.constant('STATS_REPORTING_URLS', {
 
 oppia.factory('StatsReportingService', [
   '$http', 'StopwatchObjectFactory', 'messengerService',
-  'UrlInterpolationService', 'STATS_REPORTING_URLS',
+  'UrlInterpolationService', 'STATS_REPORTING_URLS', 'siteAnalyticsService',
   function(
       $http, StopwatchObjectFactory, messengerService,
-      UrlInterpolationService, STATS_REPORTING_URLS) {
+      UrlInterpolationService, STATS_REPORTING_URLS, siteAnalyticsService) {
     var explorationId = null;
     var explorationVersion = null;
     var sessionId = null;
     var stopwatch = null;
     var optionalCollectionId = undefined;
+    var statesVisited = {};
+    var numStatesVisited = 0;
 
     var getFullStatsUrl = function(urlIdentifier) {
       return UrlInterpolationService.interpolateUrl(
@@ -77,6 +79,10 @@ oppia.factory('StatsReportingService', [
           explorationVersion: explorationVersion
         });
 
+        statesVisited[stateName] = true;
+        numStatesVisited = 1;
+        siteAnalyticsService.registerNewCard(1);
+
         stopwatch.reset();
       },
       // Note that this also resets the stopwatch.
@@ -100,6 +106,12 @@ oppia.factory('StatsReportingService', [
           paramValues: oldParams
         });
 
+        if (!statesVisited.hasOwnProperty(newStateName)) {
+          statesVisited[newStateName] = true;
+          numStatesVisited++;
+          siteAnalyticsService.registerNewCard(numStatesVisited);
+        }
+
         stopwatch.reset();
       },
       recordExplorationCompleted: function(stateName, params) {
@@ -116,16 +128,18 @@ oppia.factory('StatsReportingService', [
           explorationVersion: explorationVersion,
           paramValues: params
         });
+
+        siteAnalyticsService.registerFinishExploration();
       },
       recordAnswerSubmitted: function(
-          stateName, params, answer, answerGroupIndex, ruleSpecIndex) {
+          stateName, params, answer, answerGroupIndex, ruleIndex) {
         $http.post(getFullStatsUrl('ANSWER_SUBMITTED'), {
           answer: answer,
           params: params,
           version: explorationVersion,
           old_state_name: stateName,
           answer_group_index: answerGroupIndex,
-          rule_spec_index: ruleSpecIndex
+          rule_spec_index: ruleIndex
         });
       },
       recordMaybeLeaveEvent: function(stateName, params) {

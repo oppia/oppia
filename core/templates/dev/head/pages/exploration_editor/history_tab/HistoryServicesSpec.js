@@ -210,7 +210,8 @@ describe('Compare versions service', function() {
             value: statesDetails[stateName].contentStr
           }],
           interaction: {
-            answer_groups: []
+            answer_groups: [],
+            fallbacks: []
           }
         };
         newStateData.interaction.answer_groups =
@@ -218,7 +219,9 @@ describe('Compare versions service', function() {
             return {
               outcome: {
                 dest: ruleDestName
-              }
+              },
+              rule_specs: [],
+              correct: false
             };
           });
         statesData.states[stateName] = newStateData;

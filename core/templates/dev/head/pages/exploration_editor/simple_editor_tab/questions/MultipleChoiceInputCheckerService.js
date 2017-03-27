@@ -26,23 +26,22 @@ oppia.factory('MultipleChoiceInputCheckerService', [function() {
     // imposed by the UI of the simple editor.
     isValid: function(customizationArgs, answerGroups) {
       // Invariants to check:
-      // - Each answer group has exactly one ruleSpec, and that ruleSpec is
-      //   for an "Equals" rule. The argument for each of these rules matches a
-      //   choice in customizationArgs.
+      // - Each answer group has exactly one rule (for an "Equals" rule). The
+      //   argument for each of these rules should match a choice in
+      //   customizationArgs.
       // - Each answer group corresponds to a different choice.
       var numChoices = customizationArgs.choices.value.length;
       var coveredChoices = [];
       for (var i = 0; i < answerGroups.length; i++) {
-        var ruleSpecs = answerGroups[i].ruleSpecs;
-        if (ruleSpecs.length !== 1 ||
-            ruleSpecs[0].rule_type !== 'Equals' ||
-            ruleSpecs[0].inputs.x >= numChoices) {
+        var rules = answerGroups[i].rules;
+        if (rules.length !== 1 ||
+            rules[0].type !== 'Equals' || rules[0].inputs.x >= numChoices) {
           return false;
         }
-        if (coveredChoices.indexOf(ruleSpecs[0].inputs.x) !== -1) {
+        if (coveredChoices.indexOf(rules[0].inputs.x) !== -1) {
           return false;
         }
-        coveredChoices.push(ruleSpecs[0].inputs.x);
+        coveredChoices.push(rules[0].inputs.x);
       }
       return true;
     }

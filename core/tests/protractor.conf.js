@@ -93,7 +93,8 @@ exports.config = {
       'protractor/libraryPagesTour.js',
       'protractor/collections.js',
       'protractor/explorationFeedback.js',
-      'protractor/subscriptions.js'
+      'protractor/subscriptions.js',
+      'protractor/suggestions.js'
     ],
 
     i18n: [
