@@ -214,6 +214,8 @@
 	"I18N_PREFERENCES_CHANGE_PICTURE": "প্রোফাইল চিত্র পরিবর্তন করুন",
 	"I18N_PREFERENCES_EMAIL": "ইমেইল",
 	"I18N_PREFERENCES_EMAIL_EXPLAIN": "শুধু নিয়ন্ত্রণকারী এবং সাইট প্রশাসকগণ এটি দেখতে পারেন।",
+	"I18N_PREFERENCES_EMAIL_RECEIVE_EDIT_RIGHTS_NEWS": "ইমেইল পান যখন কেউ আপনাকে একটি অন্বেষণ সম্পাদনা করার অধিকার দেয়",
+	"I18N_PREFERENCES_EMAIL_RECEIVE_FEEDBACK_NEWS": "ইমেইল পান যখন কেউ একটি অন্বেষণে আপনাকে প্রতিক্রিয়া পাঠায়",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_NEWS": "সাইটটি সম্পর্কে সংবাদ ও হালনাগাদ গ্রহণ করুন",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_SUBSCRIPTION_NEWS": "ইমেইল গ্রহণ করুন যখন আপনার সদস্যতা নেয়া একজন একটি অন্বেষণ প্রকাশ করেন",
 	"I18N_PREFERENCES_HEADING": "পছন্দসমূহ",

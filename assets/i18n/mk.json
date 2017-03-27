@@ -215,6 +215,8 @@
 	"I18N_PREFERENCES_CHANGE_PICTURE": "Смени профилна слика",
 	"I18N_PREFERENCES_EMAIL": "Е-пошта",
 	"I18N_PREFERENCES_EMAIL_EXPLAIN": "Ова е видливо само за модераторите и администраторите на Опија.",
+	"I18N_PREFERENCES_EMAIL_RECEIVE_EDIT_RIGHTS_NEWS": "Известувај ме по е-пошта кога некој ќе ми додели право да уредувам истражување",
+	"I18N_PREFERENCES_EMAIL_RECEIVE_FEEDBACK_NEWS": "Известувај ме по е-пошта кога некој ќе ми даде мислење за истражување",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_NEWS": "Добивајте новости за Опија",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_SUBSCRIPTION_NEWS": "Примајте е-пошта кога создавач на кој сте претплатени ќе објави ново истражување",
 	"I18N_PREFERENCES_HEADING": "Поставки",
