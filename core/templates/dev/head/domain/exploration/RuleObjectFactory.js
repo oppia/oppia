@@ -13,28 +13,36 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of Fallback
+ * @fileoverview Factory for creating new frontend instances of Rule
  * domain objects.
  */
 
-oppia.factory('FallbackObjectFactory', [function() {
-  var Fallback = function(trigger, outcome) {
-    this.trigger = trigger;
-    this.outcome = outcome;
+oppia.factory('RuleObjectFactory', [function() {
+  var Rule = function(type, inputs) {
+    this.type = type;
+    this.inputs = inputs;
   };
 
-  Fallback.prototype.toBackendDict = function() {
+  Rule.prototype.toBackendDict = function() {
     return {
-      trigger: this.trigger,
-      outcome: this.outcome
+      rule_type: this.type,
+      inputs: this.inputs
     };
   };
 
-  Fallback.createFromBackendDict = function(fallbackBackendDict) {
-    return new Fallback(
-      fallbackBackendDict.trigger,
-      fallbackBackendDict.outcome);
+  Rule.createNew = function(type, inputs) {
+    return new Rule(type, inputs);
   };
 
-  return Fallback;
+  Rule.createFromBackendDict = function(ruleDict) {
+    return new Rule(ruleDict.rule_type, ruleDict.inputs);
+  };
+
+  Rule.createNewClassifierRule = function() {
+    return new Rule('FuzzyMatches', {
+      training_data: []
+    });
+  };
+
+  return Rule;
 }]);

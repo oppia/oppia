@@ -1815,12 +1815,12 @@ oppia.factory('explorationWarningsService', [
   '$filter', 'graphDataService', 'explorationStatesService',
   'expressionInterpolationService', 'explorationParamChangesService',
   'parameterMetadataService', 'INTERACTION_SPECS', 'WARNING_TYPES',
-  'STATE_ERROR_MESSAGES', 'CLASSIFIER_RULESPEC_STR',
+  'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
   function(
       $filter, graphDataService, explorationStatesService,
       expressionInterpolationService, explorationParamChangesService,
       parameterMetadataService, INTERACTION_SPECS, WARNING_TYPES,
-      STATE_ERROR_MESSAGES, CLASSIFIER_RULESPEC_STR) {
+      STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
     var _warningsList = [];
     var stateWarnings = {};
     var hasCriticalStateWarning = false;
@@ -1931,9 +1931,9 @@ oppia.factory('explorationWarningsService', [
       var answerGroups = state.interaction.answerGroups;
       for (var i = 0; i < answerGroups.length; i++) {
         var group = answerGroups[i];
-        if (group.ruleSpecs.length === 1 &&
-            group.ruleSpecs[0].rule_type === CLASSIFIER_RULESPEC_STR &&
-            group.ruleSpecs[0].inputs.training_data.length === 0) {
+        if (group.rules.length === 1 &&
+            group.rules[0].type === RULE_TYPE_CLASSIFIER &&
+            group.rules[0].inputs.training_data.length === 0) {
           indexes.push(i);
         }
       }
@@ -2102,13 +2102,13 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
 
   var makeRulesListHumanReadable = function(answerGroupValue) {
     var rulesList = [];
-    answerGroupValue.ruleSpecs.forEach(function(ruleSpec) {
+    answerGroupValue.rules.forEach(function(rule) {
       var ruleElm = angular.element('<li></li>');
-      ruleElm.html('<p>Type: ' + ruleSpec.rule_type + '</p>');
+      ruleElm.html('<p>Type: ' + rule.type + '</p>');
       ruleElm.append(
         '<p>Value: ' + (
-          Object.keys(ruleSpec.inputs).map(function(input) {
-            return ruleSpec.inputs[input];
+          Object.keys(rule.inputs).map(function(input) {
+            return rule.inputs[input];
           })
         ).toString() + '</p>');
       rulesList.push(ruleElm);
@@ -2274,7 +2274,7 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
                       '<div class="feedback">' + newValue.outcome.feedback +
                       '</div></div>');
                 }
-                if (!angular.equals(newValue.ruleSpecs, oldValue.ruleSpecs)) {
+                if (!angular.equals(newValue.rules, oldValue.rules)) {
                   var rulesList = makeRulesListHumanReadable(newValue);
                   if (rulesList.length > 0) {
                     answerGroupHtml += '<p class="sub-edit"><i>Rules: </i></p>';

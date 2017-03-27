@@ -627,7 +627,7 @@ textarea {
   color: #fff;
   font-size: 13px;
   line-height: 20px;
-  position: absolute;
+  position: relative;
   width: 100%;
 }
 
@@ -690,8 +690,8 @@ textarea {
   }
 }
 @media (max-width: 440px) {
-  .oppia-footer-padding-below-banner{
-    height: 250px;
+  .oppia-footer-padding-below-banner {
+    height: 270px;
   }
 }
 /*
@@ -4193,7 +4193,6 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-about-extra-container {
-  margin-bottom: 20px;
   position: relative;
   top: 50px;
   width: 100%;
@@ -4206,7 +4205,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 @media(max-width: 440px) {
   .oppia-about-extra-container {
-    margin-bottom: 40px;
+    margin-bottom: 30px;
   }
 }
 
@@ -4456,7 +4455,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-donation-card-content-wide {
-  margin: 0 auto;
+  margin: 40px auto 80px;
   min-height: 670px;
   overflow: auto;
 }
@@ -4511,7 +4510,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 @media only screen and (max-width: 1140px) {
   .oppia-donation-card-content-wide {
-    margin-bottom: 30px;
+    margin-bottom: 90px;
   }
   .oppia-donate-info {
     display: none;

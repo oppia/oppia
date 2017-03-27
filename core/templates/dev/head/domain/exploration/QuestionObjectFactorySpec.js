@@ -31,7 +31,7 @@ describe('Question object factory', function() {
 
     sampleQuestion = QuestionObjectFactory.create(
       'First state',
-      InteractionObjectFactory.create({
+      InteractionObjectFactory.createFromBackendDict({
         answer_groups: [{
           correct: false,
           outcome: {

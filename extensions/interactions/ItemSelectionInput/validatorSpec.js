@@ -47,8 +47,8 @@ describe('oppiaInteractiveItemSelectionInputValidator', function() {
       }
     };
     goodAnswerGroups = [{
-      ruleSpecs: [{
-        rule_type: 'Equals',
+      rules: [{
+        type: 'Equals',
         inputs: {
           x: ['Selection 1', 'Selection 2']
         }

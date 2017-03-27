@@ -92,8 +92,6 @@ class BaseHandlerTest(test_utils.GenericTestBase):
 
             # Some of these will 404 or 302. This is expected.
             response = self.testapp.get(url, expect_errors=True)
-            self.log_line(
-                'Fetched %s with status code %s' % (url, response.status_int))
             self.assertIn(response.status_int, [200, 302, 401, 404])
 
         # TODO(sll): Add similar tests for POST, PUT, DELETE.
@@ -339,6 +337,10 @@ class I18nDictsTest(test_utils.GenericTestBase):
         master_key_list = self._extract_keys_from_json_file('en.json')
         self.assertGreater(len(master_key_list), 0)
 
+        supported_language_filenames = [
+            ('%s.json' % language_details['id'])
+            for language_details in feconf.SUPPORTED_SITE_LANGUAGES]
+
         filenames = os.listdir(
             os.path.join(os.getcwd(), self.get_static_asset_filepath(),
                          'assets', 'i18n'))
@@ -346,18 +348,16 @@ class I18nDictsTest(test_utils.GenericTestBase):
             if filename == 'en.json':
                 continue
 
-            self.log_line('Processing %s...' % filename)
-
             key_list = self._extract_keys_from_json_file(filename)
             # All other JSON files should have a subset of the keys in en.json.
             self.assertEqual(len(set(key_list) - set(master_key_list)), 0)
 
-            # If there are missing keys, log an error, but don't fail the
-            # tests.
-            if set(key_list) != set(master_key_list):
-                self.log_line('')
+            # If there are missing keys in supported site languages, log an
+            # error, but don't fail the tests.
+            if (filename in supported_language_filenames and
+                    set(key_list) != set(master_key_list)):
                 untranslated_keys = list(set(master_key_list) - set(key_list))
-                self.log_line('ERROR: Untranslated keys in %s:' % filename)
+                self.log_line('Untranslated keys in %s:' % filename)
                 for key in untranslated_keys:
                     self.log_line('- %s' % key)
                 self.log_line('')

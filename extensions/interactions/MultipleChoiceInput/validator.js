@@ -57,13 +57,13 @@ oppia.filter('oppiaInteractiveMultipleChoiceInputValidator', [
 
     var selectedEqualsChoices = [];
     for (var i = 0; i < answerGroups.length; i++) {
-      var ruleSpecs = answerGroups[i].ruleSpecs;
-      for (var j = 0; j < ruleSpecs.length; j++) {
-        if (ruleSpecs[j].rule_type === 'Equals') {
+      var rules = answerGroups[i].rules;
+      for (var j = 0; j < rules.length; j++) {
+        if (rules[j].type === 'Equals') {
           var choicePreviouslySelected = (
-            selectedEqualsChoices.indexOf(ruleSpecs[j].inputs.x) !== -1);
+            selectedEqualsChoices.indexOf(rules[j].inputs.x) !== -1);
           if (!choicePreviouslySelected) {
-            selectedEqualsChoices.push(ruleSpecs[j].inputs.x);
+            selectedEqualsChoices.push(rules[j].inputs.x);
           } else {
             warningsList.push({
               type: WARNING_TYPES.CRITICAL,
@@ -72,7 +72,7 @@ oppia.filter('oppiaInteractiveMultipleChoiceInputValidator', [
                 'option as another rule.'
             });
           }
-          if (ruleSpecs[j].inputs.x >= numChoices) {
+          if (rules[j].inputs.x >= numChoices) {
             warningsList.push({
               type: WARNING_TYPES.CRITICAL,
               message: 'Please ensure rule ' + String(j + 1) + ' in group ' +
