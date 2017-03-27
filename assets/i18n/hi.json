@@ -218,6 +218,7 @@
 	"I18N_PLAYER_RETURN_TO_COLLECTION": "वापस जाये <[collectionTitle]>",
 	"I18N_PLAYER_RETURN_TO_EDITOR": "संपादक पर वापस जाये",
 	"I18N_PLAYER_SHARE_EXPLORATION": "आपने इस एक्सप्लोरेशन का आननद लिया ? अपने दोस्तों के साथ शेयर करे!",
+	"I18N_PLAYER_SHARE_THIS_COLLECTION": "इस कलेक्शन को शेयर करे",
 	"I18N_PLAYER_SHARE_THIS_EXPLORATION": "शेयर दीस एक्सप्लोरेशन",
 	"I18N_PLAYER_STAY_ANONYMOUS": "गुमनाम रहे",
 	"I18N_PLAYER_SUBMIT_BUTTON": "जमा करें",
