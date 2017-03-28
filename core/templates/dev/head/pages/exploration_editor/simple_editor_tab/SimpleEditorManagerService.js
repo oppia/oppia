@@ -151,12 +151,14 @@ oppia.factory('SimpleEditorManagerService', [
               SimpleEditorShimService.saveCustomizationArgs(
                 lastStateName, DEFAULT_INTERACTION.CUSTOMIZATION_ARGS);
             }
+
             if(type == "itemSelection"){
               SimpleEditorShimService.saveInteractionId(
-                lastStateName, "ItemSelectionInput");
+                lastStateName, "ItaddemSelectionInput");
               SimpleEditorShimService.saveCustomizationArgs(
                 lastStateName, DEFAULT_ITEM_INTERACTION .CUSTOMIZATION_ARGS);
             }
+
           SimpleEditorShimService.saveDefaultOutcome(lastStateName, {
             dest: lastStateName,
             feedback: [''],
