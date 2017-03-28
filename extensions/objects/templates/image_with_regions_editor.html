@@ -58,3 +58,22 @@
   <br>
   <button type="button" class="btn btn-danger" ng-click="resetEditor()">Clear Image and Regions</button>
 </div>
+<script type="text/ng-template" id="modals/clearImageRegions">
+  <div class="modal-header">
+    <h3>Clear Image and Regions</h3>
+  </div>
+
+  <div class="modal-body">
+    <p>
+      Are you sure you want to clear image and regions?
+    </p>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-danger protractor-test-confirm-delete-interaction"
+            ng-click="confirmClear()">
+      Clear Image and Regions
+    </button>
+  </div>
+</script>
