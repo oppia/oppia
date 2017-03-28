@@ -318,29 +318,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         collection.delete_node('test_exp')
         self.assertEqual(len(collection.nodes), 0)
 
-    def test_skills_property(self):
-        collection = collection_domain.Collection.create_default_collection(
-            '0')
-
-        self.assertEqual(collection.skills, [])
-
-        collection.add_node('exp_id_0')
-        collection.add_node('exp_id_1')
-        collection.get_node('exp_id_0').update_acquired_skills(
-            ['skill0a'])
-        collection.get_node('exp_id_1').update_prerequisite_skills(
-            ['skill0a'])
-        collection.get_node('exp_id_1').update_acquired_skills(
-            ['skill1b', 'skill1c'])
-
-        self.assertEqual(collection.skills, ['skill0a', 'skill1b', 'skill1c'])
-
-        # Skills should be unique, even if they are duplicated across multiple
-        # acquired and prerequisite skill lists.
-        collection.add_node('exp_id_2')
-        collection.get_node('exp_id_2').update_acquired_skills(
-            ['skill0a', 'skill1c'])
-        self.assertEqual(collection.skills, ['skill0a', 'skill1b', 'skill1c'])
+    # TODO(wxy): write tests for skills
 
 
 class ExplorationGraphUnitTests(test_utils.GenericTestBase):
@@ -641,9 +619,33 @@ schema_version: 2
 tags: []
 title: A title
 """)
+    YAML_CONTENT_V3 = ("""category: A category
+language_code: en
+nodes:
+- acquired_skills:
+  - 0
+  - 1
+  exploration_id: Exp1
+  prerequisite_skills: []
+objective: ''
+schema_version: 2
+skills:
+  0:
+    skill_id: 0
+    name: Skill1
+    question_ids: []
+  1:
+    skill_id: 1
+    name: Skill2
+    question_ids: []
+skills_id_count: 2
+tags: []
+title: A title
+""")
 
     _LATEST_YAML_CONTENT = YAML_CONTENT_V1
     _LATEST_YAML_CONTENT = YAML_CONTENT_V2
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V3
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -659,4 +661,12 @@ title: A title
             'Exp1', 'user@example.com', end_state_name='End')
         collection = collection_domain.Collection.from_yaml(
             'cid', self.YAML_CONTENT_V2)
+        self.assertEqual(collection.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v2(self):
+        """Test direct loading from a v3 yaml file."""
+        self.save_new_valid_exploration(
+            'Exp1', 'user@example.com', end_state_name='End')
+        collection = collection_domain.Collection.from_yaml(
+            'cid', self.YAML_CONTENT_V3)
         self.assertEqual(collection.to_yaml(), self._LATEST_YAML_CONTENT)

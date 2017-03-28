@@ -222,6 +222,7 @@ class CollectionNode(object):
                 'The prerequisite_skills list has duplicate entries: %s' %
                 self.prerequisite_skills)
 
+        # TODO(wxy): probably need to change the string to int here
         for prerequisite_skill in self.prerequisite_skills:
             if not isinstance(prerequisite_skill, basestring):
                 raise utils.ValidationError(
@@ -238,6 +239,7 @@ class CollectionNode(object):
                 'The acquired_skills list has duplicate entries: %s' %
                 self.acquired_skills)
 
+        # TODO(wxy): probably need to change the string to int here
         for acquired_skill in self.acquired_skills:
             if not isinstance(acquired_skill, basestring):
                 raise utils.ValidationError(
@@ -257,11 +259,50 @@ class CollectionNode(object):
         return cls(exploration_id, [], [])
 
 
+class CollectionSkill(object):
+    """Domain object describing a skill in the collection.
+
+    The skill contains the skill id, the human readable name, and the list of
+    question IDs associated to the skill.
+    """
+
+    def __init__(self, skill_id, name, question_ids):
+        """Constructs a new CollectionSkill object.
+
+        Args:
+        - skill_id (int): the skill ID
+        - name (string): the displayed name of the skill
+        - question_ids (list of strings): list of the question IDs associated
+                                          to the skill.
+        """
+        self.skill_id = skill_id
+        self.name = name
+        self.question_ids = question_ids
+
+    def to_dict(self):
+        return {
+            'skill_id': self.skill_id,
+            'name': self.name,
+            'question_ids': self.question_ids
+        }
+
+    @classmethod
+    def from_dict(cls, skill_dict):
+        return cls(
+            copy.deepcopy(skill_dict['skill_id']),
+            copy.deepcopy(skill_dict['name']),
+            copy.deepcopy(skill_dict['question_ids'])
+        )
+
+    # TODO(wxy): validation, and other skill functions go here
+
+
 class Collection(object):
     """Domain object for an Oppia collection."""
 
     def __init__(self, collection_id, title, category, objective,
-                 language_code, tags, schema_version, nodes, version,
+                 language_code, tags, schema_version, nodes, skills,
+                 skills_id_count, version,
                  created_on=None, last_updated=None):
         """Constructs a new collection given all the information necessary to
         represent a collection.
@@ -286,6 +327,8 @@ class Collection(object):
         self.tags = tags
         self.schema_version = schema_version
         self.nodes = nodes
+        self.skills = skills
+        self.skills_id_count = skills_id_count
         self.version = version
         self.created_on = created_on
         self.last_updated = last_updated
@@ -301,6 +344,10 @@ class Collection(object):
             'schema_version': self.schema_version,
             'nodes': [
                 node.to_dict() for node in self.nodes
+            ],
+            'skills_id_count': self.skills_id_count,
+            'skills': [
+                skill.to_dict() for skill in self.skills
             ]
         }
 
@@ -312,7 +359,7 @@ class Collection(object):
             language_code=feconf.DEFAULT_LANGUAGE_CODE):
         return cls(
             collection_id, title, category, objective, language_code, [],
-            feconf.CURRENT_COLLECTION_SCHEMA_VERSION, [], 0)
+            feconf.CURRENT_COLLECTION_SCHEMA_VERSION, [], {}, 0, 0)
 
     @classmethod
     def from_dict(
@@ -322,12 +369,17 @@ class Collection(object):
             collection_dict['id'], collection_dict['title'],
             collection_dict['category'], collection_dict['objective'],
             collection_dict['language_code'], collection_dict['tags'],
-            collection_dict['schema_version'], [], collection_version,
+            collection_dict['schema_version'], [], {},
+            collection_dict['skills_id_count'], collection_version,
             collection_created_on, collection_last_updated)
 
         for node_dict in collection_dict['nodes']:
             collection.nodes.append(
                 CollectionNode.from_dict(node_dict))
+
+        for skill_dict in collection_dict['skills']:
+            skill = CollectionSkill.from_dict(skill_dict)
+            collection.skills[skill.skill_id] = skill
 
         return collection
 
@@ -342,10 +394,22 @@ class Collection(object):
 
     @classmethod
     def _convert_v1_dict_to_v2_dict(cls, collection_dict):
-        """Converts a v1 collection dict into a v2 collection dict."""
+        """Converts a v1 collection dict into a v2 collection dict.
+
+        Adds a language code, and tags.
+        """
         collection_dict['schema_version'] = 2
         collection_dict['language_code'] = feconf.DEFAULT_LANGUAGE_CODE
         collection_dict['tags'] = []
+        return collection_dict
+
+    @classmethod
+    def _convert_v2_dict_to_v3_dict(cls, collection_dict):
+        """Converts a v2 collection dict into a v3 collection dict.
+
+        No changes to dict structure.
+        """
+        collection_dict['schema_version'] = 3
         return collection_dict
 
     @classmethod
@@ -389,6 +453,56 @@ class Collection(object):
         return collection_contents
 
     @classmethod
+    def _convert_collection_contents_v2_dict_to_v3_dict(
+            cls, collection_contents):
+        """Converts from version 2 to 3.
+
+        Adds a skills dict and skill id counter. Gets skills in
+        prerequisite_skills and acquired_skills in nodes, and assigns them
+        integer IDs.
+        """
+        collection_contents['skills'] = {}
+        collection_contents['skills_id_count'] = 0
+
+        def _add_or_get_id(skill):
+            # Don't add skill if already inside skill dict
+            for skill_dict in collection_contents['skills']:
+                if skill_dict['name'] == skill:
+                    return skill_dict['skill_id']
+
+            # Add a new skill dict
+            skill_id_count = collection_contents['skills_id_count']
+            collection_contents['skills'][skill_id_count] = {
+                'skill_id': skill_id_count,
+                'name': skill,
+                'question_ids': []
+            }
+            collection_contents['skills_id_count'] = skill_id_count + 1
+            return skill_id_count
+
+
+        new_nodes = []
+        for node in collection_contents['nodes']:
+            new_prerequisite_skills = []
+            for skill in node['prerequisite_skills']:
+                skill_id = _add_or_get_id(skill)
+                new_prerequisite_skills.append(skill_id)
+
+            new_acquired_skills = []
+            for skill in node['acquired_skills']:
+                skill_id = _add_or_get_id(skill)
+                new_acquired_skills.append(skill_id)
+
+            new_nodes.append({
+                'exploration_id': node.exploration_id,
+                'prerequisite_skills': new_prerequisite_skills,
+                'acquired_skills': new_acquired_skills
+            })
+        collection_contents['nodes'] = new_nodes
+
+        return collection_contents
+
+    @classmethod
     def update_collection_contents_from_model(
             cls, versioned_collection_contents, current_version):
         """Converts the states blob contained in the given
@@ -414,15 +528,16 @@ class Collection(object):
         versioned_collection_contents['collection_contents'] = conversion_fn(
             versioned_collection_contents['collection_contents'])
 
-    @property
-    def skills(self):
+    def get_human_readable_skills(self):
+        # TODO(wxy): update docstring
         """The skills of a collection are made up of all prerequisite and
         acquired skills of each exploration that is part of this collection.
         This returns a sorted list of all the skills of the collection.
         """
         unique_skills = set()
         for node in self.nodes:
-            unique_skills.update(node.skills)
+            for skill_id in node.skills:
+                unique_skills.update(self.skills[skill_id].name)
         return sorted(unique_skills)
 
     @property
