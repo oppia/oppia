@@ -648,8 +648,9 @@ describe('Line to have known layout as student types', function() {
     expect(
       errorWrapper(requireIdentifiable, 'from p we have p\u2228q')).toThrow(
       {
-        message: ('This line could not be identified as valid - please ' +
-        'check the list of possible lines.')
+        message: (
+          'This line could not be identified as valid - please ' +
+          'check the list of possible lines.')
       });
   });
 });
@@ -670,9 +671,9 @@ describe('Require all lines to have known layouts as student types',
       }).toThrow(
         {
           message: (
-          'We could not identify \'A\u2227\'; please make sure you' +
-          ' are using vocabulary from the given list, and don\'t have two ' +
-          'consecutive expressions.'),
+            'We could not identify \'A\u2227\'; please make sure you ' +
+            'are using vocabulary from the given list, and don\'t have ' +
+            'two consecutive expressions.'),
           line: 0
         }
       );
