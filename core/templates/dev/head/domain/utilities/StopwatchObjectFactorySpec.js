@@ -25,7 +25,7 @@ describe('Stopwatch object factory', function() {
 
     beforeEach(inject(function($injector) {
       StopwatchObjectFactory = $injector.get('StopwatchObjectFactory');
-      spyOn($injector.get('$log'), 'error').andCallFake(function(errorMessage) {
+      spyOn($injector.get('$log'), 'error').and.callFake(function(errorMessage) {
         errorLog.push(errorMessage);
       });
     }));
