@@ -172,7 +172,7 @@ gulp.task('generateCss', function() {
     .pipe(isMinificationNeeded ? concat('third_party.min.css') :
         concat('third_party.css'))
     .pipe(isMinificationNeeded ? cleanCss({}) : gulpUtil.noop())
-    .pipe(isMinificationNeeded ? sourcemaps.write() : gulpUtil.noop())
+    .pipe(isMinificationNeeded ? sourcemaps.write('.') : gulpUtil.noop())
     .pipe(gulp.dest(generatedCssTargetDir));
 });
 
@@ -188,7 +188,7 @@ gulp.task('generateJs', function() {
     // column number in your generated JavaScript, you can do a lookup in the
     // source map which returns the original location.
     // http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/
-    .pipe(isMinificationNeeded ? sourcemaps.write() : gulpUtil.noop())
+    .pipe(isMinificationNeeded ? sourcemaps.write('.') : gulpUtil.noop())
     .pipe(gulp.dest(generatedJsTargetDir));
 });
 // This task is used to copy all fonts which are used by
