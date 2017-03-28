@@ -22,7 +22,7 @@ import utils
 # pylint: disable=protected-access
 
 
-class LDAStringClassifierUnitTests(test_utils.GenericTestBase):
+class LDAStringClassifierTest(test_utils.GenericTestBase):
 
     _EXAMPLES_TRAIN = [
         ['i eat fish and vegetables', ['food']],
@@ -40,7 +40,7 @@ class LDAStringClassifierUnitTests(test_utils.GenericTestBase):
     ]
 
     def setUp(self):
-        super(LDAStringClassifierUnitTests, self).setUp()
+        super(LDAStringClassifierTest, self).setUp()
         self.classifier = (
             classifier_registry.Registry.get_classifier_by_id(
                 feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']))
