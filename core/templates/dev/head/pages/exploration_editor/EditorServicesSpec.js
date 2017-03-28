@@ -263,7 +263,8 @@ describe('Change list service', function() {
             }
           },
           visible_in_states: ['newState1']
-        }
+        },
+        panel: undefined
       }]);
       expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
