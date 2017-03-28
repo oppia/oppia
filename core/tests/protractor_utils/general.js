@@ -135,7 +135,9 @@ var expect404Error = function() {
 var ensurePageHasNoTranslationIds = function() {
   // The use of the InnerHTML is hacky, but is faster than checking each
   // individual component that contains text.
-  element(by.css('.oppia-base-container')).getInnerHtml().then(
+  browser.executeScript(
+    'return arguments[0].innerHTML;',
+    element(by.css('.oppia-base-container'))).then(
     function(promiseValue) {
       // First remove all the attributes translate and variables that are
       // not displayed
