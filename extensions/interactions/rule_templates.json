@@ -64,6 +64,8 @@
       "description": "is not correct due to {{c|LogicErrorCategory}}"
     }
   },
+  "FillInTheBlank": {
+  },
   "MathExpressionInput": {
     "IsMathematicallyEquivalentTo": {
       "description": "is mathematically equivalent to (LaTeX) {{x|UnicodeString}}"
