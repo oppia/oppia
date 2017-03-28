@@ -66,8 +66,8 @@ describe('rich-text components', function() {
       }, {
         title: 'title 1',
         content: forms.toRichText('contents 2')
-      }]);
-
+      }]
+      );
     });
 
     editor.discardChanges();
