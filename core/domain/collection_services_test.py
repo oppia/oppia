@@ -190,15 +190,18 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
         collection_services.update_collection(
             self.owner_id, self.COL_ID_0,
             [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'skill0'
+            },{
                 'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
                 'exploration_id': self.EXP_ID_0,
                 'property_name': 'acquired_skills',
-                'new_value': ['0_exp_skill']
+                'new_value': ['s0']
             }, {
                 'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
                 'exploration_id': self.EXP_ID_2,
                 'property_name': 'prerequisite_skills',
-                'new_value': ['0_exp_skill']
+                'new_value': ['s0']
             }],
             'Updated exp 2 to require exp 0 before being playable')
 
@@ -913,6 +916,34 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
                     'new_value': ['duplicate', 'duplicate']
                 }], 'Add a new tag')
 
+    def test_add_collection_skills(self):
+        # Verify skills table is initially empty
+        collection = collection_services.get_collection_by_id(
+            self.COLLECTION_ID)
+        self.assertEqual(collection.skills, {})
+
+        # Add a skill.
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'test'
+            }], 'Add a new skill')
+
+        # Verify that the skill is added.
+        collection = collection_services.get_collection_by_id(
+            self.COLLECTION_ID)
+        self.assertEqual(collection.skills.keys(), ['s0'])
+
+        # Verify that error will be thrown when duplicate skill is added.
+        with self.assertRaisesRegexp(
+            ValueError,
+            'Skill with name "test" already exists.'):
+            collection_services.update_collection(
+                self.owner_id, self.COLLECTION_ID, [{
+                    'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                    'name': 'test'
+                }], 'Add a new skill, again')
+
     def test_update_collection_node_prerequisite_skills(self):
         # Verify initial prerequisite skills are empty.
         collection = collection_services.get_collection_by_id(
@@ -920,21 +951,39 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         collection_node = collection.get_node(self.EXPLORATION_ID)
         self.assertEqual(collection_node.prerequisite_skills, [])
 
+        # Add skill to collection.
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'test skill'
+            }], 'Add a new skill')
+
         # Update the prerequisite skills.
         collection_services.update_collection(
             self.owner_id, self.COLLECTION_ID, [{
                 'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
                 'exploration_id': self.EXPLORATION_ID,
                 'property_name': 'prerequisite_skills',
-                'new_value': ['first', 'second']
+                'new_value': ['s0']
             }], 'Changed the prerequisite skills of a collection node')
 
         # Verify the prerequisites are different.
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
         collection_node = collection.get_node(self.EXPLORATION_ID)
-        self.assertEqual(
-            collection_node.prerequisite_skills, ['first', 'second'])
+        self.assertEqual(collection_node.prerequisite_skills, ['s0'])
+
+        # Verify that error will be thrown if nonexistent skill is added.
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Skill ID test not found in collection %s.' % self.COLLECTION_ID):
+            collection_services.update_collection(
+                self.owner_id, self.COLLECTION_ID, [{
+                    'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
+                    'exploration_id': self.EXPLORATION_ID,
+                    'property_name': 'prerequisite_skills',
+                    'new_value': ['test']
+                }], 'Changed the prerequisite skills of a collection node')
 
     def test_update_collection_node_acquired_skills(self):
         # Verify initial acquired skills are empty.
@@ -943,20 +992,39 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         collection_node = collection.get_node(self.EXPLORATION_ID)
         self.assertEqual(collection_node.acquired_skills, [])
 
+        # Add skill to collection.
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'test skill'
+            }], 'Add a new skill')
+
         # Update the acquired skills.
         collection_services.update_collection(
             self.owner_id, self.COLLECTION_ID, [{
                 'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
                 'exploration_id': self.EXPLORATION_ID,
                 'property_name': 'acquired_skills',
-                'new_value': ['third', 'fourth']
+                'new_value': ['s0']
             }], 'Changed the acquired skills of a collection node')
 
         # Verify the acquired are different.
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
         collection_node = collection.get_node(self.EXPLORATION_ID)
-        self.assertEqual(collection_node.acquired_skills, ['third', 'fourth'])
+        self.assertEqual(collection_node.acquired_skills, ['s0'])
+
+        # Verify that error will be thrown if nonexistent skill is added.
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Skill ID test not found in collection %s.' % self.COLLECTION_ID):
+            collection_services.update_collection(
+                self.owner_id, self.COLLECTION_ID, [{
+                    'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
+                    'exploration_id': self.EXPLORATION_ID,
+                    'property_name': 'acquired_skills',
+                    'new_value': ['test']
+                }], 'Changed the prerequisite skills of a collection node')
 
 def _get_node_change_list(exploration_id, property_name, new_value):
     """Generates a change list for a single collection node change."""
@@ -1009,10 +1077,9 @@ class CommitMessageHandlingTests(CollectionServicesUnitTests):
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
 
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, _get_node_change_list(
-                self.EXP_ID,
-                collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS,
-                ['Skill']), 'A message')
+            self.owner_id, self.COLLECTION_ID, _get_collection_change_list(
+                collection_domain.COLLECTION_PROPERTY_TITLE,
+                'New Title'), 'A message')
 
         self.assertEqual(
             collection_services.get_collection_snapshots_metadata(
@@ -1029,31 +1096,27 @@ class CommitMessageHandlingTests(CollectionServicesUnitTests):
             'received none.'
             ):
             collection_services.update_collection(
-                self.owner_id, self.COLLECTION_ID, _get_node_change_list(
-                    self.EXP_ID,
-                    collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS,
-                    ['Skill']), '')
+                self.owner_id, self.COLLECTION_ID, _get_collection_change_list(
+                    collection_domain.COLLECTION_PROPERTY_TITLE,
+                    'New Title'), '')
 
     def test_unpublished_collections_can_accept_commit_message(self):
         """Test unpublished collections can accept optional commit messages."""
 
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, _get_node_change_list(
-                self.EXP_ID,
-                collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS,
-                ['Skill']), 'A message')
+            self.owner_id, self.COLLECTION_ID, _get_collection_change_list(
+                collection_domain.COLLECTION_PROPERTY_TITLE,
+                'New Title'), 'A message')
 
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, _get_node_change_list(
-                self.EXP_ID,
-                collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS,
-                ['Skill']), '')
+            self.owner_id, self.COLLECTION_ID, _get_collection_change_list(
+                collection_domain.COLLECTION_PROPERTY_TITLE,
+                'New Title'), '')
 
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, _get_node_change_list(
-                self.EXP_ID,
-                collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS,
-                ['Skill']), None)
+            self.owner_id, self.COLLECTION_ID, _get_collection_change_list(
+                collection_domain.COLLECTION_PROPERTY_TITLE,
+                'New Title'), None)
 
 
 class CollectionSnapshotUnitTests(CollectionServicesUnitTests):

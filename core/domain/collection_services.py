@@ -161,7 +161,14 @@ def get_collection_from_model(collection_model, run_conversion=True):
             collection_domain.CollectionNode.from_dict(collection_node_dict)
             for collection_node_dict in
             versioned_collection_contents['collection_contents']['nodes']
-        ],
+        ], {
+            skill_id: collection_domain.CollectionSkill.from_dict(
+                skill_id, skill_dict)
+            for skill_id, skill_dict in
+            versioned_collection_contents[
+                'collection_contents']['skills'].iteritems()
+        },
+        versioned_collection_contents['collection_contents']['skill_id_count'],
         collection_model.version, collection_model.created_on,
         collection_model.last_updated)
 
@@ -481,6 +488,64 @@ def get_collection_summaries_matching_ids(collection_ids):
             collection_ids)]
 
 
+def update_collection_node_prerequisite_skills(
+        collection, exploration_id, skill_ids):
+    """Updates prerequisite skills for a node in a collection.
+
+    Args:
+        collection: Collection. The collection object.
+        exploration_id: str. The exploration id identifying the node.
+        skill_ids: list(str). The skill id. Must be present in the exploration
+            skill table.
+
+    Raises:
+        ValidationError: the exploration id is not found or any of the skill ids
+            are is not found.
+    """
+    collection_node = collection.get_node(exploration_id)
+    if collection_node is None:
+        raise utils.ValidationError('Collection node with ID %s not found in '
+                                    'collection %s.'
+                                    % (exploration_id, collection.id))
+
+    for skill_id in skill_ids:
+        if skill_id not in collection.skills:
+            raise utils.ValidationError(
+                'Skill ID %s not found in collection %s.'
+                % (skill_id, collection.id))
+
+    collection_node.update_prerequisite_skills(skill_ids)
+
+
+def update_collection_node_acquired_skills(
+        collection, exploration_id, skill_ids):
+    """Updates acquired skills for a node in a collection.
+
+    Args:
+        collection: Collection. The collection object.
+        exploration_id: str. The exploration id identifying the node.
+        skill_ids: list(str). The skill id. Must be present in the exploration
+            skill table.
+
+    Raises:
+        ValidationError: the exploration id is not found or any of the skill ids
+            is not found.
+    """
+    collection_node = collection.get_node(exploration_id)
+    if collection_node is None:
+        raise utils.ValidationError('Collection node with ID %s not found in '
+                                    'collection %s.'
+                                    % (exploration_id, collection.id))
+
+    for skill_id in skill_ids:
+        if skill_id not in collection.skills:
+            raise utils.ValidationError(
+                'Skill ID %s not found in collection %s.'
+                % (skill_id, collection.id))
+
+    collection_node.update_acquired_skills(skill_ids)
+
+
 # TODO(bhenning): Update this function to support also matching the query to
 # explorations contained within this collection. Introduce tests to verify this
 # behavior.
@@ -565,14 +630,14 @@ def apply_change_list(collection_id, change_list):
             elif (
                     change.cmd ==
                     collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY):
-                collection_node = collection.get_node(change.exploration_id)
                 if (change.property_name ==
                         collection_domain.COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS): # pylint: disable=line-too-long
-                    collection_node.update_prerequisite_skills(
-                        change.new_value)
+                    update_collection_node_prerequisite_skills(
+                        collection, change.exploration_id, change.new_value)
                 elif (change.property_name ==
                       collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS): # pylint: disable=line-too-long
-                    collection_node.update_acquired_skills(change.new_value)
+                    update_collection_node_acquired_skills(
+                        collection, change.exploration_id, change.new_value)
             elif change.cmd == collection_domain.CMD_EDIT_COLLECTION_PROPERTY:
                 if (change.property_name ==
                         collection_domain.COLLECTION_PROPERTY_TITLE):
@@ -597,6 +662,10 @@ def apply_change_list(collection_id, change_list):
                 # latest schema version. As a result, simply resaving the
                 # collection is sufficient to apply the schema migration.
                 continue
+            elif change.cmd == collection_domain.CMD_ADD_COLLECTION_SKILL:
+                collection.add_skill(change.name)
+            elif change.cmd == collection_domain.CMD_DELETE_COLLECTION_SKILL:
+                collection.add_skill(change.skill_id)
         return collection
 
     except Exception as e:
@@ -701,7 +770,12 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     collection_model.collection_contents = {
         'nodes': [
             collection_node.to_dict() for collection_node in collection.nodes
-        ]
+        ],
+        'skills': {
+            skill_id: skill.to_dict()
+            for skill_id, skill in collection.skills.iteritems()
+        },
+        'skill_id_count': collection.skill_id_count
     }
     collection_model.node_count = len(collection_model.nodes)
     collection_model.commit(committer_id, commit_message, change_list)
@@ -739,8 +813,13 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
             'nodes': [
                 collection_node.to_dict()
                 for collection_node in collection.nodes
-            ]
-        }
+            ],
+            'skills': {
+                skill_id: skill.to_dict()
+                for skill_id, skill in collection.skills.iteritems()
+            },
+            'skill_id_count': collection.skill_id_count
+        },
     )
     model.commit(committer_id, commit_message, commit_cmds)
     collection.version += 1
@@ -868,7 +947,12 @@ def update_collection(
             'Collection is public so expected a commit message but '
             'received none.')
 
+    collection = get_collection_by_id(collection_id)
+    print collection.to_dict()
+
     collection = apply_change_list(collection_id, change_list)
+
+    print collection.to_dict()
     _save_collection(committer_id, collection, commit_message, change_list)
     update_collection_summary(collection.id, committer_id)
 
