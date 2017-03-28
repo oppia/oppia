@@ -43,8 +43,13 @@ var errorWrapper = function(
   };
 };
 
-var sharedErrorWrapper = function (message, line, code, category) {
-  return {message: message, line: line, code: code, category: category};
+var sharedErrorWrapper = function(message, line, code, category) {
+  return {
+    message: message,
+    line: line,
+    code: code,
+    category: category
+  };
 };
 
 describe('Full system', function() {

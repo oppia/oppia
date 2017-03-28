@@ -43,8 +43,13 @@ var errorWrapper = function(
   };
 };
 
-var sharedErrorWrapper = function (message, line, code, category) {
-  return {message: message, line: line, code: code, category: category};
+var sharedErrorWrapper = function(message, line, code, category) {
+  return {
+    message: message,
+    line: line,
+    code: code,
+    category: category
+  };
 };
 
 var displayLine = function(line, operators) {
@@ -571,7 +576,8 @@ describe('Throw lines messages', function() {
           T: logicProofParser.parse('x=y', 'expression'),
           U: logicProofParser.parse('A2(x,y)', 'expression')
         }, logicProofData.BASE_STUDENT_LANGUAGE.operators);
-    })).toThrowError('The conclusion you are allowed to make here is \'From x=y ' +
+    })).toThrowError(
+      'The conclusion you are allowed to make here is \'From x=y ' +
       'and A2(x,y) we have (x=y)\u2227A2(x,y)\'.');
   });
 });
@@ -610,14 +616,16 @@ describe('Match line to template', function() {
       errorWrapper(
         matchLineToTemplate, 'from p and q we have q\u2227p',
         sampleInteraction.line_templates[0])
-    ).toThrowError('This line could not be identified as valid - please check the' +
+    ).toThrowError(
+      'This line could not be identified as valid - please check the' +
       ' list of possible lines.');
 
     expect(
       errorWrapper(
         matchLineToTemplate, 'z was arbitrary from \u2200x.x=2',
         sampleInteraction.line_templates[1])
-    ).toThrowError('This line could not be identified as valid - please check the' +
+    ).toThrowError(
+      'This line could not be identified as valid - please check the' +
       ' list of possible lines.');
   });
 });
@@ -639,8 +647,10 @@ describe('Line to have known layout as student types', function() {
   it('should reject unknown layouts', function() {
     expect(
       errorWrapper(requireIdentifiable, 'from p we have p\u2228q')).toThrow(
-      {'message': 'This line could not be identified as valid - please ' +
-      'check the list of possible lines.'});
+      {
+        message: ('This line could not be identified as valid - please ' +
+        'check the list of possible lines.')
+      });
   });
 });
 
@@ -658,10 +668,14 @@ describe('Require all lines to have known layouts as student types',
         logicProofStudent.validateProof(
           'from A and B we have A\u2227\n', sampleInteraction);
       }).toThrow(
-        {'message': (
+        {
+          message: (
           'We could not identify \'A\u2227\'; please make sure you' +
           ' are using vocabulary from the given list, and don\'t have two ' +
-          'consecutive expressions.' ), 'line': 0});
+          'consecutive expressions.'),
+          line: 0
+        }
+      );
     });
   }
 );
@@ -722,15 +736,18 @@ describe('Build, validate and display line', function() {
   it('should reject lines that match an incorrect template', function() {
     expect(
       errorWrapper(buildThenDisplay, 'from a<b and b<c we have a<b \u2227 b<d')
-    ).toThrowError('The conclusion you are allowed to make here is \'From a<b and' +
+    ).toThrowError(
+      'The conclusion you are allowed to make here is \'From a<b and' +
       ' b<c we have (a<b)\u2227(b<c)\'.');
   });
 
   it('should reject lines starting with an odd number of spaces', function() {
     expect(
       errorWrapper(buildThenDisplay, '   from R and A=>B have R\u2227(A=>B)')
-    ).toThrowError('An indentation is indicated by a double space at the start of' +
-      ' the line, but this line starts with an odd number of spaces.');
+    ).toThrowError(
+      'An indentation is indicated by a double space at the start of' +
+      ' the line, but this line starts with an odd number of spaces.'
+    );
   });
 });
 

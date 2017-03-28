@@ -212,15 +212,18 @@ describe('Parse lines', function() {
   it('should reject unknown phrases', function() {
     expect(
       errorWrapper(parse, 'from p we havw p\u2227q')
-    ).toThrowError('The phrase starting \'we\' could not be identified; please ' +
-      'make sure you are only using phrases from the given list of vocabulary.'
+    ).toThrowError(
+      'The phrase starting \'we\' could not be identified; ' +
+      'please make sure you are only using phrases from the given list of ' +
+      'vocabulary.'
     );
   });
 
   it('should reject consecutive expressions', function() {
     expect(
       errorWrapper(parse, 'from A=>B B have B')
-    ).toThrowError('We could not identify \'B\'; please make sure you are using ' +
+    ).toThrowError(
+      'We could not identify \'B\'; please make sure you are using ' +
       'vocabulary from the given list, and don\'t have two consecutive ' +
       'expressions.');
   });
