@@ -66,7 +66,7 @@ oppia.factory('SimpleEditorManagerService', [
         }
       }
     };
-    //console.log(data);
+    console.log(data);
     var getNewStateName = function() {
       var allStateNames = data.questionList.getAllStateNames();
 
@@ -146,6 +146,7 @@ oppia.factory('SimpleEditorManagerService', [
             data.questionList.getLastQuestion().getDestinationStateName());
 
             if(type == "multiple"){
+              console.log(lastStateName);
               SimpleEditorShimService.saveInteractionId(
                 lastStateName, DEFAULT_INTERACTION.ID);
               SimpleEditorShimService.saveCustomizationArgs(
@@ -153,10 +154,11 @@ oppia.factory('SimpleEditorManagerService', [
             }
 
             if(type == "itemSelection"){
+              console.log(lastStateName);
               SimpleEditorShimService.saveInteractionId(
-                lastStateName, "ItaddemSelectionInput");
+                lastStateName, "ItemSelectionInput");
               SimpleEditorShimService.saveCustomizationArgs(
-                lastStateName, DEFAULT_ITEM_INTERACTION .CUSTOMIZATION_ARGS);
+                lastStateName, DEFAULT_ITEM_INTERACTION.CUSTOMIZATION_ARGS);
             }
 
           SimpleEditorShimService.saveDefaultOutcome(lastStateName, {

@@ -207,13 +207,12 @@ oppia.directive('checkBoxEditor', [
           $scope.selectCorrectAnswer = function(value) {
             var newCustomizationArgs = $scope.getCustomizationArgs();
 
-
             var answerGroups = $scope.getAnswerGroups();
             var newAnswerGroups = [];
 
             if (answerGroups.length === 0) {
               var newStateName = $scope.addState();
-              newAnswerGroups.push(AnswerGroupObjectFactory.create([{
+              newAnswerGroups.push(AnswerGroupObjectFactory.createNew([{
                 inputs: {
                   x: [value]
                 },
