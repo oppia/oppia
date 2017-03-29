@@ -386,8 +386,7 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
   var _readFormattedText = function(text, tagName) {
     expect(arrayOfElems[arrayPointer].getTagName()).toBe(tagName);
     expect(
-      browser.executeScript(
-        'return arguments[0].innerHTML;', arrayOfElems[arrayPointer])
+      arrayOfElems[arrayPointer].getAttribute('innerHTML')
       ).toBe(text);
     expect(arrayOfTexts[arrayPointer]).toEqual(text);
     arrayPointer = arrayPointer + 1;
