@@ -55,14 +55,14 @@ oppia.controller('Dashboard', [
   'ExplorationCreationService', 'UrlInterpolationService', 'FATAL_ERROR_CODES',
   'EXPLORATION_DROPDOWN_STATS', 'EXPLORATIONS_SORT_BY_KEYS',
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
-  'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
+  'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', 'urlService',
   function(
       $scope, $rootScope, $window, $location, oppiaDatetimeFormatter,
       alertsService, DashboardBackendApiService, RatingComputationService,
       ExplorationCreationService, UrlInterpolationService, FATAL_ERROR_CODES,
       EXPLORATION_DROPDOWN_STATS, EXPLORATIONS_SORT_BY_KEYS,
       HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS, SUBSCRIPTION_SORT_BY_KEYS,
-      HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS) {
+      HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS, urlService) {
     var EXP_PUBLISH_TEXTS = {
       defaultText: (
         'This exploration is private. Publish it to receive statistics.'),
@@ -92,22 +92,23 @@ oppia.controller('Dashboard', [
     $scope.unresolvedAnswersIconUrl = UrlInterpolationService.getStaticImageUrl(
       '/icons/unresolved_answers.svg');
 
+    // This flag is set whenever the back button is pressed (the dashboard
+    // page has to be refreshed) and is used to show the Loading message.
+    $scope.backButtonReloadFlag = 0;
     // Refreshes the dashboard page whenever the back button is pressed
     $scope.$watch(function() {
       return $location.path();
     }, function(newPath, oldPath) {
-      if (performance.navigation.type !== 1) {
-        if (newPath === '' && oldPath === '') {
-          $location.path('').replace;
-          return;
-        } else if (newPath === '/' && oldPath === '/') {
-          $location.path('back').replace;
+      if (newPath === '/' && oldPath === '/') {
+        $rootScope.loadingMessage = 'Loading';
+        if (
+          performance.navigation.type !== 1 &&
+          urlService.getUrlParams().mode !== 'create') {
+          $scope.backButtonReloadFlag = 1;
           $window.location.reload();
-          return;
         }
-      }
-      if (newPath === '/back' && oldPath === '/back') {
-        $location.path('').replace;
+      } else if (newPath === '' && oldPath === '') {
+        $location.path('').replace();
       }
     });
 
@@ -225,10 +226,9 @@ oppia.controller('Dashboard', [
         } else {
           $scope.activeTab = 'myExplorations';
         }
-        if ($location.path() === '/back') {
+        $rootScope.loadingMessage = '';
+        if ($scope.backButtonReloadFlag === 1) {
           $rootScope.loadingMessage = 'Loading';
-        } else {
-          $rootScope.loadingMessage = '';
         }
       },
       function(errorResponse) {

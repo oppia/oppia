@@ -100,7 +100,7 @@ oppia.directive('createActivityButton', [function() {
           if (!GLOBALS.can_create_collections) {
             // It appends '/' to the url so that the creation loop is
             // prevented when the user presses the back button.
-            $location.path('').replace;
+            $location.path('').replace();
             ExplorationCreationService.createNewExploration();
           } else {
             $scope.initCreationProcess();
