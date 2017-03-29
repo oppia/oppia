@@ -45,11 +45,11 @@ oppia.factory('answerGroupsCache', [function() {
 oppia.factory('responsesService', [
   '$rootScope', 'stateInteractionIdService', 'INTERACTION_SPECS',
   'answerGroupsCache', 'editorContextService', 'changeListService',
-  'explorationStatesService', 'graphDataService',
+  'explorationStatesService', 'graphDataService', 'OutcomeObjectFactory',
   function(
       $rootScope, stateInteractionIdService, INTERACTION_SPECS,
       answerGroupsCache, editorContextService, changeListService,
-      explorationStatesService, graphDataService) {
+      explorationStatesService, graphDataService, OutcomeObjectFactory) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
     var _confirmedUnclassifiedAnswersMemento = null;

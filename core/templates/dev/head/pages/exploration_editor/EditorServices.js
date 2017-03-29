@@ -799,6 +799,9 @@ oppia.factory('explorationStatesService', [
           answerGroupBackendDicts.push(answerGroup.toBackendDict());
         });
         return answerGroupBackendDicts;
+      },
+      default_outcome: function(defaultOutcome) {
+        return defaultOutcome.toBackendDict();
       }
     };
 

@@ -18,13 +18,12 @@
  */
 
 oppia.factory('InteractionObjectFactory', [
-  'AnswerGroupObjectFactory', 'FallbackObjectFactory',
-  'OutcomeObjectFactory',
-  function(AnswerGroupObjectFactory, FallbackObjectFactory,
-    OutcomeObjectFactory) {
+  'AnswerGroupObjectFactory', 'FallbackObjectFactory', 'OutcomeObjectFactory',
+  function(
+    AnswerGroupObjectFactory, FallbackObjectFactory, OutcomeObjectFactory) {
     var Interaction = function(
-      answerGroups, confirmedUnclassifiedAnswers, customizationArgs,
-      defaultOutcome, fallbacks, id) {
+        answerGroups, confirmedUnclassifiedAnswers, customizationArgs,
+        defaultOutcome, fallbacks, id) {
       this.answerGroups = answerGroups;
       this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
       this.customizationArgs = customizationArgs;
@@ -49,12 +48,18 @@ oppia.factory('InteractionObjectFactory', [
     };
 
     Interaction.createFromBackendDict = function(interactionDict) {
+      var defaultOutcome;
+      if (interactionDict.default_outcome) {
+        defaultOutcome = OutcomeObjectFactory.createFromBackendDict(
+          interactionDict.default_outcome);
+      } else {
+        defaultOutcome = null;
+      }
       return new Interaction(
         generateAnswerGroupsFromBackend(interactionDict.answer_groups),
         interactionDict.confirmed_unclassified_answers,
         interactionDict.customization_args,
-        OutcomeObjectFactory.createFromBackendDict(
-          interactionDict.default_outcome),
+        defaultOutcome,
         generateFallbacksFromBackend(interactionDict.fallbacks),
         interactionDict.id);
     };
@@ -74,4 +79,5 @@ oppia.factory('InteractionObjectFactory', [
     };
 
     return Interaction;
-  }]);
+  }
+]);

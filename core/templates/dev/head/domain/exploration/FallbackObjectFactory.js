@@ -18,38 +18,39 @@
  */
 
 oppia.factory('FallbackObjectFactory', [
-    'OutcomeObjectFactory',
+  'OutcomeObjectFactory',
   function(OutcomeObjectFactory) {
-  var Fallback = function(trigger, outcome) {
-    this.trigger = trigger;
-    this.outcome = outcome;
-  };
-
-  Fallback.prototype.toBackendDict = function() {
-    return {
-      trigger: this.trigger,
-      outcome: this.outcome.toBackendDict()
+    var Fallback = function(trigger, outcome) {
+      this.trigger = trigger;
+      this.outcome = outcome;
     };
-  };
 
-  Fallback.createFromBackendDict = function(fallbackBackendDict) {
-    return new Fallback(
-      fallbackBackendDict.trigger,
-      OutcomeObjectFactory.createFromBackendDict(fallbackBackendDict.outcome));
-  };
+    Fallback.prototype.toBackendDict = function() {
+      return {
+        trigger: this.trigger,
+        outcome: this.outcome.toBackendDict()
+      };
+    };
 
-  Fallback.createDefault = function(dest) {
-    return new Fallback(
-              {
-                trigger_type: 'NthResubmission',
-                customization_args: {
-                  num_submits: {
-                    value: 3
-                  }
-                }
-              },
-              OutcomeObjectFactory.createNew(dest, [], []));
-  };
+    Fallback.createFromBackendDict = function(fallbackBackendDict) {
+      return new Fallback(
+        fallbackBackendDict.trigger,
+        OutcomeObjectFactory.createFromBackendDict(fallbackBackendDict.outcome));
+    };
 
-  return Fallback;
-}]);
+    Fallback.createDefault = function(dest) {
+      return new Fallback(
+        {
+          trigger_type: 'NthResubmission',
+          customization_args: {
+            num_submits: {
+              value: 3
+            }
+          }
+        },
+        OutcomeObjectFactory.createNew(dest, [], []));
+    };
+
+    return Fallback;
+  }
+]);
