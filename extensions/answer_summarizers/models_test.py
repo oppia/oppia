@@ -386,13 +386,13 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
                 'Explicit A', 0., 'sid1', exp_domain.EXPLICIT_CLASSIFICATION),
 
             self._create_sample_answer(
-                'Tained data A', 0., 'sid1',
+                'Trained data A', 0., 'sid1',
                 exp_domain.TRAINING_DATA_CLASSIFICATION),
             self._create_sample_answer(
-                'Tained data B', 0., 'sid1',
+                'Trained data B', 0., 'sid1',
                 exp_domain.TRAINING_DATA_CLASSIFICATION),
             self._create_sample_answer(
-                'Tained data B', 0., 'sid1',
+                'Trained data B', 0., 'sid1',
                 exp_domain.TRAINING_DATA_CLASSIFICATION),
 
             self._create_sample_answer(
@@ -402,7 +402,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             self._create_sample_answer(
                 'Stats C', 0., 'sid1', exp_domain.STATISTICAL_CLASSIFICATION),
             self._create_sample_answer(
-                'Tained data B', 0., 'sid1',
+                'Trained data B', 0., 'sid1',
                 exp_domain.STATISTICAL_CLASSIFICATION),
 
             self._create_sample_answer(
@@ -433,17 +433,17 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
                 'frequency': 1
             }],
             'training_data_match': [{
-                'answer': 'Tained data B',
+                'answer': 'Trained data B',
                 'frequency': 2
             }, {
-                'answer': 'Tained data A',
+                'answer': 'Trained data A',
                 'frequency': 1
             }],
             'statistical_classifier': [{
                 'answer': 'Stats C',
                 'frequency': 2
             }, {
-                'answer': 'Tained data B',
+                'answer': 'Trained data B',
                 'frequency': 1
             }, {
                 'answer': 'Stats B',

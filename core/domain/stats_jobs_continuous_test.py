@@ -423,21 +423,21 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
             # add some answers
             event_services.AnswerSubmissionEventHandler.record(
-                exp_id, exp_version, first_state_name, 0, 0,
-                exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
+                exp_id, exp_version, first_state_name, 'MultipleChoiceInput', 0,
+                0, exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
                 params, 'answer1')
             event_services.AnswerSubmissionEventHandler.record(
-                exp_id, exp_version, first_state_name, 0, 0,
-                exp_domain.EXPLICIT_CLASSIFICATION, 'session2', time_spent,
+                exp_id, exp_version, first_state_name, 'MultipleChoiceInput', 0,
+                0, exp_domain.EXPLICIT_CLASSIFICATION, 'session2', time_spent,
                 params, 'answer1')
             event_services.AnswerSubmissionEventHandler.record(
-                exp_id, exp_version, first_state_name, 0, 0,
-                exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
+                exp_id, exp_version, first_state_name, 'MultipleChoiceInput', 0,
+                0, exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
                 params, 'answer2')
             event_services.AnswerSubmissionEventHandler.record(
-                exp_id, exp_version, second_state_name, 0, 0,
-                exp_domain.EXPLICIT_CLASSIFICATION, 'session2', time_spent,
-                params, 'answer3')
+                exp_id, exp_version, second_state_name, 'MultipleChoiceInput',
+                0, 0, exp_domain.EXPLICIT_CLASSIFICATION, 'session2',
+                time_spent, params, 'answer3')
 
             # Run job on exploration with answers
             ModifiedInteractionAnswerSummariesAggregator.start_computation()
@@ -450,7 +450,8 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             # get job output of first state and check it
             calc_output_domain_object = (
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, first_state_name, calc_id, exp_version))
+                    exp_id, first_state_name, calc_id,
+                    exploration_version=exp_version))
             self.assertEqual(
                 'AnswerFrequencies', calc_output_domain_object.calculation_id)
 
@@ -470,7 +471,8 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             # get job output of second state and check it
             calc_output_domain_object = (
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, second_state_name, calc_id, exp_version))
+                    exp_id, second_state_name, calc_id,
+                    exploration_version=exp_version))
 
             self.assertEqual(
                 'AnswerFrequencies', calc_output_domain_object.calculation_id)
@@ -517,8 +519,8 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
             # Add an answer.
             event_services.AnswerSubmissionEventHandler.record(
-                exp_id, exp_version, first_state_name, 0, 0,
-                exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
+                exp_id, exp_version, first_state_name, 'MultipleChoiceInput', 0,
+                0, exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
                 params, 'answer1')
 
             # Run the answers aggregation job.
@@ -536,8 +538,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     exploration_version='2'))
             calc_output_all_domain_object = (
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, first_state_name, calc_id,
-                    exploration_version=None))
+                    exp_id, first_state_name, calc_id))
 
             self.assertEqual(
                 'AnswerFrequencies',
@@ -574,8 +575,8 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             # Submit another answer.
             exp_version = exp.version
             event_services.AnswerSubmissionEventHandler.record(
-                exp_id, exp_version, first_state_name, 0, 0,
-                exp_domain.EXPLICIT_CLASSIFICATION, 'session2', time_spent,
+                exp_id, exp_version, first_state_name, 'MultipleChoiceInput', 0,
+                0, exp_domain.EXPLICIT_CLASSIFICATION, 'session2', time_spent,
                 params, 'answer1')
 
             # Run the aggregator again.
@@ -596,8 +597,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     exploration_version='3'))
             calc_output_all_domain_object = (
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, first_state_name, calc_id,
-                    exploration_version=None))
+                    exp_id, first_state_name, calc_id))
 
             self.assertEqual(
                 'AnswerFrequencies',
@@ -670,7 +670,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
             # Add an answer.
             event_services.AnswerSubmissionEventHandler.record(
-                exp_id, exp_version, first_state_name, 0, 0,
+                exp_id, exp_version, first_state_name, 'TextInput', 0, 0,
                 exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
                 params, 'answer1')
 

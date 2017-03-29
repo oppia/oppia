@@ -90,13 +90,6 @@ class AnswerEventTests(test_utils.GenericTestBase):
     TIME_SPENT = 5.0
     PARAMS = {}
 
-    def _get_submitted_answer_dict_list(self, state_answers):
-        submitted_answer_dict_list = (
-            state_answers.get_submitted_answer_dict_list())
-        for submitted_answer_dict in submitted_answer_dict_list:
-            del submitted_answer_dict['json_size']
-        return submitted_answer_dict_list
-
     def test_record_answer(self):
         self.save_new_default_exploration('eid', 'fake@user.com')
         exp = exp_services.get_exploration_by_id('eid')
@@ -128,26 +121,26 @@ class AnswerEventTests(test_utils.GenericTestBase):
 
         # answer is a string
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', exp_version, first_state_name, 0, 0,
+            'eid', exp_version, first_state_name, 'TextInput', 0, 0,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', self.TIME_SPENT,
             self.PARAMS, 'answer1')
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', exp_version, first_state_name, 0, 1,
+            'eid', exp_version, first_state_name, 'TextInput', 0, 1,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid2', self.TIME_SPENT,
             self.PARAMS, 'answer1')
         # answer is a dict
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', exp_version, first_state_name, 1, 0,
+            'eid', exp_version, first_state_name, 'TextInput', 1, 0,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', self.TIME_SPENT,
             self.PARAMS, {'x': 1.0, 'y': 5.0})
         # answer is a list
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', exp_version, second_state_name, 2, 0,
+            'eid', exp_version, second_state_name, 'TextInput', 2, 0,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid3', self.TIME_SPENT,
             self.PARAMS, [2, 4, 8])
         # answer is a unicode string
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', exp_version, second_state_name, 1, 1,
+            'eid', exp_version, second_state_name, 'TextInput', 1, 1,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid4', self.TIME_SPENT,
             self.PARAMS, self.UNICODE_TEST_STRING)
 
@@ -182,13 +175,13 @@ class AnswerEventTests(test_utils.GenericTestBase):
         state_answers = stats_services.get_state_answers(
             'eid', exp_version, first_state_name)
         self.assertEqual(
-            self._get_submitted_answer_dict_list(state_answers),
+            state_answers.get_submitted_answer_dict_list(),
             expected_submitted_answer_list1)
 
         state_answers = stats_services.get_state_answers(
             'eid', exp_version, second_state_name)
         self.assertEqual(
-            self._get_submitted_answer_dict_list(state_answers),
+            state_answers.get_submitted_answer_dict_list(),
             expected_submitted_answer_list2)
 
 
@@ -196,13 +189,6 @@ class RecordAnswerTests(test_utils.GenericTestBase):
     """Tests for functionality related to recording and retrieving answers."""
 
     EXP_ID = 'exp_id0'
-
-    def _get_submitted_answer_dict_list(self, state_answers):
-        submitted_answer_dict_list = (
-            state_answers.get_submitted_answer_dict_list())
-        for submitted_answer_dict in submitted_answer_dict_list:
-            del submitted_answer_dict['json_size']
-        return submitted_answer_dict_list
 
     def setUp(self):
         super(RecordAnswerTests, self).setUp()
@@ -213,11 +199,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             self.EXP_ID, self.owner_id, end_state_name='End')
 
     def test_record_answer_without_retrieving_it_first(self):
-        # Do not assert the initial state since
-        # stats_services.get_state_answers() will change the behavior of
-        # stats_services.record_answer().
         stats_services.record_answer(
-            self.exploration, self.exploration.init_state_name,
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name, 'TextInput',
             stats_domain.SubmittedAnswer(
                 'first answer', 'TextInput', 0,
                 0, exp_domain.EXPLICIT_CLASSIFICATION, {},
@@ -226,7 +210,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         state_answers = stats_services.get_state_answers(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name)
-        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': 'first answer',
             'time_spent_in_sec': 1.0,
             'answer_group_index': 0,
@@ -244,7 +228,8 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         self.assertIsNone(state_answers)
 
         stats_services.record_answer(
-            self.exploration, self.exploration.init_state_name,
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name, 'TextInput',
             stats_domain.SubmittedAnswer(
                 'some text', 'TextInput', 0,
                 1, exp_domain.EXPLICIT_CLASSIFICATION, {},
@@ -258,7 +243,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         self.assertEqual(
             state_answers.state_name, feconf.DEFAULT_INIT_STATE_NAME)
         self.assertEqual(state_answers.interaction_id, 'TextInput')
-        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': 'some text',
             'time_spent_in_sec': 10.0,
             'answer_group_index': 0,
@@ -271,7 +256,8 @@ class RecordAnswerTests(test_utils.GenericTestBase):
 
     def test_record_and_retrieve_single_answer_with_preexisting_entry(self):
         stats_services.record_answer(
-            self.exploration, self.exploration.init_state_name,
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name, 'TextInput',
             stats_domain.SubmittedAnswer(
                 'first answer', 'TextInput', 0,
                 0, exp_domain.EXPLICIT_CLASSIFICATION, {},
@@ -280,7 +266,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         state_answers = stats_services.get_state_answers(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name)
-        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': 'first answer',
             'time_spent_in_sec': 1.0,
             'answer_group_index': 0,
@@ -292,7 +278,8 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         }])
 
         stats_services.record_answer(
-            self.exploration, self.exploration.init_state_name,
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name, 'TextInput',
             stats_domain.SubmittedAnswer(
                 'some text', 'TextInput', 0,
                 1, exp_domain.EXPLICIT_CLASSIFICATION, {},
@@ -306,7 +293,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         self.assertEqual(
             state_answers.state_name, feconf.DEFAULT_INIT_STATE_NAME)
         self.assertEqual(state_answers.interaction_id, 'TextInput')
-        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': 'first answer',
             'time_spent_in_sec': 1.0,
             'answer_group_index': 0,
@@ -344,7 +331,8 @@ class RecordAnswerTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 7.5),
         ]
         stats_services.record_answers(
-            self.exploration, self.exploration.init_state_name,
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name, 'TextInput',
             submitted_answer_list)
 
         # The order of the answers returned depends on the size of the answers.
@@ -356,7 +344,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         self.assertEqual(
             state_answers.state_name, feconf.DEFAULT_INIT_STATE_NAME)
         self.assertEqual(state_answers.interaction_id, 'TextInput')
-        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': 'answer a',
             'time_spent_in_sec': 10.0,
             'answer_group_index': 0,
@@ -403,7 +391,8 @@ class RecordAnswerTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 7.5),
         ]
         stats_services.record_answers(
-            self.exploration, self.exploration.init_state_name,
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name, 'TextInput',
             submitted_answer_list * 200)
 
         # Verify more than 1 shard was stored. The index shard (shard_id 0) is
@@ -423,11 +412,12 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             state_answers.state_name, feconf.DEFAULT_INIT_STATE_NAME)
         self.assertEqual(state_answers.interaction_id, 'TextInput')
         self.assertEqual(
-            len(self._get_submitted_answer_dict_list(state_answers)), 600)
+            len(state_answers.get_submitted_answer_dict_list()), 600)
 
     def test_record_many_answers_with_preexisting_entry(self):
         stats_services.record_answer(
-            self.exploration, self.exploration.init_state_name,
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name, 'TextInput',
             stats_domain.SubmittedAnswer(
                 '1 answer', 'TextInput', 0,
                 0, exp_domain.EXPLICIT_CLASSIFICATION, {},
@@ -436,7 +426,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         state_answers = stats_services.get_state_answers(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name)
-        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': '1 answer',
             'time_spent_in_sec': 1.0,
             'answer_group_index': 0,
@@ -459,7 +449,8 @@ class RecordAnswerTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 7.5),
         ]
         stats_services.record_answers(
-            self.exploration, self.exploration.init_state_name,
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name, 'TextInput',
             submitted_answer_list)
 
         # The order of the answers returned depends on the size of the answers.
@@ -471,7 +462,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         self.assertEqual(
             state_answers.state_name, feconf.DEFAULT_INIT_STATE_NAME)
         self.assertEqual(state_answers.interaction_id, 'TextInput')
-        self.assertEqual(self._get_submitted_answer_dict_list(state_answers), [{
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': '1 answer',
             'time_spent_in_sec': 1.0,
             'answer_group_index': 0,
@@ -541,7 +532,8 @@ class AnswerStatsTests(test_utils.GenericTestBase):
             self, answer_str, exploration, state_name,
             classification=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION):
         stats_services.record_answer(
-            exploration, state_name, stats_domain.SubmittedAnswer(
+            exploration.id, exploration.version, state_name, 'TextInput',
+            stats_domain.SubmittedAnswer(
                 answer_str, 'TextInput', 0, 0, classification, {}, 'session',
                 self.DEFAULT_TIME_SPENT))
 
@@ -829,7 +821,8 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
             self, answer_str, exploration, state_name,
             classification=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION):
         stats_services.record_answer(
-            exploration, state_name, stats_domain.SubmittedAnswer(
+            exploration.id, exploration.version, state_name, 'TextInput',
+            stats_domain.SubmittedAnswer(
                 answer_str, 'TextInput', 0, 0, classification, {}, 'session',
                 self.DEFAULT_TIME_SPENT))
 
@@ -970,8 +963,3 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
                 stats_services.get_exps_unresolved_answers_for_default_rule(
                     ['eid1']),
                 self._get_default_dict_when_no_unresolved_answers(['eid1']))
-
-
-class ExplorationStatsTests(test_utils.GenericTestBase):
-    """Tests for stats functions related to explorations."""
-    pass

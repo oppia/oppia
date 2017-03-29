@@ -18,9 +18,9 @@ import ast
 import collections
 import datetime
 import itertools
-import os
-import random
+import json
 import re
+import sys
 import traceback
 
 from core import jobs
@@ -42,7 +42,34 @@ import utils
 transaction_services = models.Registry.import_transaction_services()
 
 
-# pylint: disable=W0123
+def _unpack_state_rule_answer_log_model_id(item_id):
+    # Cannot unpack the item ID with a simple split, since the rule_str
+    # component can contains periods. The ID is guaranteed to always
+    # contain 4 parts: exploration ID, state name, handler name, and
+    # rule_str.
+    item_id_tokens = item_id
+
+    period_idx = item_id_tokens.index('.')
+    exp_id = item_id_tokens[:period_idx]
+
+    item_id_tokens = item_id_tokens[period_idx+1:]
+    handler_period_idx = item_id_tokens.index('submit') - 1
+    state_name = item_id_tokens[:handler_period_idx]
+
+    item_id_tokens = item_id_tokens[handler_period_idx+1:]
+    period_idx = item_id_tokens.index('.')
+    handler_name = item_id_tokens[:period_idx]
+
+    item_id_tokens = item_id_tokens[period_idx+1:]
+    rule_str = item_id_tokens
+    return (exp_id, state_name, handler_name, rule_str)
+
+
+def _get_answer_dict_size(answer_dict):
+    """Returns a size overestimate (in bytes) of the given answer dict."""
+    return sys.getsizeof(json.dumps(answer_dict))
+
+
 class StatisticsAudit(jobs.BaseMapReduceJobManager):
 
     _STATE_COUNTER_ERROR_KEY = 'State Counter ERROR'
@@ -147,7 +174,12 @@ class StatisticsAudit(jobs.BaseMapReduceJobManager):
 
 
 class AnswersAudit(jobs.BaseMapReduceJobManager):
-
+    """Provides statistics for the number of times each rule type occurs in
+    StateRuleAnswerLogModel. This job is successful if no errors are reported in
+    the job output. The statistics computed by this job can be compared to
+    results from AnswersAudit2 to determine whether the AnswerMigrationJob was
+    successful.
+    """
     # pylint: disable=invalid-name
     _STATE_COUNTER_ERROR_KEY = 'State Counter ERROR'
     _UNKNOWN_HANDLER_NAME_COUNTER_KEY = 'UnknownHandlerCounter'
@@ -159,6 +191,7 @@ class AnswersAudit(jobs.BaseMapReduceJobManager):
     _HANDLER_ERROR_RULE_COUNTER_KEY = 'ErrorRuleCounter'
     _UNIQUE_ANSWER_COUNTER_KEY = 'UniqueAnswerCounter'
     _CUMULATIVE_ANSWER_COUNTER_KEY = 'CumulativeAnswerCounter'
+    # pylint: enable=invalid-name
 
     @classmethod
     def _get_consecutive_dot_count(cls, string, idx):
@@ -181,19 +214,12 @@ class AnswersAudit(jobs.BaseMapReduceJobManager):
             })
             return
 
-        period_idx = item_id.index('submit')
-        item_id = item_id[period_idx:]
-        period_idx = item_id.index('.')
-        period_idx += (
-            AnswersAudit._get_consecutive_dot_count(item_id, period_idx) - 1)
-        handler_name = item_id[:period_idx]
+        _, _, handler_name, rule_str = (
+            _unpack_state_rule_answer_log_model_id(item_id))
         yield (handler_name, {
             'reduce_type': AnswersAudit._SUBMIT_HANDLER_NAME_COUNTER_KEY,
             'rule_spec_str': item.id
         })
-
-        item_id = item_id[period_idx+1:]
-        rule_str = item_id
 
         answers = item.answers
         total_submission_count = 0
@@ -247,7 +273,7 @@ class AnswersAudit(jobs.BaseMapReduceJobManager):
         for value_str in stringified_values:
             value_dict = ast.literal_eval(value_str)
             if reduce_type and reduce_type != value_dict['reduce_type']:
-                yield 'Internal error 1'
+                yield 'Error: Internal error 1'
             elif not reduce_type:
                 reduce_type = value_dict['reduce_type']
 
@@ -262,7 +288,7 @@ class AnswersAudit(jobs.BaseMapReduceJobManager):
         elif reduce_type == AnswersAudit._SUBMIT_HANDLER_NAME_COUNTER_KEY:
             yield 'Found handler "%s" %d time(s)' % (key, reduce_count)
         elif reduce_type == AnswersAudit._HANDLER_FUZZY_RULE_COUNTER_KEY:
-            yield 'Found fuzzy rules %d time(s)' % reduce_count
+            yield 'Error: Found fuzzy rules %d time(s)' % reduce_count
         elif reduce_type == AnswersAudit._HANDLER_DEFAULT_RULE_COUNTER_KEY:
             yield 'Found default rules %d time(s)' % reduce_count
         elif reduce_type == AnswersAudit._HANDLER_STANDARD_RULE_COUNTER_KEY:
@@ -271,18 +297,21 @@ class AnswersAudit(jobs.BaseMapReduceJobManager):
             yield 'Standard rule submitted %d time(s)' % reduce_count
         elif reduce_type == AnswersAudit._HANDLER_ERROR_RULE_COUNTER_KEY:
             yield (
-                'Encountered invalid rule string %d time(s) (is it too long?): '
-                '"%s"' % (reduce_count, key))
+                'Error: Encountered invalid rule string %d time(s) (is it too '
+                'long?): "%s"' % (reduce_count, key))
         elif reduce_type == AnswersAudit._UNIQUE_ANSWER_COUNTER_KEY:
             yield 'Total of %d unique answers' % reduce_count
         elif reduce_type == AnswersAudit._CUMULATIVE_ANSWER_COUNTER_KEY:
             yield 'Total of %d answers have been submitted' % reduce_count
         else:
-            yield 'Internal error 2'
+            yield 'Error: Internal error 2'
 
 
 class AnswersAudit2(jobs.BaseMapReduceJobManager):
-
+    """Functionally equivalent to AnswersAudit except this audits answers in
+    StateAnswersModel and does not include handler information since no handlers
+    are stored in the new answer model.
+    """
     # pylint: disable=invalid-name
     _HANDLER_FUZZY_RULE_COUNTER_KEY = 'FuzzyRuleCounter'
     _HANDLER_DEFAULT_RULE_COUNTER_KEY = 'DefaultRuleCounter'
@@ -290,6 +319,7 @@ class AnswersAudit2(jobs.BaseMapReduceJobManager):
     _STANDARD_RULE_SUBMISSION_COUNTER_KEY = 'StandardRuleSubmitCounter'
     _HANDLER_ERROR_RULE_COUNTER_KEY = 'ErrorRuleCounter'
     _CUMULATIVE_ANSWER_COUNTER_KEY = 'CumulativeAnswerCounter'
+    # pylint: enable=invalid-name
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -337,12 +367,12 @@ class AnswersAudit2(jobs.BaseMapReduceJobManager):
         for value_str in stringified_values:
             value_dict = ast.literal_eval(value_str)
             if reduce_type and reduce_type != value_dict['reduce_type']:
-                yield 'Internal error 1'
+                yield 'Error: Internal error 1'
             elif not reduce_type:
                 reduce_type = value_dict['reduce_type']
 
         if reduce_type == AnswersAudit2._HANDLER_FUZZY_RULE_COUNTER_KEY:
-            yield 'Found fuzzy rules %d time(s)' % reduce_count
+            yield 'Error: Found fuzzy rules %d time(s)' % reduce_count
         elif reduce_type == AnswersAudit2._HANDLER_DEFAULT_RULE_COUNTER_KEY:
             yield 'Found default rules %d time(s)' % reduce_count
         elif reduce_type == AnswersAudit2._HANDLER_STANDARD_RULE_COUNTER_KEY:
@@ -351,12 +381,12 @@ class AnswersAudit2(jobs.BaseMapReduceJobManager):
             yield 'Standard rule submitted %d time(s)' % reduce_count
         elif reduce_type == AnswersAudit2._HANDLER_ERROR_RULE_COUNTER_KEY:
             yield (
-                'Encountered invalid rule string %d time(s) (is it too long?): '
-                '"%s"' % (reduce_count, key))
+                'Error: Encountered invalid rule string %d time(s) (is it too '
+                'long?): "%s"' % (reduce_count, key))
         elif reduce_type == AnswersAudit2._CUMULATIVE_ANSWER_COUNTER_KEY:
             yield 'Total of %d answers have been submitted' % reduce_count
         else:
-            yield 'Internal error 2'
+            yield 'Error: Internal error 2'
 
 
 class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
@@ -374,31 +404,15 @@ class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
     @staticmethod
     def map(item):
         if isinstance(item, stats_models.StateRuleAnswerLogModel):
-            item_id = item.id
-
-            period_idx = item_id.index('.')
-            exp_id = item_id[:period_idx]
-
-            item_id = item_id[period_idx+1:]
-            handler_period_idx = item_id.index('submit') - 1
-            state_name = item_id[:handler_period_idx]
-
-            item_id = item_id[handler_period_idx+1:]
-            period_idx = item_id.index('.')
-
-            item_id = item_id[period_idx+1:]
-            rule_str = item_id
+            exp_id, state_name, _, rule_str = (
+                _unpack_state_rule_answer_log_model_id(item.id))
 
             if '(' in rule_str:
                 rule_name = rule_str[:rule_str.index('(')]
             else:
                 rule_name = rule_str
 
-            answers = item.answers
-            total_submission_count = 0
-            for _, count in answers.iteritems():
-                total_submission_count = total_submission_count + count
-
+            total_submission_count = sum(item.answers.itervalues())
             yield (item.id, {
                 'frequency': total_submission_count,
                 'type': RuleTypeBreakdownAudit._OLD_ANSWER_MODEL_TYPE,
@@ -480,7 +494,8 @@ class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
                     'and %d in the new model' % (
                         rule_name, item_id, old_total_count, new_total_count))
             else:
-                # This output will be aggregated and acts as a sanity check.
+                # This output will be aggregated since job output is
+                # de-duplicated. and acts as a sanity check.
                 yield (
                     '%s: Exploration has the same number of answers in both '
                     'models' % rule_name)
@@ -500,20 +515,8 @@ class ClearUnknownMissingAnswersJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def map(item):
         if isinstance(item, stats_models.StateRuleAnswerLogModel):
-            item_id = item.id
-
-            period_idx = item_id.index('.')
-            exp_id = item_id[:period_idx]
-
-            item_id = item_id[period_idx+1:]
-            handler_period_idx = item_id.index('submit') - 1
-            state_name = item_id[:handler_period_idx]
-
-            item_id = item_id[handler_period_idx+1:]
-            period_idx = item_id.index('.')
-
-            item_id = item_id[period_idx+1:]
-            rule_str = item_id
+            exp_id, state_name, _, rule_str = (
+                _unpack_state_rule_answer_log_model_id(item.id))
 
             if '(' in rule_str:
                 rule_name = rule_str[:rule_str.index('(')]
@@ -584,6 +587,11 @@ class ClearUnknownMissingAnswersJob(jobs.BaseMapReduceJobManager):
                         migrated_answer_record.exploration_id, exp_version,
                         migrated_answer_record.state_name)
                     if not all_models:
+                        yield (
+                            'Encountered model with old model ID \'%s\' which '
+                            'has a record for exploration version %s but no '
+                            'corresponding model' % (
+                                item_id.decode('utf-8'), exp_version))
                         continue
                     # The entire state of records need to be deleted since there
                     # isn't a reliable way to go into submitted answers and
@@ -597,8 +605,8 @@ class ClearUnknownMissingAnswersJob(jobs.BaseMapReduceJobManager):
                             in state_answer_model.submitted_answer_list]
                         exp_id = state_answer_model.exploration_id
                         state_name = state_answer_model.state_name
-                        for submited_answer in submitted_answers:
-                            rule_str = submited_answer.rule_spec_str
+                        for submitted_answer in submitted_answers:
+                            rule_str = submitted_answer.rule_spec_str
                             old_item_id = u'%s.%s.%s.%s' % (
                                 exp_id, state_name, 'submit', rule_str)
                             separate_migrated_answer_record = (
@@ -629,7 +637,7 @@ class ClearMigratedAnswersJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
-        yield '%s: deleted %d answer buckets' % (key, len(stringified_values))
+        yield '%s: deleted %d items' % (key, len(stringified_values))
 
 
 class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
@@ -655,26 +663,8 @@ class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        item_id = item.id
-
-        if 'submit' not in item_id:
-            yield (PurgeInconsistentAnswersJob._REMOVED_INVALID_HANDLER, {})
-            yield (PurgeInconsistentAnswersJob._AGGREGATION_KEY, {})
-            item.delete()
-            return
-
-        period_idx = item_id.index('.')
-        exp_id = item_id[:period_idx]
-
-        item_id = item_id[period_idx+1:]
-        handler_period_idx = item_id.index('submit') - 1
-
-        item_id = item_id[handler_period_idx+1:]
-        period_idx = item_id.index('.')
-        handler_name = item_id[:period_idx]
-
-        item_id = item_id[period_idx+1:]
-        rule_str = item_id
+        exp_id, _, handler_name, rule_str = (
+            _unpack_state_rule_answer_log_model_id(item.id))
 
         if handler_name != 'submit':
             yield (PurgeInconsistentAnswersJob._REMOVED_INVALID_HANDLER, {})
@@ -700,10 +690,6 @@ class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
             item.delete()
             return
         if exp_model.deleted:
-            # TODO(bhenning): Decide if we actually want to omit these answers.
-            # They might be useful in case the corresponding exploration is ever
-            # undeleted. If it never will be, it's safe to remove these answers
-            # permanently.
             yield (PurgeInconsistentAnswersJob._REMOVED_DELETED_EXP, {})
             yield (PurgeInconsistentAnswersJob._AGGREGATION_KEY, {})
             item.delete()
@@ -714,8 +700,6 @@ class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
             item.delete()
             return
 
-        # TODO(bhenning): Verify these buckets are okay to delete before running
-        # the final production job.
         bucket_ids_to_remove_graph_input = [
             '11.Bosses question.submit.Default',
             '11.Cities question.submit.Default',
@@ -837,8 +821,7 @@ class SplitLargeAnswerBucketsJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def map(item):
         if stats_models.LargeAnswerBucketModel.should_split_log_entity(item):
-            # pylint: disable=line-too-long
-            stats_models.LargeAnswerBucketModel.insert_state_rule_answer_log_entity(item)
+            stats_models.LargeAnswerBucketModel.insert_state_rule_answer_log_entity(item) # pylint: disable=line-too-long
             yield (SplitLargeAnswerBucketsJob._SPLIT_ANSWER_KEY, {
                 'item_id': item.id,
                 'answer_count': len(item.answers)
@@ -898,7 +881,8 @@ class CleanupLargeBucketLabelsFromNewAnswersJob(jobs.BaseMapReduceJobManager):
         for submitted_answer in submitted_answers:
             if submitted_answer.large_bucket_entity_id:
                 submitted_answer.large_bucket_entity_id = None
-                new_submitted_answer_sizes.append(submitted_answer.json_size)
+                new_submitted_answer_sizes.append(
+                    _get_answer_dict_size(submitted_answer.to_dict()))
         # If any answers were submitted, update the model.
         if new_submitted_answer_sizes:
             item.submitted_answer_list = [
@@ -978,7 +962,7 @@ class AnswerMigrationCleanupJob(jobs.BaseMapReduceJobManager):
                     not in incomplete_bucket_ids)
             ]
             removed_answer_sizes = [
-                submitted_answer_dict['json_size']
+                _get_answer_dict_size(submitted_answer_dict)
                 for submitted_answer_dict in submitted_answer_list
                 if 'large_bucket_entity_id' in submitted_answer_dict and (
                     submitted_answer_dict['large_bucket_entity_id']
@@ -1087,59 +1071,14 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         'A5'
     ]
 
-    # Following are all rules in Oppia during the time of answer migration. (44)
-    # Each being migrated by this job is prefixed with a '+' and, conversely, a
-    # prefix of '-' indicates it is not being migrated by this job. 6 rules are
-    # not being recovered. Also, rules which cannot be 100% recovered are noted.
-    # + checked_proof.Correct
-    # - checked_proof.NotCorrect
-    # - checked_proof.NotCorrectByCategory
-    # + click_on_image.IsInRegion
-    # - code_evaluation.CodeEquals
-    # + code_evaluation.CodeContains (cannot be 100% recovered)
-    # + code_evaluation.CodeDoesNotContain (cannot be 100% recovered)
-    # + code_evaluation.OutputEquals (cannot be 100% recovered)
-    # + code_evaluation.ResultsInError (cannot be 100% recovered)
-    # - code_evaluation.ErrorContains
-    # + coord_two_dim.Within
-    # + coord_two_dim.NotWithin
-    # - graph.HasGraphProperty
-    # - graph.IsIsomorphicTo
-    # + math_expression.IsMathematicallyEquivalentTo
-    # + music_phrase.Equals
-    # + music_phrase.IsLongerThan
-    # + music_phrase.HasLengthInclusivelyBetween
-    # + music_phrase.IsEqualToExceptFor
-    # + music_phrase.IsTranspositionOf
-    # + music_phrase.IsTranspositionOfExceptFor
-    # + nonnegative_int.Equals
-    # + normalized_string.Equals
-    # + normalized_string.CaseSensitiveEquals
-    # + normalized_string.StartsWith
-    # + normalized_string.Contains
-    # + normalized_string.FuzzyEquals
-    # + real.Equals
-    # + real.IsLessThan
-    # + real.IsGreaterThan
-    # + real.IsLessThanOrEqualTo
-    # + real.IsGreaterThanOrEqualTo
-    # + real.IsInclusivelyBetween
-    # + real.IsWithinTolerance
-    # + set_of_html_string.Equals
-    # + set_of_html_string.ContainsAtLeastOneOf
-    # + set_of_html_string.DoesNotContainAtLeastOneOf
-    # + set_of_unicode_string.Equals
-    # + set_of_unicode_string.IsSubsetOf
-    # + set_of_unicode_string.IsSupersetOf
-    # + set_of_unicode_string.HasElementsIn
-    # + set_of_unicode_string.HasElementsNotIn
-    # + set_of_unicode_string.OmitsElementsIn
-    # + set_of_unicode_string.IsDisjointFrom
-
     # NOTE TO DEVELOPERS: This was never a modifiable value, so it will always
     # take the minimum value. It wasn't stored in answers, but it does not need
     # to be reconstituted.
     _NOTE_DURATION_FRACTION_PART = 1
+
+    RTE_LATEX_START = (
+        '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;')
+    RTE_LATEX_END = '&amp;quot;"></oppia-noninteractive-math>'
 
     # A modern version of
     # https://github.com/oppia/oppia/blob/94df0f/extensions/widgets/interactive/FileReadInput/FileReadInput.py.
@@ -1195,6 +1134,12 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     def _get_exploration_models_by_versions(cls, exp_id, versions):
         """Similar to VersionedModel.get_version(), except this allows retrieval
         of exploration models marked as deleted.
+
+        Returns a tuple with the first element a list of exploration models, one
+        for each version in the versions list and in the same order. The second
+        element is an error, if any occurred. Either the first or second element
+        will be None and one will always be None, depending on the outcome of
+        the method.
         """
         try:
             # pylint: disable=protected-access
@@ -1205,6 +1150,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 exp_models.ExplorationModel(id=exp_id) for _ in versions]
             return (exp_models.ExplorationModel._reconstitute_multi_from_models(
                 zip(snapshot_ids, exp_models_by_versions)), None)
+            # pylint: enable=protected-access
         except Exception as error:
             return (None, error)
 
@@ -1244,6 +1190,13 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _get_explorations_from_models(cls, exp_models_by_versions):
+        """Returns a tuple with the first element being a list of Exploration
+        objects for each ExplorationModel passed in exp_models_by_versions. The
+        second element is a boolean indicating whether a conversion error
+        occurred when performing an needed exploration migrations for one of the
+        ExplorationModels. The third element is any errors that occurred,
+        ExplorationConversionError or otherwise.
+        """
         cls._ensure_removed_interactions_are_in_registry()
         try:
             return (list([
@@ -1267,11 +1220,13 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _get_all_exploration_versions(cls, exp_id, max_version):
-        """Return all exploration versions for the given exploration ID in
-        descending order by version, or an empty list if none could be found
-        (such as if the exploration was permanently deleted). This function can
-        retrieve deleted explorations. Returns None if any exploration that
-        would have been returned failed a migration.
+        """Returns a tuple with the first element being a list of explorations
+        up to the max_version specified and the second element being any
+        migration errors that occurred while retrieivng the explorations, or
+        None if no migration errors occurred. The returned explorations are in
+        descending order by version. This function can retrieve deleted
+        explorations, but not permanently deleted explorations (in which case
+        the first element of the tuple will be empty list).
         """
         # NOTE(bhenning): It's possible some of these answers were submitted
         # during a playthrough where the exploration was changed midway. There's
@@ -1302,8 +1257,10 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             return tuple([cls._get_hashable_value(elem) for elem in value])
         elif isinstance(value, dict):
             return cls._get_hashable_value(
-                [(cls._get_hashable_value(key), cls._get_hashable_value(value))
-                 for (key, value) in value.iteritems()])
+                sorted([
+                    (cls._get_hashable_value(key),
+                     cls._get_hashable_value(value))
+                    for (key, value) in value.iteritems()]))
         else:
             return value
 
@@ -1436,8 +1393,6 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _infer_classification_categorization(cls, rule_str):
-        # At this point, no classification was possible. Thus, only soft, hard,
-        # and default classifications are possible.
         fuzzy_rule_type = 'FuzzyMatches'
         if rule_str == cls._DEFAULT_RULESPEC_STR:
             return exp_domain.DEFAULT_OUTCOME_CLASSIFICATION
@@ -1448,12 +1403,12 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _normalize_raw_answer_object(
-            cls, answer_object, raw_answer, answer_str):
+            cls, object_cls, raw_answer, answer_str):
         try:
             return (
-                answer_object.normalize(raw_answer), None)
+                object_cls.normalize(raw_answer), None)
         except AssertionError as error:
-            answer_object_type_name = type(answer_object).__name__
+            answer_object_type_name = type(object_cls).__name__
             error_str = str(error)
             return (
                 None,
@@ -1479,9 +1434,6 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # special sentinel values. Empty strings must be checked in conjunction
         # with the session_id to determine whether the empty string is the
         # special sentinel value.
-
-        # TODO(bhenning): Should something more significant (like None) be used
-        # for sentinel values for output/evaluation/error instead?
         if answer_str is None:
             return (None, 'Failed to recover code: \'%s\'' % answer_str)
         if rule_str != cls._DEFAULT_RULESPEC_STR:
@@ -1546,6 +1498,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         #   [{% for edge in answer.edges -%}
         #     ({{edge.src}},{{edge.dst}}){% if not loop.last -%},{% endif -%}
         #   {% endfor -%}]
+        # pylint: enable=line-too-long
 
         # This answer type is not being reconstituted. 'HasGraphProperty' has
         # never had an answer submitted for it. 'IsIsomorphicTo' has had 5
@@ -1565,17 +1518,13 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # pylint: disable=line-too-long
         # The Jinja representation for ClickOnImage answer strings is:
         #   ({{'%0.3f' | format(answer.clickPosition[0]|float)}}, {{'%0.3f'|format(answer.clickPosition[1]|float)}})
-        if rule_str != cls._DEFAULT_RULESPEC_STR:
-            if rule_spec.rule_type != 'IsInRegion':
-                return (
-                    None,
-                    'Cannot reconstitute ImageClickInput object without an '
-                    'IsInRegion rule.')
-            # Extract the region clicked on from the rule string.
-            clicked_regions = [rule_str[len(rule_spec.rule_type) + 1:-1]]
-        else:
-            # If the default outcome happened, then no regions were clicked on
-            clicked_regions = []
+        # pylint: enable=line-too-long
+        if (rule_str != cls._DEFAULT_RULESPEC_STR
+                and rule_spec.rule_type != 'IsInRegion'):
+            return (
+                None,
+                'Cannot reconstitute ImageClickInput object without an '
+                'IsInRegion rule.')
 
         # Match the pattern: '(real, real)' to extract the coordinates. One
         # answer in production demonstrated a negative coordinate.
@@ -1586,10 +1535,40 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             return (
                 None,
                 'Bad answer string in ImageClickInput IsInRegion rule.')
+        click_position_x = float(match.group('x'))
+        click_position_y = float(match.group('y'))
+
+        # If the default outcome happened, then either the user did not
+        # click on a region or there is no answer group associated with the
+        # clicked region. Try to recover which region was clicked, if any.
+        clicked_regions = []
+        customization_args = state.interaction.customization_args
+        image_and_regions_dict = customization_args['imageAndRegions']['value']
+        for labeled_region_dict in image_and_regions_dict['labeledRegions']:
+            region_dict = labeled_region_dict['region']
+            if region_dict['regionType'] == 'Rectangle':
+                region_area = region_dict['area']
+                left_x = region_area[0][0]
+                upper_y = region_area[0][1]
+                right_x = region_area[1][0]
+                lower_y = region_area[1][1]
+                if (left_x <= click_position_x <= right_x
+                        and upper_y <= click_position_y <= lower_y):
+                    clicked_regions.append(labeled_region_dict['label'])
+
+        # For IsInRegion, ensure that the inputted region matches customization
+        # args for this state.
+        if rule_str != cls._DEFAULT_RULESPEC_STR:
+            # Extract the region clicked on from the rule string.
+            expected_clicked_region = rule_str[len(rule_spec.rule_type) + 1:-1]
+            if expected_clicked_region not in clicked_regions:
+                return (
+                    None,
+                    'Expected IsInRegion occurrence to refer to the region '
+                    'actually containing the clicked coordinates')
+
         click_on_image_dict = {
-            'clickPosition': [
-                float(match.group('x')), float(match.group('y'))
-            ],
+            'clickPosition': [click_position_x, click_position_y],
             'clickedRegions': clicked_regions
         }
         return cls._normalize_raw_answer_object(
@@ -1601,6 +1580,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # pylint: disable=line-too-long
         # The Jinja representation for CoordTwoDim answer strings is:
         #   ({{'%0.6f' | format(answer[0]|float)}}, {{'%0.6f'|format(answer[1]|float)}})
+        # pylint: enable=line-too-long
         supported_rule_types = ['Within', 'NotWithin']
         if rule_str != cls._DEFAULT_RULESPEC_STR:
             if rule_spec.rule_type not in supported_rule_types:
@@ -1809,18 +1789,15 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                         'choices in the exploration: %s (len=%d)' % (
                             clicked_index, choices, len(choices)))
                 if answer_str != choices[clicked_index]:
-                    rte_latex_start = (
-                        '<oppia-noninteractive-math '
-                        'raw_latex-with-value="&amp;quot;')
-                    rte_latex_end = '&amp;quot;"></oppia-noninteractive-math>'
                     expected_answer = choices[clicked_index]
                     if (not answer_str.startswith('$') or
                             not answer_str.endswith('$') or
-                            not expected_answer.startswith(rte_latex_start) or
-                            not expected_answer.endswith(rte_latex_end)):
+                            not expected_answer.startswith(
+                                cls.RTE_LATEX_START) or
+                            not expected_answer.endswith(cls.RTE_LATEX_END)):
                         stripped_answer_str = answer_str[1:-1]
                         stripped_expected_answer = expected_answer[
-                            len(rte_latex_start):-len(rte_latex_end)]
+                            len(cls.RTE_LATEX_START):-len(cls.RTE_LATEX_END)]
                         if stripped_answer_str != stripped_expected_answer:
                             return (
                                 None,
@@ -1861,7 +1838,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                     None,
                     'Unsupported rule type encountered while attempting to '
                     'reconstitute MusicPhrase object: %s' % rule_spec.rule_type)
-        answer_str = answer_str.rstrip()
+        answer_str = answer_str.strip()
         if answer_str == 'No answer given.':
             return cls._normalize_raw_answer_object(
                 objects.MusicPhrase, [], answer_str)
@@ -1971,8 +1948,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         if interaction_id in cls._RECONSTITUTION_FUNCTION_MAP:
             reconstitute = getattr(
                 cls, cls._RECONSTITUTION_FUNCTION_MAP[interaction_id])
-            # If the answer is a default answer, then rule_spec will not be
-            # defined.
+            # If the answer is a default answer, then rule_spec will be None.
             return reconstitute(
                 state, answer_group_index, rule_spec, rule_str, answer_str)
         return (
@@ -1981,31 +1957,16 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             interaction_id)
 
     @classmethod
-    def _evaluate_string_literal(cls, literal_str):
-        class Transformer(ast.NodeTransformer):
-            ALLOWED_NAMES = set(['datetime', 'None', 'False', 'True'])
-            ALLOWED_NODE_TYPES = set(['Expression', 'Tuple', 'Call', 'Name',
-                                      'Load', 'Str', 'Num', 'List', 'Dict',
-                                      'Attribute'])
+    def _datetime_to_float(cls, dt):
+        """Converts a Python datetime object to a float (in seconds)."""
+        # http://stackoverflow.com/a/35337826
+        return (dt - datetime.datetime.utcfromtimestamp(0)).total_seconds()
 
-            # pylint: disable=invalid-name
-            def visit_Name(self, node):
-                if node.id not in self.ALLOWED_NAMES:
-                    raise RuntimeError(
-                        'Name access to %s not allowed' % node.id)
-                return self.generic_visit(node)
-
-            def generic_visit(self, node):
-                node_type_name = type(node).__name__
-                if node_type_name not in self.ALLOWED_NODE_TYPES:
-                    raise RuntimeError(
-                        'Invalid node of type: %s' % node_type_name)
-                return ast.NodeTransformer.generic_visit(self, node)
-
-        tree = ast.parse(literal_str, mode='eval')
-        Transformer().visit(tree)
-        compiled = compile(tree, '<AST>', 'eval')
-        return eval(compiled, {'datetime': datetime})
+    @classmethod
+    def _float_to_datetime(cls, sec):
+        """Converts a float in seconds to a datetime object."""
+        # http://stackoverflow.com/a/35337826
+        return datetime.datetime.utcfromtimestamp(sec)
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -2051,25 +2012,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                     'already been migrated')
                 return
 
-        # Cannot unpack the item ID with a simple split, since the rule_str
-        # component can contains periods. The ID is guaranteed to always
-        # contain 4 parts: exploration ID, state name, handler name, and
-        # rule_str.
-        item_id_tokens = item_id
-
-        period_idx = item_id_tokens.index('.')
-        exp_id = item_id_tokens[:period_idx]
-
-        item_id_tokens = item_id_tokens[period_idx+1:]
-        handler_period_idx = item_id_tokens.index('submit') - 1
-        state_name = item_id_tokens[:handler_period_idx]
-
-        item_id_tokens = item_id_tokens[handler_period_idx+1:]
-        period_idx = item_id_tokens.index('.')
-        handler_name = item_id_tokens[:period_idx]
-
-        item_id_tokens = item_id_tokens[period_idx+1:]
-        rule_str = item_id_tokens
+        exp_id, state_name, handler_name, rule_str = (
+            _unpack_state_rule_answer_log_model_id(item_id))
 
         # The exploration and state name are needed in the new data model and
         # are also needed to cross reference the answer. Since the answer is
@@ -2094,18 +2038,13 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         else:
             max_version = latest_exp_model.version
 
-        # Split up the answers across multiple shards (64) so that they may be
-        # more randomly distributed.
-        random.seed('%s.%s.%s' % (
-            item_id, datetime.datetime.utcnow(), os.urandom(64)))
-        entropy = random.randint(0, 63)
         yield ('%s.%s.%s' % (exp_id, max_version, state_name), {
             'item_id': item_id,
             'exploration_id': exp_id,
             'exploration_max_version': max_version,
             'state_name': state_name,
             'rule_str': rule_str,
-            'last_updated': last_updated,
+            'last_updated': AnswerMigrationJob._datetime_to_float(last_updated),
             'large_answer_bucket_id': large_answer_bucket_id,
             'large_answer_bucket_count': large_answer_bucket_count
         })
@@ -2121,7 +2060,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             return
 
         value_dict_list = [
-            AnswerMigrationJob._evaluate_string_literal(stringified_value)
+            ast.literal_eval(stringified_value)
             for stringified_value in stringified_values]
 
         # The first dict can be used to extract exploration_id and state_name,
@@ -2161,7 +2100,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         for value_dict in value_dict_list:
             item_id = value_dict['item_id'].decode('utf-8')
             rule_str = value_dict['rule_str']
-            last_updated = value_dict['last_updated']
+            last_updated = AnswerMigrationJob._float_to_datetime(
+                value_dict['last_updated'])
             large_answer_bucket_id = value_dict['large_answer_bucket_id']
             if large_answer_bucket_id:
                 large_answer_bucket_id = large_answer_bucket_id.decode('utf-8')
@@ -2196,13 +2136,13 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                     large_answer_bucket_id))
             return
 
-        # If the item ID has been truncated, the answer might not be abel to be
+        # If the item ID has been truncated, the answer might not be able to be
         # migrated. Some answers have been confirmed to still work even with
         # truncated item IDs.
         if len(item_id) == 490 and item_id[-1] != ')' and (
                 'ContainsAtLeastOneOf' not in item_id):
-            # Mark the answer as migrated so it does not fail post-migration
-            # validation.
+            # Truncated answers should fail post-migration validation since they
+            # should be removed as part of the purge job.
             yield 'Encountered truncated item ID'
             return
 
@@ -2215,7 +2155,6 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
         migrated_answers = []
         matched_explorations = []
-        answer_strings = []
         answer_frequencies = []
         migrated_answer_count = 0
         for answer_str, answer_frequency in answers.iteritems():
@@ -2227,23 +2166,19 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 # saving too many answers to the datatore in one go. Simply
                 # repeating the answer, exploration, and answer string is
                 # adequate because answers can be stored incrementally.
-                def _append_answer(
-                        migrated_answer, matched_exp, answer_str, frequency):
+                def _append_answer(migrated_answer, matched_exp, frequency):
                     migrated_answers.append(migrated_answer)
                     matched_explorations.append(matched_exp)
-                    answer_strings.append(answer_str)
                     answer_frequencies.append(frequency)
 
                 batch_count = answer_frequency / 100
                 for _ in xrange(batch_count):
-                    _append_answer(
-                        migrated_answer, matched_exp, answer_str, 100)
+                    _append_answer(migrated_answer, matched_exp, 100)
 
                 remaining_answers = answer_frequency % 100
                 if remaining_answers > 0:
                     _append_answer(
-                        migrated_answer, matched_exp, answer_str,
-                        remaining_answers)
+                        migrated_answer, matched_exp, remaining_answers)
 
                 migrated_answer_count = migrated_answer_count + 1
             else:
@@ -2253,15 +2188,16 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             yield 'Failed to migrate all answers for item batch: %s' % item_id
             return
 
-        for answer, exploration, answer_str, answer_frequency in zip(
-                migrated_answers, matched_explorations, answer_strings,
-                answer_frequencies):
+        for answer, exploration, answer_frequency in zip(
+                migrated_answers, matched_explorations, answer_frequencies):
             # The resolved answer will simply be duplicated in the new data
             # store to replicate frequency.
             submitted_answer_list = [answer] * answer_frequency
 
             stats_services.record_answers(
-                exploration, state_name, submitted_answer_list)
+                exploration.id, exploration.version, state_name,
+                exploration.states[state_name].interaction.id,
+                submitted_answer_list)
             exploration_version = exploration.version
 
             stats_models.MigratedAnswerModel.finish_migrating_answer(
@@ -2284,12 +2220,9 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         corresponds to the newer exploration.
 
         Returns a tuple containing the migrated answer, the exploration that was
-        used to migrate the answer, an an error. The error is None unless the
+        used to migrate the answer, and an error. The error is None unless the
         migration failed.
         """
-        # TODO(bhenning): Consider outputting the results of running this
-        # matching procedure (e.g. how many versions were skipped with errors
-        # before a matching answer was found).
         if last_updated < explorations[-1].created_on:
             return (
                 None, None,
@@ -2299,7 +2232,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         matched_answer = None
         first_error = None
         matched_exploration = None
-        # pylint: disable=unidiomatic-typecheck
+        has_matched_answer = False
         for exploration in explorations:
             # A newer exploration could not be the recipient of this answer if
             # the last answer for this entity was submitted before this version
@@ -2310,22 +2243,23 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 answer, error = cls._migrate_answer(
                     answer_str, rule_str, exploration, state_name,
                     large_answer_bucket_id)
-            except:
+            except Exception:
                 answer = None
                 error = traceback.format_exc()
-            if not answer:
+            if error:
                 if not first_error:
                     first_error = error
             elif not matched_answer:
                 matched_answer = answer
                 matched_exploration = exploration
+                has_matched_answer = True
 
                 # Only pick the earliest matched answer. Any subsequent errors
                 # or similarly migrated values are useless at this point, as a
                 # successful migration has occurred.
                 break
 
-        if matched_answer:
+        if has_matched_answer:
             first_error = None
         elif not first_error:
             first_error = (
@@ -2367,24 +2301,19 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         time_spent_in_sec = (
             stats_domain.MIGRATED_STATE_ANSWER_TIME_SPENT_IN_SEC)
 
+        state = exploration.states[state_name]
+
         # Unfortunately, the answer_group_index and rule_spec_index may be
         # wrong for soft rules, since previously there was no way of
         # differentiating between which soft rule was selected. This problem is
         # also revealed for RuleSpecs which produce the same rule_spec_str.
-        answer_group_index = None
-        rule_spec_index = None
-
-        # By default, the answer is matched with the default outcome.
-        answer_group = None
-        rule_spec = None
-
-        state = exploration.states[state_name]
         (answer_group_index, rule_spec_index, error_string) = (
             cls._infer_which_answer_group_and_rule_match_answer(
                 state, rule_str))
 
-        # Major point of failure: answer_group_index or rule_spec_index may
-        # return none when it's not a default result.
+        # Major point of failure: answer_group_index or rule_spec_index may be
+        # None if the rule_str cannot be matched against any of the rules
+        # defined in the state.
         if answer_group_index is None or rule_spec_index is None:
             return (
                 None,
@@ -2393,6 +2322,10 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                     rule_str.encode('utf-8'),
                     error_string.encode('utf-8'),
                     state.to_dict()))
+
+        # By default, the answer is matched with the default outcome.
+        answer_group = None
+        rule_spec = None
 
         answer_groups = state.interaction.answer_groups
         if answer_group_index != len(answer_groups):
@@ -2410,9 +2343,9 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             outcome = (
                 state.interaction.answer_groups[answer_group_index].outcome)
             temporary_special_param = next(
-               (param_change for param_change in outcome.param_changes
-                if param_change.name == (
-                    AnswerMigrationJob._TEMPORARY_SPECIAL_RULE_PARAMETER)),
+                (param_change for param_change in outcome.param_changes
+                 if param_change.name == (
+                     AnswerMigrationJob._TEMPORARY_SPECIAL_RULE_PARAMETER)),
                 None)
             # If this answer corresponds to a rule_spec with a non-answer
             # subject type, then retain the value of that subject in the

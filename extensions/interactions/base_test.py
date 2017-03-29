@@ -425,7 +425,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     'interaction: %s' % interaction_id)
 
     def test_trainable_interactions_have_more_than_just_a_classifier(self):
-        """This ensures that trainable interactions cannot only have a fuzzy
+        """This ensures that trainable interactions cannot only have a soft
         rule, as that would break frontend functionality (users would not be
         able to create manual answer groups).
         """

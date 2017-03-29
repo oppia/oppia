@@ -126,7 +126,6 @@ def get_visualizations_info(exploration_id, state_name):
     for calculation_id in calculation_ids:
         # This is None if the calculation job has not yet been run for this
         # state.
-        # pylint: disable=line-too-long
         calc_output_domain_object = (
             stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
                 exploration_id, state_name, calculation_id))
@@ -151,9 +150,10 @@ def get_top_state_rule_answers(
         exploration_id, state_name, classify_category_list):
     """Returns a list of top answers (sorted by submission frequency) submitted
     to the given state in the given exploration which were mapped to any of the
-    rule classification categories listed in 'classify_category_list'. All
-    answers submitted to the specified state and match the rule spec strings in
-    rule_str_list are returned.
+    rule classification categories listed in 'classify_category_list'. See
+    exp_domain for the list of available classification categories (e.g.
+    exp_domain.EXPLICIT_CLASSIFICATION). All answers submitted to the specified
+    state that match the rule spec strings in rule_str_list are returned.
     """
     return get_top_state_rule_answers_multi(
         [(exploration_id, state_name)], classify_category_list)[0]
@@ -163,11 +163,18 @@ def get_top_state_rule_answers_multi(
         exploration_state_list, classify_category_list):
     """Returns a list of top answers (sorted by submission frequency) submitted
     to the given explorations and states which were mapped to any of the rule
-    classification categories listed in 'classify_category_list'.
+    classification categories listed in 'classify_category_list'. See exp_domain
+    for the list of available classification categories (e.g.
+    exp_domain.EXPLICIT_CLASSIFICATION).
 
     NOTE TO DEVELOPERS: Classification categories are stored upon answer
     submission, so the answers returned by this function may be stale and not
-    evaluate in the same way as they did upon submission.
+    evaluate in the same way as they did upon submission since some of the
+    answers may have been submitted to older versions of the exploration or the
+    exploration's training models may have been recomputed.
+
+    Also note that this function involves a O(N^2) operation based on the number
+    of answers which match the input criteria (which can be quite large).
     """
     # TODO(bhenning): This should have a custom, continuous job (possibly as
     # part of the summarizers framework) which goes through all answers, finds
@@ -177,9 +184,8 @@ def get_top_state_rule_answers_multi(
     # by creators.
     answer_lists = []
     for exploration_id, state_name in exploration_state_list:
-        # pylint: disable=line-too-long
         job_result = (
-            stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output(
+            stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
                 exploration_id, state_name, 'TopAnswersByCategorization'))
         if job_result:
             calc_output = job_result.calculation_output
@@ -268,20 +274,27 @@ def get_exploration_stats(exploration_id, exploration_version):
     }
 
 
-def record_answer(exploration, state_name, submitted_answer):
+def record_answer(
+        exploration_id, exploration_version, state_name, interaction_id,
+        submitted_answer):
     """Record an answer by storing it to the corresponding StateAnswers entity.
     """
-    record_answers(exploration, state_name, [submitted_answer])
+    record_answers(
+        exploration_id, exploration_version, state_name, interaction_id,
+        [submitted_answer])
 
 
-def record_answers(exploration, state_name, submitted_answer_list):
+def record_answers(
+        exploration_id, exploration_version, state_name, interaction_id,
+        submitted_answer_list):
     """Optimally record a group of answers using an already loaded exploration..
     The submitted_answer_list is a list of SubmittedAnswer domain objects.
     """
     state_answers = stats_domain.StateAnswers(
-        exploration.id, exploration.version, state_name,
-        exploration.states[state_name].interaction.id, submitted_answer_list)
-    state_answers.validate()
+        exploration_id, exploration_version, state_name, interaction_id,
+        submitted_answer_list)
+    for submitted_answer in submitted_answer_list:
+        submitted_answer.validate()
 
     stats_models.StateAnswersModel.insert_submitted_answers(
         state_answers.exploration_id, state_answers.exploration_version,

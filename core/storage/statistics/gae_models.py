@@ -17,8 +17,10 @@
 """Models for Oppia statistics."""
 
 import datetime
+import json
 import logging
 import operator
+import sys
 
 from core.platform import models
 import feconf
@@ -601,9 +603,9 @@ class StateAnswersModel(base_models.BaseModel):
     The id/key of instances of this class has the form
         [EXPLORATION_ID]:[EXPLORATION_VERSION]:[STATE_NAME]:[SHARD_ID].
     """
-    # This provides about 48k of padding for the other properties and entity
+    # This provides about 24k of padding for the other properties and entity
     # storage overhead (since the max entity size is 1MB).
-    _MAX_ANSWER_LIST_BYTE_SIZE = 100000
+    _MAX_ANSWER_LIST_BYTE_SIZE = 1000000
 
     # Explicitly store exploration id, exploration version and state name
     # so we can easily do queries on them.
@@ -647,11 +649,10 @@ class StateAnswersModel(base_models.BaseModel):
         """
         # It's okay if this isn't run in a transaction. When adding new shards,
         # it's guaranteed the master shard will be updated at the same time the
-        # new shard is added. Shard deletion is not supported, so there will
-        # never be a shard accessed after retrieving the master shard. Finally,
-        # if a new shard is added after the master shard is retrieved, it will
-        # simply be ignored in the result of this function. It will be included
-        # during the next call.
+        # new shard is added. Shard deletion is not supported. Finally, if a new
+        # shard is added after the master shard is retrieved, it will simply be
+        # ignored in the result of this function. It will be included during the
+        # next call.
         main_shard = cls._get_model(
             exploration_id, exploration_version, state_name, 0)
 
@@ -672,6 +673,10 @@ class StateAnswersModel(base_models.BaseModel):
     def _insert_submitted_answers_unsafe(
             cls, exploration_id, exploration_version, state_name,
             interaction_id, new_submitted_answer_dict_list):
+        """See the insert_submitted_answers for general documentation of what
+        this method does. It's only safe to call this method from within a
+        transaction.
+        """
         # The main shard always needs to be retrieved. At most one other shard
         # needs to be retrieved (the last one).
         main_shard = cls._get_model(
@@ -704,7 +709,8 @@ class StateAnswersModel(base_models.BaseModel):
         last_shard_is_main = main_shard.shard_count == 0
 
         # Update the last shard if it changed.
-        if sharded_answer_lists[0] != last_shard.submitted_answer_list:
+        if sharded_answer_list_sizes[0] != (
+                last_shard.accumulated_answer_json_size):
             last_shard.submitted_answer_list = sharded_answer_lists[0]
             last_shard.accumulated_answer_json_size = (
                 sharded_answer_list_sizes[0])
@@ -779,13 +785,14 @@ class StateAnswersModel(base_models.BaseModel):
         The first entry is guaranteed to contain all answers of the current
         answer list.
         """
-        # Sort the new answers to insert in a descending by size in bytes.
-        new_answer_list_sorted = sorted(
-            new_answer_list, key=lambda x: x['json_size'])
+        # Sort the new answers to insert in a ascending by size in bytes.
+        new_answer_size_list = [
+            (answer_dict, cls._get_answer_dict_size(answer_dict))
+            for answer_dict in new_answer_list]
+        new_answer_list_sorted = sorted(new_answer_size_list, lambda x: x[1])
         sharded_answer_lists = [list(current_answer_list)]
         sharded_answer_list_sizes = [current_answer_list_size]
-        for answer_dict in new_answer_list_sorted:
-            answer_size = answer_dict['json_size']
+        for answer_dict, answer_size in new_answer_list_sorted:
             if (sharded_answer_list_sizes[-1] + answer_size <=
                     cls._MAX_ANSWER_LIST_BYTE_SIZE):
                 sharded_answer_lists[-1].append(answer_dict)
@@ -794,6 +801,11 @@ class StateAnswersModel(base_models.BaseModel):
                 sharded_answer_lists.append([answer_dict])
                 sharded_answer_list_sizes.append(answer_size)
         return sharded_answer_lists, sharded_answer_list_sizes
+
+    @classmethod
+    def _get_answer_dict_size(cls, answer_dict):
+        """Returns a size overestimate (in bytes) of the given answer dict."""
+        return sys.getsizeof(json.dumps(answer_dict))
 
 
 class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):

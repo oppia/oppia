@@ -315,8 +315,7 @@ class VersionedModel(BaseModel):
             for snapshot_id_model in snapshot_id_model_list]
         snapshot_models = cls.SNAPSHOT_CONTENT_CLASS.get_multi(snapshot_ids)
         return [
-            # pylint: disable=protected-access
-            model._reconstitute_from_snapshot_model(snapshot_model)
+            model._reconstitute_from_snapshot_model(snapshot_model) # pylint: disable=protected-access
             for model, snapshot_model in zip(
                 models_to_reconstitute, snapshot_models)]
 

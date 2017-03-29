@@ -36,8 +36,6 @@ class StateAnswersTests(test_utils.GenericTestBase):
                     rule_spec_str='rule spec str2', answer_str='answer str2')])
         submitted_answer_dict_list = (
             state_answers.get_submitted_answer_dict_list())
-        for submitted_answer_dict in submitted_answer_dict_list:
-            del submitted_answer_dict['json_size']
         self.assertEqual(submitted_answer_dict_list, [{
             'answer': 'Text',
             'interaction_id': 'TextInput',
@@ -155,7 +153,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
             'Text', 'TextInput', 0, 1, exp_domain.EXPLICIT_CLASSIFICATION, {},
             'sess', 10.5, rule_spec_str='rule spec str',
             answer_str='answer str')
-        self.assertEqual(submitted_answer.to_dict(json_size=1), {
+        self.assertEqual(submitted_answer.to_dict(), {
             'answer': 'Text',
             'interaction_id': 'TextInput',
             'answer_group_index': 0,
@@ -164,7 +162,6 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
             'params': {},
             'session_id': 'sess',
             'time_spent_in_sec': 10.5,
-            'json_size': 1,
             'rule_spec_str': 'rule spec str',
             'answer_str': 'answer str'
         })
@@ -173,7 +170,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
         submitted_answer = stats_domain.SubmittedAnswer(
             'Text', 'TextInput', 0, 1, exp_domain.EXPLICIT_CLASSIFICATION, {},
             'sess', 10.5)
-        self.assertEqual(submitted_answer.to_dict(json_size=1), {
+        self.assertEqual(submitted_answer.to_dict(), {
             'answer': 'Text',
             'interaction_id': 'TextInput',
             'answer_group_index': 0,
@@ -181,8 +178,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': exp_domain.EXPLICIT_CLASSIFICATION,
             'params': {},
             'session_id': 'sess',
-            'time_spent_in_sec': 10.5,
-            'json_size': 1
+            'time_spent_in_sec': 10.5
         })
 
     def test_requires_normalized_answer_to_be_created_from_dict(self):
@@ -371,10 +367,10 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
             self.submitted_answer,
             'SubmittedAnswers must have a provided time_spent_in_sec')
 
-    def test_time_spent_in_sec_must_be_float(self):
+    def test_time_spent_in_sec_must_be_number(self):
         self.submitted_answer.time_spent_in_sec = '0'
         self._assert_validation_error(
-            self.submitted_answer, 'Expected time_spent_in_sec to be a float')
+            self.submitted_answer, 'Expected time_spent_in_sec to be a number')
 
     def test_time_spent_in_sec_must_be_positive(self):
         self.submitted_answer.time_spent_in_sec = -1.
@@ -420,12 +416,6 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.submitted_answer,
             'Expected rule_spec_index to be non-negative')
-
-    def test_classification_categorization_must_be_string(self):
-        self.submitted_answer.classification_categorization = 2
-        self._assert_validation_error(
-            self.submitted_answer,
-            'Expected classification_categorization to be a string')
 
     def test_classification_categorization_must_be_valid_category(self):
         self.submitted_answer.classification_categorization = (
@@ -492,7 +482,6 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.state_answers_calc_output,
             'Expected state_name to be a string')
-
 
     def test_calculation_id_must_be_string(self):
         self.state_answers_calc_output.calculation_id = ['calculation id']
