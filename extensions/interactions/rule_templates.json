@@ -66,6 +66,8 @@
   },
   "FillInTheBlank": {
   },
+  "LabelingInput": {
+  },  
   "MathExpressionInput": {
     "IsMathematicallyEquivalentTo": {
       "description": "is mathematically equivalent to (LaTeX) {{x|UnicodeString}}"
