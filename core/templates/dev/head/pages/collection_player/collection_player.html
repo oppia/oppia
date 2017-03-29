@@ -349,7 +349,7 @@
           </svg>
           <img ng-src="<[getStaticImageUrl('/general/mobile_path_segment.svg')]>">
           <div style="position: fixed; z-index: 100; top: 100px; left: 50%; transform: translate(-130px);">
-            <exploration-summary-tile ng-if="!previewCardIsShown"
+            <exploration-summary-tile ng-if="explorationCardIsShown"
                                       collection-id="getCollectionId()"
                                       exploration-id="currentExplorationId"
                                       exploration-title="summaryToPreview.title"
@@ -374,11 +374,11 @@
           <div class="title-section" style="background-color: <[collectionSummary.thumbnail_bg_color]>; z-index: 1;">
             <img ng-src="<[collectionSummary.thumbnail_icon_url]>" class="thumbnail-image">
           </div>
-          <div class="title-section-mask" style="padding: 22px;">
+          <div class="title-section-mask" style="padding: 26px;">
             <span style="font-size: 14px;">Highlight an icon to preview an exploration.</span>
           </div>
         </md-card>
-        <exploration-summary-tile ng-if="!previewCardIsShown"
+        <exploration-summary-tile ng-if="explorationCardIsShown"
                                   collection-id="getCollectionId()"
                                   exploration-id="currentExplorationId"
                                   exploration-title="summaryToPreview.title"

@@ -43,7 +43,7 @@ oppia.controller('CollectionPlayer', [
     $scope.collectionPlaythrough = null;
     $scope.collectionId = GLOBALS.collectionId;
     $scope.showingAllExplorations = !GLOBALS.isLoggedIn;
-    $scope.previewCardIsShown = true;
+    $scope.explorationCardIsShown = false;
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     // The pathIconParameters is an array containing the co-ordinates,
     // background color and icon url for the icons generated on the path.
@@ -70,7 +70,7 @@ oppia.controller('CollectionPlayer', [
     };
 
     $scope.togglePreviewCard = function() {
-      $scope.previewCardIsShown = !$scope.previewCardIsShown;
+      $scope.explorationCardIsShown = !$scope.explorationCardIsShown;
     };
 
     $scope.getCollectionNodeForExplorationId = function(explorationId) {
@@ -128,7 +128,7 @@ oppia.controller('CollectionPlayer', [
     };
 
     $scope.updateExplorationPreview = function(explorationId) {
-      $scope.previewCardIsShown = false;
+      $scope.explorationCardIsShown = true;
       $scope.currentExplorationId = explorationId;
       $scope.summaryToPreview = $scope.getCollectionNodeForExplorationId(
         explorationId).getExplorationSummaryObject();
@@ -285,8 +285,8 @@ oppia.controller('CollectionPlayer', [
     };
     // Touching anywhere outside the mobile preview should hide it.
     document.addEventListener('touchstart', function() {
-      if ($scope.previewCardIsShown === false) {
-        $scope.previewCardIsShown = true;
+      if ($scope.explorationCardIsShown === true) {
+        $scope.explorationCardIsShown = false;
       }
     });
   }
