@@ -19,7 +19,8 @@ from core.domain import exp_services
 from core.domain import param_domain
 from core.domain import rights_manager
 from core.domain import classifier_registry
-from core.tests.performance_tests import lda_string_classifier_performance_test as lda # pylint: disable=line-too-long
+import yaml
+import os
 from core.tests import test_utils
 import feconf
 
@@ -110,17 +111,39 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
 
     def test_classifier(self):
         """Test classification handler"""
-        class_obj = lda.LDAStringClassifierBenchmarker()
-
-        #Train the model with 100 samples.
-        classifier_dict = class_obj.train(700)
-        if not classifier_dict:
-            raise Exception('No classifier found')
+        #Loading demo exploration.
+        yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                                 '../tests/data/string_classifier_test.yaml')
+        doc_to_label = {}
+        with open(yaml_path, 'r') as yaml_file:
+            yaml_dict = yaml.load(yaml_file)
+            interactions = yaml_dict['states']['Home']['interaction']
+            # The first element contains no training data,
+            # so only consider [1:].
+            for answer_group in interactions['answer_groups'][1:]:
+                label = answer_group['outcome']['feedback'][0]
+                for rule in answer_group['rule_specs']:
+                    if 'inputs' in rule and 'training_data' in rule['inputs']:
+                        for doc in rule['inputs']['training_data']:
+                            if doc not in doc_to_label:
+                                doc_to_label[doc] = []
+                            doc_to_label[doc].append(label)
+        examples = [[doc, doc_to_label[doc]] for doc in doc_to_label]
+        docs_to_classify = [doc[0] for doc in examples]
+        
+        #Training the model
         classifier = (
             classifier_registry.ClassifierRegistry.get_classifier_by_id(
                 feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']))
+        classifier.train(examples)
+        classifier_dict = classifier.to_dict()
+
+        #Testing predictions
         classifier.from_dict(classifier_dict)
-        print classifier.predict(['Permutations and comb'])
+        outcome_dict = classifier.predict(["""Permutations""",
+        """son 3 y tienen dos opciones de cambio cada una"""])
+        self.assertEqual(outcome_dict[0],"<p>Detected permutation.</p>")
+        self.assertEqual(outcome_dict[1],"<p>Detected factorial.</p>")
 
 
 class FeedbackIntegrationTest(test_utils.GenericTestBase):
