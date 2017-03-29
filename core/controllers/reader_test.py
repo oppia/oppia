@@ -18,6 +18,8 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import param_domain
 from core.domain import rights_manager
+from core.domain import classifier_registry
+from core.tests.performance_tests import lda_string_classifier_performance_test as lda # pylint: disable=line-too-long
 from core.tests import test_utils
 import feconf
 
@@ -102,6 +104,23 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
             expect_errors=True)
         self.assertEqual(response.status_int, 200)
+
+class ClassifyHandlerTest(test_utils.GenericTestBase):
+    """Test the hander for classification"""
+
+    def test_classifier(self):
+        """Test classification handler"""
+        class_obj = lda.LDAStringClassifierBenchmarker()
+
+        #Train the model with 100 samples.
+        classifier_dict = class_obj.train(700)
+        if not classifier_dict:
+            raise Exception('No classifier found')
+        classifier = (
+            classifier_registry.ClassifierRegistry.get_classifier_by_id(
+                feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']))
+        classifier.from_dict(classifier_dict)
+        print classifier.predict(['Permutations and comb'])
 
 
 class FeedbackIntegrationTest(test_utils.GenericTestBase):
