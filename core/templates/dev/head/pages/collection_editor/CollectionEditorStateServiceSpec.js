@@ -159,7 +159,7 @@ describe('Collection editor state service', function() {
       function() {
     spyOn(
       fakeCollectionRightsBackendApiService,
-      'fetchCollectionRights').andCallThrough();
+      'fetchCollectionRights').and.callThrough();
 
     CollectionEditorStateService.loadCollection(5);
     expect(fakeCollectionRightsBackendApiService.fetchCollectionRights)
