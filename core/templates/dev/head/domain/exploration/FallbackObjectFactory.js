@@ -17,7 +17,9 @@
  * domain objects.
  */
 
-oppia.factory('FallbackObjectFactory', [function() {
+oppia.factory('FallbackObjectFactory', [
+    'OutcomeObjectFactory',
+  function(OutcomeObjectFactory) {
   var Fallback = function(trigger, outcome) {
     this.trigger = trigger;
     this.outcome = outcome;
@@ -26,14 +28,27 @@ oppia.factory('FallbackObjectFactory', [function() {
   Fallback.prototype.toBackendDict = function() {
     return {
       trigger: this.trigger,
-      outcome: this.outcome
+      outcome: this.outcome.toBackendDict()
     };
   };
 
   Fallback.createFromBackendDict = function(fallbackBackendDict) {
     return new Fallback(
       fallbackBackendDict.trigger,
-      fallbackBackendDict.outcome);
+      OutcomeObjectFactory.createFromBackendDict(fallbackBackendDict.outcome));
+  };
+
+  Fallback.createDefault = function(dest) {
+    return new Fallback(
+              {
+                trigger_type: 'NthResubmission',
+                customization_args: {
+                  num_submits: {
+                    value: 3
+                  }
+                }
+              },
+              OutcomeObjectFactory.createNew(dest, [], []));
   };
 
   return Fallback;
