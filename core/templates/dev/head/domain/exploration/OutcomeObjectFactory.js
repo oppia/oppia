@@ -18,30 +18,30 @@
  */
 
 oppia.factory('OutcomeObjectFactory', [function() {
-	var Outcome = function(dest, feedback, paramChanges) {
-		this.dest = dest;
-		this.feedback = feedback;
-		this.paramChanges = paramChanges;
-	};
+  var Outcome = function(dest, feedback, paramChanges) {
+    this.dest = dest;
+    this.feedback = feedback;
+    this.paramChanges = paramChanges;
+  };
 
-	Outcome.prototype.toBackendDict = function() {
-		return {
-			dest: this.dest,
-			feedback: this.feedback,
-			param_changes: this.paramChanges
-		};
-	};
+  Outcome.prototype.toBackendDict = function() {
+    return {
+      dest: this.dest,
+      feedback: this.feedback,
+      param_changes: this.paramChanges
+    };
+  };
 
-	Outcome.createNew = function(dest, feedback, paramChanges) {
-		return new Outcome(dest, feedback, paramChanges);
-	};
+  Outcome.createNew = function(dest, feedback, paramChanges) {
+    return new Outcome(dest, feedback, paramChanges);
+  };
 
-	Outcome.createFromBackendDict = function(outcomeDict) {
-		return new Outcome(
-			outcomeDict.dest,
-			outcomeDict.feedback,
-			outcomeDict.param_changes);
-	};
+  Outcome.createFromBackendDict = function(outcomeDict) {
+    return new Outcome(
+      outcomeDict.dest,
+      outcomeDict.feedback,
+      outcomeDict.param_changes);
+  };
 
-	return Outcome;
+  return Outcome;
 }]);
