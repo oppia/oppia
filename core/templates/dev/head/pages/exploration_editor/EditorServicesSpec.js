@@ -263,6 +263,7 @@ describe('Change list service', function() {
               value: 'Tips'
             }
           },
+          panel: 'right',
           visible_in_states: ['newState1']
         },
         panel: 'right'
