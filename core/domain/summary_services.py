@@ -693,7 +693,7 @@ def get_recently_published_exp_summary_dicts(limit):
             'thumbnail_bg_color': '#a33f40',
             'thumbnail_icon_url': self.get_static_asset_url(
                 '/images/subjects/Lightbulb.svg'),
-            'title': u'Exploration 2 Albert title',
+            'title': u'Exploration 2 Albert title'
         }, ]
     """
     recently_published_exploration_summaries = [
