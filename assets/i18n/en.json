@@ -198,6 +198,7 @@
     "I18N_PLAYER_LOADING": "Loading...",
     "I18N_PLAYER_NO_OBJECTIVE": "No objective specified.",
     "I18N_PLAYER_NO_TAGS": "No tags specified.",
+    "I18N_PLAYER_PLAY_EXPLORATION": "Play Exploration",
     "I18N_PLAYER_PLUS_TAGS": "<[additionalTagNumber]>+ more tags",
     "I18N_PLAYER_PREVIOUS_RESPONSES": "Previous responses (<[previousResponses]>)",
     "I18N_PLAYER_RATE_EXPLORATION": "Learned something new? How would you rate this exploration?",
