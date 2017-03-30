@@ -35,7 +35,8 @@ oppia.factory('FallbackObjectFactory', [
     Fallback.createFromBackendDict = function(fallbackBackendDict) {
       return new Fallback(
         fallbackBackendDict.trigger,
-        OutcomeObjectFactory.createFromBackendDict(fallbackBackendDict.outcome));
+        OutcomeObjectFactory.createFromBackendDict(
+          fallbackBackendDict.outcome));
     };
 
     Fallback.createDefault = function(dest) {
