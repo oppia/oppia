@@ -29,6 +29,8 @@ install_node_module gulp-concat 2.6.0
 install_node_module gulp-clean-css 2.0.2
 install_node_module gulp-util 3.0.7
 install_node_module jscs 2.3.0
+install_node_module eslint 3.18.0
+install_node_module eslint-config-google 0.7.1
 install_node_module gulp-sourcemaps 1.6.0
 install_node_module gulp-uglify 2.0.1
 
