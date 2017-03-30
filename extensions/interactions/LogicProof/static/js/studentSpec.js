@@ -43,6 +43,15 @@ var errorWrapper = function(
   };
 };
 
+var sharedErrorWrapper = function(message, line, code, category) {
+  return {
+    message: message,
+    line: line,
+    code: code,
+    category: category
+  };
+};
+
 var displayLine = function(line, operators) {
   var matchings = {};
   for (var key in line.matchings) {
@@ -500,7 +509,7 @@ describe('Match expression to expression template', function() {
   it('should reject expressions that do not match', function() {
     expect(errorWrapper(matchThenDisplay, 'A(x)\u2227t', 'p\u2227q', {
       q: logicProofParser.parse('s', 'expression')
-    })).toThrow(
+    })).toThrowError(
       'This line could not be identified as valid - please check the list ' +
       'of possible lines.');
   });
@@ -567,7 +576,8 @@ describe('Throw lines messages', function() {
           T: logicProofParser.parse('x=y', 'expression'),
           U: logicProofParser.parse('A2(x,y)', 'expression')
         }, logicProofData.BASE_STUDENT_LANGUAGE.operators);
-    })).toThrow('The conclusion you are allowed to make here is \'From x=y ' +
+    })).toThrowError(
+      'The conclusion you are allowed to make here is \'From x=y ' +
       'and A2(x,y) we have (x=y)\u2227A2(x,y)\'.');
   });
 });
@@ -606,14 +616,16 @@ describe('Match line to template', function() {
       errorWrapper(
         matchLineToTemplate, 'from p and q we have q\u2227p',
         sampleInteraction.line_templates[0])
-    ).toThrow('This line could not be identified as valid - please check the' +
+    ).toThrowError(
+      'This line could not be identified as valid - please check the' +
       ' list of possible lines.');
 
     expect(
       errorWrapper(
         matchLineToTemplate, 'z was arbitrary from \u2200x.x=2',
         sampleInteraction.line_templates[1])
-    ).toThrow('This line could not be identified as valid - please check the' +
+    ).toThrowError(
+      'This line could not be identified as valid - please check the' +
       ' list of possible lines.');
   });
 });
@@ -635,8 +647,11 @@ describe('Line to have known layout as student types', function() {
   it('should reject unknown layouts', function() {
     expect(
       errorWrapper(requireIdentifiable, 'from p we have p\u2228q')).toThrow(
-      'This line could not be identified as valid - please check the list of ' +
-      'possible lines.');
+      {
+        message: (
+          'This line could not be identified as valid - please ' +
+          'check the list of possible lines.')
+      });
   });
 });
 
@@ -653,9 +668,15 @@ describe('Require all lines to have known layouts as student types',
       expect(function() {
         logicProofStudent.validateProof(
           'from A and B we have A\u2227\n', sampleInteraction);
-      }).toThrow('We could not identify \'A\u2227\'; please make sure you' +
-        ' are using vocabulary from the given list, and don\'t have two ' +
-        'consecutive expressions.');
+      }).toThrow(
+        {
+          message: (
+            'We could not identify \'A\u2227\'; please make sure you ' +
+            'are using vocabulary from the given list, and don\'t have ' +
+            'two consecutive expressions.'),
+          line: 0
+        }
+      );
     });
   }
 );
@@ -691,24 +712,24 @@ describe('Build, validate and display line', function() {
   it('should reject lines for which type assignment fails', function() {
     expect(
       errorWrapper(buildThenDisplay, 'x+2 was arbitrary so \u2200y.p')
-    ).toThrow('In a line of this form, your x+2 should be a variable.');
+    ).toThrowError('In a line of this form, your x+2 should be a variable.');
 
     expect(
       errorWrapper(
         buildThenDisplay, 'from A(x) and A(y) we have A(x)\u2227A(z)')
-    ).toThrow('The operator A could not be identified.');
+    ).toThrowError('The operator A could not be identified.');
   });
 
   it('should reject lines that cannot be parsed', function() {
     expect(
-      errorWrapper(buildThenDisplay, 'fromj p we have q')).toThrow(
+      errorWrapper(buildThenDisplay, 'fromj p we have q')).toThrowError(
         'We could not identify either of \'fromj\' or \'p\' as words;' +
         ' please make sure you are using vocabulary from the given list, and' +
         ' don\'t have two consecutive expressions.');
   });
 
   it('should reject lines that do not match a template', function() {
-    expect(errorWrapper(buildThenDisplay, 'Hence A=>x=3')).toThrow(
+    expect(errorWrapper(buildThenDisplay, 'Hence A=>x=3')).toThrowError(
       'This line could not be identified as valid - please check the list ' +
       'of possible lines.');
   });
@@ -716,15 +737,18 @@ describe('Build, validate and display line', function() {
   it('should reject lines that match an incorrect template', function() {
     expect(
       errorWrapper(buildThenDisplay, 'from a<b and b<c we have a<b \u2227 b<d')
-    ).toThrow('The conclusion you are allowed to make here is \'From a<b and' +
+    ).toThrowError(
+      'The conclusion you are allowed to make here is \'From a<b and' +
       ' b<c we have (a<b)\u2227(b<c)\'.');
   });
 
   it('should reject lines starting with an odd number of spaces', function() {
     expect(
       errorWrapper(buildThenDisplay, '   from R and A=>B have R\u2227(A=>B)')
-    ).toThrow('An indentation is indicated by a double space at the start of' +
-      ' the line, but this line starts with an odd number of spaces.');
+    ).toThrowError(
+      'An indentation is indicated by a double space at the start of' +
+      ' the line, but this line starts with an odd number of spaces.'
+    );
   });
 });
 
@@ -770,8 +794,10 @@ describe('Build, validate and display proof', function() {
     expect(function() {
       buildThenDisplay(
         'from a and b we have a\u2227b\nfrom a and b we have b\u2227a');
-    }).toThrow('The conclusion you are allowed to make here is \'From' +
-      ' a and b we have a\u2227b\'.');
+    }).toThrow(
+      sharedErrorWrapper(
+        'The conclusion you are allowed to make here is \'From' +
+        ' a and b we have a\u2227b\'.', 1, 'and_introduce_e4', 'line'));
   });
 });
 
@@ -904,16 +930,22 @@ describe('Check proof makes no mistakes from the mistake table', function() {
       testCheck([
         'from p and q we have p\u2227q',
         '  from p and p\u2227q we have p\u2227(p\u2227q)'].join('\n'));
-    }).toThrow('The last line of a proof should not be indented; you need ' +
-      'to prove that the given formulas holds just from the original ' +
-      'assumptions, not the additional assumption of p\u2227q.');
+    }).toThrow(
+      sharedErrorWrapper(
+        'The last line of a proof should not be indented; you need ' +
+        'to prove that the given formulas holds just from the original ' +
+        'assumptions, not the additional assumption of p\u2227q.',
+        1, 'last_line_indented_assumption', 'target'));
 
     expect(function() {
       testCheck([
         'a was arbitrary hence \u2200x.p',
         '  from p and q we have p\u2227q',
         '  b was arbitrary hence \u2200x.q'].join('\n'));
-    }).toThrow('We originally took a as our arbitrary variable so this, ' +
-      'rather than b, needs to be the one that we quantify out over.');
+    }).toThrow(
+    sharedErrorWrapper(
+      'We originally took a as our arbitrary variable so this, ' +
+      'rather than b, needs to be the one that we quantify out over.', 2,
+      'incorrect_variable_forall', 'variables'));
   });
 });
