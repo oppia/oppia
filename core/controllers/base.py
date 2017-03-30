@@ -330,6 +330,8 @@ class BaseHandler(webapp2.RequestHandler):
                 self.username and self.username in
                 config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value
             ),
+            'promo_bar_enabled': config_domain.PROMO_BAR_ENABLED.value,
+            'promo_bar_message': config_domain.PROMO_BAR_MESSAGE.value,
             'username': self.username,
             'user_is_logged_in': user_services.has_fully_registered(
                 self.user_id),
