@@ -801,7 +801,11 @@ oppia.factory('explorationStatesService', [
         return answerGroupBackendDicts;
       },
       default_outcome: function(defaultOutcome) {
-        return defaultOutcome.toBackendDict();
+        if (defaultOutcome) {
+          return defaultOutcome.toBackendDict();
+        } else {
+          return null;
+        }
       }
     };
 

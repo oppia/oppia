@@ -442,7 +442,7 @@ oppia.directive('trainingPanel', [function() {
 
         $scope.beginAddingNewResponse = function() {
           $scope.classification.newOutcome = OutcomeObjectFactory.createNew(
-              editorContextService.getActiveStateName(), [''], []);
+            editorContextService.getActiveStateName(), [''], []);
           $scope.addingNewResponse = true;
         };
 
