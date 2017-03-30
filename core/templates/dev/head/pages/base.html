@@ -117,7 +117,7 @@
         profilePictureDataUrl: JSON.parse('{{profile_picture_data_url|js_string}}'),
         userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}'),
         username: JSON.parse('{{username|js_string}}'),
-        IS_PROMO_BAR_ENABLED: JSON.parse('{{promo_bar_enabled|js_string}}'),
+        PROMO_BAR_IS_ENABLED: JSON.parse('{{promo_bar_enabled|js_string}}'),
         PROMO_BAR_MESSAGE: JSON.parse('{{promo_bar_message|js_string}}')
       };
 
@@ -138,7 +138,7 @@
     {% if iframed %}
       {{ warnings_and_loader() }}
     {% else %}
-      <promo-bar ng-if="isPromoBarEnabled" promo-message="promoBarMessage">
+      <promo-bar ng-if="promoBarIsEnabled" promo-message="promoBarMessage">
       </promo-bar>
 
       <div class="oppia-base-container"

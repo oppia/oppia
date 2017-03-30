@@ -28,12 +28,22 @@ oppia.directive('promoBar', [function() {
     controller: [
       '$scope',
       function($scope) {
+        var isPromoDismissed = function() {
+          return !!angular.fromJson(sessionStorage.promoIsDismissed);
+        };
+        var setPromoDismissed = function(promoIsDismissed) {
+          sessionStorage.promoIsDismissed = angular.toJson(promoIsDismissed);
+        };
+
         // TODO(bhenning): Utilize cookies for tracking when a promo is
-        // dismissed.
-        $scope.promoIsVisible = true;
+        // dismissed. Cookies allow for a longer-lived memory of whether the
+        // promo is dismissed.
+        $scope.promoIsVisible = !isPromoDismissed();
+        console.log('Promo is visible: ', $scope.promoIsVisible);
 
         $scope.dismissPromo = function() {
           $scope.promoIsVisible = false;
+          setPromoDismissed(true);
         };
       }
     ]
