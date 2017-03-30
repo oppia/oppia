@@ -205,9 +205,11 @@ oppia.directive('checkBoxEditor', [
           };
 
           $scope.selectCorrectAnswer = function(value) {
+            
             var newCustomizationArgs = $scope.getCustomizationArgs();
-
             var answerGroups = $scope.getAnswerGroups();
+            console.log(answerGroups);
+
             var newAnswerGroups = [];
 
             if (answerGroups.length === 0) {
@@ -233,7 +235,7 @@ oppia.directive('checkBoxEditor', [
             }
             else{
 
-
+              console.log("Updating the answer group");
               newAnswerGroups.push(answerGroups[0]);
               var index = newAnswerGroups[0].ruleSpecs[0].inputs.x.indexOf(value);
               if(index > -1){
@@ -250,6 +252,7 @@ oppia.directive('checkBoxEditor', [
                 newCustomizationArgs.maxAllowableSelectionCount.value = 1;
                 newCustomizationArgs.minAllowableSelectionCount.value = 1;
               }
+
               /* If some other answer group has this answer, remove it.
               for (var i = 1; i < answerGroups.length; i++) {
                 if (answerGroups[i].ruleSpecs[0].inputs.x !== index) {
