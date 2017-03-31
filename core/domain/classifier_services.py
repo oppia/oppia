@@ -104,7 +104,7 @@ def classify_string_classifier_rule(state, normalized_answer):
             predicted_answer_group = state.interaction.answer_groups[
                 predicted_answer_group_index]
             for rule_spec in predicted_answer_group.rule_specs:
-                if rule_spec.rule_type == exp_domain.CLASSIFIER_RULESPEC_STR:
+                if rule_spec.rule_type == exp_domain.RULE_TYPE_CLASSIFIER:
                     best_matched_rule_spec_index = classifier_rule_spec_index
                     break
             best_matched_answer_group = predicted_answer_group

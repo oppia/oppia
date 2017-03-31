@@ -18,9 +18,9 @@
  */
 
 oppia.factory('FallbackObjectFactory', [function() {
-  var Fallback = function(triggerBackendDict, outcomeBackendDict) {
-    this.trigger = triggerBackendDict;
-    this.outcome = outcomeBackendDict;
+  var Fallback = function(trigger, outcome) {
+    this.trigger = trigger;
+    this.outcome = outcome;
   };
 
   Fallback.prototype.toBackendDict = function() {

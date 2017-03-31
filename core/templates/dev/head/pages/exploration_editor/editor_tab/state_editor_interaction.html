@@ -36,7 +36,7 @@
       Choose Interaction
     </h3>
 
-    <h3 ng-if="stateInteractionIdService.displayed">
+    <h3 ng-if="stateInteractionIdService.displayed && (customizationModalReopened || hasCustomizationArgs)">
       Customize Interaction (<[INTERACTION_SPECS[stateInteractionIdService.displayed].name]>)
     </h3>
   </div>
@@ -60,12 +60,7 @@
       </tabset>
     </div>
 
-    <form ng-if="stateInteractionIdService.displayed" name="form.schemaForm" class="protractor-test-interaction-editor">
-      <div ng-if="customizationArgSpecs.length === 0">
-        <em>There are no customizations options available.<br><br>
-        To use this interaction, click 'Save Interaction'.</em>
-      </div>
-
+    <form ng-if="stateInteractionIdService.displayed && hasCustomizationArgs" name="form.schemaForm" class="protractor-test-interaction-editor">
       <div ng-repeat="customizationArgSpec in customizationArgSpecs track by $index">
         <div class="oppia-interaction-customization-label"><[customizationArgSpec.description]></div>
         <div>
@@ -75,16 +70,26 @@
         </div>
       </div>
     </form>
+
+    <form ng-if="stateInteractionIdService.displayed && !hasCustomizationArgs && customizationModalReopened">
+      This interaction cannot be modified. To delete it, close this popup and click the 'x' button in the top-right corner.
+    </form>
   </div>
 
   <div class="modal-footer">
     <!-- Do not show this button if an interaction is already selected. -->
-    <button class="btn btn-default" style="float: left;" ng-click="returnToInteractionSelector()" ng-if="stateInteractionIdService.displayed && !stateInteractionIdService.savedMemento">Change Interaction</button>
+    <button class="btn btn-default" style="float: left;" ng-click="returnToInteractionSelector()" ng-if="stateInteractionIdService.displayed && !stateInteractionIdService.savedMemento && hasCustomizationArgs">Change Interaction</button>
 
-    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-default" ng-click="cancel()" ng-if="hasCustomizationArgs">Cancel</button>
     <button class="btn btn-success protractor-test-save-interaction" ng-click="save()"
-            ng-disabled="!stateInteractionIdService.displayed || form.schemaForm.$invalid">
+            ng-disabled="!stateInteractionIdService.displayed || form.schemaForm.$invalid"
+            ng-if="hasCustomizationArgs">
       Save Interaction
+    </button>
+    <button class="btn btn-success protractor-test-close-no-customization-modal"
+            ng-click="okay()"
+            ng-if="!hasCustomizationArgs && customizationModalReopened">
+      Okay
     </button>
   </div>
 </script>

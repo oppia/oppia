@@ -30,7 +30,7 @@ describe('oppiaInteractiveCodeReplValidator', function() {
       feedback: []
     };
     goodAnswerGroups = [{
-      ruleSpecs: [],
+      rules: [],
       outcome: goodDefaultOutcome,
       correct: false
     }];

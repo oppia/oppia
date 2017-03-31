@@ -27,25 +27,25 @@
     <div class="oppia-dashboard-aggregated-stats" ng-if="explorationsList.length > 0 || collectionsList.length > 0">
       <md-card layout="row">
         <div class="average-ratings stats-card">
-          <p class="stat-description">Average Rating</p>
+          <p class="stat-description" translate="I18N_DASHBOARD_STATS_AVERAGE_RATING"></p>
           <h1 class="stat-value"><[dashboardStats.average_ratings || 'N/A']></h1>
           <p ng-hide="!dashboardStats.num_ratings">
             (by <[dashboardStats.num_ratings]> users)
           </p>
         </div>
         <div class="total-plays stats-card">
-          <p class="stat-description">Total Plays</p>
+          <p class="stat-description" translate="I18N_DASHBOARD_STATS_TOTAL_PLAYS"></p>
           <h1 class="stat-value"><[dashboardStats.total_plays]></h1>
           <p ng-hide="!relativeChangeInTotalPlays">
             (+<[relativeChangeInTotalPlays]> from last week)
           </p>
         </div>
         <div class="total-open-feedback stats-card">
-          <p class="stat-description">Open feedback</p>
+          <p class="stat-description" translate="I18N_DASHBOARD_STATS_OPEN_FEEDBACK"></p>
           <h1 class="stat-value"><[dashboardStats.total_open_feedback]></h1>
         </div>
         <div class="total-open-feedback stats-card">
-          <p class="stat-description">Subscribers</p>
+          <p class="stat-description" translate="I18N_DASHBOARD_STATS_TOTAL_SUBSCRIBERS"></p>
           <h1 class="stat-value"><[subscribersList.length]></h1>
         </div>
       </md-card>
@@ -133,11 +133,11 @@
               ng-if="activeTab === 'myExplorations'"
               ng-class="{'sort-explorations-select-three-tabs': (collectionsList.length !== 0 && subscribersList.length !== 0)}"
               style="float: right;">
-          <p class="sort-by-text">Sort By</p>
+          <p class="sort-by-text" translate="I18N_DASHBOARD_EXPLORATIONS_SORT_BY">Sort By</p>
           <select ng-model="currentSortType"
                   class="sort-options"
                   ng-change="setExplorationsSortingOptions(currentSortType)"
-                  ng-options="EXPLORATIONS_SORT_BY_KEYS[key] as value for (key, value) in HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS">
+                  ng-options="EXPLORATIONS_SORT_BY_KEYS[key] as value | translate for (key, value) in HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS">
           </select>
           <span class="sort-order fa"
                 ng-click="setExplorationsSortingOptions(currentSortType)"
@@ -162,12 +162,12 @@
               <th ng-repeat="(key, value) in EXPLORATIONS_SORT_BY_KEYS"
                   class="oppia-dashboard-table-headings"
                   ng-click="setExplorationsSortingOptions(value)">
-                <p ng-if="key === 'TITLE'">Exploration</p>
-                <p ng-if="key === 'RATING'">Rating</p>
-                <p ng-if="key === 'NUM_VIEWS'">Plays</p>
-                <p ng-if="key === 'OPEN_FEEDBACK'">Open Threads</p>
-                <p ng-if="key === 'LAST_UPDATED'">Last Updated</p>
-                <p ng-if="key === 'UNRESOLVED_ANSWERS'">Unresolved Answers</p>
+                <p ng-if="key === 'TITLE'" translate="I18N_DASHBOARD_TABLE_HEADING_EXPLORATION"></p>
+                <p ng-if="key === 'RATING'" translate="I18N_DASHBOARD_TABLE_HEADING_RATING"></p>
+                <p ng-if="key === 'NUM_VIEWS'" translate="I18N_DASHBOARD_TABLE_HEADING_PLAYS"></p>
+                <p ng-if="key === 'OPEN_FEEDBACK'" translate="I18N_DASHBOARD_TABLE_HEADING_OPEN_THREADS"></p>
+                <p ng-if="key === 'LAST_UPDATED'" translate="I18N_DASHBOARD_TABLE_HEADING_LAST_UPDATED"></p>
+                <p ng-if="key === 'UNRESOLVED_ANSWERS'" translate="I18N_DASHBOARD_TABLE_HEADING_UNRESOLVED_ANSWERS"></p>
                 <span class="fa"
                       ng-if="currentSortType === value"
                       ng-class="isCurrentSortDescending ? 'fa-caret-up': 'fa-caret-down'">
@@ -313,6 +313,7 @@
                              layout-type="row"
                              layout-align-type="center left"
                              twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD"
+                             share-type="exploration"
                              exploration-id="exploration.id">
               </sharing-links>
             </ul>

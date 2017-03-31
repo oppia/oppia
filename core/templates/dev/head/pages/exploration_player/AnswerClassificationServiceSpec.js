@@ -122,7 +122,7 @@ describe('Answer classification service with string classifier disabled',
     expect(successHandler).toHaveBeenCalledWith({
       outcome: 'outcome 1',
       answerGroupIndex: 0,
-      ruleSpecIndex: 0
+      ruleIndex: 0
     });
     expect(failHandler).not.toHaveBeenCalled();
 
@@ -132,7 +132,7 @@ describe('Answer classification service with string classifier disabled',
     expect(successHandler).toHaveBeenCalledWith({
       outcome: 'outcome 2',
       answerGroupIndex: 1,
-      ruleSpecIndex: 0
+      ruleIndex: 0
     });
     expect(failHandler).not.toHaveBeenCalled();
 
@@ -142,7 +142,7 @@ describe('Answer classification service with string classifier disabled',
     expect(successHandler).toHaveBeenCalledWith({
       outcome: 'outcome 2',
       answerGroupIndex: 1,
-      ruleSpecIndex: 1
+      ruleIndex: 1
     });
     expect(failHandler).not.toHaveBeenCalled();
   });
@@ -154,7 +154,7 @@ describe('Answer classification service with string classifier disabled',
     expect(successHandler).toHaveBeenCalledWith({
       outcome: 'default',
       answerGroupIndex: 2,
-      ruleSpecIndex: 0
+      ruleIndex: 0
     });
     expect(failHandler).not.toHaveBeenCalled();
   });
@@ -292,7 +292,7 @@ describe('Answer classification service with string classifier enabled',
     var expectedClassificationResult = {
       outcome: 'outcome',
       answerGroupIndex: 0,
-      ruleSpecIndex: 0
+      ruleIndex: 0
     };
     $httpBackend.expectPOST(
       '/explorehandler/classify/' + explorationId).respond(
@@ -314,7 +314,7 @@ describe('Answer classification service with string classifier enabled',
     expect(successHandler).toHaveBeenCalledWith({
       outcome: 'default',
       answerGroupIndex: 2,
-      ruleSpecIndex: 0
+      ruleIndex: 0
     });
     expect(failHandler).not.toHaveBeenCalled();
   });

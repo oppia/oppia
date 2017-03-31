@@ -44,11 +44,11 @@ oppia.filter('oppiaInteractiveInteractiveMapValidator', [
     }
 
     for (var i = 0; i < answerGroups.length; i++) {
-      var ruleSpecs = answerGroups[i].ruleSpecs;
-      for (var j = 0; j < ruleSpecs.length; j++) {
-        if (ruleSpecs[j].rule_type === 'Within' ||
-            ruleSpecs[j].rule_type === 'NotWithin') {
-          if (ruleSpecs[j].inputs.d < 0) {
+      var rules = answerGroups[i].rules;
+      for (var j = 0; j < rules.length; j++) {
+        if (rules[j].type === 'Within' ||
+            rules[j].type === 'NotWithin') {
+          if (rules[j].inputs.d < 0) {
             warningsList.push({
               type: WARNING_TYPES.CRITICAL,
               message: 'Please ensure that rule ' + String(j + 1) +

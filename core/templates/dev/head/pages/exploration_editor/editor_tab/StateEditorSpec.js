@@ -52,6 +52,7 @@ describe('State Editor controller', function() {
       cls = $injector.get('changeListService');
       ess = $injector.get('explorationStatesService');
       IS = $injector.get('INTERACTION_SPECS');
+      cof = $injector.get('ContentObjectFactory');
 
       GLOBALS.INVALID_NAME_CHARS = '#@&^%$';
 
@@ -64,9 +65,9 @@ describe('State Editor controller', function() {
           interaction: {
             id: 'TextInput',
             answer_groups: [{
-              ruleSpecs: [{
-                dest: 'Second State'
-              }]
+              rule_specs: [],
+              outcome: {},
+              correct: false
             }],
             fallbacks: []
           },
@@ -80,9 +81,9 @@ describe('State Editor controller', function() {
           interaction: {
             id: 'TextInput',
             answer_groups: [{
-              ruleSpecs: [{
-                dest: 'Second State'
-              }]
+              rule_specs: [],
+              outcome: {},
+              correct: false
             }],
             fallbacks: []
           },
@@ -96,9 +97,9 @@ describe('State Editor controller', function() {
           interaction: {
             id: 'TextInput',
             answer_groups: [{
-              ruleSpecs: [{
-                dest: 'Second State'
-              }]
+              rule_specs: [],
+              outcome: {},
+              correct: false
             }],
             fallbacks: []
           },
@@ -114,10 +115,10 @@ describe('State Editor controller', function() {
       });
 
       scope.getContent = function(contentString) {
-        return [{
+        return [cof.createFromBackendDict({
           type: 'text',
           value: contentString
-        }];
+        })];
       };
 
       ctrl = $controller('StateEditor', {
@@ -192,7 +193,7 @@ describe('State Editor controller', function() {
 
   describe('TrainingDataService', function() {
     var $httpBackend;
-    var scope, siis, ecs, cls, rs, tds, ess, IS, CLASSIFIER_RULESPEC_STR;
+    var scope, siis, ecs, cls, rs, tds, ess, IS, RULE_TYPE_CLASSIFIER, rof;
     var mockExplorationData;
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
@@ -229,7 +230,8 @@ describe('State Editor controller', function() {
       rs = $injector.get('responsesService');
       tds = $injector.get('trainingDataService');
       IS = $injector.get('INTERACTION_SPECS');
-      CLASSIFIER_RULESPEC_STR = $injector.get('CLASSIFIER_RULESPEC_STR');
+      RULE_TYPE_CLASSIFIER = $injector.get('RULE_TYPE_CLASSIFIER');
+      rof = $injector.get('RuleObjectFactory');
 
       // Set the currently loaded interaction ID.
       siis.savedMemento = 'TextInput';
@@ -317,23 +319,21 @@ describe('State Editor controller', function() {
       // Training the first answer of a group should add a new classifier.
       tds.trainAnswerGroup(0, 'text answer');
       var state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual({
-        rule_type: CLASSIFIER_RULESPEC_STR,
-        inputs: {
+      expect(state.interaction.answerGroups[0].rules[1]).toEqual(
+        rof.createNew(RULE_TYPE_CLASSIFIER, {
           training_data: ['text answer']
-        }
-      });
+        })
+      );
 
       // Training a second answer to the same group should append the answer to
       // the training data.
       tds.trainAnswerGroup(0, 'second answer');
       state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual({
-        rule_type: CLASSIFIER_RULESPEC_STR,
-        inputs: {
+      expect(state.interaction.answerGroups[0].rules[1]).toEqual(
+        rof.createNew(RULE_TYPE_CLASSIFIER, {
           training_data: ['text answer', 'second answer']
-        }
-      });
+        })
+      );
 
       // Training the default response should add information to the confirmed
       // unclassified answers.
@@ -354,12 +354,11 @@ describe('State Editor controller', function() {
 
       // Verify initial state.
       var state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual({
-        rule_type: CLASSIFIER_RULESPEC_STR,
-        inputs: {
+      expect(state.interaction.answerGroups[0].rules[1]).toEqual(
+        rof.createNew(RULE_TYPE_CLASSIFIER, {
           training_data: ['text answer', 'second answer']
-        }
-      });
+        })
+      );
       expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
         'third answer'
       ]);
@@ -367,12 +366,11 @@ describe('State Editor controller', function() {
       // Try to retrain the second answer (answer group -> default response).
       tds.trainDefaultResponse('second answer');
       state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual({
-        rule_type: CLASSIFIER_RULESPEC_STR,
-        inputs: {
+      expect(state.interaction.answerGroups[0].rules[1]).toEqual(
+        rof.createNew(RULE_TYPE_CLASSIFIER, {
           training_data: ['text answer']
-        }
-      });
+        })
+      );
       expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
         'third answer', 'second answer'
       ]);
@@ -380,12 +378,11 @@ describe('State Editor controller', function() {
       // Try to retrain the third answer (default response -> answer group).
       tds.trainAnswerGroup(0, 'third answer');
       state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual({
-        rule_type: CLASSIFIER_RULESPEC_STR,
-        inputs: {
+      expect(state.interaction.answerGroups[0].rules[1]).toEqual(
+        rof.createNew(RULE_TYPE_CLASSIFIER, {
           training_data: ['text answer', 'third answer']
-        }
-      });
+        })
+      );
       expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
         'second answer'
       ]);
@@ -398,12 +395,11 @@ describe('State Editor controller', function() {
 
       // Verify initial state.
       var state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual({
-        rule_type: CLASSIFIER_RULESPEC_STR,
-        inputs: {
+      expect(state.interaction.answerGroups[0].rules[1]).toEqual(
+        rof.createNew(RULE_TYPE_CLASSIFIER, {
           training_data: ['text answer']
-        }
-      });
+        })
+      );
       expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
         'second answer'
       ]);
@@ -411,12 +407,11 @@ describe('State Editor controller', function() {
       // Ensure emptying the default unclassified answers is handled properly.
       tds.trainAnswerGroup(0, 'second answer');
       state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual({
-        rule_type: CLASSIFIER_RULESPEC_STR,
-        inputs: {
+      expect(state.interaction.answerGroups[0].rules[1]).toEqual(
+        rof.createNew(RULE_TYPE_CLASSIFIER, {
           training_data: ['text answer', 'second answer']
-        }
-      });
+        })
+      );
       expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([]);
 
       // Ensure emptying the answer group's classifier properly deletes the rule
@@ -424,12 +419,11 @@ describe('State Editor controller', function() {
       tds.trainDefaultResponse('second answer');
       tds.trainDefaultResponse('text answer');
       state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].ruleSpecs).toEqual([{
-        rule_type: 'Contains',
-        inputs: {
+      expect(state.interaction.answerGroups[0].rules).toEqual([
+        rof.createNew('Contains', {
           x: 'Test'
-        }
-      }]);
+        })
+      ]);
       expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
         'second answer', 'text answer'
       ]);
@@ -437,22 +431,18 @@ describe('State Editor controller', function() {
       // Training the answer group should add the classifier back.
       tds.trainAnswerGroup(0, 'second answer');
       state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].ruleSpecs).toEqual([{
-          rule_type: 'Contains',
-          inputs: {
-            x: 'Test'
-          }
-        }, {
-          rule_type: CLASSIFIER_RULESPEC_STR,
-          inputs: {
-            training_data: ['second answer']
-          }
-        }
+      expect(state.interaction.answerGroups[0].rules).toEqual([
+        rof.createNew('Contains', {
+          x: 'Test'
+        }),
+        rof.createNew(RULE_TYPE_CLASSIFIER, {
+          training_data: ['second answer']
+        })
       ]);
 
       // Removing the the 'contains' rule from the group and then removing the
       // training data should not remove the classifier.
-      state.interaction.answerGroups[0].ruleSpecs.splice(0, 1);
+      state.interaction.answerGroups[0].rules.splice(0, 1);
       ess.setState('State', state);
       rs.init({
         answerGroups: state.interaction.answerGroups,
@@ -463,12 +453,10 @@ describe('State Editor controller', function() {
 
       tds.trainDefaultResponse('second answer');
       state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].ruleSpecs).toEqual([{
-          rule_type: CLASSIFIER_RULESPEC_STR,
-          inputs: {
-            training_data: []
-          }
-        }
+      expect(state.interaction.answerGroups[0].rules).toEqual([
+        rof.createNew(RULE_TYPE_CLASSIFIER, {
+          training_data: []
+        })
       ]);
     });
 
@@ -478,12 +466,11 @@ describe('State Editor controller', function() {
 
       // Verify initial state.
       var state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual({
-        rule_type: CLASSIFIER_RULESPEC_STR,
-        inputs: {
+      expect(state.interaction.answerGroups[0].rules[1]).toEqual(
+        rof.createNew(RULE_TYPE_CLASSIFIER, {
           training_data: ['text answer']
-        }
-      });
+        })
+      );
       expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
         'second answer'
       ]);
@@ -491,23 +478,21 @@ describe('State Editor controller', function() {
       // Training a duplicate answer for the answer group should change nothing.
       tds.trainAnswerGroup(0, 'text answer');
       state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual({
-        rule_type: CLASSIFIER_RULESPEC_STR,
-        inputs: {
+      expect(state.interaction.answerGroups[0].rules[1]).toEqual(
+        rof.createNew(RULE_TYPE_CLASSIFIER, {
           training_data: ['text answer']
-        }
-      });
+        })
+      );
 
       // Training a duplicate answer for the default response should change
       // nothing.
       tds.trainDefaultResponse('second answer');
       state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].ruleSpecs[1]).toEqual({
-        rule_type: CLASSIFIER_RULESPEC_STR,
-        inputs: {
+      expect(state.interaction.answerGroups[0].rules[1]).toEqual(
+        rof.createNew(RULE_TYPE_CLASSIFIER, {
           training_data: ['text answer']
-        }
-      });
+        })
+      );
     });
 
     it('should remove unresolved answers after training', function() {

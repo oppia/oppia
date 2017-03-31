@@ -273,7 +273,7 @@ class Collection(object):
         function will need to be added to this class to convert from the
         current schema version to the new one. This function should be called
         in both from_yaml in this class and
-        collection_services._migrate_collection_to_latest_schema.
+        collection_services._migrate_collection_contents_to_latest_schema.
         feconf.CURRENT_COLLECTION_SCHEMA_VERSION should be incremented and the
         new value should be saved in the collection after the migration
         process, ensuring it represents the latest schema version.
@@ -379,6 +379,40 @@ class Collection(object):
 
         collection_dict['id'] = collection_id
         return Collection.from_dict(collection_dict)
+
+    @classmethod
+    def _convert_collection_contents_v1_dict_to_v2_dict(
+            cls, collection_contents):
+        """Converts from version 1 to 2. Does nothing since this migration only
+        changes the language code.
+        """
+        return collection_contents
+
+    @classmethod
+    def update_collection_contents_from_model(
+            cls, versioned_collection_contents, current_version):
+        """Converts the states blob contained in the given
+        versioned_collection_contents dict from current_version to
+        current_version + 1.
+
+        Note that the versioned_collection_contents being passed in is modified
+        in-place.
+        """
+        if (versioned_collection_contents['schema_version'] + 1 >
+                feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
+            raise Exception('Collection is version %d but current collection'
+                            ' schema version is %d' % (
+                                versioned_collection_contents['schema_version'],
+                                feconf.CURRENT_COLLECTION_SCHEMA_VERSION))
+
+        versioned_collection_contents['schema_version'] = (
+            current_version + 1)
+
+        conversion_fn = getattr(
+            cls, '_convert_collection_contents_v%s_dict_to_v%s_dict' % (
+                current_version, current_version + 1))
+        versioned_collection_contents['collection_contents'] = conversion_fn(
+            versioned_collection_contents['collection_contents'])
 
     @property
     def skills(self):
