@@ -330,12 +330,20 @@ class BaseHandler(webapp2.RequestHandler):
                 self.username and self.username in
                 config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value
             ),
-            'promo_bar_enabled': config_domain.PROMO_BAR_ENABLED.value,
-            'promo_bar_message': config_domain.PROMO_BAR_MESSAGE.value,
             'username': self.username,
             'user_is_logged_in': user_services.has_fully_registered(
                 self.user_id),
             'preferred_site_language_code': self.preferred_site_language_code
+        })
+        if feconf.ENABLE_PROMO_BAR:
+            promo_bar_enabled = config_domain.PROMO_BAR_ENABLED.value
+            promo_bar_message = config_domain.PROMO_BAR_MESSAGE.value
+        else:
+            promo_bar_enabled = False
+            promo_bar_message = ''
+        values.update({
+            'promo_bar_enabled': promo_bar_enabled,
+            'promo_bar_message': promo_bar_message,
         })
 
         if 'meta_name' not in values:
