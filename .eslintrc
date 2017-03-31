@@ -1,185 +1,95 @@
 {
   "extends": [
     "eslint:recommended",
-    "google"
+    "angular"
   ],
+  "plugins": [
+    "html"
+  ],
+  "env": {
+    "browser": true,
+    "jasmine": true,
+    "jquery": true
+  },
   "rules": {
     "no-empty": [
-      2,
+      "error",
       {
         "allowEmptyCatch": true
       }
     ],
     "func-style": [
-      2,
+      "error",
       "expression"
     ],
-    "brace-style": [
-      2,
-      "1tbs",
-      {
-        "allowSingleLine": true
-      }
+    "no-multi-str": [
+      "error"
     ],
-    "no-mixed-spaces-and-tabs": 2,
-    "no-multiple-empty-lines": 2,
-    "no-multi-str": 2,
-    "no-multi-spaces": 2,
+    "no-multi-spaces": [
+      "error"
+    ],
     "one-var": [
-      2,
+      "error",
       {
         "uninitialized": "always",
         "initialized": "never"
       }
     ],
     "padded-blocks": [
-      2,
+      "error",
       "never"
     ],
     "quote-props": [
-      2,
+      "error",
       "as-needed"
     ],
-    "key-spacing": [
-      2,
-      {
-        "beforeColon": false,
-        "afterColon": true
-      }
-    ],
     "space-unary-ops": [
-      2,
+      "error",
       {
-        "words": false,
-        "nonwords": false
-      }
-    ],
-    "comma-spacing": [
-      2,
-      {
-        "before": false,
-        "after": true
-      }
-    ],
-    "semi-spacing": [
-      2,
-      {
-        "before": false,
-        "after": true
+        "words": true,
+        "nonwords": false,
       }
     ],
     "space-before-function-paren": [
-      2,
+      "error",
       {
         "anonymous": "ignore",
         "named": "never"
       }
     ],
-    "no-spaced-func": 2,
-    "array-bracket-spacing": [
-      2,
-      "never",
-      {
-        "singleValue": true
-      }
-    ],
-    "space-in-parens": [
-      2,
-      "never"
-    ],
     "indent": [
-      2,
-      2,
-      {
-        "SwitchCase": 1
-      }
-    ],
-    "comma-dangle": [
-      2,
-      "never"
-    ],
-    "no-trailing-spaces": 2,
-    "no-unused-vars": [
-      2,
-      {
-        "vars": "local",
-        "args": "all"
-      }
-    ],
-    "yoda": [
-      2,
-      "never"
-    ],
-    "valid-jsdoc": 2,
-    "max-len": [
-      2,
-      80
+      "error",
+      2
     ],
     "camelcase": [
-      2,
+      "error",
       {
-        "properties": "always"
+        "properties": "never"
       }
     ],
-    "comma-style": [
-      2,
-      "last"
-    ],
     "curly": [
-      2,
+      "error",
       "all"
     ],
     "dot-notation": [
-      2,
+      "error",
       {
         "allowKeywords": true
       }
     ],
-    "eol-last": 2,
     "operator-linebreak": [
-      2,
+      "error",
       "after"
     ],
-    "wrap-iife": 2,
-    "semi": [
-      2,
-      "always"
+    "wrap-iife": [
+      "error",
+      "any"
     ],
-    "space-infix-ops": 2,
-    "keyword-spacing": [
-      2,
-      {
-        "overrides": {
-          "catch": {
-            "before": true
-          },
-          "else": {
-            "before": true
-          },
-          "while": {
-            "before": true
-          }
-        }
-      }
-    ],
-    "spaced-comment": [
-      2,
-      "always"
-    ],
-    "space-before-blocks": [
-      2,
-      "always"
-    ],
-    "consistent-this": [
-      2,
-      "that"
-    ],
-    "linebreak-style": [
-      2,
-      "unix"
+    "space-infix-ops": [
+      "error"
     ],
     "quotes": [
-      2,
+      "error",
       "single",
       {
         "avoidEscape": true

@@ -99,23 +99,6 @@ BAD_PATTERNS = {
         'excluded_dirs': ()}
 }
 
-# This is now the default option in ESLint (Remove before flight)
-# BAD_PATTERNS_JS = {
-#     ' == ': {
-#         'message': 'Please replace == with === in this file.',
-#         'excluded_files': (
-#             'core/templates/dev/head/expressions/parserSpec.js',
-#             'core/templates/dev/head/expressions/evaluatorSpec.js',
-#             'core/templates/dev/head/expressions/typeParserSpec.js')},
-#     ' != ': {
-#         'message': 'Please replace != with !== in this file.',
-#         'excluded_files': (
-#             'core/templates/dev/head/expressions/parserSpec.js',
-#             'core/templates/dev/head/expressions/evaluatorSpec.js',
-#             'core/templates/dev/head/expressions/typeParserSpec.js')}
-# }
-
-
 BAD_PATTERNS_JS_REGEXP = [
     {
         'regexp': r"\b(ddescribe|fdescribe)\(",
@@ -210,7 +193,8 @@ def _get_changed_filenames():
         a list of filenames of modified files.
     """
     unstaged_files = subprocess.check_output([
-        'git', 'diff', '--name-only']).splitlines()
+        'git', 'diff', '--name-only',
+        '--diff-filter=ACM']).splitlines()
     staged_files = subprocess.check_output([
         'git', 'diff', '--cached', '--name-only',
         '--diff-filter=ACM']).splitlines()
@@ -542,15 +526,6 @@ def _check_bad_patterns(all_files):
                         filename, BAD_PATTERNS[pattern]['message'])
                     total_error_count += 1
             if filename.endswith('.js'):
-                # for pattern in BAD_PATTERNS_JS:
-                #     if filename not in (
-                #             BAD_PATTERNS_JS[pattern]['excluded_files']):
-                #         if pattern in content:
-                #             failed = True
-                #             print '%s --> %s' % (
-                #                 filename,
-                #                 BAD_PATTERNS_JS[pattern]['message'])
-                #             total_error_count += 1
                 for regexp in BAD_PATTERNS_JS_REGEXP:
                     regexp_pattern = regexp['regexp']
                     if filename not in regexp['excluded_files']:
