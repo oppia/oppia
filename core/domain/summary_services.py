@@ -690,7 +690,7 @@ def get_recently_published_exp_summary_dicts(limit):
         limit: int. Maximum number of exploration returned
 
     Return:
-        list(dict). A list of exploration summary(dict) in human readable
+        list(dict). A list of exploration summary (dict) in human readable
         form. Example:
 
         [ {
