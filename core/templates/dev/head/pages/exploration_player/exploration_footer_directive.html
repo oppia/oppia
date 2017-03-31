@@ -5,7 +5,7 @@
         <ul class="author-profile">
           <li>
             <img ng-src="<[getStaticImageUrl('/general/apple.svg')]>" class="exploration-footer-img"
-                 ng-if="contributorNames.length > 0" alt="">
+                 alt="">
           </li>
           <li class="hover-link"
               ng-mouseenter="hovering = true"
@@ -45,6 +45,7 @@
                              twitter-text="getTwitterText()"
                              exploration-id="explorationId"
                              layout-type="row"
+                             share-type="exploration"
                              class="oppia-exploration-footer-sharing-links">
               </sharing-links>
             </li>

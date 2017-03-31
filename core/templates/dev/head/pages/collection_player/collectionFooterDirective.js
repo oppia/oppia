@@ -13,20 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for displaying the collection's owner name and
- * permissions.
+ * @fileoverview Directive for showing author/share footer
+ * in collection player.
  */
 
-oppia.directive('collectionPermissionsCard', [function() {
+oppia.directive('collectionFooter', [function() {
   return {
     restrict: 'E',
-    templateUrl: 'inline/collection_permissions_card_directive',
+    scope: {
+      twitterText: '@'
+    },
+    templateUrl: 'components/collectionFooter',
     controller: [
-      '$scope', 'CollectionEditorStateService',
-      function($scope, CollectionEditorStateService) {
-        $scope.collectionRights =
-          CollectionEditorStateService.getCollectionRights();
-        $scope.hasPageLoaded = CollectionEditorStateService.hasLoadedCollection;
+      '$scope', 'UrlInterpolationService',
+      function($scope, UrlInterpolationService) {
+        $scope.collectionId = GLOBALS.collectionId;
+
+        $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+
+        $scope.getTwitterText = function() {
+          return $scope.twitterText;
+        };
       }
     ]
   };

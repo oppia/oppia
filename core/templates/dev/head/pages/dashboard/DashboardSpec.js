@@ -72,7 +72,7 @@ describe('Creator dashboard controller', function() {
       function($rootScope, $controller, DashboardBackendApiService) {
         mockDashboardBackendApiService = DashboardBackendApiService;
         spyOn(mockDashboardBackendApiService, 'fetchDashboardData')
-          .andCallThrough();
+          .and.callThrough();
         scope = $rootScope.$new();
         ctrl = $controller('Dashboard', {
           $scope: scope,

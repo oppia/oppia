@@ -60,8 +60,13 @@ class CollectionModel(base_models.VersionedModel):
     # The version of all property blob schemas.
     schema_version = ndb.IntegerProperty(
         required=True, default=1, indexed=True)
-    # A dict representing all explorations belonging to this collection.
+    # DEPRECATED in v2.4.2. Do not use.
     nodes = ndb.JsonProperty(default={}, indexed=False)
+
+    # A dict representing the contents of a collection. Currently, this
+    # contains the list of nodes. This dict should contain collection data
+    # whose structure might need to be changed in the future.
+    collection_contents = ndb.JsonProperty(default={}, indexed=False)
 
     @classmethod
     def get_collection_count(cls):

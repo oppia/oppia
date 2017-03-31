@@ -30,12 +30,9 @@
         top: 168px;
       }
       .oppia-collection-table {
-        background: #fff;
-        border-radius: 2px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
         margin: 0 auto;
-        max-width: 80%;
-        padding: 20px 20px 60px 20px;
+        max-width: 90%;
+        padding: 50px 20px 420px 20px;
         position: relative;
         text-align: left;
         top: 35px;
@@ -58,18 +55,6 @@
         position: absolute;
         top: 40px;
         width: 120px;
-      }
-      .collection-subject-icon {
-        width: 80px;
-      }
-      .highlight-location-text {
-        bottom: 30px;
-        color: #005048;
-        font-family: Capriola, Roboto, Arial, sans-serif;
-        font-size: 18px;
-        font-style: italic;
-        left: 42px;
-        position: absolute;
       }
       @media only screen and (max-width : 600px) {
         .oppia-collection-player-title-font {
@@ -177,6 +162,16 @@
         animation: next-exploration-animation-effect 3s infinite;
         transform-origin: center;
         -webkit-transform-origin: center;
+      }
+      .mobile-path-segment {
+        margin: 0 auto;
+        width: 250px;
+      }
+      .mobile-lesson-icon {
+        position: absolute;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100px;
       }
     </style>
   {% endif %}
@@ -298,35 +293,80 @@
       </div>
 
       <div ng-if="collection" class="oppia-collection-table hidden-md hidden-lg hidden-xl">
-        <table class="oppia-dashboard-table">
-          <tr>
-            <th>
-              <p>Exploration</p>
-            </th>
-            <th class="hidden-xs">
-              <p>Objective</p>
-            </th>
-          </tr>
-          <tr ng-repeat="node in collection.getCollectionNodes()"
-              class="exploration-list-item">
-            <td class="oppia-exploration-list-table-item">
-              <a ng-href="/explore/<[node.getExplorationId()]>"
-                 ng-mouseover="updateExplorationPreview(node.getExplorationId())"
-                 ng-mouseleave="togglePreviewCard()"
-                 class="oppia-dashboard-list-summary">
-                <[node.getExplorationSummaryObject().title]>
-              </a>
-            </td>
-            <td class="hidden-xs oppia-exploration-list-table-item">
-              <a ng-href="/explore/<[node.getExplorationId()]>"
-                 ng-mouseover="updateExplorationPreview(node.getExplorationId())"
-                 ng-mouseleave="togglePreviewCard()"
-                 class="oppia-dashboard-list-summary">
-                <[node.getExplorationSummaryObject().objective]>
-              </a>
-            </td>
-          </tr>
-        </table>
+        <img ng-src="<[getStaticImageUrl('/general/collection_mascot.svg')]>" class="mobile-lesson-icon">
+        <div class="mobile-path-segment" ng-repeat="node in collection.getCollectionNodes()" id="mobile-path-anchor-<[$index]>">
+          <svg width="100"
+               height="150"
+               xmlns="http://www.w3.org/2000/svg"
+               xmlns:xlink="http://www.w3.org/1999/xlink"
+               version="1.1"
+               style="position: absolute; left: 50%; transform: translate(-50%, 195px);"
+               ng-click="scrollToLocation('mobile-path-anchor-' + $index); updateExplorationPreview(node.getExplorationId());">
+            <defs>
+              <pattern id="image0<[$index]>" patternUnits="userSpaceOnUse" height="150" width="100">
+                <circle cx="50"
+                        cy="70"
+                        r="50"
+                        ng-attr-fill="<[pathIconParameters[$index].thumbnailBgColor]>"/>
+                <image ng-if="isCompletedExploration(node.getExplorationId())"
+                       x="0"
+                       y="20"
+                       height="100"
+                       width="100"
+                       ng-attr-xlink:href="<[getStaticImageUrl('/general/collection_paw.svg')]>"
+                       xlink:href=""></image>
+                <image ng-if="!isCompletedExploration(node.getExplorationId())"
+                       x="10"
+                       y="30"
+                       height="80"
+                       width="80"
+                       ng-attr-xlink:href="<[pathIconParameters[$index].thumbnailIconUrl]>"
+                       xlink:href=""></image>
+              </pattern>
+            </defs>
+              <circle ng-show="($index===activeHighlightedIconIndex)?true:false"
+                      cx="50"
+                      cy="70"
+                      r="50"
+                      id="<['highlight' + $index]>"
+                      fill="#A6DACF"
+                      fill-opacity="0.5"/>
+              <circle cx="50"
+                      cy="70"
+                      r="42"
+                      fill="url(#image0<[$index]>)"
+                      stroke="#006553"
+                      stroke-width="2"/>
+            <text x="50%"
+                  y="15"
+                  alignment-baseline="middle"
+                  font-family="Capriola, Roboto, Arial, sans-serif"
+                  font-size="20"
+                  fill="#006553"
+                  text-anchor="middle">
+              <[$index + 1]>
+            </text>
+          </svg>
+          <img ng-src="<[getStaticImageUrl('/general/mobile_path_segment.svg')]>">
+          <div style="position: fixed; z-index: 100; top: 100px; left: 50%; transform: translate(-130px);">
+            <exploration-summary-tile ng-if="explorationCardIsShown"
+                                      collection-id="getCollectionId()"
+                                      exploration-id="currentExplorationId"
+                                      exploration-title="summaryToPreview.title"
+                                      last-updated-msec="summaryToPreview.last_updated_msec"
+                                      objective="summaryToPreview.objective"
+                                      category="summaryToPreview.category"
+                                      ratings="summaryToPreview.ratings"
+                                      num-views="summaryToPreview.num_views"
+                                      thumbnail-icon-url="summaryToPreview.thumbnail_icon_url"
+                                      thumbnail-bg-color="summaryToPreview.thumbnail_bg_color"
+                                      is-community-owned="summaryToPreview.community_owned"
+                                      is-collection-preview-tile="true"
+                                      style="position: absolute; z-index: 10;">
+            </exploration-summary-tile>
+          </div>
+        </div>
+
       </div>
 
       <div ng-if="collection" class="oppia-card-preview-panel hidden-sm hidden-xs">
@@ -334,11 +374,11 @@
           <div class="title-section" style="background-color: <[collectionSummary.thumbnail_bg_color]>; z-index: 1;">
             <img ng-src="<[collectionSummary.thumbnail_icon_url]>" class="thumbnail-image">
           </div>
-          <div class="title-section-mask" style="padding: 22px;">
+          <div class="title-section-mask" style="padding: 26px;">
             <span style="font-size: 14px;">Highlight an icon to preview an exploration.</span>
           </div>
         </md-card>
-        <exploration-summary-tile ng-if="!previewCardIsShown"
+        <exploration-summary-tile ng-if="explorationCardIsShown"
                                   collection-id="getCollectionId()"
                                   exploration-id="currentExplorationId"
                                   exploration-title="summaryToPreview.title"
@@ -351,7 +391,7 @@
                                   thumbnail-bg-color="summaryToPreview.thumbnail_bg_color"
                                   is-community-owned="summaryToPreview.community_owned"
                                   style="position: absolute; left: 85px; top: 30px; z-index: 10;">
-        <exploration-summary-tile/>
+        </exploration-summary-tile>
       </div>
     </div>
   </div>
@@ -360,6 +400,12 @@
 
   {% include 'components/attribution_guide/attribution_guide_directive.html' %}
   {% include 'pages/collection_player/collection_node_list_directive.html' %}
+{% endblock %}
+
+{% block footer %}
+  {% include 'pages/collection_player/collection_footer_directive.html' %}
+  {% include 'components/share/sharing_links_directive.html' %}
+  <collection-footer twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></collection-footer>
 {% endblock %}
 
 {% block footer_js %}
@@ -373,7 +419,10 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/ReadOnlyCollectionBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/SkillListObjectFactory.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_player/collectionFooterDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/share/SharingLinksDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/attribution_guide/AttributionGuideDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/embed_modal/ExplorationEmbedButtonService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
 

@@ -643,6 +643,26 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
         self.assertEqual(
             retrieved_collection_summary.category, 'A new category')
 
+    def test_update_collection_by_migration_bot(self):
+        exp_id = 'exp_id'
+        self.save_new_valid_collection(
+            self.COLLECTION_ID, self.owner_id, exploration_id=exp_id)
+        rights_manager.publish_exploration(self.owner_id, exp_id)
+        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+
+        # This should not give an error.
+        collection_services.update_collection(
+            feconf.MIGRATION_BOT_USER_ID, self.COLLECTION_ID, [{
+                'cmd': 'edit_collection_property',
+                'property_name': 'title',
+                'new_value': 'New title'
+            }], 'Did migration.')
+
+        # Check that the version of the collection is incremented
+        collection = collection_services.get_collection_by_id(
+            self.COLLECTION_ID)
+        self.assertEqual(collection.version, 2)
+
 
 class LoadingAndDeletionOfCollectionDemosTest(CollectionServicesUnitTests):
 
