@@ -63,12 +63,12 @@ def get_human_readable_contributors_summary(contributors_summary):
     """Get contributors summary in human readable form.
 
     Args:
-        contributors_summary: dict. the keys are users id and 
+        contributors_summary: dict. the keys are users id and
             the values are the number of commits.
 
-    Returns: 
-        dict. A dict of contributors in human readable form; the keys are users name and 
-        the values are a dict. Example:
+    Returns:
+        dict. A dict of contributors in human readable form; the keys are users
+        name and the values are a dict. Example:
 
         {
             'albert': {
@@ -90,24 +90,25 @@ def get_human_readable_contributors_summary(contributors_summary):
 def get_learner_collection_dict_by_id(
         collection_id, user_id, strict=True, allow_invalid_explorations=False,
         version=None):
-    """Get a dictionary representation of a collection given by the provided collection ID.
+    """Get a dictionary representation of a collection given by the provided
+    collection ID.
 
     Args:
         collection_id: str. The id of collection to return
         user_id: str. User id
         strict: bool. Whether to fail noisily if no collection with the given
             id exists in the datastore.
-        allow_invalid_explorations: bool. Return also explorations that are invalid.
-            (Example: exploration deleted or private exploration)
+        allow_invalid_explorations: bool. Return also explorations that are
+            invalid. (Example: exploration deleted or private exploration)
         version: str or None. The version number of the collection to be
             retrieved. If it is None, the latest version will be retrieved.
 
     Returns:
-        dict. A dictionary that contains extra information along with the dict returned by 
-        collection_domain.Collection.to_dict() which includes useful data for the 
-        collection learner view. The information includes progress in the collection,
-        information about explorations referenced within the collection, and a 
-        slightly nicer data structure for frontend work.
+        dict. A dictionary that contains extra information along with the dict
+        returned by collection_domain.Collection.to_dict() which includes useful
+        data for the collection learner view. The information includes progress
+        in the collection, information about explorations referenced within the
+        collection, and a slightly nicer data structure for frontend work.
 
     Raises:
         ValidationError: If the collection retrieved using the given
@@ -178,7 +179,8 @@ def get_learner_collection_dict_by_id(
 
 
 def get_displayable_collection_summary_dicts_matching_ids(collection_ids):
-    """Returns a list of dict with all collection summary objects from collection ids.
+    """Returns a list of dict with all collection summary objects from
+    collection ids.
 
     Args:
         collection_ids: list(str). A list of collection id
@@ -194,7 +196,7 @@ def get_displayable_collection_summary_dicts_matching_ids(collection_ids):
 
 
 def get_exp_metadata_dicts_matching_query(query_string, search_cursor, user_id):
-    """Given a query string and a search cursor, returns a list of exploration 
+    """Given a query string and a search cursor, returns a list of exploration
     metadata dicts that satisfy the search query.
 
     Args:
@@ -203,12 +205,12 @@ def get_exp_metadata_dicts_matching_query(query_string, search_cursor, user_id):
         search_cursor: str or None. The cursor location to start the search
             from. If None, the returned values are from the beginning
             of the results list.
-        user_id: str or None. User id. If not None, private explorations that are
-            editable by this user are also returned.
+        user_id: str or None. User id. If not None, private explorations that
+            are editable by this user are also returned.
 
     Returns:
-        exploration_list: list. A list of metadata dicts for explorations matching
-            the query.
+        exploration_list: list. A list of metadata dicts for explorations
+            matching the query.
         new_search_cursor: str. New search cursor location.
     """
     exp_ids, new_search_cursor = (
@@ -227,14 +229,14 @@ def get_exploration_metadata_dicts(exploration_ids, editor_user_id=None):
     node search.
 
     Args:
-        exploration_ids: list(str). A list of exploration ids for which exploration
-            metadata dicts are to be returned.
-        editor_user_id: str or None. User id. If not None, private explorations that are
-            editable by this user are also returned.
+        exploration_ids: list(str). A list of exploration ids for which
+            exploration metadata dicts are to be returned.
+        editor_user_id: str or None. User id. If not None, private explorations
+            that are editable by this user are also returned.
 
     Returns:
-        list(dict). A list of metadata dicts corresponding to the given exploration ids.
-        Each dict has three keys:
+        list(dict). A list of metadata dicts corresponding to the given
+        exploration ids. Each dict has three keys:
             'id': the exploration id
             'title': the exploration title
             'objective': the exploration objective
@@ -264,7 +266,8 @@ def get_exploration_metadata_dicts(exploration_ids, editor_user_id=None):
 
 def get_displayable_exp_summary_dicts_matching_ids(
         exploration_ids, editor_user_id=None):
-    """Get a summary of explorations in human readable form from exploration ids.
+    """Get a summary of explorations in human readable form from
+    exploration ids.
 
     Given a list of exploration ids, optionally filters the list for
     explorations that are currently non-private and not deleted, and returns a
@@ -276,11 +279,12 @@ def get_displayable_exp_summary_dicts_matching_ids(
 
     Args:
         exploration_ids: list(str). List of exploration id
-        editor_user_id: str of None. User id to filter exploration. If None the 
+        editor_user_id: str of None. User id to filter exploration. If None the
         returned list is not filtered.
 
     Return:
-        list(dict). A list of exploration summary (dict) in human readable form. Example:
+        list(dict). A list of exploration summary (dict) in human readable form.
+        Example:
 
         [ {
             'category': u'A category',
@@ -331,7 +335,8 @@ def get_displayable_exp_summary_dicts(exploration_summaries):
         exploration_summaries: list(str). List of exploration summary object
 
     Return:
-        list(dict). A list of exploration summary (dict) in human readable form. Example:
+        list(dict). A list of exploration summary (dict) in human readable form.
+        Example:
 
         [ {
             'category': u'A category',
@@ -393,14 +398,17 @@ def get_displayable_exp_summary_dicts(exploration_summaries):
     return displayable_exp_summaries
 
 
-def _get_displayable_collection_summary_dicts(collection_summaries): 
-    """Returns a list with all collection summary objects from collection summaries domain object.
+def _get_displayable_collection_summary_dicts(collection_summaries):
+    """Returns a list with all collection summary objects from collection
+    summaries domain object.
 
     Args:
-        collection_summaries: list(CollectionSummary). List of collection summary domain object
+        collection_summaries: list(CollectionSummary). List of collection
+        summary domain object
 
     Return:
-        list(dict). A list of exploration summary (dict) in human readable form. Example:
+        list(dict). A list of exploration summary(dict) in human readable form.
+        Example:
 
         [ {
             'category': u'A category',
@@ -448,8 +456,9 @@ def get_library_groups(language_codes):
         language_codes: list(str). A list of language code
 
     Return:
-        list(dict). List of groups(dict); for each group there is a list of dicts representing
-            activity summaries (key = 'activity_summary_dicts'). Example:
+        list(dict). List of groups(dict); for each group there is a list of
+            dicts representing activity summaries
+            (key = 'activity_summary_dicts'). Example:
 
         [ {'activity_summary_dicts': [{}],
             'categories': [],
@@ -544,7 +553,8 @@ def require_activities_to_be_public(activity_references):
     exist, or is not public.
 
     Args:
-        activity_references: list(ActivityReference). A list of ActivityReference domain object
+        activity_references: list(ActivityReference). A list of
+            ActivityReference domain object
 
     Raises:
         Exception: If any activity reference in the list does not
@@ -641,7 +651,8 @@ def get_top_rated_exploration_summary_dicts(language_codes, limit):
         limit: int. Maximum number of exploration returned
 
     Return:
-        list(dict). A list of exploration summary (dict) in human readable form. Example:
+        list(dict). A list of exploration summary (dict) in human readable form.
+        Example:
 
         [ {
             'category': u'A category',
@@ -679,7 +690,8 @@ def get_recently_published_exp_summary_dicts(limit):
         limit: int. Maximum number of exploration returned
 
     Return:
-        list(dict). A list of exploration summary (dict) in human readable form. Example:
+        list(dict). A list of exploration summary(dict) in human readable
+        form. Example:
 
         [ {
             'category': u'A category',
