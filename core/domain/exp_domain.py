@@ -166,10 +166,10 @@ class ExplorationChange(object):
     cmd keys that already exist.
 
     NOTE TO DEVELOPERS: Please note that, for a brief period around
-    Feb - Apr 2017, change dicts related to editing of answer groups accidentally
-    stored the old_value using a ruleSpecs key instead of a rule_specs key. So, if
-    you are making use of this data, make sure to verify the format of the old_value
-    before doing any processing.
+    Feb - Apr 2017, change dicts related to editing of answer groups 
+    accidentally stored the old_value using a ruleSpecs key instead of a
+    rule_specs key. So, if you are making use of this data, make sure to
+    verify the format of the old_value before doing any processing.
     """
 
     STATE_PROPERTIES = (
