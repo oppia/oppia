@@ -102,7 +102,7 @@ describe('Build line templates', function() {
     expect(
       errorWrapper2(
         buildThenDisplay, 'name', 'from q we have r', 'q', 'p', '', [])
-    ).toThrow(
+    ).toThrowError(
       'It will not be possible to uniquely identify p from a line of this ' +
       'form.');
 
@@ -111,7 +111,7 @@ describe('Build line templates', function() {
       errorWrapper2(
         buildThenDisplay, 'exists_introduce',
         'from p[x->a] we have \u2203x.p', 'p[x->a]', '\u2203x.p', 'a', [])
-    ).toThrow(
+    ).toThrowError(
       'It will not be possible to uniquely identify a from a line of this ' +
       'form.');
   });
@@ -120,7 +120,7 @@ describe('Build line templates', function() {
     expect(
       errorWrapper2(
         buildThenDisplay, 'name', 'take p satisfying q[x->p]', '', '', '', [])
-    ).toThrow(
+    ).toThrowError(
       'p yields a boolean but you are trying to use it to give a element.');
   });
 });
@@ -285,7 +285,7 @@ describe('Build mistake entry', function() {
       errorWrapper2(
         buildThenDisplay, 'name', 'template(n) = \'given\'',
         ['examine {{antecedents(n-1)+1}}'])
-    ).toThrow(
+    ).toThrowError(
       'antecedents yields a set_of_formulas but you are trying to use it to ' +
       'give a integer.'
     );
@@ -411,14 +411,14 @@ describe('Build control function', function() {
       errorWrapper2(
         buildThenDisplay, 'bad_function(x,y)', 'missing_function(x-y, x+y)',
         '')
-    ).toThrow('The operator missing_function could not be identified.');
+    ).toThrowError('The operator missing_function could not be identified.');
   });
 
   it('should forbid type mismatches', function() {
     expect(
       errorWrapper2(
         buildThenDisplay, 'f(n)', 'template(n) + 3', '')
-    ).toThrow(
+    ).toThrowError(
       'template yields a string but you are trying to use it to give a ' +
       'integer.');
   });
@@ -427,7 +427,7 @@ describe('Build control function', function() {
     expect(
       errorWrapper2(
         buildThenDisplay, 'f(n)', 'n', '')
-    ).toThrow(
+    ).toThrowError(
       'Unfortunately this cannot be accepted as it has multiple possible ' +
       'typings.');
   });
@@ -436,7 +436,7 @@ describe('Build control function', function() {
     expect(
       errorWrapper2(
         buildThenDisplay, 'n(x,y)', 'x-y', '')
-    ).toThrow(
+    ).toThrowError(
       'You cannot use n as a function name; it is reserved to refer to line ' +
       'numbers');
   });
@@ -526,7 +526,7 @@ describe('Parse messages describing student mistakes', function() {
       errorWrapper2(
         logicProofTeacher2.parseMessage,
         'By lack of arbitraryness this fails for {{p[[x->a]}}.', 'line')
-    ).toThrow('It was not possible to parse {{p[[x->a]}}.');
+    ).toThrowError('It was not possible to parse {{p[[x->a]}}.');
   });
 
   it('should forbid unmatched {{', function() {
@@ -534,6 +534,6 @@ describe('Parse messages describing student mistakes', function() {
       errorWrapper2(
         logicProofTeacher2.parseMessage,
         'of {{result(scoper(n))}}.{{d)', 'control')
-    ).toThrow('This has an unmatched {{.');
+    ).toThrowError('This has an unmatched {{.');
   });
 });

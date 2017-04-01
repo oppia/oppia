@@ -116,7 +116,9 @@
         logoutUrl: JSON.parse('{{logout_url|js_string}}'),
         profilePictureDataUrl: JSON.parse('{{profile_picture_data_url|js_string}}'),
         userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}'),
-        username: JSON.parse('{{username|js_string}}')
+        username: JSON.parse('{{username|js_string}}'),
+        PROMO_BAR_IS_ENABLED: JSON.parse('{{promo_bar_enabled|js_string}}'),
+        PROMO_BAR_MESSAGE: JSON.parse('{{promo_bar_message|js_string}}')
       };
 
       {% if additional_angular_modules %}
@@ -136,6 +138,9 @@
     {% if iframed %}
       {{ warnings_and_loader() }}
     {% else %}
+      <promo-bar ng-if="promoBarIsEnabled" promo-message="promoBarMessage">
+      </promo-bar>
+
       <div class="oppia-base-container"
            ng-class="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
            ng-swipe-left="closeSidebarOnSwipe()">
@@ -225,6 +230,7 @@
     {% include 'components/forms/schema_viewers/schema_based_viewer_directive.html' %}
 
     {% include 'components/loading/loading_dots_directive.html' %}
+    {% include 'components/promo/promo_bar_directive.html' %}
     {% include 'components/summary_tile/circular_image_directive.html' %}
     {% include 'components/summary_tile/collection_summary_tile_directive.html' %}
     {% include 'components/summary_tile/exploration_summary_tile_directive.html' %}
@@ -250,6 +256,7 @@
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/ObjectEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/promo/PromoBarDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/side_navigation_bar/SideNavigationBarDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/social_buttons/SocialButtonsDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/top_navigation_bar/TopNavigationBarDirective.js"></script>

@@ -148,7 +148,7 @@ describe('Collection editor state service', function() {
   it('should request to load the collection from the backend', function() {
     spyOn(
       fakeEditableCollectionBackendApiService,
-      'fetchCollection').andCallThrough();
+      'fetchCollection').and.callThrough();
 
     CollectionEditorStateService.loadCollection(5);
     expect(fakeEditableCollectionBackendApiService.fetchCollection)
@@ -157,9 +157,8 @@ describe('Collection editor state service', function() {
 
   it('should request to load the collection rights from the backend',
     function() {
-      spyOn(
-        fakeCollectionRightsBackendApiService,
-        'fetchCollectionRights').andCallThrough();
+      spyOn(fakeCollectionRightsBackendApiService, 'fetchCollectionRights')
+        .and.callThrough();
 
       CollectionEditorStateService.loadCollection(5);
       expect(fakeCollectionRightsBackendApiService.fetchCollectionRights)
@@ -169,7 +168,7 @@ describe('Collection editor state service', function() {
 
   it('should fire an init event after loading the first collection',
     function() {
-      spyOn($rootScope, '$broadcast').andCallThrough();
+      spyOn($rootScope, '$broadcast').and.callThrough();
 
       CollectionEditorStateService.loadCollection(5);
       $rootScope.$apply();
@@ -184,7 +183,7 @@ describe('Collection editor state service', function() {
     CollectionEditorStateService.loadCollection(5);
     $rootScope.$apply();
 
-    spyOn($rootScope, '$broadcast').andCallThrough();
+    spyOn($rootScope, '$broadcast').and.callThrough();
 
     // Load a second collection.
     CollectionEditorStateService.loadCollection(1);
@@ -348,7 +347,7 @@ describe('Collection editor state service', function() {
       CollectionEditorStateService.loadCollection(5);
       $rootScope.$apply();
 
-      spyOn($rootScope, '$broadcast').andCallThrough();
+      spyOn($rootScope, '$broadcast').and.callThrough();
 
       var newCollection = CollectionObjectFactory.create(
         secondBackendCollectionObject);
@@ -372,7 +371,7 @@ describe('Collection editor state service', function() {
       CollectionEditorStateService.loadCollection(5);
       $rootScope.$apply();
 
-      spyOn($rootScope, '$broadcast').andCallThrough();
+      spyOn($rootScope, '$broadcast').and.callThrough();
       expect(CollectionEditorStateService.saveCollection(
         'Commit message')).toBe(false);
       expect($rootScope.$broadcast).not.toHaveBeenCalled();
@@ -382,7 +381,7 @@ describe('Collection editor state service', function() {
   it('should be able to save the collection and pending changes', function() {
     spyOn(
       fakeEditableCollectionBackendApiService,
-      'updateCollection').andCallThrough();
+      'updateCollection').and.callThrough();
 
     CollectionEditorStateService.loadCollection(0);
     CollectionUpdateService.setCollectionTitle(
@@ -408,7 +407,7 @@ describe('Collection editor state service', function() {
       CollectionEditorStateService.getCollection(), 'New title');
     $rootScope.$apply();
 
-    spyOn($rootScope, '$broadcast').andCallThrough();
+    spyOn($rootScope, '$broadcast').and.callThrough();
     CollectionEditorStateService.saveCollection('Commit message');
     $rootScope.$apply();
 

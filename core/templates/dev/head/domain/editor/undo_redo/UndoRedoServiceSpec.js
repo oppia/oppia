@@ -117,7 +117,7 @@ describe('Undo/Redo Service', function() {
       backendChangeObject, fakeDomainObject);
 
     // Apply must be called twice (once for the first apply and once for redo).
-    expect(applyFunc.callCount).toEqual(2);
+    expect(applyFunc.calls.count()).toEqual(2);
   });
 
   it('should not undo anything if no changes are applied', function() {
@@ -163,7 +163,7 @@ describe('Undo/Redo Service', function() {
 
     expect(applyFunc).toHaveBeenCalled();
     expect(reverseFunc).not.toHaveBeenCalled();
-    expect(applyFunc.callCount).toEqual(1);
+    expect(applyFunc.calls.count()).toEqual(1);
   });
 
   it('should undo changes in the reverse order of applying', function() {

@@ -211,6 +211,11 @@ describe('Compare versions service', function() {
           }],
           interaction: {
             answer_groups: [],
+            default_outcome: {
+              dest: 'default',
+              feedback: [],
+              param_changes: []
+            },
             fallbacks: []
           }
         };
@@ -218,7 +223,9 @@ describe('Compare versions service', function() {
           statesDetails[stateName].ruleDests.map(function(ruleDestName) {
             return {
               outcome: {
-                dest: ruleDestName
+                dest: ruleDestName,
+                feedback: [],
+                param_changes: []
               },
               rule_specs: [],
               correct: false

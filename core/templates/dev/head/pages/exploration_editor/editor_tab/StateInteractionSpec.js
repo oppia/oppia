@@ -78,6 +78,11 @@ describe('State Interaction controller', function() {
               outcome: {},
               correct: false
             }],
+            default_outcome: {
+              dest: 'default',
+              feedback: [],
+              param_changes: []
+            },
             fallbacks: []
           },
           param_changes: []
@@ -94,6 +99,11 @@ describe('State Interaction controller', function() {
               outcome: {},
               correct: false
             }],
+            default_outcome: {
+              dest: 'default',
+              feedback: [],
+              param_changes: []
+            },
             fallbacks: []
           },
           param_changes: []

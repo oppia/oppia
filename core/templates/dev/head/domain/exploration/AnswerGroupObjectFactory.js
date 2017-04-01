@@ -18,7 +18,8 @@
  */
 
 oppia.factory('AnswerGroupObjectFactory', [
-  'RuleObjectFactory', function(RuleObjectFactory) {
+  'RuleObjectFactory', 'OutcomeObjectFactory',
+  function(RuleObjectFactory, OutcomeObjectFactory) {
     var AnswerGroup = function(rules, outcome, correct) {
       this.rules = rules;
       this.outcome = outcome;
@@ -30,7 +31,7 @@ oppia.factory('AnswerGroupObjectFactory', [
         rule_specs: this.rules.map(function(rule) {
           return rule.toBackendDict();
         }),
-        outcome: this.outcome,
+        outcome: this.outcome.toBackendDict(),
         correct: this.correct
       };
     };
@@ -44,7 +45,8 @@ oppia.factory('AnswerGroupObjectFactory', [
     AnswerGroup.createFromBackendDict = function(answerGroupBackendDict) {
       return new AnswerGroup(
         generateRulesFromBackend(answerGroupBackendDict.rule_specs),
-        answerGroupBackendDict.outcome,
+        OutcomeObjectFactory.createFromBackendDict(
+          answerGroupBackendDict.outcome),
         false);
     };
 

@@ -309,7 +309,7 @@ oppia.factory('oppiaPlayerService', [
                     playerTranscriptService.getNumSubmitsForLastCard()) {
                 outcome.dest = fallback.outcome.dest;
                 outcome.feedback = fallback.outcome.feedback;
-                outcome.param_changes = fallback.outcome.param_changes;
+                outcome.paramChanges = fallback.outcome.paramChanges;
                 break;
               }
             }
