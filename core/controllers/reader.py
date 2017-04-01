@@ -333,7 +333,7 @@ class ClassifyHandler(base.BaseHandler):
         # The learner's raw answer.
         answer = self.payload.get('answer')
         # The learner's parameter values.
-        params = self.payload.get('params')
+        #params = self.payload.get('params')
         #params['answer'] = answer : This line is not required.
         result = classifier_services.classify(old_state, answer)
         self.render_json(result)
