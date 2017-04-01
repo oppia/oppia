@@ -109,9 +109,18 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
 class ClassifyHandlerTest(test_utils.GenericTestBase):
     """Test the hander for classification"""
 
-    def test_classifier(self):
-        """Test classification handler"""
-        #Loading demo exploration.
+    def setUp(self):
+        super(ClassifyHandlerTest,self).setUp()
+
+    def test_classification_handler(self):
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+        # Load demo exploration
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        #Reading YAML exploration into a dictionary
         yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                                  '../tests/data/string_classifier_test.yaml')
         doc_to_label = {}
@@ -131,6 +140,9 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
         examples = [[doc, doc_to_label[doc]] for doc in doc_to_label]
         docs_to_classify = [doc[0] for doc in examples]
         
+        #Creating the exploration domain object
+        exploration = exp_domain.Exploration.from_dict(yaml_dict)
+
         #Training the model
         classifier = (
             classifier_registry.ClassifierRegistry.get_classifier_by_id(
@@ -138,12 +150,14 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
         classifier.train(examples)
         classifier_dict = classifier.to_dict()
 
-        #Testing predictions
-        classifier.from_dict(classifier_dict)
-        outcome_dict = classifier.predict(["""Permutations""",
-        """son 3 y tienen dos opciones de cambio cada una"""])
-        self.assertEqual(outcome_dict[0],"<p>Detected permutation.</p>")
-        self.assertEqual(outcome_dict[1],"<p>Detected factorial.</p>")
+        #Testing the handler
+        self.login(self.VIEWER_EMAIL)
+        old_state = exploration.states['Home'].to_dict()
+        answer='Permutations'
+        params = { 'old_state' : old_state, 'answer' : answer }
+        feconf.ENABLE_STRING_CLASSIFIER = True
+        res = self.post_json('/explorehandler/classify/%s' % exp_id,params)
+        self.logout()
 
 
 class FeedbackIntegrationTest(test_utils.GenericTestBase):
