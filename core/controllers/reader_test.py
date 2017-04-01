@@ -14,10 +14,9 @@
 
 """Tests for the page that allows learners to play through an exploration."""
 
-import yaml
 import os
+import yaml
 
-from core.domain import classifier_registry
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import param_domain
@@ -137,19 +136,21 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
 
         #Testing the handler for a correct answer
         old_state = exploration.states['Home'].to_dict()
-        answer= 'Permutations'
+        answer = 'Permutations'
         params = {'old_state' : old_state, 'answer' : answer}
         feconf.ENABLE_STRING_CLASSIFIER = True
         res = self.post_json('/explorehandler/classify/%s' % exp_id, params)
-        self.assertEqual(res['outcome']['feedback'][0],'<p>Detected permutation.</p>')
+        self.assertEqual(res['outcome']['feedback'][0],
+                         '<p>Detected permutation.</p>')
 
         #Testing the handler for a wrong answer
         old_state = exploration.states['Home'].to_dict()
-        answer= 'Shigatsu wa kimi no uso'
+        answer = 'Shigatsu wa kimi no uso'
         params = {'old_state' : old_state, 'answer' : answer}
         feconf.ENABLE_STRING_CLASSIFIER = True
         res = self.post_json('/explorehandler/classify/%s' % exp_id, params)
-        self.assertEqual(res['outcome']['feedback'][0],'<p>Detected unsure.</p>')
+        self.assertEqual(res['outcome']['feedback'][0],
+                         '<p>Detected unsure.</p>')
         self.logout()
 
 
