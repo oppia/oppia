@@ -14,13 +14,14 @@
 
 """Tests for the page that allows learners to play through an exploration."""
 
+import yaml
+import os
+
+from core.domain import classifier_registry
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import param_domain
 from core.domain import rights_manager
-from core.domain import classifier_registry
-import yaml
-import os
 from core.tests import test_utils
 import feconf
 
@@ -106,11 +107,21 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
             expect_errors=True)
         self.assertEqual(response.status_int, 200)
 
+
 class ClassifyHandlerTest(test_utils.GenericTestBase):
     """Test the hander for classification"""
 
     def setUp(self):
-        super(ClassifyHandlerTest,self).setUp()
+        super(ClassifyHandlerTest, self).setUp()
+
+        #Reading YAML exploration into a dictionary
+        yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                                 '../tests/data/string_classifier_test.yaml')
+        with open(yaml_path, 'r') as yaml_file:
+            self.yaml_dict = yaml.load(yaml_file)
+
+        self.login(self.VIEWER_EMAIL)
+
 
     def test_classification_handler(self):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -120,43 +131,25 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
 
-        #Reading YAML exploration into a dictionary
-        yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                 '../tests/data/string_classifier_test.yaml')
-        doc_to_label = {}
-        with open(yaml_path, 'r') as yaml_file:
-            yaml_dict = yaml.load(yaml_file)
-            interactions = yaml_dict['states']['Home']['interaction']
-            # The first element contains no training data,
-            # so only consider [1:].
-            for answer_group in interactions['answer_groups'][1:]:
-                label = answer_group['outcome']['feedback'][0]
-                for rule in answer_group['rule_specs']:
-                    if 'inputs' in rule and 'training_data' in rule['inputs']:
-                        for doc in rule['inputs']['training_data']:
-                            if doc not in doc_to_label:
-                                doc_to_label[doc] = []
-                            doc_to_label[doc].append(label)
-        examples = [[doc, doc_to_label[doc]] for doc in doc_to_label]
-        docs_to_classify = [doc[0] for doc in examples]
-        
         #Creating the exploration domain object
-        exploration = exp_domain.Exploration.from_dict(yaml_dict)
+        self.yaml_dict['id'] = 20
+        exploration = exp_domain.Exploration.from_dict(self.yaml_dict)
 
-        #Training the model
-        classifier = (
-            classifier_registry.ClassifierRegistry.get_classifier_by_id(
-                feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']))
-        classifier.train(examples)
-        classifier_dict = classifier.to_dict()
-
-        #Testing the handler
-        self.login(self.VIEWER_EMAIL)
+        #Testing the handler for a correct answer
         old_state = exploration.states['Home'].to_dict()
-        answer='Permutations'
-        params = { 'old_state' : old_state, 'answer' : answer }
+        answer= 'Permutations'
+        params = {'old_state' : old_state, 'answer' : answer}
         feconf.ENABLE_STRING_CLASSIFIER = True
-        res = self.post_json('/explorehandler/classify/%s' % exp_id,params)
+        res = self.post_json('/explorehandler/classify/%s' % exp_id, params)
+        self.assertEqual(res['outcome']['feedback'][0],'<p>Detected permutation.</p>')
+
+        #Testing the handler for a wrong answer
+        old_state = exploration.states['Home'].to_dict()
+        answer= 'Shigatsu wa kimi no uso'
+        params = {'old_state' : old_state, 'answer' : answer}
+        feconf.ENABLE_STRING_CLASSIFIER = True
+        res = self.post_json('/explorehandler/classify/%s' % exp_id, params)
+        self.assertEqual(res['outcome']['feedback'][0],'<p>Detected unsure.</p>')
         self.logout()
 
 
