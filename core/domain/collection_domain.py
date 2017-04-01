@@ -270,18 +270,18 @@ class CollectionSkill(object):
         """Constructs a new CollectionSkill object.
 
         Args:
-        - skill_id (int): the skill ID
-        - name (string): the displayed name of the skill
-        - question_ids (list of strings): list of the question IDs associated
-                                          to the skill.
+            skill_id: int. the skill ID.
+            name: str. the displayed name of the skill.
+            question_ids: list(str). The list of question IDs
+                associated with the skill.
         """
-        self.skill_id = skill_id
+        self.id = skill_id
         self.name = name
         self.question_ids = question_ids
 
     def to_dict(self):
         return {
-            'skill_id': self.skill_id,
+            'skill_id': self.id,
             'name': self.name,
             'question_ids': self.question_ids
         }
@@ -302,7 +302,7 @@ class Collection(object):
 
     def __init__(self, collection_id, title, category, objective,
                  language_code, tags, schema_version, nodes, skills,
-                 skills_id_count, version,
+                 skill_id_count, version,
                  created_on=None, last_updated=None):
         """Constructs a new collection given all the information necessary to
         represent a collection.
@@ -328,7 +328,7 @@ class Collection(object):
         self.schema_version = schema_version
         self.nodes = nodes
         self.skills = skills
-        self.skills_id_count = skills_id_count
+        self.skill_id_count = skill_id_count
         self.version = version
         self.created_on = created_on
         self.last_updated = last_updated
@@ -345,7 +345,7 @@ class Collection(object):
             'nodes': [
                 node.to_dict() for node in self.nodes
             ],
-            'skills_id_count': self.skills_id_count,
+            'skill_id_count': self.skill_id_count,
             'skills': [
                 skill.to_dict() for skill in self.skills
             ]
@@ -370,7 +370,7 @@ class Collection(object):
             collection_dict['category'], collection_dict['objective'],
             collection_dict['language_code'], collection_dict['tags'],
             collection_dict['schema_version'], [], {},
-            collection_dict['skills_id_count'], collection_version,
+            collection_dict['skill_id_count'], collection_version,
             collection_created_on, collection_last_updated)
 
         for node_dict in collection_dict['nodes']:
@@ -462,7 +462,7 @@ class Collection(object):
         integer IDs.
         """
         collection_contents['skills'] = {}
-        collection_contents['skills_id_count'] = 0
+        collection_contents['skill_id_count'] = 0
 
         def _add_or_get_id(skill):
             # Don't add skill if already inside skill dict
@@ -471,13 +471,13 @@ class Collection(object):
                     return skill_dict['skill_id']
 
             # Add a new skill dict
-            skill_id_count = collection_contents['skills_id_count']
+            skill_id_count = collection_contents['skill_id_count']
             collection_contents['skills'][skill_id_count] = {
                 'skill_id': skill_id_count,
                 'name': skill,
                 'question_ids': []
             }
-            collection_contents['skills_id_count'] = skill_id_count + 1
+            collection_contents['skill_id_count'] = skill_id_count + 1
             return skill_id_count
 
 
@@ -528,7 +528,7 @@ class Collection(object):
         versioned_collection_contents['collection_contents'] = conversion_fn(
             versioned_collection_contents['collection_contents'])
 
-    def get_human_readable_skills(self):
+    def human_readable_skill_names(self):
         # TODO(wxy): update docstring
         """The skills of a collection are made up of all prerequisite and
         acquired skills of each exploration that is part of this collection.

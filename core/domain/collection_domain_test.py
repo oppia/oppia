@@ -638,7 +638,7 @@ skills:
     skill_id: 1
     name: Skill2
     question_ids: []
-skills_id_count: 2
+skill_id_count: 2
 tags: []
 title: A title
 """)
@@ -663,7 +663,7 @@ title: A title
             'cid', self.YAML_CONTENT_V2)
         self.assertEqual(collection.to_yaml(), self._LATEST_YAML_CONTENT)
 
-    def test_load_from_v2(self):
+    def test_load_from_v3(self):
         """Test direct loading from a v3 yaml file."""
         self.save_new_valid_exploration(
             'Exp1', 'user@example.com', end_state_name='End')

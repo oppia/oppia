@@ -165,11 +165,11 @@ def get_collection_from_model(collection_model, run_conversion=True):
             for collection_node_dict in
             versioned_collection_contents['collection_contents']['nodes']
         ], [
-            collection_domain.CollectionSkil.from_dict(collection_skill_dict)
+            collection_domain.CollectionSkill.from_dict(collection_skill_dict)
             for collection_skill_dict in
             versioned_collection_contents['collection_contents']['skills']
         ],
-        versioned_collection_contents['collection_contents']['skills_id_count'],
+        versioned_collection_contents['collection_contents']['skill_id_count'],
         collection_model.version, collection_model.created_on,
         collection_model.last_updated)
 
