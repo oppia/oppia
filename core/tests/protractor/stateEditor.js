@@ -27,21 +27,22 @@ var player = require('../protractor_utils/player.js');
 
 describe('State editor', function() {
   it('should walk through the tutorial when user repeatedly clicks Next',
-      function() {
-    var NUM_TUTORIAL_STAGES = 7;
-    users.createUser(
-      'userTutorial@stateEditor.com', 'userTutorialStateEditor');
-    users.login('userTutorial@stateEditor.com');
+    function() {
+      var NUM_TUTORIAL_STAGES = 7;
+      users.createUser(
+        'userTutorial@stateEditor.com', 'userTutorialStateEditor');
+      users.login('userTutorial@stateEditor.com');
 
-    workflow.createExplorationAndStartTutorial();
-    editor.startTutorial();
-    for (var i = 0; i < NUM_TUTORIAL_STAGES - 1; i++) {
-      editor.progressInTutorial();
-      general.waitForSystem();
+      workflow.createExplorationAndStartTutorial();
+      editor.startTutorial();
+      for (var i = 0; i < NUM_TUTORIAL_STAGES - 1; i++) {
+        editor.progressInTutorial();
+        general.waitForSystem();
+      }
+      editor.finishTutorial();
+      users.logout();
     }
-    editor.finishTutorial();
-    users.logout();
-  });
+  );
 
   it('should display plain text content', function() {
     users.createUser('user1@stateEditor.com', 'user1StateEditor');

@@ -26,15 +26,14 @@
 // autoplaying.
 
 oppia.factory('autoplayedVideosService', [function() {
-    var autoplayedVideosDict = {};
-    return {
-      addAutoplayedVideo: function(videoId) {
-        autoplayedVideosDict[videoId] = true;
-      },
+  var autoplayedVideosDict = {};
+  return {
+    addAutoplayedVideo: function(videoId) {
+      autoplayedVideosDict[videoId] = true;
+    },
 
-      hasVideoBeenAutoplayed: function(videoId) {
-        return Boolean(autoplayedVideosDict[videoId]);
-      }
-    };
-  }
-]);
+    hasVideoBeenAutoplayed: function(videoId) {
+      return Boolean(autoplayedVideosDict[videoId]);
+    }
+  };
+}]);

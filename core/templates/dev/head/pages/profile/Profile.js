@@ -55,21 +55,22 @@ oppia.controller('Profile', [
       }];
 
       $scope.userEditedExplorations = data.edited_exp_summary_dicts.sort(
-          function(exploration1, exploration2) {
-        if (exploration1.ratings > exploration2.ratings) {
-          return 1;
-        } else if (exploration1.ratings === exploration2.ratings) {
-          if (exploration1.playthroughs > exploration2.playthroughs) {
+        function(exploration1, exploration2) {
+          if (exploration1.ratings > exploration2.ratings) {
             return 1;
-          } else if (exploration1.playthroughs > exploration2.playthroughs) {
-            return 0;
+          } else if (exploration1.ratings === exploration2.ratings) {
+            if (exploration1.playthroughs > exploration2.playthroughs) {
+              return 1;
+            } else if (exploration1.playthroughs > exploration2.playthroughs) {
+              return 0;
+            } else {
+              return -1;
+            }
           } else {
             return -1;
           }
-        } else {
-          return -1;
         }
-      });
+      );
 
       $scope.userNotLoggedIn = !data.username;
 

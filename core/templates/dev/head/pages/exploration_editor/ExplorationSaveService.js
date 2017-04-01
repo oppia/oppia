@@ -120,14 +120,14 @@ oppia.factory('explorationSaveService', [
       publishModalInstance.result.then(function() {
         if (onStartSaveCallback) {
           onStartSaveCallback();
-        };
+        }
 
         explorationRightsService.saveChangeToBackend({
           is_public: true
         }).then(function() {
           if (onSaveDoneCallback) {
             onSaveDoneCallback();
-          };
+          }
 
           showCongratulatorySharingModal();
           siteAnalyticsService.registerPublishExplorationEvent(
@@ -393,7 +393,7 @@ oppia.factory('explorationSaveService', [
             // Toggle loading dots off after modal is opened
             if (onEndLoadingCallback) {
               onEndLoadingCallback();
-            };
+            }
           });
 
           modalInstance.result.then(function(metadataList) {
@@ -403,12 +403,12 @@ oppia.factory('explorationSaveService', [
 
               if (onStartLoadingCallback) {
                 onStartLoadingCallback();
-              };
+              }
 
               saveDraftToBackend(commitMessage).then(function() {
                 if (onEndLoadingCallback) {
                   onEndLoadingCallback();
-                };
+                }
                 openPublishExplorationModal(
                     onStartLoadingCallback, onEndLoadingCallback)
                   .then(function() {
@@ -534,7 +534,7 @@ oppia.factory('explorationSaveService', [
             // Toggle loading dots off after modal is opened
             if (onEndLoadingCallback) {
               onEndLoadingCallback();
-            };
+            }
             // The $timeout seems to be needed
             // in order to give the modal time to render.
             $timeout(function() {
@@ -548,7 +548,7 @@ oppia.factory('explorationSaveService', [
             // Toggle loading dots back on for loading from backend.
             if (onStartLoadingCallback) {
               onStartLoadingCallback();
-            };
+            }
 
             saveDraftToBackend(commitMessage).then(function() {
               whenModalClosed.resolve();

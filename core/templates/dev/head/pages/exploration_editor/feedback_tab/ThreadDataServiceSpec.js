@@ -83,9 +83,10 @@ describe('retrieving threads service', function() {
     });
 
     httpBackend.whenGET('/suggestionlisthandler/' + expId +
-        '?has_suggestion=true&list_type=all').respond({
-      threads: mockOpenSuggestionThreads
-    });
+      '?has_suggestion=true&list_type=all').respond({
+        threads: mockOpenSuggestionThreads
+      }
+    );
 
     threadDataService.fetchThreads();
     httpBackend.flush();

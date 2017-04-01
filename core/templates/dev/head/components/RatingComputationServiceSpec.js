@@ -24,35 +24,37 @@ describe('Rating computation service', function() {
     RatingComputationService = $injector.get('RatingComputationService');
   }));
 
-  it('should show an average rating only if there are enough individual ones',
-      function() {
-    // Don't show an average rating if there are too few ratings.
-    expect(RatingComputationService.computeAverageRating({
-      1: 0,
-      2: 0,
-      3: 0,
-      4: 0,
-      5: 0
-    })).toBe(undefined);
+  it(
+    'should show an average rating only if there are enough individual ones',
+    function() {
+      // Don't show an average rating if there are too few ratings.
+      expect(RatingComputationService.computeAverageRating({
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0
+      })).toBe(undefined);
 
-    // Show an average rating once the minimum is reached.
-    expect(RatingComputationService.computeAverageRating({
-      1: 1,
-      2: 0,
-      3: 0,
-      4: 0,
-      5: 0
-    })).toBe(1.0);
+      // Show an average rating once the minimum is reached.
+      expect(RatingComputationService.computeAverageRating({
+        1: 1,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0
+      })).toBe(1.0);
 
-    // Continue showing an average rating if additional ratings are added.
-    expect(RatingComputationService.computeAverageRating({
-      1: 1,
-      2: 0,
-      3: 0,
-      4: 0,
-      5: 1
-    })).toBe(3.0);
-  });
+      // Continue showing an average rating if additional ratings are added.
+      expect(RatingComputationService.computeAverageRating({
+        1: 1,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 1
+      })).toBe(3.0);
+    }
+  );
 
   it('should compute average ratings correctly', function() {
     expect(RatingComputationService.computeAverageRating({
