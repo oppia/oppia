@@ -45,11 +45,11 @@ oppia.factory('answerGroupsCache', [function() {
 oppia.factory('responsesService', [
   '$rootScope', 'stateInteractionIdService', 'INTERACTION_SPECS',
   'answerGroupsCache', 'editorContextService', 'changeListService',
-  'explorationStatesService', 'graphDataService',
+  'explorationStatesService', 'graphDataService', 'OutcomeObjectFactory',
   function(
       $rootScope, stateInteractionIdService, INTERACTION_SPECS,
       answerGroupsCache, editorContextService, changeListService,
-      explorationStatesService, graphDataService) {
+      explorationStatesService, graphDataService, OutcomeObjectFactory) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
     var _confirmedUnclassifiedAnswersMemento = null;
@@ -158,16 +158,8 @@ oppia.factory('responsesService', [
             if (INTERACTION_SPECS[newInteractionId].is_terminal) {
               _defaultOutcome = null;
             } else if (!_defaultOutcome) {
-              // TODO(bhenning): There should be a service for creating new
-              // instances of all aspects of the states schema, such as a new
-              // state, new answer group, or new outcome. This avoids tightly
-              // coupling code scattered throughout the frontend with the states
-              // schema.
-              _defaultOutcome = {
-                feedback: [],
-                dest: editorContextService.getActiveStateName(),
-                param_changes: []
-              };
+              _defaultOutcome = OutcomeObjectFactory.createNew(
+                editorContextService.getActiveStateName(), [], []);
             }
           }
         }
@@ -677,21 +669,18 @@ oppia.controller('StateResponses', [
         controller: [
           '$scope', '$modalInstance', 'responsesService',
           'editorContextService', 'editorFirstTimeEventsService',
-          'RuleObjectFactory',
+          'RuleObjectFactory', 'OutcomeObjectFactory',
           function(
               $scope, $modalInstance, responsesService,
               editorContextService, editorFirstTimeEventsService,
-              RuleObjectFactory) {
+              RuleObjectFactory, OutcomeObjectFactory) {
             $scope.feedbackEditorIsOpen = false;
             $scope.openFeedbackEditor = function() {
               $scope.feedbackEditorIsOpen = true;
             };
             $scope.tmpRule = RuleObjectFactory.createNew(null, {});
-            $scope.tmpOutcome = {
-              dest: editorContextService.getActiveStateName(),
-              feedback: [''],
-              param_changes: []
-            };
+            $scope.tmpOutcome = OutcomeObjectFactory.createNew(
+              editorContextService.getActiveStateName(), [''], []);
 
             $scope.isSelfLoopWithNoFeedback = function(tmpOutcome) {
               var hasFeedback = false;

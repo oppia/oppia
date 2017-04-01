@@ -66,9 +66,18 @@ describe('State Editor controller', function() {
             id: 'TextInput',
             answer_groups: [{
               rule_specs: [],
-              outcome: {},
+              outcome: {
+                dest: 'unused',
+                feedback: [],
+                param_changes: []
+              },
               correct: false
             }],
+            default_outcome: {
+              dest: 'default',
+              feedback: [],
+              param_changes: []
+            },
             fallbacks: []
           },
           param_changes: []
@@ -82,9 +91,18 @@ describe('State Editor controller', function() {
             id: 'TextInput',
             answer_groups: [{
               rule_specs: [],
-              outcome: {},
+              outcome: {
+                dest: 'unused',
+                feedback: [],
+                param_changes: []
+              },
               correct: false
             }],
+            default_outcome: {
+              dest: 'default',
+              feedback: [],
+              param_changes: []
+            },
             fallbacks: []
           },
           param_changes: []
@@ -98,9 +116,18 @@ describe('State Editor controller', function() {
             id: 'TextInput',
             answer_groups: [{
               rule_specs: [],
-              outcome: {},
+              outcome: {
+                dest: 'unused',
+                feedback: [],
+                param_changes: []
+              },
               correct: false
             }],
+            default_outcome: {
+              dest: 'default',
+              feedback: [],
+              param_changes: []
+            },
             fallbacks: []
           },
           param_changes: [{
@@ -193,7 +220,8 @@ describe('State Editor controller', function() {
 
   describe('TrainingDataService', function() {
     var $httpBackend;
-    var scope, siis, ecs, cls, rs, tds, ess, IS, RULE_TYPE_CLASSIFIER, rof;
+    var scope, siis, ecs, cls, rs, tds, ess, IS, RULE_TYPE_CLASSIFIER, rof,
+      oof;
     var mockExplorationData;
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
@@ -232,6 +260,7 @@ describe('State Editor controller', function() {
       IS = $injector.get('INTERACTION_SPECS');
       RULE_TYPE_CLASSIFIER = $injector.get('RULE_TYPE_CLASSIFIER');
       rof = $injector.get('RuleObjectFactory');
+      oof = $injector.get('OutcomeObjectFactory');
 
       // Set the currently loaded interaction ID.
       siis.savedMemento = 'TextInput';
@@ -253,13 +282,15 @@ describe('State Editor controller', function() {
               }],
               outcome: {
                 feedback: 'Feedback',
-                dest: 'State'
+                dest: 'State',
+                param_changes: []
               },
               correct: false
             }],
             default_outcome: {
               feedback: 'Default',
-              dest: 'State'
+              dest: 'State',
+              param_changes: []
             },
             fallbacks: [],
             confirmed_unclassified_answers: []
@@ -512,13 +543,9 @@ describe('State Editor controller', function() {
 
     it('should get all potential outcomes of an interaction', function() {
       // First the answer group's outcome is listed, then the default.
-      expect(tds.getAllPotentialOutcomes(ess.getState('State'))).toEqual([{
-          feedback: 'Feedback',
-          dest: 'State'
-        }, {
-          feedback: 'Default',
-          dest: 'State'
-        }]);
+      expect(tds.getAllPotentialOutcomes(ess.getState('State'))).toEqual([
+        oof.createNew('State', 'Feedback', []),
+        oof.createNew('State', 'Default', [])]);
     });
   });
 });

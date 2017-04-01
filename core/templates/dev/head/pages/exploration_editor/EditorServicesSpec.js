@@ -857,7 +857,7 @@ describe('New state template service', function() {
             defaultOutcome: {
               dest: NEW_STATE_NAME,
               feedback: [],
-              param_changes: []
+              paramChanges: []
             },
             fallbacks: [],
             id: 'TextInput'

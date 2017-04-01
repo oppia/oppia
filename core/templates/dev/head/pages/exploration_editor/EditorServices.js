@@ -794,11 +794,21 @@ oppia.factory('explorationStatesService', [
 
     var BACKEND_CONVERSIONS = {
       answer_groups: function(answerGroups) {
-        var answerGroupBackendDicts = [];
-        answerGroups.map(function(answerGroup) {
-          answerGroupBackendDicts.push(answerGroup.toBackendDict());
+        return answerGroups.map(function(answerGroup) {
+          return answerGroup.toBackendDict();
         });
-        return answerGroupBackendDicts;
+      },
+      default_outcome: function(defaultOutcome) {
+        if (defaultOutcome) {
+          return defaultOutcome.toBackendDict();
+        } else {
+          return null;
+        }
+      },
+      fallbacks: function(fallbacks) {
+        return fallbacks.map(function(fallback) {
+          return fallback.toBackendDict();
+        });
       }
     };
 
@@ -836,14 +846,16 @@ oppia.factory('explorationStatesService', [
     var saveStateProperty = function(stateName, backendName, newValue) {
       var oldValue = getStatePropertyMemento(stateName, backendName);
       var newBackendValue = angular.copy(newValue);
+      var oldBackendValue = angular.copy(oldValue);
 
       if (BACKEND_CONVERSIONS.hasOwnProperty(backendName)) {
         newBackendValue = convertToBackendRepresentation(newValue, backendName);
+        oldBackendValue = convertToBackendRepresentation(oldValue, backendName);
       }
 
       if (!angular.equals(oldValue, newValue)) {
         changeListService.editStateProperty(
-          stateName, backendName, newBackendValue, oldValue);
+          stateName, backendName, newBackendValue, oldBackendValue);
 
         var newStateData = angular.copy(_states[stateName]);
         var accessorList = PROPERTY_REF_DATA[backendName];

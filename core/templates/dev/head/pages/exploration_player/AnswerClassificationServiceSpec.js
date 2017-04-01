@@ -33,10 +33,12 @@ describe('Answer classification service with string classifier disabled',
 
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  var acs, $httpBackend, successHandler, failHandler, $rootScope, state;
+  var acs, sof, oof, $httpBackend, successHandler, failHandler, $rootScope,
+    state;
   beforeEach(inject(function($injector) {
     acs = $injector.get('AnswerClassificationService');
     sof = $injector.get('StateObjectFactory');
+    oof = $injector.get('OutcomeObjectFactory');
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
     successHandler = jasmine.createSpy('success');
@@ -50,7 +52,11 @@ describe('Answer classification service with string classifier disabled',
       interaction: {
         id: 'RuleTest',
         answer_groups: [{
-          outcome: 'outcome 1',
+          outcome: {
+            dest: 'outcome 1',
+            feedback: [''],
+            param_changes: []
+          },
           rule_specs: [{
             inputs: {
               x: 10
@@ -59,7 +65,11 @@ describe('Answer classification service with string classifier disabled',
           }],
           correct: false
         }, {
-          outcome: 'outcome 2',
+          outcome: {
+            dest: 'outcome 2',
+            feedback: [''],
+            param_changes: []
+          },
           rule_specs: [{
             inputs: {
               x: 5
@@ -83,7 +93,11 @@ describe('Answer classification service with string classifier disabled',
           }],
           correct: false
         }],
-        default_outcome: 'default',
+        default_outcome: {
+          dest: 'default',
+          feedback: [],
+          param_changes: []
+        },
         fallbacks: []
       },
       param_changes: []
@@ -120,7 +134,7 @@ describe('Answer classification service with string classifier disabled',
       explorationId, state, 10, false, rules).then(successHandler, failHandler);
     $rootScope.$digest();
     expect(successHandler).toHaveBeenCalledWith({
-      outcome: 'outcome 1',
+      outcome: oof.createNew('outcome 1', [''], []),
       answerGroupIndex: 0,
       ruleIndex: 0
     });
@@ -130,7 +144,7 @@ describe('Answer classification service with string classifier disabled',
       explorationId, state, 5, false, rules).then(successHandler, failHandler);
     $rootScope.$digest();
     expect(successHandler).toHaveBeenCalledWith({
-      outcome: 'outcome 2',
+      outcome: oof.createNew('outcome 2', [''], []),
       answerGroupIndex: 1,
       ruleIndex: 0
     });
@@ -140,7 +154,7 @@ describe('Answer classification service with string classifier disabled',
       explorationId, state, 6, false, rules).then(successHandler, failHandler);
     $rootScope.$digest();
     expect(successHandler).toHaveBeenCalledWith({
-      outcome: 'outcome 2',
+      outcome: oof.createNew('outcome 2', [''], []),
       answerGroupIndex: 1,
       ruleIndex: 1
     });
@@ -152,7 +166,7 @@ describe('Answer classification service with string classifier disabled',
       explorationId, state, 7, false, rules).then(successHandler, failHandler);
     $rootScope.$digest();
     expect(successHandler).toHaveBeenCalledWith({
-      outcome: 'default',
+      outcome: oof.createNew('default', [], []),
       answerGroupIndex: 2,
       ruleIndex: 0
     });
@@ -169,7 +183,11 @@ describe('Answer classification service with string classifier disabled',
       interaction: {
         id: 'RuleTest',
         answer_groups: [{
-          outcome: 'outcome 1',
+          outcome: {
+            dest: 'outcome 1',
+            feedback: [''],
+            param_changes: []
+          },
           rule_specs: [{
             inputs: {
               x: 10
@@ -178,6 +196,11 @@ describe('Answer classification service with string classifier disabled',
           }],
           correct: false
         }],
+        default_outcome: {
+          dest: 'default',
+          feedback: [],
+          param_changes: []
+        },
         fallbacks: []
       },
       param_changes: []
@@ -211,10 +234,12 @@ describe('Answer classification service with string classifier enabled',
 
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  var acs, $httpBackend, successHandler, failHandler, $rootScope, state, state2;
+  var acs, sof, oof, $httpBackend, successHandler, failHandler, $rootScope,
+    state, state2;
   beforeEach(inject(function($injector) {
     acs = $injector.get('AnswerClassificationService');
     sof = $injector.get('StateObjectFactory');
+    oof = $injector.get('OutcomeObjectFactory');
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
     successHandler = jasmine.createSpy('success');
@@ -228,7 +253,11 @@ describe('Answer classification service with string classifier enabled',
       interaction: {
         id: 'TrainableInteraction',
         answer_groups: [{
-          outcome: 'outcome 1',
+          outcome: {
+            dest: 'outcome 1',
+            feedback: [''],
+            param_changes: []
+          },
           rule_specs: [{
             inputs: {
               x: 10
@@ -237,7 +266,11 @@ describe('Answer classification service with string classifier enabled',
           }],
           correct: false
         }, {
-          outcome: 'outcome 2',
+          outcome: {
+            dest: 'outcome 2',
+            feedback: [''],
+            param_changes: []
+          },
           rule_specs: [{
             inputs: {
               x: 5
@@ -256,7 +289,11 @@ describe('Answer classification service with string classifier enabled',
           }],
           correct: false
         }],
-        default_outcome: 'default',
+        default_outcome: {
+          dest: 'default',
+          feedback: [],
+          param_changes: []
+        },
         fallbacks: []
       },
       param_changes: []
@@ -312,7 +349,7 @@ describe('Answer classification service with string classifier enabled',
       explorationId, state2, 0, false, rules).then(successHandler, failHandler);
     $rootScope.$digest();
     expect(successHandler).toHaveBeenCalledWith({
-      outcome: 'default',
+      outcome: oof.createNew('default', [], []),
       answerGroupIndex: 2,
       ruleIndex: 0
     });
