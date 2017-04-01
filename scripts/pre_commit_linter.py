@@ -263,7 +263,7 @@ def _lint_js_files(node_path, eslint_path, files_to_lint, stdout,
         return
 
     print 'Total js files: ', num_js_files
-    eslint_cmd_args = [node_path, eslint_path]
+    eslint_cmd_args = [node_path, eslint_path, '--quiet']
     for _, filename in enumerate(files_to_lint):
         print 'Linting: ', filename
         proc_args = eslint_cmd_args + [filename]

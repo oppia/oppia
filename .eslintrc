@@ -1,22 +1,28 @@
 {
   "extends": [
     "eslint:recommended",
-    "angular"
   ],
   "plugins": [
     "html"
   ],
-  "env": {
-    "browser": true,
-    "jasmine": true,
-    "jquery": true
-  },
   "rules": {
     "no-empty": [
       "error",
       {
         "allowEmptyCatch": true
       }
+    ],
+    "no-redeclare": [
+      "off"
+    ],
+    "no-unused-vars": [
+      "off"
+    ],
+    "no-console": [
+      "off"
+    ],
+    "no-constant-condition": [
+      "off"
     ],
     "func-style": [
       "error",
@@ -28,12 +34,11 @@
     "no-multi-spaces": [
       "error"
     ],
+    "no-undef": [
+      "off"
+    ],
     "one-var": [
-      "error",
-      {
-        "uninitialized": "always",
-        "initialized": "never"
-      }
+      "off"
     ],
     "padded-blocks": [
       "error",
@@ -41,7 +46,10 @@
     ],
     "quote-props": [
       "error",
-      "as-needed"
+      "as-needed",
+      {
+        "keywords": true
+      }
     ],
     "space-unary-ops": [
       "error",
@@ -59,7 +67,12 @@
     ],
     "indent": [
       "error",
-      2
+      2,
+      {
+        "ArrayExpression": "first",
+        "MemberExpression": 1,
+        "SwitchCase": 1
+      }
     ],
     "camelcase": [
       "error",
@@ -74,7 +87,7 @@
     "dot-notation": [
       "error",
       {
-        "allowKeywords": true
+        "allowKeywords": false
       }
     ],
     "operator-linebreak": [
