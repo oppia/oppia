@@ -1438,6 +1438,9 @@ md-card.oppia-dashboard-tile {
 .toast-warning {
   background-image: url("/assets/common/images/general/warning.png");
 }
+.toast-info {
+  background-image: url("/assets/common/images/general/info.png");
+}
 
 @media all and (max-width: 240px) {
   .oppia-toast {

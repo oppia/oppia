@@ -247,6 +247,11 @@ DUPLICATE_EMAIL_INTERVAL_MINS = 2
 # Number of digits after decimal to which the average ratings value in the
 # dashboard is rounded off to.
 AVERAGE_RATINGS_DASHBOARD_PRECISION = 2
+# Whether to enable the promo bar functionality. This does not actually turn on
+# the promo bar, as that is gated by a config value (see config_domain). This
+# merely avoids checking for whether the promo bar is enabled for every Oppia
+# page visited.
+ENABLE_PROMO_BAR = True
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
