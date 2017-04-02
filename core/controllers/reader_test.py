@@ -108,9 +108,10 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
 
 
 class ClassifyHandlerTest(test_utils.GenericTestBase):
-    """Test the hander for classification"""
+    """Test the handler for classification."""
 
     def setUp(self):
+        """Before the test, create an exploration_dict."""
         super(ClassifyHandlerTest, self).setUp()
 
         #Reading YAML exploration into a dictionary
@@ -123,18 +124,19 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
 
 
     def test_classification_handler(self):
+        """Test the classification handler."""
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
-        # Load demo exploration
+        # Load demo exploration.
         exp_id = '0'
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
 
-        #Creating the exploration domain object
+        #Creating the exploration domain object.
         self.yaml_dict['id'] = 20
         exploration = exp_domain.Exploration.from_dict(self.yaml_dict)
 
-        #Testing the handler for a correct answer
+        #Testing the handler for a correct answer.
         old_state = exploration.states['Home'].to_dict()
         answer = 'Permutations'
         params = {'old_state' : old_state, 'answer' : answer}
@@ -143,7 +145,7 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(res['outcome']['feedback'][0],
                          '<p>Detected permutation.</p>')
 
-        #Testing the handler for a wrong answer
+        #Testing the handler for a wrong answer.
         old_state = exploration.states['Home'].to_dict()
         answer = 'Shigatsu wa kimi no uso'
         params = {'old_state' : old_state, 'answer' : answer}
