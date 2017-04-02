@@ -113,8 +113,10 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
     def setUp(self):
         """Before the test, create an exploration_dict."""
         super(ClassifyHandlerTest, self).setUp()
+        self.enable_string_classifier = self.swap(
+            feconf,'ENABLE_STRING_CLASSIFIER',True)
 
-        #Reading YAML exploration into a dictionary
+        # Reading YAML exploration into a dictionary.
         yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                                  '../tests/data/string_classifier_test.yaml')
         with open(yaml_path, 'r') as yaml_file:
@@ -122,34 +124,31 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.VIEWER_EMAIL)
 
-
     def test_classification_handler(self):
         """Test the classification handler."""
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
         # Load demo exploration.
         exp_id = '0'
-        exp_services.delete_demo('0')
-        exp_services.load_demo('0')
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
 
-        #Creating the exploration domain object.
+        # Creating the exploration domain object.
         self.yaml_dict['id'] = 20
         exploration = exp_domain.Exploration.from_dict(self.yaml_dict)
 
-        #Testing the handler for a correct answer.
+        # Testing the handler for a correct answer.
         old_state = exploration.states['Home'].to_dict()
         answer = 'Permutations'
         params = {'old_state' : old_state, 'answer' : answer}
-        feconf.ENABLE_STRING_CLASSIFIER = True
         res = self.post_json('/explorehandler/classify/%s' % exp_id, params)
         self.assertEqual(res['outcome']['feedback'][0],
                          '<p>Detected permutation.</p>')
 
-        #Testing the handler for a wrong answer.
+        # Testing the handler for a wrong answer.
         old_state = exploration.states['Home'].to_dict()
         answer = 'Shigatsu wa kimi no uso'
         params = {'old_state' : old_state, 'answer' : answer}
-        feconf.ENABLE_STRING_CLASSIFIER = True
         res = self.post_json('/explorehandler/classify/%s' % exp_id, params)
         self.assertEqual(res['outcome']['feedback'][0],
                          '<p>Detected unsure.</p>')
