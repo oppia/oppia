@@ -60,7 +60,7 @@ _LIBRARY_INDEX_GROUPS = [{
 
 
 def get_human_readable_contributors_summary(contributors_summary):
-    """Get contributors summary in human readable form.
+    """Gets contributors summary in human readable form.
 
     Args:
         contributors_summary: dict. The keys are user ids and
@@ -90,7 +90,7 @@ def get_human_readable_contributors_summary(contributors_summary):
 def get_learner_collection_dict_by_id(
         collection_id, user_id, strict=True, allow_invalid_explorations=False,
         version=None):
-    """Get a dictionary representation of a collection given by the provided
+    """Gets a dictionary representation of a collection given by the provided
     collection ID. This dict includes user-specific playthrough information.
 
     Args:
@@ -269,7 +269,7 @@ def get_exploration_metadata_dicts(exploration_ids, editor_user_id=None):
 
 def get_displayable_exp_summary_dicts_matching_ids(
         exploration_ids, editor_user_id=None):
-    """Get a summary of explorations in human readable form from
+    """Gets a summary of explorations in human readable form from
     exploration ids.
 
     Given a list of exploration ids, optionally filters the list for
