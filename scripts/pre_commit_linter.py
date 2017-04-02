@@ -377,6 +377,9 @@ def _get_all_files():
         all_files = valid_filepaths
     else:
         all_files = _get_changed_filenames()
+    all_files = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
     return all_files
 
 
