@@ -358,8 +358,8 @@ describe('State Editor controller', function() {
           })
         );
 
-        // Training a second answer to the same group should append the answer to
-        // the training data.
+        // Training a second answer to the same group should append the answer
+        // to the training data.
         tds.trainAnswerGroup(0, 'second answer');
         state = ess.getState('State');
         expect(state.interaction.answerGroups[0].rules[1]).toEqual(

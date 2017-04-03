@@ -212,16 +212,16 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', function($modal) {
 
         // This is a bit silly. It appears that in contenteditables (in Chrome,
         // anyway) the cursor will stubbornly remain within the oppia-parameter
-        // element (even though it should be outside it). However the behavior is
-        // correct for images -- so we use images to delimit it. It's still hard
-        // to do selection before the element if it's the first thing in the doc,
-        // after the element if it's the last thing in the doc, or between two
-        // consecutive elements. See this bug for a demonstration:
+        // element (even though it should be outside it). However the behavior
+        // is correct for images -- so we use images to delimit it. It's still
+        // hard to do selection before the element if it's the first thing in
+        // the doc, after the element if it's the last thing in the doc, or
+        // between two consecutive elements. See this bug for a demonstration:
         //
         //     https://code.google.com/p/chromium/issues/detail?id=242110
         var INVISIBLE_IMAGE_TAG = (
-          '<img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAA' +
-          'BAAEAAAICTAEAOw=="></img>');
+          '<img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAA' +
+          'AAABAAEAAAICTAEAOw=="></img>');
         var PARAM_CONTAINER_CLASS = 'oppia-parameter-container';
 
         $scope._createRteParameterTag = function(paramName) {
@@ -274,58 +274,61 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', function($modal) {
 
         // If eltToReplace is null, a new element should be inserted at the
         // current caret.
-        $scope.openEditParameterModal = function(currentParamName, eltToReplace) {
-          return $modal.open({
-            templateUrl: 'modals/editParamName',
-            backdrop: true,
-            resolve: {
-              allowedParameterNames: function() {
-                return $scope.allowedParameterNames();
+        $scope.openEditParameterModal =
+          function(currentParamName, eltToReplace) {
+            return $modal.open({
+              templateUrl: 'modals/editParamName',
+              backdrop: true,
+              resolve: {
+                allowedParameterNames: function() {
+                  return $scope.allowedParameterNames();
+                }
+              },
+              controller: [
+                '$scope', '$modalInstance', 'allowedParameterNames',
+                function($scope, $modalInstance, allowedParameterNames) {
+                  $scope.currentParamName = currentParamName;
+                  $scope.paramOptions = allowedParameterNames.map(
+                    function(paramName) {
+                      return {
+                        name: paramName,
+                        value: paramName
+                      };
+                    }
+                  );
+
+                  $scope.cancel = function() {
+                    $modalInstance.dismiss('cancel');
+                  };
+
+                  $scope.save = function(paramName) {
+                    $modalInstance.close(paramName);
+                  };
+                }
+              ]
+            }).result.then(function(paramName) {
+              var el = $scope._createRteParameterTag(paramName);
+              if (eltToReplace === null) {
+                var doc = $(rteNode).wysiwyg('document').get(0);
+                $(rteNode).wysiwyg(
+                  'insertHtml', '<span class="insertionPoint"></span>');
+                eltToReplace =
+                  $scope.editorDoc.querySelector('.insertionPoint');
               }
-            },
-            controller: [
-              '$scope', '$modalInstance', 'allowedParameterNames',
-              function($scope, $modalInstance, allowedParameterNames) {
-                $scope.currentParamName = currentParamName;
-                $scope.paramOptions = allowedParameterNames.map(
-                  function(paramName) {
-                    return {
-                      name: paramName,
-                      value: paramName
-                    };
-                  }
-                );
 
-                $scope.cancel = function() {
-                  $modalInstance.dismiss('cancel');
-                };
-
-                $scope.save = function(paramName) {
-                  $modalInstance.close(paramName);
-                };
-              }
-            ]
-          }).result.then(function(paramName) {
-            var el = $scope._createRteParameterTag(paramName);
-            if (eltToReplace === null) {
-              var doc = $(rteNode).wysiwyg('document').get(0);
-              $(rteNode).wysiwyg(
-                'insertHtml', '<span class="insertionPoint"></span>');
-              eltToReplace = $scope.editorDoc.querySelector('.insertionPoint');
-            }
-
-            // Note that this removes the contenteditable="false" and ondblclick
-            // attributes of el (but they are eventually replaced during the
-            // normalization of the RTE content step). Also, we need to save the
-            // change explicitly because the wysiwyg editor does not auto-detect
-            // replaceWith() events.
-            $(eltToReplace).replaceWith(el);
-            $(rteNode).wysiwyg('save');
-          });
-        };
+              // Note that this removes the contenteditable="false" and
+              // ondblclick attributes of el (but they are eventually replaced
+              // during the normalization of the RTE content step). Also, we
+              // need to save the change explicitly because the wysiwyg editor
+              // does not auto-detect replaceWith() events.
+              $(eltToReplace).replaceWith(el);
+              $(rteNode).wysiwyg('save');
+            });
+          };
 
         $scope.insertNewParameter = function() {
-          $scope.openEditParameterModal($scope.allowedParameterNames()[0], null);
+          $scope.openEditParameterModal(
+            $scope.allowedParameterNames()[0], null);
         };
 
         var rteContentMemento = $scope._convertUnicodeToRte($scope.localValue);
@@ -339,13 +342,14 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', function($modal) {
         }, true);
 
         $scope._normalizeRteContent = function(content) {
-          // TODO(sll): Write this method to validate rather than just normalize.
+          // TODO(sll): Write this method to validate rather than just
+          // normalize.
 
-          // The only top-level tags should be oppia-parameter tags. Each of these
-          // tags should have a contenteditable=false attribute, a dblclick
-          // handler that opens the parameter modal, and content consisting of a
-          // valid parameter name of type unicode surrounded by two invisible
-          // image tags.
+          // The only top-level tags should be oppia-parameter tags. Each of
+          // these tags should have a contenteditable=false attribute, a
+          // dblclick handler that opens the parameter modal, and content
+          // consisting of a valid parameter name of type unicode surrounded
+          // by two invisible image tags.
           var elt = $('<div>' + content + '</div>');
           elt.find('.' + PARAM_CONTAINER_CLASS).replaceWith(function() {
             return $scope._createRteParameterTag(this.textContent.trim());
@@ -362,8 +366,8 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', function($modal) {
             debug: true,
             events: {
               // Prevent dragging, since this causes weird things to happen when
-              // a user selects text containing all or part of parameter tags and
-              // then drags that text elsewhere.
+              // a user selects text containing all or part of parameter tags
+              // and then drags that text elsewhere.
               dragstart: function(e) {
                 e.preventDefault();
               },
@@ -387,8 +391,8 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', function($modal) {
                     e.preventDefault();
                   }
                 }
-                // Disable the enter key. Contenteditable does not seem to support
-                // deletion of newlines. Also disable the tab key.
+                // Disable the enter key. Contenteditable does not seem to
+                // support deletion of newlines. Also disable the tab key.
                 if (e.keyCode === 13 || e.keyCode === 9) {
                   e.preventDefault();
                 }
@@ -408,7 +412,8 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', function($modal) {
                 // with the normalized content, and update the memento as well.
                 var normalizedContent = '';
                 try {
-                  normalizedContent = $scope._normalizeRteContent(currentContent);
+                  normalizedContent =
+                    $scope._normalizeRteContent(currentContent);
                 } catch (unusedException) {
                   console.error('Error parsing RTE content: ' + currentContent);
                   normalizedContent = rteContentMemento;
@@ -418,8 +423,9 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', function($modal) {
                   $(rteNode).wysiwyg('setContent', normalizedContent);
                 }
 
-                // Update the external value. The $timeout removes the '$apply in
-                // progress' errors which get triggered if a parameter was edited.
+                // Update the external value. The $timeout removes the '$apply
+                // in progress' errors which get triggered if a parameter was
+                // edited.
                 $timeout(function() {
                   $scope.$apply(function() {
                     $scope.currentlyEditing = true;
@@ -462,15 +468,15 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', function($modal) {
 
         // TODO(sll): If two RTEs share the same data source, and one RTE saves
         // a change to the data, the other RTE should be updated. However, if we
-        // just place a $scope.$watch on the data source, then typing in a single
-        // RTE is going to call that method, and this will replace the content of
-        // the RTE -- which is normally not an issue, but in this case it
-        // moves the cursor back to the beginning of the doc and frustrates the
-        // user. We should find a solution for this -- although it probably is
-        // not a common use case to have multiple unicode RTEs referencing the
-        // same data source, there is a problem in that although the Cancel
-        // button does update the data model, it does not update the appearance
-        // of the RTE.
+        // just place a $scope.$watch on the data source, then typing in a
+        // single RTE is going to call that method, and this will replace the
+        // content of the RTE -- which is normally not an issue, but in this
+        // case it moves the cursor back to the beginning of the doc and
+        // frustrates the user. We should find a solution for this -- although
+        // it probably is not a common use case to have multiple unicode RTEs
+        // referencing the same data source, there is a problem in that although
+        // the Cancel button does update the data model, it does not update the
+        // appearance of the RTE.
       }
     ]
   };
@@ -745,9 +751,10 @@ oppia.config(['$provide', function($provide) {
 
               // Without this code, the focus will remain in the background RTE
               // even after the modal loads. This switches the focus to a
-              // temporary field in the modal which is then removed from the DOM.
-              // TODO(sll): Make this switch to the first input field in the modal
-              // instead.
+              // temporary field in the modal which is then removed from the
+              // DOM.
+              // TODO(sll): Make this switch to the first input field in the
+              // modal instead.
               $scope.modalIsLoading = true;
               focusService.setFocus('tmpFocusPoint');
               $timeout(function() {
@@ -1118,8 +1125,8 @@ oppia.directive('requireIsFloat', ['$filter', function($filter) {
 oppia.directive('requireIsValidExpression', [
   'parameterSpecsService', 'expressionEvaluatorService',
   function(parameterSpecsService, expressionEvaluatorService) {
-    // Create a namescope environment from the parameter names. The values of the
-    // parameters do not matter.
+    // Create a namescope environment from the parameter names. The values of
+    // the parameters do not matter.
     var params = {};
     parameterSpecsService.getAllParams().forEach(function(name) {
       params[name] = true;

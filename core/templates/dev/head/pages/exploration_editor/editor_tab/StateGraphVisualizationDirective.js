@@ -403,8 +403,8 @@ oppia.directive('stateGraphViz', [function() {
                         -graphBounds.top - origTranslations[1]);
                     }
 
-                    // We need a separate layer here so that the translation does
-                    // not influence the panning event receivers.
+                    // We need a separate layer here so that the translation
+                    // does not influence the panning event receivers.
                     $scope.innerTransformStr = (
                       'translate(' + d3.event.translate + ')');
                     $scope.$apply();

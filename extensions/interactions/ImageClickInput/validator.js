@@ -21,7 +21,8 @@ oppia.filter('oppiaInteractiveImageClickInputValidator', [
   '$filter', 'WARNING_TYPES', 'baseInteractionValidationService',
   function($filter, WARNING_TYPES, baseInteractionValidationService) {
     // Returns a list of warnings.
-    return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
+    return function(
+      stateName, customizationArgs, answerGroups, defaultOutcome) {
       var warningsList = [];
 
       baseInteractionValidationService.requireCustomizationArguments(
@@ -94,8 +95,8 @@ oppia.filter('oppiaInteractiveImageClickInputValidator', [
               warningsList.push({
                 type: WARNING_TYPES.CRITICAL,
                 message: (
-                  'The region label \'' + label + '\' in rule ' + String(j + 1) +
-                  ' in group ' + String(i + 1) + ' is invalid.')
+                  'The region label \'' + label + '\' in rule ' +
+                  String(j + 1) + ' in group ' + String(i + 1) + ' is invalid.')
               });
             }
           }

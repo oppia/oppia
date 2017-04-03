@@ -21,7 +21,8 @@ oppia.filter('oppiaInteractiveEndExplorationValidator', [
   'WARNING_TYPES', 'baseInteractionValidationService',
   function(WARNING_TYPES, baseInteractionValidationService) {
     // Returns a list of warnings.
-    return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
+    return function(
+      stateName, customizationArgs, answerGroups, defaultOutcome) {
       var warningsList = [];
 
       baseInteractionValidationService.requireCustomizationArguments(
@@ -30,15 +31,15 @@ oppia.filter('oppiaInteractiveEndExplorationValidator', [
       if (answerGroups.length !== 0) {
         warningsList.push({
           type: WARNING_TYPES.ERROR,
-          message: 'Please make sure end exploration interactions do not have ' +
-            'any answer groups.'
+          message: 'Please make sure end exploration interactions do not ' +
+            'have any answer groups.'
         });
       }
       if (defaultOutcome) {
         warningsList.push({
           type: WARNING_TYPES.ERROR,
-          message: 'Please make sure end exploration interactions do not have ' +
-            'a default outcome.'
+          message: 'Please make sure end exploration interactions do not ' +
+          'have a default outcome.'
         });
       }
 

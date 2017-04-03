@@ -112,7 +112,8 @@ describe('Search service', function() {
           summary: ''
         }
       };
-      var urlComponent = '?q=test&category=("Mathematics")&language_code=("en")';
+      var urlComponent =
+        '?q=test&category=("Mathematics")&language_code=("en")';
       expect(searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
         results)).toBe('test');
       expect(results.languageCodes.selections).toEqual({

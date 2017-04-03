@@ -21,7 +21,8 @@ oppia.filter('oppiaInteractiveMultipleChoiceInputValidator', [
   '$filter', 'WARNING_TYPES', 'baseInteractionValidationService',
   function($filter, WARNING_TYPES, baseInteractionValidationService) {
     // Returns a list of warnings.
-    return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
+    return function(
+      stateName, customizationArgs, answerGroups, defaultOutcome) {
       var warningsList = [];
 
       baseInteractionValidationService.requireCustomizationArguments(

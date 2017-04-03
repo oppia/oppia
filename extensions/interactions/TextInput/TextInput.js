@@ -57,7 +57,8 @@ oppia.directive('oppiaInteractiveTextInput', [
               rulesService: textInputRulesService
             });
           };
-        }]
+        }
+      ]
     };
   }
 ]);

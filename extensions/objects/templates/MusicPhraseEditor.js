@@ -64,7 +64,8 @@ oppia.directive('musicPhraseEditor', [
         $scope.$watch('localValue', function(newValue, oldValue) {
           if (newValue && oldValue) {
             if (newValue.length > _MAX_NOTES_IN_PHRASE) {
-              alertsService.addWarning('There are too many notes on the staff.');
+              alertsService.addWarning(
+                'There are too many notes on the staff.');
             } else {
               var parentValues = [];
               for (var i = 0; i < newValue.length; i++) {

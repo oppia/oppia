@@ -865,7 +865,8 @@ var FallbackEditor = function(fallbackNum) {
       // Save destination.
       element(by.css('.protractor-test-save-outcome-dest')).click();
     },
-    'delete': function() {
+    // eslint-disable-next-line quote-props
+    delete: function() {
       headerElem.element(by.css('.protractor-test-delete-response')).click();
       element(by.css('.protractor-test-confirm-delete-fallback')).click();
     },
@@ -1143,12 +1144,14 @@ var _selectComparedVersions = function(v1, v2) {
   element.all(by.css('.protractor-test-history-checkbox-selector')).count()
     .then(function(versionNumber) {
       if (v1 < 0) {
-        throw Error('In editor._selectComparedVersions(' + v1 + ', ' + v2 + '),' +
-        'expected v1 to be >= 0');
+        throw Error(
+          'In editor._selectComparedVersions(' + v1 + ', ' + v2 + '),' +
+          'expected v1 to be >= 0');
       }
       if (v2 < 0) {
-        throw Error('In editor._selectComparedVersions(' + v1 + ', ' + v2 + '),' +
-        'expected v2 to be >= 0');
+        throw Error(
+          'In editor._selectComparedVersions(' + v1 + ', ' + v2 + '),' +
+          'expected v2 to be >= 0');
       }
       // Check to ensure no negative indices are queried
       if (v1 > versionNumber) {
@@ -1158,7 +1161,8 @@ var _selectComparedVersions = function(v1, v2) {
           'revisions');
       }
       if (v2 > versionNumber) {
-        throw Error('In editor._selectComparedVersions(' + v1 + ', ' + v2 + '),' +
+        throw Error(
+          'In editor._selectComparedVersions(' + v1 + ', ' + v2 + '),' +
         'expected v2 be less than or equal to total number of saved revisions');
       }
 
@@ -1200,8 +1204,8 @@ var expectGraphComparisonOf = function(v1, v2) {
             by.css('.protractor-test-node-background')).getCssValue('fill')
         };
       }).then(function(states) {
-        // Note: we need to compare this way because the state graph is sometimes
-        // generated with states in different configurations.
+        // Note: we need to compare this way because the state graph is
+        // sometimes generated with states in different configurations.
         expect(states.length).toEqual(expectedStates.length);
         for (var i = 0; i < states.length; i++) {
           expect(expectedStates).toContain(states[i]);

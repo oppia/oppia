@@ -285,7 +285,8 @@ describe('Undo/Redo Service', function() {
       expect(UndoRedoService.getChangeCount()).toEqual(2);
 
       var origChangeList = UndoRedoService.getChangeList();
-      expect(origChangeList).toEqual([changeDomainObject1, changeDomainObject2]);
+      expect(origChangeList)
+        .toEqual([changeDomainObject1, changeDomainObject2]);
     }
   );
 

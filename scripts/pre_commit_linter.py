@@ -21,9 +21,7 @@ list of lint errors to the terminal. If the directory path is passed,
 it will lint all Python and JavaScript files in that directory; otherwise,
 it will only lint files that have been touched in this commit.
 
-This script ignores all filepaths contained within .eslintignore. Note that,
-as a side-effect, these filepaths will also prevent Python files in those paths
-from being linted.
+This script ignores all filepaths contained within .eslintignore.
 
 IMPORTANT NOTES:
 

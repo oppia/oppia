@@ -34,9 +34,10 @@ oppia.directive('schemaBasedUnicodeEditor', [
       controller: [
         '$scope', '$filter', '$sce', 'parameterSpecsService',
         function($scope, $filter, $sce, parameterSpecsService) {
-          $scope.allowedParameterNames = parameterSpecsService.getAllParamsOfType(
-            'unicode');
-          $scope.doUnicodeParamsExist = ($scope.allowedParameterNames.length > 0);
+          $scope.allowedParameterNames =
+            parameterSpecsService.getAllParamsOfType('unicode');
+          $scope.doUnicodeParamsExist =
+            ($scope.allowedParameterNames.length > 0);
 
           if ($scope.uiConfig() && $scope.uiConfig().rows &&
               $scope.doUnicodeParamsExist) {
@@ -71,9 +72,10 @@ oppia.directive('schemaBasedUnicodeEditor', [
             if ($scope.isDisabled()) {
               $scope.codemirrorOptions.readOnly = 'nocursor';
             }
-            // Note that only 'coffeescript', 'javascript', 'lua', 'python', 'ruby'
-            // and 'scheme' have CodeMirror-supported syntax highlighting. For other
-            // languages, syntax highlighting will not happen.
+            // Note that only 'coffeescript', 'javascript', 'lua', 'python',
+            // 'ruby' and 'scheme' have CodeMirror-supported syntax
+            // highlighting. For other languages, syntax highlighting will not
+            // happen.
             if ($scope.uiConfig().coding_mode !== CODING_MODE_NONE) {
               $scope.codemirrorOptions.mode = $scope.uiConfig().coding_mode;
             }

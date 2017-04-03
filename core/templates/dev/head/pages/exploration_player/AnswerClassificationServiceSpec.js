@@ -131,7 +131,8 @@ describe('Answer classification service with string classifier disabled',
     it('should return the first matching answer group and first matching rule' +
        'spec', function() {
       acs.getMatchingClassificationResult(
-        explorationId, state, 10, false, rules).then(successHandler, failHandler);
+        explorationId, state, 10, false, rules)
+        .then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).toHaveBeenCalledWith({
         outcome: oof.createNew('outcome 1', [''], []),
@@ -141,7 +142,8 @@ describe('Answer classification service with string classifier disabled',
       expect(failHandler).not.toHaveBeenCalled();
 
       acs.getMatchingClassificationResult(
-        explorationId, state, 5, false, rules).then(successHandler, failHandler);
+        explorationId, state, 5, false, rules)
+        .then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).toHaveBeenCalledWith({
         outcome: oof.createNew('outcome 2', [''], []),
@@ -151,7 +153,8 @@ describe('Answer classification service with string classifier disabled',
       expect(failHandler).not.toHaveBeenCalled();
 
       acs.getMatchingClassificationResult(
-        explorationId, state, 6, false, rules).then(successHandler, failHandler);
+        explorationId, state, 6, false, rules)
+        .then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).toHaveBeenCalledWith({
         outcome: oof.createNew('outcome 2', [''], []),
@@ -335,8 +338,9 @@ describe('Answer classification service with string classifier enabled',
       $httpBackend.expectPOST(
         '/explorehandler/classify/' + explorationId).respond(
         backendClassifiedOutcome);
-      acs.getMatchingClassificationResult(explorationId, state, 0, false, rules).
-        then(successHandler, failHandler);
+      acs.getMatchingClassificationResult(
+        explorationId, state, 0, false, rules)
+        .then(successHandler, failHandler);
       $rootScope.$apply();
       $httpBackend.flush();
 
@@ -347,7 +351,8 @@ describe('Answer classification service with string classifier enabled',
     it('should return the default rule if no answer group matches and ' +
        'interaction is not trainable', function() {
       acs.getMatchingClassificationResult(
-        explorationId, state2, 0, false, rules).then(successHandler, failHandler);
+        explorationId, state2, 0, false, rules)
+        .then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).toHaveBeenCalledWith({
         outcome: oof.createNew('default', [], []),

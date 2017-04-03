@@ -327,7 +327,8 @@ describe('Collection editor state service', function() {
         unpublishablePublicCollectionRightsObject);
       expect(previousCollectionRights).not.toEqual(expectedCollectionRights);
 
-      CollectionEditorStateService.setCollectionRights(expectedCollectionRights);
+      CollectionEditorStateService.setCollectionRights(
+        expectedCollectionRights);
 
       var actualCollectionRights = (
         CollectionEditorStateService.getCollectionRights());

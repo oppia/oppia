@@ -582,8 +582,8 @@ oppia.factory('explorationPropertyService', [
 
         $log.info('Initializing exploration ' + this.propertyName + ':', value);
 
-        // The current value of the property (which may not have been saved to the
-        // frontend yet). In general, this will be bound directly to the UI.
+        // The current value of the property (which may not have been saved to
+        // the frontend yet). In general, this will be bound directly to the UI.
         this.displayed = angular.copy(value);
         // The previous (saved-in-the-frontend) value of the property. Here,
         // 'saved' means that this is the latest value of the property as
@@ -596,7 +596,8 @@ oppia.factory('explorationPropertyService', [
       hasChanged: function() {
         return !angular.equals(this.savedMemento, this.displayed);
       },
-      // The backend name for this property. THIS MUST BE SPECIFIED BY SUBCLASSES.
+      // The backend name for this property. THIS MUST BE SPECIFIED BY
+      // SUBCLASSES.
       propertyName: null,
       // Transforms the given value into a normalized form. THIS CAN BE
       // OVERRIDDEN BY SUBCLASSES. The default behavior is to do nothing.

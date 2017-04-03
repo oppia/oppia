@@ -19,10 +19,11 @@
 oppia.factory('baseInteractionValidationService', [
   '$filter', 'WARNING_TYPES', function($filter, WARNING_TYPES) {
     return {
-      // 'argNames' is an array of top-level customization argument names (such as
-      // 'chocies') used to verify the basic structure of the input customization
-      // arguments object.
-      requireCustomizationArguments: function(customizationArguments, argNames) {
+      // 'argNames' is an array of top-level customization argument names (such
+      // as 'chocies') used to verify the basic structure of the input
+      // customization arguments object.
+      requireCustomizationArguments: function(
+        customizationArguments, argNames) {
         var missingArgs = [];
         for (var i = 0; i < argNames.length; i++) {
           if (!customizationArguments.hasOwnProperty(argNames[i])) {
@@ -44,7 +45,8 @@ oppia.factory('baseInteractionValidationService', [
 
         // This does not check the default outcome.
         for (var i = 0; i < answerGroups.length; i++) {
-          if ($filter('isOutcomeConfusing')(answerGroups[i].outcome, stateName)) {
+          if (
+            $filter('isOutcomeConfusing')(answerGroups[i].outcome, stateName)) {
             partialWarningsList.push({
               type: WARNING_TYPES.ERROR,
               message: (

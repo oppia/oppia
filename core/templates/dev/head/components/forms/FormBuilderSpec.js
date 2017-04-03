@@ -355,8 +355,8 @@ describe('RTE helper service', function() {
         'First Tabs Content&amp;amp;nbsp;&amp;lt;oppia-noninteractive-link ' +
         'url-with-value=\&amp;quot;&amp;amp;amp;quot;' +
         'https://www.example.com/abc&amp;amp;amp;quot;\&amp;quot; ' +
-        'text-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;' +
-        'quot; open_link_in_same_window-with-value=\&amp;quot;' +
+        'text-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;' +
+        '\&amp;quot; open_link_in_same_window-with-value=\&amp;quot;' +
         'false\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-link&amp;gt;' +
         '&amp;lt;/p&amp;gt;&amp;quot;},{&amp;quot;title&amp;quot;:&amp;quot;' +
         'Tab 2&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p' +
@@ -402,8 +402,8 @@ describe('RTE helper service', function() {
         'First Tabs Content&amp;amp;nbsp;&amp;lt;oppia-noninteractive-link ' +
         'url-with-value=\&amp;quot;&amp;amp;amp;quot;' +
         'https://www.example.com/abc&amp;amp;amp;quot;\&amp;quot; ' +
-        'text-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;' +
-        'quot; open_link_in_same_window-with-value=\&amp;quot;' +
+        'text-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;' +
+        '\&amp;quot; open_link_in_same_window-with-value=\&amp;quot;' +
         'false\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-link&amp;gt;' +
         '&amp;lt;/p&amp;gt;&amp;quot;},{&amp;quot;title&amp;quot;:&amp;quot;' +
         'Tab 2&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p' +
@@ -447,7 +447,8 @@ describe('RTE helper service', function() {
       expect($filter('sanitizeHtmlForRte')(
         RAW_MATH + RAW_TEXT + RAW_LINK + RAW_ITALIC_TEXT
       )).toEqual(
-        PROCESSED_MATH + PROCESSED_TEXT + PROCESSED_LINK + PROCESSED_ITALIC_TEXT);
+        PROCESSED_MATH + PROCESSED_TEXT + PROCESSED_LINK +
+        PROCESSED_ITALIC_TEXT);
 
       // Invalid combinations.
       expect($filter('sanitizeHtmlForRte')(RAW_MATH + '<span')).toEqual(

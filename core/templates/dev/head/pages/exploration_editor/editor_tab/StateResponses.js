@@ -622,33 +622,33 @@ oppia.controller('StateResponses', [
 
               AnswerClassificationService.getMatchingClassificationResult(
                 _explorationId, _state, answer, true, rulesService)
-                .then(
-                  function(classificationResult) {
-                    var feedback = 'Nothing';
-                    var dest = classificationResult.outcome.dest;
-                    if (classificationResult.outcome.feedback.length > 0) {
-                      feedback = classificationResult.outcome.feedback[0];
-                    }
-                    if (dest === _stateName) {
-                      dest = '<em>(try again)</em>';
-                    }
-                    $scope.trainingDataAnswer = answer;
-                    $scope.trainingDataFeedback = feedback;
-                    $scope.trainingDataOutcomeDest = dest;
-
-                    var answerGroupIndex = classificationResult.answerGroupIndex;
-                    var ruleIndex = classificationResult.ruleIndex;
-                    if (answerGroupIndex !==
-                      _state.interaction.answerGroups.length &&
-                        _state.interaction.answerGroups[answerGroupIndex]
-                          .rules[ruleIndex].type !== RULE_TYPE_CLASSIFIER) {
-                      $scope.classification.answerGroupIndex = -1;
-                    } else {
-                      $scope.classification.answerGroupIndex = (
-                        classificationResult.answerGroupIndex);
-                    }
+                .then(function(classificationResult) {
+                  var feedback = 'Nothing';
+                  var dest = classificationResult.outcome.dest;
+                  if (classificationResult.outcome.feedback.length > 0) {
+                    feedback = classificationResult.outcome.feedback[0];
                   }
-                );
+                  if (dest === _stateName) {
+                    dest = '<em>(try again)</em>';
+                  }
+                  $scope.trainingDataAnswer = answer;
+                  $scope.trainingDataFeedback = feedback;
+                  $scope.trainingDataOutcomeDest = dest;
+
+                  var answerGroupIndex =
+                    classificationResult.answerGroupIndex;
+                  var ruleIndex = classificationResult.ruleIndex;
+                  if (answerGroupIndex !==
+                    _state.interaction.answerGroups.length &&
+                      _state.interaction.answerGroups[answerGroupIndex]
+                        .rules[ruleIndex].type !== RULE_TYPE_CLASSIFIER) {
+                    $scope.classification.answerGroupIndex = -1;
+                  } else {
+                    $scope.classification.answerGroupIndex = (
+                      classificationResult.answerGroupIndex);
+                  }
+                }
+              );
             };
           }]
       }).result.then(function(result) {

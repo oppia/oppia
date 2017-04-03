@@ -63,7 +63,8 @@ describe('Item Selection rules service', function() {
       };
       expect(isirs.DoesNotContainAtLeastOneOf(['d'], RULE_INPUT)).toBe(true);
       expect(isirs.DoesNotContainAtLeastOneOf([], RULE_INPUT)).toBe(true);
-      expect(isirs.DoesNotContainAtLeastOneOf(['a', 'b'], RULE_INPUT)).toBe(true);
+      expect(
+        isirs.DoesNotContainAtLeastOneOf(['a', 'b'], RULE_INPUT)).toBe(true);
       expect(isirs.DoesNotContainAtLeastOneOf(['a'], RULE_INPUT)).toBe(true);
       expect(isirs.DoesNotContainAtLeastOneOf(
         ['a', 'b', 'c'], RULE_INPUT)).toBe(false);

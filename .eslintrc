@@ -74,6 +74,11 @@
         "SwitchCase": 1
       }
     ],
+    "max-len": [
+      "error",
+      "code": 80,
+      "ignoreUrls": true
+    ],
     "camelcase": [
       "error",
       {

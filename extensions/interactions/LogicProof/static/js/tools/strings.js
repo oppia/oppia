@@ -21,9 +21,8 @@ var DEFAULT_VOCABULARY = {
   arbitrary: ['was arbitrary', 'is arbitrary'],
   take: ['take'],
   satisfying: ['satisfying', 'such that'],
-  // jscs:disable disallowQuotedKeysInObjects
+  // eslint-disable-next-line quote-props
   'if': ['if'],
-  // jscs:enable disallowQuotedKeysInObjects
   given: ['given'],
   contradiction: ['contradiction'],
   at: ['at']

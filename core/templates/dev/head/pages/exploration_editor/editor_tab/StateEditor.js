@@ -162,8 +162,10 @@ oppia.factory('trainingModalService', [
               };
 
               $scope.init = function() {
-                var explorationId = explorationContextService.getExplorationId();
-                var currentStateName = editorContextService.getActiveStateName();
+                var explorationId =
+                  explorationContextService.getExplorationId();
+                var currentStateName =
+                  editorContextService.getActiveStateName();
                 var state = explorationStatesService.getState(currentStateName);
 
                 AnswerClassificationService.getMatchingClassificationResult(
@@ -179,13 +181,13 @@ oppia.factory('trainingModalService', [
                     }
 
                     // $scope.trainingDataAnswer, $scope.trainingDataFeedback
-                    // $scope.trainingDataOutcomeDest are intended to be local to
-                    // this modal and should not be used to populate any
+                    // $scope.trainingDataOutcomeDest are intended to be local
+                    // to this modal and should not be used to populate any
                     // information in the active exploration (including the
-                    // feedback). The feedback here refers to a representation of
-                    // the outcome of an answer group, rather than the specific
-                    // feedback of the outcome (for instance, it includes the
-                    // destination state within the feedback).
+                    // feedback). The feedback here refers to a representation
+                    // of the outcome of an answer group, rather than the
+                    // specific feedback of the outcome (for instance, it
+                    // includes the destination state within the feedback).
                     $scope.trainingDataAnswer = unhandledAnswer;
                     $scope.trainingDataFeedback = feedback;
                     $scope.trainingDataOutcomeDest = dest;

@@ -182,12 +182,12 @@ describe('Collection object factory', function() {
 
       // Ensure mutability.
       collectionNodeBefore.getPrerequisiteSkillList().addSkill('example');
-      expect(collectionNodeBefore).not.toEqual(CollectionNodeObjectFactory.create(
-        collectionNodeBackendObject));
+      expect(collectionNodeBefore).not.toEqual(
+        CollectionNodeObjectFactory.create(collectionNodeBackendObject));
 
       var collectionNodeAfter = _getCollectionNode('exp_id0');
-      expect(collectionNodeAfter).not.toEqual(CollectionNodeObjectFactory.create(
-        collectionNodeBackendObject));
+      expect(collectionNodeAfter).not.toEqual(
+        CollectionNodeObjectFactory.create(collectionNodeBackendObject));
       expect(collectionNodeAfter.getPrerequisiteSkillList().containsSkill(
         'example')).toBe(true);
     }
@@ -222,7 +222,8 @@ describe('Collection object factory', function() {
       var collectionNodes = _sampleCollection.getCollectionNodes();
       collectionNodes.splice(0, 1);
 
-      expect(_sampleCollection.getCollectionNodes()).not.toEqual(collectionNodes);
+      expect(
+        _sampleCollection.getCollectionNodes()).not.toEqual(collectionNodes);
       expect(_sampleCollection.getCollectionNodeCount()).toEqual(2);
 
       // Ensure contained collection nodes can be mutated and reflected in the
@@ -314,7 +315,8 @@ describe('Collection object factory', function() {
       expect(skillList).not.toBe(otherSkillList);
 
       // The skills will not be provided in sorted order.
-      var expectedSkills = ['a_needed_for_01', 'b_final_skill', 'c_needed_for_0'];
+      var expectedSkills = [
+        'a_needed_for_01', 'b_final_skill', 'c_needed_for_0'];
       expect(skillList.getSkills()).not.toEqual(expectedSkills);
 
       skillList.sortSkills();

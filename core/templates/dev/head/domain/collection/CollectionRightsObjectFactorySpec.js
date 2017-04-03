@@ -140,7 +140,8 @@ describe('Collection rights object factory', function() {
 
       expect(function() {
         sampleCollectionRights.setPrivate();
-      }).toThrow(new Error('User is not allowed to unpublish this collection.'));
+      }).toThrow(
+        new Error('User is not allowed to unpublish this collection.'));
 
       // Verify that the status remains unchanged.
       expect(sampleCollectionRights.isPrivate()).toBe(false);

@@ -28,37 +28,38 @@ oppia.factory('searchService', [
 
     // Appends a suffix to the query describing allowed category and language
     // codes to filter on.
-    var _getSuffixForQuery = function(selectedCategories, selectedLanguageCodes) {
-      var querySuffix = '';
+    var _getSuffixForQuery =
+      function(selectedCategories, selectedLanguageCodes) {
+        var querySuffix = '';
 
-      var _categories = '';
-      for (var key in selectedCategories) {
-        if (selectedCategories[key]) {
-          if (_categories) {
-            _categories += '" OR "';
+        var _categories = '';
+        for (var key in selectedCategories) {
+          if (selectedCategories[key]) {
+            if (_categories) {
+              _categories += '" OR "';
+            }
+            _categories += key;
           }
-          _categories += key;
         }
-      }
-      if (_categories) {
-        querySuffix += '&category=("' + _categories + '")';
-      }
+        if (_categories) {
+          querySuffix += '&category=("' + _categories + '")';
+        }
 
-      var _languageCodes = '';
-      for (var key in selectedLanguageCodes) {
-        if (selectedLanguageCodes[key]) {
-          if (_languageCodes) {
-            _languageCodes += '" OR "';
+        var _languageCodes = '';
+        for (var key in selectedLanguageCodes) {
+          if (selectedLanguageCodes[key]) {
+            if (_languageCodes) {
+              _languageCodes += '" OR "';
+            }
+            _languageCodes += key;
           }
-          _languageCodes += key;
         }
-      }
-      if (_languageCodes) {
-        querySuffix += '&language_code=("' + _languageCodes + '")';
-      }
+        if (_languageCodes) {
+          querySuffix += '&language_code=("' + _languageCodes + '")';
+        }
 
-      return querySuffix;
-    };
+        return querySuffix;
+      };
 
     var hasReachedEndOfPage = function() {
       return _searchCursor === null;
@@ -145,8 +146,8 @@ oppia.factory('searchService', [
       },
       // The following takes in the url search component as an argument and the
       // selectionDetails. It will update selectionDetails with the relevant
-      // fields that were extracted from the url. It returns the unencoded search
-      // query string.
+      // fields that were extracted from the url. It returns the unencoded
+      // search query string.
       updateSearchFieldsBasedOnUrlQuery: function(
           urlComponent, selectionDetails) {
         var urlQuery = urlComponent.substring('?q='.length);

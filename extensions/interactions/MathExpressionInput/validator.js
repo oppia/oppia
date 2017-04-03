@@ -21,7 +21,8 @@ oppia.filter('oppiaInteractiveMathExpressionInputValidator', [
   'baseInteractionValidationService', 'WARNING_TYPES',
   function(baseInteractionValidationService, WARNING_TYPES) {
     // Returns a list of warnings.
-    return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
+    return function(
+      stateName, customizationArgs, answerGroups, defaultOutcome) {
       var warningsList = baseInteractionValidationService.getAllOutcomeWarnings(
         answerGroups, defaultOutcome, stateName);
 

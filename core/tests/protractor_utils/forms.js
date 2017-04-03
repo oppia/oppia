@@ -499,8 +499,8 @@ var CodeMirrorChecker = function(elem) {
     elem.all(by.xpath('./div')).map(function(lineElement) {
       return lineElement.element(by.css('.CodeMirror-linenumber')).getText()
         .then(function(lineNumber) {
-          // Note: the last line in codemirror will have an empty string for line
-          // number and for text. This is to skip that line.
+          // Note: the last line in codemirror will have an empty string for
+          // line number and for text. This is to skip that line.
           if (lineNumber === '') {
             return lineNumber;
           }
@@ -510,7 +510,8 @@ var CodeMirrorChecker = function(elem) {
           expect(lineElement.element(by.xpath('./pre')).getText())
             .toEqual(compareDict[lineNumber].text);
           expect(
-            lineElement.element(by.css('.CodeMirror-linebackground')).isPresent())
+            lineElement.element(
+              by.css('.CodeMirror-linebackground')).isPresent())
             .toEqual(compareDict[lineNumber].highlighted);
           compareDict[lineNumber].checked = true;
           return lineNumber;

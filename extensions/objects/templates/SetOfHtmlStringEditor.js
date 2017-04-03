@@ -46,8 +46,8 @@ oppia.directive('setOfHtmlStringEditor', [
           return $scope.$parent.value.indexOf(choice.id) !== -1;
         });
 
-        // The following function is necessary to insert elements into the answer
-        // groups for the Item Selection Widget.
+        // The following function is necessary to insert elements into the
+        // answer groups for the Item Selection Widget.
         $scope.toggleSelection = function(choiceListIndex) {
           var choiceHtml = $scope.choices[choiceListIndex].id;
           var selectedChoicesIndex = $scope.$parent.value.indexOf(choiceHtml);

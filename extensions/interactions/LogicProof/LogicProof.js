@@ -31,7 +31,8 @@ oppia.directive('oppiaInteractiveLogicProof', [
           // the dependencies.
           $scope.questionData = angular.copy(LOGIC_PROOF_DEFAULT_QUESTION_DATA);
 
-          $scope.questionData.assumptions = $scope.localQuestionData.assumptions;
+          $scope.questionData.assumptions =
+            $scope.localQuestionData.assumptions;
           $scope.questionData.results = $scope.localQuestionData.results;
 
           // Deduce the new operators, as in logicProofTeacher.buildQuestion(),
@@ -91,14 +92,14 @@ oppia.directive('oppiaInteractiveLogicProof', [
             editor.setOption('lineNumbers', true);
             editor.setOption('lineWrapping', true);
 
-            // NOTE: this is necessary to avoid the textarea being greyed-out. See
-            // http://stackoverflow.com/questions/8349571 for discussion.
+            // NOTE: this is necessary to avoid the textarea being greyed-out.
+            // See: http://stackoverflow.com/questions/8349571 for discussion.
             setTimeout(function() {
               editor.refresh();
             }, 500);
 
-            // NOTE: we must use beforeChange rather than change here to avoid an
-            // infinite loop (which code-mirror will not catch).
+            // NOTE: we must use beforeChange rather than change here to avoid
+            // an infinite loop (which code-mirror will not catch).
             editor.on('beforeChange', function(instance, change) {
               var convertedText = logicProofConversion.convertToLogicCharacters(
                 change.text.join('\n'));
@@ -117,12 +118,13 @@ oppia.directive('oppiaInteractiveLogicProof', [
               }
             });
 
-            // NOTE: we use change rather than beforeChange here so that checking
-            // for mistakes is done with respect to the updated text.
+            // NOTE: we use change rather than beforeChange here so that
+            // checking for mistakes is done with respect to the updated text.
             editor.on('change', function(instance, change) {
               $scope.proofString = editor.getValue();
               // We update the message only if the user has added or removed a
-              // line break, so that it remains while they work on a single line.
+              // line break, so that it remains while they work on a single
+              // line.
               if (change.text.length > 1 || change.removed.length > 1) {
                 $scope.checkForBasicErrors();
               }
@@ -131,8 +133,8 @@ oppia.directive('oppiaInteractiveLogicProof', [
             $scope.editor = editor;
           };
 
-          // This performs simple error checks that are done as the student types
-          // rather than waiting for the proof to be submitted.
+          // This performs simple error checks that are done as the student
+          // types rather than waiting for the proof to be submitted.
           $scope.checkForBasicErrors = function() {
             if (!$scope.messageIsSticky) {
               $scope.clearMessage();
@@ -194,8 +196,8 @@ oppia.directive('oppiaInteractiveLogicProof', [
           };
 
           // NOTE: proof_num_lines, displayed_question and displayed_proof are
-          // only computed here because response.html needs them and does not have
-          // its own javascript.
+          // only computed here because response.html needs them and does not
+          // have its own javascript.
           $scope.submitProof = function() {
             $scope.clearMessage();
             var submission = {

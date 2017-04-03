@@ -94,7 +94,8 @@ describe('Collection update service', function() {
 
   it('should create a proper backend change dict for deleting collection nodes',
     function() {
-      CollectionUpdateService.deleteCollectionNode(_sampleCollection, 'exp_id0');
+      CollectionUpdateService
+        .deleteCollectionNode(_sampleCollection, 'exp_id0');
       expect(UndoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'delete_collection_node',
         exploration_id: 'exp_id0'
@@ -113,7 +114,8 @@ describe('Collection update service', function() {
 
   it('should create a proper backend change dict for changing titles',
     function() {
-      CollectionUpdateService.setCollectionTitle(_sampleCollection, 'new title');
+      CollectionUpdateService
+        .setCollectionTitle(_sampleCollection, 'new title');
       expect(UndoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'edit_collection_property',
         property_name: 'title',
@@ -180,7 +182,8 @@ describe('Collection update service', function() {
 
   it('should create a proper backend change dict for changing language codes',
     function() {
-      CollectionUpdateService.setCollectionLanguageCode(_sampleCollection, 'fi');
+      CollectionUpdateService
+        .setCollectionLanguageCode(_sampleCollection, 'fi');
       expect(UndoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'edit_collection_property',
         property_name: 'language_code',

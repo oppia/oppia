@@ -88,8 +88,8 @@ oppia.config([
         prefix: GLOBALS.ASSET_DIR_PREFIX + '/assets/i18n/',
         suffix: '.json'
       })
-      // The use of default translation improves the loading time when English is
-      // selected
+      // The use of default translation improves the loading time when English
+      // is selected
       .translations('en', DEFAULT_TRANSLATIONS)
       .fallbackLanguage('en')
       .determinePreferredLanguage()
