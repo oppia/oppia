@@ -96,10 +96,10 @@ def get_learner_collection_dict_by_id(
     Args:
         collection_id: str. The id of the collection.
         user_id: str. The user_id of the learner.
-        strict: bool. Whether to also return explorations that are invalid,
-            such as deleted/private explorations.
-        allow_invalid_explorations: bool. Return also explorations that are
-            invalid. (Example: exploration deleted or private exploration)
+        strict: bool. Whether to fail noisily if no collection with the given
+            id exists in the datastore.
+        allow_invalid_explorations: bool. Whether to also return explorations
+            that are invalid, such as deleted/private explorations.
         version: str or None. The version number of the collection to be
             retrieved. If it is None, the latest version will be retrieved.
 
@@ -240,9 +240,9 @@ def get_exploration_metadata_dicts(exploration_ids, editor_user_id=None):
     Returns:
         list(dict). A list of metadata dicts corresponding to the given
         exploration ids. Each dict has three keys:
-            'id': the exploration id
-            'title': the exploration title
-            'objective': the exploration objective
+            'id': the exploration id;
+            'title': the exploration title;
+            'objective': the exploration objective.
     """
     exploration_summaries = (
         exp_services.get_exploration_summaries_matching_ids(exploration_ids))
@@ -286,7 +286,6 @@ def get_displayable_exp_summary_dicts_matching_ids(
             filtered based on a user ID who has edit access to the
             corresponding explorations. Otherwise, the returned list is not
             filtered.
-
 
     Return:
         list(dict). A list of exploration summary dicts in human readable form.
@@ -339,7 +338,7 @@ def get_displayable_exp_summary_dicts(exploration_summaries):
 
     Args:
         exploration_summaries: list(ExplorationSummary). List of exploration
-        summary objects
+        summary objects.
 
     Return:
         list(dict). A list of exploration summary dicts in human readable form.
@@ -410,10 +409,10 @@ def _get_displayable_collection_summary_dicts(collection_summaries):
 
     Args:
         collection_summaries: list(CollectionSummary). List of collection
-        summary domain object
+        summary domain object.
 
     Return:
-        list(dict). A list of exploration summary(dict) in human readable form.
+        list(dict). A list of exploration summary dicts in human readable form.
         Example:
 
         [ {
@@ -459,8 +458,8 @@ def get_library_groups(language_codes):
     header and a list of dicts representing activity summaries.
 
     Args:
-        language_codes: list(str). A list of language codes. Filter explorations
-            for their language.
+        language_codes: list(str). A list of language codes. Only explorations
+            with these languages will be returned.
 
     Return:
         list(dict). A list of groups for the library index page. Each group is
@@ -469,9 +468,11 @@ def get_library_groups(language_codes):
                 activity summaries.
             - categories: list(str). The list of group categories.
             - header_i18n_id: str. The i18n id for the header of the category.
-            - has_full_results_page: bool.
-            - full_results_url: str. The url of category in the library
-                index page.
+            - has_full_results_page: bool. Whether the group header links to
+                a "full results" page. This is always True for the
+                "exploration category" groups.
+            - full_results_url: str. The URL to the corresponding "full results"
+                page.
     """
     language_codes_suffix = ''
     if language_codes:
@@ -559,7 +560,7 @@ def require_activities_to_be_public(activity_references):
 
     Args:
         activity_references: list(ActivityReference). A list of
-            ActivityReference domain objects
+            ActivityReference domain objects.
 
     Raises:
         Exception: Any activity reference in the list does not
@@ -597,8 +598,8 @@ def get_featured_activity_summary_dicts(language_codes):
     The return value is sorted according to the list stored in the datastore.
 
     Args:
-        language_codes: list(str). A list of language code. Filter explorations
-            for their language.
+        language_codes: list(str). A list of language codes. Only explorations
+            with these languages will be returned.
 
     Return:
         list(dict). Each dict in this list represents a featured activity.
@@ -654,9 +655,9 @@ def get_top_rated_exploration_summary_dicts(language_codes, limit):
     The return value is sorted in decreasing order of average rating.
 
     Args:
-        language_codes: list(str). A list of language codes. Filter explorations
-            for their language.
-        limit: int. The maximum number of explorations to return
+        language_codes: list(str). A list of language codes. Only explorations
+            with these languages will be returned.
+        limit: int. The maximum number of explorations to return.
 
     Return:
         list(dict). Each dict in this list represents a exploration summary in
