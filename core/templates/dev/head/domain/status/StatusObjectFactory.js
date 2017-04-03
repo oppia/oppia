@@ -18,6 +18,7 @@
  */
 
 oppia.factory('StatusObjectFactory', [function() {
+
   var Status = function(reason, value) {
     this._reason = reason;
     this._value = value;
@@ -33,11 +34,11 @@ oppia.factory('StatusObjectFactory', [function() {
     return new Status(reason, false);
   };
 
-  Status.prototye.getReason = function() {
+  Status.prototype.getReason = function() {
     return this._reason;
   };
 
-  Status.prototye.getValue = function() {
+  Status.prototype.getValue = function() {
     return this._value;
   };
 
