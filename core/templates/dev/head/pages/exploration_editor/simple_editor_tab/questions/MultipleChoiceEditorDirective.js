@@ -23,7 +23,7 @@ oppia.directive('multipleChoiceEditor', [
   'QuestionIdService', 'AnswerGroupObjectFactory', 'RuleObjectFactory',
   'StatusObjectFactory',
   function(QuestionIdService, AnswerGroupObjectFactory, RuleObjectFactory,
-   StatusObjectFactory) {
+      StatusObjectFactory) {
     return {
       restrict: 'E',
       scope: {
@@ -103,9 +103,8 @@ oppia.directive('multipleChoiceEditor', [
             }
 
             if (foundEmptyField) {
-              return StatusObjectFactory.createNew(
-                'Found an empty field',
-                false
+              return StatusObjectFactory.createFailure(
+                'Found an empty field'
               );
             }
 
@@ -141,9 +140,8 @@ oppia.directive('multipleChoiceEditor', [
           $scope.saveChoice = function(index, newChoiceValue) {
             if (!newChoiceValue) {
               alertsService.addWarning('Cannot save an empty choice.');
-              return StatusObjectFactory.createNew(
-                'Cannot save an empty choice',
-                false
+              return StatusObjectFactory.createFailure(
+                'Cannot save an empty choice'
               );
             }
 
@@ -152,18 +150,16 @@ oppia.directive('multipleChoiceEditor', [
 
             if (newChoiceValue === choiceNames[index]) {
               // No change has been made.
-              return StatusObjectFactory.createNew(
-                'No change has been made',
-                false
+              return StatusObjectFactory.createFailure(
+                'No change has been made'
               );
             }
 
             if (choiceNames.indexOf('newChoiceValue') !== -1) {
               alertsService.addWarning(
                 'Cannot save: this duplicates an existing choice.');
-              return StatusObjectFactory.createNew(
-                'This duplicates an existing choice',
-                false
+              return StatusObjectFactory.createFailure(
+                'This duplicates an existing choice'
               );
             }
 

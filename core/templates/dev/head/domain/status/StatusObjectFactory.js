@@ -13,19 +13,32 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new Status domain objects.
+ * @fileoverview Factory for creating new Status domain objects to be used
+ * when returning success results from functions.
  */
 
 oppia.factory('StatusObjectFactory', [function() {
   var Status = function(reason, value) {
-    this.reason = reason;
-    this.value = value;
+    this._reason = reason;
+    this._value = value;
   };
 
   // Static class methods. Note that "this" is not available in
   // static contexts.
-  Status.createNew = function(reason, value) {
-    return new Status(reason, value);
+  Status.createSuccess = function(reason) {
+    return new Status(reason, true);
+  };
+
+  Status.createFailure = function(reason) {
+    return new Status(reason, false);
+  };
+
+  Status.prototye.getReason = function() {
+    return this._reason;
+  };
+
+  Status.prototye.getValue = function() {
+    return this._value;
   };
 
   return Status;
