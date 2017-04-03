@@ -50,7 +50,7 @@ oppia.factory('ReadOnlyExplorationBackendApiService', [
         return UrlInterpolationService.interpolateUrl(
         EXPLORATION_VERSION_DATA_URL_TEMPLATE, {
           exploration_id: explorationId,
-          v: String(version)
+          version: String(version)
         });
       }
       return UrlInterpolationService.interpolateUrl(
@@ -70,8 +70,7 @@ oppia.factory('ReadOnlyExplorationBackendApiService', [
        * with the exploration passed in as a parameter. If something goes
        * wrong while trying to fetch the exploration, the rejection callback
        * is called instead, if present. The rejection callback function is
-       * passed an error message using this format
-       * 'Error loading exploration x'.
+       * passed any data returned by the backend in the case of an error.
        */
       fetchExploration: function(explorationId, version) {
         return $q(function(resolve, reject) {

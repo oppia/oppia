@@ -129,10 +129,12 @@ oppia.factory('EditableExplorationBackendApiService', [
        * changes are used to commit a change to the exploration.
        * The new exploration is passed to the success callback,
        * if one is provided to the returned promise object. Errors are passed
-       * to the error callback, if one is provided. Finally, if the update is
-       * successful, the returned exploration will be cached within the
-       * ReadOnlyExplorationBackendApiService to ensure the cache is
-       * not out-of-date with any updates made by this backend API service.
+       * to the error callback, if one is provided. Please note, once this is
+       * called the cached exploration in ReadOnlyExplorationBackendApiService
+       * will be deleted. This is due to the differences in the back-end
+       * editor object and the back-end player object. As it stands now,
+       * we are unable to cache any Exploration object obtained from the
+       * editor beackend.
        */
       updateExploration: function(
           explorationId, explorationVersion, commitMessage, changeList) {

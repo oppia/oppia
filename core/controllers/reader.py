@@ -218,7 +218,7 @@ class ExplorationHandler(base.BaseHandler):
 
     def get(self, exploration_id):
         """Populates the data on the individual exploration page."""
-        version = self.request.get('v')
+        version = self.request.get('version')
         version = int(version) if version else None
 
         try:

@@ -199,7 +199,7 @@ oppia.factory('oppiaPlayerService', [
             _loadInitialState(successCallback);
           });
         } else {
-          loadedExploration = null;
+          var loadedExploration = null;
           if (version) {
             loadedExploration = (
               ReadOnlyExplorationBackendApiService.loadExploration(

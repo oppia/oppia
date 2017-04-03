@@ -28,7 +28,7 @@ oppia.constant(
   '/explorehandler/init/<exploration_id>');
 oppia.constant(
   'EXPLORATION_VERSION_DATA_URL_TEMPLATE',
-  '/explorehandler/init/<exploration_id>?v=<v>');
+  '/explorehandler/init/<exploration_id>?version=<version>');
 oppia.constant(
   'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
   '/createhandler/data/<exploration_id>');
