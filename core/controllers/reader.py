@@ -329,8 +329,7 @@ class ClassifyHandler(base.BaseHandler):
         arguments.
         """
         # A domain object representing the old state.
-        old_state = exp_domain.State.from_dict(self.payload.get(
-            'old_state'))
+        old_state = exp_domain.State.from_dict(self.payload.get('old_state'))
         # The learner's raw answer.
         answer = self.payload.get('answer')
         # The learner's parameter values.
