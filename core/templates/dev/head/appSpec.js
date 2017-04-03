@@ -78,13 +78,14 @@ describe('HTML escaper', function() {
     }));
 
     it('should correctly translate between escaped and unescaped strings',
-        function() {
-      var strs = ['abc', 'a&b<html>', '&&&&&'];
-      for (var i = 0; i < strs.length; i++) {
-        expect(ohe.escapedStrToUnescapedStr(
-          ohe.unescapedStrToEscapedStr(strs[i]))).toEqual(strs[i]);
+      function() {
+        var strs = ['abc', 'a&b<html>', '&&&&&'];
+        for (var i = 0; i < strs.length; i++) {
+          expect(ohe.escapedStrToUnescapedStr(
+            ohe.unescapedStrToEscapedStr(strs[i]))).toEqual(strs[i]);
+        }
       }
-    });
+    );
 
     it('should correctly escape and unescape JSON', function() {
       var objs = [{

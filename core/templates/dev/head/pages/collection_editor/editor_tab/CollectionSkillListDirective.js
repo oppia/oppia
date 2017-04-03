@@ -21,10 +21,12 @@ oppia.directive('collectionSkillList', [function() {
   return {
     restrict: 'E',
     templateUrl: 'inline/collection_skill_list_directive',
-    controller: ['$scope', 'CollectionEditorStateService',
-    function($scope, CollectionEditorStateService) {
-      $scope.collectionSkillList = (
-        CollectionEditorStateService.getCollectionSkillList());
-    }]
+    controller: [
+      '$scope', 'CollectionEditorStateService',
+      function($scope, CollectionEditorStateService) {
+        $scope.collectionSkillList = (
+          CollectionEditorStateService.getCollectionSkillList());
+      }
+    ]
   };
 }]);

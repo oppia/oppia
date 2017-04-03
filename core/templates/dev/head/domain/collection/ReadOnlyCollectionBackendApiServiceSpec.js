@@ -58,58 +58,61 @@ describe('Read only collection backend API service', function() {
   });
 
   it('should successfully fetch an existing collection from the backend',
-      function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expect('GET', '/collection_handler/data/0').respond(
-      sampleDataResults);
-    ReadOnlyCollectionBackendApiService.fetchCollection('0').then(
-      successHandler, failHandler);
-    $httpBackend.flush();
+      $httpBackend.expect('GET', '/collection_handler/data/0').respond(
+        sampleDataResults);
+      ReadOnlyCollectionBackendApiService.fetchCollection('0').then(
+        successHandler, failHandler);
+      $httpBackend.flush();
 
-    expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
-    expect(failHandler).not.toHaveBeenCalled();
-  });
+      expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+  );
 
   it('should load a cached collection after fetching it from the backend',
-      function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
 
-    // Loading a collection the first time should fetch it from the backend.
-    $httpBackend.expect('GET', '/collection_handler/data/0').respond(
-      sampleDataResults);
-    ReadOnlyCollectionBackendApiService.loadCollection('0').then(
-      successHandler, failHandler);
-    $httpBackend.flush();
+      // Loading a collection the first time should fetch it from the backend.
+      $httpBackend.expect('GET', '/collection_handler/data/0').respond(
+        sampleDataResults);
+      ReadOnlyCollectionBackendApiService.loadCollection('0').then(
+        successHandler, failHandler);
+      $httpBackend.flush();
 
-    expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
-    expect(failHandler).not.toHaveBeenCalled();
+      expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
+      expect(failHandler).not.toHaveBeenCalled();
 
-    // Loading a collection the second time should not fetch it.
-    ReadOnlyCollectionBackendApiService.loadCollection('0').then(
-      successHandler, failHandler);
+      // Loading a collection the second time should not fetch it.
+      ReadOnlyCollectionBackendApiService.loadCollection('0').then(
+        successHandler, failHandler);
 
-    expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
-    expect(failHandler).not.toHaveBeenCalled();
-  });
+      expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+  );
 
   it('should use the rejection handler if the backend request failed',
-      function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
 
-    // Loading a collection the first time should fetch it from the backend.
-    $httpBackend.expect('GET', '/collection_handler/data/0').respond(
-      500, 'Error loading collection 0.');
-    ReadOnlyCollectionBackendApiService.loadCollection('0').then(
-      successHandler, failHandler);
-    $httpBackend.flush();
+      // Loading a collection the first time should fetch it from the backend.
+      $httpBackend.expect('GET', '/collection_handler/data/0').respond(
+        500, 'Error loading collection 0.');
+      ReadOnlyCollectionBackendApiService.loadCollection('0').then(
+        successHandler, failHandler);
+      $httpBackend.flush();
 
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Error loading collection 0.');
-  });
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Error loading collection 0.');
+    }
+  );
 
   it('should report caching and support clearing the cache', function() {
     var successHandler = jasmine.createSpy('success');

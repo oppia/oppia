@@ -126,78 +126,84 @@ oppia.controller('StateEditor', [
 
 // A service which handles opening and closing the training modal used for both
 // unresolved answers and answers within the training data of a classifier.
-oppia.factory('trainingModalService', ['$rootScope', '$modal', 'alertsService',
-    function($rootScope, $modal, alertsService) {
-  return {
-    openTrainUnresolvedAnswerModal: function(unhandledAnswer, externalSave) {
-      alertsService.clearWarnings();
-      if (externalSave) {
-        $rootScope.$broadcast('externalSave');
+oppia.factory('trainingModalService', [
+  '$rootScope', '$modal', 'alertsService',
+  function($rootScope, $modal, alertsService) {
+    return {
+      openTrainUnresolvedAnswerModal: function(unhandledAnswer, externalSave) {
+        alertsService.clearWarnings();
+        if (externalSave) {
+          $rootScope.$broadcast('externalSave');
+        }
+
+        $modal.open({
+          templateUrl: 'modals/trainUnresolvedAnswer',
+          backdrop: true,
+          controller: [
+            '$scope', '$modalInstance', 'explorationStatesService',
+            'editorContextService', 'AnswerClassificationService',
+            'explorationContextService',
+            function($scope, $modalInstance, explorationStatesService,
+                editorContextService, AnswerClassificationService,
+                explorationContextService) {
+              $scope.trainingDataAnswer = '';
+              $scope.trainingDataFeedback = '';
+              $scope.trainingDataOutcomeDest = '';
+
+              // See the training panel directive in StateEditor for an
+              // explanation on the structure of this object.
+              $scope.classification = {
+                answerGroupIndex: 0,
+                newOutcome: null
+              };
+
+              $scope.finishTraining = function() {
+                $modalInstance.close();
+              };
+
+              $scope.init = function() {
+                var explorationId =
+                  explorationContextService.getExplorationId();
+                var currentStateName =
+                  editorContextService.getActiveStateName();
+                var state = explorationStatesService.getState(currentStateName);
+
+                AnswerClassificationService.getMatchingClassificationResult(
+                  explorationId, state, unhandledAnswer, true)
+                  .then(function(classificationResult) {
+                    var feedback = 'Nothing';
+                    var dest = classificationResult.outcome.dest;
+                    if (classificationResult.outcome.feedback.length > 0) {
+                      feedback = classificationResult.outcome.feedback[0];
+                    }
+                    if (dest === currentStateName) {
+                      dest = '<em>(try again)</em>';
+                    }
+
+                    // $scope.trainingDataAnswer, $scope.trainingDataFeedback
+                    // $scope.trainingDataOutcomeDest are intended to be local
+                    // to this modal and should not be used to populate any
+                    // information in the active exploration (including the
+                    // feedback). The feedback here refers to a representation
+                    // of the outcome of an answer group, rather than the
+                    // specific feedback of the outcome (for instance, it
+                    // includes the destination state within the feedback).
+                    $scope.trainingDataAnswer = unhandledAnswer;
+                    $scope.trainingDataFeedback = feedback;
+                    $scope.trainingDataOutcomeDest = dest;
+                    $scope.classification.answerGroupIndex = (
+                      classificationResult.answerGroupIndex);
+                  }
+                );
+              };
+
+              $scope.init();
+            }]
+        });
       }
-
-      $modal.open({
-        templateUrl: 'modals/trainUnresolvedAnswer',
-        backdrop: true,
-        controller: ['$scope', '$modalInstance', 'explorationStatesService',
-          'editorContextService', 'AnswerClassificationService',
-          'explorationContextService',
-          function($scope, $modalInstance, explorationStatesService,
-              editorContextService, AnswerClassificationService,
-              explorationContextService) {
-            $scope.trainingDataAnswer = '';
-            $scope.trainingDataFeedback = '';
-            $scope.trainingDataOutcomeDest = '';
-
-            // See the training panel directive in StateEditor for an
-            // explanation on the structure of this object.
-            $scope.classification = {
-              answerGroupIndex: 0,
-              newOutcome: null
-            };
-
-            $scope.finishTraining = function() {
-              $modalInstance.close();
-            };
-
-            $scope.init = function() {
-              var explorationId = explorationContextService.getExplorationId();
-              var currentStateName = editorContextService.getActiveStateName();
-              var state = explorationStatesService.getState(currentStateName);
-
-              AnswerClassificationService.getMatchingClassificationResult(
-                explorationId, state, unhandledAnswer, true).then(
-                    function(classificationResult) {
-                  var feedback = 'Nothing';
-                  var dest = classificationResult.outcome.dest;
-                  if (classificationResult.outcome.feedback.length > 0) {
-                    feedback = classificationResult.outcome.feedback[0];
-                  }
-                  if (dest === currentStateName) {
-                    dest = '<em>(try again)</em>';
-                  }
-
-                  // $scope.trainingDataAnswer, $scope.trainingDataFeedback
-                  // $scope.trainingDataOutcomeDest are intended to be local to
-                  // this modal and should not be used to populate any
-                  // information in the active exploration (including the
-                  // feedback). The feedback here refers to a representation of
-                  // the outcome of an answer group, rather than the specific
-                  // feedback of the outcome (for instance, it includes the
-                  // destination state within the feedback).
-                  $scope.trainingDataAnswer = unhandledAnswer;
-                  $scope.trainingDataFeedback = feedback;
-                  $scope.trainingDataOutcomeDest = dest;
-                  $scope.classification.answerGroupIndex = (
-                    classificationResult.answerGroupIndex);
-                });
-            };
-
-            $scope.init();
-          }]
-      });
-    }
-  };
-}]);
+    };
+  }
+]);
 
 // A service that, given an exploration ID and state name, determines all of the
 // answers which do not have certain classification and are not currently used

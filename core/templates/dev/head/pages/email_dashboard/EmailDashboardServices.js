@@ -80,11 +80,11 @@ oppia.factory('EmailDashboardDataService', [
         } else {
           currentPageIndex = currentPageIndex + 1;
           return fetchQueriesPage(QUERIES_PER_PAGE, latestCursor)
-          .then(function(data) {
-            queries = queries.concat(data.recent_queries);
-            latestCursor = data.cursor;
-            return queries.slice(startQueryIndex, endQueryIndex);
-          });
+            .then(function(data) {
+              queries = queries.concat(data.recent_queries);
+              latestCursor = data.cursor;
+              return queries.slice(startQueryIndex, endQueryIndex);
+            });
         }
       },
 

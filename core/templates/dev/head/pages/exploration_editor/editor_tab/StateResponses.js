@@ -291,7 +291,7 @@ oppia.factory('responsesService', [
                   }
                 });
                 rule.inputs[key] = newInputValue;
-              };
+              }
             });
 
             _updateAnswerGroup(answerGroupIndex, {
@@ -621,9 +621,8 @@ oppia.controller('StateResponses', [
                   stateCustomizationArgsService.savedMemento));
 
               AnswerClassificationService.getMatchingClassificationResult(
-                _explorationId, _state, answer, true,
-                rulesService).then(
-                    function(classificationResult) {
+                _explorationId, _state, answer, true, rulesService)
+                .then(function(classificationResult) {
                   var feedback = 'Nothing';
                   var dest = classificationResult.outcome.dest;
                   if (classificationResult.outcome.feedback.length > 0) {
@@ -636,18 +635,20 @@ oppia.controller('StateResponses', [
                   $scope.trainingDataFeedback = feedback;
                   $scope.trainingDataOutcomeDest = dest;
 
-                  var answerGroupIndex = classificationResult.answerGroupIndex;
+                  var answerGroupIndex =
+                    classificationResult.answerGroupIndex;
                   var ruleIndex = classificationResult.ruleIndex;
                   if (answerGroupIndex !==
                     _state.interaction.answerGroups.length &&
                       _state.interaction.answerGroups[answerGroupIndex]
-                      .rules[ruleIndex].type !== RULE_TYPE_CLASSIFIER) {
+                        .rules[ruleIndex].type !== RULE_TYPE_CLASSIFIER) {
                     $scope.classification.answerGroupIndex = -1;
                   } else {
                     $scope.classification.answerGroupIndex = (
                       classificationResult.answerGroupIndex);
                   }
-                });
+                }
+              );
             };
           }]
       }).result.then(function(result) {
@@ -832,32 +833,33 @@ oppia.controller('StateResponses', [
 ]);
 
 oppia.filter('summarizeAnswerGroup', [
-    '$filter', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
-    function($filter, RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
-  return function(answerGroup, interactionId, answerChoices, shortenRule) {
-    var summary = '';
-    var outcome = answerGroup.outcome;
-    var hasFeedback = outcome.feedback.length > 0 && outcome.feedback[0];
+  '$filter', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
+  function($filter, RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
+    return function(answerGroup, interactionId, answerChoices, shortenRule) {
+      var summary = '';
+      var outcome = answerGroup.outcome;
+      var hasFeedback = outcome.feedback.length > 0 && outcome.feedback[0];
 
-    if (answerGroup.rules) {
-      var firstRule = $filter('convertToPlainText')(
-        $filter('parameterizeRuleDescription')(
-          answerGroup.rules[0], interactionId, answerChoices));
-      summary = 'Answer ' + firstRule;
+      if (answerGroup.rules) {
+        var firstRule = $filter('convertToPlainText')(
+          $filter('parameterizeRuleDescription')(
+            answerGroup.rules[0], interactionId, answerChoices));
+        summary = 'Answer ' + firstRule;
 
-      if (hasFeedback && shortenRule) {
-        summary = $filter('wrapTextWithEllipsis')(
-          summary, RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+        if (hasFeedback && shortenRule) {
+          summary = $filter('wrapTextWithEllipsis')(
+            summary, RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+        }
+        summary = '[' + summary + '] ';
       }
-      summary = '[' + summary + '] ';
-    }
 
-    if (hasFeedback) {
-      summary += $filter('convertToPlainText')(outcome.feedback[0]);
-    }
-    return summary;
-  };
-}]);
+      if (hasFeedback) {
+        summary += $filter('convertToPlainText')(outcome.feedback[0]);
+      }
+      return summary;
+    };
+  }
+]);
 
 oppia.filter('summarizeDefaultOutcome', [
   '$filter', 'INTERACTION_SPECS', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',

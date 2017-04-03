@@ -112,9 +112,10 @@ oppia.factory('explorationData', [
       resolveAnswers: function(stateName, resolvedAnswersList) {
         alertsService.clearWarnings();
         $http.put(
-            resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateName), {
-          resolved_answers: resolvedAnswersList
-        });
+          resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateName), {
+            resolved_answers: resolvedAnswersList
+          }
+        );
       },
       /**
        * Saves the exploration to the backend, and, on a success callback,
@@ -489,155 +490,158 @@ oppia.factory('changeListService', [
 
 // A data service that stores data about the rights for this exploration.
 oppia.factory('explorationRightsService', [
-    '$http', '$q', 'explorationData', 'alertsService',
-    function($http, $q, explorationData, alertsService) {
-  return {
-    init: function(
-        ownerNames, editorNames, viewerNames, status, clonedFrom,
-        isCommunityOwned, viewableIfPrivate) {
-      this.ownerNames = ownerNames;
-      this.editorNames = editorNames;
-      this.viewerNames = viewerNames;
-      this._status = status;
-      // This is null if the exploration was not cloned from anything,
-      // otherwise it is the exploration ID of the source exploration.
-      this._clonedFrom = clonedFrom;
-      this._isCommunityOwned = isCommunityOwned;
-      this._viewableIfPrivate = viewableIfPrivate;
-    },
-    clonedFrom: function() {
-      return this._clonedFrom;
-    },
-    isPrivate: function() {
-      return this._status === GLOBALS.ACTIVITY_STATUS_PRIVATE;
-    },
-    isPublic: function() {
-      return this._status === GLOBALS.ACTIVITY_STATUS_PUBLIC;
-    },
-    isPublicized: function() {
-      return this._status === GLOBALS.ACTIVITY_STATUS_PUBLICIZED;
-    },
-    isCloned: function() {
-      return Boolean(this._clonedFrom);
-    },
-    isCommunityOwned: function() {
-      return this._isCommunityOwned;
-    },
-    viewableIfPrivate: function() {
-      return this._viewableIfPrivate;
-    },
-    saveChangeToBackend: function(requestParams) {
-      var whenRightsSaved = $q.defer();
-      var that = this;
+  '$http', '$q', 'explorationData', 'alertsService',
+  function($http, $q, explorationData, alertsService) {
+    return {
+      init: function(
+          ownerNames, editorNames, viewerNames, status, clonedFrom,
+          isCommunityOwned, viewableIfPrivate) {
+        this.ownerNames = ownerNames;
+        this.editorNames = editorNames;
+        this.viewerNames = viewerNames;
+        this._status = status;
+        // This is null if the exploration was not cloned from anything,
+        // otherwise it is the exploration ID of the source exploration.
+        this._clonedFrom = clonedFrom;
+        this._isCommunityOwned = isCommunityOwned;
+        this._viewableIfPrivate = viewableIfPrivate;
+      },
+      clonedFrom: function() {
+        return this._clonedFrom;
+      },
+      isPrivate: function() {
+        return this._status === GLOBALS.ACTIVITY_STATUS_PRIVATE;
+      },
+      isPublic: function() {
+        return this._status === GLOBALS.ACTIVITY_STATUS_PUBLIC;
+      },
+      isPublicized: function() {
+        return this._status === GLOBALS.ACTIVITY_STATUS_PUBLICIZED;
+      },
+      isCloned: function() {
+        return Boolean(this._clonedFrom);
+      },
+      isCommunityOwned: function() {
+        return this._isCommunityOwned;
+      },
+      viewableIfPrivate: function() {
+        return this._viewableIfPrivate;
+      },
+      saveChangeToBackend: function(requestParams) {
+        var whenRightsSaved = $q.defer();
+        var that = this;
 
-      requestParams.version = explorationData.data.version;
-      var explorationRightsUrl = (
-        '/createhandler/rights/' + explorationData.explorationId);
-      $http.put(explorationRightsUrl, requestParams).then(function(response) {
-        var data = response.data;
-        alertsService.clearWarnings();
-        that.init(
-          data.rights.owner_names, data.rights.editor_names,
-          data.rights.viewer_names, data.rights.status,
-          data.rights.cloned_from, data.rights.community_owned,
-          data.rights.viewable_if_private);
-        whenRightsSaved.resolve();
-      });
-      return whenRightsSaved.promise;
-    },
-    saveModeratorChangeToBackend: function(action, emailBody) {
-      var that = this;
+        requestParams.version = explorationData.data.version;
+        var explorationRightsUrl = (
+          '/createhandler/rights/' + explorationData.explorationId);
+        $http.put(explorationRightsUrl, requestParams).then(function(response) {
+          var data = response.data;
+          alertsService.clearWarnings();
+          that.init(
+            data.rights.owner_names, data.rights.editor_names,
+            data.rights.viewer_names, data.rights.status,
+            data.rights.cloned_from, data.rights.community_owned,
+            data.rights.viewable_if_private);
+          whenRightsSaved.resolve();
+        });
+        return whenRightsSaved.promise;
+      },
+      saveModeratorChangeToBackend: function(action, emailBody) {
+        var that = this;
 
-      var explorationModeratorRightsUrl = (
-        '/createhandler/moderatorrights/' + explorationData.explorationId);
-      $http.put(explorationModeratorRightsUrl, {
-        action: action,
-        email_body: emailBody,
-        version: explorationData.data.version
-      }).then(function(response) {
-        var data = response.data;
-        alertsService.clearWarnings();
-        that.init(
-          data.rights.owner_names, data.rights.editor_names,
-          data.rights.viewer_names, data.rights.status,
-          data.rights.cloned_from, data.rights.community_owned,
-          data.rights.viewable_if_private);
-      });
-    }
-  };
-}]);
+        var explorationModeratorRightsUrl = (
+          '/createhandler/moderatorrights/' + explorationData.explorationId);
+        $http.put(explorationModeratorRightsUrl, {
+          action: action,
+          email_body: emailBody,
+          version: explorationData.data.version
+        }).then(function(response) {
+          var data = response.data;
+          alertsService.clearWarnings();
+          that.init(
+            data.rights.owner_names, data.rights.editor_names,
+            data.rights.viewer_names, data.rights.status,
+            data.rights.cloned_from, data.rights.community_owned,
+            data.rights.viewable_if_private);
+        });
+      }
+    };
+  }
+]);
 
 oppia.factory('explorationPropertyService', [
-    '$rootScope', '$log', 'changeListService', 'alertsService',
-    function($rootScope, $log, changeListService, alertsService) {
-  // Public base API for data services corresponding to exploration properties
-  // (title, category, etc.)
-  return {
-    init: function(value) {
-      if (this.propertyName === null) {
-        throw 'Exploration property name cannot be null.';
+  '$rootScope', '$log', 'changeListService', 'alertsService',
+  function($rootScope, $log, changeListService, alertsService) {
+    // Public base API for data services corresponding to exploration properties
+    // (title, category, etc.)
+    return {
+      init: function(value) {
+        if (this.propertyName === null) {
+          throw 'Exploration property name cannot be null.';
+        }
+
+        $log.info('Initializing exploration ' + this.propertyName + ':', value);
+
+        // The current value of the property (which may not have been saved to
+        // the frontend yet). In general, this will be bound directly to the UI.
+        this.displayed = angular.copy(value);
+        // The previous (saved-in-the-frontend) value of the property. Here,
+        // 'saved' means that this is the latest value of the property as
+        // determined by the frontend change list.
+        this.savedMemento = angular.copy(value);
+
+        $rootScope.$broadcast('explorationPropertyChanged');
+      },
+      // Returns whether the current value has changed from the memento.
+      hasChanged: function() {
+        return !angular.equals(this.savedMemento, this.displayed);
+      },
+      // The backend name for this property. THIS MUST BE SPECIFIED BY
+      // SUBCLASSES.
+      propertyName: null,
+      // Transforms the given value into a normalized form. THIS CAN BE
+      // OVERRIDDEN BY SUBCLASSES. The default behavior is to do nothing.
+      _normalize: function(value) {
+        return value;
+      },
+      // Validates the given value and returns a boolean stating whether it
+      // is valid or not. THIS CAN BE OVERRIDDEN BY SUBCLASSES. The default
+      // behavior is to always return true.
+      _isValid: function(value) {
+        return true;
+      },
+      // Normalizes the displayed value. Then, if the memento and the displayed
+      // value are the same, does nothing. Otherwise, creates a new entry in the
+      // change list, and updates the memento to the displayed value.
+      saveDisplayedValue: function() {
+        if (this.propertyName === null) {
+          throw 'Exploration property name cannot be null.';
+        }
+
+        this.displayed = this._normalize(this.displayed);
+        if (!this._isValid(this.displayed) || !this.hasChanged()) {
+          this.restoreFromMemento();
+          return;
+        }
+
+        if (angular.equals(this.displayed, this.savedMemento)) {
+          return;
+        }
+
+        alertsService.clearWarnings();
+        changeListService.editExplorationProperty(
+          this.propertyName, this.displayed, this.savedMemento);
+        this.savedMemento = angular.copy(this.displayed);
+
+        $rootScope.$broadcast('explorationPropertyChanged');
+      },
+      // Reverts the displayed value to the saved memento.
+      restoreFromMemento: function() {
+        this.displayed = angular.copy(this.savedMemento);
       }
-
-      $log.info('Initializing exploration ' + this.propertyName + ':', value);
-
-      // The current value of the property (which may not have been saved to the
-      // frontend yet). In general, this will be bound directly to the UI.
-      this.displayed = angular.copy(value);
-      // The previous (saved-in-the-frontend) value of the property. Here,
-      // 'saved' means that this is the latest value of the property as
-      // determined by the frontend change list.
-      this.savedMemento = angular.copy(value);
-
-      $rootScope.$broadcast('explorationPropertyChanged');
-    },
-    // Returns whether the current value has changed from the memento.
-    hasChanged: function() {
-      return !angular.equals(this.savedMemento, this.displayed);
-    },
-    // The backend name for this property. THIS MUST BE SPECIFIED BY SUBCLASSES.
-    propertyName: null,
-    // Transforms the given value into a normalized form. THIS CAN BE
-    // OVERRIDDEN BY SUBCLASSES. The default behavior is to do nothing.
-    _normalize: function(value) {
-      return value;
-    },
-    // Validates the given value and returns a boolean stating whether it
-    // is valid or not. THIS CAN BE OVERRIDDEN BY SUBCLASSES. The default
-    // behavior is to always return true.
-    _isValid: function(value) { // jscs:ignore disallowUnusedParams
-      return true;
-    },
-    // Normalizes the displayed value. Then, if the memento and the displayed
-    // value are the same, does nothing. Otherwise, creates a new entry in the
-    // change list, and updates the memento to the displayed value.
-    saveDisplayedValue: function() {
-      if (this.propertyName === null) {
-        throw 'Exploration property name cannot be null.';
-      }
-
-      this.displayed = this._normalize(this.displayed);
-      if (!this._isValid(this.displayed) || !this.hasChanged()) {
-        this.restoreFromMemento();
-        return;
-      }
-
-      if (angular.equals(this.displayed, this.savedMemento)) {
-        return;
-      }
-
-      alertsService.clearWarnings();
-      changeListService.editExplorationProperty(
-        this.propertyName, this.displayed, this.savedMemento);
-      this.savedMemento = angular.copy(this.displayed);
-
-      $rootScope.$broadcast('explorationPropertyChanged');
-    },
-    // Reverts the displayed value to the saved memento.
-    restoreFromMemento: function() {
-      this.displayed = angular.copy(this.savedMemento);
-    }
-  };
-}]);
+    };
+  }
+]);
 
 // A data service that stores the current exploration title so that it can be
 // displayed and edited in multiple places in the UI.
@@ -699,78 +703,83 @@ oppia.factory('explorationObjectiveService', [
 
 // A data service that stores the exploration language code.
 oppia.factory('explorationLanguageCodeService', [
-    'explorationPropertyService', function(explorationPropertyService) {
-  var child = Object.create(explorationPropertyService);
-  child.propertyName = 'language_code';
-  child.getAllLanguageCodes = function() {
-    return GLOBALS.ALL_LANGUAGE_CODES;
-  };
-  child.getCurrentLanguageDescription = function() {
-    for (var i = 0; i < GLOBALS.ALL_LANGUAGE_CODES.length; i++) {
-      if (GLOBALS.ALL_LANGUAGE_CODES[i].code === child.displayed) {
-        return GLOBALS.ALL_LANGUAGE_CODES[i].description;
+  'explorationPropertyService', function(explorationPropertyService) {
+    var child = Object.create(explorationPropertyService);
+    child.propertyName = 'language_code';
+    child.getAllLanguageCodes = function() {
+      return GLOBALS.ALL_LANGUAGE_CODES;
+    };
+    child.getCurrentLanguageDescription = function() {
+      for (var i = 0; i < GLOBALS.ALL_LANGUAGE_CODES.length; i++) {
+        if (GLOBALS.ALL_LANGUAGE_CODES[i].code === child.displayed) {
+          return GLOBALS.ALL_LANGUAGE_CODES[i].description;
+        }
       }
-    }
-  };
-  child._isValid = function(value) {
-    return GLOBALS.ALL_LANGUAGE_CODES.some(function(elt) {
-      return elt.code === value;
-    });
-  };
-  return child;
-}]);
+    };
+    child._isValid = function(value) {
+      return GLOBALS.ALL_LANGUAGE_CODES.some(function(elt) {
+        return elt.code === value;
+      });
+    };
+    return child;
+  }
+]);
 
 // A data service that stores the name of the exploration's initial state.
 // NOTE: This service does not perform validation. Users of this service
 // should ensure that new initial state names passed to the service are
 // valid.
 oppia.factory('explorationInitStateNameService', [
-    'explorationPropertyService', function(explorationPropertyService) {
-  var child = Object.create(explorationPropertyService);
-  child.propertyName = 'init_state_name';
-  return child;
-}]);
+  'explorationPropertyService', function(explorationPropertyService) {
+    var child = Object.create(explorationPropertyService);
+    child.propertyName = 'init_state_name';
+    return child;
+  }
+]);
 
 // A data service that stores tags for the exploration.
 oppia.factory('explorationTagsService', [
-    'explorationPropertyService',
-    function(explorationPropertyService) {
-  var child = Object.create(explorationPropertyService);
-  child.propertyName = 'tags';
-  child._normalize = function(value) {
-    for (var i = 0; i < value.length; i++) {
-      value[i] = value[i].trim().replace(/\s+/g, ' ');
-    }
-    // TODO(sll): Prevent duplicate tags from being added.
-    return value;
-  };
-  child._isValid = function(value) {
-    // Every tag should match the TAG_REGEX.
-    for (var i = 0; i < value.length; i++) {
-      var tagRegex = new RegExp(GLOBALS.TAG_REGEX);
-      if (!value[i].match(tagRegex)) {
-        return false;
+  'explorationPropertyService',
+  function(explorationPropertyService) {
+    var child = Object.create(explorationPropertyService);
+    child.propertyName = 'tags';
+    child._normalize = function(value) {
+      for (var i = 0; i < value.length; i++) {
+        value[i] = value[i].trim().replace(/\s+/g, ' ');
       }
-    }
+      // TODO(sll): Prevent duplicate tags from being added.
+      return value;
+    };
+    child._isValid = function(value) {
+      // Every tag should match the TAG_REGEX.
+      for (var i = 0; i < value.length; i++) {
+        var tagRegex = new RegExp(GLOBALS.TAG_REGEX);
+        if (!value[i].match(tagRegex)) {
+          return false;
+        }
+      }
 
-    return true;
-  };
-  return child;
-}]);
+      return true;
+    };
+    return child;
+  }
+]);
 
 oppia.factory('explorationParamSpecsService', [
-    'explorationPropertyService', function(explorationPropertyService) {
-  var child = Object.create(explorationPropertyService);
-  child.propertyName = 'param_specs';
-  return child;
-}]);
+  'explorationPropertyService', function(explorationPropertyService) {
+    var child = Object.create(explorationPropertyService);
+    child.propertyName = 'param_specs';
+    return child;
+  }
+]);
 
 oppia.factory('explorationParamChangesService', [
-    'explorationPropertyService', function(explorationPropertyService) {
-  var child = Object.create(explorationPropertyService);
-  child.propertyName = 'param_changes';
-  return child;
-}]);
+  'explorationPropertyService', function(explorationPropertyService) {
+    var child = Object.create(explorationPropertyService);
+    child.propertyName = 'param_changes';
+    return child;
+  }
+]);
 
 // Data service for keeping track of the exploration's states. Note that this
 // is unlike the other exploration property services, in that it keeps no
@@ -1092,7 +1101,7 @@ oppia.factory('explorationStatesService', [
         if (!validatorsService.isValidStateName(newStateName, true)) {
           return;
         }
-        if (!!_states[newStateName]) {
+        if (_states[newStateName]) {
           alertsService.addWarning('A state with this name already exists.');
           return;
         }
@@ -1187,7 +1196,7 @@ oppia.factory('statePropertyService', [
       // Validates the given value and returns a boolean stating whether it
       // is valid or not. THIS CAN BE OVERRIDDEN BY SUBCLASSES. The default
       // behavior is to always return true.
-      _isValid: function(value) { // jscs:ignore disallowUnusedParams
+      _isValid: function(value) {
         return true;
       },
       // Creates a new entry in the change list, and updates the memento to the
@@ -1225,39 +1234,43 @@ oppia.factory('statePropertyService', [
 // A data service that stores the current list of state parameter changes.
 // TODO(sll): Add validation.
 oppia.factory('stateParamChangesService', [
-    'statePropertyService', function(statePropertyService) {
-  var child = Object.create(statePropertyService);
-  child.setterMethodKey = 'saveStateParamChanges';
-  return child;
-}]);
+  'statePropertyService', function(statePropertyService) {
+    var child = Object.create(statePropertyService);
+    child.setterMethodKey = 'saveStateParamChanges';
+    return child;
+  }
+]);
 
 // A data service that stores the current interaction id.
 // TODO(sll): Add validation.
 oppia.factory('stateInteractionIdService', [
-    'statePropertyService', function(statePropertyService) {
-  var child = Object.create(statePropertyService);
-  child.setterMethodKey = 'saveInteractionId';
-  return child;
-}]);
+  'statePropertyService', function(statePropertyService) {
+    var child = Object.create(statePropertyService);
+    child.setterMethodKey = 'saveInteractionId';
+    return child;
+  }
+]);
 
 // A data service that stores the current state customization args for the
 // interaction. This is a dict mapping customization arg names to dicts of the
 // form {value: customization_arg_value}.
 // TODO(sll): Add validation.
 oppia.factory('stateCustomizationArgsService', [
-    'statePropertyService', function(statePropertyService) {
-  var child = Object.create(statePropertyService);
-  child.setterMethodKey = 'saveInteractionCustomizationArgs';
-  return child;
-}]);
+  'statePropertyService', function(statePropertyService) {
+    var child = Object.create(statePropertyService);
+    child.setterMethodKey = 'saveInteractionCustomizationArgs';
+    return child;
+  }
+]);
 
 // A data service that stores the current interaction fallbacks.
 oppia.factory('stateFallbacksService', [
-    'statePropertyService', function(statePropertyService) {
-  var child = Object.create(statePropertyService);
-  child.setterMethodKey = 'saveFallbacks';
-  return child;
-}]);
+  'statePropertyService', function(statePropertyService) {
+    var child = Object.create(statePropertyService);
+    child.setterMethodKey = 'saveFallbacks';
+    return child;
+  }
+]);
 
 // Data service for keeping track of gadget data and location across panels.
 oppia.factory('explorationGadgetsService', [
@@ -1651,8 +1664,8 @@ oppia.factory('explorationGadgetsService', [
 ]);
 
 // A service that returns the frontend representation of a newly-added state.
-oppia.factory('newStateTemplateService',
-  ['StateObjectFactory', function(StateObjectFactory) {
+oppia.factory('newStateTemplateService', [
+  'StateObjectFactory', function(StateObjectFactory) {
     return {
       // Returns a template for the new state with the given state name,
       // changing the default rule destination to the new state name in
@@ -2062,7 +2075,7 @@ oppia.factory('explorationWarningsService', [
             'The following states have errors: ' +
             Object.keys(stateWarnings).join(', ') + '.')
         });
-      };
+      }
 
       var statesWithAnswerGroupsWithEmptyClassifiers = (
         _getStatesAndAnswerGroupsWithEmptyClassifiers());
@@ -2346,7 +2359,7 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
                   angular.element('<div>Deleted default outcome</div>')
                     .addClass('state-edit-desc'));
               }
-          };
+          }
       }
     });
 
@@ -2446,7 +2459,8 @@ oppia.factory('autosaveInfoModalsService', [
 // Service registering analytics events for the editor for events which are
 // only logged when they happen after the editor is opened for the first time
 // for an exploration.
-oppia.factory('editorFirstTimeEventsService', ['siteAnalyticsService',
+oppia.factory('editorFirstTimeEventsService', [
+  'siteAnalyticsService',
   function(siteAnalyticsService) {
     var explorationId = null;
     var shouldRegisterEvents = false;

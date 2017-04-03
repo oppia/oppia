@@ -501,35 +501,36 @@ describe('Compare versions service', function() {
     });
 
     it('should add new state with same name as old name of renamed state',
-        function() {
-      $httpBackend.expect('GET', '/createhandler/data/0?v=5')
-        .respond(_getStatesData(testExplorationData1[4]));
-      $httpBackend.expect('GET', '/createhandler/data/0?v=8')
-        .respond(_getStatesData(testExplorationData1[7]));
-      vts.init(testSnapshots1);
-      var nodeData = null;
-      cvs.getDiffGraphData(5, 8).then(function(data) {
-        nodeData = data.nodes;
-      });
-      $httpBackend.flush();
-      expect(nodeData).toEqual({
-        1: {
-          newestStateName: 'A',
-          stateProperty: 'unchanged',
-          originalStateName: 'A'
-        },
-        2: {
-          newestStateName: 'C',
-          stateProperty: 'changed',
-          originalStateName: 'B'
-        },
-        3: {
-          newestStateName: 'B',
-          stateProperty: 'added',
-          originalStateName: 'B'
-        }
-      });
-    });
+      function() {
+        $httpBackend.expect('GET', '/createhandler/data/0?v=5')
+          .respond(_getStatesData(testExplorationData1[4]));
+        $httpBackend.expect('GET', '/createhandler/data/0?v=8')
+          .respond(_getStatesData(testExplorationData1[7]));
+        vts.init(testSnapshots1);
+        var nodeData = null;
+        cvs.getDiffGraphData(5, 8).then(function(data) {
+          nodeData = data.nodes;
+        });
+        $httpBackend.flush();
+        expect(nodeData).toEqual({
+          1: {
+            newestStateName: 'A',
+            stateProperty: 'unchanged',
+            originalStateName: 'A'
+          },
+          2: {
+            newestStateName: 'C',
+            stateProperty: 'changed',
+            originalStateName: 'B'
+          },
+          3: {
+            newestStateName: 'B',
+            stateProperty: 'added',
+            originalStateName: 'B'
+          }
+        });
+      }
+    );
 
     it('should not include added, then deleted state', function() {
       $httpBackend.expect('GET', '/createhandler/data/0?v=7')
@@ -669,35 +670,36 @@ describe('Compare versions service', function() {
     });
 
     it('should mark states correctly when a series of changes are applied',
-        function() {
-      $httpBackend.expect('GET', '/createhandler/data/0?v=1')
-        .respond(_getStatesData(testExplorationData1[0]));
-      $httpBackend.expect('GET', '/createhandler/data/0?v=13')
-        .respond(_getStatesData(testExplorationData1[12]));
-      vts.init(testSnapshots1);
-      var nodeData = null;
-      cvs.getDiffGraphData(1, 13).then(function(data) {
-        nodeData = data.nodes;
-      });
-      $httpBackend.flush();
-      expect(nodeData).toEqual({
-        1: {
-          newestStateName: 'D',
-          stateProperty: 'deleted',
-          originalStateName: 'A'
-        },
-        2: {
-          newestStateName: 'C',
-          stateProperty: 'added',
-          originalStateName: 'B'
-        },
-        3: {
-          newestStateName: 'B',
-          stateProperty: 'added',
-          originalStateName: 'B'
-        }
-      });
-    });
+      function() {
+        $httpBackend.expect('GET', '/createhandler/data/0?v=1')
+          .respond(_getStatesData(testExplorationData1[0]));
+        $httpBackend.expect('GET', '/createhandler/data/0?v=13')
+          .respond(_getStatesData(testExplorationData1[12]));
+        vts.init(testSnapshots1);
+        var nodeData = null;
+        cvs.getDiffGraphData(1, 13).then(function(data) {
+          nodeData = data.nodes;
+        });
+        $httpBackend.flush();
+        expect(nodeData).toEqual({
+          1: {
+            newestStateName: 'D',
+            stateProperty: 'deleted',
+            originalStateName: 'A'
+          },
+          2: {
+            newestStateName: 'C',
+            stateProperty: 'added',
+            originalStateName: 'B'
+          },
+          3: {
+            newestStateName: 'B',
+            stateProperty: 'added',
+            originalStateName: 'B'
+          }
+        });
+      }
+    );
 
     var testSnapshots2 = [{
       commit_type: 'create',
@@ -860,56 +862,58 @@ describe('Compare versions service', function() {
     });
 
     it('should mark states correctly when there is 1 reversion to before v1',
-        function() {
-      $httpBackend.expect('GET', '/createhandler/data/0?v=3')
-        .respond(_getStatesData(testExplorationData2[2]));
-      $httpBackend.expect('GET', '/createhandler/data/0?v=5')
-        .respond(_getStatesData(testExplorationData2[4]));
-      vts.init(testSnapshots2);
-      var nodeData = null;
-      cvs.getDiffGraphData(3, 5).then(function(data) {
-        nodeData = data.nodes;
-      });
-      $httpBackend.flush();
-      expect(nodeData).toEqual({
-        1: {
-          newestStateName: 'A',
-          stateProperty: 'unchanged',
-          originalStateName: 'A'
-        },
-        2: {
-          newestStateName: 'B',
-          stateProperty: 'deleted',
-          originalStateName: 'C'
-        }
-      });
-    });
+      function() {
+        $httpBackend.expect('GET', '/createhandler/data/0?v=3')
+          .respond(_getStatesData(testExplorationData2[2]));
+        $httpBackend.expect('GET', '/createhandler/data/0?v=5')
+          .respond(_getStatesData(testExplorationData2[4]));
+        vts.init(testSnapshots2);
+        var nodeData = null;
+        cvs.getDiffGraphData(3, 5).then(function(data) {
+          nodeData = data.nodes;
+        });
+        $httpBackend.flush();
+        expect(nodeData).toEqual({
+          1: {
+            newestStateName: 'A',
+            stateProperty: 'unchanged',
+            originalStateName: 'A'
+          },
+          2: {
+            newestStateName: 'B',
+            stateProperty: 'deleted',
+            originalStateName: 'C'
+          }
+        });
+      }
+    );
 
     it('should mark states correctly when compared version is a reversion',
-        function() {
-      $httpBackend.expect('GET', '/createhandler/data/0?v=4')
-        .respond(_getStatesData(testExplorationData2[3]));
-      $httpBackend.expect('GET', '/createhandler/data/0?v=5')
-        .respond(_getStatesData(testExplorationData2[4]));
-      vts.init(testSnapshots2);
-      var nodeData = null;
-      cvs.getDiffGraphData(4, 5).then(function(data) {
-        nodeData = data.nodes;
-      });
-      $httpBackend.flush();
-      expect(nodeData).toEqual({
-        1: {
-          newestStateName: 'A',
-          stateProperty: 'unchanged',
-          originalStateName: 'A'
-        },
-        2: {
-          newestStateName: 'B',
-          stateProperty: 'deleted',
-          originalStateName: 'B'
-        }
-      });
-    });
+      function() {
+        $httpBackend.expect('GET', '/createhandler/data/0?v=4')
+          .respond(_getStatesData(testExplorationData2[3]));
+        $httpBackend.expect('GET', '/createhandler/data/0?v=5')
+          .respond(_getStatesData(testExplorationData2[4]));
+        vts.init(testSnapshots2);
+        var nodeData = null;
+        cvs.getDiffGraphData(4, 5).then(function(data) {
+          nodeData = data.nodes;
+        });
+        $httpBackend.flush();
+        expect(nodeData).toEqual({
+          1: {
+            newestStateName: 'A',
+            stateProperty: 'unchanged',
+            originalStateName: 'A'
+          },
+          2: {
+            newestStateName: 'B',
+            stateProperty: 'deleted',
+            originalStateName: 'B'
+          }
+        });
+      }
+    );
 
     it('should mark states correctly when there are 2 reversions', function() {
       $httpBackend.expect('GET', '/createhandler/data/0?v=5')

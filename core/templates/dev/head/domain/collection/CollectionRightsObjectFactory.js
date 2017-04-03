@@ -18,7 +18,7 @@
  */
 
 oppia.factory('CollectionRightsObjectFactory', [
-    function() {
+  function() {
     var CollectionRights = function(collectionRightsObject) {
       this._collectionId = collectionRightsObject.collection_id;
       this._canEdit = collectionRightsObject.can_edit;

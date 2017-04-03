@@ -141,6 +141,7 @@ describe('Full exploration editor', function() {
         expectAvailableDestinationsToBe(['second', 'final card']);
       editor.addResponse('NumericInput', null, 'final card', false,
         'IsGreaterThan', 2);
+      // eslint-disable-next-line dot-notation
       editor.ResponseEditor(0).delete();
 
       // Setup a terminating state

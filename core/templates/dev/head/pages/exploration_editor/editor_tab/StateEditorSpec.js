@@ -184,38 +184,40 @@ describe('State Editor controller', function() {
     });
 
     it('should check that content edits are saved correctly',
-       function() {
-      ecs.setActiveStateName('Third State');
-      expect(cls.getChangeList()).toEqual([]);
-      scope.openStateContentEditor();
-      scope.content = scope.getContent('babababa');
-      scope.saveTextContent();
-      expect(cls.getChangeList().length).toBe(1);
-      expect(cls.getChangeList()[0].new_value[0].value).toEqual('babababa');
-      expect(cls.getChangeList()[0].old_value[0].value).toEqual(
-        'This is some content.');
+      function() {
+        ecs.setActiveStateName('Third State');
+        expect(cls.getChangeList()).toEqual([]);
+        scope.openStateContentEditor();
+        scope.content = scope.getContent('babababa');
+        scope.saveTextContent();
+        expect(cls.getChangeList().length).toBe(1);
+        expect(cls.getChangeList()[0].new_value[0].value).toEqual('babababa');
+        expect(cls.getChangeList()[0].old_value[0].value).toEqual(
+          'This is some content.');
 
-      scope.openStateContentEditor();
-      scope.content = scope.getContent(
-        'And now for something completely different.'
-      );
-      scope.saveTextContent();
-      expect(cls.getChangeList().length).toBe(2);
-      expect(cls.getChangeList()[1].new_value[0].value)
-        .toEqual('And now for something completely different.');
-      expect(cls.getChangeList()[1].old_value[0].value).toEqual('babababa');
-    });
+        scope.openStateContentEditor();
+        scope.content = scope.getContent(
+          'And now for something completely different.'
+        );
+        scope.saveTextContent();
+        expect(cls.getChangeList().length).toBe(2);
+        expect(cls.getChangeList()[1].new_value[0].value)
+          .toEqual('And now for something completely different.');
+        expect(cls.getChangeList()[1].old_value[0].value).toEqual('babababa');
+      }
+    );
 
     it('should not save any changes to content when an edit is cancelled',
-       function() {
-      ecs.setActiveStateName('Third State');
-      scope.initStateEditor();
-      var contentBeforeEdit = angular.copy(scope.content);
-      scope.content = scope.getContent('Test Content');
-      scope.cancelEdit();
-      expect(scope.contentEditorIsOpen).toBe(false);
-      expect(scope.content).toEqual(contentBeforeEdit);
-    });
+      function() {
+        ecs.setActiveStateName('Third State');
+        scope.initStateEditor();
+        var contentBeforeEdit = angular.copy(scope.content);
+        scope.content = scope.getContent('Test Content');
+        scope.cancelEdit();
+        expect(scope.contentEditorIsOpen).toBe(false);
+        expect(scope.content).toEqual(contentBeforeEdit);
+      }
+    );
   });
 
   describe('TrainingDataService', function() {
@@ -346,34 +348,35 @@ describe('State Editor controller', function() {
     });
 
     it('should be able to train answer groups and the default response',
-        function() {
-      // Training the first answer of a group should add a new classifier.
-      tds.trainAnswerGroup(0, 'text answer');
-      var state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].rules[1]).toEqual(
-        rof.createNew(RULE_TYPE_CLASSIFIER, {
-          training_data: ['text answer']
-        })
-      );
+      function() {
+        // Training the first answer of a group should add a new classifier.
+        tds.trainAnswerGroup(0, 'text answer');
+        var state = ess.getState('State');
+        expect(state.interaction.answerGroups[0].rules[1]).toEqual(
+          rof.createNew(RULE_TYPE_CLASSIFIER, {
+            training_data: ['text answer']
+          })
+        );
 
-      // Training a second answer to the same group should append the answer to
-      // the training data.
-      tds.trainAnswerGroup(0, 'second answer');
-      state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].rules[1]).toEqual(
-        rof.createNew(RULE_TYPE_CLASSIFIER, {
-          training_data: ['text answer', 'second answer']
-        })
-      );
+        // Training a second answer to the same group should append the answer
+        // to the training data.
+        tds.trainAnswerGroup(0, 'second answer');
+        state = ess.getState('State');
+        expect(state.interaction.answerGroups[0].rules[1]).toEqual(
+          rof.createNew(RULE_TYPE_CLASSIFIER, {
+            training_data: ['text answer', 'second answer']
+          })
+        );
 
-      // Training the default response should add information to the confirmed
-      // unclassified answers.
-      tds.trainDefaultResponse('third answer');
-      state = ess.getState('State');
-      expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
-        'third answer'
-      ]);
-    });
+        // Training the default response should add information to the confirmed
+        // unclassified answers.
+        tds.trainDefaultResponse('third answer');
+        state = ess.getState('State');
+        expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
+          'third answer'
+        ]);
+      }
+    );
 
     it('should be able to retrain answers between answer groups and the ' +
         'default outcome', function() {
