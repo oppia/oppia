@@ -42,7 +42,7 @@ oppia.controller('StateFallbacks', [
     });
 
     $scope.getFallbackSummary = function(fallback) {
-      var numSubmits = fallback.trigger.customization_args.num_submits.value;
+      var numSubmits = fallback.trigger.customizationArgs.num_submits.value;
       var fallbackDescription = (
         '[' + numSubmits +
         ' unsuccessful attempt' + (numSubmits !== 1 ? 's' : '') + '] ');

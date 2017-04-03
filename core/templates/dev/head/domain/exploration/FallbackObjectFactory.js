@@ -18,8 +18,8 @@
  */
 
 oppia.factory('FallbackObjectFactory', [
-  'OutcomeObjectFactory',
-  function(OutcomeObjectFactory) {
+  'OutcomeObjectFactory', 'TriggerObjectFactory',
+  function(OutcomeObjectFactory, TriggerObjectFactory) {
     var Fallback = function(trigger, outcome) {
       this.trigger = trigger;
       this.outcome = outcome;
@@ -27,28 +27,30 @@ oppia.factory('FallbackObjectFactory', [
 
     Fallback.prototype.toBackendDict = function() {
       return {
-        trigger: this.trigger,
+        trigger: this.trigger.toBackendDict(),
         outcome: this.outcome.toBackendDict()
       };
     };
 
     Fallback.createFromBackendDict = function(fallbackBackendDict) {
       return new Fallback(
-        fallbackBackendDict.trigger,
+        TriggerObjectFactory.createFromBackendDict(
+          fallbackBackendDict.trigger),
         OutcomeObjectFactory.createFromBackendDict(
           fallbackBackendDict.outcome));
     };
 
     Fallback.createDefault = function(dest) {
       return new Fallback(
-        {
-          trigger_type: 'NthResubmission',
-          customization_args: {
-            num_submits: {
-              value: 3
+        TriggerObjectFactory.createFromBackendDict(
+          {
+            trigger_type: 'NthResubmission',
+            customization_args: {
+              num_submits: {
+                value: 3
+              }
             }
-          }
-        },
+          }),
         OutcomeObjectFactory.createNew(dest, [], []));
     };
 
