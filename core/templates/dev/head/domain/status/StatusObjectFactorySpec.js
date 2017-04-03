@@ -17,14 +17,12 @@
  */
 
 describe('StatusObjectFactory', function() {
-
   beforeEach(module('oppia'));
 
   var status, StatusObjectFactory;
 
   beforeEach(inject(function($injector) {
     StatusObjectFactory = $injector.get('StatusObjectFactory');
-    // console.log("hello " + StatusObjectFactory);
   }));
 
   it('should create success status', function() {
@@ -34,10 +32,8 @@ describe('StatusObjectFactory', function() {
   });
 
   it('should create failure status', function() {
-    // console.log("hello " + StatusObjectFactory);
     status = StatusObjectFactory.createFailure('Failure status test');
     expect(status.getValue()).toBe(false);
     expect(status.getReason()).toBe('Failure status test');
   });
-
 });

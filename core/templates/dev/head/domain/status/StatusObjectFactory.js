@@ -18,7 +18,6 @@
  */
 
 oppia.factory('StatusObjectFactory', [function() {
-
   var Status = function(reason, value) {
     this._reason = reason;
     this._value = value;
