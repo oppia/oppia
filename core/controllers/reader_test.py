@@ -15,7 +15,6 @@
 """Tests for the page that allows learners to play through an exploration."""
 
 import os
-import yaml
 
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -120,43 +119,51 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
         yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                                  '../tests/data/string_classifier_test.yaml')
         with open(yaml_path, 'r') as yaml_file:
-            self.yaml_dict = yaml.load(yaml_file)
+            self.yaml_content = yaml_file.read()
 
         self.login(self.VIEWER_EMAIL)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
         # Load demo exploration.
         self.exp_id = '0'
+        self.title = 'Testing String Classifier'
+        self.category = 'Test'
         exp_services.delete_demo(self.exp_id)
         exp_services.load_demo(self.exp_id)
 
         # Creating the exploration domain object.
-        self.yaml_dict['id'] = 20
-        self.exploration = exp_domain.Exploration.from_dict(self.yaml_dict)
+        self.exploration = exp_domain.Exploration.from_untitled_yaml(
+            self.exp_id,
+            self.title,
+            self.category,
+            self.yaml_content)
 
     def test_classification_handler(self):
         """Test the classification handler for a right answer."""
 
         with self.enable_string_classifier:
             # Testing the handler for a correct answer.
-            old_state = self.exploration.states['Home'].to_dict()
+            old_state_dict = self.exploration.states['Home'].to_dict()
             answer = 'Permutations'
-            params = {'old_state' : old_state, 'answer' : answer}
+            params = {}
             res = self.post_json('/explorehandler/classify/%s' % self.exp_id,
-                                 params)
+                                 {'params' : params,
+                                  'old_state_dict' : old_state_dict,
+                                  'answer' : answer})
             self.assertEqual(res['outcome']['feedback'][0],
                              '<p>Detected permutation.</p>')
 
             # Testing the handler for a wrong answer.
-            old_state = self.exploration.states['Home'].to_dict()
+            old_state_dict = self.exploration.states['Home'].to_dict()
             answer = 'Shigatsu wa kimi no uso'
-            params = {'old_state' : old_state, 'answer' : answer}
+            params = {}
             res = self.post_json('/explorehandler/classify/%s' % self.exp_id,
-                                 params)
+                                 {'params' : params,
+                                  'old_state_dict' : old_state_dict,
+                                  'answer' : answer})
             self.assertEqual(res['outcome']['feedback'][0],
                              '<p>Detected unsure.</p>')
             self.logout()
-
 
 
 class FeedbackIntegrationTest(test_utils.GenericTestBase):
