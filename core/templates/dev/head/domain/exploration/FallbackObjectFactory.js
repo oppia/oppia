@@ -42,15 +42,14 @@ oppia.factory('FallbackObjectFactory', [
 
     Fallback.createDefault = function(dest) {
       return new Fallback(
-        TriggerObjectFactory.createFromBackendDict(
-          {
-            trigger_type: 'NthResubmission',
-            customization_args: {
-              num_submits: {
-                value: 3
-              }
+        TriggerObjectFactory.createFromBackendDict({
+          trigger_type: 'NthResubmission',
+          customization_args: {
+            num_submits: {
+              value: 3
             }
-          }),
+          }
+        }),
         OutcomeObjectFactory.createNew(dest, [], []));
     };
 
