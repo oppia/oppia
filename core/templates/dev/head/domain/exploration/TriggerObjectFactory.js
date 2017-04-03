@@ -38,4 +38,3 @@ oppia.factory('TriggerObjectFactory', [function() {
 
   return Trigger;
 }]);
-
