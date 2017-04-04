@@ -46,10 +46,6 @@ describe('Simple Editor Manager Service', function() {
     $provide.value('explorationData', mockExplorationData);
   }));
 
-  beforeEach(inject(function() {
-    GLOBALS.NEW_STATE_TEMPLATE = constants.NEW_STATE_TEMPLATE;
-  }));
-
   beforeEach(inject(function($injector) {
     simpleEditorManagerService = $injector.get('SimpleEditorManagerService');
     questionObjectFactory = $injector.get('QuestionObjectFactory');
