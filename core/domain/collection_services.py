@@ -605,6 +605,22 @@ def apply_change_list(collection_id, change_list):
                 # latest schema version. As a result, simply resaving the
                 # collection is sufficient to apply the schema migration.
                 continue
+            elif change.cmd == collection.CMD_ADD_COLLECTION_SKILL:
+                collection.add_skill(change.skill_id)
+            elif change.cmd == collection.CMD_DELETE_COLLECTION_SKILL:
+                collection.delete_skill(change.skill_id)
+            elif change.cmd == collection.CMD_EDIT_COLLECTION_SKILL_PROPERTY:
+                collection_skill = collection.get_skill(change.skill_id)
+                if (change.property_name ==
+                        collection_domain.COLLECTION_SKILL_PROPERTY_NAME):
+                    collection_skill.set_name(change.new_value)
+                elif (change.property_name ==
+                      collection_domain.COLLECTION_SKILL_PROPERTY_ADD_QUESTION):
+                    collection_skill.add_question(change.new_value)
+                elif (change.property_name ==
+                      collection_domain.COLLECTION_SKILL_PROPERTY_DELETE_QUESTION): # pylint: disable=line-too-long
+                    collection_skill.delete_question(change.new_value)
+
         return collection
 
     except Exception as e:
