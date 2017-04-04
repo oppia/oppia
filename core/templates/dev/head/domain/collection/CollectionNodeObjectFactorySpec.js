@@ -96,14 +96,15 @@ describe('Collection node object factory', function() {
   });
 
   it('should be able to create a new collection node by exploration ID',
-      function() {
-    var collectionNode = CollectionNodeObjectFactory.createFromExplorationId(
-      'exp_id0');
-    var prerequisiteSkillList = collectionNode.getPrerequisiteSkillList();
-    var acquiredSkillList = collectionNode.getAcquiredSkillList();
-    expect(collectionNode.getExplorationId()).toEqual('exp_id0');
-    expect(prerequisiteSkillList.getSkillCount()).toEqual(0);
-    expect(acquiredSkillList.getSkillCount()).toEqual(0);
-    expect(collectionNode.doesExplorationExist()).toBe(false);
-  });
+    function() {
+      var collectionNode = CollectionNodeObjectFactory.createFromExplorationId(
+        'exp_id0');
+      var prerequisiteSkillList = collectionNode.getPrerequisiteSkillList();
+      var acquiredSkillList = collectionNode.getAcquiredSkillList();
+      expect(collectionNode.getExplorationId()).toEqual('exp_id0');
+      expect(prerequisiteSkillList.getSkillCount()).toEqual(0);
+      expect(acquiredSkillList.getSkillCount()).toEqual(0);
+      expect(collectionNode.doesExplorationExist()).toBe(false);
+    }
+  );
 });

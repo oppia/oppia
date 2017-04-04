@@ -22,7 +22,7 @@ import pkgutil
 import feconf
 
 
-class ClassifierRegistry(object):
+class Registry(object):
     """Registry of all classification classes."""
 
     # Dict mapping algorithm IDs to instances of the classification classes.

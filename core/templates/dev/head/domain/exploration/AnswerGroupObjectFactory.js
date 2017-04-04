@@ -17,42 +17,45 @@
  * domain objects.
  */
 
-oppia.factory('AnswerGroupObjectFactory', ['RuleObjectFactory',
-  function(RuleObjectFactory) {
-  var AnswerGroup = function(rules, outcome, correct) {
-    this.rules = rules;
-    this.outcome = outcome;
-    this.correct = correct;
-  };
-
-  AnswerGroup.prototype.toBackendDict = function() {
-    return {
-      rule_specs: this.rules.map(function(rule) {
-        return rule.toBackendDict();
-      }),
-      outcome: this.outcome,
-      correct: this.correct
+oppia.factory('AnswerGroupObjectFactory', [
+  'RuleObjectFactory', 'OutcomeObjectFactory',
+  function(RuleObjectFactory, OutcomeObjectFactory) {
+    var AnswerGroup = function(rules, outcome, correct) {
+      this.rules = rules;
+      this.outcome = outcome;
+      this.correct = correct;
     };
-  };
 
-  // Static class methods. Note that "this" is not available in
-  // static contexts.
-  AnswerGroup.createNew = function(rules, outcome, correct) {
-    return new AnswerGroup(rules, outcome, correct);
-  };
+    AnswerGroup.prototype.toBackendDict = function() {
+      return {
+        rule_specs: this.rules.map(function(rule) {
+          return rule.toBackendDict();
+        }),
+        outcome: this.outcome.toBackendDict(),
+        correct: this.correct
+      };
+    };
 
-  AnswerGroup.createFromBackendDict = function(answerGroupBackendDict) {
-    return new AnswerGroup(
-      generateRulesFromBackend(answerGroupBackendDict.rule_specs),
-      answerGroupBackendDict.outcome,
-      false);
-  };
+    // Static class methods. Note that "this" is not available in
+    // static contexts.
+    AnswerGroup.createNew = function(rules, outcome, correct) {
+      return new AnswerGroup(rules, outcome, correct);
+    };
 
-  var generateRulesFromBackend = function(ruleBackendDicts) {
-    return ruleBackendDicts.map(function(ruleBackendDict) {
-      return RuleObjectFactory.createFromBackendDict(ruleBackendDict);
-    });
-  };
+    AnswerGroup.createFromBackendDict = function(answerGroupBackendDict) {
+      return new AnswerGroup(
+        generateRulesFromBackend(answerGroupBackendDict.rule_specs),
+        OutcomeObjectFactory.createFromBackendDict(
+          answerGroupBackendDict.outcome),
+        false);
+    };
 
-  return AnswerGroup;
-}]);
+    var generateRulesFromBackend = function(ruleBackendDicts) {
+      return ruleBackendDicts.map(function(ruleBackendDict) {
+        return RuleObjectFactory.createFromBackendDict(ruleBackendDict);
+      });
+    };
+
+    return AnswerGroup;
+  }
+]);

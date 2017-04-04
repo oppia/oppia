@@ -39,17 +39,17 @@ var expectComponentDetailsToMatch = function(elem, tabArray) {
   elem.element(by.tagName('ul')).all(by.tagName('li')).then(
     function(titleElems) {
       expect(titleElems.length).toEqual(tabArray.length);
-      elem.element(by.css('.tab-content')).all(by.xpath('./*')).
-          then(function(contentElems) {
-        for (var i = 0; i < tabArray.length; i++) {
-          // Click on each tab in turn to check its contents
-          expect(titleElems[i].getText()).toMatch(tabArray[i].title);
-          titleElems[i].click();
-          forms.expectRichText(
-            contentElems[i].element(by.xpath('./span'))
-          ).toMatch(tabArray[i].content);
-        }
-      });
+      elem.element(by.css('.tab-content')).all(by.xpath('./*'))
+        .then(function(contentElems) {
+          for (var i = 0; i < tabArray.length; i++) {
+            // Click on each tab in turn to check its contents
+            expect(titleElems[i].getText()).toMatch(tabArray[i].title);
+            titleElems[i].click();
+            forms.expectRichText(
+              contentElems[i].element(by.xpath('./span'))
+            ).toMatch(tabArray[i].content);
+          }
+        });
     }
   );
 };

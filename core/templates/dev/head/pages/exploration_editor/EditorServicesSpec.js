@@ -240,6 +240,7 @@ describe('Change list service', function() {
             value: 'Tips'
           }
         },
+        panel: 'right',
         visible_in_states: ['newState1']
       };
       cls.addGadget(gadgetDict);
@@ -262,8 +263,10 @@ describe('Change list service', function() {
               value: 'Tips'
             }
           },
+          panel: 'right',
           visible_in_states: ['newState1']
-        }
+        },
+        panel: 'right'
       }]);
       expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
@@ -854,7 +857,7 @@ describe('New state template service', function() {
             defaultOutcome: {
               dest: NEW_STATE_NAME,
               feedback: [],
-              param_changes: []
+              paramChanges: []
             },
             fallbacks: [],
             id: 'TextInput'

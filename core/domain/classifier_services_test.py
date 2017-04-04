@@ -16,21 +16,24 @@
 
 import os
 
+from core.domain import classifier_domain
 from core.domain import classifier_registry
 from core.domain import classifier_services
 from core.domain import exp_services
+from core.platform import models
 from core.tests import test_utils
 import feconf
 import utils
 
+(classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
+
 class ClassifierServicesTests(test_utils.GenericTestBase):
-    """Test reader.classify using the sample explorations.
+    """Test "classify" using the sample explorations.
 
     Since the end to end tests cover correct classification, and frontend tests
     test hard rules, ReaderClassifyTests is only checking that the string
     classifier is actually called.
     """
-
     def setUp(self):
         super(ClassifierServicesTests, self).setUp()
         self._init_classify_inputs('16')
@@ -49,7 +52,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             exp_services.get_exploration_by_id(exploration_id).states['Home'])
 
     def _is_string_classifier_called(self, answer):
-        sc = classifier_registry.ClassifierRegistry.get_classifier_by_id(
+        sc = classifier_registry.Registry.get_classifier_by_id(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])
         string_classifier_predict = (
             sc.__class__.predict)
@@ -71,6 +74,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
     def test_string_classifier_classification(self):
         """All these responses trigger the string classifier."""
+
         with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
             self.assertTrue(
                 self._is_string_classifier_called(
@@ -83,3 +87,78 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
                 self._is_string_classifier_called('abc acb bac bca cbb cba'))
             self.assertTrue(
                 self._is_string_classifier_called('dunno, just guessed'))
+
+    def test_retrieval_of_classifiers(self):
+        """Test the get_classifier_by_id method."""
+
+        with self.assertRaisesRegexp(Exception, (
+            "Entity for class ClassifierModel with id fake_id not found")):
+            classifier_services.get_classifier_by_id('fake_id')
+
+        exp_id = u'1'
+        state = 'Home'
+        classifier_id = classifier_models.ClassifierModel.create(
+            exp_id, 1, state,
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'], [], 1)
+        classifier = classifier_services.get_classifier_by_id(
+            classifier_id)
+        self.assertEqual(classifier.exp_id, exp_id)
+        self.assertEqual(classifier.state_name, state)
+
+    def test_deletion_of_classifiers(self):
+        """Test the delete_classifier method."""
+
+        with self.assertRaisesRegexp(Exception, (
+            "Entity for class ClassifierModel with id fake_id not found")):
+            classifier_services.delete_classifier('fake_id')
+
+        exp_id = u'1'
+        state = 'Home'
+        classifier_id = classifier_models.ClassifierModel.create(
+            exp_id, 1, state,
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'], [], 1)
+        classifier_services.delete_classifier(classifier_id)
+        with self.assertRaisesRegexp(Exception, (
+            "Entity for class ClassifierModel with id %s not found" %(
+                classifier_id))):
+            classifier_services.get_classifier_by_id(classifier_id)
+
+    def test_update_of_classifiers(self):
+        """Test the save_classifier method."""
+
+        exp_id = u'1'
+        state_name = 'Home'
+        test_state_name = 'State'
+        cached_data = {
+            '_alpha': 0.1,
+            '_beta': 0.001,
+            '_prediction_threshold': 0.5,
+            '_training_iterations': 25,
+            '_prediction_iterations': 5,
+            '_num_labels': 10,
+            '_num_docs': 12,
+            '_num_words': 20,
+            '_label_to_id': {'text': 1},
+            '_word_to_id': {'hello': 2},
+            '_w_dp': [],
+            '_b_dl': [],
+            '_l_dp': [],
+            '_c_dl': [],
+            '_c_lw': [],
+            '_c_l': []
+        }
+        classifier = classifier_domain.Classifier(
+            '1', exp_id, 1, state_name,
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'], cached_data, 1)
+        classifier_id = (
+            classifier_services.save_classifier(classifier))
+        classifier = classifier_services.get_classifier_by_id(
+            classifier_id)
+        self.assertEqual(classifier.exp_id, exp_id)
+        self.assertEqual(classifier.state_name, state_name)
+        classifier.update_state_name(test_state_name)
+        classifier_services.save_classifier(classifier)
+        classifier = classifier_services.get_classifier_by_id(
+            classifier_id)
+        self.assertEqual(classifier.exp_id, exp_id)
+        self.assertEqual(classifier.state_name, test_state_name)

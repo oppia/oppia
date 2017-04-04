@@ -335,6 +335,16 @@ class BaseHandler(webapp2.RequestHandler):
                 self.user_id),
             'preferred_site_language_code': self.preferred_site_language_code
         })
+        if feconf.ENABLE_PROMO_BAR:
+            promo_bar_enabled = config_domain.PROMO_BAR_ENABLED.value
+            promo_bar_message = config_domain.PROMO_BAR_MESSAGE.value
+        else:
+            promo_bar_enabled = False
+            promo_bar_message = ''
+        values.update({
+            'promo_bar_enabled': promo_bar_enabled,
+            'promo_bar_message': promo_bar_message,
+        })
 
         if 'meta_name' not in values:
             values['meta_name'] = 'Personalized Online Learning from Oppia'
