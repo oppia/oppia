@@ -1951,14 +1951,6 @@ pre.oppia-pre-wrapped-text {
   outline: auto 5px -webkit-focus-ring-color;
 }
 
-.oppia-graph-resize-button {
-  border: 0;
-  padding: 9px 10px 6px 10px;
-  position: absolute;
-  right: 2px;
-  top: 2px;
-}
-
 .nav-pills > li > a.oppia-rule-tab {
   background: rgba(0,0,0,0.05);
   border-radius: 0;
