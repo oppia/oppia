@@ -49,8 +49,7 @@ describe('Preferences Controller', function() {
       });
 
     it('should show that feedback message notifications checkbox is true' +
-      'by default',
-      function() {
+      'by default', function() {
         $httpBackend.flush();
         expect(scope.canReceiveFeedbackMessageEmail).toBe(true);
       });

@@ -22,11 +22,10 @@ oppia.directive('collectionPermissionsCard', [function() {
     restrict: 'E',
     templateUrl: 'inline/collection_permissions_card_directive',
     controller: [
-      '$scope', 'CollectionEditorStateService',
-      function($scope, CollectionEditorStateService) {
-        $scope.collectionRights =
-          CollectionEditorStateService.getCollectionRights();
-        $scope.hasPageLoaded = CollectionEditorStateService.hasLoadedCollection;
+      '$scope',
+      function($scope) {
+        $scope.ownerNames = GLOBALS.ownerNames;
+        $scope.isPrivate = GLOBALS.isPrivate;
       }
     ]
   };

@@ -48,11 +48,10 @@ oppia.controller('PreviewTab', [
       }
 
       // Prompt user to enter any unset parameters, then populate exploration
-      manualParamChanges = $scope.getManualParamChanges(initStateNameForPreview)
-        .then(function(manualParamChanges) {
-          $scope.loadPreviewState(initStateNameForPreview, manualParamChanges);
-        }
-      );
+      manualParamChanges = $scope.getManualParamChanges(
+        initStateNameForPreview).then(function(manualParamChanges) {
+        $scope.loadPreviewState(initStateNameForPreview, manualParamChanges);
+      });
     });
 
     $scope.getManualParamChanges = function(initStateNameForPreview) {
@@ -77,7 +76,7 @@ oppia.controller('PreviewTab', [
         var newParamChange =
           getDefaultParameterChange(unsetParametersInfo[i].paramName);
         manualParamChanges.push(newParamChange);
-      }
+      };
 
       // Use modal to populate parameter change values
       if (manualParamChanges.length > 0) {
@@ -86,7 +85,7 @@ oppia.controller('PreviewTab', [
         });
       } else {
         deferred.resolve([]);
-      }
+      };
 
       return deferred.promise;
     };

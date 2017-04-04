@@ -103,8 +103,16 @@ class CollectionEditorPage(CollectionEditorHandler):
             collection_id, strict=False)
 
         self.values.update({
+            'can_edit': True,
+            'can_unpublish': rights_manager.Actor(
+                self.user_id).can_unpublish(
+                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id),
             'collection_id': collection.id,
+            'is_private': rights_manager.is_collection_private(collection_id),
             'nav_mode': feconf.NAV_MODE_CREATE,
+            'owner_names': rights_manager.get_collection_owner_names(
+                collection_id),
+            'title': collection.title,
             'SHOW_COLLECTION_NAVIGATION_TAB_HISTORY': (
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_HISTORY),
             'SHOW_COLLECTION_NAVIGATION_TAB_STATS': (
@@ -183,24 +191,6 @@ class CollectionRightsHandler(CollectionEditorHandler):
     """Handles management of collection editing rights."""
 
     @require_editor
-    def get(self, collection_id):
-        """Gets the editing rights for the given collection."""
-        collection = collection_services.get_collection_by_id(collection_id)
-
-        self.values.update({
-            'can_edit': True,
-            'can_unpublish': rights_manager.Actor(
-                self.user_id).can_unpublish(
-                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id),
-            'collection_id': collection.id,
-            'is_private': rights_manager.is_collection_private(collection_id),
-            'owner_names': rights_manager.get_collection_owner_names(
-                collection_id)
-        })
-
-        self.render_json(self.values)
-
-    @require_editor
     def put(self, collection_id):
         """Updates the editing rights for the given collection."""
         collection = collection_services.get_collection_by_id(collection_id)
@@ -232,15 +222,9 @@ class CollectionRightsHandler(CollectionEditorHandler):
                 raise self.InvalidInputException(
                     'Cannot unpublish a collection.')
 
-        self.values.update({
-            'can_edit': True,
-            'can_unpublish': rights_manager.Actor(
-                self.user_id).can_unpublish(
-                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id),
-            'collection_id': collection.id,
-            'is_private': rights_manager.is_collection_private(collection_id),
-            'owner_names': rights_manager.get_collection_owner_names(
-                collection_id)
+        self.render_json({
+            'rights': rights_manager.get_collection_rights(
+                collection_id).to_dict()
         })
 
 

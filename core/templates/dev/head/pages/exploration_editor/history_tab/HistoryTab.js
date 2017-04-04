@@ -184,18 +184,16 @@ oppia.controller('HistoryTab', [
         $scope.explorationVersionMetadata[laterComparedVersion];
 
       compareVersionsService.getDiffGraphData(earlierComparedVersion,
-          laterComparedVersion).then(
-        function(response) {
-          $log.info('Retrieved version comparison data');
-          $log.info(response);
+          laterComparedVersion).then(function(response) {
+        $log.info('Retrieved version comparison data');
+        $log.info(response);
 
-          $scope.diffData = response;
-          $scope.earlierVersionHeader = getVersionHeader(
-            $scope.compareVersionMetadata.earlierVersion);
-          $scope.laterVersionHeader = getVersionHeader(
-            $scope.compareVersionMetadata.laterVersion);
-        }
-      );
+        $scope.diffData = response;
+        $scope.earlierVersionHeader = getVersionHeader(
+          $scope.compareVersionMetadata.earlierVersion);
+        $scope.laterVersionHeader = getVersionHeader(
+          $scope.compareVersionMetadata.laterVersion);
+      });
     };
 
     // Check if valid versions were selected
@@ -230,8 +228,7 @@ oppia.controller('HistoryTab', [
             return version;
           }
         },
-        controller: [
-          '$scope', '$modalInstance', 'version', 'explorationData',
+        controller: ['$scope', '$modalInstance', 'version', 'explorationData',
           function($scope, $modalInstance, version, explorationData) {
             $scope.version = version;
 

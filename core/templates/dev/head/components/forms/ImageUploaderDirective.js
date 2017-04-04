@@ -51,12 +51,11 @@ oppia.directive('imageUploader', [
         scope.fileInputClassName = (
           'image-uploader-file-input' + IdGenerationService.generateNewId());
         angular.element(document).on(
-          'change', '.' + scope.fileInputClassName, function(evt) {
-            scope.onFileChanged(
-              evt.currentTarget.files[0],
-              evt.target.value.split(/(\\|\/)/g).pop());
-          }
-        );
+            'change', '.' + scope.fileInputClassName, function(evt) {
+          scope.onFileChanged(
+            evt.currentTarget.files[0],
+            evt.target.value.split(/(\\|\/)/g).pop());
+        });
       }
     };
   }

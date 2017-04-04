@@ -167,10 +167,21 @@ describe('MusicNotesInput interaction', function() {
     });
 
     it('does not do anything when asked to remove a note that does not exist',
-      function() {
-        expect(ctrlScope.noteSequence).toEqual([]);
+       function() {
+      expect(ctrlScope.noteSequence).toEqual([]);
 
-        ctrlScope._addNoteToNoteSequence({
+      ctrlScope._addNoteToNoteSequence({
+        baseNoteMidiNumber: 64,
+        offset: 0,
+        noteId: 'note_id_0',
+        noteStart: {
+          num: 1,
+          den: 1
+        }
+      });
+      ctrlScope._removeNotesFromNoteSequenceWithId('note_id_1');
+      expect(ctrlScope.noteSequence).toEqual([{
+        note: {
           baseNoteMidiNumber: 64,
           offset: 0,
           noteId: 'note_id_0',
@@ -178,21 +189,9 @@ describe('MusicNotesInput interaction', function() {
             num: 1,
             den: 1
           }
-        });
-        ctrlScope._removeNotesFromNoteSequenceWithId('note_id_1');
-        expect(ctrlScope.noteSequence).toEqual([{
-          note: {
-            baseNoteMidiNumber: 64,
-            offset: 0,
-            noteId: 'note_id_0',
-            noteStart: {
-              num: 1,
-              den: 1
-            }
-          }
-        }]);
-      }
-    );
+        }
+      }]);
+    });
 
     it('correctly handles duplicate removals', function() {
       expect(ctrlScope.noteSequence).toEqual([]);
@@ -239,14 +238,13 @@ describe('Music phrase player service', function() {
     }));
 
     it('should stop any existing playthroughs when a new play is requested',
-      function() {
-        mpps.playMusicPhrase([]);
-        expect(MIDI.Player.stop).toHaveBeenCalled();
-      }
-    );
+        function() {
+      mpps.playMusicPhrase([]);
+      expect(MIDI.Player.stop).toHaveBeenCalled();
+    });
 
     it('should play all the notes in a music phrase',
-    inject(function($timeout) {
+        inject(function($timeout) {
       mpps.playMusicPhrase([{
         midiValue: 69,
         duration: 2,

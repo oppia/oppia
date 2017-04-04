@@ -170,7 +170,7 @@ exports.config = {
       }));
     }
 
-    var SpecReporter = require('jasmine-spec-reporter').SpecReporter;
+    var SpecReporter = require('jasmine-spec-reporter');
     jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: 'all',
       displaySpecDuration: true

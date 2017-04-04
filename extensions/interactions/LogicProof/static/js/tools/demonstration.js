@@ -249,7 +249,7 @@ logicDemo.controller('TestCtrl', function($scope) {
 
   $scope.REPLACEMENT_PAIRS = [{
     old: '\u2227',
-    // eslint-disable quote-props
+    // jscs:disable disallowQuotedKeysInObjects
     'new': '\\u2227'
   }, {
     old: '\u2228',
@@ -263,7 +263,7 @@ logicDemo.controller('TestCtrl', function($scope) {
   }, {
     old: '\u2208',
     'new': '\\u2208'
-    // eslint-enable quote-props
+    // jscs:enable disallowQuotedKeysInObjects
   }];
 
   // JSON.stringify will display '\u2227' from strings.js as '∧'. We do not

@@ -25,8 +25,7 @@ oppia.directive('oppiaNoninteractiveLink', [
       restrict: 'E',
       scope: {},
       templateUrl: 'richTextComponent/Link',
-      controller: [
-        '$scope', '$attrs', 'explorationContextService',
+      controller: ['$scope', '$attrs', 'explorationContextService',
         function($scope, $attrs, explorationContextService) {
           var untrustedUrl = encodeURI(oppiaHtmlEscaper.escapedJsonToObj(
             $attrs.urlWithValue));

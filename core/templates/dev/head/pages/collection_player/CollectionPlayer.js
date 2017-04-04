@@ -31,19 +31,17 @@ oppia.animation('.oppia-collection-animate-slide', function() {
 });
 
 oppia.controller('CollectionPlayer', [
-  '$scope', '$anchorScroll', '$location', '$http',
-  'ReadOnlyCollectionBackendApiService',
+  '$scope', '$http', 'ReadOnlyCollectionBackendApiService',
   'CollectionObjectFactory', 'CollectionPlaythroughObjectFactory',
   'alertsService', 'UrlInterpolationService',
-  function($scope, $anchorScroll, $location, $http,
-           ReadOnlyCollectionBackendApiService,
-           CollectionObjectFactory, CollectionPlaythroughObjectFactory,
-           alertsService, UrlInterpolationService) {
+  function($scope, $http, ReadOnlyCollectionBackendApiService,
+    CollectionObjectFactory, CollectionPlaythroughObjectFactory,
+    alertsService, UrlInterpolationService) {
     $scope.collection = null;
     $scope.collectionPlaythrough = null;
     $scope.collectionId = GLOBALS.collectionId;
     $scope.showingAllExplorations = !GLOBALS.isLoggedIn;
-    $scope.explorationCardIsShown = false;
+    $scope.previewCardIsShown = true;
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     // The pathIconParameters is an array containing the co-ordinates,
     // background color and icon url for the icons generated on the path.
@@ -59,7 +57,6 @@ oppia.controller('CollectionPlayer', [
     $scope.ICON_X_RIGHT_PX = 395;
     $scope.svgHeight = $scope.MIN_HEIGHT_FOR_PATH_SVG_PX;
     $scope.nextExplorationId = null;
-    $anchorScroll.yOffset = -80;
 
     $scope.setIconHighlight = function(index) {
       $scope.activeHighlightedIconIndex = index;
@@ -70,7 +67,7 @@ oppia.controller('CollectionPlayer', [
     };
 
     $scope.togglePreviewCard = function() {
-      $scope.explorationCardIsShown = !$scope.explorationCardIsShown;
+      $scope.previewCardIsShown = !$scope.previewCardIsShown;
     };
 
     $scope.getCollectionNodeForExplorationId = function(explorationId) {
@@ -128,7 +125,7 @@ oppia.controller('CollectionPlayer', [
     };
 
     $scope.updateExplorationPreview = function(explorationId) {
-      $scope.explorationCardIsShown = true;
+      $scope.previewCardIsShown = false;
       $scope.currentExplorationId = explorationId;
       $scope.summaryToPreview = $scope.getCollectionNodeForExplorationId(
         explorationId).getExplorationSummaryObject();
@@ -278,16 +275,5 @@ oppia.controller('CollectionPlayer', [
         $scope.generatePathParameters();
       }
     }, true);
-
-    $scope.scrollToLocation = function(id) {
-      $location.hash(id);
-      $anchorScroll();
-    };
-    // Touching anywhere outside the mobile preview should hide it.
-    document.addEventListener('touchstart', function() {
-      if ($scope.explorationCardIsShown === true) {
-        $scope.explorationCardIsShown = false;
-      }
-    });
   }
 ]);
