@@ -352,28 +352,12 @@ class ExplorationHandler(EditorHandler):
     @require_editor
     def delete(self, exploration_id):
         """Deletes the given exploration."""
-        role = self.request.get('role')
-        if not role:
-            role = None
 
-        if role == rights_manager.ROLE_ADMIN:
-            if not self.is_admin:
-                logging.error(
-                    '%s tried to delete an exploration, but is not an admin.'
-                    % self.user_id)
-                raise self.UnauthorizedUserException(
-                    'User %s does not have permissions to delete exploration '
-                    '%s' % (self.user_id, exploration_id))
-        elif role == rights_manager.ROLE_MODERATOR:
-            if not self.is_moderator:
-                logging.error(
-                    '%s tried to delete an exploration, but is not a '
-                    'moderator.' % self.user_id)
-                raise self.UnauthorizedUserException(
-                    'User %s does not have permissions to delete exploration '
-                    '%s' % (self.user_id, exploration_id))
-        elif role is not None:
-            raise self.InvalidInputException('Invalid role: %s' % role)
+        role = ''
+        if self.is_admin:
+            role = 'admin'
+        elif self.is_moderator:
+            role = 'moderator'
 
         logging.info(
             '%s %s tried to delete exploration %s' %
