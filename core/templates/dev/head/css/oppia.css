@@ -824,7 +824,6 @@ textarea {
    clicked -- so, in such cases (e.g. for the 'Sign in' link at the top right),
    we use this instead.
 */
-.oppia-navbar-clickable-dropdown:hover ul.dropdown-menu,
 .oppia-clickable-navbar-element:hover {
   display: block;
 }
@@ -2401,28 +2400,6 @@ div#ng-curtain {
   /* This ensures that content is not tucked behind the fixed navbar. */
   height: 56px;
 }
-.oppia-navbar-menu {
-  margin-left: 10px;
-  opacity: 0.9;
-  outline-color: transparent;
-  padding-top: 20px;
-}
-.oppia-navbar-close-icon {
-  color: #fff;
-  margin-right: 4px;
-  margin-top: -10px;
-}
-.oppia-navbar-menu-icon {
-  color: #fff;
-  margin-top: -5px;
-}
-.oppia-navbar-menu:hover {
-  opacity: 1;
-}
-.oppia-navbar-menu:focus {
-  outline: 1px dotted #212121;
-  outline: auto 5px -webkit-focus-ring-color;
-}
 
 .oppia-navbar-brand-name {
   float: left;
@@ -2454,7 +2431,7 @@ div#ng-curtain {
   display: inline-block;
   vertical-align: top;
 }
-.oppia-navbar-clickable-dropdown:hover ul.dropdown-menu, .oppia-clickable-navbar-element:hover {
+.oppia-clickable-navbar-element:hover {
   display: inline-block;
 }
 .oppia-navbar-nav .dropdown-menu {
@@ -2482,9 +2459,7 @@ div#ng-curtain {
   height: 56px;
   color: #fff;
 }
-.oppia-navbar-profile {
-  float: right;
-}
+
 .oppia-navbar-nav > li > a:hover,
 .oppia-navbar-nav > li > a:focus,
 .oppia-navbar-nav .open > a,
@@ -2527,41 +2502,6 @@ div#ng-curtain {
 .oppia-navbar-profile-picture {
   height: 32px;
   width: 32px;
-}
-.oppia-navbar-role-indicator {
-  background-color: #f7a541;
-  border-radius: 20px;
-  bottom: 10px;
-  height: 15px;
-  position: absolute;
-  right: 25px;
-  width: 15px;
-}
-.oppia-navbar-role-text {
-  bottom: 0;
-  color: white;
-  font-size: 1.12rem;
-  font-weight: bold;
-  position: absolute;
-  right: 3px;
-}
-
-.oppia-navbar-dashboard-indicator {
-  background-color: #f7a541;
-  border-radius: 20px;
-  height: 15px;
-  position: absolute;
-  right: 25px;
-  top: 8px;
-  width: 15px;
-}
-.oppia-navbar-dashboard-indicator-text {
-  bottom: 0;
-  color: white;
-  font-size: 1.12rem;
-  font-weight: bold;
-  position: absolute;
-  right: 4px;
 }
 
 .oppia-select {
