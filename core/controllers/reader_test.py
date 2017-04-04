@@ -153,18 +153,6 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(res['outcome']['feedback'][0],
                              '<p>Detected permutation.</p>')
 
-            # Testing the handler for a wrong answer.
-            old_state_dict = self.exploration.states['Home'].to_dict()
-            answer = 'Shigatsu wa kimi no uso'
-            params = {}
-            res = self.post_json('/explorehandler/classify/%s' % self.exp_id,
-                                 {'params' : params,
-                                  'old_state' : old_state_dict,
-                                  'answer' : answer})
-            self.assertEqual(res['outcome']['feedback'][0],
-                             '<p>Detected unsure.</p>')
-            self.logout()
-
 
 class FeedbackIntegrationTest(test_utils.GenericTestBase):
     """Test the handler for giving feedback."""
