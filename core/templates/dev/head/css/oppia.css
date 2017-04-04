@@ -2783,13 +2783,6 @@ div#ng-curtain {
 .oppia-feedback-popover-submit-btn-enabled {
   color: #009688;
 }
-.oppia-feedback-popover-textarea {
-  border: 1px solid rgba(0,0,0,0.2);
-  margin-top: 4px;
-  padding: 4px;
-  resize: none;
-  width: 200px;
-}
 
 .oppia-rte-toolbar-image {
   padding-bottom: 8px;
