@@ -18,51 +18,52 @@
  */
 
 oppia.filter('oppiaInteractiveInteractiveMapValidator', [
-    'WARNING_TYPES', 'baseInteractionValidationService',
-    function(WARNING_TYPES, baseInteractionValidationService) {
+  'WARNING_TYPES', 'baseInteractionValidationService',
+  function(WARNING_TYPES, baseInteractionValidationService) {
   // Returns a list of warnings.
-  return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
-    var warningsList = [];
+    return function(
+      stateName, customizationArgs, answerGroups, defaultOutcome) {
+      var warningsList = [];
 
-    baseInteractionValidationService.requireCustomizationArguments(
-      customizationArgs, ['latitude', 'longitude']);
+      baseInteractionValidationService.requireCustomizationArguments(
+        customizationArgs, ['latitude', 'longitude']);
 
-    if (customizationArgs.latitude.value < -90 ||
-        customizationArgs.latitude.value > 90) {
-      warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
-        message: 'Please pick a starting latitude between -90 and 90.'
-      });
-    }
+      if (customizationArgs.latitude.value < -90 ||
+          customizationArgs.latitude.value > 90) {
+        warningsList.push({
+          type: WARNING_TYPES.CRITICAL,
+          message: 'Please pick a starting latitude between -90 and 90.'
+        });
+      }
 
-    if (customizationArgs.longitude.value < -180 ||
-        customizationArgs.longitude.value > 180) {
-      warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
-        message: 'Please pick a starting longitude between -180 and 180.'
-      });
-    }
+      if (customizationArgs.longitude.value < -180 ||
+          customizationArgs.longitude.value > 180) {
+        warningsList.push({
+          type: WARNING_TYPES.CRITICAL,
+          message: 'Please pick a starting longitude between -180 and 180.'
+        });
+      }
 
-    for (var i = 0; i < answerGroups.length; i++) {
-      var rules = answerGroups[i].rules;
-      for (var j = 0; j < rules.length; j++) {
-        if (rules[j].type === 'Within' ||
-            rules[j].type === 'NotWithin') {
-          if (rules[j].inputs.d < 0) {
-            warningsList.push({
-              type: WARNING_TYPES.CRITICAL,
-              message: 'Please ensure that rule ' + String(j + 1) +
-                ' in group ' + String(i + 1) + ' refers to a valid distance.'
-            });
+      for (var i = 0; i < answerGroups.length; i++) {
+        var rules = answerGroups[i].rules;
+        for (var j = 0; j < rules.length; j++) {
+          if (rules[j].type === 'Within' ||
+              rules[j].type === 'NotWithin') {
+            if (rules[j].inputs.d < 0) {
+              warningsList.push({
+                type: WARNING_TYPES.CRITICAL,
+                message: 'Please ensure that rule ' + String(j + 1) +
+                  ' in group ' + String(i + 1) + ' refers to a valid distance.'
+              });
+            }
           }
         }
       }
-    }
 
-    warningsList = warningsList.concat(
-      baseInteractionValidationService.getAllOutcomeWarnings(
-        answerGroups, defaultOutcome, stateName));
+      warningsList = warningsList.concat(
+        baseInteractionValidationService.getAllOutcomeWarnings(
+          answerGroups, defaultOutcome, stateName));
 
-    return warningsList;
-  };
-}]);
+      return warningsList;
+    };
+  }]);

@@ -888,37 +888,38 @@ describe('Graph Input service', function() {
     });
 
     it('should return false for graphs that are only weakly connected',
-        function() {
-      expect(girs.HasGraphProperty({
-        vertices: [{
-          label: 'a',
-          x: 1.0,
-          y: 1.0
+      function() {
+        expect(girs.HasGraphProperty({
+          vertices: [{
+            label: 'a',
+            x: 1.0,
+            y: 1.0
+          }, {
+            label: 'b',
+            x: 2.0,
+            y: 2.0
+          }, {
+            label: 'c',
+            x: 0.0,
+            y: 0.0
+          }],
+          edges: [{
+            src: 0,
+            dst: 1,
+            weight: 2
+          }, {
+            src: 2,
+            dst: 1,
+            weight: 1
+          }],
+          isDirected: true,
+          isWeighted: true,
+          isLabeled: true
         }, {
-          label: 'b',
-          x: 2.0,
-          y: 2.0
-        }, {
-          label: 'c',
-          x: 0.0,
-          y: 0.0
-        }],
-        edges: [{
-          src: 0,
-          dst: 1,
-          weight: 2
-        }, {
-          src: 2,
-          dst: 1,
-          weight: 1
-        }],
-        isDirected: true,
-        isWeighted: true,
-        isLabeled: true
-      }, {
-        p: 'strongly_connected'
-      })).toBe(false);
-    });
+          p: 'strongly_connected'
+        })).toBe(false);
+      }
+    );
   });
 
   describe('\'is acyclic\' rule', function() {

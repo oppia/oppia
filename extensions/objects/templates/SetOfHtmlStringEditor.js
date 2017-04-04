@@ -17,46 +17,46 @@
 // in via initArgs.
 
 oppia.directive('setOfHtmlStringEditor', [
-    '$compile', 'OBJECT_EDITOR_URL_PREFIX',
-    function($compile, OBJECT_EDITOR_URL_PREFIX) {
-  return {
-    link: function(scope, element) {
-      scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_URL_PREFIX + 'SetOfHtmlString';
-      };
-      $compile(element.contents())(scope);
-    },
-    restrict: 'E',
-    scope: true,
-    template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: ['$scope', function($scope) {
-      $scope.SCHEMA = {
-        type: 'list',
-        items: {
-          type: 'html'
+  '$compile', 'OBJECT_EDITOR_URL_PREFIX',
+  function($compile, OBJECT_EDITOR_URL_PREFIX) {
+    return {
+      link: function(scope, element) {
+        scope.getTemplateUrl = function() {
+          return OBJECT_EDITOR_URL_PREFIX + 'SetOfHtmlString';
+        };
+        $compile(element.contents())(scope);
+      },
+      restrict: 'E',
+      scope: true,
+      template: '<span ng-include="getTemplateUrl()"></span>',
+      controller: ['$scope', function($scope) {
+        $scope.SCHEMA = {
+          type: 'list',
+          items: {
+            type: 'html'
+          }
+        };
+
+        if (!$scope.$parent.value) {
+          $scope.$parent.value = [];
         }
-      };
 
-      if (!$scope.$parent.value) {
-        $scope.$parent.value = [];
-      }
+        $scope.choices = $scope.initArgs.choices;
+        $scope.selections = $scope.choices.map(function(choice) {
+          return $scope.$parent.value.indexOf(choice.id) !== -1;
+        });
 
-      $scope.choices = $scope.initArgs.choices;
-      $scope.selections = $scope.choices.map(function(choice) {
-        return $scope.$parent.value.indexOf(choice.id) !== -1;
-      });
-
-      // The following function is necessary to insert elements into the answer
-      // groups for the Item Selection Widget.
-      $scope.toggleSelection = function(choiceListIndex) {
-        var choiceHtml = $scope.choices[choiceListIndex].id;
-        var selectedChoicesIndex = $scope.$parent.value.indexOf(choiceHtml);
-        if (selectedChoicesIndex > -1) {
-          $scope.$parent.value.splice(selectedChoicesIndex, 1);
-        } else {
-          $scope.$parent.value.push(choiceHtml);
-        }
-      };
-    }]
-  };
-}]);
+        // The following function is necessary to insert elements into the
+        // answer groups for the Item Selection Widget.
+        $scope.toggleSelection = function(choiceListIndex) {
+          var choiceHtml = $scope.choices[choiceListIndex].id;
+          var selectedChoicesIndex = $scope.$parent.value.indexOf(choiceHtml);
+          if (selectedChoicesIndex > -1) {
+            $scope.$parent.value.splice(selectedChoicesIndex, 1);
+          } else {
+            $scope.$parent.value.push(choiceHtml);
+          }
+        };
+      }]
+    };
+  }]);
