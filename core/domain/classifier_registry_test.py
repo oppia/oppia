@@ -26,10 +26,10 @@ class ClassifierRegistryTest(test_utils.GenericTestBase):
             'LDAStringClassifier'
         ]
         algorithm_ids = (
-            classifier_registry.ClassifierRegistry.get_all_classifier_ids())
+            classifier_registry.Registry.get_all_classifier_ids())
         self.assertItemsEqual(expected_algorithm_ids, algorithm_ids)
 
     def test_get_all_classifiers(self):
         classifier_instances = (
-            classifier_registry.ClassifierRegistry.get_all_classifiers())
+            classifier_registry.Registry.get_all_classifiers())
         self.assertEquals(len(classifier_instances), 1)
