@@ -1559,11 +1559,6 @@ md-card.oppia-dashboard-tile {
   }
 }
 
-/* Overwrite the Bootstrap defaults. */
-.nav > li > a.oppia-editor-navbar-tab-anchor {
-  padding: 15px 11px;
-}
-
 .oppia-save-publish-loading.oppia-save-publish-button-icon {
   font-size: 30px;
   line-height: 14px;
@@ -2556,26 +2551,6 @@ div#ng-curtain {
 }
 .oppia-editor-warnings-count {
   margin-left: -3px;
-}
-
-.oppia-exploration-open-threads-indicator {
-  border-radius: 10%;
-  bottom: 10px;
-  height: 13px;
-  position: absolute;
-  right: 5px;
-  text-align: center;
-  width: 16px;
-}
-.oppia-exploration-open-threads-color {
-  background-color: #4078C0;
-  border: 1px solid rgb(243, 243, 243);
-}
-.oppia-exploration-open-threads-count {
-  bottom: 8px;
-  color: white;
-  font-size: 9px;
-  position: relative;
 }
 
 .dropdown-menu.oppia-editor-warnings-box {
