@@ -23,7 +23,6 @@ import logging
 import jinja2
 
 from constants import constants
-from constants import constants
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import dependency_registry
