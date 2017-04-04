@@ -676,17 +676,10 @@ textarea {
   list-style-position: inside;
   list-style-type: none;
 }
-.oppia-footer-social a:hover,
-.oppia-footer-social a:focus {
-  text-decoration: none;
-}
-.oppia-footer-social a:focus > img,
+
 .oppia-language-selector:focus {
   outline: 1px dotted #FFF;
   outline: auto 5px -webkit-focus-ring-color;
-}
-.oppia-footer-social a > img {
-  width: 30px;
 }
 .oppia-footer-padding {
   height: 198px;
