@@ -2508,13 +2508,6 @@ div#ng-curtain {
   padding: 5px;
 }
 
-.oppia-feedback-tab-row {
-  cursor: pointer;
-}
-.oppia-feedback-tab-row:hover {
-  background: #eee;
-}
-
 .oppia-editor-sidebar {
   max-width: 500px;
   padding: 7px 5px 0 5px;
