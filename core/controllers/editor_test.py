@@ -18,7 +18,7 @@ import datetime
 import os
 import StringIO
 import zipfile
-from constants import constants
+
 from core.controllers import dashboard
 from core.controllers import editor
 from core.domain import config_services
@@ -106,7 +106,8 @@ class EditorTest(BaseEditorControllerTest):
             feconf.DEFAULT_INIT_STATE_NAME].to_dict()
         new_state_dict['unresolved_answers'] = {}
         self.assertEqual(new_state_dict, editor.NEW_STATE_TEMPLATE)
-        self.assertEqual(exp_domain.State.NULL_INTERACTION_DICT, 
+        self.assertEqual(
+            exp_domain.State.NULL_INTERACTION_DICT,
             editor.NEW_STATE_TEMPLATE['interaction'])
 
     def test_that_default_exploration_cannot_be_published(self):
