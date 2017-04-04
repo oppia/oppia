@@ -1859,16 +1859,6 @@ pre.oppia-pre-wrapped-text {
   margin-right: 5px;
 }
 
-.oppia-nested-link {
-  color: #0844aa;
-  cursor: pointer;
-}
-
-.oppia-nested-link:hover {
-  color: #3f2c76;
-  text-decoration: underline;
-}
-
 .oppia-add-interaction-button,
 .oppia-add-response-button,
 .oppia-add-fallback-button {
@@ -2039,21 +2029,6 @@ pre.oppia-pre-wrapped-text {
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   margin: -2px;
   z-index: 1;
-}
-
-.oppia-response-header-block {
-  overflow: hidden;
-  padding-left: 24px;
-  white-space: nowrap;
-  width: 640px;
-}
-
-.oppia-response-header {
-  float: left;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  width: 500px;
 }
 
 .oppia-rule-sort-handle, .oppia-fallback-sort-handle {
