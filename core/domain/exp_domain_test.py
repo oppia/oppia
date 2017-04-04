@@ -17,7 +17,7 @@
 """Tests for exploration domain objects and methods defined on them."""
 
 import os
-
+from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import param_domain
@@ -2282,3 +2282,10 @@ class GadgetVisibilityInStatesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(affected_gadget_instances), 1)
         self.assertEqual(affected_gadget_instances[0].name, 'ATestGadget')
+
+class StatePropertiesCheck(test_utils.GenericTestBase):
+    """Tests to verify all class variables are correct."""
+    
+    def test_constants_dependencies_matches_feconf(self):
+        self.assertEqual(feconf.DEFAULT_INIT_STATE_NAME, 
+        exp_domain.State.NULL_INTERACTION_DICT['default_outcome']['dest'])
