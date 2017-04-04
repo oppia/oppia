@@ -304,12 +304,12 @@ oppia.factory('oppiaPlayerService', [
           if (outcome.dest === playerTranscriptService.getLastStateName()) {
             for (var i = 0; i < oldState.interaction.fallbacks.length; i++) {
               var fallback = oldState.interaction.fallbacks[i];
-              if (fallback.trigger.type === 'NthResubmission' &&
-                  fallback.trigger.customizationArgs.num_submits.value ===
+              if (fallback.trigger.trigger_type === 'NthResubmission' &&
+                  fallback.trigger.customization_args.num_submits.value ===
                     playerTranscriptService.getNumSubmitsForLastCard()) {
                 outcome.dest = fallback.outcome.dest;
                 outcome.feedback = fallback.outcome.feedback;
-                outcome.paramChanges = fallback.outcome.paramChanges;
+                outcome.param_changes = fallback.outcome.param_changes;
                 break;
               }
             }

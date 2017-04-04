@@ -91,12 +91,11 @@ describe('Signup controller', function() {
     });
 
     it('should show warning if username has non-alphanumeric characters',
-      function() {
-        scope.updateWarningText('a-a');
-        expect(scope.warningI18nCode).toEqual(
-          'I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM');
-      }
-    );
+        function() {
+      scope.updateWarningText('a-a');
+      expect(scope.warningI18nCode).toEqual(
+        'I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM');
+    });
 
     it('should show warning if username has \'admin\' in it', function() {
       scope.updateWarningText('administrator');

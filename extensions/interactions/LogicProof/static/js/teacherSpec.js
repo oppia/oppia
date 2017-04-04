@@ -48,11 +48,7 @@ describe('Build questions', function() {
     expect(function() {
       logicProofTeacher.buildQuestion(
         'f(x,y)=z', 'f(x)=z', logicProofData.BASE_VOCABULARY);
-    }).toThrow(
-      {
-        message: 'f must have 1 arguments.'
-      }
-    );
+    }).toThrow('f must have 1 arguments.');
   });
 
   it('should forbid the use of reserved words', function() {
@@ -60,11 +56,7 @@ describe('Build questions', function() {
       logicProofTeacher.buildQuestion('we\u2227you', 'p=q',
         logicProofData.BASE_VOCABULARY);
     }).toThrow(
-      {
-        message: (
-          'The name \'we\' is reserved for vocabulary and so cannot ' +
-          'be used here.')
-      }
+      'The name \'we\' is reserved for vocabulary and so cannot be used here.'
     );
   });
 });

@@ -85,13 +85,13 @@ describe('Pre-parse lines', function() {
   it('should reject lines that are entirely whitespace', function() {
     expect(
       errorWrapper(preParse, '   ', false)
-    ).toThrowError('This line is blank.');
+    ).toThrow('This line is blank.');
   });
 
   it('should reject unknown symbols', function() {
     expect(
       errorWrapper(preParse, 'from p and p{q we see q', false)
-    ).toThrowError('The symbol { was not recognised.');
+    ).toThrow('The symbol { was not recognised.');
   });
 });
 
@@ -152,78 +152,75 @@ describe('Parse lines', function() {
       parse(
         'from p[x->a] we know hence a contradiction {{ a | element }}', true)
     ).toEqual([[{
-      format: 'phrase',
-      content: 'from'
-    }, {
-      format: 'expression',
-      content: {
-        expression: {
-          top_kind_name: 'variable',
-          top_operator_name: 'p',
-          arguments: [],
-          dummies: []
-        },
-        substitutions: [{
-          x: {
+        format: 'phrase',
+        content: 'from'
+      }, {
+        format: 'expression',
+        content: {
+          expression: {
+            top_kind_name: 'variable',
+            top_operator_name: 'p',
+            arguments: [],
+            dummies: []
+          },
+          substitutions: [{
+            x: {
+              top_kind_name: 'variable',
+              top_operator_name: 'a',
+              arguments: [],
+              dummies: []
+            }
+          }],
+          type: 'boolean'
+        }
+      }, {
+        format: 'phrase',
+        content: 'have'
+      }, {
+        format: 'phrase',
+        content: 'hence'
+      }, {
+        format: 'expression',
+        content: {
+          expression: {
             top_kind_name: 'variable',
             top_operator_name: 'a',
             arguments: [],
             dummies: []
-          }
-        }],
-        type: 'boolean'
-      }
-    }, {
-      format: 'phrase',
-      content: 'have'
-    }, {
-      format: 'phrase',
-      content: 'hence'
-    }, {
-      format: 'expression',
-      content: {
-        expression: {
-          top_kind_name: 'variable',
-          top_operator_name: 'a',
-          arguments: [],
-          dummies: []
-        },
-        substitutions: [],
-        type: 'boolean'
-      }
-    }, {
-      format: 'phrase',
-      content: 'contradiction'
-    }, {
-      format: 'expression',
-      content: {
-        expression: {
-          top_kind_name: 'variable',
-          top_operator_name: 'a',
-          arguments: [],
-          dummies: []
-        },
-        substitutions: [],
-        type: 'element'
-      }
-    }]]);
+          },
+          substitutions: [],
+          type: 'boolean'
+        }
+      }, {
+        format: 'phrase',
+        content: 'contradiction'
+      }, {
+        format: 'expression',
+        content: {
+          expression: {
+            top_kind_name: 'variable',
+            top_operator_name: 'a',
+            arguments: [],
+            dummies: []
+          },
+          substitutions: [],
+          type: 'element'
+        }
+      }]]);
   });
 
   it('should reject unknown phrases', function() {
     expect(
       errorWrapper(parse, 'from p we havw p\u2227q')
-    ).toThrowError(
-      'The phrase starting \'we\' could not be identified; ' +
-      'please make sure you are only using phrases from the given list of ' +
-      'vocabulary.'
+    ).toThrow('The phrase starting \'we\' could not be identified; please ' +
+      'make sure you are only using phrases from the given list of vocabulary.'
     );
   });
 
   it('should reject consecutive expressions', function() {
     expect(
       errorWrapper(parse, 'from A=>B B have B')
-    ).toThrowError(
-      'We could not identify \'B\'; please make sure you are using ' +
+    ).toThrow('We could not identify \'B\'; please make sure you are using ' +
       'vocabulary from the given list, and don\'t have two consecutive ' +
       'expressions.');
   });
@@ -232,12 +229,12 @@ describe('Parse lines', function() {
 describe('Instantiate types', function() {
   it('should instantiate examples correctly', function() {
     expect(logicProofShared.instantiateTypingElementArray([{
-      type: 'boolean',
-      arbitrarily_many: false
-    }, {
-      type: 'element',
-      arbitrarily_many: true
-    }], 3)).toEqual(['boolean', 'element', 'element']);
+        type: 'boolean',
+        arbitrarily_many: false
+      }, {
+        type: 'element',
+        arbitrarily_many: true
+      }], 3)).toEqual(['boolean', 'element', 'element']);
     expect(logicProofShared.instantiateTypingElementArray([], 0)).toEqual([]);
   });
 });
@@ -334,7 +331,7 @@ describe('Assign types to expressions', function() {
   it('should reject type mismatches', function() {
     expect(
       errorWrapper(assignTypes, 'p<=>2+x', ['variable'])
-    ).toThrowError(
+    ).toThrow(
       'addition yields a element but you are trying to use it to give a ' +
       'boolean.');
 
@@ -342,13 +339,13 @@ describe('Assign types to expressions', function() {
       errorWrapper(
         assignTypes, 'x\u2227f(x)',
         ['variable', 'prefix_function', 'constant'])
-    ).toThrowError(
+    ).toThrow(
       'x yields a boolean but you are trying to use it to give a element.');
 
     expect(
       errorWrapper(
         assignTypesControl, '\'a\'=2', ['prefix_function', 'constant'])
-    ).toThrowError(
+    ).toThrow(
       '2 yields a integer but you are trying to use it to give a string.');
   });
 
@@ -357,7 +354,7 @@ describe('Assign types to expressions', function() {
       errorWrapper(
         assignTypes, 'a\u2227\u2203a.f(2)',
         ['variable', 'prefix_function', 'constant'])
-    ).toThrowError(
+    ).toThrow(
       'The name \'a\' is already in use and so cannot be quantified over in ' +
       '\u2203a.f(2).');
   });
@@ -366,7 +363,7 @@ describe('Assign types to expressions', function() {
     expect(
       errorWrapper(
         assignTypes, 'f(f)', ['variable', 'prefix_function', 'constant'])
-    ).toThrowError('f is supposed to be a prefix_function.');
+    ).toThrow('f is supposed to be a prefix_function.');
   });
 
   it('should reject unknown operators of an un-addable kind', function() {
@@ -374,11 +371,11 @@ describe('Assign types to expressions', function() {
       errorWrapper(
         assignTypes, '\u2200m<n.A(n)',
         ['variable', 'prefix_function', 'constant'])
-    ).toThrowError('The operator bounded_for_all could not be identified.');
+    ).toThrow('The operator bounded_for_all could not be identified.');
     expect(
       errorWrapper(
         assignTypes, '\u2203x.A(x)<=>x=2', ['prefix_function', 'constant'])
-    ).toThrowError('The operator x could not be identified.');
+    ).toThrow('The operator x could not be identified.');
   });
 });
 
@@ -413,13 +410,13 @@ describe('Check equality between expression constructs', function() {
   it('should recognise when sets of expressions are equal', function() {
     expect(
       logicProofShared.checkSetsOfExpressionsAreEqual([
-        logicProofParser.parse('A(x)\u2228x=2', 'expression'),
-        logicProofParser.parse('p', 'expression')
-      ], [
-        logicProofParser.parse('p', 'expression'),
-        logicProofParser.parse('A(x)\u2228(x=2)', 'expression'),
-        logicProofParser.parse('p', 'expression')
-      ])
+          logicProofParser.parse('A(x)\u2228x=2', 'expression'),
+          logicProofParser.parse('p', 'expression')
+        ], [
+          logicProofParser.parse('p', 'expression'),
+          logicProofParser.parse('A(x)\u2228(x=2)', 'expression'),
+          logicProofParser.parse('p', 'expression')
+        ])
     ).toBe(true);
   });
 });

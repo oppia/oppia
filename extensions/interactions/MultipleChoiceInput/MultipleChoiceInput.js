@@ -66,14 +66,13 @@ oppia.directive('oppiaShortResponseMultipleChoiceInput', [
       restrict: 'E',
       scope: {},
       templateUrl: 'shortResponse/MultipleChoiceInput',
-      controller: [
-        '$scope', '$attrs', '$filter',
-        function($scope, $attrs, $filter) {
-          var _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
-          var _choices = oppiaHtmlEscaper.escapedJsonToObj($attrs.choices);
-          var response = $filter('convertToPlainText')(_choices[_answer]);
-          $scope.response = $filter('truncateAtFirstLine')(response);
-        }]
+      controller: ['$scope', '$attrs', '$filter',
+          function($scope, $attrs, $filter) {
+        var _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        var _choices = oppiaHtmlEscaper.escapedJsonToObj($attrs.choices);
+        var response = $filter('convertToPlainText')(_choices[_answer]);
+        $scope.response = $filter('truncateAtFirstLine')(response);
+      }]
     };
   }
 ]);

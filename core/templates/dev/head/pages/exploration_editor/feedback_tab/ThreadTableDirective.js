@@ -26,14 +26,13 @@ oppia.directive('threadTable', [function() {
     },
     templateUrl: 'feedbackTab/threadTable',
     controller: [
-      '$scope', 'threadStatusDisplayService', 'oppiaDatetimeFormatter',
-      function($scope, threadStatusDisplayService, oppiaDatetimeFormatter) {
-        $scope.getLabelClass = threadStatusDisplayService.getLabelClass;
-        $scope.getHumanReadableStatus = (
-          threadStatusDisplayService.getHumanReadableStatus);
-        $scope.getLocaleAbbreviatedDatetimeString = (
-          oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString);
-      }
-    ]
+        '$scope', 'threadStatusDisplayService', 'oppiaDatetimeFormatter',
+        function($scope, threadStatusDisplayService, oppiaDatetimeFormatter) {
+      $scope.getLabelClass = threadStatusDisplayService.getLabelClass;
+      $scope.getHumanReadableStatus = (
+        threadStatusDisplayService.getHumanReadableStatus);
+      $scope.getLocaleAbbreviatedDatetimeString = (
+        oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString);
+    }]
   };
 }]);

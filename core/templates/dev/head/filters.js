@@ -155,104 +155,103 @@ oppia.filter('isOutcomeConfusing', [function() {
 // values. Note that this returns an HTML string to accommodate the case of
 // multiple-choice input and image-click input.
 oppia.filter('parameterizeRuleDescription', [
-  'INTERACTION_SPECS', function(INTERACTION_SPECS) {
-    return function(rule, interactionId, choices) {
-      if (!rule) {
-        return '';
+    'INTERACTION_SPECS', function(INTERACTION_SPECS) {
+  return function(rule, interactionId, choices) {
+    if (!rule) {
+      return '';
+    }
+
+    if (!INTERACTION_SPECS.hasOwnProperty(interactionId)) {
+      console.error('Cannot find interaction with id ' + interactionId);
+      return '';
+    }
+    var description = INTERACTION_SPECS[interactionId].rule_descriptions[
+      rule.type];
+    if (!description) {
+      console.error(
+        'Cannot find description for rule ' + rule.type +
+        ' for interaction ' + interactionId);
+      return '';
+    }
+
+    var inputs = rule.inputs;
+    var finalDescription = description;
+
+    var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
+    var iter = 0;
+    while (true) {
+      if (!description.match(PATTERN) || iter === 100) {
+        break;
+      }
+      iter++;
+
+      var varName = description.match(PATTERN)[1];
+      var varType = description.match(PATTERN)[2];
+      if (varType) {
+        varType = varType.substring(1);
       }
 
-      if (!INTERACTION_SPECS.hasOwnProperty(interactionId)) {
-        console.error('Cannot find interaction with id ' + interactionId);
-        return '';
-      }
-      var description = INTERACTION_SPECS[interactionId].rule_descriptions[
-        rule.type];
-      if (!description) {
-        console.error(
-          'Cannot find description for rule ' + rule.type +
-          ' for interaction ' + interactionId);
-        return '';
-      }
-
-      var inputs = rule.inputs;
-      var finalDescription = description;
-
-      var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
-      var iter = 0;
-      while (true) {
-        if (!description.match(PATTERN) || iter === 100) {
-          break;
-        }
-        iter++;
-
-        var varName = description.match(PATTERN)[1];
-        var varType = description.match(PATTERN)[2];
-        if (varType) {
-          varType = varType.substring(1);
-        }
-
-        var replacementText = '[INVALID]';
-        // Special case for MultipleChoiceInput, ImageClickInput, and
-        // ItemSelectionInput.
-        if (choices) {
-          if (varType === 'SetOfHtmlString') {
-            replacementText = '[';
-            var key = inputs[varName];
-            for (var i = 0; i < key.length; i++) {
-              replacementText += key[i];
-              if (i < key.length - 1) {
-                replacementText += ',';
-              }
-            }
-            replacementText += ']';
-          } else {
-            // The following case is for MultipleChoiceInput
-            for (var i = 0; i < choices.length; i++) {
-              if (choices[i].val === inputs[varName]) {
-                replacementText = '\'' + choices[i].label + '\'';
-              }
-            }
-          }
-          // TODO(sll): Generalize this to use the inline string representation
-          // of an object type.
-        } else if (varType === 'MusicPhrase') {
+      var replacementText = '[INVALID]';
+      // Special case for MultipleChoiceInput, ImageClickInput, and
+      // ItemSelectionInput.
+      if (choices) {
+        if (varType === 'SetOfHtmlString') {
           replacementText = '[';
-          for (var i = 0; i < inputs[varName].length; i++) {
-            if (i !== 0) {
-              replacementText += ', ';
+          var key = inputs[varName];
+          for (var i = 0; i < key.length; i++) {
+            replacementText += key[i];
+            if (i < key.length - 1) {
+              replacementText += ',';
             }
-            replacementText += inputs[varName][i].readableNoteName;
           }
           replacementText += ']';
-        } else if (varType === 'CoordTwoDim') {
-          var latitude = inputs[varName][0] || 0.0;
-          var longitude = inputs[varName][1] || 0.0;
-          replacementText = '(';
-          replacementText += (
-            inputs[varName][0] >= 0.0 ?
-            latitude.toFixed(2) + '°N' :
-            -latitude.toFixed(2) + '°S');
-          replacementText += ', ';
-          replacementText += (
-            inputs[varName][1] >= 0.0 ?
-            longitude.toFixed(2) + '°E' :
-            -longitude.toFixed(2) + '°W');
-          replacementText += ')';
-        } else if (varType === 'NormalizedString') {
-          replacementText = '"' + inputs[varName] + '"';
-        } else if (varType === 'Graph') {
-          replacementText = '[reference graph]';
         } else {
-          replacementText = inputs[varName];
+          // The following case is for MultipleChoiceInput
+          for (var i = 0; i < choices.length; i++) {
+            if (choices[i].val === inputs[varName]) {
+              replacementText = '\'' + choices[i].label + '\'';
+            }
+          }
         }
-
-        description = description.replace(PATTERN, ' ');
-        finalDescription = finalDescription.replace(PATTERN, replacementText);
+        // TODO(sll): Generalize this to use the inline string representation of
+        // an object type.
+      } else if (varType === 'MusicPhrase') {
+        replacementText = '[';
+        for (var i = 0; i < inputs[varName].length; i++) {
+          if (i !== 0) {
+            replacementText += ', ';
+          }
+          replacementText += inputs[varName][i].readableNoteName;
+        }
+        replacementText += ']';
+      } else if (varType === 'CoordTwoDim') {
+        var latitude = inputs[varName][0] || 0.0;
+        var longitude = inputs[varName][1] || 0.0;
+        replacementText = '(';
+        replacementText += (
+          inputs[varName][0] >= 0.0 ?
+          latitude.toFixed(2) + '°N' :
+          -latitude.toFixed(2) + '°S');
+        replacementText += ', ';
+        replacementText += (
+          inputs[varName][1] >= 0.0 ?
+          longitude.toFixed(2) + '°E' :
+          -longitude.toFixed(2) + '°W');
+        replacementText += ')';
+      } else if (varType === 'NormalizedString') {
+        replacementText = '"' + inputs[varName] + '"';
+      } else if (varType === 'Graph') {
+        replacementText = '[reference graph]';
+      } else {
+        replacementText = inputs[varName];
       }
-      return finalDescription;
-    };
-  }
-]);
+
+      description = description.replace(PATTERN, ' ');
+      finalDescription = finalDescription.replace(PATTERN, replacementText);
+    }
+    return finalDescription;
+  };
+}]);
 
 // Filter that removes whitespace from the beginning and end of a string, and
 // replaces interior whitespace with a single space character.

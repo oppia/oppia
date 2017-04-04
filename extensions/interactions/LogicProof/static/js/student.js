@@ -458,8 +458,9 @@ var logicProofStudent = (function() {
           return result;
         }
       },
-      // eslint-disable-next-line quote-props
+      // jscs:disable disallowQuotedKeysInObjects
       'if': {
+        // jscs:enable disallowQuotedKeysInObjects
         format: 'bottom_up',
         evaluateExpression: function(args) {
           return args[0] ? args[1] : args[2];

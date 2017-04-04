@@ -218,6 +218,7 @@ oppia.factory('compareVersionsService', [
               directionForwards: true
             }]
           );
+
           return {
             nodes: diffGraphData.nodes,
             links: diffGraphData.links,
