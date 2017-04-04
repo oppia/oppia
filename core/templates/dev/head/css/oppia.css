@@ -1471,18 +1471,6 @@ md-card.oppia-dashboard-tile {
   min-height: 100%;
 }
 
-.oppia-cc-icon {
-  bottom: 50px;
-  opacity: 0.4;
-  position: fixed;
-  right: 25px;
-}
-
-.oppia-cc-icon:hover {
-  opacity: 0.7;
-  text-decoration: none;
-}
-
 .oppia-wide-panel {
   border: 1px solid #dde0FF;
   border-radius: 20px;
