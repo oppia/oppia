@@ -29,7 +29,8 @@ oppia.constant(
 oppia.constant(
   'COLLECTION_TITLE_INPUT_FOCUS_LABEL', 'collectionTitleInputFocusLabel');
 
-oppia.controller('CollectionEditor', ['CollectionEditorStateService',
+oppia.controller('CollectionEditor', [
+  'CollectionEditorStateService',
   function(CollectionEditorStateService) {
     // Load the collection to be edited.
     CollectionEditorStateService.loadCollection(GLOBALS.collectionId);

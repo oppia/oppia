@@ -18,57 +18,66 @@
  */
 
 oppia.factory('InteractionObjectFactory', [
-  'AnswerGroupObjectFactory', 'FallbackObjectFactory',
-  function(AnswerGroupObjectFactory, FallbackObjectFactory) {
-  var Interaction = function(
-    answerGroups, confirmedUnclassifiedAnswers, customizationArgs,
-    defaultOutcome, fallbacks, id) {
-    this.answerGroups = answerGroups;
-    this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
-    this.customizationArgs = customizationArgs;
-    this.defaultOutcome = defaultOutcome;
-    this.fallbacks = fallbacks;
-    this.id = id;
-  };
-
-  Interaction.prototype.toBackendDict = function() {
-    return {
-      answer_groups: this.answerGroups.map(function(answerGroup) {
-        return answerGroup.toBackendDict();
-      }),
-      confirmed_unclassified_answers: this.confirmedUnclassifiedAnswers,
-      customization_args: this.customizationArgs,
-      default_outcome: this.defaultOutcome,
-      fallbacks: this.fallbacks.map(function(fallback) {
-        return fallback.toBackendDict();
-      }),
-      id: this.id
+  'AnswerGroupObjectFactory', 'FallbackObjectFactory', 'OutcomeObjectFactory',
+  function(
+    AnswerGroupObjectFactory, FallbackObjectFactory, OutcomeObjectFactory) {
+    var Interaction = function(
+        answerGroups, confirmedUnclassifiedAnswers, customizationArgs,
+        defaultOutcome, fallbacks, id) {
+      this.answerGroups = answerGroups;
+      this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
+      this.customizationArgs = customizationArgs;
+      this.defaultOutcome = defaultOutcome;
+      this.fallbacks = fallbacks;
+      this.id = id;
     };
-  };
 
-  Interaction.createFromBackendDict = function(interactionDict) {
-    return new Interaction(
-      generateAnswerGroupsFromBackend(interactionDict.answer_groups),
-      interactionDict.confirmed_unclassified_answers,
-      interactionDict.customization_args,
-      interactionDict.default_outcome,
-      generateFallbacksFromBackend(interactionDict.fallbacks),
-      interactionDict.id);
-  };
+    Interaction.prototype.toBackendDict = function() {
+      return {
+        answer_groups: this.answerGroups.map(function(answerGroup) {
+          return answerGroup.toBackendDict();
+        }),
+        confirmed_unclassified_answers: this.confirmedUnclassifiedAnswers,
+        customization_args: this.customizationArgs,
+        default_outcome: this.defaultOutcome.toBackendDict(),
+        fallbacks: this.fallbacks.map(function(fallback) {
+          return fallback.toBackendDict();
+        }),
+        id: this.id
+      };
+    };
 
-  var generateAnswerGroupsFromBackend = function(answerGroupBackendDicts) {
-    return answerGroupBackendDicts.map(function(
-      answerGroupBackendDict) {
-      return AnswerGroupObjectFactory.createFromBackendDict(
-        answerGroupBackendDict);
-    });
-  };
+    Interaction.createFromBackendDict = function(interactionDict) {
+      var defaultOutcome;
+      if (interactionDict.default_outcome) {
+        defaultOutcome = OutcomeObjectFactory.createFromBackendDict(
+          interactionDict.default_outcome);
+      } else {
+        defaultOutcome = null;
+      }
+      return new Interaction(
+        generateAnswerGroupsFromBackend(interactionDict.answer_groups),
+        interactionDict.confirmed_unclassified_answers,
+        interactionDict.customization_args,
+        defaultOutcome,
+        generateFallbacksFromBackend(interactionDict.fallbacks),
+        interactionDict.id);
+    };
 
-  var generateFallbacksFromBackend = function(fallbackBackendDicts) {
-    return fallbackBackendDicts.map(function(fallbackBackendDict) {
-      return FallbackObjectFactory.createFromBackendDict(fallbackBackendDict);
-    });
-  };
+    var generateAnswerGroupsFromBackend = function(answerGroupBackendDicts) {
+      return answerGroupBackendDicts.map(function(
+        answerGroupBackendDict) {
+        return AnswerGroupObjectFactory.createFromBackendDict(
+          answerGroupBackendDict);
+      });
+    };
 
-  return Interaction;
-}]);
+    var generateFallbacksFromBackend = function(fallbackBackendDicts) {
+      return fallbackBackendDicts.map(function(fallbackBackendDict) {
+        return FallbackObjectFactory.createFromBackendDict(fallbackBackendDict);
+      });
+    };
+
+    return Interaction;
+  }
+]);

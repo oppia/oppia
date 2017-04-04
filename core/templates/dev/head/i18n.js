@@ -38,71 +38,73 @@ oppia.constant('DEFAULT_TRANSLATIONS', {
 });
 
 oppia.controller('I18nFooter', [
-    '$http', '$rootScope', '$scope', '$translate', '$timeout',
-    function($http, $rootScope, $scope, $translate, $timeout) {
-  // Changes the language of the translations.
-  var preferencesDataUrl = '/preferenceshandler/data';
-  var siteLanguageUrl = '/save_site_language';
-  $scope.supportedSiteLanguages = GLOBALS.SUPPORTED_SITE_LANGUAGES;
-  if (GLOBALS.userIsLoggedIn && GLOBALS.preferredSiteLanguageCode) {
-    $translate.use(GLOBALS.preferredSiteLanguageCode);
-  }
-
-  // The $timeout seems to be necessary for the dropdown to show anything
-  // at the outset, if the default language is not English.
-  $timeout(function() {
-    // $translate.use() returns undefined until the language file is fully
-    // loaded, which causes a blank field in the dropdown, hence we use
-    // $translate.proposedLanguage() as suggested in
-    // http://stackoverflow.com/a/28903658
-    $scope.currentLanguageCode = $translate.use() ||
-      $translate.proposedLanguage();
-  }, 50);
-
-  $scope.changeLanguage = function() {
-    $translate.use($scope.currentLanguageCode);
-    if (GLOBALS.userIsLoggedIn) {
-      $http.put(siteLanguageUrl, {
-        site_language_code: $scope.currentLanguageCode
-      });
+  '$http', '$rootScope', '$scope', '$translate', '$timeout',
+  function($http, $rootScope, $scope, $translate, $timeout) {
+    // Changes the language of the translations.
+    var preferencesDataUrl = '/preferenceshandler/data';
+    var siteLanguageUrl = '/save_site_language';
+    $scope.supportedSiteLanguages = GLOBALS.SUPPORTED_SITE_LANGUAGES;
+    if (GLOBALS.userIsLoggedIn && GLOBALS.preferredSiteLanguageCode) {
+      $translate.use(GLOBALS.preferredSiteLanguageCode);
     }
-  };
-}]);
+
+    // The $timeout seems to be necessary for the dropdown to show anything
+    // at the outset, if the default language is not English.
+    $timeout(function() {
+      // $translate.use() returns undefined until the language file is fully
+      // loaded, which causes a blank field in the dropdown, hence we use
+      // $translate.proposedLanguage() as suggested in
+      // http://stackoverflow.com/a/28903658
+      $scope.currentLanguageCode = $translate.use() ||
+        $translate.proposedLanguage();
+    }, 50);
+
+    $scope.changeLanguage = function() {
+      $translate.use($scope.currentLanguageCode);
+      if (GLOBALS.userIsLoggedIn) {
+        $http.put(siteLanguageUrl, {
+          site_language_code: $scope.currentLanguageCode
+        });
+      }
+    };
+  }
+]);
 
 oppia.config([
-    '$translateProvider', 'DEFAULT_TRANSLATIONS',
-    function($translateProvider, DEFAULT_TRANSLATIONS) {
-  var availableLanguageKeys = [];
-  var availableLanguageKeysMap = {};
-  GLOBALS.SUPPORTED_SITE_LANGUAGES.forEach(function(language) {
-    availableLanguageKeys.push(language.id);
-    availableLanguageKeysMap[language.id + '*'] = language.id;
-  });
-  availableLanguageKeysMap['*'] = 'en';
+  '$translateProvider', 'DEFAULT_TRANSLATIONS',
+  function($translateProvider, DEFAULT_TRANSLATIONS) {
+    var availableLanguageKeys = [];
+    var availableLanguageKeysMap = {};
+    GLOBALS.SUPPORTED_SITE_LANGUAGES.forEach(function(language) {
+      availableLanguageKeys.push(language.id);
+      availableLanguageKeysMap[language.id + '*'] = language.id;
+    });
+    availableLanguageKeysMap['*'] = 'en';
 
-  $translateProvider
-    .registerAvailableLanguageKeys(
-      availableLanguageKeys, availableLanguageKeysMap)
-    .useStaticFilesLoader({
-      prefix: GLOBALS.ASSET_DIR_PREFIX + '/assets/i18n/',
-      suffix: '.json'
-    })
-    // The use of default translation improves the loading time when English is
-    // selected
-    .translations('en', DEFAULT_TRANSLATIONS)
-    .fallbackLanguage('en')
-    .determinePreferredLanguage()
-    .useCookieStorage()
-    // The messageformat interpolation method is necessary for pluralization.
-    // Is optional and should be passed as argument to the translate call. See
-    // https://angular-translate.github.io/docs/#/guide/14_pluralization
-    .addInterpolation('$translateMessageFormatInterpolation')
-    // The strategy 'sanitize' does not support utf-8 encoding.
-    // https://github.com/angular-translate/angular-translate/issues/1131
-    // The strategy 'escape' will brake strings with raw html, like hyperlinks
-    .useSanitizeValueStrategy('sanitizeParameters')
-    .forceAsyncReload(true);
-}]);
+    $translateProvider
+      .registerAvailableLanguageKeys(
+        availableLanguageKeys, availableLanguageKeysMap)
+      .useStaticFilesLoader({
+        prefix: GLOBALS.ASSET_DIR_PREFIX + '/assets/i18n/',
+        suffix: '.json'
+      })
+      // The use of default translation improves the loading time when English
+      // is selected
+      .translations('en', DEFAULT_TRANSLATIONS)
+      .fallbackLanguage('en')
+      .determinePreferredLanguage()
+      .useCookieStorage()
+      // The messageformat interpolation method is necessary for pluralization.
+      // Is optional and should be passed as argument to the translate call. See
+      // https://angular-translate.github.io/docs/#/guide/14_pluralization
+      .addInterpolation('$translateMessageFormatInterpolation')
+      // The strategy 'sanitize' does not support utf-8 encoding.
+      // https://github.com/angular-translate/angular-translate/issues/1131
+      // The strategy 'escape' will brake strings with raw html, like hyperlinks
+      .useSanitizeValueStrategy('sanitizeParameters')
+      .forceAsyncReload(true);
+  }
+]);
 
 // Service to dynamically construct translation ids for i18n.
 oppia.factory('i18nIdService', function() {

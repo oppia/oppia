@@ -18,43 +18,44 @@
  */
 
 oppia.factory('ExplorationSummaryBackendApiService', [
-    '$http', '$q', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
-    function($http, $q, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
-      var _fetchExpSummaries = function(explorationIds,
-        includePrivateExplorations, successCallback, errorCallback) {
-        var explorationSummaryDataUrl = EXPLORATION_SUMMARY_DATA_URL_TEMPLATE;
+  '$http', '$q', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
+  function($http, $q, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
+    var _fetchExpSummaries = function(explorationIds,
+      includePrivateExplorations, successCallback, errorCallback) {
+      var explorationSummaryDataUrl = EXPLORATION_SUMMARY_DATA_URL_TEMPLATE;
 
-        $http.get(explorationSummaryDataUrl, {
-          params: {
-            stringified_exp_ids: JSON.stringify(explorationIds),
-            include_private_explorations: JSON.stringify(
-              includePrivateExplorations)
-          }
-        }).then(function(response) {
-          var summaries = angular.copy(response.data.summaries);
-          if (successCallback) {
-            successCallback(summaries);
-          }
-        }, function(errorResponse) {
-          if (errorCallback) {
-            errorCallback(errorResponse.data);
-          }
-        });
-      };
-
-      return {
-        /**
-         * Fetches a list of public exploration summaries and private
-         * exploration summaries for which the current user has access from the
-         * backend for each exploration ID provided. The provided list of
-         * exploration summaries are in the same order as input exploration IDs
-         * list, though some may be missing (if the exploration doesn't exist or
-         * or the user does not have access to it).
-         */
-        loadPublicAndPrivateExplorationSummaries: function(explorationIds) {
-          return $q(function(resolve, reject) {
-            _fetchExpSummaries(explorationIds, true, resolve, reject);
-          });
+      $http.get(explorationSummaryDataUrl, {
+        params: {
+          stringified_exp_ids: JSON.stringify(explorationIds),
+          include_private_explorations: JSON.stringify(
+            includePrivateExplorations)
         }
-      };
-    }]);
+      }).then(function(response) {
+        var summaries = angular.copy(response.data.summaries);
+        if (successCallback) {
+          successCallback(summaries);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
+    return {
+      /**
+       * Fetches a list of public exploration summaries and private
+       * exploration summaries for which the current user has access from the
+       * backend for each exploration ID provided. The provided list of
+       * exploration summaries are in the same order as input exploration IDs
+       * list, though some may be missing (if the exploration doesn't exist or
+       * or the user does not have access to it).
+       */
+      loadPublicAndPrivateExplorationSummaries: function(explorationIds) {
+        return $q(function(resolve, reject) {
+          _fetchExpSummaries(explorationIds, true, resolve, reject);
+        });
+      }
+    };
+  }
+]);

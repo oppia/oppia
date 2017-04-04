@@ -240,7 +240,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
     template: '<div ng-include="directiveTemplateId"></div>',
     controller: [
       '$scope', '$timeout', '$rootScope', '$window', '$translate', '$http',
-       'messengerService', 'oppiaPlayerService', 'urlService', 'focusService',
+      'messengerService', 'oppiaPlayerService', 'urlService', 'focusService',
       'LearnerViewRatingService', 'windowDimensionsService',
       'playerTranscriptService', 'LearnerParamsService',
       'playerPositionService', 'explorationRecommendationsService',
