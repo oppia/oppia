@@ -1,4 +1,18 @@
 <script type="text/ng-template" id="components/responseHeader">
+  <style>
+    .oppia-delete-response-button {
+      cursor: pointer;
+      opacity: 0.5;
+      position: absolute;
+      right: 8px;
+      top: 8px;
+      width: 20px;
+    }
+
+    .oppia-delete-response-button:hover {
+      opacity: 1;
+    }
+  </style>
   <div class="oppia-response-header-block">
     <div class="oppia-response-header">
       <span ng-if="!isActive()" ng-attr-title="<[getSummary()]>">

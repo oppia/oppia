@@ -1949,19 +1949,10 @@ pre.oppia-pre-wrapped-text {
   right: -30px;
   top: 0;
 }
-.oppia-delete-response-button {
-  cursor: pointer;
-  opacity: 0.5;
-  position: absolute;
-  right: 8px;
-  top: 8px;
-  width: 20px;
-}
 
 .oppia-delete-param-change-button:hover,
 .oppia-delete-interaction-button:hover,
-.oppia-close-popover-button:hover,
-.oppia-delete-response-button:hover {
+.oppia-close-popover-button:hover {
   opacity: 1;
 }
 
