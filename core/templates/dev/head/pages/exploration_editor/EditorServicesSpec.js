@@ -808,11 +808,13 @@ describe('New state template service', function() {
           nsts.getNewStateTemplate(NEW_STATE_NAME)
         ))).toEqual({
           name: 'new state name',
+          classifierModelId: null,
           content: [{
             type: 'text',
             value: ''
           }],
           interaction: {
+
             answer_groups: [],
             confirmed_unclassified_answers: [],
             customization_args: {},

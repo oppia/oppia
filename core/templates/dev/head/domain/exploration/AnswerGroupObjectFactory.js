@@ -12,23 +12,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-oppia.factory('AnswerGroupObjectFactory', [function() {
-  var AnswerGroup = function(ruleSpecs, outcome) {
-    this.ruleSpecs = ruleSpecs;
+/**
+ * @fileoverview Factory for creating new frontend instances of AnswerGroup
+ * domain objects.
+ */
+
+oppia.factory('AnswerGroupObjectFactory', ['RuleObjectFactory',
+  function(RuleObjectFactory) {
+  var AnswerGroup = function(rules, outcome, correct) {
+    this.rules = rules;
     this.outcome = outcome;
+    this.correct = correct;
   };
 
   AnswerGroup.prototype.toBackendDict = function() {
     return {
-      rule_specs: this.ruleSpecs,
-      outcome: this.outcome
+      rule_specs: this.rules.map(function(rule) {
+        return rule.toBackendDict();
+      }),
+      outcome: this.outcome,
+      correct: this.correct
     };
   };
 
   // Static class methods. Note that "this" is not available in
   // static contexts.
-  AnswerGroup.create = function(ruleSpecs, outcome) {
-    return new AnswerGroup(ruleSpecs, outcome);
+  AnswerGroup.createNew = function(rules, outcome, correct) {
+    return new AnswerGroup(rules, outcome, correct);
+  };
+
+  AnswerGroup.createFromBackendDict = function(answerGroupBackendDict) {
+    return new AnswerGroup(
+      generateRulesFromBackend(answerGroupBackendDict.rule_specs),
+      answerGroupBackendDict.outcome,
+      false);
+  };
+
+  var generateRulesFromBackend = function(ruleBackendDicts) {
+    return ruleBackendDicts.map(function(ruleBackendDict) {
+      return RuleObjectFactory.createFromBackendDict(ruleBackendDict);
+    });
   };
 
   return AnswerGroup;

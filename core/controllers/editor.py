@@ -331,7 +331,6 @@ class ExplorationHandler(EditorHandler):
 
         commit_message = self.payload.get('commit_message')
         change_list = self.payload.get('change_list')
-
         try:
             exp_services.update_exploration(
                 self.user_id, exploration_id, change_list, commit_message)
@@ -641,7 +640,7 @@ class UntrainedAnswersHandler(EditorHandler):
         answers = stats_services.get_top_state_rule_answers(
             exploration_id, state_name, [
                 exp_domain.DEFAULT_RULESPEC_STR,
-                exp_domain.CLASSIFIER_RULESPEC_STR])[
+                exp_domain.RULE_TYPE_CLASSIFIER])[
                     :self.NUMBER_OF_TOP_ANSWERS_PER_RULE]
 
         interaction = state.interaction
@@ -661,7 +660,7 @@ class UntrainedAnswersHandler(EditorHandler):
                 for answer_group in interaction.answer_groups:
                     for rule_spec in answer_group.rule_specs:
                         if (rule_spec.rule_type ==
-                                exp_domain.CLASSIFIER_RULESPEC_STR):
+                                exp_domain.RULE_TYPE_CLASSIFIER):
                             trained_answers.update(
                                 interaction_instance.normalize_answer(trained)
                                 for trained

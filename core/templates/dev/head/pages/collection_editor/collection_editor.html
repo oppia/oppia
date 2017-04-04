@@ -71,6 +71,12 @@
 
 {% block footer_js %}
   {{ super() }}
+  
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionSyntaxTree.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/evaluator.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/parser.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionInterpolationService.js"></script>
+
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/CollectionEditor.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/CollectionEditorNavbarBreadcrumbDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/CollectionEditorNavbarDirective.js"></script>
@@ -110,5 +116,4 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationEditor.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/GadgetValidationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/RouterServices.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionInterpolationService.js"></script>
 {% endblock footer_js %}
