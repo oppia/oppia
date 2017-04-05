@@ -28,7 +28,7 @@ class ImageClickInput(base.BaseInteraction):
     answer_type = 'ClickOnImage'
     instructions = 'Drag in the correct labels.'
     narrow_instructions = 'Label the image'
-    needs_summary = false
+    needs_summary = False
 
     _customization_arg_specs = [{
         'name': 'imageAndRegions',
@@ -49,28 +49,3 @@ class ImageClickInput(base.BaseInteraction):
         },
         'default_value': False
     }]
-
-
-
-class LabelingInput(base.BaseInteraction):
-
-    name = 'Label the Picture'
-    description = 'Allows learners to label pictures.'
-    display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
-    is_trainable = False
-    _dependency_ids = []
-    instructions = 'Drag in the correct labels.'
-    narrow_instructions = 'Label the image'
-    needs_summary = True
-
-    _customization_arg_specs = [{
-        'name': 'labelInput',
-        'description': 'Provide an image',
-        'schema': {
-            'type': 'custom',
-            'obj_type': 'ImageWithRegions'
-        },
-        'default_value': {
-            'imagePath': '',
-            'labeledRegions': []
-        }}]
