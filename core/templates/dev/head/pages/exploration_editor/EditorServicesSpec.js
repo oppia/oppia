@@ -814,11 +814,10 @@ describe('New state template service', function() {
             value: ''
           }],
           interaction: {
-
-            answer_groups: [],
-            confirmed_unclassified_answers: [],
-            customization_args: {},
-            default_outcome: {
+            answerGroups: [],
+            confirmedUnclassifiedAnswers: [],
+            customizationArgs: {},
+            defaultOutcome: {
               dest: NEW_STATE_NAME,
               feedback: [],
               param_changes: []
