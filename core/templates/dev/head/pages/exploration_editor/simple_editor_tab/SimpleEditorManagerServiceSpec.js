@@ -28,6 +28,7 @@ describe('Simple Editor Manager Service', function () {
   var simpleEditorManagerService;
   var questionObjectFactory;
   var answerGroupObjectFactory;
+  var ruleObjectFactory;
   var explorationStatesService;
   var explorationTitleService;
   var explorationInitStateNameService;
@@ -51,6 +52,7 @@ describe('Simple Editor Manager Service', function () {
     simpleEditorManagerService = $injector.get('SimpleEditorManagerService');
     questionObjectFactory = $injector.get('QuestionObjectFactory');
     answerGroupObjectFactory = $injector.get('AnswerGroupObjectFactory');
+    ruleObjectFactory = $injector.get('RuleObjectFactory');
     explorationStatesService = $injector.get('explorationStatesService');
     explorationTitleService = $injector.get('explorationTitleService');
     explorationInitStateNameService = $injector
@@ -212,7 +214,7 @@ describe('Simple Editor Manager Service', function () {
     END_EXPLORATION_INTERACTION = {
       ID: 'EndExploration',
       CUSTOMIZATION_ARGS: {
-        recommendedExplorationIds: []
+        recommendedExplorationIds: { value: [] }
       }
     };
 
@@ -310,17 +312,14 @@ describe('Simple Editor Manager Service', function () {
     simpleEditorManagerService.saveCustomizationArgs(
       testStateName, expectedNewCustomizationArgs);
     expect(explorationStatesService.getState(testStateName)
-      .interaction.customization_args).toEqual(expectedNewCustomizationArgs);
+      .interaction.customizationArgs).toEqual(expectedNewCustomizationArgs);
   });
 
   it('should save the answer groups', function () {
     var testStateName = 'Introduction';
-    var newAnswerGroupRuleSpecs = [{
-        "inputs": {
-          "x": "ate"
-        },
-        "rule_type": "Contains"
-      }];
+    var newAnswerGroupRuleSpecs = [ruleObjectFactory.createNew('Contains', {
+      "x": "ate"
+    })];
     var newAnswerGroupOutcome = {
       "param_changes": [],
       "feedback": [
@@ -329,12 +328,12 @@ describe('Simple Editor Manager Service', function () {
       "dest": "Question 1"
     };
     var expectedNewAnswerGroups = [answerGroupObjectFactory
-      .create(newAnswerGroupRuleSpecs, newAnswerGroupOutcome)];
+      .createNew(newAnswerGroupRuleSpecs, newAnswerGroupOutcome, false)];
     simpleEditorManagerService.tryToInit();
     simpleEditorManagerService.saveAnswerGroups(
       testStateName, expectedNewAnswerGroups);
     expect(explorationStatesService.getState(testStateName)
-      .interaction.answer_groups).toEqual(expectedNewAnswerGroups);
+      .interaction.answerGroups).toEqual(expectedNewAnswerGroups);
   });
 
   it('should save the default outcome', function () {
@@ -349,7 +348,7 @@ describe('Simple Editor Manager Service', function () {
     simpleEditorManagerService.saveDefaultOutcome(
       testStateName, expectedNewDefaultOutcome);
     expect(explorationStatesService.getState(testStateName)
-      .interaction.default_outcome).toEqual(expectedNewDefaultOutcome);
+      .interaction.defaultOutcome).toEqual(expectedNewDefaultOutcome);
   });
 
   it('should save the bridge html', function () {
@@ -377,9 +376,9 @@ describe('Simple Editor Manager Service', function () {
     simpleEditorManagerService.addNewQuestion();
     var state = explorationStatesService.getState(expectedLastStateName);
     expect(state.interaction.id).toEqual(expectedInteraction.ID);
-    expect(state.interaction.customization_args)
+    expect(state.interaction.customizationArgs)
       .toEqual(expectedInteraction.CUSTOMIZATION_ARGS);
-    expect(state.interaction.default_outcome).toEqual(expectedDefaultOutcome);
+    expect(state.interaction.defaultOutcome).toEqual(expectedDefaultOutcome);
     var expectedQuestion = questionObjectFactory.create(
       expectedLastStateName, state.interaction, '');
     expect(simpleEditorManagerService.getQuestionList()._questions
@@ -393,8 +392,8 @@ describe('Simple Editor Manager Service', function () {
     var newStateName = simpleEditorManagerService.addState();
     var newState = explorationStatesService.getState(newStateName);
     expect(newState.interaction.id).toEqual(END_EXPLORATION_INTERACTION.ID);
-    expect(newState.interaction.customization_args)
+    expect(newState.interaction.customizationArgs)
       .toEqual(END_EXPLORATION_INTERACTION.CUSTOMIZATION_ARGS);
-    expect(newState.interaction.default_outcome).toEqual(null);
+    expect(newState.interaction.defaultOutcome).toEqual(null);
   });
 });
