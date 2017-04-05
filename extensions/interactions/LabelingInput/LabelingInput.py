@@ -17,6 +17,41 @@
 from extensions.interactions import base
 
 
+class ImageClickInput(base.BaseInteraction):
+    """Interaction allowing labeling on an image."""
+
+    name = 'Label the Picture'
+    description = 'Allows learners to label pictures.'
+    display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
+    # is_trainable = False
+    _dependency_ids = []
+    answer_type = 'ClickOnImage'
+    instructions = 'Drag in the correct labels.'
+    narrow_instructions = 'Label the image'
+    needs_summary = false
+
+    _customization_arg_specs = [{
+        'name': 'imageAndRegions',
+        'description': 'Image',
+        'schema': {
+            'type': 'custom',
+            'obj_type': 'ImageWithRegions',
+        },
+        'default_value': {
+            'imagePath': '',
+            'labeledRegions': []
+        },
+    }, {
+        'name': 'highlightRegionsOnHover',
+        'description': 'Highlight regions when the learner hovers over them',
+        'schema': {
+            'type': 'bool',
+        },
+        'default_value': False
+    }]
+
+
+
 class LabelingInput(base.BaseInteraction):
 
     name = 'Label the Picture'
@@ -33,7 +68,7 @@ class LabelingInput(base.BaseInteraction):
         'description': 'Provide an image',
         'schema': {
             'type': 'custom',
-            'obj_type': 'ImageWithRegions' 
+            'obj_type': 'ImageWithRegions'
         },
         'default_value': {
             'imagePath': '',
