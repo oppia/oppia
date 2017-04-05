@@ -13,14 +13,14 @@
 // limitations under the License.
 
 /**
- * Directive for the ImageClickInput interaction.
+ * Directive for the LabelingInput interaction.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
 
-oppia.directive('oppiaInteractiveImageClickInput', [
+oppia.directive('oppiaInteractiveLabelingInput', [
   '$sce', 'oppiaHtmlEscaper', 'explorationContextService',
   'imageClickInputRulesService',
   function($sce, oppiaHtmlEscaper, explorationContextService,
@@ -30,7 +30,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
       scope: {
         onSubmit: '&'
       },
-      templateUrl: 'interaction/ImageClickInput',
+      templateUrl: 'interaction/LabelingInput',
       controller: [
         '$scope', '$element', '$attrs', function($scope, $element, $attrs) {
           var imageAndRegions = oppiaHtmlEscaper.escapedJsonToObj(
@@ -98,11 +98,11 @@ oppia.directive('oppiaInteractiveImageClickInput', [
   }
 ]);
 
-oppia.directive('oppiaResponseImageClickInput', [function() {
+oppia.directive('oppiaResponseLabelingInput', [function() {
   return {
     restrict: 'E',
     scope: {},
-    templateUrl: 'response/ImageClickInput',
+    templateUrl: 'response/LabelingInput',
     controller: [
         '$scope', '$attrs', 'oppiaHtmlEscaper',
         function($scope, $attrs, oppiaHtmlEscaper) {
@@ -115,12 +115,12 @@ oppia.directive('oppiaResponseImageClickInput', [function() {
   };
 }]);
 
-oppia.directive('oppiaShortResponseImageClickInput', [
+oppia.directive('oppiaShortResponseLabelingInput', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'shortResponse/ImageClickInput',
+      templateUrl: 'shortResponse/LabelingInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         var _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
         $scope.clickRegionLabel = (
