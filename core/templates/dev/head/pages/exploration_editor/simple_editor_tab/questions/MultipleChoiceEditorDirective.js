@@ -20,8 +20,10 @@
 // dependencies should be standard utility services. It should not have any
 // concept of "state in an exploration".
 oppia.directive('multipleChoiceEditor', [
-  'QuestionIdService', 'AnswerGroupObjectFactory',
-  function(QuestionIdService, AnswerGroupObjectFactory) {
+  'QuestionIdService', 'AnswerGroupObjectFactory', 'RuleObjectFactory',
+  'StatusObjectFactory',
+  function(QuestionIdService, AnswerGroupObjectFactory, RuleObjectFactory,
+      StatusObjectFactory) {
     return {
       restrict: 'E',
       scope: {
@@ -81,7 +83,7 @@ oppia.directive('multipleChoiceEditor', [
             if (answerGroups.length === 0) {
               return false;
             } else {
-              return answerGroups[0].ruleSpecs[0].inputs.x === index;
+              return answerGroups[0].rules[0].inputs.x === index;
             }
           };
 
@@ -101,7 +103,9 @@ oppia.directive('multipleChoiceEditor', [
             }
 
             if (foundEmptyField) {
-              return;
+              return StatusObjectFactory.createFailure(
+                'Found an empty field'
+              );
             }
 
             var newChoiceIndex = choiceNames.length;
@@ -136,7 +140,9 @@ oppia.directive('multipleChoiceEditor', [
           $scope.saveChoice = function(index, newChoiceValue) {
             if (!newChoiceValue) {
               alertsService.addWarning('Cannot save an empty choice.');
-              return;
+              return StatusObjectFactory.createFailure(
+                'Cannot save an empty choice'
+              );
             }
 
             var newCustomizationArgs = $scope.getCustomizationArgs();
@@ -144,13 +150,17 @@ oppia.directive('multipleChoiceEditor', [
 
             if (newChoiceValue === choiceNames[index]) {
               // No change has been made.
-              return;
+              return StatusObjectFactory.createFailure(
+                'No change has been made'
+              );
             }
 
             if (choiceNames.indexOf('newChoiceValue') !== -1) {
               alertsService.addWarning(
                 'Cannot save: this duplicates an existing choice.');
-              return;
+              return StatusObjectFactory.createFailure(
+                'This duplicates an existing choice'
+              );
             }
 
             newCustomizationArgs.choices.value[index] = newChoiceValue;
@@ -181,10 +191,10 @@ oppia.directive('multipleChoiceEditor', [
             var oldAnswerGroupsLength = answerGroups.length;
             var newAnswerGroups = [];
             for (var i = 0; i < answerGroups.length; i++) {
-              if (answerGroups[i].ruleSpecs[0].inputs.x < index) {
+              if (answerGroups[i].rules[0].inputs.x < index) {
                 newAnswerGroups.push(answerGroups[i]);
-              } else if (answerGroups[i].ruleSpecs[0].inputs.x > index) {
-                answerGroups[i].ruleSpecs[0].inputs.x--;
+              } else if (answerGroups[i].rules[0].inputs.x > index) {
+                answerGroups[i].rules[0].inputs.x--;
                 newAnswerGroups.push(answerGroups[i]);
               }
             }
@@ -196,7 +206,7 @@ oppia.directive('multipleChoiceEditor', [
             if (newAnswerGroups.length === 0 && oldAnswerGroupsLength > 0) {
               newAnswerGroups = [];
               newAnswerGroups.push(answerGroups[0]);
-              newAnswerGroups[0].ruleSpecs[0].inputs.x = 0;
+              newAnswerGroups[0].rules[0].inputs.x = 0;
             }
 
             $scope.saveAnswerGroups({
@@ -211,27 +221,29 @@ oppia.directive('multipleChoiceEditor', [
             if (answerGroups.length === 0) {
               var newStateName = $scope.addState();
 
-              newAnswerGroups.push(AnswerGroupObjectFactory.create([{
-                inputs: {
+              // Note that we do not use the 'correct' field of the answer
+              // group in explorations. Instead, 'correctness' is determined by
+              // whether the answer group is the first in the list.
+              newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
+                RuleObjectFactory.createNew('Equals', {
                   x: index
-                },
-                rule_type: 'Equals'
-              }], {
+                })
+              ], {
                 dest: newStateName,
                 feedback: [''],
                 param_changes: []
-              }));
+              }, false));
 
               $scope.saveAnswerGroups({
                 newValue: newAnswerGroups
               });
             } else {
               newAnswerGroups.push(answerGroups[0]);
-              newAnswerGroups[0].ruleSpecs[0].inputs.x = index;
+              newAnswerGroups[0].rules[0].inputs.x = index;
 
               // If some other answer group has this answer, remove it.
               for (var i = 1; i < answerGroups.length; i++) {
-                if (answerGroups[i].ruleSpecs[0].inputs.x !== index) {
+                if (answerGroups[i].rules[0].inputs.x !== index) {
                   newAnswerGroups.push(answerGroups[i]);
                 }
               }

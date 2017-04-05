@@ -101,12 +101,12 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
         });
 
         answerGroups.forEach(function(answerGroup, answerIndex) {
-          var ruleSpecs = answerGroup.ruleSpecs;
-          ruleSpecs.forEach(function(ruleSpec, ruleIndex) {
-            var ruleInputs = ruleSpec.inputs.x;
+          var rules = answerGroup.rules;
+          rules.forEach(function(rule, ruleIndex) {
+            var ruleInputs = rule.inputs.x;
             ruleInputs.forEach(function(ruleInput) {
               var choiceIndex = answerChoiceToIndex[ruleInput];
-              if (ruleSpec.rule_type === 'Equals') {
+              if (rule.type === 'Equals') {
                 handledAnswers[choiceIndex] = true;
                 if (ruleInputs.length > 1) {
                   warningsList.push({
@@ -117,9 +117,9 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
                       'please select only one answer choice.')
                   });
                 }
-              } else if (ruleSpec.rule_type === 'ContainsAtLeastOneOf') {
+              } else if (rule.type === 'ContainsAtLeastOneOf') {
                 handledAnswers[choiceIndex] = true;
-              } else if (ruleSpec.rule_type ===
+              } else if (rule.type ===
                 'DoesNotContainAtLeastOneOf') {
                 for (var i = 0; i < handledAnswers.length; i++) {
                   if (i !== choiceIndex) {
@@ -141,8 +141,8 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
           warningsList.push({
             type: WARNING_TYPES.ERROR,
             message: (
-              'Please clarify the default outcome so it is less confusing to ' +
-              'the user.')
+              'Please add something for Oppia to say in the ' +
+              '\"All other answers\" response.')
           });
         }
       }

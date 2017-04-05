@@ -34,8 +34,9 @@ describe('oppiaInteractiveContinueValidator', function() {
     };
 
     goodAnswerGroups = [{
-      ruleSpecs: [],
-      outcome: goodDefaultOutcome
+      rules: [],
+      outcome: goodDefaultOutcome,
+      correct: false
     }];
     customizationArguments = {
       buttonText: {

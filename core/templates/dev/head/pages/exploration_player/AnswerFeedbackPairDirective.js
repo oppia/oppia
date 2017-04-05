@@ -44,7 +44,7 @@ oppia.directive('answerFeedbackPair', [function() {
           if ($scope.data) {
             return oppiaExplorationHtmlFormatterService.getAnswerHtml(
               $scope.data.learnerAnswer, interaction.id,
-              interaction.customization_args);
+              interaction.customizationArgs);
           }
         };
 
@@ -59,7 +59,7 @@ oppia.directive('answerFeedbackPair', [function() {
             shortAnswerHtml = (
               oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
                 $scope.data.learnerAnswer, interaction.id,
-                interaction.customization_args));
+                interaction.customizationArgs));
           }
           return shortAnswerHtml;
         };
