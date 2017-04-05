@@ -675,6 +675,34 @@ class ImageRegion(BaseObject):
         }]
     }
 
+class ImageWithLabels(BaseObject):
+    """An image overlaid with labels to fill in"""
+    description = 'An image with labels to fill in'
+    edit_html_filename = 'image_with_labels_editor'
+    edit_js_filename = 'ImageWithLabelsEditor'
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'imagePath',
+            'schema': Filepath.SCHEMA
+        }, {
+            'name': 'labeledRegions',
+            'schema': {
+                'type': 'list',
+                'items': {
+                    'type': 'dict',
+                    'properties': [{
+                        'name': 'label',
+                        'schema': UnicodeString.SCHEMA
+                    }, {
+                        'name': 'region',
+                        'schema': ImageRegion.SCHEMA
+                    }]
+                }
+            }
+        }]
+    }
+
 
 class ImageWithRegions(BaseObject):
     """An image overlaid with labeled regions."""

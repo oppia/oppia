@@ -30,8 +30,12 @@ class LabelingInput(base.BaseInteraction):
 
     _customization_arg_specs = [{
         'name': 'labelInput',
-        'description': 'Initial Phrase',
+        'description': 'Provide an image',
         'schema': {
-            'type': 'unicode'
+            'type': 'custom',
+            'obj_type': 'ImageWithRegions' 
         },
-        'default_value': ''}]
+        'default_value': {
+            'imagePath': '',
+            'labeledRegions': []
+        }}]
