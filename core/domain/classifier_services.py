@@ -83,8 +83,13 @@ def classify_string_classifier_rule(state, normalized_answer):
     best_matched_answer_group_index = len(state.interaction.answer_groups)
     best_matched_rule_spec_index = None
 
-    sc = classifier_registry.Registry.get_classifier_by_id(
-        feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])
+    if state.classifier_model_id == None:
+        sc = classifier_registry.Registry.get_classifier_by_id(
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])
+
+    else:
+        classifier = get_classifier_by_id(state.classifier_model_id)
+        sc = classifier.cached_classifier_data.from_dict()
 
     training_examples = [
         [doc, []] for doc in state.interaction.confirmed_unclassified_answers]
