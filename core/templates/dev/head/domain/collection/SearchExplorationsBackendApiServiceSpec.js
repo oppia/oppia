@@ -43,7 +43,9 @@ describe('Exploration search backend API service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     $httpBackend.expect(
-      'GET', '/exploration/metadata_search?q=three').respond(200);
+      'GET', '/exploration/metadata_search?q=three').respond(200, {
+        collection_node_metadata_list: []
+      });
     SearchExplorationsBackendApiService.getExplorations('three').then(
       successHandler, failHandler);
     $httpBackend.flush();
