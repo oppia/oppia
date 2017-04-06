@@ -42,7 +42,7 @@ oppia.directive('editorNavigation', [function() {
             $scope.postTutorialHelpPopoverIsShown = true;
             $timeout(function() {
             $scope.postTutorialHelpPopoverIsShown = false;
-              }, 5000);
+            }, 5000);
           }
           else {
           $scope.postTutorialHelpPopoverIsShown = false;
