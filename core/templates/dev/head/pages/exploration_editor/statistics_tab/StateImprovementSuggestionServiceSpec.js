@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,11 +14,9 @@
 
 /**
  * @fileoverview Unit tests for statistics services.
- *
- * @author henning.benmax@gmail.com (Ben Henning)
  */
 
-describe('ExplorationStatistics', function() {
+describe('StateImprovementSuggestionService', function() {
   beforeEach(module('oppia'));
 
   // TODO(bhenning): These tests were ported from the backend tests. More tests

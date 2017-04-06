@@ -16,7 +16,7 @@
 
 """Domain object for statistics models."""
 
-import number
+import numbers
 import sys
 import utils
 
@@ -35,9 +35,9 @@ import feconf
 # over the migrated answers to avoid tainted results. Furthermore, all migrated
 # answers are easy to retrieve by reducing session value on this session ID.
 # NOTE TO DEVELOPERS: All other state answer data model entities must not ever
-# store this session ID unless it was created by the AnswerMigrationJob. Also,
-# this string must never change.
-MIGRATED_STATE_ANSWER_SESSION_ID = 'migrated_state_answer_session_id_2017'
+# store this session ID unless it was created by the 2017 answer migration job
+# (see #1205). Also, this string must never change.
+MIGRATED_STATE_ANSWER_SESSION_ID_2017 = 'migrated_state_answer_session_id_2017'
 MIGRATED_STATE_ANSWER_TIME_SPENT_IN_SEC = 0.0
 
 
@@ -217,7 +217,7 @@ class SubmittedAnswer(object):
                 'Expected session_id to be a string, received %s' %
                 str(self.session_id))
 
-        if not isinstance(self.time_spent_in_sec, number.Number):
+        if not isinstance(self.time_spent_in_sec, numbers.Number):
             raise utils.ValidationError(
                 'Expected time_spent_in_sec to be a number, received %s' %
                 str(self.time_spent_in_sec))
@@ -251,10 +251,11 @@ class SubmittedAnswer(object):
                 'Expected time_spent_in_sec to be non-negative, received %f' %
                 self.time_spent_in_sec)
 
-        if self.answer is None and self.interaction_id != 'Continue':
+        if self.answer is None and (
+                self.interaction_id not in feconf.LINEAR_INTERACTION_IDS):
             raise utils.ValidationError(
                 'SubmittedAnswers must have a provided answer except for '
-                'Continue interactions')
+                'linear interactions')
 
         valid_classification_categories = [
             exp_domain.EXPLICIT_CLASSIFICATION,

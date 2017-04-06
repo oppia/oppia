@@ -612,6 +612,10 @@ class StateAnswersModel(base_models.BaseModel):
     exploration_id = ndb.StringProperty(indexed=True, required=True)
     exploration_version = ndb.IntegerProperty(indexed=True, required=True)
     state_name = ndb.StringProperty(indexed=True, required=True)
+    # Which shard this corresponds to in the list of shards. If this is 0 it
+    # represents the master shard which includes the shard_count. All other
+    # shards look similar to the master shard except they do not populate
+    # shard_count.
     shard_id = ndb.IntegerProperty(indexed=True, required=True)
     # Store interaction type to know which calculations should be performed
     interaction_id = ndb.StringProperty(indexed=True, required=True)
@@ -621,9 +625,9 @@ class StateAnswersModel(base_models.BaseModel):
     shard_count = ndb.IntegerProperty(indexed=True, required=False)
     # The total number of bytes needed to store all of the answers in the
     # submitted_answer_list, minus any overhead of the property itself. This
-    # value is found by summing all json_size values for answer dicts inside
+    # value is found by summing the JSON sizes of all answer dicts stored inside
     # submitted_answer_list.
-    accumulated_answer_json_size = ndb.IntegerProperty(
+    accumulated_answer_json_size_bytes = ndb.IntegerProperty(
         indexed=False, required=False, default=0)
     # List of answer dicts, each of which is stored as JSON blob. The content
     # of answer dicts is specified in core.domain.stats_domain.StateAnswers.
@@ -699,7 +703,7 @@ class StateAnswersModel(base_models.BaseModel):
 
         sharded_answer_lists, sharded_answer_list_sizes = cls._shard_answers(
             last_shard.submitted_answer_list,
-            last_shard.accumulated_answer_json_size,
+            last_shard.accumulated_answer_json_size_bytes,
             new_submitted_answer_dict_list)
         new_shard_count = main_shard.shard_count + len(sharded_answer_lists) - 1
 
@@ -710,9 +714,9 @@ class StateAnswersModel(base_models.BaseModel):
 
         # Update the last shard if it changed.
         if sharded_answer_list_sizes[0] != (
-                last_shard.accumulated_answer_json_size):
+                last_shard.accumulated_answer_json_size_bytes):
             last_shard.submitted_answer_list = sharded_answer_lists[0]
-            last_shard.accumulated_answer_json_size = (
+            last_shard.accumulated_answer_json_size_bytes = (
                 sharded_answer_list_sizes[0])
             last_shard_updated = True
         else:
@@ -728,7 +732,7 @@ class StateAnswersModel(base_models.BaseModel):
                 exploration_version=exploration_version, state_name=state_name,
                 shard_id=shard_id, interaction_id=interaction_id,
                 submitted_answer_list=sharded_answer_lists[i],
-                accumulated_answer_json_size=sharded_answer_list_sizes[i])
+                accumulated_answer_json_size_bytes=sharded_answer_list_sizes[i])
             entities_to_put.append(new_shard)
 
         # Update the shard count if any new shards were added.
@@ -785,11 +789,15 @@ class StateAnswersModel(base_models.BaseModel):
         The first entry is guaranteed to contain all answers of the current
         answer list.
         """
-        # Sort the new answers to insert in a ascending by size in bytes.
+        # Sort the new answers to insert in ascending order their sizes in
+        # bytes.
         new_answer_size_list = [
             (answer_dict, cls._get_answer_dict_size(answer_dict))
             for answer_dict in new_answer_list]
         new_answer_list_sorted = sorted(new_answer_size_list, lambda x: x[1])
+        # NOTE TO DEVELOPERS: this list cast is needed because the nested list
+        # is appended to later in this function and the list passed into here
+        # may be a reference to an answer list stored within a model class.
         sharded_answer_lists = [list(current_answer_list)]
         sharded_answer_list_sizes = [current_answer_list_size]
         for answer_dict, answer_size in new_answer_list_sorted:
@@ -912,6 +920,9 @@ class LargeAnswerBucketModel(base_models.BaseModel):
             bucket_id = cls.get_new_id('')
             start_shard_answer_index = i * cls._MAX_ANSWERS_PER_BUCKET
             end_shard_answer_index = (i + 1) * cls._MAX_ANSWERS_PER_BUCKET
+            # Since the answers submitted to the model were converted to a list
+            # of tuples earlier, take only a subset of the list and convert it
+            # back to a dict for storage.
             sharded_answer_list = answer_list[
                 start_shard_answer_index:end_shard_answer_index]
             bucket_entity = cls(

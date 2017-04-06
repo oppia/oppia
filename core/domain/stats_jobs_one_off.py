@@ -44,7 +44,7 @@ transaction_services = models.Registry.import_transaction_services()
 
 def _unpack_state_rule_answer_log_model_id(item_id):
     # Cannot unpack the item ID with a simple split, since the rule_str
-    # component can contains periods. The ID is guaranteed to always
+    # component can contain periods. The ID is guaranteed to always
     # contain 4 parts: exploration ID, state name, handler name, and
     # rule_str.
     item_id_tokens = item_id
@@ -597,6 +597,14 @@ class ClearUnknownMissingAnswersJob(jobs.BaseMapReduceJobManager):
                     # isn't a reliable way to go into submitted answers and
                     # remove specific failures. The entire state will be
                     # re-migrated the next time the AnswerMigrationJob runs.
+
+                    # Moreover, records are stored based on the old storage
+                    # model item IDs, which means it's possible for multiple
+                    # records to correspond to a single state answer model entry
+                    # such as in the case of multiple exploration versions. The
+                    # old storage model IDs did not contain exploration
+                    # versions, so this isn't a 1:1 mapping and additional
+                    # cleanup is required for each answer we want to remove.
                     for state_answer_model in all_models:
                         submitted_answers = [
                             stats_domain.SubmittedAnswer.from_dict(
@@ -888,7 +896,8 @@ class CleanupLargeBucketLabelsFromNewAnswersJob(jobs.BaseMapReduceJobManager):
             item.submitted_answer_list = [
                 submitted_answer.to_dict()
                 for submitted_answer in submitted_answers]
-            item.accumulated_answer_json_size = sum(new_submitted_answer_sizes)
+            item.accumulated_answer_json_size_bytes = sum(
+                new_submitted_answer_sizes)
             item.put()
             yield (CleanupLargeBucketLabelsFromNewAnswersJob._UPDATED_KEY, 1)
         else:
@@ -972,7 +981,7 @@ class AnswerMigrationCleanupJob(jobs.BaseMapReduceJobManager):
             # other bookkeeping information and then commit it.
             if len(submitted_answer_list) != len(
                     state_answer_model.submitted_answer_list):
-                state_answer_model.accumulated_answer_json_size -= sum(
+                state_answer_model.accumulated_answer_json_size_bytes -= sum(
                     removed_answer_sizes)
                 state_answer_model.put()
 
@@ -1157,8 +1166,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     @classmethod
     def _force_rule_spec_subjects_to_answer(cls, states_dict):
         for state_dict in states_dict.values():
-            # Only MultipleChoiceInput interactions with non-answer subjects are
-            # supported for migration.
+            # MultipleChoiceInput is the only interaction that supports the
+            # migration of answers with a non-"answer" subject.
             if state_dict['interaction']['id'] != 'MultipleChoiceInput':
                 continue
             for handler_dict in state_dict['interaction']['handlers']:
@@ -1266,6 +1275,18 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _permute_index(cls, value_list, idx):
+        """Takes a list of values and a specific index and yields every
+        permutation of the value at the specified index in a new list with only
+        the corresponding index changed for the new permutation. For instance,
+        given the following example call to this method:
+
+            cls._permute_index(['a', [1, 2], 'b'], 1)
+
+        Two lists would be yielded:
+
+            ['a', [1, 2], 'b']
+            ['a', [2, 1], 'b']
+        """
         if idx == len(value_list):
             yield value_list
             return
@@ -1286,12 +1307,14 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _stringify_classified_rule(cls, rule_spec):
-        # This is based on the original
-        # exp_domain.RuleSpec.stringify_classified_rule, however it returns a
-        # list of possible matches by permuting the rule_spec inputs, since the
-        # order of a Python dict is implementation-dependent. Our stringified
-        # string may not necessarily match the one stored a long time ago in
-        # the data store.
+        """This is based on the original
+        exp_domain.RuleSpec.stringify_classified_rule, however it returns a list
+        of possible matches by permuting the rule_spec inputs, since the order
+        of a Python dict is implementation-dependent. Our stringified string may
+        not necessarily match the one stored a long time ago in the data store.
+        The individual elements of the dict are also permuted in case they are
+        out of order.
+        """
         if rule_spec.rule_type == exp_domain.CLASSIFIER_RULESPEC_STR:
             yield rule_spec.rule_type
         else:
@@ -1312,13 +1335,19 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # Otherwise, first RuleSpec instance to match is the winner. The first
         # pass is to stringify parameters and doing a string comparison. This is
         # efficient and works for most situations.
+        all_possible_stringified_rules = {}
         for answer_group_index, answer_group in enumerate(answer_groups):
             rule_specs = answer_group.rule_specs
+            possible_stringified_rules_for_answer_group = {}
             for rule_spec_index, rule_spec in enumerate(rule_specs):
                 possible_stringified_rules = list(
                     cls._stringify_classified_rule(rule_spec))
+                possible_stringified_rules_for_answer_group[rule_spec_index] = (
+                    possible_stringified_rules)
                 if rule_str in possible_stringified_rules:
                     return (answer_group_index, rule_spec_index, None)
+            all_possible_stringified_rules[answer_group_index] = (
+                possible_stringified_rules_for_answer_group)
 
         # The second attempt involves parsing the rule string and doing an exact
         # match on the rule parameter values. This needs to be done in the event
@@ -1383,8 +1412,11 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             for answer_group_index, answer_group in enumerate(answer_groups):
                 rule_specs = answer_group.rule_specs
                 for rule_spec_index, rule_spec in enumerate(rule_specs):
-                    possible_stringified_rules = list(
-                        cls._stringify_classified_rule(rule_spec))
+                    possible_stringified_rules = (
+                        all_possible_stringified_rules[
+                            answer_group_index][rule_spec_index])
+                    if rule_spec.rule_type != rule_type:
+                        continue
                     for possible_stringified_rule in possible_stringified_rules:
                         if possible_stringified_rule.startswith(rule_str):
                             return (answer_group_index, rule_spec_index, None)
@@ -2297,7 +2329,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
         # These are values which cannot be reconstituted; use special sentinel
         # values for them, instead.
-        session_id = stats_domain.MIGRATED_STATE_ANSWER_SESSION_ID
+        session_id = stats_domain.MIGRATED_STATE_ANSWER_SESSION_ID_2017
         time_spent_in_sec = (
             stats_domain.MIGRATED_STATE_ANSWER_TIME_SPENT_IN_SEC)
 

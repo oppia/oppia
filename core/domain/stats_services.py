@@ -147,24 +147,42 @@ def get_visualizations_info(exploration_id, state_name):
 
 
 def get_top_state_rule_answers(
-        exploration_id, state_name, classify_category_list):
+        exploration_id, state_name, classification_category_list):
     """Returns a list of top answers (sorted by submission frequency) submitted
     to the given state in the given exploration which were mapped to any of the
-    rule classification categories listed in 'classify_category_list'. See
+    rule classification categories listed in 'classification_category_list'. See
     exp_domain for the list of available classification categories (e.g.
     exp_domain.EXPLICIT_CLASSIFICATION). All answers submitted to the specified
     state that match the rule spec strings in rule_str_list are returned.
+
+    See get_top_state_rule_answers_multi for more details.
+
+    Args:
+        exploration_id: str. The ID of the exploration being searched for top
+            answers (across all versions of the exploration).
+        state_name: str. The name of the state in the referenced exploration
+            being searched for top answers.
+        classification_category_list: list. Each element is one of the
+            classification types listed in exp_domain, e.g.
+            EXPLICIT_CLASSIFICATION).
+
+    Returns:
+        A list sorted by frequency and containing tuples of (answer, frequency),
+        where
+                answer: stats_domain.SubmittedAnswer. One of the top answers.
+                frequency: int. The number of times the answer was submitted to
+                    the specified exploration and state.
     """
     return get_top_state_rule_answers_multi(
-        [(exploration_id, state_name)], classify_category_list)[0]
+        [(exploration_id, state_name)], classification_category_list)[0]
 
 
 def get_top_state_rule_answers_multi(
-        exploration_state_list, classify_category_list):
+        exploration_state_list, classification_category_list):
     """Returns a list of top answers (sorted by submission frequency) submitted
     to the given explorations and states which were mapped to any of the rule
-    classification categories listed in 'classify_category_list'. See exp_domain
-    for the list of available classification categories (e.g.
+    classification categories listed in 'classification_category_list'. See
+    exp_domain for the list of available classification categories (e.g.
     exp_domain.EXPLICIT_CLASSIFICATION).
 
     NOTE TO DEVELOPERS: Classification categories are stored upon answer
@@ -175,6 +193,22 @@ def get_top_state_rule_answers_multi(
 
     Also note that this function involves a O(N^2) operation based on the number
     of answers which match the input criteria (which can be quite large).
+
+    Args:
+        exploration_state_list: list. Each element is a tuple of
+            (exploration_id, state_name).
+        classification_category_list: list. Each element is one of the
+            classification types listed in exp_domain, e.g.
+            EXPLICIT_CLASSIFICATION).
+
+    Returns:
+        A list of lists. Each list corresponds by index to each one of the
+            (exploration_id, state_name) values passed in
+            exploration_state_list. Each list is sorted by frequency and
+            contains tuples of (answer, frequency), where
+                answer: stats_domain.SubmittedAnswer. One of the top answers.
+                frequency: int. The number of times the answer was submitted to
+                    the corresponding exploration and state.
     """
     # TODO(bhenning): This should have a custom, continuous job (possibly as
     # part of the summarizers framework) which goes through all answers, finds
@@ -182,6 +216,11 @@ def get_top_state_rule_answers_multi(
     # data of soft rules, rank them by their frequency, then output them. This
     # output will have reasonably up-to-date answers which need to be resolved
     # by creators.
+
+    # TODO(bhenning): Profile this function and determine whether there should
+    # be bounds set on the values returned by TopAnswersByCategorization or the
+    # visualization itself. This function may be prohibitively expensive for
+    # states with very large numbers of answers.
     answer_lists = []
     for exploration_id, state_name in exploration_state_list:
         job_result = (
@@ -191,7 +230,7 @@ def get_top_state_rule_answers_multi(
             calc_output = job_result.calculation_output
             answer_list = list(itertools.chain.from_iterable(
                 calc_output[category]
-                for category in classify_category_list
+                for category in classification_category_list
                 if category in calc_output))
 
             # If the answer_list includes similar answers matching multiple

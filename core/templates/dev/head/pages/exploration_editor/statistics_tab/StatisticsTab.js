@@ -225,22 +225,22 @@ oppia.factory('StateImprovementSuggestionService', [
             stateInteraction['default_outcome'] &&
             stateInteraction['default_outcome'].dest == stateName) {
           eligibleFlags.push({
-            'rank': defaultAnswerCount,
-            'improveType': IMPROVE_TYPE_DEFAULT,
+            rank: defaultAnswerCount,
+            improveType: IMPROVE_TYPE_DEFAULT,
           });
         }
         if (noAnswerSubmittedCount > threshold) {
           eligibleFlags.push({
-            'rank': noAnswerSubmittedCount,
-            'improveType': IMPROVE_TYPE_INCOMPLETE,
+            rank: noAnswerSubmittedCount,
+            improveType: IMPROVE_TYPE_INCOMPLETE,
           });
         }
         if (eligibleFlags.length > 0) {
           eligibleFlags.sort(rankComparator);
           rankedStates.push({
-            'rank': eligibleFlags[0].rank,
-            'stateName': stateName,
-            'type': eligibleFlags[0].improveType,
+            rank: eligibleFlags[0].rank,
+            stateName: stateName,
+            type: eligibleFlags[0].improveType,
           });
         }
       }

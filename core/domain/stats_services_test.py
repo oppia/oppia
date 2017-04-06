@@ -96,6 +96,7 @@ class AnswerEventTests(test_utils.GenericTestBase):
 
         first_state_name = exp.init_state_name
         second_state_name = 'State 2'
+        third_state_name = 'State 3'
         exp_services.update_exploration('fake@user.com', 'eid', [{
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': first_state_name,
@@ -109,6 +110,11 @@ class AnswerEventTests(test_utils.GenericTestBase):
             'state_name': second_state_name,
             'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
             'new_value': 'TextInput',
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': third_state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'Continue',
         }], 'Add new state')
         exp = exp_services.get_exploration_by_id('eid')
 
@@ -133,6 +139,16 @@ class AnswerEventTests(test_utils.GenericTestBase):
             'eid', exp_version, first_state_name, 'TextInput', 1, 0,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', self.TIME_SPENT,
             self.PARAMS, {'x': 1.0, 'y': 5.0})
+        # answer is a number
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid', exp_version, first_state_name, 'TextInput', 2, 0,
+            exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', self.TIME_SPENT,
+            self.PARAMS, 10)
+        # answer is a listt of dicts
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid', exp_version, first_state_name, 'TextInput', 3, 0,
+            exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', self.TIME_SPENT,
+            self.PARAMS, [{'a': 'some', 'b': 'text'}, {'a': 1.0, 'c': 2.0}])
         # answer is a list
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, second_state_name, 'TextInput', 2, 0,
@@ -143,6 +159,11 @@ class AnswerEventTests(test_utils.GenericTestBase):
             'eid', exp_version, second_state_name, 'TextInput', 1, 1,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid4', self.TIME_SPENT,
             self.PARAMS, self.UNICODE_TEST_STRING)
+        # answer is None (such as for Continue)
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid', exp_version, third_state_name, 'Continue', 1, 1,
+            exp_domain.EXPLICIT_CLASSIFICATION, 'sid5', self.TIME_SPENT,
+            self.PARAMS, None)
 
         expected_submitted_answer_list1 = [{
             'answer': 'answer1', 'time_spent_in_sec': 5.0,
@@ -159,6 +180,15 @@ class AnswerEventTests(test_utils.GenericTestBase):
             'answer_group_index': 1, 'rule_spec_index': 0,
             'classification_categorization': 'explicit', 'session_id': 'sid1',
             'interaction_id': 'TextInput', 'params': {}
+        }, {
+            'answer': 10, 'time_spent_in_sec': 5.0, 'answer_group_index': 2,
+            'rule_spec_index': 0, 'classification_categorization': 'explicit',
+            'session_id': 'sid1', 'interaction_id': 'TextInput', 'params': {}
+        }, {
+            'answer': [{'a': 'some', 'b': 'text'}, {'a': 1.0, 'c': 2.0}],
+            'time_spent_in_sec': 5.0, 'answer_group_index': 3,
+            'rule_spec_index': 0, 'classification_categorization': 'explicit',
+            'session_id': 'sid1', 'interaction_id': 'TextInput', 'params': {}
         }]
         expected_submitted_answer_list2 = [{
             'answer': [2, 4, 8], 'time_spent_in_sec': 5.0,
@@ -167,9 +197,14 @@ class AnswerEventTests(test_utils.GenericTestBase):
             'interaction_id': 'TextInput', 'params': {}
         }, {
             'answer': self.UNICODE_TEST_STRING, 'time_spent_in_sec': 5.0,
-            'answer_group_index': 1, 'rule_spec_index': 1,
+            'answer_group_index': 0, 'rule_spec_index': 0,
             'classification_categorization': 'explicit', 'session_id': 'sid4',
             'interaction_id': 'TextInput', 'params': {}
+        }]
+        expected_submitted_answer_list3 = [{
+            'answer': None, 'time_spent_in_sec': 5.0, 'answer_group_index': 0,
+            'rule_spec_index': 0, 'classification_categorization': 'explicit',
+            'session_id': 'sid5', 'interaction_id': 'Continue', 'params': {}
         }]
 
         state_answers = stats_services.get_state_answers(
@@ -183,6 +218,12 @@ class AnswerEventTests(test_utils.GenericTestBase):
         self.assertEqual(
             state_answers.get_submitted_answer_dict_list(),
             expected_submitted_answer_list2)
+
+        state_answers = stats_services.get_state_answers(
+            'eid', exp_version, third_state_name)
+        self.assertEqual(
+            state_answers.get_submitted_answer_dict_list(),
+            expected_submitted_answer_list3)
 
 
 class RecordAnswerTests(test_utils.GenericTestBase):

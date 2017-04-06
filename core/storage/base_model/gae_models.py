@@ -307,6 +307,10 @@ class VersionedModel(BaseModel):
         _reconstitute_from_snapshot_id for N models. Returns a list of the
         reconstituted models.
         """
+
+        # TODO(bhenning): Remove this method and revert
+        # _reconstitute_from_snapshot_model once the answer migration is
+        # completed.
         snapshot_ids = [
             snapshot_id_model[0]
             for snapshot_id_model in snapshot_id_model_list]

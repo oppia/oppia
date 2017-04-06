@@ -54,7 +54,7 @@ oppia.factory('AnswerClassificationService', [
     var classifyAnswer = function(
         answer, answerGroups, defaultOutcome, interactionRulesService) {
       // Find the first group that contains a rule which returns true
-      // TODO(bhenning): Implement soft and classifier classifications.
+      // TODO(bhenning): Implement training data classification.
       for (var i = 0; i < answerGroups.length; i++) {
         for (var j = 0; j < answerGroups[i].rule_specs.length; j++) {
           var ruleSpec = answerGroups[i].rule_specs[j];

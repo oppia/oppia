@@ -486,7 +486,6 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
             self.assertEqual(calculation_output, expected_calculation_output)
 
-
     def test_answers_across_multiple_exploration_versions(self):
         with self.swap(
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',

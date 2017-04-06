@@ -716,15 +716,11 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
 
 # Operations on exploration snapshots.
 def get_exploration_snapshots_metadata(exploration_id, allow_deleted=False):
-    """Returns the snapshots for this exploration, as dicts. If a version is
-    specified, only the snapshots up to that version (inclusively) will be
-    returned. Otherwise, the snapshots for all versions of the exploration will
-    be returned.
+    """Returns the snapshots for this exploration, as dicts, up to and including
+    the latest version of the exploration.
 
     Args:
         exploration_id: str. The id of the exploration in question.
-        max_version: int. The last version that should be returned within the
-            retrieved snapshots list.
         allow_deleted: bool. Whether to allow retrieval of deleted snapshots.
 
     Returns:
