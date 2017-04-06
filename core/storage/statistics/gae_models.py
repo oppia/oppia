@@ -789,7 +789,7 @@ class StateAnswersModel(base_models.BaseModel):
         The first entry is guaranteed to contain all answers of the current
         answer list.
         """
-        # Sort the new answers to insert in ascending order their sizes in
+        # Sort the new answers to insert in ascending order of their sizes in
         # bytes.
         new_answer_size_list = [
             (answer_dict, cls._get_answer_dict_size(answer_dict))
