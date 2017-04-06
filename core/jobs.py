@@ -17,6 +17,7 @@
 """Common classes and methods for managing long running jobs."""
 
 import ast
+import collections
 import copy
 import datetime
 import json
@@ -154,7 +155,7 @@ class BaseJobManager(object):
     @classmethod
     def register_completion(cls, job_id, output_list):
         """Marks a job as completed."""
-        _MAX_OUTPUT_LENGTH = 900000
+        _MAX_OUTPUT_LENGTH_CHARS = 900000
 
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
@@ -170,14 +171,12 @@ class BaseJobManager(object):
 
         # De-duplicate the lines of output since it's not very useful to repeat
         # them.
-        unique_output_str_list = list(set(output_str_list))
+        counter = collections.Counter(list(output_str_list))
         output_str_frequency_list = [
-            output_str_list.count(output_str)
-            for output_str in unique_output_str_list]
+            (output_str, counter[output_str]) for output_str in counter]
         output_str_list = [
             line if freq == 1 else '%s (%d times)' % (line, freq)
-            for (line, freq) in zip(
-                unique_output_str_list, output_str_frequency_list)
+            for (line, freq) in output_str_frequency_list
         ]
 
         cutoff_index = 0
@@ -185,8 +184,9 @@ class BaseJobManager(object):
         for idx, output_str in enumerate(output_str_list):
             cutoff_index += 1
             total_output_size += len(output_str)
-            if total_output_size >= _MAX_OUTPUT_LENGTH:
-                max_element_length = total_output_size - _MAX_OUTPUT_LENGTH
+            if total_output_size >= _MAX_OUTPUT_LENGTH_CHARS:
+                max_element_length = (
+                    total_output_size - _MAX_OUTPUT_LENGTH_CHARS)
                 output_str_list[idx] = output_str[:max_element_length]
                 output_str_list[idx] += ' <TRUNCATED>'
                 break

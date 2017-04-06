@@ -380,14 +380,11 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
 
         normalized_answer = old_interaction_instance.normalize_answer(answer)
 
-        # Don't persist the parameter-stored answer value.
-        if 'answer' in params:
-            del params['answer']
-
         event_services.AnswerSubmissionEventHandler.record(
-            exploration_id, version, old_state_name, answer_group_index,
-            rule_spec_index, classification_categorization, session_id,
-            client_time_spent_in_secs, params, normalized_answer)
+            exploration_id, version, old_state_name,
+            exploration.states[old_state_name].interaction.id,
+            answer_group_index, rule_spec_index, classification_categorization,
+            session_id, client_time_spent_in_secs, params, normalized_answer)
         self.render_json({})
 
 

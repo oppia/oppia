@@ -58,8 +58,9 @@ def _get_hashable_value(value):
         return tuple([_get_hashable_value(elem) for elem in value])
     elif isinstance(value, dict):
         return _get_hashable_value(
-            [(_get_hashable_value(key), _get_hashable_value(value))
-             for (key, value) in value.iteritems()])
+            sorted([
+                (_get_hashable_value(key), _get_hashable_value(value))
+                for (key, value) in value.iteritems()]))
     else:
         return value
 
@@ -171,19 +172,10 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-        # Get a list of stringified sets, e.g. [u"[u'abc', u'www']",
-        # u"[u'abc']", u"[u'xyz']", u"[u'xyz', u'abc']"]
         answer_values = [
             answer_dict['answer']
             for answer_dict in state_answers_dict['submitted_answer_list']]
 
-        # For each stringified set, replace '[' and ']' by empty string,
-        # and split at commas ', ' to convert string to set.
-        # TODO(msl): This will yield wrong results if answers contain ',',
-        # '[', or ']'. Consider saving sets instead of stringified sets.
-        # TODO(bhenning): Remove this string parsing in favor of directly
-        # working with the set itself, rather than a stringified representation
-        # of it.
         list_of_all_elements = []
         for set_value in answer_values:
             list_of_all_elements += set_value

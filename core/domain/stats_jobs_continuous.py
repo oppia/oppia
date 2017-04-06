@@ -16,6 +16,7 @@
 
 import ast
 import collections
+import copy
 import datetime
 import itertools
 
@@ -520,6 +521,11 @@ class InteractionAnswerSummariesMRJobManager(
     def entity_classes_to_map_over(cls):
         return [stats_models.StateAnswersModel]
 
+    # TODO(bhenning): Update this job to persist results for all older
+    # exploration versions, since those versions should never have new answers
+    # submitted to them. Moreover, answers are also only added so this job might
+    # be further optimized to increment on previous results, rather than
+    # recomputing results from scratch each time.
     @staticmethod
     def map(item):
         def _encode(item):
@@ -537,8 +543,7 @@ class InteractionAnswerSummariesMRJobManager(
             else:
                 raise Exception('Cannot encode item: %s' % item)
 
-        # pylint: disable=line-too-long
-        if InteractionAnswerSummariesMRJobManager._entity_created_before_job_queued(
+        if InteractionAnswerSummariesMRJobManager._entity_created_before_job_queued( # pylint: disable=line-too-long
                 item):
             state_answers_dict = {
                 'exploration_id': item.exploration_id,
@@ -551,7 +556,8 @@ class InteractionAnswerSummariesMRJobManager(
             # Output answers submitted to the exploration for this exp version.
             versioned_key = u'%s:%s:%s' % (
                 item.exploration_id, item.exploration_version, item.state_name)
-            yield (versioned_key.encode('utf-8'), state_answers_dict)
+            yield (versioned_key.encode('utf-8'),
+                copy.deepcopy(state_answers_dict))
 
             # Output the same set of answers independent of the version. This
             # allows the reduce step to aggregate answers across all
@@ -562,10 +568,10 @@ class InteractionAnswerSummariesMRJobManager(
             yield (all_versions_key.encode('utf-8'), state_answers_dict)
 
     @staticmethod
-    def reduce(key, stringified_submitted_answer_list):
+    def reduce(key, stringified_state_answers_dicts):
         exploration_id, exploration_version, state_name = key.split(':')
         interaction_id = ast.literal_eval(
-            stringified_submitted_answer_list[0])['interaction_id']
+            stringified_state_answers_dicts[0])['interaction_id']
 
         # Collapse the list of answers into a single answer dict. This
         # aggregates across multiple answers if the key ends with VERSION_ALL.
@@ -576,7 +582,7 @@ class InteractionAnswerSummariesMRJobManager(
             'interaction_id': interaction_id,
             'submitted_answer_list': list(itertools.chain.from_iterable(
                 ast.literal_eval(state_answers)['submitted_answer_list']
-                for state_answers in stringified_submitted_answer_list))
+                for state_answers in stringified_state_answers_dicts))
         }
 
         # NOTE TO DEVELOPERS: 'submitted_answer_list' above is being converted
@@ -586,7 +592,9 @@ class InteractionAnswerSummariesMRJobManager(
         # tee'd, but that also can take significant memory. Adding this note
         # here in case it leads to significant memory consumption in the future,
         # as well as pointing out a possible solution which may consume less
-        # memory.
+        # memory. If you came across this TODO when investigating a shard
+        # failure for this job due to exceeding the soft private memory limit,
+        # this is probably the reson.
 
         # Get all desired calculations for the current interaction id.
         calc_ids = interaction_registry.Registry.get_interaction_by_id(
@@ -596,11 +604,9 @@ class InteractionAnswerSummariesMRJobManager(
             for calc_id in calc_ids]
 
         # Perform each calculation, and store the output.
-        counter = 0
         for calc in calculations:
             calc_output = calc.calculate_from_state_answers_dict(
                 combined_state_answers)
-            counter = counter + 1
             calc_output.save()
 
 
@@ -632,7 +638,7 @@ class InteractionAnswerSummariesAggregator(
     @classmethod
     def get_calc_output(
             cls, exploration_id, state_name, calculation_id,
-            exploration_version=None):
+            exploration_version=VERSION_ALL):
         """Get state answers calculation output domain object obtained from
         StateAnswersCalcOutputModel instance stored in the data store. This
         aggregator does not have a real-time layer, which means the results
@@ -640,12 +646,9 @@ class InteractionAnswerSummariesAggregator(
         the name of the calculation class used to compute aggregate data from
         submitted user answers.
 
-        If 'exploration_version' is None, this will return aggregated output
-        for all versions of the specified state and exploration.
+        If 'exploration_version' is VERSION_ALL, this will return aggregated
+        output for all versions of the specified state and exploration.
         """
-        if not exploration_version:
-            exploration_version = VERSION_ALL
-
         calc_output_model = stats_models.StateAnswersCalcOutputModel.get_model(
             exploration_id, exploration_version, state_name, calculation_id)
         if calc_output_model:

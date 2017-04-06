@@ -213,13 +213,14 @@ class EditorTest(BaseEditorControllerTest):
                 return [_create_answer(value) for value in arg]
 
             def _submit_answer(
-                    exp_id, state_name, answer_group_index, rule_spec_index,
-                    classification_categorization, answer, exp_version=1,
-                    session_id='dummy_session_id', time_spent_in_secs=0.0,
-                    params={}):
+                    exp_id, state_name, interaction_id, answer_group_index,
+                    rule_spec_index, classification_categorization, answer,
+                    exp_version=1, session_id='dummy_session_id',
+                    time_spent_in_secs=0.0, params={}):
                 event_services.AnswerSubmissionEventHandler.record(
-                    exp_id, exp_version, state_name, answer_group_index,
-                    rule_spec_index, classification_categorization, session_id,
+                    exp_id, exp_version, state_name, interaction_id,
+                    answer_group_index, rule_spec_index,
+                    classification_categorization, session_id,
                     time_spent_in_secs, params, answer)
 
             # Load the string classifier demo exploration.
@@ -248,24 +249,24 @@ class EditorTest(BaseEditorControllerTest):
 
             # Input happy since there is an explicit rule checking for that.
             _submit_answer(
-                exp_id, state_name, 0, 0, exp_domain.EXPLICIT_CLASSIFICATION,
-                'happy')
+                exp_id, state_name, 'TextInput', 0, 0,
+                exp_domain.EXPLICIT_CLASSIFICATION, 'happy')
 
             # Input text not at all similar to happy (default outcome).
             _submit_answer(
-                exp_id, state_name, 2, 0,
+                exp_id, state_name, 'TextInput', 2, 0,
                 exp_domain.DEFAULT_OUTCOME_CLASSIFICATION, 'sad')
 
             # Input cheerful: this is current training data and falls under the
             # classifier.
             _submit_answer(
-                exp_id, state_name, 1, 0,
+                exp_id, state_name, 'TextInput', 1, 0,
                 exp_domain.TRAINING_DATA_CLASSIFICATION, 'cheerful')
 
             # Input joyful: this is not training data but it will later be
             # classified under the classifier.
             _submit_answer(
-                exp_id, state_name, 2, 0,
+                exp_id, state_name, 'TextInput', 2, 0,
                 exp_domain.DEFAULT_OUTCOME_CLASSIFICATION, 'joyful')
 
             # Perform answer summarization on the summarized answers.

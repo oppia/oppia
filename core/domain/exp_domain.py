@@ -127,7 +127,8 @@ def _validate_customization_args_and_values(
     validation.
 
     Note that this may modify the given customization_args dict, if it has
-    extra or missing keys.
+    extra or missing keys. It also normalizes any HTML in the customization_args
+    dict.
     """
     ca_spec_names = [
         ca_spec.name for ca_spec in ca_specs_to_validate_against]
@@ -160,9 +161,10 @@ def _validate_customization_args_and_values(
     # Check that each value has the correct type.
     for ca_spec in ca_specs_to_validate_against:
         try:
-            schema_utils.normalize_against_schema(
-                customization_args[ca_spec.name]['value'],
-                ca_spec.schema)
+            customization_args[ca_spec.name]['value'] = (
+                schema_utils.normalize_against_schema(
+                    customization_args[ca_spec.name]['value'],
+                    ca_spec.schema))
         except Exception:
             # TODO(sll): Raise an actual exception here if parameters are not
             # involved. (If they are, can we get sample values for the state
@@ -2223,6 +2225,8 @@ class Exploration(object):
 
         return states_dict
 
+    # TODO(bhenning): Remove pre_v4_states_conversion_func when the answer
+    # migration is completed.
     @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version,
@@ -2230,6 +2234,11 @@ class Exploration(object):
         """Converts the states blob contained in the given
         versioned_exploration_states dict from current_states_schema_version to
         current_states_schema_version + 1.
+
+        If pre_v4_states_conversion_func is provided, it will be called in the
+        migration process before migrating from v3 to v4. It is provided a
+        states dict and will overwrite the migrated states dict with the dict it
+        returns.
 
         Note that the versioned_exploration_states being passed in is modified
         in-place.

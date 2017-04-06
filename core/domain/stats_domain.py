@@ -16,7 +16,7 @@
 
 """Domain object for statistics models."""
 
-import json
+import number
 import sys
 import utils
 
@@ -37,22 +37,32 @@ import feconf
 # NOTE TO DEVELOPERS: All other state answer data model entities must not ever
 # store this session ID unless it was created by the AnswerMigrationJob. Also,
 # this string must never change.
-MIGRATED_STATE_ANSWER_SESSION_ID = 'migrated_state_answer_session_id'
+MIGRATED_STATE_ANSWER_SESSION_ID = 'migrated_state_answer_session_id_2017'
 MIGRATED_STATE_ANSWER_TIME_SPENT_IN_SEC = 0.0
 
 
+# TODO(bhenning): Monitor sizes (lengths of submitted_answer_list) of these
+# objects and determine if we should enforce an upper bound for
+# submitted_answer_list.
 class StateAnswers(object):
     """Domain object containing answers submitted to an exploration state."""
 
     def __init__(self, exploration_id, exploration_version, state_name,
                  interaction_id, submitted_answer_list,
                  schema_version=feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION):
-        """Initialize domain object for state answers.
+        """Constructs a StateAnswers domain object.
 
-        interaction_id contains the interaction type of the state, e.g.
-        multiple choice.
-
-        submitted_answer_list contains a list of SubmittedAnswer objects.
+        Args:
+            exploration_id. The ID of the exploration corresponding to submitted
+                answers.
+            exploration_version. The version of the exploration corresponding to
+                submitted answers.
+            state_name. The state to which the answers were submitted.
+            interaction_id. The ID of the interaction which created the answers.
+            submitted_answer_list. The list of SubmittedAnswer domain objects
+                that were submitted to the exploration and version specified in
+                this object.
+            schema_version. The schema version of this answers object.
         """
         self.exploration_id = exploration_id
         self.exploration_version = exploration_version
@@ -114,23 +124,24 @@ class StateAnswers(object):
                     feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION,
                     self.schema_version))
 
-        for submitted_answer in self.submitted_answer_list:
-            submitted_answer.validate()
-
 
 class SubmittedAnswer(object):
     """Domain object representing an answer submitted to a state."""
 
     # NOTE TO DEVELOPERS: do not use the rule_spec_str and answer_str
-    # parameters, as they are here as part of the answer migration.
+    # parameters; they are only populated by the answer migration job. They only
+    # represent context that is lost as part of the answer migration and are
+    # used as part of validating the migration was correct. They may be
+    # referenced in future migration or mapreduce jobs, or they may be removed
+    # without warning or migration.
 
     # TODO(bhenning): Remove large_bucket_entity_id once the answer migration is
     # completed in production.
-    def __init__(self, normalized_answer, interaction_id, answer_group_index,
+    def __init__(self, answer, interaction_id, answer_group_index,
                  rule_spec_index, classification_categorization, params,
                  session_id, time_spent_in_sec, rule_spec_str=None,
                  answer_str=None, large_bucket_entity_id=None):
-        self.normalized_answer = normalized_answer
+        self.answer = answer
         self.interaction_id = interaction_id
         self.answer_group_index = answer_group_index
         self.rule_spec_index = rule_spec_index
@@ -142,17 +153,9 @@ class SubmittedAnswer(object):
         self.answer_str = answer_str
         self.large_bucket_entity_id = large_bucket_entity_id
 
-    @property
-    def json_size(self):
-        """Returns the size of the dict returned by to_dict(). This may not be
-        exactly the size of the returned dict, since it assumes the property in
-        the dict for the json_size is sys.maxint.
-        """
-        return sys.getsizeof(json.dumps(self.to_dict(json_size=sys.maxint)))
-
-    def to_dict(self, json_size=None):
+    def to_dict(self):
         submitted_answer_dict = {
-            'answer': self.normalized_answer,
+            'answer': self.answer,
             'interaction_id': self.interaction_id,
             'answer_group_index': self.answer_group_index,
             'rule_spec_index': self.rule_spec_index,
@@ -160,7 +163,6 @@ class SubmittedAnswer(object):
             'params': self.params,
             'session_id': self.session_id,
             'time_spent_in_sec': self.time_spent_in_sec,
-            'json_size': self.json_size if not json_size else json_size,
         }
         if self.rule_spec_str is not None:
             submitted_answer_dict['rule_spec_str'] = self.rule_spec_str
@@ -215,9 +217,9 @@ class SubmittedAnswer(object):
                 'Expected session_id to be a string, received %s' %
                 str(self.session_id))
 
-        if not isinstance(self.time_spent_in_sec, float):
+        if not isinstance(self.time_spent_in_sec, number.Number):
             raise utils.ValidationError(
-                'Expected time_spent_in_sec to be a float, received %s' %
+                'Expected time_spent_in_sec to be a number, received %s' %
                 str(self.time_spent_in_sec))
 
         if not isinstance(self.params, dict):
@@ -234,11 +236,6 @@ class SubmittedAnswer(object):
                 'Expected rule_spec_index to be an integer, received %s' %
                 str(self.rule_spec_index))
 
-        if not isinstance(self.classification_categorization, basestring):
-            raise utils.ValidationError(
-                'Expected classification_categorization to be a string, '
-                'received %s' % str(self.classification_categorization))
-
         if self.answer_group_index < 0:
             raise utils.ValidationError(
                 'Expected answer_group_index to be non-negative, received %d' %
@@ -254,10 +251,10 @@ class SubmittedAnswer(object):
                 'Expected time_spent_in_sec to be non-negative, received %f' %
                 self.time_spent_in_sec)
 
-        if self.normalized_answer is None and self.interaction_id != 'Continue':
+        if self.answer is None and self.interaction_id != 'Continue':
             raise utils.ValidationError(
-                'SubmittedAnswers must have a provided normalized_answer '
-                'except for Continue interactions')
+                'SubmittedAnswers must have a provided answer except for '
+                'Continue interactions')
 
         valid_classification_categories = [
             exp_domain.EXPLICIT_CLASSIFICATION,

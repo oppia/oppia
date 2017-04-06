@@ -585,7 +585,7 @@ class UntrainedAnswersHandler(EditorHandler):
         # The total number of possible answers is 100 because it requests the
         # top 50 answers matched to the default rule and the top 50 answers
         # matched to the classifier individually.
-        answers = stats_services.get_top_state_rule_answers(
+        submitted_answers = stats_services.get_top_state_rule_answers(
             exploration_id, state_name, [
                 exp_domain.DEFAULT_OUTCOME_CLASSIFICATION,
                 exp_domain.TRAINING_DATA_CLASSIFICATION])[
@@ -600,7 +600,7 @@ class UntrainedAnswersHandler(EditorHandler):
 
             try:
                 # Normalize the answers.
-                for answer in answers:
+                for answer in submitted_answers:
                     answer['answer'] = interaction_instance.normalize_answer(
                         answer['answer'])
 
@@ -622,7 +622,7 @@ class UntrainedAnswersHandler(EditorHandler):
                     in interaction.confirmed_unclassified_answers))
 
                 unhandled_answers = [
-                    answer for answer in answers
+                    answer for answer in submitted_answers
                     if answer['answer'] not in trained_answers
                 ]
             except Exception as e:
