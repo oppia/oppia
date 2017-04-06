@@ -65,7 +65,8 @@ _STATUS_PUBLICIZED_BONUS = 30
 _DEFAULT_RANK = 20
 
 
-def _migrate_states_schema(versioned_exploration_states):
+def _migrate_states_schema(
+        versioned_exploration_states, pre_v4_states_conversion_func):
     """Holds the responsibility of performing a step-by-step, sequential update
     of an exploration states structure based on the schema version of the input
     exploration dictionary. This is very similar to the YAML conversion process
@@ -98,7 +99,8 @@ def _migrate_states_schema(versioned_exploration_states):
     while (states_schema_version <
            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
         exp_domain.Exploration.update_states_from_model(
-            versioned_exploration_states, states_schema_version)
+            versioned_exploration_states, states_schema_version,
+            pre_v4_states_conversion_func=pre_v4_states_conversion_func)
         states_schema_version += 1
 
 
@@ -111,7 +113,9 @@ def _get_exploration_memcache_key(exploration_id, version=None):
         return 'exploration:%s' % exploration_id
 
 
-def get_exploration_from_model(exploration_model, run_conversion=True):
+def get_exploration_from_model(
+        exploration_model, run_conversion=True,
+        pre_v4_states_conversion_func=None):
     """Returns an Exploration domain object given an exploration model loaded
     from the datastore.
 
@@ -135,7 +139,8 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
     # is necessary.
     if (run_conversion and exploration_model.states_schema_version !=
             feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
-        _migrate_states_schema(versioned_exploration_states)
+        _migrate_states_schema(
+            versioned_exploration_states, pre_v4_states_conversion_func)
 
     return exp_domain.Exploration(
         exploration_model.id, exploration_model.title,
@@ -710,11 +715,13 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
 
 
 # Operations on exploration snapshots.
-def get_exploration_snapshots_metadata(exploration_id):
-    """Returns the snapshots for this exploration, as dicts.
+def get_exploration_snapshots_metadata(exploration_id, allow_deleted=False):
+    """Returns the snapshots for this exploration, as dicts, up to and including
+    the latest version of the exploration.
 
     Args:
         exploration_id: str. The id of the exploration in question.
+        allow_deleted: bool. Whether to allow retrieval of deleted snapshots.
 
     Returns:
         list of dicts, each representing a recent snapshot. Each dict has the
@@ -728,7 +735,7 @@ def get_exploration_snapshots_metadata(exploration_id):
     version_nums = range(1, current_version + 1)
 
     return exp_models.ExplorationModel.get_snapshots_metadata(
-        exploration_id, version_nums)
+        exploration_id, version_nums, allow_deleted=allow_deleted)
 
 
 def _get_last_updated_by_human_ms(exp_id):

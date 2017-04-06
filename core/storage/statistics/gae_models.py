@@ -17,7 +17,10 @@
 """Models for Oppia statistics."""
 
 import datetime
+import json
 import logging
+import operator
+import sys
 
 from core.platform import models
 import feconf
@@ -26,6 +29,7 @@ import utils
 from google.appengine.ext import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+transaction_services = models.Registry.import_transaction_services()
 
 # TODO(bhenning): Everything is handler name submit; therefore, it is
 # pointless and should be removed.
@@ -546,7 +550,8 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
 
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     """Batch model for storing MapReduce calculation output for
-    exploration-level statistics."""
+    exploration-level statistics.
+    """
     # Id of exploration.
     exploration_id = ndb.StringProperty(indexed=True)
     # Version of exploration.
@@ -587,114 +592,237 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
             ).fetch(feconf.DEFAULT_QUERY_LIMIT)]
 
 
-def process_submitted_answer(
-        exploration_id, unused_exploration_version, state_name,
-        rule_spec_string, answer):
-    """Adds an answer to the answer log for the rule it hits.
-
-    Args:
-        exploration_id: the exploration id
-        state_name: the state name
-        answer: an HTML string representation of the answer
-    """
-    # Add answer to StateRuleAnswerLogModel
-    answer_log = StateRuleAnswerLogModel.get_or_create(
-        exploration_id, state_name, rule_spec_string)
-    if answer in answer_log.answers:
-        answer_log.answers[answer] += 1
-    else:
-        answer_log.answers[answer] = 1
-
-    # This may fail due to answer_log.answers being larger than 1 MB in size.
-    try:
-        answer_log.put()
-    except Exception as e:
-        logging.error(e)
-
-
-def resolve_answers(
-        exploration_id, state_name, rule_str, answers):
-    """Resolves selected answers for the given rule.
-
-    Args:
-        exploration_id: the exploration id
-        state_name: the state name
-        rule_str: a string representation of the rule
-        answers: a list of HTML string representations of the resolved answers
-    """
-    assert isinstance(answers, list)
-    answer_log = StateRuleAnswerLogModel.get_or_create(
-        exploration_id, state_name, rule_str)
-
-    for answer in answers:
-        if answer not in answer_log.answers:
-            logging.error(
-                'Answer %s not found in answer log for rule %s of exploration '
-                '%s, state %s, handler %s' % (
-                    answer, rule_str, exploration_id, state_name,
-                    _OLD_SUBMIT_HANDLER_NAME))
-        else:
-            del answer_log.answers[answer]
-    answer_log.put()
-
-
 class StateAnswersModel(base_models.BaseModel):
-    """Store all answers of a state.
+    """Store all answers of a state. This model encapsulates a sharded storage
+    system for answers. Multiple entries in the model may contain answers for
+    the same state. The initial entry has a shard ID of 0 and contains
+    information about how many shards exist for this state. All other meta
+    information is duplicated across all shards, since they are immutable or are
+    local to that shard.
 
     The id/key of instances of this class has the form
-        [EXPLORATION_ID]:[EXPLORATION_VERSION]:[STATE_NAME].
+        [EXPLORATION_ID]:[EXPLORATION_VERSION]:[STATE_NAME]:[SHARD_ID].
     """
+    # This provides about 24k of padding for the other properties and entity
+    # storage overhead (since the max entity size is 1MB).
+    _MAX_ANSWER_LIST_BYTE_SIZE = 1000000
+
     # Explicitly store exploration id, exploration version and state name
     # so we can easily do queries on them.
     exploration_id = ndb.StringProperty(indexed=True, required=True)
     exploration_version = ndb.IntegerProperty(indexed=True, required=True)
     state_name = ndb.StringProperty(indexed=True, required=True)
+    # Which shard this corresponds to in the list of shards. If this is 0 it
+    # represents the master shard which includes the shard_count. All other
+    # shards look similar to the master shard except they do not populate
+    # shard_count.
+    shard_id = ndb.IntegerProperty(indexed=True, required=True)
     # Store interaction type to know which calculations should be performed
     interaction_id = ndb.StringProperty(indexed=True, required=True)
+    # Store how many extra shards are associated with this state. This is only
+    # present when shard_id is 0. This starts at 0 (the main shard is not
+    # counted).
+    shard_count = ndb.IntegerProperty(indexed=True, required=False)
+    # The total number of bytes needed to store all of the answers in the
+    # submitted_answer_list, minus any overhead of the property itself. This
+    # value is found by summing the JSON sizes of all answer dicts stored inside
+    # submitted_answer_list.
+    accumulated_answer_json_size_bytes = ndb.IntegerProperty(
+        indexed=False, required=False, default=0)
     # List of answer dicts, each of which is stored as JSON blob. The content
-    # of answer dicts is specified in core.domain.stats_services.record_answer.
-    answers_list = ndb.JsonProperty(repeated=True, indexed=False)
+    # of answer dicts is specified in core.domain.stats_domain.StateAnswers.
+    submitted_answer_list = ndb.JsonProperty(repeated=True, indexed=False)
+    # The version of the submitted_answer_list currently supported by Oppia. If
+    # the internal JSON structure of submitted_answer_list changes,
+    # CURRENT_SCHEMA_VERSION in this class needs to be incremented.
+    schema_version = ndb.IntegerProperty(
+        indexed=True, default=feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION)
 
     @classmethod
-    def get_model(cls, exploration_id, exploration_version, state_name):
+    def _get_model(
+            cls, exploration_id, exploration_version, state_name, shard_id):
         entity_id = cls._get_entity_id(
-            exploration_id, str(exploration_version), state_name)
-        instance = cls.get(entity_id, strict=False)
-        return instance
+            exploration_id, exploration_version, state_name, shard_id)
+        return cls.get(entity_id, strict=False)
 
     @classmethod
-    def create_or_update(
+    def get_all_models(cls, exploration_id, exploration_version, state_name):
+        """Retrieves all models and shards associated with the specific
+        exploration state. Returns None if no answers have yet been submitted to
+        the specified exploration state.
+        """
+        # It's okay if this isn't run in a transaction. When adding new shards,
+        # it's guaranteed the master shard will be updated at the same time the
+        # new shard is added. Shard deletion is not supported. Finally, if a new
+        # shard is added after the master shard is retrieved, it will simply be
+        # ignored in the result of this function. It will be included during the
+        # next call.
+        main_shard = cls._get_model(
+            exploration_id, exploration_version, state_name, 0)
+
+        if main_shard:
+            all_models = [main_shard]
+            if main_shard.shard_count > 0:
+                shard_ids = [
+                    cls._get_entity_id(
+                        exploration_id, exploration_version, state_name,
+                        shard_id)
+                    for shard_id in xrange(1, main_shard.shard_count + 1)]
+                all_models += cls.get_multi(shard_ids)
+            return all_models
+        else:
+            return None
+
+    @classmethod
+    def _insert_submitted_answers_unsafe(
             cls, exploration_id, exploration_version, state_name,
-            interaction_id, answers_list):
-        entity_id = cls._get_entity_id(
-            exploration_id, str(exploration_version), state_name)
-        instance = cls(id=entity_id, exploration_id=exploration_id,
-                       exploration_version=exploration_version,
-                       state_name=state_name,
-                       interaction_id=interaction_id,
-                       answers_list=answers_list)
-        return instance
+            interaction_id, new_submitted_answer_dict_list):
+        """See the insert_submitted_answers for general documentation of what
+        this method does. It's only safe to call this method from within a
+        transaction.
+        """
+        # The main shard always needs to be retrieved. At most one other shard
+        # needs to be retrieved (the last one).
+        main_shard = cls._get_model(
+            exploration_id, exploration_version, state_name, 0)
+        last_shard = main_shard
+
+        if not main_shard:
+            entity_id = cls._get_entity_id(
+                exploration_id, exploration_version, state_name, 0)
+            main_shard = cls(
+                id=entity_id, exploration_id=exploration_id,
+                exploration_version=exploration_version, state_name=state_name,
+                shard_id=0, interaction_id=interaction_id, shard_count=0,
+                submitted_answer_list=[])
+            last_shard = main_shard
+        elif main_shard.shard_count > 0:
+            last_shard = cls._get_model(
+                exploration_id, exploration_version, state_name,
+                main_shard.shard_count)
+
+        sharded_answer_lists, sharded_answer_list_sizes = cls._shard_answers(
+            last_shard.submitted_answer_list,
+            last_shard.accumulated_answer_json_size_bytes,
+            new_submitted_answer_dict_list)
+        new_shard_count = main_shard.shard_count + len(sharded_answer_lists) - 1
+
+        # Collect all entities to update to efficiently send them as a single
+        # update.
+        entities_to_put = []
+        last_shard_is_main = main_shard.shard_count == 0
+
+        # Update the last shard if it changed.
+        if sharded_answer_list_sizes[0] != (
+                last_shard.accumulated_answer_json_size_bytes):
+            last_shard.submitted_answer_list = sharded_answer_lists[0]
+            last_shard.accumulated_answer_json_size_bytes = (
+                sharded_answer_list_sizes[0])
+            last_shard_updated = True
+        else:
+            last_shard_updated = False
+
+        # Insert any new shards.
+        for i in xrange(1, len(sharded_answer_lists)):
+            shard_id = main_shard.shard_count + i
+            entity_id = cls._get_entity_id(
+                exploration_id, exploration_version, state_name, shard_id)
+            new_shard = cls(
+                id=entity_id, exploration_id=exploration_id,
+                exploration_version=exploration_version, state_name=state_name,
+                shard_id=shard_id, interaction_id=interaction_id,
+                submitted_answer_list=sharded_answer_lists[i],
+                accumulated_answer_json_size_bytes=sharded_answer_list_sizes[i])
+            entities_to_put.append(new_shard)
+
+        # Update the shard count if any new shards were added.
+        if main_shard.shard_count != new_shard_count:
+            main_shard.shard_count = new_shard_count
+            main_shard_updated = True
+        else:
+            main_shard_updated = False
+
+        if last_shard_is_main and (main_shard_updated or last_shard_updated):
+            entities_to_put.append(main_shard)
+        else:
+            if main_shard_updated:
+                entities_to_put.append(main_shard)
+            if last_shard_updated:
+                entities_to_put.append(last_shard)
+
+        cls.put_multi(entities_to_put)
 
     @classmethod
-    def _get_entity_id(cls, exploration_id, exploration_version, state_name):
-        return ':'.join([exploration_id,
-                         str(exploration_version),
-                         state_name])
+    def insert_submitted_answers(
+            cls, exploration_id, exploration_version, state_name,
+            interaction_id, new_submitted_answer_dict_list):
+        """Given an exploration ID, version, state name, and interaction ID,
+        attempt to insert a list of specified SubmittedAnswers into this model,
+        performing sharding operations as necessary. This method automatically
+        commits updated/new models to the data store. This method returns
+        nothing. This method can guarantee atomicity since mutations are
+        performed transactionally, but it cannot guarantee uniqueness for answer
+        submission. Answers may be duplicated in cases where a past transaction
+        is interrupted and retried. Furthermore, this method may fail with a
+        DeadlineExceededError if too many answers are attempted for submission
+        simultaneously.
+        """
+        transaction_services.run_in_transaction(
+            cls._insert_submitted_answers_unsafe, exploration_id,
+            exploration_version, state_name, interaction_id,
+            new_submitted_answer_dict_list)
 
-    def save(self):
-        """Commit to storage."""
-        # This may fail if answers_list is too large.
-        try:
-            self.put()
-        except Exception as e:
-            logging.error(e)
+    @classmethod
+    def _get_entity_id(
+            cls, exploration_id, exploration_version, state_name, shard_id):
+        return ':'.join([
+            exploration_id, str(exploration_version), state_name,
+            str(shard_id)])
+
+    @classmethod
+    def _shard_answers(
+            cls, current_answer_list, current_answer_list_size,
+            new_answer_list):
+        """Given a current answer list which can fit within one NDB entity and
+        a list of new answers which need to try and fit in the current answer
+        list, shard the answers such that a list of answer lists are returned.
+        The first entry is guaranteed to contain all answers of the current
+        answer list.
+        """
+        # Sort the new answers to insert in ascending order of their sizes in
+        # bytes.
+        new_answer_size_list = [
+            (answer_dict, cls._get_answer_dict_size(answer_dict))
+            for answer_dict in new_answer_list]
+        new_answer_list_sorted = sorted(new_answer_size_list, lambda x: x[1])
+        # NOTE TO DEVELOPERS: this list cast is needed because the nested list
+        # is appended to later in this function and the list passed into here
+        # may be a reference to an answer list stored within a model class.
+        sharded_answer_lists = [list(current_answer_list)]
+        sharded_answer_list_sizes = [current_answer_list_size]
+        for answer_dict, answer_size in new_answer_list_sorted:
+            if (sharded_answer_list_sizes[-1] + answer_size <=
+                    cls._MAX_ANSWER_LIST_BYTE_SIZE):
+                sharded_answer_lists[-1].append(answer_dict)
+                sharded_answer_list_sizes[-1] += answer_size
+            else:
+                sharded_answer_lists.append([answer_dict])
+                sharded_answer_list_sizes.append(answer_size)
+        return sharded_answer_lists, sharded_answer_list_sizes
+
+    @classmethod
+    def _get_answer_dict_size(cls, answer_dict):
+        """Returns a size overestimate (in bytes) of the given answer dict."""
+        return sys.getsizeof(json.dumps(answer_dict))
 
 
 class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     """Store output of calculation performed on StateAnswers."""
 
     exploration_id = ndb.StringProperty(indexed=True, required=True)
-    exploration_version = ndb.IntegerProperty(indexed=True, required=True)
+    # May be an integral exploration_version or 'all' if this entity represents
+    # an aggregation of multiple sets of answers.
+    exploration_version = ndb.StringProperty(indexed=True, required=True)
     state_name = ndb.StringProperty(indexed=True, required=True)
     calculation_id = ndb.StringProperty(indexed=True, required=True)
     # Calculation output dict stored as JSON blob
@@ -737,3 +865,250 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
         return ':'.join([
             exploration_id, str(exploration_version), state_name,
             calculation_id])
+
+
+class LargeAnswerBucketModel(base_models.BaseModel):
+    """Stores answers from StateRuleAnswerLogModel for entities with very large
+    numbers of answers. Those answers are copied to this model and stored in a
+    fragmented way so that the answer migration can perform the larger
+    migrations in smaller chunks.
+    """
+    # TODO(bhenning): Remove this model once the AnswerMigrationJob has
+    # successfully run in production.
+
+    _MAX_ANSWERS_PER_BUCKET = 100
+    log_model_item_id = ndb.StringProperty(indexed=True)
+    answers = ndb.JsonProperty(indexed=False)
+    log_model_last_update = ndb.DateTimeProperty(indexed=False)
+
+    @classmethod
+    def should_split_log_entity(cls, item):
+        """Returns whether the given StateRuleAnswerLogModel entity has enough
+        answers to be split up.
+        """
+        return len(item.answers) > cls._MAX_ANSWERS_PER_BUCKET
+
+    @classmethod
+    def get_split_entity_count_for_answer_log_entity(cls, item_id):
+        """Returns how many times the given StateRuleAnswerLogModel entity (by
+        ID) has been split and stored within this model in shards, or 0 if it is
+        not split at all. This will never return 1.
+        """
+        return cls.query(cls.log_model_item_id == item_id).count()
+
+    @classmethod
+    def insert_state_rule_answer_log_entity(cls, item):
+        """Attemps to instance a StateRuleAnswerLogModel entity, splitting up
+        its entities as necessary. This method guarantees more than one
+        LargeAnswerBucketModel entity will be written, otherwise the entity will
+        not be split up.
+        """
+        total_answer_count = len(item.answers)
+        if total_answer_count <= cls._MAX_ANSWERS_PER_BUCKET:
+            raise Exception(
+                'Cannot split up entity with less than max answers: %s' % (
+                    item.id))
+        full_bucket_count = total_answer_count / cls._MAX_ANSWERS_PER_BUCKET
+        remaining_answer_count = (
+            total_answer_count % cls._MAX_ANSWERS_PER_BUCKET)
+        answer_list = item.answers.items()
+        # TODO(bhenning): Figure out a better way to deal with this situation.
+        # This sort is only here for the benefit of tests, but it might be slow
+        # enough to cause the transaction to fail.
+        answer_list.sort(key=operator.itemgetter(0))
+        for i in xrange(full_bucket_count):
+            bucket_id = cls.get_new_id('')
+            start_shard_answer_index = i * cls._MAX_ANSWERS_PER_BUCKET
+            end_shard_answer_index = (i + 1) * cls._MAX_ANSWERS_PER_BUCKET
+            # Since the answers submitted to the model were converted to a list
+            # of tuples earlier, take only a subset of the list and convert it
+            # back to a dict for storage.
+            sharded_answer_list = answer_list[
+                start_shard_answer_index:end_shard_answer_index]
+            bucket_entity = cls(
+                id=bucket_id,
+                log_model_item_id=item.id,
+                answers=dict(sharded_answer_list),
+                log_model_last_update=item.last_updated)
+            bucket_entity.put()
+
+        if remaining_answer_count > 0:
+            bucket_id = cls.get_new_id('')
+            sharded_answer_list = answer_list[
+                full_bucket_count*cls._MAX_ANSWERS_PER_BUCKET:]
+            bucket_entity = cls(
+                id=bucket_id,
+                log_model_item_id=item.id,
+                answers=dict(sharded_answer_list),
+                log_model_last_update=item.last_updated)
+            bucket_entity.put()
+
+
+class MigratedAnswerModel(base_models.BaseModel):
+    """A temporary model which maps answers in StateRuleAnswerLogModel and
+    LargeAnswerBucketModel to answers migrated and inserted in
+    StateAnswersModel. This model can be used to verify a given answer exists
+    (and the correct number of times) in StateAnswersModel. Although the
+    AnswerMigrationJob is not idempotent, this model aims to help make it closer
+    to idempotent.
+    """
+    # TODO(bhenning): Remove this model once the AnswerMigrationJob has
+    # successfully run in production.
+
+    exploration_id = ndb.StringProperty(indexed=True, required=True)
+    state_name = ndb.StringProperty(indexed=True, required=True)
+    exploration_versions = ndb.IntegerProperty(indexed=False, repeated=True)
+    started_migration = ndb.BooleanProperty(indexed=False, default=False)
+    finished_migration = ndb.BooleanProperty(indexed=False, default=False)
+    started_large_answer_bucket_ids = ndb.StringProperty(
+        indexed=False, repeated=True)
+    finished_large_answer_bucket_ids = ndb.StringProperty(
+        indexed=False, repeated=True)
+    expected_large_answer_bucket_count = ndb.IntegerProperty(
+        indexed=False, default=0)
+
+    @classmethod
+    def _start_migrating_answer_bucket(
+            cls, state_answer_log_model_item_id, exploration_id, state_name,
+            large_answer_bucket_id, large_answer_bucket_count):
+        model = cls.get(state_answer_log_model_item_id, strict=False)
+        # Only expect migration to not have been started if there aren't a group
+        # of answers being matched to this entity.
+        if not large_answer_bucket_id and model:
+            raise Exception(
+                'Expected to not have started migrating answer bucket: %s' % (
+                    state_answer_log_model_item_id))
+
+        if (large_answer_bucket_id and model
+                and large_answer_bucket_id
+                in model.started_large_answer_bucket_ids):
+            raise Exception(
+                'Expected to not have started migrating large answer bucket: '
+                '\'%s\' (part of group \'%s\')' % (
+                    large_answer_bucket_id, state_answer_log_model_item_id))
+        if not model:
+            started_large_answer_bucket_ids = (
+                [large_answer_bucket_id] if large_answer_bucket_id else [])
+            model = cls(
+                id=state_answer_log_model_item_id,
+                exploration_id=exploration_id, state_name=state_name,
+                exploration_versions=[], started_migration=True,
+                started_large_answer_bucket_ids=started_large_answer_bucket_ids,
+                finished_large_answer_bucket_ids=[],
+                expected_large_answer_bucket_count=large_answer_bucket_count)
+        else:
+            started_large_answer_bucket_ids = set(
+                model.started_large_answer_bucket_ids)
+            started_large_answer_bucket_ids.add(large_answer_bucket_id)
+            model.started_large_answer_bucket_ids = list(
+                started_large_answer_bucket_ids)
+        model.put()
+
+    @classmethod
+    def start_migrating_answer_bucket(
+            cls, state_answer_log_model_item_id, exploration_id, state_name,
+            large_answer_bucket_id, large_answer_bucket_count):
+        transaction_services.run_in_transaction(
+            cls._start_migrating_answer_bucket, state_answer_log_model_item_id,
+            exploration_id, state_name, large_answer_bucket_id,
+            large_answer_bucket_count)
+
+    @classmethod
+    def _finish_migrating_answer(
+            cls, state_answer_log_model_item_id, exploration_version):
+        model = cls.get(state_answer_log_model_item_id)
+        # Avoid an unnecessary put if the given version is already recorded
+        if exploration_version not in model.exploration_versions:
+            model.exploration_versions.append(exploration_version)
+            model.put()
+
+    @classmethod
+    def finish_migrating_answer(
+            cls, state_answer_log_model_item_id, exploration_version):
+        transaction_services.run_in_transaction(
+            cls._finish_migrating_answer, state_answer_log_model_item_id,
+            exploration_version)
+
+    @classmethod
+    def _finish_migration_answer_bucket(
+            cls, state_answer_log_model_item_id, large_answer_bucket_id):
+        model = cls.get(state_answer_log_model_item_id)
+        if large_answer_bucket_id:
+            finished_large_answer_bucket_ids = set(
+                model.finished_large_answer_bucket_ids)
+            finished_large_answer_bucket_ids.add(large_answer_bucket_id)
+            expected_bucket_count = model.expected_large_answer_bucket_count
+            model.finished_migration = (
+                len(finished_large_answer_bucket_ids) >= expected_bucket_count)
+            model.finished_large_answer_bucket_ids = list(
+                finished_large_answer_bucket_ids)
+        else:
+            model.finished_migration = True
+        model.put()
+
+    @classmethod
+    def finish_migration_answer_bucket(
+            cls, state_answer_log_model_item_id, large_answer_bucket_id):
+        transaction_services.run_in_transaction(
+            cls._finish_migration_answer_bucket, state_answer_log_model_item_id,
+            large_answer_bucket_id)
+
+    @classmethod
+    def has_started_being_migrated(
+            cls, state_answer_log_model_item_id, large_answer_bucket_id=None):
+        model = cls.get(state_answer_log_model_item_id, strict=False)
+        return model is not None and (
+            not large_answer_bucket_id or large_answer_bucket_id
+            in model.started_large_answer_bucket_ids)
+
+    @classmethod
+    def validate_answers_are_migrated(cls, state_rule_answer_log_model):
+        migrated_answer_model = MigratedAnswerModel.get(
+            state_rule_answer_log_model.id, strict=False)
+        if not migrated_answer_model:
+            raise utils.ValidationError(
+                u'Answers not migrated: %s' % state_rule_answer_log_model.id)
+        state_answer_models_list = []
+
+        # A version of -1 is a special sentinel value to silence the
+        # validation on this answer bucket. It typically represents an
+        # answer which cannot be migrated for a known reason. These answers
+        # should not be validated, since they were never migrated.
+        if migrated_answer_model.exploration_versions == [-1]:
+            return
+
+        for exploration_version in migrated_answer_model.exploration_versions:
+            state_answer_models = StateAnswersModel.get_all_models(
+                migrated_answer_model.exploration_id, exploration_version,
+                migrated_answer_model.state_name)
+            if not state_answer_models:
+                raise utils.ValidationError(
+                    u'Inconsistency: previous mentioned answers were migrated '
+                    'for exploration %s (version=%s) state name %s, but none '
+                    'found' % (
+                        migrated_answer_model.exploration_id,
+                        exploration_version, migrated_answer_model.state_name))
+            state_answer_models_list.append(state_answer_models)
+        answer_str_list = (
+            cls._get_answer_str_list_from_state_answer_models_list(
+                state_answer_models_list))
+        for answer_str, expected_count in (
+                state_rule_answer_log_model.answers.iteritems()):
+            observed_count = answer_str_list.count(answer_str)
+            if expected_count != observed_count:
+                raise utils.ValidationError(
+                    u'Expected \'%s\' answer string %d time(s) in new data '
+                    'model, but found it %d time(s)' % (
+                        answer_str, expected_count, observed_count))
+
+    @classmethod
+    def _get_answer_str_list_from_state_answer_models_list(
+            cls, state_answer_models_list):
+        answer_str_list = []
+        for state_answer_models in state_answer_models_list:
+            for state_answer_model in state_answer_models:
+                for submitted_answer_dict in (
+                        state_answer_model.submitted_answer_list):
+                    answer_str_list.append(
+                        submitted_answer_dict.get('answer_str'))
+        return answer_str_list

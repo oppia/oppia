@@ -17,12 +17,19 @@
  * exploration editor.
  */
 
+oppia.constant('IMPROVE_TYPE_DEFAULT', 'default');
+oppia.constant('IMPROVE_TYPE_INCOMPLETE', 'incomplete');
+
 oppia.controller('StatisticsTab', [
   '$scope', '$http', '$modal', 'alertsService', 'explorationStatesService',
   'explorationData', 'computeGraphService', 'oppiaDatetimeFormatter',
+  'StateImprovementSuggestionService', 'IMPROVE_TYPE_DEFAULT',
+  'IMPROVE_TYPE_INCOMPLETE',
   function(
       $scope, $http, $modal, alertsService, explorationStatesService,
-      explorationData, computeGraphService, oppiaDatetimeFormatter) {
+      explorationData, computeGraphService, oppiaDatetimeFormatter,
+      StateImprovementSuggestionService, IMPROVE_TYPE_DEFAULT,
+      IMPROVE_TYPE_INCOMPLETE) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
       chartAreaWidth: 300,
       colors: ['green', 'firebrick'],
@@ -63,6 +70,21 @@ oppia.controller('StatisticsTab', [
           var initStateName = response.data.init_state_name;
           $scope.statsGraphData = computeGraphService.compute(
             initStateName, states);
+
+          var improvements = (
+            StateImprovementSuggestionService.getStateImprovements(
+              states, $scope.stateStats));
+          $scope.highlightStates = {};
+          improvements.forEach(function(impItem) {
+            // TODO(bhenning): This is the feedback for improvement types and
+            // should be included with the definitions of the improvement types.
+            if (impItem.type === IMPROVE_TYPE_DEFAULT) {
+              $scope.highlightStates[impItem.stateName] = (
+                'Needs more feedback');
+            } else if (impItem.type === IMPROVE_TYPE_INCOMPLETE) {
+              $scope.highlightStates[impItem.stateName] = 'May be confusing';
+            }
+          });
         });
 
         var data = response.data;
@@ -91,20 +113,11 @@ oppia.controller('StatisticsTab', [
         for (var stateName in explorationStatesService.getStates()) {
           var visits = 0;
           if ($scope.stateStats.hasOwnProperty(stateName)) {
-            visits = $scope.stateStats[stateName].firstEntryCount;
+            visits = $scope.stateStats[stateName].first_entry_count;
           }
           $scope.statsGraphOpacities[stateName] = Math.max(
             visits / numVisits, 0.05);
         }
-
-        $scope.highlightStates = {};
-        improvements.forEach(function(impItem) {
-          if (impItem.type === 'default') {
-            $scope.highlightStates[impItem.state_name] = 'Needs more feedback';
-          } else if (impItem.type === 'incomplete') {
-            $scope.highlightStates[impItem.state_name] = 'May be confusing';
-          }
-        });
 
         $scope.hasTabLoaded = true;
       });
@@ -134,43 +147,18 @@ oppia.controller('StatisticsTab', [
             improvementType: function() {
               return improvementType;
             },
-            rulesStats: function() {
-              return response.data.rules_stats;
-            },
             visualizationsInfo: function() {
               return response.data.visualizations_info;
             }
           },
           controller: [
-            '$scope', '$modalInstance', 'stateName', 'stateStats',
-            'improvementType', 'rulesStats', 'utilsService',
-            function(
-                $scope, $modalInstance, stateName,
-                stateStats, improvementType, rulesStats, utilsService) {
+            '$scope', '$modalInstance', '$filter', 'stateName', 'stateStats',
+            'improvementType', 'visualizationsInfo', 'oppiaHtmlEscaper',
+            function($scope, $modalInstance, $filter, stateName, stateStats,
+                improvementType, visualizationsInfo, oppiaHtmlEscaper) {
               $scope.stateName = stateName;
               $scope.stateStats = stateStats;
               $scope.improvementType = improvementType;
-              $scope.rulesStats = rulesStats;
-
-              $scope.getNumTimesString = function(numberOfTimes) {
-                var suffix = (numberOfTimes === 1 ? ' time' : ' times');
-                return numberOfTimes + suffix;
-              };
-
-              $scope.getHumanReadableRuleName = function(ruleName) {
-                return ruleName.substring('submit.'.length);
-              };
-
-              $scope.isEmpty = utilsService.isEmpty;
-
-              $scope.doesAnswerExist = function() {
-                for (var rule in $scope.rulesStats) {
-                  if ($scope.rulesStats[rule].answers.length > 0) {
-                    return true;
-                  }
-                }
-                return false;
-              };
 
               var _getVisualizationsHtml = function() {
                 var htmlSnippets = [];
@@ -202,3 +190,64 @@ oppia.controller('StatisticsTab', [
     };
   }
 ]);
+
+oppia.factory('StateImprovementSuggestionService', [
+  'IMPROVE_TYPE_DEFAULT', 'IMPROVE_TYPE_INCOMPLETE',
+  function(
+    IMPROVE_TYPE_DEFAULT, IMPROVE_TYPE_INCOMPLETE) {
+  return {
+    // Returns an array of suggested improvements to states. Each suggestion is
+    // an object with the keys: rank, improveType, and stateName.
+    getStateImprovements: function(explorationStates, allStateStats) {
+      var rankComparator = function(lhs, rhs) {
+        return rhs.rank - lhs.rank;
+      };
+
+      var rankedStates = [];
+      var stateNames = Object.keys(explorationStates);
+      for (var i = 0; i < stateNames.length; i++) {
+        var stateName = stateNames[i];
+        var stateStats = allStateStats[stateName];
+
+        var totalEntryCount = stateStats['total_entry_count'];
+        var noAnswerSubmittedCount = stateStats['no_submitted_answer_count'];
+        var defaultAnswerCount = stateStats['num_default_answers'];
+
+        if (totalEntryCount == 0) {
+          continue;
+        }
+
+        var threshold = 0.2 * totalEntryCount;
+        var eligibleFlags = [];
+        var state = explorationStates[stateName];
+        var stateInteraction = state.interaction;
+        if (defaultAnswerCount > threshold &&
+            stateInteraction['default_outcome'] &&
+            stateInteraction['default_outcome'].dest == stateName) {
+          eligibleFlags.push({
+            rank: defaultAnswerCount,
+            improveType: IMPROVE_TYPE_DEFAULT,
+          });
+        }
+        if (noAnswerSubmittedCount > threshold) {
+          eligibleFlags.push({
+            rank: noAnswerSubmittedCount,
+            improveType: IMPROVE_TYPE_INCOMPLETE,
+          });
+        }
+        if (eligibleFlags.length > 0) {
+          eligibleFlags.sort(rankComparator);
+          rankedStates.push({
+            rank: eligibleFlags[0].rank,
+            stateName: stateName,
+            type: eligibleFlags[0].improveType,
+          });
+        }
+      }
+
+      // The returned suggestions are sorted decreasingly by their ranks.
+      rankedStates.sort(rankComparator);
+      return rankedStates;
+    }
+  };
+}]);

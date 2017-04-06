@@ -273,11 +273,11 @@ describe('State Editor controller', function() {
 
       $httpBackend.when('GET', '/createhandler/training_data/0/State').respond({
         unhandled_answers: [{
-          value: 'answer1',
-          count: 2
+          answer: 'answer1',
+          frequency: 2
         }, {
-          value: 'answer2',
-          count: 1
+          answer: 'answer2',
+          frequency: 1
         }]
       });
     }));
@@ -293,7 +293,7 @@ describe('State Editor controller', function() {
       tds.initializeTrainingData('0', 'State');
       $httpBackend.flush();
       expect(tds.getTrainingDataAnswers()).toEqual(['answer1', 'answer2']);
-      expect(tds.getTrainingDataCounts()).toEqual([2, 1]);
+      expect(tds.getTrainingDataFrequencies()).toEqual([2, 1]);
 
       // Ensure it handles receiving no unhandled answers correctly.
       $httpBackend.expect(
@@ -304,7 +304,7 @@ describe('State Editor controller', function() {
       tds.initializeTrainingData('0', 'State');
       $httpBackend.flush();
       expect(tds.getTrainingDataAnswers()).toEqual([]);
-      expect(tds.getTrainingDataCounts()).toEqual([]);
+      expect(tds.getTrainingDataFrequencies()).toEqual([]);
     });
 
     it('should be able to train answer groups and the default response',
@@ -512,12 +512,12 @@ describe('State Editor controller', function() {
       // Training an answer group should remove an unresolved answer.
       tds.trainAnswerGroup(0, 'answer1');
       expect(tds.getTrainingDataAnswers()).toEqual(['answer2']);
-      expect(tds.getTrainingDataCounts()).toEqual([1]);
+      expect(tds.getTrainingDataFrequencies()).toEqual([1]);
 
       // Training the default response should also remove an answer.
       tds.trainDefaultResponse('answer2');
       expect(tds.getTrainingDataAnswers()).toEqual([]);
-      expect(tds.getTrainingDataCounts()).toEqual([]);
+      expect(tds.getTrainingDataFrequencies()).toEqual([]);
     });
 
     it('should get all potential outcomes of an interaction', function() {

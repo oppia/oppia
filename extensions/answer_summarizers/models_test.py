@@ -79,7 +79,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             calculation_instance.calculate_from_state_answers_dict(
                 state_answers_dict))
 
-        self.assertEquals(
+        self.assertEqual(
             actual_state_answers_calc_output.calculation_id,
             'AnswerFrequencies')
         actual_calc_output = (
@@ -189,45 +189,45 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         total_answer_count = sum([
             len(all_answer_lists[list_name])
             for list_name in all_answer_lists])
-        self.assertEquals(total_answer_count, len(answer_list))
+        self.assertEqual(total_answer_count, len(answer_list))
 
         # Verify the frequencies of answers in the submission queue. This is
         # another quick check to protect changes to this test.
-        self.assertEquals(len([
+        self.assertEqual(len([
             answer_submission for answer_submission in answer_list
             if answer_submission['answer'] == 'English']), 12)
-        self.assertEquals(len([
+        self.assertEqual(len([
             answer_submission for answer_submission in answer_list
             if answer_submission['answer'] == 'French']), 9)
-        self.assertEquals(len([
+        self.assertEqual(len([
             answer_submission for answer_submission in answer_list
             if answer_submission['answer'] == 'Finnish']), 7)
-        self.assertEquals(len([
+        self.assertEqual(len([
             answer_submission for answer_submission in answer_list
             if answer_submission['answer'] == 'Italian']), 4)
-        self.assertEquals(len([
+        self.assertEqual(len([
             answer_submission for answer_submission in answer_list
             if answer_submission['answer'] == 'Spanish']), 3)
-        self.assertEquals(len([
+        self.assertEqual(len([
             answer_submission for answer_submission in answer_list
             if answer_submission['answer'] == 'Japanese']), 3)
-        self.assertEquals(len([
+        self.assertEqual(len([
             answer_submission for answer_submission in answer_list
             if answer_submission['answer'] == 'Hungarian']), 2)
-        self.assertEquals(len([
+        self.assertEqual(len([
             answer_submission for answer_submission in answer_list
             if answer_submission['answer'] == 'Portuguese']), 1)
-        self.assertEquals(len([
+        self.assertEqual(len([
             answer_submission for answer_submission in answer_list
             if answer_submission['answer'] == 'German']), 1)
-        self.assertEquals(len([
+        self.assertEqual(len([
             answer_submission for answer_submission in answer_list
             if answer_submission['answer'] == 'Gaelic']), 1)
 
         # Finally, verify that all of the answers in the answer lists are
         # represents in the submission queue (in case another answer is added
         # to the answer list but not added to the queue).
-        self.assertEquals(len(set([
+        self.assertEqual(len(set([
             answer_submission['answer']
             for answer_submission in answer_list])), 10)
 
@@ -248,7 +248,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             calculation_instance.calculate_from_state_answers_dict(
                 state_answers_dict))
 
-        self.assertEquals(
+        self.assertEqual(
             actual_state_answers_calc_output.calculation_id,
             'Top5AnswerFrequencies')
         actual_calc_output = (
@@ -304,7 +304,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             calculation_instance.calculate_from_state_answers_dict(
                 state_answers_dict))
 
-        self.assertEquals(
+        self.assertEqual(
             actual_state_answers_calc_output.calculation_id,
             'Top5AnswerFrequencies')
         actual_calc_output = (
@@ -344,13 +344,13 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             calculation_instance.calculate_from_state_answers_dict(
                 state_answers_dict))
 
-        self.assertEquals(
+        self.assertEqual(
             actual_state_answers_calc_output.calculation_id,
             'TopAnswersByCategorization')
 
         actual_calc_output = (
             actual_state_answers_calc_output.calculation_output)
-        self.assertEquals(actual_calc_output, {})
+        self.assertEqual(actual_calc_output, {})
 
         # Only submitting a hard rule should result in only one returned
         # category.
@@ -367,7 +367,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         actual_calc_output = (
             actual_state_answers_calc_output.calculation_output)
 
-        self.assertEquals(actual_calc_output, {
+        self.assertEqual(actual_calc_output, {
             'explicit': [{
                 'answer': 'Hard A',
                 'frequency': 1
@@ -375,7 +375,8 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         })
 
         # Multiple categories of answers should be identified and properly
-        # aggregated.
+        # aggregated. Similar answers mapping to multiple categories should be
+        # properly identified.
         dummy_submitted_answer_list = [
             self._create_sample_answer(
                 'Explicit A', 0., 'sid1', exp_domain.EXPLICIT_CLASSIFICATION),
@@ -385,13 +386,13 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
                 'Explicit A', 0., 'sid1', exp_domain.EXPLICIT_CLASSIFICATION),
 
             self._create_sample_answer(
-                'Tained data A', 0., 'sid1',
+                'Trained data A', 0., 'sid1',
                 exp_domain.TRAINING_DATA_CLASSIFICATION),
             self._create_sample_answer(
-                'Tained data B', 0., 'sid1',
+                'Trained data B', 0., 'sid1',
                 exp_domain.TRAINING_DATA_CLASSIFICATION),
             self._create_sample_answer(
-                'Tained data B', 0., 'sid1',
+                'Trained data B', 0., 'sid1',
                 exp_domain.TRAINING_DATA_CLASSIFICATION),
 
             self._create_sample_answer(
@@ -400,6 +401,9 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
                 'Stats C', 0., 'sid1', exp_domain.STATISTICAL_CLASSIFICATION),
             self._create_sample_answer(
                 'Stats C', 0., 'sid1', exp_domain.STATISTICAL_CLASSIFICATION),
+            self._create_sample_answer(
+                'Trained data B', 0., 'sid1',
+                exp_domain.STATISTICAL_CLASSIFICATION),
 
             self._create_sample_answer(
                 'Default C', 0., 'sid1',
@@ -420,7 +424,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         actual_calc_output = (
             actual_state_answers_calc_output.calculation_output)
 
-        self.assertEquals(actual_calc_output, {
+        self.assertEqual(actual_calc_output, {
             'explicit': [{
                 'answer': 'Explicit A',
                 'frequency': 2
@@ -429,15 +433,18 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
                 'frequency': 1
             }],
             'training_data_match': [{
-                'answer': 'Tained data B',
+                'answer': 'Trained data B',
                 'frequency': 2
             }, {
-                'answer': 'Tained data A',
+                'answer': 'Trained data A',
                 'frequency': 1
             }],
             'statistical_classifier': [{
                 'answer': 'Stats C',
                 'frequency': 2
+            }, {
+                'answer': 'Trained data B',
+                'frequency': 1
             }, {
                 'answer': 'Stats B',
                 'frequency': 1
@@ -451,7 +458,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             }]
         })
 
-    def test_top_answers_by_categorization_cannot_classify_invalid_category(self): # pylint: disable=line-too-long
+    def test_top_answers_by_categorization_ignores_invalid_category(self):
         """The TopAnswersByCategorization calculation cannot use answers with
         unknown categorizations. It will throw an exception in these
         situations.
@@ -473,7 +480,9 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             'submitted_answer_list': dummy_submitted_answer_list
         }
 
-        with self.assertRaisesRegexp(
-            Exception, 'Cannot aggregate answer with unknown rule'):
+        actual_state_answers_calc_output = (
             calculation_instance.calculate_from_state_answers_dict(
-                state_answers_dict)
+                state_answers_dict))
+        actual_calc_output = (
+            actual_state_answers_calc_output.calculation_output)
+        self.assertEqual(actual_calc_output, {})

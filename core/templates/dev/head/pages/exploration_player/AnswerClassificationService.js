@@ -16,11 +16,22 @@
  * @fileoverview Classification service for answer groups.
  */
 
+ // TODO(bhenning): Find a better place for these constants.
+
+// NOTE TO DEVELOPERS: These constants must be the same (in name and value) as
+// the corresponding classification constants defined in core.domain.exp_domain.
+oppia.constant('EXPLICIT_CLASSIFICATION', 'explicit')
+oppia.constant('TRAINING_DATA_CLASSIFICATION', 'training_data_match')
+oppia.constant('STATISTICAL_CLASSIFICATION', 'statistical_classifier')
+oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome')
+
 oppia.factory('AnswerClassificationService', [
   '$http', '$q', 'LearnerParamsService', 'alertsService', 'INTERACTION_SPECS',
-  'ENABLE_STRING_CLASSIFIER', 'CLASSIFIER_RULESPEC_STR',
+  'ENABLE_STRING_CLASSIFIER', 'EXPLICIT_CLASSIFICATION',
+  'DEFAULT_OUTCOME_CLASSIFICATION', 'CLASSIFIER_RULESPEC_STR',
   function($http, $q, LearnerParamsService, alertsService, INTERACTION_SPECS,
-      ENABLE_STRING_CLASSIFIER, CLASSIFIER_RULESPEC_STR) {
+      ENABLE_STRING_CLASSIFIER, EXPLICIT_CLASSIFICATION,
+      DEFAULT_OUTCOME_CLASSIFICATION, CLASSIFIER_RULESPEC_STR) {
     /**
      * Finds the first answer group with a rule that returns true.
      *
@@ -43,6 +54,7 @@ oppia.factory('AnswerClassificationService', [
     var classifyAnswer = function(
         answer, answerGroups, defaultOutcome, interactionRulesService) {
       // Find the first group that contains a rule which returns true
+      // TODO(bhenning): Implement training data classification.
       for (var i = 0; i < answerGroups.length; i++) {
         for (var j = 0; j < answerGroups[i].rule_specs.length; j++) {
           var ruleSpec = answerGroups[i].rule_specs[j];
@@ -52,7 +64,8 @@ oppia.factory('AnswerClassificationService', [
             return {
               outcome: answerGroups[i].outcome,
               answerGroupIndex: i,
-              ruleSpecIndex: j
+              ruleSpecIndex: j,
+              classificationCategorization: EXPLICIT_CLASSIFICATION
             };
           }
         }
@@ -64,7 +77,8 @@ oppia.factory('AnswerClassificationService', [
         return {
           outcome: defaultOutcome,
           answerGroupIndex: answerGroups.length,
-          ruleSpecIndex: 0
+          ruleSpecIndex: 0,
+          classificationCategorization: DEFAULT_OUTCOME_CLASSIFICATION
         };
       } else {
         alertsService.addWarning('Something went wrong with the exploration.');
@@ -116,8 +130,6 @@ oppia.factory('AnswerClassificationService', [
             INTERACTION_SPECS[oldState.interaction.id]
               .is_string_classifier_trainable &&
             ENABLE_STRING_CLASSIFIER) {
-          // TODO(bhenning): Figure out a long-term solution for determining
-          // what params should be passed to the batch classifier.
           var classifyUrl = '/explorehandler/classify/' + explorationId;
           var params = (
             isInEditorMode ? {} : LearnerParamsService.getAllParams());
@@ -131,7 +143,8 @@ oppia.factory('AnswerClassificationService', [
             deferred.resolve({
               outcome: result.outcome,
               ruleSpecIndex: result.rule_spec_index,
-              answerGroupIndex: result.answer_group_index
+              answerGroupIndex: result.answer_group_index,
+              classificationCategorization: result.classification_categorization
             });
           });
         } else {

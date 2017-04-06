@@ -378,9 +378,7 @@ class ModifiedInteractionAnswerSummariesMRJobManager(
 class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
     """Tests for interaction answer view aggregations."""
 
-    CONTINUOUS_MANAGERS_FOR_TESTS = [
-        ModifiedInteractionAnswerSummariesAggregator]
-    DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
+    ALL_CC_MANAGERS_FOR_TESTS = [ModifiedInteractionAnswerSummariesAggregator]
 
     def _record_start(self, exp_id, exp_version, state_name, session_id):
         event_services.StartExplorationEventHandler.record(
@@ -390,7 +388,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
     def test_one_answer(self):
         with self.swap(
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-            self.CONTINUOUS_MANAGERS_FOR_TESTS):
+            self.ALL_CC_MANAGERS_FOR_TESTS):
 
             # setup example exploration
             exp_id = 'eid'
@@ -425,21 +423,21 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
             # add some answers
             event_services.AnswerSubmissionEventHandler.record(
-                exp_id, exp_version, first_state_name,
-                self.DEFAULT_RULESPEC_STR, 'session1', time_spent, params,
-                'answer1')
+                exp_id, exp_version, first_state_name, 'MultipleChoiceInput', 0,
+                0, exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
+                params, 'answer1')
             event_services.AnswerSubmissionEventHandler.record(
-                exp_id, exp_version, first_state_name,
-                self.DEFAULT_RULESPEC_STR, 'session2', time_spent, params,
-                'answer1')
+                exp_id, exp_version, first_state_name, 'MultipleChoiceInput', 0,
+                0, exp_domain.EXPLICIT_CLASSIFICATION, 'session2', time_spent,
+                params, 'answer1')
             event_services.AnswerSubmissionEventHandler.record(
-                exp_id, exp_version, first_state_name,
-                self.DEFAULT_RULESPEC_STR, 'session1', time_spent, params,
-                'answer2')
+                exp_id, exp_version, first_state_name, 'MultipleChoiceInput', 0,
+                0, exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
+                params, 'answer2')
             event_services.AnswerSubmissionEventHandler.record(
-                exp_id, exp_version, second_state_name,
-                self.DEFAULT_RULESPEC_STR, 'session2', time_spent, params,
-                'answer3')
+                exp_id, exp_version, second_state_name, 'MultipleChoiceInput',
+                0, 0, exp_domain.EXPLICIT_CLASSIFICATION, 'session2',
+                time_spent, params, 'answer3')
 
             # Run job on exploration with answers
             ModifiedInteractionAnswerSummariesAggregator.start_computation()
@@ -452,7 +450,8 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             # get job output of first state and check it
             calc_output_domain_object = (
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, exp_version, first_state_name, calc_id))
+                    exp_id, first_state_name, calc_id,
+                    exploration_version=exp_version))
             self.assertEqual(
                 'AnswerFrequencies', calc_output_domain_object.calculation_id)
 
@@ -472,7 +471,8 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             # get job output of second state and check it
             calc_output_domain_object = (
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, exp_version, second_state_name, calc_id))
+                    exp_id, second_state_name, calc_id,
+                    exploration_version=exp_version))
 
             self.assertEqual(
                 'AnswerFrequencies', calc_output_domain_object.calculation_id)
@@ -485,3 +485,227 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             }]
 
             self.assertEqual(calculation_output, expected_calculation_output)
+
+    def test_answers_across_multiple_exploration_versions(self):
+        with self.swap(
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS):
+
+            # Setup example exploration.
+            exp_id = 'eid'
+            exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
+            first_state_name = exp.init_state_name
+            second_state_name = 'State 2'
+            exp_services.update_exploration('fake@user.com', exp_id, [{
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': first_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'MultipleChoiceInput',
+            }, {
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': second_state_name,
+            }, {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': second_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'MultipleChoiceInput',
+            }], 'Add new state')
+            exp = exp_services.get_exploration_by_id(exp_id)
+            exp_version = exp.version
+
+            time_spent = 5.0
+            params = {}
+
+            # Add an answer.
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, exp_version, first_state_name, 'MultipleChoiceInput', 0,
+                0, exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
+                params, 'answer1')
+
+            # Run the answers aggregation job.
+            ModifiedInteractionAnswerSummariesAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+
+            calc_id = 'AnswerFrequencies'
+
+            # Check the output of the job.
+            calc_output_first_domain_object = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
+                    exp_id, first_state_name, calc_id,
+                    exploration_version='2'))
+            calc_output_all_domain_object = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
+                    exp_id, first_state_name, calc_id))
+
+            self.assertEqual(
+                'AnswerFrequencies',
+                calc_output_first_domain_object.calculation_id)
+            self.assertEqual(
+                'AnswerFrequencies',
+                calc_output_all_domain_object.calculation_id)
+
+            calculation_output_first = (
+                calc_output_first_domain_object.calculation_output)
+            calculation_output_all = (
+                calc_output_all_domain_object.calculation_output)
+
+            expected_calculation_output_first_answer = [{
+                'answer': 'answer1',
+                'frequency': 1
+            }]
+
+            self.assertEqual(
+                calculation_output_first,
+                expected_calculation_output_first_answer)
+            self.assertEqual(
+                calculation_output_all,
+                expected_calculation_output_first_answer)
+
+            # Try modifying the exploration and adding another answer.
+            exp_services.update_exploration('fake@user.com', exp_id, [{
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'third state',
+            }], 'Adding yet another state')
+            exp = exp_services.get_exploration_by_id(exp_id)
+            self.assertNotEqual(exp.version, exp_version)
+
+            # Submit another answer.
+            exp_version = exp.version
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, exp_version, first_state_name, 'MultipleChoiceInput', 0,
+                0, exp_domain.EXPLICIT_CLASSIFICATION, 'session2', time_spent,
+                params, 'answer1')
+
+            # Run the aggregator again.
+            ModifiedInteractionAnswerSummariesAggregator.stop_computation('a')
+            ModifiedInteractionAnswerSummariesAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+
+            # Extract the output from the job.
+            calc_output_first_domain_object = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
+                    exp_id, first_state_name, calc_id,
+                    exploration_version='2'))
+            calc_output_second_domain_object = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
+                    exp_id, first_state_name, calc_id,
+                    exploration_version='3'))
+            calc_output_all_domain_object = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
+                    exp_id, first_state_name, calc_id))
+
+            self.assertEqual(
+                'AnswerFrequencies',
+                calc_output_first_domain_object.calculation_id)
+            self.assertEqual(
+                'AnswerFrequencies',
+                calc_output_second_domain_object.calculation_id)
+            self.assertEqual(
+                'AnswerFrequencies',
+                calc_output_all_domain_object.calculation_id)
+
+            calculation_output_first = (
+                calc_output_first_domain_object.calculation_output)
+            calculation_output_second = (
+                calc_output_second_domain_object.calculation_output)
+            calculation_output_all = (
+                calc_output_all_domain_object.calculation_output)
+
+            # The output for version 2 of the exploration should be the same,
+            # but the total combined output should include both answers. Also,
+            # the output for version 3 should only include the second answer.
+            expected_calculation_output_second_answer = [{
+                'answer': 'answer1',
+                'frequency': 1
+            }]
+            expected_calculation_output_all_answers = [{
+                'answer': 'answer1',
+                'frequency': 2
+            }]
+
+            self.assertEqual(
+                calculation_output_first,
+                expected_calculation_output_first_answer)
+            self.assertEqual(
+                calculation_output_second,
+                expected_calculation_output_second_answer)
+            self.assertEqual(
+                calculation_output_all,
+                expected_calculation_output_all_answers)
+
+    def test_multiple_computations_in_one_job(self):
+        with self.swap(
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS):
+
+            # setup example exploration
+            exp_id = 'eid'
+            exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
+            first_state_name = exp.init_state_name
+            second_state_name = 'State 2'
+            exp_services.update_exploration('fake@user.com', exp_id, [{
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': first_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'TextInput',
+            }, {
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': second_state_name,
+            }, {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': second_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'TextInput',
+            }], 'Add new state')
+            exp = exp_services.get_exploration_by_id(exp_id)
+            exp_version = exp.version
+
+            time_spent = 5.0
+            params = {}
+
+            # Add an answer.
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, exp_version, first_state_name, 'TextInput', 0, 0,
+                exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
+                params, 'answer1')
+
+            # Run the aggregator job.
+            ModifiedInteractionAnswerSummariesAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+
+            # Retrieve outputs for all of the computations running on this
+            # interaction.
+            answer_frequencies_calc_output_domain_object = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
+                    exp_id, first_state_name, 'AnswerFrequencies'))
+            self.assertEqual(
+                'AnswerFrequencies',
+                answer_frequencies_calc_output_domain_object.calculation_id)
+
+            top5_answer_frequencies_calc_output_domain_object = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
+                    exp_id, first_state_name, 'Top5AnswerFrequencies'))
+            self.assertEqual(
+                'Top5AnswerFrequencies',
+                top5_answer_frequencies_calc_output_domain_object.calculation_id) # pylint: disable=line-too-long
+
+            calculation_output_first = (
+                answer_frequencies_calc_output_domain_object.calculation_output)
+            calculation_output_second = (
+                top5_answer_frequencies_calc_output_domain_object.calculation_output) # pylint: disable=line-too-long
+
+            expected_calculation_output = [{
+                'answer': 'answer1',
+                'frequency': 1
+            }]
+
+            self.assertEqual(
+                calculation_output_first, expected_calculation_output)
+            self.assertEqual(
+                calculation_output_second, expected_calculation_output)

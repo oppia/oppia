@@ -339,7 +339,8 @@ class TestBase(unittest.TestCase):
             self, exploration_id, owner_id, title='A title',
             category='A category', objective='An objective',
             language_code=feconf.DEFAULT_LANGUAGE_CODE,
-            end_state_name=None):
+            end_state_name=None,
+            interaction_id='TextInput'):
         """Saves a new strictly-validated exploration.
 
         Returns the exploration domain object.
@@ -348,7 +349,7 @@ class TestBase(unittest.TestCase):
             exploration_id, title=title, category=category,
             language_code=language_code)
         exploration.states[exploration.init_state_name].update_interaction_id(
-            'TextInput')
+            interaction_id)
         exploration.objective = objective
 
         # If an end state name is provided, add terminal node with that name

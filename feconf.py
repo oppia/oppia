@@ -105,6 +105,10 @@ CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 7
 # number must be changed.
 CURRENT_COLLECTION_SCHEMA_VERSION = 2
 
+# This value should be updated in the event of any
+# StateAnswersModel.submitted_answer_list schema change.
+CURRENT_STATE_ANSWERS_SCHEMA_VERSION = 1
+
 # The default number of exploration tiles to load at a time in the search
 # results page.
 SEARCH_RESULTS_PAGE_SIZE = 20
@@ -375,6 +379,12 @@ ALLOWED_INTERACTION_CATEGORIES = [{
         'InteractiveMap'
     ],
 }]
+
+# The list of interaction IDs which correspond to interactions that set their
+# is_linear property to true. Linear interactions do not support branching and
+# thus only allow for default answer classification. This value is guarded by a
+# test in extensions.interactions.base_test.
+LINEAR_INTERACTION_IDS = ['Continue']
 
 ALLOWED_GADGETS = {
     'ScoreBar': {

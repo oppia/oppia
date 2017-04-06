@@ -19,6 +19,7 @@ import os
 import StringIO
 import zipfile
 
+from core import jobs_registry
 from core.controllers import dashboard
 from core.controllers import editor
 from core.domain import config_services
@@ -26,6 +27,7 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
+from core.domain import stats_jobs_continuous_test
 from core.domain import rights_manager
 from core.platform import models
 from core.tests import test_utils
@@ -68,6 +70,10 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
 
 class EditorTest(BaseEditorControllerTest):
 
+    ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS = [
+        stats_jobs_continuous_test.ModifiedInteractionAnswerSummariesAggregator
+    ]
+
     def setUp(self):
         super(EditorTest, self).setUp()
         exp_services.load_demo('0')
@@ -103,7 +109,6 @@ class EditorTest(BaseEditorControllerTest):
         exploration.add_states([feconf.DEFAULT_INIT_STATE_NAME])
         new_state_dict = exploration.states[
             feconf.DEFAULT_INIT_STATE_NAME].to_dict()
-        new_state_dict['unresolved_answers'] = {}
         self.assertEqual(new_state_dict, editor.NEW_STATE_TEMPLATE)
 
     def test_that_default_exploration_cannot_be_published(self):
@@ -199,86 +204,24 @@ class EditorTest(BaseEditorControllerTest):
 
         self.logout()
 
-    def test_resolved_answers_handler(self):
-        # As a learner, submit the first multiple-choice answer, then submit
-        # 'blah' once, 'blah2' twice and 'blah3' three times.
-        exp_id = '0'
-        exploration_dict = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
-        self.assertEqual(
-            exploration_dict['exploration']['title'], 'Welcome to Oppia!')
-
-        first_state_name = exploration_dict['exploration']['init_state_name']
-        event_services.AnswerSubmissionEventHandler.record(
-            exp_id, 1, first_state_name, exp_domain.DEFAULT_RULESPEC_STR, 0)
-
-        second_state_name = 'What language'
-        event_services.AnswerSubmissionEventHandler.record(
-            exp_id, 1, second_state_name, exp_domain.DEFAULT_RULESPEC_STR,
-            'blah')
-        for _ in range(2):
-            event_services.AnswerSubmissionEventHandler.record(
-                exp_id, 1, second_state_name, exp_domain.DEFAULT_RULESPEC_STR,
-                'blah2')
-        for _ in range(3):
-            event_services.AnswerSubmissionEventHandler.record(
-                exp_id, 1, second_state_name, exp_domain.DEFAULT_RULESPEC_STR,
-                'blah3')
-
-        # Log in as an editor.
-        self.login(self.EDITOR_EMAIL)
-
-        response = self.testapp.get('/create/%s' % exp_id)
-        csrf_token = self.get_csrf_token_from_response(response)
-        url = str('/createhandler/resolved_answers/%s/%s' % (
-            exp_id, second_state_name))
-
-        def _get_unresolved_answers():
-            return stats_domain.StateRuleAnswerLog.get(
-                exp_id, second_state_name, exp_domain.DEFAULT_RULESPEC_STR
-            ).answers
-
-        self.assertEqual(
-            _get_unresolved_answers(), {'blah': 1, 'blah2': 2, 'blah3': 3})
-
-        # An empty request should result in an error.
-        response_dict = self.put_json(
-            url, {'something_else': []}, csrf_token,
-            expect_errors=True, expected_status_int=400)
-        self.assertIn('Expected a list', response_dict['error'])
-
-        # A request of the wrong type should result in an error.
-        response_dict = self.put_json(
-            url, {'resolved_answers': 'this_is_a_string'}, csrf_token,
-            expect_errors=True, expected_status_int=400)
-        self.assertIn('Expected a list', response_dict['error'])
-
-        # Trying to remove an answer that wasn't submitted has no effect.
-        response_dict = self.put_json(
-            url, {'resolved_answers': ['not_submitted_answer']}, csrf_token)
-        self.assertEqual(
-            _get_unresolved_answers(), {'blah': 1, 'blah2': 2, 'blah3': 3})
-
-        # A successful request should remove the answer in question.
-        response_dict = self.put_json(
-            url, {'resolved_answers': ['blah']}, csrf_token)
-        self.assertEqual(
-            _get_unresolved_answers(), {'blah2': 2, 'blah3': 3})
-
-        # It is possible to remove more than one answer at a time.
-        response_dict = self.put_json(
-            url, {'resolved_answers': ['blah2', 'blah3']}, csrf_token)
-        self.assertEqual(_get_unresolved_answers(), {})
-
-        self.logout()
-
     def test_untrained_answers_handler(self):
         with self.swap(feconf, 'SHOW_TRAINABLE_UNRESOLVED_ANSWERS', True):
             def _create_answer(value, count=1):
-                return {'value': value, 'count': count}
+                return {'answer': value, 'frequency': count}
 
             def _create_training_data(*arg):
                 return [_create_answer(value) for value in arg]
+
+            def _submit_answer(
+                    exp_id, state_name, interaction_id, answer_group_index,
+                    rule_spec_index, classification_categorization, answer,
+                    exp_version=1, session_id='dummy_session_id',
+                    time_spent_in_secs=0.0, params={}):
+                event_services.AnswerSubmissionEventHandler.record(
+                    exp_id, exp_version, state_name, interaction_id,
+                    answer_group_index, rule_spec_index,
+                    classification_categorization, session_id,
+                    time_spent_in_secs, params, answer)
 
             # Load the string classifier demo exploration.
             exp_id = '15'
@@ -303,28 +246,38 @@ class EditorTest(BaseEditorControllerTest):
 
             answer_groups = exp_services.get_exploration_by_id('15').states[
                 state_name].interaction.answer_groups
-            explicit_rule_spec_string = (
-                answer_groups[0].rule_specs[0].stringify_classified_rule())
-            classifier_rule_spec_string = (
-                answer_groups[1].rule_specs[0].stringify_classified_rule())
 
             # Input happy since there is an explicit rule checking for that.
-            event_services.AnswerSubmissionEventHandler.record(
-                exp_id, 1, state_name, explicit_rule_spec_string, 'happy')
+            _submit_answer(
+                exp_id, state_name, 'TextInput', 0, 0,
+                exp_domain.EXPLICIT_CLASSIFICATION, 'happy')
 
             # Input text not at all similar to happy (default outcome).
-            event_services.AnswerSubmissionEventHandler.record(
-                exp_id, 1, state_name, exp_domain.DEFAULT_RULESPEC_STR, 'sad')
+            _submit_answer(
+                exp_id, state_name, 'TextInput', 2, 0,
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION, 'sad')
 
             # Input cheerful: this is current training data and falls under the
             # classifier.
-            event_services.AnswerSubmissionEventHandler.record(
-                exp_id, 1, state_name, classifier_rule_spec_string, 'cheerful')
+            _submit_answer(
+                exp_id, state_name, 'TextInput', 1, 0,
+                exp_domain.TRAINING_DATA_CLASSIFICATION, 'cheerful')
 
-            # Input joyful: this is not training data but will be classified
-            # under the classifier.
-            event_services.AnswerSubmissionEventHandler.record(
-                exp_id, 1, state_name, classifier_rule_spec_string, 'joyful')
+            # Input joyful: this is not training data but it will later be
+            # classified under the classifier.
+            _submit_answer(
+                exp_id, state_name, 'TextInput', 2, 0,
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION, 'joyful')
+
+            # Perform answer summarization on the summarized answers.
+            with self.swap(
+                    jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                    self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+                # Run job on exploration with answers
+                stats_jobs_continuous_test.ModifiedInteractionAnswerSummariesAggregator.start_computation()
+                self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+                self.process_and_flush_pending_tasks()
+                self.assertEqual(self.count_jobs_in_taskqueue(), 0)
 
             # Log in as an editor.
             self.login(self.EDITOR_EMAIL)

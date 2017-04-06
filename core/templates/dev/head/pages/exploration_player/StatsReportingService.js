@@ -118,7 +118,8 @@ oppia.factory('StatsReportingService', [
         });
       },
       recordAnswerSubmitted: function(
-          stateName, params, answer, answerGroupIndex, ruleSpecIndex) {
+          stateName, params, answer, answerGroupIndex, ruleSpecIndex,
+          classificationCategorization) {
         $http.post(getFullStatsUrl('ANSWER_SUBMITTED'), {
           answer: answer,
           params: params,
@@ -127,7 +128,8 @@ oppia.factory('StatsReportingService', [
           client_time_spent_in_secs: stopwatch.getTimeInSecs(),
           old_state_name: stateName,
           answer_group_index: answerGroupIndex,
-          rule_spec_index: ruleSpecIndex
+          rule_spec_index: ruleSpecIndex,
+          classification_categorization: classificationCategorization
         });
       },
       recordMaybeLeaveEvent: function(stateName, params) {

@@ -56,34 +56,10 @@
     </div>
 
     <p>
-      <strong>Times entered</strong>: <[stateStats.totalEntryCount]>
+      <strong>Times entered</strong>: <[stateStats.total_entry_count]>
     </p>
 
     <div angular-html-bind="visualizationsHtml"></div>
-
-    <div ng-if="stateStats.totalEntryCount">
-      <h5>Answers</h5>
-      <div ng-show="doesAnswerExist()">
-        <ul>
-          <li ng-repeat="(rule, ruleData) in rulesStats" ng-show="ruleData.answers.length > 0">
-            <[getHumanReadableRuleName(rule)]>
-            <ul>
-              <li ng-repeat="answerData in ruleData.answers track by $index">
-                <span class="label label-info pull-right">
-                  <[getNumTimesString(answerData[1])]>
-                </span>
-                <pre><[answerData[0]]></pre>
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-
-      <div ng-if="!doesAnswerExist()">
-        <em>No one has given any answers that need to be resolved.</em>
-      </div>
-    </div>
-
   </div>
 
   <div class="modal-footer">

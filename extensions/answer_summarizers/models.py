@@ -58,8 +58,9 @@ def _get_hashable_value(value):
         return tuple([_get_hashable_value(elem) for elem in value])
     elif isinstance(value, dict):
         return _get_hashable_value(
-            [(_get_hashable_value(key), _get_hashable_value(value))
-             for (key, value) in value.iteritems()])
+            sorted([
+                (_get_hashable_value(key), _get_hashable_value(value))
+                for (key, value) in value.iteritems()]))
     else:
         return value
 
@@ -171,24 +172,13 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-        # Get a list of stringified sets, e.g. [u"[u'abc', u'www']",
-        # u"[u'abc']", u"[u'xyz']", u"[u'xyz', u'abc']"]
         answer_values = [
             answer_dict['answer']
             for answer_dict in state_answers_dict['submitted_answer_list']]
 
-        # For each stringified set, replace '[' and ']' by empty string,
-        # and split at commas ', ' to convert string to set.
-        # TODO(msl): This will yield wrong results if answers contain ',',
-        # '[', or ']'. Consider saving sets instead of stringified sets.
-        # TODO(bhenning): Remove this string parsing in favor of directly
-        # working with the set itself, rather than a stringified representation
-        # of it.
         list_of_all_elements = []
-        for setstring in answer_values:
-            elts_this_set = (
-                setstring.replace('[', '').replace(']', '').split(', '))
-            list_of_all_elements += elts_this_set
+        for set_value in answer_values:
+            list_of_all_elements += set_value
 
         elements_as_list_of_pairs = sorted(
             collections.Counter(list_of_all_elements).items(),
@@ -227,36 +217,45 @@ class TopAnswersByCategorization(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-        top_answer_counts_as_list_of_pairs = _count_answers(
-            state_answers_dict['submitted_answer_list'])
+        classify_categories = [
+            exp_domain.EXPLICIT_CLASSIFICATION,
+            exp_domain.TRAINING_DATA_CLASSIFICATION,
+            exp_domain.STATISTICAL_CLASSIFICATION,
+            exp_domain.DEFAULT_OUTCOME_CLASSIFICATION
+        ]
+
+        submitted_answer_list = state_answers_dict['submitted_answer_list']
+        submitted_answers_by_categorization = {
+            classify_category: [
+                submitted_answer_dict
+                for submitted_answer_dict in submitted_answer_list
+                if submitted_answer_dict['classification_categorization'] == (
+                    classify_category)]
+            for classify_category in classify_categories
+        }
+        top_answer_count_pairs_by_category = {
+            classify_category: _count_answers(answers)
+            for classify_category, answers
+            in submitted_answers_by_categorization.iteritems()
+        }
 
         calculation_output = {
-            exp_domain.EXPLICIT_CLASSIFICATION: [],
-            exp_domain.TRAINING_DATA_CLASSIFICATION: [],
-            exp_domain.STATISTICAL_CLASSIFICATION: [],
-            exp_domain.DEFAULT_OUTCOME_CLASSIFICATION: [],
+            classify_category: []
+            for classify_category in classify_categories
         }
-        for item in top_answer_counts_as_list_of_pairs:
-            answer_dict = item[0]
-            classify_category = answer_dict['classification_categorization']
-            if classify_category not in calculation_output:
-                raise Exception(
-                    'Cannot aggregate answer with unknown rule classification '
-                    'category: %s' % classify_category)
-            calculation_output[classify_category].append({
-                'answer': answer_dict['answer'],
-                'frequency': item[1]
-            })
+        for classify_category, top_answer_counts_as_list_of_pairs in (
+                top_answer_count_pairs_by_category.iteritems()):
+            for item in top_answer_counts_as_list_of_pairs:
+                answer_dict = item[0]
+                calculation_output[classify_category].append({
+                    'answer': answer_dict['answer'],
+                    'frequency': item[1]
+                })
 
         # Remove empty lists if no answers match within those categories.
-        if not calculation_output[exp_domain.EXPLICIT_CLASSIFICATION]:
-            del calculation_output[exp_domain.EXPLICIT_CLASSIFICATION]
-        if not calculation_output[exp_domain.TRAINING_DATA_CLASSIFICATION]:
-            del calculation_output[exp_domain.TRAINING_DATA_CLASSIFICATION]
-        if not calculation_output[exp_domain.STATISTICAL_CLASSIFICATION]:
-            del calculation_output[exp_domain.STATISTICAL_CLASSIFICATION]
-        if not calculation_output[exp_domain.DEFAULT_OUTCOME_CLASSIFICATION]:
-            del calculation_output[exp_domain.DEFAULT_OUTCOME_CLASSIFICATION]
+        for classify_category in classify_categories:
+            if not calculation_output[classify_category]:
+                del calculation_output[classify_category]
 
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],

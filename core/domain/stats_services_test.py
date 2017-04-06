@@ -14,14 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from core import jobs_registry
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import stats_domain
 from core.domain import stats_jobs_continuous
+from core.domain import stats_domain
 from core.domain import stats_services
+from core.domain import user_services
+from core.platform import models
 from core.tests import test_utils
 import feconf
+
+(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
 class ModifiedStatisticsAggregator(stats_jobs_continuous.StatisticsAggregator):
@@ -45,718 +50,26 @@ class ModifiedStatisticsMRJobManager(
         return ModifiedStatisticsAggregator
 
 
-class AnalyticsEventHandlersUnitTests(test_utils.GenericTestBase):
-    """Test the event handlers for analytics events."""
-
-    DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
-    CLASSIFIER_RULESPEC_STR = exp_domain.CLASSIFIER_RULESPEC_STR
-    DEFAULT_SESSION_ID = 'session_id'
-    DEFAULT_TIME_SPENT = 5.0
-    DEFAULT_PARAMS = {}
-
-    EXP_ID0 = 'eid0'
-    EXP_ID1 = 'eid1'
-
-    def _record_answer(
-            self, answer, exploration_id='eid0', exploration_version=1,
-            state_name='sname', rule_spec_str=DEFAULT_RULESPEC_STR,
-            session_id=DEFAULT_SESSION_ID,
-            time_spent_in_secs=DEFAULT_TIME_SPENT, params=DEFAULT_PARAMS):
-        event_services.AnswerSubmissionEventHandler.record(
-            exploration_id, exploration_version, state_name, rule_spec_str,
-            session_id, time_spent_in_secs, params, answer)
-
-    def setUp(self):
-        """Before each individual test, create a dummy exploration."""
-        super(AnalyticsEventHandlersUnitTests, self).setUp()
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
-        exp = self.save_new_default_exploration(self.EXP_ID0, self.owner_id)
-        self.state_name = exp.init_state_name
-
-    def test_record_answer_submitted(self):
-        self._record_answer('answer', state_name=self.state_name)
-        answer_log = stats_domain.StateRuleAnswerLog.get(
-            self.EXP_ID0, self.state_name, self.DEFAULT_RULESPEC_STR)
-        self.assertEquals(answer_log.answers, {'answer': 1})
-
-        self._record_answer('answer', state_name=self.state_name)
-        answer_log = stats_domain.StateRuleAnswerLog.get(
-            self.EXP_ID0, self.state_name, self.DEFAULT_RULESPEC_STR)
-        self.assertEquals(answer_log.answers, {'answer': 2})
-
-        answer_log = stats_domain.StateRuleAnswerLog.get(
-            self.EXP_ID0, self.state_name, self.DEFAULT_RULESPEC_STR)
-        self.assertEquals(answer_log.answers, {'answer': 2})
-
-    def test_resolve_answers_for_default_rule(self):
-        # Submit three answers.
-        self._record_answer('a1', state_name=self.state_name)
-        self._record_answer('a2', state_name=self.state_name)
-        self._record_answer('a3', state_name=self.state_name)
-
-        answer_log = stats_domain.StateRuleAnswerLog.get(
-            self.EXP_ID0, self.state_name, self.DEFAULT_RULESPEC_STR)
-        self.assertEquals(
-            answer_log.answers, {'a1': 1, 'a2': 1, 'a3': 1})
-
-        # Nothing changes if you try to resolve an invalid answer.
-        event_services.DefaultRuleAnswerResolutionEventHandler.record(
-            self.EXP_ID0, self.state_name, ['fake_answer'])
-        answer_log = stats_domain.StateRuleAnswerLog.get(
-            self.EXP_ID0, self.state_name, self.DEFAULT_RULESPEC_STR)
-        self.assertEquals(
-            answer_log.answers, {'a1': 1, 'a2': 1, 'a3': 1})
-
-        # Resolve two answers.
-        event_services.DefaultRuleAnswerResolutionEventHandler.record(
-            self.EXP_ID0, self.state_name, ['a1', 'a2'])
-
-        answer_log = stats_domain.StateRuleAnswerLog.get(
-            self.EXP_ID0, self.state_name, self.DEFAULT_RULESPEC_STR)
-        self.assertEquals(answer_log.answers, {'a3': 1})
-
-        # Nothing changes if you try to resolve an answer that has already
-        # been resolved.
-        event_services.DefaultRuleAnswerResolutionEventHandler.record(
-            self.EXP_ID0, self.state_name, ['a1'])
-        answer_log = stats_domain.StateRuleAnswerLog.get(
-            self.EXP_ID0, self.state_name, self.DEFAULT_RULESPEC_STR)
-        self.assertEquals(answer_log.answers, {'a3': 1})
-
-        # Resolve the last answer.
-        event_services.DefaultRuleAnswerResolutionEventHandler.record(
-            self.EXP_ID0, self.state_name, ['a3'])
-
-        answer_log = stats_domain.StateRuleAnswerLog.get(
-            self.EXP_ID0, self.state_name, 'Rule')
-        self.assertEquals(answer_log.answers, {})
-
-    def test_get_top_state_rule_answers(self):
-        # There are no initial top answers for this state.
-        top_answers = stats_services.get_top_state_rule_answers(
-            self.EXP_ID0, self.state_name, [self.DEFAULT_RULESPEC_STR])
-        self.assertEquals(len(top_answers), 0)
-
-        # Submit some answers.
-        self._record_answer('a', state_name=self.state_name)
-        self._record_answer('a', state_name=self.state_name)
-        self._record_answer('b', state_name=self.state_name)
-        self._record_answer('b', state_name=self.state_name)
-        self._record_answer('b', state_name=self.state_name)
-        self._record_answer('c', state_name=self.state_name)
-        self._record_answer('c', state_name=self.state_name)
-
-        top_answers = stats_services.get_top_state_rule_answers(
-            self.EXP_ID0, self.state_name, [self.DEFAULT_RULESPEC_STR])
-        self.assertEquals(len(top_answers), 3)
-        self.assertEquals(top_answers, [{
-            'value': 'b',
-            'count': 3
-        }, {
-            'value': 'a',
-            'count': 2
-        }, {
-            'value': 'c',
-            'count': 2
-        }])
-
-    def test_get_top_state_answers_for_multiple_classified_rules(self):
-        # There are no initial top answers for this state.
-        top_answers = stats_services.get_top_state_rule_answers(
-            self.EXP_ID0, self.state_name,
-            [self.CLASSIFIER_RULESPEC_STR, self.DEFAULT_RULESPEC_STR])
-        self.assertEquals(len(top_answers), 0)
-
-        # Submit some answers.
-        self._record_answer(
-            'a', state_name=self.state_name,
-            rule_spec_str=self.DEFAULT_RULESPEC_STR)
-        self._record_answer(
-            'a', state_name=self.state_name,
-            rule_spec_str=self.DEFAULT_RULESPEC_STR)
-        self._record_answer(
-            'b', state_name=self.state_name,
-            rule_spec_str=self.CLASSIFIER_RULESPEC_STR)
-        self._record_answer(
-            'b', state_name=self.state_name,
-            rule_spec_str=self.CLASSIFIER_RULESPEC_STR)
-        self._record_answer(
-            'b', state_name=self.state_name,
-            rule_spec_str=self.CLASSIFIER_RULESPEC_STR)
-        self._record_answer(
-            'c', state_name=self.state_name,
-            rule_spec_str=self.CLASSIFIER_RULESPEC_STR)
-        self._record_answer(
-            'c', state_name=self.state_name,
-            rule_spec_str=self.DEFAULT_RULESPEC_STR)
-
-        top_answers = stats_services.get_top_state_rule_answers(
-            self.EXP_ID0, self.state_name,
-            [self.CLASSIFIER_RULESPEC_STR, self.DEFAULT_RULESPEC_STR])
-        self.assertEquals(len(top_answers), 3)
-        # Rules across multiple rule types are combined and still sorted by
-        # frequency.
-        self.assertEquals(top_answers, [{
-            'value': 'b',
-            'count': 3
-        }, {
-            'value': 'a',
-            'count': 2
-        }, {
-            'value': 'c',
-            'count': 2
-        }])
-
-    def test_get_top_state_rule_answers_from_multiple_explorations(self):
-        exp1 = self.save_new_default_exploration(self.EXP_ID1, self.owner_id)
-        exp_services.update_exploration(self.owner_id, self.EXP_ID1, [{
-            'cmd': exp_domain.CMD_RENAME_STATE,
-            'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'new_state_name': 'Second',
-        }], 'Change state name')
-        state_name0 = self.state_name
-        state_name1 = exp1.init_state_name
-
-        # There are no initial top answers for these explorations.
-        top_answers_list = stats_services.get_top_state_rule_answers_multi(
-            [(self.EXP_ID0, state_name0), (self.EXP_ID1, state_name1)],
-            [self.DEFAULT_RULESPEC_STR])
-        self.assertEquals(len(top_answers_list), 2)
-        self.assertEquals(len(top_answers_list[0]), 0)
-        self.assertEquals(len(top_answers_list[1]), 0)
-
-        # Submit some answers.
-        self._record_answer(
-            'a', exploration_id=self.EXP_ID0, state_name=state_name0)
-        self._record_answer(
-            'a', exploration_id=self.EXP_ID1, state_name=state_name1)
-        self._record_answer(
-            'b', exploration_id=self.EXP_ID1, state_name=state_name1)
-        self._record_answer(
-            'b', exploration_id=self.EXP_ID1, state_name=state_name1)
-        self._record_answer(
-            'b', exploration_id=self.EXP_ID1, state_name=state_name1)
-        self._record_answer(
-            'c', exploration_id=self.EXP_ID1, state_name=state_name1)
-        self._record_answer(
-            'c', exploration_id=self.EXP_ID0, state_name=state_name0)
-
-        top_answers_list = stats_services.get_top_state_rule_answers_multi(
-            [(self.EXP_ID0, state_name0), (self.EXP_ID1, state_name1)],
-            [self.DEFAULT_RULESPEC_STR])
-        self.assertEquals(len(top_answers_list), 2)
-        self.assertEquals(top_answers_list[0], [{
-            'value': 'a',
-            'count': 1
-        }, {
-            'value': 'c',
-            'count': 1
-        }])
-        self.assertEquals(top_answers_list[1], [{
-            'value': 'b',
-            'count': 3
-        }, {
-            'value': 'a',
-            'count': 1
-        }, {
-            'value': 'c',
-            'count': 1
-        }])
-
-    def test_get_top_state_rule_answers_from_multiple_states(self):
-        state_name0 = self.state_name
-        state_name1 = 'Second'
-
-        exp_services.update_exploration(self.owner_id, self.EXP_ID0, [{
-            'cmd': exp_domain.CMD_ADD_STATE,
-            'state_name': state_name1
-        }], 'Add new state')
-
-        # There are no initial top answers for these states.
-        top_answers_list = stats_services.get_top_state_rule_answers_multi(
-            [(self.EXP_ID0, state_name0), (self.EXP_ID0, state_name1)],
-            [self.DEFAULT_RULESPEC_STR])
-        self.assertEquals(len(top_answers_list), 2)
-        self.assertEquals(len(top_answers_list[0]), 0)
-        self.assertEquals(len(top_answers_list[1]), 0)
-
-        # Submit some answers.
-        self._record_answer(
-            'a', exploration_id=self.EXP_ID0, state_name=state_name0)
-        self._record_answer(
-            'a', exploration_id=self.EXP_ID0, exploration_version=2,
-            state_name=state_name1)
-        self._record_answer(
-            'b', exploration_id=self.EXP_ID0, exploration_version=2,
-            state_name=state_name1)
-        self._record_answer(
-            'b', exploration_id=self.EXP_ID0, exploration_version=2,
-            state_name=state_name1)
-        self._record_answer(
-            'b', exploration_id=self.EXP_ID0, exploration_version=2,
-            state_name=state_name1)
-        self._record_answer(
-            'c', exploration_id=self.EXP_ID0, exploration_version=2,
-            state_name=state_name1)
-        self._record_answer(
-            'c', exploration_id=self.EXP_ID0, state_name=state_name0)
-
-        top_answers_list = stats_services.get_top_state_rule_answers_multi(
-            [(self.EXP_ID0, state_name0), (self.EXP_ID0, state_name1)],
-            [self.DEFAULT_RULESPEC_STR])
-        self.assertEquals(len(top_answers_list), 2)
-        self.assertEquals(top_answers_list[0], [{
-            'value': 'a',
-            'count': 1
-        }, {
-            'value': 'c',
-            'count': 1
-        }])
-        self.assertEquals(top_answers_list[1], [{
-            'value': 'b',
-            'count': 3
-        }, {
-            'value': 'a',
-            'count': 1
-        }, {
-            'value': 'c',
-            'count': 1
-        }])
-
-
-class StateImprovementsUnitTests(test_utils.GenericTestBase):
-    """Test the get_state_improvements() function."""
-
-    DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
-    DEFAULT_SESSION_ID = 'session_id'
-    DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
-    DEFAULT_TIME_SPENT = 5.0
-    DEFAULT_PARAMS = {}
-
-    def _get_swap_context(self):
-        return self.swap(
-            stats_jobs_continuous.StatisticsAggregator, 'get_statistics',
-            ModifiedStatisticsAggregator.get_statistics)
-
-    def test_get_state_improvements(self):
-        exp = exp_domain.Exploration.create_default_exploration('eid')
-        exp_services.save_new_exploration('fake@user.com', exp)
-
-        for ind in range(5):
-            event_services.StartExplorationEventHandler.record(
-                'eid', 1, exp.init_state_name, 'session_id_%s' % ind,
-                {}, feconf.PLAY_TYPE_NORMAL)
-            event_services.StateHitEventHandler.record(
-                'eid', 1, exp.init_state_name, 'session_id_%s' % ind,
-                {}, feconf.PLAY_TYPE_NORMAL)
-        event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, exp.init_state_name,
-            self.DEFAULT_RULESPEC_STR, self.DEFAULT_SESSION_ID,
-            self.DEFAULT_TIME_SPENT, self.DEFAULT_PARAMS, '1')
-        for _ in range(2):
-            event_services.AnswerSubmissionEventHandler.record(
-                'eid', 1, exp.init_state_name,
-                self.DEFAULT_RULESPEC_STR, self.DEFAULT_SESSION_ID,
-                self.DEFAULT_TIME_SPENT, self.DEFAULT_PARAMS, '2')
-        ModifiedStatisticsAggregator.start_computation()
-        self.process_and_flush_pending_tasks()
-        with self._get_swap_context():
-            self.assertEquals(
-                stats_services.get_state_improvements('eid', 1), [{
-                    'type': 'default',
-                    'rank': 3,
-                    'state_name': exp.init_state_name
-                }])
-
-    def test_single_default_rule_hit(self):
-        exp = exp_domain.Exploration.create_default_exploration('eid')
-        exp_services.save_new_exploration('fake@user.com', exp)
-        state_name = exp.init_state_name
-
-        event_services.StartExplorationEventHandler.record(
-            'eid', 1, state_name, 'session_id', {}, feconf.PLAY_TYPE_NORMAL)
-        event_services.StateHitEventHandler.record(
-            'eid', 1, state_name, 'session_id', {},
-            feconf.PLAY_TYPE_NORMAL)
-        event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name,
-            self.DEFAULT_RULESPEC_STR, 'session_id', self.DEFAULT_TIME_SPENT,
-            self.DEFAULT_PARAMS, '1')
-        ModifiedStatisticsAggregator.start_computation()
-        self.process_and_flush_pending_tasks()
-
-        with self._get_swap_context():
-            self.assertEquals(
-                stats_services.get_state_improvements('eid', 1), [{
-                    'type': 'default',
-                    'rank': 1,
-                    'state_name': exp.init_state_name
-                }])
-
-    def test_no_improvement_flag_hit(self):
-        self.save_new_valid_exploration(
-            'eid', 'fake@user.com', end_state_name='End')
-        exp = exp_services.get_exploration_by_id('eid')
-
-        not_default_rule_spec = exp_domain.RuleSpec('Equals', {'x': 'Text'})
-        not_default_rule_spec_str = (
-            not_default_rule_spec.stringify_classified_rule())
-        init_interaction = exp.init_state.interaction
-        init_interaction.answer_groups.append(exp_domain.AnswerGroup(
-            exp_domain.Outcome(exp.init_state_name, [], {}),
-            [not_default_rule_spec]))
-        init_interaction.default_outcome = exp_domain.Outcome(
-            'End', [], {})
-        exp_services._save_exploration(  # pylint: disable=protected-access
-            'fake@user.com', exp, '', [])
-
-        event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, exp.init_state_name,
-            not_default_rule_spec_str, self.DEFAULT_SESSION_ID,
-            self.DEFAULT_TIME_SPENT, self.DEFAULT_PARAMS, '1')
-        self.assertEquals(stats_services.get_state_improvements('eid', 1), [])
-
-    def test_incomplete_and_default_flags(self):
-        exp = exp_domain.Exploration.create_default_exploration('eid')
-        exp_services.save_new_exploration('fake@user.com', exp)
-        state_name = exp.init_state_name
-
-        # Fail to answer twice.
-        for ind in range(2):
-            event_services.StartExplorationEventHandler.record(
-                'eid', 1, state_name, 'session_id %d' % ind, {},
-                feconf.PLAY_TYPE_NORMAL)
-            event_services.StateHitEventHandler.record(
-                'eid', 1, state_name, 'session_id %d' % ind,
-                {}, feconf.PLAY_TYPE_NORMAL)
-            event_services.MaybeLeaveExplorationEventHandler.record(
-                'eid', 1, state_name, 'session_id %d' % ind, 10.0, {},
-                feconf.PLAY_TYPE_NORMAL)
-
-        # Hit the default rule once.
-        event_services.StateHitEventHandler.record(
-            'eid', 1, state_name, 'session_id 3', {}, feconf.PLAY_TYPE_NORMAL)
-        event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name,
-            self.DEFAULT_RULESPEC_STR, 'session_id 3',
-            self.DEFAULT_TIME_SPENT, self.DEFAULT_PARAMS, '1')
-
-        # The result should be classified as incomplete.
-        ModifiedStatisticsAggregator.start_computation()
-        self.process_and_flush_pending_tasks()
-        with self._get_swap_context():
-            self.assertEquals(
-                stats_services.get_state_improvements('eid', 1), [{
-                    'rank': 2,
-                    'type': 'incomplete',
-                    'state_name': state_name
-                }])
-
-        # Now hit the default two more times. The result should be classified
-        # as default.
-        for _ in range(2):
-            event_services.StateHitEventHandler.record(
-                'eid', 1, state_name, 'session_id',
-                {}, feconf.PLAY_TYPE_NORMAL)
-            event_services.AnswerSubmissionEventHandler.record(
-                'eid', 1, state_name,
-                self.DEFAULT_RULESPEC_STR, 'session_id',
-                self.DEFAULT_TIME_SPENT, self.DEFAULT_PARAMS, '1')
-        with self._get_swap_context():
-            self.assertEquals(
-                stats_services.get_state_improvements('eid', 1), [{
-                    'rank': 3,
-                    'type': 'default',
-                    'state_name': state_name
-                }])
-
-    def test_two_state_default_hit(self):
-        self.save_new_default_exploration('eid', 'fake@user.com')
-        exp = exp_services.get_exploration_by_id('eid')
-
-        first_state_name = exp.init_state_name
-        second_state_name = 'State 2'
-        exp_services.update_exploration('fake@user.com', 'eid', [{
-            'cmd': 'edit_state_property',
-            'state_name': first_state_name,
-            'property_name': 'widget_id',
-            'new_value': 'TextInput',
-        }, {
-            'cmd': 'add_state',
-            'state_name': second_state_name,
-        }, {
-            'cmd': 'edit_state_property',
-            'state_name': second_state_name,
-            'property_name': 'widget_id',
-            'new_value': 'TextInput',
-        }], 'Add new state')
-
-        # Hit the default rule of state 1 once, and the default rule of state 2
-        # twice. Note that both rules are self-loops.
-        event_services.StartExplorationEventHandler.record(
-            'eid', 2, first_state_name, 'session_id', {},
-            feconf.PLAY_TYPE_NORMAL)
-        event_services.StateHitEventHandler.record(
-            'eid', 2, first_state_name, 'session_id',
-            {}, feconf.PLAY_TYPE_NORMAL)
-        event_services.AnswerSubmissionEventHandler.record(
-            'eid', 2, first_state_name,
-            self.DEFAULT_RULESPEC_STR, 'session_id',
-            self.DEFAULT_TIME_SPENT, self.DEFAULT_PARAMS, '1')
-
-        for _ in range(2):
-            event_services.StateHitEventHandler.record(
-                'eid', 2, second_state_name, 'session_id',
-                {}, feconf.PLAY_TYPE_NORMAL)
-            event_services.AnswerSubmissionEventHandler.record(
-                'eid', 2, second_state_name,
-                self.DEFAULT_RULESPEC_STR, 'session_id',
-                self.DEFAULT_TIME_SPENT, self.DEFAULT_PARAMS, '1')
-        ModifiedStatisticsAggregator.start_computation()
-        self.process_and_flush_pending_tasks()
-        with self._get_swap_context():
-            states = stats_services.get_state_improvements('eid', 2)
-        self.assertEquals(states, [{
-            'rank': 2,
-            'type': 'default',
-            'state_name': second_state_name
-        }, {
-            'rank': 1,
-            'type': 'default',
-            'state_name': first_state_name
-        }])
-
-        # Hit the default rule of state 1 two more times.
-        for _ in range(2):
-            event_services.StateHitEventHandler.record(
-                'eid', 1, first_state_name, 'session_id',
-                {}, feconf.PLAY_TYPE_NORMAL)
-            event_services.AnswerSubmissionEventHandler.record(
-                'eid', 1, first_state_name,
-                self.DEFAULT_RULESPEC_STR, 'session_id',
-                self.DEFAULT_TIME_SPENT, self.DEFAULT_PARAMS, '1')
-
-        with self._get_swap_context():
-            states = stats_services.get_state_improvements('eid', 2)
-        self.assertEquals(states, [{
-            'rank': 3,
-            'type': 'default',
-            'state_name': first_state_name
-        }, {
-            'rank': 2,
-            'type': 'default',
-            'state_name': second_state_name
-        }])
-
-
-# TODO(bhenning): Remove these.
-class UnresolvedAnswersTests(test_utils.GenericTestBase):
-    """Test the unresolved answers methods."""
-
-    DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
-    CLASSIFIER_RULESPEC_STR = exp_domain.CLASSIFIER_RULESPEC_STR
-    DEFAULT_SESSION_ID = 'session_id'
-    DEFAULT_TIME_SPENT = 5.0
-    DEFAULT_PARAMS = {}
-    STATE_2_NAME = 'State 2'
-
-    def _create_and_update_fake_exploration(self, exp_id):
-        exp = exp_domain.Exploration.create_default_exploration(exp_id)
-        exp_services.save_new_exploration('fake@user.com', exp)
-        exp_services.update_exploration('fake@user.com', exp_id, [{
-            'cmd': 'edit_state_property',
-            'state_name': exp.init_state_name,
-            'property_name': 'widget_id',
-            'new_value': 'TextInput',
-        }, {
-            'cmd': 'add_state',
-            'state_name': self.STATE_2_NAME,
-        }, {
-            'cmd': 'edit_state_property',
-            'state_name': self.STATE_2_NAME,
-            'property_name': 'widget_id',
-            'new_value': 'TextInput',
-        }], 'Add new state')
-        return exp
-
-    def _get_default_dict_when_no_unresolved_answers(self, exp_ids):
-        result = {}
-        for exp_id in exp_ids:
-            result[exp_id] = {'count': 0, 'unresolved_answers': []}
-        return result
-
-    def test_get_top_unresolved_answers(self):
-        exp = exp_domain.Exploration.create_default_exploration(
-            'eid', 'title', 'category')
-        exp_services.save_new_exploration('user_id', exp)
-        state_name = exp.init_state_name
-
-        self.assertEquals(
-            stats_services.get_top_unresolved_answers_for_default_rule(
-                'eid', state_name), {})
-
-        event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name,
-            self.DEFAULT_RULESPEC_STR, 'session', self.DEFAULT_TIME_SPENT,
-            self.DEFAULT_PARAMS, 'a1')
-        self.assertEquals(
-            stats_services.get_top_unresolved_answers_for_default_rule(
-                'eid', state_name), {'a1': 1})
-
-        event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name,
-            self.DEFAULT_RULESPEC_STR, 'session', self.DEFAULT_TIME_SPENT,
-            self.DEFAULT_PARAMS, 'a1')
-        self.assertEquals(
-            stats_services.get_top_unresolved_answers_for_default_rule(
-                'eid', state_name), {'a1': 2})
-
-        event_services.DefaultRuleAnswerResolutionEventHandler.record(
-            'eid', state_name, ['a1'])
-        self.assertEquals(
-            stats_services.get_top_unresolved_answers_for_default_rule(
-                'eid', state_name), {})
-
-    def test_unresolved_answers_for_single_exploration(self):
-        exp_1 = self._create_and_update_fake_exploration('eid1')
-        self.assertEquals(
-            stats_services.get_exps_unresolved_answers_for_default_rule(
-                ['eid1']), self._get_default_dict_when_no_unresolved_answers(
-                    ['eid1']))
-        event_services.AnswerSubmissionEventHandler.record(
-            'eid1', 1, exp_1.init_state_name, self.DEFAULT_RULESPEC_STR, 'a1')
-        self.assertEquals(
-            stats_services.get_exps_unresolved_answers_for_default_rule(
-                ['eid1']), {
-                    'eid1': {'count': 1, 'unresolved_answers': [
-                        {'count': 1, 'value': 'a1',
-                         'state': exp_1.init_state_name}
-                    ]}
-                })
-
-    def test_unresolved_answers_for_multiple_explorations(self):
-        exp_1 = self._create_and_update_fake_exploration('eid1')
-        exp_2 = self._create_and_update_fake_exploration('eid2')
-        exp_3 = self._create_and_update_fake_exploration('eid3')
-        self.assertEquals(
-            stats_services.get_exps_unresolved_answers_for_default_rule(
-                ['eid1', 'eid2', 'eid3']),
-            self._get_default_dict_when_no_unresolved_answers(
-                ['eid1', 'eid2', 'eid3']))
-        event_services.AnswerSubmissionEventHandler.record(
-            'eid1', 1, exp_1.init_state_name, self.DEFAULT_RULESPEC_STR, 'a1')
-        event_services.AnswerSubmissionEventHandler.record(
-            'eid2', 1, exp_2.init_state_name, self.DEFAULT_RULESPEC_STR, 'a3')
-        event_services.AnswerSubmissionEventHandler.record(
-            'eid2', 1, exp_2.init_state_name, self.DEFAULT_RULESPEC_STR, 'a2')
-        event_services.AnswerSubmissionEventHandler.record(
-            'eid3', 1, exp_3.init_state_name, self.DEFAULT_RULESPEC_STR, 'a2')
-        self.assertEquals(
-            stats_services.get_exps_unresolved_answers_for_default_rule(
-                ['eid1', 'eid2', 'eid3']), {
-                    'eid1': {'count': 1, 'unresolved_answers': [
-                        {'count': 1, 'value': 'a1',
-                         'state': exp_1.init_state_name}
-                    ]},
-                    'eid2': {'count': 2, 'unresolved_answers': [
-                        {'count': 1, 'value': 'a3',
-                         'state': exp_2.init_state_name},
-                        {'count': 1, 'value': 'a2',
-                         'state': exp_2.init_state_name}
-                    ]},
-                    'eid3': {'count': 1, 'unresolved_answers': [
-                        {'count': 1, 'value': 'a2',
-                         'state': exp_3.init_state_name}
-                    ]}
-                })
-
-    def test_unresolved_answers_count_when_answers_marked_as_resolved(self):
-        exp_1 = self._create_and_update_fake_exploration('eid1')
-        self.assertEquals(
-            stats_services.get_exps_unresolved_answers_for_default_rule(
-                ['eid1']),
-            self._get_default_dict_when_no_unresolved_answers(['eid1']))
-        event_services.AnswerSubmissionEventHandler.record(
-            'eid1', 1, exp_1.init_state_name, self.DEFAULT_RULESPEC_STR, 'a1')
-        event_services.AnswerSubmissionEventHandler.record(
-            'eid1', 1, exp_1.init_state_name, self.DEFAULT_RULESPEC_STR, 'a2')
-        self.assertEquals(
-            stats_services.get_exps_unresolved_answers_for_default_rule(
-                ['eid1']), {
-                    'eid1': {'count': 2, 'unresolved_answers': [
-                        {'count': 1, 'value': 'a1',
-                         'state': exp_1.init_state_name},
-                        {'count': 1, 'value': 'a2',
-                         'state': exp_1.init_state_name}
-                    ]}
-                })
-
-        event_services.DefaultRuleAnswerResolutionEventHandler.record(
-            'eid1', exp_1.init_state_name, ['a1'])
-        self.assertEquals(
-            stats_services.get_exps_unresolved_answers_for_default_rule(
-                ['eid1']), {
-                    'eid1': {'count': 1, 'unresolved_answers': [
-                        {'count': 1, 'value': 'a2',
-                         'state': exp_1.init_state_name}
-                    ]}
-                })
-
-        exp_2 = self._create_and_update_fake_exploration('eid2')
-        event_services.AnswerSubmissionEventHandler.record(
-            'eid2', 1, exp_2.init_state_name, self.DEFAULT_RULESPEC_STR, 'a1')
-        event_services.DefaultRuleAnswerResolutionEventHandler.record(
-            'eid1', exp_1.init_state_name, ['a2'])
-        event_services.DefaultRuleAnswerResolutionEventHandler.record(
-            'eid2', exp_1.init_state_name, ['a1'])
-        self.assertEquals(
-            stats_services.get_exps_unresolved_answers_for_default_rule(
-                ['eid1', 'eid2']),
-            self._get_default_dict_when_no_unresolved_answers(
-                ['eid1', 'eid2']))
-
-    def test_unresolved_answers_count_for_multiple_states(self):
-        exp_1 = self._create_and_update_fake_exploration('eid1')
-        self.assertEquals(
-            stats_services.get_exps_unresolved_answers_for_default_rule(
-                ['eid1']), self._get_default_dict_when_no_unresolved_answers(
-                    ['eid1']))
-        event_services.AnswerSubmissionEventHandler.record(
-            'eid1', 1, exp_1.init_state_name, self.DEFAULT_RULESPEC_STR, 'a1')
-        event_services.AnswerSubmissionEventHandler.record(
-            'eid1', 1, self.STATE_2_NAME, self.DEFAULT_RULESPEC_STR, 'a1')
-        event_services.AnswerSubmissionEventHandler.record(
-            'eid1', 1, self.STATE_2_NAME, self.DEFAULT_RULESPEC_STR, 'a2')
-        self.assertEquals(
-            stats_services.get_exps_unresolved_answers_for_default_rule(
-                ['eid1']), {
-                    'eid1': {'count': 3, 'unresolved_answers': [
-                        {'count': 1, 'value': 'a1',
-                         'state': exp_1.init_state_name},
-                        {'count': 1, 'value': 'a1',
-                         'state': self.STATE_2_NAME},
-                        {'count': 1, 'value': 'a2',
-                         'state': self.STATE_2_NAME}
-                    ]}
-                })
-
-    def test_unresolved_answers_count_for_non_default_rules(self):
-        exp_1 = self._create_and_update_fake_exploration('eid1')
-        self.assertEquals(
-            stats_services.get_exps_unresolved_answers_for_default_rule(
-                ['eid1']), self._get_default_dict_when_no_unresolved_answers(
-                    ['eid1']))
-        event_services.AnswerSubmissionEventHandler.record(
-            'eid1', 1, exp_1.init_state_name, self.CLASSIFIER_RULESPEC_STR, 'a1'
-        )
-        event_services.AnswerSubmissionEventHandler.record(
-            'eid1', 1, self.STATE_2_NAME, self.CLASSIFIER_RULESPEC_STR, 'a1')
-        self.assertEquals(
-            stats_services.get_exps_unresolved_answers_for_default_rule(
-                ['eid1']), self._get_default_dict_when_no_unresolved_answers(
-                    ['eid1']))
+class ModifiedInteractionAnswerSummariesAggregator(
+        stats_jobs_continuous.StatisticsAggregator):
+    """A modified InteractionAnswerSummariesAggregator that does not start
+    a new batch job when the previous one has finished.
+    """
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return ModifiedInteractionAnswerSummariesMRJobManager
+
+    @classmethod
+    def _kickoff_batch_job_after_previous_one_ends(cls):
+        pass
+
+
+class ModifiedInteractionAnswerSummariesMRJobManager(
+        stats_jobs_continuous.InteractionAnswerSummariesMRJobManager):
+
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return ModifiedInteractionAnswerSummariesAggregator
 
 
 class EventLogEntryTests(test_utils.GenericTestBase):
@@ -768,3 +81,926 @@ class EventLogEntryTests(test_utils.GenericTestBase):
             'eid', 2, 'state', 'session', {}, feconf.PLAY_TYPE_NORMAL)
         event_services.MaybeLeaveExplorationEventHandler.record(
             'eid', 2, 'state', 'session', 27.2, {}, feconf.PLAY_TYPE_NORMAL)
+
+
+class AnswerEventTests(test_utils.GenericTestBase):
+    """Test recording new answer operations through events."""
+
+    SESSION_ID = 'SESSION_ID'
+    TIME_SPENT = 5.0
+    PARAMS = {}
+
+    def test_record_answer(self):
+        self.save_new_default_exploration('eid', 'fake@user.com')
+        exp = exp_services.get_exploration_by_id('eid')
+
+        first_state_name = exp.init_state_name
+        second_state_name = 'State 2'
+        third_state_name = 'State 3'
+        exp_services.update_exploration('fake@user.com', 'eid', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': first_state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'TextInput',
+        }, {
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': second_state_name,
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': second_state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'TextInput',
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': third_state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'Continue',
+        }], 'Add new state')
+        exp = exp_services.get_exploration_by_id('eid')
+
+        exp_version = exp.version
+
+        for state_name in [first_state_name, second_state_name]:
+            state_answers = stats_services.get_state_answers(
+                'eid', exp_version, state_name)
+            self.assertEqual(state_answers, None)
+
+        # answer is a string
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid', exp_version, first_state_name, 'TextInput', 0, 0,
+            exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', self.TIME_SPENT,
+            self.PARAMS, 'answer1')
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid', exp_version, first_state_name, 'TextInput', 0, 1,
+            exp_domain.EXPLICIT_CLASSIFICATION, 'sid2', self.TIME_SPENT,
+            self.PARAMS, 'answer1')
+        # answer is a dict
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid', exp_version, first_state_name, 'TextInput', 1, 0,
+            exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', self.TIME_SPENT,
+            self.PARAMS, {'x': 1.0, 'y': 5.0})
+        # answer is a number
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid', exp_version, first_state_name, 'TextInput', 2, 0,
+            exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', self.TIME_SPENT,
+            self.PARAMS, 10)
+        # answer is a list of dicts
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid', exp_version, first_state_name, 'TextInput', 3, 0,
+            exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', self.TIME_SPENT,
+            self.PARAMS, [{'a': 'some', 'b': 'text'}, {'a': 1.0, 'c': 2.0}])
+        # answer is a list
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid', exp_version, second_state_name, 'TextInput', 2, 0,
+            exp_domain.EXPLICIT_CLASSIFICATION, 'sid3', self.TIME_SPENT,
+            self.PARAMS, [2, 4, 8])
+        # answer is a unicode string
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid', exp_version, second_state_name, 'TextInput', 1, 1,
+            exp_domain.EXPLICIT_CLASSIFICATION, 'sid4', self.TIME_SPENT,
+            self.PARAMS, self.UNICODE_TEST_STRING)
+        # answer is None (such as for Continue)
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid', exp_version, third_state_name, 'Continue', 1, 1,
+            exp_domain.EXPLICIT_CLASSIFICATION, 'sid5', self.TIME_SPENT,
+            self.PARAMS, None)
+
+        expected_submitted_answer_list1 = [{
+            'answer': 'answer1', 'time_spent_in_sec': 5.0,
+            'answer_group_index': 0, 'rule_spec_index': 0,
+            'classification_categorization': 'explicit', 'session_id': 'sid1',
+            'interaction_id': 'TextInput', 'params': {}
+        }, {
+            'answer': 'answer1', 'time_spent_in_sec': 5.0,
+            'answer_group_index': 0, 'rule_spec_index': 1,
+            'classification_categorization': 'explicit', 'session_id': 'sid2',
+            'interaction_id': 'TextInput', 'params': {}
+        }, {
+            'answer': {'x': 1.0, 'y': 5.0}, 'time_spent_in_sec': 5.0,
+            'answer_group_index': 1, 'rule_spec_index': 0,
+            'classification_categorization': 'explicit', 'session_id': 'sid1',
+            'interaction_id': 'TextInput', 'params': {}
+        }, {
+            'answer': 10, 'time_spent_in_sec': 5.0, 'answer_group_index': 2,
+            'rule_spec_index': 0, 'classification_categorization': 'explicit',
+            'session_id': 'sid1', 'interaction_id': 'TextInput', 'params': {}
+        }, {
+            'answer': [{'a': 'some', 'b': 'text'}, {'a': 1.0, 'c': 2.0}],
+            'time_spent_in_sec': 5.0, 'answer_group_index': 3,
+            'rule_spec_index': 0, 'classification_categorization': 'explicit',
+            'session_id': 'sid1', 'interaction_id': 'TextInput', 'params': {}
+        }]
+        expected_submitted_answer_list2 = [{
+            'answer': [2, 4, 8], 'time_spent_in_sec': 5.0,
+            'answer_group_index': 2, 'rule_spec_index': 0,
+            'classification_categorization': 'explicit', 'session_id': 'sid3',
+            'interaction_id': 'TextInput', 'params': {}
+        }, {
+            'answer': self.UNICODE_TEST_STRING, 'time_spent_in_sec': 5.0,
+            'answer_group_index': 0, 'rule_spec_index': 0,
+            'classification_categorization': 'explicit', 'session_id': 'sid4',
+            'interaction_id': 'TextInput', 'params': {}
+        }]
+        expected_submitted_answer_list3 = [{
+            'answer': None, 'time_spent_in_sec': 5.0, 'answer_group_index': 0,
+            'rule_spec_index': 0, 'classification_categorization': 'explicit',
+            'session_id': 'sid5', 'interaction_id': 'Continue', 'params': {}
+        }]
+
+        state_answers = stats_services.get_state_answers(
+            'eid', exp_version, first_state_name)
+        self.assertEqual(
+            state_answers.get_submitted_answer_dict_list(),
+            expected_submitted_answer_list1)
+
+        state_answers = stats_services.get_state_answers(
+            'eid', exp_version, second_state_name)
+        self.assertEqual(
+            state_answers.get_submitted_answer_dict_list(),
+            expected_submitted_answer_list2)
+
+        state_answers = stats_services.get_state_answers(
+            'eid', exp_version, third_state_name)
+        self.assertEqual(
+            state_answers.get_submitted_answer_dict_list(),
+            expected_submitted_answer_list3)
+
+
+class RecordAnswerTests(test_utils.GenericTestBase):
+    """Tests for functionality related to recording and retrieving answers."""
+
+    EXP_ID = 'exp_id0'
+
+    def setUp(self):
+        super(RecordAnswerTests, self).setUp()
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        user_services.get_or_create_user(self.owner_id, self.OWNER_EMAIL)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='End')
+
+    def test_record_answer_without_retrieving_it_first(self):
+        stats_services.record_answer(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name, 'TextInput',
+            stats_domain.SubmittedAnswer(
+                'first answer', 'TextInput', 0,
+                0, exp_domain.EXPLICIT_CLASSIFICATION, {},
+                'a_session_id_val', 1.0))
+
+        state_answers = stats_services.get_state_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': 'first answer',
+            'time_spent_in_sec': 1.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': 'explicit',
+            'session_id': 'a_session_id_val',
+            'interaction_id': 'TextInput',
+            'params': {}
+        }])
+
+    def test_record_and_retrieve_single_answer(self):
+        state_answers = stats_services.get_state_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertIsNone(state_answers)
+
+        stats_services.record_answer(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name, 'TextInput',
+            stats_domain.SubmittedAnswer(
+                'some text', 'TextInput', 0,
+                1, exp_domain.EXPLICIT_CLASSIFICATION, {},
+                'a_session_id_val', 10.0))
+
+        state_answers = stats_services.get_state_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertEqual(state_answers.exploration_id, 'exp_id0')
+        self.assertEqual(state_answers.exploration_version, 1)
+        self.assertEqual(
+            state_answers.state_name, feconf.DEFAULT_INIT_STATE_NAME)
+        self.assertEqual(state_answers.interaction_id, 'TextInput')
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': 'some text',
+            'time_spent_in_sec': 10.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 1,
+            'classification_categorization': 'explicit',
+            'session_id': 'a_session_id_val',
+            'interaction_id': 'TextInput',
+            'params': {}
+        }])
+
+    def test_record_and_retrieve_single_answer_with_preexisting_entry(self):
+        stats_services.record_answer(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name, 'TextInput',
+            stats_domain.SubmittedAnswer(
+                'first answer', 'TextInput', 0,
+                0, exp_domain.EXPLICIT_CLASSIFICATION, {},
+                'a_session_id_val', 1.0))
+
+        state_answers = stats_services.get_state_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': 'first answer',
+            'time_spent_in_sec': 1.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': 'explicit',
+            'session_id': 'a_session_id_val',
+            'interaction_id': 'TextInput',
+            'params': {}
+        }])
+
+        stats_services.record_answer(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name, 'TextInput',
+            stats_domain.SubmittedAnswer(
+                'some text', 'TextInput', 0,
+                1, exp_domain.EXPLICIT_CLASSIFICATION, {},
+                'a_session_id_val', 10.0))
+
+        state_answers = stats_services.get_state_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertEqual(state_answers.exploration_id, 'exp_id0')
+        self.assertEqual(state_answers.exploration_version, 1)
+        self.assertEqual(
+            state_answers.state_name, feconf.DEFAULT_INIT_STATE_NAME)
+        self.assertEqual(state_answers.interaction_id, 'TextInput')
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': 'first answer',
+            'time_spent_in_sec': 1.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': 'explicit',
+            'session_id': 'a_session_id_val',
+            'interaction_id': 'TextInput',
+            'params': {}
+        }, {
+            'answer': 'some text',
+            'time_spent_in_sec': 10.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 1,
+            'classification_categorization': 'explicit',
+            'session_id': 'a_session_id_val',
+            'interaction_id': 'TextInput',
+            'params': {}
+        }])
+
+    def test_record_many_answers(self):
+        state_answers = stats_services.get_state_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertIsNone(state_answers)
+
+        submitted_answer_list = [
+            stats_domain.SubmittedAnswer(
+                'answer a', 'TextInput', 0, 1,
+                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 10.0),
+            stats_domain.SubmittedAnswer(
+                'answer ccc', 'TextInput', 1, 1,
+                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 3.0),
+            stats_domain.SubmittedAnswer(
+                'answer bbbbb', 'TextInput', 1, 0,
+                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 7.5),
+        ]
+        stats_services.record_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name, 'TextInput',
+            submitted_answer_list)
+
+        # The order of the answers returned depends on the size of the answers.
+        state_answers = stats_services.get_state_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertEqual(state_answers.exploration_id, 'exp_id0')
+        self.assertEqual(state_answers.exploration_version, 1)
+        self.assertEqual(
+            state_answers.state_name, feconf.DEFAULT_INIT_STATE_NAME)
+        self.assertEqual(state_answers.interaction_id, 'TextInput')
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': 'answer a',
+            'time_spent_in_sec': 10.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 1,
+            'classification_categorization': 'explicit',
+            'session_id': 'session_id_v',
+            'interaction_id': 'TextInput',
+            'params': {}
+        }, {
+            'answer': 'answer ccc',
+            'time_spent_in_sec': 3.0,
+            'answer_group_index': 1,
+            'rule_spec_index': 1,
+            'classification_categorization': 'explicit',
+            'session_id': 'session_id_v',
+            'interaction_id': 'TextInput',
+            'params': {}
+        }, {
+            'answer': 'answer bbbbb',
+            'time_spent_in_sec': 7.5,
+            'answer_group_index': 1,
+            'rule_spec_index': 0,
+            'classification_categorization': 'explicit',
+            'session_id': 'session_id_v',
+            'interaction_id': 'TextInput',
+            'params': {}
+        }])
+
+    def test_record_answers_exceeding_one_shard(self):
+        state_answers = stats_services.get_state_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertIsNone(state_answers)
+
+        submitted_answer_list = [
+            stats_domain.SubmittedAnswer(
+                'answer a', 'TextInput', 0, 1,
+                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 10.0),
+            stats_domain.SubmittedAnswer(
+                'answer ccc', 'TextInput', 1, 1,
+                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 3.0),
+            stats_domain.SubmittedAnswer(
+                'answer bbbbb', 'TextInput', 1, 0,
+                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 7.5),
+        ]
+        stats_services.record_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name, 'TextInput',
+            submitted_answer_list * 200)
+
+        # Verify more than 1 shard was stored. The index shard (shard_id 0) is
+        # not included in the shard count.
+        model = stats_models.StateAnswersModel.get('%s:%s:%s:%s' % (
+            self.exploration.id, str(self.exploration.version),
+            self.exploration.init_state_name, '0'))
+        self.assertEqual(model.shard_count, 1)
+
+        # The order of the answers returned depends on the size of the answers.
+        state_answers = stats_services.get_state_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertEqual(state_answers.exploration_id, 'exp_id0')
+        self.assertEqual(state_answers.exploration_version, 1)
+        self.assertEqual(
+            state_answers.state_name, feconf.DEFAULT_INIT_STATE_NAME)
+        self.assertEqual(state_answers.interaction_id, 'TextInput')
+        self.assertEqual(
+            len(state_answers.get_submitted_answer_dict_list()), 600)
+
+    def test_record_many_answers_with_preexisting_entry(self):
+        stats_services.record_answer(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name, 'TextInput',
+            stats_domain.SubmittedAnswer(
+                '1 answer', 'TextInput', 0,
+                0, exp_domain.EXPLICIT_CLASSIFICATION, {},
+                'a_session_id_val', 1.0))
+
+        state_answers = stats_services.get_state_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': '1 answer',
+            'time_spent_in_sec': 1.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': 'explicit',
+            'session_id': 'a_session_id_val',
+            'interaction_id': 'TextInput',
+            'params': {}
+        }])
+
+        submitted_answer_list = [
+            stats_domain.SubmittedAnswer(
+                'answer aaa', 'TextInput', 0, 1,
+                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 10.0),
+            stats_domain.SubmittedAnswer(
+                'answer ccccc', 'TextInput', 1, 1,
+                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 3.0),
+            stats_domain.SubmittedAnswer(
+                'answer bbbbbbb', 'TextInput', 1, 0,
+                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 7.5),
+        ]
+        stats_services.record_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name, 'TextInput',
+            submitted_answer_list)
+
+        # The order of the answers returned depends on the size of the answers.
+        state_answers = stats_services.get_state_answers(
+            self.EXP_ID, self.exploration.version,
+            self.exploration.init_state_name)
+        self.assertEqual(state_answers.exploration_id, 'exp_id0')
+        self.assertEqual(state_answers.exploration_version, 1)
+        self.assertEqual(
+            state_answers.state_name, feconf.DEFAULT_INIT_STATE_NAME)
+        self.assertEqual(state_answers.interaction_id, 'TextInput')
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': '1 answer',
+            'time_spent_in_sec': 1.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': 'explicit',
+            'session_id': 'a_session_id_val',
+            'interaction_id': 'TextInput',
+            'params': {}
+        }, {
+            'answer': 'answer aaa',
+            'time_spent_in_sec': 10.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 1,
+            'classification_categorization': 'explicit',
+            'session_id': 'session_id_v',
+            'interaction_id': 'TextInput',
+            'params': {}
+        }, {
+            'answer': 'answer ccccc',
+            'time_spent_in_sec': 3.0,
+            'answer_group_index': 1,
+            'rule_spec_index': 1,
+            'classification_categorization': 'explicit',
+            'session_id': 'session_id_v',
+            'interaction_id': 'TextInput',
+            'params': {}
+        }, {
+            'answer': 'answer bbbbbbb',
+            'time_spent_in_sec': 7.5,
+            'answer_group_index': 1,
+            'rule_spec_index': 0,
+            'classification_categorization': 'explicit',
+            'session_id': 'session_id_v',
+            'interaction_id': 'TextInput',
+            'params': {}
+        }])
+
+
+class AnswerStatsTests(test_utils.GenericTestBase):
+    """Tests functionality related to answer statistics."""
+
+    ALL_CC_MANAGERS_FOR_TESTS = [ModifiedInteractionAnswerSummariesAggregator]
+    DEFAULT_TIME_SPENT = 10.0
+
+    def setUp(self):
+        super(AnswerStatsTests, self).setUp()
+        self.exploration0 = self.save_new_valid_exploration(
+            'eid0', 'test@example.com')
+        self.exploration1 = self.save_new_valid_exploration(
+            'eid1', 'test@example.com')
+        self.state_name00 = self.exploration0.init_state_name
+        self.state_name01 = 'Second'
+        self.state_name10 = self.exploration1.init_state_name
+
+        exp_services.update_exploration('test@example.com', 'eid0', [{
+            'cmd': 'add_state',
+            'state_name': self.state_name01,
+        }, {
+            'cmd': 'edit_state_property',
+            'state_name': self.state_name01,
+            'property_name': 'widget_id',
+            'new_value': 'TextInput',
+        }], 'Add new state')
+        self.exploration0 = exp_services.get_exploration_by_id('eid0')
+
+    def _record_answer(
+            self, answer_str, exploration, state_name,
+            classification=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION):
+        stats_services.record_answer(
+            exploration.id, exploration.version, state_name, 'TextInput',
+            stats_domain.SubmittedAnswer(
+                answer_str, 'TextInput', 0, 0, classification, {}, 'session',
+                self.DEFAULT_TIME_SPENT))
+
+    def _record_answer_to_default_exp(
+            self, answer_str,
+            classification=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION):
+        self._record_answer(
+            answer_str, self.exploration0, self.state_name00,
+            classification=classification)
+
+    def _run_aggregator_job(self):
+        """Start the InteractionAnswerSummariesAggregator to aggregate submitted
+        answers.
+        """
+        ModifiedInteractionAnswerSummariesAggregator.start_computation()
+        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.process_and_flush_pending_tasks()
+        self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+
+    def test_get_top_state_rule_answers(self):
+        with self.swap(
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS):
+            # There are no initial top answers for this state.
+            top_answers = stats_services.get_top_state_rule_answers(
+                'eid0', self.state_name00, [
+                    exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
+            self.assertEqual(len(top_answers), 0)
+
+            # Submit some answers.
+            self._record_answer_to_default_exp('a')
+            self._record_answer_to_default_exp('a')
+            self._record_answer_to_default_exp('b')
+            self._record_answer_to_default_exp('b')
+            self._record_answer_to_default_exp('b')
+            self._record_answer_to_default_exp('c')
+            self._record_answer_to_default_exp('c')
+            self._run_aggregator_job()
+
+            top_answers = stats_services.get_top_state_rule_answers(
+                'eid0', self.state_name00, [
+                    exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
+            self.assertEqual(len(top_answers), 3)
+            self.assertEqual(top_answers, [{
+                'answer': 'b',
+                'frequency': 3
+            }, {
+                'answer': 'a',
+                'frequency': 2
+            }, {
+                'answer': 'c',
+                'frequency': 2
+            }])
+
+    def test_get_top_state_answers_for_multiple_classified_rules(self):
+        with self.swap(
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS):
+            # There are no initial top answers for this state.
+            top_answers = stats_services.get_top_state_rule_answers(
+                'eid0', self.state_name00, [
+                    exp_domain.STATISTICAL_CLASSIFICATION,
+                    exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
+            self.assertEqual(len(top_answers), 0)
+
+            # Submit some answers.
+            self._record_answer_to_default_exp(
+                'a', classification=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
+            self._record_answer_to_default_exp(
+                'a', classification=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
+            self._record_answer_to_default_exp(
+                'b', classification=exp_domain.STATISTICAL_CLASSIFICATION)
+            self._record_answer_to_default_exp(
+                'b', classification=exp_domain.STATISTICAL_CLASSIFICATION)
+            self._record_answer_to_default_exp(
+                'b', classification=exp_domain.STATISTICAL_CLASSIFICATION)
+            self._record_answer_to_default_exp(
+                'c', classification=exp_domain.STATISTICAL_CLASSIFICATION)
+            self._record_answer_to_default_exp(
+                'c', classification=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
+            self._run_aggregator_job()
+
+            top_answers = stats_services.get_top_state_rule_answers(
+                'eid0', self.state_name00, [
+                    exp_domain.STATISTICAL_CLASSIFICATION,
+                    exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
+            self.assertEqual(len(top_answers), 3)
+            # Rules across multiple rule types are combined and still sorted by
+            # frequency.
+            self.assertEqual(top_answers, [{
+                'answer': 'b',
+                'frequency': 3
+            }, {
+                'answer': 'c',
+                'frequency': 2
+            }, {
+                'answer': 'a',
+                'frequency': 2
+            }])
+
+    def test_get_top_state_rule_answers_from_multiple_explorations(self):
+        with self.swap(
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS):
+            # There are no initial top answers for these explorations.
+            top_answers_list = stats_services.get_top_state_rule_answers_multi(
+                [('eid0', self.state_name00), ('eid1', self.state_name10)],
+                [exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
+            self.assertEqual(len(top_answers_list), 2)
+            self.assertEqual(len(top_answers_list[0]), 0)
+            self.assertEqual(len(top_answers_list[1]), 0)
+
+            # Submit some answers.
+            self._record_answer('a', self.exploration0, self.state_name00)
+            self._record_answer('a', self.exploration1, self.state_name10)
+            self._record_answer('b', self.exploration1, self.state_name10)
+            self._record_answer('b', self.exploration1, self.state_name10)
+            self._record_answer('b', self.exploration1, self.state_name10)
+            self._record_answer('c', self.exploration1, self.state_name10)
+            self._record_answer('c', self.exploration0, self.state_name00)
+            self._run_aggregator_job()
+
+            top_answers_list = stats_services.get_top_state_rule_answers_multi(
+                [('eid0', self.state_name00), ('eid1', self.state_name10)],
+                [exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
+            self.assertEqual(len(top_answers_list), 2)
+            self.assertEqual(top_answers_list[0], [{
+                'answer': 'a',
+                'frequency': 1
+            }, {
+                'answer': 'c',
+                'frequency': 1
+            }])
+            self.assertEqual(top_answers_list[1], [{
+                'answer': 'b',
+                'frequency': 3
+            }, {
+                'answer': 'a',
+                'frequency': 1
+            }, {
+                'answer': 'c',
+                'frequency': 1
+            }])
+
+    def test_get_top_state_rule_answers_from_multiple_states(self):
+        with self.swap(
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS):
+            # There are no initial top answers for these states.
+            top_answers_list = stats_services.get_top_state_rule_answers_multi(
+                [('eid0', self.state_name00), ('eid0', self.state_name01)],
+                [exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
+            self.assertEqual(len(top_answers_list), 2)
+            self.assertEqual(len(top_answers_list[0]), 0)
+            self.assertEqual(len(top_answers_list[1]), 0)
+
+            # Submit some answers.
+            self._record_answer('a', self.exploration0, self.state_name00)
+            self._record_answer('a', self.exploration0, self.state_name01)
+            self._record_answer('b', self.exploration0, self.state_name01)
+            self._record_answer('b', self.exploration0, self.state_name01)
+            self._record_answer('b', self.exploration0, self.state_name01)
+            self._record_answer('c', self.exploration0, self.state_name01)
+            self._record_answer('c', self.exploration0, self.state_name00)
+            self._run_aggregator_job()
+
+            top_answers_list = stats_services.get_top_state_rule_answers_multi(
+                [('eid0', self.state_name00), ('eid0', self.state_name01)],
+                [exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
+            self.assertEqual(len(top_answers_list), 2)
+            self.assertEqual(top_answers_list[0], [{
+                'answer': 'a',
+                'frequency': 1
+            }, {
+                'answer': 'c',
+                'frequency': 1
+            }])
+            self.assertEqual(top_answers_list[1], [{
+                'answer': 'b',
+                'frequency': 3
+            }, {
+                'answer': 'a',
+                'frequency': 1
+            }, {
+                'answer': 'c',
+                'frequency': 1
+            }])
+
+    def test_count_top_state_rule_answers(self):
+        with self.swap(
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS):
+            # There are no initial top answers for this state.
+            default_answer_count = stats_services.count_top_state_rule_answers(
+                'eid0', self.state_name00,
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
+            self.assertEqual(default_answer_count, 0)
+
+            stats_answer_count = stats_services.count_top_state_rule_answers(
+                'eid0', self.state_name00,
+                exp_domain.STATISTICAL_CLASSIFICATION)
+            self.assertEqual(stats_answer_count, 0)
+
+            # Submit some answers.
+            self._record_answer_to_default_exp(
+                'a', classification=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
+            self._record_answer_to_default_exp(
+                'a', classification=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
+            self._record_answer_to_default_exp(
+                'b', classification=exp_domain.STATISTICAL_CLASSIFICATION)
+            self._record_answer_to_default_exp(
+                'b', classification=exp_domain.STATISTICAL_CLASSIFICATION)
+            self._record_answer_to_default_exp(
+                'b', classification=exp_domain.STATISTICAL_CLASSIFICATION)
+            self._record_answer_to_default_exp(
+                'c', classification=exp_domain.STATISTICAL_CLASSIFICATION)
+            self._record_answer_to_default_exp(
+                'c', classification=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
+            self._run_aggregator_job()
+
+            top_answers = stats_services.get_top_state_rule_answers(
+                'eid0', self.state_name00, [
+                    exp_domain.DEFAULT_OUTCOME_CLASSIFICATION])
+            # Rules across multiple rule types are combined and still sorted by
+            # frequency.
+            self.assertEqual(top_answers, [{
+                'answer': 'a',
+                'frequency': 2
+            }, {
+                'answer': 'c',
+                'frequency': 1
+            }])
+
+            default_answer_count = stats_services.count_top_state_rule_answers(
+                'eid0', self.state_name00,
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
+            self.assertEqual(default_answer_count, 3)
+
+            top_answers = stats_services.get_top_state_rule_answers(
+                'eid0', self.state_name00, [
+                    exp_domain.STATISTICAL_CLASSIFICATION])
+            # Rules across multiple rule types are combined and still sorted by
+            # frequency.
+            self.assertEqual(top_answers, [{
+                'answer': 'b',
+                'frequency': 3
+            }, {
+                'answer': 'c',
+                'frequency': 1
+            }])
+
+            stats_answer_count = stats_services.count_top_state_rule_answers(
+                'eid0', self.state_name00,
+                exp_domain.STATISTICAL_CLASSIFICATION)
+            self.assertEqual(stats_answer_count, 4)
+
+
+class UnresolvedAnswersTests(test_utils.GenericTestBase):
+    """Tests the unresolved answers methods."""
+
+    ALL_CC_MANAGERS_FOR_TESTS = [ModifiedInteractionAnswerSummariesAggregator]
+    STATE_2_NAME = 'State 2'
+    DEFAULT_TIME_SPENT = 10.0
+
+    def _create_and_update_fake_exploration(self, exp_id):
+        self.save_new_valid_exploration(exp_id, 'fake@user.com')
+        exp_services.update_exploration('fake@user.com', exp_id, [{
+            'cmd': 'add_state',
+            'state_name': self.STATE_2_NAME,
+        }, {
+            'cmd': 'edit_state_property',
+            'state_name': self.STATE_2_NAME,
+            'property_name': 'widget_id',
+            'new_value': 'TextInput',
+        }], 'Add new state')
+        return exp_services.get_exploration_by_id(exp_id)
+
+    def _get_default_dict_when_no_unresolved_answers(self, exp_ids):
+        result = {}
+        for exp_id in exp_ids:
+            result[exp_id] = {'frequency': 0, 'unresolved_answers': []}
+        return result
+
+    def _record_answer(
+            self, answer_str, exploration, state_name,
+            classification=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION):
+        stats_services.record_answer(
+            exploration.id, exploration.version, state_name, 'TextInput',
+            stats_domain.SubmittedAnswer(
+                answer_str, 'TextInput', 0, 0, classification, {}, 'session',
+                self.DEFAULT_TIME_SPENT))
+
+    def _run_aggregator_job(self):
+        """Start the InteractionAnswerSummariesAggregator to aggregate submitted
+        answers.
+        """
+        ModifiedInteractionAnswerSummariesAggregator.start_computation()
+        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.process_and_flush_pending_tasks()
+        self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+
+    def test_unresolved_answers_for_single_exploration(self):
+        with self.swap(
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS):
+            exp_1 = self._create_and_update_fake_exploration('eid1')
+            self.assertEqual(
+                stats_services.get_exps_unresolved_answers_for_default_rule(
+                    ['eid1']),
+                self._get_default_dict_when_no_unresolved_answers(['eid1']))
+            self._record_answer('a1', exp_1, exp_1.init_state_name)
+            self._run_aggregator_job()
+            self.assertEqual(
+                stats_services.get_exps_unresolved_answers_for_default_rule(
+                    ['eid1']), {
+                        'eid1': {
+                            'frequency': 1,
+                            'unresolved_answers': [{
+                                'frequency': 1,
+                                'answer': 'a1',
+                                'state': exp_1.init_state_name
+                            }]
+                        }
+                    })
+
+    def test_unresolved_answers_for_multiple_explorations(self):
+        with self.swap(
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS):
+            exp_1 = self._create_and_update_fake_exploration('eid1')
+            exp_2 = self._create_and_update_fake_exploration('eid2')
+            exp_3 = self._create_and_update_fake_exploration('eid3')
+            self.assertEqual(
+                stats_services.get_exps_unresolved_answers_for_default_rule(
+                    ['eid1', 'eid2', 'eid3']),
+                self._get_default_dict_when_no_unresolved_answers(
+                    ['eid1', 'eid2', 'eid3']))
+            self._record_answer('a1', exp_1, exp_1.init_state_name)
+            self._record_answer('a3', exp_2, exp_2.init_state_name)
+            self._record_answer('a2', exp_2, exp_2.init_state_name)
+            self._record_answer('a2', exp_3, exp_3.init_state_name)
+            self._run_aggregator_job()
+            self.assertEqual(
+                stats_services.get_exps_unresolved_answers_for_default_rule(
+                    ['eid1', 'eid2', 'eid3']), {
+                        'eid1': {
+                            'frequency': 1,
+                            'unresolved_answers': [{
+                                'frequency': 1,
+                                'answer': 'a1',
+                                'state': exp_1.init_state_name
+                            }]
+                        },
+                        'eid2': {
+                            'frequency': 2,
+                            'unresolved_answers': [{
+                                'frequency': 1,
+                                'answer': 'a3',
+                                'state': exp_2.init_state_name
+                            }, {
+                                'frequency': 1,
+                                'answer': 'a2',
+                                'state': exp_2.init_state_name
+                            }]
+                        },
+                        'eid3': {
+                            'frequency': 1,
+                            'unresolved_answers': [{
+                                'frequency': 1,
+                                'answer': 'a2',
+                                'state': exp_3.init_state_name
+                            }]
+                        }
+                    })
+
+    def test_unresolved_answers_count_for_multiple_states(self):
+        with self.swap(
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS):
+            exp_1 = self._create_and_update_fake_exploration('eid1')
+            self.assertEqual(
+                stats_services.get_exps_unresolved_answers_for_default_rule(
+                    ['eid1']),
+                self._get_default_dict_when_no_unresolved_answers(['eid1']))
+            self._record_answer('a1', exp_1, exp_1.init_state_name)
+            self._record_answer('a1', exp_1, self.STATE_2_NAME)
+            self._record_answer('a2', exp_1, self.STATE_2_NAME)
+            self._run_aggregator_job()
+            self.assertEqual(
+                stats_services.get_exps_unresolved_answers_for_default_rule(
+                    ['eid1']), {
+                        'eid1': {
+                            'frequency': 3,
+                            'unresolved_answers': [{
+                                'frequency': 1,
+                                'answer': 'a1',
+                                'state': exp_1.init_state_name
+                            }, {
+                                'frequency': 1,
+                                'answer': 'a1',
+                                'state': self.STATE_2_NAME
+                            }, {
+                                'frequency': 1,
+                                'answer': 'a2',
+                                'state': self.STATE_2_NAME
+                            }]
+                        }
+                    })
+
+    def test_unresolved_answers_count_for_non_default_rules(self):
+        with self.swap(
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS):
+            exp_1 = self._create_and_update_fake_exploration('eid1')
+            self.assertEqual(
+                stats_services.get_exps_unresolved_answers_for_default_rule(
+                    ['eid1']),
+                self._get_default_dict_when_no_unresolved_answers(['eid1']))
+            self._record_answer(
+                'a1', exp_1, exp_1.init_state_name,
+                classification=exp_domain.STATISTICAL_CLASSIFICATION)
+            self._record_answer(
+                'a1', exp_1, self.STATE_2_NAME,
+                classification=exp_domain.STATISTICAL_CLASSIFICATION)
+            self._run_aggregator_job()
+            self.assertEqual(
+                stats_services.get_exps_unresolved_answers_for_default_rule(
+                    ['eid1']),
+                self._get_default_dict_when_no_unresolved_answers(['eid1']))

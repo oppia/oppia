@@ -128,6 +128,14 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             names = [name for name in names if not name.endswith(suffix)]
         return names
 
+    def _get_linear_interaction_ids(self):
+        all_interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids())
+        return [
+            interaction_id for interaction_id in all_interaction_ids
+            if interaction_registry.Registry.get_interaction_by_id(
+                interaction_id).is_linear]
+
     def test_interaction_properties(self):
         """Test the standard properties of interactions."""
 
@@ -208,18 +216,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # html file, a JS file, a validator.js file,  a directory named
             # 'static' that contains (at least) a .png thumbnail file,
             # (optionally) a JS test spec file, (optionally) a JS test spec
-            # file for rules, (optionally) a stats_response.html file and
-            # (optionally) a protractor.js file.
+            # file for rules, and (optionally) a protractor.js file.
             dir_contents = self._listdir_omit_ignored(interaction_dir)
 
             optional_dirs_and_files_count = 0
-
-            try:
-                self.assertTrue(os.path.isfile(
-                    os.path.join(interaction_dir, 'stats_response.html')))
-                optional_dirs_and_files_count += 1
-            except Exception:
-                pass
 
             try:
                 self.assertTrue(os.path.isfile(os.path.join(
@@ -433,7 +433,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     'interaction: %s' % interaction_id)
 
     def test_trainable_interactions_have_more_than_just_a_classifier(self):
-        """This ensures that trainable interactions cannot only have a fuzzy
+        """This ensures that trainable interactions cannot only have a soft
         rule, as that would break frontend functionality (users would not be
         able to create manual answer groups).
         """
@@ -452,14 +452,13 @@ class InteractionUnitTests(test_utils.GenericTestBase):
     def test_linear_interactions(self):
         """Sanity-check for the number of linear interactions."""
 
-        all_interaction_ids = (
-            interaction_registry.Registry.get_all_interaction_ids())
+        actual_linear_interaction_ids = self._get_linear_interaction_ids()
+        self.assertEqual(len(actual_linear_interaction_ids), 1)
 
-        count = 0
-        for interaction_id in all_interaction_ids:
-            interaction = interaction_registry.Registry.get_interaction_by_id(
-                interaction_id)
-            if interaction.is_linear:
-                count += 1
-
-        self.assertEqual(count, 1)
+    def test_linear_interaction_ids_list_matches_linear_interactions(self):
+        """Sanity-check the feconf constant which lists all linear interaction
+        IDs.
+        """
+        actual_linear_interaction_ids = self._get_linear_interaction_ids()
+        self.assertEqual(
+            actual_linear_interaction_ids, feconf.LINEAR_INTERACTION_IDS)

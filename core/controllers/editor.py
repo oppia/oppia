@@ -59,7 +59,6 @@ NEW_STATE_TEMPLATE = {
     }],
     'interaction': exp_domain.State.NULL_INTERACTION_DICT,
     'param_changes': [],
-    'unresolved_answers': {},
 }
 
 DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = config_domain.ConfigProperty(
@@ -277,9 +276,6 @@ class ExplorationHandler(EditorHandler):
         states = {}
         for state_name in exploration.states:
             state_dict = exploration.states[state_name].to_dict()
-            state_dict['unresolved_answers'] = (
-                stats_services.get_top_unresolved_answers_for_default_rule(
-                    exploration_id, state_name))
             states[state_name] = state_dict
         exp_user_data = user_models.ExplorationUserDataModel.get(
             self.user_id, exploration_id)
@@ -549,29 +545,9 @@ class ExplorationModeratorRightsHandler(EditorHandler):
         })
 
 
-class ResolvedAnswersHandler(EditorHandler):
-    """Allows learners' answers for a state to be marked as resolved."""
-
-    @require_editor
-    def put(self, exploration_id, state_name):
-        """Marks learners' answers as resolved."""
-        resolved_answers = self.payload.get('resolved_answers')
-
-        if not isinstance(resolved_answers, list):
-            raise self.InvalidInputException(
-                'Expected a list of resolved answers; received %s.' %
-                resolved_answers)
-
-        if 'resolved_answers' in self.payload:
-            event_services.DefaultRuleAnswerResolutionEventHandler.record(
-                exploration_id, state_name, resolved_answers)
-
-        self.render_json({})
-
-
 class UntrainedAnswersHandler(EditorHandler):
     """Returns answers that learners have submitted, but that Oppia hasn't been
-    explicitly trained to respond to be an exploration author.
+    explicitly trained to respond to by an exploration author.
     """
     NUMBER_OF_TOP_ANSWERS_PER_RULE = 50
 
@@ -609,10 +585,10 @@ class UntrainedAnswersHandler(EditorHandler):
         # The total number of possible answers is 100 because it requests the
         # top 50 answers matched to the default rule and the top 50 answers
         # matched to the classifier individually.
-        answers = stats_services.get_top_state_rule_answers(
+        submitted_answers = stats_services.get_top_state_rule_answers(
             exploration_id, state_name, [
-                exp_domain.DEFAULT_RULESPEC_STR,
-                exp_domain.CLASSIFIER_RULESPEC_STR])[
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION,
+                exp_domain.TRAINING_DATA_CLASSIFICATION])[
                     :self.NUMBER_OF_TOP_ANSWERS_PER_RULE]
 
         interaction = state.interaction
@@ -624,9 +600,9 @@ class UntrainedAnswersHandler(EditorHandler):
 
             try:
                 # Normalize the answers.
-                for answer in answers:
-                    answer['value'] = interaction_instance.normalize_answer(
-                        answer['value'])
+                for answer in submitted_answers:
+                    answer['answer'] = interaction_instance.normalize_answer(
+                        answer['answer'])
 
                 trained_answers = set()
                 for answer_group in interaction.answer_groups:
@@ -646,8 +622,8 @@ class UntrainedAnswersHandler(EditorHandler):
                     in interaction.confirmed_unclassified_answers))
 
                 unhandled_answers = [
-                    answer for answer in answers
-                    if answer['value'] not in trained_answers
+                    answer for answer in submitted_answers
+                    if answer['answer'] not in trained_answers
                 ]
             except Exception as e:
                 logging.warning(
@@ -830,7 +806,6 @@ class StateRulesStatsHandler(EditorHandler):
         """Handles GET requests."""
         try:
             exploration = exp_services.get_exploration_by_id(exploration_id)
-            current_version = exploration.version
         except:
             raise self.PageNotFoundException
 
@@ -841,10 +816,8 @@ class StateRulesStatsHandler(EditorHandler):
             raise self.PageNotFoundException
 
         self.render_json({
-            'rules_stats': stats_services.get_state_rules_stats(
-                exploration_id, state_name),
             'visualizations_info': stats_services.get_visualizations_info(
-                exploration_id, current_version, state_name),
+                exploration_id, state_name),
         })
 
 
