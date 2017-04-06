@@ -105,7 +105,12 @@
                   <img ng-src="<[subscription.creator_picture_data_url]>" class="oppia-subscription-card-profile-picture img-circle">
                   <span class="oppia-subscription-card-summary">
                     <div style="margin-bottom: 5px; font-size: 17.5px;">
-                      <strong class="protractor-test-subscription-name"><[subscription.creator_username| truncate:10]></strong>
+                      <strong class="protractor-test-subscription-name"
+                              popover-append-to-body
+                              popover-trigger="<[showUsernamePopover(subscription.creator_username)]>"
+                              ng-attr-popover="<[subscription.creator_username]>">
+                        <[subscription.creator_username| truncate:10]>
+                      </strong>
                     </div>
                     <div style="font-size: 14.5px;">
                       <span>Impact</span>
