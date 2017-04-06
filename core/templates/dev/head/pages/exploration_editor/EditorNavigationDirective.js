@@ -38,10 +38,15 @@ oppia.directive('editorNavigation', [function() {
         $scope.postTutorialHelpPopoverIsShown = false;
 
         $scope.$on('openPostTutorialHelpPopover', function() {
-          $scope.postTutorialHelpPopoverIsShown = true;
-          $timeout(function() {
+          if ($scope.isLargeScreen) {
+            $scope.postTutorialHelpPopoverIsShown = true;
+            $timeout(function() {
             $scope.postTutorialHelpPopoverIsShown = false;
-          }, 5000);
+              }, 5000);
+          }
+          else {
+          $scope.postTutorialHelpPopoverIsShown = false;
+          }
         });
 
         $scope.showUserHelpModal = function() {
