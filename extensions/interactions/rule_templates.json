@@ -67,6 +67,9 @@
   "FillInTheBlank": {
   },
   "LabelingInput": {
+    "IsInRegion": {
+      "description": "is in the region {{x|UnicodeString}}"
+    }
   },  
   "MathExpressionInput": {
     "IsMathematicallyEquivalentTo": {

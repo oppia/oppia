@@ -1,5 +1,5 @@
 <script src="{{cache_slug}}/extensions/interactions/LabelingInput/LabelingInput.js"></script>
-<script src="{{cache_slug}}/extensions/interactions/LabelingInput/validator.js"></script>
+<!-- <script src="{{cache_slug}}/extensions/interactions/LabelingInput/validator.js"></script> -->
 
 <script type="text/ng-template" id="interaction/LabelingInput">
   <style>
@@ -46,6 +46,20 @@
              background: rgba(0,0,255,0.5);
              z-index: 10;">
       </div>
+    </div>
+    <div ng-if="alwaysShowRegions">
+      <div ng-repeat="region in allRegions"
+          style="
+            height: <[getRegionDimensions($index).height]>px;
+             width: <[getRegionDimensions($index).width]>px;
+             left: <[getRegionDimensions($index).left]>px;
+             top: <[getRegionDimensions($index).top]>px;
+             pointer-events: none;
+             position: absolute;
+             display: <[getRegionDisplay(region.label)]>;
+             background: rgba(0,0,255,0.5);
+             z-index: 10;
+          "
     </div>
   </div>
 </script>

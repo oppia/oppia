@@ -37,6 +37,9 @@ oppia.directive('oppiaInteractiveLabelingInput', [
             $attrs.imageAndRegionsWithValue);
           $scope.highlightRegionsOnHover =
             ($attrs.highlightRegionsOnHoverWithValue === 'true');
+          $scope.alwaysShowRegions = 
+            ($attrs.alwaysShowRegionsWithValue === 'true');
+          if ($scope.alwaysShowRegions) {$scope.highlightRegionsOnHover = false;}
           $scope.filepath = imageAndRegions.imagePath;
           $scope.imageUrl = (
             $scope.filepath ?

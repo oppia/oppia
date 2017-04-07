@@ -17,7 +17,7 @@
 from extensions.interactions import base
 
 
-class ImageClickInput(base.BaseInteraction):
+class LabelingInput(base.BaseInteraction):
     """Interaction allowing labeling on an image."""
 
     name = 'Label the Picture'
@@ -31,16 +31,17 @@ class ImageClickInput(base.BaseInteraction):
     needs_summary = False
 
     _customization_arg_specs = [{
-        'name': 'imageAndRegions',
+        'name': 'imageAndLabels',
         'description': 'Image',
         'schema': {
             'type': 'custom',
-            'obj_type': 'ImageWithRegions',
+            'obj_type': 'ImageWithLabels',
         },
         'default_value': {
             'imagePath': '',
             'labeledRegions': []
         },
+        #TODO Change below to a radio button-esque format
     }, {
         'name': 'highlightRegionsOnHover',
         'description': 'Highlight regions when the learner hovers over them',
@@ -48,4 +49,11 @@ class ImageClickInput(base.BaseInteraction):
             'type': 'bool',
         },
         'default_value': False
+    }, {
+        'name': 'alwaysShowRegions',
+        'description': 'Always show the labeled regions (without labels)',
+        'schema': {
+            'type': 'bool',
+        },
+        'default_value': False    
     }]
