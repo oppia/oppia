@@ -19,11 +19,11 @@
 oppia.factory('SearchExplorationsBackendApiService', [
     '$http', 'alertsService', 'UrlInterpolationService', '$q',
     function($http, alertsService, UrlInterpolationService, $q) {
+      var SEARCH_EXPLORATION_URL_TEMPLATE = (
+        '/exploration/metadata_search?q=<query>');
 
-    var SEARCH_EXPLORATION_URL_TEMPLATE = (
-      '/exploration/metadata_search?q=<query>');
-
-    var _getExplorations = function(searchQuery, successCallback, errorCallback) {
+      var _getExplorations = function(
+        searchQuery, successCallback, errorCallback) {
         queryUrl = UrlInterpolationService.interpolateUrl(
           SEARCH_EXPLORATION_URL_TEMPLATE, {
             query: searchQuery
@@ -38,12 +38,12 @@ oppia.factory('SearchExplorationsBackendApiService', [
             errorCallback(errorResponse.data);
           }
         });
-    };
-    return {
-      getExplorations: function(searchQuery) {
-        return $q(function(resolve, reject) {
-          _getExplorations(searchQuery, resolve, reject);
-      });
-    },
-    };
-}]);
+      };
+      return {
+        getExplorations: function(searchQuery) {
+          return $q(function(resolve, reject) {
+            _getExplorations(searchQuery, resolve, reject);
+          });
+        }
+      };
+    }]);

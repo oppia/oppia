@@ -25,15 +25,13 @@ oppia.directive('collectionNodeCreator', [function() {
       'validatorsService', 'CollectionEditorStateService',
       'CollectionLinearizerService', 'CollectionUpdateService',
       'CollectionNodeObjectFactory', 'ExplorationSummaryBackendApiService',
-      'SearchExplorationsBackendApiService','siteAnalyticsService',
-      'UrlInterpolationService',
+      'SearchExplorationsBackendApiService', 'siteAnalyticsService',
       function(
           $scope, $http, $window, $filter, alertsService,
           validatorsService, CollectionEditorStateService,
           CollectionLinearizerService, CollectionUpdateService,
           CollectionNodeObjectFactory, ExplorationSummaryBackendApiService,
-          SearchExplorationsBackendApiService, siteAnalyticsService,
-          UrlInterpolationService) {
+          SearchExplorationsBackendApiService, siteAnalyticsService) {
         $scope.collection = CollectionEditorStateService.getCollection();
         $scope.newExplorationId = '';
         $scope.newExplorationTitle = '';
@@ -41,14 +39,16 @@ oppia.directive('collectionNodeCreator', [function() {
 
         $scope.fetchExplorationsMetadata = function(searchQuery) {
           if (/^[a-zA-Z0-9- ]*$/.test(searchQuery)) {
-            return SearchExplorationsBackendApiService.getExplorations(searchQuery).then(
+            return SearchExplorationsBackendApiService.getExplorations(
+              searchQuery).then(
             function(explorationMetadataObject) {
               return explorationMetadataObject.map(function(item) {
-                  return '(#' + item.id + ') ' + item.title;
+                return '(#' + item.id + ') ' + item.title;
               });
             },
-            function(error) {
-              alertsService.addWarning('There was an error when searching the explorations.');
+            function() {
+              alertsService.addWarning(
+                'There was an error when searching the explorations.');
             });
           }
         };
