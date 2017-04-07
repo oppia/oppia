@@ -309,6 +309,15 @@ oppia.controller('StateInteraction', [
       }
     };
 
+    $scope.heightWatcher = function() {
+      var elementHeight = angular.element('#editorCard').height();
+      if (elementHeight >= 690) {
+        return true;
+      } else {
+        return false;
+      }
+    };
+
     $scope.deleteInteraction = function() {
       alertsService.clearWarnings();
       $modal.open({
@@ -411,5 +420,12 @@ oppia.directive('testInteractionPanel', [function() {
         };
       }
     ]
+  };
+}]);
+
+oppia.directive('heightGuide', [function() {
+  return {
+    restrict: 'E',
+    templateUrl: 'notify/heightGuide'
   };
 }]);
