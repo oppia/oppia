@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,11 +17,11 @@
  */
 
 oppia.factory('SearchExplorationsBackendApiService', [
-    '$http', 'alertsService', 'UrlInterpolationService', '$q',
-    function($http, alertsService, UrlInterpolationService, $q) {
-      var SEARCH_EXPLORATION_URL_TEMPLATE = (
-        '/exploration/metadata_search?q=<query>');
-
+    '$http', 'alertsService', 'SEARCH_EXPLORATION_URL_TEMPLATE',
+    'UrlInterpolationService', '$q',
+    function(
+        $http, alertsService, SEARCH_EXPLORATION_URL_TEMPLATE,
+        UrlInterpolationService, $q) {
       var _getExplorations = function(
         searchQuery, successCallback, errorCallback) {
         queryUrl = UrlInterpolationService.interpolateUrl(
@@ -31,7 +31,7 @@ oppia.factory('SearchExplorationsBackendApiService', [
         );
         $http.get(queryUrl).then(function(response) {
           if (successCallback) {
-            successCallback(response.data.collection_node_metadata_list);
+            successCallback(response.data);
           }
         }, function(errorResponse) {
           if (errorCallback) {

@@ -4413,3 +4413,7 @@ md-card.preview-conversation-skin-supplemental-card {
   right: -25px;
   top: 175px;
 }
+
+.collection-editor-exp-search {
+  width: 210px !important;
+}

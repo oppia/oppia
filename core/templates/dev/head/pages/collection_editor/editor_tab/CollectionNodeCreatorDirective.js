@@ -42,7 +42,8 @@ oppia.directive('collectionNodeCreator', [function() {
             return SearchExplorationsBackendApiService.getExplorations(
               searchQuery).then(
             function(explorationMetadataObject) {
-              return explorationMetadataObject.map(function(item) {
+              return explorationMetadataObject.collection_node_metadata_list.
+                map(function(item) {
                 return '(#' + item.id + ') ' + item.title;
               });
             },
