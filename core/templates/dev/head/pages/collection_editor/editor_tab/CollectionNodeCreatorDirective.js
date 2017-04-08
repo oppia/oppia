@@ -44,8 +44,8 @@ oppia.directive('collectionNodeCreator', [function() {
             function(explorationMetadataObject) {
               return explorationMetadataObject.collection_node_metadata_list.
                 map(function(item) {
-                return '(#' + item.id + ') ' + item.title;
-              });
+                  return '(#' + item.id + ') ' + item.title;
+                });
             },
             function() {
               alertsService.addWarning(
