@@ -399,14 +399,16 @@ class ClassifyHandler(base.BaseHandler):
         """Handle POST requests.
 
         Args:
-            unused_exploration_id: this str ID is just used by the require_playable decorator.
+            unused_exploration_id: this str ID is just used by the
+                                   require_playable decorator.
 
         Returns:
-            The corresponding classification result, which is a dict containing three keys:
-                'outcome': A dict representing the outcome of the answer group matched.
+            A classification result, which is a dict containing three keys:
+                'outcome': A dict representing the outcome of the answer group
+                           matched.
                 'answer_group_index': The index of the matched answer group.
-                'rule_spec_index': The index of the matched rule spec in the matched
-                                answer group.
+                'rule_spec_index': The index of the matched rule spec in the
+                                    matched answer group.
         """
         # A domain object representing the old state.
         old_state = exp_domain.State.from_dict(self.payload.get('old_state'))
@@ -430,7 +432,8 @@ class ReaderFeedbackHandler(base.BaseHandler):
         Handles POST requests.
 
         Args:
-            exploration_id: The str ID of the exploration the learner wants to submit feedback.
+            exploration_id: The str ID of the exploration the learner wants
+                            to submit feedback.
 
         Returns:
             thread_id of the feedback.
@@ -461,7 +464,8 @@ class ExplorationStartEventHandler(base.BaseHandler):
         Handles POST requests.
 
         Args:
-            exploration_id: The str ID of the exploration the learner wants to start exploring.
+            exploration_id: The str ID of the exploration the learner wants to
+                            start exploring.
         """
         event_services.StartExplorationEventHandler.record(
             exploration_id, self.payload.get('version'),
@@ -484,7 +488,8 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
         """
         Handles POST requests.
         Args:
-            exploration_id: The str ID of the exploration the learner is finishing.
+            exploration_id: The str ID of the exploration the learner is
+                            finishing.
         """
 
         # This will be None if the exploration is not being played within the
@@ -519,7 +524,8 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
         """
         Handles POST requests.
         Args:
-            exploration_id: The str ID of the exploration the learner is leaving without finishing.
+            exploration_id: The str ID of the exploration the learner is
+                            leaving without finishing.
 
         """
         event_services.MaybeLeaveExplorationEventHandler.record(
@@ -548,7 +554,8 @@ class RatingHandler(base.BaseHandler):
         Handles GET requests.
 
         Args:
-            exploration_id: The str ID of the exploration the learner wants get the rating.
+            exploration_id: The str ID of the exploration the learner wants
+                            get the rating.
 
         Returns:
             A response with current overall_ratings and user_rating.
@@ -572,7 +579,8 @@ class RatingHandler(base.BaseHandler):
         with the current session.
 
         Args:
-            exploration_id: The str ID of the exploration the learner wants to rate.
+            exploration_id: The str ID of the exploration the learner wants to
+                            rate.
         """
         user_rating = self.payload.get('user_rating')
         rating_services.assign_rating_to_exploration(
@@ -596,7 +604,8 @@ class RecommendationsHandler(base.BaseHandler):
         """
         Handles GET requests.
         Args:
-            exploration_id: The str ID of the exploration the learner wants to get other recommendations.
+            exploration_id: The str ID of the exploration the learner wants
+                            to get other recommendations.
         Returns:
             A response with 'summaries' which is a dictionary key
             of author and auto recommendations explorations id values.
@@ -656,10 +665,11 @@ class FlagExplorationHandler(base.BaseHandler):
     def post(self, exploration_id):
         """
         Handles POST requests.
-        base.require_user decorator ensure that the current learner is associated
-        with the current session.
+        base.require_user decorator ensure that the current learner is
+        associated with the current session.
         Args:
-            exploration_id: The str ID of the exploration the learner wants to flag.
+            exploration_id: The str ID of the exploration the learner
+                            wants to flag.
 
         """
         moderator_services.enqueue_flag_exploration_email_task(
