@@ -29,11 +29,11 @@ class Registry(object):
     _classifier_instances = {}
 
     @classmethod
-    def get_all_classifier_ids(cls):
-        """Retrieves a list of all classifier IDs.
+    def get_all_classifier_algorithm_ids(cls):
+        """Retrieves a list of all classifier algorithm IDs.
 
         Returns:
-            A list containing all the classifier IDs.
+            A list containing all the classifier algorithm IDs.
         """
         return [classifier_id
                 for classifier_id in feconf.ANSWER_CLASSIFIER_CLASS_IDS]
@@ -45,7 +45,7 @@ class Registry(object):
         """
         cls._classifier_instances.clear()
 
-        all_classifier_ids = cls.get_all_classifier_ids()
+        all_classifier_ids = cls.get_all_classifier_algorithm_ids()
 
         # Assemble all paths to the classifiers.
         extension_paths = [
@@ -75,14 +75,14 @@ class Registry(object):
         return cls._classifier_instances.values()
 
     @classmethod
-    def get_classifier_by_id(cls, classifier_id):
-        """Retrieves a classifier instance by its id.
+    def get_classifier_by_algorithm_id(cls, classifier_algorithm_id):
+        """Retrieves a classifier instance by its algorithm id.
 
         Refreshes once if the classifier is not found; subsequently, throws a
         KeyError.
 
         Args:
-            classifier_id: str. The ID of the classifier.
+            classifier_algorithm_id: str. The ID of the classifier algorithm.
 
         Raises:
             KeyError: If the classifier is not found the first time.
@@ -90,6 +90,6 @@ class Registry(object):
         Returns:
             An instance of the classifier.
         """
-        if classifier_id not in cls._classifier_instances:
+        if classifier_algorithm_id not in cls._classifier_instances:
             cls._refresh()
-        return cls._classifier_instances[classifier_id]
+        return cls._classifier_instances[classifier_algorithm_id]

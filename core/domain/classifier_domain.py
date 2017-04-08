@@ -162,6 +162,7 @@ class Classifier(object):
             raise utils.ValidationError(
                 'Expected cached_classifier_data to be a dict, received %s' %(
                     self.cached_classifier_data))
-        classifier_class = classifier_registry.Registry.get_classifier_by_id(
-            self.algorithm_id)
+        classifier_class = (
+            classifier_registry.Registry.get_classifier_by_algorithm_id(
+                self.algorithm_id))
         classifier_class.validate(self.cached_classifier_data)

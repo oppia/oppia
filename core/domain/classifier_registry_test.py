@@ -21,12 +21,12 @@ from core.tests import test_utils
 class ClassifierRegistryTest(test_utils.GenericTestBase):
     """Test the classifier registry class."""
 
-    def test_get_all_classifier_ids(self):
+    def test_get_all_classifier_algorithm_ids(self):
         expected_algorithm_ids = [
             'LDAStringClassifier'
         ]
         algorithm_ids = (
-            classifier_registry.Registry.get_all_classifier_ids())
+            classifier_registry.Registry.get_all_classifier_algorithm_ids())
         self.assertItemsEqual(expected_algorithm_ids, algorithm_ids)
 
     def test_get_all_classifiers(self):
