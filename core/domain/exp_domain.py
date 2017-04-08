@@ -100,7 +100,7 @@ DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome'
 # This represents the stringified version of a rule which uses statistical
 # classification for evaluation. Answers which are matched to rules with this
 # rulespec will be stored with the STATISTICAL_CLASSIFICATION category.
-CLASSIFIER_RULESPEC_STR = 'FuzzyMatches'
+RULE_TYPE_CLASSIFIER = 'FuzzyMatches'
 
 
 def _get_full_customization_args(customization_args, ca_specs):

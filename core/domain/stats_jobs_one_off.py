@@ -1315,7 +1315,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         The individual elements of the dict are also permuted in case they are
         out of order.
         """
-        if rule_spec.rule_type == exp_domain.CLASSIFIER_RULESPEC_STR:
+        if rule_spec.rule_type == exp_domain.RULE_TYPE_CLASSIFIER:
             yield rule_spec.rule_type
         else:
             rule_spec_inputs = rule_spec.inputs.values()

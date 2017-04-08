@@ -19,7 +19,6 @@
 import inspect
 
 from core import jobs_registry
-from core.domain import exp_services
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.platform import models
