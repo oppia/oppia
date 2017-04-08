@@ -574,6 +574,15 @@ oppia.factory('explorationPropertyService', [
   function($rootScope, $log, changeListService, alertsService) {
     // Public base API for data services corresponding to exploration properties
     // (title, category, etc.)
+
+    var BACKEND_CONVERSIONS = {
+      'param_changes': function(paramChanges) {
+        return paramChanges.map(function(paramChange) {
+          return paramChange.toBackendDict();
+        });
+      }
+    }
+
     return {
       init: function(value) {
         if (this.propertyName === null) {
@@ -628,8 +637,19 @@ oppia.factory('explorationPropertyService', [
         }
 
         alertsService.clearWarnings();
+
+        var newBackendValue = angular.copy(this.displayed);
+        var oldBackendValue = angular.copy(this.savedMemento);
+        
+        if (BACKEND_CONVERSIONS.hasOwnProperty(this.propertyName)) {
+          newBackendValue =
+            BACKEND_CONVERSIONS[this.propertyName](this.displayed);
+          oldBackendValue =
+            BACKEND_CONVERSIONS[this.propertyName](this.savedMemento);
+        }
+
         changeListService.editExplorationProperty(
-          this.propertyName, this.displayed, this.savedMemento);
+          this.propertyName, newBackendValue, oldBackendValue);
         this.savedMemento = angular.copy(this.displayed);
 
         $rootScope.$broadcast('explorationPropertyChanged');
@@ -776,11 +796,11 @@ oppia.factory('explorationParamChangesService', [
   'explorationPropertyService', function(explorationPropertyService) {
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'param_changes';
-    child._normalize = function(paramChanges) {
-      return paramChanges.map(function(paramChange) {
-        return paramChange.toBackendDict();
-      });
-    };
+    // child._normalize = function(paramChanges) {
+    //   return paramChanges.map(function(paramChange) {
+    //     return paramChange.toBackendDict();
+    //   });
+    // };
     return child;
   }
 ]);
