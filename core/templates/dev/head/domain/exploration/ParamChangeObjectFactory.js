@@ -23,7 +23,7 @@ oppia.factory('ParamChangeObjectFactory', [function() {
     this.generatorId = generatorId;
     this.name = name;
   };
-  
+
   var DEFAULT_CUSTOMIZATION_ARGS = {
     Copier: {
       parse_with_jinja: true,
