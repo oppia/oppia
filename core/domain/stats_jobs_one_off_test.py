@@ -351,7 +351,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                     'dest': 'End',
                     'feedback': ['Yes'],
                     'param_changes': []
-                }
+                },
+                'correct': False,
             }],
             'old_value': [
                 answer_group.to_dict()
@@ -590,7 +591,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self._verify_no_migration_validation_problems()
 
         unique_submitted_answer_strs = set([
-            state_answer.normalized_answer
+            state_answer.answer
             for state_answer in state_answers.submitted_answer_list])
         for i in xrange(100):
             self.assertIn('Plate%d' % i, unique_submitted_answer_strs)
@@ -631,7 +632,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self._verify_no_migration_validation_problems()
 
         unique_submitted_answer_strs = set([
-            state_answer.normalized_answer
+            state_answer.answer
             for state_answer in state_answers.submitted_answer_list])
         for i in xrange(101):
             self.assertIn('Plate%d' % i, unique_submitted_answer_strs)
@@ -672,7 +673,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self._verify_no_migration_validation_problems()
 
         unique_submitted_answer_strs = set([
-            state_answer.normalized_answer
+            state_answer.answer
             for state_answer in state_answers.submitted_answer_list])
         for i in xrange(200):
             self.assertIn('Plate%d' % i, unique_submitted_answer_strs)
@@ -713,7 +714,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self._verify_no_migration_validation_problems()
 
         unique_submitted_answer_strs = set([
-            state_answer.normalized_answer
+            state_answer.answer
             for state_answer in state_answers.submitted_answer_list])
         for i in xrange(201):
             self.assertIn('Plate%d' % i, unique_submitted_answer_strs)
@@ -762,7 +763,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                     'dest': 'End',
                     'feedback': ['Yes'],
                     'param_changes': []
-                }
+                },
+                'correct': False,
             }],
             'old_value': [
                 answer_group.to_dict()
@@ -807,7 +809,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                     'dest': 'End',
                     'feedback': ['Yes'],
                     'param_changes': []
-                }
+                },
+                'correct': False,
             }],
             'old_value': [
                 answer_group.to_dict()
@@ -966,7 +969,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                     'dest': state_name,
                     'feedback': [],
                     'param_changes': []
-                }
+                },
+                'correct': False,
             }]
         }], 'Create initial text input state')
 
@@ -1086,7 +1090,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                     'dest': state_name,
                     'feedback': [],
                     'param_changes': []
-                }
+                },
+                'correct': False,
             }, {
                 'rule_specs': [{
                     'rule_type': 'Equals',
@@ -1098,7 +1103,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                     'dest': state_name,
                     'feedback': [],
                     'param_changes': []
-                }
+                },
+                'correct': False,
             }]
         }, {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -1218,7 +1224,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                     'dest': state_name,
                     'feedback': [],
                     'param_changes': []
-                }
+                },
+                'correct': False,
             }]
         }], 'Create initial text input state')
 
@@ -1583,7 +1590,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                     'dest': state_name,
                     'feedback': [],
                     'param_changes': []
-                }
+                },
+                'correct': False,
             }]
         }], 'Create initial text input state')
 
@@ -1618,7 +1626,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                     'dest': state_name,
                     'feedback': [],
                     'param_changes': []
-                }
+                },
+                'correct': False,
             }]
         }], 'Change to TextInput')
 
@@ -1692,7 +1701,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                     'dest': state_name,
                     'feedback': [],
                     'param_changes': []
-                }
+                },
+                'correct': False,
             }]
         }], 'Create initial text input state')
 
@@ -1766,7 +1776,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                     'dest': state_name,
                     'feedback': [],
                     'param_changes': []
-                }
+                },
+                'correct': False,
             }]
         }], 'Create initial text input state')
 
@@ -1796,7 +1807,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                     'dest': state_name,
                     'feedback': [],
                     'param_changes': []
-                }
+                },
+                'correct': False,
             }]
         }], 'Change to TextInput')
 
@@ -2071,10 +2083,10 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         first_submitted_answer = next(
             submitted_answer
             for submitted_answer in state_answers.submitted_answer_list
-            if submitted_answer.normalized_answer == 'Plate000')
+            if submitted_answer.answer == 'Plate000')
 
         unique_submitted_answer_strs = set([
-            submitted_answer.normalized_answer
+            submitted_answer.answer
             for submitted_answer in state_answers.submitted_answer_list])
         # Do not verify the answers above 100 since it's essentially random
         # which of Plate100-Plate149 was migrated.
@@ -2157,10 +2169,10 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         first_submitted_answer = next(
             submitted_answer
             for submitted_answer in state_answers.submitted_answer_list
-            if submitted_answer.normalized_answer == 'Plate000')
+            if submitted_answer.answer == 'Plate000')
 
         unique_submitted_answer_strs = set([
-            state_answer.normalized_answer
+            state_answer.answer
             for state_answer in state_answers.submitted_answer_list])
         for i in xrange(150):
             if i < 10:
@@ -2174,7 +2186,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         first_submitted_answer = next(
             submitted_answer
             for submitted_answer in state_answers.submitted_answer_list
-            if submitted_answer.normalized_answer == 'Plate000')
+            if submitted_answer.answer == 'Plate000')
 
         # Verify the answer dicts no longer have large_bucket_entity_id entries.
         first_submitted_answer_dict = first_submitted_answer.to_dict()
@@ -2621,7 +2633,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                     'dest': 'End',
                     'feedback': ['Yes'],
                     'param_changes': []
-                }
+                },
+                'correct': False,
             }]
         }, {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -2910,7 +2923,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                     'dest': 'End',
                     'feedback': ['Yes'],
                     'param_changes': []
-                }
+                },
+                'correct': False,
             }]
         }, {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -3205,7 +3219,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                     'dest': 'End',
                     'feedback': ['Yes'],
                     'param_changes': []
-                }
+                },
+                'correct': False,
             }]
         }], 'Initialize pencil code exploration')
 
@@ -3681,7 +3696,8 @@ class PurgeInconsistentAnswersJobTests(test_utils.GenericTestBase):
                     'dest': state_name,
                     'feedback': [],
                     'param_changes': []
-                }
+                },
+                'correct': False,
             }]
         }], 'Create initial text input state')
 
@@ -3735,7 +3751,8 @@ class PurgeInconsistentAnswersJobTests(test_utils.GenericTestBase):
                     'dest': feconf.DEFAULT_INIT_STATE_NAME,
                     'feedback': [],
                     'param_changes': []
-                }
+                },
+                'correct': False,
             }]
         }], 'Create initial text input state')
 

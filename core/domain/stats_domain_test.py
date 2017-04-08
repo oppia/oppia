@@ -121,18 +121,6 @@ class StateAnswersValidationTests(test_utils.GenericTestBase):
         self.state_answers.schema_version = 1
         self.state_answers.validate()
 
-    def test_state_answers_chains_validation_of_submitted_answers(self):
-        submitted_answer = stats_domain.SubmittedAnswer(
-            'Text', 'TextInput', 0, 0, exp_domain.EXPLICIT_CLASSIFICATION, {},
-            'session_id', 0.)
-        self.state_answers.submitted_answer_list = [submitted_answer]
-        chained_validation = [False]
-        def _validate_spy():
-            chained_validation[0] = True
-        with self.swap(submitted_answer, 'validate', _validate_spy):
-            self.state_answers.validate()
-        self.assertTrue(chained_validation[0])
-
 
 class SubmittedAnswerTests(test_utils.GenericTestBase):
     """Tests the SubmittedAnswer domain object."""
@@ -181,7 +169,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
             'time_spent_in_sec': 10.5
         })
 
-    def test_requires_normalized_answer_to_be_created_from_dict(self):
+    def test_requires_answer_to_be_created_from_dict(self):
         with self.assertRaisesRegexp(KeyError, 'answer'):
             stats_domain.SubmittedAnswer.from_dict({
                 'interaction_id': 'TextInput',
@@ -298,7 +286,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
             'rule_spec_str': 'rule spec str',
             'answer_str': 'answer str'
         })
-        self.assertEqual(submitted_answer.normalized_answer, 'Text')
+        self.assertEqual(submitted_answer.answer, 'Text')
         self.assertEqual(submitted_answer.interaction_id, 'TextInput')
         self.assertEqual(submitted_answer.answer_group_index, 0)
         self.assertEqual(submitted_answer.rule_spec_index, 1)
@@ -323,7 +311,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
             'session_id': 'sess',
             'time_spent_in_sec': 10.5
         })
-        self.assertEqual(submitted_answer.normalized_answer, 'Text')
+        self.assertEqual(submitted_answer.answer, 'Text')
         self.assertEqual(submitted_answer.interaction_id, 'TextInput')
         self.assertEqual(submitted_answer.answer_group_index, 0)
         self.assertEqual(submitted_answer.rule_spec_index, 1)
@@ -349,14 +337,13 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
         # The canonical object should have no validation problems
         self.submitted_answer.validate()
 
-    def test_normalized_answer_may_be_none_only_for_continue_interaction(self):
-        # It's valid for normalized_answer to be None if the interaction type is
-        # Continue.
-        self.submitted_answer.normalized_answer = None
+    def test_answer_may_be_none_only_for_linear_interaction(self):
+        # It's valid for answer to be None if the interaction type is Continue.
+        self.submitted_answer.answer = None
         self._assert_validation_error(
             self.submitted_answer,
-            'SubmittedAnswers must have a provided normalized_answer except '
-            'for Continue interactions')
+            'SubmittedAnswers must have a provided answer except for linear '
+            'interactions')
 
         self.submitted_answer.interaction_id = 'Continue'
         self.submitted_answer.validate()

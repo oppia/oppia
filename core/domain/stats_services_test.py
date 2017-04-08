@@ -106,6 +106,9 @@ class AnswerEventTests(test_utils.GenericTestBase):
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': second_state_name,
         }, {
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': third_state_name,
+        }, {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': second_state_name,
             'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
@@ -197,13 +200,13 @@ class AnswerEventTests(test_utils.GenericTestBase):
             'interaction_id': 'TextInput', 'params': {}
         }, {
             'answer': self.UNICODE_TEST_STRING, 'time_spent_in_sec': 5.0,
-            'answer_group_index': 0, 'rule_spec_index': 0,
+            'answer_group_index': 1, 'rule_spec_index': 1,
             'classification_categorization': 'explicit', 'session_id': 'sid4',
             'interaction_id': 'TextInput', 'params': {}
         }]
         expected_submitted_answer_list3 = [{
-            'answer': None, 'time_spent_in_sec': 5.0, 'answer_group_index': 0,
-            'rule_spec_index': 0, 'classification_categorization': 'explicit',
+            'answer': None, 'time_spent_in_sec': 5.0, 'answer_group_index': 1,
+            'rule_spec_index': 1, 'classification_categorization': 'explicit',
             'session_id': 'sid5', 'interaction_id': 'Continue', 'params': {}
         }]
 
@@ -415,45 +418,54 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         }])
 
     def test_record_answers_exceeding_one_shard(self):
-        state_answers = stats_services.get_state_answers(
-            self.EXP_ID, self.exploration.version,
-            self.exploration.init_state_name)
-        self.assertIsNone(state_answers)
+        # Use a smaller max answer list size so less answers are needed to
+        # exceed a shard.
+        with self.swap(
+            stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE',
+            100000):
+            state_answers = stats_services.get_state_answers(
+                self.EXP_ID, self.exploration.version,
+                self.exploration.init_state_name)
+            self.assertIsNone(state_answers)
 
-        submitted_answer_list = [
-            stats_domain.SubmittedAnswer(
-                'answer a', 'TextInput', 0, 1,
-                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 10.0),
-            stats_domain.SubmittedAnswer(
-                'answer ccc', 'TextInput', 1, 1,
-                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 3.0),
-            stats_domain.SubmittedAnswer(
-                'answer bbbbb', 'TextInput', 1, 0,
-                exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v', 7.5),
-        ]
-        stats_services.record_answers(
-            self.EXP_ID, self.exploration.version,
-            self.exploration.init_state_name, 'TextInput',
-            submitted_answer_list * 200)
+            submitted_answer_list = [
+                stats_domain.SubmittedAnswer(
+                    'answer a', 'TextInput', 0, 1,
+                    exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v',
+                    10.0),
+                stats_domain.SubmittedAnswer(
+                    'answer ccc', 'TextInput', 1, 1,
+                    exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v',
+                    3.0),
+                stats_domain.SubmittedAnswer(
+                    'answer bbbbb', 'TextInput', 1, 0,
+                    exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v',
+                    7.5),
+            ]
+            stats_services.record_answers(
+                self.EXP_ID, self.exploration.version,
+                self.exploration.init_state_name, 'TextInput',
+                submitted_answer_list * 200)
 
-        # Verify more than 1 shard was stored. The index shard (shard_id 0) is
-        # not included in the shard count.
-        model = stats_models.StateAnswersModel.get('%s:%s:%s:%s' % (
-            self.exploration.id, str(self.exploration.version),
-            self.exploration.init_state_name, '0'))
-        self.assertEqual(model.shard_count, 1)
+            # Verify more than 1 shard was stored. The index shard (shard_id 0)
+            # is not included in the shard count.
+            model = stats_models.StateAnswersModel.get('%s:%s:%s:%s' % (
+                self.exploration.id, str(self.exploration.version),
+                self.exploration.init_state_name, '0'))
+            self.assertEqual(model.shard_count, 1)
 
-        # The order of the answers returned depends on the size of the answers.
-        state_answers = stats_services.get_state_answers(
-            self.EXP_ID, self.exploration.version,
-            self.exploration.init_state_name)
-        self.assertEqual(state_answers.exploration_id, 'exp_id0')
-        self.assertEqual(state_answers.exploration_version, 1)
-        self.assertEqual(
-            state_answers.state_name, feconf.DEFAULT_INIT_STATE_NAME)
-        self.assertEqual(state_answers.interaction_id, 'TextInput')
-        self.assertEqual(
-            len(state_answers.get_submitted_answer_dict_list()), 600)
+            # The order of the answers returned depends on the size of the
+            # answers.
+            state_answers = stats_services.get_state_answers(
+                self.EXP_ID, self.exploration.version,
+                self.exploration.init_state_name)
+            self.assertEqual(state_answers.exploration_id, 'exp_id0')
+            self.assertEqual(state_answers.exploration_version, 1)
+            self.assertEqual(
+                state_answers.state_name, feconf.DEFAULT_INIT_STATE_NAME)
+            self.assertEqual(state_answers.interaction_id, 'TextInput')
+            self.assertEqual(
+                len(state_answers.get_submitted_answer_dict_list()), 600)
 
     def test_record_many_answers_with_preexisting_entry(self):
         stats_services.record_answer(

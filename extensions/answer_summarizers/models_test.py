@@ -443,10 +443,10 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
                 'answer': 'Stats C',
                 'frequency': 2
             }, {
-                'answer': 'Trained data B',
+                'answer': 'Stats B',
                 'frequency': 1
             }, {
-                'answer': 'Stats B',
+                'answer': 'Trained data B',
                 'frequency': 1
             }],
             'default_outcome': [{

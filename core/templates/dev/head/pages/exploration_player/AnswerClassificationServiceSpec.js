@@ -245,6 +245,9 @@ describe('Answer classification service with string classifier enabled',
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
+    var EXPLICIT_CLASSIFICATION = 'explicit';
+    var DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome';
+
     var acs, sof, oof, $httpBackend, successHandler, failHandler, $rootScope,
       state, state2;
     beforeEach(inject(function($injector) {
@@ -366,7 +369,8 @@ describe('Answer classification service with string classifier enabled',
       expect(successHandler).toHaveBeenCalledWith({
         outcome: oof.createNew('default', [], []),
         answerGroupIndex: 2,
-        ruleIndex: 0
+        ruleIndex: 0,
+        classificationCategorization: DEFAULT_OUTCOME_CLASSIFICATION
       });
       expect(failHandler).not.toHaveBeenCalled();
     });

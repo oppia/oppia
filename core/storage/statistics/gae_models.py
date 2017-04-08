@@ -794,7 +794,8 @@ class StateAnswersModel(base_models.BaseModel):
         new_answer_size_list = [
             (answer_dict, cls._get_answer_dict_size(answer_dict))
             for answer_dict in new_answer_list]
-        new_answer_list_sorted = sorted(new_answer_size_list, lambda x: x[1])
+        new_answer_list_sorted = sorted(
+            new_answer_size_list, key=lambda x: x[1])
         # NOTE TO DEVELOPERS: this list cast is needed because the nested list
         # is appended to later in this function and the list passed into here
         # may be a reference to an answer list stored within a model class.
