@@ -11,6 +11,8 @@
                 <input id="explorationTitle" type="text" class="form-control protractor-test-exploration-title-input" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()" placeholder="Choose a title for your exploration." focus-on="<[::EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>" maxlength="40">
                 <span class="help-block" style="font-size: smaller">
                   <em>Please use at most 40 characters, so that this fits in the summary card.</em>
+                  <span ng-if="explorationTitleService.displayed.length > 0"><[ "Characters used: " +  (explorationTitleService.displayed.length) + "/40" ]>
+                  </span>
                 </span>
               </div>
             </div>
@@ -20,11 +22,11 @@
                 <input id="explorationObjective" type="text"
                        class="form-control protractor-test-exploration-objective-input"
                        ng-model="explorationObjectiveService.displayed"
-                       ng-blur="saveExplorationObjective()" placeholder="What does this exploration help people to do? " data-ng-trim="false">
+                       ng-blur="saveExplorationObjective()" placeholder="Learn how to..." data-ng-trim="false">
                 <span class="help-block" style="font-size: smaller">
-                    <span ng-if="!explorationObjectiveService.displayed || explorationObjectiveService.displayed.length">Please provide a complete, descriptive sentence.
+                    <span ng-if="!explorationObjectiveService.displayed || explorationObjectiveService.displayed.length"> In a complete sentence, tell people what they'll learn from this exploration.
                     </span>
-                    <span ng-if="explorationObjectiveService.displayed.length > 0"><[ "Characters remaining: " +  (explorationObjectiveService.displayed.length) + "/100" ]>
+                    <span ng-if="explorationObjectiveService.displayed.length > 0"><[ "Characters used: " +  (explorationObjectiveService.displayed.length) + "/100" ]>
                     </span>
                 </span>
               </div>
