@@ -1046,6 +1046,26 @@ class AnswerMigrationCleanupJob(jobs.BaseMapReduceJobManager):
         yield '%s: %d' % (key, len(stringified_values))
 
 
+class RefreshInteractionRegistryJob(jobs.BaseMapReduceJobManager):
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    # pylint: disable=unused-argument
+    @staticmethod
+    def map(item):
+        yield ('key', 'value')
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        # pylint: disable=protected-access
+        interaction_registry.Registry._refresh()
+        # pylint: enable=protected-access
+        yield 'Refreshed interaction registry.'
+    # pylint: enable=unused-argument
+
+
 class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     """This job is responsible for migrating all answers stored within
     stats_models.StateRuleAnswerLogModel to stats_models.StateAnswersModel
