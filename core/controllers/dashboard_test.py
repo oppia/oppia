@@ -465,9 +465,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
 
     def test_no_explorations_and_visit_dashboard(self):
         self.login(self.OWNER_EMAIL)
-        response = self.get_json(feconf.DASHBOARD_DATA_URL)
-        self.assertEqual(response['explorations_list'],[])
-
+        
         # Testing that creator only visit dashboard without any exploration created
         response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']),0)
