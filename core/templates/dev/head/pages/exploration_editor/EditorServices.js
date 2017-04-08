@@ -576,7 +576,7 @@ oppia.factory('explorationPropertyService', [
     // (title, category, etc.)
 
     var BACKEND_CONVERSIONS = {
-      'param_changes': function(paramChanges) {
+      param_changes: function(paramChanges) {
         return paramChanges.map(function(paramChange) {
           return paramChange.toBackendDict();
         });
@@ -640,7 +640,7 @@ oppia.factory('explorationPropertyService', [
 
         var newBackendValue = angular.copy(this.displayed);
         var oldBackendValue = angular.copy(this.savedMemento);
-        
+
         if (BACKEND_CONVERSIONS.hasOwnProperty(this.propertyName)) {
           newBackendValue =
             BACKEND_CONVERSIONS[this.propertyName](this.displayed);
