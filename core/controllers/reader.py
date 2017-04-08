@@ -61,7 +61,8 @@ def require_playable(handler):
             kwargs: Any other keyworded args.
 
         Returns:
-            either None if exploration_id is in disabled ids or a handler instance with updated args
+            either None if exploration_id is in disabled ids or
+            a handler instance with updated args.
         Raises:
             PageNotFound if user is not logged in.
         """
@@ -91,7 +92,8 @@ def require_playable(handler):
 def _get_exploration_player_data(
         exploration_id, version, collection_id, can_edit):
     """
-    This function is used to get exploration data which is returned a dictionary.
+    This function is used to get exploration data which
+    is returned a dictionary.
 
     Args:
         exploration_id: str ID of exploration item.
@@ -171,7 +173,8 @@ class ExplorationPageEmbed(base.BaseHandler):
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests.
-        The require_playable decorator ensures the user can play the exploration with the exploration_id.
+        The require_playable decorator ensures the user can play the exploration
+        with the exploration_id.
 
         Args:
             exploration_id: str ID of the needed exploration.
@@ -214,14 +217,11 @@ class ExplorationPage(base.BaseHandler):
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests.
-        The require_playable decorator ensures the user can play the exploration with the exploration_id.
+        The require_playable decorator ensures the user can play
+        the exploration with the exploration_id.
 
         Args:
             exploration_id: str ID of the needed exploration.
-
-        Returns:
-            Serves the exploration item using "pages/exploration_player/exploration_player.html" template.
-
         Raises:
             PageNotFound if exploration item do not exist.
 
@@ -269,7 +269,8 @@ class ExplorationHandler(base.BaseHandler):
             exploration_id: str ID of the needed exploration.
 
         Returns:
-            A response with updated metadata(can_edit, session_id etc) of an exploration.
+            A response with updated metadata(can_edit, session_id etc)
+            of an exploration.
 
         Raises:
             PageNotFound if exploration with exploration_id  does not exist.
@@ -306,13 +307,16 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
     def post(self, exploration_id):
         """
         Handles user answer POST requests.
-        The require_playable decorator ensures the user can play the exploration with the exploration_id.
+        The require_playable decorator ensures the user can play
+        the exploration with the exploration_id.
 
         Args:
-            exploration_id: The str ID of the exploration the learner wants to post an answer.
+            exploration_id: The str ID of the exploration the learner
+                            wants to post an answer.
 
         Returns:
-            A response with empty dictionary is returned.This happens after the answer from the payload is recorded.
+            A response with empty dictionary is returned.
+            This happens after the answer from the payload is recorded.
         """
         old_state_name = self.payload.get('old_state_name')
         answer = self.payload.get('answer')
@@ -358,7 +362,8 @@ class StateHitEventHandler(base.BaseHandler):
         """Handles POST requests.
 
         Args:
-            exploration_id: The str ID of the exploration the learner wants to hit new state.
+            exploration_id: The str ID of the exploration the learner wants
+                            to hit new state.
 
         Returns:
             Returns nothing but records learner's new state.
