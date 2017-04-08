@@ -17,6 +17,7 @@
 from core.domain import classifier_domain
 from core.domain import classifier_registry
 from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import interaction_registry
 from core.platform import models
 
@@ -25,7 +26,7 @@ import feconf
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
 
 
-def classify(state, answer):
+def classify(state, answer, exp_id, state_name):
     """Classify the answer using the string classifier.
 
     This should only be called if the string classifier functionality is
@@ -55,7 +56,8 @@ def classify(state, answer):
     response = None
 
     if interaction_instance.is_string_classifier_trainable:
-        response = classify_string_classifier_rule(state, normalized_answer)
+        response = classify_string_classifier_rule(state, normalized_answer,
+            exp_id, state_name)
     else:
         raise Exception('No classifier found for interaction.')
 
@@ -75,16 +77,14 @@ def classify(state, answer):
         'exploration owner.')
 
 
-def classify_string_classifier_rule(state, normalized_answer):
+def classify_string_classifier_rule(state, normalized_answer, exp_id,
+                                    state_name):
     """Run the classifier if no prediction has been made yet. Currently this
     is behind a development flag.
     """
     best_matched_answer_group = None
     best_matched_answer_group_index = len(state.interaction.answer_groups)
     best_matched_rule_spec_index = None
-
-    sc = classifier_registry.Registry.get_classifier_by_algorithm_id(
-        feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])
 
     training_examples = [
         [doc, []] for doc in state.interaction.confirmed_unclassified_answers]
@@ -100,8 +100,27 @@ def classify_string_classifier_rule(state, normalized_answer):
             training_examples.extend([
                 [doc, [str(answer_group_index)]]
                 for doc in classifier_rule_spec.inputs['training_data']])
-    if len(training_examples) > 0:
+
+
+    exploration = exp_services.get_exploration_by_id(exp_id)
+    print exploration.state_names_to_classifier_ids
+    algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']
+    if state_name in exploration.state_names_to_classifier_ids:
+        classifier_id = state_names_to_classifier_ids[state_name]
+        classifier = get_classifier_by_id(classifier_id)
+        sc = classifier.cached_classifier_data.from_dict()
+
+    else:
+        sc = classifier_registry.Registry.get_classifier_by_algorithm_id(
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])
         sc.train(training_examples)
+        classifier = classifier_domain.Classifier('0', exploration.id,
+            exploration.version, state_name, algorithm_id, sc.to_dict(),
+            exploration.states_schema_version)
+        classifier_id = save_classifier(classifier)
+        exploration.state_names_to_classifier_ids[state_name] = classifier_id 
+
+    if len(training_examples) > 0:
         labels = sc.predict([normalized_answer])
         predicted_label = labels[0]
         if predicted_label != feconf.DEFAULT_CLASSIFIER_LABEL:
@@ -204,7 +223,7 @@ def save_classifier(classifier):
     classifier_id = classifier.id
     classifier_model = classifier_models.ClassifierModel.get(
         classifier_id, False)
-    classifier.validate()
+    #classifier.validate()
     if classifier_model is None:
         classifier_id = _create_classifier(classifier)
     else:

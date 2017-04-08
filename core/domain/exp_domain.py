@@ -1330,6 +1330,7 @@ class Exploration(object):
         self.version = version
         self.created_on = created_on
         self.last_updated = last_updated
+        self.state_names_to_classifier_ids = {}
 
     @classmethod
     def create_default_exploration(

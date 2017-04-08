@@ -60,7 +60,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             string_classifier_predict)
 
         with self.swap(sc.__class__, 'predict', predict_counter):
-            response = classifier_services.classify(self.exp_state, answer)
+            response = classifier_services.classify(self.exp_state, answer, self.exp_id, 'Home')
 
         answer_group_index = response['answer_group_index']
         rule_spec_index = response['rule_spec_index']
