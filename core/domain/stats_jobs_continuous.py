@@ -557,7 +557,7 @@ class InteractionAnswerSummariesMRJobManager(
             versioned_key = u'%s:%s:%s' % (
                 item.exploration_id, item.exploration_version, item.state_name)
             yield (versioned_key.encode('utf-8'),
-                copy.deepcopy(state_answers_dict))
+                   copy.deepcopy(state_answers_dict))
 
             # Output the same set of answers independent of the version. This
             # allows the reduce step to aggregate answers across all

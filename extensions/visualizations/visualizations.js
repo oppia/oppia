@@ -23,34 +23,36 @@ oppia.directive('oppiaVisualizationBarChart', [function() {
   return {
     restrict: 'E',
     scope: {},
-    controller: ['$scope', '$attrs', '$element', 'oppiaHtmlEscaper',
-    function($scope, $attrs, $element, oppiaHtmlEscaper) {
-      $scope.data = oppiaHtmlEscaper.escapedJsonToObj($attrs.data);
-      $scope.options = oppiaHtmlEscaper.escapedJsonToObj($attrs.options);
+    controller: [
+      '$scope', '$attrs', '$element', 'oppiaHtmlEscaper',
+      function($scope, $attrs, $element, oppiaHtmlEscaper) {
+        $scope.data = oppiaHtmlEscaper.escapedJsonToObj($attrs.data);
+        $scope.options = oppiaHtmlEscaper.escapedJsonToObj($attrs.options);
 
-      var dataArray = [['Answers', '']];
-      for (var i = 0; i < $scope.data.length; i++) {
-        dataArray.push([$scope.data[i].answer, $scope.data[i].frequency]);
-      }
-
-      var data = google.visualization.arrayToDataTable(dataArray);
-
-      var options = {
-        chartArea: {
-          width: '60%'
-        },
-        hAxis: {
-          title: 'Number of times answer was submitted',
-          minValue: 0
-        },
-        legend: {
-          position: 'none'
+        var dataArray = [['Answers', '']];
+        for (var i = 0; i < $scope.data.length; i++) {
+          dataArray.push([$scope.data[i].answer, $scope.data[i].frequency]);
         }
-      };
 
-      var chart = new google.visualization.BarChart($element[0]);
-      chart.draw(data, options);
-    }]
+        var data = google.visualization.arrayToDataTable(dataArray);
+
+        var options = {
+          chartArea: {
+            width: '60%'
+          },
+          hAxis: {
+            title: 'Number of times answer was submitted',
+            minValue: 0
+          },
+          legend: {
+            position: 'none'
+          }
+        };
+
+        var chart = new google.visualization.BarChart($element[0]);
+        chart.draw(data, options);
+      }
+    ]
   };
 }]);
 
@@ -59,10 +61,12 @@ oppia.directive('oppiaVisualizationFrequencyTable', [function() {
     restrict: 'E',
     scope: {},
     templateUrl: 'visualizations/FrequencyTable',
-    controller: ['$scope', '$attrs', 'oppiaHtmlEscaper',
-    function($scope, $attrs, oppiaHtmlEscaper) {
-      $scope.data = oppiaHtmlEscaper.escapedJsonToObj($attrs.data);
-      $scope.options = oppiaHtmlEscaper.escapedJsonToObj($attrs.options);
-    }]
+    controller: [
+      '$scope', '$attrs', 'oppiaHtmlEscaper',
+      function($scope, $attrs, oppiaHtmlEscaper) {
+        $scope.data = oppiaHtmlEscaper.escapedJsonToObj($attrs.data);
+        $scope.options = oppiaHtmlEscaper.escapedJsonToObj($attrs.options);
+      }
+    ]
   };
 }]);

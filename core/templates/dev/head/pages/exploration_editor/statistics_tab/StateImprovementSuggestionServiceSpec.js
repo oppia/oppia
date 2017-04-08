@@ -98,8 +98,7 @@ describe('StateImprovementSuggestionService', function() {
       }]);
     });
 
-    it('should produce improvement suggestions for a single default rule hit',
-        function() {
+    it('should produce suggestions for a single default rule hit', function() {
       // Create a looping state, similar to create_default_exploration.
       var states = {
         state: _createState('state')
@@ -119,8 +118,7 @@ describe('StateImprovementSuggestionService', function() {
       }]);
     });
 
-    it('should not suggest improvements for non-default answer submissions',
-        function() {
+    it('should not suggest improvements for non-default answers', function() {
       // Create a non-looping state for testing, similar to
       // save_new_valid_exploration.
       var states = {
