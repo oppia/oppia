@@ -37,7 +37,9 @@ oppia.factory('StateObjectFactory', [
         content: this.content,
         classifier_model_id: this.classifierModelId,
         interaction: this.interaction.toBackendDict(),
-        param_changes: convertListToBackend(this.paramChanges)
+        param_changes: this.paramChanges.map(function(paramChange) {
+          return paramChange.toBackendDict();
+        })
       };
     };
 
@@ -56,12 +58,6 @@ oppia.factory('StateObjectFactory', [
     var generateContentFromBackend = function(contentBackendList) {
       return contentBackendList.map(function(contentBackendDict) {
         return ContentObjectFactory.createFromBackendDict(contentBackendDict);
-      });
-    };
-
-    var convertListToBackend = function(list) {
-      return list.map(function(item) {
-        return item.toBackendDict();
       });
     };
 
