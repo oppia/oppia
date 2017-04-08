@@ -47,7 +47,6 @@ oppia.factory('explorationData', [
     var explorationData = {
       explorationId: explorationId,
       autosaveChangeList: function(changeList, successCallback, errorCallback) {
-        console.log(angular.copy(changeList));
         $http.put(explorationDraftAutosaveUrl, {
           change_list: changeList,
           version: explorationData.data.version
@@ -618,9 +617,7 @@ oppia.factory('explorationPropertyService', [
         if (this.propertyName === null) {
           throw 'Exploration property name cannot be null.';
         }
-        console.log(angular.copy(this.displayed));
         this.displayed = this._normalize(this.displayed);
-        console.log(angular.copy(this.displayed));
         if (!this._isValid(this.displayed) || !this.hasChanged()) {
           this.restoreFromMemento();
           return;

@@ -34,7 +34,6 @@ oppia.factory('parameterMetadataService', [
       var result = [];
       for (var i = 0; i < paramChanges.length; i++) {
         var pc = paramChanges[i];
-
         if (pc.generatorId === 'Copier') {
           if (!pc.customizationArgs.parse_with_jinja) {
             result.push({

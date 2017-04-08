@@ -36,7 +36,7 @@ oppia.controller('ExplorationEditor', [
   'explorationWarningsService', '$templateCache', 'explorationContextService',
   'explorationAdvancedFeaturesService', '$modal', 'changeListService',
   'autosaveInfoModalsService', 'siteAnalyticsService',
-  'UserEmailPreferencesService',
+  'UserEmailPreferencesService', 'ParamChangesObjectFactory',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       explorationData, editorContextService, explorationTitleService,
@@ -49,7 +49,7 @@ oppia.controller('ExplorationEditor', [
       explorationWarningsService, $templateCache, explorationContextService,
       explorationAdvancedFeaturesService, $modal, changeListService,
       autosaveInfoModalsService, siteAnalyticsService,
-      UserEmailPreferencesService) {
+      UserEmailPreferencesService, ParamChangesObjectFactory) {
     $scope.editabilityService = editabilityService;
     $scope.editorContextService = editorContextService;
 
@@ -103,7 +103,8 @@ oppia.controller('ExplorationEditor', [
         explorationInitStateNameService.init(data.init_state_name);
         explorationTagsService.init(data.tags);
         explorationParamSpecsService.init(data.param_specs);
-        explorationParamChangesService.init(data.param_changes || []);
+        explorationParamChangesService.init(
+          ParamChangesObjectFactory.createFromBackendList(data.param_changes));
 
         $scope.explorationTitleService = explorationTitleService;
         $scope.explorationCategoryService = explorationCategoryService;
