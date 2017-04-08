@@ -47,6 +47,7 @@ oppia.factory('explorationData', [
     var explorationData = {
       explorationId: explorationId,
       autosaveChangeList: function(changeList, successCallback, errorCallback) {
+        console.log(angular.copy(changeList));
         $http.put(explorationDraftAutosaveUrl, {
           change_list: changeList,
           version: explorationData.data.version
@@ -617,8 +618,9 @@ oppia.factory('explorationPropertyService', [
         if (this.propertyName === null) {
           throw 'Exploration property name cannot be null.';
         }
-
+        console.log(angular.copy(this.displayed));
         this.displayed = this._normalize(this.displayed);
+        console.log(angular.copy(this.displayed));
         if (!this._isValid(this.displayed) || !this.hasChanged()) {
           this.restoreFromMemento();
           return;
@@ -777,6 +779,11 @@ oppia.factory('explorationParamChangesService', [
   'explorationPropertyService', function(explorationPropertyService) {
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'param_changes';
+    child._normalize = function(paramChanges) {
+      return paramChanges.map(function(paramChange) {
+        return paramChange.toBackendDict();
+      });
+    };
     return child;
   }
 ]);
@@ -797,9 +804,6 @@ oppia.factory('explorationStatesService', [
     var _states = null;
     // Properties that have a different backend representation from the
     // frontend and must be converted.
-    var PROPERTIES_TO_CONVERT = [
-      'answer_groups'
-    ];
 
     var BACKEND_CONVERSIONS = {
       answer_groups: function(answerGroups) {
@@ -817,6 +821,11 @@ oppia.factory('explorationStatesService', [
       fallbacks: function(fallbacks) {
         return fallbacks.map(function(fallback) {
           return fallback.toBackendDict();
+        });
+      },
+      param_changes: function(paramChanges) {
+        return paramChanges.map(function(paramChange) {
+          return paramChange.toBackendDict();
         });
       }
     };

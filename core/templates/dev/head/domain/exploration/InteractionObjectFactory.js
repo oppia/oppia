@@ -39,7 +39,8 @@ oppia.factory('InteractionObjectFactory', [
         }),
         confirmed_unclassified_answers: this.confirmedUnclassifiedAnswers,
         customization_args: this.customizationArgs,
-        default_outcome: this.defaultOutcome.toBackendDict(),
+        default_outcome:
+          this.defaultOutcome ? this.defaultOutcome.toBackendDict() : null,
         fallbacks: this.fallbacks.map(function(fallback) {
           return fallback.toBackendDict();
         }),
