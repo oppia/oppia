@@ -98,7 +98,7 @@ def _get_exploration_player_data(
     Args:
         exploration_id: str ID of exploration item.
         version: Version of the exploration
-        collection_id: str ID of the collection which the exploration belongs to.
+        collection_id: str ID of the collection which the exploration belongs.
         can_edit: Boolean to check if the exploration is editable by user.
 
     Returns:
@@ -179,11 +179,8 @@ class ExplorationPageEmbed(base.BaseHandler):
         Args:
             exploration_id: str ID of the needed exploration.
 
-        Returns:
-            Serves the exploration item using "pages/exploration_player/exploration_player.html" template.
-
         Raises:
-            PageNotFound if exploration item do not exist.
+            PageNotFound if exploration item does not exist.
 
         """
         version_str = self.request.get('v')
@@ -575,8 +572,8 @@ class RatingHandler(base.BaseHandler):
         """Handles PUT requests for submitting ratings at the end of an
         exploration.
 
-        base.require_user decorator ensure that the current learner is associated
-        with the current session.
+        base.require_user decorator ensure that the current learner is
+        associated with the current session.
 
         Args:
             exploration_id: The str ID of the exploration the learner wants to
