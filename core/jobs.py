@@ -1110,7 +1110,7 @@ def get_data_for_recent_jobs(recency_msec=DEFAULT_RECENCY_MSEC):
     returned.
 
     Args:
-    - recency_secs: the threshold for a recent job, in seconds.
+        recency_msec: the threshold for a recent job, in milliseconds.
     """
     recent_job_models = job_models.JobModel.get_recent_jobs(
         NUM_JOBS_IN_DASHBOARD_LIMIT, recency_msec)

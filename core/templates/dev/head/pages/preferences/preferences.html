@@ -22,10 +22,11 @@
 {% endblock header_js %}
 
 {% block content %}
+  <background-banner></background-banner>
   <div class="oppia-dashboard-container ng-scope" ng-controller="Preferences">
-    <h2 class="oppia-page-heading protractor-test-preferences-title"
+    <h2 class="oppia-preferences-page-heading protractor-test-preferences-title"
         translate="I18N_PREFERENCES_HEADING"></h2>
-    <div class="oppia-page-heading-subtext" translate="I18N_PREFERENCES_HEADING_SUBTEXT"></div>
+    <em><div class="oppia-preferences-page-heading-subtext" translate="I18N_PREFERENCES_HEADING_SUBTEXT"></div></em>
     <md-card class="oppia-page-card">
       <div class="row">
         <div role="form" class="form-horizontal">
@@ -87,6 +88,32 @@
                   <[subjectInterestsWarningText]>
                 </span>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <div role="form" class="form-horizontal">
+          <div class="form-group">
+            <label class="col-lg-2 col-md-2 col-sm-2"  translate="I18N_PREFERENCES_SUBSCRIBED_CREATORS"></label>
+            <div class="col-lg-10 col-md-10 col-sm-10">
+              <span ng-if="subscriptionList.length === 0" translate="I18N_PREFERENCES_NO_SUBSCRIPTIONS"></span>
+              <md-card class="oppia-subscription-card"
+                       ng-if="subscriptionList.length > 0"
+                       ng-repeat="subscription in subscriptionList"
+                       style="margin: 0 16px 0 0;">
+                <a class="oppia-subscription-profile-link" href="/profile/<[subscription.creator_username]>" target="_blank">
+                  <img ng-src="<[subscription.creator_picture_data_url]>" class="oppia-subscription-card-profile-picture img-circle">
+                  <span class="oppia-subscription-card-summary">
+                    <div style="margin-bottom: 5px; font-size: 17.5px;">
+                      <strong class="protractor-test-subscription-name"><[subscription.creator_username| truncate:11]></strong>
+                    </div>
+                    <div style="font-size: 14.5px;">
+                      <span>Impact</span>
+                      <span><[subscription.creator_impact || 0]></span>
+                    </div>
+                  </span>
+                </a>
+              </md-card>
             </div>
           </div>
         </div>
@@ -155,20 +182,26 @@
             <div class="col-lg-10 col-md-10 col-sm-10">
               <div class="checkbox">
                 <label>
-                  <input type="checkbox" ng-model="canReceiveEmailUpdates" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail)">
+                  <input type="checkbox" ng-model="canReceiveEmailUpdates" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail)">
                   <span translate="I18N_PREFERENCES_EMAIL_RECEIVE_NEWS"></span>
                 </label>
               </div>
               <div class="checkbox">
                 <label>
-                  <input type="checkbox" ng-model="canReceiveEditorRoleEmail" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail)">
-                  Receive emails when someone gives you edit rights to an exploration
+                  <input type="checkbox" ng-model="canReceiveEditorRoleEmail" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail)">
+                  <span translate="I18N_PREFERENCES_EMAIL_RECEIVE_EDIT_RIGHTS_NEWS"></span>
                 </label>
               </div>
               <div class="checkbox">
                 <label>
-                  <input type="checkbox" ng-model="canReceiveFeedbackMessageEmail" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail)">
-                  Receive emails when someone sends you feedback on an exploration
+                  <input type="checkbox" ng-model="canReceiveSubscriptionEmail" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail)">
+                  <span translate="I18N_PREFERENCES_EMAIL_RECEIVE_SUBSCRIPTION_NEWS"></span>
+                </label>
+              </div>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" ng-model="canReceiveFeedbackMessageEmail" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail)">
+                  <span translate="I18N_PREFERENCES_EMAIL_RECEIVE_FEEDBACK_NEWS"></span>
                 </label>
               </div>
             </div>
@@ -227,4 +260,7 @@
 {% block footer_js %}
   {{ super() }}
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/preferences/Preferences.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/Select2DropdownDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/ImageUploaderDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
 {% endblock footer_js %}

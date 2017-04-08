@@ -28,7 +28,7 @@
         Thanks for your interest in helping out with the Oppia project!
       </p>
 
-      <h3>We're all volunteers</h3>
+      <h2 class="oppia-contact-h2">We're all volunteers</h2>
       <p>
         We're a team of volunteers around the world who want to improve access
         to high-quality education. Currently, we're working on building scalable
@@ -42,7 +42,7 @@
         <a href="mailto:admin@oppia.org" class="inline-links">admin@oppia.org</a>.
       </p>
 
-      <h3>How Oppia is different from other learning platforms</h3>
+      <h2 class="oppia-contact-h2">How Oppia is different from other learning platforms</h2>
       <p>
         There is lots of educational research that suggests that active learning
         and targeted feedback lead to large learning gains, and providing support
@@ -166,7 +166,19 @@
   </div>
   <div class="oppia-footer-padding-below-banner">
   </div>
+  <style>
+    h2.oppia-contact-h2 {
+      font-size: 1.17em;
+      font-weight: bold;
+      text-align: left;
+    }
+  </style>
 {% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
+{% endblock footer_js %}
 
 {% block footer%}
   {% include 'pages/footer.html' %}

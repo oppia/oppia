@@ -31,12 +31,22 @@ oppia.constant('EXPLORATIONS_SORT_BY_KEYS', {
 });
 
 oppia.constant('HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', {
-  TITLE: 'Title',
-  RATING: 'Average Rating',
-  NUM_VIEWS: 'Total Plays',
-  OPEN_FEEDBACK: 'Open Feedback',
-  UNRESOLVED_ANSWERS: 'Unresolved Answers',
-  LAST_UPDATED: 'Last Updated'
+  TITLE: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_TITLE ',
+  RATING: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_AVERAGE_RATING',
+  NUM_VIEWS: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_TOTAL_PLAYS',
+  OPEN_FEEDBACK: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_OPEN_FEEDBACK',
+  UNRESOLVED_ANSWERS: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_UNRESOLVED_ANSWERS',
+  LAST_UPDATED: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_LAST_UPDATED'
+});
+
+oppia.constant('SUBSCRIPTION_SORT_BY_KEYS', {
+  USERNAME: 'subscriber_username',
+  IMPACT: 'subscriber_impact'
+});
+
+oppia.constant('HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
+  USERNAME: 'Username',
+  IMPACT: 'Impact'
 });
 
 oppia.controller('Dashboard', [
@@ -44,13 +54,15 @@ oppia.controller('Dashboard', [
   'DashboardBackendApiService', 'RatingComputationService',
   'ExplorationCreationService', 'UrlInterpolationService', 'FATAL_ERROR_CODES',
   'EXPLORATION_DROPDOWN_STATS', 'EXPLORATIONS_SORT_BY_KEYS',
-  'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS',
+  'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
+  'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
   function(
       $scope, $rootScope, $window, oppiaDatetimeFormatter, alertsService,
       DashboardBackendApiService, RatingComputationService,
       ExplorationCreationService, UrlInterpolationService, FATAL_ERROR_CODES,
       EXPLORATION_DROPDOWN_STATS, EXPLORATIONS_SORT_BY_KEYS,
-      HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS) {
+      HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS, SUBSCRIPTION_SORT_BY_KEYS,
+      HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS) {
     var EXP_PUBLISH_TEXTS = {
       defaultText: (
         'This exploration is private. Publish it to receive statistics.'),
@@ -62,6 +74,9 @@ oppia.controller('Dashboard', [
     $scope.EXPLORATIONS_SORT_BY_KEYS = EXPLORATIONS_SORT_BY_KEYS;
     $scope.HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS = (
       HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS);
+    $scope.SUBSCRIPTION_SORT_BY_KEYS = SUBSCRIPTION_SORT_BY_KEYS;
+    $scope.HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS = (
+      HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS);
     $scope.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
       GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
 
@@ -77,7 +92,6 @@ oppia.controller('Dashboard', [
     $scope.unresolvedAnswersIconUrl = UrlInterpolationService.getStaticImageUrl(
       '/icons/unresolved_answers.svg');
 
-    $scope.activeTab = 'myExplorations';
     $scope.setActiveTab = function(newActiveTabName) {
       $scope.activeTab = newActiveTabName;
     };
@@ -121,6 +135,26 @@ oppia.controller('Dashboard', [
       }
     };
 
+    $scope.setSubscriptionSortingOptions = function(sortType) {
+      if (sortType === $scope.currentSubscribersSortType) {
+        $scope.isCurrentSubscriptionSortDescending = (
+          !$scope.isCurrentSubscriptionSortDescending);
+      } else {
+        $scope.currentSubscribersSortType = sortType;
+      }
+    };
+
+    $scope.sortSubscriptionFunction = function(entity) {
+      // This function is passed as a custom comparator function to `orderBy`,
+      // so that special cases can be handled while sorting subscriptions.
+      var value = entity[$scope.currentSubscribersSortType];
+      if ($scope.currentSubscribersSortType ===
+          SUBSCRIPTION_SORT_BY_KEYS.IMPACT) {
+        value = (value || 0);
+      }
+      return value;
+    };
+
     $scope.sortByFunction = function(entity) {
       // This function is passed as a custom comparator function to `orderBy`,
       // so that special cases can be handled while sorting explorations.
@@ -152,15 +186,24 @@ oppia.controller('Dashboard', [
       function(response) {
         var responseData = response.data;
         $scope.currentSortType = EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK;
+        $scope.currentSubscribersSortType = SUBSCRIPTION_SORT_BY_KEYS.USERNAME;
         $scope.isCurrentSortDescending = true;
+        $scope.isCurrentSubscriptionSortDescending = true;
         $scope.explorationsList = responseData.explorations_list;
         $scope.collectionsList = responseData.collections_list;
+        $scope.subscribersList = responseData.subscribers_list;
         $scope.dashboardStats = responseData.dashboard_stats;
         $scope.lastWeekStats = responseData.last_week_stats;
         if ($scope.dashboardStats && $scope.lastWeekStats) {
           $scope.relativeChangeInTotalPlays = (
             $scope.dashboardStats.total_plays - $scope.lastWeekStats.total_plays
           );
+        }
+        if ($scope.explorationsList.length === 0 &&
+          $scope.collectionsList.length > 0) {
+          $scope.activeTab = 'myCollections';
+        } else {
+          $scope.activeTab = 'myExplorations';
         }
         $rootScope.loadingMessage = '';
       },

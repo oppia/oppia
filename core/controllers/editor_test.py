@@ -29,6 +29,7 @@ from core.domain import exp_services
 from core.domain import stats_domain
 from core.domain import stats_jobs_continuous_test
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -322,7 +323,7 @@ class EditorTest(BaseEditorControllerTest):
             answer_group = state['interaction']['answer_groups'][1]
             rule_spec = answer_group['rule_specs'][0]
             self.assertEqual(
-                rule_spec['rule_type'], exp_domain.CLASSIFIER_RULESPEC_STR)
+                rule_spec['rule_type'], exp_domain.RULE_TYPE_CLASSIFIER)
             rule_spec['inputs']['training_data'].append('joyful')
 
             self.put_json('/createhandler/data/%s' % exp_id, {
@@ -397,7 +398,8 @@ class DownloadIntegrationTest(BaseEditorControllerTest):
     """Test handler for exploration and state download."""
 
     SAMPLE_JSON_CONTENT = {
-        'State A': ("""content:
+        'State A': ("""classifier_model_id: null
+content:
 - type: text
   value: ''
 interaction:
@@ -416,7 +418,8 @@ interaction:
   id: TextInput
 param_changes: []
 """),
-        'State B': ("""content:
+        'State B': ("""classifier_model_id: null
+content:
 - type: text
   value: ''
 interaction:
@@ -435,7 +438,8 @@ interaction:
   id: TextInput
 param_changes: []
 """),
-        feconf.DEFAULT_INIT_STATE_NAME: ("""content:
+        feconf.DEFAULT_INIT_STATE_NAME: ("""classifier_model_id: null
+content:
 - type: text
   value: ''
 interaction:
@@ -456,7 +460,8 @@ param_changes: []
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
 
-    SAMPLE_STATE_STRING = ("""content:
+    SAMPLE_STATE_STRING = ("""classifier_model_id: null
+content:
 - type: text
   value: ''
 interaction:
@@ -524,7 +529,6 @@ param_changes: []
                   'rb') as f:
             golden_zipfile = f.read()
         zf_gold = zipfile.ZipFile(StringIO.StringIO(golden_zipfile))
-
         # Compare saved with golden file
         self.assertEqual(
             zf_saved.open(
@@ -967,6 +971,68 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         self.logout()
 
 
+class UserExplorationEmailsIntegrationTest(BaseEditorControllerTest):
+    """Test the handler for user email notification preferences."""
+
+    def test_user_exploration_emails_handler(self):
+        """Test user exploration emails handler."""
+
+        # Owner creates exploration
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for emails handler test!',
+            category='Category')
+
+        exploration = exp_services.get_exploration_by_id(exp_id)
+
+        response = self.testapp.get(
+            '%s/%s' % (feconf.EDITOR_URL_PREFIX, exp_id))
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        exp_email_preferences = (
+            user_services.get_email_preferences_for_exploration(
+                self.owner_id, exp_id))
+        self.assertFalse(exp_email_preferences.mute_feedback_notifications)
+        self.assertFalse(exp_email_preferences.mute_suggestion_notifications)
+
+        # Owner changes email preferences
+        emails_url = '%s/%s' % (feconf.USER_EXPLORATION_EMAILS_PREFIX, exp_id)
+        self.put_json(
+            emails_url, {
+                'version': exploration.version,
+                'mute': True,
+                'message_type': 'feedback'
+            }, csrf_token)
+
+        exp_email_preferences = (
+            user_services.get_email_preferences_for_exploration(
+                self.owner_id, exp_id))
+        self.assertTrue(exp_email_preferences.mute_feedback_notifications)
+        self.assertFalse(exp_email_preferences.mute_suggestion_notifications)
+
+        self.put_json(
+            emails_url, {
+                'version': exploration.version,
+                'mute': True,
+                'message_type': 'suggestion'
+            }, csrf_token)
+        self.put_json(
+            emails_url, {
+                'version': exploration.version,
+                'mute': False,
+                'message_type': 'feedback'
+            }, csrf_token)
+
+        exp_email_preferences = (
+            user_services.get_email_preferences_for_exploration(
+                self.owner_id, exp_id))
+        self.assertFalse(exp_email_preferences.mute_feedback_notifications)
+        self.assertTrue(exp_email_preferences.mute_suggestion_notifications)
+
+        self.logout()
+
+
 class ModeratorEmailsTest(test_utils.GenericTestBase):
     """Integration test for post-moderator action emails."""
 
@@ -1222,7 +1288,9 @@ class EditorAutosaveTest(BaseEditorControllerTest):
     EXP_ID1 = '1'
     EXP_ID2 = '2'
     EXP_ID3 = '3'
-    NEWER_DATETIME = datetime.datetime.strptime('2017-03-16', '%Y-%m-%d')
+    # 30 days into the future.
+    NEWER_DATETIME = datetime.datetime.utcnow() + datetime.timedelta(30)
+    # A date in the past.
     OLDER_DATETIME = datetime.datetime.strptime('2015-03-16', '%Y-%m-%d')
     DRAFT_CHANGELIST = [{
         'cmd': 'edit_exploration_property',

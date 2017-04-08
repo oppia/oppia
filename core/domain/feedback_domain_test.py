@@ -88,13 +88,14 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
             'message_id': self.MESSAGE_ID,
             'text': 'a message text',
             'updated_status': 'open',
-            'updated_subject': 'an updated subject'
+            'updated_subject': 'an updated subject',
+            'received_via_email': False
         }
         observed_message = feedback_domain.FeedbackMessage(
             self.FULL_MESSAGE_ID, self.FULL_THREAD_ID, self.MESSAGE_ID,
             self.owner_id, expected_message_dict['updated_status'],
             expected_message_dict['updated_subject'],
-            expected_message_dict['text'], fake_date, fake_date)
+            expected_message_dict['text'], fake_date, fake_date, False)
         self.assertDictEqual(expected_message_dict,
                              observed_message.to_dict())
 

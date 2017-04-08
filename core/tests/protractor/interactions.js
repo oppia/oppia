@@ -75,4 +75,3 @@ describe('Interactions', function() {
     general.checkForConsoleErrors([]);
   });
 });
-

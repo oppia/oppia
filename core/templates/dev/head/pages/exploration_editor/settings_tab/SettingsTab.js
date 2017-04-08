@@ -24,8 +24,9 @@ oppia.controller('SettingsTab', [
   'explorationInitStateNameService', 'explorationParamSpecsService',
   'changeListService', 'alertsService', 'explorationStatesService',
   'explorationParamChangesService', 'explorationWarningsService',
-  'CATEGORY_LIST', 'explorationAdvancedFeaturesService',
-  'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
+  'explorationAdvancedFeaturesService', 'ALL_CATEGORIES',
+  'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'UserEmailPreferencesService',
+  'UrlInterpolationService',
   function(
       $scope, $http, $window, $modal, $rootScope,
       explorationData, explorationTitleService, explorationCategoryService,
@@ -34,16 +35,17 @@ oppia.controller('SettingsTab', [
       explorationInitStateNameService, explorationParamSpecsService,
       changeListService, alertsService, explorationStatesService,
       explorationParamChangesService, explorationWarningsService,
-      CATEGORY_LIST, explorationAdvancedFeaturesService,
-      EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
+      explorationAdvancedFeaturesService, ALL_CATEGORIES,
+      EXPLORATION_TITLE_INPUT_FOCUS_LABEL, UserEmailPreferencesService,
+      UrlInterpolationService) {
     $scope.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
 
     $scope.CATEGORY_LIST_FOR_SELECT2 = [];
-    for (var i = 0; i < CATEGORY_LIST.length; i++) {
+    for (var i = 0; i < ALL_CATEGORIES.length; i++) {
       $scope.CATEGORY_LIST_FOR_SELECT2.push({
-        id: CATEGORY_LIST[i],
-        text: CATEGORY_LIST[i]
+        id: ALL_CATEGORIES[i],
+        text: ALL_CATEGORIES[i]
       });
     }
 
@@ -70,6 +72,7 @@ oppia.controller('SettingsTab', [
       $scope.explorationInitStateNameService = explorationInitStateNameService;
       $scope.explorationParamSpecsService = explorationParamSpecsService;
       $scope.explorationParamChangesService = explorationParamChangesService;
+      $scope.UserEmailPreferencesService = UserEmailPreferencesService;
 
       explorationData.getData().then(function() {
         $scope.refreshSettingsTab();
@@ -205,8 +208,69 @@ oppia.controller('SettingsTab', [
     };
 
     /********************************************
+    * Methods for notifications muting.
+    ********************************************/
+
+    $scope.muteFeedbackNotifications = function() {
+      UserEmailPreferencesService.setFeedbackNotificationPreferences(true);
+    };
+    $scope.muteSuggestionNotifications = function() {
+      UserEmailPreferencesService.setSuggestionNotificationPreferences(true);
+    };
+
+    $scope.unmuteFeedbackNotifications = function() {
+      UserEmailPreferencesService.setFeedbackNotificationPreferences(false);
+    };
+    $scope.unmuteSuggestionNotifications = function() {
+      UserEmailPreferencesService.setSuggestionNotificationPreferences(false);
+    };
+
+    /********************************************
     * Methods relating to control buttons.
     ********************************************/
+    $scope.previewSummaryTile = function() {
+      alertsService.clearWarnings();
+      $modal.open({
+        templateUrl: 'modals/previewSummaryTile',
+        backdrop: true,
+        controller: [
+          '$scope', '$modalInstance', function($scope, $modalInstance) {
+            $scope.getExplorationTitle = function() {
+              return explorationTitleService.displayed;
+            };
+            $scope.getExplorationObjective = function() {
+              return explorationObjectiveService.displayed;
+            };
+            $scope.getExplorationCategory = function() {
+              return explorationCategoryService.displayed;
+            };
+            $scope.getThumbnailIconUrl = function() {
+              var category = explorationCategoryService.displayed;
+              if (GLOBALS.ALL_CATEGORIES.indexOf(category) === -1) {
+                category = GLOBALS.DEFAULT_CATEGORY_ICON;
+              }
+              return UrlInterpolationService.getStaticImageUrl(
+                '/subjects/' + category + '.svg');
+            };
+            $scope.getThumbnailBgColor = function() {
+              var category = explorationCategoryService.displayed;
+              if (!GLOBALS.CATEGORIES_TO_COLORS.hasOwnProperty(category)) {
+                var color = GLOBALS.DEFAULT_COLOR;
+              } else {
+                var color = GLOBALS.CATEGORIES_TO_COLORS[category];
+              }
+              return color;
+            };
+
+            $scope.close = function() {
+              $modalInstance.dismiss();
+              alertsService.clearWarnings();
+            };
+          }
+        ]
+      });
+    };
+
     $scope.showTransferExplorationOwnershipModal = function() {
       alertsService.clearWarnings();
       $modal.open({
@@ -275,32 +339,33 @@ oppia.controller('SettingsTab', [
             }
           },
           controller: [
-              '$scope', '$modalInstance', 'draftEmailBody',
-              function($scope, $modalInstance, draftEmailBody) {
-            $scope.action = action;
-            $scope.willEmailBeSent = Boolean(draftEmailBody);
-            $scope.emailBody = draftEmailBody;
+            '$scope', '$modalInstance', 'draftEmailBody',
+            function($scope, $modalInstance, draftEmailBody) {
+              $scope.action = action;
+              $scope.willEmailBeSent = Boolean(draftEmailBody);
+              $scope.emailBody = draftEmailBody;
 
-            if ($scope.willEmailBeSent) {
-              $scope.EMAIL_BODY_SCHEMA = {
-                type: 'unicode',
-                ui_config: {
-                  rows: 20
-                }
+              if ($scope.willEmailBeSent) {
+                $scope.EMAIL_BODY_SCHEMA = {
+                  type: 'unicode',
+                  ui_config: {
+                    rows: 20
+                  }
+                };
+              }
+
+              $scope.reallyTakeAction = function() {
+                $modalInstance.close({
+                  emailBody: $scope.emailBody
+                });
+              };
+
+              $scope.cancel = function() {
+                $modalInstance.dismiss('cancel');
+                alertsService.clearWarnings();
               };
             }
-
-            $scope.reallyTakeAction = function() {
-              $modalInstance.close({
-                emailBody: $scope.emailBody
-              });
-            };
-
-            $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
-            };
-          }]
+          ]
         }).result.then(function(result) {
           explorationRightsService.saveModeratorChangeToBackend(
             action, result.emailBody);

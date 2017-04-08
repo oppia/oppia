@@ -36,6 +36,7 @@ oppia.controller('ExplorationEditor', [
   'explorationWarningsService', '$templateCache', 'explorationContextService',
   'explorationAdvancedFeaturesService', '$modal', 'changeListService',
   'autosaveInfoModalsService', 'siteAnalyticsService',
+  'UserEmailPreferencesService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       explorationData, editorContextService, explorationTitleService,
@@ -47,7 +48,8 @@ oppia.controller('ExplorationEditor', [
       explorationParamSpecsService, explorationParamChangesService,
       explorationWarningsService, $templateCache, explorationContextService,
       explorationAdvancedFeaturesService, $modal, changeListService,
-      autosaveInfoModalsService, siteAnalyticsService) {
+      autosaveInfoModalsService, siteAnalyticsService,
+      UserEmailPreferencesService) {
     $scope.editabilityService = editabilityService;
     $scope.editorContextService = editorContextService;
 
@@ -123,6 +125,9 @@ oppia.controller('ExplorationEditor', [
           data.rights.viewer_names, data.rights.status,
           data.rights.cloned_from, data.rights.community_owned,
           data.rights.viewable_if_private);
+        UserEmailPreferencesService.init(
+          data.email_preferences.mute_feedback_notifications,
+          data.email_preferences.mute_suggestion_notifications);
 
         if (GLOBALS.can_edit) {
           editabilityService.markEditable();
@@ -393,119 +398,5 @@ oppia.controller('ExplorationEditor', [
     $scope.$on(
       'enterEditorForTheFirstTime', $scope.showWelcomeExplorationModal);
     $scope.$on('openEditorTutorial', $scope.startTutorial);
-  }
-]);
-
-oppia.controller('EditorNavigation', [
-  '$scope', '$rootScope', '$timeout', '$modal', 'routerService',
-  'explorationRightsService', 'explorationWarningsService',
-  'stateEditorTutorialFirstTimeService',
-  'threadDataService', 'siteAnalyticsService',
-  'explorationContextService',
-  function(
-    $scope, $rootScope, $timeout, $modal, routerService,
-    explorationRightsService, explorationWarningsService,
-    stateEditorTutorialFirstTimeService,
-    threadDataService, siteAnalyticsService,
-    explorationContextService) {
-    $scope.postTutorialHelpPopoverIsShown = false;
-
-    $scope.$on('openPostTutorialHelpPopover', function() {
-      $scope.postTutorialHelpPopoverIsShown = true;
-      $timeout(function() {
-        $scope.postTutorialHelpPopoverIsShown = false;
-      }, 5000);
-    });
-
-    $scope.showUserHelpModal = function() {
-      var explorationId = explorationContextService.getExplorationId();
-      siteAnalyticsService.registerClickHelpButtonEvent(explorationId);
-      var modalInstance = $modal.open({
-        templateUrl: 'modals/userHelp',
-        backdrop: true,
-        controller: [
-          '$scope', '$modalInstance',
-          'siteAnalyticsService', 'explorationContextService',
-          function(
-            $scope, $modalInstance,
-            siteAnalyticsService, explorationContextService) {
-            var explorationId = explorationContextService.getExplorationId();
-
-            $scope.beginTutorial = function() {
-              siteAnalyticsService.registerOpenTutorialFromHelpCenterEvent(
-                explorationId);
-              $modalInstance.close();
-            };
-
-            $scope.goToHelpCenter = function() {
-              siteAnalyticsService.registerVisitHelpCenterEvent(explorationId);
-              $modalInstance.dismiss('cancel');
-            };
-          }
-        ],
-        windowClass: 'oppia-help-modal'
-      });
-
-      modalInstance.result.then(function() {
-        $rootScope.$broadcast('openEditorTutorial');
-      }, function() {
-        stateEditorTutorialFirstTimeService.markTutorialFinished();
-      });
-    };
-
-    $scope.countWarnings = explorationWarningsService.countWarnings;
-    $scope.getWarnings = explorationWarningsService.getWarnings;
-    $scope.hasCriticalWarnings = explorationWarningsService.hasCriticalWarnings;
-
-    $scope.explorationRightsService = explorationRightsService;
-    $scope.getTabStatuses = routerService.getTabStatuses;
-    $scope.selectMainTab = routerService.navigateToMainTab;
-    $scope.selectPreviewTab = routerService.navigateToPreviewTab;
-    $scope.selectSettingsTab = routerService.navigateToSettingsTab;
-    $scope.selectStatsTab = routerService.navigateToStatsTab;
-    $scope.selectHistoryTab = routerService.navigateToHistoryTab;
-    $scope.selectFeedbackTab = routerService.navigateToFeedbackTab;
-    $scope.getOpenThreadsCount = threadDataService.getOpenThreadsCount;
-  }
-]);
-
-oppia.controller('EditorNavbarBreadcrumb', [
-  '$scope', 'explorationTitleService', 'routerService', 'focusService',
-  'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
-  function(
-      $scope, explorationTitleService, routerService, focusService,
-      EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
-    $scope.navbarTitle = null;
-    $scope.$on('explorationPropertyChanged', function() {
-      var _MAX_TITLE_LENGTH = 20;
-      $scope.navbarTitle = explorationTitleService.savedMemento;
-      if ($scope.navbarTitle.length > _MAX_TITLE_LENGTH) {
-        $scope.navbarTitle = (
-          $scope.navbarTitle.substring(0, _MAX_TITLE_LENGTH - 3) + '...');
-      }
-    });
-
-    $scope.editTitle = function() {
-      routerService.navigateToSettingsTab();
-      focusService.setFocus(EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
-    };
-
-    var _TAB_NAMES_TO_HUMAN_READABLE_NAMES = {
-      main: 'Edit',
-      preview: 'Preview',
-      settings: 'Settings',
-      stats: 'Statistics',
-      history: 'History',
-      feedback: 'Feedback'
-    };
-
-    $scope.getCurrentTabName = function() {
-      if (!routerService.getTabStatuses()) {
-        return '';
-      } else {
-        return _TAB_NAMES_TO_HUMAN_READABLE_NAMES[
-          routerService.getTabStatuses().active];
-      }
-    };
   }
 ]);

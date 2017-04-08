@@ -415,7 +415,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 interaction_id)
             if interaction.is_trainable:
                 self.assertIn(
-                    exp_domain.CLASSIFIER_RULESPEC_STR, interaction.rules_dict,
+                    exp_domain.RULE_TYPE_CLASSIFIER, interaction.rules_dict,
                     'Expected to find a classifier in trainable '
                     'interaction: %s' % interaction_id)
 
@@ -428,7 +428,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 interaction_id)
             if not interaction.is_trainable:
                 self.assertNotIn(
-                    exp_domain.CLASSIFIER_RULESPEC_STR, interaction.rules_dict,
+                    exp_domain.RULE_TYPE_CLASSIFIER, interaction.rules_dict,
                     'Did not expect to find a classifier in untrainable '
                     'interaction: %s' % interaction_id)
 

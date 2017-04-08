@@ -36,8 +36,11 @@ oppia.directive('collectionEditorNavbar', [function() {
           EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
         $scope.collectionId = GLOBALS.collectionId;
         $scope.collection = CollectionEditorStateService.getCollection();
-        $scope.isPrivate = GLOBALS.isPrivate;
-        $scope.canUnpublish = GLOBALS.canUnpublish;
+        $scope.collectionRights = (
+          CollectionEditorStateService.getCollectionRights());
+
+        $scope.isLoadingCollection = (
+          CollectionEditorStateService.isLoadingCollection);
         $scope.validationIssues = [];
         $scope.isSaveInProgress = (
           CollectionEditorStateService.isSavingCollection);
@@ -50,7 +53,7 @@ oppia.directive('collectionEditorNavbar', [function() {
         $scope.selectHistoryTab = routerService.navigateToHistoryTab;
 
         var _validateCollection = function() {
-          if ($scope.isPrivate) {
+          if ($scope.collectionRights.isPrivate()) {
             $scope.validationIssues = (
               CollectionValidationService
                 .findValidationIssuesForPrivateCollection(
@@ -69,10 +72,9 @@ oppia.directive('collectionEditorNavbar', [function() {
           CollectionRightsBackendApiService.setCollectionPublic(
             $scope.collectionId, $scope.collection.getVersion()).then(
             function() {
-              // TODO(bhenning): There should be a scope-level rights object
-              // used, instead. The rights object should be loaded with the
-              // collection.
-              $scope.isPrivate = false;
+              $scope.collectionRights.setPublic();
+              CollectionEditorStateService.setCollectionRights(
+                $scope.collectionRights);
             }, function() {
               alertsService.addWarning(
                 'There was an error when publishing the collection.');
@@ -100,13 +102,13 @@ oppia.directive('collectionEditorNavbar', [function() {
 
         $scope.isCollectionPublishable = function() {
           return (
-            $scope.isPrivate &&
+            $scope.collectionRights.isPrivate() &&
             $scope.getChangeListCount() === 0 &&
             $scope.validationIssues.length === 0);
         };
 
         $scope.saveChanges = function() {
-          var isPrivate = $scope.isPrivate;
+          var isPrivate = $scope.collectionRights.isPrivate();
           var modalInstance = $modal.open({
             templateUrl: 'modals/saveCollection',
             backdrop: true,
@@ -141,10 +143,10 @@ oppia.directive('collectionEditorNavbar', [function() {
               backdrop: true,
               controller: [
                 '$scope', '$modalInstance', 'CollectionEditorStateService',
-                'CollectionUpdateService', 'CATEGORY_LIST',
+                'CollectionUpdateService', 'ALL_CATEGORIES',
                 function(
                     $scope, $modalInstance, CollectionEditorStatesService,
-                    CollectionUpdateService, CATEGORY_LIST) {
+                    CollectionUpdateService, ALL_CATEGORIES) {
                   var collection = (
                     CollectionEditorStateService.getCollection());
 
@@ -159,10 +161,10 @@ oppia.directive('collectionEditorNavbar', [function() {
                   $scope.newCategory = collection.getCategory();
 
                   $scope.CATEGORY_LIST_FOR_SELECT2 = [];
-                  for (var i = 0; i < CATEGORY_LIST.length; i++) {
+                  for (var i = 0; i < ALL_CATEGORIES.length; i++) {
                     $scope.CATEGORY_LIST_FOR_SELECT2.push({
-                      id: CATEGORY_LIST[i],
-                      text: CATEGORY_LIST[i]
+                      id: ALL_CATEGORIES[i],
+                      text: ALL_CATEGORIES[i]
                     });
                   }
 
@@ -229,7 +231,9 @@ oppia.directive('collectionEditorNavbar', [function() {
           CollectionRightsBackendApiService.setCollectionPrivate(
             $scope.collectionId, $scope.collection.getVersion()).then(
             function() {
-              $scope.isPrivate = true;
+              $scope.collectionRights.setPrivate();
+              CollectionEditorStateService.setCollectionRights(
+                $scope.collectionRights);
             }, function() {
               alertsService.addWarning(
                 'There was an error when unpublishing the collection.');

@@ -32,7 +32,6 @@ oppia.factory('parameterMetadataService', [
 
     var getMetadataFromParamChanges = function(paramChanges) {
       var result = [];
-
       for (var i = 0; i < paramChanges.length; i++) {
         var pc = paramChanges[i];
 
@@ -86,17 +85,19 @@ oppia.factory('parameterMetadataService', [
     var getStateParamMetadata = function(state) {
       // First, the state param changes are applied: we get their values
       // and set the params.
-      var result = getMetadataFromParamChanges(state.param_changes);
+      var result = getMetadataFromParamChanges(state.paramChanges);
 
       // Next, the content is evaluated.
       expressionInterpolationService.getParamsFromString(
-          state.content[0].value).forEach(function(paramName) {
-        result.push({
-          action: PARAM_ACTION_GET,
-          paramName: paramName,
-          source: PARAM_SOURCE_CONTENT
-        });
-      });
+          state.content[0].value).forEach(
+        function(paramName) {
+          result.push({
+            action: PARAM_ACTION_GET,
+            paramName: paramName,
+            source: PARAM_SOURCE_CONTENT
+          });
+        }
+      );
 
       // Next, the answer is received.
       result.push({
@@ -106,17 +107,19 @@ oppia.factory('parameterMetadataService', [
       });
 
       // Finally, the rule feedback strings are evaluated.
-      state.interaction.answer_groups.forEach(function(group) {
+      state.interaction.answerGroups.forEach(function(group) {
         for (var k = 0; k < group.outcome.feedback.length; k++) {
           expressionInterpolationService.getParamsFromString(
-              group.outcome.feedback[k]).forEach(function(paramName) {
-            result.push({
-              action: PARAM_ACTION_GET,
-              paramName: paramName,
-              source: PARAM_SOURCE_FEEDBACK,
-              sourceInd: k
-            });
-          });
+              group.outcome.feedback[k]).forEach(
+            function(paramName) {
+              result.push({
+                action: PARAM_ACTION_GET,
+                paramName: paramName,
+                source: PARAM_SOURCE_FEEDBACK,
+                sourceInd: k
+              });
+            }
+          );
         }
       });
 
@@ -161,7 +164,6 @@ oppia.factory('parameterMetadataService', [
             allParamNames.push(expParamMetadataItem.paramName);
           }
         });
-
         for (var stateName in states) {
           stateParamMetadatas[stateName] = getStateParamMetadata(
             states[stateName]);

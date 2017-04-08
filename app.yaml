@@ -1,5 +1,5 @@
 application: oppiaserver
-version: 2-3-7
+version: 2-4-1
 runtime: python27
 api_version: 1
 threadsafe: false
@@ -12,6 +12,7 @@ builtins:
 
 inbound_services:
 - warmup
+- mail
 
 handlers:
 - url: /favicon.ico
@@ -31,6 +32,7 @@ handlers:
 - url: /build
   static_dir: build
   secure: always
+  expiration: 30d
   http_headers:
     Cache-Control: 'public, max-age=2592000'
 - url: /assets/common
@@ -43,6 +45,7 @@ handlers:
 - url: /assets
   static_dir: assets
   secure: always
+  application_readable: true
   http_headers:
     Cache-Control: 'public, max-age=60'
 - url: /css
@@ -113,6 +116,10 @@ handlers:
 - url: /task/.*
   login: admin
   script: main_taskqueue.app
+  secure: always
+- url: /_ah/mail/.*
+  login: admin
+  script: main_mail.app
   secure: always
 - url: /.*
   script: main.app

@@ -22,7 +22,7 @@
 
   <background-banner></background-banner>
   <div class="oppia-page-card oppia-static-content oppia-static-content-below-banner">
-    <div class="oppia-static-card-content oppia-static-card-content-narrow">
+    <div class="oppia-static-card-content oppia-static-card-content-narrow oppia-get-started">
 
       <p>
         Creating an exploration is easy and free. Share your knowledge with
@@ -30,7 +30,7 @@
         your exploration's effectiveness.
       </p>
 
-      <h3>Choose a Topic</h3>
+      <h2>Choose a Topic</h2>
       <p>All you need to get started is a topic you want to teach. You can
         create an exploration about any topic, large or small. The ideal size
         of topic for an exploration is one that you would cover in a single
@@ -39,7 +39,7 @@
       </p>
 
 
-      <h3>Create Your Exploration</h3>
+      <h2>Create Your Exploration</h2>
       <p>
         When you have chosen a topic, just click ‘Create’, and log in with your Google account.
         If you don't have a Google account, you can <a href="https://accounts.google.com/SignUp" target="new">create one here</a>.
@@ -60,17 +60,19 @@
         <li><a href="https://www.oppia.org/collection/inDXV0w8-p1C" target="new">Programming with Carla</a></li>
       </ul>
       <p>
-        More information about creating explorations can be found <a href="https://oppia.github.io/#/CreatingAnExploration" target="new">here</a>.
+        More information about creating explorations can be found
+        <a href="https://oppia.github.io/#/CreatingAnExploration" target="new">
+          in our user documentation</a>.
       </p>
 
-      <h3>Publish Your Exploration</h3>
+      <h2>Publish Your Exploration</h2>
       <p>
         Once you've created your exploration and you're ready for learners to see it, click the
         'Publish' button at the top of the page.  This will make your exploration available to
         learners around the world!
       </p>
 
-      <h3>Share Your Exploration</h3>
+      <h2>Share Your Exploration</h2>
       <p>
         After you publish the exploration, you can share it via a
         link, or even <a href="https://oppia.github.io/#/EmbeddingAnExploration" target="new">embed
@@ -79,7 +81,7 @@
 
       <!-- todo: make it easy to get the right link to share, update this doc with that info -->
 
-      <h3>Improve Your Exploration</h3>
+      <h2>Improve Your Exploration</h2>
       <p>
         When learners go through your exploration, they can send you feedback to alert you to problems
         or to share ideas for making it better.
@@ -92,7 +94,7 @@
         step, or "go deeper" by asking another question.
       </p>
 
-      <h3>Get Involved</h3>
+      <h2>Get Involved</h2>
       <p>
         To get involved in the Oppia
         project and help us bring about our mission of free, high-quality
@@ -105,7 +107,19 @@
   </div>
   <div class="oppia-footer-padding-below-banner">
   </div>
+  <style>
+    .oppia-get-started h2 {
+      font-size: 1.17em;
+      font-weight: bold;
+      text-align: left;
+    }
+  </style>
 {% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
+{% endblock footer_js %}
 
 {% block footer%}
   {% include 'pages/footer.html' %}

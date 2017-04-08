@@ -80,7 +80,7 @@ oppia.directive('searchBar', [function() {
           var selectedItems = [];
           for (var i = 0; i < masterList.length; i++) {
             if ($scope.selectionDetails[itemsType]
-                      .selections[masterList[i].id]) {
+              .selections[masterList[i].id]) {
               selectedItems.push(masterList[i].text);
             }
           }
@@ -101,7 +101,7 @@ oppia.directive('searchBar', [function() {
             var translatedItems = [];
             for (var i = 0; i < selectedItems.length; i++) {
               translatedItems.push($translate.instant(selectedItems[i]));
-            };
+            }
             $scope.selectionDetails[itemsType].description = (
               translatedItems.join(', '));
           } else {
@@ -127,6 +127,13 @@ oppia.directive('searchBar', [function() {
           updateSelectionDetails(itemsType);
         };
 
+        $scope.$watch('searchQuery', function(newQuery, oldQuery) {
+          // Run only if the query has changed.
+          if (newQuery !== oldQuery) {
+            onSearchQueryChangeExec();
+          }
+        });
+
         var onSearchQueryChangeExec = function() {
           searchService.executeSearchQuery(
             $scope.searchQuery, $scope.selectionDetails.categories.selections,
@@ -147,15 +154,6 @@ oppia.directive('searchBar', [function() {
         for (var itemsType in $scope.selectionDetails) {
           updateSelectionDetails(itemsType);
         }
-
-        $scope.onSearchQueryChange = function(evt) {
-          // Query immediately when the enter or space key is pressed.
-          if (evt.keyCode === 13 || evt.keyCode === 32) {
-            onSearchQueryChangeExec();
-          } else {
-            oppiaDebouncer.debounce(onSearchQueryChangeExec, 1000)();
-          }
-        };
 
         var updateSearchFieldsBasedOnUrlQuery = function() {
           var oldQueryString = searchService.getCurrentUrlQueryString();
@@ -205,6 +203,10 @@ oppia.directive('searchBar', [function() {
             }
 
             refreshSearchBarLabels();
+
+            // Notify the function that handles overflow in case the search
+            // elements load after it has already been run.
+            $rootScope.$broadcast('searchBarLoaded', true);
           }
         );
 

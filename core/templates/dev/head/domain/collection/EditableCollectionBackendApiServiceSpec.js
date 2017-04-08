@@ -60,67 +60,70 @@ describe('Editable collection backend API service', function() {
   });
 
   it('should successfully fetch an existing collection from the backend',
-      function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expect('GET', '/collection_editor_handler/data/0').respond(
-      sampleDataResults);
-    EditableCollectionBackendApiService.fetchCollection('0').then(
-      successHandler, failHandler);
-    $httpBackend.flush();
+      $httpBackend.expect('GET', '/collection_editor_handler/data/0').respond(
+        sampleDataResults);
+      EditableCollectionBackendApiService.fetchCollection('0').then(
+        successHandler, failHandler);
+      $httpBackend.flush();
 
-    expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
-    expect(failHandler).not.toHaveBeenCalled();
-  });
+      expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+  );
 
   it('should use the rejection handler if the backend request failed',
-      function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
 
-    // Loading a collection the first time should fetch it from the backend.
-    $httpBackend.expect('GET', '/collection_editor_handler/data/1').respond(
-      500, 'Error loading collection 1.');
-    EditableCollectionBackendApiService.fetchCollection('1').then(
-      successHandler, failHandler);
-    $httpBackend.flush();
+      // Loading a collection the first time should fetch it from the backend.
+      $httpBackend.expect('GET', '/collection_editor_handler/data/1').respond(
+        500, 'Error loading collection 1.');
+      EditableCollectionBackendApiService.fetchCollection('1').then(
+        successHandler, failHandler);
+      $httpBackend.flush();
 
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Error loading collection 1.');
-  });
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Error loading collection 1.');
+    }
+  );
 
   it('should update a collection after fetching it from the backend',
-      function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
 
-    // Loading a collection the first time should fetch it from the backend.
-    $httpBackend.expect('GET', '/collection_editor_handler/data/0').respond(
-      sampleDataResults);
+      // Loading a collection the first time should fetch it from the backend.
+      $httpBackend.expect('GET', '/collection_editor_handler/data/0').respond(
+        sampleDataResults);
 
-    EditableCollectionBackendApiService.fetchCollection('0').then(
-      function(data) {
-        collection = data;
-      });
-    $httpBackend.flush();
+      EditableCollectionBackendApiService.fetchCollection('0').then(
+        function(data) {
+          collection = data;
+        });
+      $httpBackend.flush();
 
-    collection.title = 'New Title';
-    collection.version = '2';
-    var collectionWrapper = {
-      collection: collection
-    };
+      collection.title = 'New Title';
+      collection.version = '2';
+      var collectionWrapper = {
+        collection: collection
+      };
 
-    $httpBackend.expect('PUT', '/collection_editor_handler/data/0').respond(
-      collectionWrapper);
+      $httpBackend.expect('PUT', '/collection_editor_handler/data/0').respond(
+        collectionWrapper);
 
-    // Send a request to update collection
-    EditableCollectionBackendApiService.updateCollection(
-      collection.id, collection.version, collection.title, []).then(
-        successHandler, failHandler);
-    $httpBackend.flush();
+      // Send a request to update collection
+      EditableCollectionBackendApiService.updateCollection(
+        collection.id, collection.version, collection.title, []).then(
+          successHandler, failHandler);
+      $httpBackend.flush();
 
-    expect(successHandler).toHaveBeenCalledWith(collection);
-    expect(failHandler).not.toHaveBeenCalled();
-  });
+      expect(successHandler).toHaveBeenCalledWith(collection);
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+  );
 });

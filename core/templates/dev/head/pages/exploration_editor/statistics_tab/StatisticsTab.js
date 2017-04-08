@@ -23,13 +23,13 @@ oppia.constant('IMPROVE_TYPE_INCOMPLETE', 'incomplete');
 oppia.controller('StatisticsTab', [
   '$scope', '$http', '$modal', 'alertsService', 'explorationStatesService',
   'explorationData', 'computeGraphService', 'oppiaDatetimeFormatter',
-  'StateImprovementSuggestionService', 'IMPROVE_TYPE_DEFAULT',
-  'IMPROVE_TYPE_INCOMPLETE',
+  'StatesObjectFactory', 'StateImprovementSuggestionService',
+  'IMPROVE_TYPE_DEFAULT', 'IMPROVE_TYPE_INCOMPLETE',
   function(
       $scope, $http, $modal, alertsService, explorationStatesService,
       explorationData, computeGraphService, oppiaDatetimeFormatter,
-      StateImprovementSuggestionService, IMPROVE_TYPE_DEFAULT,
-      IMPROVE_TYPE_INCOMPLETE) {
+      StatesObjectFactory, StateImprovementSuggestionService,
+      IMPROVE_TYPE_DEFAULT, IMPROVE_TYPE_INCOMPLETE) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
       chartAreaWidth: 300,
       colors: ['green', 'firebrick'],
@@ -66,7 +66,8 @@ oppia.controller('StatisticsTab', [
           '/createhandler/data/' + explorationData.explorationId);
 
         $http.get(explorationDataUrl).then(function(response) {
-          var states = response.data.states;
+          var statesDict = response.data.states;
+          var states = StatesObjectFactory.createFromBackendDict(statesDict);
           var initStateName = response.data.init_state_name;
           $scope.statsGraphData = computeGraphService.compute(
             initStateName, states);

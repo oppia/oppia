@@ -1,5 +1,4 @@
 category: Welcome
-language_code: en
 nodes:
 - acquired_skills:
   - Welcome to Oppia!
@@ -25,6 +24,7 @@ nodes:
   exploration_id: '15'
   prerequisite_skills:
   - Three Balls
+language_code: en
 objective: To introduce collections using demo explorations.
 schema_version: 2
 tags: []

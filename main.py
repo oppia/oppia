@@ -32,6 +32,7 @@ from core.controllers import profile
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
+from core.controllers import subscriptions
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -70,7 +71,18 @@ class HomePageRedirectHandler(base.BaseHandler):
     """
     def get(self):
         if self.user_id and user_services.has_fully_registered(self.user_id):
-            self.redirect(feconf.DASHBOARD_URL)
+            user_contributions = user_services.get_user_contributions(
+                self.user_id)
+
+            # 'Creator' is a user who has created or edited an exploration.
+            user_is_creator = (
+                user_contributions is not None and
+                (len(user_contributions.created_exploration_ids) > 0 or
+                 len(user_contributions.edited_exploration_ids) > 0))
+            if user_is_creator:
+                self.redirect(feconf.DASHBOARD_URL)
+            else:
+                self.redirect(feconf.LIBRARY_INDEX_URL)
         else:
             self.redirect(feconf.SPLASH_URL)
 
@@ -227,7 +239,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/profilehandler/data/<username>', profile.ProfileHandler),
     get_redirect_route(r'/preferences', profile.PreferencesPage),
     get_redirect_route(
-        r'/preferenceshandler/data', profile.PreferencesHandler),
+        feconf.PREFERENCES_DATA_URL, profile.PreferencesHandler),
     get_redirect_route(
         r'/preferenceshandler/profile_picture', profile.ProfilePictureHandler),
     get_redirect_route(
@@ -309,6 +321,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/moderatorrights/<exploration_id>',
         editor.ExplorationModeratorRightsHandler),
     get_redirect_route(
+        r'/createhandler/notificationpreferences/<exploration_id>',
+        editor.UserExplorationEmailsHandler),
+    get_redirect_route(
         r'/createhandler/snapshots/<exploration_id>',
         editor.ExplorationSnapshotsHandler),
     get_redirect_route(
@@ -349,6 +364,12 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.SUGGESTION_URL_PREFIX,
         feedback.SuggestionHandler),
+    get_redirect_route(
+        r'%s' % feconf.SUBSCRIBE_URL_PREFIX,
+        subscriptions.SubscribeHandler),
+    get_redirect_route(
+        r'%s' % feconf.UNSUBSCRIBE_URL_PREFIX,
+        subscriptions.UnsubscribeHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.FLAG_EXPLORATION_URL_PREFIX,
         reader.FlagExplorationHandler),

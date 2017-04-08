@@ -21,9 +21,7 @@ list of lint errors to the terminal. If the directory path is passed,
 it will lint all Python and JavaScript files in that directory; otherwise,
 it will only lint files that have been touched in this commit.
 
-This script ignores all filepaths contained within the excludeFiles
-argument in .jscsrc. Note that, as a side-effect, these filepaths will also
-prevent Python files in those paths from being linted.
+This script ignores all filepaths contained within .eslintignore.
 
 IMPORTANT NOTES:
 
@@ -40,7 +38,7 @@ CUSTOMIZATION OPTIONS
 1.  To lint only files that have been touched in this commit
        python scripts/pre_commit_linter.py
 
-2.  To lint all files in  the folder or to lint just a specific file
+2.  To lint all files in the folder or to lint just a specific file
         python scripts/pre_commit_linter.py --path filepath
 
 3.  To lint a specific list of files (*.js/*.py only). Separate files by spaces
@@ -53,7 +51,6 @@ Note that the root folder MUST be named 'oppia'.
 # pylint: disable=wrong-import-order
 import argparse
 import fnmatch
-import json
 import multiprocessing
 import os
 import re
@@ -77,36 +74,27 @@ _EXCLUSIVE_GROUP.add_argument(
 BAD_PATTERNS = {
     '__author__': {
         'message': 'Please remove author tags from this file.',
-        'excluded_files': ()},
+        'excluded_files': (),
+        'excluded_dirs': ()},
     'datetime.datetime.now()': {
         'message': 'Please use datetime.datetime.utcnow() instead of'
                    'datetime.datetime.now().',
-        'excluded_files': ()},
+        'excluded_files': (),
+        'excluded_dirs': ()},
     '\t': {
         'message': 'Please use spaces instead of tabs.',
-        'excluded_files': ()},
+        'excluded_files': (),
+        'excluded_dirs': (
+            'assets/i18n/',)},
     '\r': {
         'message': 'Please make sure all files only have LF endings (no CRLF).',
-        'excluded_files': ()},
+        'excluded_files': (),
+        'excluded_dirs': ()},
     'glyphicon': {
         'message': 'Please use equivalent material-icons '
                    'instead of glyphicons.',
-        'excluded_files': ()}
-}
-
-BAD_PATTERNS_JS = {
-    ' == ': {
-        'message': 'Please replace == with === in this file.',
-        'excluded_files': (
-            'core/templates/dev/head/expressions/parserSpec.js',
-            'core/templates/dev/head/expressions/evaluatorSpec.js',
-            'core/templates/dev/head/expressions/typeParserSpec.js')},
-    ' != ': {
-        'message': 'Please replace != with !== in this file.',
-        'excluded_files': (
-            'core/templates/dev/head/expressions/parserSpec.js',
-            'core/templates/dev/head/expressions/evaluatorSpec.js',
-            'core/templates/dev/head/expressions/typeParserSpec.js')}
+        'excluded_files': (),
+        'excluded_dirs': ()}
 }
 
 BAD_PATTERNS_JS_REGEXP = [
@@ -180,36 +168,50 @@ _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
 
 
+def _is_filename_excluded_for_bad_patterns_check(pattern, filename):
+    """Checks if file is excluded from the bad patterns check.
+
+    Args:
+        pattern: str. The pattern to be checked against.
+        filename: str. Name of the file.
+
+    Returns:
+        bool: Whether to exclude the given file from this
+        particular pattern check.
+    """
+    return (any(filename.startswith(bad_pattern)
+                for bad_pattern in BAD_PATTERNS[pattern]['excluded_dirs'])
+            or filename in BAD_PATTERNS[pattern]['excluded_files'])
+
+
 def _get_changed_filenames():
     """Returns a list of modified files (both staged and unstaged)
 
     Returns:
-        a list of filenames of modified files
+        a list of filenames of modified files.
     """
     unstaged_files = subprocess.check_output([
-        'git', 'diff', '--name-only']).splitlines()
+        'git', 'diff', '--name-only',
+        '--diff-filter=ACM']).splitlines()
     staged_files = subprocess.check_output([
         'git', 'diff', '--cached', '--name-only',
         '--diff-filter=ACM']).splitlines()
     return unstaged_files + staged_files
 
 
-def _get_glob_patterns_excluded_from_jscsrc(config_jscsrc):
-    """Collects excludeFiles from jscsrc file.
+def _get_glob_patterns_excluded_from_eslint(eslintignore_path):
+    """Collects excludeFiles from .eslintignore file.
 
     Args:
-    - config_jscsrc: str. Path to .jscsrc file.
+        eslintignore_path: str. Path to .eslintignore file.
 
     Returns:
         a list of files in excludeFiles.
     """
-    with open(config_jscsrc) as f:
-        f.readline()  # First three lines are comments
-        f.readline()
-        f.readline()
-        json_data = json.loads(f.read())
-
-    return json_data['excludeFiles']
+    file_data = []
+    with open(eslintignore_path) as f:
+        file_data.extend(f.readlines())
+    return file_data
 
 
 def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
@@ -217,8 +219,9 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     subdirectories of specified path.
 
     Args:
-    - dir_path: str. Path to the folder to be linted.
-    - excluded_glob_patterns: set. Set of all files to be excluded.
+        dir_path: str. Path to the folder to be linted.
+        excluded_glob_patterns: set(str). Set of all glob patterns
+            to be excluded.
 
     Returns:
         a list of files in directory and subdirectories without excluded files.
@@ -234,17 +237,16 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     return files_in_directory
 
 
-def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint, stdout,
+def _lint_js_files(node_path, eslint_path, files_to_lint, stdout,
                    result):
     """Prints a list of lint errors in the given list of JavaScript files.
 
     Args:
-    - node_path: str. Path to the node binary.
-    - jscs_path: str. Path to the JSCS binary.
-    - config_jscsrc: str. Configuration args for the call to the JSCS binary.
-    - files_to_lint: list of str. A list of filepaths to lint.
-    - stdout:  multiprocessing.Queue. A queue to store JSCS outputs
-    - result: multiprocessing.Queue. A queue to put results of test
+        node_path: str. Path to the node binary.
+        eslint_path: str. Path to the ESLint binary.
+        files_to_lint: list(str). A list of filepaths to lint.
+        stdout:  multiprocessing.Queue. A queue to store ESLint outputs.
+        result: multiprocessing.Queue. A queue to put results of test.
 
     Returns:
         None
@@ -259,10 +261,10 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint, stdout,
         return
 
     print 'Total js files: ', num_js_files
-    jscs_cmd_args = [node_path, jscs_path, config_jscsrc]
+    eslint_cmd_args = [node_path, eslint_path, '--quiet']
     for _, filename in enumerate(files_to_lint):
         print 'Linting: ', filename
-        proc_args = jscs_cmd_args + [filename]
+        proc_args = eslint_cmd_args + [filename]
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -290,9 +292,9 @@ def _lint_py_files(config_pylint, files_to_lint, result):
     """Prints a list of lint errors in the given list of Python files.
 
     Args:
-    - config_pylint: str. Path to the .pylintrc file.
-    - files_to_lint: list of str. A list of filepaths to lint.
-    - result: multiprocessing.Queue. A queue to put results of test
+        config_pylint: str. Path to the .pylintrc file.
+        files_to_lint: list(str). A list of filepaths to lint.
+        result: multiprocessing.Queue. A queue to put results of test.
 
     Returns:
         None
@@ -343,7 +345,7 @@ def _get_all_files():
     root directory and to return a list of all the files for linting and
     pattern checks.
     """
-    jscsrc_path = os.path.join(os.getcwd(), '.jscsrc')
+    eslintignore_path = os.path.join(os.getcwd(), '.eslintignore')
     parsed_args = _PARSER.parse_args()
     if parsed_args.path:
         input_path = os.path.join(os.getcwd(), parsed_args.path)
@@ -354,8 +356,8 @@ def _get_all_files():
         if os.path.isfile(input_path):
             all_files = [input_path]
         else:
-            excluded_glob_patterns = _get_glob_patterns_excluded_from_jscsrc(
-                jscsrc_path)
+            excluded_glob_patterns = _get_glob_patterns_excluded_from_eslint(
+                eslintignore_path)
             all_files = _get_all_files_in_directory(
                 input_path, excluded_glob_patterns)
     elif parsed_args.files:
@@ -373,31 +375,32 @@ def _get_all_files():
         all_files = valid_filepaths
     else:
         all_files = _get_changed_filenames()
+    all_files = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
     return all_files
 
 
 def _pre_commit_linter(all_files):
-    """This function is used to check if node-jscs dependencies are installed
-    and pass JSCS binary path
+    """This function is used to check if node-eslint dependencies are installed
+    and pass ESLint binary path.
     """
     print 'Starting linter...'
 
-    jscsrc_path = os.path.join(os.getcwd(), '.jscsrc')
     pylintrc_path = os.path.join(os.getcwd(), '.pylintrc')
 
-    config_jscsrc = '--config=%s' % jscsrc_path
     config_pylint = '--rcfile=%s' % pylintrc_path
 
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
     node_path = os.path.join(
         parent_dir, 'oppia_tools', 'node-6.9.1', 'bin', 'node')
-    jscs_path = os.path.join(
-        parent_dir, 'node_modules', 'jscs', 'bin', 'jscs')
+    eslint_path = os.path.join(
+        parent_dir, 'node_modules', 'eslint', 'bin', 'eslint.js')
 
-    if not os.path.exists(jscs_path):
+    if not os.path.exists(eslint_path):
         print ''
-        print 'ERROR    Please run start.sh first to install node-jscs '
+        print 'ERROR    Please run start.sh first to install node-eslint '
         print '         and its dependencies.'
         sys.exit(1)
 
@@ -410,8 +413,8 @@ def _pre_commit_linter(all_files):
     linting_processes = []
     js_stdout = multiprocessing.Queue()
     linting_processes.append(multiprocessing.Process(
-        target=_lint_js_files, args=(node_path, jscs_path, config_jscsrc,
-                                     js_files_to_lint, js_stdout, js_result)))
+        target=_lint_js_files, args=(node_path, eslint_path, js_files_to_lint,
+                                     js_stdout, js_result)))
 
     py_result = multiprocessing.Queue()
     linting_processes.append(multiprocessing.Process(
@@ -445,6 +448,60 @@ def _pre_commit_linter(all_files):
     return summary_messages
 
 
+def _check_newline_character(all_files):
+    """This function is used to check that each file
+    ends with a single newline character.
+    """
+    print 'Starting newline-at-EOF checks'
+    print '----------------------------------------'
+    total_files_checked = 0
+    total_error_count = 0
+    summary_messages = []
+    all_files = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
+    failed = False
+    for filename in all_files:
+        with open(filename, 'rb') as f:
+            total_files_checked += 1
+            total_num_chars = 0
+            for line in f:
+                total_num_chars += len(line)
+            if total_num_chars == 1:
+                failed = True
+                print '%s --> Error: Only one character in file' % filename
+                total_error_count += 1
+            elif total_num_chars > 1:
+                f.seek(-2, 2)
+                if not (f.read(1) != '\n' and f.read(1) == '\n'):
+                    failed = True
+                    print (
+                        '%s --> Please ensure that this file ends'
+                        'with exactly one newline char.' % filename)
+                    total_error_count += 1
+
+    if failed:
+        summary_message = '%s   Newline character checks failed' % (
+            _MESSAGE_TYPE_FAILED)
+        summary_messages.append(summary_message)
+    else:
+        summary_message = '%s   Newline character checks passed' % (
+            _MESSAGE_TYPE_SUCCESS)
+        summary_messages.append(summary_message)
+
+    print ''
+    print '----------------------------------------'
+    print ''
+    if total_files_checked == 0:
+        print 'There are no files to be checked.'
+    else:
+        print '(%s files checked, %s errors found)' % (
+            total_files_checked, total_error_count)
+        print summary_message
+
+    return summary_messages
+
+
 def _check_bad_patterns(all_files):
     """This function is used for detecting bad patterns.
     """
@@ -462,22 +519,14 @@ def _check_bad_patterns(all_files):
             content = f.read()
             total_files_checked += 1
             for pattern in BAD_PATTERNS:
-                if pattern in content and filename not in (
-                        BAD_PATTERNS[pattern]['excluded_files']):
+                if (pattern in content and
+                        not _is_filename_excluded_for_bad_patterns_check(
+                            pattern, filename)):
                     failed = True
                     print '%s --> %s' % (
                         filename, BAD_PATTERNS[pattern]['message'])
                     total_error_count += 1
             if filename.endswith('.js'):
-                for pattern in BAD_PATTERNS_JS:
-                    if filename not in (
-                            BAD_PATTERNS_JS[pattern]['excluded_files']):
-                        if pattern in content:
-                            failed = True
-                            print '%s --> %s' % (
-                                filename,
-                                BAD_PATTERNS_JS[pattern]['message'])
-                            total_error_count += 1
                 for regexp in BAD_PATTERNS_JS_REGEXP:
                     regexp_pattern = regexp['regexp']
                     if filename not in regexp['excluded_files']:
@@ -517,9 +566,10 @@ def _check_bad_patterns(all_files):
 
 def main():
     all_files = _get_all_files()
+    newline_messages = _check_newline_character(all_files)
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
-    all_messages = linter_messages + pattern_messages
+    all_messages = linter_messages + newline_messages + pattern_messages
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)

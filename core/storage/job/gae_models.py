@@ -40,7 +40,14 @@ class JobModel(base_models.BaseModel):
 
     @classmethod
     def get_new_id(cls, entity_name):
-        """Overwrites superclass method."""
+        """Overwrites superclass method.
+
+        Args:
+            entity_name: str. The name of the entity to create a new job id for.
+
+        Returns:
+            str. A job id.
+        """
         job_type = entity_name
         current_time_str = str(int(utils.get_current_time_in_millisecs()))
         random_int = random.randint(0, 1000)
@@ -87,6 +94,17 @@ class JobModel(base_models.BaseModel):
 
     @classmethod
     def get_recent_jobs(cls, limit, recency_msec):
+        """Gets at most limit jobs with respect to a time after recency_msec.
+
+        Args:
+            limit: int. A limit on the number of jobs to return.
+            recency_msec: int. The number of milliseconds earlier
+                than the current time.
+
+        Returns:
+            list(JobModel) or None. A list of at most `limit` jobs
+            that come after recency_msec time.
+        """
         earliest_time_msec = (
             utils.get_current_time_in_millisecs() - recency_msec)
         return cls.query().filter(
@@ -95,17 +113,40 @@ class JobModel(base_models.BaseModel):
 
     @classmethod
     def get_all_unfinished_jobs(cls, limit):
+        """Gets at most `limit` unfinished jobs.
+
+        Args:
+            limit: int. A limit on the number of jobs to return.
+
+        Returns:
+            list(JobModel) or None. A list of at most `limit` number
+            of unfinished jobs.
+        """
         return cls.query().filter(
             JobModel.status_code.IN([STATUS_CODE_QUEUED, STATUS_CODE_STARTED])
         ).order(-cls.time_queued_msec).fetch(limit)
 
     @classmethod
     def get_unfinished_jobs(cls, job_type):
+        """Gets jobs that are unfinished.
+
+        Args:
+            job_type: str. The type of jobs that may be unfinished.
+
+        Returns:
+            list(JobModel) or None. A list of all jobs that belong
+            to the given job_type.
+        """
         return cls.query().filter(cls.job_type == job_type).filter(
             JobModel.status_code.IN([STATUS_CODE_QUEUED, STATUS_CODE_STARTED]))
 
     @classmethod
     def do_unfinished_jobs_exist(cls, job_type):
+        """Checks if unfinished jobs exist.
+
+        Returns:
+            bool. True if unfinished jobs exist, otherwise false.
+        """
         return bool(cls.get_unfinished_jobs(job_type).count(limit=1))
 
 

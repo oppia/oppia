@@ -22,6 +22,7 @@ import logging
 
 import jinja2
 
+from constants import constants
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import dependency_registry
@@ -53,6 +54,7 @@ current_user_services = models.Registry.import_current_user_services()
 # state name and the destination of the default rule should first be
 # changed to the desired new state name.
 NEW_STATE_TEMPLATE = {
+    'classifier_model_id': None,
     'content': [{
         'type': 'text',
         'value': ''
@@ -159,7 +161,7 @@ class ExplorationPage(EditorHandler):
 
     def get(self, exploration_id):
         """Handles GET requests."""
-        if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
+        if exploration_id in constants.DISABLED_EXPLORATION_IDS:
             self.render_template(
                 'pages/error/disabled_exploration.html',
                 iframe_restriction=None)
@@ -286,6 +288,9 @@ class ExplorationHandler(EditorHandler):
                 exploration_id, exp_user_data.draft_change_list_exp_version)
             if exp_user_data and exp_user_data.draft_change_list_exp_version
             else None)
+        exploration_email_preferences = (
+            user_services.get_email_preferences_for_exploration(
+                self.user_id, exploration_id))
         editor_dict = {
             'category': exploration.category,
             'exploration_id': exploration_id,
@@ -305,7 +310,8 @@ class ExplorationHandler(EditorHandler):
             'title': exploration.title,
             'version': exploration.version,
             'is_version_of_draft_valid': is_version_of_draft_valid,
-            'draft_changes': draft_changes
+            'draft_changes': draft_changes,
+            'email_preferences': exploration_email_preferences.to_dict()
         }
 
         return editor_dict
@@ -334,7 +340,6 @@ class ExplorationHandler(EditorHandler):
 
         commit_message = self.payload.get('commit_message')
         change_list = self.payload.get('change_list')
-
         try:
             exp_services.update_exploration(
                 self.user_id, exploration_id, change_list, commit_message)
@@ -545,6 +550,62 @@ class ExplorationModeratorRightsHandler(EditorHandler):
         })
 
 
+class UserExplorationEmailsHandler(EditorHandler):
+    """Handles management of user email notification preferences for this
+    exploration.
+    """
+
+    def put(self, exploration_id):
+        """Updates the email notification preferences for the given exploration.
+
+        Args:
+            exploration_id: str. The exploration id.
+
+        Raises:
+            InvalidInputException: Invalid message type.
+        """
+
+        mute = self.payload.get('mute')
+        message_type = self.payload.get('message_type')
+
+        if message_type == feconf.MESSAGE_TYPE_FEEDBACK:
+            user_services.set_email_preferences_for_exploration(
+                self.user_id, exploration_id, mute_feedback_notifications=mute)
+        elif message_type == feconf.MESSAGE_TYPE_SUGGESTION:
+            user_services.set_email_preferences_for_exploration(
+                self.user_id, exploration_id,
+                mute_suggestion_notifications=mute)
+        else:
+            raise self.InvalidInputException(
+                'Invalid message type.')
+
+        exploration_email_preferences = (
+            user_services.get_email_preferences_for_exploration(
+                self.user_id, exploration_id))
+        self.render_json({
+            'email_preferences': exploration_email_preferences.to_dict()
+        })
+
+class ResolvedAnswersHandler(EditorHandler):
+    """Allows learners' answers for a state to be marked as resolved."""
+
+    @require_editor
+    def put(self, exploration_id, state_name):
+        """Marks learners' answers as resolved."""
+        resolved_answers = self.payload.get('resolved_answers')
+
+        if not isinstance(resolved_answers, list):
+            raise self.InvalidInputException(
+                'Expected a list of resolved answers; received %s.' %
+                resolved_answers)
+
+        if 'resolved_answers' in self.payload:
+            event_services.DefaultRuleAnswerResolutionEventHandler.record(
+                exploration_id, state_name, resolved_answers)
+
+        self.render_json({})
+
+
 class UntrainedAnswersHandler(EditorHandler):
     """Returns answers that learners have submitted, but that Oppia hasn't been
     explicitly trained to respond to by an exploration author.
@@ -608,7 +669,7 @@ class UntrainedAnswersHandler(EditorHandler):
                 for answer_group in interaction.answer_groups:
                     for rule_spec in answer_group.rule_specs:
                         if (rule_spec.rule_type ==
-                                exp_domain.CLASSIFIER_RULESPEC_STR):
+                                exp_domain.RULE_TYPE_CLASSIFIER):
                             trained_answers.update(
                                 interaction_instance.normalize_answer(trained)
                                 for trained

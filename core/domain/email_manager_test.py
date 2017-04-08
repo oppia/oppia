@@ -20,6 +20,7 @@ import types
 from core.domain import config_services
 from core.domain import email_manager
 from core.domain import rights_manager
+from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -134,7 +135,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
 
     def test_email_is_not_sent_if_recipient_has_declined_such_emails(self):
         user_services.update_email_preferences(
-            self.new_user_id, True, False, False)
+            self.new_user_id, True, False, False, False)
 
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             email_manager.send_role_notification_email(
@@ -1086,7 +1087,7 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
             'A', self.editor_id, 'Title')
 
         self.expected_email_subject = (
-            'You\'ve received 1 new message on your explorations')
+            'You\'ve received 3 new messages on your explorations')
 
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
@@ -1097,12 +1098,18 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
         expected_email_html_body = (
             'Hi editor,<br>'
             '<br>'
-            'You\'ve received 1 new message on your Oppia explorations:<br>'
-            '<ul><li>Title: A message<br></li></ul>'
+            'You\'ve received 3 new messages on your Oppia explorations:<br>'
+            '<ul>'
+            '<li><a href="https://www.oppia.org/create/A#/feedback">Title</a>:'
+            '<br>'
+            '<ul><li>Message 1.1<br></li>'
+            '<li>Message 1.2<br></li>'
+            '<li>Message 1.3<br></li>'
+            '</ul></li></ul>'
             'You can view and reply to your messages from your '
             '<a href="https://www.oppia.org/dashboard">dashboard</a>.'
             '<br>'
-            'Thanks, and happy teaching!<br>'
+            '<br>Thanks, and happy teaching!<br>'
             '<br>'
             'Best wishes,<br>'
             'The Oppia Team<br>'
@@ -1113,9 +1120,12 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
         expected_email_text_body = (
             'Hi editor,\n'
             '\n'
-            'You\'ve received 1 new message on your Oppia explorations:\n'
-            '- Title: A message\n'
-            'You can view and reply to your messages from your dashboard.'
+            'You\'ve received 3 new messages on your Oppia explorations:\n'
+            '- Title:\n'
+            '- Message 1.1\n'
+            '- Message 1.2\n'
+            '- Message 1.3\n'
+            'You can view and reply to your messages from your dashboard.\n'
             '\n'
             'Thanks, and happy teaching!\n'
             '\n'
@@ -1127,7 +1137,7 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
         feedback_messages = {
             self.exploration.id : {
                 'title': self.exploration.title,
-                'messages': ['A message']}
+                'messages': ['Message 1.1', 'Message 1.2', 'Message 1.3']}
         }
 
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
@@ -1247,6 +1257,89 @@ class SuggestionEmailTest(test_utils.GenericTestBase):
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION)
+
+
+class SubscriptionEmailTest(test_utils.GenericTestBase):
+    def setUp(self):
+        super(SubscriptionEmailTest, self).setUp()
+
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+
+        self.exploration = self.save_new_default_exploration(
+            'A', self.editor_id, 'Title')
+        subscription_services.subscribe_to_creator(
+            self.new_user_id, self.editor_id)
+
+        self.can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS', True)
+        self.can_send_subscription_email_ctx = self.swap(
+            feconf, 'CAN_SEND_SUBSCRIPTION_EMAILS', True)
+
+    def test_that_subscription_emails_are_correct(self):
+        expected_email_subject = 'editor has published a new exploration!'
+
+        expected_email_html_body = (
+            'Hi newuser,<br>'
+            '<br>'
+            'editor has published a new exploration! You can play it here: '
+            '<a href="https://www.oppia.org/explore/A">Title</a><br>'
+            '<br>'
+            'Thanks, and happy learning!<br>'
+            '<br>'
+            'Best wishes,<br>'
+            '- The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_email_text_body = (
+            'Hi newuser,\n'
+            '\n'
+            'editor has published a new exploration! You can play it here: '
+            'Title\n'
+            '\n'
+            'Thanks, and happy learning!\n'
+            '\n'
+            'Best wishes,\n'
+            '- The Oppia Team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+
+        with self.can_send_emails_ctx, self.can_send_subscription_email_ctx:
+            email_manager.send_emails_to_subscribers(
+                self.editor_id, self.exploration.id, self.exploration.title)
+
+            # make sure correct email is sent.
+            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(),
+                expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(),
+                expected_email_text_body)
+
+            # Make sure correct email model is stored.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            sent_email_model = all_models[0]
+            self.assertEqual(
+                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(
+                sent_email_model.recipient_id, self.new_user_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.NEW_USER_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION)
 
 
 class FeedbackMessageInstantEmailTests(test_utils.GenericTestBase):
@@ -1701,3 +1794,76 @@ class BulkEmailsTests(test_utils.GenericTestBase):
 
         all_models = email_models.BulkEmailModel.get_all().fetch()
         self.assertEqual(len(all_models), 0)
+
+
+class EmailPreferencesTests(test_utils.GenericTestBase):
+
+    def test_can_users_receive_thread_email(self):
+        user_ids = ('someUser1', 'someUser2')
+        exp_id = 'someExploration'
+        usernames = ('username1', 'username2')
+        emails = ('user1@example.com', 'user2@example.com')
+
+        for user_id, username, user_email in zip(user_ids, usernames, emails):
+            user_services.get_or_create_user(user_id, user_email)
+            user_services.set_username(user_id, username)
+
+        # Both users can receive all emails in default setting.
+        self.assertListEqual(email_manager.can_users_receive_thread_email(
+            user_ids, exp_id, True), [True, True])
+        self.assertTrue(email_manager.can_users_receive_thread_email(
+            user_ids, exp_id, False), [True, True])
+
+        # First user have muted feedback notifications for this exploration,
+        # therefore he should receive only suggestion emails.
+        user_services.set_email_preferences_for_exploration(
+            user_ids[0], exp_id, mute_feedback_notifications=True)
+        self.assertListEqual(email_manager.can_users_receive_thread_email(
+            user_ids, exp_id, True), [True, True])
+        self.assertListEqual(email_manager.can_users_receive_thread_email(
+            user_ids, exp_id, False), [False, True])
+
+        # Second user have muted suggestion notifications for this exploration,
+        # therefore he should receive only feedback emails.
+        user_services.set_email_preferences_for_exploration(
+            user_ids[1], exp_id, mute_suggestion_notifications=True)
+        self.assertListEqual(email_manager.can_users_receive_thread_email(
+            user_ids, exp_id, True), [True, False])
+        self.assertListEqual(email_manager.can_users_receive_thread_email(
+            user_ids, exp_id, False), [False, True])
+
+        # Both users have disabled all emails globally, therefore they
+        # should not receive any emails.
+        for user_id in user_ids:
+            user_services.update_email_preferences(user_id, True, True, False,
+                                                   True)
+
+        self.assertListEqual(email_manager.can_users_receive_thread_email(
+            user_ids, exp_id, True), [False, False])
+        self.assertTrue(email_manager.can_users_receive_thread_email(
+            user_ids, exp_id, False), [False, False])
+
+        # Both users have unmuted feedback/suggestion emails for this
+        # exploration, but all emails are still disabled globally,
+        # therefore they should not receive any emails.
+        user_services.set_email_preferences_for_exploration(
+            user_ids[0], exp_id, mute_feedback_notifications=False)
+        user_services.set_email_preferences_for_exploration(
+            user_ids[1], exp_id, mute_suggestion_notifications=False)
+        user_services.update_email_preferences(user_id, True, True, False,
+                                               True)
+        self.assertListEqual(email_manager.can_users_receive_thread_email(
+            user_ids, exp_id, True), [False, False])
+        self.assertTrue(email_manager.can_users_receive_thread_email(
+            user_ids, exp_id, False), [False, False])
+
+        # Both user have enabled all emails globally, therefore they should
+        # receive all emails.
+        for user_id in user_ids:
+            user_services.update_email_preferences(user_id, True, True, True,
+                                                   True)
+
+        self.assertListEqual(email_manager.can_users_receive_thread_email(
+            user_ids, exp_id, True), [True, True])
+        self.assertTrue(email_manager.can_users_receive_thread_email(
+            user_ids, exp_id, False), [True, True])

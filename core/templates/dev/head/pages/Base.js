@@ -20,6 +20,9 @@ oppia.controller('Base', [
   '$scope', '$rootScope', '$document', 'alertsService', 'SidebarStatusService',
   function($scope, $rootScope, $document, alertsService, SidebarStatusService) {
     $scope.alertsService = alertsService;
+    $scope.currentLang = 'en';
+    $scope.promoBarIsEnabled = GLOBALS.PROMO_BAR_IS_ENABLED;
+    $scope.promoBarMessage = GLOBALS.PROMO_BAR_MESSAGE;
 
     $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
     // If this is nonempty, the whole page goes into 'Loading...' mode.
@@ -27,6 +30,11 @@ oppia.controller('Base', [
 
     $scope.isSidebarShown = SidebarStatusService.isSidebarShown;
     $scope.closeSidebarOnSwipe = SidebarStatusService.closeSidebar;
+
+    // Listener function to catch the change in language preference.
+    $rootScope.$on('$translateChangeSuccess', function(evt, response) {
+      $scope.currentLang = response.language;
+    });
 
     // TODO(sll): use 'touchstart' for mobile.
     $document.on('click', function() {

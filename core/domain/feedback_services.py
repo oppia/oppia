@@ -23,10 +23,12 @@ from core.domain import feedback_jobs_continuous
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
+from core.domain import email_manager
 from core.platform import models
 import feconf
 
-(feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
+(feedback_models, email_models) = models.Registry.import_models(
+    [models.NAMES.feedback, models.NAMES.email])
 taskqueue_services = models.Registry.import_taskqueue_services()
 transaction_services = models.Registry.import_transaction_services()
 
@@ -91,12 +93,13 @@ def create_thread(
 
 def create_message(
         exploration_id, thread_id, author_id, updated_status, updated_subject,
-        text):
+        text, received_via_email=False):
     """Creates a new message for the thread and subscribes the author to the
     thread.
 
     Args:
         exploration_id: str. The exploration id the thread belongs to.
+        thread_id: str. The thread id the message belongs to.
         author_id: str. The author id who creates this message.
         updated_status: str, one of STATUS_CHOICES. New thread status.
             Must be supplied if this is the first message of a thread. For the
@@ -105,8 +108,8 @@ def create_message(
             the first message of a thread. For the rest of the thread, should
             exist only when the subject changes.
         text: str. The text of the feedback message. This may be ''.
-        has_suggestion: bool. Whether this thread has a related
-            learner suggestion.
+        received_via_email: bool. Whether new message is received via email or
+            web.
     """
     from core.domain import event_services
     # Get the thread at the outset, in order to check that the thread_id passed
@@ -137,6 +140,7 @@ def create_message(
     if updated_subject:
         msg.updated_subject = updated_subject
     msg.text = text
+    msg.received_via_email = received_via_email
     msg.put()
 
     # We do a put() even if the status and subject are not updated, so that the
@@ -177,7 +181,8 @@ def _get_message_from_model(message_model):
         message_model.id, message_model.thread_id, message_model.message_id,
         message_model.author_id, message_model.updated_status,
         message_model.updated_subject, message_model.text,
-        message_model.created_on, message_model.last_updated)
+        message_model.created_on, message_model.last_updated,
+        message_model.received_via_email)
 
 
 def get_messages(exploration_id, thread_id):
@@ -724,7 +729,9 @@ def _get_all_recipient_ids(exploration_id, thread_id, author_id):
     return (batch_recipient_ids, other_recipient_ids)
 
 
-def _send_batch_emails(recipient_list, feedback_message_reference):
+def _send_batch_emails(
+        recipient_list, feedback_message_reference, exploration_id,
+        has_suggestion):
     """Adds the given FeedbackMessageReference to each of the
     recipient's email buffers. The collected messages will be
     sent out as a batch after a short delay.
@@ -734,17 +741,23 @@ def _send_batch_emails(recipient_list, feedback_message_reference):
             of the email.
         feedback_message_reference: FeedbackMessageReference.
             The reference to add to each email buffer.
+        exploration_id: str. ID of exploration that received new message.
+        has_suggestion: bool. Whether this thread has a related
+            learner suggestion.
     """
-    for recipient_id in recipient_list:
-        recipient_preferences = (
-            user_services.get_email_preferences(recipient_id))
-        if recipient_preferences['can_receive_feedback_message_email']:
+    can_users_receive_email = (
+        email_manager.can_users_receive_thread_email(
+            recipient_list, exploration_id, has_suggestion))
+    for index, recipient_id in enumerate(recipient_list):
+        if can_users_receive_email[index]:
             transaction_services.run_in_transaction(
                 _add_feedback_message_reference, recipient_id,
                 feedback_message_reference)
 
 
-def _send_instant_emails(recipient_list, feedback_message_reference):
+def _send_instant_emails(
+        recipient_list, feedback_message_reference, exploration_id,
+        has_suggestion):
     """Adds the given FeedbackMessageReference to each of the
     recipient's email buffers. The collected messages will be
     sent out immediately.
@@ -753,18 +766,23 @@ def _send_instant_emails(recipient_list, feedback_message_reference):
         recipient_list: list of str. A list of user_ids of all
             recipients of the email.
         feedback_message_reference: FeedbackMessageReference.
+        exploration_id: str. ID of exploration that received new message.
+        has_suggestion: bool. Whether this thread has a related
+            learner suggestion.
     """
-    for recipient_id in recipient_list:
-        recipient_preferences = (
-            user_services.get_email_preferences(recipient_id))
-        if recipient_preferences['can_receive_feedback_message_email']:
+    can_users_receive_email = (
+        email_manager.can_users_receive_thread_email(
+            recipient_list, exploration_id, has_suggestion))
+    for index, recipient_id in enumerate(recipient_list):
+        if can_users_receive_email[index]:
             transaction_services.run_in_transaction(
                 enqueue_feedback_message_instant_email_task, recipient_id,
                 feedback_message_reference)
 
 
 def _send_feedback_thread_status_change_emails(
-        recipient_list, feedback_message_reference, old_status, new_status):
+        recipient_list, feedback_message_reference, old_status, new_status,
+        exploration_id, has_suggestion):
     """Notifies the given recipients about the status change.
 
     Args:
@@ -772,15 +790,43 @@ def _send_feedback_thread_status_change_emails(
         feedback_message_reference: FeedbackMessageReference
         old_status: str, one of STATUS_CHOICES
         new_status: str, one of STATUS_CHOICES
+        exploration_id: str. ID of exploration that received new message.
+        has_suggestion: bool. Whether this thread has a related
+            learner suggestion.
     """
-    for recipient_id in recipient_list:
-        recipient_preferences = (
-            user_services.get_email_preferences(recipient_id))
-        if recipient_preferences['can_receive_feedback_message_email']:
+    can_users_receive_email = (
+        email_manager.can_users_receive_thread_email(
+            recipient_list, exploration_id, has_suggestion))
+    for index, recipient_id in enumerate(recipient_list):
+        if can_users_receive_email[index]:
             transaction_services.run_in_transaction(
                 _enqueue_feedback_thread_status_change_email_task,
                 recipient_id, feedback_message_reference,
                 old_status, new_status)
+
+
+def _ensure_each_recipient_has_reply_to_id(user_ids, exploration_id, thread_id):
+    """Ensures that instance of FeedbackEmailReplyToIdModel exists
+    for each user in user_ids.
+
+    Args:
+        user_ids: list of str. A list of user_ids.
+        exploration_id: str. The id of exploration used to obtain
+            FeedbackEmailReplyToIdModel for given user.
+        thread_id: str. The id of thread used to obtain
+            FeedbackEmailReplyToIdModel for given user.
+    """
+    feedback_email_id_models = (
+        email_models.FeedbackEmailReplyToIdModel.get_multi_by_user_ids(
+            user_ids, exploration_id, thread_id))
+
+    # Users are added to thread incrementally. Therefore at a time there can be
+    # at most one user who does not have FeedbackEmailReplyToIdModel instance.
+    for user_id in user_ids:
+        if feedback_email_id_models[user_id] is None:
+            new_model = email_models.FeedbackEmailReplyToIdModel.create(
+                user_id, exploration_id, thread_id)
+            new_model.put()
 
 
 def _add_message_to_email_buffer(
@@ -800,19 +846,31 @@ def _add_message_to_email_buffer(
         old_status: str, one of STATUS_CHOICES. Value of old thread status.
         new_status: str, one of STATUS_CHOICES. Value of new thread status.
     """
+    thread = (
+        feedback_models.FeedbackThreadModel.get_by_exp_and_thread_id(
+            exploration_id, thread_id))
+    has_suggestion = thread.has_suggestion
+
     feedback_message_reference = feedback_domain.FeedbackMessageReference(
         exploration_id, thread_id, message_id)
     batch_recipient_ids, other_recipient_ids = (
         _get_all_recipient_ids(exploration_id, thread_id, author_id))
 
+    _ensure_each_recipient_has_reply_to_id(
+        other_recipient_ids, exploration_id, thread_id)
+
     if old_status != new_status:
         # Send email for feedback thread status change.
         _send_feedback_thread_status_change_emails(
             other_recipient_ids, feedback_message_reference,
-            old_status, new_status)
+            old_status, new_status, exploration_id, has_suggestion)
 
     if message_length > 0:
         # Send feedback message email only if message text is non empty.
         # It can be empty in the case when only status is changed.
-        _send_batch_emails(batch_recipient_ids, feedback_message_reference)
-        _send_instant_emails(other_recipient_ids, feedback_message_reference)
+        _send_batch_emails(
+            batch_recipient_ids, feedback_message_reference,
+            exploration_id, has_suggestion)
+        _send_instant_emails(
+            other_recipient_ids, feedback_message_reference,
+            exploration_id, has_suggestion)

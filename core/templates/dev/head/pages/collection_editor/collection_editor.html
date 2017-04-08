@@ -11,11 +11,7 @@
 {% block header_js %}
   {{ super() }}
   <script type="text/javascript">
-    GLOBALS.canEdit = JSON.parse('{{can_edit|js_string}}');
-    GLOBALS.canUnpublish = JSON.parse('{{can_unpublish|js_string}}');
     GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
-    GLOBALS.collectionTitle = JSON.parse('{{title|js_string}}');
-    GLOBALS.isPrivate = JSON.parse('{{is_private|js_string}}');
     GLOBALS.TAG_REGEX = JSON.parse('{{TAG_REGEX|js_string}}');
   </script>
 {% endblock header_js %}
@@ -62,6 +58,7 @@
   {% include 'pages/collection_editor/history_tab/collection_history_tab_directive.html' %}
 
   {% include 'pages/collection_editor/settings_tab/collection_details_editor_directive.html' %}
+  {% include 'pages/collection_editor/settings_tab/collection_permissions_card_directive.html' %}
   {% include 'pages/collection_editor/settings_tab/collection_settings_tab_directive.html' %}
 
   {% include 'pages/collection_editor/statistics_tab/collection_statistics_tab_directive.html' %}
@@ -69,6 +66,12 @@
 
 {% block footer_js %}
   {{ super() }}
+  
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionSyntaxTree.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/evaluator.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/parser.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionInterpolationService.js"></script>
+
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/CollectionEditor.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/CollectionEditorNavbarBreadcrumbDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/CollectionEditorNavbarDirective.js"></script>
@@ -80,6 +83,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/editor_tab/CollectionSkillListDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/history_tab/CollectionHistoryTabDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/settings_tab/CollectionDetailsEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/settings_tab/CollectionPermissionsCardDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/settings_tab/CollectionSettingsTabDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/statistics_tab/CollectionStatisticsTabDirective.js"></script>
 
@@ -87,6 +91,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionNodeObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionRightsBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionRightsObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionUpdateService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionValidationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/EditableCollectionBackendApiService.js"></script>
@@ -94,12 +99,23 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/SkillListObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/ChangeObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/UndoRedoService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StateObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/InteractionObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/AnswerGroupObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ContentObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/RuleObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/FallbackObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/TriggerObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/OutcomeObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/summary/ExplorationSummaryBackendApiService.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/Select2DropdownDirective.js"></script>
 
   {# TODO(bhenning): Remove these once RouterServices is decoupled from the exploration editor #}
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorServices.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationEditor.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/GadgetValidationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/RouterServices.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionInterpolationService.js"></script>
 {% endblock footer_js %}

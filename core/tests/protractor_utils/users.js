@@ -66,9 +66,10 @@ var createModerator = function(email, username) {
   login(email, true);
   _completeSignup(username);
   admin.editConfigProperty(
-      'Usernames of moderators', 'List', function(listEditor) {
-    listEditor.addItem('Unicode').setValue(username);
-  });
+    'Usernames of moderators', 'List', function(listEditor) {
+      listEditor.addItem('Unicode').setValue(username);
+    }
+  );
   logout();
 };
 
@@ -81,9 +82,10 @@ var createAndLoginAdminUser = function(email, username) {
   login(email, true);
   _completeSignup(username);
   admin.editConfigProperty(
-      'Usernames of admins', 'List', function(listEditor) {
-    listEditor.addItem('Unicode').setValue(username);
-  });
+    'Usernames of admins', 'List', function(listEditor) {
+      listEditor.addItem('Unicode').setValue(username);
+    }
+  );
 };
 
 exports.login = login;
@@ -93,4 +95,3 @@ exports.createAndLoginUser = createAndLoginUser;
 exports.createModerator = createModerator;
 exports.createAdmin = createAdmin;
 exports.createAndLoginAdminUser = createAndLoginAdminUser;
-
