@@ -23,8 +23,8 @@
 oppia.constant('ACTIVITY_STATUS_PRIVATE', 'private');
 
 oppia.factory('CollectionNodeObjectFactory', [
-      'SkillListObjectFactory', 'ACTIVITY_STATUS_PRIVATE',
-      function(SkillListObjectFactory, ACTIVITY_STATUS_PRIVATE) {
+  'SkillListObjectFactory', 'ACTIVITY_STATUS_PRIVATE',
+  function(SkillListObjectFactory, ACTIVITY_STATUS_PRIVATE) {
     var CollectionNode = function(collectionNodeBackendObject) {
       this._explorationId = collectionNodeBackendObject.exploration_id;
       this._prerequisiteSkillList = SkillListObjectFactory.create(
@@ -101,6 +101,11 @@ oppia.factory('CollectionNodeObjectFactory', [
         explorationSummaryBackendObject) {
       this._explorationSummaryObject = angular.copy(
         explorationSummaryBackendObject);
+    };
+
+    CollectionNode.prototype.getCapitalizedObjective = function() {
+      return this._explorationSummaryObject.objective.charAt(0).toUpperCase() +
+              this._explorationSummaryObject.objective.slice(1);
     };
 
     // Static class methods. Note that "this" is not available in static

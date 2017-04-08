@@ -17,32 +17,47 @@
  * domain objects.
  */
 
-oppia.factory('StateObjectFactory', [function() {
-  var State = function(name, content, interaction, paramChanges) {
-    this.name = name;
-    this.content = content;
-    this.interaction = interaction;
-    this.paramChanges = paramChanges;
-  };
-
-  // Instance methods.
-  State.prototype.toBackendDict = function() {
-    return {
-      content: this.content,
-      interaction: this.interaction,
-      param_changes: this.paramChanges
+oppia.factory('StateObjectFactory', [
+  'AnswerGroupObjectFactory', 'InteractionObjectFactory',
+  'ContentObjectFactory',
+  function(AnswerGroupObjectFactory, InteractionObjectFactory,
+    ContentObjectFactory) {
+    var State = function(name, classifierModelId, content, interaction,
+      paramChanges) {
+      this.name = name;
+      this.classifierModelId = classifierModelId;
+      this.content = content;
+      this.interaction = interaction;
+      this.paramChanges = paramChanges;
     };
-  };
 
-  // Static class methods. Note that "this" is not available in
-  // static contexts.
-  State.create = function(stateName, stateDict) {
-    return new State(
-      stateName,
-      stateDict.content,
-      stateDict.interaction,
-      stateDict.param_changes);
-  };
+    // Instance methods.
+    State.prototype.toBackendDict = function() {
+      return {
+        content: this.content,
+        classifier_model_id: this.classifierModelId,
+        interaction: this.interaction.toBackendDict(),
+        param_changes: this.paramChanges
+      };
+    };
 
-  return State;
-}]);
+    // Static class methods. Note that "this" is not available in
+    // static contexts.
+    State.createFromBackendDict = function(stateName, stateDict) {
+      return new State(
+        stateName,
+        stateDict.classifier_model_id,
+        generateContentFromBackend(stateDict.content),
+        InteractionObjectFactory.createFromBackendDict(stateDict.interaction),
+        stateDict.param_changes);
+    };
+
+    var generateContentFromBackend = function(contentBackendList) {
+      return contentBackendList.map(function(contentBackendDict) {
+        return ContentObjectFactory.createFromBackendDict(contentBackendDict);
+      });
+    };
+
+    return State;
+  }
+]);

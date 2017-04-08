@@ -62,7 +62,8 @@ _STATUS_PUBLICIZED_BONUS = 30
 _DEFAULT_RANK = 20
 
 
-def _migrate_collection_to_latest_schema(versioned_collection):
+def _migrate_collection_contents_to_latest_schema(
+        versioned_collection_contents):
     """Holds the responsibility of performing a step-by-step, sequential update
     of the collection structure based on the schema version of the input
     collection dictionary. This is very similar to the exploration migration
@@ -71,27 +72,27 @@ def _migrate_collection_to_latest_schema(versioned_collection):
     this function to account for that new version.
 
     Args:
-        versioned_collection: A dict with two keys:
+        versioned_collection_contents: A dict with two keys:
           - schema_version: str. The schema version for the collection.
-          - nodes: list(dict). The list of collection node dicts comprising the
-                collection.
+          - collection_contents: dict. The dict comprising the collection
+              contents.
 
     Raises:
         Exception: The schema version of the collection is outside of what is
         supported at present.
     """
-    collection_schema_version = versioned_collection['schema_version']
+    collection_schema_version = versioned_collection_contents['schema_version']
     if not (1 <= collection_schema_version
             <= feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d collection schemas at '
             'present.' % feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
-    # This is where conversion functions will be placed once updates to the
-    # collection schemas happen.
-    # TODO(sll): Ensure that there is a test similar to
-    # exp_domain_test.SchemaMigrationMethodsUnitTests to ensure that the
-    # appropriate migration functions are declared.
+    while (collection_schema_version <
+           feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
+        collection_domain.Collection.update_collection_contents_from_model(
+            versioned_collection_contents, collection_schema_version)
+        collection_schema_version += 1
 
 
 # Repository GET methods.
@@ -134,23 +135,35 @@ def get_collection_from_model(collection_model, run_conversion=True):
     """
 
     # Ensure the original collection model does not get altered.
-    versioned_collection = {
+    versioned_collection_contents = {
         'schema_version': collection_model.schema_version,
-        'nodes': copy.deepcopy(collection_model.nodes)
+        'collection_contents':
+            copy.deepcopy(collection_model.collection_contents)
     }
+
+    # If collection_contents is empty, attempt to retrieve nodes data from nodes
+    # instead. This is temporary, and intended to not break backwards
+    # compatibility before the migration job is run.
+    # TODO(wxy): Remove this after collection migration is completed.
+    if not versioned_collection_contents['collection_contents']:
+        versioned_collection_contents['collection_contents'] = {
+            'nodes': copy.deepcopy(collection_model.nodes)
+        }
 
     # Migrate the collection if it is not using the latest schema version.
     if (run_conversion and collection_model.schema_version !=
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
-        _migrate_collection_to_latest_schema(versioned_collection)
+        _migrate_collection_contents_to_latest_schema(
+            versioned_collection_contents)
 
     return collection_domain.Collection(
         collection_model.id, collection_model.title,
         collection_model.category, collection_model.objective,
         collection_model.language_code, collection_model.tags,
-        versioned_collection['schema_version'], [
+        versioned_collection_contents['schema_version'], [
             collection_domain.CollectionNode.from_dict(collection_node_dict)
-            for collection_node_dict in versioned_collection['nodes']
+            for collection_node_dict in
+            versioned_collection_contents['collection_contents']['nodes']
         ],
         collection_model.version, collection_model.created_on,
         collection_model.last_updated)
@@ -688,9 +701,11 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     collection_model.language_code = collection.language_code
     collection_model.tags = collection.tags
     collection_model.schema_version = collection.schema_version
-    collection_model.nodes = [
-        collection_node.to_dict() for collection_node in collection.nodes
-    ]
+    collection_model.collection_contents = {
+        'nodes': [
+            collection_node.to_dict() for collection_node in collection.nodes
+        ]
+    }
     collection_model.node_count = len(collection_model.nodes)
     collection_model.commit(committer_id, commit_message, change_list)
     memcache_services.delete(_get_collection_memcache_key(collection.id))
@@ -723,9 +738,12 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
         language_code=collection.language_code,
         tags=collection.tags,
         schema_version=collection.schema_version,
-        nodes=[
-            collection_node.to_dict() for collection_node in collection.nodes
-        ],
+        collection_contents={
+            'nodes': [
+                collection_node.to_dict()
+                for collection_node in collection.nodes
+            ]
+        }
     )
     model.commit(committer_id, commit_message, commit_cmds)
     collection.version += 1
@@ -857,7 +875,8 @@ def update_collection(
     _save_collection(committer_id, collection, commit_message, change_list)
     update_collection_summary(collection.id, committer_id)
 
-    if not rights_manager.is_collection_private(collection.id):
+    if (not rights_manager.is_collection_private(collection.id) and
+            committer_id != feconf.MIGRATION_BOT_USER_ID):
         user_services.update_first_contribution_msec_if_not_set(
             committer_id, utils.get_current_time_in_millisecs())
 

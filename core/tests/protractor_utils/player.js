@@ -134,6 +134,41 @@ var expectExplorationToNotBeOver = function() {
   )).last().getText()).not.toEqual('Congratulations, you have finished!');
 };
 
+var openFeedbackPopup = function() {
+  element(by.css('.protractor-test-exploration-feedback-popup-link')).click();
+};
+
+var openSuggestionPopup = function() {
+  element(by.css('.protractor-test-exploration-suggestion-popup-link')).click();
+};
+
+var submitFeedback = function(feedback) {
+  openFeedbackPopup();
+  element(by.css('.protractor-test-exploration-feedback-textarea')).
+    sendKeys(feedback);
+  element(by.css('.protractor-test-exploration-feedback-submit-btn')).click();
+};
+
+var fillInSuggestion = function(suggestion) {
+  var suggestionModalClass = '.protractor-test-exploration-suggestion-modal';
+  var richTextEditor = forms.RichTextEditor(
+    element(by.css(suggestionModalClass)));
+  richTextEditor.setPlainText(suggestion);
+};
+
+var addSuggestionDescription = function(description) {
+  element(by.css('.protractor-test-suggestion-description-input')).
+    sendKeys(description);
+};
+
+var submitSuggestion = function(suggestion, description) {
+  openSuggestionPopup();
+  fillInSuggestion(suggestion);
+  addSuggestionDescription(description);
+  element(by.css('.protractor-test-suggestion-submit-btn')).click();
+  general.waitForSystem();
+};
+
 exports.restartExploration = restartExploration;
 
 exports.expectExplorationNameToBe = expectExplorationNameToBe;
@@ -153,3 +188,7 @@ exports.expectExplorationRatingOnInformationCardToEqual = (
 
 exports.expectExplorationToBeOver = expectExplorationToBeOver;
 exports.expectExplorationToNotBeOver = expectExplorationToNotBeOver;
+
+exports.openFeedbackPopup = openFeedbackPopup;
+exports.submitFeedback = submitFeedback;
+exports.submitSuggestion = submitSuggestion;

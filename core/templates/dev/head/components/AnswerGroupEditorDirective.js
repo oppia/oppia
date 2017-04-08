@@ -33,11 +33,11 @@ oppia.directive('answerGroupEditor', [function() {
     controller: [
       '$scope', 'stateInteractionIdService', 'responsesService',
       'editorContextService', 'alertsService', 'INTERACTION_SPECS',
-      'CLASSIFIER_RULESPEC_STR',
+      'RULE_TYPE_CLASSIFIER', 'RuleObjectFactory',
       function(
           $scope, stateInteractionIdService, responsesService,
           editorContextService, alertsService, INTERACTION_SPECS,
-          CLASSIFIER_RULESPEC_STR) {
+          RULE_TYPE_CLASSIFIER, RuleObjectFactory) {
         $scope.rulesMemento = null;
         $scope.activeRuleIndex = responsesService.getActiveRuleIndex();
         $scope.editAnswerGroupForm = {};
@@ -157,7 +157,7 @@ oppia.directive('answerGroupEditor', [function() {
           var ruleTypes = Object.keys(ruleDescriptions);
           var ruleType = null;
           for (var i = 0; i < ruleTypes.length; i++) {
-            if (ruleTypes[i] !== CLASSIFIER_RULESPEC_STR) {
+            if (ruleTypes[i] !== RULE_TYPE_CLASSIFIER) {
               ruleType = ruleTypes[i];
               break;
             }
@@ -190,10 +190,7 @@ oppia.directive('answerGroupEditor', [function() {
           // TODO(bhenning): Should use functionality in ruleEditor.js, but move
           // it to responsesService in StateResponses.js to properly form a new
           // rule.
-          $scope.rules.push({
-            inputs: inputs,
-            rule_type: ruleType
-          });
+          $scope.rules.push(RuleObjectFactory.createNew(ruleType, inputs));
           $scope.changeActiveRuleIndex($scope.rules.length - 1);
         };
 

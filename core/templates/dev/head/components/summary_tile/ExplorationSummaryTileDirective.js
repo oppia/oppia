@@ -35,6 +35,9 @@ oppia.directive('explorationSummaryTile', [function() {
       // summary tile is clicked.
       openInNewWindow: '@openInNewWindow',
       isCommunityOwned: '&isCommunityOwned',
+      // If this is not undefined, collection preview tile for mobile
+      // will be displayed.
+      isCollectionPreviewTile: '@isCollectionPreviewTile',
       // If the screen width is below the threshold defined here, the mobile
       // version of the summary tile is displayed. This attribute is optional:
       // if it is not specified, it is treated as 0, which means that the
@@ -89,25 +92,6 @@ oppia.directive('explorationSummaryTile', [function() {
         );
 
         $scope.avatarsList = [];
-        $scope.contributors.forEach(function(contributorName) {
-          var DEFAULT_PROFILE_IMAGE_PATH = (
-            UrlInterpolationService.getStaticImageUrl(
-              '/avatar/user_blue_72px.png'));
-
-          var avatarData = {
-            image: contributorsSummary[
-              contributorName].profile_picture_data_url ||
-              DEFAULT_PROFILE_IMAGE_PATH,
-            tooltipText: contributorName
-          };
-
-          if (GLOBALS.SYSTEM_USERNAMES.indexOf(contributorName) === -1) {
-            avatarData.link = '/profile/' + contributorName;
-          }
-
-          $scope.avatarsList.push(avatarData);
-        });
-
         if ($scope.isCommunityOwned()) {
           var COMMUNITY_OWNED_IMAGE_PATH = (
             UrlInterpolationService.getStaticImageUrl(
@@ -126,23 +110,29 @@ oppia.directive('explorationSummaryTile', [function() {
         $scope.MAX_AVATARS_TO_DISPLAY = 5;
 
         $scope.getAverageRating = function() {
+          if (!$scope.getRatings()) {
+            return null;
+          }
           return RatingComputationService.computeAverageRating(
             $scope.getRatings());
         };
 
         $scope.getLastUpdatedDatetime = function() {
+          if (!$scope.getLastUpdatedMsec()) {
+            return null;
+          }
           return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
             $scope.getLastUpdatedMsec());
         };
 
-        $scope.wasRecentlyUpdated = function() {
-          return oppiaDatetimeFormatter.isRecent($scope.getLastUpdatedMsec());
-        };
-
         $scope.getExplorationLink = function() {
-          var result = '/explore/' + $scope.getExplorationId();
-          if ($scope.getCollectionId()) {
-            result += ('?collection_id=' + $scope.getCollectionId());
+          if (!$scope.getExplorationId()) {
+            return '#';
+          } else {
+            var result = '/explore/' + $scope.getExplorationId();
+            if ($scope.getCollectionId()) {
+              result += ('?collection_id=' + $scope.getCollectionId());
+            }
           }
           return result;
         };

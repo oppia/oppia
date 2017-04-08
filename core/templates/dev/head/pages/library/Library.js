@@ -28,10 +28,10 @@ oppia.constant('LIBRARY_PAGE_MODES', {
 
 oppia.controller('Library', [
   '$scope', '$http', '$rootScope', '$window', '$timeout', 'i18nIdService',
-  'urlService', 'CATEGORY_LIST', 'searchService', 'windowDimensionsService',
+  'urlService', 'ALL_CATEGORIES', 'searchService', 'windowDimensionsService',
   'UrlInterpolationService', 'LIBRARY_PAGE_MODES', function(
       $scope, $http, $rootScope, $window, $timeout, i18nIdService,
-      urlService, CATEGORY_LIST, searchService, windowDimensionsService,
+      urlService, ALL_CATEGORIES, searchService, windowDimensionsService,
       UrlInterpolationService, LIBRARY_PAGE_MODES) {
     $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
     var possibleBannerFilenames = [
@@ -154,10 +154,6 @@ oppia.controller('Library', [
       }
       var carouselJQuerySelector = (
         '.oppia-library-carousel-tiles:eq(n)'.replace('n', ind));
-      var leftOverlaySelector =
-        '.oppia-library-carousel-overlay-left:eq(n)'.replace('n', ind);
-      var rightOverlaySelector =
-        '.oppia-library-carousel-overlay-right:eq(n)'.replace('n', ind);
 
       var direction = isLeftScroll ? -1 : 1;
       var carouselScrollPositionPx = $(carouselJQuerySelector).scrollLeft();
@@ -195,19 +191,6 @@ oppia.controller('Library', [
         complete: function() {
           isAnyCarouselCurrentlyScrolling = false;
         }
-      });
-
-      $(leftOverlaySelector).css({
-        display: 'inline'
-      }).fadeOut({
-        duration: 800,
-        queue: false
-      });
-      $(rightOverlaySelector).css({
-        display: 'inline'
-      }).fadeOut({
-        duration: 800,
-        queue: false
       });
     };
 

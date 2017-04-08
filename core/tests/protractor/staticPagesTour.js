@@ -25,15 +25,18 @@ describe('Oppia static pages tour', function() {
   });
 
   it('visits the links in About dropdown', function() {
-    var dropdown = element(by.css('.protractor-test-about-oppia-list-item'));
-    var linkClassNames = ['.protractor-test-about-link',
-                          '.protractor-test-teach-link',
-                          '.protractor-test-contact-link'
-                         ];
+    var LINKS_CLASS_NAMES = [
+      '.protractor-test-about-link',
+      '.protractor-test-get-started-link',
+      '.protractor-test-teach-link',
+      '.protractor-test-contact-link'
+    ];
 
-    linkClassNames.forEach(function(className) {
+    LINKS_CLASS_NAMES.forEach(function(className) {
+      var dropdown = element(by.css('.protractor-test-about-oppia-list-item'));
       browser.actions().mouseMove(dropdown).perform();
       dropdown.element(by.css(className)).click();
+      general.waitForSystem();
     });
   });
 
@@ -57,7 +60,8 @@ describe('Oppia static pages tour', function() {
     general.checkForConsoleErrors([
       // TODO (Jacob) Remove when
       // https://code.google.com/p/google-cast-sdk/issues/detail?id=309 is fixed
-      'cast_sender.js - Failed to load resource: net::ERR_FAILED'
+      'cast_sender.js - Failed to load resource: net::ERR_FAILED',
+      'Uncaught ReferenceError: ytcfg is not defined'
     ]);
   });
 });

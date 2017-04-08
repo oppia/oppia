@@ -55,21 +55,29 @@ oppia.controller('Profile', [
       }];
 
       $scope.userEditedExplorations = data.edited_exp_summary_dicts.sort(
-          function(exploration1, exploration2) {
-        if (exploration1.ratings > exploration2.ratings) {
-          return 1;
-        } else if (exploration1.ratings === exploration2.ratings) {
-          if (exploration1.playthroughs > exploration2.playthroughs) {
+        function(exploration1, exploration2) {
+          if (exploration1.ratings > exploration2.ratings) {
             return 1;
-          } else if (exploration1.playthroughs > exploration2.playthroughs) {
-            return 0;
+          } else if (exploration1.ratings === exploration2.ratings) {
+            if (exploration1.playthroughs > exploration2.playthroughs) {
+              return 1;
+            } else if (exploration1.playthroughs > exploration2.playthroughs) {
+              return 0;
+            } else {
+              return -1;
+            }
           } else {
             return -1;
           }
-        } else {
-          return -1;
         }
-      });
+      );
+
+      $scope.userNotLoggedIn = !data.username;
+
+      $scope.isAlreadySubscribed = data.is_already_subscribed;
+      $scope.isUserVisitingOwnProfile = data.is_user_visiting_own_profile;
+
+      $scope.subscriptionButtonPopoverText = '';
 
       $scope.currentPageNumber = 0;
       $scope.PAGE_SIZE = 6;
@@ -77,6 +85,41 @@ oppia.controller('Profile', [
       $scope.endingExplorationNumber = 6;
       $scope.Math = window.Math;
       $scope.profileIsOfCurrentUser = data.profile_is_of_current_user;
+
+      $scope.changeSubscriptionStatus = function() {
+        if ($scope.userNotLoggedIn) {
+          window.location.href = GLOBALS.loginUrl;
+        } else {
+          if (!$scope.isAlreadySubscribed) {
+            $scope.isAlreadySubscribed = true;
+            $http.post('/subscribehandler', {
+              creator_username: data.profile_username
+            });
+          } else {
+            $scope.isAlreadySubscribed = false;
+            $http.post('/unsubscribehandler', {
+              creator_username: data.profile_username
+            });
+          }
+          $scope.updateSubscriptionButtonPopoverText();
+        }
+      };
+
+      $scope.updateSubscriptionButtonPopoverText = function() {
+        if ($scope.userNotLoggedIn) {
+          $scope.subscriptionButtonPopoverText = (
+            'Log in or sign up to subscribe to your favorite creators.');
+        } else if ($scope.isAlreadySubscribed) {
+          $scope.subscriptionButtonPopoverText = (
+            'Unsubscribe to stop receiving email notifications regarding new ' +
+            'explorations published by ' + $scope.username.value + '.');
+        } else {
+          $scope.subscriptionButtonPopoverText = (
+            'Receive email notifications, whenever ' +
+            $scope.username.value + ' publishes a new exploration.');
+        }
+      };
+      $scope.updateSubscriptionButtonPopoverText();
 
       $scope.goToPreviousPage = function() {
         if ($scope.currentPageNumber === 0) {

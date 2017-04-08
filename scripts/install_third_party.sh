@@ -22,15 +22,16 @@ echo Installing third-party JS libraries and zip files.
 $PYTHON_CMD scripts/install_third_party.py
 
 # Install third-party node modules needed for the build process.
+install_node_module eslint 3.18.0
+install_node_module eslint-plugin-html 2.0.1
 install_node_module gulp 3.9.0
 install_node_module through2 2.0.0
 install_node_module yargs 3.29.0
 install_node_module gulp-concat 2.6.0
 install_node_module gulp-clean-css 2.0.2
 install_node_module gulp-util 3.0.7
-install_node_module jscs 2.3.0
 install_node_module gulp-sourcemaps 1.6.0
-install_node_module gulp-minify 0.0.5
+install_node_module gulp-uglify 2.0.1
 
 # Download and install Skulpt. Skulpt is built using a Python script included
 # within the Skulpt repository (skulpt.py). This script normally requires
@@ -117,7 +118,7 @@ echo Checking if webtest is installed in third_party
 if [ ! -d "$TOOLS_DIR/webtest-1.4.2" ]; then
   echo Installing webtest framework
   # Note that the github URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl --silent -L https://github.com/Pylons/webtest/archive/1.4.2.zip -o webtest-download.zip
+  curl -o webtest-download.zip -L https://github.com/Pylons/webtest/archive/1.4.2.zip
   unzip webtest-download.zip -d $TOOLS_DIR
   rm webtest-download.zip
 fi

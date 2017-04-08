@@ -47,8 +47,11 @@ describe('Collection rights backend API service', function() {
     // PUT request. The typical expect() syntax with a passed-in object payload
     // does not seem to be working correctly.
     $httpBackend.expect(
-      'PUT', '/collection_editor_handler/rights/0').respond(
-      200);
+      'PUT', '/collection_editor_handler/rights/0').respond(200, {
+        data: {
+          is_private: false
+        }
+      });
     CollectionRightsBackendApiService.setCollectionPublic('0', 1).then(
       successHandler, failHandler);
     $httpBackend.flush();
@@ -72,5 +75,61 @@ describe('Collection rights backend API service', function() {
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalled();
+  });
+
+  it('should call the provided fail handler if isPrivate response is false ' +
+     'when setting collection public', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect(
+      'PUT', '/collection_editor_handler/rights/0').respond(200, {
+        is_private: true
+      });
+    CollectionRightsBackendApiService.setCollectionPublic('0', 1).then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+    $rootScope.$digest();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  });
+
+  it('should report a cached collection rights after caching it', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    // The collection should not currently be cached.
+    expect(CollectionRightsBackendApiService.isCached('0')).toBe(false);
+
+    // Cache a collection.
+    CollectionRightsBackendApiService.cacheCollectionRights('0', {
+      collection_id: 0,
+      can_edit: true,
+      can_unpublish: false,
+      is_private: true,
+      owner_names: ['A']
+    });
+
+    // It should now be cached.
+    expect(CollectionRightsBackendApiService.isCached('0')).toBe(true);
+
+    // A new collection should not have been fetched from the backend. Also,
+    // the returned collection should match the expected collection object.
+    CollectionRightsBackendApiService.loadCollectionRights('0').then(
+      successHandler, failHandler);
+
+    // http://brianmcd.com/2014/03/27/
+    // a-tip-for-angular-unit-tests-with-promises.html
+    $rootScope.$digest();
+
+    expect(successHandler).toHaveBeenCalledWith({
+      collection_id: 0,
+      can_edit: true,
+      can_unpublish: false,
+      is_private: true,
+      owner_names: ['A']
+    });
+    expect(failHandler).not.toHaveBeenCalled();
   });
 });

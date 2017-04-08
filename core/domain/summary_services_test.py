@@ -149,13 +149,9 @@ class ExplorationDisplayableSummariesTest(
         self.assertEqual({
             self.ALBERT_NAME: {
                 'num_commits': 10,
-                'profile_picture_data_url': (
-                    user_services.DEFAULT_IDENTICON_DATA_URL)
             },
             self.BOB_NAME: {
                 'num_commits': 13,
-                'profile_picture_data_url': (
-                    user_services.DEFAULT_IDENTICON_DATA_URL)
             }
         }, summary_services.get_human_readable_contributors_summary(
             contributors_summary))
@@ -164,12 +160,9 @@ class ExplorationDisplayableSummariesTest(
         self.assertEqual({
             self.USER_C_NAME: {
                 'num_commits': 1,
-                'profile_picture_data_url': self.USER_C_PROFILE_PICTURE
             },
             self.USER_D_NAME: {
                 'num_commits': 2,
-                'profile_picture_data_url': (
-                    user_services.DEFAULT_IDENTICON_DATA_URL)
             }
         }, summary_services.get_human_readable_contributors_summary(
             contributors_summary))

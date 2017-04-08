@@ -49,7 +49,7 @@ class AnalyticsEventHandlersUnitTests(test_utils.GenericTestBase):
     """Test the event handlers for analytics events."""
 
     DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
-    CLASSIFIER_RULESPEC_STR = exp_domain.CLASSIFIER_RULESPEC_STR
+    RULE_TYPE_CLASSIFIER = exp_domain.RULE_TYPE_CLASSIFIER
 
     def _record_answer(
             self, answer, exploration_id='eid', state_name='sname',
@@ -150,21 +150,21 @@ class AnalyticsEventHandlersUnitTests(test_utils.GenericTestBase):
         # There are no initial top answers for this state.
         top_answers = stats_services.get_top_state_rule_answers(
             'eid', 'sname',
-            [self.CLASSIFIER_RULESPEC_STR, self.DEFAULT_RULESPEC_STR])
+            [self.RULE_TYPE_CLASSIFIER, self.DEFAULT_RULESPEC_STR])
         self.assertEquals(len(top_answers), 0)
 
         # Submit some answers.
         self._record_answer('a', rule_spec_str=self.DEFAULT_RULESPEC_STR)
         self._record_answer('a', rule_spec_str=self.DEFAULT_RULESPEC_STR)
-        self._record_answer('b', rule_spec_str=self.CLASSIFIER_RULESPEC_STR)
-        self._record_answer('b', rule_spec_str=self.CLASSIFIER_RULESPEC_STR)
-        self._record_answer('b', rule_spec_str=self.CLASSIFIER_RULESPEC_STR)
-        self._record_answer('c', rule_spec_str=self.CLASSIFIER_RULESPEC_STR)
+        self._record_answer('b', rule_spec_str=self.RULE_TYPE_CLASSIFIER)
+        self._record_answer('b', rule_spec_str=self.RULE_TYPE_CLASSIFIER)
+        self._record_answer('b', rule_spec_str=self.RULE_TYPE_CLASSIFIER)
+        self._record_answer('c', rule_spec_str=self.RULE_TYPE_CLASSIFIER)
         self._record_answer('c', rule_spec_str=self.DEFAULT_RULESPEC_STR)
 
         top_answers = stats_services.get_top_state_rule_answers(
             'eid', 'sname',
-            [self.CLASSIFIER_RULESPEC_STR, self.DEFAULT_RULESPEC_STR])
+            [self.RULE_TYPE_CLASSIFIER, self.DEFAULT_RULESPEC_STR])
         self.assertEquals(len(top_answers), 3)
         # Rules across multiple rule types are combined and still sorted by
         # frequency.
@@ -328,7 +328,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
         init_interaction = exp.init_state.interaction
         init_interaction.answer_groups.append(exp_domain.AnswerGroup(
             exp_domain.Outcome(exp.init_state_name, [], {}),
-            [not_default_rule_spec]))
+            [not_default_rule_spec], False))
         init_interaction.default_outcome = exp_domain.Outcome(
             'End', [], {})
         exp_services._save_exploration(  # pylint: disable=protected-access
@@ -469,7 +469,7 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
     """Test the unresolved answers methods."""
 
     DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
-    CLASSIFIER_RULESPEC_STR = exp_domain.CLASSIFIER_RULESPEC_STR
+    RULE_TYPE_CLASSIFIER = exp_domain.RULE_TYPE_CLASSIFIER
     STATE_2_NAME = 'State 2'
 
     def _create_and_update_fake_exploration(self, exp_id):
@@ -650,10 +650,10 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
                 ['eid1']), self._get_default_dict_when_no_unresolved_answers(
                     ['eid1']))
         event_services.AnswerSubmissionEventHandler.record(
-            'eid1', 1, exp_1.init_state_name, self.CLASSIFIER_RULESPEC_STR, 'a1'
+            'eid1', 1, exp_1.init_state_name, self.RULE_TYPE_CLASSIFIER, 'a1'
         )
         event_services.AnswerSubmissionEventHandler.record(
-            'eid1', 1, self.STATE_2_NAME, self.CLASSIFIER_RULESPEC_STR, 'a1')
+            'eid1', 1, self.STATE_2_NAME, self.RULE_TYPE_CLASSIFIER, 'a1')
         self.assertEquals(
             stats_services.get_exps_unresolved_answers_for_default_rule(
                 ['eid1']), self._get_default_dict_when_no_unresolved_answers(

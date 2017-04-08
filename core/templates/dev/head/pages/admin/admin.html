@@ -4,7 +4,7 @@
     <title>Oppia Admin Panel</title>
 
     {% include 'pages/header_css_libs.html' %}
-    {% include 'pages/header_js_libs.html' %}
+
     <script>
       var GLOBALS = {
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
@@ -28,11 +28,8 @@
         DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}')
       }
     </script>
-    <style>
-      html, body {
-        background-color: #eee;
-      }
-    </style>
+
+    {% include 'pages/header_js_libs.html' %}
   </head>
 
   <body>
@@ -74,6 +71,17 @@
     </div>
 
     {% include 'components/forms/form_builder_templates.html' %}
+    {% include 'components/forms/schema_editors/schema_based_bool_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_choices_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_custom_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_dict_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_expression_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_float_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_html_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_int_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_list_editor_directive.html' %}
+    {% include 'components/forms/schema_editors/schema_based_unicode_editor_directive.html' %}
     {% include 'pages/footer_js_libs.html' %}
     {% include 'pages/admin/admin_navbar_directive.html' %}
     {% include 'pages/admin/activities_tab/admin_dev_mode_activities_tab_directive.html' %}
@@ -83,6 +91,7 @@
     {% include 'pages/admin/misc_tab/admin_misc_tab_directive.html' %}
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/app.js"></script>
+
     <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/Admin.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/AdminNavbarDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/AdminRouterService.js"></script>
@@ -99,6 +108,17 @@
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/ObjectEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedCustomEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedDictEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedExpressionEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedFloatEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedHtmlEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedIntEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedListEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.js"></script>
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionSyntaxTree.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/evaluator.js"></script>

@@ -24,7 +24,6 @@ from core.tests import test_utils
 
 
 class UserQueryServicesTest(test_utils.GenericTestBase):
-
     def test_save_new_query_model(self):
         submitter_id = 'submitter'
         inactive_in_last_n_days = 10

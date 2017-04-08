@@ -48,7 +48,7 @@ describe('oppiaInteractiveGraphInputValidator', function() {
 
     var answerGroup = {
       outcome: goodDefaultOutcome,
-      rule_specs: [{
+      ruleSpecs: [{
         inputs: {
           g: {
             vertices: new Array(10)
@@ -62,7 +62,8 @@ describe('oppiaInteractiveGraphInputValidator', function() {
           }
         },
         rule_type: 'IsIsomorphicTo'
-      }]
+      }],
+      correct: false
     };
     answerGroups = [answerGroup, angular.copy(answerGroup)];
   }));
@@ -98,9 +99,9 @@ describe('oppiaInteractiveGraphInputValidator', function() {
   it('The graph used in the rule x in group y exceeds supported maximum ' +
     'number of vertices of 10 for isomorphism check.',
     function() {
-      answerGroups[0].rule_specs[0].inputs.g.vertices = new Array(11);
-      answerGroups[0].rule_specs[1].inputs.g.vertices = new Array(11);
-      answerGroups[1].rule_specs[0].inputs.g.vertices = new Array(11);
+      answerGroups[0].ruleSpecs[0].inputs.g.vertices = new Array(11);
+      answerGroups[0].ruleSpecs[1].inputs.g.vertices = new Array(11);
+      answerGroups[1].ruleSpecs[0].inputs.g.vertices = new Array(11);
       var warnings = validator(
         currentState, customizationArguments, answerGroups,
         goodDefaultOutcome);
