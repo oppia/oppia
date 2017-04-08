@@ -83,7 +83,6 @@ oppia.directive('paramChangesEditor', [function() {
               angular.copy(DEFAULT_PARAM_SPEC));
             $scope.paramNameChoices = generateParamNameChoices();
           }
-          console.log(angular.copy(newParamChange));
           $scope.paramChangesService.displayed.push(newParamChange);
         };
 
@@ -101,7 +100,6 @@ oppia.directive('paramChangesEditor', [function() {
         };
 
         $scope.onChangeGeneratorType = function(paramChange) {
-          console.log(angular.copy(paramChange));
           paramChange.changeGeneratorType();
         };
 
@@ -186,7 +184,6 @@ oppia.directive('paramChangesEditor', [function() {
           });
 
           explorationParamSpecsService.saveDisplayedValue();
-          console.log(angular.copy($scope.paramChangesService.displayed));
           $scope.paramChangesService.saveDisplayedValue();
           if ($scope.postSaveHook) {
             $scope.postSaveHook();
