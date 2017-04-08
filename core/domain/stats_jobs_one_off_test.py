@@ -24,17 +24,16 @@ from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
-from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import stats_jobs_one_off
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 from extensions.objects.models import objects
-(stats_models,exp_models) = models.Registry.import_models([
-    models.NAMES.statistics, models.NAMES.exploration])
-
 import feconf
+
+(stats_models, exp_models) = models.Registry.import_models([
+    models.NAMES.statistics, models.NAMES.exploration])
 
 
 class AnswerMigrationJobTests(test_utils.GenericTestBase):
@@ -86,14 +85,18 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
     def _enable_memchache(self):
         """Emabbles memcache for StateAnswersModel (default behavior)."""
 
+        # pylint: disable=protected-access
         stats_models.StateAnswersModel._use_memcache = True
+        # pylint: enable=protected-access
 
     def _disable_memchache(self):
         """Disables memcache for StateAnswersModel since it can cause some
         issues when switching between the enqueued migration job and the
         migration job which runs locally.
         """
+        # pylint: disable=protected-access
         stats_models.StateAnswersModel._use_memcache = False
+        # pylint: enable=protected-access
 
     def _run_migration_job(self):
         """Start the AnswerMigrationJob to migrate answers submitted to
@@ -122,7 +125,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         orig_insert_submitted_answers = (
             stats_models.StateAnswersModel.insert_submitted_answers)
         def proxy_insert_submitted_answers(
-                cls, exploration_id, exploration_version, state_name,
+                _, exploration_id, exploration_version, state_name,
                 interaction_id, submitted_answer_dict_list):
             if fail_predicate and fail_predicate(submitted_answer_dict_list):
                 raise Exception('Induced shard failure')
@@ -138,8 +141,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # http://stackoverflow.com/a/261677
         output = []
         with self.swap(
-                stats_models.StateAnswersModel, 'insert_submitted_answers',
-                classmethod(proxy_insert_submitted_answers)):
+            stats_models.StateAnswersModel, 'insert_submitted_answers',
+            classmethod(proxy_insert_submitted_answers)):
             reductions = defaultdict(list)
             for state_rule_answer_log in state_rule_answer_logs:
                 while True:
@@ -1352,9 +1355,9 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                     'content': [{'type': 'text', 'value': 'Find {{CityName}}'}],
                     'interaction': {
                         'customization_args': {
-                            'latitude': { 'value': 0 },
-                            'longitude': { 'value': 0 },
-                            'zoom': { 'value': 3 }
+                            'latitude': {'value': 0},
+                            'longitude': {'value': 0},
+                            'zoom': {'value': 3}
                         },
                         'id': 'InteractiveMap',
                         'handlers': [{
@@ -1366,8 +1369,8 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                                 'param_changes': [],
                                 'definition': {
                                     'inputs': {
-                                      'd': 11.0,
-                                      'p': [24.467, 54.367]
+                                        'd': 11.0,
+                                        'p': [24.467, 54.367]
                                     },
                                     'name': 'Within',
                                     'rule_type': 'atomic',
@@ -1381,7 +1384,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 'PickCity': {
                     'content': [{
                         'type': 'text',
-                        'value': 'Let\s find {{CityName}}?'
+                        'value': 'Let\'s find {{CityName}}?'
                     }],
                     'interaction': {
                         'customization_args': {
@@ -1397,7 +1400,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                             'name': 'submit',
                             'rule_specs': [{
                                 'definition': {
-                                    'inputs': { 'x': 1 },
+                                    'inputs': {'x': 1},
                                     'name': 'Equals',
                                     'rule_type': 'atomic',
                                     'subject': 'answer'
@@ -1407,7 +1410,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                                 'param_changes': []
                             }, {
                                 'definition': {
-                                    'inputs': { 'x': 2 },
+                                    'inputs': {'x': 2},
                                     'name': 'Equals',
                                     'rule_type': 'atomic',
                                     'subject': 'answer'
@@ -1417,7 +1420,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                                 'param_changes': []
                             }, {
                                 'definition': {
-                                    'inputs': { 'x': 'Abu Dhabi' },
+                                    'inputs': {'x': 'Abu Dhabi'},
                                     'name': 'Equals',
                                     'rule_type': 'atomic',
                                     'subject': 'CityName'
@@ -1555,7 +1558,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id_2017',
             'interaction_id': 'MultipleChoiceInput',
-            'params': { 'CityName': 'Abu Dhabi' },
+            'params': {'CityName': 'Abu Dhabi'},
             'rule_spec_str': 'Equals(Abu Dhabi)',
             'answer_str': 'OK.'
         }, submitted_answers)
@@ -1572,7 +1575,6 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'exp_id0', self.owner_id, end_state_name='End',
             interaction_id='NumericInput')
         state_name = exploration.init_state_name
-        initial_state = exploration.states[state_name]
 
         exp_services.update_exploration(self.owner_id, 'exp_id0', [{
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -2019,7 +2021,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             pass
 
         LargeAnswerBucketIdState.id = 0
-        def proxy_get_new_id(cls, partial_id):
+        def proxy_get_new_id(cls, partial_id): # pylint: disable=unused-argument
             LargeAnswerBucketIdState.id = LargeAnswerBucketIdState.id + 1
             return str(LargeAnswerBucketIdState.id)
 
@@ -2906,7 +2908,6 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'exp_id0', self.owner_id, end_state_name='End',
             interaction_id='MultipleChoiceInput')
         state_name = exploration.init_state_name
-        initial_state = exploration.states[state_name]
         exp_services.update_exploration(self.owner_id, 'exp_id0', [{
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': state_name,
@@ -3202,7 +3203,6 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'exp_id0', self.owner_id, end_state_name='End',
             interaction_id='PencilCodeEditor')
         state_name = exploration.init_state_name
-        initial_state = exploration.states[state_name]
         exp_services.update_exploration(self.owner_id, 'exp_id0', [{
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': state_name,

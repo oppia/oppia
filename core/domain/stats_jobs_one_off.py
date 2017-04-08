@@ -555,7 +555,7 @@ class ClearUnknownMissingAnswersJob(jobs.BaseMapReduceJobManager):
                 })
 
     @staticmethod
-    def reduce(key, stringified_values):
+    def reduce(_, stringified_values):
         value_dict_list = [
             ast.literal_eval(stringified_value)
             for stringified_value in stringified_values]
@@ -836,7 +836,7 @@ class SplitLargeAnswerBucketsJob(jobs.BaseMapReduceJobManager):
             })
 
     @staticmethod
-    def reduce(key, stringified_values):
+    def reduce(_, stringified_values):
         value_dict_list = [
             ast.literal_eval(stringified_value)
             for stringified_value in stringified_values]
@@ -1053,7 +1053,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     _ERROR_KEY = 'Answer Migration ERROR'
     _ALREADY_MIGRATED_KEY = 'Answer ALREADY MIGRATED'
     _SKIPPED_KEY = 'Answer SKIPPED'
-    _TEMPORARY_SPECIAL_RULE_PARAMETER = '__answermigrationjobparamindicator'
+    _TEMP_SPECIAL_RULE_PARAM = '__answermigrationjobparamindicator'
 
     _DEFAULT_RULESPEC_STR = 'Default'
 
@@ -1129,12 +1129,14 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         interactions = interaction_registry.Registry.get_all_interactions()
         interaction_names = [
             type(interaction).__name__ for interaction in interactions]
+        # pylint: disable=protected-access
         if 'FileReadInput' not in interaction_names:
             interaction_registry.Registry._interactions['FileReadInput'] = (
                 cls.FileReadInput())
         if 'TarFileReadInput' not in interaction_names:
             interaction_registry.Registry._interactions['TarFileReadInput'] = (
                 cls.TarFileReadInput())
+        # pylint: enable=protected-access
 
         interaction_registry.Registry.get_interaction_by_id('FileReadInput')
         interaction_registry.Registry.get_interaction_by_id('TarFileReadInput')
@@ -1177,7 +1179,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                         rule_spec_dict['param_changes']
                         if 'param_changes' in rule_spec_dict else [])
                     special_rule_param = (
-                        AnswerMigrationJob._TEMPORARY_SPECIAL_RULE_PARAMETER)
+                        AnswerMigrationJob._TEMP_SPECIAL_RULE_PARAM)
                     if any(param_change for param_change in param_changes
                            if param_change['name'] == special_rule_param):
                         continue
@@ -1188,7 +1190,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                         # old subject to a later part of the migration job.
                         param_changes.append({
                             'name': (
-                                AnswerMigrationJob._TEMPORARY_SPECIAL_RULE_PARAMETER),
+                                AnswerMigrationJob._TEMP_SPECIAL_RULE_PARAM),
                             'generator_id': 'RandomSelector',
                             'customization_args': {
                                 'subject': definition_dict['subject']
@@ -1786,7 +1788,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 temporary_special_param = next(
                     (param_change for param_change in outcome.param_changes
                      if param_change.name == (
-                         AnswerMigrationJob._TEMPORARY_SPECIAL_RULE_PARAMETER)),
+                         AnswerMigrationJob._TEMP_SPECIAL_RULE_PARAM)),
                     None)
 
             # If the subject type is not an answer, then the index is extracted
@@ -1989,10 +1991,11 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             interaction_id)
 
     @classmethod
-    def _datetime_to_float(cls, dt):
+    def _datetime_to_float(cls, datetime_value):
         """Converts a Python datetime object to a float (in seconds)."""
         # http://stackoverflow.com/a/35337826
-        return (dt - datetime.datetime.utcfromtimestamp(0)).total_seconds()
+        duration = datetime_value - datetime.datetime.utcfromtimestamp(0)
+        return duration.total_seconds()
 
     @classmethod
     def _float_to_datetime(cls, sec):
@@ -2377,7 +2380,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             temporary_special_param = next(
                 (param_change for param_change in outcome.param_changes
                  if param_change.name == (
-                     AnswerMigrationJob._TEMPORARY_SPECIAL_RULE_PARAMETER)),
+                     AnswerMigrationJob._TEMP_SPECIAL_RULE_PARAM)),
                 None)
             # If this answer corresponds to a rule_spec with a non-answer
             # subject type, then retain the value of that subject in the

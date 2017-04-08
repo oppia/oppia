@@ -627,8 +627,11 @@ class StateAnswersModel(base_models.BaseModel):
     # submitted_answer_list, minus any overhead of the property itself. This
     # value is found by summing the JSON sizes of all answer dicts stored inside
     # submitted_answer_list.
+    # pylint: disable=invalid-name
     accumulated_answer_json_size_bytes = ndb.IntegerProperty(
         indexed=False, required=False, default=0)
+    # pylint: enable=invalid-name
+
     # List of answer dicts, each of which is stored as JSON blob. The content
     # of answer dicts is specified in core.domain.stats_domain.StateAnswers.
     submitted_answer_list = ndb.JsonProperty(repeated=True, indexed=False)
@@ -963,10 +966,12 @@ class MigratedAnswerModel(base_models.BaseModel):
     finished_migration = ndb.BooleanProperty(indexed=False, default=False)
     started_large_answer_bucket_ids = ndb.StringProperty(
         indexed=False, repeated=True)
+    # pylint: disable=invalid-name
     finished_large_answer_bucket_ids = ndb.StringProperty(
         indexed=False, repeated=True)
     expected_large_answer_bucket_count = ndb.IntegerProperty(
         indexed=False, default=0)
+    # pylint: enable=invalid-name
 
     @classmethod
     def _start_migrating_answer_bucket(

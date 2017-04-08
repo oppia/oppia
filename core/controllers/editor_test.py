@@ -26,7 +26,6 @@ from core.domain import config_services
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import stats_domain
 from core.domain import stats_jobs_continuous_test
 from core.domain import rights_manager
 from core.domain import user_services
@@ -71,7 +70,7 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
 
 class EditorTest(BaseEditorControllerTest):
 
-    ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS = [
+    ALL_CC_MANAGERS_FOR_TESTS = [
         stats_jobs_continuous_test.ModifiedInteractionAnswerSummariesAggregator
     ]
 
@@ -217,12 +216,12 @@ class EditorTest(BaseEditorControllerTest):
                     exp_id, state_name, interaction_id, answer_group_index,
                     rule_spec_index, classification_categorization, answer,
                     exp_version=1, session_id='dummy_session_id',
-                    time_spent_in_secs=0.0, params={}):
+                    time_spent_in_secs=0.0):
                 event_services.AnswerSubmissionEventHandler.record(
                     exp_id, exp_version, state_name, interaction_id,
                     answer_group_index, rule_spec_index,
                     classification_categorization, session_id,
-                    time_spent_in_secs, params, answer)
+                    time_spent_in_secs, {}, answer)
 
             # Load the string classifier demo exploration.
             exp_id = '15'
@@ -244,9 +243,6 @@ class EditorTest(BaseEditorControllerTest):
             self.assertEqual(
                 exploration_dict['exploration']['states'][state_name][
                     'interaction']['id'], 'TextInput')
-
-            answer_groups = exp_services.get_exploration_by_id('15').states[
-                state_name].interaction.answer_groups
 
             # Input happy since there is an explicit rule checking for that.
             _submit_answer(
@@ -272,10 +268,10 @@ class EditorTest(BaseEditorControllerTest):
 
             # Perform answer summarization on the summarized answers.
             with self.swap(
-                    jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-                    self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                self.ALL_CC_MANAGERS_FOR_TESTS):
                 # Run job on exploration with answers
-                stats_jobs_continuous_test.ModifiedInteractionAnswerSummariesAggregator.start_computation()
+                stats_jobs_continuous_test.ModifiedInteractionAnswerSummariesAggregator.start_computation() # pylint: disable=line-too-long
                 self.assertEqual(self.count_jobs_in_taskqueue(), 1)
                 self.process_and_flush_pending_tasks()
                 self.assertEqual(self.count_jobs_in_taskqueue(), 0)
