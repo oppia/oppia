@@ -27,47 +27,48 @@ oppia.directive('oppiaInteractiveSetInput', [function() {
       onSubmit: '&'
     },
     templateUrl: 'interaction/SetInput',
-    controller: ['$scope', '$attrs', '$translate', 'setInputRulesService',
-        function($scope, $attrs, $translate, setInputRulesService) {
-      $scope.schema = {
-        type: 'list',
-        items: {
-          type: 'unicode'
-        },
-        ui_config: {
-          // TODO(mili): Translate this in the HTML.
-          add_element_text: $translate.instant(
-            'I18N_INTERACTIONS_SET_INPUT_ADD_ITEM')
-        }
-      };
+    controller: [
+      '$scope', '$attrs', '$translate', 'setInputRulesService',
+      function($scope, $attrs, $translate, setInputRulesService) {
+        $scope.schema = {
+          type: 'list',
+          items: {
+            type: 'unicode'
+          },
+          ui_config: {
+            // TODO(mili): Translate this in the HTML.
+            add_element_text: $translate.instant(
+              'I18N_INTERACTIONS_SET_INPUT_ADD_ITEM')
+          }
+        };
 
-      // Adds an input field by default
-      $scope.answer = [''];
+        // Adds an input field by default
+        $scope.answer = [''];
 
-      var hasDuplicates = function(answer) {
-        for (var i = 0; i < answer.length; i++) {
-          for (var j = 0; j < i; j++) {
-            if (angular.equals(answer[i], answer[j], true)) {
-              return true;
+        var hasDuplicates = function(answer) {
+          for (var i = 0; i < answer.length; i++) {
+            for (var j = 0; j < i; j++) {
+              if (angular.equals(answer[i], answer[j], true)) {
+                return true;
+              }
             }
           }
-        }
-        return false;
-      };
+          return false;
+        };
 
-      $scope.submitAnswer = function(answer) {
-        if (hasDuplicates(answer)) {
-          $scope.errorMessage = (
-            'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
-        } else {
-          $scope.errorMessage = '';
-          $scope.onSubmit({
-            answer: answer,
-            rulesService: setInputRulesService
-          });
-        }
-      };
-    }]
+        $scope.submitAnswer = function(answer) {
+          if (hasDuplicates(answer)) {
+            $scope.errorMessage = (
+              'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
+          } else {
+            $scope.errorMessage = '';
+            $scope.onSubmit({
+              answer: answer,
+              rulesService: setInputRulesService
+            });
+          }
+        };
+      }]
   };
 }]);
 

@@ -21,9 +21,8 @@ var DEFAULT_VOCABULARY = {
   arbitrary: ['was arbitrary', 'is arbitrary'],
   take: ['take'],
   satisfying: ['satisfying', 'such that'],
-  // jscs:disable disallowQuotedKeysInObjects
+  // eslint-disable-next-line quote-props
   'if': ['if'],
-  // jscs:enable disallowQuotedKeysInObjects
   given: ['given'],
   contradiction: ['contradiction'],
   at: ['at']
@@ -318,9 +317,9 @@ var DEFAULT_LINE_TEMPLATE_STRINGS = [{
   results: 'R',
   variables: '',
   error: [
-  'If you want to reach a contradiction from {{~R}} and so conclude {{R}} ' +
-  'then you\'ll need to start from the law of the excluded middle \'We know ' +
-  '{{R\u2228~R}}\'.']
+    'If you want to reach a contradiction from {{~R}} and so conclude {{R}} ' +
+    'then you\'ll need to start from the law of the excluded middle \'We ' +
+    'know {{R\u2228~R}}\.']
 }];
 
 var DEFAULT_LAYOUT_MISTAKE_STRINGS = [{

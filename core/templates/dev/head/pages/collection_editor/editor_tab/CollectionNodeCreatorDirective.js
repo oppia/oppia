@@ -50,8 +50,8 @@ oppia.directive('collectionNodeCreator', [function() {
           }
 
           ExplorationSummaryBackendApiService
-            .loadPublicAndPrivateExplorationSummaries(
-                [newExplorationId]).then(function(summaries) {
+            .loadPublicAndPrivateExplorationSummaries([newExplorationId])
+            .then(function(summaries) {
               var summaryBackendObject = null;
               if (summaries.length !== 0 &&
                   summaries[0].id === newExplorationId) {
@@ -69,7 +69,8 @@ oppia.directive('collectionNodeCreator', [function() {
               alertsService.addWarning(
                 'There was an error while adding an exploration to the ' +
                 'collection.');
-            });
+            }
+          );
         };
 
         // Creates a new exploration, then adds it to the collection.

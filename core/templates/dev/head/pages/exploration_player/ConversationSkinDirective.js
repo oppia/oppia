@@ -240,7 +240,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
     template: '<div ng-include="directiveTemplateId"></div>',
     controller: [
       '$scope', '$timeout', '$rootScope', '$window', '$translate', '$http',
-       'messengerService', 'oppiaPlayerService', 'urlService', 'focusService',
+      'messengerService', 'oppiaPlayerService', 'urlService', 'focusService',
       'LearnerViewRatingService', 'windowDimensionsService',
       'playerTranscriptService', 'LearnerParamsService',
       'playerPositionService', 'explorationRecommendationsService',
@@ -277,7 +277,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
         $scope.isIframed = urlService.isIframed();
         $rootScope.loadingMessage = 'Loading';
         $scope.hasFullyLoaded = false;
-        $scope.recommendedExplorationSummaries = [];
+        $scope.recommendedExplorationSummaries = null;
 
         $scope.OPPIA_AVATAR_IMAGE_URL = (
           UrlInterpolationService.getStaticImageUrl(
@@ -434,7 +434,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
 
         $scope.initializePage = function() {
           hasInteractedAtLeastOnce = false;
-          $scope.recommendedExplorationSummaries = [];
+          $scope.recommendedExplorationSummaries = null;
 
           playerPositionService.init(_navigateToActiveCard);
           oppiaPlayerService.init(function(exploration, initHtml, newParams) {
@@ -746,6 +746,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
 
         $scope.collectionId = GLOBALS.collectionId;
         $scope.collectionTitle = GLOBALS.collectionTitle;
+        $scope.collectionSummary = null;
 
         if ($scope.collectionId) {
           $http.get('/collectionsummarieshandler/data', {

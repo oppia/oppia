@@ -16,6 +16,7 @@
 
 """Job registries."""
 
+from core.domain import collection_jobs_one_off
 from core.domain import exp_jobs_one_off
 from core.domain import feedback_jobs_continuous
 from core.domain import stats_jobs_continuous
@@ -44,7 +45,8 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UserProfilePictureOneOffJob,
     exp_jobs_one_off.ItemSelectionInteractionOneOffJob,
     user_jobs_one_off.UserLastExplorationActivityOneOffJob,
-    recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob]
+    recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
+    collection_jobs_one_off.CollectionMigrationJob]
 
 # List of all ContinuousComputation managers to show controls for on the
 # admin dashboard.

@@ -13,33 +13,33 @@
 // limitations under the License.
 
 oppia.directive('realEditor', [
-    '$compile', 'OBJECT_EDITOR_URL_PREFIX',
-    function($compile, OBJECT_EDITOR_URL_PREFIX) {
-  return {
-    link: function(scope, element) {
-      scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_URL_PREFIX + 'Real';
-      };
-      $compile(element.contents())(scope);
-    },
-    restrict: 'E',
-    scope: true,
-    template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: ['$scope', function($scope) {
-      $scope.schema = {
-        type: 'float'
-      };
+  '$compile', 'OBJECT_EDITOR_URL_PREFIX',
+  function($compile, OBJECT_EDITOR_URL_PREFIX) {
+    return {
+      link: function(scope, element) {
+        scope.getTemplateUrl = function() {
+          return OBJECT_EDITOR_URL_PREFIX + 'Real';
+        };
+        $compile(element.contents())(scope);
+      },
+      restrict: 'E',
+      scope: true,
+      template: '<span ng-include="getTemplateUrl()"></span>',
+      controller: ['$scope', function($scope) {
+        $scope.schema = {
+          type: 'float'
+        };
 
-      $scope.$watch('$parent.value', function() {
+        $scope.$watch('$parent.value', function() {
+          if ($scope.$parent.value === '') {
+            // A new rule
+            $scope.$parent.value = 0.0;
+          }
+        });
+
         if ($scope.$parent.value === '') {
-          // A new rule
           $scope.$parent.value = 0.0;
         }
-      });
-
-      if ($scope.$parent.value === '') {
-        $scope.$parent.value = 0.0;
-      }
-    }]
-  };
-}]);
+      }]
+    };
+  }]);

@@ -17,58 +17,58 @@
 // in via initArgs.
 
 oppia.directive('logicErrorCategoryEditor', [
-    '$compile', 'OBJECT_EDITOR_URL_PREFIX',
-    function($compile, OBJECT_EDITOR_URL_PREFIX) {
-  return {
-    link: function(scope, element) {
-      scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_URL_PREFIX + 'LogicErrorCategory';
-      };
-      $compile(element.contents())(scope);
-    },
-    restrict: 'E',
-    scope: true,
-    template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: ['$scope', function($scope) {
-      $scope.alwaysEditable = true;
-      $scope.errorCategories = [{
-        name: 'parsing',
-        humanReadable: 'Unparseable'
-      }, {
-        name: 'typing',
-        humanReadable: 'Ill-typed'
-      }, {
-        name: 'line',
-        humanReadable: 'Incorrect line'
-      }, {
-        name: 'layout',
-        humanReadable: 'Wrong indenting'
-      }, {
-        name: 'variables',
-        humanReadable: 'Variables error'
-      }, {
-        name: 'logic',
-        humanReadable: 'Invalid deduction'
-      }, {
-        name: 'target',
-        humanReadable: 'Target not proved'
-      }, {
-        name: 'mistake',
-        humanReadable: 'Unspecified'
-      }];
+  '$compile', 'OBJECT_EDITOR_URL_PREFIX',
+  function($compile, OBJECT_EDITOR_URL_PREFIX) {
+    return {
+      link: function(scope, element) {
+        scope.getTemplateUrl = function() {
+          return OBJECT_EDITOR_URL_PREFIX + 'LogicErrorCategory';
+        };
+        $compile(element.contents())(scope);
+      },
+      restrict: 'E',
+      scope: true,
+      template: '<span ng-include="getTemplateUrl()"></span>',
+      controller: ['$scope', function($scope) {
+        $scope.alwaysEditable = true;
+        $scope.errorCategories = [{
+          name: 'parsing',
+          humanReadable: 'Unparseable'
+        }, {
+          name: 'typing',
+          humanReadable: 'Ill-typed'
+        }, {
+          name: 'line',
+          humanReadable: 'Incorrect line'
+        }, {
+          name: 'layout',
+          humanReadable: 'Wrong indenting'
+        }, {
+          name: 'variables',
+          humanReadable: 'Variables error'
+        }, {
+          name: 'logic',
+          humanReadable: 'Invalid deduction'
+        }, {
+          name: 'target',
+          humanReadable: 'Target not proved'
+        }, {
+          name: 'mistake',
+          humanReadable: 'Unspecified'
+        }];
 
-      $scope.localValue = {
-        category: $scope.errorCategories[0]
-      };
-      for (var i = 0; i < $scope.errorCategories.length; i++) {
-        if ($scope.errorCategories[i].name === $scope.$parent.value) {
-          $scope.localValue.category = $scope.errorCategories[i];
+        $scope.localValue = {
+          category: $scope.errorCategories[0]
+        };
+        for (var i = 0; i < $scope.errorCategories.length; i++) {
+          if ($scope.errorCategories[i].name === $scope.$parent.value) {
+            $scope.localValue.category = $scope.errorCategories[i];
+          }
         }
-      }
 
-      $scope.$watch('localValue.category', function() {
-        $scope.$parent.value = $scope.localValue.category.name;
-      });
-    }]
-  };
-}]);
+        $scope.$watch('localValue.category', function() {
+          $scope.$parent.value = $scope.localValue.category.name;
+        });
+      }]
+    };
+  }]);

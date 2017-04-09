@@ -3,7 +3,7 @@ var isMinificationNeeded = (argv.minify === 'True');
 var generatedJs = 'third_party/generated/js/third_party.js';
 if (isMinificationNeeded) {
   generatedJs = 'third_party/generated/js/third_party.min.js';
-};
+}
 
 module.exports = function(config) {
   config.set({

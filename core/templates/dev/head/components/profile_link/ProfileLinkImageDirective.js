@@ -23,30 +23,30 @@ oppia.directive('profileLinkImage', [function() {
       username: '&'
     },
     templateUrl: 'components/profileLinkImage',
-    controller: ['$scope', '$http', 'UrlInterpolationService',
-    function($scope, $http, UrlInterpolationService) {
-      var DEFAULT_PROFILE_IMAGE_PATH = (
-        UrlInterpolationService.getStaticImageUrl(
-          '/avatar/user_blue_72px.png'));
+    controller: [
+      '$scope', '$http', 'UrlInterpolationService',
+      function($scope, $http, UrlInterpolationService) {
+        var DEFAULT_PROFILE_IMAGE_PATH = (
+          UrlInterpolationService.getStaticImageUrl(
+            '/avatar/user_blue_72px.png'));
 
-      $scope.isUsernameLinkable = function(username) {
-        return GLOBALS.SYSTEM_USERNAMES.indexOf(username) === -1;
-      };
+        $scope.isUsernameLinkable = function(username) {
+          return GLOBALS.SYSTEM_USERNAMES.indexOf(username) === -1;
+        };
 
-      $scope.profileImageUrl = (
-        '/preferenceshandler/profile_picture_by_username/' +
-        $scope.username());
-      $scope.profilePicture = DEFAULT_PROFILE_IMAGE_PATH;
+        $scope.profileImageUrl = (
+          '/preferenceshandler/profile_picture_by_username/' +
+          $scope.username());
+        $scope.profilePicture = DEFAULT_PROFILE_IMAGE_PATH;
 
-      // Returns a promise for the user profile picture, or the default image
-      // if user is not logged in or has not uploaded a profile picture, or
-      // the player is in preview mode.
-      $http.get($scope.profileImageUrl).then(function(response) {
-        $scope.profilePicture = (
-          response.data.profile_picture_data_url_for_username ||
-          DEFAULT_PROFILE_IMAGE_PATH);
-      });
-    }]
-
+        // Returns a promise for the user profile picture, or the default image
+        // if user is not logged in or has not uploaded a profile picture, or
+        // the player is in preview mode.
+        $http.get($scope.profileImageUrl).then(function(response) {
+          $scope.profilePicture = (
+            response.data.profile_picture_data_url_for_username ||
+            DEFAULT_PROFILE_IMAGE_PATH);
+        });
+      }]
   };
 }]);

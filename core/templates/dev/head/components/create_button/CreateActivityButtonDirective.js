@@ -56,30 +56,30 @@ oppia.directive('createActivityButton', [function() {
               templateUrl: 'modals/createActivity',
               backdrop: true,
               controller: [
-                  '$scope', '$modalInstance', 'UrlInterpolationService',
-                  function($scope, $modalInstance, UrlInterpolationService) {
-                $scope.chooseExploration = function() {
-                  ExplorationCreationService.createNewExploration();
-                  $modalInstance.close();
-                };
+                '$scope', '$modalInstance', 'UrlInterpolationService',
+                function($scope, $modalInstance, UrlInterpolationService) {
+                  $scope.chooseExploration = function() {
+                    ExplorationCreationService.createNewExploration();
+                    $modalInstance.close();
+                  };
 
-                $scope.chooseCollection = function() {
-                  CollectionCreationService.createNewCollection();
-                  $modalInstance.close();
-                };
+                  $scope.chooseCollection = function() {
+                    CollectionCreationService.createNewCollection();
+                    $modalInstance.close();
+                  };
 
-                $scope.cancel = function() {
-                  $modalInstance.dismiss('cancel');
-                };
+                  $scope.cancel = function() {
+                    $modalInstance.dismiss('cancel');
+                  };
 
-                $scope.explorationImgUrl = (
-                  UrlInterpolationService.getStaticImageUrl(
-                  '/activity/exploration.svg'));
+                  $scope.explorationImgUrl = (
+                    UrlInterpolationService.getStaticImageUrl(
+                    '/activity/exploration.svg'));
 
-                $scope.collectionImgUrl = (
-                  UrlInterpolationService.getStaticImageUrl(
-                  '/activity/collection.svg'));
-              }],
+                  $scope.collectionImgUrl = (
+                    UrlInterpolationService.getStaticImageUrl(
+                    '/activity/collection.svg'));
+                }],
               windowClass: 'oppia-creation-modal'
             }).result.then(function() {}, function() {
               $scope.creationInProgress = false;
