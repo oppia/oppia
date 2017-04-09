@@ -506,6 +506,7 @@ class LDAStringClassifier(BaseClassifier):
         model['_c_dl'] = copy.deepcopy(self._c_dl)
         model['_c_lw'] = copy.deepcopy(self._c_lw)
         model['_c_l'] = copy.deepcopy(self._c_l)
+        model = self._make_json_serializable(model)
         return model
 
     def from_dict(self, model):
@@ -515,6 +516,7 @@ class LDAStringClassifier(BaseClassifier):
         Args:
             model: A dict representing a StringClassifier.
         """
+        model = self._unpickle_json_serialization(model)
         self._alpha = copy.deepcopy(model['_alpha'])
         self._beta = copy.deepcopy(model['_beta'])
         self._prediction_threshold = copy.deepcopy(
@@ -535,12 +537,15 @@ class LDAStringClassifier(BaseClassifier):
         self._c_lw = copy.deepcopy(model['_c_lw'])
         self._c_l = copy.deepcopy(model['_c_l'])
 
-    def make_json_serializable(self, model):
+    def _make_json_serializable(self, model):
         """Makes the StringClassifier dict JSON serializable by
         converting numpy data types to Python data types.
 
         Args:
             model: A dict representing a StringClassifier.
+
+        Returns:
+            model: A dict representing a StringClassifier
         """
         model["_b_dl"] = model["_b_dl"].tolist()
         for k in range(len(model["_b_dl"])):
@@ -576,6 +581,21 @@ class LDAStringClassifier(BaseClassifier):
                     model["_l_dp"][k][i] = int(model["_l_dp"][k][i])
                 elif isinstance(model["_l_dp"][k][i], numpy.floating):
                     model["_l_dp"][k][i] = float(model["_l_dp"][k][i])
+        return model
+
+    def _unpickle_json_serialization(self, model):
+        """Converts the JSON serialized data back to Numpy format.
+
+        Args:
+            model: A dict representing a StringClassifier.
+
+        Returns:
+            model: A dict representing a StringClassifier
+        """
+        model["_b_dl"] = numpy.array(model["_b_dl"])
+        model["_c_dl"] = numpy.array(model["_c_dl"])
+        model["_c_lw"] = numpy.array(model["_c_lw"])
+        model["_c_l"] = numpy.array(model["_c_l"])
         return model
 
     def train(self, training_data):
