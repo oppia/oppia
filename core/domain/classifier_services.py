@@ -114,11 +114,14 @@ def classify_string_classifier_rule(state, normalized_answer, exp_id,
         sc = classifier_registry.Registry.get_classifier_by_algorithm_id(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])
         sc.train(training_examples)
+        cached_classifier_data = sc.to_dict()
+        cached_classifier_data = sc.make_json_serializable(
+            cached_classifier_data)
         schema_version = exploration.states_schema_version
         classifier = classifier_domain.Classifier('0', exploration.id,
                                                   exploration.version,
                                                   state_name, algorithm_id,
-                                                  sc.to_dict(),
+                                                  cached_classifier_data,
                                                   schema_version)
         classifier_id = save_classifier(classifier)
         state.classifier_model_id = classifier_id
