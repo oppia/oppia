@@ -4009,7 +4009,8 @@ md-card.preview-conversation-skin-supplemental-card {
   display: inline-block;
   height: 90px;
   padding: 0;
-  width: 184px;
+  margin: 8px 4px;
+  width: 191px;
 }
 
 .oppia-dashboard-tab-panel {
@@ -4037,7 +4038,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-subscription-card-summary {
   float: left;
-  margin-left: 14px;
+  margin-left: 11px;
   margin-top: 19.5px;
 }
 
