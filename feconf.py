@@ -256,7 +256,7 @@ ENABLE_PROMO_BAR = True
 # all HTTP requests to the maintenance page. This is the only check which
 # determines whether the site is in maintenance mode to avoid queries to the
 # database by non-admins.
-ENABLE_MAINTENANCE_MODE = True
+ENABLE_MAINTENANCE_MODE = False
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'

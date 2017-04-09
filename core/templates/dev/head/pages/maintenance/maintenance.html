@@ -76,8 +76,13 @@
             </nav>
             <div class="oppia-splash-section-one text-center">
               <h2 class="oppia-splash-h2"
-                  translate="I18N_MAINTENANCE_DOWN_TIME_DESCRIPTION"
-                  style="padding-top: 100px; padding-bottom: 100px;"></h2>
+                  style="padding-top: 100px; padding-bottom: 100px; margin: 0 50px;">
+                Oppia is currently down for one-off maintenance.
+              </h2>
+              <div>
+                This is temporary and should only take a few hours. Please check
+                back again soon!
+              </div>
             </div>
           </div>
         </div>
@@ -94,6 +99,5 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/ObjectEditorDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/UrlInterpolationService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/pages/maintenance/Maintenance.js"></script>
-    {% include 'pages/footer.html' %}
   </body>
 </html>

@@ -219,7 +219,6 @@ class ConsoleErrorPage(base.BaseHandler):
 class MaintenancePage(base.BaseHandler):
     """Page describing that Oppia is down for maintenance mode."""
 
-    @require_maintenance_mode
-    def get(self):
+    def get(self, *args, **kwargs):
         """Handles GET requests."""
         self.render_template('pages/maintenance/maintenance.html')

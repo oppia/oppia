@@ -17,13 +17,10 @@
  */
 
 oppia.controller('Maintenance', [
-  '$scope', '$rootScope',
-  function($scope, $rootScope) {
+  '$scope', '$rootScope', 'UrlInterpolationService',
+  function($scope, $rootScope, UrlInterpolationService) {
     $scope.currentLang = 'en';
     $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
-    // Listener function to catch the change in language preference.
-    $rootScope.$on('$translateChangeSuccess', function(evt, response) {
-      $scope.currentLang = response.language;
-    });
+    $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
   }
 ]);
