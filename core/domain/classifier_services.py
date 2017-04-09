@@ -57,7 +57,7 @@ def classify(state, answer, exp_id, state_name):
 
     if interaction_instance.is_string_classifier_trainable:
         response = classify_string_classifier_rule(state, normalized_answer,
-            exp_id, state_name)
+                                                   exp_id, state_name)
     else:
         raise Exception('No classifier found for interaction.')
 
@@ -114,9 +114,12 @@ def classify_string_classifier_rule(state, normalized_answer, exp_id,
         sc = classifier_registry.Registry.get_classifier_by_algorithm_id(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])
         sc.train(training_examples)
+        schema_version = exploration.states_schema_version
         classifier = classifier_domain.Classifier('0', exploration.id,
-            exploration.version, state_name, algorithm_id, sc.to_dict(),
-            exploration.states_schema_version)
+                                                  exploration.version,
+                                                  state_name, algorithm_id,
+                                                  sc.to_dict(),
+                                                  schema_version)
         classifier_id = save_classifier(classifier)
         state.classifier_model_id = classifier_id
 
