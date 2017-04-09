@@ -70,6 +70,7 @@
     </li>
 
     {% if username %}
+    <div class="oppia-help-dropdown nav navbar-nav oppia-navbar-nav pull-right ng-cloak">
       <li class="dropdown" popover-is-open="postTutorialHelpPopoverIsShown"
           popover-placement="bottom" popover-trigger="none"
           popover="To get help in the future, click here!">
@@ -78,11 +79,12 @@
           <i class="material-icons">&#xE887;</i>
         </a>
       </li>
+    </div>
     {% endif %}
   </ul>
 </script>
 <style type="text/css">
-  ul .popover.bottom {
+  .oppia-help-dropdown .popover {
     font-size: 13px;
     max-width: 200px;
     text-align: center;
