@@ -101,14 +101,14 @@ def classify_string_classifier_rule(state, normalized_answer, exp_id,
                 [doc, [str(answer_group_index)]]
                 for doc in classifier_rule_spec.inputs['training_data']])
 
-
     exploration = exp_services.get_exploration_by_id(exp_id)
-    print exploration.state_names_to_classifier_ids
     algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']
-    if state_name in exploration.state_names_to_classifier_ids:
-        classifier_id = state_names_to_classifier_ids[state_name]
-        classifier = get_classifier_by_id(classifier_id)
-        sc = classifier.cached_classifier_data.from_dict()
+    if state.classifier_model_id:
+        classifier = get_classifier_by_id(state.classifier_model_id)
+        sc_dict = classifier.cached_classifier_data
+        sc = classifier_registry.Registry.get_classifier_by_algorithm_id(
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])
+        sc.from_dict(sc_dict)
 
     else:
         sc = classifier_registry.Registry.get_classifier_by_algorithm_id(
@@ -118,7 +118,7 @@ def classify_string_classifier_rule(state, normalized_answer, exp_id,
             exploration.version, state_name, algorithm_id, sc.to_dict(),
             exploration.states_schema_version)
         classifier_id = save_classifier(classifier)
-        exploration.state_names_to_classifier_ids[state_name] = classifier_id 
+        state.classifier_model_id = classifier_id
 
     if len(training_examples) > 0:
         labels = sc.predict([normalized_answer])
