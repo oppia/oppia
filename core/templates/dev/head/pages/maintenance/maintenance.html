@@ -65,24 +65,26 @@
             <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
               <div class="navbar-container">
                 <div class="navbar-header protractor-test-navbar-header pull-left">
-                    <a class="oppia-navbar-brand-name oppia-transition-200" href="/">
-                      <img ng-src="<[getStaticImageUrl('/logo/288x128_logo_white.png')]>"
-                           class="oppia-logo oppia-logo-wide" alt="Oppia Home">
-                    </a>
-                  </div>
-                  <div ng-cloak class="navbar-header pull-right">
-                  </div>
+                  <a class="oppia-navbar-brand-name oppia-transition-200" href="/">
+                    <img ng-src="<[getStaticImageUrl('/logo/288x128_logo_white.png')]>"
+                         class="oppia-logo oppia-logo-wide" alt="Oppia Home">
+                  </a>
+                </div>
+                <div ng-cloak class="navbar-header pull-right">
+                </div>
               </div>
             </nav>
-            <div class="oppia-splash-section-one text-center">
-              <h2 class="oppia-splash-h2"
-                  style="padding-top: 100px; padding-bottom: 100px; margin: 0 50px;">
-                Oppia is currently down for one-off maintenance.
-              </h2>
-              <div>
-                This is temporary and should only take a few hours. Please check
-                back again soon!
-              </div>
+
+            <div class="oppia-top-of-page-padding"></div>
+            <div class="oppia-page-cards-container">
+              <md-card class="oppia-page-card oppia-long-text">
+                <h2>The Oppia site is temporarily unavailable.</h2>
+
+                <p>
+                  Oppia is currently being upgraded, and the site should be up
+                  and running again in a few hours. Thanks for your patience!
+                </p>
+              </md-card>
             </div>
           </div>
         </div>
