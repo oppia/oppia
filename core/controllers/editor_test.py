@@ -18,6 +18,7 @@ import datetime
 import os
 import StringIO
 import zipfile
+import logging
 
 from core.controllers import dashboard
 from core.controllers import editor
@@ -47,12 +48,16 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
 
         self.set_admins([self.ADMIN_USERNAME])
+        self.set_moderators([self.MODERATOR_USERNAME])
 
     def assert_can_edit(self, response_body):
         """Returns True if the response body indicates that the exploration is
@@ -697,6 +702,73 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
         self.assertEqual(response.status_int, 200)
         self.logout()
 
+    def test_logging_info_after_deletion(self):
+        """Tests correctness of logged statements while deleting exploration"""
+        logging_info = []
+
+        def add_logging_info(msg, *_):
+            if msg != 'all_pending: clear %s':
+                logging_info.append(msg)
+
+        with self.swap(logging, 'info', add_logging_info), self.swap(
+            logging, 'debug', add_logging_info):
+            # checking for normal user
+            exp_id = 'unpublished_eid'
+            exploration = exp_domain.Exploration.create_default_exploration(
+                exp_id)
+            exp_services.save_new_exploration(self.owner_id, exploration)
+
+            self.login(self.OWNER_EMAIL)
+            self.testapp.delete(
+                '/createhandler/data/%s' % exp_id, expect_errors=True)
+            self.assertEqual(logging_info[0],
+                             self.owner_id + ' tried to delete exploration ' +
+                             exp_id)
+            self.assertEqual(logging_info[2],
+                             self.owner_id + ' deleted exploration ' + exp_id)
+            self.logout()
+
+            # checking for admin
+            logging_info = []
+            exp_id = 'unpublished_eid'
+            exploration = exp_domain.Exploration.create_default_exploration(
+                exp_id)
+            exp_services.save_new_exploration(self.admin_id, exploration)
+
+            self.login(self.ADMIN_EMAIL)
+            self.testapp.delete(
+                '/createhandler/data/%s' % exp_id, expect_errors=True)
+            self.assertEqual(logging_info[0],
+                             '(admin) ' + self.admin_id +
+                             ' tried to delete exploration ' +
+                             exp_id)
+            self.assertEqual(logging_info[2],
+                             '(admin) ' + self.admin_id +
+                             ' deleted exploration ' +
+                             exp_id)
+            self.logout()
+
+            # checking for moderator
+            logging_info = []
+            exp_id = 'unpublished_eid'
+            exploration = exp_domain.Exploration.create_default_exploration(
+                exp_id)
+            exp_services.save_new_exploration(self.moderator_id, exploration)
+
+            self.login(self.MODERATOR_EMAIL)
+            self.testapp.delete(
+                '/createhandler/data/%s' % exp_id, expect_errors=True)
+            self.assertEqual(logging_info[0],
+                             '(moderator) ' +
+                             self.moderator_id +
+                             ' tried to delete exploration ' +
+                             exp_id)
+            self.assertEqual(logging_info[2],
+                             '(moderator) ' +
+                             self.moderator_id +
+                             ' deleted exploration ' +
+                             exp_id)
+            self.logout()
 
 class VersioningIntegrationTest(BaseEditorControllerTest):
     """Test retrieval of and reverting to old exploration versions."""
