@@ -55,5 +55,5 @@ class LabelingInput(base.BaseInteraction):
         'schema': {
             'type': 'bool',
         },
-        'default_value': False    
+        'default_value': False
     }]

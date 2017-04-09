@@ -23,15 +23,11 @@ oppia.filter('oppiaInteractiveLabelingInputValidator', [
   // Returns a list of warnings.
   return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
     var warningsList = [];
-    return warningsList;
-  }
-}]);
-//TODO Add Tests
-    /*
-    baseInteractionValidationService.requireCustomizationArguments(
-      customizationArgs, ['imageAndRegions']);
 
-    if (!customizationArgs.imageAndRegions.value.imagePath) {
+    baseInteractionValidationService.requireCustomizationArguments(
+      customizationArgs, ['imageAndLabels']);
+
+    if (!customizationArgs.imageAndLabels.value.imagePath) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
         message: 'Please add an image for the learner to click on.'
@@ -41,7 +37,7 @@ oppia.filter('oppiaInteractiveLabelingInputValidator', [
     var areAnyRegionStringsEmpty = false;
     var areAnyRegionStringsDuplicated = false;
     var seenRegionStrings = [];
-    if (customizationArgs.imageAndRegions.value.labeledRegions.length === 0) {
+    if (customizationArgs.imageAndLabels.value.labeledRegions.length === 0) {
       warningsList.push({
         type: WARNING_TYPES.ERROR,
         message: 'Please specify at least one image region to click on.'
@@ -49,10 +45,10 @@ oppia.filter('oppiaInteractiveLabelingInputValidator', [
     }
 
     for (var i = 0;
-         i < customizationArgs.imageAndRegions.value.labeledRegions.length;
+         i < customizationArgs.imageAndLabels.value.labeledRegions.length;
          i++) {
       var regionLabel = (
-        customizationArgs.imageAndRegions.value.labeledRegions[i].label);
+        customizationArgs.imageAndLabels.value.labeledRegions[i].label);
 
       var ALPHANUMERIC_REGEX = /^[A-Za-z0-9]+$/;
       if (regionLabel.trim().length === 0) {

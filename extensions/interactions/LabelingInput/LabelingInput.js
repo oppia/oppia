@@ -33,14 +33,14 @@ oppia.directive('oppiaInteractiveLabelingInput', [
       templateUrl: 'interaction/LabelingInput',
       controller: [
         '$scope', '$element', '$attrs', function($scope, $element, $attrs) {
-          var imageAndRegions = oppiaHtmlEscaper.escapedJsonToObj(
-            $attrs.imageAndRegionsWithValue);
+          var imageAndLabels = oppiaHtmlEscaper.escapedJsonToObj(
+            $attrs.imageAndLabelsWithValue);
           $scope.highlightRegionsOnHover =
             ($attrs.highlightRegionsOnHoverWithValue === 'true');
-          $scope.alwaysShowRegions = 
+          $scope.alwaysShowRegions =
             ($attrs.alwaysShowRegionsWithValue === 'true');
           if ($scope.alwaysShowRegions) {$scope.highlightRegionsOnHover = false;}
-          $scope.filepath = imageAndRegions.imagePath;
+          $scope.filepath = imageAndLabels.imagePath;
           $scope.imageUrl = (
             $scope.filepath ?
             $sce.trustAsResourceUrl(
@@ -49,10 +49,10 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           $scope.mouseX = 0;
           $scope.mouseY = 0;
           $scope.currentlyHoveredRegions = [];
-          $scope.allRegions = imageAndRegions.labeledRegions;
+          $scope.allRegions = imageAndLabels.labeledRegions;
           $scope.getRegionDimensions = function(index) {
             var image = $($element).find('.oppia-image-click-img');
-            var labeledRegion = imageAndRegions.labeledRegions[index];
+            var labeledRegion = imageAndLabels.labeledRegions[index];
             var regionArea = labeledRegion.region.area;
             var leftDelta = image.offset().left - image.parent().offset().left;
             var topDelta = image.offset().top - image.parent().offset().top;
@@ -75,8 +75,8 @@ oppia.directive('oppiaInteractiveLabelingInput', [
             $scope.mouseX = (event.pageX - image.offset().left) / image.width();
             $scope.mouseY = (event.pageY - image.offset().top) / image.height();
             $scope.currentlyHoveredRegions = [];
-            for (var i = 0; i < imageAndRegions.labeledRegions.length; i++) {
-              var labeledRegion = imageAndRegions.labeledRegions[i];
+            for (var i = 0; i < imageAndLabels.labeledRegions.length; i++) {
+              var labeledRegion = imageAndLabels.labeledRegions[i];
               var regionArea = labeledRegion.region.area;
               if (regionArea[0][0] <= $scope.mouseX &&
                   $scope.mouseX <= regionArea[1][0] &&
