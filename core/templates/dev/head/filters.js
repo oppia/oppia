@@ -350,6 +350,9 @@ oppia.filter('summarizeNonnegativeNumber', [function() {
 // Note that this filter does not truncate at the middle of a word.
 oppia.filter('truncateAndCapitalize', [function() {
   return function(input, maxNumberOfCharacters) {
+    if (!input) {
+      return input;
+    }
     var words = input.trim().match(/\S+/g);
 
     // Capitalize the first word and add it to the result.
