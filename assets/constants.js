@@ -1,4 +1,6 @@
-{
+/* eslint-disable */
+
+var constants = {
   "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
     "Art", "Astronomy", "Biology", "Business", "Calculus", "Chemistry",
     "Combinatorics", "Computing", "Economics", "Education", "Engineering",
@@ -8,4 +10,4 @@
     "Probability", "Programming", "Puzzles", "Reading", "Spanish", "Sport",
     "Statistics", "Trigonometry", "Welcome"],
   "DISABLED_EXPLORATION_IDS": ["5"]
-}
+};
