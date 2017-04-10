@@ -55,7 +55,7 @@ class CollectionMigrationJob(jobs.BaseMapReduceJobManager):
         # Note: the read will bring the collection up to the newest version.
         collection = collection_services.get_collection_by_id(item.id)
         try:
-            collection.validate()
+            collection.validate(strict=False)
         except Exception as e:
             logging.error(
                 'Collection %s failed validation: %s' % (item.id, e))
