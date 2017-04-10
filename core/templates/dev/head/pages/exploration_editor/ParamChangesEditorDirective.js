@@ -100,7 +100,7 @@ oppia.directive('paramChangesEditor', [function() {
         };
 
         $scope.onChangeGeneratorType = function(paramChange) {
-          paramChange.changeGeneratorType();
+          paramChange.resetCustomizationArgs();
         };
 
         $scope.HUMAN_READABLE_ARGS_RENDERERS = {

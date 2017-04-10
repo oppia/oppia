@@ -68,7 +68,7 @@ oppia.controller('PreviewTab', [
       for (var i = 0; i < unsetParametersInfo.length; i++) {
         var newParamChange = ParamChangeObjectFactory.createEmpty(
           unsetParametersInfo[i].paramName);
-        manualParamChanges.push(newParamChange); 
+        manualParamChanges.push(newParamChange);
       }
 
       // Use modal to populate parameter change values

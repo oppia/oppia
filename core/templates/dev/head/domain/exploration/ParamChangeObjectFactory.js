@@ -42,7 +42,7 @@ oppia.factory('ParamChangeObjectFactory', [function() {
     };
   };
 
-  ParamChange.changeGeneratorType = function() {
+  ParamChange.resetCustomizationArgs = function() {
     this.customizationArgs = angular.copy(
       DEFAULT_CUSTOMIZATION_ARGS[this.generatorId]);
   };
@@ -54,16 +54,16 @@ oppia.factory('ParamChangeObjectFactory', [function() {
       paramChangeBackendDict.name);
   };
 
-  ParamChange.createEmpty = function(name) {
+  ParamChange.createEmpty = function(paramName) {
     return new ParamChange({
       parse_with_jinja: true,
       value: ''
-    }, 'Copier', name);
+    }, 'Copier', paramName);
   };
 
-  ParamChange.createDefault = function(name) {
+  ParamChange.createDefault = function(paramName) {
     return new ParamChange(
-      angular.copy(DEFAULT_CUSTOMIZATION_ARGS.Copier), 'Copier', name);
+      angular.copy(DEFAULT_CUSTOMIZATION_ARGS.Copier), 'Copier', paramName);
   };
 
   return ParamChange;

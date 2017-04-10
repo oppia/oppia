@@ -796,11 +796,6 @@ oppia.factory('explorationParamChangesService', [
   'explorationPropertyService', function(explorationPropertyService) {
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'param_changes';
-    // child._normalize = function(paramChanges) {
-    //   return paramChanges.map(function(paramChange) {
-    //     return paramChange.toBackendDict();
-    //   });
-    // };
     return child;
   }
 ]);
