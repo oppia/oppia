@@ -310,7 +310,7 @@ class LDAStringClassifierTest(test_utils.GenericTestBase):
 
         # Verify validation error is raised when the list values are string
         # instead of int.
-        classifier_data['_w_dp'] = ['abc']
+        classifier_data['_w_dp'] = [['abc']]
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected values of _w_dp to be a int')):
             self.classifier.validate(classifier_data)
