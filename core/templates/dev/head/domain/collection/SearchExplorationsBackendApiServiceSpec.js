@@ -38,15 +38,30 @@ describe('Exploration search backend API service', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should search for an exploration from the backend', function() {
+  // Search result object returnable from the backend
+  searchResults = {
+    collection_node_metadata_list: [{
+      id: '12',
+      objective: 
+      'learn how to count permutations accurately and systematically',
+      title: 'Protractor Test'
+    },{
+      id: '4',
+      objective: 
+      'learn how to count permutations accurately and systematically',
+      title: 'Three Balls'
+    }]
+  };
+
+  it('should call the provided success handler on HTTP success', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
     $httpBackend.expect(
-      'GET', '/exploration/metadata_search?q=three').respond(200, {
+      'GET', '/exploration/metadata_search?q=oppia').respond(200, {
         collection_node_metadata_list: []
       });
-    SearchExplorationsBackendApiService.getExplorations('three').then(
+    SearchExplorationsBackendApiService.getExplorations('oppia').then(
       successHandler, failHandler);
     $httpBackend.flush();
     $rootScope.$digest();
@@ -55,13 +70,29 @@ describe('Exploration search backend API service', function() {
     expect(failHandler).not.toHaveBeenCalled();
   });
 
+  it('should search for explorations from the backend', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect(
+      'GET', '/exploration/metadata_search?q=oppia').respond(200, 
+      searchResults);
+    SearchExplorationsBackendApiService.getExplorations('oppia').then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+    $rootScope.$digest();
+
+    expect(successHandler).toHaveBeenCalledWith(searchResults);
+    expect(failHandler).not.toHaveBeenCalled();
+  });
+
   it('should call the provided fail handler on HTTP failure', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
     $httpBackend.expect(
-      'GET', '/exploration/metadata_search?q=three').respond(500);
-    SearchExplorationsBackendApiService.getExplorations('three').then(
+      'GET', '/exploration/metadata_search?q=oppia').respond(500);
+    SearchExplorationsBackendApiService.getExplorations('oppia').then(
       successHandler, failHandler);
     $httpBackend.flush();
     $rootScope.$digest();
