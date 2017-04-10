@@ -603,9 +603,11 @@ class StateAnswersModel(base_models.BaseModel):
     The id/key of instances of this class has the form
         [EXPLORATION_ID]:[EXPLORATION_VERSION]:[STATE_NAME]:[SHARD_ID].
     """
-    # This provides about 24k of padding for the other properties and entity
-    # storage overhead (since the max entity size is 1MB).
-    _MAX_ANSWER_LIST_BYTE_SIZE = 1000000
+    # This provides about 124k of padding for the other properties and entity
+    # storage overhead (since the max entity size is 1MB). The meta data can
+    # get close to 50k or exceed it, so plenty of padding is leftover to avoid
+    # risking overflowing an entity.
+    _MAX_ANSWER_LIST_BYTE_SIZE = 900000
 
     # Explicitly store exploration id, exploration version and state name
     # so we can easily do queries on them.

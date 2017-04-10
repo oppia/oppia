@@ -1615,11 +1615,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         if rule_str != cls._DEFAULT_RULESPEC_STR:
             # Extract the region clicked on from the rule string.
             expected_clicked_region = rule_str[len(rule_spec.rule_type) + 1:-1]
-            if expected_clicked_region not in clicked_regions:
-                return (
-                    None,
-                    'Expected IsInRegion occurrence to refer to the region '
-                    'actually containing the clicked coordinates')
+            clicked_regions = list(
+                set(clicked_regions + [expected_clicked_region]))
 
         click_on_image_dict = {
             'clickPosition': [click_position_x, click_position_y],
