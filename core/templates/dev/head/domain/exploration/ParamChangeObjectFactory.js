@@ -63,7 +63,7 @@ oppia.factory('ParamChangeObjectFactory', [function() {
 
   ParamChange.createDefault = function(name) {
     return new ParamChange(
-      DEFAULT_CUSTOMIZATION_ARGS.Copier, 'Copier', name);
+      angular.copy(DEFAULT_CUSTOMIZATION_ARGS.Copier), 'Copier', name);
   };
 
   return ParamChange;

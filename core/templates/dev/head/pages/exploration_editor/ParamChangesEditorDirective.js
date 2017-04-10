@@ -83,8 +83,7 @@ oppia.directive('paramChangesEditor', [function() {
               angular.copy(DEFAULT_PARAM_SPEC));
             $scope.paramNameChoices = generateParamNameChoices();
           }
-          $scope.paramChangesService.displayed.push(
-            angular.copy(newParamChange));
+          $scope.paramChangesService.displayed.push(newParamChange);
         };
 
         $scope.openParamChangesEditor = function() {
