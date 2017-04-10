@@ -16,9 +16,7 @@
 
 import ast
 import collections
-import copy
 import datetime
-import itertools
 
 from core import jobs
 from core.domain import calculation_registry
@@ -545,56 +543,49 @@ class InteractionAnswerSummariesMRJobManager(
 
         if InteractionAnswerSummariesMRJobManager._entity_created_before_job_queued( # pylint: disable=line-too-long
                 item):
-            state_answers_dict = {
-                'exploration_id': item.exploration_id,
-                'exploration_version': item.exploration_version,
-                'state_name': _encode(item.state_name),
-                'interaction_id': item.interaction_id,
-                'submitted_answer_list': item.submitted_answer_list,
-            }
-
             # Output answers submitted to the exploration for this exp version.
-            versioned_key = u'%s:%s:%s' % (
-                item.exploration_id, item.exploration_version, item.state_name)
-            yield (versioned_key.encode('utf-8'),
-                   copy.deepcopy(state_answers_dict))
+            versioned_key = u'%s:%s:%s:%s' % (
+                item.exploration_id, item.exploration_version,
+                item.interaction_id, item.state_name)
+            yield (versioned_key.encode('utf-8'), item.id)
 
             # Output the same set of answers independent of the version. This
             # allows the reduce step to aggregate answers across all
             # exploration versions.
-            state_answers_dict['exploration_version'] = VERSION_ALL
-            all_versions_key = u'%s:%s:%s' % (
-                item.exploration_id, VERSION_ALL, item.state_name)
-            yield (all_versions_key.encode('utf-8'), state_answers_dict)
+            all_versions_key = u'%s:%s:%s:%s' % (
+                item.exploration_id, VERSION_ALL, item.interaction_id,
+                item.state_name)
+            yield (all_versions_key.encode('utf-8'), item.id)
 
     @staticmethod
-    def reduce(key, stringified_state_answers_dicts):
-        exploration_id, exploration_version, state_name = key.split(':')
-        interaction_id = ast.literal_eval(
-            stringified_state_answers_dicts[0])['interaction_id']
+    def reduce(key, stringified_item_ids):
+        exploration_id, exploration_version, interaction_id, state_name = (
+            key.split(':'))
 
         # Collapse the list of answers into a single answer dict. This
         # aggregates across multiple answers if the key ends with VERSION_ALL.
+        # TODO(bhenning): Find a way to iterate across all answers more
+        # efficiently and by not loading all answers for a particular
+        # exploration into memory.
+        submitted_answer_list = []
         combined_state_answers = {
             'exploration_id': exploration_id,
             'exploration_version': exploration_version,
             'state_name': state_name,
             'interaction_id': interaction_id,
-            'submitted_answer_list': list(itertools.chain.from_iterable(
-                ast.literal_eval(state_answers)['submitted_answer_list']
-                for state_answers in stringified_state_answers_dicts))
+            'submitted_answer_list': submitted_answer_list
         }
 
-        # NOTE TO DEVELOPERS: 'submitted_answer_list' above is being converted
-        # into a list. This means ALL answers will be placed into memory at this
-        # point. This is needed because 'submitted_answer_list' is iterated
-        # multiple times by different computations. The iterable could also be
-        # tee'd, but that also can take significant memory. Adding this note
-        # here in case it leads to significant memory consumption in the future,
-        # as well as pointing out a possible solution which may consume less
-        # memory. If you came across this TODO when investigating a shard
-        # failure for this job due to exceeding the soft private memory limit,
-        # this is probably the reson.
+        # Retrieve all associates IDs to StateAnswersModel.
+        item_ids = set(stringified_item_ids)
+
+        # Retrieve all StateAnswerModel entities associated with this shard
+        # instance.
+        state_answer_models = stats_models.StateAnswersModel.get_multi(item_ids)
+        for state_answers_model in state_answer_models:
+            if state_answers_model:
+                submitted_answer_list += (
+                    state_answers_model.submitted_answer_list)
 
         # Get all desired calculations for the current interaction id.
         calc_ids = interaction_registry.Registry.get_interaction_by_id(
