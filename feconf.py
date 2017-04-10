@@ -831,6 +831,9 @@ SUPPORTED_SITE_LANGUAGES = [{
     'id': 'es',
     'text': 'Español'
 }, {
+    'id': 'hu',
+    'text': 'magyar'
+}, {
     'id': 'pt',
     'text': 'Português'
 }, {
