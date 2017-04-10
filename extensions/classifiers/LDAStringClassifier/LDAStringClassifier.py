@@ -704,4 +704,3 @@ class LDAStringClassifier(BaseClassifier):
                         raise utils.ValidationError(
                             'Expected values of %s to be a int, received %s' % (
                                 list_of_list_property, value))
-
