@@ -112,11 +112,7 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
         """Tests that the collection migration job migrates collections which
         do not pass strict validation.
         """
-        # Create an exploration to put in the collection.
-        self.save_new_default_exploration(self.EXP_ID, self.albert_id)
-        node = collection_domain.CollectionNode.create_default_node(self.EXP_ID)
-
-        # Save a collection without an objective in version 1.
+        # Save a collection without an objective or explorations in version 1.
         collection_title = 'A title'
         collection_category = 'A category'
         rights_manager.create_new_collection_rights(
@@ -128,7 +124,6 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
             objective='',
             tags=[],
             schema_version=1,
-            nodes=[node.to_dict()],
         )
         model.commit(self.albert_id, 'Made a new collection!', [{
             'cmd': collection_services.CMD_CREATE_NEW,
