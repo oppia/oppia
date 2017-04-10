@@ -110,6 +110,7 @@ describe('Answer classification service with string classifier disabled',
     });
 
     var explorationId = 'exploration';
+    var stateName = 'stateName';
 
     var rules = {
       Equals: function(answer, inputs) {
@@ -121,8 +122,9 @@ describe('Answer classification service with string classifier disabled',
     };
 
     it('should fail if no frontend rules are provided', function() {
-      acs.getMatchingClassificationResult(explorationId, state, 0, false).then(
-        successHandler, failHandler);
+      acs.getMatchingClassificationResult(
+        explorationId, stateName, state, 0, false)
+        .then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalled();
@@ -131,7 +133,7 @@ describe('Answer classification service with string classifier disabled',
     it('should return the first matching answer group and first matching rule' +
        'spec', function() {
       acs.getMatchingClassificationResult(
-        explorationId, state, 10, false, rules)
+        explorationId, stateName, state, 10, false, rules)
         .then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).toHaveBeenCalledWith({
@@ -142,7 +144,7 @@ describe('Answer classification service with string classifier disabled',
       expect(failHandler).not.toHaveBeenCalled();
 
       acs.getMatchingClassificationResult(
-        explorationId, state, 5, false, rules)
+        explorationId, stateName, state, 5, false, rules)
         .then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).toHaveBeenCalledWith({
@@ -153,7 +155,7 @@ describe('Answer classification service with string classifier disabled',
       expect(failHandler).not.toHaveBeenCalled();
 
       acs.getMatchingClassificationResult(
-        explorationId, state, 6, false, rules)
+        explorationId, stateName, state, 6, false, rules)
         .then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).toHaveBeenCalledWith({
@@ -166,7 +168,7 @@ describe('Answer classification service with string classifier disabled',
 
     it('should return the default rule if no answer group matches', function() {
       acs.getMatchingClassificationResult(
-        explorationId, state, 7, false, rules)
+        explorationId, stateName, state, 7, false, rules)
         .then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).toHaveBeenCalledWith({
@@ -210,8 +212,9 @@ describe('Answer classification service with string classifier disabled',
         param_changes: []
       });
 
-      acs.getMatchingClassificationResult(explorationId, state, 0, false).then(
-        successHandler, failHandler);
+      acs.getMatchingClassificationResult(
+        explorationId, stateName, state, 0, false)
+        .then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalled();
@@ -313,6 +316,7 @@ describe('Answer classification service with string classifier enabled',
     });
 
     var explorationId = 'exploration';
+    var stateName = 'stateName';
 
     var rules = {
       Equals: function(answer, inputs) {
@@ -339,7 +343,7 @@ describe('Answer classification service with string classifier enabled',
         '/explorehandler/classify/' + explorationId).respond(
         backendClassifiedOutcome);
       acs.getMatchingClassificationResult(
-        explorationId, state, 0, false, rules)
+        explorationId, stateName, state, 0, false, rules)
         .then(successHandler, failHandler);
       $rootScope.$apply();
       $httpBackend.flush();
@@ -351,7 +355,7 @@ describe('Answer classification service with string classifier enabled',
     it('should return the default rule if no answer group matches and ' +
        'interaction is not trainable', function() {
       acs.getMatchingClassificationResult(
-        explorationId, state2, 0, false, rules)
+        explorationId, stateName, state2, 0, false, rules)
         .then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).toHaveBeenCalledWith({

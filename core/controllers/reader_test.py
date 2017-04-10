@@ -128,6 +128,7 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
         self.exp_id = '0'
         self.title = 'Testing String Classifier'
         self.category = 'Test'
+        self.state_name = 'Home'
         exp_services.delete_demo(self.exp_id)
         exp_services.load_demo(self.exp_id)
 
@@ -143,13 +144,15 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
 
         with self.enable_string_classifier:
             # Testing the handler for a correct answer.
-            old_state_dict = self.exploration.states['Home'].to_dict()
+            old_state_dict = self.exploration.states[self.state_name].to_dict()
             answer = 'Permutations'
             params = {}
             res = self.post_json('/explorehandler/classify/%s' % self.exp_id,
                                  {'params' : params,
                                   'old_state' : old_state_dict,
-                                  'answer' : answer})
+                                  'answer' : answer,
+                                  'state_name' : self.state_name,
+                                  'exp_id' : self.exp_id})
             self.assertEqual(res['outcome']['feedback'][0],
                              '<p>Detected permutation.</p>')
 
