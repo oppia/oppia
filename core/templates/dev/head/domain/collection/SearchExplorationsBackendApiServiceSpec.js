@@ -58,10 +58,10 @@ describe('Exploration search backend API service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     $httpBackend.expect(
-      'GET', '/exploration/metadata_search?q=oppia').respond(200, {
+      'GET', '/exploration/metadata_search?q=three').respond(200, {
         collection_node_metadata_list: []
       });
-    SearchExplorationsBackendApiService.getExplorations('oppia').then(
+    SearchExplorationsBackendApiService.getExplorations('three').then(
       successHandler, failHandler);
     $httpBackend.flush();
     $rootScope.$digest();
@@ -75,9 +75,9 @@ describe('Exploration search backend API service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     $httpBackend.expect(
-      'GET', '/exploration/metadata_search?q=oppia').respond(200, 
+      'GET', '/exploration/metadata_search?q=count').respond(200, 
       searchResults);
-    SearchExplorationsBackendApiService.getExplorations('oppia').then(
+    SearchExplorationsBackendApiService.getExplorations('count').then(
       successHandler, failHandler);
     $httpBackend.flush();
     $rootScope.$digest();
