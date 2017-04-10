@@ -385,7 +385,40 @@ describe('Simple Editor Manager Service', function() {
       expectedLastStateName, state.interaction, '');
     expect(simpleEditorManagerService.getQuestionList()._questions
       .some(function(question) {
-        return JSON.stringify(question) === JSON.stringify(expectedQuestion);
+        // Checks recursively if two objects are equal.
+        var areObjectsEqual = function(obj1, obj2) {
+          if (obj1 === null && obj2 === null) {
+            return true;
+          } else if ((obj1 === null && obj2 !== null) ||
+            (obj2 === null && obj1 !== null)) {
+            return false;
+          }
+
+          var keys1 = Object.getOwnPropertyNames(obj1).sort();
+          var keys2 = Object.getOwnPropertyNames(obj2).sort();
+          var areEqual = true;
+
+          if (keys1.length !== keys2.length) {
+            return false;
+          }
+
+          for (var i = 0; i < keys1.length; i++) {
+            if (keys1[i] !== keys2[i]) {
+              return false;
+            }
+            if (typeof obj1[keys1[i]] === 'object') {
+              if (areObjectsEqual(obj1[keys1[i]], obj2[keys2[i]]) === false) {
+                return false;
+              }
+            } else if (obj1[keys1[i]] !== obj2[keys2[i]]) {
+              return false;
+            }
+          }
+
+          return true;
+        };
+
+        return areObjectsEqual(question, expectedQuestion);
       })).toBe(true);
   });
 
