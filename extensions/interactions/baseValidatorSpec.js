@@ -72,29 +72,31 @@ describe('Interaction validator', function() {
     });
 
     it('should have a warning for an answer group with a confusing outcome',
-        function() {
-      var answerGroups = [
-        agof.createNew([], goodOutcomeDest, false),
-        agof.createNew([], badOutcome, false),
-        agof.createNew([], goodOutcomeFeedback, false)
-      ];
-      var warnings = bivs.getAnswerGroupWarnings(answerGroups, currentState);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.ERROR,
-        message: 'Please specify what Oppia should do in answer group 2.'
-      }]);
-    });
+      function() {
+        var answerGroups = [
+          agof.createNew([], goodOutcomeDest, false),
+          agof.createNew([], badOutcome, false),
+          agof.createNew([], goodOutcomeFeedback, false)
+        ];
+        var warnings = bivs.getAnswerGroupWarnings(answerGroups, currentState);
+        expect(warnings).toEqual([{
+          type: WARNING_TYPES.ERROR,
+          message: 'Please specify what Oppia should do in answer group 2.'
+        }]);
+      }
+    );
 
     it('should not have any warnings for a non-confusing default outcome',
-        function() {
-      var warnings = bivs.getDefaultOutcomeWarnings(
-        goodOutcomeDest, currentState);
-      expect(warnings).toEqual([]);
+      function() {
+        var warnings = bivs.getDefaultOutcomeWarnings(
+          goodOutcomeDest, currentState);
+        expect(warnings).toEqual([]);
 
-      warnings = bivs.getDefaultOutcomeWarnings(
-        goodOutcomeFeedback, currentState);
-      expect(warnings).toEqual([]);
-    });
+        warnings = bivs.getDefaultOutcomeWarnings(
+          goodOutcomeFeedback, currentState);
+        expect(warnings).toEqual([]);
+      }
+    );
 
     it('should have a warning for a confusing default outcome', function() {
       var warnings = bivs.getDefaultOutcomeWarnings(badOutcome, currentState);
@@ -121,17 +123,17 @@ describe('Interaction validator', function() {
       var warnings = bivs.getAllOutcomeWarnings(
         badAnswerGroups, badOutcome, currentState);
       expect(warnings).toEqual([{
-          type: WARNING_TYPES.ERROR,
-          message: 'Please specify what Oppia should do in answer group 2.'
-        }, {
-          type: WARNING_TYPES.ERROR,
-          message: 'Please specify what Oppia should do in answer group 3.'
-        }, {
-          type: WARNING_TYPES.ERROR,
-          message: (
-            'Please add feedback for the user if they are to return ' +
-            'to the same state again.')
-        }
+        type: WARNING_TYPES.ERROR,
+        message: 'Please specify what Oppia should do in answer group 2.'
+      }, {
+        type: WARNING_TYPES.ERROR,
+        message: 'Please specify what Oppia should do in answer group 3.'
+      }, {
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'Please add feedback for the user if they are to return ' +
+          'to the same state again.')
+      }
       ]);
     });
   });
@@ -148,12 +150,13 @@ describe('Interaction validator', function() {
     });
 
     it('should throw warnings for multiple missing top-level fields',
-        function() {
-      var expectedArgs = ['first', 'second'];
-      expect(function() {
-        bivs.requireCustomizationArguments({}, expectedArgs);
-      }).toThrow(
-        'Expected customization arguments to have properties: first, second');
-    });
+      function() {
+        var expectedArgs = ['first', 'second'];
+        expect(function() {
+          bivs.requireCustomizationArguments({}, expectedArgs);
+        }).toThrow(
+          'Expected customization arguments to have properties: first, second');
+      }
+    );
   });
 });

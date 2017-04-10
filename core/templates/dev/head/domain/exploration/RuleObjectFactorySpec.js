@@ -27,8 +27,7 @@ describe('Rule object factory', function() {
       rof = $injector.get('RuleObjectFactory');
     }));
 
-    it('should have matching classifier constants',
-        inject(function($injector) {
+    it('should have matching classifier constants', inject(function($injector) {
       expect(rof.createNewClassifierRule().type).toEqual(
         $injector.get('RULE_TYPE_CLASSIFIER'));
     }));

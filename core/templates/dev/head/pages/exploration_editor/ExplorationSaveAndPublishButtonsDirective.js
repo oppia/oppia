@@ -91,12 +91,12 @@ oppia.directive('explorationSaveAndPublishButtons', [function() {
           $scope.publishIsInProcess = true;
           $scope.loadingDotsAreShown = true;
 
-          explorationSaveService.showPublishExplorationModal(showLoadingDots,
-            hideLoadingDots)
-              .then(function() {
-                $scope.publishIsInProcess = false;
-                $scope.loadingDotsAreShown = false;
-              });
+          explorationSaveService.showPublishExplorationModal(
+            showLoadingDots, hideLoadingDots)
+            .then(function() {
+              $scope.publishIsInProcess = false;
+              $scope.loadingDotsAreShown = false;
+            });
         };
 
         $scope.saveChanges = function() {

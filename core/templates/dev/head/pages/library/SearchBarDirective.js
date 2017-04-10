@@ -80,7 +80,7 @@ oppia.directive('searchBar', [function() {
           var selectedItems = [];
           for (var i = 0; i < masterList.length; i++) {
             if ($scope.selectionDetails[itemsType]
-                      .selections[masterList[i].id]) {
+              .selections[masterList[i].id]) {
               selectedItems.push(masterList[i].text);
             }
           }
@@ -101,7 +101,7 @@ oppia.directive('searchBar', [function() {
             var translatedItems = [];
             for (var i = 0; i < selectedItems.length; i++) {
               translatedItems.push($translate.instant(selectedItems[i]));
-            };
+            }
             $scope.selectionDetails[itemsType].description = (
               translatedItems.join(', '));
           } else {

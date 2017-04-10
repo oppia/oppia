@@ -209,6 +209,11 @@ describe('Compare versions service', function() {
           }],
           interaction: {
             answer_groups: [],
+            default_outcome: {
+              dest: 'default',
+              feedback: [],
+              param_changes: []
+            },
             fallbacks: []
           }
         };
@@ -216,7 +221,9 @@ describe('Compare versions service', function() {
           statesDetails[stateName].ruleDests.map(function(ruleDestName) {
             return {
               outcome: {
-                dest: ruleDestName
+                dest: ruleDestName,
+                feedback: [],
+                param_changes: []
               },
               rule_specs: [],
               correct: false
@@ -498,9 +505,9 @@ describe('Compare versions service', function() {
 
     it('should add new state with same name as old name of renamed state',
         function() {
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=5')
+      $httpBackend.expect('GET', '/createhandler/init/0?v=5')
         .respond(_getStatesData(testExplorationData1[4]));
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=8')
+      $httpBackend.expect('GET', '/createhandler/init/0?v=8')
         .respond(_getStatesData(testExplorationData1[7]));
       vts.init(testSnapshots1);
       var nodeData = null;
@@ -666,9 +673,9 @@ describe('Compare versions service', function() {
 
     it('should mark states correctly when a series of changes are applied',
         function() {
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=1')
+      $httpBackend.expect('GET', '/createhandler/init/0?v=1')
         .respond(_getStatesData(testExplorationData1[0]));
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=13')
+      $httpBackend.expect('GET', '/createhandler/init/0?v=13')
         .respond(_getStatesData(testExplorationData1[12]));
       vts.init(testSnapshots1);
       var nodeData = null;
@@ -857,9 +864,9 @@ describe('Compare versions service', function() {
 
     it('should mark states correctly when there is 1 reversion to before v1',
         function() {
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=3')
+      $httpBackend.expect('GET', '/createhandler/init/0?v=3')
         .respond(_getStatesData(testExplorationData2[2]));
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=5')
+      $httpBackend.expect('GET', '/createhandler/init/0?v=5')
         .respond(_getStatesData(testExplorationData2[4]));
       vts.init(testSnapshots2);
       var nodeData = null;
@@ -883,9 +890,9 @@ describe('Compare versions service', function() {
 
     it('should mark states correctly when compared version is a reversion',
         function() {
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=4')
+      $httpBackend.expect('GET', '/createhandler/init/0?v=4')
         .respond(_getStatesData(testExplorationData2[3]));
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=5')
+      $httpBackend.expect('GET', '/createhandler/init/0?v=5')
         .respond(_getStatesData(testExplorationData2[4]));
       vts.init(testSnapshots2);
       var nodeData = null;

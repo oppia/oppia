@@ -104,14 +104,14 @@ oppia.directive('oppiaResponseImageClickInput', [function() {
     scope: {},
     templateUrl: 'response/ImageClickInput',
     controller: [
-        '$scope', '$attrs', 'oppiaHtmlEscaper',
-        function($scope, $attrs, oppiaHtmlEscaper) {
-      var _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+      '$scope', '$attrs', 'oppiaHtmlEscaper',
+      function($scope, $attrs, oppiaHtmlEscaper) {
+        var _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
 
-      $scope.clickRegionLabel = '(Clicks on ' + (
-        _answer.clickedRegions.length > 0 ?
-        '\'' + _answer.clickedRegions[0] + '\'' : 'image') + ')';
-    }]
+        $scope.clickRegionLabel = '(Clicks on ' + (
+          _answer.clickedRegions.length > 0 ?
+          '\'' + _answer.clickedRegions[0] + '\'' : 'image') + ')';
+      }]
   };
 }]);
 

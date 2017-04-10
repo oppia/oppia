@@ -521,18 +521,18 @@ describe('Substitute into expression', function() {
       logicProofShared.displayExpression(
         logicProofStudent.substituteIntoExpression(
           logicProofParser.parse('p\u2227A(x,x)', 'expression'), {
-          p: logicProofParser.parse('B(x)<=>q', 'expression'),
-          x: logicProofParser.parse('y+2', 'expression')
-        }), logicProofData.BASE_STUDENT_LANGUAGE.operators)
+            p: logicProofParser.parse('B(x)<=>q', 'expression'),
+            x: logicProofParser.parse('y+2', 'expression')
+          }), logicProofData.BASE_STUDENT_LANGUAGE.operators)
     ).toEqual('(B(x)<=>q)\u2227A(y+2,y+2)');
 
     expect(
       logicProofShared.displayExpression(
         logicProofStudent.substituteIntoExpression(
           logicProofParser.parse('\u2200y.y=z', 'expression'), {
-          y: logicProofParser.parse('x', 'expression'),
-          z: logicProofParser.parse('22', 'expression')
-        }), logicProofData.BASE_STUDENT_LANGUAGE.operators)
+            y: logicProofParser.parse('x', 'expression'),
+            z: logicProofParser.parse('22', 'expression')
+          }), logicProofData.BASE_STUDENT_LANGUAGE.operators)
     ).toEqual('\u2200y.(y=22)');
   });
 });
@@ -560,10 +560,10 @@ describe('Compute expression from template', function() {
       logicProofShared.displayExpression(
         logicProofStudent.computeExpressionFromTemplate(
           logicProofParser.parse('p[x->a]', 'booleanTemplate'), {
-          p: logicProofParser.parse('B(y)', 'expression'),
-          x: logicProofParser.parse('y', 'expression'),
-          a: logicProofParser.parse('2-2', 'expression')
-        }), logicProofData.BASE_STUDENT_LANGUAGE.operators)
+            p: logicProofParser.parse('B(y)', 'expression'),
+            x: logicProofParser.parse('y', 'expression'),
+            a: logicProofParser.parse('2-2', 'expression')
+          }), logicProofData.BASE_STUDENT_LANGUAGE.operators)
     ).toEqual('B(2-2)');
   });
 });
@@ -605,10 +605,10 @@ describe('Match line to template', function() {
       matchLineToTemplate(
         'z was arbitrary so \u2200x.x=2', sampleInteraction.line_templates[1])
     ).toEqual({
-        a: logicProofParser.parse('z', 'expression'),
-        p: logicProofParser.parse('x=2', 'expression'),
-        x: logicProofParser.parse('x', 'expression')
-      });
+      a: logicProofParser.parse('z', 'expression'),
+      p: logicProofParser.parse('x=2', 'expression'),
+      x: logicProofParser.parse('x', 'expression')
+    });
   });
 
   it('should reject examples that do not match', function() {
@@ -818,18 +818,18 @@ describe('Evaluate a logical expression', function() {
       x: 'a',
       y: logicProofParser.parse('p\u2227q', 'expression'),
       z: [
-           logicProofParser.parse('\u2203x.p', 'expression'),
-           logicProofParser.parse('p\u2227q', 'expression')
-         ]
+        logicProofParser.parse('\u2203x.p', 'expression'),
+        logicProofParser.parse('p\u2227q', 'expression')
+      ]
     }, {})).toEqual(true);
 
     expect(testEvaluate('x=\'a\'', 'boolean', {
       x: '\'a\'',
       y: logicProofParser.parse('p\u2227q', 'expression'),
       z: [
-           logicProofParser.parse('\u2203x.p', 'expression'),
-           logicProofParser.parse('p\u2227q', 'expression')
-         ]
+        logicProofParser.parse('\u2203x.p', 'expression'),
+        logicProofParser.parse('p\u2227q', 'expression')
+      ]
     }, {})).toEqual(true);
 
     expect(
@@ -848,7 +848,7 @@ describe('Evaluate a logical expression', function() {
           proof: logicProofStudent.buildProof([
             'from r and s we have r\u2227s',
             'from r\u2227s and s we have (r\u2227s)\u2227s'
-            ].join('\n'), sampleInteraction)
+          ].join('\n'), sampleInteraction)
         }), logicProofData.BASE_CONTROL_LANGUAGE.operators)
     ).toEqual('r\u2227s, s');
 
@@ -887,9 +887,9 @@ describe('Render mistake messages', function() {
     expect(
       render(
         sampleInteraction.mistake_table[0].entries[0], 2, [
-        'a was arbitrary hence \u2200x.p',
-        '  from p and q we have p\u2227q',
-        '  b was arbitrary hence \u2200x.q'].join('\n'))[0]
+          'a was arbitrary hence \u2200x.p',
+          '  from p and q we have p\u2227q',
+          '  b was arbitrary hence \u2200x.q'].join('\n'))[0]
     ).toEqual('We originally took a as our arbitrary variable so this, ' +
       'rather than b, needs to be the one that we quantify out over.');
 
@@ -904,8 +904,8 @@ describe('Render mistake messages', function() {
     expect(
       render(
         sampleInteraction.mistake_table[1].entries[0], 0, [
-        'a was arbitrary hence \u2200x.p',
-        '  from p and q we have p\u2227q'].join('\n'))
+          'a was arbitrary hence \u2200x.p',
+          '  from p and q we have p\u2227q'].join('\n'))
     ).toEqual([]);
   });
 });

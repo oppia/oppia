@@ -124,8 +124,8 @@ oppia.factory('itemSelectionInputRulesService', ['$filter', function($filter) {
       var normalizedInput = $filter('removeDuplicatesInArray')(inputs.x);
       return normalizedAnswer.length === normalizedInput.length &&
           normalizedAnswer.every(function(val) {
-        return normalizedInput.indexOf(val) !== -1;
-      });
+            return normalizedInput.indexOf(val) !== -1;
+          });
     },
     ContainsAtLeastOneOf: function(answer, inputs) {
       var normalizedAnswer = $filter('removeDuplicatesInArray')(answer);

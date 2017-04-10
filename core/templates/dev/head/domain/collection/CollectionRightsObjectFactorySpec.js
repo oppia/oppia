@@ -44,22 +44,23 @@ describe('Collection rights object factory', function() {
   });
 
   it('should accept accept changes to the bindable list of collection nodes',
-     function() {
-    var initialCollectionRightsBackendObject = {
-      collection_id: 0,
-      can_edit: true,
-      can_unpublish: false,
-      is_private: true,
-      owner_names: ['A']
-    };
+    function() {
+      var initialCollectionRightsBackendObject = {
+        collection_id: 0,
+        can_edit: true,
+        can_unpublish: false,
+        is_private: true,
+        owner_names: ['A']
+      };
 
-    sampleCollectionRights = CollectionRightsObjectFactory.create(
-      initialCollectionRightsBackendObject);
-    var ownerNames = sampleCollectionRights.getBindableOwnerNames();
-    ownerNames.push('B');
+      sampleCollectionRights = CollectionRightsObjectFactory.create(
+        initialCollectionRightsBackendObject);
+      var ownerNames = sampleCollectionRights.getBindableOwnerNames();
+      ownerNames.push('B');
 
-    expect(sampleCollectionRights.getOwnerNames()).toEqual(['A', 'B']);
-  });
+      expect(sampleCollectionRights.getOwnerNames()).toEqual(['A', 'B']);
+    }
+  );
 
   it('should be able to set public when canEdit is true', function() {
     var initialCollectionRightsBackendObject = {
@@ -81,26 +82,27 @@ describe('Collection rights object factory', function() {
   });
 
   it('should throw error and not be able to set public when canEdit is false',
-     function() {
-    var initialCollectionRightsBackendObject = {
-      collection_id: 0,
-      can_edit: false,
-      can_unpublish: false,
-      is_private: true,
-      owner_names: ['A']
-    };
+    function() {
+      var initialCollectionRightsBackendObject = {
+        collection_id: 0,
+        can_edit: false,
+        can_unpublish: false,
+        is_private: true,
+        owner_names: ['A']
+      };
 
-    sampleCollectionRights = CollectionRightsObjectFactory.create(
-      initialCollectionRightsBackendObject);
-    expect(sampleCollectionRights.isPrivate()).toBe(true);
-    expect(sampleCollectionRights.isPublic()).toBe(false);
+      sampleCollectionRights = CollectionRightsObjectFactory.create(
+        initialCollectionRightsBackendObject);
+      expect(sampleCollectionRights.isPrivate()).toBe(true);
+      expect(sampleCollectionRights.isPublic()).toBe(false);
 
-    expect(function() {
-      sampleCollectionRights.setPublic();
-    }).toThrow(new Error('User is not allowed to edit this collection.'));
-    expect(sampleCollectionRights.isPrivate()).toBe(true);
-    expect(sampleCollectionRights.isPublic()).toBe(false);
-  });
+      expect(function() {
+        sampleCollectionRights.setPublic();
+      }).toThrow(new Error('User is not allowed to edit this collection.'));
+      expect(sampleCollectionRights.isPrivate()).toBe(true);
+      expect(sampleCollectionRights.isPublic()).toBe(false);
+    }
+  );
 
   it('should be able to set private when canUnpublish is true', function() {
     var initialCollectionRightsBackendObject = {
@@ -122,28 +124,30 @@ describe('Collection rights object factory', function() {
   });
 
   it('should throw error when when canUnpublish is false during unpublishing',
-     function() {
-    var noUnpublishCollectionRightsBackendObject = {
-      collection_id: 0,
-      can_edit: true,
-      can_unpublish: false,
-      is_private: false,
-      owner_names: ['A']
-    };
+    function() {
+      var noUnpublishCollectionRightsBackendObject = {
+        collection_id: 0,
+        can_edit: true,
+        can_unpublish: false,
+        is_private: false,
+        owner_names: ['A']
+      };
 
-    sampleCollectionRights = CollectionRightsObjectFactory.create(
-      noUnpublishCollectionRightsBackendObject);
-    expect(sampleCollectionRights.isPrivate()).toBe(false);
-    expect(sampleCollectionRights.isPublic()).toBe(true);
+      sampleCollectionRights = CollectionRightsObjectFactory.create(
+        noUnpublishCollectionRightsBackendObject);
+      expect(sampleCollectionRights.isPrivate()).toBe(false);
+      expect(sampleCollectionRights.isPublic()).toBe(true);
 
-    expect(function() {
-      sampleCollectionRights.setPrivate();
-    }).toThrow(new Error('User is not allowed to unpublish this collection.'));
+      expect(function() {
+        sampleCollectionRights.setPrivate();
+      }).toThrow(
+        new Error('User is not allowed to unpublish this collection.'));
 
-    // Verify that the status remains unchanged.
-    expect(sampleCollectionRights.isPrivate()).toBe(false);
-    expect(sampleCollectionRights.isPublic()).toBe(true);
-  });
+      // Verify that the status remains unchanged.
+      expect(sampleCollectionRights.isPrivate()).toBe(false);
+      expect(sampleCollectionRights.isPublic()).toBe(true);
+    }
+  );
 
   it('should create an empty collection rights object', function() {
     var emptyCollectionRightsBackendObject = (

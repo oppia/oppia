@@ -89,13 +89,15 @@ oppia.factory('parameterMetadataService', [
 
       // Next, the content is evaluated.
       expressionInterpolationService.getParamsFromString(
-          state.content[0].value).forEach(function(paramName) {
-        result.push({
-          action: PARAM_ACTION_GET,
-          paramName: paramName,
-          source: PARAM_SOURCE_CONTENT
-        });
-      });
+          state.content[0].value).forEach(
+        function(paramName) {
+          result.push({
+            action: PARAM_ACTION_GET,
+            paramName: paramName,
+            source: PARAM_SOURCE_CONTENT
+          });
+        }
+      );
 
       // Next, the answer is received.
       result.push({
@@ -108,14 +110,16 @@ oppia.factory('parameterMetadataService', [
       state.interaction.answerGroups.forEach(function(group) {
         for (var k = 0; k < group.outcome.feedback.length; k++) {
           expressionInterpolationService.getParamsFromString(
-              group.outcome.feedback[k]).forEach(function(paramName) {
-            result.push({
-              action: PARAM_ACTION_GET,
-              paramName: paramName,
-              source: PARAM_SOURCE_FEEDBACK,
-              sourceInd: k
-            });
-          });
+              group.outcome.feedback[k]).forEach(
+            function(paramName) {
+              result.push({
+                action: PARAM_ACTION_GET,
+                paramName: paramName,
+                source: PARAM_SOURCE_FEEDBACK,
+                sourceInd: k
+              });
+            }
+          );
         }
       });
 
