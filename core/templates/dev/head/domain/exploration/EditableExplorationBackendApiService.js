@@ -18,26 +18,21 @@
 
 oppia.factory('EditableExplorationBackendApiService', [
   '$http', '$q', 'EXPLORATION_DATA_URL_TEMPLATE',
-  'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE', 'UrlInterpolationService',
+  'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
+  'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
+  'EDITABLE_EXPLORATION_DATA_ROLE_URL_TEMPLATE', 'UrlInterpolationService',
   'ReadOnlyExplorationBackendApiService',
   function($http, $q, EXPLORATION_DATA_URL_TEMPLATE,
-    EDITABLE_EXPLORATION_DATA_URL_TEMPLATE, UrlInterpolationService,
+    EDITABLE_EXPLORATION_DATA_URL_TEMPLATE,
+    EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE,
+    EDITABLE_EXPLORATION_DATA_ROLE_URL_TEMPLATE, UrlInterpolationService,
     ReadOnlyExplorationBackendApiService) {
     var _fetchExploration = function(
         explorationId, applyDraft, successCallback, errorCallback) {
-      var explorationDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_EXPLORATION_DATA_URL_TEMPLATE, {
-          exploration_id: explorationId
-        });
+      var editableExplorationDataUrl = _getExplorationUrl(
+        explorationId, applyDraft, null);
 
-      params = {};
-      if (applyDraft) {
-        params.apply_draft = applyDraft;
-      }
-
-      $http.get(explorationDataUrl, {
-        params: params
-      }).then(function(response) {
+      $http.get(editableExplorationDataUrl).then(function(response) {
         var exploration = angular.copy(response.data);
         if (successCallback) {
           successCallback(exploration);
@@ -52,12 +47,8 @@ oppia.factory('EditableExplorationBackendApiService', [
     var _updateExploration = function(
         explorationId, explorationVersion, commitMessage, changeList,
         successCallback, errorCallback) {
-      var editableExplorationDataUrl = (
-        UrlInterpolationService.interpolateUrl(
-        EDITABLE_EXPLORATION_DATA_URL_TEMPLATE, {
-          exploration_id: explorationId
-        })
-      );
+      var editableExplorationDataUrl = _getExplorationUrl(
+        explorationId, null, null);
 
       var putData = {
         version: explorationVersion,
@@ -85,21 +76,10 @@ oppia.factory('EditableExplorationBackendApiService', [
 
     var _deleteExploration = function(
         explorationId, role, successCallback, errorCallback) {
-      var editableExplorationDataUrl = (
-        UrlInterpolationService.interpolateUrl(
-        EDITABLE_EXPLORATION_DATA_URL_TEMPLATE, {
-          exploration_id: explorationId
-        })
-      );
+      var editableExplorationDataUrl = _getExplorationUrl(
+        explorationId, null, role);
 
-      params = {};
-      if (role) {
-        params.role = JSON.stringify(role);
-      }
-
-      $http['delete'](editableExplorationDataUrl, {
-        params: params
-      }).then(function() {
+      $http['delete'](editableExplorationDataUrl).then(function() {
         // Delete item from the ReadOnlyExplorationBackendApiService's cache
         ReadOnlyExplorationBackendApiService.deleteExplorationFromCache(
           explorationId);
@@ -113,8 +93,36 @@ oppia.factory('EditableExplorationBackendApiService', [
       });
     };
 
+    var _getExplorationUrl = function(explorationId, applyDraft, role) {
+      if (role) {
+        return UrlInterpolationService.interpolateUrl(
+        EDITABLE_EXPLORATION_DATA_ROLE_URL_TEMPLATE, {
+          exploration_id: explorationId,
+          role: JSON.stringify(role)
+        });
+      }
+      if (applyDraft) {
+        return UrlInterpolationService.interpolateUrl(
+        EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE, {
+          exploration_id: explorationId,
+          applyDraft: JSON.stringify(applyDraft)
+        });
+      }
+      return UrlInterpolationService.interpolateUrl(
+        EDITABLE_EXPLORATION_DATA_URL_TEMPLATE, {
+          exploration_id: explorationId
+        }
+      );
+    };
+
     return {
-      fetchExploration: function(explorationId, applyDraft) {
+      fetchExploration: function(explorationId) {
+        return $q(function(resolve, reject) {
+          _fetchExploration(explorationId, null, resolve, reject);
+        });
+      },
+
+      fetchApplyDraftExploration: function(explorationId, applyDraft) {
         return $q(function(resolve, reject) {
           _fetchExploration(explorationId, applyDraft, resolve, reject);
         });
@@ -147,12 +155,11 @@ oppia.factory('EditableExplorationBackendApiService', [
 
       /**
        * Deletes an exploration in the backend with the provided exploration
-       * ID. If successful, the exploration will also be deleted from the
-       * ReadOnlyExplorationBackendApiService cache as well. Errors are passed
-       * to the error callback, if one is provided.
+       * ID, for a particular role. If successful, the exploration will
+       * also be deleted from the ReadOnlyExplorationBackendApiService cache
+       * as well. Errors are passed to the error callback, if one is provided.
        */
-      deleteExploration: function(
-        explorationId, role) {
+      deleteExploration: function(explorationId, role) {
         return $q(function(resolve, reject) {
           _deleteExploration(
             explorationId, role, resolve, reject);

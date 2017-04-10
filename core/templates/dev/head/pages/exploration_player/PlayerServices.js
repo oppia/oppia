@@ -190,7 +190,7 @@ oppia.factory('oppiaPlayerService', [
         playerTranscriptService.init();
 
         if (_editorPreviewMode) {
-          EditableExplorationBackendApiService.fetchExploration(
+          EditableExplorationBackendApiService.fetchApplyDraftExploration(
             _explorationId, true).then(function(data) {
             exploration = ExplorationObjectFactory.createFromBackendDict(
               data);

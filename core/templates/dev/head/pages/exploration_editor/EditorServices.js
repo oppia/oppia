@@ -87,15 +87,17 @@ oppia.factory('explorationData', [
           // changes applied. This makes a force-refresh necessary when changes
           // are discarded, otherwise the exploration-with-draft-changes
           // (which is cached here) will be reused.
-          return EditableExplorationBackendApiService.fetchExploration(
+          return (
+            EditableExplorationBackendApiService.fetchApplyDraftExploration(
             explorationId, true).then(function(response) {
-            $log.info('Retrieved exploration data.');
-            $log.info(response);
+              $log.info('Retrieved exploration data.');
+              $log.info(response);
 
-            explorationData.data = response;
+              explorationData.data = response;
 
-            return response;
-          });
+              return response;
+            })
+          );
         }
       },
       // Returns a promise supplying the last saved version for the current
