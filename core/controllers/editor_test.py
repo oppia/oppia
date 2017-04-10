@@ -15,10 +15,10 @@
 """Tests for the exploration editor page."""
 
 import datetime
+import logging
 import os
 import StringIO
 import zipfile
-import logging
 
 from core.controllers import dashboard
 from core.controllers import editor
@@ -703,16 +703,16 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
         self.logout()
 
     def test_logging_info_after_deletion(self):
-        """Tests correctness of logged statements while deleting exploration"""
-        logging_info = []
+        """Test correctness of logged statements while deleting exploration."""
+        observed_log_messages = []
 
         def add_logging_info(msg, *_):
             if msg != 'all_pending: clear %s':
-                logging_info.append(msg)
+                observed_log_messages.append(msg)
 
         with self.swap(logging, 'info', add_logging_info), self.swap(
             logging, 'debug', add_logging_info):
-            # checking for normal user
+            # Checking for non-moderator/non-admin.
             exp_id = 'unpublished_eid'
             exploration = exp_domain.Exploration.create_default_exploration(
                 exp_id)
@@ -721,15 +721,17 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             self.login(self.OWNER_EMAIL)
             self.testapp.delete(
                 '/createhandler/data/%s' % exp_id, expect_errors=True)
-            self.assertEqual(logging_info[0],
-                             self.owner_id + ' tried to delete exploration ' +
-                             exp_id)
-            self.assertEqual(logging_info[2],
-                             self.owner_id + ' deleted exploration ' + exp_id)
+            self.assertEqual(len(observed_log_messages), 3)
+            self.assertEqual(observed_log_messages[0],
+                             '%s tried to delete exploration %s' %
+                             (self.owner_id, exp_id))
+            self.assertEqual(observed_log_messages[2],
+                             '%s deleted exploration %s' %
+                             (self.owner_id, exp_id))
             self.logout()
 
-            # checking for admin
-            logging_info = []
+            # Checking for admin.
+            observed_log_messages = []
             exp_id = 'unpublished_eid'
             exploration = exp_domain.Exploration.create_default_exploration(
                 exp_id)
@@ -738,18 +740,17 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             self.login(self.ADMIN_EMAIL)
             self.testapp.delete(
                 '/createhandler/data/%s' % exp_id, expect_errors=True)
-            self.assertEqual(logging_info[0],
-                             '(admin) ' + self.admin_id +
-                             ' tried to delete exploration ' +
-                             exp_id)
-            self.assertEqual(logging_info[2],
-                             '(admin) ' + self.admin_id +
-                             ' deleted exploration ' +
-                             exp_id)
+            self.assertEqual(len(observed_log_messages), 3)
+            self.assertEqual(observed_log_messages[0],
+                             '(admin) %s tried to delete exploration %s' %
+                             (self.admin_id, exp_id))
+            self.assertEqual(observed_log_messages[2],
+                             '(admin) %s deleted exploration %s' %
+                             (self.admin_id, exp_id))
             self.logout()
 
-            # checking for moderator
-            logging_info = []
+            # Checking for moderator.
+            observed_log_messages = []
             exp_id = 'unpublished_eid'
             exploration = exp_domain.Exploration.create_default_exploration(
                 exp_id)
@@ -758,17 +759,15 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             self.login(self.MODERATOR_EMAIL)
             self.testapp.delete(
                 '/createhandler/data/%s' % exp_id, expect_errors=True)
-            self.assertEqual(logging_info[0],
-                             '(moderator) ' +
-                             self.moderator_id +
-                             ' tried to delete exploration ' +
-                             exp_id)
-            self.assertEqual(logging_info[2],
-                             '(moderator) ' +
-                             self.moderator_id +
-                             ' deleted exploration ' +
-                             exp_id)
+            self.assertEqual(len(observed_log_messages), 3)
+            self.assertEqual(observed_log_messages[0],
+                             '(moderator) %s tried to delete exploration %s' %
+                             (self.moderator_id, exp_id))
+            self.assertEqual(observed_log_messages[2],
+                             '(moderator) %s deleted exploration %s' %
+                             (self.moderator_id, exp_id))
             self.logout()
+
 
 class VersioningIntegrationTest(BaseEditorControllerTest):
     """Test retrieval of and reverting to old exploration versions."""
