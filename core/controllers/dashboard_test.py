@@ -526,7 +526,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         exp_services.delete_exploration(self.owner_id_2, self.EXP_ID_1)
         exp_services.delete_exploration(self.owner_id_2, self.EXP_ID_2)
         exp_services.delete_exploration(self.owner_id_2, self.EXP_ID_3)
-        # If no exploration loaded, a blank query should not get any exploration.
+        # If no exploration loaded,ablank query should not get any exploration.
         response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 0)
         self.logout()
