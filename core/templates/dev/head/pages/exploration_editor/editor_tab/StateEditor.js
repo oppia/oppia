@@ -140,12 +140,14 @@ oppia.factory('trainingModalService', [
           templateUrl: 'modals/trainUnresolvedAnswer',
           backdrop: true,
           controller: [
-            '$scope', '$modalInstance', 'explorationStatesService',
-            'editorContextService', 'AnswerClassificationService',
-            'explorationContextService',
-            function($scope, $modalInstance, explorationStatesService,
-                editorContextService, AnswerClassificationService,
-                explorationContextService) {
+            '$scope', '$injector', '$modalInstance',
+            'explorationStatesService', 'editorContextService',
+            'AnswerClassificationService', 'explorationContextService',
+            'stateInteractionIdService',
+            function($scope, $injector, $modalInstance,
+                explorationStatesService, editorContextService,
+                AnswerClassificationService, explorationContextService,
+                stateInteractionIdService) {
               $scope.trainingDataAnswer = '';
               $scope.trainingDataFeedback = '';
               $scope.trainingDataOutcomeDest = '';
@@ -168,8 +170,17 @@ oppia.factory('trainingModalService', [
                   editorContextService.getActiveStateName();
                 var state = explorationStatesService.getState(currentStateName);
 
+                // Retrieve the interaction ID.
+                var interactionId = stateInteractionIdService.savedMemento;
+
+                var rulesServiceName = interactionId.charAt(0).toLowerCase() +
+                interactionId.slice(1) + 'RulesService';
+
+                // Inject RulesService dynamically.
+                var rulesService = $injector.get(rulesServiceName);
+
                 AnswerClassificationService.getMatchingClassificationResult(
-                  explorationId, state, unhandledAnswer, true)
+                  explorationId, state, unhandledAnswer, true, rulesService)
                   .then(function(classificationResult) {
                     var feedback = 'Nothing';
                     var dest = classificationResult.outcome.dest;
