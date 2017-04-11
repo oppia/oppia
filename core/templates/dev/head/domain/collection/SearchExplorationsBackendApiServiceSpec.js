@@ -38,21 +38,6 @@ describe('Exploration search backend API service', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  // Search result object returnable from the backend
-  searchResults = {
-    collection_node_metadata_list: [{
-      id: '12',
-      objective: 
-      'learn how to count permutations accurately and systematically',
-      title: 'Protractor Test'
-    },{
-      id: '4',
-      objective: 
-      'learn how to count permutations accurately and systematically',
-      title: 'Three Balls'
-    }]
-  };
-
   it('should call the provided success handler on HTTP success', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
@@ -73,6 +58,21 @@ describe('Exploration search backend API service', function() {
   it('should search for explorations from the backend', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
+
+    // Search result object returnable from the backend
+    searchResults = {
+      collection_node_metadata_list: [{
+        id: '12',
+        objective: 
+        'learn how to count permutations accurately and systematically',
+        title: 'Protractor Test'
+      },{
+        id: '4',
+        objective: 
+        'learn how to count permutations accurately and systematically',
+        title: 'Three Balls'
+      }]
+    };
 
     $httpBackend.expect(
       'GET', '/exploration/metadata_search?q=count').respond(200, 
