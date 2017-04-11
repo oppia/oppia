@@ -340,7 +340,7 @@ class ClassifyHandler(base.BaseHandler):
         params = self.payload.get('params')
         params['answer'] = answer
         result = classifier_services.classify(old_state, answer, exp_id,
-            state_name)
+                                              state_name)
         self.render_json(result)
 
 
