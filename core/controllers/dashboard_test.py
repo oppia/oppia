@@ -16,6 +16,7 @@
 
 from core.controllers import dashboard
 from core.domain import event_services
+from core.domain import exp_services
 from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import rating_services
@@ -24,7 +25,6 @@ from core.domain import rights_manager
 from core.domain import stats_jobs_continuous_test
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_continuous_test
-from core.domain import exp_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -481,7 +481,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
 
     def test_no_explorations_and_visit_dashboard(self):
         self.login(self.OWNER_EMAIL)
-        # Testing that creator only visit dashboard without any 
+        # Testing that creator only visit dashboard without any
         # exploration created
         response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 0)
@@ -506,7 +506,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 2)
         exp_services.delete_exploration(self.owner_id_1, self.EXP_ID_1)
-        # Testing whether 1 exploration left after deletion of previous one 
+        # Testing whether 1 exploration left after deletion of previous one
         response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.logout()
