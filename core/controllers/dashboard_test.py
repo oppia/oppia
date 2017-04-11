@@ -482,7 +482,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
     def test_no_explorations_and_visit_dashboard(self):
         self.login(self.OWNER_EMAIL)
         # Testing that creator only visit dashboard without any
-        # exploration created
+        # exploration created.
         response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 0)
         self.logout()
@@ -491,7 +491,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         self.save_new_default_exploration(
             self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
-        # Testing the quantity of exploration created and it should be 1
+        # Testing the quantity of exploration created and it should be 1.
         response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.logout()
@@ -502,11 +502,11 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
             self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
         self.save_new_default_exploration(
             self.EXP_ID_2, self.owner_id_1, title=self.EXP_TITLE_2)
-        # Testing the quantity of exploration and it should be 2
+        # Testing the quantity of exploration and it should be 2.
         response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 2)
         exp_services.delete_exploration(self.owner_id_1, self.EXP_ID_1)
-        # Testing whether 1 exploration left after deletion of previous one
+        # Testing whether 1 exploration left after deletion of previous one.
         response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.logout()
@@ -519,14 +519,14 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
             self.EXP_ID_2, self.owner_id_2, title=self.EXP_TITLE_2)
         self.save_new_default_exploration(
             self.EXP_ID_3, self.owner_id_2, title=self.EXP_TITLE_3)
-        # Testing for quantity of explorations to be 3
+        # Testing for quantity of explorations to be 3.
         response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 3)
-        # Testing for deletion of all created previously
+        # Testing for deletion of all created previously.
         exp_services.delete_exploration(self.owner_id_2, self.EXP_ID_1)
         exp_services.delete_exploration(self.owner_id_2, self.EXP_ID_2)
         exp_services.delete_exploration(self.owner_id_2, self.EXP_ID_3)
-        # If no exploration loaded, a blank query should not get any exploration
+        # If no exploration loaded, a blank query should not get any exploration.
         response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 0)
         self.logout()
