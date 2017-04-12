@@ -27,7 +27,6 @@ import logging
 import re
 import string
 
-from constants import constants
 from core.domain import html_cleaner
 from core.domain import gadget_registry
 from core.domain import interaction_registry
@@ -1097,8 +1096,6 @@ class SkinInstance(object):
 
 class State(object):
     """Domain object for a state."""
-
-    NULL_INTERACTION_DICT = constants.NULL_INTERACTION_DICT
 
     def __init__(self, content, param_changes, interaction,
                  classifier_model_id=None):

@@ -106,9 +106,6 @@ class EditorTest(BaseEditorControllerTest):
             feconf.DEFAULT_INIT_STATE_NAME].to_dict()
         new_state_dict['unresolved_answers'] = {}
         self.assertEqual(new_state_dict, editor.NEW_STATE_TEMPLATE)
-        self.assertEqual(
-            exp_domain.State.NULL_INTERACTION_DICT,
-            editor.NEW_STATE_TEMPLATE['interaction'])
 
     def test_that_default_exploration_cannot_be_published(self):
         """Test that publishing a default exploration raises an error

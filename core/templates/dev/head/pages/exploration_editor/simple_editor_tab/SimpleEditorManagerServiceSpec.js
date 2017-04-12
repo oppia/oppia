@@ -20,7 +20,7 @@ describe('Simple Editor Manager Service', function() {
   var stubs;
   var data;
   var mockExplorationData = {
-    explorationId: 0,
+    explorationId: '',
     autosaveChangeList: function() { },
     discardDraft: function() { }
   };
@@ -233,8 +233,7 @@ describe('Simple Editor Manager Service', function() {
   });
 
   it('should initialize the local data variables', function() {
-    var expectedReturnedValue = simpleEditorManagerService.tryToInit();
-    expect(expectedReturnedValue).toBeTruthy();
+    expect(simpleEditorManagerService.tryToInit()).toBe(true);
     expect(simpleEditorManagerService.getTitle()).toBe(data.title);
     expect(simpleEditorManagerService.getIntroductionHtml())
       .toBe(data.states.Introduction.content[0].value);
@@ -246,10 +245,8 @@ describe('Simple Editor Manager Service', function() {
 
   it('should return false if initializing the question list fails',
     function() {
-      var expectedReturnedValue = simpleEditorManagerService.tryToInit();
       spyOn(statesToQuestionsService, 'getQuestions').andReturn(null);
-      expectedReturnedValue = simpleEditorManagerService.tryToInit();
-      expect(expectedReturnedValue).toBeFalsy();
+      expect(simpleEditorManagerService.tryToInit()).toBe(false);
     });
 
   it('should return data representing the exploration', function() {
@@ -384,42 +381,9 @@ describe('Simple Editor Manager Service', function() {
     var expectedQuestion = questionObjectFactory.create(
       expectedLastStateName, state.interaction, '');
     expect(simpleEditorManagerService.getQuestionList()._questions
-      .some(function(question) {
-        // Checks recursively if two objects are equal.
-        var areObjectsEqual = function(obj1, obj2) {
-          if (obj1 === null && obj2 === null) {
-            return true;
-          } else if ((obj1 === null && obj2 !== null) ||
-            (obj2 === null && obj1 !== null)) {
-            return false;
-          }
-
-          var keys1 = Object.getOwnPropertyNames(obj1).sort();
-          var keys2 = Object.getOwnPropertyNames(obj2).sort();
-          var areEqual = true;
-
-          if (keys1.length !== keys2.length) {
-            return false;
-          }
-
-          for (var i = 0; i < keys1.length; i++) {
-            if (keys1[i] !== keys2[i]) {
-              return false;
-            }
-            if (typeof obj1[keys1[i]] === 'object') {
-              if (areObjectsEqual(obj1[keys1[i]], obj2[keys2[i]]) === false) {
-                return false;
-              }
-            } else if (obj1[keys1[i]] !== obj2[keys2[i]]) {
-              return false;
-            }
-          }
-
-          return true;
-        };
-
-        return areObjectsEqual(question, expectedQuestion);
-      })).toBe(true);
+        .some(function(question) {
+          return angular.equals(question, expectedQuestion);
+        })).toBe(true);
   });
 
   it('should add new state', function() {
