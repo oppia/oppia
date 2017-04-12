@@ -101,7 +101,8 @@ def _get_exploration_player_data(
     Args:
         exploration_id: str. The id of the exploration to get metadata.
         version: int. The version of the exploration.
-        collection_id: str. The id of the collection which the exploration belongs.
+        collection_id: str. The id of the collection which the exploration
+            belongs to.
         can_edit: bool. Check if the exploration is editable by user.
 
     Returns:
@@ -384,7 +385,8 @@ class ClassifyHandler(base.BaseHandler):
                 require_playable decorator.
 
         Returns:
-            dict. Renders a classification result, which is a dictionary containing three keys.
+            dict. A classification result, which is a dictionary containing
+                three keys.
                 'outcome': A dict representing the outcome of the answer group
                     matched.
                 'answer_group_index': The index of the matched answer group.
