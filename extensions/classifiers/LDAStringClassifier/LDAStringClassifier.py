@@ -698,7 +698,8 @@ class LDAStringClassifier(BaseClassifier):
             if not isinstance(classifier_data[list_of_list_property], list):
                 raise utils.ValidationError(
                     'Expected %s to be a list, received %s' % (
-                        list_of_list_property, classifier_data[list_of_list_property]))
+                        list_of_list_property,
+                        classifier_data[list_of_list_property]))
             for inner_list in classifier_data[list_of_list_property]:
                 for value in inner_list:
                     if not isinstance(value, int):
@@ -714,10 +715,11 @@ class LDAStringClassifier(BaseClassifier):
             if not isinstance(classifier_data[list_of_list_property], list):
                 raise utils.ValidationError(
                     'Expected %s to be a list, received %s' % (
-                        list_of_list_property, classifier_data[list_of_list_property]))
+                        list_of_list_property,
+                        classifier_data[list_of_list_property]))
             for inner_list in classifier_data[list_of_list_property]:
                 for value in inner_list:
                     if not isinstance(value, bool):
                         raise utils.ValidationError(
-                            'Expected values of %s to be a bool, received %s' % (
+                            'Expected values of %s to be bool, received %s' % (
                                 list_of_list_property, value))
