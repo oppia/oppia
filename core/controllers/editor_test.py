@@ -728,9 +728,9 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
                 '/createhandler/data/%s' % exp_id, expect_errors=True)
 
             # Observed_log_messages[1] is 'Attempting to delete documents
-            # from index %s, ids: %s' % (index.name, ', '.join(doc_ids)) it is
-            # logged by function delete_documents_from_index in
-            # oppia/core/platform/search/gae_search_services.py
+            # from index %s, ids: %s' % (index.name, ', '.join(doc_ids)). It
+            # is logged by function delete_documents_from_index in
+            # oppia/core/platform/search/gae_search_services.py,
             # not to be checked here (same for admin and moderator).
             self.assertEqual(len(observed_log_messages), 3)
             self.assertEqual(observed_log_messages[0],
