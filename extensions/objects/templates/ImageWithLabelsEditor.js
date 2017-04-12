@@ -69,6 +69,8 @@ oppia.directive('imageWithLabelsEditor', [
         $scope.rectY = 0;
         $scope.rectWidth = 0;
         $scope.rectHeight = 0;
+        boxWidth = 200;
+        boxHeight = 50;
         // Is user currently drawing a new region?
         $scope.userIsCurrentlyDrawing = false;
         // Is user currently dragging an existing region?
@@ -252,16 +254,32 @@ oppia.directive('imageWithLabelsEditor', [
             x, y, Math.abs(newWidth), Math.abs(newHeight));
         };
 
+
+
         $scope.onSvgMouseMove = function(evt) {
           var svgElement = $($element).find(
             '.oppia-image-with-regions-editor-svg');
           $scope.mouseX = evt.pageX - svgElement.offset().left;
           $scope.mouseY = evt.pageY - svgElement.offset().top;
           if ($scope.userIsCurrentlyDrawing) {
-            $scope.rectX = Math.min($scope.originalMouseX, $scope.mouseX);
-            $scope.rectY = Math.min($scope.originalMouseY, $scope.mouseY);
-            $scope.rectWidth = Math.abs($scope.originalMouseX - $scope.mouseX);
-            $scope.rectHeight = Math.abs($scope.originalMouseY - $scope.mouseY);
+            //Below here is rect size, use these to draw line
+        // function drawLine(data1, data2) {
+            // context.beginPath();
+            // context.moveTo(data1.x, data1.y);
+            // context.lineTo(data2.x, data2.y);
+            // context.strokeStyle = "black";
+            // context.stroke();
+            // $scope.rectX = Math.min($scope.originalMouseX, $scope.mouseX);
+            // $scope.rectY = Math.min($scope.originalMouseY, $scope.mouseY);
+            $scope.rectX = $scope.mouseX;
+            $scope.rectY = $scope.mouseY;
+
+            if ($scope.mouseY < $scope.originalMouseY){
+              $scope.rectX -= boxWidth;
+            }
+
+            $scope.rectWidth = boxWidth;//Math.abs($scope.originalMouseX - $scope.mouseX);
+            $scope.rectHeight = boxHeight;//Math.abs($scope.originalMouseY - $scope.mouseY);
           } else if ($scope.userIsCurrentlyDragging) {
             var labeledRegions = $scope.$parent.value.labeledRegions;
             var draggedRegion = labeledRegions[$scope.selectedRegion].region;
@@ -318,6 +336,7 @@ oppia.directive('imageWithLabelsEditor', [
               );
               // Searches numbers starting from 1 to find a valid label
               // that doesn't overlap with currently existing labels
+              //  Creates the new label
               var newLabel = null;
               for (var i = 1; i <= labels.length + 1; i++) {
                 if (labels.indexOf(i.toString()) === -1) {
@@ -331,7 +350,7 @@ oppia.directive('imageWithLabelsEditor', [
                   regionType: 'Rectangle',
                   area: regionAreaFromCornerAndDimensions(
                     $scope.rectX,
-                    $scope.rectY,
+                    $scope.rectY - boxHeight/2,
                     $scope.rectWidth,
                     $scope.rectHeight
                   )
