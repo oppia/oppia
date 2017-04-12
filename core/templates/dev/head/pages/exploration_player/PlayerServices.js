@@ -70,12 +70,12 @@ oppia.factory('oppiaPlayerService', [
     var makeParams = function(oldParams, paramChanges, envs) {
       var newParams = angular.copy(oldParams);
       if (paramChanges.every(function(pc) {
-        if (pc.generator_id === 'Copier') {
-          if (!pc.customization_args.parse_with_jinja) {
-            newParams[pc.name] = pc.customization_args.value;
+        if (pc.generatorId === 'Copier') {
+          if (!pc.customizationArgs.parse_with_jinja) {
+            newParams[pc.name] = pc.customizationArgs.value;
           } else {
             var paramValue = expressionInterpolationService.processUnicode(
-              pc.customization_args.value, [newParams].concat(envs));
+              pc.customizationArgs.value, [newParams].concat(envs));
             if (paramValue === null) {
               return false;
             }
@@ -84,7 +84,7 @@ oppia.factory('oppiaPlayerService', [
         } else {
           // RandomSelector.
           newParams[pc.name] = randomFromArray(
-            pc.customization_args.list_of_values);
+            pc.customizationArgs.list_of_values);
         }
         return true;
       })) {
