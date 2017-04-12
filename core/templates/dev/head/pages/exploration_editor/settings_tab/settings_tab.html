@@ -429,7 +429,7 @@
         {% if can_delete %}
           <p class="oppia-exploration-ctrl">
             <button type="button" ng-if="explorationRightsService.isPrivate()"
-                    class="btn btn-danger" ng-click="deleteExploration('')"
+                    class="btn btn-danger" ng-click="deleteExploration()"
                     title="Delete this exploration">
               Delete Exploration
             </button>
@@ -472,7 +472,7 @@
 
         <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-if="explorationRightsService.isPublic() && (currentUserIsAdmin || currentUserIsModerator)">
           <button type="button" class="btn btn-danger"
-                  ng-click="currentUserIsAdmin ? deleteExploration('admin') : deleteExploration('moderator')">
+                  ng-click="deleteExploration()">
             Delete Exploration
             <span ng-if="currentUserIsAdmin">(as admin)</span>
             <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>

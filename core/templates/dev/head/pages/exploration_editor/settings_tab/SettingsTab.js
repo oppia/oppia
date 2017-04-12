@@ -293,7 +293,7 @@ oppia.controller('SettingsTab', [
       });
     };
 
-    $scope.deleteExploration = function(role) {
+    $scope.deleteExploration = function() {
       alertsService.clearWarnings();
 
       $modal.open({
@@ -311,9 +311,6 @@ oppia.controller('SettingsTab', [
         ]
       }).result.then(function() {
         var deleteUrl = $scope.explorationDataUrl;
-        if (role) {
-          deleteUrl += ('?role=' + role);
-        }
         $http['delete'](deleteUrl).then(function() {
           $window.location = DASHBOARD_PAGE_URL;
         });
