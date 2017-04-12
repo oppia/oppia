@@ -506,7 +506,6 @@ class LDAStringClassifier(BaseClassifier):
         model['_c_dl'] = copy.deepcopy(self._c_dl)
         model['_c_lw'] = copy.deepcopy(self._c_lw)
         model['_c_l'] = copy.deepcopy(self._c_l)
-        model = self._make_json_serializable(model)
         return model
 
     def from_dict(self, model):
@@ -516,7 +515,6 @@ class LDAStringClassifier(BaseClassifier):
         Args:
             model: A dict representing a StringClassifier.
         """
-        model = self._unpickle_json_serialization(model)
         self._alpha = copy.deepcopy(model['_alpha'])
         self._beta = copy.deepcopy(model['_beta'])
         self._prediction_threshold = copy.deepcopy(
@@ -536,67 +534,6 @@ class LDAStringClassifier(BaseClassifier):
         self._c_dl = copy.deepcopy(model['_c_dl'])
         self._c_lw = copy.deepcopy(model['_c_lw'])
         self._c_l = copy.deepcopy(model['_c_l'])
-
-    def _make_json_serializable(self, model):
-        """Makes the StringClassifier dict JSON serializable by
-        converting numpy data types to Python data types.
-
-        Args:
-            model: A dict representing a StringClassifier.
-
-        Returns:
-            model: A dict representing a StringClassifier
-        """
-        model["_b_dl"] = model["_b_dl"].tolist()
-        for k in range(len(model["_b_dl"])):
-            for i in range(len(model["_b_dl"][k])):
-                if isinstance(model["_b_dl"][k][i], numpy.integer):
-                    model["_b_dl"][k][i] = int(model["_b_dl"][k][i])
-                elif isinstance(model["_b_dl"][k][i], numpy.floating):
-                    model["_b_dl"][k][i] = float(model["_b_dl"][k][i])
-        model["_c_dl"] = model["_c_dl"].tolist()
-        for k in range(len(model["_c_dl"])):
-            for i in range(len(model["_c_dl"][k])):
-                if isinstance(model["_c_dl"][k][i], numpy.integer):
-                    model["_c_dl"][k][i] = int(model["_c_dl"][k][i])
-                elif isinstance(model["_c_dl"][k][i], numpy.floating):
-                    model["_c_dl"][k][i] = float(model["_c_dl"][k][i])
-        model["_c_lw"] = model["_c_lw"].tolist()
-        for k in range(len(model["_c_lw"])):
-            for i in range(len(model["_c_lw"][k])):
-                if isinstance(model["_c_lw"][k][i], numpy.integer):
-                    model["_c_lw"][k][i] = int(model["_c_lw"][k][i])
-                elif isinstance(model["_c_lw"][k][i], numpy.floating):
-                    model["_c_lw"][k][i] = float(model["_c_lw"][k][i])
-        model["_c_l"] = model["_c_l"].tolist()
-        for k in range(len(model["_c_l"])):
-            if isinstance(model["_c_l"][k], numpy.integer):
-                model["_c_lw"][k] = int(model["_c_lw"][k])
-            elif isinstance(model["_c_l"][k], numpy.floating):
-                model["_c_lw"][k] = float(model["_c_lw"][k])
-        model["_l_dp"] = model["_l_dp"]
-        for k in range(len(model["_l_dp"])):
-            for i in range(len(model["_l_dp"][k])):
-                if isinstance(model["_l_dp"][k][i], numpy.integer):
-                    model["_l_dp"][k][i] = int(model["_l_dp"][k][i])
-                elif isinstance(model["_l_dp"][k][i], numpy.floating):
-                    model["_l_dp"][k][i] = float(model["_l_dp"][k][i])
-        return model
-
-    def _unpickle_json_serialization(self, model):
-        """Converts the JSON serialized data back to Numpy format.
-
-        Args:
-            model: A dict representing a StringClassifier.
-
-        Returns:
-            model: A dict representing a StringClassifier
-        """
-        model["_b_dl"] = numpy.array(model["_b_dl"])
-        model["_c_dl"] = numpy.array(model["_c_dl"])
-        model["_c_lw"] = numpy.array(model["_c_lw"])
-        model["_c_l"] = numpy.array(model["_c_l"])
-        return model
 
     def train(self, training_data):
         """Sets the internal state of the classifier, assigns random initial
