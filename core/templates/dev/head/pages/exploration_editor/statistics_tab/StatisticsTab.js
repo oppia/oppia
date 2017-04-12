@@ -61,13 +61,13 @@ oppia.controller('StatisticsTab', [
       $http.get($scope.explorationStatisticsUrl).then(function(response) {
         ReadOnlyExplorationBackendApiService.loadLatestExploration(
           explorationData.explorationId).then(function(response) {
-          var statesDict = response.exploration.states;
-          var states = StatesObjectFactory.createFromBackendDict(statesDict);
-          var initStateName = response.exploration.init_state_name;
+            var statesDict = response.exploration.states;
+            var states = StatesObjectFactory.createFromBackendDict(statesDict);
+            var initStateName = response.exploration.init_state_name;
 
-          $scope.statsGraphData = computeGraphService.compute(
-            initStateName, states);
-        });
+            $scope.statsGraphData = computeGraphService.compute(
+              initStateName, states);
+          });
 
         var data = response.data;
         var numVisits = data.num_starts;

@@ -105,11 +105,11 @@ oppia.factory('explorationData', [
       getLastSavedData: function() {
         return ReadOnlyExplorationBackendApiService.loadLatestExploration(
           explorationId).then(function(response) {
-          $log.info('Retrieved saved exploration data.');
-          $log.info(response);
+            $log.info('Retrieved saved exploration data.');
+            $log.info(response);
 
-          return response.exploration;
-        });
+            return response.exploration;
+          });
       },
       resolveAnswers: function(stateName, resolvedAnswersList) {
         alertsService.clearWarnings();
@@ -134,18 +134,19 @@ oppia.factory('explorationData', [
         EditableExplorationBackendApiService.updateExploration(explorationId,
           explorationData.data.version, commitMessage, changeList).then(
             function(response) {
-          alertsService.clearWarnings();
-          explorationData.data = response;
-          if (successCallback) {
-            successCallback(
-              response.is_version_of_draft_valid,
-              response.draft_changes);
-          }
-        }, function() {
-          if (errorCallback) {
-            errorCallback();
-          }
-        });
+              alertsService.clearWarnings();
+              explorationData.data = response;
+              if (successCallback) {
+                successCallback(
+                  response.is_version_of_draft_valid,
+                  response.draft_changes);
+              }
+            }, function() {
+              if (errorCallback) {
+                errorCallback();
+              }
+            }
+          );
       }
     };
 

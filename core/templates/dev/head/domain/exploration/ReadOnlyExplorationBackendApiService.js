@@ -115,13 +115,12 @@ oppia.factory('ReadOnlyExplorationBackendApiService', [
        */
       loadExploration: function(explorationId, version) {
         return $q(function(resolve, reject) {
-            _fetchExploration(explorationId, version, function(exploration) {
-              if (resolve) {
-                resolve(angular.copy(exploration));
-              }
-            }, reject);
-          }
-        );
+          _fetchExploration(explorationId, version, function(exploration) {
+            if (resolve) {
+              resolve(angular.copy(exploration));
+            }
+          }, reject);
+        });
       },
 
       /**

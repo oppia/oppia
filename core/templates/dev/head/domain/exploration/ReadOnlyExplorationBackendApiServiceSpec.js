@@ -73,58 +73,61 @@ describe('Read only exploration backend API service', function() {
   });
 
   it('should successfully fetch an existing exploration from the backend',
-      function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expect('GET', '/explorehandler/init/0').respond(
-      sampleDataResults);
-    ReadOnlyExplorationBackendApiService.fetchExploration('0', null).then(
-      successHandler, failHandler);
-    $httpBackend.flush();
+      $httpBackend.expect('GET', '/explorehandler/init/0').respond(
+        sampleDataResults);
+      ReadOnlyExplorationBackendApiService.fetchExploration('0', null).then(
+        successHandler, failHandler);
+      $httpBackend.flush();
 
-    expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
-    expect(failHandler).not.toHaveBeenCalled();
-  });
+      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+  );
 
   it('should load a cached exploration after fetching it from the backend',
-      function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
 
-    // Loading a exploration the first time should fetch it from the backend.
-    $httpBackend.expect('GET', '/explorehandler/init/0').respond(
-      sampleDataResults);
-    ReadOnlyExplorationBackendApiService.loadExploration('0', null).then(
-      successHandler, failHandler);
-    $httpBackend.flush();
+      // Loading a exploration the first time should fetch it from the backend.
+      $httpBackend.expect('GET', '/explorehandler/init/0').respond(
+        sampleDataResults);
+      ReadOnlyExplorationBackendApiService.loadExploration('0', null).then(
+        successHandler, failHandler);
+      $httpBackend.flush();
 
-    expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
-    expect(failHandler).not.toHaveBeenCalled();
+      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+      expect(failHandler).not.toHaveBeenCalled();
 
-    // Loading a exploration the second time should not fetch it.
-    ReadOnlyExplorationBackendApiService.loadExploration('0', null).then(
-      successHandler, failHandler);
+      // Loading a exploration the second time should not fetch it.
+      ReadOnlyExplorationBackendApiService.loadExploration('0', null).then(
+        successHandler, failHandler);
 
-    expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
-    expect(failHandler).not.toHaveBeenCalled();
-  });
+      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+  );
 
   it('should use the rejection handler if the backend request failed',
-      function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
 
-    // Loading a exploration the first time should fetch it from the backend.
-    $httpBackend.expect('GET', '/explorehandler/init/0').respond(
-      500, 'Error loading exploration 0.');
-    ReadOnlyExplorationBackendApiService.loadExploration('0', null).then(
-      successHandler, failHandler);
-    $httpBackend.flush();
+      // Loading a exploration the first time should fetch it from the backend.
+      $httpBackend.expect('GET', '/explorehandler/init/0').respond(
+        500, 'Error loading exploration 0.');
+      ReadOnlyExplorationBackendApiService.loadExploration('0', null).then(
+        successHandler, failHandler);
+      $httpBackend.flush();
 
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Error loading exploration 0.');
-  });
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Error loading exploration 0.');
+    }
+  );
 
   it('should report caching and support clearing the cache', function() {
     var successHandler = jasmine.createSpy('success');

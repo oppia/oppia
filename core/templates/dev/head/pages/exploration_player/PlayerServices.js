@@ -192,12 +192,12 @@ oppia.factory('oppiaPlayerService', [
         if (_editorPreviewMode) {
           EditableExplorationBackendApiService.fetchApplyDraftExploration(
             _explorationId, true).then(function(data) {
-            exploration = ExplorationObjectFactory.createFromBackendDict(
-              data);
-            exploration.setInitialStateName(initStateName);
-            initParams(manualParamChanges);
-            _loadInitialState(successCallback);
-          });
+              exploration = ExplorationObjectFactory.createFromBackendDict(
+                data);
+              exploration.setInitialStateName(initStateName);
+              initParams(manualParamChanges);
+              _loadInitialState(successCallback);
+            });
         } else {
           var loadedExploration = null;
           if (version) {

@@ -75,9 +75,9 @@ oppia.factory('EditableExplorationBackendApiService', [
     };
 
     var _deleteExploration = function(
-        explorationId, role, successCallback, errorCallback) {
+      explorationId, role, successCallback, errorCallback) {
       var editableExplorationDataUrl = _getExplorationUrl(
-        explorationId, null, role);
+          explorationId, null, role);
 
       $http['delete'](editableExplorationDataUrl).then(function() {
         // Delete item from the ReadOnlyExplorationBackendApiService's cache
