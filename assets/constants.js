@@ -17,5 +17,5 @@ var constants = {
     "Probability", "Programming", "Puzzles", "Reading", "Spanish", "Sport",
     "Statistics", "Trigonometry", "Welcome"],
   "DISABLED_EXPLORATION_IDS": ["5"],
-  "TESTING_CONSTANTS": "test"
+  "TESTING_CONSTANT": "test"
 };
