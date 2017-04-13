@@ -31,4 +31,4 @@ class ConstantsTests(test_utils.GenericTestBase):
         with open(os.path.join('assets', 'constants.js'), 'r') as f:
             json = constants.parse_json(f)
             self.assertTrue(isinstance(json, dict))
-            self.assertTrue(json["TESTING_CONSTANT"] == "test")
+            self.assertEqual(json['TESTING_CONSTANT'], 'test')
