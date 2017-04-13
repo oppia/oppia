@@ -481,8 +481,8 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
 
     def test_no_explorations_and_visit_dashboard(self):
         self.login(self.OWNER_EMAIL)
-        # Testing that creator only visit dashboard without any
-        # exploration created.
+        # Testing that creator only visit dashboard without any exploration
+        # created.
         response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 0)
         self.logout()
@@ -526,7 +526,8 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         exp_services.delete_exploration(self.owner_id_2, self.EXP_ID_1)
         exp_services.delete_exploration(self.owner_id_2, self.EXP_ID_2)
         exp_services.delete_exploration(self.owner_id_2, self.EXP_ID_3)
-        # If no exploration loaded,ablank query should not get any exploration.
+        # All explorations have been deleted, so the dashboard query should not
+        # load any explorations.
         response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 0)
         self.logout()
