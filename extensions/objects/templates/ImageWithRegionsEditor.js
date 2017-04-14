@@ -18,9 +18,9 @@
 
 // TODO(czx): Uniquify the labels of image regions
 oppia.directive('imageWithRegionsEditor', [
-  '$sce', '$compile', 'alertsService', '$document', 'explorationContextService',
+  '$modal','$sce','$compile', 'alertsService', '$document', 'explorationContextService',
   'OBJECT_EDITOR_URL_PREFIX',
-  function($sce, $compile, alertsService, $document, explorationContextService,
+  function($modal,$sce, $compile, alertsService, $document, explorationContextService,
            OBJECT_EDITOR_URL_PREFIX) {
     return {
       link: function(scope, element) {
@@ -441,10 +441,26 @@ oppia.directive('imageWithRegionsEditor', [
           }
           return ($scope.regionDrawMode) ? 'crosshair' : 'default';
         };
-
         $scope.resetEditor = function() {
-          $scope.$parent.value.imagePath = '';
-          $scope.$parent.value.labeledRegions = [];
+          $modal.open({
+            templateUrl: 'modals/clearImageRegions',
+            backdrop: true,
+            controller: [
+              '$scope', '$modalInstance', function($scope, $modalInstance) {
+                $scope.confirmClear = function() {
+                  $modalInstance.close();
+                  alertsService.clearWarnings();
+                };
+                $scope.cancel = function() {
+                  $modalInstance.dismiss('cancel');
+                  alertsService.clearWarnings();
+                };
+              }
+            ]
+          }).result.then(function(){
+            $scope.$parent.value.imagePath = '';
+            $scope.$parent.value.labeledRegions = [];
+          });
         };
         $scope.deleteRegion = function(index) {
           if ($scope.selectedRegion === index) {
