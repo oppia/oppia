@@ -227,7 +227,7 @@ def save_classifier(classifier):
     classifier_id = classifier.id
     classifier_model = classifier_models.ClassifierModel.get(
         classifier_id, False)
-    #classifier.validate()
+    classifier.validate()
     if classifier_model is None:
         classifier_id = _create_classifier(classifier)
     else:
