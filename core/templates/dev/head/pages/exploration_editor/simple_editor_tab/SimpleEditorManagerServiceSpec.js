@@ -20,7 +20,7 @@ describe('Simple Editor Manager Service', function() {
   var stubs;
   var data;
   var mockExplorationData = {
-    explorationId: '',
+    explorationId: 'exp_id',
     autosaveChangeList: function() { },
     discardDraft: function() { }
   };
@@ -381,9 +381,9 @@ describe('Simple Editor Manager Service', function() {
     var expectedQuestion = questionObjectFactory.create(
       expectedLastStateName, state.interaction, '');
     expect(simpleEditorManagerService.getQuestionList()._questions
-        .some(function(question) {
-          return angular.equals(question, expectedQuestion);
-        })).toBe(true);
+      .some(function(question) {
+        return angular.equals(question, expectedQuestion);
+      })).toBe(true);
   });
 
   it('should add new state', function() {
