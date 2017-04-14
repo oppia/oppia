@@ -83,37 +83,47 @@
       </div>
     </div>
 
-    <div ng-if="recommendedExplorationSummaries.length > 0"
+    <div ng-if="recommendedExplorationSummaries !== null && (collectionSummary || recommendedExplorationSummaries.length > 0)"
          class="conversation-skin-final-recommendations">
-      <span class="conversation-skin-final-recommendations-header"
-            translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS">
-      </span>
+      <div ng-if="recommendedExplorationSummaries.length > 0">
+        <span class="conversation-skin-final-recommendations-header"
+              translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS">
+        </span>
 
-      <div class="oppia-exp-summary-tiles-container conversation-skin-recommended-explorations-container">
-        <exploration-summary-tile ng-repeat="exp in (recommendedExplorationSummaries|limitTo:3) track by $index"
-                                  collection-id="collectionId"
-                                  exploration-id="exp.id"
-                                  exploration-title="exp.title"
-                                  last-updated-msec="exp.last_updated_msec"
-                                  objective="exp.objective"
-                                  category="exp.category"
-                                  ratings="exp.ratings"
-                                  thumbnail-icon-url="exp.thumbnail_icon_url"
-                                  thumbnail-bg-color="exp.thumbnail_bg_color"
-                                  num-views="exp.num_views"
-                                  is-community-owned="exp.community_owned"
-                                  style="margin-left: 10px;">
-        </exploration-summary-tile>
-        <collection-summary-tile ng-if="collectionId"
-                                 collection-id="collectionSummary.id"
-                                 collection-title="collectionSummary.title"
-                                 last-updated-msec="collectionSummary.last_updated_msec"
-                                 node-count="collectionSummary.node_count"
-                                 objective="collectionSummary.objective"
-                                 thumbnail-icon-url="collectionSummary.thumbnail_icon_url"
-                                 thumbnail-bg-color="collectionSummary.thumbnail_bg_color"
-                                 style="margin-left: 10px;">
-        </collection-summary-tile>
+        <div class="oppia-exp-summary-tiles-container conversation-skin-recommended-activities-container">
+          <exploration-summary-tile ng-repeat="exp in (recommendedExplorationSummaries|limitTo:3) track by $index"
+                                    collection-id="collectionId"
+                                    exploration-id="exp.id"
+                                    exploration-title="exp.title"
+                                    last-updated-msec="exp.last_updated_msec"
+                                    objective="exp.objective"
+                                    category="exp.category"
+                                    ratings="exp.ratings"
+                                    thumbnail-icon-url="exp.thumbnail_icon_url"
+                                    thumbnail-bg-color="exp.thumbnail_bg_color"
+                                    num-views="exp.num_views"
+                                    is-community-owned="exp.community_owned"
+                                    style="margin-left: 10px;">
+          </exploration-summary-tile>
+        </div>
+      </div>
+
+      <div ng-if="collectionSummary && recommendedExplorationSummaries.length === 0">
+        <span class="conversation-skin-final-recommendations-header"
+              translate="I18N_PLAYER_RETURN_TO_COLLECTION"
+              translate-values="{collectionTitle: collectionSummary.title}">
+        </span>
+        <div class="oppia-exp-summary-tiles-container conversation-skin-recommended-activities-container">
+          <collection-summary-tile collection-id="collectionSummary.id"
+                                   collection-title="collectionSummary.title"
+                                   last-updated-msec="collectionSummary.last_updated_msec"
+                                   node-count="collectionSummary.node_count"
+                                   objective="collectionSummary.objective"
+                                   thumbnail-icon-url="collectionSummary.thumbnail_icon_url"
+                                   thumbnail-bg-color="collectionSummary.thumbnail_bg_color"
+                                   style="margin-left: 10px;">
+          </collection-summary-tile>
+        </div>
       </div>
     </div>
   </div>
@@ -351,7 +361,7 @@
       margin-bottom: 25px;
     }
 
-    .conversation-skin-recommended-explorations-container {
+    .conversation-skin-recommended-activities-container {
       padding-top: 10px;
     }
 
