@@ -263,14 +263,6 @@ oppia.directive('imageWithLabelsEditor', [
           $scope.mouseY = evt.pageY - svgElement.offset().top;
           if ($scope.userIsCurrentlyDrawing) {
             //Below here is rect size, use these to draw line
-        // function drawLine(data1, data2) {
-            // context.beginPath();
-            // context.moveTo(data1.x, data1.y);
-            // context.lineTo(data2.x, data2.y);
-            // context.strokeStyle = "black";
-            // context.stroke();
-            // $scope.rectX = Math.min($scope.originalMouseX, $scope.mouseX);
-            // $scope.rectY = Math.min($scope.originalMouseY, $scope.mouseY);
             $scope.rectX = $scope.mouseX;
             $scope.rectY = $scope.mouseY;
 

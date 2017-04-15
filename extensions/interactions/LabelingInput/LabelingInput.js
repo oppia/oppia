@@ -71,6 +71,9 @@ oppia.directive('oppiaInteractiveLabelingInput', [
               return 'inline';
             }
           };
+          $scope.inlineRegionDisplay = function(){
+            return 'inline';
+          }
           $scope.onMousemoveImage = function(event) {
             var image = $($element).find('.oppia-image-click-img');
             $scope.mouseX = (event.pageX - image.offset().left) / image.width();
@@ -137,8 +140,24 @@ oppia.directive('oppiaShortResponseLabelingInput', [
 
 oppia.factory('imageClickInputRulesService', [function() {
   return {
+    /*
+    Answer has clicked regions, check that the label of the clicked
+    region matches that of the dropped label
+    */
     IsInRegion: function(answer, inputs) {
       return answer.clickedRegions.indexOf(inputs.x) !== -1;
+    },
+    IsNotInRegion: function(answer, inputs){
+      console.log(answer)
+      console.log(inputs)
+      return answer.clickedRegions.indexOf(inputs.x) === -1;
     }
   };
 }]);
+
+/*
+  Guide for revamping the image drag and drop
+  1st, on a click, if is on button
+    - check via mousedown
+    - on mouseup run the onSubmit function with the answer being the button's text
+*/
