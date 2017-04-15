@@ -170,6 +170,13 @@ oppia.factory('UrlInterpolationService', [
         }
         return getCachePrefixedUrl('/extensions/interactions/' +
           interactionId + '/static/' + interactionId + '.png');
+      },
+
+      getComponentUrl: function(componentPath) {
+        validateResourcePath(componentPath);
+        var templatePath = ((GLOBALS.MINIFICATION || !GLOBALS.DEV_MODE) ?
+          '/templates/head/components' : '/templates/dev/head/components');
+        return getCachePrefixedUrl(templatePath + componentPath);
       }
     };
   }
