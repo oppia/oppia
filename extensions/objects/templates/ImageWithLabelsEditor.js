@@ -346,6 +346,8 @@ oppia.directive('imageWithLabelsEditor', [
               }
               var newRegion = {
                 label: newLabel,
+                startX: $scope.originalMouseX,
+                startY: $scope.originalMouseY,
                 region: {
                   regionType: 'Rectangle',
                   area: regionAreaFromCornerAndDimensions(

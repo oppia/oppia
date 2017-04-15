@@ -33,6 +33,7 @@
          class="oppia-image-click-img"
          ng-click="onClickImage($event)"
          ng-mousemove="onMousemoveImage($event)">
+
     <div ng-if="highlightRegionsOnHover">
       <div ng-repeat="region in allRegions"
            style="
@@ -47,7 +48,15 @@
              z-index: 10;">
       </div>
     </div>
-    <div ng-if="alwaysShowRegions">
+    <line
+        ng-attr-x1="<[region.startX]>",
+        ng-attr-y1="<[region.startY]>",
+        ng-attr-x2="<[region.region.area[0][0] * getRegionDimensions($index).left]>",
+        ng-attr-y2="<[region.region.area[0][1] * getRegionDimensions($index).top]>"
+        style="stroke:rgb(0,0,0);stroke-width:2" 
+    />
+    </line>
+<!--     <div ng-if="alwaysShowRegions">
       <div ng-repeat="region in allRegions"
           style="
             height: <[getRegionDimensions($index).height]>px;
@@ -59,9 +68,19 @@
              display: <[getRegionDisplay(region.label)]>;
              background: rgba(0,0,255,0.5);
              z-index: 10;
-          "
+          ">
     </div>
-  </div>
+  </div> -->
+
+    </div>
+  <line ng-repeat="region in allRegions",
+        ng-attr-x1="<[region.startX]>",
+        ng-attr-y1="<[region.startY]>",
+        ng-attr-x2="<[region.region.area[0][0] * getImageWidth()]>",
+        ng-attr-y2="<[region.region.area[0][1] * getImageHeight()]>"
+        style="stroke:rgb(0,0,0);stroke-width:2" 
+    />
+    </line>
 </script>
 
 <script type="text/ng-template" id="response/LabelingInput">

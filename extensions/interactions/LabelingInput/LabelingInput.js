@@ -50,6 +50,7 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           $scope.mouseY = 0;
           $scope.currentlyHoveredRegions = [];
           $scope.allRegions = imageAndLabels.labeledRegions;
+          console.log($scope.allRegions);
           $scope.getRegionDimensions = function(index) {
             var image = $($element).find('.oppia-image-click-img');
             var labeledRegion = imageAndLabels.labeledRegions[index];
