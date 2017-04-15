@@ -1,0 +1,32 @@
+<script type="text/ng-template" id="richTextComponent/Hints">
+  <style>
+    .oppia-extension-hint-link {
+      color: #0D48A1; 
+      cursor: pointer; 
+      font-weight: bold;
+    }
+    .oppia-extension-hint-link.disabled {
+      color: #aaa;
+      cursor: default;
+      font-weight: normal;
+      font-style: italic;
+    }
+    .oppia-extension-hint {
+      border-bottom: 1px solid #eee;
+      border-top: 1px solid #eee;
+      padding: 4px 0;
+    }
+    .oppia-extension-hint.ng-enter
+    { 
+        -webkit-transition: 100ms ease-out all;
+        transition: 250ms ease-out all;
+        opacity: 0;
+    } 
+    .oppia-extension-hint.ng-enter.ng-enter-active {
+        opacity: 1;
+    }
+  </style>
+  <span class="oppia-extension-hint-link" ng-class="{'disabled': currentHintIndex == numberOfHints}" ng-click="showNextHint()">Click here for a hint (<[ numberOfHints - currentHintIndex ]>)</span>
+  <div class="oppia-extension-hint" ng-repeat="visibleHint in visibleHints track by $index" ng-bind-html="visibleHint">
+  </div>
+</script>
