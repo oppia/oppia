@@ -43,6 +43,7 @@ from mapreduce import parameters as mapreduce_parameters
 import webapp2
 from webapp2_extras.routes import RedirectRoute
 
+current_user_services = models.Registry.import_current_user_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -427,5 +428,21 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/<:.*>', base.Error404Handler),
 ]
 
+URLS_TO_SERVE = []
+
+if (feconf.ENABLE_MAINTENANCE_MODE and
+        not current_user_services.is_current_user_super_admin()):
+    # Show only the maintenance mode page.
+    URLS_TO_SERVE = [
+        get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
+        get_redirect_route(r'/adminhandler', admin.AdminHandler),
+        get_redirect_route(r'/adminjoboutput', admin.AdminJobOutput),
+        get_redirect_route(
+            r'/admintopicscsvdownloadhandler',
+            admin.AdminTopicsCsvDownloadHandler),
+        get_redirect_route(r'/<:.*>', pages.MaintenancePage)]
+else:
+    URLS_TO_SERVE = URLS
+
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
-    webapp2.WSGIApplication(URLS, debug=feconf.DEBUG))
+    webapp2.WSGIApplication(URLS_TO_SERVE, debug=feconf.DEBUG))

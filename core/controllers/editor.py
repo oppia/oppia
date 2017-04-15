@@ -352,32 +352,21 @@ class ExplorationHandler(EditorHandler):
     @require_editor
     def delete(self, exploration_id):
         """Deletes the given exploration."""
-        role = self.request.get('role')
-        if not role:
-            role = None
 
-        if role == rights_manager.ROLE_ADMIN:
-            if not self.is_admin:
-                logging.error(
-                    '%s tried to delete an exploration, but is not an admin.'
-                    % self.user_id)
-                raise self.UnauthorizedUserException(
-                    'User %s does not have permissions to delete exploration '
-                    '%s' % (self.user_id, exploration_id))
-        elif role == rights_manager.ROLE_MODERATOR:
-            if not self.is_moderator:
-                logging.error(
-                    '%s tried to delete an exploration, but is not a '
-                    'moderator.' % self.user_id)
-                raise self.UnauthorizedUserException(
-                    'User %s does not have permissions to delete exploration '
-                    '%s' % (self.user_id, exploration_id))
-        elif role is not None:
-            raise self.InvalidInputException('Invalid role: %s' % role)
+        role_description = ''
+        if self.is_admin:
+            role_description = 'admin'
+        elif self.is_moderator:
+            role_description = 'moderator'
 
-        logging.info(
-            '%s %s tried to delete exploration %s' %
-            (role, self.user_id, exploration_id))
+        log_debug_string = ''
+        if role_description == '':
+            log_debug_string = '%s tried to delete exploration %s' % (
+                self.user_id, exploration_id)
+        else:
+            log_debug_string = '(%s) %s tried to delete exploration %s' % (
+                role_description, self.user_id, exploration_id)
+        logging.debug(log_debug_string)
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
         can_delete = rights_manager.Actor(self.user_id).can_delete(
@@ -392,9 +381,14 @@ class ExplorationHandler(EditorHandler):
         exp_services.delete_exploration(
             self.user_id, exploration_id, force_deletion=is_exploration_cloned)
 
-        logging.info(
-            '%s %s deleted exploration %s' %
-            (role, self.user_id, exploration_id))
+        log_info_string = ''
+        if role_description == '':
+            log_info_string = '%s deleted exploration %s' % (
+                self.user_id, exploration_id)
+        else:
+            log_info_string = '(%s) %s deleted exploration %s' % (
+                role_description, self.user_id, exploration_id)
+        logging.info(log_info_string)
 
 
 class ExplorationRightsHandler(EditorHandler):

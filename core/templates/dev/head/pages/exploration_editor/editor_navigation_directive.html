@@ -70,7 +70,8 @@
     </li>
 
     {% if username %}
-      <li ng-if="isLargeScreen" class="dropdown" popover-is-open="postTutorialHelpPopoverIsShown"
+    <div class="nav navbar-nav oppia-navbar-nav oppia-help-dropdown pull-right ng-cloak">
+      <li class="dropdown" popover-is-open="postTutorialHelpPopoverIsShown"
           popover-placement="bottom" popover-trigger="none"
           popover="To get help in the future, click here!">
         <a href="#" tooltip="Help" tooltip-placement="bottom"
@@ -78,6 +79,23 @@
           <i class="material-icons">&#xE887;</i>
         </a>
       </li>
+    </div>
     {% endif %}
   </ul>
 </script>
+<style type="text/css">
+  .oppia-help-dropdown .popover{
+    background-color: black;
+    color: white;
+    font-size: 13px;
+    max-width: 300px;
+    text-align: center;
+    z-index: -1;
+  }
+  .oppia-help-dropdown .popover.bottom > .arrow{
+    border-bottom-color: #000;
+  }
+  .oppia-help-dropdown .popover.bottom > .arrow:after {
+    border-bottom-color: #000;
+  }
+</style>

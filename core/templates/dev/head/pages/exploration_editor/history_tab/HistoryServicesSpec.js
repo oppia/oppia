@@ -217,7 +217,8 @@ describe('Compare versions service', function() {
               param_changes: []
             },
             fallbacks: []
-          }
+          },
+          param_changes: []
         };
         newStateData.interaction.answer_groups =
           statesDetails[stateName].ruleDests.map(function(ruleDestName) {

@@ -45,10 +45,10 @@ describe('Subscriptions functionality', function() {
     browser.get(general.USER_PREFERENCES_URL);
     expect(element.all(by.css(
       '.protractor-test-subscription-name')).first().getText()).toMatch(
-      'creator1...');
+      'creator...');
     expect(element.all(by.css(
       '.protractor-test-subscription-name')).last().getText()).toMatch(
-      'creator2...');
+      'creator...');
     users.logout();
 
     // Create a learner who subscribes to one creator and unsubscribes from the
@@ -69,7 +69,7 @@ describe('Subscriptions functionality', function() {
       '.protractor-test-subscription-name')).count()).toEqual(1);
     expect(element.all(by.css(
       '.protractor-test-subscription-name')).first().getText()).toMatch(
-      'creator1...');
+      'creator...');
     users.logout();
 
     users.login('creator1@subscriptions.com');
@@ -78,10 +78,10 @@ describe('Subscriptions functionality', function() {
     element(by.css('.protractor-test-subscription-tab')).click();
     expect(element.all(by.css(
       '.protractor-test-subscription-name')).first().getText()).toMatch(
-      'learner2...');
+      'learner...');
     expect(element.all(by.css(
       '.protractor-test-subscription-name')).last().getText()).toMatch(
-      'learner1...');
+      'learner...');
     users.logout();
 
     users.login('creator2@subscriptions.com');
@@ -92,7 +92,7 @@ describe('Subscriptions functionality', function() {
       '.protractor-test-subscription-name')).count()).toEqual(1);
     expect(element.all(by.css(
       '.protractor-test-subscription-name')).last().getText()).toMatch(
-      'learner1...');
+      'learner...');
     users.logout();
   });
 

@@ -416,10 +416,12 @@ oppia.directive('trainingPanel', [function() {
       'editorContextService', 'explorationStatesService',
       'trainingDataService', 'responsesService', 'stateInteractionIdService',
       'stateCustomizationArgsService', 'AnswerGroupObjectFactory',
+      'OutcomeObjectFactory',
       function($scope, oppiaExplorationHtmlFormatterService,
           editorContextService, explorationStatesService,
           trainingDataService, responsesService, stateInteractionIdService,
-          stateCustomizationArgsService, AnswerGroupObjectFactory) {
+          stateCustomizationArgsService, AnswerGroupObjectFactory,
+          OutcomeObjectFactory) {
         $scope.changingAnswerGroupIndex = false;
         $scope.addingNewResponse = false;
 

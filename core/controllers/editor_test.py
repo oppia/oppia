@@ -15,6 +15,7 @@
 """Tests for the exploration editor page."""
 
 import datetime
+import logging
 import os
 import StringIO
 import zipfile
@@ -47,12 +48,16 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
 
         self.set_admins([self.ADMIN_USERNAME])
+        self.set_moderators([self.MODERATOR_USERNAME])
 
     def assert_can_edit(self, response_body):
         """Returns True if the response body indicates that the exploration is
@@ -696,6 +701,83 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             '/createhandler/data/%s' % published_exp_id)
         self.assertEqual(response.status_int, 200)
         self.logout()
+
+    def test_logging_info_after_deletion(self):
+        """Test correctness of logged statements while deleting exploration."""
+        observed_log_messages = []
+
+        def add_logging_info(msg, *_):
+            # Message logged by function clear_all_pending() in
+            # oppia_tools/google_appengine_1.9.19/google_appengine/google/
+            # appengine/ext/ndb/tasklets.py, not to be checked here.
+            log_from_google_app_engine = 'all_pending: clear %s'
+
+            if msg != log_from_google_app_engine:
+                observed_log_messages.append(msg)
+
+        with self.swap(logging, 'info', add_logging_info), self.swap(
+            logging, 'debug', add_logging_info):
+            # Checking for non-moderator/non-admin.
+            exp_id = 'unpublished_eid'
+            exploration = exp_domain.Exploration.create_default_exploration(
+                exp_id)
+            exp_services.save_new_exploration(self.owner_id, exploration)
+
+            self.login(self.OWNER_EMAIL)
+            self.testapp.delete(
+                '/createhandler/data/%s' % exp_id, expect_errors=True)
+
+            # Observed_log_messages[1] is 'Attempting to delete documents
+            # from index %s, ids: %s' % (index.name, ', '.join(doc_ids)). It
+            # is logged by function delete_documents_from_index in
+            # oppia/core/platform/search/gae_search_services.py,
+            # not to be checked here (same for admin and moderator).
+            self.assertEqual(len(observed_log_messages), 3)
+            self.assertEqual(observed_log_messages[0],
+                             '%s tried to delete exploration %s' %
+                             (self.owner_id, exp_id))
+            self.assertEqual(observed_log_messages[2],
+                             '%s deleted exploration %s' %
+                             (self.owner_id, exp_id))
+            self.logout()
+
+            # Checking for admin.
+            observed_log_messages = []
+            exp_id = 'unpublished_eid'
+            exploration = exp_domain.Exploration.create_default_exploration(
+                exp_id)
+            exp_services.save_new_exploration(self.admin_id, exploration)
+
+            self.login(self.ADMIN_EMAIL)
+            self.testapp.delete(
+                '/createhandler/data/%s' % exp_id, expect_errors=True)
+            self.assertEqual(len(observed_log_messages), 3)
+            self.assertEqual(observed_log_messages[0],
+                             '(admin) %s tried to delete exploration %s' %
+                             (self.admin_id, exp_id))
+            self.assertEqual(observed_log_messages[2],
+                             '(admin) %s deleted exploration %s' %
+                             (self.admin_id, exp_id))
+            self.logout()
+
+            # Checking for moderator.
+            observed_log_messages = []
+            exp_id = 'unpublished_eid'
+            exploration = exp_domain.Exploration.create_default_exploration(
+                exp_id)
+            exp_services.save_new_exploration(self.moderator_id, exploration)
+
+            self.login(self.MODERATOR_EMAIL)
+            self.testapp.delete(
+                '/createhandler/data/%s' % exp_id, expect_errors=True)
+            self.assertEqual(len(observed_log_messages), 3)
+            self.assertEqual(observed_log_messages[0],
+                             '(moderator) %s tried to delete exploration %s' %
+                             (self.moderator_id, exp_id))
+            self.assertEqual(observed_log_messages[2],
+                             '(moderator) %s deleted exploration %s' %
+                             (self.moderator_id, exp_id))
+            self.logout()
 
 
 class VersioningIntegrationTest(BaseEditorControllerTest):
