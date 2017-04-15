@@ -26,7 +26,7 @@ import feconf
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
 
 
-def classify(state, answer, exp_id, state_name):
+def classify(state, answer, exp_id, exp_version, state_name):
     """Classify the answer using the string classifier.
 
     This should only be called if the string classifier functionality is
@@ -57,7 +57,8 @@ def classify(state, answer, exp_id, state_name):
 
     if interaction_instance.is_string_classifier_trainable:
         response = classify_string_classifier_rule(state, normalized_answer,
-                                                   exp_id, state_name)
+                                                   exp_id, exp_version,
+                                                   state_name)
     else:
         raise Exception('No classifier found for interaction.')
 
@@ -78,7 +79,7 @@ def classify(state, answer, exp_id, state_name):
 
 
 def classify_string_classifier_rule(state, normalized_answer, exp_id,
-                                    state_name):
+                                    exp_version, state_name):
     """Run the classifier if no prediction has been made yet. Currently this
     is behind a development flag.
     """
@@ -101,7 +102,8 @@ def classify_string_classifier_rule(state, normalized_answer, exp_id,
                 [doc, [str(answer_group_index)]]
                 for doc in classifier_rule_spec.inputs['training_data']])
 
-    exploration = exp_services.get_exploration_by_id(exp_id)
+    exploration = exp_services.get_exploration_by_id(exp_id,
+                                                     version=exp_version)
     algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']
     if state.classifier_model_id:
         classifier = get_classifier_by_id(state.classifier_model_id)
@@ -117,7 +119,7 @@ def classify_string_classifier_rule(state, normalized_answer, exp_id,
         cached_classifier_data = sc.to_dict()
         schema_version = exploration.states_schema_version
         classifier = classifier_domain.Classifier('0', exploration.id,
-                                                  exploration.version,
+                                                  exp_version,
                                                   state_name, algorithm_id,
                                                   cached_classifier_data,
                                                   schema_version)

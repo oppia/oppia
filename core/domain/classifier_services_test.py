@@ -50,6 +50,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self.exp_id = exploration_id
         self.exp_state = (
             exp_services.get_exploration_by_id(exploration_id).states['Home'])
+        self.exp_version = (
+            exp_services.get_exploration_by_id(exploration_id).version)
 
     def _is_string_classifier_called(self, answer):
         sc = classifier_registry.Registry.get_classifier_by_algorithm_id(
@@ -61,7 +63,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
         with self.swap(sc.__class__, 'predict', predict_counter):
             response = classifier_services.classify(self.exp_state, answer,
-                                                    self.exp_id, 'Home')
+                                                    self.exp_id,
+                                                    self.exp_version, 'Home')
 
         answer_group_index = response['answer_group_index']
         rule_spec_index = response['rule_spec_index']

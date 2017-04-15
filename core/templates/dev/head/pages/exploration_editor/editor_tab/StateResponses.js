@@ -46,10 +46,12 @@ oppia.factory('responsesService', [
   '$rootScope', 'stateInteractionIdService', 'INTERACTION_SPECS',
   'answerGroupsCache', 'editorContextService', 'changeListService',
   'explorationStatesService', 'graphDataService', 'OutcomeObjectFactory',
+  'oppiaPlayerService',
   function(
       $rootScope, stateInteractionIdService, INTERACTION_SPECS,
       answerGroupsCache, editorContextService, changeListService,
-      explorationStatesService, graphDataService, OutcomeObjectFactory) {
+      explorationStatesService, graphDataService, OutcomeObjectFactory,
+      oppiaPlayerService) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
     var _confirmedUnclassifiedAnswersMemento = null;
@@ -564,7 +566,7 @@ oppia.controller('StateResponses', [
           'explorationContextService', 'editorContextService',
           'explorationStatesService', 'trainingDataService',
           'AnswerClassificationService', 'focusService',
-          'RULE_TYPE_CLASSIFIER',
+          'RULE_TYPE_CLASSIFIER', 'oppiaPlayerService',
           function(
               $scope, $injector, $modalInstance,
               oppiaExplorationHtmlFormatterService,
@@ -572,8 +574,10 @@ oppia.controller('StateResponses', [
               explorationContextService, editorContextService,
               explorationStatesService, trainingDataService,
               AnswerClassificationService, focusService,
-              RULE_TYPE_CLASSIFIER) {
-            var _explorationId = explorationContextService.getExplorationId();
+              RULE_TYPE_CLASSIFIER, oppiaPlayerService) {
+            var _explorationId =
+              explorationContextService.getExplorationId();
+            var _explorationVersion = oppiaPlayerService.getExplorationVersion();
             var _stateName = editorContextService.getActiveStateName();
             var _state = explorationStatesService.getState(_stateName);
 
@@ -621,7 +625,8 @@ oppia.controller('StateResponses', [
                   stateCustomizationArgsService.savedMemento));
 
               AnswerClassificationService.getMatchingClassificationResult(
-                _explorationId, _stateName, _state, answer, true, rulesService)
+                _explorationId, _explorationVersion,
+                _stateName, _state, answer, true, rulesService)
                 .then(function(classificationResult) {
                   var feedback = 'Nothing';
                   var dest = classificationResult.outcome.dest;

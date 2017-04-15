@@ -147,12 +147,14 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
             old_state_dict = self.exploration.states[self.state_name].to_dict()
             answer = 'Permutations'
             params = {}
+            exp_version = self.exploration.version
             res = self.post_json('/explorehandler/classify/%s' % self.exp_id,
                                  {'params' : params,
                                   'old_state' : old_state_dict,
                                   'answer' : answer,
                                   'state_name' : self.state_name,
-                                  'exp_id' : self.exp_id})
+                                  'exp_id' : self.exp_id,
+                                  'exp_version' : exp_version})
             self.assertEqual(res['outcome']['feedback'][0],
                              '<p>Detected permutation.</p>')
 
