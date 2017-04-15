@@ -16,7 +16,7 @@
     "I18N_ABOUT_PAGE_ABOUT_TAB_SHARE_TEXT": "your creations with the community.",
     "I18N_ABOUT_PAGE_CREDITS_TAB_HEADING": "Credits",
     "I18N_ABOUT_PAGE_CREDITS_TAB_TEXT": "Oppia's contributors come from all over the world &mdash; many of us are students, recent students and teachers. We'd like to thank the following contributors who've helped to build the platform. If you'd like to help, <a href=\"/contact\">here's how you can get involved</a>!",
-    "I18N_ABOUT_PAGE_CREDITS_TAB_TEXT_BOTTOM": "The Oppia development team is also grateful for the feedback, ideas, help and suggestions by <[listOfNames]>",
+    "I18N_ABOUT_PAGE_CREDITS_TAB_TEXT_BOTTOM": "The Oppia development team is also grateful for the feedback, ideas, help and suggestions by <[listOfNames]>.",
     "I18N_ABOUT_PAGE_CREDITS_THANK_TRANSLATEWIKI": "We would also like to thank <a href=\"https://translatewiki.net/wiki/Translating:Oppia\">translatewiki.net</a> for providing crowdsourced translations.",
     "I18N_ABOUT_PAGE_FOUNDATION_TAB_DONATE_BUTTON": "Donate",
     "I18N_ABOUT_PAGE_FOUNDATION_TAB_GET_INVOLVED_BUTTON" : "Get Involved",
