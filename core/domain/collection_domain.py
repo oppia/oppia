@@ -474,45 +474,35 @@ class Collection(object):
         prerequisite_skills and acquired_skills in nodes, and assigns them
         integer IDs.
         """
-        collection_contents['skills'] = {}
-        collection_contents['skill_id_count'] = 0
 
-        def _add_or_get_id(skill):
-            # Don't add skill if already inside skill dict
-            for skill_id, skill_dict in (
-                    collection_contents['skills'].iteritems()):
-                if skill_dict['name'] == skill:
-                    return skill_id
+        skill_names = set()
+        for node in collection_contents['nodes']:
+            skill_names.update(node['acquired_skills'])
+            skill_names.update(node['prerequisite_skills'])
+        skill_names_to_ids = {
+            name: 's' + str(index)
+            for index, name in enumerate(sorted(skill_names))
+        }
 
-            # Add a new skill dict
-            skill_id_count = collection_contents['skill_id_count']
-            new_skill_id = 's' + str(skill_id_count)
-            collection_contents['skills'][new_skill_id] = {
-                'name': skill,
+        collection_contents['nodes'] = [{
+            'exploration_id': node['exploration_id'],
+            'prerequisite_skills': [
+                skill_names_to_ids[prerequisite_skill_name]
+                for prerequisite_skill_name in node['prerequisite_skills']],
+            'acquired_skills': [
+                skill_names_to_ids[acquired_skill_name]
+                for acquired_skill_name in node['acquired_skills']]
+        } for node in collection_contents['nodes']]
+
+        collection_contents['skills'] = {
+            skill_id: {
+                'name': skill_name,
                 'question_ids': []
             }
-            collection_contents['skill_id_count'] = skill_id_count + 1
-            return new_skill_id
+            for skill_name, skill_id in skill_names_to_ids.iteritems()
+        }
 
-
-        new_nodes = []
-        for node in collection_contents['nodes']:
-            new_prerequisite_skills = []
-            for skill in node['prerequisite_skills']:
-                skill_id = _add_or_get_id(skill)
-                new_prerequisite_skills.append(skill_id)
-
-            new_acquired_skills = []
-            for skill in node['acquired_skills']:
-                skill_id = _add_or_get_id(skill)
-                new_acquired_skills.append(skill_id)
-
-            new_nodes.append({
-                'exploration_id': node['exploration_id'],
-                'prerequisite_skills': new_prerequisite_skills,
-                'acquired_skills': new_acquired_skills
-            })
-        collection_contents['nodes'] = new_nodes
+        collection_contents['skill_id_count'] = len(skill_names)
 
         return collection_contents
 

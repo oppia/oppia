@@ -612,6 +612,10 @@ nodes:
   - Skill2
   exploration_id: Exp1
   prerequisite_skills: []
+- acquired_skills: []
+  exploration_id: Exp2
+  prerequisite_skills:
+  - Skill1
 objective: ''
 schema_version: 1
 title: A title
@@ -624,6 +628,10 @@ nodes:
   - Skill2
   exploration_id: Exp1
   prerequisite_skills: []
+- acquired_skills: []
+  exploration_id: Exp2
+  prerequisite_skills:
+  - Skill1
 objective: ''
 schema_version: 2
 tags: []
@@ -637,6 +645,10 @@ nodes:
   - s1
   exploration_id: Exp1
   prerequisite_skills: []
+- acquired_skills: []
+  exploration_id: Exp2
+  prerequisite_skills:
+  - s0
 objective: ''
 schema_version: 3
 skill_id_count: 2
