@@ -405,7 +405,7 @@ class Collection(object):
     def _convert_v2_dict_to_v3_dict(cls, collection_dict):
         """Converts a v2 collection dict into a v3 collection dict.
 
-
+        This adds skills to the collection.
         """
         collection_contents = {
             'nodes': collection_dict['nodes']
