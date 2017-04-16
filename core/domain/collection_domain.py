@@ -545,15 +545,11 @@ class Collection(object):
             versioned_collection_contents['collection_contents'])
 
     def human_readable_skill_names(self):
-        # TODO(wxy): update docstring
-        """The skills of a collection are made up of all prerequisite and
-        acquired skills of each exploration that is part of this collection.
-        This returns a sorted list of all the skills of the collection.
-        """
+        """Returns a list of skill names of all the skills in the collection."""
         unique_skills = set()
         for node in self.nodes:
-            for skill_id in node.skills:
-                unique_skills.update(self.skills[skill_id].name)
+            for skill in node.skills:
+                unique_skills.update(skill.name)
         return sorted(unique_skills)
 
     @property
@@ -707,6 +703,25 @@ class Collection(object):
                 'Exploration is not part of this collection: %s' %
                 exploration_id)
         del self.nodes[node_index]
+
+    def get_skill(self, skill_id):
+        """Retrieves the skill domain object from the skills dict."""
+        if skill_id not in self.skills:
+            raise ValueError(
+                'Skill is not part of this collection: %s' % skill_id)
+        return self.skills[skill_id]
+
+    def add_skill(self, skill_name):
+        """Adds the new skill domain object with the specified name."""
+
+        for _, skill in self.skills.iteritems():
+            if skill.name == skill_name:
+                raise ValueError(
+                    'Skill with name "%s" already exists.' % skill_name)
+
+        skill_id = 's' + str(self.skill_id_count)
+        self.skills[skill_id] = CollectionSkill(skill_id, skill_name, [])
+        self.skill_id_count += 1
 
     def validate(self, strict=True):
         """Validates all properties of this collection and its constituents."""

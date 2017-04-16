@@ -540,8 +540,10 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         collection.add_node(self.EXPLORATION_ID)
         self.assertEqual(len(collection.nodes), 1)
 
+        collection.add_skill('Skill0a')
+        collection.add_skill('Skill0b')
         collection_node = collection.get_node(self.EXPLORATION_ID)
-        collection_node.update_acquired_skills(['Skill0a', 'Skill0b'])
+        collection_node.update_acquired_skills(['s0', 's1'])
 
         collection.validate()
 
