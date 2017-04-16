@@ -212,11 +212,11 @@ oppia.factory('oppiaPlayerService', [
           loadedExploration.then(function(data) {
             exploration = ExplorationObjectFactory.createFromBackendDict(
               data.exploration);
-            version = exploration.version;
+            version = data.version;
             initParams([]);
 
             StatsReportingService.initSession(
-              _explorationId, exploration.version, data.session_id,
+              _explorationId, version, data.session_id,
               GLOBALS.collectionId);
 
             _loadInitialState(successCallback);
