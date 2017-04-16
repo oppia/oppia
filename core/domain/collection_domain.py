@@ -222,7 +222,6 @@ class CollectionNode(object):
                 'The prerequisite_skills list has duplicate entries: %s' %
                 self.prerequisite_skills)
 
-        # TODO(wxy): probably need to change the string to int here
         for prerequisite_skill in self.prerequisite_skills:
             if not isinstance(prerequisite_skill, basestring):
                 raise utils.ValidationError(
@@ -239,7 +238,6 @@ class CollectionNode(object):
                 'The acquired_skills list has duplicate entries: %s' %
                 self.acquired_skills)
 
-        # TODO(wxy): probably need to change the string to int here
         for acquired_skill in self.acquired_skills:
             if not isinstance(acquired_skill, basestring):
                 raise utils.ValidationError(
@@ -546,11 +544,10 @@ class Collection(object):
 
     def human_readable_skill_names(self):
         """Returns a list of skill names of all the skills in the collection."""
-        unique_skills = set()
-        for node in self.nodes:
-            for skill in node.skills:
-                unique_skills.update(skill.name)
-        return sorted(unique_skills)
+        skill_names = set()
+        for _, skill in self.skills.iteritems():
+            skill_names.update(skill.name)
+        return sorted(skill_names)
 
     @property
     def exploration_ids(self):
@@ -817,6 +814,12 @@ class Collection(object):
         # Validate all collection nodes.
         for node in self.nodes:
             node.validate()
+
+        if not isinstance(self.skills, object):
+            raise utils.ValidationError(
+                'Expected skills to be a dict, received %s' % self.skills)
+
+        # TODO(wxy): add validation for skills
 
         if strict:
             if not self.title:

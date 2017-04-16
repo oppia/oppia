@@ -165,7 +165,8 @@ def get_collection_from_model(collection_model, run_conversion=True):
             for collection_node_dict in
             versioned_collection_contents['collection_contents']['nodes']
         ], {
-            (skill_id, collection_domain.CollectionSkill.from_dict(skill_dict))
+            skill_id: collection_domain.CollectionSkill.from_dict(
+                skill_id, skill_dict)
             for skill_id, skill_dict in
             versioned_collection_contents[
                 'collection_contents']['skills'].iteritems()
@@ -710,7 +711,12 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     collection_model.collection_contents = {
         'nodes': [
             collection_node.to_dict() for collection_node in collection.nodes
-        ]
+        ],
+        'skills': {
+            skill_id: skill.to_dict()
+            for skill_id, skill in collection.skills.iteritems()
+        },
+        'skill_id_count': collection.skill_id_count
     }
     collection_model.node_count = len(collection_model.nodes)
     collection_model.commit(committer_id, commit_message, change_list)
@@ -750,8 +756,8 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
                 for collection_node in collection.nodes
             ],
             'skills': {
-                collection_skill.id: collection_skill.to_dict()
-                for collection_skill in collection.skills
+                skill_id: skill.to_dict()
+                for skill_id, skill in collection.skills.iteritems()
             },
             'skill_id_count': collection.skill_id_count
         },
@@ -882,7 +888,12 @@ def update_collection(
             'Collection is public so expected a commit message but '
             'received none.')
 
+    collection = get_collection_by_id(collection_id)
+    print collection.to_dict()
+
     collection = apply_change_list(collection_id, change_list)
+
+    print collection.to_dict()
     _save_collection(committer_id, collection, commit_message, change_list)
     update_collection_summary(collection.id, committer_id)
 
