@@ -111,7 +111,7 @@ CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 9
 # structure within the Collection domain object). If any backward-incompatible
 # changes are made to any of the blob schemas in the data store, this version
 # number must be changed.
-CURRENT_COLLECTION_SCHEMA_VERSION = 2
+CURRENT_COLLECTION_SCHEMA_VERSION = 3
 
 # The default number of exploration tiles to load at a time in the search
 # results page.

@@ -33,12 +33,20 @@ SAMPLE_YAML_CONTENT = ("""category: A category
 language_code: en
 nodes:
 - acquired_skills:
-  - Skill0a
-  - Skill0b
+  - s0
+  - s1
   exploration_id: an_exploration_id
   prerequisite_skills: []
 objective: An objective
 schema_version: %d
+skill_id_count: 2
+skills:
+  s0:
+    name: Skill0a
+    question_ids: []
+  s1:
+    name: Skill0b
+    question_ids: []
 tags: []
 title: A title
 """) % (feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
@@ -318,29 +326,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         collection.delete_node('test_exp')
         self.assertEqual(len(collection.nodes), 0)
 
-    def test_skills_property(self):
-        collection = collection_domain.Collection.create_default_collection(
-            '0')
-
-        self.assertEqual(collection.skills, [])
-
-        collection.add_node('exp_id_0')
-        collection.add_node('exp_id_1')
-        collection.get_node('exp_id_0').update_acquired_skills(
-            ['skill0a'])
-        collection.get_node('exp_id_1').update_prerequisite_skills(
-            ['skill0a'])
-        collection.get_node('exp_id_1').update_acquired_skills(
-            ['skill1b', 'skill1c'])
-
-        self.assertEqual(collection.skills, ['skill0a', 'skill1b', 'skill1c'])
-
-        # Skills should be unique, even if they are duplicated across multiple
-        # acquired and prerequisite skill lists.
-        collection.add_node('exp_id_2')
-        collection.get_node('exp_id_2').update_acquired_skills(
-            ['skill0a', 'skill1c'])
-        self.assertEqual(collection.skills, ['skill0a', 'skill1b', 'skill1c'])
+    # TODO(wxy): write tests for skills
 
 
 class ExplorationGraphUnitTests(test_utils.GenericTestBase):
@@ -554,8 +540,10 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         collection.add_node(self.EXPLORATION_ID)
         self.assertEqual(len(collection.nodes), 1)
 
+        collection.add_skill('Skill0a')
+        collection.add_skill('Skill0b')
         collection_node = collection.get_node(self.EXPLORATION_ID)
-        collection_node.update_acquired_skills(['Skill0a', 'Skill0b'])
+        collection_node.update_acquired_skills(['s0', 's1'])
 
         collection.validate()
 
@@ -624,6 +612,10 @@ nodes:
   - Skill2
   exploration_id: Exp1
   prerequisite_skills: []
+- acquired_skills: []
+  exploration_id: Exp2
+  prerequisite_skills:
+  - Skill1
 objective: ''
 schema_version: 1
 title: A title
@@ -636,14 +628,44 @@ nodes:
   - Skill2
   exploration_id: Exp1
   prerequisite_skills: []
+- acquired_skills: []
+  exploration_id: Exp2
+  prerequisite_skills:
+  - Skill1
 objective: ''
 schema_version: 2
+tags: []
+title: A title
+""")
+    YAML_CONTENT_V3 = ("""category: A category
+language_code: en
+nodes:
+- acquired_skills:
+  - s0
+  - s1
+  exploration_id: Exp1
+  prerequisite_skills: []
+- acquired_skills: []
+  exploration_id: Exp2
+  prerequisite_skills:
+  - s0
+objective: ''
+schema_version: 3
+skill_id_count: 2
+skills:
+  s0:
+    name: Skill1
+    question_ids: []
+  s1:
+    name: Skill2
+    question_ids: []
 tags: []
 title: A title
 """)
 
     _LATEST_YAML_CONTENT = YAML_CONTENT_V1
     _LATEST_YAML_CONTENT = YAML_CONTENT_V2
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V3
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -659,4 +681,12 @@ title: A title
             'Exp1', 'user@example.com', end_state_name='End')
         collection = collection_domain.Collection.from_yaml(
             'cid', self.YAML_CONTENT_V2)
+        self.assertEqual(collection.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v3(self):
+        """Test direct loading from a v3 yaml file."""
+        self.save_new_valid_exploration(
+            'Exp1', 'user@example.com', end_state_name='End')
+        collection = collection_domain.Collection.from_yaml(
+            'cid', self.YAML_CONTENT_V3)
         self.assertEqual(collection.to_yaml(), self._LATEST_YAML_CONTENT)

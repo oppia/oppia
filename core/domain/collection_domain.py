@@ -257,11 +257,49 @@ class CollectionNode(object):
         return cls(exploration_id, [], [])
 
 
+class CollectionSkill(object):
+    """Domain object describing a skill in the collection.
+
+    The skill contains the skill id, the human readable name, and the list of
+    question IDs associated to the skill.
+    """
+
+    def __init__(self, skill_id, name, question_ids):
+        """Constructs a new CollectionSkill object.
+
+        Args:
+            skill_id: str. the skill ID.
+            name: str. the displayed name of the skill.
+            question_ids: list(str). The list of question IDs
+                associated with the skill.
+        """
+        self.id = skill_id
+        self.name = name
+        self.question_ids = question_ids
+
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'question_ids': self.question_ids
+        }
+
+    @classmethod
+    def from_dict(cls, skill_id, skill_dict):
+        return cls(
+            skill_id,
+            copy.deepcopy(skill_dict['name']),
+            copy.deepcopy(skill_dict['question_ids'])
+        )
+
+    # TODO(wxy): validation, and other skill functions go here
+
+
 class Collection(object):
     """Domain object for an Oppia collection."""
 
     def __init__(self, collection_id, title, category, objective,
-                 language_code, tags, schema_version, nodes, version,
+                 language_code, tags, schema_version, nodes, skills,
+                 skill_id_count, version,
                  created_on=None, last_updated=None):
         """Constructs a new collection given all the information necessary to
         represent a collection.
@@ -286,6 +324,8 @@ class Collection(object):
         self.tags = tags
         self.schema_version = schema_version
         self.nodes = nodes
+        self.skills = skills
+        self.skill_id_count = skill_id_count
         self.version = version
         self.created_on = created_on
         self.last_updated = last_updated
@@ -301,7 +341,12 @@ class Collection(object):
             'schema_version': self.schema_version,
             'nodes': [
                 node.to_dict() for node in self.nodes
-            ]
+            ],
+            'skill_id_count': self.skill_id_count,
+            'skills': {
+                skill_id: skill.to_dict()
+                for skill_id, skill in self.skills.iteritems()
+            }
         }
 
     @classmethod
@@ -312,7 +357,7 @@ class Collection(object):
             language_code=feconf.DEFAULT_LANGUAGE_CODE):
         return cls(
             collection_id, title, category, objective, language_code, [],
-            feconf.CURRENT_COLLECTION_SCHEMA_VERSION, [], 0)
+            feconf.CURRENT_COLLECTION_SCHEMA_VERSION, [], {}, 0, 0)
 
     @classmethod
     def from_dict(
@@ -322,12 +367,17 @@ class Collection(object):
             collection_dict['id'], collection_dict['title'],
             collection_dict['category'], collection_dict['objective'],
             collection_dict['language_code'], collection_dict['tags'],
-            collection_dict['schema_version'], [], collection_version,
+            collection_dict['schema_version'], [], {},
+            collection_dict['skill_id_count'], collection_version,
             collection_created_on, collection_last_updated)
 
         for node_dict in collection_dict['nodes']:
             collection.nodes.append(
                 CollectionNode.from_dict(node_dict))
+
+        for skill_id, skill_dict in collection_dict['skills'].iteritems():
+            skill = CollectionSkill.from_dict(skill_id, skill_dict)
+            collection.skills[skill.id] = skill
 
         return collection
 
@@ -342,10 +392,33 @@ class Collection(object):
 
     @classmethod
     def _convert_v1_dict_to_v2_dict(cls, collection_dict):
-        """Converts a v1 collection dict into a v2 collection dict."""
+        """Converts a v1 collection dict into a v2 collection dict.
+
+        Adds a language code, and tags.
+        """
         collection_dict['schema_version'] = 2
         collection_dict['language_code'] = feconf.DEFAULT_LANGUAGE_CODE
         collection_dict['tags'] = []
+        return collection_dict
+
+    @classmethod
+    def _convert_v2_dict_to_v3_dict(cls, collection_dict):
+        """Converts a v2 collection dict into a v3 collection dict.
+
+        This adds skills to the collection.
+        """
+        collection_contents = {
+            'nodes': collection_dict['nodes']
+        }
+        new_collection_contents = (
+            cls._convert_collection_contents_v2_dict_to_v3_dict(
+                collection_contents))
+        collection_dict['nodes'] = new_collection_contents['nodes']
+        collection_dict['skills'] = new_collection_contents['skills']
+        collection_dict['skill_id_count'] = (
+            new_collection_contents['skill_id_count'])
+
+        collection_dict['schema_version'] = 3
         return collection_dict
 
     @classmethod
@@ -367,9 +440,13 @@ class Collection(object):
                 'Sorry, we can only process v1 to v%s collection YAML files at '
                 'present.' % feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
-        if collection_schema_version == 1:
-            collection_dict = cls._convert_v1_dict_to_v2_dict(collection_dict)
-            collection_schema_version = 2
+        while (collection_schema_version <
+               feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
+            conversion_fn = getattr(
+                cls, '_convert_v%s_dict_to_v%s_dict' % (
+                    collection_schema_version, collection_schema_version + 1))
+            collection_dict = conversion_fn(collection_dict)
+            collection_schema_version += 1
 
         return collection_dict
 
@@ -386,6 +463,47 @@ class Collection(object):
         """Converts from version 1 to 2. Does nothing since this migration only
         changes the language code.
         """
+        return collection_contents
+
+    @classmethod
+    def _convert_collection_contents_v2_dict_to_v3_dict(
+            cls, collection_contents):
+        """Converts from version 2 to 3.
+
+        Adds a skills dict and skill id counter. Gets skills in
+        prerequisite_skills and acquired_skills in nodes, and assigns them
+        integer IDs.
+        """
+
+        skill_names = set()
+        for node in collection_contents['nodes']:
+            skill_names.update(node['acquired_skills'])
+            skill_names.update(node['prerequisite_skills'])
+        skill_names_to_ids = {
+            name: 's' + str(index)
+            for index, name in enumerate(sorted(skill_names))
+        }
+
+        collection_contents['nodes'] = [{
+            'exploration_id': node['exploration_id'],
+            'prerequisite_skills': [
+                skill_names_to_ids[prerequisite_skill_name]
+                for prerequisite_skill_name in node['prerequisite_skills']],
+            'acquired_skills': [
+                skill_names_to_ids[acquired_skill_name]
+                for acquired_skill_name in node['acquired_skills']]
+        } for node in collection_contents['nodes']]
+
+        collection_contents['skills'] = {
+            skill_id: {
+                'name': skill_name,
+                'question_ids': []
+            }
+            for skill_name, skill_id in skill_names_to_ids.iteritems()
+        }
+
+        collection_contents['skill_id_count'] = len(skill_names)
+
         return collection_contents
 
     @classmethod
@@ -414,16 +532,12 @@ class Collection(object):
         versioned_collection_contents['collection_contents'] = conversion_fn(
             versioned_collection_contents['collection_contents'])
 
-    @property
-    def skills(self):
-        """The skills of a collection are made up of all prerequisite and
-        acquired skills of each exploration that is part of this collection.
-        This returns a sorted list of all the skills of the collection.
-        """
-        unique_skills = set()
-        for node in self.nodes:
-            unique_skills.update(node.skills)
-        return sorted(unique_skills)
+    def human_readable_skill_names(self):
+        """Returns a list of skill names of all the skills in the collection."""
+        skill_names = set()
+        for _, skill in self.skills.iteritems():
+            skill_names.update(skill.name)
+        return sorted(skill_names)
 
     @property
     def exploration_ids(self):
@@ -577,6 +691,25 @@ class Collection(object):
                 exploration_id)
         del self.nodes[node_index]
 
+    def get_skill(self, skill_id):
+        """Retrieves the skill domain object from the skills dict."""
+        if skill_id not in self.skills:
+            raise ValueError(
+                'Skill is not part of this collection: %s' % skill_id)
+        return self.skills[skill_id]
+
+    def add_skill(self, skill_name):
+        """Adds the new skill domain object with the specified name."""
+
+        for _, skill in self.skills.iteritems():
+            if skill.name == skill_name:
+                raise ValueError(
+                    'Skill with name "%s" already exists.' % skill_name)
+
+        skill_id = 's' + str(self.skill_id_count)
+        self.skills[skill_id] = CollectionSkill(skill_id, skill_name, [])
+        self.skill_id_count += 1
+
     def validate(self, strict=True):
         """Validates all properties of this collection and its constituents."""
 
@@ -671,6 +804,12 @@ class Collection(object):
         # Validate all collection nodes.
         for node in self.nodes:
             node.validate()
+
+        if not isinstance(self.skills, object):
+            raise utils.ValidationError(
+                'Expected skills to be a dict, received %s' % self.skills)
+
+        # TODO(wxy): add validation for skills
 
         if strict:
             if not self.title:
