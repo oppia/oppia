@@ -172,6 +172,20 @@ oppia.factory('editorContextService', ['$log', function($log) {
   };
 }]);
 
+
+// A service that maps IDs to Angular names
+oppia.factory('angularNameService', [function() {
+  var angularName = null;
+
+  return {
+    getNameOfInteractionRulesService: function(interactionId) {
+      angularName = interactionId.charAt(0).toLowerCase() + 
+        interactionId.slice(1) + 'RulesService';
+      return angularName
+    }
+  };
+}]);
+
 // TODO(sll): Should this depend on a versioning service that keeps track of
 // the current active version? Previous versions should not be editable.
 oppia.factory('editabilityService', [function() {
