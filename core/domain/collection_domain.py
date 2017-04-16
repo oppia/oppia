@@ -270,7 +270,7 @@ class CollectionSkill(object):
         """Constructs a new CollectionSkill object.
 
         Args:
-            skill_id: int. the skill ID.
+            skill_id: str. the skill ID.
             name: str. the displayed name of the skill.
             question_ids: list(str). The list of question IDs
                 associated with the skill.
@@ -281,15 +281,14 @@ class CollectionSkill(object):
 
     def to_dict(self):
         return {
-            'skill_id': self.id,
             'name': self.name,
             'question_ids': self.question_ids
         }
 
     @classmethod
-    def from_dict(cls, skill_dict):
+    def from_dict(cls, skill_id, skill_dict):
         return cls(
-            copy.deepcopy(skill_dict['skill_id']),
+            skill_id,
             copy.deepcopy(skill_dict['name']),
             copy.deepcopy(skill_dict['question_ids'])
         )
@@ -346,9 +345,10 @@ class Collection(object):
                 node.to_dict() for node in self.nodes
             ],
             'skill_id_count': self.skill_id_count,
-            'skills': [
-                skill.to_dict() for skill in self.skills
-            ]
+            'skills': {
+                skill_id: skill.to_dict()
+                for skill_id, skill in self.skills.iteritems()
+            }
         }
 
     @classmethod
@@ -377,9 +377,9 @@ class Collection(object):
             collection.nodes.append(
                 CollectionNode.from_dict(node_dict))
 
-        for skill_dict in collection_dict['skills']:
-            skill = CollectionSkill.from_dict(skill_dict)
-            collection.skills[skill.skill_id] = skill
+        for skill_id, skill_dict in collection_dict['skills'].iteritems():
+            skill = CollectionSkill.from_dict(skill_id, skill_dict)
+            collection.skills[skill.id] = skill
 
         return collection
 
@@ -407,8 +407,19 @@ class Collection(object):
     def _convert_v2_dict_to_v3_dict(cls, collection_dict):
         """Converts a v2 collection dict into a v3 collection dict.
 
-        No changes to dict structure.
+
         """
+        collection_contents = {
+            'nodes': collection_dict['nodes']
+        }
+        new_collection_contents = (
+            cls._convert_collection_contents_v2_dict_to_v3_dict(
+                collection_contents))
+        collection_dict['nodes'] = new_collection_contents['nodes']
+        collection_dict['skills'] = new_collection_contents['skills']
+        collection_dict['skill_id_count'] = (
+            new_collection_contents['skill_id_count'])
+
         collection_dict['schema_version'] = 3
         return collection_dict
 
@@ -431,9 +442,13 @@ class Collection(object):
                 'Sorry, we can only process v1 to v%s collection YAML files at '
                 'present.' % feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
-        if collection_schema_version == 1:
-            collection_dict = cls._convert_v1_dict_to_v2_dict(collection_dict)
-            collection_schema_version = 2
+        while (collection_schema_version <
+               feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
+            conversion_fn = getattr(
+                cls, '_convert_v%s_dict_to_v%s_dict' % (
+                    collection_schema_version, collection_schema_version + 1))
+            collection_dict = conversion_fn(collection_dict)
+            collection_schema_version += 1
 
         return collection_dict
 
@@ -466,19 +481,20 @@ class Collection(object):
 
         def _add_or_get_id(skill):
             # Don't add skill if already inside skill dict
-            for skill_dict in collection_contents['skills']:
+            for skill_id, skill_dict in (
+                    collection_contents['skills'].iteritems()):
                 if skill_dict['name'] == skill:
-                    return skill_dict['skill_id']
+                    return skill_id
 
             # Add a new skill dict
             skill_id_count = collection_contents['skill_id_count']
-            collection_contents['skills'][skill_id_count] = {
-                'skill_id': skill_id_count,
+            new_skill_id = 's' + str(skill_id_count)
+            collection_contents['skills'][new_skill_id] = {
                 'name': skill,
                 'question_ids': []
             }
             collection_contents['skill_id_count'] = skill_id_count + 1
-            return skill_id_count
+            return new_skill_id
 
 
         new_nodes = []
@@ -494,7 +510,7 @@ class Collection(object):
                 new_acquired_skills.append(skill_id)
 
             new_nodes.append({
-                'exploration_id': node.exploration_id,
+                'exploration_id': node['exploration_id'],
                 'prerequisite_skills': new_prerequisite_skills,
                 'acquired_skills': new_acquired_skills
             })

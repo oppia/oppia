@@ -33,12 +33,20 @@ SAMPLE_YAML_CONTENT = ("""category: A category
 language_code: en
 nodes:
 - acquired_skills:
-  - Skill0a
-  - Skill0b
+  - s0
+  - s1
   exploration_id: an_exploration_id
   prerequisite_skills: []
 objective: An objective
 schema_version: %d
+skill_id_count: 2
+skills:
+  s0:
+    name: Skill0a
+    question_ids: []
+  s1:
+    name: Skill0b
+    question_ids: []
 tags: []
 title: A title
 """) % (feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
@@ -623,22 +631,20 @@ title: A title
 language_code: en
 nodes:
 - acquired_skills:
-  - 0
-  - 1
+  - s0
+  - s1
   exploration_id: Exp1
   prerequisite_skills: []
 objective: ''
-schema_version: 2
+schema_version: 3
+skill_id_count: 2
 skills:
-  0:
-    skill_id: 0
+  s0:
     name: Skill1
     question_ids: []
-  1:
-    skill_id: 1
+  s1:
     name: Skill2
     question_ids: []
-skill_id_count: 2
 tags: []
 title: A title
 """)

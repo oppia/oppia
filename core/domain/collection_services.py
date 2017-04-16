@@ -164,11 +164,12 @@ def get_collection_from_model(collection_model, run_conversion=True):
             collection_domain.CollectionNode.from_dict(collection_node_dict)
             for collection_node_dict in
             versioned_collection_contents['collection_contents']['nodes']
-        ], [
-            collection_domain.CollectionSkill.from_dict(collection_skill_dict)
-            for collection_skill_dict in
-            versioned_collection_contents['collection_contents']['skills']
-        ],
+        ], {
+            (skill_id, collection_domain.CollectionSkill.from_dict(skill_dict))
+            for skill_id, skill_dict in
+            versioned_collection_contents[
+                'collection_contents']['skills'].iteritems()
+        },
         versioned_collection_contents['collection_contents']['skill_id_count'],
         collection_model.version, collection_model.created_on,
         collection_model.last_updated)
@@ -747,8 +748,13 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
             'nodes': [
                 collection_node.to_dict()
                 for collection_node in collection.nodes
-            ]
-        }
+            ],
+            'skills': {
+                collection_skill.id: collection_skill.to_dict()
+                for collection_skill in collection.skills
+            },
+            'skill_id_count': collection.skill_id_count
+        },
     )
     model.commit(committer_id, commit_message, commit_cmds)
     collection.version += 1
