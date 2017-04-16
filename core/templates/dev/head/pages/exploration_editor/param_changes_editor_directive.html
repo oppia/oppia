@@ -19,13 +19,13 @@
                             width="143px">
           </select2-dropdown>
 
-          <select class="form-control" ng-model="paramChange.generator_id"
+          <select class="form-control" ng-model="paramChange.generatorId"
                   ng-options="key as PREAMBLE_TEXT[key] for (key, value) in PREAMBLE_TEXT"
                   style="width: 110px; display: inline;" required
                   ng-change="onChangeGeneratorType(paramChange)">
           </select>
-          <value-generator-editor generator-id="paramChange.generator_id"
-                                  customization-args="paramChange.customization_args"
+          <value-generator-editor generator-id="paramChange.generatorId"
+                                  customization-args="paramChange.customizationArgs"
                                   obj-type="'UnicodeString'">
           </value-generator-editor>
         </span>
@@ -70,7 +70,7 @@
       </span>
       <div class="oppia-param-display-row" ng-repeat="paramChange in paramChangesService.savedMemento track by $index">
         <[$index + 1]>. Change <span class="label label-info"><[paramChange.name]></span>
-         <[HUMAN_READABLE_ARGS_RENDERERS[paramChange.generator_id](paramChange.customization_args)]>
+         <[HUMAN_READABLE_ARGS_RENDERERS[paramChange.generatorId](paramChange.customizationArgs)]>
       </div>
     </div>
   </div>

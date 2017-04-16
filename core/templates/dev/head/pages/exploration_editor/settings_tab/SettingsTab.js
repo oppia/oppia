@@ -293,7 +293,7 @@ oppia.controller('SettingsTab', [
       });
     };
 
-    $scope.deleteExploration = function(role) {
+    $scope.deleteExploration = function() {
       alertsService.clearWarnings();
 
       $modal.open({

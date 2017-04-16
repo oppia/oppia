@@ -34,9 +34,8 @@ oppia.factory('parameterMetadataService', [
       var result = [];
       for (var i = 0; i < paramChanges.length; i++) {
         var pc = paramChanges[i];
-
-        if (pc.generator_id === 'Copier') {
-          if (!pc.customization_args.parse_with_jinja) {
+        if (pc.generatorId === 'Copier') {
+          if (!pc.customizationArgs.parse_with_jinja) {
             result.push({
               action: PARAM_ACTION_SET,
               paramName: pc.name,
@@ -46,7 +45,7 @@ oppia.factory('parameterMetadataService', [
           } else {
             var paramsReferenced = (
               expressionInterpolationService.getParamsFromString(
-                pc.customization_args.value));
+                pc.customizationArgs.value));
             for (var j = 0; j < paramsReferenced.length; j++) {
               result.push({
                 action: PARAM_ACTION_GET,

@@ -575,6 +575,15 @@ oppia.factory('explorationPropertyService', [
   function($rootScope, $log, changeListService, alertsService) {
     // Public base API for data services corresponding to exploration properties
     // (title, category, etc.)
+
+    var BACKEND_CONVERSIONS = {
+      param_changes: function(paramChanges) {
+        return paramChanges.map(function(paramChange) {
+          return paramChange.toBackendDict();
+        });
+      }
+    }
+
     return {
       init: function(value) {
         if (this.propertyName === null) {
@@ -618,7 +627,6 @@ oppia.factory('explorationPropertyService', [
         if (this.propertyName === null) {
           throw 'Exploration property name cannot be null.';
         }
-
         this.displayed = this._normalize(this.displayed);
         if (!this._isValid(this.displayed) || !this.hasChanged()) {
           this.restoreFromMemento();
@@ -630,8 +638,19 @@ oppia.factory('explorationPropertyService', [
         }
 
         alertsService.clearWarnings();
+
+        var newBackendValue = angular.copy(this.displayed);
+        var oldBackendValue = angular.copy(this.savedMemento);
+
+        if (BACKEND_CONVERSIONS.hasOwnProperty(this.propertyName)) {
+          newBackendValue =
+            BACKEND_CONVERSIONS[this.propertyName](this.displayed);
+          oldBackendValue =
+            BACKEND_CONVERSIONS[this.propertyName](this.savedMemento);
+        }
+
         changeListService.editExplorationProperty(
-          this.propertyName, this.displayed, this.savedMemento);
+          this.propertyName, newBackendValue, oldBackendValue);
         this.savedMemento = angular.copy(this.displayed);
 
         $rootScope.$broadcast('explorationPropertyChanged');
@@ -798,9 +817,6 @@ oppia.factory('explorationStatesService', [
     var _states = null;
     // Properties that have a different backend representation from the
     // frontend and must be converted.
-    var PROPERTIES_TO_CONVERT = [
-      'answer_groups'
-    ];
 
     var BACKEND_CONVERSIONS = {
       answer_groups: function(answerGroups) {
@@ -818,6 +834,11 @@ oppia.factory('explorationStatesService', [
       fallbacks: function(fallbacks) {
         return fallbacks.map(function(fallback) {
           return fallback.toBackendDict();
+        });
+      },
+      param_changes: function(paramChanges) {
+        return paramChanges.map(function(paramChange) {
+          return paramChange.toBackendDict();
         });
       }
     };

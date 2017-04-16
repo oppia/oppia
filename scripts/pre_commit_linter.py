@@ -36,7 +36,7 @@ IMPORTANT NOTES:
 CUSTOMIZATION OPTIONS
 =====================
 1.  To lint only files that have been touched in this commit
-       python scripts/pre_commit_linter.py
+        python scripts/pre_commit_linter.py
 
 2.  To lint all files in the folder or to lint just a specific file
         python scripts/pre_commit_linter.py --path filepath
