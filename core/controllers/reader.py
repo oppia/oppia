@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for the Oppia exploration user view."""
+"""Controllers for the Oppia exploration learner view."""
 
 import json
 import logging
@@ -46,29 +46,28 @@ DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = config_domain.ConfigProperty(
     'default_twitter_share_message_player', {
         'type': 'unicode',
     },
-    'Default text for the Twitter share message for the user view',
+    'Default text for the Twitter share message for the learner view',
     default_value=(
         'Check out this interactive lesson from Oppia - a free, open-source '
         'learning platform!'))
 
 
 def require_playable(handler):
-    """Decorator that checks if the user can play the given exploration."""
+    """Decorator that checks if the learner can play the given exploration."""
     def test_can_play(self, exploration_id, **kwargs):
-        """Tests if the user can play the exploration.
+        """Tests if the learner can play the exploration.
+
         Args:
             exploration_id: str. The id of the exploration to test if
-                the user can play.
+                the use can play.
             kwargs: Any other keyword args.
 
         Returns:
-            handler or None. If the exploration is disabled,
-            the disabled_exploration.html page is rendered.
-            Otherwise, if the exploration can be played by the user,
-            the corresponding handler is returned.
+            The relevant handler(response), if the user is authorized to play this
+            exploration.
 
         Raises:
-            PageNotFound: The user cannot play the exploration.
+            PageNotFound: The learner cannot play the exploration.
         """
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             self.render_template(
@@ -84,6 +83,7 @@ def require_playable(handler):
                 self.request.get('iframed')):
             self.values['iframed'] = True
 
+        # Checks whether the learner can play this activity.
         if rights_manager.Actor(self.user_id).can_play(
                 feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             return handler(self, exploration_id, **kwargs)
@@ -95,15 +95,14 @@ def require_playable(handler):
 
 def _get_exploration_player_data(
         exploration_id, version, collection_id, can_edit):
-    """This function is used to get exploration data which
-    is returned a dictionary.
+    """Get's exploration data which is returned as a dictionary.
 
     Args:
         exploration_id: str. The id of the exploration to get metadata.
         version: int. The version of the exploration.
         collection_id: str. The id of the collection which the exploration
             belongs to.
-        can_edit: bool. Check if the exploration is editable by user.
+        can_edit: bool. If the exploration is editable by the learner.
 
     Returns:
         dict. A dictionary with metadata pertaining the exploration
@@ -178,7 +177,7 @@ class ExplorationPageEmbed(base.BaseHandler):
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests.
-        The require_playable decorator ensures the user can play the exploration
+        The require_playable decorator ensures the learner can play the exploration
         with the exploration_id.
 
         Args:
@@ -219,7 +218,7 @@ class ExplorationPage(base.BaseHandler):
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests.
-        The require_playable decorator ensures the user can play
+        The require_playable decorator ensures the learner can play
         the exploration with the exploration_id.
 
         Args:
@@ -295,18 +294,18 @@ class ExplorationHandler(base.BaseHandler):
 
 
 class AnswerSubmittedEventHandler(base.BaseHandler):
-    """Tracks a user submitting an answer."""
+    """Tracks a learner submitting an answer."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @require_playable
     def post(self, exploration_id):
-        """Handles user answer POST requests.
-        The require_playable decorator ensures the user can play
+        """Handles learner answer POST requests.
+        The require_playable decorator ensures the learner can play
         the exploration with the id exploration_id.
         Args:
-            exploration_id: str. The id of the exploration the user
-                            wants to post an answer.
+            exploration_id: str. The id of the exploration the learner
+                wants to post an answer.
         """
         old_state_name = self.payload.get('old_state_name')
         answer = self.payload.get('answer')
@@ -343,16 +342,16 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
 
 
 class StateHitEventHandler(base.BaseHandler):
-    """Tracks a user hitting a new state."""
+    """Tracks a learner hitting a new state."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @require_playable
     def post(self, exploration_id):
         """Handles POST requests.
-        Records user's new state
+        Records learner's new state
         Args:
-            exploration_id: str. The id of the exploration the user wants
+            exploration_id: str. The id of the exploration the learner wants
                 to hit new state.
         """
         new_state_name = self.payload.get('new_state_name')
@@ -395,9 +394,9 @@ class ClassifyHandler(base.BaseHandler):
         """
         # A domain object representing the old state.
         old_state = exp_domain.State.from_dict(self.payload.get('old_state'))
-        # The user's raw answer.
+        # The learner's raw answer.
         answer = self.payload.get('answer')
-        # The user's parameter values.
+        # The learner's parameter values.
         params = self.payload.get('params')
         params['answer'] = answer
         result = classifier_services.classify(old_state, answer)
@@ -412,13 +411,13 @@ class ReaderFeedbackHandler(base.BaseHandler):
     @require_playable
     def post(self, exploration_id):
         """Handles POST requests.
-        It records a thread_id of the feedback from a user.
+        Records a thread_id of the feedback from a learner.
         Args:
-            exploration_id: str. The id for the exploration the user wants
+            exploration_id: str. The id for the exploration the learner wants
                 to submit feedback.
         """
         state_name = self.payload.get('state_name')
-        subject = self.payload.get('subject', 'Feedback from a user')
+        subject = self.payload.get('subject', 'Feedback from a learner')
         feedback = self.payload.get('feedback')
         include_author = self.payload.get('include_author')
 
@@ -432,7 +431,7 @@ class ReaderFeedbackHandler(base.BaseHandler):
 
 
 class ExplorationStartEventHandler(base.BaseHandler):
-    """Tracks a user starting an exploration."""
+    """Tracks a learner starting an exploration."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
@@ -440,7 +439,7 @@ class ExplorationStartEventHandler(base.BaseHandler):
     def post(self, exploration_id):
         """Handles POST requests.
         Args:
-            exploration_id: str. The id of the exploration the user wants to
+            exploration_id: str. The id of the exploration the learner wants to
                             start exploring.
         """
         event_services.StartExplorationEventHandler.record(
@@ -452,7 +451,7 @@ class ExplorationStartEventHandler(base.BaseHandler):
 
 
 class ExplorationCompleteEventHandler(base.BaseHandler):
-    """Tracks a user completing an exploration.
+    """Tracks a learner completing an exploration.
     The state name recorded should be a state with a terminal interaction.
     """
 
@@ -462,8 +461,8 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
     def post(self, exploration_id):
         """Handles POST requests.
         Args:
-            exploration_id: str. The id of the exploration the user is
-                            finishing.
+            exploration_id: str. The id of the exploration the learner is
+                finishing.
         """
         # This will be None if the exploration is not being played within the
         # context of a collection.
@@ -485,7 +484,7 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
 
 
 class ExplorationMaybeLeaveHandler(base.BaseHandler):
-    """Tracks a user leaving an exploration without completing it.
+    """Tracks a learner leaving an exploration without completing it.
     The state name recorded should be a state with a non-terminal interaction.
     """
 
@@ -495,8 +494,8 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
     def post(self, exploration_id):
         """Handles POST requests.
         Args:
-            exploration_id: str. The id of the exploration the user is
-                            leaving without finishing.
+            exploration_id: str. The id of the exploration the learner is
+                leaving without finishing.
         """
         event_services.MaybeLeaveExplorationEventHandler.record(
             exploration_id,
@@ -509,8 +508,7 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
 
 
 class RatingHandler(base.BaseHandler):
-    """
-    Records the rating of an exploration submitted by a user.
+    """Records the rating of an exploration submitted by a learner.
 
     Note that this represents ratings submitted on completion of the
     exploration.
@@ -522,8 +520,8 @@ class RatingHandler(base.BaseHandler):
     def get(self, exploration_id):
         """Handles GET requests.
         Args:
-            exploration_id: str. The id of the exploration the user wants
-                            get the rating.
+            exploration_id: str. The id of the exploration the learner wants
+                get the rating.
         """
         self.values.update({
             'overall_ratings':
@@ -540,12 +538,12 @@ class RatingHandler(base.BaseHandler):
         """Handles PUT requests for submitting ratings at the end of an
         exploration.
 
-        base.require_user decorator ensure that the current user is
+        base.require_user decorator ensures that the current learner is
         associated with the current session.
 
         Args:
-            exploration_id: str. The id of the exploration the user wants to
-                            rate.
+            exploration_id: str. The id of the exploration the learner wants to
+                rate.
         """
         user_rating = self.payload.get('user_rating')
         rating_services.assign_rating_to_exploration(
@@ -554,12 +552,11 @@ class RatingHandler(base.BaseHandler):
 
 
 class RecommendationsHandler(base.BaseHandler):
-    """
-    Provides recommendations to be displayed at the end of explorations.
+    """Provides recommendations to be displayed at the end of explorations.
     Which explorations are provided depends on whether the exploration was
-    played within the context of a collection and whether the user is logged in.
+    played within the context of a collection and whether the learner is logged in.
     If both are true, then the explorations are suggested from the collection,
-    if there are upcoming explorations for the user to complete.
+    if there are upcoming explorations for the learner to complete.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -568,8 +565,8 @@ class RecommendationsHandler(base.BaseHandler):
     def get(self, exploration_id):
         """Handles GET requests.
         Args:
-            exploration_id: str. The id of the exploration the user wants
-                            to get other recommendations.
+            exploration_id: str. The id of the exploration the learner wants
+                to get other recommendations.
         """
         collection_id = self.request.get('collection_id')
         include_system_recommendations = self.request.get(
@@ -620,16 +617,16 @@ class RecommendationsHandler(base.BaseHandler):
 
 
 class FlagExplorationHandler(base.BaseHandler):
-    """Handles operations relating to user flagging of explorations."""
+    """Handles operations relating to learner flagging of explorations."""
 
     @base.require_user
     def post(self, exploration_id):
         """Handles POST requests.
-        base.require_user decorator ensure that the current user is
+        base.require_user decorator ensures that the current learner is
         associated with the current session.
         Args:
-            exploration_id: str. The id of the exploration the user
-                            wants to flag.
+            exploration_id: str. The id of the exploration the learner
+                wants to flag.
         """
         moderator_services.enqueue_flag_exploration_email_task(
             exploration_id,
