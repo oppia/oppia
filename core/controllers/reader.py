@@ -555,8 +555,8 @@ class RecommendationsHandler(base.BaseHandler):
     """Provides recommendations to be displayed at the end of explorations.
     Which explorations are provided depends on whether the exploration was
     played within the context of a collection and whether the learner is logged
-    in.If both are true, then the explorations are suggested from the collection,
-    if there are upcoming explorations for the learner to complete.
+    in.If both are true, then the explorations are suggested from the
+    collection,if there are upcoming explorations for the learner to complete.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
