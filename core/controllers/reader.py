@@ -63,8 +63,8 @@ def require_playable(handler):
             kwargs: Any other keyword args.
 
         Returns:
-            The relevant handler(response), if the user is authorized to play this
-            exploration.
+            The relevant handler(response), if the user is authorized to play
+            this exploration.
 
         Raises:
             PageNotFound: The learner cannot play the exploration.
@@ -177,8 +177,8 @@ class ExplorationPageEmbed(base.BaseHandler):
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests.
-        The require_playable decorator ensures the learner can play the exploration
-        with the exploration_id.
+        The require_playable decorator ensures the learner can play the
+        exploration with the exploration_id.
 
         Args:
             exploration_id: str. The id of the exploration requested.
@@ -554,8 +554,8 @@ class RatingHandler(base.BaseHandler):
 class RecommendationsHandler(base.BaseHandler):
     """Provides recommendations to be displayed at the end of explorations.
     Which explorations are provided depends on whether the exploration was
-    played within the context of a collection and whether the learner is logged in.
-    If both are true, then the explorations are suggested from the collection,
+    played within the context of a collection and whether the learner is logged
+    in.If both are true, then the explorations are suggested from the collection,
     if there are upcoming explorations for the learner to complete.
     """
 
