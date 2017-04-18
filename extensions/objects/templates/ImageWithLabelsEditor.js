@@ -69,8 +69,8 @@ oppia.directive('imageWithLabelsEditor', [
         $scope.rectY = 0;
         $scope.rectWidth = 0;
         $scope.rectHeight = 0;
-        boxWidth = 200;
-        boxHeight = 50;
+        boxWidth = 150;
+        boxHeight = 65;
         // Is user currently drawing a new region?
         $scope.userIsCurrentlyDrawing = false;
         // Is user currently dragging an existing region?
