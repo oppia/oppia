@@ -72,7 +72,9 @@ class UserSettings(object):
             self, user_id, email, username=None, last_agreed_to_terms=None,
             last_started_state_editor_tutorial=None, last_logged_in=None,
             last_created_an_exploration=None,
-            last_edited_an_exploration=None, profile_picture_data_url=None,
+            last_edited_an_exploration=None, last_created_an_collection=None,
+            last_edited_an_collection=None,
+            profile_picture_data_url=None,
             user_bio='', subject_interests=None, first_contribution_msec=None,
             preferred_language_codes=None, preferred_site_language_code=None):
         """Constructs a UserSettings domain object.
@@ -112,6 +114,8 @@ class UserSettings(object):
         self.last_logged_in = last_logged_in
         self.last_edited_an_exploration = last_edited_an_exploration
         self.last_created_an_exploration = last_created_an_exploration
+        self.last_created_an_collection = last_created_an_collection
+        self.last_edited_an_collection = last_edited_an_collection
         self.profile_picture_data_url = profile_picture_data_url
         self.user_bio = user_bio
         self.subject_interests = (
@@ -353,6 +357,10 @@ def get_users_settings(user_ids):
                 last_edited_an_exploration=model.last_edited_an_exploration,
                 last_created_an_exploration=(
                     model.last_created_an_exploration),
+                last_created_an_collection=(
+                    model.last_created_an_collection),
+                last_edited_an_collection=(
+                    model.last_edited_an_collection),
                 profile_picture_data_url=model.profile_picture_data_url,
                 user_bio=model.user_bio,
                 subject_interests=model.subject_interests,
@@ -490,6 +498,10 @@ def _save_user_settings(user_settings):
         last_edited_an_exploration=user_settings.last_edited_an_exploration,
         last_created_an_exploration=(
             user_settings.last_created_an_exploration),
+        last_created_an_collection=(
+            user_settings.last_created_an_collection),
+        last_edited_an_collection=(
+            user_settings.last_edited_an_collection),
         profile_picture_data_url=user_settings.profile_picture_data_url,
         user_bio=user_settings.user_bio,
         subject_interests=user_settings.subject_interests,
@@ -567,7 +579,7 @@ def _create_user(user_id, email):
         user_id, email,
         preferred_language_codes=[feconf.DEFAULT_LANGUAGE_CODE])
     _save_user_settings(user_settings)
-    create_user_contributions(user_id, [], [])
+    create_user_contributions(user_id, [], [], [], [])
     return user_settings
 
 
@@ -849,6 +861,24 @@ def record_user_created_an_exploration(user_id):
         user_settings.last_created_an_exploration = datetime.datetime.utcnow()
         _save_user_settings(user_settings)
 
+def record_user_created_an_collection(user_id):
+    """Updates last_created _an_collection to the current datetime
+    for the user with given user_id.
+    """
+    user_settings = get_user_settings(user_id)
+    if user_settings:
+        user_settings.last_created_an_collection = datetime.datetime.utcnow()
+        _save_user_settings(user_settings)
+
+def record_user_edited_an_collection(user_id):
+    """Updates last_edited_an_collection to the current datetime
+    for the user with given user_id.
+    """
+    user_settings = get_user_settings(user_id)
+    if user_settings:
+        user_settings.last_edited_an_collection = datetime.datetime.utcnow()
+        _save_user_settings(user_settings)
+
 
 def update_email_preferences(
         user_id, can_receive_email_updates, can_receive_editor_role_email,
@@ -1029,9 +1059,9 @@ class UserContributions(object):
         edited_exploration_ids: list(str). IDs of explorations that this
             user has edited.
     """
-
     def __init__(
-            self, user_id, created_exploration_ids, edited_exploration_ids):
+            self, user_id, created_exploration_ids, edited_exploration_ids,
+            created_collection_ids, edited_collection_ids):
         """Constructs a UserContributions domain object.
 
         Args:
@@ -1044,6 +1074,8 @@ class UserContributions(object):
         self.user_id = user_id
         self.created_exploration_ids = created_exploration_ids
         self.edited_exploration_ids = edited_exploration_ids
+        self.created_collection_ids = created_collection_ids
+        self.edited_collection_ids = edited_collection_ids
 
     def validate(self):
         """Checks that user_id, created_exploration_ids and
@@ -1105,14 +1137,17 @@ def get_user_contributions(user_id, strict=False):
     if model is not None:
         result = UserContributions(
             model.id, model.created_exploration_ids,
-            model.edited_exploration_ids)
+            model.edited_exploration_ids,
+            model.created_collection_ids,
+            model.edited_collection_ids)
     else:
         result = None
     return result
 
 
 def create_user_contributions(
-        user_id, created_exploration_ids, edited_exploration_ids):
+        user_id, created_exploration_ids, edited_exploration_ids,
+        created_collection_ids, edited_collection_ids):
     """Creates a new UserContributionsModel and returns the domain object.
 
     Args:
@@ -1136,13 +1171,16 @@ def create_user_contributions(
             'User contributions model for user %s already exists.' % user_id)
     else:
         user_contributions = UserContributions(
-            user_id, created_exploration_ids, edited_exploration_ids)
+            user_id, created_exploration_ids, edited_exploration_ids,
+            created_collection_ids, edited_collection_ids)
         _save_user_contributions(user_contributions)
     return user_contributions
 
 
 def update_user_contributions(user_id, created_exploration_ids,
-                              edited_exploration_ids):
+                              edited_exploration_ids,
+                              created_collection_ids,
+                              edited_collection_ids):
     """Updates an existing UserContributionsModel with new calculated
     contributions.
 
@@ -1164,6 +1202,8 @@ def update_user_contributions(user_id, created_exploration_ids,
 
     user_contributions.created_exploration_ids = created_exploration_ids
     user_contributions.edited_exploration_ids = edited_exploration_ids
+    user_contributions.created_collection_ids = created_collection_ids
+    user_contributions.edited_collection_ids = edited_collection_ids
 
     _save_user_contributions(user_contributions)
 
@@ -1179,7 +1219,7 @@ def add_created_exploration_id(user_id, exploration_id):
     user_contributions = get_user_contributions(user_id, strict=False)
 
     if not user_contributions:
-        create_user_contributions(user_id, [exploration_id], [])
+        create_user_contributions(user_id, [exploration_id], [], [], [])
     elif exploration_id not in user_contributions.created_exploration_ids:
         user_contributions.created_exploration_ids.append(exploration_id)
         user_contributions.created_exploration_ids.sort()
@@ -1197,11 +1237,47 @@ def add_edited_exploration_id(user_id, exploration_id):
     user_contributions = get_user_contributions(user_id, strict=False)
 
     if not user_contributions:
-        create_user_contributions(user_id, [], [exploration_id])
+        create_user_contributions(user_id, [], [exploration_id], [], [])
 
     elif exploration_id not in user_contributions.edited_exploration_ids:
         user_contributions.edited_exploration_ids.append(exploration_id)
         user_contributions.edited_exploration_ids.sort()
+        _save_user_contributions(user_contributions)
+
+
+def add_created_collection_id(user_id, collection_id):
+    """Adds an collection_id to a user_id's UserContributionalModel collection
+    of created collection.
+
+    Args:
+        user_id: str. The user id.
+        collection_id: str. The collection_id.
+    """
+    user_contributions = get_user_contributions(user_id, strict=False)
+
+    if not user_contributions:
+        create_user_contributions(user_id, [], [], [collection_id], [])
+    elif collection_id not in user_contributions.created_collection_ids:
+        user_contributions.created_collection_ids.append(collection_id)
+        user_contributions.created_collection_ids.sort()
+        _save_user_contributions(user_contributions)
+
+
+def add_edited_collection_id(user_id, collection_id):
+    """Adds an collection_id to a user_id's UserContributionalModel collection
+    of edited collection.
+
+    Args:
+        user_id: str. The user id.
+        collection_id: str. The collection_id.
+    """
+    user_contributions = get_user_contributions(user_id, strict=False)
+
+    if not user_contributions:
+        create_user_contributions(user_id, [], [], [], [collection_id])
+    elif collection_id not in user_contributions.edited_collection_ids:
+        user_contributions.edited_collection_ids.append(collection_id)
+        user_contributions.edited_collection_ids.sort()
         _save_user_contributions(user_contributions)
 
 
@@ -1217,6 +1293,8 @@ def _save_user_contributions(user_contributions):
         id=user_contributions.user_id,
         created_exploration_ids=user_contributions.created_exploration_ids,
         edited_exploration_ids=user_contributions.edited_exploration_ids,
+        created_collection_ids=user_contributions.created_collection_ids,
+        edited_collection_ids=user_contributions.edited_collection_ids,
     ).put()
 
 

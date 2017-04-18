@@ -22,7 +22,7 @@
     </li>
   </ul>
 {% endblock navbar_breadcrumb %}
-
+ 
 {% block content %}
   <background-banner></background-banner>
   <div class="oppia-profile-container" ng-controller="Profile">
@@ -101,31 +101,42 @@
     </md-card>
 
     <md-card class="oppia-profile-content-card">
-      <md-content class="oppia-profile-portfolio-container">
-        <exploration-summary-tile ng-repeat="expl in getExplorationsToDisplay()"
-          exploration-id="expl.id"
-          exploration-title="expl.title"
-          last-updated-msec="expl.last_updated_msec"
-          objective="expl.objective"
-          category="expl.category"
-          ratings="expl.ratings"
-          thumbnail-icon-url="expl.thumbnail_icon_url"
-          thumbnail-bg-color="expl.thumbnail_bg_color"
-          num-views="expl.num_views"
-          is-community-editable="expl.community_editable"
-          mobile-cutoff-px="610">
-        </exploration-summary-tile>
-
-        <div ng-if="userEditedExplorations.length === 0">
+      <md-content class=" oppia-profile-portfolio-container">
+        <div ng-if="userEditedExplorations.length === 0 && userEditedCollections.length === 0">
           <br><em>This user hasn't created or edited any explorations yet.</em>
         </div>
-      </md-content>
-
-      <span class="oppia-profile-portfolio-pages" ng-if="numUserPortfolioExplorations > 6">
+        <div ng-repeat="tile in getActivityToDisplay() track by $index" style="display: inline-block;">
+           <collection-summary-tile ng-if="tile.activity_type === 'collection'"
+              collection-id="tile.id"
+              collection-title="tile.title"
+              last-updated-msec="tile.last_updated_msec"
+              objective="tile.objective"
+              node-count="tile.node_count"
+              category="tile.category"
+              thumbnail-icon-url="tile.thumbnail_icon_url"
+              thumbnail-bg-color="tile.thumbnail_bg_color">
+          </collection-summary-tile>
+          <exploration-summary-tile ng-if="tile.activity_type ==='exploration'"
+              exploration-id="tile.id"
+              exploration-title="tile.title"
+              last-updated-msec="tile.last_updated_msec"
+              objective="tile.objective"
+              category="tile.category"
+              ratings="tile.ratings"
+              thumbnail-icon-url="tile.thumbnail_icon_url"
+              thumbnail-bg-color="tile.thumbnail_bg_color"
+              num-views="tile.num_views"
+              num-views="tile.num_views"
+              is-community-editable="tile.community_editable"
+              mobile-cutoff-px="610">
+          </exploration-summary-tile>
+      </div>
+    </md-content>
+        <span class="oppia-profile-portfolio-pages" ng-if="numUserPortfolioActivity > 6">
         <i class="material-icons md-18" ng-disabled="currentPageNumber == 0"
            ng-click="goToPreviousPage()">&#xE5C4;</i>
-        Showing <[currentPageNumber * PAGE_SIZE + 1]> - <[Math.min(numUserPortfolioExplorations, (currentPageNumber + 1) * PAGE_SIZE)]> of <[numUserPortfolioExplorations]>
-        <i class="material-icons md-18" ng-disabled="(currentPageNumber + 1) * PAGE_SIZE >= userEditedExplorations.length" ng-click="goToNextPage()">&#xE5C8;</i>
+        Showing <[currentPageNumber * PAGE_SIZE + 1]> - <[Math.min(numUserPortfolioActivity, (currentPageNumber + 1) * PAGE_SIZE)]> of <[numUserPortfolioActivity]>
+        <i class="material-icons md-18" ng-disabled="(currentPageNumber + 1) * PAGE_SIZE >= userEditedExplorations.length + userEditedCollection.length" ng-click="goToNextPage()">&#xE5C8;</i>
       </span>
     </md-card>
 
@@ -161,6 +172,7 @@
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CollectionSummaryTileDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CircularImageDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
 {% endblock footer_js %}

@@ -169,6 +169,7 @@ def get_collection_from_model(collection_model, run_conversion=True):
         collection_model.last_updated)
 
 
+
 def get_collection_summary_from_model(collection_summary_model):
     """Returns a domain object for an Oppia collection summary given a
     collection summary model.
@@ -764,6 +765,9 @@ def save_new_collection(committer_id, collection):
         'title': collection.title,
         'category': collection.category,
     }])
+    user_services.add_created_collection_id(committer_id, collection.id)
+    user_services.add_edited_collection_id(committer_id, collection.id)
+    user_services.record_user_created_an_collection(committer_id)
 
 
 def delete_collection(committer_id, collection_id, force_deletion=False):
@@ -874,6 +878,8 @@ def update_collection(
     collection = apply_change_list(collection_id, change_list)
     _save_collection(committer_id, collection, commit_message, change_list)
     update_collection_summary(collection.id, committer_id)
+    user_services.add_edited_collection_id(committer_id, collection.id)
+    user_services.record_user_edited_an_collection(committer_id)
 
     if (not rights_manager.is_collection_private(collection.id) and
             committer_id != feconf.MIGRATION_BOT_USER_ID):
