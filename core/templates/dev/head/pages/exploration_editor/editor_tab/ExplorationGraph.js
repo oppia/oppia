@@ -30,8 +30,15 @@ oppia.controller('ExplorationGraph', [
     // We hide the graph at the outset in order not to confuse new exploration
     // creators.
     $scope.isGraphShown = function() {
-      var states = explorationStatesService.getStates();
-      return Boolean(states && Object.keys(states).length > 1);
+      var states = {};
+      var statesExist = explorationStatesService.getStates() != null;
+      if (statesExist) {
+        var states = explorationStatesService.getStates().getStates();
+        console.log(angular.copy(states));
+      }
+      console.log(angular.copy(statesExist));
+      console.log(Object.keys(states).length);
+      return Boolean(statesExist && Object.keys(states).length > 1);
     };
 
     $scope.deleteState = function(deleteStateName) {
@@ -39,6 +46,7 @@ oppia.controller('ExplorationGraph', [
     };
 
     $scope.onClickStateInMinimap = function(stateName) {
+      console.log(angular.copy(stateName));
       routerService.navigateToMainTab(stateName);
     };
 

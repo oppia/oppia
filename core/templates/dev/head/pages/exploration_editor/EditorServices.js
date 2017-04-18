@@ -865,7 +865,7 @@ oppia.factory('explorationStatesService', [
     var getStatePropertyMemento = function(stateName, backendName) {
       var accessorList = PROPERTY_REF_DATA[backendName];
 
-      var propertyRef = _states[stateName];
+      var propertyRef = _states.getState(stateName);
       accessorList.forEach(function(key) {
         propertyRef = propertyRef[key];
       });
@@ -887,7 +887,7 @@ oppia.factory('explorationStatesService', [
         changeListService.editStateProperty(
           stateName, backendName, newBackendValue, oldBackendValue);
 
-        var newStateData = angular.copy(_states[stateName]);
+        var newStateData = _states.getState(stateName);
         var accessorList = PROPERTY_REF_DATA[backendName];
 
         var propertyRef = newStateData;
@@ -915,23 +915,24 @@ oppia.factory('explorationStatesService', [
 
     // TODO(sll): Add unit tests for all get/save methods.
     return {
-      init: function(states) {
-        _states = StatesObjectFactory.createFromBackendDict(states);
+      init: function(statesBackendDict) {
+        console.log(angular.copy(statesBackendDict));
+        _states = StatesObjectFactory.createFromBackendDict(statesBackendDict);
       },
       getStates: function() {
         return angular.copy(_states);
       },
       hasState: function(stateName) {
-        return _states.hasOwnProperty(stateName);
+        return _states.getStates().hasOwnProperty(stateName);
       },
       getState: function(stateName) {
-        return angular.copy(_states[stateName]);
+        return angular.copy(_states.getState(stateName));
       },
       setState: function(stateName, stateData) {
         _setState(stateName, stateData, true);
       },
       isNewStateNameValid: function(newStateName, showWarnings) {
-        if (_states.hasOwnProperty(newStateName)) {
+        if (_states.getStates().hasOwnProperty(newStateName)) {
           if (showWarnings) {
             alertsService.addWarning('A state with this name already exists.');
           }
@@ -997,7 +998,7 @@ oppia.factory('explorationStatesService', [
         if (!validatorsService.isValidStateName(newStateName, true)) {
           return;
         }
-        if (_states.hasOwnProperty(newStateName)) {
+        if (_states.getStates().hasOwnProperty(newStateName)) {
           alertsService.addWarning('A state with this name already exists.');
           return;
         }
@@ -1018,7 +1019,7 @@ oppia.factory('explorationStatesService', [
         if (deleteStateName === initStateName) {
           return;
         }
-        if (!_states[deleteStateName]) {
+        if (!_states.getState(deleteStateName)) {
           alertsService.addWarning(
             'No state with name ' + deleteStateName + ' exists.');
           return;
@@ -1074,28 +1075,8 @@ oppia.factory('explorationStatesService', [
             }
           ]
         }).result.then(function(deleteStateName) {
-          delete _states[deleteStateName];
-          for (var otherStateName in _states) {
-            var interaction = _states[otherStateName].interaction;
-            var groups = interaction.answerGroups;
-            for (var i = 0; i < groups.length; i++) {
-              if (groups[i].outcome.dest === deleteStateName) {
-                groups[i].outcome.dest = otherStateName;
-              }
-            }
-            if (interaction.defaultOutcome) {
-              if (interaction.defaultOutcome.dest === deleteStateName) {
-                interaction.defaultOutcome.dest = otherStateName;
-              }
-            }
+          _states.deleteState(deleteStateName);
 
-            var fallbacks = interaction.fallbacks;
-            for (var i = 0; i < fallbacks.length; i++) {
-              if (fallbacks[i].outcome.dest === deleteStateName) {
-                fallbacks[i].outcome.dest = otherStateName;
-              }
-            }
-          }
           changeListService.deleteState(deleteStateName);
 
           if (editorContextService.getActiveStateName() === deleteStateName) {
@@ -1117,36 +1098,13 @@ oppia.factory('explorationStatesService', [
         if (!validatorsService.isValidStateName(newStateName, true)) {
           return;
         }
-        if (_states[newStateName]) {
+        if (_states.getState(newStateName)) {
           alertsService.addWarning('A state with this name already exists.');
           return;
         }
         alertsService.clearWarnings();
 
-        _states[newStateName] = angular.copy(_states[oldStateName]);
-        delete _states[oldStateName];
-
-        for (var otherStateName in _states) {
-          var interaction = _states[otherStateName].interaction;
-          var groups = interaction.answerGroups;
-          for (var i = 0; i < groups.length; i++) {
-            if (groups[i].outcome.dest === oldStateName) {
-              groups[i].outcome.dest = newStateName;
-            }
-          }
-          if (interaction.defaultOutcome) {
-            if (interaction.defaultOutcome.dest === oldStateName) {
-              interaction.defaultOutcome.dest = newStateName;
-            }
-          }
-
-          var fallbacks = interaction.fallbacks;
-          for (var i = 0; i < fallbacks.length; i++) {
-            if (fallbacks[i].outcome.dest === oldStateName) {
-              fallbacks[i].outcome.dest = newStateName;
-            }
-          }
-        }
+        _states.renameState(oldStateName, newStateName);
 
         editorContextService.setActiveStateName(newStateName);
         // The 'rename state' command must come before the 'change
@@ -1708,7 +1666,6 @@ oppia.factory('computeGraphService', [
       var nodes = {};
       var links = [];
       var finalStateIds = [];
-      console.log(angular.copy(states));
       for (var stateName in states.getStates()) {
         var interaction = states.getState(stateName).interaction;
         if (interaction.id && INTERACTION_SPECS[interaction.id].is_terminal) {
@@ -1716,7 +1673,6 @@ oppia.factory('computeGraphService', [
         }
 
         nodes[stateName] = stateName;
-
         if (interaction.id) {
           var groups = interaction.answerGroups;
           for (var h = 0; h < groups.length; h++) {

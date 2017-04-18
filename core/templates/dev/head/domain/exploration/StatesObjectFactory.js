@@ -36,6 +36,56 @@ oppia.factory('StatesObjectFactory', [
       States.prototype.setState = function(stateName, stateData) {
         states[stateName] = angular.copy(stateData);
       };
+      States.prototype.deleteState = function(deleteStateName) {
+        delete states[deleteStateName];
+        for (var otherStateName in states) {
+          var interaction = states[otherStateName].interaction;
+          var groups = interaction.answerGroups;
+          for (var i = 0; i < groups.length; i++) {
+            if (groups[i].outcome.dest === deleteStateName) {
+              groups[i].outcome.dest = otherStateName;
+            }
+          }
+          if (interaction.defaultOutcome) {
+            if (interaction.defaultOutcome.dest === deleteStateName) {
+              interaction.defaultOutcome.dest = otherStateName;
+            }
+          }
+
+          var fallbacks = interaction.fallbacks;
+          for (var i = 0; i < fallbacks.length; i++) {
+            if (fallbacks[i].outcome.dest === deleteStateName) {
+              fallbacks[i].outcome.dest = otherStateName;
+            }
+          }
+        }
+      };
+      States.prototype.renameState = function(oldStateName, newStateName) {
+        states[newStateName] = angular.copy(states[oldStateName]);
+        delete states[oldStateName];
+
+        for (var otherStateName in states) {
+          var interaction = states[otherStateName].interaction;
+          var groups = interaction.answerGroups;
+          for (var i = 0; i < groups.length; i++) {
+            if (groups[i].outcome.dest === oldStateName) {
+              groups[i].outcome.dest = newStateName;
+            }
+          }
+          if (interaction.defaultOutcome) {
+            if (interaction.defaultOutcome.dest === oldStateName) {
+              interaction.defaultOutcome.dest = newStateName;
+            }
+          }
+
+          var fallbacks = interaction.fallbacks;
+          for (var i = 0; i < fallbacks.length; i++) {
+            if (fallbacks[i].outcome.dest === oldStateName) {
+              fallbacks[i].outcome.dest = newStateName;
+            }
+          }
+        }
+      };
     };
 
     States.createFromBackendDict = function(statesBackendDict) {

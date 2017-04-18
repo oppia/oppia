@@ -72,7 +72,8 @@ oppia.directive('outcomeDestinationEditor', [function() {
           // graph.
           var lastComputedArrangement = (
             StateGraphLayoutService.getLastComputedArrangement());
-          var allStateNames = Object.keys(explorationStatesService.getStates());
+          var allStateNames = Object.keys(
+            explorationStatesService.getStates().getStates());
 
           var maxDepth = 0;
           var maxOffset = 0;

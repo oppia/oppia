@@ -89,7 +89,7 @@ oppia.factory('routerService', [
       var pathBase = '/' + pathType + '/';
       var putativeStateName = path.substring(pathBase.length);
       var waitForStatesToLoad = $interval(function() {
-        var allStates = explorationStatesService.getStates();
+        var allStates = explorationStatesService.getStates().getStates();
         if (allStates) {
           $interval.cancel(waitForStatesToLoad);
           if (allStates.hasOwnProperty(putativeStateName)) {
