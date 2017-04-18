@@ -807,12 +807,12 @@ oppia.factory('explorationStatesService', [
   '$log', '$modal', '$filter', '$location', '$rootScope',
   'explorationInitStateNameService', 'alertsService', 'changeListService',
   'editorContextService', 'validatorsService', 'newStateTemplateService',
-  'explorationGadgetsService', 'StateObjectFactory',
+  'explorationGadgetsService', 'StatesObjectFactory',
   function(
       $log, $modal, $filter, $location, $rootScope,
       explorationInitStateNameService, alertsService, changeListService,
       editorContextService, validatorsService, newStateTemplateService,
-      explorationGadgetsService, StateObjectFactory) {
+      explorationGadgetsService, StatesObjectFactory) {
     var _states = null;
     // Properties that have a different backend representation from the
     // frontend and must be converted.
@@ -856,7 +856,7 @@ oppia.factory('explorationStatesService', [
     };
 
     var _setState = function(stateName, stateData, refreshGraph) {
-      _states[stateName] = angular.copy(stateData);
+      _states.setState(stateName, angular.copy(stateData));
       if (refreshGraph) {
         $rootScope.$broadcast('refreshGraph');
       }
@@ -916,12 +916,7 @@ oppia.factory('explorationStatesService', [
     // TODO(sll): Add unit tests for all get/save methods.
     return {
       init: function(states) {
-        _states = {};
-        for (var stateName in states) {
-          var stateData = angular.copy(states[stateName]);
-          _states[stateName] = StateObjectFactory.createFromBackendDict(
-            stateName, stateData);
-        }
+        _states = StatesObjectFactory.createFromBackendDict(states);
       },
       getStates: function() {
         return angular.copy(_states);
@@ -1008,8 +1003,8 @@ oppia.factory('explorationStatesService', [
         }
         alertsService.clearWarnings();
 
-        _states[newStateName] = newStateTemplateService.getNewStateTemplate(
-          newStateName);
+        _states.addState(newStateName);
+
         changeListService.addState(newStateName);
         $rootScope.$broadcast('refreshGraph');
         if (successCallback) {
@@ -1713,8 +1708,9 @@ oppia.factory('computeGraphService', [
       var nodes = {};
       var links = [];
       var finalStateIds = [];
-      for (var stateName in states) {
-        var interaction = states[stateName].interaction;
+      console.log(angular.copy(states));
+      for (var stateName in states.getStates()) {
+        var interaction = states.getState(stateName).interaction;
         if (interaction.id && INTERACTION_SPECS[interaction.id].is_terminal) {
           finalStateIds.push(stateName);
         }
@@ -1791,6 +1787,7 @@ oppia.factory('graphDataService', [
 
       var states = explorationStatesService.getStates();
       var initStateId = explorationInitStateNameService.savedMemento;
+      console.log(angular.copy(states));
       _graphData = computeGraphService.compute(initStateId, states);
     };
 
@@ -1875,8 +1872,8 @@ oppia.factory('explorationWarningsService', [
       var statesWithoutInteractionIds = [];
 
       var states = explorationStatesService.getStates();
-      for (var stateName in states) {
-        if (!states[stateName].interaction.id) {
+      for (var stateName in states.getStates()) {
+        if (!states.getState(stateName).interaction.id) {
           statesWithoutInteractionIds.push(stateName);
         }
       }
@@ -1990,9 +1987,9 @@ oppia.factory('explorationWarningsService', [
       var results = [];
 
       var states = explorationStatesService.getStates();
-      for (var stateName in states) {
+      for (var stateName in states.getStates()) {
         var groupIndexes = _getAnswerGroupIndexesWithEmptyClassifiers(
-          states[stateName]);
+          states.getState(stateName));
         if (groupIndexes.length > 0) {
           results.push({
             groupIndexes: groupIndexes,
@@ -2013,11 +2010,11 @@ oppia.factory('explorationWarningsService', [
       var _graphData = graphDataService.getGraphData();
 
       var _states = explorationStatesService.getStates();
-      for (var stateName in _states) {
-        var interaction = _states[stateName].interaction;
+      for (var stateName in _states.getStates()) {
+        var interaction = _states.getState(stateName).interaction;
         if (interaction.id) {
           var validatorName = (
-            'oppiaInteractive' + _states[stateName].interaction.id +
+            'oppiaInteractive' + _states.getState(stateName).interaction.id +
             'Validator');
           var interactionWarnings = $filter(validatorName)(
             stateName, interaction.customizationArgs,

@@ -18,18 +18,35 @@
  */
 
 oppia.factory('StatesObjectFactory', [
-  'StateObjectFactory', function(StateObjectFactory) {
-    var createFromBackendDict = function(statesBackendDict) {
+    'StateObjectFactory', 'newStateTemplateService',
+  function(StateObjectFactory, newStateTemplateService) {
+    var States = function(states) {
+      var states = states;
+
+      States.prototype.getState = function(stateName) {
+        return states[stateName];
+      };
+      States.prototype.getStates = function() {
+        return angular.copy(states);
+      };
+      States.prototype.addState = function(newStateName) {
+        states[newStateName] = newStateTemplateService.getNewStateTemplate(
+          newStateName);
+      };
+      States.prototype.setState = function(stateName, stateData) {
+        states[stateName] = angular.copy(stateData);
+      };
+    };
+
+    States.createFromBackendDict = function(statesBackendDict) {
       var stateObjectsDict = {};
       for (var stateName in statesBackendDict) {
         stateObjectsDict[stateName] = StateObjectFactory.createFromBackendDict(
           stateName, statesBackendDict[stateName]);
       }
-      return stateObjectsDict;
+      return new States(stateObjectsDict);
     };
 
-    return {
-      createFromBackendDict: createFromBackendDict
-    };
+    return States;
   }
 ]);
