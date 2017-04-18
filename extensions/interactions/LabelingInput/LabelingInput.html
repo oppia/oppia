@@ -14,7 +14,11 @@
       margin-bottom: 1rem;
       display: inline-block;
       text-align: center;
-      line-height: 50px;
+      /*line-height: 50px;*/
+      padding: 22px 0px;
+      white-space: normal;
+      z-index: 999;
+
     }
     .oppia-image-click-img {
       cursor: pointer;
@@ -68,6 +72,9 @@
 
      <div ng-if="alwaysShowRegions">
       <div ng-repeat="region in allRegions"
+          data-drop="true"
+          data-jqyoui-options ng-model="list2"
+          jqyoui-droppable="{animate:true}"
           style="
             height: <[getRegionDimensions($index).height]>px;
              width: <[getRegionDimensions($index).width]>px;

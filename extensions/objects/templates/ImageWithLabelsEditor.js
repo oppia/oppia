@@ -33,6 +33,10 @@ oppia.directive('imageWithLabelsEditor', [
       scope: true,
       template: '<div ng-include="getTemplateUrl()"></div>',
       controller: ['$scope', '$element', function($scope, $element) {
+//ngDragDrop
+        $scope.list1 = {};
+        $scope.list2 = {};
+
         $scope.alwaysEditable = true;
 
         $scope.REGION_LABEL_OFFSET_X = 6;
