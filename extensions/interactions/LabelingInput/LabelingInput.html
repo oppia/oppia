@@ -8,6 +8,14 @@
       padding: 8px;
       position: relative;
     }
+    .dragItem{
+      width: 150px;
+      height: 65px;
+      margin-bottom: 1rem;
+      display: inline-block;
+      text-align: center;
+      line-height: 50px;
+    }
     .oppia-image-click-img {
       cursor: pointer;
       display: block;
@@ -33,8 +41,9 @@
   <hr>
   <h1>Word Bank</h1>
     <div ng-repeat="region in allRegions">
-      <div class="btn btn-primary" data-drag="true" data-jqyoui-options="{revert: 'invalid'}" ng-model="list1" jqyoui-draggable="{animate:true}"><[region.label]></div>
+      <div class="btn btn-primary dragItem" data-drag="true" data-jqyoui-options="{revert: 'invalid'}" ng-model="list1" jqyoui-draggable="{animate:true}"><[region.label]></div>
       </div>
+
     </div>
     <br>
     <img ng-src="<[imageUrl]>"
@@ -56,14 +65,7 @@
              z-index: 10;">
       </div>
     </div>
-    <line
-        ng-attr-x1="<[region.startX]>",
-        ng-attr-y1="<[region.startY]>",
-        ng-attr-x2="<[region.region.area[0][0] * getRegionDimensions(0).left]>",
-        ng-attr-y2="<[region.region.area[0][1] * getRegionDimensions(0).top]>"
-        style="stroke:rgb(0,0,0);stroke-width:2" 
-    />
-    </line>
+
      <div ng-if="alwaysShowRegions">
       <div ng-repeat="region in allRegions"
           style="
@@ -77,18 +79,19 @@
              background: rgba(0,0,255,0.5);
              z-index: 10;
           ">
+
     </div>
   </div>
 
     </div>
-<!--   <line ng-repeat="region in allRegions",
+  <line ng-repeat="region in allRegions",
         ng-attr-x1="<[region.startX]>",
         ng-attr-y1="<[region.startY]>",
         ng-attr-x2="<[region.region.area[0][0] * getImageWidth()]>",
         ng-attr-y2="<[region.region.area[0][1] * getImageHeight()]>"
-        style="stroke:rgb(0,0,0);stroke-width:2" 
-    />
-    </line> -->
+        style="stroke:rgb(0,0,0);stroke-width:2"
+    >
+    </line>
 
 </script>
 
