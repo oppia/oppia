@@ -52,16 +52,7 @@ current_user_services = models.Registry.import_current_user_services()
 # IMPORTANT: Before adding this state to an existing exploration, the
 # state name and the destination of the default rule should first be
 # changed to the desired new state name.
-NEW_STATE_TEMPLATE = {
-    'classifier_model_id': None,
-    'content': [{
-        'type': 'text',
-        'value': ''
-    }],
-    'interaction': exp_domain.State.NULL_INTERACTION_DICT,
-    'param_changes': [],
-    'unresolved_answers': {},
-}
+NEW_STATE_TEMPLATE = constants.NEW_STATE_TEMPLATE
 
 DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = config_domain.ConfigProperty(
     'default_twitter_share_message_editor', {

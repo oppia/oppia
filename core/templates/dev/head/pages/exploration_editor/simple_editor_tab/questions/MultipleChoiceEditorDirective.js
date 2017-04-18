@@ -21,7 +21,9 @@
 // concept of "state in an exploration".
 oppia.directive('multipleChoiceEditor', [
   'QuestionIdService', 'AnswerGroupObjectFactory', 'RuleObjectFactory',
-  function(QuestionIdService, AnswerGroupObjectFactory, RuleObjectFactory) {
+  'StatusObjectFactory',
+  function(QuestionIdService, AnswerGroupObjectFactory, RuleObjectFactory,
+      StatusObjectFactory) {
     return {
       restrict: 'E',
       scope: {
@@ -101,7 +103,9 @@ oppia.directive('multipleChoiceEditor', [
             }
 
             if (foundEmptyField) {
-              return;
+              return StatusObjectFactory.createFailure(
+                'Found an empty field'
+              );
             }
 
             var newChoiceIndex = choiceNames.length;
@@ -136,7 +140,9 @@ oppia.directive('multipleChoiceEditor', [
           $scope.saveChoice = function(index, newChoiceValue) {
             if (!newChoiceValue) {
               alertsService.addWarning('Cannot save an empty choice.');
-              return;
+              return StatusObjectFactory.createFailure(
+                'Cannot save an empty choice'
+              );
             }
 
             var newCustomizationArgs = $scope.getCustomizationArgs();
@@ -144,13 +150,17 @@ oppia.directive('multipleChoiceEditor', [
 
             if (newChoiceValue === choiceNames[index]) {
               // No change has been made.
-              return;
+              return StatusObjectFactory.createFailure(
+                'No change has been made'
+              );
             }
 
             if (choiceNames.indexOf('newChoiceValue') !== -1) {
               alertsService.addWarning(
                 'Cannot save: this duplicates an existing choice.');
-              return;
+              return StatusObjectFactory.createFailure(
+                'This duplicates an existing choice'
+              );
             }
 
             newCustomizationArgs.choices.value[index] = newChoiceValue;

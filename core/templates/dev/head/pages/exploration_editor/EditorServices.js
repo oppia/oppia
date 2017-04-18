@@ -1647,7 +1647,7 @@ oppia.factory('newStateTemplateService',
       // the process.
       // NB: clients should ensure that the desired state name is valid.
       getNewStateTemplate: function(newStateName) {
-        var newStateTemplate = angular.copy(GLOBALS.NEW_STATE_TEMPLATE);
+        var newStateTemplate = angular.copy(constants.NEW_STATE_TEMPLATE);
         var newState = StateObjectFactory.createFromBackendDict(newStateName, {
           classifier_model_id: newStateTemplate.classifier_model_id,
           content: newStateTemplate.content,

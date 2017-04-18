@@ -1097,19 +1097,6 @@ class SkinInstance(object):
 class State(object):
     """Domain object for a state."""
 
-    NULL_INTERACTION_DICT = {
-        'id': None,
-        'customization_args': {},
-        'answer_groups': [],
-        'default_outcome': {
-            'dest': feconf.DEFAULT_INIT_STATE_NAME,
-            'feedback': [],
-            'param_changes': [],
-        },
-        'confirmed_unclassified_answers': [],
-        'fallbacks': [],
-    }
-
     def __init__(self, content, param_changes, interaction,
                  classifier_model_id=None):
         # The content displayed to the reader in this state.
