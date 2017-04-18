@@ -108,6 +108,7 @@ oppia.directive('outcomeEditor', [function() {
           return $scope.isSelfLoopWithNoFeedback(tmpOutcome);
         };
         $scope.openFeedbackEditor = function() {
+          $scope.savedOutcome = angular.copy($scope.outcome);
           if ($scope.isEditable()) {
             $scope.feedbackEditorIsOpen = true;
             if ($scope.outcome.feedback.length === 0) {
@@ -117,6 +118,7 @@ oppia.directive('outcomeEditor', [function() {
         };
 
         $scope.openDestinationEditor = function() {
+          $scope.savedOutcome = angular.copy($scope.outcome);
           if ($scope.isEditable()) {
             $scope.destinationEditorIsOpen = true;
           }
