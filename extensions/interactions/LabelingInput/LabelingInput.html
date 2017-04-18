@@ -12,9 +12,12 @@
       width: 150px;
       height: 65px;
       margin-bottom: 1rem;
+      margin-left: .5rem;
+      margin-right: .5rem;
       display: inline-block;
+      /*float: left;*/
+      clear: none;
       text-align: center;
-      /*line-height: 50px;*/
       padding: 22px 0px;
       white-space: normal;
       z-index: 999;
@@ -91,6 +94,7 @@
   </div>
 
     </div>
+    <!-- x2 and y2 are NAN -->
   <line ng-repeat="region in allRegions",
         ng-attr-x1="<[region.startX]>",
         ng-attr-y1="<[region.startY]>",
