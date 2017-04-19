@@ -4,7 +4,7 @@
   <div class="options-container">
     <ul style="margin-bottom: 0;">
       <li ng-repeat="choice in getChoices() track by $index" class="option" style="list-style-type: square;">
-        <button ng-click="deleteChoice($index)" class="btn-delete-option"
+        <button ng-click="deleteChoice(choice)" class="btn-delete-option"
                 ng-if="getChoices().length > 1">
           <i class="material-icons md-18">&#xE5CD;</i>
         </button>
@@ -19,48 +19,45 @@
 
     <button ng-click="addChoice()" class="btn-add-option">
       <i class="material-icons md-18 btn-add-option-icon">&#xE145;</i>
-      Add option
+      Add Value
     </button>
   </div>
 
-    <anchor-header header-id="getSubfieldId('Correct answer')"
-                   header-text="Pick the correct answer"></anchor-header>
-    <div class="correct-answer-picker-container">
-      <button class="correct-answer-option"
-              ng-repeat="choice in getChoices() track by $index"
-              ng-click="selectCorrectAnswer(choice)"
-              ng-class="{'correct-answer-option-selected': isCorrectAnswer(choice)}">
-        <div class="correct-answer-check-button-container">
-          <span class="correct-answer-outer-check-button">
-            <span class="correct-answer-inner-check-button"></span>
-          </span>
-        </div>
-        <div class="correct-answer-content-container">
-          <span angular-html-bind="choice"></span>
-        </div>
-      </button>
-    </div>
+  <anchor-header header-id="getSubfieldId('Correct answer')"
+                 header-text="Pick the correct answer"></anchor-header>
+  <div class="correct-answer-picker-container">
+    <button class="correct-answer-option"
+             ng-repeat="choice in getChoices() track by $index"
+             ng-click="selectCorrectAnswer(choice)"
+             ng-class="{'correct-answer-option-selected': isCorrectAnswer(choice)}">
 
+      <div class="correct-answer-radio-button-container">
+        <span class="correct-answer-outer-radio-button">
+          <span class="correct-answer-inner-radio-button"></span>
+        </span>
+      </div>
+      <div class="correct-answer-content-container">
+        <span angular-html-bind="choice"></span>
+      </div>
+    </button>
+  </div>
 
-    <div ng-if="getAnswerGroups().length > 0">
-      <h3>Provide additional explanation for the correct answer</h3>
-      <editor-html-field original-value="getAnswerGroups()[0].outcome.feedback[0]"
-                         on-finish-editing="saveCorrectAnswerFeedback(newValue)"
-                         placeholder="Type something"
-                         field-id="<[getFieldId('correct-response')]>">
-      </editor-html-field>
-    </div>
-
-    <anchor-header header-id="getSubfieldId('Hints')"
-                   header-text="Provide a hint for all other answers"></anchor-header>
-    <editor-html-field original-value="getDefaultOutcome().feedback[0]"
-                       on-finish-editing="saveDefaultFeedback(newValue)"
-                       placeholder="Type something">
+  <div ng-if="getAnswerGroups().length > 0">
+    <h3>Provide additional explanation for the correct answer</h3>
+    <editor-html-field original-value="getAnswerGroups()[0].outcome.feedback[0]"
+                       on-finish-editing="saveCorrectAnswerFeedback(newValue)"
+                       placeholder="Type something"
+                       field-id="<[getFieldId('correct-response')]>">
     </editor-html-field>
-    <!--
--->
-</script>
+  </div>
 
+  <anchor-header header-id="getSubfieldId('Hints')"
+                 header-text="Provide a hint for all other answers"></anchor-header>
+  <editor-html-field original-value="getDefaultOutcome().feedback[0]"
+                     on-finish-editing="saveDefaultFeedback(newValue)"
+                     placeholder="Type something">
+  </editor-html-field>
+</script>
 
 <style>
   check-box-editor .options-container {
@@ -113,32 +110,32 @@
     /* This is needed so that images stay bounded by the container in Firefox. */
     width: 100%;
   }
-  check-box-editor .correct-answer-check-button-container,
+  check-box-editor .correct-answer-radio-button-container,
   check-box-editor .correct-answer-content-container {
     display: table-cell;
     vertical-align: bottom;
   }
-  check-box-editor .correct-answer-outer-check-button {
+  check-box-editor .correct-answer-outer-radio-button {
     border: 2px solid rgba(0,0,0,0.87);
-    border-radius: 2px;
+    border-radius: 3px;
     display: inline-block;
     height: 16px;
     margin-left: 35px;
     margin-right: 20px;
     width: 16px;
   }
-  check-box-editor .correct-answer-option:hover .correct-answer-inner-check-button,
-  check-box-editor .correct-answer-option-selected .correct-answer-inner-check-button {
-    border-radius: 2px;
+  check-box-editor .correct-answer-option:hover .correct-answer-inner-radio-button,
+  check-box-editor .correct-answer-option-selected .correct-answer-inner-radio-button {
+    border-radius: 3px;
     display: block;
     height: 8px;
     margin: 2px;
     width: 8px;
   }
-  check-box-editor .correct-answer-option:hover:not(.correct-answer-option-selected) .correct-answer-inner-check-button {
+  check-box-editor .correct-answer-option:hover:not(.correct-answer-option-selected) .correct-answer-inner-radio-button {
     background-color: rgba(0,0,0,0.87);
   }
-  check-box-editor .correct-answer-option-selected .correct-answer-inner-check-button {
+  check-box-editor .correct-answer-option-selected .correct-answer-inner-radio-button {
     background-color: #009688;
   }
 </style>

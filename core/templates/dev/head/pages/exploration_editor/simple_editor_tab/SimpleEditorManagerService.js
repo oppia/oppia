@@ -66,7 +66,7 @@ oppia.factory('SimpleEditorManagerService', [
         }
       }
     };
-    console.log(data);
+    //console.log(data);
     var getNewStateName = function() {
       var allStateNames = data.questionList.getAllStateNames();
 

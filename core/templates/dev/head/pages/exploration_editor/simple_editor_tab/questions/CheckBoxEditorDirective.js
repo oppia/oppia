@@ -20,8 +20,10 @@
 // dependencies should be standard utility services. It should not have any
 // concept of "state in an exploration".
 oppia.directive('checkBoxEditor', [
-  'QuestionIdService', 'AnswerGroupObjectFactory',
-  function(QuestionIdService, AnswerGroupObjectFactory) {
+  'QuestionIdService', 'AnswerGroupObjectFactory', 'RuleObjectFactory',
+  'StatusObjectFactory',
+  function(QuestionIdService, AnswerGroupObjectFactory, RuleObjectFactory,
+      StatusObjectFactory) {
     return {
       restrict: 'E',
       scope: {
@@ -78,11 +80,13 @@ oppia.directive('checkBoxEditor', [
 
           $scope.isCorrectAnswer = function(value) {
             var answerGroups = $scope.getAnswerGroups();
-            if (answerGroups.length === 0) {
-              return false;
-            } else {
-              return answerGroups[0].ruleSpecs[0].inputs.x.includes(value);
-            }
+            if(answerGroups[0]["rules"][0]["inputs"]["x"].includes(value) ){
+              return true;
+             }
+             else{
+               return false;
+             }
+
           };
 
           $scope.addChoice = function() {
@@ -101,19 +105,21 @@ oppia.directive('checkBoxEditor', [
             }
 
             if (foundEmptyField) {
-              return;
+              return StatusObjectFactory.createFailure(
+                'Found an empty field'
+              );
             }
 
             var newChoiceIndex = choiceNames.length;
             // This is the human-readable number in the choice name.
             var newChoiceNumber = choiceNames.length + 1;
             while (choiceNames.indexOf(
-                '<p>Option ' + newChoiceNumber + '</p>') !== -1) {
+                '<p>Good Option ' + newChoiceNumber + '</p>') !== -1) {
               newChoiceNumber++;
             }
 
             newCustomizationArgs.choices.value.push(
-              '<p>Option ' + newChoiceNumber + '</p>');
+              '<p>Good Option ' + newChoiceNumber + '</p>');
             $scope.saveCustomizationArgs({
               newValue: newCustomizationArgs
             });
@@ -136,7 +142,9 @@ oppia.directive('checkBoxEditor', [
           $scope.saveChoice = function(index, newChoiceValue) {
             if (!newChoiceValue) {
               alertsService.addWarning('Cannot save an empty choice.');
-              return;
+              return StatusObjectFactory.createFailure(
+                'Cannot save an empty choice'
+              );
             }
 
             var newCustomizationArgs = $scope.getCustomizationArgs();
@@ -144,13 +152,17 @@ oppia.directive('checkBoxEditor', [
 
             if (newChoiceValue === choiceNames[index]) {
               // No change has been made.
-              return;
+              return StatusObjectFactory.createFailure(
+                'No change has been made'
+              );
             }
 
             if (choiceNames.indexOf('newChoiceValue') !== -1) {
               alertsService.addWarning(
                 'Cannot save: this duplicates an existing choice.');
-              return;
+              return StatusObjectFactory.createFailure(
+                'This duplicates an existing choice'
+              );
             }
 
             newCustomizationArgs.choices.value[index] = newChoiceValue;
@@ -159,111 +171,98 @@ oppia.directive('checkBoxEditor', [
             });
           };
 
-          $scope.deleteChoice = function(index) {
+          $scope.deleteChoice = function(value) {
             var newCustomizationArgs = $scope.getCustomizationArgs();
-            if (newCustomizationArgs.choices.value.length === 1) {
+            console.log(newCustomizationArgs);
+            if(newCustomizationArgs["choices"]["value"].length === 1){
               throw Error(
                 'Cannot delete choice when there is only 1 choice remaining.');
             }
-
-            $scope.$broadcast('discardChangesEditorHtmlField', {
-              fieldId: $scope.getFieldId(index)
+            else{
+              if(newCustomizationArgs["choices"]["value"].includes(value) ){
+                  var position = newCustomizationArgs["choices"]["value"].indexOf(value);
+                  newCustomizationArgs["choices"]["value"].splice(position, 1);
+                  newCustomizationArgs.maxAllowableSelectionCount.value--;
+                  newCustomizationArgs.minAllowableSelectionCount.value--;
+               }
+               var answerGroups = $scope.getAnswerGroups();
+               var newAnswerGroups = [];
+               newAnswerGroups.push(answerGroups[0]);
+               if(newAnswerGroups[0]["rules"][0]["inputs"]["x"].includes(value) ){
+                   var position = newAnswerGroups[0]["rules"][0]["inputs"]["x"].indexOf(value);
+                   newAnswerGroups[0].rules[0].inputs.x.splice(position, 1);
+                   console.log(newAnswerGroups);
+                   console.loh(newCustomizationArgs);
+                }
+           }
+            $scope.saveAnswerGroups({
+              newValue: newAnswerGroups
             });
-
-            newCustomizationArgs.choices.value.splice(index, 1);
             $scope.saveCustomizationArgs({
               newValue: newCustomizationArgs
             });
 
-            // Update the indexes in the answer groups, and remove answer groups
-            // that correspond to deleted choices.
-            var answerGroups = $scope.getAnswerGroups();
-            var oldAnswerGroupsLength = answerGroups.length;
-            var newAnswerGroups = [];
-            for (var i = 0; i < answerGroups.length; i++) {
-              if (answerGroups[i].ruleSpecs[0].inputs.x < index) {
-                newAnswerGroups.push(answerGroups[i]);
-              } else if (answerGroups[i].ruleSpecs[0].inputs.x > index) {
-                answerGroups[i].ruleSpecs[0].inputs.x--;
-                newAnswerGroups.push(answerGroups[i]);
-              }
-            }
-            // However, if this would result in no answer groups, instead select
-            // the first choice as the correct answer. This is done in order to
-            // preserve the invariant that, once a correct answer is selected,
-            // there is always some correct answer selected. Otherwise, the
-            // chain of questions can get broken.
-            if (newAnswerGroups.length === 0 && oldAnswerGroupsLength > 0) {
-              newAnswerGroups = [];
-              newAnswerGroups.push(answerGroups[0]);
-              newAnswerGroups[0].ruleSpecs[0].inputs.x = 0;
-            }
-
-            $scope.saveAnswerGroups({
-              newValue: newAnswerGroups
-            });
           };
 
           $scope.selectCorrectAnswer = function(value) {
-            
-            var newCustomizationArgs = $scope.getCustomizationArgs();
-            var answerGroups = $scope.getAnswerGroups();
-            console.log(answerGroups);
-
-            var newAnswerGroups = [];
+              var answerGroups = $scope.getAnswerGroups();
+              var newAnswerGroups = [];
 
             if (answerGroups.length === 0) {
               var newStateName = $scope.addState();
-              newAnswerGroups.push(AnswerGroupObjectFactory.createNew([{
-                inputs: {
+
+              // Note that we do not use the 'correct' field of the answer
+              // group in explorations. Instead, 'correctness' is determined by
+              // whether the answer group is the first in the list.
+
+              newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
+                RuleObjectFactory.createNew('Equals', {
                   x: [value]
-                },
-                rule_type: 'Equals'
-              }], {
+                })
+              ], {
                 dest: newStateName,
                 feedback: [''],
                 param_changes: []
-              }));
-              console.log(newAnswerGroups);
+              }, false));
 
               $scope.saveAnswerGroups({
                 newValue: newAnswerGroups
               });
+              console.log(newAnswerGroups);
+            } else {
 
+              var newCustomizationArgs = $scope.getCustomizationArgs();
 
-
-            }
-            else{
-
-              console.log("Updating the answer group");
               newAnswerGroups.push(answerGroups[0]);
-              var index = newAnswerGroups[0].ruleSpecs[0].inputs.x.indexOf(value);
-              if(index > -1){
-                 newAnswerGroups[0].ruleSpecs[0].inputs.x.splice(index, 1);
-                 newCustomizationArgs.maxAllowableSelectionCount.value--;
-                 newCustomizationArgs.minAllowableSelectionCount.value--;
-              }
-              else{
-                newAnswerGroups[0].ruleSpecs[0].inputs.x.push(value);
-                newCustomizationArgs.maxAllowableSelectionCount.value++;
-                newCustomizationArgs.minAllowableSelectionCount.value++;
-              }
-              if (answerGroups.length === 1) {
-                newCustomizationArgs.maxAllowableSelectionCount.value = 1;
-                newCustomizationArgs.minAllowableSelectionCount.value = 1;
-              }
+              var index = newAnswerGroups[0]["rules"][0]["inputs"]["x"].length;
+              console.log(newAnswerGroups);
+              console.log(index+""+value);
 
-              /* If some other answer group has this answer, remove it.
+              if(newAnswerGroups[0]["rules"][0]["inputs"]["x"].includes(value) ){
+                  var position = newAnswerGroups[0]["rules"][0]["inputs"]["x"].indexOf(value);
+                  newAnswerGroups[0].rules[0].inputs.x.splice(position, 1);
+                  newCustomizationArgs.maxAllowableSelectionCount.value--;
+                  newCustomizationArgs.minAllowableSelectionCount.value--;
+               }
+               else{
+                 newAnswerGroups[0].rules[0].inputs.x.push(value);
+                 newCustomizationArgs.maxAllowableSelectionCount.value++;
+                 newCustomizationArgs.minAllowableSelectionCount.value++;
+               }
+
+              // If some other answer group has this answer, remove it.
               for (var i = 1; i < answerGroups.length; i++) {
-                if (answerGroups[i].ruleSpecs[0].inputs.x !== index) {
+                if (answerGroups[i].rules[0].inputs.x !== index) {
                   newAnswerGroups.push(answerGroups[i]);
                 }
-              }*/
+              }
 
               $scope.saveAnswerGroups({
                 newValue: newAnswerGroups
               });
-
+              $scope.saveCustomizationArgs({
+                newValue: newCustomizationArgs
+              });
               // Focus on the "response to correct answer" field, since it is
               // likely to need changing.
               $scope.$broadcast('openEditorHtmlField', {
@@ -271,9 +270,6 @@ oppia.directive('checkBoxEditor', [
               });
 
             }
-            $scope.saveCustomizationArgs({
-              newValue: newCustomizationArgs
-            });
           };
 
           $scope.saveCorrectAnswerFeedback = function(newFeedback) {

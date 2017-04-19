@@ -33,6 +33,7 @@ oppia.factory('StatesToQuestionsService', [
 
     var allowedInteractionIds = SUPPORTED_INTERACTION_TYPES.map(
       function(interactionTypeData) {
+
         return interactionTypeData.id;
       }
     );
@@ -93,6 +94,7 @@ oppia.factory('StatesToQuestionsService', [
 
         // Check that the interaction ID is valid.
         var interactionId = interaction.id;
+
         if (!interactionId ||
             interactionId === INTERACTION_ID_END_EXPLORATION) {
           // The end of the chain has been reached.
@@ -105,6 +107,7 @@ oppia.factory('StatesToQuestionsService', [
 
         // Check that the customizationArgs and the rules for each answer
         // group are valid.
+
         var checkerService = $injector.get(interactionId + 'CheckerService');
         if (!checkerService.isValid(
             interaction.customizationArgs, interaction.answerGroups)) {
