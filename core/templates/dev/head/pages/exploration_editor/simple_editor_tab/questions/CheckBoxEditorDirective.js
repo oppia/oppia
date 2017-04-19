@@ -173,7 +173,6 @@ oppia.directive('checkBoxEditor', [
 
           $scope.deleteChoice = function(value) {
             var newCustomizationArgs = $scope.getCustomizationArgs();
-            console.log(newCustomizationArgs);
             if(newCustomizationArgs["choices"]["value"].length === 1){
               throw Error(
                 'Cannot delete choice when there is only 1 choice remaining.');
@@ -191,8 +190,6 @@ oppia.directive('checkBoxEditor', [
                if(newAnswerGroups[0]["rules"][0]["inputs"]["x"].includes(value) ){
                    var position = newAnswerGroups[0]["rules"][0]["inputs"]["x"].indexOf(value);
                    newAnswerGroups[0].rules[0].inputs.x.splice(position, 1);
-                   console.log(newAnswerGroups);
-                   console.loh(newCustomizationArgs);
                 }
            }
             $scope.saveAnswerGroups({
@@ -228,15 +225,12 @@ oppia.directive('checkBoxEditor', [
               $scope.saveAnswerGroups({
                 newValue: newAnswerGroups
               });
-              console.log(newAnswerGroups);
             } else {
 
               var newCustomizationArgs = $scope.getCustomizationArgs();
 
               newAnswerGroups.push(answerGroups[0]);
               var index = newAnswerGroups[0]["rules"][0]["inputs"]["x"].length;
-              console.log(newAnswerGroups);
-              console.log(index+""+value);
 
               if(newAnswerGroups[0]["rules"][0]["inputs"]["x"].includes(value) ){
                   var position = newAnswerGroups[0]["rules"][0]["inputs"]["x"].indexOf(value);

@@ -66,7 +66,6 @@ oppia.factory('SimpleEditorManagerService', [
         }
       }
     };
-    //console.log(data);
     var getNewStateName = function() {
       var allStateNames = data.questionList.getAllStateNames();
 
@@ -146,7 +145,6 @@ oppia.factory('SimpleEditorManagerService', [
             data.questionList.getLastQuestion().getDestinationStateName());
 
             if(type == "multiple"){
-              console.log(lastStateName);
               SimpleEditorShimService.saveInteractionId(
                 lastStateName, DEFAULT_INTERACTION.ID);
               SimpleEditorShimService.saveCustomizationArgs(
@@ -154,7 +152,6 @@ oppia.factory('SimpleEditorManagerService', [
             }
 
             if(type == "itemSelection"){
-              console.log(lastStateName);
               SimpleEditorShimService.saveInteractionId(
                 lastStateName, "ItemSelectionInput");
               SimpleEditorShimService.saveCustomizationArgs(
@@ -168,8 +165,8 @@ oppia.factory('SimpleEditorManagerService', [
           });
 
           var stateData = SimpleEditorShimService.getState(lastStateName);
-          console.log(data.questionList.addQuestion(QuestionObjectFactory.create(
-            lastStateName, stateData.interaction, '')));
+          data.questionList.addQuestion(QuestionObjectFactory.create(
+            lastStateName, stateData.interaction, ''));
 
 
       },
@@ -179,7 +176,6 @@ oppia.factory('SimpleEditorManagerService', [
         //   introduction.
         // - Otherwise, the requirement is that, for the last question in the
         //   list, there is at least one answer group.
-      //  console.log(data);
         if (data.questionList.isEmpty()) {
           return Boolean(data.introductionHtml);
         } else {
