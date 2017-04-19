@@ -56,9 +56,8 @@ def classify(state, answer, exp_id, exp_version, state_name):
     response = None
 
     if interaction_instance.is_string_classifier_trainable:
-        response = classify_string_classifier_rule(state, normalized_answer,
-                                                   exp_id, exp_version,
-                                                   state_name)
+        response = classify_string_classifier_rule(
+            state, normalized_answer, exp_id, exp_version, state_name)
     else:
         raise Exception('No classifier found for interaction.')
 
@@ -78,11 +77,12 @@ def classify(state, answer, exp_id, exp_version, state_name):
         'exploration owner.')
 
 
-def classify_string_classifier_rule(state, normalized_answer, exp_id,
-                                    exp_version, state_name):
+def classify_string_classifier_rule(
+        state, normalized_answer, exp_id, exp_version, state_name):
     """Run the classifier if no prediction has been made yet. Currently this
     is behind a development flag.
     """
+    owner_id = '0'
     best_matched_answer_group = None
     best_matched_answer_group_index = len(state.interaction.answer_groups)
     best_matched_rule_spec_index = None
@@ -102,29 +102,36 @@ def classify_string_classifier_rule(state, normalized_answer, exp_id,
                 [doc, [str(answer_group_index)]]
                 for doc in classifier_rule_spec.inputs['training_data']])
 
-    exploration = exp_services.get_exploration_by_id(exp_id,
-                                                     version=exp_version)
+    exploration = exp_services.get_exploration_by_id(exp_id)
+    print exploration.title
+    state_obj = exploration.states[state_name]
     algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']
-    if state.classifier_model_id:
-        classifier = get_classifier_by_id(state.classifier_model_id)
+    if state_obj.classifier_model_id:
+        classifier = get_classifier_by_id(state_obj.classifier_model_id)
         sc_dict = classifier.cached_classifier_data
         sc = classifier_registry.Registry.get_classifier_by_algorithm_id(
-            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])
+            algorithm_id)
         sc.from_dict(sc_dict)
 
     else:
         sc = classifier_registry.Registry.get_classifier_by_algorithm_id(
-            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])
+            algorithm_id)
         sc.train(training_examples)
         cached_classifier_data = sc.to_dict()
         schema_version = exploration.states_schema_version
-        classifier = classifier_domain.Classifier('0', exploration.id,
-                                                  exp_version,
-                                                  state_name, algorithm_id,
-                                                  cached_classifier_data,
-                                                  schema_version)
+        classifier = classifier_domain.Classifier(
+            '0', exploration.id, exp_version, state_name, algorithm_id,
+            cached_classifier_data, schema_version)
         classifier_id = save_classifier(classifier)
-        state.classifier_model_id = classifier_id
+        #state.classifier_model_id = classifier_id
+        change_list = [{
+            'cmd': 'edit_state_property',
+            'state_name': state_name,
+            'property_name': 'classifier_model_id',
+            'new_value': classifier_id
+        }]
+        exp_services.update_exploration(
+            owner_id, exp_id, change_list, '')
 
     if len(training_examples) > 0:
         labels = sc.predict([normalized_answer])

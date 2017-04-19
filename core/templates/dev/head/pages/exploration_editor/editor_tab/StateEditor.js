@@ -164,7 +164,7 @@ oppia.factory('trainingModalService', [
 
               $scope.init = function() {
                 var explorationId =
-                  explorationContextService.getExploratonId();
+                  explorationContextService.getExplorationId();
                 var explorationVersion =
                   oppiaPlayerService.getExplorationVersion();
                 var currentStateName =

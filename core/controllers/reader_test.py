@@ -22,6 +22,7 @@ from core.domain import param_domain
 from core.domain import rights_manager
 from core.tests import test_utils
 import feconf
+import utils
 
 
 class ReaderPermissionsTest(test_utils.GenericTestBase):
@@ -115,46 +116,47 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
         self.enable_string_classifier = self.swap(
             feconf, 'ENABLE_STRING_CLASSIFIER', True)
 
-        # Reading YAML exploration into a dictionary.
-        yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                 '../tests/data/string_classifier_test.yaml')
-        with open(yaml_path, 'r') as yaml_file:
-            self.yaml_content = yaml_file.read()
-
         self.login(self.VIEWER_EMAIL)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
         # Load demo exploration.
-        self.exp_id = '0'
+        self.unused_exp_id = '0'
+        self.exp_id = '16'
         self.title = 'Testing String Classifier'
         self.category = 'Test'
         self.state_name = 'Home'
-        exp_services.delete_demo(self.exp_id)
-        exp_services.load_demo(self.exp_id)
+        exp_services.delete_demo(self.unused_exp_id)
+        exp_services.load_demo(self.unused_exp_id)
 
-        # Creating the exploration domain object.
-        self.exploration = exp_domain.Exploration.from_untitled_yaml(
-            self.exp_id,
-            self.title,
-            self.category,
-            self.yaml_content)
+        test_exp_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, self.exp_id,
+            assets_list)
+
+        self.exp_state = (
+            exp_services.get_exploration_by_id(self.exp_id).states['Home'])
+        self.exp_version = (
+            exp_services.get_exploration_by_id(self.exp_id).version)
 
     def test_classification_handler(self):
         """Test the classification handler for a right answer."""
 
         with self.enable_string_classifier:
             # Testing the handler for a correct answer.
-            old_state_dict = self.exploration.states[self.state_name].to_dict()
+            old_state_dict = self.exp_state.to_dict()
             answer = 'Permutations'
             params = {}
-            exp_version = self.exploration.version
-            res = self.post_json('/explorehandler/classify/%s' % self.exp_id,
+            res = self.post_json('/explorehandler/classify/%s'
+                                 % self.unused_exp_id,
                                  {'params' : params,
                                   'old_state' : old_state_dict,
                                   'answer' : answer,
                                   'state_name' : self.state_name,
                                   'exp_id' : self.exp_id,
-                                  'exp_version' : exp_version})
+                                  'exp_version' : self.exp_version})
             self.assertEqual(res['outcome']['feedback'][0],
                              '<p>Detected permutation.</p>')
 
