@@ -140,3 +140,10 @@ libraries:
 # running the server in the dev environment.
 env_variables:
   MINIFICATION: false
+
+skip_files:
+- \.gitignore
+- ^\.git/.*
+- \.*\.lint$
+- ^fabfile\.py
+- ^testrunner\.py

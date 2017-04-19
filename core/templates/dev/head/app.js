@@ -24,7 +24,7 @@ var oppia = angular.module(
     'ngMaterial', 'ngAnimate', 'ngSanitize', 'ngTouch', 'ngResource',
     'ui.bootstrap', 'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop',
     'ui.validate', 'textAngular', 'pascalprecht.translate', 'ngCookies',
-    'toastr', 'ngDragDrop'
+    'toastr'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
                    : []));

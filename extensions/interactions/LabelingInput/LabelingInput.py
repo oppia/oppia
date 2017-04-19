@@ -24,7 +24,7 @@ class LabelingInput(base.BaseInteraction):
     description = 'Allows learners to label pictures.'
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     # is_trainable = False
-    _dependency_ids = []
+    _dependency_ids = ['dragdrop']
     answer_type = 'ClickOnImage'
     instructions = 'Drag in the correct labels.'
     narrow_instructions = 'Label the image'
