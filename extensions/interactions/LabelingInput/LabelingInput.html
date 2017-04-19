@@ -98,13 +98,13 @@
   style="
     left: <[region.startX + getLeftDelta()]>px;
     top: <[region.startY + getTopDelta()]>px;
-    width: <[getLineDistance(region.startX, region.endX, region.startY, region.endY)]>px;
+    width: <[getLineDistance(region.startX, region.region.area[0][0] * getImageWidth(), region.startY, region.region.area[0][1] * getImageHeight())]>px;
     height: 2px;
     stroke: rgb(0,0,0);
     stroke-width: 3;
     position: absolute;
     background: rgba(255,0,0,0.5);
-    transform: rotate(<[convertArctan(region.startX, region.endX, region.startY, region.endY)]>rad);
+    transform: rotate(<[convertArctan(region.startX, region.region.area[0][0] * getImageWidth(), region.startY, region.region.area[0][1] * getImageHeight())]>rad);
     transform-origin: 0% 0%;
   ">
     <!-- /*width: <[region.region.area[0][0] * getImageWidth() - region.startX]>px;*/ -->
