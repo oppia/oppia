@@ -35,10 +35,7 @@ oppia.directive('oppiaInteractiveLabelingInput', [
         '$scope', '$element', '$attrs', function($scope, $element, $attrs) {
           var imageAndLabels = oppiaHtmlEscaper.escapedJsonToObj(
             $attrs.imageAndLabelsWithValue);
-          $scope.highlightRegionsOnHover =
-            ($attrs.highlightRegionsOnHoverWithValue === 'true');
-          $scope.alwaysShowRegions =
-            ($attrs.alwaysShowRegionsWithValue === 'true');
+          $scope.alwaysShowRegions = 'true';
           if ($scope.alwaysShowRegions) {$scope.highlightRegionsOnHover = false;}
           $scope.filepath = imageAndLabels.imagePath;
           $scope.imageUrl = (
@@ -48,9 +45,64 @@ oppia.directive('oppiaInteractiveLabelingInput', [
               '/' + encodeURIComponent($scope.filepath)) : null);
           $scope.mouseX = 0;
           $scope.mouseY = 0;
+          $scope.list1 = [];
+          $scope.correctElements = [];
+          $scope.incorrectElements = [];
+          $scope.currentDraggedElement = "";
           $scope.currentlyHoveredRegions = [];
           $scope.allRegions = imageAndLabels.labeledRegions;
           console.log($scope.allRegions);
+          //Ensure no duplicates of elements in our element tracking arrays
+          $scope.checkAndRemoveElement = function(name){
+            var index = $scope.correctElements.indexOf(name);
+            if (index > -1){
+              $scope.correctElements.splice(index, 1);
+            }
+            index = $scope.incorrectElements.indexOf(name);
+            if (index > -1){
+              $scope.incorrectElements.splice(index, 1);
+            }
+            return;
+          }
+          //Get the current element label
+          $scope.getThisName = function(event, ui, name){
+            console.log(name);
+            console.log("Element selected: ".concat(name));
+            $scope.checkAndRemoveElement(name);
+            $scope.currentDraggedElement = name;
+            return;
+          }
+          //If all labels have been placed, run a correctness check
+          $scope.runSubmitCheck = function(){
+            console.log("Incorrect Ones");
+            console.log($scope.incorrectElements.length);
+            console.log($scope.incorrectElements);
+            $scope.onSubmit({
+              answer: {
+                clickPosition: [$scope.mouseX, $scope.mouseY],
+                clickedRegions: $scope.currentlyHoveredRegions,
+                incorrectElements: $scope.incorrectElements
+              },
+              rulesService: imageClickInputRulesService
+            });
+          }
+          //Check if our value is the one of the region, and handle acccordingly
+          $scope.checkTheValues = function(event, ui, correctName){
+            if (correctName == $scope.currentDraggedElement){
+              console.log("Correct!");
+              $scope.correctElements.push($scope.currentDraggedElement);
+            } else {
+              console.log("Incorrect");
+              console.log(correctName);
+              console.log($scope.currentDraggedElement);
+              $scope.incorrectElements.push($scope.currentDraggedElement);
+            }
+            var correctLen = $scope.correctElements.length;
+            var incorrectLen = $scope.incorrectElements.length;
+            if ((correctLen + incorrectLen) === $scope.allRegions.length){
+              $scope.runSubmitCheck();
+            }
+          }
           $scope.getRegionDimensions = function(index) {
             var image = $($element).find('.oppia-image-click-img');
             var labeledRegion = imageAndLabels.labeledRegions[index];
@@ -117,11 +169,13 @@ oppia.directive('oppiaInteractiveLabelingInput', [
               }
             }
           };
+          //TODO: Delete below
           $scope.onClickImage = function() {
             $scope.onSubmit({
               answer: {
                 clickPosition: [$scope.mouseX, $scope.mouseY],
-                clickedRegions: $scope.currentlyHoveredRegions
+                clickedRegions: $scope.currentlyHoveredRegions,
+                incorrectElements: $scope.incorrectElements
               },
               rulesService: imageClickInputRulesService
             });
@@ -171,13 +225,15 @@ oppia.factory('imageClickInputRulesService', [function() {
     Answer has clicked regions, check that the label of the clicked
     region matches that of the dropped label
     */
-    IsInRegion: function(answer, inputs) {
-      return answer.clickedRegions.indexOf(inputs.x) !== -1;
-    },
-    IsNotInRegion: function(answer, inputs){
+    GetsAllCorrect: function(answer, inputs){
       console.log(answer)
       console.log(inputs)
-      return answer.clickedRegions.indexOf(inputs.x) === -1;
+      return answer.incorrectElements.length === 0;
+    },
+    Misses: function(answer, inputs){
+      console.log(answer)
+      console.log(inputs)
+      return answer.incorrectElements.indexOf(inputs.x) !== -1;      
     }
   };
 }]);

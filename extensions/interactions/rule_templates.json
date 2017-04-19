@@ -67,11 +67,11 @@
   "FillInTheBlank": {
   },
   "LabelingInput": {
-    "IsInRegion": {
-      "description": "is in the region {{x|UnicodeString}}"
+    "GetsAllCorrect": {
+      "description": "gets all values correct"
     },
-    "IsNotInRegion": {
-      "description": "is not in the region {{x|UnicodeString}}"
+    "Misses": {
+      "description": "does not correctly get the value {{x|UnicodeString}}"
     }
   },  
   "MathExpressionInput": {

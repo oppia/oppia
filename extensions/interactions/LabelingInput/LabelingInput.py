@@ -41,19 +41,4 @@ class LabelingInput(base.BaseInteraction):
             'imagePath': '',
             'labeledRegions': []
         },
-        #TODO Change below to a radio button-esque format
-    }, {
-        'name': 'highlightRegionsOnHover',
-        'description': 'Highlight regions when the learner hovers over them',
-        'schema': {
-            'type': 'bool',
-        },
-        'default_value': False
-    }, {
-        'name': 'alwaysShowRegions',
-        'description': 'Always show the labeled regions (without labels)',
-        'schema': {
-            'type': 'bool',
-        },
-        'default_value': False
     }]
