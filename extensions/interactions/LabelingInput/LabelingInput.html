@@ -93,17 +93,25 @@
     </div>
   </div>
 
-    </div>
-    <!-- x2 and y2 are NAN -->
-  <line ng-repeat="region in allRegions",
-        ng-attr-x1="<[region.startX]>",
-        ng-attr-y1="<[region.startY]>",
-        ng-attr-x2="<[region.region.area[0][0] * getImageWidth()]>",
-        ng-attr-y2="<[region.region.area[0][1] * getImageHeight()]>"
-        style="stroke:rgb(0,0,0);stroke-width:2"
-    >
-    </line>
-
+  <div ng-repeat="region in allRegions"
+  class="line"
+  style="
+    left: <[region.startX + getLeftDelta()]>px;
+    top: <[region.startY + getTopDelta()]>px;
+    width: <[getLineDistance(region.startX, region.endX, region.startY, region.endY)]>px;
+    height: 2px;
+    stroke: rgb(0,0,0);
+    stroke-width: 3;
+    position: absolute;
+    background: rgba(255,0,0,0.5);
+    transform: rotate(<[convertArctan(region.startX, region.endX, region.startY, region.endY)]>rad);
+    transform-origin: 0% 0%;
+  ">
+    <!-- /*width: <[region.region.area[0][0] * getImageWidth() - region.startX]>px;*/ -->
+      <!-- /*transform: rotate(<[convertArctan(region.startX + getLeftDelta(), ...)]>rad);*/ -->
+    <!-- /*transform-origin: 0% 0%;*/ -->
+  </div>
+</div>
 </script>
 
 <script type="text/ng-template" id="response/LabelingInput">

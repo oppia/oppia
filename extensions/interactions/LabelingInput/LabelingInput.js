@@ -74,6 +74,33 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           $scope.inlineRegionDisplay = function(){
             return 'inline';
           }
+          $scope.getImageWidth = function(){
+            var image = $($element).find('.oppia-image-click-img');
+            return image.width();
+          }
+          $scope.getImageHeight = function(){
+            var image = $($element).find('.oppia-image-click-img');
+            return image.height();
+          }
+          $scope.getLeftDelta = function(){
+            var image = $($element).find('.oppia-image-click-img');
+            return image.offset().left - image.parent().offset().left;
+          }
+          $scope.getTopDelta = function(){
+            var image = $($element).find('.oppia-image-click-img');
+            return image.offset().top - image.parent().offset().top;
+          }
+          $scope.getLineDistance = function(x1, x2, y1, y2){
+            var xDiff = Math.pow((x2 - x1), 2);
+            var yDiff = Math.pow((y2 - y1), 2);
+            return Math.sqrt(xDiff + yDiff);
+          }
+          $scope.convertArctan = function(x1, x2, y1, y2){
+            if (x2 < x1) {
+              return Math.atan((y2 - y1) / (x2 - x1)) + Math.PI;
+            }
+            return Math.atan((y2 - y1) / (x2 - x1));
+          }
           $scope.onMousemoveImage = function(event) {
             var image = $($element).find('.oppia-image-click-img');
             $scope.mouseX = (event.pageX - image.offset().left) / image.width();
