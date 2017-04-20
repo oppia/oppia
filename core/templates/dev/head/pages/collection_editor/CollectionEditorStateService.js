@@ -24,15 +24,19 @@ oppia.constant('EVENT_COLLECTION_REINITIALIZED', 'collectionReinitialized');
 
 oppia.factory('CollectionEditorStateService', [
   '$rootScope', 'alertsService', 'CollectionObjectFactory',
+  'CollectionRightsBackendApiService', 'CollectionRightsObjectFactory',
   'SkillListObjectFactory', 'UndoRedoService',
   'EditableCollectionBackendApiService', 'EVENT_COLLECTION_INITIALIZED',
   'EVENT_COLLECTION_REINITIALIZED', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
   function(
       $rootScope, alertsService, CollectionObjectFactory,
+      CollectionRightsBackendApiService, CollectionRightsObjectFactory,
       SkillListObjectFactory, UndoRedoService,
       EditableCollectionBackendApiService, EVENT_COLLECTION_INITIALIZED,
       EVENT_COLLECTION_REINITIALIZED, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
     var _collection = CollectionObjectFactory.createEmptyCollection();
+    var _collectionRights = (
+      CollectionRightsObjectFactory.createEmptyCollectionRights());
     var _collectionSkillList = SkillListObjectFactory.create([]);
     var _collectionIsInitialized = false;
     var _isLoadingCollection = false;
@@ -57,6 +61,13 @@ oppia.factory('CollectionEditorStateService', [
       _setCollection(CollectionObjectFactory.create(
         newBackendCollectionObject));
     };
+    var _setCollectionRights = function(collectionRights) {
+      _collectionRights.copyFromCollectionRights(collectionRights);
+    };
+    var _updateCollectionRights = function(newBackendCollectionRightsObject) {
+      _setCollectionRights(CollectionRightsObjectFactory.create(
+        newBackendCollectionRightsObject));
+    };
 
     // TODO(bhenning): Do this more efficiently by passing the change object
     // and whether it was a forward change from the UndoRedoService through the
@@ -76,11 +87,20 @@ oppia.factory('CollectionEditorStateService', [
           collectionId).then(
           function(newBackendCollectionObject) {
             _updateCollection(newBackendCollectionObject);
-            _isLoadingCollection = false;
           },
           function(error) {
             alertsService.addWarning(
               error || 'There was an error when loading the collection.');
+            _isLoadingCollection = false;
+          });
+        CollectionRightsBackendApiService.fetchCollectionRights(
+          collectionId).then(function(newBackendCollectionRightsObject) {
+            _updateCollectionRights(newBackendCollectionRightsObject);
+            _isLoadingCollection = false;
+          }, function(error) {
+            alertsService.addWarning(
+              error ||
+              'There was an error when loading the collection rights.');
             _isLoadingCollection = false;
           });
       },
@@ -114,6 +134,18 @@ oppia.factory('CollectionEditorStateService', [
       },
 
       /**
+       * Returns the current collection rights to be shared among the collection
+       * editor. Please note any changes to this collection rights will be
+       * propogated to all bindings to it. This collection rights object will
+       * be retained for the lifetime of the editor. This function never returns
+       * null, though it may return an empty collection rights object if the
+       * collection rights has not yet been loaded for this editor instance.
+       */
+      getCollectionRights: function() {
+        return _collectionRights;
+      },
+
+      /**
        * Sets the collection stored within this service, propogating changes to
        * all bindings to the collection returned by getCollection(). The first
        * time this is called it will fire a global event based on the
@@ -122,6 +154,18 @@ oppia.factory('CollectionEditorStateService', [
        */
       setCollection: function(collection) {
         _setCollection(collection);
+      },
+
+      /**
+       * Sets the collection rights stored within this service, propogating
+       * changes to all bindings to the collection returned by
+       * getCollectionRights(). The first time this is called it will fire a
+       * global event based on the EVENT_COLLECTION_INITIALIZED constant. All
+       * subsequent calls will similarly fire a EVENT_COLLECTION_REINITIALIZED
+       * event.
+       */
+      setCollectionRights: function(collectionRights) {
+        _setCollectionRights(collectionRights);
       },
 
       /**

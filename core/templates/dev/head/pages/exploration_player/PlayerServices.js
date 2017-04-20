@@ -70,12 +70,12 @@ oppia.factory('oppiaPlayerService', [
     var makeParams = function(oldParams, paramChanges, envs) {
       var newParams = angular.copy(oldParams);
       if (paramChanges.every(function(pc) {
-        if (pc.generator_id === 'Copier') {
-          if (!pc.customization_args.parse_with_jinja) {
-            newParams[pc.name] = pc.customization_args.value;
+        if (pc.generatorId === 'Copier') {
+          if (!pc.customizationArgs.parse_with_jinja) {
+            newParams[pc.name] = pc.customizationArgs.value;
           } else {
             var paramValue = expressionInterpolationService.processUnicode(
-              pc.customization_args.value, [newParams].concat(envs));
+              pc.customizationArgs.value, [newParams].concat(envs));
             if (paramValue === null) {
               return false;
             }
@@ -84,7 +84,7 @@ oppia.factory('oppiaPlayerService', [
         } else {
           // RandomSelector.
           newParams[pc.name] = randomFromArray(
-            pc.customization_args.list_of_values);
+            pc.customizationArgs.list_of_values);
         }
         return true;
       })) {
@@ -197,7 +197,8 @@ oppia.factory('oppiaPlayerService', [
               apply_draft: true
             }
           }).then(function(response) {
-            exploration = ExplorationObjectFactory.create(response.data);
+            exploration = ExplorationObjectFactory.createFromBackendDict(
+              response.data);
             exploration.setInitialStateName(initStateName);
             initParams(manualParamChanges);
             _loadInitialState(successCallback);
@@ -209,7 +210,8 @@ oppia.factory('oppiaPlayerService', [
             }) + (version ? '?v=' + version : '');
           $http.get(explorationDataUrl).then(function(response) {
             var data = response.data;
-            exploration = ExplorationObjectFactory.create(data.exploration);
+            exploration = ExplorationObjectFactory.createFromBackendDict(
+              data.exploration);
             version = data.version;
 
             initParams([]);
@@ -288,7 +290,7 @@ oppia.factory('oppiaPlayerService', [
               LearnerParamsService.getAllParams(),
               answer,
               classificationResult.answerGroupIndex,
-              classificationResult.ruleSpecIndex);
+              classificationResult.ruleIndex);
           }
 
           // Use angular.copy() to clone the object
@@ -302,12 +304,12 @@ oppia.factory('oppiaPlayerService', [
           if (outcome.dest === playerTranscriptService.getLastStateName()) {
             for (var i = 0; i < oldState.interaction.fallbacks.length; i++) {
               var fallback = oldState.interaction.fallbacks[i];
-              if (fallback.trigger.trigger_type === 'NthResubmission' &&
-                  fallback.trigger.customization_args.num_submits.value ===
+              if (fallback.trigger.type === 'NthResubmission' &&
+                  fallback.trigger.customizationArgs.num_submits.value ===
                     playerTranscriptService.getNumSubmitsForLastCard()) {
                 outcome.dest = fallback.outcome.dest;
                 outcome.feedback = fallback.outcome.feedback;
-                outcome.param_changes = fallback.outcome.param_changes;
+                outcome.paramChanges = fallback.outcome.paramChanges;
                 break;
               }
             }

@@ -42,6 +42,23 @@ describe('Editor context service', function() {
   });
 });
 
+describe('Angular names service', function() {
+  beforeEach(module('oppia'));
+
+  describe('angular name service', function() {
+    var ans = null;
+
+    beforeEach(inject(function($injector) {
+      ans = $injector.get('angularNameService');
+    }));
+
+    it('should map interaction ID to correct RulesService', function() {
+      expect(ans.getNameOfInteractionRulesService('TextInput')).toEqual(
+        'textInputRulesService');
+    });
+  });
+});
+
 describe('Change list service', function() {
   beforeEach(module('oppia'));
 
@@ -240,6 +257,7 @@ describe('Change list service', function() {
             value: 'Tips'
           }
         },
+        panel: 'right',
         visible_in_states: ['newState1']
       };
       cls.addGadget(gadgetDict);
@@ -262,8 +280,10 @@ describe('Change list service', function() {
               value: 'Tips'
             }
           },
+          panel: 'right',
           visible_in_states: ['newState1']
-        }
+        },
+        panel: 'right'
       }]);
       expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
@@ -801,6 +821,7 @@ describe('New state template service', function() {
 
     beforeEach(inject(function($injector) {
       GLOBALS.NEW_STATE_TEMPLATE = {
+        classifier_model_id: null,
         content: [{
           type: 'text',
           value: ''
@@ -834,14 +855,15 @@ describe('New state template service', function() {
           nsts.getNewStateTemplate(NEW_STATE_NAME)
         ))).toEqual({
           name: 'new state name',
+          classifierModelId: null,
           content: [{
             type: 'text',
             value: ''
           }],
           interaction: {
-            answer_groups: [],
-            confirmed_unclassified_answers: [],
-            customization_args: {
+            answerGroups: [],
+            confirmedUnclassifiedAnswers: [],
+            customizationArgs: {
               rows: {
                 value: 1
               },
@@ -849,10 +871,10 @@ describe('New state template service', function() {
                 value: 'Type your answer here.'
               }
             },
-            default_outcome: {
+            defaultOutcome: {
               dest: NEW_STATE_NAME,
               feedback: [],
-              param_changes: []
+              paramChanges: []
             },
             fallbacks: [],
             id: 'TextInput'

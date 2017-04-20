@@ -58,12 +58,14 @@ var expectCurrentCategorySelectionToBe = function(expectedCategories) {
 // Returns a promise of all explorations with the given name.
 var _getExplorationElements = function(name) {
   return element.all(by.css('.protractor-test-exp-summary-tile')).filter(
-      function(tile) {
-    return tile.element(by.css('.protractor-test-exp-summary-tile-title')).
+    function(tile) {
+      return tile.element(by.css('.protractor-test-exp-summary-tile-title')).
         getText().then(function(tileTitle) {
-      return (tileTitle === name);
-    });
-  });
+          return (tileTitle === name);
+        }
+      );
+    }
+  );
 };
 
 var expectExplorationToBeVisible = function(name) {

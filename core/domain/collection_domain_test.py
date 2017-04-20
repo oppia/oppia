@@ -573,6 +573,47 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
             collection_domain.Collection.from_yaml('collection3', None)
 
 
+class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
+    """Tests the presence of appropriate schema migration methods in the
+    Collection domain object class.
+    """
+
+    def test_correct_collection_contents_schema_conversion_methods_exist(self):
+        """Test that the right collection_contents schema conversion methods
+        exist.
+        """
+        current_collection_schema_version = (
+            feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
+        for version_num in range(1, current_collection_schema_version):
+            self.assertTrue(hasattr(
+                collection_domain.Collection,
+                '_convert_collection_contents_v%s_dict_to_v%s_dict' % (
+                    version_num, version_num + 1)))
+
+        self.assertFalse(hasattr(
+            collection_domain.Collection,
+            '_convert_collection_contents_v%s_dict_to_v%s_dict' % (
+                current_collection_schema_version,
+                current_collection_schema_version + 1)))
+
+    def test_correct_collection_schema_conversion_methods_exist(self):
+        """Test that the right collection schema conversion methods exist."""
+        current_collection_schema_version = (
+            feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
+
+        for version_num in range(1, current_collection_schema_version):
+            self.assertTrue(hasattr(
+                collection_domain.Collection,
+                '_convert_v%s_dict_to_v%s_dict' % (
+                    version_num, version_num + 1)))
+
+        self.assertFalse(hasattr(
+            collection_domain.Collection,
+            '_convert_v%s_dict_to_v%s_dict' % (
+                current_collection_schema_version,
+                current_collection_schema_version + 1)))
+
+
 class SchemaMigrationUnitTests(test_utils.GenericTestBase):
     """Test migration methods for yaml content."""
 

@@ -227,13 +227,13 @@ oppia.factory('ExplorationDiffService', [
       }
       for (var stateName in states) {
         var interaction = states[stateName].interaction;
-        var groups = interaction.answer_groups;
+        var groups = interaction.answerGroups;
         for (var h = 0; h < groups.length; h++) {
           var dest = groups[h].outcome.dest;
           adjMatrix[stateIds[stateName]][stateIds[dest]] = true;
         }
-        if (interaction.default_outcome) {
-          var defaultDest = interaction.default_outcome.dest;
+        if (interaction.defaultOutcome) {
+          var defaultDest = interaction.defaultOutcome.dest;
           adjMatrix[stateIds[stateName]][stateIds[defaultDest]] = true;
         }
       }

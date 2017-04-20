@@ -32,7 +32,8 @@ oppia.directive('collectionSummaryTile', [function() {
       getLastUpdatedMsec: '&lastUpdatedMsec',
       getThumbnailIconUrl: '&thumbnailIconUrl',
       getThumbnailBgColor: '&thumbnailBgColor',
-      isLinkedToEditorPage: '=?isLinkedToEditorPage'
+      isLinkedToEditorPage: '=?isLinkedToEditorPage',
+      getCategory: '&category'
     },
     templateUrl: 'summaryTile/collection',
     controller: [
@@ -41,9 +42,6 @@ oppia.directive('collectionSummaryTile', [function() {
       oppiaDatetimeFormatter, UrlInterpolationService, COLLECTION_VIEWER_URL,
       COLLECTION_EDITOR_URL) {
         $scope.DEFAULT_EMPTY_TITLE = 'Untitled';
-        var targetUrl = (
-          $scope.isLinkedToEditorPage ?
-           COLLECTION_EDITOR_URL : COLLECTION_VIEWER_URL);
 
         $scope.getLastUpdatedDatetime = function() {
           return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
@@ -51,6 +49,9 @@ oppia.directive('collectionSummaryTile', [function() {
         };
 
         $scope.getCollectionLink = function() {
+          var targetUrl = (
+            $scope.isLinkedToEditorPage ?
+            COLLECTION_EDITOR_URL : COLLECTION_VIEWER_URL);
           return UrlInterpolationService.interpolateUrl(
             targetUrl, {
               collection_id: $scope.getCollectionId()

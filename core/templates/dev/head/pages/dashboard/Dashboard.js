@@ -31,12 +31,12 @@ oppia.constant('EXPLORATIONS_SORT_BY_KEYS', {
 });
 
 oppia.constant('HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', {
-  TITLE: 'Title',
-  RATING: 'Average Rating',
-  NUM_VIEWS: 'Total Plays',
-  OPEN_FEEDBACK: 'Open Feedback',
-  UNRESOLVED_ANSWERS: 'Unresolved Answers',
-  LAST_UPDATED: 'Last Updated'
+  TITLE: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_TITLE ',
+  RATING: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_AVERAGE_RATING',
+  NUM_VIEWS: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_TOTAL_PLAYS',
+  OPEN_FEEDBACK: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_OPEN_FEEDBACK',
+  UNRESOLVED_ANSWERS: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_UNRESOLVED_ANSWERS',
+  LAST_UPDATED: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_LAST_UPDATED'
 });
 
 oppia.constant('SUBSCRIPTION_SORT_BY_KEYS', {
@@ -111,6 +111,17 @@ oppia.controller('Dashboard', [
 
     $scope.checkMobileView = function() {
       return ($window.innerWidth < 500);
+    };
+
+    $scope.showUsernamePopover = function(subscriberUsername) {
+      // The popover on the subscription card is only shown if the length of
+      // the subscriber username is greater than 10 and the user hovers over
+      // the truncated username.
+      if (subscriberUsername.length > 10) {
+        return 'mouseenter';
+      } else {
+        return 'none';
+      }
     };
 
     $scope.updatesGivenScreenWidth = function() {

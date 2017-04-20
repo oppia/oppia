@@ -28,11 +28,12 @@ describe('Login Flow', function() {
   it('visits the links in the dropdown', function() {
     var profileDropdown = element(by.css('.protractor-test-profile-dropdown'));
 
-    var classNames = ['.protractor-test-profile-link',
-                      '.protractor-test-dashboard-link',
-                      '.protractor-test-preferences-link',
-                      '.protractor-test-notifications-link'
-                     ];
+    var classNames = [
+      '.protractor-test-profile-link',
+      '.protractor-test-dashboard-link',
+      '.protractor-test-preferences-link',
+      '.protractor-test-notifications-link'
+    ];
     classNames.forEach(function(className) {
       browser.actions().mouseMove(profileDropdown).perform();
       profileDropdown.element(by.css(className)).click();

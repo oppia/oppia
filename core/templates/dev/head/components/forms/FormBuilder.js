@@ -201,277 +201,284 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', function($modal) {
       '  </span>' +
       '</div>'),
     controller: [
-        '$scope', '$element', '$filter', '$timeout',
-        function($scope, $element, $filter, $timeout) {
-      if (!$scope.allowedParameterNames().length) {
-        console.error(
-          'The unicode-with-parameters editor should not be used if there ' +
-          'are no unicode parameters available.');
-        return;
-      }
+      '$scope', '$element', '$filter', '$timeout',
+      function($scope, $element, $filter, $timeout) {
+        if (!$scope.allowedParameterNames().length) {
+          console.error(
+            'The unicode-with-parameters editor should not be used if there ' +
+            'are no unicode parameters available.');
+          return;
+        }
 
-      // This is a bit silly. It appears that in contenteditables (in Chrome,
-      // anyway) the cursor will stubbornly remain within the oppia-parameter
-      // element (even though it should be outside it). However the behavior is
-      // correct for images -- so we use images to delimit it. It's still hard
-      // to do selection before the element if it's the first thing in the doc,
-      // after the element if it's the last thing in the doc, or between two
-      // consecutive elements. See this bug for a demonstration:
-      //
-      //     https://code.google.com/p/chromium/issues/detail?id=242110
-      var INVISIBLE_IMAGE_TAG = (
-        '<img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAA' +
-        'BAAEAAAICTAEAOw=="></img>');
-      var PARAM_CONTAINER_CLASS = 'oppia-parameter-container';
+        // This is a bit silly. It appears that in contenteditables (in Chrome,
+        // anyway) the cursor will stubbornly remain within the oppia-parameter
+        // element (even though it should be outside it). However the behavior
+        // is correct for images -- so we use images to delimit it. It's still
+        // hard to do selection before the element if it's the first thing in
+        // the doc, after the element if it's the last thing in the doc, or
+        // between two consecutive elements. See this bug for a demonstration:
+        //
+        //     https://code.google.com/p/chromium/issues/detail?id=242110
+        var INVISIBLE_IMAGE_TAG = (
+          '<img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAA' +
+          'AAABAAEAAAICTAEAOw=="></img>');
+        var PARAM_CONTAINER_CLASS = 'oppia-parameter-container';
 
-      $scope._createRteParameterTag = function(paramName) {
-        var el = $(
-          '<span class="' + PARAM_CONTAINER_CLASS + '" ' +
-                 'contenteditable="false">' +
-            INVISIBLE_IMAGE_TAG +
-              '<oppia-parameter>' +
-                paramName +
-              '</oppia-parameter>' +
-            INVISIBLE_IMAGE_TAG +
-          '</span>');
+        $scope._createRteParameterTag = function(paramName) {
+          var el = $(
+            '<span class="' + PARAM_CONTAINER_CLASS + '" ' +
+                   'contenteditable="false">' +
+              INVISIBLE_IMAGE_TAG +
+                '<oppia-parameter>' +
+                  paramName +
+                '</oppia-parameter>' +
+              INVISIBLE_IMAGE_TAG +
+            '</span>');
 
-        var domNode = el.get(0);
-        domNode.ondblclick = function() {
-          $scope.openEditParameterModal(paramName, domNode);
+          var domNode = el.get(0);
+          domNode.ondblclick = function() {
+            $scope.openEditParameterModal(paramName, domNode);
+          };
+          return domNode;
         };
-        return domNode;
-      };
 
-      // Convert a unicode string into its RTE representation.
-      $scope._convertUnicodeToRte = function(str) {
-        var html = $filter('convertUnicodeWithParamsToHtml')(str);
+        // Convert a unicode string into its RTE representation.
+        $scope._convertUnicodeToRte = function(str) {
+          var html = $filter('convertUnicodeWithParamsToHtml')(str);
 
-        var elt = $('<div>' + html + '</div>');
-        elt.find('oppia-parameter').replaceWith(function() {
-          return $scope._createRteParameterTag(this.textContent);
-        });
-        return elt.html();
-      };
+          var elt = $('<div>' + html + '</div>');
+          elt.find('oppia-parameter').replaceWith(function() {
+            return $scope._createRteParameterTag(this.textContent);
+          });
+          return elt.html();
+        };
 
-      // Convert an RTE representation into a unicode string by removing all
-      // insertion points and replacing <oppia-parameter> tags with {{...}}.
-      $scope._convertRteToUnicode = function(rte) {
-        var elt = $('<div>' + rte + '</div>');
-        // Strip out all additional attributes and class names from the
-        // <oppia-parameter> tag before conversion to a unicode string.
-        elt.find('.' + PARAM_CONTAINER_CLASS).replaceWith(function() {
-          return $('<oppia-parameter/>').text(this.textContent).get(0);
-        });
-        return $filter('convertHtmlWithParamsToUnicode')(elt.html());
-      };
+        // Convert an RTE representation into a unicode string by removing all
+        // insertion points and replacing <oppia-parameter> tags with {{...}}.
+        $scope._convertRteToUnicode = function(rte) {
+          var elt = $('<div>' + rte + '</div>');
+          // Strip out all additional attributes and class names from the
+          // <oppia-parameter> tag before conversion to a unicode string.
+          elt.find('.' + PARAM_CONTAINER_CLASS).replaceWith(function() {
+            return $('<oppia-parameter/>').text(this.textContent).get(0);
+          });
+          return $filter('convertHtmlWithParamsToUnicode')(elt.html());
+        };
 
-      var rteNode = $element[0].querySelector('textarea');
+        var rteNode = $element[0].querySelector('textarea');
 
-      // A pointer to the editorDoc in the RTE iframe. Populated when the RTE
-      // is initialized.
-      $scope.editorDoc = null;
-      $scope.hasFullyLoaded = false;
+        // A pointer to the editorDoc in the RTE iframe. Populated when the RTE
+        // is initialized.
+        $scope.editorDoc = null;
+        $scope.hasFullyLoaded = false;
 
-      // If eltToReplace is null, a new element should be inserted at the
-      // current caret.
-      $scope.openEditParameterModal = function(currentParamName, eltToReplace) {
-        return $modal.open({
-          templateUrl: 'modals/editParamName',
-          backdrop: true,
-          resolve: {
-            allowedParameterNames: function() {
-              return $scope.allowedParameterNames();
-            }
-          },
-          controller: [
-            '$scope', '$modalInstance', 'allowedParameterNames',
-            function($scope, $modalInstance, allowedParameterNames) {
-              $scope.currentParamName = currentParamName;
-              $scope.paramOptions = allowedParameterNames.map(
-                function(paramName) {
-                  return {
-                    name: paramName,
-                    value: paramName
+        // If eltToReplace is null, a new element should be inserted at the
+        // current caret.
+        $scope.openEditParameterModal =
+          function(currentParamName, eltToReplace) {
+            return $modal.open({
+              templateUrl: 'modals/editParamName',
+              backdrop: true,
+              resolve: {
+                allowedParameterNames: function() {
+                  return $scope.allowedParameterNames();
+                }
+              },
+              controller: [
+                '$scope', '$modalInstance', 'allowedParameterNames',
+                function($scope, $modalInstance, allowedParameterNames) {
+                  $scope.currentParamName = currentParamName;
+                  $scope.paramOptions = allowedParameterNames.map(
+                    function(paramName) {
+                      return {
+                        name: paramName,
+                        value: paramName
+                      };
+                    }
+                  );
+
+                  $scope.cancel = function() {
+                    $modalInstance.dismiss('cancel');
+                  };
+
+                  $scope.save = function(paramName) {
+                    $modalInstance.close(paramName);
                   };
                 }
-              );
+              ]
+            }).result.then(function(paramName) {
+              var el = $scope._createRteParameterTag(paramName);
+              if (eltToReplace === null) {
+                var doc = $(rteNode).wysiwyg('document').get(0);
+                $(rteNode).wysiwyg(
+                  'insertHtml', '<span class="insertionPoint"></span>');
+                eltToReplace =
+                  $scope.editorDoc.querySelector('.insertionPoint');
+              }
 
-              $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
-              };
+              // Note that this removes the contenteditable="false" and
+              // ondblclick attributes of el (but they are eventually replaced
+              // during the normalization of the RTE content step). Also, we
+              // need to save the change explicitly because the wysiwyg editor
+              // does not auto-detect replaceWith() events.
+              $(eltToReplace).replaceWith(el);
+              $(rteNode).wysiwyg('save');
+            });
+          };
 
-              $scope.save = function(paramName) {
-                $modalInstance.close(paramName);
-              };
-            }
-          ]
-        }).result.then(function(paramName) {
-          var el = $scope._createRteParameterTag(paramName);
-          if (eltToReplace === null) {
-            var doc = $(rteNode).wysiwyg('document').get(0);
-            $(rteNode).wysiwyg(
-              'insertHtml', '<span class="insertionPoint"></span>');
-            eltToReplace = $scope.editorDoc.querySelector('.insertionPoint');
+        $scope.insertNewParameter = function() {
+          $scope.openEditParameterModal(
+            $scope.allowedParameterNames()[0], null);
+        };
+
+        var rteContentMemento = $scope._convertUnicodeToRte($scope.localValue);
+        $scope.currentlyEditing = false;
+        $scope.$watch('localValue', function() {
+          if (!$scope.currentlyEditing) {
+            // This is an external change.
+            rteContentMemento = $scope._convertUnicodeToRte($scope.localValue);
+            $(rteNode).wysiwyg('setContent', rteContentMemento);
           }
+        }, true);
 
-          // Note that this removes the contenteditable="false" and ondblclick
-          // attributes of el (but they are eventually replaced during the
-          // normalization of the RTE content step). Also, we need to save the
-          // change explicitly because the wysiwyg editor does not auto-detect
-          // replaceWith() events.
-          $(eltToReplace).replaceWith(el);
-          $(rteNode).wysiwyg('save');
-        });
-      };
+        $scope._normalizeRteContent = function(content) {
+          // TODO(sll): Write this method to validate rather than just
+          // normalize.
 
-      $scope.insertNewParameter = function() {
-        $scope.openEditParameterModal($scope.allowedParameterNames()[0], null);
-      };
+          // The only top-level tags should be oppia-parameter tags. Each of
+          // these tags should have a contenteditable=false attribute, a
+          // dblclick handler that opens the parameter modal, and content
+          // consisting of a valid parameter name of type unicode surrounded
+          // by two invisible image tags.
+          var elt = $('<div>' + content + '</div>');
+          elt.find('.' + PARAM_CONTAINER_CLASS).replaceWith(function() {
+            return $scope._createRteParameterTag(this.textContent.trim());
+          });
+          return elt.html();
+        };
 
-      var rteContentMemento = $scope._convertUnicodeToRte($scope.localValue);
-      $scope.currentlyEditing = false;
-      $scope.$watch('localValue', function() {
-        if (!$scope.currentlyEditing) {
-          // This is an external change.
-          rteContentMemento = $scope._convertUnicodeToRte($scope.localValue);
-          $(rteNode).wysiwyg('setContent', rteContentMemento);
-        }
-      }, true);
-
-      $scope._normalizeRteContent = function(content) {
-        // TODO(sll): Write this method to validate rather than just normalize.
-
-        // The only top-level tags should be oppia-parameter tags. Each of these
-        // tags should have a contenteditable=false attribute, a dblclick
-        // handler that opens the parameter modal, and content consisting of a
-        // valid parameter name of type unicode surrounded by two invisible
-        // image tags.
-        var elt = $('<div>' + content + '</div>');
-        elt.find('.' + PARAM_CONTAINER_CLASS).replaceWith(function() {
-          return $scope._createRteParameterTag(this.textContent.trim());
-        });
-        return elt.html();
-      };
-
-      $scope.init = function() {
-        $(rteNode).wysiwyg({
-          autoGrow: true,
-          autoSave: true,
-          controls: {},
-          css: '/css/rte_single_line.css',
-          debug: true,
-          events: {
-            // Prevent dragging, since this causes weird things to happen when
-            // a user selects text containing all or part of parameter tags and
-            // then drags that text elsewhere.
-            dragstart: function(e) {
-              e.preventDefault();
-            },
-            // Prevent use of keyboard shortcuts for bold, italics, etc. Also
-            // prevent pasting, newlines and tabbing.
-            keydown: function(e) {
-              var aKey = 65;
-              var cKey = 67;
-              var xKey = 88;
-              var zKey = 90;
-              var vKey = 86;
-              if (e.ctrlKey) {
-                if (e.keyCode === 86) {
-                  e.preventDefault();
-                  alert(
-                    'Pasting in string input fields is currently not ' +
-                    'supported. Sorry about that!');
-                } else if (
-                    e.keyCode !== aKey && e.keyCode !== cKey &&
-                    e.keyCode !== xKey && e.keyCode !== zKey) {
+        $scope.init = function() {
+          $(rteNode).wysiwyg({
+            autoGrow: true,
+            autoSave: true,
+            controls: {},
+            css: '/css/rte_single_line.css',
+            debug: true,
+            events: {
+              // Prevent dragging, since this causes weird things to happen when
+              // a user selects text containing all or part of parameter tags
+              // and then drags that text elsewhere.
+              dragstart: function(e) {
+                e.preventDefault();
+              },
+              // Prevent use of keyboard shortcuts for bold, italics, etc. Also
+              // prevent pasting, newlines and tabbing.
+              keydown: function(e) {
+                var aKey = 65;
+                var cKey = 67;
+                var xKey = 88;
+                var zKey = 90;
+                var vKey = 86;
+                if (e.ctrlKey) {
+                  if (e.keyCode === 86) {
+                    e.preventDefault();
+                    alert(
+                      'Pasting in string input fields is currently not ' +
+                      'supported. Sorry about that!');
+                  } else if (
+                      e.keyCode !== aKey && e.keyCode !== cKey &&
+                      e.keyCode !== xKey && e.keyCode !== zKey) {
+                    e.preventDefault();
+                  }
+                }
+                // Disable the enter key. Contenteditable does not seem to
+                // support deletion of newlines. Also disable the tab key.
+                if (e.keyCode === 13 || e.keyCode === 9) {
                   e.preventDefault();
                 }
-              }
-              // Disable the enter key. Contenteditable does not seem to support
-              // deletion of newlines. Also disable the tab key.
-              if (e.keyCode === 13 || e.keyCode === 9) {
+              },
+              paste: function(e) {
                 e.preventDefault();
-              }
-            },
-            paste: function(e) {
-              e.preventDefault();
-            },
-            save: function() {
-              var currentContent = $(rteNode).wysiwyg('getContent');
-              if (currentContent === null || currentContent === undefined) {
-                return;
-              }
+              },
+              save: function() {
+                var currentContent = $(rteNode).wysiwyg('getContent');
+                if (currentContent === null || currentContent === undefined) {
+                  return;
+                }
 
-              // Normalize the new content. If a validation error occurs,
-              // revert to the memento, and update the external and internal
-              // values. Otherwise, update the external and internal values
-              // with the normalized content, and update the memento as well.
-              var normalizedContent = '';
-              try {
-                normalizedContent = $scope._normalizeRteContent(currentContent);
-              } catch (unusedException) {
-                console.error('Error parsing RTE content: ' + currentContent);
-                normalizedContent = rteContentMemento;
-              }
+                // Normalize the new content. If a validation error occurs,
+                // revert to the memento, and update the external and internal
+                // values. Otherwise, update the external and internal values
+                // with the normalized content, and update the memento as well.
+                var normalizedContent = '';
+                try {
+                  normalizedContent =
+                    $scope._normalizeRteContent(currentContent);
+                } catch (unusedException) {
+                  console.error('Error parsing RTE content: ' + currentContent);
+                  normalizedContent = rteContentMemento;
+                }
 
-              if (normalizedContent !== currentContent) {
-                $(rteNode).wysiwyg('setContent', normalizedContent);
-              }
+                if (normalizedContent !== currentContent) {
+                  $(rteNode).wysiwyg('setContent', normalizedContent);
+                }
 
-              // Update the external value. The $timeout removes the '$apply in
-              // progress' errors which get triggered if a parameter was edited.
-              $timeout(function() {
-                $scope.$apply(function() {
-                  $scope.currentlyEditing = true;
-                  $scope.localValue = $scope._convertRteToUnicode(
-                    normalizedContent);
-                  // TODO(sll): This is a somewhat hacky solution. Can it be
-                  // cleaned up?
-                  $timeout(function() {
-                    $scope.currentlyEditing = false;
-                  }, 50);
+                // Update the external value. The $timeout removes the '$apply
+                // in progress' errors which get triggered if a parameter was
+                // edited.
+                $timeout(function() {
+                  $scope.$apply(function() {
+                    $scope.currentlyEditing = true;
+                    $scope.localValue = $scope._convertRteToUnicode(
+                      normalizedContent);
+                    // TODO(sll): This is a somewhat hacky solution. Can it be
+                    // cleaned up?
+                    $timeout(function() {
+                      $scope.currentlyEditing = false;
+                    }, 50);
+                  });
                 });
-              });
 
-              // Update the memento.
-              rteContentMemento = normalizedContent;
-            }
-          },
-          iFrameClass: 'wysiwyg-content',
-          initialContent: rteContentMemento,
-          maxHeight: 30,
-          rmUnusedControls: true
-        });
+                // Update the memento.
+                rteContentMemento = normalizedContent;
+              }
+            },
+            iFrameClass: 'wysiwyg-content',
+            initialContent: rteContentMemento,
+            maxHeight: 30,
+            rmUnusedControls: true
+          });
 
-        $scope.editorDoc = $(rteNode).wysiwyg('document')[0].body;
+          $scope.editorDoc = $(rteNode).wysiwyg('document')[0].body;
 
-        // Add dblclick handlers to the various nodes, since they get stripped
-        // in the initialization.
-        var elts = Array.prototype.slice.call(
-          $scope.editorDoc.querySelectorAll('.' + PARAM_CONTAINER_CLASS));
-        elts.forEach(function(elt) {
-          elt.ondblclick = function() {
-            $scope.openEditParameterModal($(elt).text(), elt);
-          };
-        });
+          // Add dblclick handlers to the various nodes, since they get stripped
+          // in the initialization.
+          var elts = Array.prototype.slice.call(
+            $scope.editorDoc.querySelectorAll('.' + PARAM_CONTAINER_CLASS));
+          elts.forEach(function(elt) {
+            elt.ondblclick = function() {
+              $scope.openEditParameterModal($(elt).text(), elt);
+            };
+          });
 
-        $scope.hasFullyLoaded = true;
-      };
+          $scope.hasFullyLoaded = true;
+        };
 
-      $scope.init();
+        $scope.init();
 
-      // TODO(sll): If two RTEs share the same data source, and one RTE saves
-      // a change to the data, the other RTE should be updated. However, if we
-      // just place a $scope.$watch on the data source, then typing in a single
-      // RTE is going to call that method, and this will replace the content of
-      // the RTE -- which is normally not an issue, but in this case it
-      // moves the cursor back to the beginning of the doc and frustrates the
-      // user. We should find a solution for this -- although it probably is
-      // not a common use case to have multiple unicode RTEs referencing the
-      // same data source, there is a problem in that although the Cancel
-      // button does update the data model, it does not update the appearance
-      // of the RTE.
-    }]
+        // TODO(sll): If two RTEs share the same data source, and one RTE saves
+        // a change to the data, the other RTE should be updated. However, if we
+        // just place a $scope.$watch on the data source, then typing in a
+        // single RTE is going to call that method, and this will replace the
+        // content of the RTE -- which is normally not an issue, but in this
+        // case it moves the cursor back to the beginning of the doc and
+        // frustrates the user. We should find a solution for this -- although
+        // it probably is not a common use case to have multiple unicode RTEs
+        // referencing the same data source, there is a problem in that although
+        // the Cancel button does update the data model, it does not update the
+        // appearance of the RTE.
+      }
+    ]
   };
 }]);
 
@@ -740,48 +747,50 @@ oppia.config(['$provide', function($provide) {
           controller: [
             '$scope', '$modalInstance', '$timeout',
             function($scope, $modalInstance, $timeout) {
-            $scope.customizationArgSpecs = customizationArgSpecs;
+              $scope.customizationArgSpecs = customizationArgSpecs;
 
-            // Without this code, the focus will remain in the background RTE
-            // even after the modal loads. This switches the focus to a
-            // temporary field in the modal which is then removed from the DOM.
-            // TODO(sll): Make this switch to the first input field in the modal
-            // instead.
-            $scope.modalIsLoading = true;
-            focusService.setFocus('tmpFocusPoint');
-            $timeout(function() {
-              $scope.modalIsLoading = false;
-            });
-
-            $scope.tmpCustomizationArgs = [];
-            for (var i = 0; i < customizationArgSpecs.length; i++) {
-              var caName = customizationArgSpecs[i].name;
-              $scope.tmpCustomizationArgs.push({
-                name: caName,
-                value: (
-                  attrsCustomizationArgsDict.hasOwnProperty(caName) ?
-                  attrsCustomizationArgsDict[caName] :
-                  customizationArgSpecs[i].default_value)
+              // Without this code, the focus will remain in the background RTE
+              // even after the modal loads. This switches the focus to a
+              // temporary field in the modal which is then removed from the
+              // DOM.
+              // TODO(sll): Make this switch to the first input field in the
+              // modal instead.
+              $scope.modalIsLoading = true;
+              focusService.setFocus('tmpFocusPoint');
+              $timeout(function() {
+                $scope.modalIsLoading = false;
               });
-            }
 
-            $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
-            };
-
-            $scope.save = function() {
-              $scope.$broadcast('externalSave');
-
-              var customizationArgsDict = {};
-              for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
-                var caName = $scope.tmpCustomizationArgs[i].name;
-                customizationArgsDict[caName] = (
-                  $scope.tmpCustomizationArgs[i].value);
+              $scope.tmpCustomizationArgs = [];
+              for (var i = 0; i < customizationArgSpecs.length; i++) {
+                var caName = customizationArgSpecs[i].name;
+                $scope.tmpCustomizationArgs.push({
+                  name: caName,
+                  value: (
+                    attrsCustomizationArgsDict.hasOwnProperty(caName) ?
+                    attrsCustomizationArgsDict[caName] :
+                    customizationArgSpecs[i].default_value)
+                });
               }
 
-              $modalInstance.close(customizationArgsDict);
-            };
-          }]
+              $scope.cancel = function() {
+                $modalInstance.dismiss('cancel');
+              };
+
+              $scope.save = function() {
+                $scope.$broadcast('externalSave');
+
+                var customizationArgsDict = {};
+                for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
+                  var caName = $scope.tmpCustomizationArgs[i].name;
+                  customizationArgsDict[caName] = (
+                    $scope.tmpCustomizationArgs[i].value);
+                }
+
+                $modalInstance.close(customizationArgsDict);
+              };
+            }
+          ]
         });
 
         modalDialog.result.then(onSubmitCallback, onDismissCallback);
@@ -900,101 +909,101 @@ oppia.config(['$provide', function($provide) {
 }]);
 
 oppia.directive('textAngularRte', [
-    '$filter', '$timeout', 'oppiaHtmlEscaper', 'rteHelperService',
-    'textAngularManager',
-    function(
-        $filter, $timeout, oppiaHtmlEscaper, rteHelperService,
-        textAngularManager) {
-      return {
-        restrict: 'E',
-        scope: {
-          htmlContent: '=',
-          uiConfig: '&',
-          labelForFocusTarget: '&'
-        },
-        template: (
-          '<div text-angular="" ta-toolbar="<[toolbarOptionsJson]>" ' +
-          '     ta-paste="stripFormatting($html)" ng-model="tempContent"' +
-          '     placeholder="<[placeholderText]>"' +
-          '     name="<[labelForFocusTarget()]>">' +
-          '</div>'),
-        controller: ['$scope', function($scope) {
-          // Currently, operations affecting the filesystem are allowed only in
-          // the editor context.
-          $scope.isCustomizationModalOpen = false;
-          var toolbarOptions = [
-            ['bold', 'italics'],
-            ['ol', 'ul', 'pre', 'indent', 'outdent'],
-            []
-          ];
-          var whitelistedImgClasses = [];
+  '$filter', '$timeout', 'oppiaHtmlEscaper', 'rteHelperService',
+  'textAngularManager',
+  function(
+    $filter, $timeout, oppiaHtmlEscaper, rteHelperService,
+    textAngularManager) {
+    return {
+      restrict: 'E',
+      scope: {
+        htmlContent: '=',
+        uiConfig: '&',
+        labelForFocusTarget: '&'
+      },
+      template: (
+        '<div text-angular="" ta-toolbar="<[toolbarOptionsJson]>" ' +
+        '     ta-paste="stripFormatting($html)" ng-model="tempContent"' +
+        '     placeholder="<[placeholderText]>"' +
+        '     name="<[labelForFocusTarget()]>">' +
+        '</div>'),
+      controller: ['$scope', function($scope) {
+        // Currently, operations affecting the filesystem are allowed only in
+        // the editor context.
+        $scope.isCustomizationModalOpen = false;
+        var toolbarOptions = [
+          ['bold', 'italics'],
+          ['ol', 'ul', 'pre', 'indent', 'outdent'],
+          []
+        ];
+        var whitelistedImgClasses = [];
 
-          if ($scope.uiConfig() && $scope.uiConfig().placeholder) {
-            $scope.placeholderText = $scope.uiConfig().placeholder;
+        if ($scope.uiConfig() && $scope.uiConfig().placeholder) {
+          $scope.placeholderText = $scope.uiConfig().placeholder;
+        }
+
+        rteHelperService.getRichTextComponents().forEach(
+          function(componentDefn) {
+            if (!($scope.uiConfig() &&
+                  $scope.uiConfig().hide_complex_extensions &&
+                  componentDefn.isComplex)) {
+              toolbarOptions[2].push(componentDefn.name);
+            }
+            var imgClassName = 'oppia-noninteractive-' + componentDefn.name;
+            whitelistedImgClasses.push(imgClassName);
           }
+        );
+        $scope.toolbarOptionsJson = JSON.stringify(toolbarOptions);
 
-          rteHelperService.getRichTextComponents().forEach(
-            function(componentDefn) {
-              if (!($scope.uiConfig() &&
-                    $scope.uiConfig().hide_complex_extensions &&
-                    componentDefn.isComplex)) {
-                toolbarOptions[2].push(componentDefn.name);
-              }
-              var imgClassName = 'oppia-noninteractive-' + componentDefn.name;
-              whitelistedImgClasses.push(imgClassName);
-            }
-          );
-          $scope.toolbarOptionsJson = JSON.stringify(toolbarOptions);
+        var _convertHtmlToRte = function(html) {
+          return rteHelperService.convertHtmlToRte(html);
+        };
 
-          var _convertHtmlToRte = function(html) {
-            return rteHelperService.convertHtmlToRte(html);
-          };
+        $scope.stripFormatting = function(html) {
+          var safeHtml = $filter(
+            'stripFormatting'
+          )(html, whitelistedImgClasses);
+          // The '.' default is needed, otherwise some tags are not stripped
+          // properly. To reproduce, copy the image from this page
+          // (https://en.wikipedia.org/wiki/C._Auguste_Dupin) and paste it
+          // into the RTE.
+          return safeHtml || '.';
+        };
 
-          $scope.stripFormatting = function(html) {
-            var safeHtml = $filter(
-              'stripFormatting'
-            )(html, whitelistedImgClasses);
-            // The '.' default is needed, otherwise some tags are not stripped
-            // properly. To reproduce, copy the image from this page
-            // (https://en.wikipedia.org/wiki/C._Auguste_Dupin) and paste it
-            // into the RTE.
-            return safeHtml || '.';
-          };
+        $scope.init = function() {
+          $scope.tempContent = _convertHtmlToRte($scope.htmlContent);
+        };
 
-          $scope.init = function() {
-            $scope.tempContent = _convertHtmlToRte($scope.htmlContent);
-          };
+        $scope.init();
 
-          $scope.init();
-
-          $scope.$on('focusOn', function(evt, label) {
-            if (label === $scope.labelForFocusTarget()) {
-              var editorScope = textAngularManager.retrieveEditor(label).scope;
-              $timeout(function() {
-                editorScope.displayElements.text[0].focus();
-              });
-            }
-          });
-
-          $scope.$watch('tempContent', function(newVal) {
-            // Sanitizing while a modal is open would delete the markers that
-            // save and restore the cursor's position in the RTE.
-            var displayedContent = $scope.isCustomizationModalOpen ? newVal :
-              $filter('sanitizeHtmlForRte')(newVal);
-            $scope.htmlContent = rteHelperService.convertRteToHtml(
-              displayedContent);
-          });
-
-          // It is possible for the content of the RTE to be changed externally,
-          // e.g. if there are several RTEs in a list, and one is deleted.
-          $scope.$on('externalHtmlContentChange', function() {
+        $scope.$on('focusOn', function(evt, label) {
+          if (label === $scope.labelForFocusTarget()) {
+            var editorScope = textAngularManager.retrieveEditor(label).scope;
             $timeout(function() {
-              $scope.tempContent = _convertHtmlToRte($scope.htmlContent);
+              editorScope.displayElements.text[0].focus();
             });
+          }
+        });
+
+        $scope.$watch('tempContent', function(newVal) {
+          // Sanitizing while a modal is open would delete the markers that
+          // save and restore the cursor's position in the RTE.
+          var displayedContent = $scope.isCustomizationModalOpen ? newVal :
+            $filter('sanitizeHtmlForRte')(newVal);
+          $scope.htmlContent = rteHelperService.convertRteToHtml(
+            displayedContent);
+        });
+
+        // It is possible for the content of the RTE to be changed externally,
+        // e.g. if there are several RTEs in a list, and one is deleted.
+        $scope.$on('externalHtmlContentChange', function() {
+          $timeout(function() {
+            $scope.tempContent = _convertHtmlToRte($scope.htmlContent);
           });
-        }]
-      };
-    }
+        });
+      }]
+    };
+  }
 ]);
 
 // The names of these filters must correspond to the names of the backend
@@ -1113,31 +1122,32 @@ oppia.directive('requireIsFloat', ['$filter', function($filter) {
   };
 }]);
 
-oppia.directive('requireIsValidExpression',
-    ['parameterSpecsService', 'expressionEvaluatorService',
-        function(parameterSpecsService, expressionEvaluatorService) {
-  // Create a namescope environment from the parameter names. The values of the
-  // parameters do not matter.
-  var params = {};
-  parameterSpecsService.getAllParams().forEach(function(name) {
-    params[name] = true;
-  });
+oppia.directive('requireIsValidExpression', [
+  'parameterSpecsService', 'expressionEvaluatorService',
+  function(parameterSpecsService, expressionEvaluatorService) {
+    // Create a namescope environment from the parameter names. The values of
+    // the parameters do not matter.
+    var params = {};
+    parameterSpecsService.getAllParams().forEach(function(name) {
+      params[name] = true;
+    });
 
-  return {
-    require: 'ngModel',
-    restrict: 'A',
-    link: function(scope, elm, attrs, ctrl) {
-      var validator = function(value) {
-        ctrl.$setValidity('isValidExpression',
-            expressionEvaluatorService.validateExpression(value, [params]));
-        return value;
-      };
+    return {
+      require: 'ngModel',
+      restrict: 'A',
+      link: function(scope, elm, attrs, ctrl) {
+        var validator = function(value) {
+          ctrl.$setValidity('isValidExpression',
+              expressionEvaluatorService.validateExpression(value, [params]));
+          return value;
+        };
 
-      ctrl.$parsers.unshift(validator);
-      ctrl.$formatters.unshift(validator);
-    }
-  };
-}]);
+        ctrl.$parsers.unshift(validator);
+        ctrl.$formatters.unshift(validator);
+      }
+    };
+  }]
+);
 
 // Prevents timeouts due to recursion in nested directives. See:
 //

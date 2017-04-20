@@ -11,12 +11,7 @@
 {% block header_js %}
   {{ super() }}
   <script type="text/javascript">
-    GLOBALS.canEdit = JSON.parse('{{can_edit|js_string}}');
-    GLOBALS.canUnpublish = JSON.parse('{{can_unpublish|js_string}}');
     GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
-    GLOBALS.collectionTitle = JSON.parse('{{title|js_string}}');
-    GLOBALS.ownerNames = JSON.parse('{{owner_names|js_string}}');
-    GLOBALS.isPrivate = JSON.parse('{{is_private|js_string}}');
     GLOBALS.TAG_REGEX = JSON.parse('{{TAG_REGEX|js_string}}');
   </script>
 {% endblock header_js %}
@@ -71,6 +66,12 @@
 
 {% block footer_js %}
   {{ super() }}
+  
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionSyntaxTree.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/evaluator.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/parser.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionInterpolationService.js"></script>
+
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/CollectionEditor.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/CollectionEditorNavbarBreadcrumbDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_editor/CollectionEditorNavbarDirective.js"></script>
@@ -90,6 +91,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionNodeObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionRightsBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionRightsObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionUpdateService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionValidationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/EditableCollectionBackendApiService.js"></script>
@@ -98,7 +100,15 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/ChangeObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/UndoRedoService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StateObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/InteractionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/AnswerGroupObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ContentObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/RuleObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/FallbackObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/TriggerObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/OutcomeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamChangeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamChangesObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/summary/ExplorationSummaryBackendApiService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>
@@ -110,5 +120,4 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationEditor.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/GadgetValidationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/RouterServices.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionInterpolationService.js"></script>
 {% endblock footer_js %}
