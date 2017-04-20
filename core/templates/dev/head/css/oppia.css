@@ -565,6 +565,19 @@ textarea {
   }
 }
 
+@media (max-width: 1100px) {
+  .oppia-site-feedback {
+    background-color: transparent;
+    opacity: 1;
+  }
+  .oppia-site-feedback span {
+    display: none;
+  }
+  .material-icons.md-18 {
+    color: rgba(1,120,109,1);
+  }
+}
+
 /*
   Styles for the global navigation sidebar menu.
 */
