@@ -853,8 +853,12 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
         try:
             # This may fail if calculation_output is too large.
             instance.put()
-        except Exception as e:
-            logging.error(e)
+        except Exception:
+            logging.exception(
+                'Failed to add calculation output for exploration ID %s, '
+                'version %s, state name %s, and calculation ID %s' % (
+                    exploration_id, exploration_version,
+                    state_name.encode('utf-8'), calculation_id))
 
     @classmethod
     def get_model(cls, exploration_id, exploration_version, state_name,
