@@ -526,41 +526,118 @@ class InteractionAnswerSummariesMRJobManager(
     # recomputing results from scratch each time.
     @staticmethod
     def map(item):
-        def _encode(item):
-            """Encodes a Python value as UTF-8."""
-            if isinstance(item, basestring):
-                return item.encode('utf-8')
-            elif isinstance(item, int) or isinstance(item, float):
-                return item
-            elif isinstance(item, list):
-                return [_encode(subitem) for subitem in item]
-            elif isinstance(item, dict):
-                return {
-                    key: _encode(value) for key, value in item.iteritems()
-                }
-            else:
-                raise Exception('Cannot encode item: %s' % item)
-
         if InteractionAnswerSummariesMRJobManager._entity_created_before_job_queued( # pylint: disable=line-too-long
                 item):
             # Output answers submitted to the exploration for this exp version.
-            versioned_key = u'%s:%s:%s:%s' % (
-                item.exploration_id, item.exploration_version,
-                item.interaction_id, item.state_name)
-            yield (versioned_key.encode('utf-8'), item.id)
+            versioned_key = u'%s:%s:%s' % (
+                item.exploration_id, item.exploration_version, item.state_name)
+            yield (versioned_key.encode('utf-8'), {
+                'item_id': item.id,
+                'interaction_id': item.interaction_id,
+                'exploration_version': item.exploration_version
+            })
 
             # Output the same set of answers independent of the version. This
             # allows the reduce step to aggregate answers across all
             # exploration versions.
-            all_versions_key = u'%s:%s:%s:%s' % (
-                item.exploration_id, VERSION_ALL, item.interaction_id,
-                item.state_name)
-            yield (all_versions_key.encode('utf-8'), item.id)
+            all_versions_key = u'%s:%s:%s' % (
+                item.exploration_id, VERSION_ALL, item.state_name)
+            yield (all_versions_key.encode('utf-8'), {
+                'item_id': item.id,
+                'interaction_id': item.interaction_id,
+                'exploration_version': item.exploration_version
+            })
 
     @staticmethod
-    def reduce(key, stringified_item_ids):
-        exploration_id, exploration_version, interaction_id, state_name = (
-            key.split(':'))
+    def reduce(key, stringified_values):
+        exploration_id, exploration_version, state_name = key.split(':')
+
+        value_dicts = [
+            ast.literal_eval(stringified_value)
+            for stringified_value in stringified_values]
+
+        # Extract versions in descending order since answers are prioritized
+        # based on recency.
+        versions = list(set([
+            int(value_dict['exploration_version'])
+            for value_dict in value_dicts]))
+        versions.sort(reverse=True)
+
+        # In half of the non-aggregated outputs from the map function, versions
+        # should be trivial since the answers are being mapped to specific
+        # versions.
+        if exploration_version != VERSION_ALL and len(versions) != 1:
+            yield (
+                'Expected a single version when aggregating answers for '
+                'exploration %s (v=%s), but found: %s' % (
+                    exploration_id, exploration_version, versions))
+
+        # Map interaction IDs and StateAnswersModel IDs to exploration versions.
+        versioned_interaction_ids = {version: set() for version in versions}
+        versioned_item_ids = {version: set() for version in versions}
+        for value_dict in value_dicts:
+            version = value_dict['exploration_version']
+            versioned_interaction_ids[version].update(
+                [value_dict['interaction_id']])
+            versioned_item_ids[version].update([value_dict['item_id']])
+
+        # Convert the interaction IDs to a list so they may be easily indexed.
+        versioned_interaction_ids = {
+            v: list(interaction_ids)
+            for v, interaction_ids in versioned_interaction_ids.iteritems()
+        }
+
+        # Verify all interaction ID and item ID containers are well-structured.
+        for version, interaction_ids in versioned_interaction_ids.iteritems():
+            if len(interaction_ids) != 1:
+                yield (
+                    'Expected exactly one interaction ID for exploration %s '
+                    'and version %s, found: %s' % (
+                        exploration_id, version, len(interaction_ids)))
+        for version, item_ids in versioned_item_ids.iteritems():
+            if not item_ids:
+                yield (
+                    'Expected at least one item ID for exploration %s and '
+                    'version %s, found: %s' % (
+                        exploration_id, version, len(item_ids)))
+
+        # Filter out any item IDs which happen at and before a version with a
+        # changed interaction ID. Start with the most recent version since it
+        # will refer to the most relevant answers.
+        latest_version = versions[0]
+        latest_interaction_id = versioned_interaction_ids[latest_version][0]
+        # NOTE TO DEVELOPER: This skips the first version in the list since that
+        # interaction ID is already being compraed. Bear in mind that skipping
+        # the first version shifts all found indexes back by one, which is
+        # intended here since the index found is the first index whose
+        # interaction ID has changed, which means the version before that in the
+        # list is desired. If all interaction IDs are the same, then the last
+        # version is used. All of these operations no-op when versions is a list
+        # of 1 version, which happens for each individually mapped version (see
+        # the map function). For this reason, all of this code is simply skipped
+        # in that case in favor of performance.
+        if len(versions) > 1:
+            start_version_index = next(
+                (index for index, version in enumerate(versions[1:])
+                 if (versioned_interaction_ids[version][0]
+                     != latest_interaction_id)),
+                len(versions) - 1)
+            start_version = versions[start_version_index]
+            # Trim away anything related to the versions which correspond to
+            # different or since changed interaction IDs.
+            ignored_versions = [
+                version for version in versions if version < start_version]
+            for ignored_version in ignored_versions:
+                del versioned_interaction_ids[ignored_version]
+                del versioned_item_ids[ignored_version]
+            versions = versions[0:start_version_index+1]
+
+        # Retrieve all StateAnswerModel entities associated with the remaining
+        # item IDs which correspond to a single interaction ID shared among all
+        # the versions between start_version and latest_version, inclusive.
+        item_ids = set()
+        for version in versions:
+            item_ids.update(versioned_item_ids[version])
 
         # Collapse the list of answers into a single answer dict. This
         # aggregates across multiple answers if the key ends with VERSION_ALL.
@@ -572,15 +649,10 @@ class InteractionAnswerSummariesMRJobManager(
             'exploration_id': exploration_id,
             'exploration_version': exploration_version,
             'state_name': state_name,
-            'interaction_id': interaction_id,
+            'interaction_id': latest_interaction_id,
             'submitted_answer_list': submitted_answer_list
         }
 
-        # Retrieve all associates IDs to StateAnswersModel.
-        item_ids = set(stringified_item_ids)
-
-        # Retrieve all StateAnswerModel entities associated with this shard
-        # instance.
         state_answer_models = stats_models.StateAnswersModel.get_multi(item_ids)
         for state_answers_model in state_answer_models:
             if state_answers_model:
@@ -589,7 +661,7 @@ class InteractionAnswerSummariesMRJobManager(
 
         # Get all desired calculations for the current interaction id.
         calc_ids = interaction_registry.Registry.get_interaction_by_id(
-            interaction_id).answer_calculation_ids
+            latest_interaction_id).answer_calculation_ids
         calculations = [
             calculation_registry.Registry.get_calculation_by_id(calc_id)
             for calc_id in calc_ids]

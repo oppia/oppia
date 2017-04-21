@@ -637,6 +637,151 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 calculation_output_all,
                 expected_calculation_output_all_answers)
 
+    def test_answers_across_multiple_exp_versions_different_interactions(self):
+        """Similar to test_answers_across_multiple_exploration_versions except
+        the exploration has changed interactions in the new versions. The
+        aggregation job should not include answers corresponding to exploration
+        versions which do not match the latest version's interaction ID.
+        """
+        with self.swap(
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS):
+
+            # Setup example exploration.
+            exp_id = 'eid'
+            exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
+            init_state_name = exp.init_state_name
+
+            time_spent = 5.0
+            params = {}
+
+            # Add a few different answers.
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, 1, init_state_name, 'TextInput', 0, 0,
+                exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
+                params, 'verb')
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, 1, init_state_name, 'TextInput', 0, 0,
+                exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
+                params, '2')
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, 1, init_state_name, 'TextInput', 0, 0,
+                exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
+                params, 'verb')
+
+            # Change the interaction ID.
+            exp_services.update_exploration('fake@user.com', exp_id, [{
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': init_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'NumericInput',
+            }], 'Change to NumericInput')
+
+            # Submit an answer to the numeric interaction.
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, 2, init_state_name, 'NumericInput', 0, 0,
+                exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
+                params, 2)
+
+            # Change back the interaction ID.
+            exp_services.update_exploration('fake@user.com', exp_id, [{
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': init_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'TextInput',
+            }], 'Change to TextInput')
+
+            # Submit another numeber-like answer.
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, 3, init_state_name, 'TextInput', 0, 0,
+                exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
+                params, '2')
+
+            # Create a 4th exploration version by changing the state's content.
+            exp_services.update_exploration('fake@user.com', exp_id, [{
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': init_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'new_value': [{
+                    'type': 'text',
+                    'value': 'New content description'
+                }]
+            }], 'Change content description')
+
+            # Submit some more answers to the latest exploration version.
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, 4, init_state_name, 'TextInput', 0, 0,
+                exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
+                params, 'noun')
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, 4, init_state_name, 'TextInput', 0, 0,
+                exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
+                params, 'verb')
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, 4, init_state_name, 'TextInput', 0, 0,
+                exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
+                params, 'noun')
+
+            exp = exp_services.get_exploration_by_id(exp_id)
+            self.assertEqual(exp.version, 4)
+
+            # Run the answers aggregation job.
+            ModifiedInteractionAnswerSummariesAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+
+            calc_id = 'AnswerFrequencies'
+
+            # Check the output of the job.
+            calc_output_latest_version_domain_object = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
+                    exp_id, init_state_name, calc_id,
+                    exploration_version='4'))
+            calc_output_all_domain_object = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
+                    exp_id, init_state_name, calc_id))
+
+            self.assertEqual(
+                'AnswerFrequencies',
+                calc_output_latest_version_domain_object.calculation_id)
+            self.assertEqual(
+                'AnswerFrequencies',
+                calc_output_all_domain_object.calculation_id)
+
+            expected_calculation_latest_version_output = [{
+                'answer': 'noun',
+                'frequency': 2
+            }, {
+                'answer': 'verb',
+                'frequency': 1
+            }]
+
+            # Only includes versions 3-4 since version 2 has a different
+            # interaction ID.
+            expected_calculation_all_versions_output = [{
+                'answer': 'noun',
+                'frequency': 2
+            }, {
+                'answer': '2',
+                'frequency': 1
+            }, {
+                'answer': 'verb',
+                'frequency': 1
+            }]
+
+            calculation_latest_version_output = (
+                calc_output_latest_version_domain_object.calculation_output)
+            calculation_output_all = (
+                calc_output_all_domain_object.calculation_output)
+
+            self.assertEqual(
+                calculation_latest_version_output,
+                expected_calculation_latest_version_output)
+            self.assertEqual(
+                calculation_output_all,
+                expected_calculation_all_versions_output)
+
     def test_multiple_computations_in_one_job(self):
         with self.swap(
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
