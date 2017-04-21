@@ -605,7 +605,7 @@ class StateAnswersModel(base_models.BaseModel):
     """
     # This provides about 124k of padding for the other properties and entity
     # storage overhead (since the max entity size is 1MB). The meta data can
-    # get close to 50k or exceed it, so plenty of padding is leftover to avoid
+    # get close to 50k or exceed it, so plenty of padding is left to avoid
     # risking overflowing an entity.
     _MAX_ANSWER_LIST_BYTE_SIZE = 900000
 

@@ -653,8 +653,9 @@ class InteractionAnswerSummariesMRJobManager(
             'submitted_answer_list': submitted_answer_list
         }
 
-        state_answer_models = stats_models.StateAnswersModel.get_multi(item_ids)
-        for state_answers_model in state_answer_models:
+        state_answers_models = stats_models.StateAnswersModel.get_multi(
+            item_ids)
+        for state_answers_model in state_answers_models:
             if state_answers_model:
                 submitted_answer_list += (
                     state_answers_model.submitted_answer_list)

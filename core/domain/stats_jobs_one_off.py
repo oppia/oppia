@@ -1052,18 +1052,16 @@ class RefreshInteractionRegistryJob(jobs.BaseMapReduceJobManager):
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationModel]
 
-    # pylint: disable=unused-argument
     @staticmethod
-    def map(item):
+    def map(item): # pylint: disable=unused-argument
         yield ('key', 'value')
 
     @staticmethod
-    def reduce(key, stringified_values):
+    def reduce(key, stringified_values): # pylint: disable=unused-argument
         # pylint: disable=protected-access
         interaction_registry.Registry._refresh()
         # pylint: enable=protected-access
         yield 'Refreshed interaction registry.'
-    # pylint: enable=unused-argument
 
 
 class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
