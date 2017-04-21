@@ -41,4 +41,11 @@ class LabelingInput(base.BaseInteraction):
             'imagePath': '',
             'labeledRegions': []
         },
-    }]
+    },
+    {
+        'name': 'imageTitle',
+        'description': 'Image Title',
+        'schema': {
+            'type': 'unicode'
+        },
+        'default_value': ''}]
