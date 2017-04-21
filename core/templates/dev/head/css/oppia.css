@@ -164,6 +164,10 @@ body {
   max-width: 800px;
 }
 
+.oppia-state-content-display-span span{
+  display: inherit;
+}
+
 .oppia-dashboard-container .exp-private-text {
   color: #aaa;
   font-style: italic;
