@@ -1,4 +1,29 @@
 <script type="text/ng-template" id="inline/editor_navigation_directive">
+  <style>
+    /* Overwrite the Bootstrap defaults. */
+    .nav > li > a.oppia-editor-navbar-tab-anchor {
+      padding: 15px 11px;
+    }
+    editor-navigation .oppia-exploration-open-threads-count {
+      bottom: 8px;
+      color: white;
+      font-size: 9px;
+      position: relative;
+    }
+    editor-navigation .oppia-exploration-open-threads-color {
+      background-color: #4078C0;
+      border: 1px solid rgb(243, 243, 243);
+    }
+    editor-navigation .oppia-exploration-open-threads-indicator {
+      border-radius: 10%;
+      bottom: 10px;
+      height: 13px;
+      position: absolute;
+      right: 5px;
+      text-align: center;
+      width: 16px;
+    }
+  </style>
   <ul class="nav navbar-nav oppia-navbar-nav pull-right ng-cloak" style="margin-left: 20px;">
     <li ng-class="{'active': getTabStatuses().active === 'main', 'dropdown': countWarnings()}">
       <a href="#" tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()"

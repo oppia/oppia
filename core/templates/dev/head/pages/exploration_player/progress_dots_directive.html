@@ -14,17 +14,17 @@
       50% { -webkit-transform: scale(0.9); }
       0% { -webkit-transform: scale(1); }
     }
-    .oppia-animate-progress-dot {
+    progress-dots .oppia-animate-progress-dot {
       display: inline-block;
       vertical-align: middle;
     }
-    .oppia-animate-progress-dot.ng-enter {
+    progress-dots .oppia-animate-progress-dot.ng-enter {
       -webkit-animation: 400ms oppia-animate-enter-progress-dot;
       animation: 400ms oppia-animate-enter-progress-dot;
       -webkit-animation-timing-function: linear;
       animation-timing-function: linear;
     }
-    .oppia-progress-arrow {
+    progress-dots .oppia-progress-arrow {
       color: rgba(2,84,78,0.25);
       display: inline-block;
       margin-left: 10px;
@@ -32,17 +32,17 @@
       -webkit-user-select: none;
       user-select: none;
     }
-    .oppia-progress-arrow-active {
+    progress-dots .oppia-progress-arrow-active {
       color: rgba(2,84,78,1);
       cursor: pointer;
     }
-    .oppia-progress-arrow:focus,
+    progress-dots .oppia-progress-arrow:focus,
     .oppia-progress-dot:focus {
       outline: 1px dotted #212121;
       outline: auto 5px -webkit-focus-ring-color;
     }
 
-    .oppia-progress-dot {
+    progress-dots .oppia-progress-dot {
       position: relative;
       border-radius: 50%;
       float: left;
@@ -50,7 +50,7 @@
       margin-left: 10px;
       width: 12px;
     }
-    .oppia-progress-dot:after {
+    progress-dots .oppia-progress-dot:after {
       content: "";
       position: absolute;
       top: -15px;
@@ -58,14 +58,14 @@
       right: -5px;
       bottom: -10px;
     }
-    .oppia-progress-dot-active {
+    progress-dots .oppia-progress-dot-active {
       background-color: #009788;
     }
-    .oppia-progress-dot-inactive {
+    progress-dots .oppia-progress-dot-inactive {
       background-color: #fff;
       cursor: pointer;
     }
-    .oppia-progress-dot-gradient-left {
+    progress-dots .oppia-progress-dot-gradient-left {
       -webkit-animation: oppia-animate-bounce-dot 1s linear 0s infinite;
       animation: oppia-animate-bounce-dot 1s linear 0s infinite ;
       background: -webkit-linear-gradient(right,#ccc,rgba(255,255,255,0));
@@ -73,7 +73,7 @@
       background: -moz-linear-gradient(right,#ccc, rgba(255,255,255,0));
       background: linear-gradient(right,#ccc, rgba(255,255,255,0));
     }
-    .oppia-progress-dot-gradient-right {
+    progress-dots .oppia-progress-dot-gradient-right {
       -webkit-animation: oppia-animate-bounce-dot 1s linear 0s infinite ;
       animation: oppia-animate-bounce-dot 1s linear 0s infinite ;
       background: -webkit-linear-gradient(left,#ccc,rgba(255,255,255,0));
@@ -81,7 +81,7 @@
       background: -moz-linear-gradient(left,#ccc, rgba(255,255,255,0));
       background: linear-gradient(left,#ccc, rgba(255,255,255,0));
     }
-    .oppia-progress-dot-list {
+    progress-dots .oppia-progress-dot-list {
       list-style-type: none;
       margin: 20px auto;
       padding-left: 0;

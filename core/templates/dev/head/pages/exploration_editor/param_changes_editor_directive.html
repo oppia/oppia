@@ -1,4 +1,38 @@
 <script type="text/ng-template" id="editor/paramChanges">
+  <style>
+    param-changes-editor .oppia-param-editor-row {
+      position: relative;
+    }
+    param-changes-editor .oppia-param-display-row {
+      margin-bottom: 4px;
+    }
+    param-changes-editor .oppia-param-change-sort-handle {
+      cursor: move;
+      left: -20px;
+      opacity: 0.3;
+      position: absolute;
+      top: 4px;
+    }
+    param-changes-editor .oppia-delete-param-change-button {
+      background: none;
+      border: 0;
+      color: #000;
+      cursor: pointer;
+      height: 30px;
+      opacity: 0.5;
+      width: 30px;
+    }
+    param-changes-editor .oppia-delete-param-change-button {
+      position: absolute;
+    }
+    param-changes-editor .oppia-delete-param-change-button {
+      right: -30px;
+      top: 0;
+    }
+    param-changes-editor .oppia-delete-param-change-button:hover {
+      opacity: 1;
+    }
+  </style>
   <!--
     We do not track by $index here, because if we do, then the select2 dropdown
     will not update when elements are swapped or deleted.
