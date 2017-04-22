@@ -3577,6 +3577,11 @@ md-card.preview-conversation-skin-supplemental-card {
   z-index: 11;
 }
 
+.oppia-activity-summary-tile .middle-card,
+.oppia-activity-summary-tile .top-card {
+  margin-top: -155px;
+}
+
 .oppia-activity-summary-tile .exploration-summary-tile-mask {
   background-color: #eee;
   height: 258px;
