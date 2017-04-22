@@ -2581,13 +2581,13 @@ div#ng-curtain {
   bottom: 10px;
   height: 15px;
   position: absolute;
-  right: 25px;
+  right: 20px;
   width: 15px;
 }
 .oppia-navbar-role-text {
   bottom: 0;
   color: white;
-  font-size: 1.12rem;
+  font-size: 0.7rem;
   font-weight: bold;
   position: absolute;
   right: 3px;
