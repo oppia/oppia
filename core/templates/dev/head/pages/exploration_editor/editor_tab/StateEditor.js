@@ -40,7 +40,7 @@ oppia.controller('StateEditor', [
     $scope.isInteractionShown = false;
 
     $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
-      '/avatar/oppia_black_72px.png');
+      '/avatar/oppia_avatar_100px.svg');
 
     $scope.isCurrentStateInitialState = function() {
       return (
