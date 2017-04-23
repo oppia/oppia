@@ -380,7 +380,6 @@ ALLOWED_INTERACTION_CATEGORIES = [{
         'ItemSelectionInput',
         'MultipleChoiceInput',
         'TextInput',
-        'FillInTheBlank',
         'LabelingInput'
     ],
 }, {

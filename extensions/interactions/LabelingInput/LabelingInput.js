@@ -40,6 +40,7 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           var unicodeStripCount = 6;
           $scope.imageTitle = $scope.imageTitle.slice(unicodeStripCount)
           $scope.imageTitle = $scope.imageTitle.slice(0, -unicodeStripCount);
+          console.log($scope.imageTitle);
           $scope.alwaysShowRegions = 'true';
           if ($scope.alwaysShowRegions) {
             $scope.highlightRegionsOnHover = false;
