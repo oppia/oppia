@@ -174,9 +174,7 @@ oppia.factory('UrlInterpolationService', [
 
       getComponentUrl: function(componentPath) {
         validateResourcePath(componentPath);
-        var templatePath = ((GLOBALS.MINIFICATION || !GLOBALS.DEV_MODE) ?
-          '/templates/head/components' : '/templates/dev/head/components');
-        return getCachePrefixedUrl(templatePath + componentPath);
+        return GLOBALS.TEMPLATE_DIR_PREFIX + '/components' + componentPath;
       }
     };
   }
