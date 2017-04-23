@@ -19,7 +19,7 @@
 
 oppia.factory('StatesObjectFactory', [
     'StateObjectFactory', 'newStateTemplateService',
-  function(StateObjectFactory, newStateTemplateService) {
+    function(StateObjectFactory, newStateTemplateService) {
     var States = function(states) {
       var states = states;
 
