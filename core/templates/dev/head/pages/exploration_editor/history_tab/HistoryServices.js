@@ -127,10 +127,10 @@ oppia.factory('versionsTreeService', [function() {
 
 oppia.factory('compareVersionsService', [
   '$http', '$q', 'versionsTreeService', 'explorationData',
-  'ExplorationDiffService',
+  'ExplorationDiffService', 'StateObjectFactory', 'StatesObjectFactory',
   function(
       $http, $q, versionsTreeService, explorationData,
-      ExplorationDiffService) {
+      ExplorationDiffService, StateObjectFactory, StatesObjectFactory) {
     /**
      * Constructs the combined list of changes needed to get from v1 to v2.
      *
@@ -198,11 +198,16 @@ oppia.factory('compareVersionsService', [
           v1Data: $http.get(explorationDataUrl + v1),
           v2Data: $http.get(explorationDataUrl + v2)
         }).then(function(response) {
-          var v1States = response.v1Data.data.states;
-          var v2States = response.v2Data.data.states;
+          var v1StatesDict = response.v1Data.data.states;
+          var v2StatesDict = response.v2Data.data.states;
 
           // Track changes from v1 to LCA, and then from LCA to v2.
           var lca = versionsTreeService.findLCA(v1, v2);
+
+          var v1States = StatesObjectFactory.createFromBackendDict(
+            v1StatesDict);
+          var v2States = StatesObjectFactory.createFromBackendDict(
+            v2StatesDict);
 
           var diffGraphData = ExplorationDiffService.getDiffGraphData(
             v1States, v2States, [{
@@ -213,7 +218,6 @@ oppia.factory('compareVersionsService', [
               directionForwards: true
             }]
           );
-
           return {
             nodes: diffGraphData.nodes,
             links: diffGraphData.links,

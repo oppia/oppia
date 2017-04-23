@@ -16,114 +16,120 @@
  * @fileoverview Directive for a schema-based editor for unicode strings.
  */
 
-oppia.directive('schemaBasedUnicodeEditor', [function() {
-  return {
-    scope: {
-      localValue: '=',
-      isDisabled: '&',
-      validators: '&',
-      uiConfig: '&',
-      allowExpressions: '&',
-      labelForFocusTarget: '&',
-      onInputBlur: '=',
-      onInputFocus: '='
-    },
-    templateUrl: 'schemaBasedEditor/unicode',
-    restrict: 'E',
-    controller: ['$scope', '$filter', '$sce', 'parameterSpecsService',
+oppia.directive('schemaBasedUnicodeEditor', [
+  function() {
+    return {
+      scope: {
+        localValue: '=',
+        isDisabled: '&',
+        validators: '&',
+        uiConfig: '&',
+        allowExpressions: '&',
+        labelForFocusTarget: '&',
+        onInputBlur: '=',
+        onInputFocus: '='
+      },
+      templateUrl: 'schemaBasedEditor/unicode',
+      restrict: 'E',
+      controller: [
+        '$scope', '$filter', '$sce', 'parameterSpecsService',
         function($scope, $filter, $sce, parameterSpecsService) {
-      $scope.allowedParameterNames = parameterSpecsService.getAllParamsOfType(
-        'unicode');
-      $scope.doUnicodeParamsExist = ($scope.allowedParameterNames.length > 0);
+          $scope.allowedParameterNames =
+            parameterSpecsService.getAllParamsOfType('unicode');
+          $scope.doUnicodeParamsExist =
+            ($scope.allowedParameterNames.length > 0);
 
-      if ($scope.uiConfig() && $scope.uiConfig().rows &&
-          $scope.doUnicodeParamsExist) {
-        $scope.doUnicodeParamsExist = false;
-        console.log(
-          'Multi-row unicode fields with parameters are not currently ' +
-          'supported.');
-      }
+          if ($scope.uiConfig() && $scope.uiConfig().rows &&
+              $scope.doUnicodeParamsExist) {
+            $scope.doUnicodeParamsExist = false;
+            console.log(
+              'Multi-row unicode fields with parameters are not currently ' +
+              'supported.');
+          }
 
-      if ($scope.uiConfig() && $scope.uiConfig().coding_mode) {
-        // Flag that is flipped each time the codemirror view is
-        // shown. (The codemirror instance needs to be refreshed
-        // every time it is unhidden.)
-        $scope.codemirrorStatus = false;
-        var CODING_MODE_NONE = 'none';
+          if ($scope.uiConfig() && $scope.uiConfig().coding_mode) {
+            // Flag that is flipped each time the codemirror view is
+            // shown. (The codemirror instance needs to be refreshed
+            // every time it is unhidden.)
+            $scope.codemirrorStatus = false;
+            var CODING_MODE_NONE = 'none';
 
-        $scope.codemirrorOptions = {
-          // Convert tabs to spaces.
-          extraKeys: {
-            Tab: function(cm) {
-              var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
-              cm.replaceSelection(spaces);
-              // Move the cursor to the end of the selection.
-              var endSelectionPos = cm.getDoc().getCursor('head');
-              cm.getDoc().setCursor(endSelectionPos);
+            $scope.codemirrorOptions = {
+              // Convert tabs to spaces.
+              extraKeys: {
+                Tab: function(cm) {
+                  var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
+                  cm.replaceSelection(spaces);
+                  // Move the cursor to the end of the selection.
+                  var endSelectionPos = cm.getDoc().getCursor('head');
+                  cm.getDoc().setCursor(endSelectionPos);
+                }
+              },
+              indentWithTabs: false,
+              lineNumbers: true
+            };
+
+            if ($scope.isDisabled()) {
+              $scope.codemirrorOptions.readOnly = 'nocursor';
             }
-          },
-          indentWithTabs: false,
-          lineNumbers: true
-        };
+            // Note that only 'coffeescript', 'javascript', 'lua', 'python',
+            // 'ruby' and 'scheme' have CodeMirror-supported syntax
+            // highlighting. For other languages, syntax highlighting will not
+            // happen.
+            if ($scope.uiConfig().coding_mode !== CODING_MODE_NONE) {
+              $scope.codemirrorOptions.mode = $scope.uiConfig().coding_mode;
+            }
 
-        if ($scope.isDisabled()) {
-          $scope.codemirrorOptions.readOnly = 'nocursor';
+            setTimeout(function() {
+              $scope.codemirrorStatus = !$scope.codemirrorStatus;
+            }, 200);
+
+            // When the form view is opened, flip the status flag. The
+            // timeout seems to be needed for the line numbers etc. to display
+            // properly.
+            $scope.$on('schemaBasedFormsShown', function() {
+              setTimeout(function() {
+                $scope.codemirrorStatus = !$scope.codemirrorStatus;
+              }, 200);
+            });
+          }
+
+          $scope.onKeypress = function(evt) {
+            if (evt.keyCode === 13) {
+              $scope.$emit('submittedSchemaBasedUnicodeForm');
+            }
+          };
+
+          $scope.getPlaceholder = function() {
+            if (!$scope.uiConfig()) {
+              return '';
+            } else {
+              return $scope.uiConfig().placeholder;
+            }
+          };
+
+          $scope.getRows = function() {
+            if (!$scope.uiConfig()) {
+              return null;
+            } else {
+              return $scope.uiConfig().rows;
+            }
+          };
+
+          $scope.getCodingMode = function() {
+            if (!$scope.uiConfig()) {
+              return null;
+            } else {
+              return $scope.uiConfig().coding_mode;
+            }
+          };
+
+          $scope.getDisplayedValue = function() {
+            return $sce.trustAsHtml(
+              $filter('convertUnicodeWithParamsToHtml')($scope.localValue));
+          };
         }
-        // Note that only 'coffeescript', 'javascript', 'lua', 'python', 'ruby'
-        // and 'scheme' have CodeMirror-supported syntax highlighting. For other
-        // languages, syntax highlighting will not happen.
-        if ($scope.uiConfig().coding_mode !== CODING_MODE_NONE) {
-          $scope.codemirrorOptions.mode = $scope.uiConfig().coding_mode;
-        }
-
-        setTimeout(function() {
-          $scope.codemirrorStatus = !$scope.codemirrorStatus;
-        }, 200);
-
-        // When the form view is opened, flip the status flag. The
-        // timeout seems to be needed for the line numbers etc. to display
-        // properly.
-        $scope.$on('schemaBasedFormsShown', function() {
-          setTimeout(function() {
-            $scope.codemirrorStatus = !$scope.codemirrorStatus;
-          }, 200);
-        });
-      }
-
-      $scope.onKeypress = function(evt) {
-        if (evt.keyCode === 13) {
-          $scope.$emit('submittedSchemaBasedUnicodeForm');
-        }
-      };
-
-      $scope.getPlaceholder = function() {
-        if (!$scope.uiConfig()) {
-          return '';
-        } else {
-          return $scope.uiConfig().placeholder;
-        }
-      };
-
-      $scope.getRows = function() {
-        if (!$scope.uiConfig()) {
-          return null;
-        } else {
-          return $scope.uiConfig().rows;
-        }
-      };
-
-      $scope.getCodingMode = function() {
-        if (!$scope.uiConfig()) {
-          return null;
-        } else {
-          return $scope.uiConfig().coding_mode;
-        }
-      };
-
-      $scope.getDisplayedValue = function() {
-        return $sce.trustAsHtml(
-          $filter('convertUnicodeWithParamsToHtml')($scope.localValue));
-      };
-    }]
-  };
-}]);
+      ]
+    };
+  }
+]);

@@ -14,11 +14,16 @@
 
 """Services for classifier models"""
 
+from core.domain import classifier_domain
 from core.domain import classifier_registry
 from core.domain import exp_domain
 from core.domain import interaction_registry
+from core.platform import models
 
 import feconf
+
+(classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
+
 
 def classify(state, answer):
     """Classify the answer using the string classifier.
@@ -78,7 +83,7 @@ def classify_string_classifier_rule(state, normalized_answer):
     best_matched_answer_group_index = len(state.interaction.answer_groups)
     best_matched_rule_spec_index = None
 
-    sc = classifier_registry.ClassifierRegistry.get_classifier_by_id(
+    sc = classifier_registry.Registry.get_classifier_by_algorithm_id(
         feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])
 
     training_examples = [
@@ -104,7 +109,7 @@ def classify_string_classifier_rule(state, normalized_answer):
             predicted_answer_group = state.interaction.answer_groups[
                 predicted_answer_group_index]
             for rule_spec in predicted_answer_group.rule_specs:
-                if rule_spec.rule_type == exp_domain.CLASSIFIER_RULESPEC_STR:
+                if rule_spec.rule_type == exp_domain.RULE_TYPE_CLASSIFIER:
                     best_matched_rule_spec_index = classifier_rule_spec_index
                     break
             best_matched_answer_group = predicted_answer_group
@@ -118,3 +123,101 @@ def classify_string_classifier_rule(state, normalized_answer):
             return None
 
     return None
+
+
+def get_classifier_from_model(classifier_model):
+    """Gets a classifier domain object from a classifier model.
+
+    Args:
+        classifier_model: Classifier model instance in datastore.
+
+    Returns:
+        classifier: Domain object for the classifier.
+    """
+    return classifier_domain.Classifier(
+        classifier_model.id, classifier_model.exp_id,
+        classifier_model.exp_version_when_created,
+        classifier_model.state_name, classifier_model.algorithm_id,
+        classifier_model.cached_classifier_data,
+        classifier_model.data_schema_version)
+
+
+def get_classifier_by_id(classifier_id):
+    """Gets a classifier from a classifier id.
+
+    Args:
+        classifier_id: str. ID of the classifier.
+
+    Returns:
+        classifier: Domain object for the classifier.
+
+    Raises:
+        Exception: Entity for class ClassifierModel with id not found.
+    """
+    classifier_model = classifier_models.ClassifierModel.get(
+        classifier_id)
+    classifier = get_classifier_from_model(classifier_model)
+    return classifier
+
+
+def _create_classifier(classifier):
+    """Creates classifier model in the datastore given a classifier
+       domain object.
+
+    Args:
+        classifier: Domain object for the classifier.
+
+    """
+    classifier_id = classifier_models.ClassifierModel.create(
+        classifier.exp_id, classifier.exp_version_when_created,
+        classifier.state_name, classifier.algorithm_id,
+        classifier.cached_classifier_data, classifier.data_schema_version)
+    return classifier_id
+
+
+def _update_classifier(classifier_model, state_name):
+    """Updates classifier model in the datastore given a classifier
+    domain object.
+
+    Args:
+        classifier_model: Classifier model instance in datastore.
+        state_name: The name of the state.
+
+    Note: All of the properties of a classifier are immutable,
+    except for state_name.
+    """
+    classifier_model.state_name = state_name
+    classifier_model.put()
+
+
+def save_classifier(classifier):
+    """Checks for the existence of the model.
+    If the model exists, it is updated using _update_classifier method.
+    If the model doesn't exist, it is created using _create_classifier method.
+
+    Args:
+        classifier: Domain object for the classifier.
+
+    Returns:
+        classifier_id: str. ID of the classifier.
+    """
+    classifier_id = classifier.id
+    classifier_model = classifier_models.ClassifierModel.get(
+        classifier_id, False)
+    classifier.validate()
+    if classifier_model is None:
+        classifier_id = _create_classifier(classifier)
+    else:
+        _update_classifier(classifier_model, classifier.state_name)
+    return classifier_id
+
+
+def delete_classifier(classifier_id):
+    """Deletes classifier model in the datastore given classifier_id.
+
+    Args:
+        classifier_id: str. ID of the classifier.
+    """
+    classifier_model = classifier_models.ClassifierModel.get(
+        classifier_id)
+    classifier_model.delete()

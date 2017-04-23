@@ -85,7 +85,7 @@ CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION = (
 # used as an identifier for the default rule when storing which rule an answer
 # was matched against.
 DEFAULT_RULESPEC_STR = 'Default'
-CLASSIFIER_RULESPEC_STR = 'FuzzyMatches'
+RULE_TYPE_CLASSIFIER = 'FuzzyMatches'
 
 
 def _get_full_customization_args(customization_args, ca_specs):
@@ -164,6 +164,12 @@ class ExplorationChange(object):
     interpreted in general) preserve backward-compatibility with the
     exploration snapshots in the datastore. Do not modify the definitions of
     cmd keys that already exist.
+
+    NOTE TO DEVELOPERS: Please note that, for a brief period around
+    Feb - Apr 2017, change dicts related to editing of answer groups
+    accidentally stored the old_value using a ruleSpecs key instead of a
+    rule_specs key. So, if you are making use of this data, make sure to
+    verify the format of the old_value before doing any processing.
     """
 
     STATE_PROPERTIES = (
@@ -356,7 +362,7 @@ class RuleSpec(object):
 
     def stringify_classified_rule(self):
         """Returns a string representation of a rule (for the stats log)."""
-        if self.rule_type == CLASSIFIER_RULESPEC_STR:
+        if self.rule_type == RULE_TYPE_CLASSIFIER:
             return self.rule_type
         else:
             param_list = [
@@ -547,7 +553,7 @@ class AnswerGroup(object):
                 raise utils.ValidationError(
                     'Unrecognized rule type: %s' % rule_spec.rule_type)
 
-            if rule_spec.rule_type == CLASSIFIER_RULESPEC_STR:
+            if rule_spec.rule_type == RULE_TYPE_CLASSIFIER:
                 if seen_classifier_rule:
                     raise utils.ValidationError(
                         'AnswerGroups can only have one classifier rule.')
@@ -564,7 +570,7 @@ class AnswerGroup(object):
         if it doesn't exist.
         """
         for (rule_spec_index, rule_spec) in enumerate(self.rule_specs):
-            if rule_spec.rule_type == CLASSIFIER_RULESPEC_STR:
+            if rule_spec.rule_type == RULE_TYPE_CLASSIFIER:
                 return rule_spec_index
         return None
 

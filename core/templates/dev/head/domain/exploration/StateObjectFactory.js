@@ -18,53 +18,49 @@
  */
 
 oppia.factory('StateObjectFactory', [
-  'AnswerGroupObjectFactory',
-  function(AnswerGroupObjectFactory) {
-  var State = function(name, content, interaction, paramChanges) {
-    this.name = name;
-    this.content = content;
-    this.interaction = {
-      answer_groups:
-        generateAnswerGroupsFromBackend(interaction.answer_groups),
-      confirmed_unclassified_answers:
-        interaction.confirmed_unclassified_answers,
-      customization_args: interaction.customization_args,
-      default_outcome: interaction.default_outcome,
-      fallbacks: interaction.fallbacks,
-      id: interaction.id
+  'AnswerGroupObjectFactory', 'InteractionObjectFactory',
+  'ContentObjectFactory', 'ParamChangesObjectFactory',
+  function(AnswerGroupObjectFactory, InteractionObjectFactory,
+    ContentObjectFactory, ParamChangesObjectFactory) {
+    var State = function(name, classifierModelId, content, interaction,
+      paramChanges) {
+      this.name = name;
+      this.classifierModelId = classifierModelId;
+      this.content = content;
+      this.interaction = interaction;
+      this.paramChanges = paramChanges;
     };
-    this.paramChanges = paramChanges;
-  };
 
-  var generateAnswerGroupsFromBackend = function(answerGroupBackendDicts) {
-    var answerGroups = answerGroupBackendDicts.map(function(answerGroupDict) {
-      return AnswerGroupObjectFactory.create(
-        answerGroupDict.rule_specs,
-        answerGroupDict.outcome,
-        answerGroupDict.correct);
-    });
-
-    return answerGroups;
-  };
-
-  // Instance methods.
-  State.prototype.toBackendDict = function() {
-    return {
-      content: this.content,
-      interaction: this.interaction,
-      param_changes: this.paramChanges
+    // Instance methods.
+    State.prototype.toBackendDict = function() {
+      return {
+        content: this.content,
+        classifier_model_id: this.classifierModelId,
+        interaction: this.interaction.toBackendDict(),
+        param_changes: this.paramChanges.map(function(paramChange) {
+          return paramChange.toBackendDict();
+        })
+      };
     };
-  };
 
-  // Static class methods. Note that "this" is not available in
-  // static contexts.
-  State.create = function(stateName, stateDict) {
-    return new State(
-      stateName,
-      stateDict.content,
-      stateDict.interaction,
-      stateDict.param_changes);
-  };
+    // Static class methods. Note that "this" is not available in
+    // static contexts.
+    State.createFromBackendDict = function(stateName, stateDict) {
+      return new State(
+        stateName,
+        stateDict.classifier_model_id,
+        generateContentFromBackend(stateDict.content),
+        InteractionObjectFactory.createFromBackendDict(stateDict.interaction),
+        ParamChangesObjectFactory.createFromBackendList(
+          stateDict.param_changes));
+    };
 
-  return State;
-}]);
+    var generateContentFromBackend = function(contentBackendList) {
+      return contentBackendList.map(function(contentBackendDict) {
+        return ContentObjectFactory.createFromBackendDict(contentBackendDict);
+      });
+    };
+
+    return State;
+  }
+]);

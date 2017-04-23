@@ -132,14 +132,14 @@ oppia.factory('StatsReportingService', [
         siteAnalyticsService.registerFinishExploration();
       },
       recordAnswerSubmitted: function(
-          stateName, params, answer, answerGroupIndex, ruleSpecIndex) {
+          stateName, params, answer, answerGroupIndex, ruleIndex) {
         $http.post(getFullStatsUrl('ANSWER_SUBMITTED'), {
           answer: answer,
           params: params,
           version: explorationVersion,
           old_state_name: stateName,
           answer_group_index: answerGroupIndex,
-          rule_spec_index: ruleSpecIndex
+          rule_spec_index: ruleIndex
         });
       },
       recordMaybeLeaveEvent: function(stateName, params) {

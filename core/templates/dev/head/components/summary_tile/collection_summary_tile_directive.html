@@ -10,8 +10,8 @@
       <div> 
         <div class="objective">
           <[getObjective() | truncateAndCapitalize: 95]>
+          <span ng-if="!getObjective()">No objective specified.</span>
         </div>
-        <span ng-if="!getObjective()">No objective specified.</span>
         <ul layout="row" class="metrics" layout-align="space-between center">
           <li>
             <span>

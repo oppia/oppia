@@ -13,28 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the base controller.
+ * @fileoverview Unit tests for the rule object factory.
  */
 
-describe('Base controller', function() {
+describe('Rule object factory', function() {
   beforeEach(module('oppia'));
 
-  describe('BaseCtrl', function() {
-    var scope, ctrl, $httpBackend;
+  describe('RuleObjectFactory', function() {
+    var scope, rof;
 
-    beforeEach(inject(function($rootScope, $controller) {
+    beforeEach(inject(function($rootScope, $injector) {
       scope = $rootScope.$new();
-      ctrl = $controller('Base', {
-        $scope: scope,
-        alertsService: null,
-        messengerService: null
-      });
+      rof = $injector.get('RuleObjectFactory');
     }));
 
-    it('should have matching classifier constants',
-        inject(function($injector) {
-      expect($injector.get('DEFAULT_CLASSIFIER_RULE_SPEC').rule_type).toEqual(
-        $injector.get('CLASSIFIER_RULESPEC_STR'));
+    it('should have matching classifier constants', inject(function($injector) {
+      expect(rof.createNewClassifierRule().type).toEqual(
+        $injector.get('RULE_TYPE_CLASSIFIER'));
     }));
   });
 });

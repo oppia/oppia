@@ -3,7 +3,7 @@ var isMinificationNeeded = (argv.minify === 'True');
 var generatedJs = 'third_party/generated/js/third_party.js';
 if (isMinificationNeeded) {
   generatedJs = 'third_party/generated/js/third_party.min.js';
-};
+}
 
 module.exports = function(config) {
   config.set({
@@ -12,11 +12,7 @@ module.exports = function(config) {
     files: [
       'core/tests/karma-globals.js',
       // Constants must be loaded before everything else.
-      {
-        pattern: 'assets/constants.json',
-        included: false
-      },
-      'core/tests/karma-constants.js',
+      'assets/constants.js',
       // Since jquery,jquery-ui,angular,angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.0.0/jquery.min.js',
@@ -33,7 +29,7 @@ module.exports = function(config) {
       'core/templates/dev/head/components/rating_display.html',
       'extensions/**/*.js',
       'extensions/interactions/**/*.html',
-      'extensions/interactions/rules.json',
+      'extensions/interactions/rule_templates.json',
       {
         pattern: 'assets/i18n/**/*.json',
         watched: true,
@@ -75,7 +71,7 @@ module.exports = function(config) {
       // list above.
       'core/templates/dev/head/components/rating_display.html': ['ng-html2js'],
       'extensions/interactions/**/*.html': ['ng-html2js'],
-      'extensions/interactions/rules.json': ['json_fixtures']
+      'extensions/interactions/rule_templates.json': ['json_fixtures']
     },
     reporters: ['progress', 'coverage'],
     coverageReporter: {

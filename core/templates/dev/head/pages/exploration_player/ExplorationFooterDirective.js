@@ -41,8 +41,9 @@ oppia.directive('explorationFooter', [function() {
         };
 
         ExplorationSummaryBackendApiService
-          .loadPublicAndPrivateExplorationSummaries(
-                [$scope.explorationId]).then(function(summaries) {
+          .loadPublicAndPrivateExplorationSummaries([$scope.explorationId])
+          .then(
+            function(summaries) {
               var summaryBackendObject = null;
               if (summaries.length > 0) {
                 var contributorSummary = (

@@ -97,6 +97,17 @@ oppia.controller('Preferences', [
         'preferred_site_language_code', preferredSiteLanguageCode);
     };
 
+    $scope.showUsernamePopover = function(creatorUsername) {
+      // The popover on the subscription card is only shown if the length of
+      // the creator username is greater than 10 and the user hovers over
+      // the truncated username.
+      if (creatorUsername.length > 10) {
+        return 'mouseenter';
+      } else {
+        return 'none';
+      }
+    };
+
     $scope.saveEmailPreferences = function(
       canReceiveEmailUpdates, canReceiveEditorRoleEmail,
       canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail) {

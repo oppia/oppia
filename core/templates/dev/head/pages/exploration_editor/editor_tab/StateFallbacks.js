@@ -20,12 +20,12 @@ oppia.controller('StateFallbacks', [
   '$scope', '$rootScope', '$modal', '$filter', 'editorContextService',
   'alertsService', 'INTERACTION_SPECS', 'stateFallbacksService',
   'explorationStatesService', 'stateInteractionIdService',
-  'UrlInterpolationService',
+  'UrlInterpolationService', 'FallbackObjectFactory',
   function(
       $scope, $rootScope, $modal, $filter, editorContextService,
       alertsService, INTERACTION_SPECS, stateFallbacksService,
       explorationStatesService, stateInteractionIdService,
-      UrlInterpolationService) {
+      UrlInterpolationService, FallbackObjectFactory) {
     $scope.editorContextService = editorContextService;
     $scope.stateFallbacksService = stateFallbacksService;
     $scope.activeFallbackIndex = null;
@@ -42,7 +42,7 @@ oppia.controller('StateFallbacks', [
     });
 
     $scope.getFallbackSummary = function(fallback) {
-      var numSubmits = fallback.trigger.customization_args.num_submits.value;
+      var numSubmits = fallback.trigger.customizationArgs.num_submits.value;
       var fallbackDescription = (
         '[' + numSubmits +
         ' unsuccessful attempt' + (numSubmits !== 1 ? 's' : '') + '] ');
@@ -87,21 +87,8 @@ oppia.controller('StateFallbacks', [
               }]
             };
 
-            $scope.tmpFallback = {
-              trigger: {
-                trigger_type: 'NthResubmission',
-                customization_args: {
-                  num_submits: {
-                    value: 3
-                  }
-                }
-              },
-              outcome: {
-                dest: editorContextService.getActiveStateName(),
-                feedback: [''],
-                param_changes: []
-              }
-            };
+            $scope.tmpFallback = FallbackObjectFactory.createDefault(
+              editorContextService.getActiveStateName());
 
             $scope.isSelfLoopWithNoFeedback = function(outcome) {
               var hasFeedback = outcome.feedback.some(function(feedbackPiece) {

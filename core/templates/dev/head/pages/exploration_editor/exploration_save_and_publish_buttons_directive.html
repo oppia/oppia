@@ -59,7 +59,7 @@
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu" role="menu" style="min-width: 125px; right: inherit;" ng-style="{ width: getChangeListLength() && !isPrivate() ? '150px' : '120px' }">
-          <li><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="protractor-test-discard-changes" title="Discard all pending changes.">Discard Draft</a></li>
+          <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="protractor-test-discard-changes">Discard Draft</a></li>
         </ul>
       </div>
     </li>

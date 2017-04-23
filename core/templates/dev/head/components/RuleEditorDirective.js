@@ -35,11 +35,11 @@ oppia.directive('ruleEditor', ['$log', function($log) {
       '$scope', '$timeout', 'editorContextService',
       'explorationStatesService', 'routerService', 'validatorsService',
       'responsesService', 'stateInteractionIdService', 'INTERACTION_SPECS',
-      'CLASSIFIER_RULESPEC_STR', function(
+      'RULE_TYPE_CLASSIFIER', function(
           $scope, $timeout, editorContextService,
           explorationStatesService, routerService, validatorsService,
           responsesService, stateInteractionIdService, INTERACTION_SPECS,
-          CLASSIFIER_RULESPEC_STR) {
+          RULE_TYPE_CLASSIFIER) {
         var DEFAULT_OBJECT_VALUES = GLOBALS.DEFAULT_OBJECT_VALUES;
 
         $scope.currentInteractionId = stateInteractionIdService.savedMemento;
@@ -47,14 +47,14 @@ oppia.directive('ruleEditor', ['$log', function($log) {
 
         // This returns the rule description string.
         var computeRuleDescriptionFragments = function() {
-          if (!$scope.rule.rule_type) {
+          if (!$scope.rule.type) {
             $scope.ruleDescriptionFragments = [];
             return '';
           }
 
           var ruleDescription = (
             INTERACTION_SPECS[$scope.currentInteractionId].rule_descriptions[
-              $scope.rule.rule_type]);
+              $scope.rule.type]);
 
           var PATTERN = /\{\{\s*(\w+)\s*\|\s*(\w+)\s*\}\}/;
           var finalInputArray = ruleDescription.split(PATTERN);
@@ -82,24 +82,26 @@ oppia.directive('ruleEditor', ['$log', function($log) {
               if (answerChoices.length > 0) {
                 if (finalInputArray[2] === 'SetOfHtmlString') {
                   $scope.ruleDescriptionChoices = answerChoices.map(
-                      function(choice) {
-                    return {
-                      id: choice.label,
-                      val: choice.label
-                    };
-                  });
+                    function(choice) {
+                      return {
+                        id: choice.label,
+                        val: choice.label
+                      };
+                    }
+                  );
                   result.push({
                     type: 'checkboxes',
                     varName: finalInputArray[i + 1]
                   });
                 } else {
                   $scope.ruleDescriptionChoices = answerChoices.map(
-                      function(choice) {
-                    return {
-                      id: choice.val,
-                      val: choice.label
-                    };
-                  });
+                    function(choice) {
+                      return {
+                        id: choice.val,
+                        val: choice.label
+                      };
+                    }
+                  );
                   result.push({
                     type: 'select',
                     varName: finalInputArray[i + 1]
@@ -146,7 +148,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           var oldRuleInputs = angular.copy($scope.rule.inputs) || {};
           var oldRuleInputTypes = angular.copy($scope.rule.inputTypes) || {};
 
-          $scope.rule.rule_type = newRuleType;
+          $scope.rule.type = newRuleType;
           $scope.rule.inputs = {};
           $scope.rule.inputTypes = {};
 
@@ -193,7 +195,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         };
 
         $scope.onDeleteTrainingDataEntry = function(index) {
-          if ($scope.rule.rule_type === CLASSIFIER_RULESPEC_STR) {
+          if ($scope.rule.type === RULE_TYPE_CLASSIFIER) {
             var trainingData = $scope.rule.inputs.training_data;
             if (index < trainingData.length) {
               trainingData.splice(index, 1);
@@ -211,8 +213,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
 
         $scope.init = function() {
           // Select a default rule type, if one isn't already selected.
-          if ($scope.rule.rule_type === null) {
-            $scope.onSelectNewRuleType($scope.rule.rule_type);
+          if ($scope.rule.type === null) {
+            $scope.onSelectNewRuleType($scope.rule.type);
           }
           computeRuleDescriptionFragments();
         };

@@ -12,26 +12,50 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-oppia.factory('AnswerGroupObjectFactory', [function() {
-  var AnswerGroup = function(ruleSpecs, outcome, correct) {
-    this.ruleSpecs = ruleSpecs;
-    this.outcome = outcome;
-    this.correct = correct;
-  };
+/**
+ * @fileoverview Factory for creating new frontend instances of AnswerGroup
+ * domain objects.
+ */
 
-  AnswerGroup.prototype.toBackendDict = function() {
-    return {
-      rule_specs: this.ruleSpecs,
-      outcome: this.outcome,
-      correct: this.correct
+oppia.factory('AnswerGroupObjectFactory', [
+  'RuleObjectFactory', 'OutcomeObjectFactory',
+  function(RuleObjectFactory, OutcomeObjectFactory) {
+    var AnswerGroup = function(rules, outcome, correct) {
+      this.rules = rules;
+      this.outcome = outcome;
+      this.correct = correct;
     };
-  };
 
-  // Static class methods. Note that "this" is not available in
-  // static contexts.
-  AnswerGroup.create = function(ruleSpecs, outcome, correct) {
-    return new AnswerGroup(ruleSpecs, outcome, correct);
-  };
+    AnswerGroup.prototype.toBackendDict = function() {
+      return {
+        rule_specs: this.rules.map(function(rule) {
+          return rule.toBackendDict();
+        }),
+        outcome: this.outcome.toBackendDict(),
+        correct: this.correct
+      };
+    };
 
-  return AnswerGroup;
-}]);
+    // Static class methods. Note that "this" is not available in
+    // static contexts.
+    AnswerGroup.createNew = function(rules, outcome, correct) {
+      return new AnswerGroup(rules, outcome, correct);
+    };
+
+    AnswerGroup.createFromBackendDict = function(answerGroupBackendDict) {
+      return new AnswerGroup(
+        generateRulesFromBackend(answerGroupBackendDict.rule_specs),
+        OutcomeObjectFactory.createFromBackendDict(
+          answerGroupBackendDict.outcome),
+        false);
+    };
+
+    var generateRulesFromBackend = function(ruleBackendDicts) {
+      return ruleBackendDicts.map(function(ruleBackendDict) {
+        return RuleObjectFactory.createFromBackendDict(ruleBackendDict);
+      });
+    };
+
+    return AnswerGroup;
+  }
+]);

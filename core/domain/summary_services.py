@@ -60,6 +60,22 @@ _LIBRARY_INDEX_GROUPS = [{
 
 
 def get_human_readable_contributors_summary(contributors_summary):
+    """Gets contributors summary in human readable form.
+
+    Args:
+        contributors_summary: dict. The keys are user ids and
+            the values are the number of commits made by that user.
+
+    Returns:
+        dict. Dicts of contributors in human readable form; the keys are
+        usernames and the values are a dict. Example:
+
+        {
+            'albert': {
+                'num_commits': 10,
+            },
+        }
+    """
     contributor_ids = contributors_summary.keys()
     contributor_usernames = user_services.get_human_readable_user_ids(
         contributor_ids)
@@ -74,16 +90,29 @@ def get_human_readable_contributors_summary(contributors_summary):
 def get_learner_collection_dict_by_id(
         collection_id, user_id, strict=True, allow_invalid_explorations=False,
         version=None):
-    """Creates and returns a dictionary representation of a collection given by
-    the provided collection ID. This dictionary contains extra information
-    along with the dict returned by collection_domain.Collection.to_dict()
-    which includes useful data for the collection learner view. The information
-    includes progress in the collection, information about explorations
-    referenced within the collection, and a slightly nicer data structure for
-    frontend work.
-    This raises a ValidationError if the collection retrieved using the given
-    ID references non-existent explorations.
-    which includes useful data for the collection learner view.
+    """Gets a dictionary representation of a collection given by the provided
+    collection ID. This dict includes user-specific playthrough information.
+
+    Args:
+        collection_id: str. The id of the collection.
+        user_id: str. The user_id of the learner.
+        strict: bool. Whether to fail noisily if no collection with the given
+            id exists in the datastore.
+        allow_invalid_explorations: bool. Whether to also return explorations
+            that are invalid, such as deleted/private explorations.
+        version: str or None. The version number of the collection to be
+            retrieved. If it is None, the latest version will be retrieved.
+
+    Returns:
+        dict. A dictionary that contains extra information along with the dict
+        returned by collection_domain.Collection.to_dict() which includes useful
+        data for the collection learner view. The information includes progress
+        in the collection, information about explorations referenced within the
+        collection, and a slightly nicer data structure for frontend work.
+
+    Raises:
+        ValidationError: If the collection retrieved using the given
+            ID references non-existent explorations.
     """
     collection = collection_services.get_collection_by_id(
         collection_id, strict=strict, version=version)
@@ -150,8 +179,16 @@ def get_learner_collection_dict_by_id(
 
 
 def get_displayable_collection_summary_dicts_matching_ids(collection_ids):
-    """Returns a list with all collection summary objects that can be
-    displayed on the library page as collection summary tiles.
+    """Returns a list of collection summary dicts corresponding to the given
+    collection ids.
+
+    Args:
+        collection_ids: list(str). A list of collection ids.
+
+    Return:
+        list(dict). Each element in this list is a collection summary dict.
+        These elements are returned in the same order as that given
+        in collection_ids.
     """
     collection_summaries = (
         collection_services.get_collection_summaries_matching_ids(
@@ -169,13 +206,14 @@ def get_exp_metadata_dicts_matching_query(query_string, search_cursor, user_id):
         search_cursor: str or None. The cursor location to start the search
             from. If None, the returned values are from the beginning
             of the results list.
-        user_id: str or None. If not None, private explorations that are
-            editable by this user are also returned.
+        user_id: str or None. The id of the user performing the query.
+            If not None, private explorations that are editable by this user
+            are also returned.
 
     Returns:
-        exploration_list: A list of metadata dicts for explorations matching
-            the query.
-        new_search_cursor: New search cursor location.
+        exploration_list: list(dict). A list of metadata dicts for explorations
+            matching the query.
+        new_search_cursor: str. New search cursor location.
     """
     exp_ids, new_search_cursor = (
         exp_services.get_exploration_ids_matching_query(
@@ -193,17 +231,18 @@ def get_exploration_metadata_dicts(exploration_ids, editor_user_id=None):
     node search.
 
     Args:
-        exploration_ids: A list of exploration ids for which exploration
-            metadata dicts are to be returned.
-        editor_user_id: str or None. If not None, private explorations that are
-            editable by this user are also returned.
+        exploration_ids: list(str). A list of exploration ids for which
+            exploration metadata dicts are to be returned.
+        editor_user_id: str or None. The id of the user performing the query.
+            If not None, private explorations that are editable by this user
+            are also returned.
 
     Returns:
-        A list of metadata dicts corresponding to the given exploration ids.
-        Each dict has three keys:
-            'id': the exploration id
-            'title': the exploration title
-            'objective': the exploration objective
+        list(dict). A list of metadata dicts corresponding to the given
+        exploration ids. Each dict has three keys:
+            'id': the exploration id;
+            'title': the exploration title;
+            'objective': the exploration objective.
     """
     exploration_summaries = (
         exp_services.get_exploration_summaries_matching_ids(exploration_ids))
@@ -230,13 +269,42 @@ def get_exploration_metadata_dicts(exploration_ids, editor_user_id=None):
 
 def get_displayable_exp_summary_dicts_matching_ids(
         exploration_ids, editor_user_id=None):
-    """Given a list of exploration ids, optionally filters the list for
+    """Gets a summary of explorations in human readable form from
+    exploration ids.
+
+    Given a list of exploration ids, optionally filters the list for
     explorations that are currently non-private and not deleted, and returns a
     list of dicts of the corresponding exploration summaries. This function can
     also filter based on a user ID who has edit access to the corresponding
     exploration, where the editor ID is for private explorations. Please use
     this function when needing summary information to display on exploration
     summary tiles in the frontend.
+
+    Args:
+        exploration_ids: list(str). List of exploration ids.
+        editor_user_id: str or None. If provided, the returned value is
+            filtered based on a user ID who has edit access to the
+            corresponding explorations. Otherwise, the returned list is not
+            filtered.
+
+    Return:
+        list(dict). A list of exploration summary dicts in human readable form.
+        Example:
+
+        [ {
+            'category': u'A category',
+            'community_owned': False,
+            'id': 'eid2',
+            'language_code': 'en',
+            'num_views': 0,
+            'objective': u'An objective',
+            'status': 'public',
+            'tags': [],
+            'thumbnail_bg_color': '#a33f40',
+            'thumbnail_icon_url': self.get_static_asset_url(
+                '/images/subjects/Lightbulb.svg'),
+            'title': u'Exploration 2 Albert title',
+        }, ]
     """
     exploration_summaries = (
         exp_services.get_exploration_summaries_matching_ids(exploration_ids))
@@ -260,12 +328,36 @@ def get_displayable_exp_summary_dicts_matching_ids(
 
 
 def get_displayable_exp_summary_dicts(exploration_summaries):
-    """Given a list of exploration summary domain objects, returns a list,
+    """Gets a summary of explorations in human readable form.
+
+    Given a list of exploration summary domain objects, returns a list,
     with the same number of elements, of the corresponding human-readable
     exploration summary dicts.
-
     This assumes that all the exploration summary domain objects passed in are
     valid (i.e., none of them are None).
+
+    Args:
+        exploration_summaries: list(ExplorationSummary). List of exploration
+        summary objects.
+
+    Return:
+        list(dict). A list of exploration summary dicts in human readable form.
+        Example:
+
+        [ {
+            'category': u'A category',
+            'community_owned': False,
+            'id': 'eid2',
+            'language_code': 'en',
+            'num_views': 0,
+            'objective': u'An objective',
+            'status': 'public',
+            'tags': [],
+            'thumbnail_bg_color': '#a33f40',
+            'thumbnail_icon_url': self.get_static_asset_url(
+                '/images/subjects/Lightbulb.svg'),
+            'title': u'Exploration 2 Albert title',
+        }, ]
     """
     exploration_ids = [
         exploration_summary.id
@@ -313,6 +405,31 @@ def get_displayable_exp_summary_dicts(exploration_summaries):
 
 
 def _get_displayable_collection_summary_dicts(collection_summaries):
+    """Gets a summary of collections in human readable form.
+
+    Args:
+        collection_summaries: list(CollectionSummary). List of collection
+        summary domain object.
+
+    Return:
+        list(dict). A list of exploration summary dicts in human readable form.
+        Example:
+
+        [ {
+            'category': u'A category',
+            'community_owned': False,
+            'id': 'eid2',
+            'language_code': 'en',
+            'num_views': 0,
+            'objective': u'An objective',
+            'status': 'public',
+            'tags': [],
+            'thumbnail_bg_color': '#a33f40',
+            'thumbnail_icon_url': self.get_static_asset_url(
+                '/images/subjects/Lightbulb.svg'),
+            'title': u'Exploration 2 Albert title',
+        }, ]
+    """
     displayable_collection_summaries = []
     for collection_summary in collection_summaries:
         if collection_summary and collection_summary.status != (
@@ -339,6 +456,23 @@ def _get_displayable_collection_summary_dicts(collection_summaries):
 def get_library_groups(language_codes):
     """Returns a list of groups for the library index page. Each group has a
     header and a list of dicts representing activity summaries.
+
+    Args:
+        language_codes: list(str). A list of language codes. Only explorations
+            with these languages will be returned.
+
+    Return:
+        list(dict). A list of groups for the library index page. Each group is
+        represented by a dict with the following keys and values:
+            - activity_summary_dicts: list(dict). A list of dicts representing
+                activity summaries.
+            - categories: list(str). The list of group categories.
+            - header_i18n_id: str. The i18n id for the header of the category.
+            - has_full_results_page: bool. Whether the group header links to
+                a "full results" page. This is always True for the
+                "exploration category" groups.
+            - full_results_url: str. The URL to the corresponding "full results"
+                page.
     """
     language_codes_suffix = ''
     if language_codes:
@@ -423,6 +557,14 @@ def get_library_groups(language_codes):
 def require_activities_to_be_public(activity_references):
     """Raises an exception if any activity reference in the list does not
     exist, or is not public.
+
+    Args:
+        activity_references: list(ActivityReference). A list of
+            ActivityReference domain objects.
+
+    Raises:
+        Exception: Any activity reference in the list does not
+            exist, or is not public.
     """
     exploration_ids, collection_ids = activity_services.split_by_type(
         activity_references)
@@ -453,8 +595,31 @@ def require_activities_to_be_public(activity_references):
 
 def get_featured_activity_summary_dicts(language_codes):
     """Returns a list of featured activities with the given language codes.
-
     The return value is sorted according to the list stored in the datastore.
+
+    Args:
+        language_codes: list(str). A list of language codes. Only explorations
+            with these languages will be returned.
+
+    Return:
+        list(dict). Each dict in this list represents a featured activity.
+        For example:
+
+        [ {
+            'status': 'public',
+            'thumbnail_bg_color': '#a33f40',
+            'community_owned': False,
+            'tags': [],
+            'thumbnail_icon_url': self.get_static_asset_url(
+                '/images/subjects/Lightbulb.svg'),
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'id': 'eid2',
+            'category': 'A category',
+            'ratings': feconf.get_empty_ratings(),
+            'title': 'A title',
+            'num_views': 0,
+            'objective': 'An objective',
+        }, ]
     """
     activity_references = activity_services.get_featured_activity_references()
     exploration_ids, collection_ids = activity_services.split_by_type(
@@ -486,9 +651,33 @@ def get_featured_activity_summary_dicts(language_codes):
 
 
 def get_top_rated_exploration_summary_dicts(language_codes, limit):
-    """Returns a list of top rated explorations with the given language code.
-
+    """Returns a list of top rated explorations with the given language codes.
     The return value is sorted in decreasing order of average rating.
+
+    Args:
+        language_codes: list(str). A list of language codes. Only explorations
+            with these languages will be returned.
+        limit: int. The maximum number of explorations to return.
+
+    Return:
+        list(dict). Each dict in this list represents a exploration summary in
+        human readable form. The list is sorted in decreasing order of average
+        rating. For example:
+
+        [ {
+            'category': u'A category',
+            'community_owned': False,
+            'id': 'eid2',
+            'language_code': 'en',
+            'num_views': 0,
+            'objective': u'An objective',
+            'status': 'public',
+            'tags': [],
+            'thumbnail_bg_color': '#a33f40',
+            'thumbnail_icon_url': self.get_static_asset_url(
+                '/images/subjects/Lightbulb.svg'),
+            'title': u'Exploration 2 Albert title',
+        }, ]
     """
     filtered_exp_summaries = [
         exp_summary for exp_summary in
@@ -505,8 +694,29 @@ def get_top_rated_exploration_summary_dicts(language_codes, limit):
 
 
 def get_recently_published_exp_summary_dicts(limit):
-    """Returns a list of recently published explorations
-     with the given language code.
+    """Returns a list of recently published explorations.
+
+    Args:
+        limit: int. The maximum number of explorations to return.
+
+    Return:
+        list(dict). Each dict in this list represents a featured activity in
+        human readable form. For example:
+
+        [ {
+            'category': u'A category',
+            'community_owned': False,
+            'id': 'eid2',
+            'language_code': 'en',
+            'num_views': 0,
+            'objective': u'An objective',
+            'status': 'public',
+            'tags': [],
+            'thumbnail_bg_color': '#a33f40',
+            'thumbnail_icon_url': self.get_static_asset_url(
+                '/images/subjects/Lightbulb.svg'),
+            'title': u'Exploration 2 Albert title',
+        }, ]
     """
     recently_published_exploration_summaries = [
         exp_summary for exp_summary in
