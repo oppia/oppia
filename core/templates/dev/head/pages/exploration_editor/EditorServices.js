@@ -916,7 +916,6 @@ oppia.factory('explorationStatesService', [
     // TODO(sll): Add unit tests for all get/save methods.
     return {
       init: function(statesBackendDict) {
-        console.log(angular.copy(statesBackendDict));
         _states = StatesObjectFactory.createFromBackendDict(statesBackendDict);
       },
       getStates: function() {
@@ -1743,7 +1742,6 @@ oppia.factory('graphDataService', [
 
       var states = explorationStatesService.getStates();
       var initStateId = explorationInitStateNameService.savedMemento;
-      console.log(angular.copy(states));
       _graphData = computeGraphService.compute(initStateId, states);
     };
 

@@ -273,8 +273,8 @@ oppia.factory('ExplorationDiffService', [
     return {
       getDiffGraphData: function(oldStates, newStates, changeListData) {
         return _getDiffGraphData(
-          oldStates.getStates(),
-          newStates.getStates(),
+          oldStates,
+          newStates,
           changeListData);
       }
     };
