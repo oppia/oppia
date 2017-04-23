@@ -1,0 +1,6 @@
+/*!
+ * Angular Material Design
+ * https://github.com/angular/material
+ * @license MIT
+ * v0.6.0-rc1
+ */md-switch{position:relative;height:24px;margin:8px;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-ms-flex-align:center;align-items:center}md-switch .md-switch-bar{position:absolute;left:16px;top:12px;width:32px;height:1px;pointer-events:none}md-switch .md-switch-thumb{position:absolute;margin:0;left:0;top:0;outline:0}md-switch .md-switch-thumb .md-container{position:absolute;transition:-webkit-transform .2s linear;transition:transform .2s linear;-webkit-transform:translate3d(0,0,0);transform:translate3d(0,0,0)}md-switch .md-switch-thumb.md-checked .md-container{-webkit-transform:translate3d(48px,0,0);transform:translate3d(48px,0,0)}md-switch .md-switch-thumb .md-label{margin-left:72px}

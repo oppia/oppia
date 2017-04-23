@@ -1,0 +1,11 @@
+Metadata-Version: 1.0
+Name: GoogleAppEngineCloudStorageClient
+Version: 1.9.15.0
+Summary: This library is the preferred way of accessing Google Cloud Storage from App Engine. It was designed to replace the Files API. As a result it contains much of the same functionality (streaming reads and writes but not the complete set of GCS APIs). It also provides key stability improvements and a better overall developer experience.
+Home-page: https://code.google.com/p/appengine-gcs-client/
+Author: Google App Engine
+Author-email: app-engine-pipeline-api@googlegroups.com
+License: Apache License 2.0
+Description: UNKNOWN
+Keywords: google app engine cloud storage
+Platform: UNKNOWN

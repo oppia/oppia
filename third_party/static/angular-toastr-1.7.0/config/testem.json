@@ -1,0 +1,13 @@
+{
+  "framework" : "jasmine2",
+  "launch_in_dev" : ["Chrome"],
+  "launch_in_ci" : ["PhantomJS"],
+  "src_files" : [
+    "node_modules/jquery/dist/jquery.js",
+    "node_modules/angular/angular.js",
+    "node_modules/angular-mocks/angular-mocks.js",
+    "gen/toastr.js",
+    "gen/toastr.tpl.js",
+    "test/toastr_spec.js"
+  ]
+}

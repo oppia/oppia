@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <script type="text/javascript" src="../external/log4javascript.js"></script>
+    <script type="text/javascript">
+        var appender = new log4javascript.InPageAppender();
+        log4javascript.getRootLogger().addAppender(appender);
+        var log = log4javascript.getRootLogger();
+        log4javascript.setShowStackTraces(true);
+    </script>
+    <script type="text/javascript" src="../src/core/core.js"></script>
+    <script type="text/javascript" src="../src/core/dom.js"></script>
+    <script type="text/javascript" src="../src/core/domrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedselection.js"></script>
+    <script type="text/javascript">
+        window.onload = function() {
+            rangy.init();
+            var textNode = document.getElementById("b1").nextSibling;
+            var p = textNode.parentNode;
+            var r = document.body.createTextRange();
+
+            var workingRange = r.duplicate();
+            var workingNode = document.createElement("span");
+            workingNode.innerHTML = "&#ffef;";
+            p.insertBefore(workingNode, textNode);
+            workingRange.moveToElementText(workingNode);
+            workingRange.collapse(false);
+            p.removeChild(workingNode);
+            r.setEndPoint("StartToStart", workingRange);
+
+
+            r.select();
+            log.warn(rangy.getSelection().inspect());
+
+        };
+    </script>
+</head>
+<body>
+<p id="p" contenteditable="true"><b id="b1">Bold </b>text<b id="b2"> bold</b></p>
+</body>
+</html>

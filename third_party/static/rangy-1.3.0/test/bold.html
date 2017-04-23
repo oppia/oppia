@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title></title>
+    <script type="text/javascript">
+
+        window.onload = function() {
+            var el = document.getElementById("d");
+
+            var k = function(evt) {
+                evt = evt || window.event;
+                if (evt.keyCode == 66 && evt.ctrlKey) {
+                    document.execCommand("bold", false, null);
+                    if (evt.preventDefault) {
+                        evt.preventDefault();
+                    } else {
+                        evt.returnValue = false;
+                    }
+                    window.setTimeout(function() {alert(el.innerHTML);}, 1);
+
+                }
+            };
+
+            if (el.addEventListener) {
+                el.addEventListener("keydown", k, false);
+            } else {
+                el.attachEvent("onkeydown", k);
+            }
+        };
+    </script>
+    <style type="text/css">
+        *.bold {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div id="d" contenteditable="true">Some lovely <b>bold</b> content and <strong>strong</strong> stuff and
+    a styled <span style="font-weight: bold">span</span>, yeah, and a <span class="bold">classy</span> span</div>
+
+</body>
+</html>

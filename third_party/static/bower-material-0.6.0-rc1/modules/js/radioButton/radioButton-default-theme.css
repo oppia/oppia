@@ -1,0 +1,19 @@
+/*!
+ * Angular Material Design
+ * https://github.com/angular/material
+ * @license MIT
+ * v0.6.0-rc1
+ */
+md-radio-button.md-default-theme .md-container .md-ripple, md-switch.md-default-theme .md-switch-thumb .md-container .md-ripple {
+  color: #43a047; }
+md-radio-button.md-default-theme .md-off, md-switch.md-default-theme .md-switch-thumb .md-off {
+  border-color: rgba(0, 0, 0, 0.54); }
+md-radio-button.md-default-theme .md-on, md-switch.md-default-theme .md-switch-thumb .md-on {
+  background-color: rgba(102, 187, 106, 0.87); }
+md-radio-button.md-default-theme.md-checked .md-off, md-switch.md-default-theme .md-switch-thumb.md-checked .md-off {
+  border-color: rgba(102, 187, 106, 0.87); }
+md-radio-button.md-default-theme.md-checked .md-ink-ripple, md-switch.md-default-theme .md-switch-thumb.md-checked .md-ink-ripple {
+  color: rgba(102, 187, 106, 0.87); }
+
+md-radio-group.md-default-theme:focus {
+  border-color: rgba(0, 0, 0, 0.73); }

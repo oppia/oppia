@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <script type="text/javascript">
+/*
+        document.onmouseup = function() {
+            var sel, range;
+            if (window.getSelection && (sel = window.getSelection()).modify) {
+                sel.modify("extend", "forward", "word");
+            } else if ( (sel = document.selection) && sel.type != "Control") {
+                range = sel.createRange();
+                range.expand("word");
+                range.select();
+            }
+        }
+*/
+
+function moveWordStart() {
+    if (document.selection) {
+        var range = document.selection.createRange();
+        range.moveStart("word", -1);
+        range.select();
+    } else {
+        window.getSelection().modify("move", "backward", "word");
+    }
+}
+
+        function moveWordEnd() {
+            if (document.selection) {
+                var range = document.selection.createRange();
+                range.moveEnd("word", 1);
+                range.select();
+            } else {
+                window.getSelection().modify("extend", "forward", "word");
+            }
+            document.getElementById("editable").focus();
+        }
+
+        function doAction(method, includeCount) {
+            var unitSelect = document.getElementById("units");
+            var units = unitSelect.options[unitSelect.selectedIndex].text;
+            var count = +document.getElementById("count").value;
+            if (document.selection) {
+                var range = document.selection.createRange();
+                document.getElementById("returnValue").value = includeCount ?
+                        range[method](units, count) : range[method](units);
+                range.select();
+                document.getElementById("editable").focus();
+            }
+        }
+    </script>
+</head>
+<body>
+<input type="button" onmousedown="moveWordStart(); return false" value="move start">
+<input type="button" onclick="moveWordEnd();" value="move end">
+<br>
+<input type="button" onmousedown="doAction('move', true); return false" value="Move">
+<input type="button" onmousedown="doAction('expand', false); doAction('expand', false); return false" value="Expand">
+<input type="button" onclick="doAction('moveStart', true);" value="Move start">
+<input type="button" onclick="doAction('moveEnd', true);" value="Move end">
+<input type="text" size="3" id="count" value="1">
+<select id="units">
+    <option>character</option>
+    <option selected>word</option>
+    <option>sentence</option>
+</select>
+<br>
+<input type="text" id="returnValue">
+
+<div id="editable" contenteditable="true">
+    %%This 'is' a Mr. Tickle, and Mr Bump 5$ pass&eacute; sentence.<br> This' is "another" tip-top $64 $5.63 amazing fun&nbsp;&nbsp;&nbsp;sentence. Yes 'five pence' and 60%. Look! Another, one" don't don''t don"t 50:50 !yes! %%70%% 70%% cheese.
+
+    one] two} three{ four [ five) six( seven; eight: nine@ ten~ eleven# twelve/ thirteen& four* five£ £6
+</div></body>
+
+</html>

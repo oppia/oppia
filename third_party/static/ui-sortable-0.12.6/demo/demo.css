@@ -1,0 +1,42 @@
+.list {
+	list-style: none outside none;
+	margin: 10px 0 30px;
+}
+
+.item {
+	width: 200px;
+	padding: 5px 10px;
+	margin: 5px 0;
+	border: 2px solid #444;
+	border-radius: 5px;
+	background-color: #EA8A8A;
+
+	font-size: 1.1em;
+	font-weight: bold;
+	text-align: center;
+	cursor: move;
+}
+
+
+/***  Extra ***/
+
+.logList {
+	margin-top: 20px;
+	width: 250px;
+	min-height: 200px;
+	padding: 5px 15px;
+	border: 5px solid #000;
+	border-radius: 15px;
+}
+
+.logList:before {
+	content: 'log';
+	padding: 0 5px;
+	position: relative;
+	top: -1.1em;
+	background-color: #FFF;
+}
+
+ul[ui-sortable] {
+	float: right;
+}

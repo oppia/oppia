@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>textAngular <%=version %> Demo</title>
+    <meta name="robots" content="noindex">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel='stylesheet' href='../bower_components/font-awesome/css/font-awesome.css'>
+    <style>
+    .ta-editor {
+        min-height: 300px;
+        height: auto;
+        overflow: auto;
+        font-family: inherit;
+        font-size: 100%;
+    }
+    </style>
+
+    <script src='https://ajax.googleapis.com/ajax/libs/angularjs/1.3.11/angular.min.js'></script>
+    <% js.forEach(function(each){ %>
+      <script src='../<%= each %>'></script>
+    <% }); %>
+</head>
+
+<body>
+    <div ng-app="textAngularTest" ng-controller="wysiwygeditor" class="container app">
+        <h1>Editor</h1>
+        <button ng-click="disabled = !disabled" unselectable>Disable text-angular Toggle</button>
+        <div text-angular="text-angular" name="htmlcontent" ng-model="htmlcontent" ta-disabled='disabled'></div>
+        <h1>Raw HTML in a text area</h1>
+        <textarea ng-model="htmlcontent" style="width: 100%"></textarea>
+        <h1>Bound with ng-bind-html</h1>
+        <div ng-bind-html="htmlcontent"></div>
+        <h1>Bound with ta-bind, our internal html-binding directive</h1>
+        <div ta-bind="text" ng-model="htmlcontent" ta-readonly='disabled'></div>
+        <button type="button" ng-click="htmlcontent = orightml">Reset</button>
+        <p>Note: although we support classes and styles, angularjs' ng-bind-html directive will strip out all style attributes.</p>
+        <h1>Option to masquerade as a fancy text-area - complete with form submission and optional ngModel</h1>
+        <text-angular name="htmlcontent" ng-model="htmlcontenttwo">
+            <p>Any <b>HTML</b> we put in-between the text-angular tags gets automatically put into the editor if there <strong style="font-size: 12pt;"><u><em>is not</em></u></strong> a value assigned to the ngModel.</p>
+            <p>If there is a value assigned to the ngModel, it replaces any html here. To see this, uncomment the line at the bottom of demo.html</p>
+        </text-angular>
+        <h1>Bound with ta-bind, our internal html-binding directive</h1>
+        <div ta-bind="text" ng-model="htmlcontenttwo" ta-readonly='disabled'></div>
+    </div>
+
+
+    <script type="text/javascript">
+    angular.module("textAngularTest", ['textAngular'])
+        .controller('wysiwygeditor', function wysiwygeditor($scope) {
+            $scope.orightml = '<h2>Try me!</h2><p>textAngular is a super cool WYSIWYG Text Editor directive for AngularJS</p><p><img class="ta-insert-video" ta-insert-video="http://www.youtube.com/embed/2maA1-mvicY" src="" allowfullscreen="true" width="300" frameborder="0" height="250"/></p><p><b>Features:</b></p><ol><li>Automatic Seamless Two-Way-Binding</li><li>Super Easy <b>Theming</b> Options</li><li style="color: green;">Simple Editor Instance Creation</li><li>Safely Parses Html for Custom Toolbar Icons</li><li class="text-danger">Doesn&apos;t Use an iFrame</li><li>Works with Firefox, Chrome, and IE9+</li></ol><p><b>Code at GitHub:</b> <a href="https://github.com/fraywing/textAngular">Here</a> </p><h4>Supports non-latin Characters</h4><p>昮朐 魡 燚璒瘭 譾躒鑅, 皾籈譧 紵脭脧 逯郹酟 煃 瑐瑍, 踆跾踄 趡趛踠 顣飁 廞 熥獘 豥 蔰蝯蝺 廦廥彋 蕍蕧螛 溹溦 幨懅憴 妎岓岕 緁, 滍 蘹蠮 蟷蠉蟼 鱐鱍鱕, 阰刲 鞮鞢騉 烳牼翐 魡 骱 銇韎餀 媓幁惁 嵉愊惵 蛶觢, 犝獫 嶵嶯幯 縓罃蔾 魵 踄 罃蔾 獿譿躐 峷敊浭, 媓幁 黐曮禷 椵楘溍 輗 漀 摲摓 墐墆墏 捃挸栚 蛣袹跜, 岓岕 溿 斶檎檦 匢奾灱 逜郰傃</p>';
+            $scope.htmlcontent = $scope.orightml;
+            $scope.disabled = false;
+        });
+    </script>
+</body>
+
+</html>

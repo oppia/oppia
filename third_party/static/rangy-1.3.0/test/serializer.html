@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>Serializer Test</title>
+    <script type="text/javascript" src="../external/log4javascript.js"></script>
+    <script type="text/javascript" src="../src/core/core.js"></script>
+    <script type="text/javascript" src="../src/core/dom.js"></script>
+    <script type="text/javascript" src="../src/core/domrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedselection.js"></script>
+    <script type="text/javascript" src="../src/modules/rangy-serializer.js"></script>
+    <script type="text/javascript">
+        function restoreSelection() {
+            rangy.init();
+            rangy.restoreSelectionFromCookie();
+        }
+
+        function saveSelection() {
+            //alert(rangy.getSelection().inspect());
+            rangy.saveSelectionCookie();
+        }
+
+        window.onload = restoreSelection;
+        window.onbeforeunload = saveSelection;
+    </script>
+</head>
+<body>
+<h1>Serializer Test</h1>
+<p>Below is some editable content:</p>
+<p id="editable" contenteditable="true" style="border: solid green 1px; background-color: lightgoldenrodyellow;">
+    The <b>cabbage</b> is a popular <a href="#" title="Cultivar">cultivar</a> of a the species
+    <i><a href="#" title="Brassica oleracea">Brassica oleracea</a> Linne</i> (Capitata Group)
+    of the Family <a href="#" title="Brassicaceae">Brassicaceae</a> (or Cruciferae), and is used as
+    a leafy green <a href="#" title="Leaf vegetable">vegetable</a>. It is a
+    <a href="#" title="Herbaceous" class="mw-redirect">herbaceous</a>,
+    <a href="#t" title="Biennial plant">biennial</a>,
+    <a href="#" title="Dicot" class="mw-redirect">dicotyledonous</a>
+
+    <a href="#" title="Flowering plant">flowering plant</a> distinguished by a short stem upon
+    which is crowded a mass of leaves, usually green but in some varieties red or purplish, which while immature
+    form a characteristic compact, globular cluster (<i>cabbagehead</i>).
+</p>
+<p id="editable2" contenteditable="true" style="border: solid green 1px; background-color: lightgoldenrodyellow;">
+    The <b>cabbage</b> is a popular <a href="#" title="Cultivar">cultivar</a> of a the species
+    <i><a href="#" title="Brassica oleracea">Brassica oleracea</a> Linne</i> (Capitata Group)
+    of the Family <a href="#" title="Brassicaceae">Brassicaceae</a> (or Cruciferae), and is used as
+    a leafy green <a href="#" title="Leaf vegetable">vegetable</a>. It is a
+    <a href="#" title="Herbaceous" class="mw-redirect">herbaceous</a>,
+    <a href="#t" title="Biennial plant">biennial</a>,
+    <a href="#" title="Dicot" class="mw-redirect">dicotyledonous</a>
+
+    <a href="#" title="Flowering plant">flowering plant</a> distinguished by a short stem upon
+    which is crowded a mass of leaves, usually green but in some varieties red or purplish, which while immature
+    form a characteristic compact, globular cluster (<i>cabbagehead</i>).
+</p>
+<p>
+    Press the button to refresh this page and restore the current selection from the cookie:
+    <input type="button" value="show" onmousedown="alert(rangy.serializeSelection(rangy.getSelection()));">
+    <input type="button" value="refresh" onmousedown="window.location.reload()">
+    <input type="button" unselectable value="copy selection to second para" onclick="var el1 = document.getElementById('editable'), el2 = document.getElementById('editable2'); var s = rangy.serializeSelection(null, false, el1); rangy.deserializeSelection(s, el2);">
+</p>
+
+</body>
+</html>

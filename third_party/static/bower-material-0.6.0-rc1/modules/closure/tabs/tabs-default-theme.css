@@ -1,0 +1,20 @@
+/*!
+ * Angular Material Design
+ * https://github.com/angular/material
+ * @license MIT
+ * v0.6.0-rc1
+ */
+md-tabs.md-default-theme .md-header {
+  background-color: #03a9f4; }
+md-tabs.md-default-theme md-tabs-ink-bar {
+  background: #ffff85; }
+md-tabs.md-default-theme md-tab {
+  color: #b3e5fc; }
+  md-tabs.md-default-theme md-tab.active {
+    color: white; }
+  md-tabs.md-default-theme md-tab[disabled] {
+    color: rgba(0, 0, 0, 0.12); }
+  md-tabs.md-default-theme md-tab:focus {
+    border-color: rgba(0, 0, 0, 0.73); }
+  md-tabs.md-default-theme md-tab .md-ripple-container {
+    color: #ffff85; }

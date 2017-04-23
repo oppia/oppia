@@ -1,0 +1,25 @@
+<html>
+  <head>
+    <title>demo of math-expressions</title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js"></script>
+    <script type="text/javascript" src="../build/math-expressions.js"></script>
+    <script type="text/javascript" src="demo.js"></script>
+  </head>
+  <body>
+    <h1>demo of math-expressions</h1>
+
+    <form>
+      Left hand side: <input type="text" id="lhs-input" data-target="lhs">
+    </form>
+
+    <p>Left hand TeX: <span id="lhs"></span></p>
+    
+    <form>
+      Right hand side: <input type="text" id="rhs-input" data-target="rhs">
+    </form>
+
+    <p>Right hand TeX: <span id="rhs"></span></p>
+    
+    <p>LHS = RHS?  <span id="equality"></span></p>
+  </body>
+</html>

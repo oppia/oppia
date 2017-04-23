@@ -1,0 +1,28 @@
+/*!
+ * Angular Material Design
+ * https://github.com/angular/material
+ * @license MIT
+ * v0.6.0-rc1
+ */
+md-input-group.md-default-theme input, md-input-group.md-default-theme textarea {
+  text-shadow: none; }
+  md-input-group.md-default-theme input:-ms-input-placeholder, md-input-group.md-default-theme textarea:-ms-input-placeholder {
+    color: rgba(0, 0, 0, 0.26); }
+  md-input-group.md-default-theme input::-webkit-input-placeholder, md-input-group.md-default-theme textarea::-webkit-input-placeholder {
+    color: rgba(0, 0, 0, 0.26); }
+md-input-group.md-default-theme label {
+  text-shadow: none;
+  color: rgba(0, 0, 0, 0.26); }
+md-input-group.md-default-theme input, md-input-group.md-default-theme textarea {
+  color: rgba(0, 0, 0, 0.73);
+  border-color: rgba(0, 0, 0, 0.12); }
+md-input-group.md-default-theme.md-input-focused input, md-input-group.md-default-theme.md-input-focused textarea {
+  border-color: #03a9f4; }
+md-input-group.md-default-theme.md-input-focused label {
+  color: #03a9f4; }
+md-input-group.md-default-theme.md-input-has-value:not(.md-input-focused) label {
+  color: rgba(0, 0, 0, 0.372); }
+md-input-group.md-default-theme[disabled] input, md-input-group.md-default-theme[disabled] textarea {
+  border-bottom-color: rgba(0, 0, 0, 0.12);
+  color: rgba(0, 0, 0, 0.26);
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.19) 0%, rgba(0, 0, 0, 0.19) 50%, rgba(0, 0, 0, 0) 0%); }

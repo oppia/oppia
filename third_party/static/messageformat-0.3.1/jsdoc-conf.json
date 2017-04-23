@@ -1,0 +1,5 @@
+{
+  "source": { "include": [ "lib/messageformat.js" ] },
+  "plugins": [ "plugins/markdown" ],
+  "opts": { "destination": "./doc/" }
+}

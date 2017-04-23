@@ -1,0 +1,5 @@
+Each testcase file can be run directly through a python interpreter
+(e.g. python test_tokenizer.py).
+
+Some testcases depend on the json module (available since Python 2.6),
+but will fall back to using simplejson if json is not available.

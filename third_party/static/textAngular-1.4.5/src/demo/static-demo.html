@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>textAngular <%=version %> Demo</title>
+    <meta name="robots" content="noindex">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel='stylesheet prefetch' href='../bower_components/font-awesome/css/font-awesome.css'>
+    <link rel='stylesheet prefetch' href='../dist/textAngular.css' media="screen">
+
+    <style>
+    .ta-editor,
+    .ta-editor > .ta-bind {
+        min-height: 600px;
+    }
+
+    .red {
+        color: red;
+    }
+
+    .statictoolbar {
+        position: fixed;
+        top: 12px;
+        z-index: 200;
+        left: 0;
+        right: 0;
+    }
+    </style>
+    <% js.forEach(function(each){ %>
+      <script src='../<%= each %>'></script>
+    <% }); %>
+</head>
+
+<body>
+    <div ng-app="textAngularTest" ng-controller="wysiwygeditor" class="container app">
+        <div text-angular-toolbar name="statictoolbar" class="statictoolbar"></div>
+        <h1>Toolbar</h1>
+        <p>
+            <button type="button" ng-click="changetesth1()">Test Change H1 Text</button>
+            <button type="button" ng-click="changeallh2()">All Change H2 Text</button>
+            <button type="button" ng-click="changeallh()">All H* Text</button>
+            <button type="button" ng-click="iconsallh()">Change H* Icons</button>
+            <button type="button" ng-click="resettoolbar()">Reset All Toolbar Buttons</button>
+        </p>
+        <div text-angular-toolbar name="test"></div>
+        <h1>Editor</h1>
+        <button ng-click="disabled = !disabled" unselectable>Disable text-angular Toggle</button>
+        <div text-angular-toolbar name="htmlcontenttools"></div>
+        <button ng-click="canEdit = !canEdit">Can Edit</button>
+        <button type="button" ta-button ng-click="reset()">Reset</button>
+        <button type="button" ta-button ng-click="clear()">clear</button>
+        <button type="button" ta-button>Does Nothing</button>
+        <form name="validationForm" ng-submit="submit()">
+            <label for="name">Name:</label>
+            <input type="text" tabindex="1" id="name" ng-model="name">
+            <label for="website">Website:</label>
+            <input type="url" tabindex="2" id="website" ng-model="website"> formValid: pristine {{validationForm.testValidation.$pristine}} valid {{validationForm.testValidation.$valid}} dirty {{validationForm.testValidation.$dirty}} invalid {{validationForm.testValidation.$invalid}} Bio:
+            <text-angular name="testValidation" ta-paste="testPaste($html)" ng-if="canEdit" ng-model="data.htmlcontent" tabindex="3" placeholder="test placeholder" required ta-disabled='disabled' ta-default-wrap="p" ta-target-toolbars='htmlcontenttools,statictoolbar' ng-model-options="{debounce: 1000}"></text-angular>
+            <div ta-bind name="testValidation" ng-model="data.htmlcontent" placeholder="test placeholder" required ng-model-options="{debounce: 1000}">
+                </text-angular>
+        </form>
+        <h1>Option to masquerade as a fancy text-area - complete with form submission and optional ngModel</h1>
+        <text-angular name="htmlcontent_nomodel">
+            <p>Any <b>HTML</b> we put in-between the text-angular tags gets <a href="automatic">automatically</a> put into the editor if there <strong style="font-size: 12pt;"><u><em>is not</em></u></strong> a ngModel</p>
+        </text-angular>
+        </div>
+        <script type="text/javascript">
+        'use strict';
+        angular.module("textAngularTest", ['textAngular'])
+            .config(function($provide) {
+                // this demonstrates how to register a new tool and add it to the default toolbar
+                $provide.decorator('taOptions', ['taRegisterTool', '$delegate', function(taRegisterTool, taOptions) { // $delegate is the taOptions we are decorating
+                    taRegisterTool('test', {
+                        buttontext: 'Test',
+                        action: function() {
+                            alert('Test Pressed')
+                        }
+                    });
+                    taOptions.toolbar[1].push('test');
+                    taRegisterTool('colourRed', {
+                        iconclass: "fa fa-square red",
+                        action: function() {
+                            this.$editor().wrapSelection('forecolor', 'red');
+                        }
+                    });
+                    // add the button to the default toolbar definition
+                    taOptions.toolbar[1].push('colourRed');
+                    return taOptions;
+                }]);
+                // this demonstrates changing the classes of the icons for the tools for font-awesome v3.x
+                /*
+								$provide.decorator('taTools', ['$delegate', function(taTools){
+											taTools.bold.iconclass = 'icon-bold';
+											taTools.italics.iconclass = 'icon-italic';
+											taTools.underline.iconclass = 'icon-underline';
+											taTools.ul.iconclass = 'icon-list-ul';
+											taTools.ol.iconclass = 'icon-list-ol';
+											taTools.undo.iconclass = 'icon-undo';
+											taTools.redo.iconclass = 'icon-repeat';
+											taTools.justifyLeft.iconclass = 'icon-align-left';
+											taTools.justifyRight.iconclass = 'icon-align-right';
+											taTools.justifyCenter.iconclass = 'icon-align-center';
+											taTools.clear.iconclass = 'icon-ban-circle';
+											taTools.insertLink.iconclass = 'icon-link';
+											taTools.unlink.iconclass = 'icon-link red';
+											taTools.insertImage.iconclass = 'icon-picture';
+											// there is no quote icon in old font-awesome so we change to text as follows
+											delete taTools.quote.iconclass;
+											taTools.quote.buttontext = 'quote';
+											return taTools;
+										}]);
+								*/
+            })
+            .controller('wysiwygeditor', function($scope, textAngularManager, $document) {
+                $scope.data = {
+                    orightml: '<h2>Try me!</h2><p>textAngular is a super cool WYSIWYG Text Editor directive for AngularJS</p><p><img class="ta-insert-video" ta-insert-video="https://www.youtube.com/embed/2maA1-mvicY" src="https://img.youtube.com/vi/2maA1-mvicY/hqdefault.jpg" allowfullscreen="true" width="300" frameborder="0" height="250"/></p><p><b>Features:</b></p><ol><li>Automatic Seamless Two-Way-Binding</li><li>Super Easy <b>Theming</b> Options</li><li style="color: green;">Simple Editor Instance Creation</li><li>Safely Parses Html for Custom Toolbar Icons</li><li class="text-danger">Doesn&apos;t Use an iFrame</li><li>Works with Firefox, Chrome, and IE9+</li></ol><p><b>Code at GitHub:</b> <a href="https://github.com/fraywing/textAngular">Here</a> </p><p>昮朐 魡 燚璒瘭 譾躒鑅, 皾籈譧 紵脭脧 逯郹酟 煃 瑐瑍, 踆跾踄 趡趛踠 顣飁 廞 熥獘 豥 蔰蝯蝺 廦廥彋 蕍蕧螛 溹溦 幨懅憴 妎岓岕 緁, 滍 蘹蠮 蟷蠉蟼 鱐鱍鱕, 阰刲 鞮鞢騉 烳牼翐 魡 骱 銇韎餀 媓幁惁 嵉愊惵 蛶觢, 犝獫 嶵嶯幯 縓罃蔾 魵 踄 罃蔾 獿譿躐 峷敊浭, 媓幁 黐曮禷 椵楘溍 輗 漀 摲摓 墐墆墏 捃挸栚 蛣袹跜, 岓岕 溿 斶檎檦 匢奾灱 逜郰傃</p>'
+                };
+                $scope.data.htmlcontent = $scope.data.orightml;
+                //$scope.$watch('data.htmlcontent', function(val){console.log('htmlcontent changed to:', val);});
+                $scope.disabled = false;
+                $scope.canEdit = true;
+                $scope.changetesth1 = function() {
+                    textAngularManager.updateToolbarToolDisplay('test', 'h1', {
+                        buttontext: 'Heading 1'
+                    });
+                };
+                $scope.changeallh2 = function() {
+                    textAngularManager.updateToolDisplay('h2', {
+                        buttontext: 'Heading 2'
+                    });
+                };
+                $scope.changeallh = function() {
+                    var data = {};
+                    for (var i = 1; i < 7; i++) {
+                        data['h' + i] = {
+                            buttontext: 'Heading ' + i
+                        };
+                    }
+                    textAngularManager.updateToolsDisplay(data);
+                };
+                $scope.resettoolbar = function() {
+                    textAngularManager.resetToolsDisplay();
+                };
+                $scope.iconsallh = function() {
+                    var data = {};
+                    for (var i = 1; i < 7; i++) {
+                        data['h' + i] = {
+                            iconclass: 'fa fa-flag',
+                            buttontext: i
+                        };
+                    }
+                    textAngularManager.updateToolsDisplay(data);
+                };
+                $scope.submit = function() {
+                    console.log('Submit triggered');
+                };
+                $scope.clear = function() {
+                    $scope.data = {
+                        orightml: '<h2>Try me!</h2><p>textAngular is a super cool WYSIWYG Text Editor directive for AngularJS</p><p><b>Features:</b></p><ol><li>Automatic Seamless Two-Way-Binding</li><li>Super Easy <b>Theming</b> Options</li><li style="color: green;">Simple Editor Instance Creation</li><li>Safely Parses Html for Custom Toolbar Icons</li><li class="text-danger">Doesn&apos;t Use an iFrame</li><li>Works with Firefox, Chrome, and IE9+</li></ol><p><b>Code at GitHub:</b> <a href="https://github.com/fraywing/textAngular">Here</a> </p>'
+                    };
+                };
+                $scope.reset = function() {
+                    $scope.data.htmlcontent = $scope.data.orightml;
+                };
+                $scope.testPaste = function($html) {
+                    console.log('Hit Paste', arguments);
+                    return '<p>Jackpot</p>';
+                };
+            });
+        </script>
+</body>
+
+</html>

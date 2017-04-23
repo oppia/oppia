@@ -1,0 +1,35 @@
+<html>
+<head>
+    <title></title>
+    <script type="text/javascript">
+        function convertCrLf(str) {
+            return "'" + str.replace(/\r/g, "\\r").replace(/\n/g, "\\n") + "'";
+        }
+
+        window.onload = function() {
+            var pre1 = document.getElementById("pre1");
+            var pre2 = document.getElementById("pre2");
+            var pre3 = document.getElementById("pre3");
+
+            alert(convertCrLf(pre1.firstChild.data) + "\n" + convertCrLf(pre2.childNodes[1].data) + "\n" + convertCrLf(pre3.childNodes[1].data));
+            alert(convertCrLf(pre1.firstChild.nodeValue) + "\n" + convertCrLf(pre2.childNodes[1].nodeValue) + "\n" + convertCrLf(pre3.childNodes[1].nodeValue));
+
+            var range = document.body.createTextRange();
+            range.moveToElementText(pre1);
+            alert(convertCrLf(range.text));
+            alert(convertCrLf(range.htmlText));
+        };
+
+    </script>
+</head>
+<body>
+    <pre id="pre1">
+
+One
+
+</pre>
+    <pre id="pre2"><script type="text/javascript">document.write("\n\nTwo\n\n")</script></pre>
+    <pre id="pre3"><script type="text/javascript">document.write("\r\rThree\r\r")</script></pre>
+
+</body>
+</html>

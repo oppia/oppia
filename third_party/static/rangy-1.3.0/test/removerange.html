@@ -1,0 +1,21 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>removeRange test</title>
+    <script type="text/javascript">
+        function test() {
+            var sel = window.getSelection();
+            var b = document.getElementById("b");
+            var r = document.createRange();
+            r.selectNodeContents(b);
+            sel.addRange(r);
+            sel.removeRange(r);
+            alert(sel.rangeCount);
+        }
+    </script>
+</head>
+<body onload="test();">
+    <p>Some text and a <b id="b">bold</b></p>
+</body>
+</html>

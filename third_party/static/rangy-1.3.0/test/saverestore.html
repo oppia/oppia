@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>Selection save/restore test</title>
+    <script type="text/javascript" src="../external/log4javascript.js"></script>
+    <script type="text/javascript">
+        var appender = new log4javascript.InPageAppender();
+        log4javascript.getRootLogger().addAppender(appender);
+        var log = log4javascript.getRootLogger();
+        log4javascript.setShowStackTraces(true);
+    </script>
+    <script type="text/javascript" src="../src/core/core.js"></script>
+    <script type="text/javascript" src="../src/core/dom.js"></script>
+    <script type="text/javascript" src="../src/core/domrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedselection.js"></script>
+    <script type="text/javascript" src="../src/modules/rangy-selectionsaverestore.js"></script>
+    <script type="text/javascript">
+        var saveSelection = function() {
+            alert("Your browser does not support the required features")
+        };
+
+        var restoreSelection = function() {
+            alert("Your browser does not support the required features")
+        };
+
+        function init() {
+            var savedSelection;
+
+            saveSelection = function() {
+                if (savedSelection) {
+                    rangy.removeMarkers(savedSelection);
+                }
+                savedSelection = rangy.saveSelection();
+                document.getElementById("restoreButton").disabled = false;
+            };
+
+            restoreSelection = function() {
+                if (savedSelection) {
+                    rangy.restoreSelection(savedSelection);
+                    savedSelection = null;
+                    document.getElementById("restoreButton").disabled = true;
+                    document.getElementById("editable").focus();
+                }
+            };
+        }
+    </script>
+</head>
+<body onload="init()">
+    <h1>Selection save/restore test</h1>
+
+    <p>Below is some editable content:</p>
+    <p id="editable" contenteditable="true" style="border: solid green 1px; background-color: lightgoldenrodyellow;">
+        The <b>cabbage</b> is a popular <a href="#" title="Cultivar">cultivar</a> of a the species
+        <i><a href="#" title="Brassica oleracea">Brassica oleracea</a> Linne</i> (Capitata Group)
+        of the Family <a href="#" title="Brassicaceae">Brassicaceae</a> (or Cruciferae), and is used as
+        a leafy green <a href="#" title="Leaf vegetable">vegetable</a>. It is a
+        <a href="#" title="Herbaceous" class="mw-redirect">herbaceous</a>,
+        <a href="#t" title="Biennial plant">biennial</a>,
+        <a href="#" title="Dicot" class="mw-redirect">dicotyledonous</a>
+
+        <a href="#" title="Flowering plant">flowering plant</a> distinguished by a short stem upon
+        which is crowded a mass of leaves, usually green but in some varieties red or purplish, which while immature
+        form a characteristic compact, globular cluster (<i>cabbagehead</i>). This is <font color="#00ffff">some</font> <b>area</b> to type.
+    </p>
+    <input type="button" onmousedown="saveSelection();" value="Save selection" unselectable>
+    <input id="restoreButton" type="button" onclick="restoreSelection();" disabled value="Restore selection" unselectable>
+    <p>
+    	Select something in the editable area above. Click on the "Save selection" button. Now click somewhere on the
+    	page to destroy the selection, and then press "Restore selection".
+    </p>
+</body>
+</html>

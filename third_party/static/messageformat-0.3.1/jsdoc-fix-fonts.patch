@@ -1,0 +1,54 @@
+From 444f76d7f22af16dd6227e1cd264d833c6f5c100 Mon Sep 17 00:00:00 2001
+From: Eemeli Aro <eemeli@gmail.com>
+Date: Mon, 6 Apr 2015 12:43:46 +0300
+Subject: [PATCH] Customize documentation CSS to fetch fonts remotely
+
+---
+ doc/styles/jsdoc-default.css | 27 +--------------------------
+ 1 file changed, 1 insertion(+), 26 deletions(-)
+
+diff --git a/doc/styles/jsdoc-default.css b/doc/styles/jsdoc-default.css
+index 24aa20f..d951b6b 100644
+--- a/doc/styles/jsdoc-default.css
++++ b/doc/styles/jsdoc-default.css
+@@ -1,28 +1,4 @@
+-@font-face {
+-    font-family: 'Open Sans';
+-    font-weight: normal;
+-    font-style: normal;
+-    src: url('../fonts/OpenSans-Regular-webfont.eot');
+-    src:
+-        local('Open Sans'),
+-        local('OpenSans'),
+-        url('../fonts/OpenSans-Regular-webfont.eot?#iefix') format('embedded-opentype'),
+-        url('../fonts/OpenSans-Regular-webfont.woff') format('woff'),
+-        url('../fonts/OpenSans-Regular-webfont.svg#open_sansregular') format('svg');
+-}
+-
+-@font-face {
+-    font-family: 'Open Sans Light';
+-    font-weight: normal;
+-    font-style: normal;
+-    src: url('../fonts/OpenSans-Light-webfont.eot');
+-    src:
+-        local('Open Sans Light'),
+-        local('OpenSans Light'),
+-        url('../fonts/OpenSans-Light-webfont.eot?#iefix') format('embedded-opentype'),
+-        url('../fonts/OpenSans-Light-webfont.woff') format('woff'),
+-        url('../fonts/OpenSans-Light-webfont.svg#open_sanslight') format('svg');
+-}
++@import url(//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,300,400,600);
+ 
+ html
+ {
+@@ -147,7 +123,6 @@ h1, h2, h3, h4 {
+ 
+ h1
+ {
+-    font-family: 'Open Sans Light', sans-serif;
+     font-size: 48px;
+     letter-spacing: -2px;
+     margin: 12px 24px 20px;
+-- 
+2.6.4
+

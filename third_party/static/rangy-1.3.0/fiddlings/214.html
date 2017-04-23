@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <script type="text/javascript" src="../external/log4javascript.js"></script>
+    <script>
+        var appender = new log4javascript.PopUpAppender();
+        log4javascript.getRootLogger().addAppender(appender);
+    </script>
+    <script type="text/javascript" src="../src/core/core.js"></script>
+    <script type="text/javascript" src="../src/core/dom.js"></script>
+    <script type="text/javascript" src="../src/core/domrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedselection.js"></script>
+    <script type="text/javascript" src="../src/modules/rangy-classapplier.js"></script>
+    <style>
+        button, input[type=submit], .btn, .bookmarklet {
+            background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(10%, #ffffff), color-stop(100%, #f0f0f0));
+            background-image: -webkit-linear-gradient(top, #ffffff 0%, #ffffff 10%, #f0f0f0 100%);
+            background-image: -moz-linear-gradient(top, #ffffff 0%, #ffffff 10%, #f0f0f0 100%);
+            background-image: -o-linear-gradient(top, #ffffff 0%, #ffffff 10%, #f0f0f0 100%);
+            background-image: linear-gradient(top, #ffffff 0%, #ffffff 10%, #f0f0f0 100%);
+            -webkit-border-radius: 0.15em;
+            -moz-border-radius: 0.15em;
+            -ms-border-radius: 0.15em;
+            -o-border-radius: 0.15em;
+            border-radius: 0.15em;
+            -webkit-box-shadow: inset 0 0.2em 0 rgba(255, 255, 255, 0.2), 0 0.05em 0.1em rgba(0, 0, 0, 0.08);
+            -moz-box-shadow: inset 0 0.2em 0 rgba(255, 255, 255, 0.2), 0 0.05em 0.1em rgba(0, 0, 0, 0.08);
+            box-shadow: inset 0 0.2em 0 rgba(255, 255, 255, 0.2), 0 0.05em 0.1em rgba(0, 0, 0, 0.08);
+            color: #777777;
+            background-color: white;
+            border: 1px solid lightgrey;
+            border-radius: .2em;
+            font-family: "Source Sans Pro", "Open Sans", sans-serif;
+            font-size: 1em;
+            padding: .33em .5em;
+            cursor: pointer;
+            display: inline-block;
+            padding: .4em .9em .5em;
+            position: relative;
+            text-decoration: none;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+            color: #585858;
+            border-color: #969696 #969696 #777777;
+            -ms-user-select: text;
+        }
+    </style>
+</head>
+<body>
+
+<div id="root">
+    <a id="clickBtn" class="btn">Click me</a>
+    <div class="adder" style="display: none;">
+        <button id="testBtn">Annotate</button>
+    </div>
+</div>
+<script>
+    rangy.init();
+
+    document.getElementById("clickBtn").onclick = function() {
+        var sel = rangy.getSelection();
+        sel.removeAllRanges();
+
+        var node = document.getElementById('testBtn');
+        //var node = a;
+        console.log('node', node);
+
+        var realRange = rangy.createRange();
+        realRange.setStartBefore(node);
+        realRange.setEndAfter(node);
+        sel.addRange(realRange);
+        console.log("Selection after trying to select invisible content: " + rangy.getSelection().inspect());
+    };
+</script>
+</body>
+</html>

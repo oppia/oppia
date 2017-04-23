@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<!--[if lte IE 6]><html class="ie6"><!--[if gt IE 8]><!--><html><!--<![endif]-->
+<head>
+    <title>Rangy Serializer Module Demo</title>
+    <link href="demo.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="../lib/rangy-core.js"></script>
+    <script type="text/javascript" src="../lib/rangy-serializer.js"></script>
+    <script type="text/javascript">
+        function gEBI(id) {
+            return document.getElementById(id);
+        }
+
+        function serializeSelection() {
+            var input = gEBI("serializedSelection");
+            input.value = rangy.serializeSelection();
+            input.focus();
+            input.select();
+        }
+
+        function deserializeSelection() {
+            rangy.deserializeSelection(gEBI("selectionToDeserialize").value);
+        }
+
+        function restoreSelection() {
+            rangy.restoreSelectionFromCookie();
+        }
+
+        function saveSelection() {
+            rangy.saveSelectionCookie();
+        }
+
+        window.onload = function() {
+            // Turn multiple selections on in IE
+            try {
+                document.execCommand("MultipleSelection", null, true);
+            } catch(ex) {}
+
+            rangy.init();
+
+            // Enable buttons
+            var serializerModule = rangy.modules.Serializer;
+            if (rangy.supported && serializerModule && serializerModule.supported) {
+                gEBI("serializedSelection").disabled = false;
+                var serializeButton = gEBI("serializeButton");
+                serializeButton.disabled = false;
+                serializeButton.ontouchstart = serializeButton.onclick = serializeSelection;
+
+                gEBI("selectionToDeserialize").disabled = false;
+                var deserializeButton = gEBI("deserializeButton");
+                deserializeButton.disabled = false;
+                deserializeButton.ontouchstart = deserializeButton.onclick = deserializeSelection;
+
+                // Display the control range element in IE
+                if (rangy.features.implementsControlRange) {
+                    gEBI("controlRange").style.display = "block";
+                }
+
+                // Restore the selection from a previous visit to this page
+                restoreSelection();
+            }
+        };
+
+        window.onbeforeunload = saveSelection;
+        
+    </script>
+</head>
+<body>
+    <div id="buttons">
+        <h3>Serialize selection</h3>
+        Click the button to serialize the selection. The serialized selection will appear in the text box.
+        <input type="text" disabled id="serializedSelection" size="30">
+        <input type="button" disabled id="serializeButton" value="Serialize selection" unselectable="on" class="unselectable">
+
+        <h3>Deserialize selection</h3>
+        Paste a serialized selection into the text box below and click the button to restore the serialized selection.
+        <input type="text" disabled id="selectionToDeserialize" size="30">
+        <input type="button" disabled id="deserializeButton" value="Restore selection" unselectable="on" class="unselectable">
+
+        <h3>Preserving the selection between page requests</h3>
+        The selection on this page will be preserved between page requests. Press the following button or your browser's
+        refresh button to refresh the page
+        <br>
+        <input type="button" value="refresh" onclick="window.location.reload();">
+    </div>
+
+    <div id="content">
+        <h1>Rangy Serializer Module Demo</h1>
+
+        <!-- A comment -->
+
+        <p id="intro">
+            Please use your mouse and/or keyboard to make selections from the sample content below and use the buttons on
+            the left hand size to serialize and deserialize the selection. Also, the selection will be preserved when you
+            refresh the page.
+        </p>
+
+        <p>
+            <b>Association football</b> is a sport played between two teams. It is usually called <b>football</b>, but in
+            some countries, such as the United States, it is called <b>soccer</b>. In
+            <a href="http://simple.wikipedia.org/wiki/Japan">Japan</a>, New Zealand, South Africa, Australia, Canada and
+            Republic of Ireland, both words are commonly used.
+        </p>
+        <p>
+            Each team has 11 players on the field. One of these players is the <i>goalkeeper</i>, and the other ten are
+            known as <i>"outfield players."</i> The game is played by <b>kicking a ball into the opponent's goal</b>. A
+            match has 90 minutes of play, with a break of 15 minutes in the middle. The break in the middle is called
+            half-time.
+        </p>
+        <h2>Competitions <span class="smaller">(this section is editable)</span></h2>
+        <p contenteditable="true">
+            There are many competitions for football, for both football clubs and countries. Football clubs usually play
+            other teams in their own country, with a few exceptions. <b>Cardiff City F.C.</b> from Wales for example, play
+            in the English leagues and in the English FA Cup.
+        </p>
+        <h2>Who plays football <span class="smaller">(this section is editable and in pre-formatted text)</span></h2>
+        <pre contenteditable="true">
+Football is the world's most popular sport. It is played in more
+countries than any other game. In fact, FIFA (the Federation
+Internationale de Football Association) has more members than the
+United Nations.
+
+It is played by both males and females.
+
+
+</pre>
+        <p id="controlRange" style="display: none" contenteditable="true">
+            Some controls to put in a ControlRange: <input> and <input> and <input>
+        </p>
+    </div>
+
+    <p class="small">
+        Text adapted from <a href="http://simple.wikipedia.org/wiki/Association_football">Simple Wikipedia page on
+        Association Football</a>, licensed under the
+        <a href="http://simple.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License">Creative
+            Commons Attribution/Share-Alike License</a>.
+    </p>
+</body>
+</html>

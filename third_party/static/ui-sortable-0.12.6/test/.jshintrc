@@ -1,0 +1,20 @@
+{
+  "node": true,
+  "globals": {
+    "angular": false,
+    "inject": false,
+    "$": false,
+
+    "jasmine": false,
+    "afterEach": false,
+    "beforeEach": false,
+    "ddescribe": false,
+    "describe": false,
+    "expect": false,
+    "iit": false,
+    "it": false,
+    "spyOn": false,
+    "xdescribe": false,
+    "xit": false
+  }
+}

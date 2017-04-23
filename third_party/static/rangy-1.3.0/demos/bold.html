@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<!--[if lte IE 6]><html class="ie6"><!--[if gt IE 8]><!--><html><!--<![endif]-->
+<head>
+    <title>Rangy Bold Demo</title>
+    <link href="demo.css" rel="stylesheet" type="text/css">
+    <style type="text/css">
+        *.italicYellowBg {
+            font-style: italic;
+            background-color: yellow;
+        }
+
+        *.boldRed {
+            font-weight: bold;
+            color: red;
+        }
+    </style>
+    <script type="text/javascript" src="../external/log4javascript.js"></script>
+    <script type="text/javascript" src="../src/core/core.js"></script>
+    <script type="text/javascript" src="../src/core/dom.js"></script>
+    <script type="text/javascript" src="../src/core/domrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedselection.js"></script>
+    <script type="text/javascript" src="../src/modules/inactive/rangy-textcommands.js"></script>
+    <script type="text/javascript">
+        function gEBI(id) {
+            return document.getElementById(id);
+        }
+
+        window.onload = function() {
+            rangy.init();
+
+            // Enable buttons
+            var textCommandsModule = rangy.modules.TextCommands;
+            if (rangy.supported && textCommandsModule && textCommandsModule.supported) {
+                var toggleBoldButton = gEBI("toggleBoldButton");
+                toggleBoldButton.disabled = false;
+                toggleBoldButton.ontouchstart = toggleBoldButton.onmousedown = function() {
+                    //alert(rangy.querySelectionCommandValue("bold"));
+                    rangy.execSelectionCommand("bold");
+                    return false;
+                };
+            }
+        };
+
+    </script>
+</head>
+<body>
+    <div id="buttons">
+        <h3>Add / remove CSS classes to / from selection</h3>
+        Make a selection in the document on the right and use the buttons below to toggle CSS classes on the selection:
+
+        <br>
+        <input type="button" disabled id="toggleBoldButton" value="Toggle bold" unselectable="on"
+               class="unselectable">
+    </div>
+
+    <div id="content">
+        <h1>Rangy Text Commands Module Demo</h1>
+
+        <!-- A comment -->
+
+        <p id="intro">
+            Please use your mouse and/or keyboard to make selections from the sample content below and use the buttons on
+            the left hand size to toggle CSS classes applied to text content within the selection.
+        </p>
+
+        <p>
+            <b>Association football</b> is a sport played between two teams. It is usually called <b>football</b>, but in
+            some countries, such as the United States, it is called <b>soccer</b>. In
+            <a href="http://simple.wikipedia.org/wiki/Japan">Japan</a>, New Zealand, South Africa, Australia, Canada and
+            Republic of Ireland, both words are commonly used.
+        </p>
+        <p>
+            Each team has 11 players on the field. One of these players is the <i>goalkeeper</i>, and the other ten are
+            known as <i>"outfield players."</i> The game is played by <b>kicking a ball into the opponent's goal</b>. A
+            match has 90 minutes of play, with a break of 15 minutes in the middle. The break in the middle is called
+            half-time.
+        </p>
+        <h2>Competitions <span class="smaller">(this section is editable)</span></h2>
+        <p contenteditable="true">
+            There are many competitions for football, for both football clubs and countries. Football clubs usually play
+            other teams in their own country, with a few exceptions. <b>Cardiff City F.C.</b> from Wales for example, play
+            in the English leagues and in the English FA Cup.
+        </p>
+        <h2>Who plays football <span class="smaller">(this section is editable and in pre-formatted text)</span></h2>
+        <pre contenteditable="true">
+Football is the world's most popular sport. It is played in more
+countries than any other game. In fact, FIFA (the Federation
+Internationale de Football Association) has more members than the
+United Nations.
+
+It is played by both males and females.
+
+
+</pre>
+    </div>
+
+    <p class="small">
+        Text adapted from <a href="http://simple.wikipedia.org/wiki/Association_football">Simple Wikipedia page on
+        Association Football</a>, licensed under the
+        <a href="http://simple.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License">Creative
+            Commons Attribution/Share-Alike License</a>.
+    </p>
+</body>
+</html>

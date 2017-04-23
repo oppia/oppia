@@ -1,0 +1,31 @@
+{
+  "name": "angular-toastr",
+  "version": "1.7.0",
+  "author": "Jesus Rodriguez <Foxandxss@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Foxandxss/angular-toastr.git"
+  },
+  "main": "index.js",
+  "keywords": [
+    "angularjs",
+    "toastr",
+    "popup"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "angular": "^1.4.3",
+    "angular-mocks": "^1.4.3",
+    "del": "^2.0.2",
+    "gulp": "^3.8.10",
+    "gulp-angular-templatecache": "^1.5.0",
+    "gulp-concat": "^2.4.3",
+    "gulp-jshint": "^2.0.0",
+    "gulp-less": "^3.0.2",
+    "gulp-minify-css": "^1.0.0",
+    "gulp-rename": "^1.2.0",
+    "gulp-uglify": "^1.0.2",
+    "jquery": "^2.1.4",
+    "jshint-stylish": "^2.0.0"
+  }
+}

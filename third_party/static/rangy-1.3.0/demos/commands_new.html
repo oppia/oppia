@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<!--[if lte IE 6]><html class="ie6"><!--[if gt IE 8]><!--><html><!--<![endif]-->
+<head>
+    <title>Rangy commands demo</title>
+    <style type="text/css">
+        div.halfWidth {
+            float: left;
+            width: 48%;
+            padding: 5px;
+        }
+
+        input.unapplied {
+            border: solid #666 1px;
+            background-color: #ccc;
+            margin-right: 5px;
+        }
+
+        input.applied {
+            border: solid #006 1px;
+            background-color: #eee;
+            margin-right: 5px;
+        }
+    </style>
+    <script type="text/javascript" src="../external/log4javascript.js"></script>
+    <script type="text/javascript">
+        var appender = new log4javascript.PopUpAppender();
+        log4javascript.getRootLogger().addAppender(appender);
+        log4javascript.setShowStackTraces(true);
+        //log4javascript.setEnabled(false);
+    </script>
+    <script type="text/javascript" src="../src/core/core.js"></script>
+    <script type="text/javascript" src="../src/core/dom.js"></script>
+    <script type="text/javascript" src="../src/core/domrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedselection.js"></script>
+    <script type="text/javascript" src="../src/modules/inactive/rangy-commands_new.js"></script>
+    <script type="text/javascript" src="../src/modules/inactive/commands/rangy-bold_new.js"></script>
+    <script type="text/javascript" src="../src/modules/inactive/commands/rangy-italic.js"></script>
+    <script type="text/javascript" src="../src/modules/inactive/commands/rangy-applyclass.js"></script>
+    <script type="text/javascript" src="../src/modules/rangy-classapplier.js"></script>
+    <script type="text/javascript" src="../test/implementation.js"></script>
+    <script type="text/javascript">
+        var iframeDoc, iframeWin, contentHtmlTextArea, mainLoaded = false, iframeLoaded = false;
+        var greenBorderClassApplier, boldRedClassApplier;
+
+        function updateContentHtml() {
+            contentHtmlTextArea.value = iframeDoc.body.innerHTML;
+        }
+
+        function allLoaded() {
+            updateContentHtml();
+        }
+
+        // This is good enough for our target browsers
+        function addEvent(obj, eventType, listener) {
+            if (typeof obj.addEventListener != "undefined") {
+                obj.addEventListener(eventType, listener, false);
+            } else if (typeof obj.attachEvent != "undefined") {
+                obj.attachEvent("on" + eventType, listener);
+            }
+        }
+
+        function execCommand(commandName, options) {
+            options.document = iframeDoc;
+            rangy.execCommand(commandName, options);
+
+            updateContentHtml();
+            iframeWin.focus();
+        }
+
+        function initTextareaIframeSync() {
+            var timer = null;
+            addEvent(iframeDoc, "keyup", function() {
+                if (timer) {
+                    window.clearTimeout(timer);
+                }
+                timer = window.setTimeout(function() {
+                    timer = null;
+                    updateContentHtml();
+                }, 1000);
+            });
+
+            contentHtmlTextArea.onchange = function() {
+                iframeDoc.body.innerHTML = contentHtmlTextArea.value;
+            };
+        }
+
+        var toolUpdaters = [];
+
+        function initToolUpdates() {
+            var timer = null;
+
+            function doUpdate() {
+                for (var i = 0, len = toolUpdaters.length; i < len; ++i) {
+                    toolUpdaters[i]();
+                }
+            }
+
+            function debouncedEventHandler() {
+                if (timer) {
+                    window.clearTimeout(timer);
+                }
+                timer = window.setTimeout(function() {
+                    timer = null;
+                    doUpdate();
+                }, 50);
+            }
+
+            if ("onselectionchange" in iframeDoc) {
+                addEvent(iframeDoc, "selectionchange", debouncedEventHandler);
+            } else {
+                addEvent(iframeDoc, "keyup", debouncedEventHandler);
+                addEvent(iframeDoc, "mouseup", debouncedEventHandler);
+            }
+        }
+
+        function createButton(text, commandName, options, isAppliedFunc) {
+            var button = document.createElement("input");
+            button.type = "button";
+            button.value = text;
+            button.className = "unapplied";
+
+            var updater = function() {
+                button.className = (isAppliedFunc && isAppliedFunc()) ? "applied" : "unapplied";
+            };
+
+            toolUpdaters.push(updater);
+
+            button.onclick = function() {
+                execCommand(commandName, options);
+                updater();
+            };
+
+            document.getElementById("toolbar").appendChild(button);
+        }
+
+        window.onload = function() {
+            rangy.init();
+            iframeWin = rangy.dom.getIframeWindow( document.getElementById("content") );
+            iframeDoc = iframeWin.document;
+            contentHtmlTextArea = document.getElementById("contentHtml");
+            mainLoaded = true;
+            if (iframeLoaded) {
+                allLoaded();
+            }
+
+            // Update the source textarea after changes in the WYSIWYG iframe and vice versa
+            initTextareaIframeSync();
+
+            // Update toolbar when the selection changes
+            initToolUpdates();
+
+            // Create buttons
+            var boldCssOptions = {
+                document: iframeDoc,
+                styleWithCss: true
+            };
+
+            createButton("Bold (CSS)", "bold", boldCssOptions,
+                function() {
+                    return rangy.queryCommandValue("bold", boldCssOptions);
+                }
+            );
+
+            var boldBOptions = {
+                document: iframeDoc,
+                styleWithCss: false,
+                tagName: "b"
+            };
+
+            createButton("Bold (b)", "bold", boldBOptions,
+                function() {
+                    return rangy.queryCommandValue("bold", boldBOptions);
+                }
+            );
+
+            var boldStrongOptions = {
+                document: iframeDoc,
+                styleWithCss: false,
+                tagName: "b"
+            };
+
+            createButton("Bold (strong)", "bold", boldStrongOptions,
+                function() {
+                    return rangy.queryCommandValue("bold", boldStrongOptions);
+                }
+            );
+
+            var italicCssOptions = {
+                document: iframeDoc,
+                styleWithCss: true
+            };
+
+            createButton("Italic (CSS)", "italic", italicCssOptions,
+                function() {
+                    return rangy.queryCommandValue("italic", italicCssOptions);
+                }
+            );
+
+            var italicIOptions = {
+                document: iframeDoc,
+                styleWithCss: false
+            };
+
+            createButton("Italic (i)", "italic", italicIOptions,
+                function() {
+                    return rangy.queryCommandValue("italic", italicIOptions);
+                }
+            );
+
+/*
+            greenBorderClassApplier = rangy.createClassApplier("greenBorder");
+            boldRedClassApplier = rangy.createClassApplier("boldRed");
+*/
+        };
+
+        // Iframe load callback
+        window.contentLoadCallback = function() {
+            iframeLoaded = true;
+            if (mainLoaded) {
+                allLoaded();
+            }
+        };
+
+        function nativeBold(css) {
+            iframeDoc.execCommand("StyleWithCSS", false, css);
+            iframeDoc.execCommand("bold", false, null);
+            updateContentHtml();
+            iframeWin.focus();
+        }
+
+        function aryehBold() {
+            var sel = rangy.getSelection(iframeDoc.defaultView);
+
+            iframeDoc.body.contentEditable = true;
+            aryeh.execCommand("stylewithcss", false, true);
+            aryeh.execCommand("bold", false, null, rangy.getSelection(iframeDoc.defaultView).getRangeAt(0));
+            iframeDoc.body.contentEditable = false;
+
+            updateContentHtml();
+            iframeWin.focus();
+        }
+/*
+        function bold(styleWithCss, tagName) {
+            rangy.execCommand("bold", {
+                document: iframeDoc,
+                styleWithCss: styleWithCss,
+                tagName: tagName
+            });
+
+            updateContentHtml();
+            iframeWin.focus();
+        }
+
+        function italic(styleWithCss) {
+            rangy.execCommand("italic", {
+                document: iframeDoc,
+                styleWithCss: styleWithCss
+            });
+
+            updateContentHtml();
+            iframeWin.focus();
+        }
+
+        function applyClass(className) {
+            rangy.execCommand("applyClass", {
+                document: iframeDoc,
+                value: className
+            });
+
+            updateContentHtml();
+            iframeWin.focus();
+        }
+
+        function applyClassUsingClassApplier(className) {
+            var applier = (className == "boldRed") ? boldRedClassApplier : greenBorderClassApplier;
+            applier.toggleSelection(iframeWin);
+            updateContentHtml();
+            iframeWin.focus();
+        }
+*/
+    </script>
+
+</head>
+<h1>Rangy commands demo</h1>
+<p>
+    Use the buttons to test the available commands. Both panes (WYSIWYG and HTML) are editable (HTML textarea uses
+    <code>onchange</code>, so click outside or tab away to get the WYSIWYG pane to update).
+</p>
+<div class="halfWidth">
+    WYSIWYG:
+    <div style="border: solid gray 1px">
+        <div style="background-color: #999; padding: 2px" id="toolbar">
+            <input type="button" onclick="nativeBold(true);" value="Bold (native, CSS)">
+            <input type="button" onclick="nativeBold(false);" value="Bold (native, no CSS)">
+            <input type="button" onclick="bold(true);" value="Bold/CSS">
+            <input type="button" onclick="bold(false, 'b');" value="Bold/B">
+            <input type="button" onclick="bold(false, 'strong');" value="Bold/strong">
+            <input type="button" onclick="aryehBold();" value="Bold (Aryeh)">
+<!--
+            <input type="button" onclick="bold(false, 'b');" value="Bold/B">
+            <input type="button" onclick="bold(false, 'strong');" value="Bold/strong">
+            <input type="button" onclick="nativeBold();" value="Bold (native)">
+            <input type="button" onclick="italic(true);" value="Italic/CSS">
+            <input type="button" onclick="italic(false);" value="Italic">
+            <input type="button" onclick="applyClass('greenBorder');" value="Green border">
+            <input type="button" onclick="applyClass('boldRed');" value="Bold red">
+            <input type="button" onclick="applyClassUsingClassApplier('greenBorder');" value="Green border (ClassApplier)">
+            <input type="button" onclick="applyClassUsingClassApplier('boldRed');" value="Bold red (ClassApplier)">
+-->
+        </div>
+        <iframe id="content" src="content.html?1" style="width: 100%; height: 400px" frameborder="0"></iframe>
+    </div>
+</div>
+<div class="halfWidth">
+    HTML:
+    <textarea style="width: 98%; height: 420px; font-size: 0.75em; font-family: Courier New, Monospace" id="contentHtml"></textarea>
+</div>
+<body>
+</body>
+</html>

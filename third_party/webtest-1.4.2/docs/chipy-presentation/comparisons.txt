@@ -1,0 +1,66 @@
+Zope:
+  http://cheeseshop.python.org/pypi/zope.testbrowser/3.4.2
+
+  Browser-centric (vs. application-centric)
+  Slightly verbose
+  Works over HTTP (WSGI with wsgi_intercept)
+  Has forms, etc (Mechanize)
+  Next best (after WebTest)
+
+Django: 
+  http://www.djangoproject.com/documentation/testing/
+
+  Reasonably system
+  Slightly verbose
+  Works over Django request system (not WSGI)
+  Slightly leaky
+  No forms
+
+CherryPy/TurboGears 1:
+  http://docs.turbogears.org/1.0/Testing#testing-your-view
+
+  Very leaky!
+  Tests happen via side effects
+  Global objects everywhere
+  Can call directly into controllers
+  No forms
+
+Rails:
+  http://manuals.rubyonrails.com/read/chapter/28
+
+  Call directly into controller
+  Actually instantiate the controller in your tests
+  The main functionality is in a TestCase subclass
+  Has some XML/HTML inspection
+  Vigorous debate on best practice:
+    http://www.anarchogeek.com/articles/2007/9/16/rails-where-the-boundries-are-pushed
+    This is not a good thing
+    Mocks all over the place :(
+
+----
+
+Twill:
+  http://twill.idyll.org/
+
+  Works over HTTP (WSGI with wsgi_intercept)
+  Lots of form support (Mechanize)
+  Simple-looking tests
+  Not a complete language
+
+Selenium:
+  http://www.openqa.org/selenium/
+
+  Works in a browser
+  Awkward language
+  Recorders exist
+  Satisfying to watch run
+
+Windmill:
+  http://windmill.osafoundation.org/
+
+  Like a mix of Twill and Selenium?
+  Uses a browser IDE like Selenium
+    Fancy Javascript recorder?
+  Experimental command-line
+  Browser can report back to code, like the (confusing) "drive" mode
+    in Selenium

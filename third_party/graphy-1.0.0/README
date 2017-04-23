@@ -1,0 +1,27 @@
+Graphy
+
+Graphy is a chart library for python. It tries to get out of the way and just
+let you work with your data.
+
+For more information, see http://code.google.com/p/graphy/
+
+For license info, see the LICENSE file.
+
+INSTALLATION:
+No installer yet, so just manually copy graphy/ into python-lib/graphy.
+
+QUICK START:
+from graphy.backends import google_chart_api
+monthly_rainfall = [3.2, 3.2, 2.7, 0.9, 0.4, 0.1, 0.0, 0.0, 0.2, 0.9, 1.8, 2.3]
+months = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split()
+chart = google_chart_api.LineChart(monthly_rainfall)
+chart.bottom.labels = months
+print chart.display.Url(400, 100)
+
+EXAMPLES:
+The examples in the examples/ directory assume graphy is in the PYTHONPATH.
+If just want to run them without installing graphy first, you will need to do
+something like this:
+  $ cd examples
+  $ PYTHONPATH=.. ./traffic.py
+

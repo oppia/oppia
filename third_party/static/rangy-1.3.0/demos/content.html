@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<!--[if lte IE 6]><html class="ie6"><!--[if gt IE 8]><!--><html><!--<![endif]-->
+<head>
+    <title>Rangy Bold Demo</title>
+    <style type="text/css">
+        *.greenBorder {
+            font-style: italic;
+            border: solid green 1px;
+            color: purple;
+        }
+
+        *.boldRed {
+            font-weight: bold;
+            color: red;
+            background-color: yellow;
+        }
+    </style>
+    <script type="text/javascript">
+        window.onload = function() {
+            var callback;
+            if ( (callback = window.parent.contentLoadCallback) ) {
+                callback();
+            }
+        }
+    </script>
+</head>
+<body contenteditable="true">
+<div> <span>Test</span> </div>
+<div> <span>Test</span> </div>
+<div>Test</div>
+
+<p> <i>2</i> </p>
+<div><p>One</p>
+<span>Two</span>
+<p>Three</p></div>
+
+    <p>
+        <b>Association football</b> is a sport played between two teams. It is usually called <b>football</b>, but in
+        some countries, such as the United States, it is called <b>soccer</b>. In
+        <a href="http://simple.wikipedia.org/wiki/Japan">Japan</a>, New Zealand, South Africa, Australia, Canada and
+        Republic of Ireland, both words are commonly used.
+    </p>
+    <p>
+        Each team has <span style="font-weight: bold; font-style: italic">11 players</span> on the field. One of these players is the <i>goalkeeper</i>, and the other ten are
+        known as <i>"outfield players."</i> The game is played by <b>kicking a ball into the opponent's goal</b>. A
+        match has 90 minutes of play, with a break of 15 minutes in the middle. The break in the middle is called
+        half-time.
+    </p>
+    <h2>Competitions</h2>
+    <p>
+        There are many competitions for football, for both football clubs and countries. Football clubs usually play
+        other teams in their own country, with a few exceptions. <b>Cardiff City F.C.</b> from Wales for example, play
+        in the English leagues and in the English FA Cup.
+    </p>
+    <h2>Who plays football</h2>
+    <pre>
+Football is the world's most popular sport. It is played in more
+countries than any other game. In fact, FIFA (the Federation
+Internationale de Football Association) has more members than the
+United Nations.
+
+It is played by both males and females.
+
+
+</pre>
+
+    <p class="small">
+        Text adapted from <a href="http://simple.wikipedia.org/wiki/Association_football">Simple Wikipedia page on
+        Association Football</a>, licensed under the
+        <a href="http://simple.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License">Creative
+            Commons Attribution/Share-Alike License</a>.
+    </p>
+</body>
+</html>

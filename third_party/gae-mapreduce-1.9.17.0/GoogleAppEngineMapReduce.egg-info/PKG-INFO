@@ -1,0 +1,11 @@
+Metadata-Version: 1.0
+Name: GoogleAppEngineMapReduce
+Version: 1.9.17.0
+Summary: Enable MapReduce style data processing on App Engine
+Home-page: https://code.google.com/p/appengine-mapreduce/
+Author: Google App Engine
+Author-email: app-engine-pipeline-api@googlegroups.com
+License: Apache License 2.0
+Description: UNKNOWN
+Keywords: google app engine mapreduce data processing
+Platform: UNKNOWN

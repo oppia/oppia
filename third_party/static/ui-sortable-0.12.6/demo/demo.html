@@ -1,0 +1,14 @@
+<section ng-app="sortableApp" ng-controller="sortableController">
+  <div class="row">
+    <div class="col-md-6">
+      <ul ui-sortable="sortableOptions" ng-model="list" class="list">
+        <li ng-repeat="item in list" class="item">{{item.text}}</li>
+      </ul>
+    </div>
+    <div class="col-md-6">
+      <ul class="list logList">
+        <li ng-repeat="entry in sortingLog" class="logItem">{{entry.Text}}</li>
+      </ul>
+    </div>
+  </div>
+</section>

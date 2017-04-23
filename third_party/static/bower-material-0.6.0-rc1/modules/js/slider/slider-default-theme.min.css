@@ -1,0 +1,6 @@
+/*!
+ * Angular Material Design
+ * https://github.com/angular/material
+ * @license MIT
+ * v0.6.0-rc1
+ */md-slider.md-default-theme .md-track{background-color:rgba(0,0,0,.26)}md-slider.md-default-theme .md-track-fill{background-color:#03a9f4}md-slider.md-default-theme .md-thumb:after{border-color:#03a9f4;background-color:#03a9f4}md-slider.md-default-theme .md-sign{background-color:#03a9f4}md-slider.md-default-theme .md-sign:after{border-top-color:#03a9f4}md-slider.md-default-theme .md-thumb-text{color:#fff}md-slider.md-default-theme .md-focus-thumb{background-color:rgba(0,0,0,.54)}md-slider.md-default-theme .md-focus-ring{border-color:rgba(0,0,0,.12)}md-slider.md-default-theme .md-disabled-thumb{border-color:#fff}md-slider.md-default-theme.md-min .md-thumb:after{background-color:#fff}md-slider.md-default-theme[disabled] .md-thumb:after{border-color:#bdbdbd}md-slider.md-default-theme[disabled]:not(.md-min) .md-thumb:after{background-color:#bdbdbd}

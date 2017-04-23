@@ -1,0 +1,6 @@
+/*!
+ * Angular Material Design
+ * https://github.com/angular/material
+ * @license MIT
+ * v0.6.0-rc1
+ */md-backdrop{z-index:5;background-color:transparent;position:fixed;left:0;top:0;right:0;bottom:0}md-backdrop.ng-enter{transition:all .4s cubic-bezier(0.25,.8,.25,1)}md-backdrop.ng-leave{transition:all .3s cubic-bezier(0.55,0,.55,.2)}md-backdrop.ng-enter,md-backdrop.ng-leave.ng-leave-active{opacity:0}md-backdrop.ng-enter.ng-enter-active,md-backdrop.ng-leave{opacity:1}

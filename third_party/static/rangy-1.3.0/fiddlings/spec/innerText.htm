@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<!-- saved from url=(0100)http://webcache.googleusercontent.com/search?q=cache:http://aryeh.name/spec/innertext/innertext.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head><body class="draft dfnEnabled"><div style="background:#fff;border:1px solid #999;margin:-1px -1px 0;padding:0;"><div style="background:#ddd;border:1px solid #999;color:#000;font:13px arial,sans-serif;font-weight:normal;margin:12px;padding:8px;text-align:left">This is Google's cache of <a href="http://aryeh.name/spec/innertext/innertext.html" style="text-decoration:underline;color:#00c">http://aryeh.name/spec/innertext/innertext.html</a>. It is a snapshot of the page as it appeared on 7 Dec 2012 16:42:04 GMT. The <a href="http://aryeh.name/spec/innertext/innertext.html" style="text-decoration:underline;color:#00c">current page</a> could have changed in the meantime. <a href="http://support.google.com/websearch/bin/answer.py?hl=en&p=cached&answer=1687222" style="text-decoration:underline;color:#00c">Learn more</a><br>Tip: To quickly find your search term on this page, press <b>Ctrl+F</b> or <b>⌘-F</b> (Mac) and use the find bar.<br><br><div style="float:right"><a href="http://webcache.googleusercontent.com/search?q=cache:http://aryeh.name/spec/innertext/innertext.html&hl=en&tbo=d&strip=1" style="text-decoration:underline;color:#00c">Text-only version</a></div>
+<div>&nbsp;</div></div></div><div style="position:relative">
+<meta charset="utf-8">
+<title>innerText</title>
+<link href="innerText_files/specification.css" type="text/css" rel="stylesheet">
+<style>
+ pre, code { font-family:monospace, sans-serif; }
+ h2 code, h3 code, h4 code,
+ h2 :link, h3 :link, h4 :link,
+ h2 :visited, h3 :visited, h4 :visited
+ { font:inherit; color:inherit; font-style:italic; }
+ @media print {
+   :not([data-anolis-spec]) > [data-anolis-spec]::after {
+     content: "[" attr(data-anolis-spec) "]";
+     font-size: 0.6em;
+     vertical-align: super;
+     text-transform: uppercase;
+   }
+ }
+</style>
+
+<div class="head" id="head">
+<h1>innerText</h1>
+<h2 class="no-num no-toc" id="work-in-progress-—-last-update-3-february-2011">Work in Progress — Last Update 3 February 2011</h2>
+<dl>
+ <dt>Editor
+ </dt><dd>Aryeh Gregor &lt;ayg+spec@aryeh.name&gt;
+
+ </dd><dt>Version history
+ </dt><dd><a href="http://aryeh.name/gitweb.cgi?p=innertext">http://aryeh.name/gitweb.cgi?p=innertext</a>
+</dd></dl>
+</div>
+
+
+<h2 class="no-num" id="introduction">Introduction</h2>
+<p>This specification defines the <a href="#innertext"><code>innerText</code></a> IDL attribute for HTML
+elements.  This was originally an extension to the DOM model introduced by
+Microsoft in Internet Explorer sometime in the mists of history, which was
+eventually copied by other browser rendering engines, albeit somewhat
+inconsistently.  This document is (or rather will be) the result of
+reverse-engineering the behavior of major browsers.
+
+</p><p>The innerText attribute essentially returns a plaintext version of the
+element's contents, so this specification just lays out an algorithm to convert
+HTML to plaintext.  The same algorithm will be reused for Selection
+stringification.  Although Gecko (Firefox) doesn't implement innerText, it does
+implement Selection stringification, so Gecko's behavior was considered in
+writing the algorithm.
+
+<!--
+<p>Since the algorithm presented here is inherently visual, it depends heavily
+on CSS.  For <code>innerText</code> to behave as expected, user agents must
+implement the default stylesheet from the HTML specification.  In particular,
+at the time of this writing, the <code data-anolis-spec=html
+title="the br element">br</code> element is not commonly implemented according
+to HTML by any major browser, so its behavior will be incorrect if this
+algorithm is implemented without modification.
+-->
+
+</p><p>Where the reasoning behind the specification is of interest, such as when
+major preexisting rendering engines are known not to match it, the reasoning is
+included in HTML comments so as not to distract the reader.
+
+
+</p><h2 class="no-num" id="definitions">Definitions</h2>
+<p>An <dfn id="ignored-node">ignored node</dfn> is a <a href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#node"><code class="external" data-anolis-spec="domcore">Node</code></a>
+that is one of the following:
+
+</p><ul>
+<li>a <a href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#comment"><code class="external" data-anolis-spec="domcore">Comment</code></a>
+</li><li>a <a href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#processinginstruction"><code class="external" data-anolis-spec="domcore">ProcessingInstruction</code></a>
+</li><li>an <a href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#element"><code class="external" data-anolis-spec="domcore">Element</code></a> whose "display" property
+computes to "none"
+</li></ul>
+
+
+<h2 class="no-num" id="the-innertext-attribute">The innerText attribute</h2>
+
+<!-- Primary references when writing this (circa February 2011) were WebKit
+(Chrome dev) and Gecko (Firefox 4).  IE9's algorithms are wildly different and
+don't make much sense as far as plaintext conversion goes.  IE8 seems to match
+WebKit/Gecko more closely, but its script support is too primitive to be worth
+the effort of testing it.  Opera is different from everyone else and reportedly
+has known compat issues, so I'm largely ignoring it too.
+
+WebKit behaves totally differently if the element you're calling innerText on
+is not visible, e.g., it's display: none or not part of a Document.  In that
+case it seems to behave more or less like textContent.  This makes no sense,
+and IE9 doesn't do it (can't test Firefox), so I'm not speccing it. -->
+
+<p>The <dfn id="innertext"><code title="">innerText</code></dfn> IDL attribute is a DOMString on
+the <a href="http://www.whatwg.org/html/#htmlelement"><code class="external" data-anolis-spec="html">HTMLElement</code></a> interface.  On setting, it
+must behave identically to <a href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#dom-node-textcontent"><code class="external" data-anolis-spec="domcore" title="dom-Node-textContent">textContent</code></a>.  On getting, the user agent must
+<a href="#append-the-plaintext">append the plaintext</a> of the <a class="external" data-anolis-spec="domcore" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#context-node">context
+node</a> to the empty string and return the string portion of the output
+(discarding the boolean portion).
+
+
+</p><h2 class="no-num" id="plaintext-conversion-algorithm">Plaintext conversion algorithm</h2>
+
+<p>To <dfn id="append-the-plaintext">append the plaintext</dfn> of a <a href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#node"><code class="external" data-anolis-spec="domcore">Node</code></a> <var title="">node</var> to a string <var title="">s</var> with boolean flag <var title="">trailing space</var>, a user agent
+must run the following algorithm.  It returns two outputs: a string and a
+boolean.  If the algorithm is invoked with only two arguments, <var title="">trailing space</var> defaults to false<!-- although this makes no
+difference -->.  To run the algorithm, the user agent must execute these steps:
+
+</p><p class="XXX">Either generated content needs to be included in the plaintext
+(which makes sense to me but no browser does it), or &lt;br&gt; has to be
+special-cased.
+
+</p><p class="XXX">The "returning two outputs" thing is awkward.  Can we do it more
+nicely?  The problem is that since the algorithm is defined recursively, we
+can't easily tell whether trailing spaces were produced as collapsed whitespace
+(and can be elided) or are part of something with "white-space: pre(-wrap)"
+(and cannot be elided).  We have a similar problem with leading/trailing
+whitespace for inlines, where we cheat by defining a separate algorithm, which
+isn't ideal.  Maybe we need to respec this non-recursively and track more state
+within the algorithm?  Probably that's how implementers will implement it
+anyway.
+
+</p><ol>
+<li>For each child <var title="">child</var> of <var title="">node</var>, in order,
+if <var title="">child</var> is&nbsp;.&nbsp;.&nbsp;.
+
+  <dl class="switch">
+  <dt>an <a href="#ignored-node">ignored node</a>
+  </dt><dd>Do nothing.
+
+  </dd><dt>a <a href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#text"><code class="external" data-anolis-spec="domcore">Text</code></a> node
+  </dt><dd>
+    <ol>
+	<li>If <var title="">node</var>'s "visibility" property computes to "hidden", do
+	nothing and abort these substeps (proceeding to the next <var title="">child</var>).
+
+	</li><li>Let <var title="">data</var> be <var title="">child</var>'s <a href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#dom-characterdata-data"><code class="external" data-anolis-spec="domcore" title="dom-CharacterData-data">data</code></a>.
+
+	</li><li>Let <var title="">whitespace</var> be the computed value of the
+	"white-space" property of <var title="">node</var>.
+
+	</li><li>If <var title="">whitespace</var> is "normal", "nowrap", or "pre-line":
+
+		<!-- WebKit doesn't quite behave like this, but it's about right.  It
+		seems to suppress the trailing newline, but Gecko doesn't, so I go with
+		the simpler behavior.
+
+		WebKit and IE9 treat pre-line about the same as white-space: normal.
+		(WebKit seems to not strip trailing spaces for pre-line, which seems
+		like a bug.) Gecko ignores CSS here entirely, only special-casing
+		<pre>.  The specced behavior roughly matches IE8, which makes the most
+		sense. -->
+		<ol>
+		<li>If <var title="">whitespace</var> is "normal" or "nowrap", let <var title="">set</var> be the set of <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/html/#space-character" title="space
+		character">space characters</a>.  If it's "pre-line", let <var title="">set</var> be the set of <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/html/#space-character" title="space
+		character">space characters</a> other than line feed (U+000A).
+
+		</li><li>Let <var title="">position</var> be a pointer into <var title="">data</var>, initially pointing at the start of the string.
+
+		</li><li>Let <var title="">newdata</var> be the empty string.
+
+		</li><li>While <var title="">position</var> doesn't point past the end of <var title="">data</var>:
+
+			<ol>
+			<li>If the character at <var title="">position</var> is from <var title="">set</var>, append a single space (U+0020) to <var title="">newdata</var> and advance <var title="">position</var> until the
+			character at <var title="">position</var> is not from <var title="">set</var>.  <!-- I can't use HTML's "collect a sequence of
+			characters" algorithm because my string isn't called "input". -->
+
+			</li><li>Otherwise, if the character at <var title="">position</var> is a
+			line feed (U+000A), delete the last character of <var title="">newdata</var> if it's a space (U+0020), then append a line
+			feed (U+000A) to <var title="">newdata</var>, then advance <var title="">position</var> until the character at <var title="">position</var> is not from <var title="">set</var>.
+
+			</li><li>Otherwise, append the character at <var title="">position</var> to
+			<var title="">newdata</var> and increment <var title="">position</var>.
+			</li></ol>
+
+		</li><li>Set <var title="">data</var> to <var title="">newdata</var>.
+		</li></ol>
+
+	</li><li>If <var title="">trailing space</var> is true and <var title="">data</var>
+	does not begin with a <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/html/#space-character">space character</a>,
+	append a space to the end of <var title="">s</var>.
+
+	</li><li>If <var title="">s</var> is empty or ends with a <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/html/#space-character">space character</a>, and <var title="">data</var> begins
+	with a space (U+0020), and <var title="">whitespace</var> is "normal",
+	"no-wrap", or "pre-line", delete the space from the beginning of <var title="">data</var>.
+
+	</li><li>If <var title="">whitespace</var> is "normal", "no-wrap", or "pre-line",
+	and the last character of <var title="">data</var> is a space (U+0020), delete
+	the last character of <var title="">data</var> and set <var title="">trailing
+	space</var> to true.  Otherwise, set <var title="">trailing space</var> to
+	false.
+
+	</li><li>If the computed value of <var title="">node</var>'s "text-transform"
+	property is not "normal", apply the appropriate transformation to <var title="">data</var>.
+	<!-- Only WebKit does it out of all the browsers tested, but it makes
+	sense. -->
+
+	<p class="note">At the time of this writing, there is no precise definition
+	of how text-transform is supposed to work in CSS.  User agents should apply
+	the same transformation here as they do in CSS.
+
+	</p></li><li>Append <var title="">data</var> to <var title="">s</var>.
+	</li></ol>
+
+  </dd><dt>an <a href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#element"><code class="external" data-anolis-spec="domcore">Element</code></a> that is not an
+  <a href="#ignored-node">ignored node</a>
+  </dt><dd>
+    <!-- Gecko indents lists, but no one else does, so let's not. -->
+    <ol>
+	<li>If the last character of <var title="">s</var> is not a newline (U+000A),
+	and the <a href="#leading-whitespace">leading whitespace</a> for <var title="">child</var> is not
+	the empty string, append the <a href="#leading-whitespace">leading whitespace</a> for <var title="">child</var> to <var title="">s</var> and set <var title="">trailing
+	space</var> to false. <!-- This gives us a line before block elements that
+	don't follow block elements, e.g., a block element inside an inline
+	element.  WebKit and IE8 do this, and Gecko effectively does (just keying
+	off the element type instead of CSS), but Opera and IE9 appear not to. -->
+
+	</li><li><a href="#append-the-plaintext">Append the plaintext</a> of <var title="">child</var> to <var title="">s</var> with flag <var title="">trailing space</var>, and assign the
+	result to (<var title="">s</var>, <var title="">trailing space</var>).
+
+	</li><li>If <var title="">node</var> has another child after <var title="">child</var>
+	that is not an <a href="#ignored-node">ignored node</a>, and the <a href="#trailing-whitespace">trailing
+	whitespace</a> of <var title="">child</var> is not the empty string, append
+	the <a href="#trailing-whitespace">trailing whitespace</a> of <var title="">child</var> to <var title="">s</var> and set <var title="">trailing space</var> to false.
+	</li></ol>
+  </dd></dl>
+
+  </li><li>Return (<var title="">s</var>, <var title="">trailing space</var>).
+</li></ol>
+
+<!-- Leading and trailing whitespace for inlines is complicated because blocks
+and similar things inside a regular inline "break out", forming anonymous block
+children, and we want the appropriate newlines in that case. -->
+
+<p>The <dfn id="leading-whitespace">leading whitespace</dfn> for an <a class="external" data-anolis-spec="domcore" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#element">Element</a> <var title="">node</var> consists of the
+following, depending on the computed value of <var title="">node</var>'s "display"
+property:
+
+</p><dl class="switch">
+<dt>inline
+</dt><dd>If <var title="">node</var> has a child that is not an <a href="#ignored-node">ignored
+node</a>, and the first child of <var title="">node</var> that is not an
+<a href="#ignored-node">ignored node</a> is an <a class="external" data-anolis-spec="domcore" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#element">Element</a>,
+the <a href="#leading-whitespace">leading whitespace</a> for that child.  Otherwise, the empty
+string.
+
+</dd><dt>inline-block
+</dt><dt>inline-table
+</dt><dt>none
+</dt><dt>table-cell
+</dt><dt>table-column
+</dt><dt>table-column-group
+</dt><dd>The empty string.
+
+</dd><dt>Any other value
+</dt><dd>The string consisting of a single newline.
+</dd></dl>
+
+<p>The <dfn id="trailing-whitespace">trailing whitespace</dfn> for an <a class="external" data-anolis-spec="domcore" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#element">Element</a> <var title="">node</var> consists of the
+following, depending on the computed value of <var title="">node</var>'s "display"
+property:
+
+</p><dl class="switch">
+<dt>inline
+</dt><dd>If <var title="">node</var> has a child that is not an <a href="#ignored-node">ignored
+node</a>, and the last child of <var title="">node</var> that is not an
+<a href="#ignored-node">ignored node</a> is an <a class="external" data-anolis-spec="domcore" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#element">Element</a>,
+the <a href="#trailing-whitespace">trailing whitespace</a> for that child.  Otherwise, the empty
+string.
+
+</dd><dt>inline-block
+</dt><dt>inline-table
+</dt><dt>none
+</dt><dt>table-column
+</dt><dt>table-column-group
+</dt><dd>The empty string.
+
+</dd><dt>table-cell
+</dt><dd>The string consisting of one tab (U+0009).
+
+</dd><dt>Any other value
+</dt><dd>If <var title="">node</var>'s <a href="#innertext"><code>innerText</code></a> is empty, the empty
+string.  Otherwise, if the "margin-bottom" property of <var title="">node</var>
+has computed value at least half that of its "font-size" property, the string
+consisting of two newlines (U+000A).  Otherwise, the string consisting of one
+newline (U+000A).
+<!-- WebKit only seems to append an extra newline for <p>, or at least it
+doesn't for <div>, or something.  But that doesn't make much sense.  It does
+appear to depend on margins in the way I document here, for <p>, so I just
+extend the magic to all blocks.
+
+Gecko seems to append the newline before the <p>, not after, so that div + p +
+div has an extra newline before the <p> instead of after as in WebKit.  I'm
+indifferent, so I arbitrarily went with WebKit. -->
+</dd></dl>
+
+
+<h2 class="no-num" id="references">References</h2><!--REFS-->
+<p>All references are normative unless marked "Non-normative".</p>
+<div id="anolis-references"><dl></dl></div>
+
+
+<!--
+<h2 class=no-num>Acknowledgements</h2>
+<p>...
+-->
+<script src="innerText_files/dfn.js"></script>
+</div></body></html>

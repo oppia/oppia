@@ -1,0 +1,7 @@
+graft docs
+prune docs/_build
+graft webtest
+graft tests
+include *.rst *.cfg *.ini
+global-exclude *.pyc
+global-exclude __pycache__

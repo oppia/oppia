@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<!--[if lte IE 6]><html class="ie6"><!--[if gt IE 8]><!--><html><!--<![endif]-->
+<head>
+    <title>Rangy Position Module Demo</title>
+    <link href="demo.css" rel="stylesheet" type="text/css">
+    <style type="text/css">
+        #wholeSelection {
+            position: absolute;
+            margin: 0;
+            padding: 0;
+            border: dotted red 2px;
+        }
+
+        #wholeSelectionInner {
+            margin: -2px;
+        }
+
+        #startSelection, #endSelection {
+            position: absolute;
+            margin: 0;
+            padding: 0;
+            background-color: yellow;
+            font-weight: bold;
+            font-size: 60%;
+        }
+
+        #footer {
+            position: fixed;
+            background-color: lightgoldenrodyellow;
+            border-top: solid darkblue 1px;
+            bottom: 0;
+            padding: 5px 0;
+            width: 100%;
+        }
+
+    </style>
+    <script type="text/javascript" src="../external/log4javascript.js"></script>
+    <script type="text/javascript" src="../src/core/core.js"></script>
+    <script type="text/javascript" src="../src/core/dom.js"></script>
+    <script type="text/javascript" src="../src/core/domrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedselection.js"></script>
+    <script type="text/javascript" src="../src/modules/inactive/rangy-position.js"></script>
+
+
+    <script type="text/javascript">
+        function gEBI(id) {
+            return document.getElementById(id);
+        }
+
+        function rectToString(rect) {
+            return "(" + rect.left + ", " + rect.top + "), (" + rect.right + ", " + rect.bottom + ")";
+        }
+
+        var wholeSelRectEl, startSelEl, endSelEl;
+
+        function removeSelectionIndicators() {
+            if (wholeSelRectEl) {
+                wholeSelRectEl.parentNode.removeChild(wholeSelRectEl);
+                startSelEl.parentNode.removeChild(startSelEl);
+                endSelEl.parentNode.removeChild(endSelEl);
+                startSelEl = endSelEl = wholeSelRectEl = null;
+            }
+        }
+
+        function showSelectionPosition() {
+            // Draw an element representing the whole selection rectangle
+            var wholeSelRect = rangy.getSelection().getBoundingDocumentRect();
+
+            removeSelectionIndicators();
+
+            if (!wholeSelRect) {
+                return;
+            }
+
+            wholeSelRectEl = document.createElement("div");
+            wholeSelRectEl.id = "wholeSelection";
+
+            var wholeSelRectInnerEl = wholeSelRectEl.appendChild(document.createElement("div"));
+            wholeSelRectInnerEl.id = "wholeSelectionInner";
+
+            rangy.util.extend(wholeSelRectEl.style, {
+                left: wholeSelRect.left + "px",
+                top: wholeSelRect.top + "px"
+            });
+
+            rangy.util.extend(wholeSelRectInnerEl.style, {
+                width: wholeSelRect.width + "px",
+                height: wholeSelRect.height + "px"
+            });
+
+            wholeSelRectEl.onmousedown = removeSelectionIndicators;
+
+            document.body.appendChild(wholeSelRectEl);
+
+            // Draw elements at the start and end of the selection
+            startSelEl = document.createElement("div");
+            startSelEl.id = "startSelection";
+            startSelEl.innerHTML = "&lt;&lt;";
+            var startPos = rangy.getSelection().getStartDocumentPos();
+            startSelEl.style.left = startPos.x + "px";
+            startSelEl.style.top = startPos.y + "px";
+            document.body.appendChild(startSelEl);
+
+            endSelEl = document.createElement("div");
+            endSelEl.id = "endSelection";
+            endSelEl.innerHTML = "&gt;&gt;";
+            var endPos = rangy.getSelection().getEndDocumentPos();
+            document.body.appendChild(endSelEl);
+            endSelEl.style.left = (endPos.x - endSelEl.offsetWidth) + "px";
+            endSelEl.style.top = (endPos.y - endSelEl.offsetHeight) + "px";
+        }
+
+        function createButton(parentNode, clickHandler, value) {
+            var button = document.createElement("input");
+            button.type = "button";
+            button.unselectable = true;
+            button.className = "unselectable";
+            button.ontouchstart = button.onmousedown = function() {
+                clickHandler();
+                return false;
+            };
+            button.value = value;
+            parentNode.appendChild(button);
+            button = null;
+        }
+
+        window.onload = function() {
+            rangy.init();
+
+            // Enable multiple selections in IE
+            try {
+                document.execCommand("MultipleSelection", true, true);
+            } catch (ex) {}
+
+            // Create selection buttons
+            var selectionButtonsContainer = gEBI("selectionButtons");
+            createButton(selectionButtonsContainer, showSelectionPosition, "Show selection position");
+
+            // Create Range buttons
+            var rangeButtonsContainer = gEBI("rangeButtons");
+
+            // Display the control range element in IE
+            if (rangy.features.implementsControlRange) {
+                gEBI("controlRange").style.display = "block";
+            }
+        };
+    </script>
+</head>
+<body>
+    <div id="buttons">
+        <h3>Selection position</h3>
+        <p>
+            Press the following button to display an outline of the selection's bounding rectangle and arrows showing
+            the positions at the start and end of the selection:
+        </p>
+        <div id="selectionButtons"></div>
+    </div>
+    <div id="content">
+    <h1>Rangy Position Module Demo</h1>
+
+    <p id="intro">
+        Please use your mouse and/or keyboard to make selections from the sample content below and use the button on
+        the left hand size to show range/selection postion.
+    </p>
+
+    <p>
+        <b>Association football</b> is a sport played between two teams. It is usually called <b>football</b>, but in
+        some countries, such as the United States, it is called <b>soccer</b>. In
+        <a href="http://simple.wikipedia.org/wiki/Japan">Japan</a>, New Zealand, South Africa, Australia, Canada and
+        Republic of Ireland, both words are commonly used.
+    </p>
+    <p>
+        Each team has 11 players on the field. One of these players is the <i>goalkeeper</i>, and the other ten are
+        known as <i>"outfield players."</i> The game is played by <b>kicking a ball into the opponent's goal</b>. A
+        match has 90 minutes of play, with a break of 15 minutes in the middle. The break in the middle is called
+        half-time.
+    </p>
+    <h2>Competitions <span class="smaller">(this section is editable)</span></h2>
+    <p contenteditable="true">
+        There are many competitions for football, for both football clubs and countries. Football clubs usually play
+        other teams in their own country, with a few exceptions. <b>Cardiff City F.C.</b> from Wales for example, play
+        in the English leagues and in the English FA Cup.
+    </p>
+    <h2>Who plays football <span class="smaller">(this section is editable and in pre-formatted text)</span></h2>
+    <pre contenteditable="true">
+Football is the world's most popular sport. It is played in more
+countries than any other game. In fact, FIFA (the Federation
+Internationale de Football Association) has more members than the
+United Nations.
+
+It is played by both males and females.
+
+</pre>
+    <h2>Famous clubs <span class="smaller">(this section is editable)</span></h2>
+    <div contenteditable="true">
+        Here's a few examples:
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Nation</th>
+                    <th>Teams</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>England</td>
+                    <td>Manchester United, Arsenal, Chelsea, Liverpool, Watford</td>
+                </tr>
+                <tr>
+                    <td>Spain</td>
+                    <td>Barcelona, Real Madrid</td>
+                </tr>
+                <tr>
+                    <td>Italy</td>
+                    <td>AC Milan, Internazionale, Juventus</td>
+                </tr>
+            </tbody>
+        </table>
+        There you go. And here are some more teams from different places and here is some text to bulk out this
+        line:
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Nation</th>
+                    <th>Teams</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Germany</td>
+                    <td>Bayern Munich</td>
+                </tr>
+            </tbody>
+        </table>
+        That's it.
+    </div>
+    <h2>Miscellaneous</h2>
+    <p id="controlRange" style="display: none" contenteditable="true">
+        Some controls to put in a ControlRange in IE: <input> and <input> and <input>
+    </p>
+
+    </div>
+    <br style="clear: both">
+    <div id="footer">
+        <p class="small">
+            Text adapted from <a href="http://simple.wikipedia.org/wiki/Association_football">Simple Wikipedia page on
+            Association Football</a>, licensed under the
+            <a href="http://simple.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License">Creative
+                Commons Attribution/Share-Alike License</a>.
+        </p>
+    </div>
+</body>
+</html>

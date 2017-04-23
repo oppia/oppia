@@ -1,0 +1,31 @@
+{
+    "name": "rangy",
+    "description": "A cross-browser DOM range and selection library",
+    "version": "1.3.0",
+    "author": {
+        "name": "Tim Down",
+        "email": "tim@timdown.co.uk",
+        "url": "http://timdown.co.uk/"
+    },
+    "keywords": ["range", "selection", "caret", "DOM"],
+    "homepage": "https://github.com/timdown/rangy",
+    "bugs": {
+        "url": "https://github.com/timdown/rangy/issues"
+    },
+    "licenses": [
+        {
+            "type": "MIT",
+            "url": "http://www.opensource.org/licenses/mit-license.php"
+        }
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/timdown/rangy.git"
+    },
+    "main": "lib/rangy-core.js",
+    "directories": {
+        "lib": "./lib"
+    },
+    "dependencies": {},
+    "devDependencies": {}
+}

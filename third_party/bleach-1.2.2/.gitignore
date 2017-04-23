@@ -1,0 +1,8 @@
+*.pyo
+*.pyc
+pip-log.txt
+.coverage
+dist
+*.egg-info
+.noseids
+build

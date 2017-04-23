@@ -1,0 +1,24 @@
+{
+  "name": "jquery-ui-touch-punch-improved",
+  "version": "0.3.1",
+  "homepage": "https://github.com/Bantam/jquery-ui-touch-punch-improved",
+  "authors": [
+    "Chris Hutchinson <chris@brushd.com>"
+  ],
+  "description": "Touch Event Support for jQuery UI",
+  "main": "jquery.ui.touch-punch-improved.js",
+  "keywords": [
+    "jquery",
+    "jquery-ui",
+    "touch",
+    "mobile"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

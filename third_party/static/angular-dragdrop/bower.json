@@ -1,0 +1,27 @@
+{
+  "name": "angular-dragdrop",
+  "version": "1.0.13",
+  "description": "This directive allows you to use jQuery UI's draggable and droppable plugins with AngularJS.",
+  "author": "https://github.com/codef0rmer/angular-dragdrop/contributors",
+  "license": "MIT",
+  "homepage": "http://codef0rmer.github.io/angular-dragdrop",
+  "main": "./src/angular-dragdrop.js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components",
+    "test*",
+    "demo*",
+    "gruntFile.js",
+    "package.json"
+  ],
+  "dependencies": {
+    "jquery-ui": "latest",
+    "angular": "latest"
+  },
+  "devDependencies": {
+    "angular-mocks": "latest",
+    "angular-ui-bootstrap-bower": "latest",
+    "angular-animate": "latest"
+  }
+}

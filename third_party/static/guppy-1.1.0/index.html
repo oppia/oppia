@@ -1,0 +1,180 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Guppy</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="build/guppy.min.css">
+    <!-- <script src="lib/katex/katex-modified.min.js"></script> -->
+    <!-- <script src="lib/mousetrap/mousetrap.min.js"></script> -->
+    <script type="text/javascript" src="build/guppy.min.js"></script>
+
+    <script type="text/javascript" src="index.js"></script>
+    <link rel="stylesheet" href="index.css">
+
+<!-- github ribbon! -->
+    <a href="https://github.com/daniel3735928559/guppy">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67"
+            alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
+
+    <label><span style="font-size:40px;padding-right:10px;">Guppy</span>  A WYSIWYG
+    Mathematics Editor</label>
+</head>
+
+<body>
+    <div>Click below to start typing a mathematical expression
+    (<a href="#" onclick="flash_help()">help</a>)</div> <br/>
+
+    <div id="guppy1"></div>
+    <br />
+
+    <div>Click the buttons to render the expression in various
+      plaintext formats</div> <br/>
+    
+    <div id="result">
+      <button class="btn btn-default" id="xml_btn" onclick="">XML</button>
+      <button class="btn btn-default" id="text_btn">Text</button>
+      <button class="btn btn-default" id="latex_btn">LaTeX</button>
+      <button class="btn btn-default btn-danger" id="clear_btn">Clear</button>
+      <div id="stuff"></div>
+    </div><br />
+    <div>Cheat sheet: </div><br />
+    <div id="help_card">
+        <style>
+            td {
+                padding: 2px 10px;
+            }
+        </style>
+        <div style="float:left">
+            <table>
+                <tr>
+                    <td><b>Type...</b></td>
+                    <td><b>...to create</b></td>
+                </tr>
+                <tr>
+                    <td>
+                        <font face="monospace">exp or ^</font>
+                    </td>
+                    <td>Exponent</td>
+                </tr>
+                <tr>
+                    <td>
+                        <font face="monospace">sub or _</font>
+                    </td>
+                    <td>Subscript</td>
+                </tr>
+                <tr>
+                    <td>
+                        <font face="monospace">frac or / </font>
+                    </td>
+                    <td>Big fraction</td>
+                </tr>
+                <tr>
+                    <td>
+                        <font face="monospace">shift-/ </font>
+                    </td>
+                    <td>Division</td>
+                </tr>
+                <tr>
+                    <td>
+                        <font face="monospace">abs</font>
+                    </td>
+                    <td>Absolute value</td>
+                </tr>
+                <tr>
+                    <td>
+                        <font face="monospace">sqrt</font>
+                    </td>
+                    <td>Square root</td>
+                </tr>
+                <tr>
+                    <td>
+                        <font face="monospace">pi</font>
+                    </td>
+                    <td>pi</td>
+                </tr>
+                <tr>
+                    <td>
+                        <font face="monospace">sin/cos/tan</font>
+                    </td>
+                    <td>Sine/cosine/tangent</td>
+                </tr>
+                <tr>
+                    <td>
+                        <font face="monospace">log or ln</font>
+                    </td>
+                    <td>Natural logarithm</td>
+                </tr>
+                <tr>
+                    <td>
+                        <font face="monospace">diff or deriv</font>
+                    </td>
+                    <td>Derivative</td>
+                </tr>
+                <tr>
+                    <td>
+                        <font face="monospace">int</font>
+                    </td>
+                    <td>Indefinite integral</td>
+                </tr>
+                <tr>
+                    <td>
+                        <font face="monospace">defi</font>
+                    </td>
+                    <td>Definite integral</td>
+                </tr>
+                <tr>
+                    <td>
+                        <font face="monospace">smi/smd</font>
+                    </td>
+                    <td>Small indef/def integral</td>
+                </tr>
+                <tr>
+                    <td>
+                        <font face="monospace">sum</font>
+                    </td>
+                    <td>Summation</td>
+                </tr>
+            </table><br />
+        </div>
+        <div style="float:left">
+            <table>
+                <tr>
+                    <td><b>Press...</b></td>
+                    <td><b>...to do</b></td>
+                </tr>
+                <tr>
+                    <td>
+                        <font face="monospace">left/right arrows</font>
+                    </td>
+                    <td>Move cursor</td>
+                </tr>
+                <tr>
+                    <td>
+                        <font face="monospace">shift + left/right arrows</font>
+                    </td>
+                    <td>Select region</td>
+                </tr>
+                <tr>
+                    <td>
+                        <font face="monospace">ctrl + x/c/v</font>
+                    </td>
+                    <td>Cut/copy/paste</td>
+                </tr>
+                <tr>
+                    <td>
+                        <font face="monospace">ctrl + z/y</font>
+                    </td>
+                    <td>Undo/redo</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+</body>
+
+</html>

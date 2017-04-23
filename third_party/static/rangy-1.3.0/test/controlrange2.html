@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title></title>
+    <script type="text/javascript" src="../external/log4javascript.js"></script>
+    <script type="text/javascript">
+        var appender = new log4javascript.InPageAppender();
+        log4javascript.getRootLogger().addAppender(appender);
+        var log = log4javascript.getRootLogger();
+        log4javascript.setShowStackTraces(true);
+        //log4javascript.setEnabled(false);
+    </script>
+
+    <script type="text/javascript" src="../src/core/core.js"></script>
+    <script type="text/javascript" src="../src/core/dom.js"></script>
+    <script type="text/javascript" src="../src/core/domrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedselection.js"></script>
+    <script type="text/javascript">
+        document.selection.empty();
+
+        function addImage(id) {
+            var sel = window.getSelection();
+            var im = document.getElementById(id);
+            var range = document.createRange();
+            range.selectNode(im);
+            sel.addRange(range);
+            document.getElementById("editor").focus();
+        }
+
+        function removeImage(id) {
+            var sel = window.getSelection();
+            var im = document.getElementById(id);
+            var range = document.createRange();
+            range.selectNode(im);
+            sel.removeRange(range);
+        }
+    </script>
+</head>
+<body onload="document.execCommand('MultipleSelection', true, true);">
+    <div contenteditable="true" id="editor">
+        Pictures of Steve Claridge:
+        <img src="claridge.jpg" alt="claridge" width="30" height="40" id="im1">
+        <img src="claridge.jpg" alt="claridge" width="30" height="40" id="im2">
+        <img src="claridge.jpg" alt="claridge" width="30" height="40" id="im3">
+    </div>
+    <input type="button" onclick="addImage('im2')" value="Add image 2">
+    <input type="button" onclick="addImage('im3')" value="Add image 3">
+    <input type="button" onclick="removeImage('im2')" value="Remove image 2">
+    <input type="button" onclick="removeImage('im3')" value="Remove image 3">
+</body>
+</html>

@@ -1,0 +1,92 @@
+body {
+	font-family: verdana, arial, helvetica, sans-serif;
+	font-size: 81.25%;
+}
+
+h2 {
+	font-size: 100%;
+	padding: 0;
+	margin: 0.1em 0 0.1em 0;
+}
+
+div.xn_test_suite_container {
+	border: solid #cccccc 1px;
+	padding: 2px 5px;
+	margin: 2px 0;
+}
+
+div.xn_test_progressbar_container {
+	border: solid black 1px;
+}
+
+div.xn_test_progressbar_container *.success {
+	background-color: #00ff00;
+}
+
+div.xn_test_progressbar_container *.failure {
+	background-color: red;
+}
+
+div.xn_test_overallprogressbar_container {
+	position: relative;
+}
+
+div.xn_test_overallprogressbar_container h1 {
+	margin: 0;
+	padding: 2px;
+	font-size: 125%;
+	font-weight: bold;
+	white-space: nowrap;
+}
+
+dl *.success {
+	color: green;
+}
+
+dl *.failure {
+	color: red;
+}
+
+span.xn_test_expander {
+	padding: 0;
+	border: solid black 1px;
+	cursor: pointer;
+	cursor: hand;
+	line-height: 100%; 
+	font-weight: bold;
+	margin-right: 1em;
+	font-size: 11px;
+}
+
+dl.xn_test_expanded {
+	display: block;
+}
+
+dl.xn_test_collapsed {
+	display: none;
+}
+
+div.xn_test_suite_success {
+	border: solid 2px limegreen;
+}
+
+div.xn_test_suite_failure {
+	border: solid 2px red;
+}
+
+pre.xn_test_log_report {
+	background-color: #f5f5f5;
+	padding: 3px;
+	border: solid gray 1px;
+	font-size: 11px;
+	font-family: Courier New, Courier, monospace;
+}
+
+code.xn_test_stacktrace {
+	color: red;
+	overflow: scroll;
+}
+
+*.xn_test_hidden {
+    display: none;
+}

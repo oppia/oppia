@@ -1,0 +1,297 @@
+/* WHATWG Green: sRGB #3c790a, rgb(60, 121, 10) */
+
+html { margin: 0; padding: 0; background: white; color: black; }
+body { margin: 0 auto; padding: 0 1.5em 2em 2.5em; max-width: 80em; background: white; color: black; }
+
+@media screen {
+    html { background: bottom right linear-gradient(357deg, #A4A4A4 0, #CCCCCC 7.5em, #FFFFFF 60vh); }
+    body { margin-bottom: 60vh; }
+    :link, :visited { text-decoration: none; }
+    :link:hover, :visited:hover, :link:focus, :visited:focus { text-decoration: underline; }
+    :link { color: #00C; }
+    :visited { color: #609; }
+    :link:active, :visited:active { color: #C00; }
+    pre :link, pre :visited { color: inherit; background: transparent; }
+    pre:hover :link, pre:hover :visited { text-decoration: underline; }
+}
+code { color: #666666; }
+dfn code { color: orangered; }
+code :link, :link code, code :visited, :visited code { color: orangered; }
+
+html, ::before { font: 1em/1.45 Helvetica Neue, sans-serif, Droid Sans Fallback; }
+h1, h2, h3, h4, h5, h6 { text-align: left; text-rendering: optimizeLegibility; text-shadow: white 0 0 2px; }
+h1, h2, h3 { color: #3c790a; background: transparent; }
+h1 { font: 900 200% Helvetica Neue, sans-serif, Droid Sans Fallback; }
+h1.allcaps { font: 900 350% Helvetica Neue, sans-serif, Droid Sans Fallback; letter-spacing: 2px; }
+h2 { font: 800 140% Helvetica Neue, sans-serif, Droid Sans Fallback; }
+h3 { font: 800 125% Helvetica Neue, sans-serif, Droid Sans Fallback; }
+h4 { font: 800 110% Helvetica Neue, sans-serif, Droid Sans Fallback; }
+h5 { font: 800 100% Helvetica Neue, sans-serif, Droid Sans Fallback; }
+h6 { font: 600 italic 100% Helvetica Neue, sans-serif, Droid Sans Fallback; }
+
+h2 { margin: 6em 0 1em 0; }
+h3, h4, h5, h6 { margin: 4.5em 0 1em 0; }
+h1 + h2, h2 + h3, h3 + h4, h4 + h5, h5 + h6, h1 + div.status + h2, h2 + div.status + h3, h3 + div.status + h4, h4 + div.status + h5, h5 + div.status + h6 { margin-top: 0.5em; }
+header + h2, header + hr + h2, header + hr + #configUI + h2, header + hr + #configUI + #updatesStatus + h2, h2.no-toc { margin-top: 2em; }
+hr { display: block; background: none; border: none; padding: 0; margin: 3em 0; height: auto; }
+p { margin: 1.25em 0; }
+pre { margin-left: 2em; white-space: pre-wrap; }
+dl, dd { margin-top: 0; margin-bottom: 0; }
+dt { margin-top: 0.75em; margin-bottom: 0.25em; clear: left; }
+dt ul { margin: 0 1.25em; }
+dt + dt { margin-top: 0; }
+dd dt { margin-top: 0.25em; margin-bottom: 0; }
+dd p, dd ol, dd ol.brief { margin-top: 0; }
+dd dl + p, dd dl + div.status + p { margin-top: 1.25em; }
+dd table + p, dd table + div.status + p { margin-top: 1.25em; }
+p + * > li, p + div.status + * > li, dd li, p + * > li > p, p + div.status + * > li > p, dd li > p { margin: 1em 0; }
+
+.toc, .toc li { list-style: none; }
+body > .toc.brief > li { margin-top: 0.35em; margin-bottom: 0.35em; }
+body > .toc > li { margin-top: 1.75em; margin-bottom: 2.25em; }
+body > .toc > li > * > li { margin-top: 0.4em; margin-bottom: 0.6em; }
+body > .toc > li > * > li > * > li { margin-top: 0.2em; margin-bottom: 0.4em; }
+body > .toc > li > * > li > * > li > * > li { margin-top: 0.1em; margin-bottom: 0.2em; }
+.toc dfn, h1 dfn, h2 dfn, h3 dfn, h4 dfn, h5 dfn, h6 dfn { font: inherit; }
+
+dt, dfn { font-weight: bolder; font-style: normal; }
+i, em, dt dfn { font-style: italic; }
+pre, code { font-size: inherit; font-family: monospace, Droid Sans Fallback, Helvetica Neue, sans-serif; font-variant: normal; }
+pre strong { color: black; font: inherit; background: #DDFFDD; color: green; }
+pre small { color: silver; font: inherit; }
+pre em { font-weight: bolder; font-style: normal; }
+var sub { vertical-align: bottom; font-size: smaller; top: 0.1em; }
+table { border-collapse: collapse; border-style: hidden hidden none hidden; }
+table thead, table tbody { border-bottom: solid; }
+table tbody th { text-align: left; }
+table tbody th:first-child { border-left: solid; }
+table td, table th { border-left: solid; border-right: solid; border-bottom: solid thin; vertical-align: top; padding: 0.2em; }
+blockquote { margin: 0 0 0 2em; border: 0; padding: 0; font-style: italic; }
+
+img, object, p.overview { position: relative; z-index: 2; }
+img.extra, p.overview { float: right; }
+p > img:only-child { margin-left: 2em; }
+
+dl.switch { padding-left: 2em; }
+dl.switch > dt { text-indent: -1.5em; }
+dl.switch > dt > * { text-indent: 0; }
+dl.switch > dt:before { content: '\21AA'; padding: 0 0.5em 0 0; display: inline-block; width: 1em; text-align: right; line-height: 0.5em; }
+dl.triple { padding: 0 0 0 1em; }
+dl.triple dt, dl.triple dd { margin: 0; display: inline }
+dl.triple dt:after { content: ':'; }
+dl.triple dd:after { content: '\A'; white-space: pre; }
+tr.rare { background: #EEEEEE; color: #333333; }
+
+pre.idl::before, pre.asn::before, pre.css::before { font: bold 0.8rem Helvetica Neue, sans-serif; padding: 0.5em; position: absolute; top: auto; margin: -0.703125em 0 0 -3.75em /* 1em/0.8 + 1.5em + 0.5em*2 */ ; width: 1.5em; background: inherit; border: 0.078125em; border-style: solid none solid solid; border-radius: 1em 0 0 1em; }
+pre.idl { border: solid 0.0625em; background: #EEEEEE; color: black; padding: 0.5em 1em; }
+pre.idl::before { content: 'IDL'; }
+pre.asn { border: solid 0.0625em; background: #EEEEEE; color: black; padding: 0.5em 1em; }
+pre.asn::before { content: 'ASN'; }
+pre.css { border: solid 0.0625em; background: #FFFFEE; color: black; padding: 0.5em 1em; }
+pre.css:first-line { color: #AAAA50; }
+pre.css::before { content: 'CSS'; }
+
+dl.domintro { position: relative; color: green; background: #DDFFDD; margin: 2em 0 2em 0; padding: 0.5em 1em 0.5em 2em; }
+hr + dl.domintro, div.impl + dl.domintro, hr + div.status + dl.domintro, div.impl + div.status + dl.domintro { margin-top: 2.5em; margin-bottom: 1.5em; }
+dl.domintro dt, dl.domintro dt * { color: black; text-decoration: none; }
+dl.domintro dd { margin: 0.5em 0 1em 2em; padding: 0; }
+dl.domintro dd p { margin: 0.5em 0; }
+dl.domintro::before { content: 'Note'; background: green; color: white; padding: 0.15em 0.25em; font-style: normal; position: absolute; top: -0.2em; left: -1.5em; transform: rotate(-5deg); }
+
+.note { position: relative; color: green; background: #DDFFDD; font-style: italic; margin-left: 2em; padding-left: 2em; }
+.note em, .note i, .note var { font-style: normal; }
+span.note { padding: 0 2em; }
+.note p:first-child { margin-top: 0; }
+.note p:last-child { margin-bottom: 0; }
+dd > .note:first-child { margin-bottom: 0; }
+.note::before { content: 'Note'; background: green; color: white; padding: 0.15em 0.25em; font-style: normal; position: absolute; top: -0.2em; left: -1.5em; transform: rotate(-5deg); }
+
+.warning { color: red; background: transparent; font: bolder italic 1em Helvetica Neue, sans-serif, Droid Sans Fallback; position: relative; margin: 2em 0 2em 6em; padding-left: 2em; }
+.warning em, .warning i, .warning var { font-style: normal; }
+.warning p:first-child { margin-top: 0; }
+.warning p:last-child { margin-bottom: 0; }
+.warning::before { font-style: normal; content: '\26A0 Warning!'; background: red; color: yellow; padding: 0.15em 0.25em; font-style: normal; position: absolute; top: -0.2em; left: -4.25em; transform: rotate(-5deg); }
+
+.example { display: block; color: #222222; background: #EEEEEE; margin-left: 2em; padding-left: 3em; position: relative; }
+.example::before { font-style: normal; content: 'Example'; background: #222222; color: #EEEEEE; padding: 0.15em 0.25em; font: 1em Helvetica Neue, sans-serif, Droid Sans Fallback; position: absolute; top: 0.2em; left: -2.25em; transform: rotate(-5deg); }
+td > .example:only-child { margin: 0 0 0 0.1em; padding: 0; }
+td > .example:only-child::before { display: none; }
+
+figure.diagrams { border: thin solid black; background: white; padding: 1em; }
+figure.diagrams img { display: block; margin: 1em auto; }
+
+h2:not(.short) { page-break-before: always; }
+h2#contents { page-break-before: avoid; }
+h1, h2, h3, h4, h5, h6, dt { page-break-after: avoid; }
+hgroup h2, h1 + h2, hr + h2.no-toc { page-break-before: auto ! important; }
+
+.brief { margin-top: 1em; margin-bottom: 1em; line-height: 1.1; }
+.brief > li { margin: 0; padding: 0; }
+.brief > li > p, .brief > li > ol, .brief > li > ul, .brief > li > dl {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.category-list { margin-top: -0.75em; margin-bottom: 1em; line-height: 1.5; }
+.category-list::before { content: '\21D2\A0'; font-size: 1.2em; font-weight: 900; }
+.category-list li { display: inline; }
+.category-list li:not(:last-child)::after { content: ', '; }
+.category-list li > span, .category-list li > a { text-transform: lowercase; }
+.category-list li * { text-transform: none; } /* don't affect <code> nested in <a> */
+
+.big-issue, .XXX { color: #E50000; background: white; border: solid red; padding: 0.5em; margin: 1em 0; }
+.big-issue > :first-child, .XXX > :first-child { margin-top: 0; }
+p .big-issue, p .XXX { line-height: 3em; }
+
+.tablenote { margin: 0.25em 0; }
+.tablenote small { font-size: 0.9em; }
+
+.bookkeeping:before { display: block; content: 'Bookkeeping details'; font-weight: bolder; font-style: italic; }
+.bookkeeping { font-size: 0.8em; margin: 2em 0; }
+.bookkeeping p { margin: 0.5em 2em; display: list-item; list-style: square; }
+.bookkeeping dt { margin: 0.5em 2em 0; }
+.bookkeeping dd { margin: 0 3em 0.5em; }
+
+.critical { margin: 1em; border: double thick red; padding: 1em; background: #FFFFCC; }
+.critical > :first-child { margin-top: 0; }
+
+h4 { position: relative; z-index: 3; }
+h4 + .element, h4 + div.status + .element { margin-top: -2.75em; padding-top: 1.5em; }
+.element { background: #EEFFEE; color: black; margin: 0 0 1em -0.15em; padding: 0 1em 0.25em 1em; }
+.element:not(:hover) > dt > :link, .element:not(:hover) > dt > :visited { color: inherit; text-decoration: none; }
+
+table.css-property caption { text-align: left; font: inherit; font-weight: bolder; }
+table.css-property th { font: inherit; font-style: italic; text-align: left; padding-left: 2em; }
+
+td.non-rectangular-cell-continuation { border-left-style: hidden; }
+td.non-rectangular-cell-indentation { border-top-style: hidden; min-width: 2em; }
+
+.hide { display: none }
+
+.head { margin: 0 0 1em; padding: 1em 0 0 0; display: block; }
+.head p { margin: 0; }
+.head h1 { margin: 0; }
+.head h2 { margin-top: 0; }
+.head .logo img { position: absolute; top: 1em; right: 1em; border: none } /* remove border from top image */
+.head dl { margin: 1em 0; }
+p.copyright { font-size: 0.6em; font-style: oblique; margin: 0; }
+
+nav { margin: 5em 0 0 0; }
+header + nav { margin: 1em 0; }
+
+#head nav {
+    text-align: center;
+    margin: auto;
+}
+#head nav > div {
+    display: inline-block;
+}
+#head nav > div > a {
+    display: inline-block;
+    white-space: nowrap;
+    font: 1em/1 Helvetica Neue, sans-serif, Droid Sans Fallback;
+    text-decoration: none;
+    width: auto;
+    margin: 0.5em;
+    color: #F3F3F3;
+    text-align: center;
+}
+#head nav > div > a { box-shadow: 0 0 2px #3C790A; background: #3C790A; }
+#head nav > div > a.comms { box-shadow: 0 0 2px #165FCC; background: #165FCC; } /* #165FCC #43679D #0B2F66 */
+#head nav > div > a.feedback { box-shadow: 0 0 2px #FF3E3A; background: #FF3E3A; } /* #FF3E3A #CD6B6A #990300 */
+#head nav > div > a.changes { box-shadow: 0 0 2px #54B29A; background: #54B29A; } /* #54B29A #6A9A8E #28584C */
+#head nav > div > a.misc { box-shadow: 0 0 2px #FFA32D; background: #FFA32D; } /* #FFA32D #CB9D62 #945400 */
+#head nav > div > a > * > * {
+    display: block;
+    padding: 0.1em 1em 0.1em;
+    background: rgba(255,255,255,0.9);
+    color: black;
+    font: inherit;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#head nav > div > a > * > *:first-child {
+    padding-top: 0.5em;
+}
+#head nav > div > a > * > *:last-child {
+    padding-bottom: 1em;
+}
+#head nav > div > a > * > strong {
+    color: blue;
+    text-decoration: underline;
+    padding-bottom: 0.5em;
+}
+#head nav > div > a > * > code {
+    font-size: 0.8em;
+}
+p.copyright { text-align: center; }
+p.copyright > span { display: inline-block; border: none; }
+
+body.dfnEnabled dfn { cursor: pointer; }
+.dfnPanel {
+    display: inline;
+    position: absolute;
+    z-index: 35;
+    height: auto;
+    width: auto;
+    padding: 0.5em 0.75em;
+    font: small Helvetica Neue, sans-serif, Droid Sans Fallback;
+    background: #DDDDDD;
+    color: black;
+    border: outset 0.2em;
+}
+.dfnPanel * { margin: 0; padding: 0; font: inherit; text-indent: 0; }
+.dfnPanel :link, .dfnPanel :visited { color: black; }
+.dfnPanel p:not(.spec-link) { font-weight: bolder; }
+.dfnPanel * + p { margin-top: 0.25em; }
+.dfnPanel li { list-style-position: inside; }
+
+@media aural {
+    h1, h2, h3 { stress: 20; richness: 90 }
+    .hide { speak: none }
+    p.copyright { volume: x-soft; speech-rate: x-fast }
+    dt { pause-before: 20% }
+    code, pre { speak-punctuation: code }
+}
+
+@media print {
+    html { font-size: 8pt; }
+    @page { margin: 1cm 1cm 1cm 1cm; }
+    @page :left {
+        @bottom-left {
+            font: 6pt Helvetica Neue, sans-serif, Droid Sans Fallback;
+            content: counter(page);
+            padding-top: 0em;
+            vertical-align: top;
+        }
+    }
+    @page :right {
+        @bottom-right {
+            font: 6pt Helvetica Neue, sans-serif, Droid Sans Fallback;
+            content: counter(page);
+            text-align: right;
+            vertical-align: top;
+            padding-top: 0em;
+        }
+    }
+    a[href^="#"]::after { font-size: 0.6em; vertical-align: super; padding: 0 0.15em 0 0.15em; content: "p" target-counter(attr(href), page); }
+    .toc a::after { font: inherit; vertical-align: baseline; padding: 0; content: leader('.') target-counter(attr(href), page); }
+    pre a[href^="#"]::after, blockquote a[href^="#"]::after { content: ""; padding: 0; }
+    table { font-size: smaller; }
+}
+
+ul.domTree, ul.domTree ul { padding: 0 0 0 1em; margin: 0; }
+ul.domTree li { padding: 0; margin: 0; list-style: none; position: relative; }
+ul.domTree li li { list-style: none; }
+ul.domTree li:first-child::before { position: absolute; top: 0; height: 0.6em; left: -0.75em; width: 0.5em; border-style: none none solid solid; content: ''; border-width: 0.1em; }
+ul.domTree li:not(:last-child)::after { position: absolute; top: 0; bottom: -0.6em; left: -0.75em; width: 0.5em; border-style: none none solid solid; content: ''; border-width: 0.1em; }
+ul.domTree span { font-style: italic; font-family: serif, Droid Sans Fallback; }
+ul.domTree .t1 code { color: purple; font-weight: bold; }
+ul.domTree .t2 { font-style: normal; font-family: monospace, Droid Sans Fallback; }
+ul.domTree .t2 .name { color: black; font-weight: bold; }
+ul.domTree .t2 .value { color: blue; font-weight: normal; }
+ul.domTree .t3 code, .domTree .t4 code, .domTree .t5 code { color: gray; }
+ul.domTree .t7 code, .domTree .t8 code { color: green; }
+ul.domTree .t10 code { color: teal; }

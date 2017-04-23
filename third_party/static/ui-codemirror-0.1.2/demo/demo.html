@@ -1,0 +1,192 @@
+<section id="codemirror" ng-app="doc.ui-codeMirror">
+
+<!-- =Minimal code
+--------------------------------------------------------------------------- -->
+<div id="demo-mini">
+  <div class="page-header">
+    <h1>Minimal code</h1>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <div ui-codemirror>Code mirror here</div>
+    </div>
+
+    <div class="col-md-6" ng-controller="PlunkerCtrl"
+         ng-init="
+vendor_css=['http://codemirror.net/lib/codemirror.css'];
+vendor_js=['http://codemirror.net/lib/codemirror.js'];
+      "
+        >
+      <div class="pull-right">
+        <button class="btn btn-info" ng-click="edit('1.2.6', 'UI.Codemirror', 'ui-codemirror')">
+          <i class="glyphicon glyphicon-edit"></i> Edit in plunker
+        </button>
+      </div>
+
+      <tabset>
+        <tab heading="Markup">
+          <div plunker-content="markup">
+<pre class="prettyprint">&lt;section&gt;
+  &lt;div ui-codemirror &gt;Code mirror here&lt;/div&gt;
+&lt;/section&gt;</pre>
+          </div>
+        </tab>
+      </tabset>
+    </div>
+  </div>
+</div>
+
+
+<!-- =General options demo
+--------------------------------------------------------------------------- -->
+<div id="demo-general">
+  <div class="page-header">
+    <h1>General options</h1>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <div ui-codemirror="{
+            lineNumbers: true,
+            theme:'twilight',
+            readOnly: 'nocursor',
+            lineWrapping : true,
+            mode: 'xml'
+          }">&lt;html style=&quot;color: green&quot;&gt;
+&lt;!-- this is a comment --&gt;
+&lt;head&gt;
+&lt;title&gt;HTML Example&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+The indentation tries to be &lt;em&gt;somewhat &amp;quot;do what
+I mean&amp;quot;&lt;/em&gt;... but might not match your style.
+&lt;/body&gt;
+&lt;/html&gt;</div>
+    </div>
+
+    <div class="col-md-6" ng-controller="PlunkerCtrl"
+         ng-init="
+vendor_css=['http://codemirror.net/lib/codemirror.css', 'http://codemirror.net/theme/twilight.css'];
+vendor_js=['http://codemirror.net/lib/codemirror.js', 'http://codemirror.net/mode/xml/xml.js'];
+      "
+        >
+      <div class="pull-right">
+        <button class="btn btn-info" ng-click="edit('1.2.6', 'UI.Codemirror', 'ui-codemirror')">
+          <i class="glyphicon glyphicon-edit"></i> Edit in plunker
+        </button>
+      </div>
+
+      <tabset>
+        <tab heading="Markup">
+          <div plunker-content="markup">
+<pre class="prettyprint">&lt;section&gt;
+  &lt;div ui-codemirror=&quot;{
+      lineNumbers: true,
+      theme:&#39;twilight&#39;,
+      readOnly: &#39;nocursor&#39;,
+      lineWrapping : true,
+      mode: &#39;xml&#39;
+    }&quot; &gt;&amp;lt;html style=&amp;quot;color: green&amp;quot;&amp;gt;
+&amp;lt;!-- this is a comment --&amp;gt;
+&amp;lt;head&amp;gt;
+&amp;lt;title&amp;gt;HTML Example&amp;lt;/title&amp;gt;
+&amp;lt;/head&amp;gt;
+&amp;lt;body&amp;gt;
+The indentation tries to be &amp;lt;em&amp;gt;somewhat &amp;amp;quot;do what
+I mean&amp;amp;quot;&amp;lt;/em&amp;gt;... but might not match your style.
+&amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;&lt;/div&gt;
+&lt;/section&gt;</pre>
+            </div>
+          </tab>
+        </tabset>
+      </div>
+    </div>
+</div>
+
+
+<!-- =Mode-Changing demo
+--------------------------------------------------------------------------- -->
+<div id="demo-mode-changing">
+    <div class="page-header">
+      <h1>Mode-Changing demo</h1>
+    </div>
+  <div class="row" ng-controller="CodemirrorCtrl">
+    <div class="col-md-12">
+      <textarea ui-codemirror="cmOption" ng-model="cmModel"></textarea>
+    </div>
+    <div class="col-md-6">
+      Mode : <select class="form-control" ng-model="mode" ng-options="m for m in modes" ng-change="modeChanged()"></select>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<div class="row">
+
+  <div class="span12" ng-controller="PlunkerCtrl"
+       ng-init="
+vendor_css=['http://codemirror.net/lib/codemirror.css'];
+vendor_js=['http://codemirror.net/lib/codemirror.js', 'http://codemirror.net/mode/scheme/scheme.js', 'http://codemirror.net/mode/javascript/javascript.js', 'http://codemirror.net/mode/xml/xml.js'];
+        "
+      >
+    <div class="pull-right">
+      <button class="btn btn-info" ng-click="edit('1.2.6', 'UI.Codemirror', 'ui-codemirror')">
+        <i class="glyphicon glyphicon-edit"></i> Edit in plunker
+      </button>
+    </div>
+
+    <tabset>
+      <tab heading="Markup">
+        <div plunker-content="markup">
+<pre class="prettyprint">&lt;section ng-controller=&quot;CodemirrorCtrl&quot;&gt;
+
+  &lt;textarea ui-codemirror=&quot;cmOption&quot; ng-model=&quot;cmModel&quot;&gt;&lt;/textarea&gt;
+
+  Mode : &lt;select ng-model=&quot;mode&quot; ng-options=&quot;m for m in modes&quot; ng-change=&quot;modeChanged()&quot;&gt;&lt;/select&gt;
+
+&lt;/section&gt;</pre>
+
+    <div style="margin-top: 450px;"></div>
+        </div>
+      </tab>
+      <tab heading="JavaScript">
+        <div plunker-content="javascript">
+<pre class="prettyprint">app.controller(&#39;CodemirrorCtrl&#39;, [&#39;$scope&#39;, function($scope) {
+
+  // The modes
+  $scope.modes = [&#39;Scheme&#39;, &#39;XML&#39;, &#39;Javascript&#39;];
+  $scope.mode = $scope.modes[0];
+
+
+  // The ui-codemirror option
+  $scope.cmOption = {
+    lineNumbers: true,
+    indentWithTabs: true,
+    onLoad : function(_cm){
+
+      // HACK to have the codemirror instance in the scope...
+      $scope.modeChanged = function(){
+        _cm.setOption(&quot;mode&quot;, $scope.mode.toLowerCase());
+      };
+    }
+  };
+
+
+
+  // Initial code content...
+  $scope.cmModel = &#39;;; Scheme code in here.\n&#39; +
+    &#39;(define (double x)\n\t(* x x))\n\n\n&#39; +
+    &#39;&lt;!-- XML code in here. --&gt;\n&#39; +
+    &#39;&lt;root&gt;\n\t&lt;foo&gt;\n\t&lt;/foo&gt;\n\t&lt;bar/&gt;\n&lt;/root&gt;\n\n\n&#39; +
+    &#39;// Javascript code in here.\n&#39; +
+    &#39;function foo(msg) {\n\tvar r = Math.random();\n\treturn &quot;&quot; + r + &quot; : &quot; + msg;\n}&#39;;
+
+}]);</pre>
+        </div>
+      </tab>
+    </tabset>
+  </div>
+</div>
+
+</section>

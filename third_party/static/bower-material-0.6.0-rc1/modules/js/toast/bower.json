@@ -1,0 +1,9 @@
+{
+  "name": "angular-material-toast",
+  "version": "0.6.0-rc1",
+  "dependencies": {
+    "angular-material-core": "0.6.0-rc1",
+    "angular-material-swipe": "0.6.0-rc1",
+    "angular-material-button": "0.6.0-rc1"
+  }
+}

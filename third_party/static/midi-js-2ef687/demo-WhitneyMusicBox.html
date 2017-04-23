@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Whitney Music Box in HTML5</title>
+ <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+ <!-- midi.js package -->
+ <script src="./js/Color/SpaceW3.js" type="text/javascript"></script>
+ <script src="./js/MIDI/AudioDetect.js" type="text/javascript"></script>
+ <script src="./js/MIDI/LoadPlugin.js" type="text/javascript"></script>
+ <script src="./js/MIDI/Plugin.js" type="text/javascript"></script>
+ <script src="./js/MIDI/Player.js" type="text/javascript"></script>
+ <script src="./js/MusicTheory/Synesthesia.js" type="text/javascript"></script>
+ <script src="./js/Widgets/Loader.js" type="text/javascript"></script>
+ <script src="./js/Window/Event.js" type="text/javascript"></script>
+ <script src="./js/Window/DOMLoader.XMLHttp.js" type="text/javascript"></script>
+ <!-- extras -->
+ <script src="./inc/Base64.js" type="text/javascript"></script>
+ <script src="./inc/base64binary.js" type="text/javascript"></script>
+ <!-- font -->
+ <link href="http://fonts.googleapis.com/css?family=Andada" rel="stylesheet" type="text/css" />
+ <style>
+ body {
+ 	background: #000; color: #fff; font-family: andada; line-height: 1.5em;
+ }
+ a {
+ 	color: #fff
+ }
+ </style>
+</head>
+<body>
+Whitney Music Box animation in HTML5.<br>
+Graphics code by <a href="https://github.com/jbum/Whitney-Music-Box-Examples">Jim Bumgardner</a>.<br>
+Audio created with <a href="https://github.com/mudx/MIDI.js">MIDI.js</a><br>
+<canvas id="mycanvas" />
+<script type="text/javascript">
+
+var dc;
+var nbrPoints = 48;
+var cycleLength = 60 * 3; // 3 minutes
+var gw = 800;
+var gh = 800;
+var cx = gw / 2;
+var cy = gh / 2;
+var circleRadius = (gw / 2) * 0.95;
+var startTime = (new Date()).getTime();
+var PI = 3.1415927;
+var PI2 = PI * 2;
+var tines = [];
+var lastSound = [];
+
+RefreshFrame = function () {
+	dc.clearRect(0, 0, gw, gh);
+	dc.lineWidth = 3;
+	dc.strokeStyle = '#333';
+	dc.beginPath();
+	dc.moveTo(cx, cy);
+	dc.lineTo(gw, cy);
+	dc.stroke();
+	var speed = (2 * PI * nbrPoints) / cycleLength;
+	var ms = (new Date()).getTime();
+	var timer = (ms - startTime) * .001 * speed;
+	var maxRad = (gw / 2 - circleRadius) * .75;
+	var minRad = maxRad * .2;
+	for (var i = 0; i < nbrPoints; ++i) {
+		var r = (i + 1) / nbrPoints;
+		var a = timer * r;
+		var len = circleRadius * (1 + 1.0 / nbrPoints - r);
+		if (Math.floor(a / PI2) !== Math.floor(tines[i] / PI2)) {
+			MIDI.noteOn(0, i + 21, 100, 0);
+			MIDI.noteOn(0, i + 21 + 36, 100, 0);
+			lastSound[i] = ms;
+		}
+		var x = (cx + Math.cos(a) * len);
+		var y = (cy + Math.sin(a) * len);
+		var radv = minRad + (maxRad - minRad) * (1 - r);
+		radv = Math.max((radv + 6) - 6 * (ms - lastSound[i]) / 500.0, radv);
+		var huev = r * 360;
+		var satv = Math.round(100 * Math.min(1, (ms - lastSound[i]) / 1000.0));
+		var lumv = Math.round(100 * Math.max(0.5, 1 - (ms - lastSound[i]) / 1000.0));
+		dc.fillStyle = 'hsla(' + huev + ',' + satv + '%,' + lumv + '%,1)';
+		dc.beginPath();
+		dc.arc(x, y, radv, 0, PI2, false);
+		dc.fill();
+		tines[i] = a;
+	}
+};
+
+window.onload = function () {
+	MIDI.loader = new widgets.Loader;
+	MIDI.loadPlugin({
+		instrument: "acoustic_grand_piano", // or multiple instruments
+		callback: function() {
+			MIDI.loader.stop();	
+			var canvas = document.getElementById('mycanvas');
+			canvas.style.width = gw + "px";
+			canvas.style.width = gw + "px";
+			canvas.width = gw;
+			canvas.height = gh;
+			dc = canvas.getContext('2d');
+			for (var i = 0; i < nbrPoints; ++i) {
+				if (i % 7 === 0) MIDI.noteOn(0, i + 21, 100, 0);
+				lastSound[i] = 0;
+				tines[i] = 0;
+			}
+			startTime = (new Date()).getTime();
+			setInterval(RefreshFrame, 1000 / 30);
+		}
+	});
+};
+
+</script>
+</body>
+</html>

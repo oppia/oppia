@@ -1,0 +1,18 @@
+v0.2.0:
+  date: 2014-05-03
+  changes:
+    - add size method to return raw size of data passed-through.
+v0.1.2:
+  date: 2014-04-18
+  changes:
+    - always use readable-stream for consistency.
+    - use crc32.unsigned to get digest.
+v0.1.1:
+  date: 2014-03-30
+  changes:
+    - gracefully handle "no data" scenario.
+    - trim down deps.
+v0.1.0:
+  date: 2014-03-30
+  changes:
+    - initial release.

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<!--[if lte IE 6]><html class="ie6"><!--[if gt IE 8]><!--><html><!--<![endif]-->
+<head>
+    <title>Rangy Core Demo</title>
+    <link href="demo.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="../external/log4javascript.js"></script>
+    <script type="text/javascript" src="../src/core/core.js"></script>
+    <script type="text/javascript" src="../src/core/dom.js"></script>
+    <script type="text/javascript" src="../src/core/domrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedselection.js"></script>
+    
+    <style>
+        #linkInput {
+            display: none;
+        }
+        
+        #editor {
+            border: solid 1px green;
+            padding: 5px;
+        }
+    </style>
+
+    <script type="text/javascript">
+        function gEBI(id) {
+            return document.getElementById(id);
+        }
+
+        window.onload = function() {
+            rangy.init();
+
+            var linkButton = gEBI("link");
+            var linkHrefInput = gEBI("linkHref");
+            var createLinkButton = gEBI("createLink");
+            var linkInputContainer = gEBI("linkInput");
+            var editableEl = gEBI("editable");
+            
+            var bookmark;
+
+            linkButton.disabled = false;
+            linkButton.onclick = function() {
+                // Bookmark the selection before showing the link input
+                bookmark = rangy.getSelection().getBookmark(editableEl);
+
+                linkInputContainer.style.display = "block";
+                linkHrefInput.select();
+                linkHrefInput.focus();
+            };
+
+            createLinkButton.onclick = function() {
+                // Get the link URL then hide the input
+                var linkHref = linkHrefInput.value;
+                linkInputContainer.style.display = "none";
+                
+                // Focus the editor and restore the selection
+                editableEl.focus();
+                rangy.getSelection().moveToBookmark(bookmark);
+                
+                // Create the link
+                document.execCommand("CreateLink", false, linkHref);
+            };
+
+        };
+    </script>
+</head>
+<body>
+    <p id="intro">
+        Please use the simple editor below to create a link, demonstrating the <code>getBoookmark()</code> and
+        <code>moveToBoookmark()</code> methods of Rangy's selection object.
+    </p>
+    <div id="editor">
+        <div>
+            <input type="button" id="link" value="Create link from selected text" unselectable="on" class="unselectable" disabled>
+        </div>
+        <div id="linkInput">
+            <input type="text" id="linkHref" size="30" value="http://www.example.com/" class="unselectable">
+            <input type="button" id="createLink" value="Create link" unselectable="on" class="unselectable">
+        </div>
+        <div contenteditable="true" id="editable">
+            <b>Association football</b> is a sport played between two teams. It is usually called <b>football</b>, but in
+            some countries, such as the United States, it is called <b>soccer</b>. In
+            <a href="http://simple.wikipedia.org/wiki/Japan">Japan</a>, New Zealand, South Africa, Australia, Canada and
+            Republic of Ireland, both words are commonly used.
+        </div>
+    </div>
+    <p class="small">
+        Text adapted from <a href="http://simple.wikipedia.org/wiki/Association_football">Simple Wikipedia page on
+        Association Football</a>, licensed under the
+        <a href="http://simple.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License">Creative
+            Commons Attribution/Share-Alike License</a>.
+    </p></div>
+</body>
+</html>

@@ -1,0 +1,75 @@
+/*!
+ * Angular Material Design
+ * https://github.com/angular/material
+ * @license MIT
+ * v0.6.0-rc1
+ */
+.md-dialog-container {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10; }
+  .md-dialog-container.md-active {
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    -webkit-transform: translate3d(0, 0, 0) scale(1);
+            transform: translate3d(0, 0, 0) scale(1);
+    opacity: 1; }
+  .md-dialog-container.ng-leave.ng-leave-active {
+    transition: all 0.3s cubic-bezier(0.55, 0, 0.55, 0.2);
+    -webkit-transform: translate3d(0, 100%, 0) scale(0.5);
+            transform: translate3d(0, 100%, 0) scale(0.5);
+    opacity: 0; }
+
+md-dialog {
+  min-width: 240px;
+  max-width: 80%;
+  max-height: 80%;
+  margin: auto;
+  position: relative;
+  box-shadow: 0px 27px 24px 0 rgba(0, 0, 0, 0.2);
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column; }
+  md-dialog md-content {
+    -webkit-order: 1;
+        -ms-flex-order: 1;
+            order: 1;
+    padding: 24px;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch; }
+    md-dialog md-content *:first-child {
+      margin-top: 0px; }
+  md-dialog .md-actions {
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-order: 2;
+        -ms-flex-order: 2;
+            order: 2;
+    box-sizing: border-box;
+    -webkit-align-items: center;
+        -ms-flex-align: center;
+            align-items: center;
+    -webkit-justify-content: flex-end;
+        -ms-flex-pack: end;
+            justify-content: flex-end;
+    padding: 16px 16px;
+    min-height: 40px; }
+    md-dialog .md-actions > * {
+      margin-left: 8px; }
+  md-dialog.md-content-overflow .md-actions {
+    border-top: 1px solid; }

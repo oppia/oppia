@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>DOM Range</title>
+    <script type="text/javascript" src="../external/log4javascript.js"></script>
+    <script type="text/javascript">
+        log4javascript.getRootLogger().addAppender(new log4javascript.InPageAppender());
+        var log = log4javascript.getRootLogger();
+
+/*        log4javascript.addRenderer(function(o) {
+            return typeof o.nodeType != "undefined";
+        }, function(o) {
+            if (!o) { return "No node"; }
+            return ("data" in o) ? '"' + o.data + '"' : o.nodeName;
+        });*/
+    </script>
+
+    <script type="text/javascript" src="../src/core/core.js"></script>
+    <script type="text/javascript" src="../src/core/dom.js"></script>
+    <script type="text/javascript" src="../src/core/domrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedselection.js"></script>
+<!--
+    <script type="text/javascript" src="../build/rangy-core.js"></script>
+-->
+    <script type="text/javascript">
+        function r() {
+            var sel = rangy.getSelection();
+            return sel.getRangeAt(0);
+        }
+
+        function logSel() {
+            log.warn(rangy.getSelection().inspect());
+        }
+
+        function g(id) {
+            return document.getElementById(id);
+        }
+
+        function showFragment(frag) {
+            g('ph').innerHTML = "";
+            g('ph').appendChild(frag);
+            log.warn(g('ph').innerHTML);
+        }
+
+        function reselect() {
+            var sel = rangy.getSelection();
+            var range = sel.getRangeAt(0);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
+
+    </script>
+</head>
+<body>
+<input type="button" value="log selection" onmousedown="logSel();">
+<input type="button" value="reselect" onmousedown="reselect(); g('ed').focus()">
+<input type="button" value="get text" onmousedown="log.warn('Selected text: |' + rangy.getSelection() + '|');">
+<input type="button" value="delete" onmousedown="r().deleteContents()">
+<input type="button" value="extract" onmousedown="try { showFragment(r().extractContents()) } catch (ex) {alert(ex);}">
+<input type="button" value="clone" onmousedown="try { showFragment(r().cloneContents()) } catch (ex) {alert(ex);}">
+<input type="button" value="surround" onmousedown="var n = document.createElement('span'); n.style.backgroundColor = 'pink'; try { r().surroundContents(n) } catch (ex) {alert(ex);}">
+<input type="button" value="delete selection" onmousedown="rangy.getSelection().deleteFromDocument(); g('ed').focus()">
+<br>
+
+<div style="border: solid green 1px; padding: 2px">
+    <h2>A subheading</h2>
+    <p>A paragraph with <b>bold text</b> with <i>italic</i> words plus <b>some using <i>both</i></b>.</p>
+    <p>A paragraph with <b>bold text</b> with <i>italic</i> words plus <b>some using <i>both</i></b>.<br>
+        A paragraph with <b>bold text</b> with <i>italic</i> words
+        <img src="claridge.jpg" alt="claridge" width="30" height="40">
+        plus <b>some using <i>both</i></b>.</p>
+    <ul id="ul">
+        <li id="li_a"> a </li>
+        <li id="li_b"> b </li>
+    </ul>
+
+</div>
+
+<div style="border: solid green 1px; padding: 2px" contenteditable="true" id="ed" onkeydown="if (event.keyCode==40 && event.ctrlKey){reselect(); g('ed').focus(); return false;}">
+    <p>A paragraph with <b id="btest">bold text</b> with <i>italic</i> words plus <b>some using <i>both</i></b>.<br>
+        A paragraph with <b>bold <img src="claridge.jpg" alt="claridge" width="30" height="40"><img src="claridge.jpg" alt="claridge" width="30" height="40"> text</b> with <b><i>bold italic</i> text</b> and <i>italic</i> words plus <b>some using <i>both</i></b>.</p>
+
+    <ul id="ul">
+        <li id="li_a"> a </li>
+        <li id="li_b"> b </li>
+    </ul>
+    
+    <pre>
+Some preformatted <script>document.write("text\n\tWonder ")</script>how it'll do
+
+with this, plus some line breaks
+
+
+</pre>
+    <table><tr><td>one</td><td>two</td></tr><tr><td>one</td><td>two</td></tr></table>
+
+</div>
+<div id="ph" style="border: solid blue 1px; padding: 2px"></div>
+<textarea rows="3" cols="60">
+    Some text and some more text and some more text
+</textarea>
+<input type="text" value="asadads sada"  onkeydown="if (event.keyCode==38 && event.ctrlKey){logSel();}"><input type="button" value="a button">
+
+<select><option>A select list</option></select>
+
+</body></html>

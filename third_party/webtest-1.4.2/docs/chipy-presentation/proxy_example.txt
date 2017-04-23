@@ -1,0 +1,92 @@
+    >>> from wsgiproxy.exactproxy import proxy_exact_request
+    >>> from webtest import TestApp
+    >>> app = TestApp(proxy_exact_request)
+    >>> resp = app.get('http://python.org')
+    >>> resp
+    <200 OK text/html body='<!DOCTYPE...\n\n'/15978>
+    >>> print resp
+    Response: 200 OK
+    Date: ...
+    Server: Apache/2.2.3 (Debian) DAV/2 SVN/1.4.2 mod_ssl/2.2.3 OpenSSL/0.9.8c
+    Last-Modified: ...
+    ETag: ...
+    Accept-Ranges: bytes
+    Content-Type: text/html
+    Content-Length: ...
+    ...
+    >>> from wsgifilter.proxyapp import DebugHeaders
+    >>> app = TestApp(DebugHeaders(proxy_exact_request))
+    >>> app.get('http://python.org/')
+    Incoming headers: (GET http://python.org/ SCRIPT_NAME='')
+      Host: python.org:80
+    Outgoing headers: (200 OK)
+      Date: ...
+      Server: Apache/2.2.3 (Debian) DAV/2 SVN/1.4.2 mod_ssl/2.2.3 OpenSSL/0.9.8c
+      Last-Modified: ...
+      Etag: ...
+      Accept-Ranges: bytes
+      Content-Length: ...
+      Content-Type: text/html
+    <200 OK text/html body='<!DOCTYPE...\n\n'/15978>
+    >>> app = TestApp(proxy_exact_request)
+    >>> resp = app.get('http://python.org')
+    >>> resp.lxml
+    <Element html at ...>
+    >>> for a in resp.lxml.xpath('//a'):
+    ...     if a.get('href').startswith('http:'):
+    ...         continue
+    ...     print a.get('href'), a.text_content()
+    / 
+    #left-hand-navigation 
+    #content-body 
+    /search Advanced Search
+    /about/ About
+    /news/ News
+    /doc/ Documentation
+    /download/ Download
+    /community/ Community
+    /psf/ Foundation
+    /dev/ Core Development
+    /links/ Links
+    /download/releases/2.5.1 Quick Links (2.5.1)
+    /ftp/python/2.5.1/python-2.5.1.msi Windows Installer
+    /ftp/python/2.5.1/Python-2.5.1.tar.bz2 Source Distribution
+    /community/jobs Python Jobs
+    /psf/donations/ Donate to the PSF
+    /about/success/usa 
+    <BLANKLINE>
+    about/success/rackspace Rackspace
+    about/success/ilm Industrial Light and Magic
+    about/success/astra AstraZeneca
+    about/success/honeywell Honeywell
+    about/success and many others
+    /about/quotes more...
+    /doc/topics/database Databases
+    /doc/topics/database/modules Others
+    /community/sigs/current/edu-sig Education
+    /about/apps Networking
+    /about/apps Software Development
+    /about/apps Game Development
+    /about/apps more...
+    /psf/license open source license
+    /psf Python Software Foundation (PSF)
+    /about Read more
+    /download try Python now
+    /download/releases/3.0 second alpha release
+    /download/releases/3.0 first alpha release
+    /channews.rdf RSS
+    /about/website Website maintained by the Python community
+    /psf Python Software Foundation
+    /about/legal Legal Statements
+    >>> resp = resp.click('Legal Statements')
+    >>> resp.request.url
+    'http://python.org/about/legal'
+    >>> resp.status
+    '301 Moved Permanently'
+    >>> resp = resp.follow()
+    >>> #resp.showbrowser()
+    >>> resp.html.html.head.title
+    <title>Legal Statements</title>
+    >>> import re
+    >>> re.search(r'<title>(.*?)</title>', resp.body).group(1)
+    'Legal Statements'

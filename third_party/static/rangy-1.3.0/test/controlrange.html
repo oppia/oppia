@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title></title>
+    <script type="text/javascript" src="../external/log4javascript.js"></script>
+    <script type="text/javascript">
+        var appender = new log4javascript.InPageAppender();
+        log4javascript.getRootLogger().addAppender(appender);
+        var log = log4javascript.getRootLogger();
+        log4javascript.setShowStackTraces(true);
+        //log4javascript.setEnabled(false);
+    </script>
+
+    <script type="text/javascript" src="../src/core/core.js"></script>
+    <script type="text/javascript" src="../src/core/dom.js"></script>
+    <script type="text/javascript" src="../src/core/domrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedselection.js"></script>
+    <script type="text/javascript">
+        //document.selection.empty();
+
+        function addImage(id) {
+            var sel = rangy.getSelection();
+            var im = document.getElementById(id);
+            var range = rangy.createRange();
+            range.selectNode(im);
+            sel.addRange(range);
+            document.getElementById("editor").focus();
+        }
+
+        function removeImage(id) {
+            var sel = rangy.getSelection();
+            var im = document.getElementById(id);
+            var range = rangy.createRange();
+            range.selectNode(im);
+            sel.removeRange(range);
+        }
+
+        window.onload = function() {
+            document.execCommand('MultipleSelection', true, true);
+            rangy.init();
+            if (rangy.features.implementsControlRange) {
+                var im1 = document.getElementById("im1");
+                var controlRange = document.body.createControlRange();
+                //controlRange.add(im1);
+                //controlRange.select();
+            }
+var im2 = document.getElementById("span1");
+var sel = rangy.getSelection();
+var range = rangy.createRange();
+range.selectNode(im2);
+            var im1 = document.getElementById("im1");
+            var range2 = rangy.createRange();
+            range2.selectNode(im1);
+sel.setRanges([range, range2]);
+            var r = sel.nativeSelection.createRange();
+            r.remove(im1);
+            r.select();
+
+            alert(sel.refresh(true))
+        }
+    </script>
+</head>
+<body>
+    <div contenteditable="true" id="editor">
+        Pictures of Steve Claridge:
+        <img src="claridge.jpg" alt="claridge" width="30" height="40" id="im1">
+        <img src="claridge.jpg" alt="claridge" width="30" height="40" id="im2">
+        <img src="claridge.jpg" alt="claridge" width="30" height="40" id="im3">
+        <span id="span1" style="zoom: 1">span</span>
+    </div>
+    <input type="button" onclick="addImage('im2')" value="Add image 2">
+    <input type="button" onclick="addImage('im3')" value="Add image 3">
+    <input type="button" onclick="removeImage('im2')" value="Remove image 2">
+    <input type="button" onclick="removeImage('im3')" value="Remove image 3">
+</body>
+</html>

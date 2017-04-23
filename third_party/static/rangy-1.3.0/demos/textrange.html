@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<!--[if lte IE 6]><html class="ie6"><!--[if gt IE 8]><!--><html><!--<![endif]-->
+<head>
+    <title>TextRange Demo</title>
+    <link href="demo.css" rel="stylesheet" type="text/css">
+    <style type="text/css">
+        *.searchResult {
+            font-weight: bold;
+            background-color: yellow;
+        }
+
+        *.redItalic {
+            font-style: italic;
+            color: red;
+        }
+
+        *.demo {
+            border: solid darkblue 1px;
+            background-color: #f5f5f5;
+            padding: 10px;
+        }
+
+        *.buttonSpan {
+            border: solid #333 1px;
+            background-color: #f5f5f5;
+            padding: 2px;
+            cursor: default;
+            font-size: 165%;
+            font-weight: bold;
+        }
+    </style>
+
+    <script type="text/javascript" src="../lib/rangy-core.js"></script>
+    <script type="text/javascript" src="../lib/rangy-classapplier.js"></script>
+    <script type="text/javascript" src="../lib/rangy-textrange.js"></script>
+
+    <script type="text/javascript">
+        function gEBI(id) {
+            return document.getElementById(id);
+        }
+
+        var searchResultApplier;
+
+        function toggleItalicYellowBg() {
+            searchResultApplier.toggleSelection();
+        }
+
+        function initFind() {
+            // Enable buttons
+            var classApplierModule = rangy.modules.ClassApplier;
+            if (rangy.supported && classApplierModule && classApplierModule.supported) {
+                searchResultApplier = rangy.createClassApplier("searchResult");
+
+                var searchBox = gEBI("search"),
+                    regexCheckBox = gEBI("regex"),
+                    caseSensitiveCheckBox = gEBI("caseSensitive"),
+                    wholeWordsOnlyCheckBox = gEBI("wholeWordsOnly"),
+                    timer;
+
+                function doSearch() {
+                    // Remove existing highlights
+                    var range = rangy.createRange();
+                    var caseSensitive = caseSensitiveCheckBox.checked;
+                    var searchScopeRange = rangy.createRange();
+                    searchScopeRange.selectNodeContents(document.body);
+
+                    var options = {
+                        caseSensitive: caseSensitive,
+                        wholeWordsOnly: wholeWordsOnlyCheckBox.checked,
+                        withinRange: searchScopeRange,
+                        direction: "forward" // This is redundant because "forward" is the default
+                    };
+
+                    range.selectNodeContents(document.body);
+                    searchResultApplier.undoToRange(range);
+
+                    // Create search term
+                    var searchTerm = searchBox.value;
+
+                    if (searchTerm !== "") {
+                        if (regexCheckBox.checked) {
+                            searchTerm = new RegExp(searchTerm, caseSensitive ? "g" : "gi");
+                        }
+
+                        // Iterate over matches
+                        while (range.findText(searchTerm, options)) {
+                            // range now encompasses the first text match
+                            searchResultApplier.applyToRange(range);
+
+                            // Collapse the range to the position immediately after the match
+                            range.collapse(false);
+                        }
+                    }
+
+                    timer = null;
+                }
+
+                function scheduleSearch() {
+                    if (timer) {
+                        window.clearTimeout(timer);
+                    }
+                    timer = window.setTimeout(doSearch, 500);
+                }
+
+                searchBox.onpropertychange = function() {
+                    if (window.event.propertyName == "value") {
+                        scheduleSearch();
+                    }
+                };
+
+                searchBox.oninput = function() {
+                    if (searchBox.onpropertychange) {
+                        searchBox.onpropertychange = null;
+                    }
+                    scheduleSearch();
+                };
+
+                regexCheckBox.onclick = scheduleSearch;
+                caseSensitiveCheckBox.onclick = scheduleSearch;
+                wholeWordsOnlyCheckBox.onclick = scheduleSearch;
+            }
+        }
+
+        function initSnapToWords1() {
+            gEBI("demo1").onmouseup = function() {
+                rangy.getSelection().expand("word");
+            };
+        }
+
+        function initSnapToWords2() {
+            gEBI("demo2").onmouseup = function() {
+                rangy.getSelection().expand("word", {
+                    wordOptions: {
+                        includeTrailingSpace: true
+                    }
+                });
+            };
+        }
+
+        function initSnapToWords3() {
+            gEBI("demo3").onmouseup = function() {
+                rangy.getSelection().expand("word", {
+                    wordOptions: {
+                        wordRegex: /[a-z0-9]+(['\-][a-z0-9]+)*/gi
+                    }
+                });
+            };
+        }
+
+        function initSnapToWords4() {
+            gEBI("demo4").onmouseup = function() {
+                rangy.getSelection().expand("word", {
+                    trim: true
+                });
+            };
+        }
+
+        function initSaveRestore() {
+            var saveButton = gEBI("saveSelButton");
+            var restoreButton = gEBI("restoreSelButton");
+            var changeFormattingButton = gEBI("changeFormattingButton");
+            var containerElement = gEBI("demo5");
+
+            var savedSel = null;
+
+            saveButton.disabled = false;
+
+            saveButton.onclick = function() {
+                savedSel = rangy.getSelection().saveCharacterRanges(containerElement);
+                restoreButton.disabled = false;
+            };
+
+            restoreButton.onclick = function() {
+                rangy.getSelection().restoreCharacterRanges(containerElement, savedSel);
+            };
+
+            var redItalicApplier = rangy.createClassApplier("redItalic");
+            var textLength = rangy.innerText(containerElement).length;
+
+            changeFormattingButton.disabled = false;
+            changeFormattingButton.onclick = function() {
+                // Randomly apply and unapply some formatting
+                var start = Math.floor(Math.random() * textLength);
+                var end = Math.floor(Math.random() * textLength);
+                if (start > end) {
+                    var temp = end;
+                    end = start;
+                    start = temp;
+                }
+                var range = rangy.createRange();
+                range.selectCharacters(containerElement, start, end);
+                redItalicApplier.toggleRange(range);
+            };
+        }
+
+        function initCaretMove() {
+            var editableDiv = gEBI("demo6");
+            var caretLeftButton = gEBI("caretLeftButton");
+            var caretRightButton = gEBI("caretRightButton");
+
+            caretLeftButton.onmousedown = function() {
+                rangy.getSelection().move("character", -1);
+                return false;
+            };
+
+            caretRightButton.onmousedown = function() {
+                rangy.getSelection().move("character", 1);
+                return false;
+            };
+        }
+
+        window.onload = function() {
+            rangy.init();
+            initFind();
+            initSnapToWords1();
+            initSnapToWords2();
+            initSnapToWords3();
+            initSnapToWords4();
+            initSaveRestore();
+            initCaretMove();
+        };
+
+    </script>
+</head>
+<body>
+    <div id="buttons">
+        <h3>Find</h3>
+        Enter search term in the box below. Search results will be highlighted as you type.
+        <br><br>
+        <label for="search">Find: </label><input type="text" size="20" id="search">
+        <br>
+        <input type="checkbox" id="regex"> <label for="regex">Regex</label>
+        <br>
+        <input type="checkbox" id="caseSensitive"> <label for="caseSensitive">Case sensitive</label>
+        <br>
+        <input type="checkbox" id="wholeWordsOnly"> <label for="wholeWordsOnly">Whole words</label>
+    </div>
+
+    <div id="content">
+        <h1>Rangy TextRange Demo</h1>
+
+        <p id="intro">
+            Rangy's <a href="https://code.google.com/p/rangy/wiki/TextRangeModule">TextRange module</a> provides various
+            methods for navigating the visible text on a page by character or word.
+        </p>
+
+        <h2>Demos</h2>
+
+        <h3>Find</h3>
+        <p>
+            The find panel is on the left and can be used to search and highlight text on the page, optionally using a
+            regular expression.
+        </p>
+
+        <h3>Selection snap to words</h3>
+        <p>
+            Selecting via the mouse in the box below will snap the selection to whole words.
+        </p>
+        <p class="demo" id="demo1" contenteditable="true">
+            Please select some of this text. Don't be shy. Here are some things with debatable word boundaries:
+            50%, 60:40, flip-flop, tic-tac-toe, fo'c'sle, 'quotes'. You can edit this too.
+        </p>
+        <p>
+            Snapping to words can optionally include the trailing space, as in the box below:
+        </p>
+        <p class="demo" id="demo2" contenteditable="true">
+            Please select some of this text. Don't be shy. Here are some things with debatable word boundaries:
+            50%, 60:40, flip-flop, tic-tac-toe, fo'c'sle, 'quotes'. You can edit this too.
+        </p>
+        <p>
+            You can also control what constitutes a word. By default, single apostrophes inside a word are allowed,
+            hence "don't" and "fo'c'sle" are considered a single word in all these examples. You may also want to
+            consider hyphenated words as single words, as in the example below:
+        </p>
+        <p class="demo" id="demo3" contenteditable="true">
+            Please select some of this text. Don't be shy. Here are some things with debatable word boundaries:
+            50%, 60:40, flip-flop, tic-tac-toe, fo'c'sle, 'quotes'. You can edit this too.
+        </p>
+        <p>
+            You can also trim ranges and selections. In the box below, try selecting some text that starts and/or ends
+            in a space:
+        </p>
+        <p class="demo" id="demo4" contenteditable="true">
+            Please select some of this text. Don't be shy. Here are some things with debatable word boundaries:
+            50%, 60:40, flip-flop, tic-tac-toe, fo'c'sle, 'quotes'. You can edit this too.
+        </p>
+
+        <h3>Character index-based selection save and restore</h3>
+        <p>
+            Rangy's TextRange module provides a character index-based selection save and restore which is not vulnerable
+            to formatting changes (unlike Rangy's existing selection save/restore module). Try it below:
+        </p>
+        <p>
+            <input type="button" disabled id="saveSelButton" value="Save selection">
+            <input type="button" disabled id="restoreSelButton" value="Restore selection">
+            <input type="button" disabled id="changeFormattingButton" value="Change some formatting">
+        </p>
+
+        <p class="demo" id="demo5" contenteditable="true">
+            Select some of this text and manipulate the selection and the formatting using the buttons above.
+        </p>
+
+        <h3>Moving the caret</h3>
+        <p>
+            The TextRange module provides methods to move the caret as though using the left and right arrow keys. See
+            this in action by clicking in the editable area below and using the buttons to move the caret:
+        </p>
+        <p>
+            <span unselectable="on" class="unselectable buttonSpan" id="caretLeftButton"
+                  title="Click to move caret left">&larr;</span>
+            <span unselectable="on" class="unselectable buttonSpan" id="caretRightButton"
+                  title="Click to move caret right">&rarr;</span>
+        </p>
+        <div class="demo" id="demo6" contenteditable="true">
+            <p>
+                <b>Association football</b> is a sport played between two teams.
+            </p>
+            <p>
+                It is usually called <b>football</b>, but in some countries, such as the United States, it is called
+                <b>soccer</b>.
+            </p>
+<pre>
+    In Japan, New Zealand, South Africa, Australia, Canada and Republic of Ireland, both words are commonly
+    used.
+</pre>
+            <p>Two lines <br>separated by a <code>&lt;br&gt;</code> element</p>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

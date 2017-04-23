@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>Selection extend tests</title>
+    <script type="text/javascript" src="../external/log4javascript.js"></script>
+    <script type="text/javascript">
+        var appender = new log4javascript.InPageAppender();
+        //log4javascript.getRootLogger().addAppender(appender);
+        var log = log4javascript.getRootLogger();
+        log4javascript.setShowStackTraces(true);
+        log4javascript.setEnabled(false);
+    </script>
+    <script type="text/javascript" src="xntest.js"></script>
+    <script type="text/javascript" src="testutils.js"></script>
+    <script type="text/javascript">
+        xn.test.enableStackTraces = true;
+    </script>
+
+    <script type="text/javascript">
+        function createBackwardsSelection() {
+            var range = document.createRange();
+            var textNode = document.getElementById(sel).firstChild;
+            range.setStart(textNode, 13);
+            range.setEnd(textNode, 13);
+            var sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+            sel.extend(textNode, 5);
+            return sel;
+        }
+
+        xn.test.suite("Selection.extend tests", function(s) {
+            s.test("Create forwards selection with extend", function(t) {
+                var range = document.createRange();
+                var textNode = document.getElementById("sel").firstChild;
+                range.setStart(textNode, 5);
+                range.setEnd(textNode, 5);
+                var sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+                sel.extend(textNode, 13);
+
+                t.assertEquivalent(sel.anchorNode, textNode);
+                t.assertEquivalent(sel.anchorOffset, 5);
+                t.assertEquivalent(sel.focusNode, textNode);
+                t.assertEquivalent(sel.focusOffset, 13);
+            });
+
+            s.test("Create backwards selection with extend", function(t) {
+                var range = document.createRange();
+                var textNode = document.getElementById("sel").firstChild;
+                range.setStart(textNode, 13);
+                range.setEnd(textNode, 13);
+                var sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+                sel.extend(textNode, 5);
+
+                t.assertEquivalent(sel.anchorNode, textNode);
+                t.assertEquivalent(sel.anchorOffset, 13);
+                t.assertEquivalent(sel.focusNode, textNode);
+                t.assertEquivalent(sel.focusOffset, 5);
+            });
+
+            s.test("collapseToStart with forwards selection", function(t) {
+                var range = document.createRange();
+                var textNode = document.getElementById("sel").firstChild;
+                range.setStart(textNode, 5);
+                range.setEnd(textNode, 5);
+                var sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+                sel.extend(textNode, 13);
+                sel.collapseToStart();
+
+                t.assertEquivalent(sel.anchorNode, textNode);
+                t.assertEquivalent(sel.anchorOffset, 5);
+                t.assertEquivalent(sel.focusNode, textNode);
+                t.assertEquivalent(sel.focusOffset, 5);
+            });
+
+            s.test("collapseToStart with backwards selection", function(t) {
+                var range = document.createRange();
+                var textNode = document.getElementById("sel").firstChild;
+                range.setStart(textNode, 13);
+                range.setEnd(textNode, 13);
+                var sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+                sel.extend(textNode, 5);
+                sel.collapseToStart();
+
+                t.assertEquivalent(sel.anchorNode, textNode);
+                t.assertEquivalent(sel.anchorOffset, 13);
+                t.assertEquivalent(sel.focusNode, textNode);
+                t.assertEquivalent(sel.focusOffset, 13);
+            });
+
+            s.test("collapseToEnd with backwards selection", function(t) {
+                var range = document.createRange();
+                var textNode = document.getElementById("sel").firstChild;
+                range.setStart(textNode, 13);
+                range.setEnd(textNode, 13);
+                var sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+                sel.extend(textNode, 5);
+                sel.collapseToEnd();
+
+                t.assertEquivalent(sel.anchorNode, textNode);
+                t.assertEquivalent(sel.anchorOffset, 5);
+                t.assertEquivalent(sel.focusNode, textNode);
+                t.assertEquivalent(sel.focusOffset, 5);
+            });
+
+            s.test("collapseToStart with backwards selection", function(t) {
+                window.setTimeout(function() {
+                    var range = document.createRange();
+                    var textNode = document.getElementById("sel").firstChild;
+                    range.setStart(textNode, 13);
+                    range.setEnd(textNode, 13);
+                    var sel = window.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                    sel.extend(textNode, 5);
+                    document.getElementById("sel").focus();
+                }, 1000)
+            });
+
+
+        });
+    </script>
+    <link rel="stylesheet" type="text/css" href="tests.css"/>
+</head>
+<body>
+    <div id="test"></div>
+    <div id="messages"></div>
+    <div id="sel" contenteditable="true">This contains the selection</div>
+</body>
+</html>

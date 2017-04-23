@@ -1,0 +1,7 @@
+#!/bin/bash
+export PATH=$PWD/bin:$PATH
+JAR="selenium-server-standalone-2.4.0.jar"
+[ ! -f "$JAR" ] && curl -O "http://selenium.googlecode.com/files/$JAR"
+export SELENIUM_JAR="$JAR" 
+SELENIUM_DRIVER="*chrome" nosetests -x tests/test_selenium.py
+SELENIUM_DRIVER="*firefox" nosetests -x tests/test_selenium.py

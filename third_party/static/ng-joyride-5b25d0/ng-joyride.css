@@ -1,0 +1,72 @@
+.ng-joyride .pull-left{
+    float: left;
+}
+.ng-joyride .pull-right{
+    float:right;
+}
+.ng-curtain-class{
+    position: fixed;
+    background: black;
+    opacity: 0.5;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
+    z-index: 9998;
+    display: none;
+}
+
+.ng-joyride-title{
+
+    z-index: 9999;
+    position:absolute;
+    top:50%; left:33%;
+    width:200px;
+    margin:-100px 0 0 -50px;
+    background: white;
+    box-shadow:         0px 0px 28px 0px rgba(50, 50, 50, 0.75);
+    width: 35em;
+}
+
+.ng-joyride .skip-class{
+    padding-top: 7px;
+}
+
+.ng-joyride-element-non-static{
+    z-index: 9999 !important;
+    box-shadow:         0px 0px 28px 0px rgba(50, 50, 50, 0.75);
+}
+
+.ng-joyride-element-static{
+    position: relative;
+    z-index: 9999 !important;
+    background: #F3F3F3;
+    box-shadow:         0px 0px 28px 0px rgba(50, 50, 50, 0.75);
+}
+.ng-joyride.popover{
+    z-index: 9999;
+
+}
+.ng-joyride.popover .popover-content{
+    width: 17em;
+    padding-left: 10px;
+}
+.ng-joyride .popover-title{
+    color: white;
+    background: #428bca;
+}
+.sharp-borders{
+    border-radius: 0px !important;
+}
+
+.ng-joyride h3.popover-title{
+    line-height: 18px;
+    padding-bottom: 8px
+}
+.ng-joyride-modal.modal{
+    z-index:9999 !important;
+}
+
+.ng-joyride .btn{
+    border-radius: 0px !important;
+}

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<!--[if lte IE 6]><html class="ie6"><!--[if gt IE 8]><!--><html><!--<![endif]-->
+<head>
+    <title>TextRange Demo</title>
+    <link href="demo.css" rel="stylesheet" type="text/css">
+    <style type="text/css">
+        *.searchResult {
+            font-weight: bold;
+            background-color: yellow;
+        }
+
+        *.redItalic {
+            font-style: italic;
+            color: red;
+        }
+
+        *.demo {
+            border: solid darkblue 1px;
+            background-color: #f5f5f5;
+            padding: 10px;
+        }
+
+        *.buttonSpan {
+            border: solid #333 1px;
+            background-color: #f5f5f5;
+            padding: 2px;
+            cursor: default;
+            font-size: 165%;
+            font-weight: bold;
+        }
+    </style>
+    <script type="text/javascript" src="../external/log4javascript.js"></script>
+
+    <script type="text/javascript" src="../src/core/core.js"></script>
+    <script type="text/javascript" src="../src/core/dom.js"></script>
+    <script type="text/javascript" src="../src/core/domrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedselection.js"></script>
+    <script type="text/javascript" src="../src/modules/inactive/rangy-position.js"></script>
+    <script type="text/javascript" src="../src/modules/inactive/rangy-events.js"></script>
+
+    <script type="text/javascript">
+        var selRanges = null;
+        var mouseEvents = ["mouseover", "mouseout", "mousedown", "mousemove", "mouseup", "click"];
+
+        function forEach(arr, fn) {
+            for (var i = 0, len = arr.length; i < len; ++i) {
+                fn(arr[i], i);
+            }
+        }
+
+        function gEBI(id) {
+            return document.getElementById(id);
+        }
+
+        function init() {
+            var eventLog = gEBI("eventLog");
+            var eventCount = 0;
+
+            function logRangeMouseEvent(evt) {
+                eventLog.value = (++eventCount) + ". " + evt.type + "\n" + eventLog.value;
+            }
+
+            document.onmouseup = function() {
+                var i, len, range;
+                if (selRanges) {
+                    forEach(selRanges, function(range) {
+                        range.removeAllListeners();
+                        range.detach();
+                    });
+                }
+
+                var sel = rangy.getSelection();
+                if (sel.isCollapsed) {
+                    selRanges = null;
+                } else {
+                    selRanges = sel.getAllRanges();
+                    forEach(mouseEvents, function(eventType) {
+                        forEach(selRanges, function(range) {
+                            //console.log(range);
+                            range.addListener(eventType, logRangeMouseEvent);
+                        });
+                    });
+                }
+            };
+        }
+
+        window.onload = function() {
+            rangy.init();
+            init();
+        };
+
+    </script>
+</head>
+<body>
+    <div id="buttons">
+        <h3>Event log</h3>
+        <textarea style="width: 95%; height: 400px" id="eventLog" readonly></textarea>
+    </div>
+
+    <div id="content">
+        <h1>Rangy Range Events Demo</h1>
+
+        <p id="intro">
+            Rangy's <a href="https://code.google.com/p/rangy/wiki/TextRangeModule">Events module</a> provides mouse and
+            touch (NOT YET IMPLEMENTED) events on Ranges. Please use your mouse to make a selection in the sample
+            content below and hover your mouse over the selection. Events are logged in the text box on the left.
+        </p>
+        <p>
+            <b>Association football</b> is a sport played between two teams. It is usually called <b>football</b>, but in
+            some countries, such as the United States, it is called <b>soccer</b>. In
+            <a href="http://simple.wikipedia.org/wiki/Japan">Japan</a>, New Zealand, South Africa, Australia, Canada and
+            Republic of Ireland, both words are commonly used.
+        </p>
+        <p>
+            Each team has 11 players on the field. One of these players is the <i>goalkeeper</i>, and the other ten are
+            known as <i>"outfield players."</i> The game is played by <b>kicking a ball into the opponent's goal</b>. A
+            match has 90 minutes of play, with a break of 15 minutes in the middle. The break in the middle is called
+            half-time.
+        </p>
+        <h2>Competitions <span class="smaller">(this section is editable)</span></h2>
+        <p contenteditable="true">
+            There are many competitions for football, for both football clubs and countries. Football clubs usually play
+            other teams in their own country, with a few exceptions. <b>Cardiff City F.C.</b> from Wales for example, play
+            in the English leagues and in the English FA Cup.
+        </p>
+        <h2>Who plays football <span class="smaller">(this section is editable and in pre-formatted text)</span></h2>
+    <pre contenteditable="true">
+Football is the world's most popular sport. It is played in more
+countries than any other game. In fact, FIFA (the Federation
+Internationale de Football Association) has more members than the
+United Nations.
+
+It is played by both males and females.
+
+
+</pre>
+
+    </div>
+</body>
+</html>

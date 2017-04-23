@@ -1,0 +1,25 @@
+---
+layout: base
+title: What's New
+navbar_active: whats-new
+relative_path: ../
+---
+{% capture jumbotron_h1 %}<i class="fa fa-lightbulb-o"></i>&nbsp; What's New{% endcapture %}
+{% capture jumbotron_p %}What's New in the latest version &mdash; Font Awesome {{ site.fontawesome.minor_version }}{% endcapture %}
+
+{% include jumbotron.html %}
+{% include stripe-social.html %}
+
+<div class="container">
+  {% capture stripe_ad_content %}
+  <p class="lead">
+    Font Awesome is always getting a little awesome-er. So here's what's new in the latest version, Font Awesome
+    {{ site.fontawesome.minor_version }}. Have some ideas for new features?
+    <a href="{{ page.relative_path }}community/">Help contribute</a>.
+  </p>
+  {% endcapture %}
+  {% include stripe-ad.html %}
+
+  {% include icons/new.html %}
+  {% include new-upgrading.html %}
+</div>

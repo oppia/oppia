@@ -1,0 +1,35 @@
+{
+  "name": "guppymath",
+  "version": "1.1.0",
+  "description": "WYSIWYG mathematics equation editor",
+  "directories": {
+    "doc": "doc",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "rebuild": "./make"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/daniel3735928559/guppy.git"
+  },
+  "keywords": [
+    "math",
+    "wysiwyg",
+    "equation",
+    "editor"
+  ],
+  "author": "daniel3735928559",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/daniel3735928559/guppy/issues"
+  },
+  "homepage": "https://github.com/daniel3735928559/guppy#readme",
+  "dependencies": {
+    "mousetrap": "^1.6.0"
+  },
+  "devDependencies": {
+    "browserify": "latest"
+  }
+}

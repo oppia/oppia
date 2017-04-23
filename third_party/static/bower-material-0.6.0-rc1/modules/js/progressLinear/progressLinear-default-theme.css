@@ -1,0 +1,14 @@
+/*!
+ * Angular Material Design
+ * https://github.com/angular/material
+ * @license MIT
+ * v0.6.0-rc1
+ */
+md-progress-linear.md-default-theme .md-container {
+  background-color: #b3e5fc; }
+md-progress-linear.md-default-theme .md-bar {
+  background-color: #03a9f4; }
+md-progress-linear.md-default-theme[md-mode=buffer] .md-dashed:before {
+  background: radial-gradient(#b3e5fc 0%, #b3e5fc 16%, transparent 42%); }
+md-progress-linear.md-default-theme[md-mode=buffer] .md-bar1 {
+  background-color: #b3e5fc; }

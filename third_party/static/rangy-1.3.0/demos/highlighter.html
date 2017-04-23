@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<!--[if lte IE 6]><html class="ie6"><!--[if gt IE 8]><!--><html><!--<![endif]-->
+<head>
+    <title>Rangy Highlighter Module Demo</title>
+    <link href="demo.css" rel="stylesheet" type="text/css">
+    <style type="text/css">
+        .highlight {
+            background-color: yellow;
+        }
+
+        .note {
+            background-color: limegreen;
+        }
+
+        #summary {
+            border: dotted orange 1px;
+        }
+    </style>
+    <script type="text/javascript" src="../lib/rangy-core.js"></script>
+    <script type="text/javascript" src="../lib/rangy-classapplier.js"></script>
+    <script type="text/javascript" src="../lib/rangy-highlighter.js"></script>
+    <script type="text/javascript">
+        var serializedHighlights = decodeURIComponent(window.location.search.slice(window.location.search.indexOf("=") + 1));
+        var highlighter;
+
+        var initialDoc;
+
+        window.onload = function() {
+            rangy.init();
+
+            highlighter = rangy.createHighlighter();
+
+            highlighter.addClassApplier(rangy.createClassApplier("highlight", {
+                ignoreWhiteSpace: true,
+                tagNames: ["span", "a"]
+            }));
+
+            highlighter.addClassApplier(rangy.createClassApplier("note", {
+                ignoreWhiteSpace: true,
+                elementTagName: "a",
+                elementProperties: {
+                    href: "#",
+                    onclick: function() {
+                        var highlight = highlighter.getHighlightForElement(this);
+                        if (window.confirm("Delete this note (ID " + highlight.id + ")?")) {
+                            highlighter.removeHighlights( [highlight] );
+                        }
+                        return false;
+                    }
+                }
+            }));
+
+
+            if (serializedHighlights) {
+                highlighter.deserialize(serializedHighlights);
+            }
+        };
+
+
+        function highlightSelectedText() {
+            highlighter.highlightSelection("highlight");
+        }
+
+        function noteSelectedText() {
+            highlighter.highlightSelection("note");
+        }
+
+        function removeHighlightFromSelectedText() {
+            highlighter.unhighlightSelection();
+        }
+
+        function highlightScopedSelectedText() {
+            highlighter.highlightSelection("highlight", { containerElementId: "summary" });
+        }
+
+        function noteScopedSelectedText() {
+            highlighter.highlightSelection("note", { containerElementId: "summary" });
+        }
+
+        function reloadPage(button) {
+            button.form.elements["serializedHighlights"].value = highlighter.serialize();
+            button.form.submit();
+        }
+
+    </script>
+</head>
+<body>
+    <div id="buttons">
+        <h3>Highlighter</h3>
+        <p>Make a selection in the document and use the buttons below to highlight and unhighlight.</p>
+        <input type="button" ontouchstart="highlightSelectedText();" onclick="highlightSelectedText();" value="Highlight selection">
+        <input type="button" ontouchstart="noteSelectedText();" onclick="noteSelectedText();" value="Add note to selection">
+        <input type="button" ontouchstart="removeHighlightFromSelectedText();" onclick="removeHighlightFromSelectedText();" value="Remove highlights from selection">
+        <br>
+        <input type="button" ontouchstart="highlightScopedSelectedText();" onclick="highlightScopedSelectedText();" value="Highlight within outlined paragraph">
+        <input type="button" ontouchstart="noteScopedSelectedText();" onclick="noteScopedSelectedText();" value="Annotate selection within outlined paragraph">
+
+        <h3>Preserving highlights between page requests</h3>
+        <form action="highlighter.html" method="get">
+            Highlights can be preserved between page requests. Press the following button to reload the page with the
+            highlights preserved:
+            <br>
+            <input type="hidden" name="serializedHighlights" value="">
+            <input type="button" value="Reload" onclick="reloadPage(this)">
+        </form>
+    </div>
+
+    <div id="content">
+        <h1>Rangy Highlighter Module Demo</h1>
+        <p id="intro">
+            Please use your mouse and/or keyboard to make selections from the sample content below and use the buttons
+            on the left hand size to create and remove highlights.
+        </p>
+        <p id="summary">
+            <b>Association football</b> is a sport played between two teams. It is usually called <b>football</b>, but in
+            some countries, such as the United States, it is called <b>soccer</b>. In
+            <a href="http://simple.wikipedia.org/wiki/Japan">Japan</a>, New Zealand, South Africa, Australia, Canada and
+            Republic of Ireland, both words are commonly used.
+        </p>
+        <p>
+            Each team has 11 players on the field. One of these players is the <i>goalkeeper</i>, and the other ten are
+            known as <i>"outfield players."</i> The game is played by <b>kicking a ball into the opponent's goal</b>. A
+            match has 90 minutes of play, with a break of 15 minutes in the middle. The break in the middle is called
+            half-time.
+        </p>
+        <h2>Competitions</h2>
+        <p>
+            There are many competitions for football, for both football clubs and countries. Football clubs usually play
+            other teams in their own country, with a few exceptions. <b>Cardiff City F.C.</b> from Wales for example, play
+            in the English leagues and in the English FA Cup.
+        </p>
+        <h2>Who plays football <span class="smaller">(this section is in pre-formatted text)</span></h2>
+        <pre>
+Football is the world's most popular sport. It is played in more
+countries than any other game. In fact, FIFA (the Federation
+Internationale de Football Association) has more members than the
+United Nations.
+
+It is played by both males and females.
+
+
+</pre>
+    </div>
+
+    <p class="small">
+        Text adapted from <a href="http://simple.wikipedia.org/wiki/Association_football">Simple Wikipedia page on
+        Association Football</a>, licensed under the
+        <a href="http://simple.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License">Creative
+            Commons Attribution/Share-Alike License</a>.
+    </p>
+</body>
+</html>

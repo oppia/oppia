@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title></title>
+    <script type="text/javascript" src="../external/log4javascript.js"></script>
+    <script type="text/javascript">
+        var appender = new log4javascript.InPageAppender();
+        log4javascript.getRootLogger().addAppender(appender);
+        var log = log4javascript.getRootLogger();
+        log4javascript.setShowStackTraces(true);
+    </script>
+    <script type="text/javascript" src="../src/core/core.js"></script>
+    <script type="text/javascript" src="../src/core/dom.js"></script>
+    <script type="text/javascript" src="../src/core/domrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedselection.js"></script>
+    <script type="text/javascript" src="../src/modules/rangy-classapplier.js"></script>
+    <script type="text/javascript">
+
+        var highlightApplier, idApplier;
+        var classMutator1, classMutator2;
+
+        rangy.addInitListener(function(rangy) {
+            classMutator1 = rangy.createClassApplier("test1", true, "*");
+            classMutator2 = rangy.createClassApplier("test2", true);
+            highlightApplier = rangy.createClassApplier("highlight", true);
+            idApplier = rangy.createClassApplier("id1", true);
+        });
+
+        function toggleHighlight() {
+            highlightApplier.toggleSelection();
+            idApplier.toggleSelection();
+        }
+
+    </script>
+    <style type="text/css">
+        *.test1 {
+            border: solid green 1px;
+            color: blue;
+        }
+
+        *.test2 {
+            font-weight: bold;
+        }
+
+        .unselectable {
+            -khtml-user-select: none;
+        }
+
+        .highlight {
+            background-color: yellow;
+        }
+
+        .id1 {
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+<div id="div" style="border: solid green 1px; padding: 5px;">
+    <strong id="s">29 min:</strong> After that let-off, <i id="i">Portugal</i> tear down the <span class="test1">other</span> end and sow panic in the Brazilian defence.
+</div>
+<input type="button" value="Toggle highlight"
+    onclick="toggleHighlight();">
+
+<input type="button" value="Toggle class 1" onmousedown="classMutator1.toggleSelection(); return false;" class="unselectable">
+<input type="button" value="Toggle class 2" onmousedown="classMutator2.toggleSelection(); return false;" class="unselectable">
+<input type="button" value="Detach class 2 applier" onmousedown="classMutator2.detach(); return false;" class="unselectable">
+
+<p>Zero</p>
+<p>One two</p>
+<p>Four five</p>
+<p id="block-24"><strong>29 min:</strong> After that let-off, Portugal tear down the other end and sow panic in the Brazilian defence, Juan forced into a clusmy-looking tackle on Tiago, who tumbles theatrically. Portugal players howl for a penalty, the ref books Tiago for diving. </p>
+<p id="block-23" contenteditable="true"><strong>28 min:</strong> Portugal switch off defensively, allowing Nilmar to collect a through-ball and shoot from eight yards. The keeper pushes it on to the psot and out! Great save. "Klose ..." blurts David Roberts. "... but no cigar."</p>
+<pre contenteditable="true">
+Some preformatted text.
+
+    Wonder how it'll do
+
+with this, plus some line breaks
+
+
+</pre>
+</body>
+</html>

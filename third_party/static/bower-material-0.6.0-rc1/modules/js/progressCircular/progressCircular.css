@@ -1,0 +1,181 @@
+/*!
+ * Angular Material Design
+ * https://github.com/angular/material
+ * @license MIT
+ * v0.6.0-rc1
+ */
+md-progress-circular {
+  display: block;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  padding: 3px; }
+  md-progress-circular .md-wrapper1, md-progress-circular .md-wrapper2 {
+    width: 48px;
+    height: 48px;
+    position: absolute;
+    border-radius: 50%; }
+  md-progress-circular .md-circle .md-mask, md-progress-circular .md-circle .md-fill, md-progress-circular .md-circle .md-shadow {
+    width: 48px;
+    height: 48px;
+    position: absolute;
+    border-radius: 50%; }
+  md-progress-circular .md-circle .md-mask, md-progress-circular .md-circle .md-fill {
+    -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+    transition: -webkit-transform 0.3s;
+    transition: transform 0.3s; }
+  md-progress-circular .md-circle .md-mask {
+    clip: rect(0px, 48px, 48px, 24px); }
+    md-progress-circular .md-circle .md-mask .md-fill {
+      clip: rect(0px, 24px, 48px, 0px); }
+  md-progress-circular .md-inset {
+    width: 36px;
+    height: 36px;
+    position: absolute;
+    margin-left: 6px;
+    margin-top: 6px;
+    border-radius: 50%; }
+  md-progress-circular[md-mode=indeterminate] .md-wrapper1, md-progress-circular[md-mode=indeterminate] .md-wrapper2 {
+    -webkit-transform-origin: 50% 50%;
+            transform-origin: 50% 50%; }
+  md-progress-circular[md-mode=indeterminate] .md-wrapper1 {
+    -webkit-animation: indeterminate_rotate1 3s infinite linear;
+            animation: indeterminate_rotate1 3s infinite linear; }
+  md-progress-circular[md-mode=indeterminate] .md-wrapper2 {
+    -webkit-animation: indeterminate_rotate2 1.5s infinite linear;
+            animation: indeterminate_rotate2 1.5s infinite linear; }
+  md-progress-circular[md-mode=indeterminate] .md-fill, md-progress-circular[md-mode=indeterminate] .md-mask.md-full {
+    -webkit-animation: indeterminate_size_fill 1.5s infinite linear;
+            animation: indeterminate_size_fill 1.5s infinite linear; }
+  md-progress-circular[md-mode=indeterminate] .md-fill.md-fix {
+    -webkit-animation: indeterminate_size_fix 1.5s infinite linear;
+            animation: indeterminate_size_fix 1.5s infinite linear; }
+
+@-webkit-keyframes indeterminate_rotate1 {
+  0% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg); }
+
+  100% {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg); } }
+
+@keyframes indeterminate_rotate1 {
+  0% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg); }
+
+  100% {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg); } }
+
+@-webkit-keyframes indeterminate_rotate2 {
+  0% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg); }
+
+  70% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg); }
+
+  100% {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg); } }
+
+@keyframes indeterminate_rotate2 {
+  0% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg); }
+
+  70% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg); }
+
+  100% {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg); } }
+
+@-webkit-keyframes indeterminate_size_fill {
+  0% {
+    -webkit-transform: rotate(5deg);
+            transform: rotate(5deg); }
+
+  10% {
+    -webkit-transform: rotate(5deg);
+            transform: rotate(5deg); }
+
+  50% {
+    -webkit-transform: rotate(135deg);
+            transform: rotate(135deg); }
+
+  70% {
+    -webkit-transform: rotate(135deg);
+            transform: rotate(135deg); }
+
+  100% {
+    -webkit-transform: rotate(5deg);
+            transform: rotate(5deg); } }
+
+@keyframes indeterminate_size_fill {
+  0% {
+    -webkit-transform: rotate(5deg);
+            transform: rotate(5deg); }
+
+  10% {
+    -webkit-transform: rotate(5deg);
+            transform: rotate(5deg); }
+
+  50% {
+    -webkit-transform: rotate(135deg);
+            transform: rotate(135deg); }
+
+  70% {
+    -webkit-transform: rotate(135deg);
+            transform: rotate(135deg); }
+
+  100% {
+    -webkit-transform: rotate(5deg);
+            transform: rotate(5deg); } }
+
+@-webkit-keyframes indeterminate_size_fix {
+  0% {
+    -webkit-transform: rotate(10deg);
+            transform: rotate(10deg); }
+
+  10% {
+    -webkit-transform: rotate(10deg);
+            transform: rotate(10deg); }
+
+  50% {
+    -webkit-transform: rotate(270deg);
+            transform: rotate(270deg); }
+
+  70% {
+    -webkit-transform: rotate(270deg);
+            transform: rotate(270deg); }
+
+  100% {
+    -webkit-transform: rotate(10deg);
+            transform: rotate(10deg); } }
+
+@keyframes indeterminate_size_fix {
+  0% {
+    -webkit-transform: rotate(10deg);
+            transform: rotate(10deg); }
+
+  10% {
+    -webkit-transform: rotate(10deg);
+            transform: rotate(10deg); }
+
+  50% {
+    -webkit-transform: rotate(270deg);
+            transform: rotate(270deg); }
+
+  70% {
+    -webkit-transform: rotate(270deg);
+            transform: rotate(270deg); }
+
+  100% {
+    -webkit-transform: rotate(10deg);
+            transform: rotate(10deg); } }

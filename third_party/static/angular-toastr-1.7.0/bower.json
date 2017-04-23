@@ -1,0 +1,34 @@
+{
+  "name": "angular-toastr",
+  "version": "1.7.0",
+  "authors": [
+    "Jesus Rodriguez <Foxandxss@gmail.com>"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "angular",
+    "angularjs",
+    "toast",
+    "toastr"
+  ],
+  "main": [
+    "./dist/angular-toastr.tpls.js",
+    "./dist/angular-toastr.css"
+  ],
+  "ignore": [
+    "config",
+    "node_modules",
+    "playground",
+    "src",
+    "test",
+    ".travis.yml",
+    ".gitignore",
+    ".jshintrc",
+    "CHANGELOG.md",
+    "Gruntfile.js",
+    "package.json"
+  ],
+  "dependencies": {
+    "angular": ">=1.3.0"
+  }
+}

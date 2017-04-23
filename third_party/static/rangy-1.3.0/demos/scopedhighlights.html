@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<!--[if lte IE 6]><html class="ie6"><!--[if gt IE 8]><!--><html><!--<![endif]-->
+<head>
+    <title>Rangy Highlighter Module Demo</title>
+    <link href="demo.css" rel="stylesheet" type="text/css">
+    <style type="text/css">
+        .highlight {
+            background-color: yellow;
+        }
+    </style>
+    <script type="text/javascript" src="../lib/rangy-core.js"></script>
+    <script type="text/javascript" src="../lib/rangy-classapplier.js"></script>
+    <script type="text/javascript" src="../lib/rangy-highlighter.js"></script>
+    <script type="text/javascript">
+        var serializedHighlights = decodeURIComponent(window.location.search.slice(window.location.search.indexOf("=") + 1));
+        var highlighter;
+
+        var initialDoc;
+
+        function randomizeQuotes() {
+            var quotesUl = document.getElementById("quotes");
+            var childNodeCount = quotesUl.childNodes.length;
+
+            for (var i = 0, random; i < 10; ++i) {
+                random = Math.floor(Math.random() * childNodeCount);
+                quotesUl.appendChild(quotesUl.childNodes[random]);
+            }
+        }
+
+        window.onload = function() {
+            rangy.init();
+            randomizeQuotes();
+
+            highlighter = rangy.createHighlighter();
+
+            highlighter.addClassApplier( rangy.createClassApplier("highlight") );
+
+            if (serializedHighlights) {
+                highlighter.deserialize(serializedHighlights);
+            }
+        };
+
+        function removeHighlightFromSelectedText() {
+            highlighter.unhighlightSelection();
+        }
+
+        function getContainingLi(node) {
+            while (node) {
+                if (node.nodeType == 1 && node.nodeName == "LI") {
+                    return node;
+                }
+                node = node.parentNode;
+            }
+            return null;
+        }
+
+        function highlightScopedSelectedText() {
+            var li;
+            var sel = rangy.getSelection();
+            if (!sel.isCollapsed) {
+                var selection = rangy.getSelection();
+                var range = selection.getRangeAt(0);
+                var containerLi = getContainingLi(range.commonAncestorContainer);
+                if (containerLi) {
+                    highlighter.highlightSelection("highlight", selection, containerLi.id);
+                }
+            }
+        }
+
+        function reloadPage(button) {
+            button.form.elements["serializedHighlights"].value = highlighter.serialize();
+            button.form.submit();
+        }
+
+    </script>
+</head>
+<body>
+<div id="buttons">
+    <h3>Highlighter</h3>
+    <p>Make a selection in the document and use the buttons below to highlight and unhighlight.</p>
+    <input type="button" ontouchstart="highlightScopedSelectedText();" onclick="highlightScopedSelectedText();" value="Highlight">
+    <input type="button" ontouchstart="removeHighlightFromSelectedText();" onclick="removeHighlightFromSelectedText();" value="Remove highlights from selection">
+
+    <h3>Preserving highlights between page requests</h3>
+    <form method="get">
+        Highlights can be preserved between page requests. Press the following button to reload the page with the
+        highlights preserved:
+        <br>
+        <input type="hidden" name="serializedHighlights" value="">
+        <input type="button" value="Reload" onclick="reloadPage(this)">
+    </form>
+</div>
+
+<div id="content">
+    <h1>Highlighter module scoped highlights demo</h1>
+    <p id="intro">
+        Please use your mouse and/or keyboard to make selections from the sample quotes below and use the buttons
+        on the left hand size to create and remove highlights.
+    </p>
+    <ul id="quotes">
+        <li id="inigo">"Hello. My name is Inigo Montoya. You killed my father. Prepare to die."</li>
+        <li id="inconceivable">"You keep using that word. I do not think it means what you think it means."</li>
+        <li id="sixFingers">"I do not mean to pry, but you don't by any chance happen to have six fingers on your right hand?"</li>
+        <li id="leftHanded">"Oh, there's something I ought to tell you.  I'm not left-handed either."</li>
+    </ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,63 @@
+{
+  "name": "textangular",
+  "version": "1.4.5",
+  "description": "A radically powerful Text-Editor/Wysiwyg editor for Angular.js",
+  "maintainers": [
+    {
+      "name": "Fraywing"
+    },
+    {
+      "name": "SimeonC"
+    }
+  ],
+  "keywords": [
+    "AngularJS",
+    "text editor",
+    "WYSIWYG",
+    "directive"
+  ],
+  "license": "MIT",
+  "homepage": "http://textangular.com",
+  "main": "./dist/textAngular.min.js", 
+  "dependencies": {
+    "rangy": "^1.3.0"
+  },
+  "browserDependencies": {
+    "angular": "^1.2.x",
+    "rangy": "^1.3.0",
+    "bootstrap": "^3.0.x",
+    "font-awesome": "^4.0.x"
+  },
+  "devDependencies": {
+    "bower": "^1.3.3",
+    "grunt": "~0.4.2",
+    "grunt-bump": "0.0.16",
+    "grunt-cli": "~0.1.11",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-concat": "^0.5.0",
+    "grunt-contrib-copy": "^0.8.0",
+    "grunt-contrib-jshint": "^0.8.0",
+    "grunt-contrib-uglify": "^0.2.7",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-conventional-changelog": "^1.1.0",
+    "grunt-git": "^0.3.2",
+    "grunt-istanbul-coverage": "~0.0.2",
+    "grunt-karma": "^0.6.2",
+    "grunt-karma-coveralls": "^2.5.0",
+    "grunt-shell": "^1.1.1",
+    "karma": "^0.10.10",
+    "karma-chrome-launcher": "~0.1.2",
+    "karma-coverage": "~0.2.0",
+    "karma-jasmine": "~0.1.5",
+    "karma-phantomjs-launcher": "~0.1.2",
+    "karma-script-launcher": "~0.1.0",
+    "phantomjs": "^1.9.8"
+  },
+  "scripts": {
+    "test": "bower install && grunt travis-test --verbose"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/fraywing/textAngular.git"
+  }
+}

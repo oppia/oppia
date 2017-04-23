@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns = "http://www.w3.org/1999/xhtml">
+<head>
+ <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+ <!-- midi.js package -->
+ <script src="./js/MIDI/AudioDetect.js" type="text/javascript"></script>
+ <script src="./js/MIDI/LoadPlugin.js" type="text/javascript"></script>
+ <script src="./js/MIDI/Plugin.js" type="text/javascript"></script>
+ <script src="./js/MIDI/Player.js" type="text/javascript"></script>
+ <script src="./js/Window/DOMLoader.XMLHttp.js" type="text/javascript"></script>
+ <!-- extras -->
+ <script src="./inc/Base64.js" type="text/javascript"></script>
+ <script src="./inc/base64binary.js" type="text/javascript"></script>
+</head>
+<body>
+<script type="text/javascript">
+
+// This iterates through all the notes in these two soundfonts.
+// The synth_drum does not have as high or low of range of notes, 
+// so you wont hear it for a few seconds.
+
+window.onload = function () {
+	MIDI.loadPlugin({
+		soundfontUrl: "./soundfont/",
+		instruments: [ "acoustic_grand_piano", "synth_drum" ],
+		callback: function() {
+			MIDI.programChange(0, 0);
+			MIDI.programChange(1, 118);
+			for (var n = 0; n < 100; n ++) {
+				var delay = n / 4; // play one note every quarter second
+				var note = MIDI.pianoKeyOffset + n; // the MIDI note
+				var velocity = 127; // how hard the note hits
+				// play the note
+				MIDI.noteOn(0, note, velocity, delay);
+				// play the some note 3-steps up
+				MIDI.noteOn(1, note + 3, velocity, delay);
+			}		
+		}
+	});
+};
+
+</script>
+</body>
+</html>

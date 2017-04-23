@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Rangy - Text Range Performance Tests</title>
+
+        <script type="text/javascript" src="../external/log4javascript_stub.js"></script>
+        <script type="text/javascript" src="../external/jshashtable.js"></script>
+
+        <script type="text/javascript" src="../src/core/core.js"></script>
+        <script type="text/javascript" src="../src/core/dom.js"></script>
+        <script type="text/javascript" src="../src/core/domrange.js"></script>
+        <script type="text/javascript" src="../src/core/wrappedrange.js"></script>
+        <script type="text/javascript" src="../src/core/wrappedselection.js"></script>
+        <script type="text/javascript" src="../src/modules/rangy-textrange.js"></script>
+        <script type="text/javascript" src="textrangetests.js"></script>
+        <link rel="stylesheet" type="text/css" href="tests.css"/>
+        <script>
+            window.onload = function() {
+                rangy.init();
+                document.body.innerHTML = new Array(500).join("<p>One <br>two <b>three</b></p>\n");
+                var range = rangy.createRange();
+                range.collapseToPoint(document.body, 0);
+
+                var start = new Date();
+                var moveCount = 0;
+                rangy.noMutation(function() {
+                    while ( range.move("character", 1) == 1 ) {
+                        moveCount++;
+                    }
+                });
+                var end = new Date();
+                alert([moveCount, end - start]);
+            };
+        </script>
+    </head>
+    <body></body>
+</html>

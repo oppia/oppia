@@ -1,0 +1,87 @@
+Bleach Changes
+==============
+
+Version 1.2.1
+-------------
+
+- clean() no longer considers "feed:" an acceptable protocol due to
+  inconsistencies in browser behavior.
+
+
+Version 1.2
+-----------
+
+- linkify() has changed considerably. Many keyword arguments have been
+  replaced with a single callbacks list. Please see the documentation
+  for more information.
+- Bleach will no longer consider unacceptable protocols when linkifying.
+- linkify() now takes a tokenizer argument that allows it to skip
+  sanitization.
+- delinkify() is gone.
+- Removed exception handling from _render. clean() and linkify() may now
+  throw.
+- linkify() correctly ignores case for protocols and domain names.
+- linkify() correctly handles markup within an <a> tag.
+
+
+Version 1.1.3
+-------------
+
+- Fix parsing bare URLs when parse_email=True.
+
+
+Version 1.1.2
+-------------
+
+- Fix hang in style attribute sanitizer. (#61)
+- Allow '/' in style attribute values.
+
+
+Version 1.1.1
+-------------
+
+- Fix tokenizer for html5lib 0.9.5.
+
+
+Version 1.1.0
+-------------
+
+- linkify() now understands port numbers. (#38)
+- Documented character encoding behavior. (#41)
+- Add an optional target argument to linkify().
+- Add delinkify() method. (#45)
+- Support subdomain whitelist for delinkify(). (#47, #48)
+
+
+Version 1.0.4
+-------------
+
+- Switch to SemVer git tags.
+- Make linkify() smarter about trailing punctuation. (#30)
+- Pass exc_info to logger during rendering issues.
+- Add wildcard key for attributes. (#19)
+- Make linkify() use the HTMLSanitizer tokenizer. (#36)
+- Fix URLs wrapped in parentheses. (#23)
+- Make linkify() UTF-8 safe. (#33)
+
+
+Version 1.0.3
+-------------
+
+- linkify() works with 3rd level domains. (#24)
+- clean() supports vendor prefixes in style values. (#31, #32)
+- Fix linkify() email escaping.
+
+
+Version 1.0.2
+-------------
+
+- linkify() supports email addresses.
+- clean() supports callables in attributes filter.
+
+
+Version 1.0.1
+-------------
+
+- linkify() doesn't drop trailing slashes. (#21)
+- linkify() won't linkify 'libgl.so.1'. (#22)

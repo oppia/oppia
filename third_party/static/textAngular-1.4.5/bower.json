@@ -1,0 +1,36 @@
+{
+  "name": "textAngular",
+  "version": "1.4.5",
+  "main": [
+    "./dist/textAngular.js",
+    "./dist/textAngular-sanitize.js",
+    "./dist/textAngularSetup.js",
+    "./dist/textAngular.css"
+  ],
+  "description": "A radically powerful Text-Editor/Wysiwyg editor for Angular.js",
+  "keywords": [
+    "editor",
+    "angular",
+    "wysiwyg"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test*",
+    "demo*",
+    "Gruntfile.js",
+    "package.json"
+  ],
+  "dependencies": {
+    "angular": ">=1.3.x",
+    "font-awesome": ">=4.0.x",
+    "rangy": "~1.3.0"
+  },
+  "devDependencies": {
+    "angular-mocks": ">=1.3.x",
+    "jquery": "1.9.x"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/fraywing/textAngular"
+}

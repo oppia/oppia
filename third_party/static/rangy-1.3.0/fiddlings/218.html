@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <script type="text/javascript" src="../external/log4javascript.js"></script>
+    <script>
+        //var appender = new log4javascript.PopUpAppender();
+        //log4javascript.getRootLogger().addAppender(appender);
+    </script>
+    <script type="text/javascript" src="../src/core/core.js"></script>
+    <script type="text/javascript" src="../src/core/dom.js"></script>
+    <script type="text/javascript" src="../src/core/domrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedrange.js"></script>
+    <script type="text/javascript" src="../src/core/wrappedselection.js"></script>
+    <script type="text/javascript" src="../src/modules/rangy-classapplier.js"></script>
+</head>
+<body>
+
+<div contenteditable="true">This is my text<sup contenteditable="false">1</sup> which has a <sup contenteditable="false">345678</sup> footnote</div>
+<script>
+    rangy.init();
+    var applier = rangy.createClassApplier("something");
+    document.onmouseup = function() {
+        console.log(applier.isAppliedToSelection(), rangy.getSelection().inspect());
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+/*!
+ * Angular Material Design
+ * https://github.com/angular/material
+ * @license MIT
+ * v0.6.0-rc1
+ */
+md-switch.md-default-theme .md-switch-bar {
+  background-color: rgba(0, 0, 0, 0.54); }
+md-switch.md-default-theme .md-switch-thumb:focus .md-label {
+  border: 1px dotted black; }

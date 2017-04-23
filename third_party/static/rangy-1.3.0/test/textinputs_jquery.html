@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>Rangy Text Inputs jQuery plugin demo</title>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <script type="text/javascript" src="../dist/textinputs_jquery.js"></script>
+    <style type="text/css">
+        p.inputcontainer {
+            background-color: lightgoldenrodyellow;
+            border: solid 1px darkblue;
+            padding: 0.3125em;
+        }
+    </style>
+</head>
+<body>
+
+<p class="inputcontainer">
+    <input type="button" value="get selection range" onclick="var sel = $('#ti').getSelection(); alert(sel.start + ',' + sel.end);">
+    <input type="button" value="paste test text" onclick="$('#ti').pasteText('**Test**')">
+    <input type="button" value="set selection" onclick="$('#ti').setSelection($('#ti_start')[0].value, $('#ti_end')[0].value)">
+    Start: <input type="text" id="ti_start" size="3" value="5">
+    End: <input type="text" id="ti_end" size="3" value="7">
+    <br><br>
+    <input type="text" id="ti" size="80" value="Here is some text in an input box">
+</p>
+
+<br><br>
+
+<p class="inputcontainer">
+    <input type="button" value="get selection range" onclick="var sel = $('#ta').getSelection(); alert(sel.start + ',' + sel.end);">
+    <input type="button" value="paste test text" onclick="$('#ta').pasteText('**Test**')">
+    <input type="button" value="set selection" onclick="$('#ta').setSelection($('#ta_start')[0].value, $('#ta_end')[0].value)">
+    Start: <input type="text" id="ta_start" size="3" value="5">
+    End: <input type="text" id="ta_end" size="3" value="7">
+
+    <br><br>
+        <textarea rows="8" cols="80" id="ta">Some test text
+That has
+
+Some line breaks, including some trailing ones
+
+
+</textarea>
+</p>
+</body>
+</html>

@@ -1,0 +1,12 @@
+/*!
+ * Angular Material Design
+ * https://github.com/angular/material
+ * @license MIT
+ * v0.6.0-rc1
+ */
+md-progress-circular.md-default-theme {
+  background-color: transparent; }
+  md-progress-circular.md-default-theme .md-circle .md-mask .md-fill {
+    background-color: #03a9f4; }
+  md-progress-circular.md-default-theme .md-inset {
+    background-color: #ffffff; }

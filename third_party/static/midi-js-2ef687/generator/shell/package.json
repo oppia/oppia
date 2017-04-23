@@ -1,0 +1,11 @@
+{
+  "name": "shell",
+  "version": "0.0.0",
+  "description": "",
+  "dependencies": {
+    "commander": "~1.1.1",
+    "btoa": "~1.0.0",
+    "atob": "~1.0.0"
+  },
+  "devDependencies": {}
+}

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Rangy - TextRange-to-Range Performace Tests</title>
+
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="../external/log4javascript.js"></script>
+        <script type="text/javascript" src="../external/jshashtable.js"></script>
+        <script type="text/javascript" src="xntest.js"></script>
+        <script type="text/javascript" src="testutils.js"></script>
+        <script type="text/javascript">
+            xn.test.enableStackTraces = true;
+        </script>
+        <script type="text/javascript">
+            var appender = new log4javascript.InPageAppender();
+            //log4javascript.getRootLogger().addAppender(appender);
+            var log = log4javascript.getRootLogger();
+            log4javascript.setShowStackTraces(true);
+
+        </script>
+        <script type="text/javascript">
+            //log4javascript.setEnabled(false);
+        </script>
+        <script type="text/javascript" src="../src/core/core.js"></script>
+        <script type="text/javascript" src="../src/core/dom.js"></script>
+        <script type="text/javascript" src="../src/core/domrange.js"></script>
+        <script type="text/javascript" src="../src/core/wrappedrange.js"></script>
+        <script type="text/javascript" src="../src/core/wrappedselection.js"></script>
+        <script type="text/javascript" src="featuretests.js"></script>
+        <link rel="stylesheet" type="text/css" href="tests.css"/>
+    </head>
+    <body>
+        <div id="test"></div>
+        <div id="messages"></div>
+    </body>
+</html>

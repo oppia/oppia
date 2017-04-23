@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<!--[if lte IE 6]><html class="ie6"><!--[if gt IE 8]><!--><html><!--<![endif]-->
+<head>
+    <title>Rangy CSS Class Applier Module Demo</title>
+    <link href="demo.css" rel="stylesheet" type="text/css">
+    <style type="text/css">
+        *.italicYellowBg {
+            font-style: italic;
+            background-color: yellow;
+        }
+
+        *.boldRed {
+            font-weight: bold;
+            color: red;
+        }
+
+        img.boldRed {
+            border: solid red 3px;
+        }
+
+        a.pinkLink {
+            color: #f66;
+            font-size: 1.2em;
+        }
+    </style>
+    <script type="text/javascript" src="../lib/rangy-core.js"></script>
+    <script type="text/javascript" src="../lib/rangy-classapplier.js"></script>
+    <script type="text/javascript">
+        function gEBI(id) {
+            return document.getElementById(id);
+        }
+
+        var italicYellowBgApplier, boldRedApplier, pinkLinkApplier;
+
+        function toggleItalicYellowBg() {
+            italicYellowBgApplier.toggleSelection();
+        }
+
+        function toggleBoldRed() {
+            boldRedApplier.toggleSelection();
+        }
+
+        function togglePinkLink() {
+            pinkLinkApplier.toggleSelection();
+        }
+
+        window.onload = function() {
+            rangy.init();
+
+            // Enable buttons
+            var classApplierModule = rangy.modules.ClassApplier;
+
+            // Next line is pure paranoia: it will only return false if the browser has no support for ranges,
+            // selections or TextRanges. Even IE 5 would pass this test.
+            if (rangy.supported && classApplierModule && classApplierModule.supported) {
+                boldRedApplier = rangy.createClassApplier("boldRed", {
+                    tagNames: ["span", "img"]
+                });
+
+                italicYellowBgApplier = rangy.createClassApplier("italicYellowBg", {
+                    tagNames: ["span", "a", "b", "img"]
+                });
+
+                pinkLinkApplier = rangy.createClassApplier("pinkLink", {
+                    elementTagName: "a",
+                    elementProperties: {
+                        href: "http://code.google.com/p/rangy",
+                        title: "Rangy home page"
+                    }
+                });
+
+                var toggleBoldRedButton = gEBI("toggleBoldRedButton");
+                toggleBoldRedButton.disabled = false;
+                toggleBoldRedButton.ontouchstart = toggleBoldRedButton.onmousedown = function() {
+                    toggleBoldRed();
+                    return false;
+                };
+
+                var toggleItalicYellowBgButton = gEBI("toggleItalicYellowBgButton");
+                toggleItalicYellowBgButton.disabled = false;
+                toggleItalicYellowBgButton.ontouchstart = toggleItalicYellowBgButton.onmousedown = function() {
+                    toggleItalicYellowBg();
+                    return false;
+                };
+
+                var togglePinkLinkButton = gEBI("togglePinkLinkButton");
+                togglePinkLinkButton.disabled = false;
+                togglePinkLinkButton.ontouchstart = togglePinkLinkButton.onmousedown = function() {
+                    togglePinkLink();
+                    return false;
+                };
+            }
+        };
+
+    </script>
+</head>
+<body>
+    <div id="buttons">
+        <h3>Add / remove CSS classes to / from selection</h3>
+        Make a selection in the document on the right and use the buttons below to toggle CSS classes on the selection:
+
+        <br>
+        <input type="button" disabled id="toggleBoldRedButton" value="Toggle bold and red" unselectable="on"
+               class="unselectable">
+        <br>
+        <input type="button" disabled id="toggleItalicYellowBgButton" value="Toggle italic and yellow bg"
+               unselectable="on" class="unselectable">
+        <br>
+        <input type="button" disabled id="togglePinkLinkButton" value="Toggle pink link"
+               unselectable="on" class="unselectable">
+    </div>
+
+    <div id="content">
+        <h1>Rangy CSS Class Applier Module Demo</h1>
+
+        <!-- A comment -->
+
+        <p id="intro">
+            Please use your mouse and/or keyboard to make selections from the sample content below and use the buttons
+            on the left hand size to toggle CSS classes applied to content (now also including images) within the
+            selection.
+        </p>
+
+        <p>
+            <b>Association football</b> is a sport played between two teams. It is usually called
+            <b class="pinkLink">football</b>, but in some countries, such as the United States, it is called
+            <b>soccer</b>. In <a href="http://simple.wikipedia.org/wiki/Japan">Japan</a>, New Zealand, South Africa,
+            Australia, Canada and Republic of Ireland, both words are commonly used.
+        </p>
+        <p>
+            Each team has 11 players on the field. One of these players is the <i>goalkeeper</i>, and the other ten are
+            known as <i>"outfield players."</i> The game is played by <b>kicking a ball
+            <img src="football.png" width="100" height="100" alt="football"> into the opponent's goal</b>. A
+            match has 90 minutes of play, with a break of 15 minutes in the middle. The break in the middle is called
+            half-time.
+        </p>
+        <h2>Competitions <span class="smaller">(this section is editable)</span></h2>
+        <p contenteditable="true">
+            There are many competitions for football, for both football clubs and countries. Football clubs usually play
+            other teams in their own country, with a few exceptions. <b>Cardiff City F.C.</b> from Wales for example, play
+            in the English leagues and in the English FA Cup.
+        </p>
+        <h2>Who plays football <span class="smaller">(this section is editable and in pre-formatted text)</span></h2>
+        <pre contenteditable="true">
+Football is the world's most popular sport. It is played in more
+countries than any other game. In fact, FIFA (the Federation
+Internationale de Football Association) has more members than the
+United Nations.
+
+It is played by both males and females.
+
+  <p>First para</p>
+  <p>Second para</p>
+
+</pre>
+    </div>
+
+    <p class="small">
+        Text adapted from <a href="http://simple.wikipedia.org/wiki/Association_football">Simple Wikipedia page on
+        Association Football</a>, licensed under the
+        <a href="http://simple.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License">Creative
+            Commons Attribution/Share-Alike License</a>.
+    </p>
+</body>
+</html>

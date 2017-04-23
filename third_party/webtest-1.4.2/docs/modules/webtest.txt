@@ -1,0 +1,42 @@
+:mod:`webtest` -- Functional Testing of Web Applications
+--------------------------------------------------------
+
+.. automodule:: webtest
+
+.. autoclass:: TestApp
+   :members:
+
+.. autoexception:: AppError
+
+Response API
+~~~~~~~~~~~~
+
+Some of the return values return instances of these classes:
+
+.. autoclass:: TestResponse
+   :members:
+
+.. autoclass:: TestRequest
+   :members:
+
+.. autoclass:: Form
+   :members:
+
+.. autoclass:: Field
+
+.. autoclass:: Select
+
+.. autoclass:: Radio
+
+.. autoclass:: Checkbox
+
+.. autoclass:: Text
+
+.. autoclass:: Textarea
+
+.. autoclass:: Hidden
+
+.. autoclass:: Submit
+
+
+

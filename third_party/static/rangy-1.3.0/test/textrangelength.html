@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>Text Range length</title>
+    <script type="text/javascript">
+        function convertCrLf(str) {
+            return "'" + str.replace(/\r/g, "\\r").replace(/\n/g, "\\n") + "'";
+        }
+
+        window.onload = function() {
+            var msgs = [];
+            var pre = document.getElementById("pre");
+            var textNode = pre.firstChild;
+            var r = document.body.createTextRange();
+            r.moveToElementText(pre);
+            msgs.push("Text node value is " + convertCrLf(textNode.data));
+            msgs.push("Text node length is " + textNode.data.length);
+            msgs.push("Range text is " + convertCrLf(r.text));
+            msgs.push("Range text length is " + r.text.length);
+            msgs.push("Pre innerText is " + convertCrLf(pre.innerText));
+            msgs.push("Pre innerText length is " + pre.innerText.length);
+
+
+
+            var r2 = r.duplicate();
+            msgs.push("Result from move by -gazillion:  " + r2.moveEnd("character", -1e8));
+
+            var charCount = 0, comparison;
+            r2 = r.duplicate();
+            while ( (comparison = r2.compareEndPoints("StartToEnd", r2)) == -1) {
+                charCount++;
+                r2.moveEnd("character", -1);
+                msgs.push("Comparison is " + comparison + ", range text is " + convertCrLf(r2.text) + ", range htmlText is " + convertCrLf(r2.htmlText) + ", range bounding dimensions are " + r2.boundingWidth + ", " + r2.boundingHeight);
+            }
+            msgs.push("moveEnd with -1 chars called " + charCount + " times, comparison: " + comparison);
+
+            r2 = r.duplicate();
+            msgs.push("Result from moveEnd -1 with unit textedit: " + r2.moveEnd("textedit", -1));
+
+
+            function testLongText() {
+                var longString = new Array(1e2).join("Some text\r\n");
+                pre.firstChild.data = longString;
+                var start, end;
+                r.moveToElementText(pre);
+
+                r2 = r.duplicate();
+                start = new Date();
+                charCount = 0;
+                while ( (comparison = r2.compareEndPoints("StartToEnd", r2)) == -1) {
+                    charCount++;
+                    r2.moveEnd("character", -1);
+                }
+                end = new Date();
+                msgs.push("Char count with lots of -1: " + charCount + ", time: " + (end - start));
+
+                r2 = r.duplicate();
+                start = new Date();
+                charCount = 0;
+                while ( (comparison = r2.compareEndPoints("StartToEnd", r2)) == -1) {
+                    charCount++;
+                    r2.moveStart("character", 1);
+                }
+                end = new Date();
+                msgs.push("Char count with lots of +1: " + charCount + ", time: " + (end - start));
+
+                r2 = r.duplicate();
+                start = new Date();
+                var rangeLength = r2.text.replace(/\r\n/g, "\r").length;
+                charCount = r2.moveStart("character", rangeLength);
+                msgs.push("Char count after moving range length of " + rangeLength + ": " + charCount);
+
+                while ( (comparison = r2.compareEndPoints("StartToEnd", r2)) == -1) {
+                    charCount++;
+                    r2.moveStart("character", 1);
+                }
+                end = new Date();
+                msgs.push("Char count with initial range text length then some +1: " + charCount + ", time: " + (end - start));
+
+
+                r2 = r.duplicate();
+                start = new Date();
+                var r3 = r2.duplicate();
+                r3.collapse(false);
+                charCount = 0;
+                while (!r2.isEqual(r3)) {
+                    charCount++;
+                    r2.moveStart("character", 1);
+                }
+                end = new Date();
+                msgs.push("Char count with lots of +1 and isEqual: " + charCount + ", time: " + (end - start));
+
+                r2 = r.duplicate();
+                start = new Date();
+                r3.collapse(false);
+                charCount = 0;
+                while (r2.boundingWidth) {
+                    charCount++;
+                    r2.moveStart("character", 1);
+                }
+                end = new Date();
+                msgs.push("Char count with lots of +1 boundingWidth: " + charCount + ", time: " + (end - start));
+
+                r2 = r.duplicate();
+                start = new Date();
+                var s = r2.moveStart("character", -1e8);
+                var e = r2.moveEnd("character", -1e8);
+                charCount = s - e;
+                end = new Date();
+                msgs.push("Char count with gazillion: " + charCount + ", time: " + (end - start));
+
+                r2 = r.duplicate();
+                start = new Date();
+                charCount = r2.text.length;
+                end = new Date();
+                msgs.push("Char count range text: " + charCount + ", time: " + (end - start));
+            }
+
+
+            testLongText();
+
+            var bigEl = document.createElement("div");
+            bigEl.innerHTML = new Array(3e3).join("<b>bum <i>poo</i></b>");
+            msgs.push("bigEl.innerHTML length: " + bigEl.innerHTML.length);
+            document.body.insertBefore(bigEl, pre);
+
+            testLongText();
+
+
+            var el = document.createElement("div")
+            el.innerHTML = msgs.join("<br>");
+            document.body.appendChild(el);
+        };
+    </script>
+</head>
+<body><pre id="pre">
+
+Test
+
+</pre></body>
+</html>

@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Guppy</title>
+    <link rel="stylesheet" href="../build/guppy.min.css">
+    <script type="text/javascript" src="../build/guppy.min.js"></script>
+    <script type="text/javascript" src="test.js"></script>
+  </head>
+  <body>
+    <div id="guppy1" style="width:50%;border:2px solid blue;height:150px;padding:10px;"></div>
+    <div id="results" style="width:50%;border:1px solid black;padding:10px;"><b>Test results: </b></div>
+    <script>
+      Guppy.guppy_init("../src/transform.xsl","../src/symbols.json");
+      var test_guppy = new Guppy("guppy1", {"debug":"yes","ready_callback":function(){console.log("hi");start_tests(this)}});
+    </script>
+</body></html>
