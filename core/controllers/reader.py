@@ -58,13 +58,12 @@ def require_playable(handler):
         """Tests if the learner can play the exploration.
 
         Args:
-            exploration_id: str. The id of the exploration to test if
-                the use can play.
+            exploration_id: str. The ID of the exploration to test.
             kwargs: Any other keyword args.
 
         Returns:
-            The relevant handler(response), if the user is authorized to play
-            this exploration.
+            handler. The relevant response handler if the learner is allowed to
+                play the exploration.
 
         Raises:
             PageNotFound: The learner cannot play the exploration.
@@ -95,21 +94,23 @@ def require_playable(handler):
 
 def _get_exploration_player_data(
         exploration_id, version, collection_id, can_edit):
-    """Get's exploration data which is returned as a dictionary.
+    """Gets exploration metadata which is returned as a dictionary.
 
     Args:
-        exploration_id: str. The id of the exploration to get metadata.
-        version: int. The version of the exploration.
+        exploration_id: str. The ID of the exploration to get metadata for.
+        version: int or None. If specified, the version of the exploration to
+            get metadata for.
         collection_id: str. The id of the collection which the exploration
             belongs to.
-        can_edit: bool. If the exploration is editable by the learner.
+        can_edit: bool. Whether the exploration is editable by the learner.
 
     Returns:
-        dict. A dictionary with metadata pertaining the exploration
-            such as  GADGET_SPECS,can_edit,title, version etc.
+        dict. A dictionary with metadata pertaining to the exploration
+            such as GADGET_SPECS, can_edit, title, version etc.
 
     Raises:
-        Exception: The collection not in current available collections.
+        Exception: The collection is not in current available collections list
+            or any error that may occur while getting the exploration object.
     """
     try:
         exploration = exp_services.get_exploration_by_id(
@@ -177,15 +178,14 @@ class ExplorationPageEmbed(base.BaseHandler):
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests.
-        The require_playable decorator ensures the learner can play the
-        exploration with the exploration_id.
 
         Args:
-            exploration_id: str. The id of the exploration requested.
+            exploration_id: str. The ID of the exploration requested by the
+                learner.
 
         Raises:
-            PageNotFound: The exploration item does not exist or is not
-                available.
+            PageNotFound: The collection which the exploration belongs to is not
+                in the currently available list.
         """
         version_str = self.request.get('v')
         version = int(version_str) if version_str else None
@@ -218,14 +218,14 @@ class ExplorationPage(base.BaseHandler):
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests.
-        The require_playable decorator ensures the learner can play
-        the exploration with the exploration_id.
 
         Args:
-            exploration_id: str. The id of the exploration requested.
+           exploration_id: str. The ID of the exploration requested by the
+                learner.
 
         Raises:
-            PageNotFound: The exploration item do not exist or is not available.
+            PageNotFound: The collection which the exploration belongs to is not
+                currently available.
         """
         version_str = self.request.get('v')
         version = int(version_str) if version_str else None
@@ -265,8 +265,10 @@ class ExplorationHandler(base.BaseHandler):
 
     def get(self, exploration_id):
         """Populates the data on the individual exploration page.
+
         Args:
-            exploration_id: str. The id of the exploration requested.
+            exploration_id: str. The ID of the exploration requested by the
+                learner.
 
         Raises:
             PageNotFound: The exploration does not exist or not available.
@@ -303,9 +305,10 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         """Handles learner answer POST requests.
         The require_playable decorator ensures the learner can play
         the exploration with the id exploration_id.
+
         Args:
-            exploration_id: str. The id of the exploration the learner
-                wants to post an answer.
+            exploration_id: str. The ID of the exploration the learner
+                has posted an answer.
         """
         old_state_name = self.payload.get('old_state_name')
         answer = self.payload.get('answer')
@@ -349,10 +352,11 @@ class StateHitEventHandler(base.BaseHandler):
     @require_playable
     def post(self, exploration_id):
         """Handles POST requests.
-        Records learner's new state
+        Records that a learner has hit new state in the exploration.
+
         Args:
-            exploration_id: str. The id of the exploration the learner wants
-                to hit new state.
+            exploration_id: str. The ID of the exploration the learner has hit
+                a new state.
         """
         new_state_name = self.payload.get('new_state_name')
         exploration_version = self.payload.get('exploration_version')
@@ -379,15 +383,17 @@ class ClassifyHandler(base.BaseHandler):
     @require_playable
     def post(self, unused_exploration_id):
         """Handle POST requests.
+
         Args:
-            unused_exploration_id: str. The id of the exploration needed by the
-                require_playable decorator.
+            unused_exploration_id: str. Although this is not used, it is passed
+                in because it is needed by the require_playable decorator.
 
         Returns:
             dict. A classification result, which is a dictionary containing
                 three keys.
-                'outcome': A dict representing the outcome of the answer group
-                    matched.
+                'outcome': dict. A dictionary representing the outcome of the
+                    answer group matched previous state with items such as
+                     name, previous answer etc.
                 'answer_group_index': The index of the matched answer group.
                 'rule_spec_index': The index of the matched rule spec in the
                     matched answer group.
@@ -395,7 +401,7 @@ class ClassifyHandler(base.BaseHandler):
         # A domain object representing the old state.
         old_state = exp_domain.State.from_dict(self.payload.get('old_state'))
         # The learner's raw answer.
-        answer = self.payload.get('answer')
+        answer = self.payload.get('answerexp_do')
         # The learner's parameter values.
         params = self.payload.get('params')
         params['answer'] = answer
@@ -411,10 +417,11 @@ class ReaderFeedbackHandler(base.BaseHandler):
     @require_playable
     def post(self, exploration_id):
         """Handles POST requests.
-        Records a thread_id of the feedback from a learner.
+        Records the feedback submitted by a learner to an exploration.
+
         Args:
-            exploration_id: str. The id for the exploration the learner wants
-                to submit feedback.
+            exploration_id: str. The ID of the exploration the learner has
+                submitted a feedback.
         """
         state_name = self.payload.get('state_name')
         subject = self.payload.get('subject', 'Feedback from a learner')
@@ -438,9 +445,10 @@ class ExplorationStartEventHandler(base.BaseHandler):
     @require_playable
     def post(self, exploration_id):
         """Handles POST requests.
+
         Args:
-            exploration_id: str. The id of the exploration the learner wants to
-                            start exploring.
+            exploration_id: str. The ID of the exploration the learner has
+                started exploring.
         """
         event_services.StartExplorationEventHandler.record(
             exploration_id, self.payload.get('version'),
@@ -460,9 +468,10 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
     @require_playable
     def post(self, exploration_id):
         """Handles POST requests.
+
         Args:
-            exploration_id: str. The id of the exploration the learner is
-                finishing.
+            exploration_id: str. The ID of the exploration the learner has
+                finished.
         """
         # This will be None if the exploration is not being played within the
         # context of a collection.
@@ -493,9 +502,10 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
     @require_playable
     def post(self, exploration_id):
         """Handles POST requests.
+
         Args:
-            exploration_id: str. The id of the exploration the learner is
-                leaving without finishing.
+            exploration_id: str. The ID of the exploration the learner has
+                left without finishing.
         """
         event_services.MaybeLeaveExplorationEventHandler.record(
             exploration_id,
@@ -519,8 +529,9 @@ class RatingHandler(base.BaseHandler):
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests.
+
         Args:
-            exploration_id: str. The id of the exploration the learner wants
+            exploration_id: str. The ID of the exploration the learner wants to
                 get the rating.
         """
         self.values.update({
@@ -538,12 +549,9 @@ class RatingHandler(base.BaseHandler):
         """Handles PUT requests for submitting ratings at the end of an
         exploration.
 
-        base.require_user decorator ensures that the current learner is
-        associated with the current session.
-
         Args:
-            exploration_id: str. The id of the exploration the learner wants to
-                rate.
+            exploration_id: str. The ID of the exploration the learner has
+                rated.
         """
         user_rating = self.payload.get('user_rating')
         rating_services.assign_rating_to_exploration(
@@ -555,8 +563,8 @@ class RecommendationsHandler(base.BaseHandler):
     """Provides recommendations to be displayed at the end of explorations.
     Which explorations are provided depends on whether the exploration was
     played within the context of a collection and whether the learner is logged
-    in.If both are true, then the explorations are suggested from the
-    collection,if there are upcoming explorations for the learner to complete.
+    in. If both are true, then the explorations are suggested from the
+    collection, if there are upcoming explorations for the learner to complete.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -564,8 +572,9 @@ class RecommendationsHandler(base.BaseHandler):
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests.
+
         Args:
-            exploration_id: str. The id of the exploration the learner wants
+            exploration_id: str. The ID of the exploration the learner wants
                 to get other recommendations.
         """
         collection_id = self.request.get('collection_id')
@@ -622,11 +631,10 @@ class FlagExplorationHandler(base.BaseHandler):
     @base.require_user
     def post(self, exploration_id):
         """Handles POST requests.
-        base.require_user decorator ensures that the current learner is
-        associated with the current session.
+
         Args:
-            exploration_id: str. The id of the exploration the learner
-                wants to flag.
+            exploration_id: str. The ID of the exploration the learner
+                has flagged.
         """
         moderator_services.enqueue_flag_exploration_email_task(
             exploration_id,
