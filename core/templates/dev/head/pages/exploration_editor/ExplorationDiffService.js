@@ -84,7 +84,6 @@ oppia.factory('ExplorationDiffService', [
         var oldStateIsTerminal = false;
         var newStateIsTerminal = false;
         if (oldState) {
-          console.log(oldState);
           oldStateIsTerminal = (
             oldState.interaction.id &&
             INTERACTION_SPECS[oldState.interaction.id].is_terminal);
@@ -128,9 +127,7 @@ oppia.factory('ExplorationDiffService', [
      * number, and false if changes are compared in decreasing version number.
      */
     var _getDiffGraphData = function(v1States, v2States, changeListData) {
-      console.log(angular.copy(v1States));
       var v1Info = _generateInitialStateIdsAndData(v1States);
-      console.log(angular.copy(v1Info.stateData));
       var stateData = v1Info.stateData;
       var stateIds = v1Info.stateIds;
       var originalStateIds = angular.copy(stateIds);
@@ -183,9 +180,6 @@ oppia.factory('ExplorationDiffService', [
             delete stateIds[oldStateName];
             stateData[stateIds[newStateName]].newestStateName = newStateName;
           } else if (change.cmd === 'edit_state_property') {
-            console.log(stateIds);
-            console.log(change.state_name);
-            console.log(stateIds[change.state_name]);
             if (stateData[stateIds[change.state_name]].stateProperty ==
                 STATE_PROPERTY_UNCHANGED) {
               stateData[stateIds[change.state_name]].stateProperty = (
@@ -222,7 +216,6 @@ oppia.factory('ExplorationDiffService', [
      * - maxId: the maximum id in states and stateIds.
      */
     var _getAdjMatrix = function(states, stateIds, maxId) {
-      console.log(angular.copy(states));
       adjMatrix = {};
       for (var stateId = 1; stateId <= maxId; stateId++) {
         adjMatrix[stateId] = {};
