@@ -24,8 +24,8 @@ oppia.directive('backgroundBanner', [
       templateUrl: UrlInterpolationService.getComponentUrl(
         '/background/background_banner_directive.html'),
       controller: [
-        '$scope', 'UrlInterpolationService',
-        function($scope, UrlInterpolationService) {
+        '$scope',
+        function($scope) {
           var possibleBannerFilenames = [
             'bannerA.svg', 'bannerB.svg', 'bannerC.svg', 'bannerD.svg'];
           var bannerImageFilename = possibleBannerFilenames[
