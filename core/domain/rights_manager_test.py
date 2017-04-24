@@ -35,6 +35,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.signup('d@example.com', 'D')
         self.signup('e@example.com', 'E')
         self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, username=self.MODERATOR_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
@@ -42,8 +43,11 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.user_id_d = self.get_user_id_from_email('d@example.com')
         self.user_id_e = self.get_user_id_from_email('e@example.com')
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.user_id_moderator = self.get_user_id_from_email(
+            self.MODERATOR_EMAIL)
 
         self.set_admins([self.ADMIN_USERNAME])
+        self.set_moderators([self.MODERATOR_USERNAME])
 
     def test_get_exploration_rights_for_nonexistent_exploration(self):
         non_exp_id = 'this_exp_does_not_exist_id'
@@ -89,6 +93,19 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             rights_manager.Actor(self.user_id_admin).can_delete(
                 feconf.ACTIVITY_TYPE_EXPLORATION, '1'))
 
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_moderator).can_play(
+                feconf.ACTIVITY_TYPE_EXPLORATION, '1'))
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_moderator).can_view(
+                feconf.ACTIVITY_TYPE_EXPLORATION, '1'))
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_moderator).can_edit(
+                feconf.ACTIVITY_TYPE_EXPLORATION, '1'))
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_moderator).can_delete(
+                feconf.ACTIVITY_TYPE_EXPLORATION, '1'))
+
     def test_non_splash_page_demo_exploration(self):
         # Note: there is no difference between permissions for demo
         # explorations, whether or not they are on the splash page.
@@ -120,6 +137,19 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
                 feconf.ACTIVITY_TYPE_EXPLORATION, '3'))
         self.assertTrue(
             rights_manager.Actor(self.user_id_admin).can_delete(
+                feconf.ACTIVITY_TYPE_EXPLORATION, '3'))
+
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_moderator).can_play(
+                feconf.ACTIVITY_TYPE_EXPLORATION, '3'))
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_moderator).can_view(
+                feconf.ACTIVITY_TYPE_EXPLORATION, '3'))
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_moderator).can_edit(
+                feconf.ACTIVITY_TYPE_EXPLORATION, '3'))
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_moderator).can_delete(
                 feconf.ACTIVITY_TYPE_EXPLORATION, '3'))
 
     def test_ownership_of_exploration(self):
@@ -164,11 +194,24 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertTrue(
             rights_manager.Actor(self.user_id_admin).can_view(
                 feconf.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
-        self.assertFalse(
+        self.assertTrue(
             rights_manager.Actor(self.user_id_admin).can_edit(
                 feconf.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertFalse(
             rights_manager.Actor(self.user_id_admin).can_delete(
+                feconf.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
+
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_moderator).can_play(
+                feconf.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_moderator).can_view(
+                feconf.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_moderator).can_edit(
+                feconf.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_moderator).can_delete(
                 feconf.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
 
         self.assertFalse(
@@ -437,6 +480,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.signup('d@example.com', 'D')
         self.signup('e@example.com', 'E')
         self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, username=self.MODERATOR_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
@@ -444,8 +488,11 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.user_id_d = self.get_user_id_from_email('d@example.com')
         self.user_id_e = self.get_user_id_from_email('e@example.com')
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.user_id_moderator = self.get_user_id_from_email(
+            self.MODERATOR_EMAIL)
 
         self.set_admins([self.ADMIN_USERNAME])
+        self.set_moderators([self.MODERATOR_USERNAME])
 
     def test_get_collection_rights_for_nonexistent_collection(self):
         non_col_id = 'this_collection_does_not_exist_id'
@@ -489,6 +536,19 @@ class CollectionRightsTests(test_utils.GenericTestBase):
                 feconf.ACTIVITY_TYPE_COLLECTION, '0'))
         self.assertTrue(
             rights_manager.Actor(self.user_id_admin).can_delete(
+                feconf.ACTIVITY_TYPE_COLLECTION, '0'))
+
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_moderator).can_play(
+                feconf.ACTIVITY_TYPE_COLLECTION, '0'))
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_moderator).can_view(
+                feconf.ACTIVITY_TYPE_COLLECTION, '0'))
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_moderator).can_edit(
+                feconf.ACTIVITY_TYPE_COLLECTION, '0'))
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_moderator).can_delete(
                 feconf.ACTIVITY_TYPE_COLLECTION, '0'))
 
     def test_ownership_of_collection(self):
@@ -539,11 +599,24 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.assertTrue(
             rights_manager.Actor(self.user_id_admin).can_view(
                 feconf.ACTIVITY_TYPE_COLLECTION, self.COLLECTION_ID))
-        self.assertFalse(
+        self.assertTrue(
             rights_manager.Actor(self.user_id_admin).can_edit(
                 feconf.ACTIVITY_TYPE_COLLECTION, self.COLLECTION_ID))
         self.assertFalse(
             rights_manager.Actor(self.user_id_admin).can_delete(
+                feconf.ACTIVITY_TYPE_COLLECTION, self.COLLECTION_ID))
+
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_moderator).can_play(
+                feconf.ACTIVITY_TYPE_COLLECTION, self.COLLECTION_ID))
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_moderator).can_view(
+                feconf.ACTIVITY_TYPE_COLLECTION, self.COLLECTION_ID))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_moderator).can_edit(
+                feconf.ACTIVITY_TYPE_COLLECTION, self.COLLECTION_ID))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_moderator).can_delete(
                 feconf.ACTIVITY_TYPE_COLLECTION, self.COLLECTION_ID))
 
         self.assertFalse(
