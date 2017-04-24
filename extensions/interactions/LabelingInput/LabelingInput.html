@@ -44,19 +44,20 @@
   <hr>
   <h4>Word Bank</h4>
     <div data-drop="true"
-          jqyoui-droppable="{animate:true}">
+        jqyoui-droppable="{animate:true}">
       <div ng-repeat="region in allRegions"
         style="
-          height: <[getRegionDimensions($index).height]>px;
-          width: <[getRegionDimensions($index).width]>px;
           margin-bottom: 1rem;
-          margin-left: .5rem;
-          margin-right: .5rem;
           display: inline-block;
           clear: none;
+          line-height: 20px;
+          padding-top: 10px;
+          padding-bottom: 10px;
+          margin-right: 1rem;
           text-align: center;
           white-space: normal;
           z-index: 999;
+          vertical-align: center;
         "
         class="btn btn-primary"
         data-drag="true"
