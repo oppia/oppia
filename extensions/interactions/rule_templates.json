@@ -68,12 +68,12 @@
   },
   "LabelingInput": {
     "GetsAllCorrect": {
-      "description": "gets all values correct"
+      "description": "gets all labels correct"
     },
     "Misses": {
-      "description": "does not correctly get the value {{x|UnicodeString}}"
+      "description": "does not correctly place the label {{x|UnicodeString}}"
     }
-  },  
+  },
   "MathExpressionInput": {
     "IsMathematicallyEquivalentTo": {
       "description": "is mathematically equivalent to (LaTeX) {{x|UnicodeString}}"
