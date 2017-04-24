@@ -860,8 +860,8 @@ textarea {
   }
   ul.nav.navbar-nav.oppia-navbar-nav.navbar-right {
     display: flex;
-    margin: 0;
     float: right;
+    margin: 0;
   }
 }
 @media(max-width: 651px) {
