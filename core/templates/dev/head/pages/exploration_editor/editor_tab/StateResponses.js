@@ -564,7 +564,7 @@ oppia.controller('StateResponses', [
           'explorationContextService', 'editorContextService',
           'explorationStatesService', 'trainingDataService',
           'AnswerClassificationService', 'focusService',
-          'RULE_TYPE_CLASSIFIER',
+          'angularNameService', 'RULE_TYPE_CLASSIFIER',
           function(
               $scope, $injector, $modalInstance,
               oppiaExplorationHtmlFormatterService,
@@ -572,7 +572,7 @@ oppia.controller('StateResponses', [
               explorationContextService, editorContextService,
               explorationStatesService, trainingDataService,
               AnswerClassificationService, focusService,
-              RULE_TYPE_CLASSIFIER) {
+              angularNameService, RULE_TYPE_CLASSIFIER) {
             var _explorationId = explorationContextService.getExplorationId();
             var _stateName = editorContextService.getActiveStateName();
             var _state = explorationStatesService.getState(_stateName);
@@ -593,8 +593,9 @@ oppia.controller('StateResponses', [
             // Retrieve the interaction ID.
             var interactionId = stateInteractionIdService.savedMemento;
 
-            var rulesServiceName = interactionId.charAt(0).toLowerCase() +
-              interactionId.slice(1) + 'RulesService';
+            var rulesServiceName = 
+              angularNameService.getNameOfInteractionRulesService(
+                interactionId)
 
             // Inject RulesService dynamically.
             var rulesService = $injector.get(rulesServiceName);

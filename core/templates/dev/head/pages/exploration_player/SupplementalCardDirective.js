@@ -47,7 +47,7 @@ oppia.directive('supplementalCard', [function() {
 
         $scope.OPPIA_AVATAR_IMAGE_URL = (
           UrlInterpolationService.getStaticImageUrl(
-            '/avatar/oppia_black_72px.png'));
+            '/avatar/oppia_avatar_100px.svg'));
 
         $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
 

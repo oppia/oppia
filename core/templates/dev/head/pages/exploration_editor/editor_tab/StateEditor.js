@@ -40,7 +40,7 @@ oppia.controller('StateEditor', [
     $scope.isInteractionShown = false;
 
     $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
-      '/avatar/oppia_black_72px.png');
+      '/avatar/oppia_avatar_100px.svg');
 
     $scope.isCurrentStateInitialState = function() {
       return (
@@ -140,12 +140,14 @@ oppia.factory('trainingModalService', [
           templateUrl: 'modals/trainUnresolvedAnswer',
           backdrop: true,
           controller: [
-            '$scope', '$modalInstance', 'explorationStatesService',
-            'editorContextService', 'AnswerClassificationService',
-            'explorationContextService',
-            function($scope, $modalInstance, explorationStatesService,
-                editorContextService, AnswerClassificationService,
-                explorationContextService) {
+            '$scope', '$injector', '$modalInstance',
+            'explorationStatesService', 'editorContextService',
+            'AnswerClassificationService', 'explorationContextService',
+            'stateInteractionIdService', 'angularNameService',
+            function($scope, $injector, $modalInstance,
+                explorationStatesService, editorContextService,
+                AnswerClassificationService, explorationContextService,
+                stateInteractionIdService, angularNameService) {
               $scope.trainingDataAnswer = '';
               $scope.trainingDataFeedback = '';
               $scope.trainingDataOutcomeDest = '';
@@ -168,8 +170,18 @@ oppia.factory('trainingModalService', [
                   editorContextService.getActiveStateName();
                 var state = explorationStatesService.getState(currentStateName);
 
+                // Retrieve the interaction ID.
+                var interactionId = stateInteractionIdService.savedMemento;
+
+                var rulesServiceName = 
+                  angularNameService.getNameOfInteractionRulesService(
+                    interactionId)
+
+                // Inject RulesService dynamically.
+                var rulesService = $injector.get(rulesServiceName);
+
                 AnswerClassificationService.getMatchingClassificationResult(
-                  explorationId, state, unhandledAnswer, true)
+                  explorationId, state, unhandledAnswer, true, rulesService)
                   .then(function(classificationResult) {
                     var feedback = 'Nothing';
                     var dest = classificationResult.outcome.dest;
