@@ -106,13 +106,6 @@ oppia.factory('StatesObjectFactory', [
         }
         return finalStateNames;
       };
-      States.prototype.toDict = function() {
-        var dict = {};
-        for (var stateName in states) {
-          dict[stateName] = JSON.parse(JSON.stringify(states[stateName]));
-        }
-        return dict;
-      };
     };
 
     States.createFromBackendDict = function(statesBackendDict) {
