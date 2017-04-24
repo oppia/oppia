@@ -204,10 +204,14 @@ oppia.factory('compareVersionsService', [
           // Track changes from v1 to LCA, and then from LCA to v2.
           var lca = versionsTreeService.findLCA(v1, v2);
 
+          console.log(angular.copy(v1StatesDict));
+
           var v1States = StatesObjectFactory.createFromBackendDict(
-            v1StatesDict).getStates();
+            v1StatesDict).getStateObjects();
           var v2States = StatesObjectFactory.createFromBackendDict(
-            v2StatesDict).getStates();
+            v2StatesDict).getStateObjects();
++
+          console.log(angular.copy(v1States));
 
           var diffGraphData = ExplorationDiffService.getDiffGraphData(
             v1States, v2States, [{

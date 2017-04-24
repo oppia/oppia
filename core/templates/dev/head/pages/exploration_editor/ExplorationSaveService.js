@@ -303,8 +303,7 @@ oppia.factory('explorationSaveService', [
                   });
                 }
 
-                var _states = explorationStatesService.getStates().getStates();
-                if (_states) {
+                if (explorationStatesService.isInitialized()) {
                   var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2
                   .some(
                     function(categoryItem) {
@@ -451,8 +450,8 @@ oppia.factory('explorationSaveService', [
 
         explorationData.getLastSavedData().then(function(data) {
           var oldStates = StatesObjectFactory.createFromBackendDict(
-            data.states);
-          var newStates = explorationStatesService.getStates();
+            data.states).getStateObjects();
+          var newStates = explorationStatesService.getStates().toDict();
           var diffGraphData = ExplorationDiffService.getDiffGraphData(
             oldStates, newStates, [{
               changeList: changeListService.getChangeList(),

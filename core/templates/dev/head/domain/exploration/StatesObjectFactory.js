@@ -18,15 +18,19 @@
  */
 
 oppia.factory('StatesObjectFactory', [
-  'StateObjectFactory', 'newStateTemplateService',
-  function(StateObjectFactory, newStateTemplateService) {
+  'StateObjectFactory', 'newStateTemplateService', 'INTERACTION_SPECS',
+  function(StateObjectFactory, newStateTemplateService, INTERACTION_SPECS) {
     var States = function(states) {
       var states = states;
 
       States.prototype.getState = function(stateName) {
         return states[stateName];
       };
-      States.prototype.getStates = function() {
+
+      //TODO(tjiang11): Remove getStateObjects() and replace calls
+      //with an object to represent data to be manipulated inside
+      //ExplorationDiffService.
+      States.prototype.getStateObjects = function() {
         return angular.copy(states);
       };
       States.prototype.addState = function(newStateName) {
@@ -35,6 +39,9 @@ oppia.factory('StatesObjectFactory', [
       };
       States.prototype.setState = function(stateName, stateData) {
         states[stateName] = angular.copy(stateData);
+      };
+      States.prototype.hasState = function(stateName) {
+        return states.hasOwnProperty(stateName);
       };
       States.prototype.deleteState = function(deleteStateName) {
         delete states[deleteStateName];
@@ -85,6 +92,26 @@ oppia.factory('StatesObjectFactory', [
             }
           }
         }
+      };
+      States.prototype.getStateNames = function() {
+        return Object.keys(states);  
+      };
+      States.prototype.getFinalStateNames = function() {
+        var finalStateNames = [];
+        for (var stateName in states) {
+          var interaction = states[stateName].interaction;
+          if (interaction.id && INTERACTION_SPECS[interaction.id].is_terminal) {
+            finalStateNames.push(stateName);  
+          }
+        }
+        return finalStateNames;
+      };
+      States.prototype.toDict = function() {
+        var dict = {};
+        for (var stateName in states) {
+          dict[stateName] = JSON.parse(JSON.stringify(states[stateName]));
+        }
+        return dict;
       };
     };
 

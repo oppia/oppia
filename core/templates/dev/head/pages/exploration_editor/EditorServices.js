@@ -921,8 +921,11 @@ oppia.factory('explorationStatesService', [
       getStates: function() {
         return angular.copy(_states);
       },
+      getStateNames: function() {
+        return _states.getStateNames();
+      },
       hasState: function(stateName) {
-        return _states.getStates().hasOwnProperty(stateName);
+        return _states.hasState(stateName);
       },
       getState: function(stateName) {
         return angular.copy(_states.getState(stateName));
@@ -931,7 +934,7 @@ oppia.factory('explorationStatesService', [
         _setState(stateName, stateData, true);
       },
       isNewStateNameValid: function(newStateName, showWarnings) {
-        if (_states.getStates().hasOwnProperty(newStateName)) {
+        if (_states.hasState(newStateName)) {
           if (showWarnings) {
             alertsService.addWarning('A state with this name already exists.');
           }
@@ -992,12 +995,15 @@ oppia.factory('explorationStatesService', [
       saveFallbacks: function(stateName, newFallbacks) {
         saveStateProperty(stateName, 'fallbacks', newFallbacks);
       },
+      isInitialized: function() {
+        return _states != null;
+      },
       addState: function(newStateName, successCallback) {
         newStateName = $filter('normalizeWhitespace')(newStateName);
         if (!validatorsService.isValidStateName(newStateName, true)) {
           return;
         }
-        if (_states.getStates().hasOwnProperty(newStateName)) {
+        if (_states.hasState(newStateName)) {
           alertsService.addWarning('A state with this name already exists.');
           return;
         }
@@ -1664,13 +1670,10 @@ oppia.factory('computeGraphService', [
     var _computeGraphData = function(initStateId, states) {
       var nodes = {};
       var links = [];
-      var finalStateIds = [];
-      for (var stateName in states.getStates()) {
-        var interaction = states.getState(stateName).interaction;
-        if (interaction.id && INTERACTION_SPECS[interaction.id].is_terminal) {
-          finalStateIds.push(stateName);
-        }
+      var finalStateIds = states.getFinalStateNames();
 
+      states.getStateNames().map(function(stateName) {
+        var interaction = states.getState(stateName).interaction;
         nodes[stateName] = stateName;
         if (interaction.id) {
           var groups = interaction.answerGroups;
@@ -1699,7 +1702,7 @@ oppia.factory('computeGraphService', [
             });
           }
         }
-      }
+      });
 
       return {
         finalStateIds: finalStateIds,
@@ -1826,11 +1829,12 @@ oppia.factory('explorationWarningsService', [
       var statesWithoutInteractionIds = [];
 
       var states = explorationStatesService.getStates();
-      for (var stateName in states.getStates()) {
+
+      states.getStateNames().map(function(stateName) {
         if (!states.getState(stateName).interaction.id) {
           statesWithoutInteractionIds.push(stateName);
         }
-      }
+      });
 
       return statesWithoutInteractionIds;
     };
@@ -1941,7 +1945,8 @@ oppia.factory('explorationWarningsService', [
       var results = [];
 
       var states = explorationStatesService.getStates();
-      for (var stateName in states.getStates()) {
+
+      states.getStateNames().map(function(stateName) {
         var groupIndexes = _getAnswerGroupIndexesWithEmptyClassifiers(
           states.getState(stateName));
         if (groupIndexes.length > 0) {
@@ -1950,7 +1955,7 @@ oppia.factory('explorationWarningsService', [
             stateName: stateName
           });
         }
-      }
+      })
 
       return results;
     };
@@ -1964,7 +1969,7 @@ oppia.factory('explorationWarningsService', [
       var _graphData = graphDataService.getGraphData();
 
       var _states = explorationStatesService.getStates();
-      for (var stateName in _states.getStates()) {
+      _states.getStateNames().map(function(stateName) {
         var interaction = _states.getState(stateName).interaction;
         if (interaction.id) {
           var validatorName = (
@@ -1986,7 +1991,7 @@ oppia.factory('explorationWarningsService', [
             }
           }
         }
-      }
+      })
 
       var statesWithoutInteractionIds = _getStatesWithoutInteractionIds();
       angular.forEach(statesWithoutInteractionIds, function(

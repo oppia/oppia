@@ -30,10 +30,8 @@ oppia.controller('ExplorationGraph', [
     // We hide the graph at the outset in order not to confuse new exploration
     // creators.
     $scope.isGraphShown = function() {
-      var statesExist = explorationStatesService.getStates() != null;
-      var states = statesExist ? 
-        explorationStatesService.getStates().getStates() : {};
-      return Boolean(statesExist && Object.keys(states).length > 1);
+      return Boolean(explorationStatesService.isInitialized()
+        && explorationStatesService.getStateNames().length > 1);
     };
 
     $scope.deleteState = function(deleteStateName) {

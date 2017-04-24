@@ -159,8 +159,7 @@ oppia.controller('GadgetEditor', [
             // a new one.
             $scope.isEditingGadget = !!gadgetDict.gadget_type;
 
-            $scope.allExplorationStateNames =
-              Object.keys(explorationStatesService.getStates());
+            $scope.allExplorationStateNames = explorationStatesService.getStateNames();
 
             $scope.onChangeGadgetType = function(newGadgetType) {
               gadgetDict.gadget_type = newGadgetType;
