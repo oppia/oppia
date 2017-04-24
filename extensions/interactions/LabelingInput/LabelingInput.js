@@ -166,6 +166,7 @@ oppia.directive('oppiaInteractiveLabelingInput', [
               }
             }
           };
+        
           //TODO: Delete below
           $scope.onClickImage = function() {
             $scope.onSubmit({
@@ -226,7 +227,7 @@ oppia.factory('imageClickInputRulesService', [function() {
       return answer.incorrectElements.length === 0;
     },
     Misses: function(answer, inputs){
-      return answer.incorrectElements.indexOf(inputs.x) !== -1;      
+      return answer.incorrectElements.indexOf(inputs.x) !== -1;
     }
   };
 }]);

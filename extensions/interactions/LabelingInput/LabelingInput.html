@@ -8,21 +8,17 @@
       padding: 8px;
       position: relative;
     }
-    .dragItem{
-      width: 150px;
-      height: 65px;
+    /*.dragItem{
       margin-bottom: 1rem;
       margin-left: .5rem;
       margin-right: .5rem;
       display: inline-block;
-      /*float: left;*/
       clear: none;
       text-align: center;
-      padding: 22px 0px;
       white-space: normal;
       z-index: 999;
 
-    }
+    }*/
     .oppia-image-click-img {
       cursor: pointer;
       display: block;
@@ -47,12 +43,29 @@
   <h2><[imageTitle]></h2>
   <hr>
   <h4>Word Bank</h4>
-    <div ng-repeat="region in allRegions" data-drop="true"
+    <div data-drop="true"
           jqyoui-droppable="{animate:true}">
-      <div class="btn btn-primary dragItem" data-drag="true" data-jqyoui-options="{revert: 'invalid'}" jqyoui-draggable="{animate:true, onStart:'getThisName(region.label)'}"><[region.label]></div>
+      <div ng-repeat="region in allRegions"
+        style="
+          height: <[getRegionDimensions($index).height]>px;
+          width: <[getRegionDimensions($index).width]>px;
+          margin-bottom: 1rem;
+          margin-left: .5rem;
+          margin-right: .5rem;
+          display: inline-block;
+          clear: none;
+          text-align: center;
+          white-space: normal;
+          z-index: 999;
+        "
+        class="btn btn-primary"
+        data-drag="true"
+        data-jqyoui-options="{revert: 'invalid'}"
+        jqyoui-draggable="{animate:true, onStart:'getThisName(region.label)'}"
+        ><[region.label]>
       </div>
-
     </div>
+</div>
     <br>
     <img ng-src="<[imageUrl]>"
          class="oppia-image-click-img"
@@ -89,8 +102,6 @@
              background: rgba(0,0,255,0.5);
              z-index: 10;
           ">
-          <!-- data-jqyoui-options ng-model="list2" -->
-
     </div>
   </div>
 
