@@ -377,10 +377,9 @@ class Actor(object):
 
     def _can_edit(self, rights_object):
         return (
-            self._has_editing_rights(rights_object) or (
+            self._has_editing_rights(rights_object) or self.is_admin() or (
                 self.is_moderator() and (
-                    rights_object.status != ACTIVITY_STATUS_PRIVATE) or
-                self.is_admin()
+                    rights_object.status != ACTIVITY_STATUS_PRIVATE)
             )
         )
 
