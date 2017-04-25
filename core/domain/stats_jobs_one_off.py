@@ -389,6 +389,54 @@ class AnswersAudit2(jobs.BaseMapReduceJobManager):
             yield 'Error: Internal error 2'
 
 
+class PartialAnswerValidationAudit(jobs.BaseMapReduceJobManager):
+    """Perform an answer value validation for numeric input answers submitted to
+    exploration 0 state NumericInput.
+    """
+    _OLD_ANSWER_MODEL_TYPE = 'StateRuleAnswerLogModel'
+    _NEW_ANSWER_MODEL_TYPE = 'StateAnswersModel'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.StateAnswersModel]
+
+    @staticmethod
+    def map(item):
+        if item.exploration_id == '0' and item.state_name == 'Numeric input':
+            for submitted_answer in item.submitted_answer_list:
+                yield ('%s:%s' % (
+                    PartialAnswerValidationAudit._OLD_ANSWER_MODEL_TYPE,
+                    submitted_answer['rule_spec_str']), {
+                        'exploration_id': item.exploration_id,
+                        'state_name': item.state_name,
+                        'rule_spec_str': submitted_answer['rule_spec_str']
+                    })
+                yield (u'%s:%s'.encode('utf-8') % (
+                    PartialAnswerValidationAudit._NEW_ANSWER_MODEL_TYPE,
+                    submitted_answer['answer']), {
+                        'answer_str': unicode(
+                            submitted_answer['answer']).encode('utf-8')
+                    })
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        first_value_dict = ast.literal_eval(stringified_values[0])
+        if key.startswith(PartialAnswerValidationAudit._OLD_ANSWER_MODEL_TYPE):
+            exp_id = first_value_dict['exploration_id']
+            state_name = first_value_dict['state_name']
+            rule_spec_str = first_value_dict['rule_spec_str']
+            item_id = '%s.%s.%s.%s' % (
+                exp_id, state_name, 'submit', rule_spec_str)
+            item = stats_models.StateRuleAnswerLogModel.get(item_id)
+            for answer_str, freq in item.answers.iteritems():
+                for _ in xrange(freq):
+                    yield u'%s (old)' % float(answer_str)
+        else:
+            answer_str = first_value_dict['answer_str'].decode('utf-8')
+            for _ in xrange(len(stringified_values)):
+                yield u'%s (new)' % float(answer_str)
+
+
 class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
 
     _KEY_PRINT_TOTAL_COUNT = 'print_total_count'
