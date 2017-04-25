@@ -45,7 +45,8 @@ oppia.directive('adminJobsTab', [
             });
           $http.get(adminJobOutputUrl).then(function(response) {
             $scope.showingJobOutput = true;
-            $scope.jobOutput = response.data.output;
+            $scope.jobOutput = response.data.output || [];
+            $scope.jobOutput.sort();
             $timeout(function() {
               document.querySelector('#job-output').scrollIntoView();
             });

@@ -227,7 +227,7 @@ oppia.factory('trainingDataService', [
       $rootScope, $http, responsesService, RULE_TYPE_CLASSIFIER,
       RuleObjectFactory) {
     var _trainingDataAnswers = [];
-    var _trainingDataCounts = [];
+    var _trainingDataFrequencies = [];
 
     var _getIndexOfTrainingData = function(answer, trainingData) {
       var index = -1;
@@ -304,7 +304,7 @@ oppia.factory('trainingDataService', [
 
       var index = _removeAnswerFromTrainingData(answer, _trainingDataAnswers);
       if (index !== -1) {
-        _trainingDataCounts.splice(index, 1);
+        _trainingDataFrequencies.splice(index, 1);
         $rootScope.$broadcast('updatedTrainingData');
       }
     };
@@ -316,11 +316,11 @@ oppia.factory('trainingDataService', [
         $http.get(trainingDataUrl).then(function(response) {
           var unhandledAnswers = response.data.unhandled_answers;
           _trainingDataAnswers = [];
-          _trainingDataCounts = [];
+          _trainingDataFrequencies = [];
           for (var i = 0; i < unhandledAnswers.length; i++) {
             var unhandledAnswer = unhandledAnswers[i];
-            _trainingDataAnswers.push(unhandledAnswer.value);
-            _trainingDataCounts.push(unhandledAnswer.count);
+            _trainingDataAnswers.push(unhandledAnswer.answer);
+            _trainingDataFrequencies.push(unhandledAnswer.frequency);
           }
           $rootScope.$broadcast('updatedTrainingData');
         });
@@ -330,8 +330,8 @@ oppia.factory('trainingDataService', [
         return _trainingDataAnswers;
       },
 
-      getTrainingDataCounts: function() {
-        return _trainingDataCounts;
+      getTrainingDataFrequencies: function() {
+        return _trainingDataFrequencies;
       },
 
       getAllPotentialOutcomes: function(state) {

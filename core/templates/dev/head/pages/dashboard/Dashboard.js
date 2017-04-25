@@ -187,7 +187,7 @@ oppia.controller('Dashboard', [
     $scope.topUnresolvedAnswersCount = function(exploration) {
       var topUnresolvedAnswersCount = 0;
       exploration.top_unresolved_answers.forEach(function(answer) {
-        topUnresolvedAnswersCount += answer.count;
+        topUnresolvedAnswersCount += answer.frequency;
       });
       return topUnresolvedAnswersCount;
     };
