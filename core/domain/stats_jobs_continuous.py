@@ -532,7 +532,7 @@ class InteractionAnswerSummariesMRJobManager(
             versioned_key = u'%s:%s:%s' % (
                 item.exploration_id, item.exploration_version, item.state_name)
             yield (versioned_key.encode('utf-8'), {
-                'item_id': item.id,
+                'state_answers_model_id': item.id,
                 'interaction_id': item.interaction_id,
                 'exploration_version': item.exploration_version
             })
@@ -543,7 +543,7 @@ class InteractionAnswerSummariesMRJobManager(
             all_versions_key = u'%s:%s:%s' % (
                 item.exploration_id, VERSION_ALL, item.state_name)
             yield (all_versions_key.encode('utf-8'), {
-                'item_id': item.id,
+                'state_answers_model_id': item.id,
                 'interaction_id': item.interaction_id,
                 'exploration_version': item.exploration_version
             })
@@ -563,10 +563,11 @@ class InteractionAnswerSummariesMRJobManager(
             for value_dict in value_dicts]))
         versions.sort(reverse=True)
 
-        # In half of the non-aggregated outputs from the map function, versions
-        # should be trivial since the answers are being mapped to specific
-        # versions.
-        if exploration_version != VERSION_ALL and len(versions) != 1:
+        # For answers mapped to specific versions, the versions list should only
+        # contain the version they correspond to. Otherwise, if they map to
+        # VERSION_ALL, then multiple versions may be included.
+        if exploration_version != VERSION_ALL and (
+                len(versions) != 1 or versions[0] != exploration_version):
             yield (
                 'Expected a single version when aggregating answers for '
                 'exploration %s (v=%s), but found: %s' % (
@@ -577,9 +578,9 @@ class InteractionAnswerSummariesMRJobManager(
         versioned_item_ids = {version: set() for version in versions}
         for value_dict in value_dicts:
             version = value_dict['exploration_version']
-            versioned_interaction_ids[version].update(
-                [value_dict['interaction_id']])
-            versioned_item_ids[version].update([value_dict['item_id']])
+            versioned_interaction_ids[version].add(value_dict['interaction_id'])
+            versioned_item_ids[version].add(
+                value_dict['state_answers_model_id'])
 
         # Convert the interaction IDs to a list so they may be easily indexed.
         versioned_interaction_ids = {
@@ -607,7 +608,7 @@ class InteractionAnswerSummariesMRJobManager(
         latest_version = versions[0]
         latest_interaction_id = versioned_interaction_ids[latest_version][0]
         # NOTE TO DEVELOPER: This skips the first version in the list since that
-        # interaction ID is already being compraed. Bear in mind that skipping
+        # interaction ID is already being compared. Bear in mind that skipping
         # the first version shifts all found indexes back by one, which is
         # intended here since the index found is the first index whose
         # interaction ID has changed, which means the version before that in the
@@ -617,20 +618,23 @@ class InteractionAnswerSummariesMRJobManager(
         # the map function). For this reason, all of this code is simply skipped
         # in that case in favor of performance.
         if len(versions) > 1:
-            start_version_index = next(
-                (index for index, version in enumerate(versions[1:])
-                 if (versioned_interaction_ids[version][0]
-                     != latest_interaction_id)),
-                len(versions) - 1)
-            start_version = versions[start_version_index]
+            indexes = [
+                index for index, version in enumerate(versions[1:])
+                if versioned_interaction_ids[version][0] != (
+                    latest_interaction_id)]
+            earliest_acceptable_version_index = (
+                indexes[0] if indexes else len(versions) - 1)
+            earliest_acceptable_version = versions[
+                earliest_acceptable_version_index]
             # Trim away anything related to the versions which correspond to
             # different or since changed interaction IDs.
             ignored_versions = [
-                version for version in versions if version < start_version]
+                version for version in versions
+                if version < earliest_acceptable_version]
             for ignored_version in ignored_versions:
                 del versioned_interaction_ids[ignored_version]
                 del versioned_item_ids[ignored_version]
-            versions = versions[0:start_version_index+1]
+            versions = versions[:earliest_acceptable_version_index+1]
 
         # Retrieve all StateAnswerModel entities associated with the remaining
         # item IDs which correspond to a single interaction ID shared among all

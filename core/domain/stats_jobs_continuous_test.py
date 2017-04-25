@@ -691,7 +691,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 'new_value': 'TextInput',
             }], 'Change to TextInput')
 
-            # Submit another numeber-like answer.
+            # Submit another number-like answer.
             event_services.AnswerSubmissionEventHandler.record(
                 exp_id, 3, init_state_name, 'TextInput', 0, 0,
                 exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
