@@ -618,12 +618,13 @@ class InteractionAnswerSummariesMRJobManager(
         # the map function). For this reason, all of this code is simply skipped
         # in that case in favor of performance.
         if len(versions) > 1:
-            indexes = [
-                index for index, version in enumerate(versions[1:])
+            invalid_version_indexes = [
+                index for index, version in enumerate(versions)
                 if versioned_interaction_ids[version][0] != (
                     latest_interaction_id)]
             earliest_acceptable_version_index = (
-                indexes[0] if indexes else len(versions) - 1)
+                invalid_version_indexes[0] - 1
+                if invalid_version_indexes else len(versions) - 1)
             earliest_acceptable_version = versions[
                 earliest_acceptable_version_index]
             # Trim away anything related to the versions which correspond to
