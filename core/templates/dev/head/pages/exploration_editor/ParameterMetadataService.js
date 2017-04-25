@@ -174,7 +174,7 @@ oppia.factory('parameterMetadataService', [
             }
           }
         });
-        
+
         // For each parameter, do a BFS to see if it's possible to get from
         // the start node to a node requiring this parameter, without passing
         // through any nodes that set this parameter.

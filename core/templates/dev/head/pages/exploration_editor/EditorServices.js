@@ -806,13 +806,13 @@ oppia.factory('explorationParamChangesService', [
 oppia.factory('explorationStatesService', [
   '$log', '$modal', '$filter', '$location', '$rootScope',
   'explorationInitStateNameService', 'alertsService', 'changeListService',
-  'editorContextService', 'validatorsService', 'newStateTemplateService',
-  'explorationGadgetsService', 'StatesObjectFactory',
+  'editorContextService', 'validatorsService', 'explorationGadgetsService',
+  'StatesObjectFactory',
   function(
       $log, $modal, $filter, $location, $rootScope,
       explorationInitStateNameService, alertsService, changeListService,
-      editorContextService, validatorsService, newStateTemplateService,
-      explorationGadgetsService, StatesObjectFactory) {
+      editorContextService, validatorsService, explorationGadgetsService,
+      StatesObjectFactory) {
     var _states = null;
     // Properties that have a different backend representation from the
     // frontend and must be converted.
@@ -1024,7 +1024,7 @@ oppia.factory('explorationStatesService', [
         if (deleteStateName === initStateName) {
           return;
         }
-        if (!_states.getState(deleteStateName)) {
+        if (!_states.hasState(deleteStateName)) {
           alertsService.addWarning(
             'No state with name ' + deleteStateName + ' exists.');
           return;
@@ -1103,7 +1103,7 @@ oppia.factory('explorationStatesService', [
         if (!validatorsService.isValidStateName(newStateName, true)) {
           return;
         }
-        if (_states.getState(newStateName)) {
+        if (_states.hasState(newStateName)) {
           alertsService.addWarning('A state with this name already exists.');
           return;
         }
@@ -1955,7 +1955,7 @@ oppia.factory('explorationWarningsService', [
             stateName: stateName
           });
         }
-      })
+      });
 
       return results;
     };
@@ -1991,7 +1991,7 @@ oppia.factory('explorationWarningsService', [
             }
           }
         }
-      })
+      });
 
       var statesWithoutInteractionIds = _getStatesWithoutInteractionIds();
       angular.forEach(statesWithoutInteractionIds, function(
