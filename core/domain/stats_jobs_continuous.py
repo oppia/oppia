@@ -607,16 +607,11 @@ class InteractionAnswerSummariesMRJobManager(
         # will refer to the most relevant answers.
         latest_version = versions[0]
         latest_interaction_id = versioned_interaction_ids[latest_version][0]
-        # NOTE TO DEVELOPER: This skips the first version in the list since that
-        # interaction ID is already being compared. Bear in mind that skipping
-        # the first version shifts all found indexes back by one, which is
-        # intended here since the index found is the first index whose
-        # interaction ID has changed, which means the version before that in the
-        # list is desired. If all interaction IDs are the same, then the last
-        # version is used. All of these operations no-op when versions is a list
-        # of 1 version, which happens for each individually mapped version (see
-        # the map function). For this reason, all of this code is simply skipped
-        # in that case in favor of performance.
+        # In the VERSION_ALL case, we only take into account the most recent
+        # consecutive block of versions with the same interaction ID as the
+        # current version, and ignore all versions prior to this block. This
+        # logic isn't needed for individually-mapped versions and, in that case,
+        # we skip all this code in favor of performance.
         if len(versions) > 1:
             invalid_version_indexes = [
                 index for index, version in enumerate(versions)
