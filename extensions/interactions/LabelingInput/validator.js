@@ -50,7 +50,7 @@ oppia.filter('oppiaInteractiveLabelingInputValidator', [
       var regionLabel = (
         customizationArgs.imageAndLabels.value.labeledRegions[i].label);
 
-      var ALPHANUMERIC_REGEX = /^[A-Za-z0-9]+$/;
+      var ALPHANUMERIC_REGEX = /^[A-Za-z0-9\s]+$/;
       if (regionLabel.trim().length === 0) {
         areAnyRegionStringsEmpty = true;
       } else if (!ALPHANUMERIC_REGEX.test(regionLabel)) {
@@ -58,7 +58,7 @@ oppia.filter('oppiaInteractiveLabelingInputValidator', [
           type: WARNING_TYPES.CRITICAL,
           message: (
             'The image region strings should consist of characters from ' +
-            '[A-Za-z0-9].')
+            '[A-Za-z0-9] and spaces.')
         });
       } else if (seenRegionStrings.indexOf(regionLabel) !== -1) {
         areAnyRegionStringsDuplicated = true;

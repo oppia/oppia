@@ -36,6 +36,8 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           var imageAndLabels = oppiaHtmlEscaper.escapedJsonToObj(
             $attrs.imageAndLabelsWithValue);
           $scope.imageTitle = $attrs.imageTitleWithValue;
+          $scope.drawLines = ($attrs.showLinesWithValue == 'true');
+          console.log($scope.drawLines);
           //Need to strip unicode
           var unicodeStripCount = 6;
           $scope.imageTitle = $scope.imageTitle.slice(unicodeStripCount)

@@ -38,6 +38,7 @@ oppia.directive('imageWithLabelsEditor', [
         $scope.list2 = {};
 
         $scope.alwaysEditable = true;
+        console.log($scope);
 
         $scope.REGION_LABEL_OFFSET_X = 6;
         $scope.REGION_LABEL_OFFSET_Y = 18;

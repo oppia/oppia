@@ -45,6 +45,7 @@
         ng-attr-y2="<[labeledRegion.region.area[0][1] * getImageHeight()]>"
         style="stroke:rgb(0,0,255);stroke-width:2"
         />
+        </line>
       <text ng-repeat="labeledRegion in $parent.$parent.value.labeledRegions"
         ng-attr-style="<[::REGION_LABEL_STYLE]>"
         ng-attr-x="<[labeledRegion.region.area[0][0] * getImageWidth() + REGION_LABEL_OFFSET_X]>"

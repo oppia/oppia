@@ -48,4 +48,11 @@ class LabelingInput(base.BaseInteraction):
         'schema': {
             'type': 'unicode'
         },
-        'default_value': ''}]
+        'default_value': ''},
+    {
+        'name': 'showLines',
+        'description': 'Show Lines on Image (Applies out of Interaction Editor)',
+        'schema': {
+            'type': 'bool'
+        },
+        'default_value': True}]

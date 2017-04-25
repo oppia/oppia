@@ -106,6 +106,7 @@
     </div>
   </div>
 
+  <div ng-if="drawLines">
   <div ng-repeat="region in allRegions"
   class="line"
   style="
@@ -118,6 +119,7 @@
     transform: rotate(<[convertArctan(region.startX, region.region.area[0][0] * getImageWidth(), region.startY, region.region.area[0][1] * getImageHeight())]>rad);
     transform-origin: 0% 0%;
   ">
+  </div>
   </div>
 </div>
 </script>
