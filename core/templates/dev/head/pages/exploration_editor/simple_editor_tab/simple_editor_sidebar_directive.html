@@ -20,6 +20,11 @@
         </div>
 
         <ul ng-show="question.isCollapsed()">
+          <li class="sidebar-item sidebar-item-indented">
+          <span>
+            <a><[questionType(question)]></a>
+          </span>
+          </li>
           <li class="sidebar-item sidebar-item-indented"
               ng-repeat="subfieldLabel in SUBFIELD_LABELS track by $index"
               ng-click="scrollToField(question, subfieldLabel)"
