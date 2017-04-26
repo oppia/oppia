@@ -18,8 +18,8 @@
  */
 
 oppia.factory('StatesObjectFactory', [
-  'StateObjectFactory', 'newStateTemplateService', 'INTERACTION_SPECS',
-  function(StateObjectFactory, newStateTemplateService, INTERACTION_SPECS) {
+  'StateObjectFactory', 'INTERACTION_SPECS',
+  function(StateObjectFactory, INTERACTION_SPECS) {
     var States = function(states) {
       this._states = states;
     };
@@ -36,8 +36,7 @@ oppia.factory('StatesObjectFactory', [
       return angular.copy(this._states);
     };
     States.prototype.addState = function(newStateName) {
-      this._states[newStateName] = newStateTemplateService.getNewStateTemplate(
-        newStateName);
+      this._states[newStateName] = getNewStateTemplate(newStateName);
     };
     States.prototype.setState = function(stateName, stateData) {
       this._states[stateName] = angular.copy(stateData);
@@ -74,7 +73,6 @@ oppia.factory('StatesObjectFactory', [
       delete this._states[oldStateName];
 
       for (var otherStateName in this._states) {
-        console.log(angular.copy(this._states));
         var interaction = this._states[otherStateName].interaction;
         var groups = interaction.answerGroups;
         for (var i = 0; i < groups.length; i++) {
@@ -118,6 +116,18 @@ oppia.factory('StatesObjectFactory', [
       }
       return new States(stateObjectsDict);
     };
+
+    var getNewStateTemplate = function(newStateName) {
+      var newStateTemplate = angular.copy(GLOBALS.NEW_STATE_TEMPLATE);
+      var newState = StateObjectFactory.createFromBackendDict(newStateName, {
+        classifier_model_id: newStateTemplate.classifier_model_id,
+        content: newStateTemplate.content,
+        interaction: newStateTemplate.interaction,
+        param_changes: newStateTemplate.param_changes
+      });
+      newState.interaction.defaultOutcome.dest = newStateName;
+      return newState;
+    }
 
     return States;
   }

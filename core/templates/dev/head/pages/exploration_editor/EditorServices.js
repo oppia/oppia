@@ -807,12 +807,12 @@ oppia.factory('explorationStatesService', [
   '$log', '$modal', '$filter', '$location', '$rootScope',
   'explorationInitStateNameService', 'alertsService', 'changeListService',
   'editorContextService', 'validatorsService', 'explorationGadgetsService',
-  'newStateTemplateService', 'StatesObjectFactory',
+  'StatesObjectFactory',
   function(
       $log, $modal, $filter, $location, $rootScope,
       explorationInitStateNameService, alertsService, changeListService,
       editorContextService, validatorsService, explorationGadgetsService,
-      newStateTemplateService, StatesObjectFactory) {
+      StatesObjectFactory) {
     var _states = null;
     // Properties that have a different backend representation from the
     // frontend and must be converted.
@@ -1637,29 +1637,6 @@ oppia.factory('explorationGadgetsService', [
         $rootScope.$broadcast('gadgetsChangedOrInitialized');
 
         changeListService.renameGadget(oldGadgetName, newGadgetName);
-      }
-    };
-  }
-]);
-
-// A service that returns the frontend representation of a newly-added state.
-oppia.factory('newStateTemplateService', [
-  'StateObjectFactory', function(StateObjectFactory) {
-    return {
-      // Returns a template for the new state with the given state name,
-      // changing the default rule destination to the new state name in
-      // the process.
-      // NB: clients should ensure that the desired state name is valid.
-      getNewStateTemplate: function(newStateName) {
-        var newStateTemplate = angular.copy(GLOBALS.NEW_STATE_TEMPLATE);
-        var newState = StateObjectFactory.createFromBackendDict(newStateName, {
-          classifier_model_id: newStateTemplate.classifier_model_id,
-          content: newStateTemplate.content,
-          interaction: newStateTemplate.interaction,
-          param_changes: newStateTemplate.param_changes
-        });
-        newState.interaction.defaultOutcome.dest = newStateName;
-        return newState;
       }
     };
   }

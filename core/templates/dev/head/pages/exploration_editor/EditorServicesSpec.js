@@ -832,38 +832,5 @@ describe('New state template service', function() {
       };
       nsts = $injector.get('newStateTemplateService');
     }));
-
-    it('should make a new state template given a state name', function() {
-      expect(JSON.parse(JSON.stringify(
-          nsts.getNewStateTemplate(NEW_STATE_NAME)
-        ))).toEqual({
-          name: 'new state name',
-          classifierModelId: null,
-          content: [{
-            type: 'text',
-            value: ''
-          }],
-          interaction: {
-            answerGroups: [],
-            confirmedUnclassifiedAnswers: [],
-            customizationArgs: {
-              rows: {
-                value: 1
-              },
-              placeholder: {
-                value: 'Type your answer here.'
-              }
-            },
-            defaultOutcome: {
-              dest: NEW_STATE_NAME,
-              feedback: [],
-              paramChanges: []
-            },
-            fallbacks: [],
-            id: 'TextInput'
-          },
-          paramChanges: []
-        });
-    });
   });
 });
