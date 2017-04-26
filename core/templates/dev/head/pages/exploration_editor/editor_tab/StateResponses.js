@@ -633,6 +633,8 @@ oppia.controller('StateResponses', [
                 rulesService).then(
                     function(classificationResult) {
                   var feedback = 'Nothing';
+                  console.log("HERE");
+                  console.log(classificationResult);
                   var dest = classificationResult.outcome.dest;
                   if (classificationResult.outcome.feedback.length > 0) {
                     feedback = classificationResult.outcome.feedback[0];

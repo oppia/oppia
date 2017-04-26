@@ -55,8 +55,10 @@ oppia.directive('oppiaInteractiveLabelingInput', [
               '/' + encodeURIComponent($scope.filepath)) : null);
           $scope.mouseX = 0;
           $scope.mouseY = 0;
+          $scope.submitted = 0;
           $scope.correctElements = [];
           $scope.incorrectElements = [];
+          $scope.incorrectBoxes = [];
           $scope.currentDraggedElement = "";
           $scope.currentlyHoveredRegions = [];
           $scope.allRegions = imageAndLabels.labeledRegions;
@@ -69,7 +71,12 @@ oppia.directive('oppiaInteractiveLabelingInput', [
             index = $scope.incorrectElements.indexOf(name);
             if (index > -1){
               $scope.incorrectElements.splice(index, 1);
+              $scope.incorrectBoxes.splice(index, 1);
             }
+            // index = $scope.incorrectBoxes.indexOf(name);
+            // if (index > -1){
+            //   $scope.incorrectBoxes.splice(index, 1);
+            // }
             return;
           }
           //Get the current element label
@@ -80,6 +87,7 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           }
           //If all labels have been placed, run a correctness check
           $scope.runSubmitCheck = function(){
+            $scope.submitted = 1;
             $scope.onSubmit({
               answer: {
                 clickPosition: [$scope.mouseX, $scope.mouseY],
@@ -95,6 +103,7 @@ oppia.directive('oppiaInteractiveLabelingInput', [
               $scope.correctElements.push($scope.currentDraggedElement);
             } else {
               $scope.incorrectElements.push($scope.currentDraggedElement);
+              $scope.incorrectBoxes.push(correctName);
             }
             var correctLen = $scope.correctElements.length;
             var incorrectLen = $scope.incorrectElements.length;
@@ -168,6 +177,24 @@ oppia.directive('oppiaInteractiveLabelingInput', [
               }
             }
           };
+
+          $scope.getRValue = function(region){
+            //Get the region it is in and not the label
+            console.log(region);
+            if (!$scope.submitted){
+              return 0;
+            }
+            return 255 * ($scope.incorrectBoxes.indexOf(region.label) !== -1);
+          }
+
+          $scope.getBValue = function(region){
+            console.log(region);
+            console.log($scope);
+            if (!$scope.submitted){
+              return 255;
+            }
+            return 255 * ($scope.incorrectBoxes.indexOf(region.label) === -1);
+          }
         
           //TODO: Delete below
           $scope.onClickImage = function() {
@@ -228,8 +255,12 @@ oppia.factory('imageClickInputRulesService', [function() {
     GetsAllCorrect: function(answer, inputs){
       return answer.incorrectElements.length === 0;
     },
+    HasMultipleMisses: function(answer, inputs){
+      return answer.incorrectElements.length >= 2;
+    },
     Misses: function(answer, inputs){
       return answer.incorrectElements.indexOf(inputs.x) !== -1;
     }
+
   };
 }]);

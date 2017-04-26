@@ -100,7 +100,7 @@
              pointer-events: none;
              position: absolute;
              display: <[getInlineDisplay()]>;
-             background: rgba(0,0,255,0.5);
+             background: rgba(<[getRValue(region)]>,0,<[getBValue(region)]>,0.5);
              z-index: 10;
           ">
     </div>
@@ -115,7 +115,7 @@
     width: <[getLineDistance(region.startX, region.region.area[0][0] * getImageWidth(), region.startY, region.region.area[0][1] * getImageHeight())]>px;
     height: 2px;
     position: absolute;
-    background: rgba(0,0,255,0.5);
+    background: rgba(<[getRValue(region)]>,0,<[getBValue(region)]>,0.5);
     transform: rotate(<[convertArctan(region.startX, region.region.area[0][0] * getImageWidth(), region.startY, region.region.area[0][1] * getImageHeight())]>rad);
     transform-origin: 0% 0%;
   ">
