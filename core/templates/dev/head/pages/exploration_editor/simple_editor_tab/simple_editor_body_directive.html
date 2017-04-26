@@ -15,8 +15,8 @@
       </editor-html-field>
 
       <div ng-repeat="question in data.questionList.getQuestions() track by $index">
-        <anchor-header header-id="question.getId()" header-text="Question <[$index +1]>"></anchor-header>
 
+        <anchor-header header-id="question.getId()" header-text="Question <[$index +1]>"></anchor-header>
         <multiple-choice-editor ng-if="question.getInteractionId() === 'MultipleChoiceInput'"
                                 unique-id="question.getId()"
                                 customization-args="question.getInteractionCustomizationArgs()"
@@ -28,6 +28,18 @@
                                 add-state="addState()">
         </multiple-choice-editor>
 
+        <check-box-editor ng-if="question.getInteractionId() === 'ItemSelectionInput'"
+                                unique-id="question.getId()"
+                                customization-args="question.getInteractionCustomizationArgs()"
+                                answer-groups="question.getAnswerGroups()"
+                                default-outcome="question.getDefaultOutcome()"
+                                save-customization-args="saveCustomizationArgs(question.getStateName(), newValue)"
+                                save-answer-groups="saveAnswerGroups(question.getStateName(), newValue)"
+                                save-default-outcome="saveDefaultOutcome(question.getStateName(), newValue)"
+                                add-state="addState()">
+        </check-box-editor>
+
+
         <!-- TODO(sll): Update this condition when control of individual field visibility is added. -->
         <div ng-if="!$last">
           <anchor-header header-id="getSubfieldId(question, 'Bridge text')"
@@ -37,16 +49,23 @@
           </editor-html-field>
         </div>
       </div>
+
+      <div ng-show="chooseQuestionType" class="question-type-wrapper" ng-if="canAddNewQuestion()">
+        <button type="button" class="oppia-question-button btn btn-primary" ng-click="addNewQuestion('multiple');">Multiple Choice Input</button>
+        <button type="button" class="oppia-question-button btn btn-primary" ng-click="addNewQuestion('itemSelection');">Check Box</button>
+      </div>
+
     </div>
 
     <div class="advance-btn-wrapper">
       <span class="advance-btn-description" ng-show="advBtnHovered">Add new question</span>
       <button ng-disabled="!canAddNewQuestion()" type="button"
-              class="btn btn-default advance-btn" ng-click="addNewQuestion(); advBtnHovered = false"
+              class="btn btn-default advance-btn" ng-click="advBtnHovered = false; chooseQuestionType = true;"
               ng-mouseenter="advBtnHovered = true" ng-mouseleave="advBtnHovered = false">
         <i class="material-icons md-30">&#xE5CF;</i>
       </button>
     </div>
+
     <div class="advance-btn-wrapper end-exploration-btn-wrapper">
       <span class="advance-btn-description" ng-show="finishBtnHovered">Finish exploration</span>
       <button ng-show="canTryToFinishExploration()" ng-disabled="!isExplorationFinishable()" type="button"
@@ -132,5 +151,20 @@
     margin-right: -100%;
     text-align: center;
     text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+  }
+  simple-editor-body .question-type-wrapper {
+    margin: 24px auto 20px auto;
+    width: 420px;
+  }
+  simple-editor-body .oppia-question-button {
+    background-color: #fff;
+    border-color: #009688;
+    border-width: 2px;
+    color: #009688;
+    height: 49px;
+  }
+  simple-editor-body .oppia-question-button:hover,.oppia-question-button:focus {
+    background-color: #009688;
+    border-color: #009688;
   }
 </style>

@@ -30,7 +30,7 @@ oppia.directive('simpleEditorSidebar', [function() {
            */
           Ps.initialize(document.querySelector('simple-editor-sidebar'));
           $scope.SUBFIELD_LABELS = [
-            'Multiple choice', 'Correct answer', 'Hints', 'Bridge text'];
+            'Correct answer', 'Hints', 'Bridge text'];
           $scope.questionList = SimpleEditorManagerService.getQuestionList();
           $scope.ID_PREFIX = QuestionIdService.SIDEBAR_PREFIX;
           $scope.getSidebarItemId = function(question, subfieldLabel) {
@@ -38,6 +38,16 @@ oppia.directive('simpleEditorSidebar', [function() {
               question.getId(), subfieldLabel
             );
           };
+          $scope.questionType = function(question) {
+            if(question._interactionId==="ItemSelectionInput"){
+              return "Item Selection Input";
+            }
+            else if(question._interactionId==="MultipleChoiceInput"){
+              return "Multiple Choice Input";
+            }
+          };
+
+
           $scope.scrollToField = function(question, subfieldLabel) {
             ScrollSyncService.scrollTo(
               QuestionIdService.getSubfieldId(
