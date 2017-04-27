@@ -18,10 +18,10 @@
  */
 
 oppia.directive('adminProdModeActivitiesTab', [
-  function() {
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      templateUrl: 'admin/activitiesTabProdMode'
+      templateUrl: UrlInterpolationService.getComponentUrl('admin/activitiesTabProdMode')
     };
   }
 ]);
