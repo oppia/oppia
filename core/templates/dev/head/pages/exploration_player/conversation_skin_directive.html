@@ -108,7 +108,8 @@
         </div>
       </div>
 
-      <div ng-if="collectionSummary && recommendedExplorationSummaries.length === 0">
+      <div ng-if="collectionSummary && recommendedExplorationSummaries.
+      length === 0">
         <span class="conversation-skin-final-recommendations-header"
               translate="I18N_PLAYER_RETURN_TO_COLLECTION"
               translate-values="{collectionTitle: collectionSummary.title}">
@@ -126,8 +127,7 @@
         </div>
           <div class="conversation-skin-back-to-collection">
             <a href="/core/templates/dev/head/pages/collection_player/collection_player.html"><span class="conversation-skin-back-to-collection-header" 
-                  translate="I18N_PLAYER_BACK_TO_COLLECTION">
-            </span></a>
+                  translate="I18N_PLAYER_BACK_TO_COLLECTION">Back to collection page</span></a>
           </div>
       </div>
     </div>
@@ -171,12 +171,12 @@
     }
 
     .conversation-skin-back-to-collection{
-      margin-top: 25px;
+      margin-bottom: 2cm;
       text-align: center;
     }
     .conversation-skin-back-to-collection-header{
       color: #064b46;
-      font-size: 100%;
+      font-size: 120%;
     }
 
     .conversation-skin-bottom-gadget-panel {
