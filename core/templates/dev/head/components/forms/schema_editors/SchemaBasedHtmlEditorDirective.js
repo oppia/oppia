@@ -16,7 +16,8 @@
  * @fileoverview Directive for a schema-based editor for HTML.
  */
 
-oppia.directive('schemaBasedHtmlEditor', [function() {
+oppia.directive('schemaBasedHtmlEditor', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
   return {
     scope: {
       localValue: '=',
@@ -25,7 +26,7 @@ oppia.directive('schemaBasedHtmlEditor', [function() {
       labelForFocusTarget: '&',
       uiConfig: '&'
     },
-    templateUrl: 'schemaBasedEditor/html',
+    templateUrl: UrlInterpolationService.getComponentUrl('schemaBasedEditor/html'),
     restrict: 'E'
   };
 }]);
