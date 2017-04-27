@@ -16,7 +16,8 @@
  * @fileoverview Directive for a schema-based editor for integers.
  */
 
-oppia.directive('schemaBasedIntEditor', [function() {
+oppia.directive('schemaBasedIntEditor', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
   return {
     scope: {
       localValue: '=',
@@ -27,7 +28,7 @@ oppia.directive('schemaBasedIntEditor', [function() {
       onInputBlur: '=',
       onInputFocus: '='
     },
-    templateUrl: 'schemaBasedEditor/int',
+    templateUrl: UrlInterpolationService.getComponentUrl('schemaBasedEditor/int'),
     restrict: 'E',
     controller: [
       '$scope', 'parameterSpecsService',
