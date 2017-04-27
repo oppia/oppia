@@ -17,7 +17,8 @@
  */
 
 oppia.directive('schemaBasedDictEditor', [
-  'recursionHelper', function(recursionHelper) {
+  'recursionHelper', 'UrlInterpolationService',
+  function(recursionHelper, UrlInterpolationService) {
     return {
       scope: {
         localValue: '=',
@@ -28,7 +29,7 @@ oppia.directive('schemaBasedDictEditor', [
         allowExpressions: '&',
         labelForFocusTarget: '&'
       },
-      templateUrl: 'schemaBasedEditor/dict',
+      templateUrl: UrlInterpolationService.getComponentUrl('schemaBasedEditor/dict'),
       restrict: 'E',
       compile: recursionHelper.compile,
       controller: [
