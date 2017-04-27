@@ -16,7 +16,8 @@
  * @fileoverview Directive for general schema-based editors.
  */
 
-oppia.directive('schemaBasedEditor', [function() {
+oppia.directive('schemaBasedEditor', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
   return {
     scope: {
       schema: '&',
@@ -27,7 +28,7 @@ oppia.directive('schemaBasedEditor', [function() {
       onInputBlur: '=',
       onInputFocus: '='
     },
-    templateUrl: 'schemaBasedEditor/master',
+    templateUrl: UrlInterpolationService.getComponentUrl('schemaBasedEditor/master'),
     restrict: 'E'
   };
 }]);
