@@ -28,7 +28,7 @@ oppia.directive('adminDevModeActivitiesTab', [
         setStatusMessage: '='
       },
       templateUrl: UrlInterpolationService.getComponentUrl(
-                   '/admin/activities_tab/admin_dev_mode_activities_tab_directive.html'),
+        '/admin/activities_tab/admin_dev_mode_activities_tab_directive.html'),
       controller: ['$scope', function($scope) {
         $scope.reloadExploration = function(explorationId) {
           if (AdminTaskManagerService.isTaskRunning()) {

@@ -28,7 +28,8 @@ oppia.directive('schemaBasedExpressionEditor', [
         labelForFocusTarget: '&'
       },
       templateUrl: UrlInterpolationService.getComponentUrl(
-          '/forms/schema_editors/Schema_based_expression_editor_directive.html'),
+        '/forms/schema_editors/Schema_based_expression_editor_directive.html'
+        ),
       restrict: 'E'
     };
   }]);
