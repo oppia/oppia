@@ -17,7 +17,7 @@
  */
 
 oppia.directive('schemaBasedUnicodeEditor', [
-  function() {
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       scope: {
         localValue: '=',
@@ -29,7 +29,7 @@ oppia.directive('schemaBasedUnicodeEditor', [
         onInputBlur: '=',
         onInputFocus: '='
       },
-      templateUrl: 'schemaBasedEditor/unicode',
+      templateUrl: UrlInterpolationService.getComponentUrl('schemaBasedEditor/unicode'),
       restrict: 'E',
       controller: [
         '$scope', '$filter', '$sce', 'parameterSpecsService',
