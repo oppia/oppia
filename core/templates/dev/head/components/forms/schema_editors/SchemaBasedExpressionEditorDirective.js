@@ -16,7 +16,8 @@
  * @fileoverview Directive for a schema-based editor for expressions.
  */
 
-oppia.directive('schemaBasedExpressionEditor', [function() {
+oppia.directive('schemaBasedExpressionEditor', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
   return {
     scope: {
       localValue: '=',
@@ -26,7 +27,7 @@ oppia.directive('schemaBasedExpressionEditor', [function() {
       outputType: '&',
       labelForFocusTarget: '&'
     },
-    templateUrl: 'schemaBasedEditor/expression',
+    templateUrl: UrlInterpolationService.getComponentUrl('schemaBasedEditor/expression'),
     restrict: 'E'
   };
 }]);
