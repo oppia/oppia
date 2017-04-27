@@ -17,14 +17,15 @@
  */
 
 oppia.directive('schemaBasedCustomEditor', [
-  'recursionHelper', function(recursionHelper) {
+  'recursionHelper', 'UrlInterpolationService',
+  function(recursionHelper, UrlInterpolationService) {
     return {
       scope: {
         localValue: '=',
         // The class of the object being edited.
         objType: '='
       },
-      templateUrl: 'schemaBasedEditor/custom',
+      templateUrl: UrlInterpolationService.getComponentUrl('schemaBasedEditor/custom'),
       restrict: 'E',
       compile: recursionHelper.compile
     };
