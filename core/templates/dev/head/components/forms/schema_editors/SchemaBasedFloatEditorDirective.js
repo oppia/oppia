@@ -16,7 +16,8 @@
  * @fileoverview Directive for a schema-based editor for floats.
  */
 
-oppia.directive('schemaBasedFloatEditor', [function() {
+oppia.directive('schemaBasedFloatEditor', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
   return {
     scope: {
       localValue: '=',
@@ -27,7 +28,7 @@ oppia.directive('schemaBasedFloatEditor', [function() {
       onInputBlur: '=',
       onInputFocus: '='
     },
-    templateUrl: 'schemaBasedEditor/float',
+    templateUrl: UrlInterpolationService.getComponentUrl('schemaBasedEditor/float'),
     restrict: 'E',
     controller: [
       '$scope', '$filter', '$timeout', 'parameterSpecsService',
