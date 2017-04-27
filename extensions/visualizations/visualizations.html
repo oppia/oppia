@@ -1,0 +1,17 @@
+<script type="text/ng-template" id="visualizations/BarChart">
+  <div></div>
+</script>
+
+<script type="text/ng-template" id="visualizations/FrequencyTable">
+  <b><[options.title]></b>
+  <table class="table">
+    <tr>
+      <th><[options.column_headers[0]]></th>
+      <th><[options.column_headers[1]]></th>
+    </tr>
+    <tr ng-repeat="row in data">
+      <td><[row.answer]></td>
+      <td><[row.frequency]></td>
+    </tr>
+  </table>
+</script>
