@@ -27,7 +27,7 @@ oppia.directive('schemaBasedHtmlEditor', [
         uiConfig: '&'
       },
       templateUrl: UrlInterpolationService.getComponentUrl(
-                   '/schemaBasedEditor/html'),
+          '/forms/schema_editors/Schema_based_html_editor_directive.html'),
       restrict: 'E'
     };
   }]);

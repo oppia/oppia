@@ -26,7 +26,7 @@ oppia.directive('schemaBasedCustomEditor', [
         objType: '='
       },
       templateUrl: UrlInterpolationService.getComponentUrl(
-                   '/schemaBasedEditor/custom'),
+            '/forms/schema_editors/Schema_based_custom_editor_directive.html'),
       restrict: 'E',
       compile: recursionHelper.compile
     };

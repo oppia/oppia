@@ -22,7 +22,7 @@ oppia.directive('adminProdModeActivitiesTab', [
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getComponentUrl(
-                   '/admin/activitiesTabProdMode')
+                   '/admin/activities_tab/admin_prod_mode_activities_tab_directive.html')
     };
   }
 ]);
