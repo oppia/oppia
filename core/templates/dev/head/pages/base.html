@@ -109,6 +109,7 @@
         SYSTEM_USERNAMES: JSON.parse('{{SYSTEM_USERNAMES|js_string}}'),
         SUPPORTED_SITE_LANGUAGES: JSON.parse(
           '{{SUPPORTED_SITE_LANGUAGES|js_string}}'),
+        TEMPLATE_DIR_PREFIX: JSON.parse('{{TEMPLATE_DIR_PREFIX|js_string}}'),
         isAdmin: JSON.parse('{{is_admin|js_string}}'),
         isModerator: JSON.parse('{{is_moderator|js_string}}'),
         isSuperAdmin: JSON.parse('{{is_super_admin|js_string}}'),
@@ -205,7 +206,6 @@
 
     {% include 'pages/footer_js_libs.html' %}
 
-    {% include 'components/background/background_banner_directive.html' %}
     {% include 'components/create_button/create_activity_button_directive.html' %}
 
     {% include 'components/forms/form_builder_templates.html' %}

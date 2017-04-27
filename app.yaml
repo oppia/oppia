@@ -59,6 +59,13 @@ handlers:
   static_files: core/templates/dev/head/\1
   upload: core/templates/dev/head/(.*\.(js))$
   secure: always
+- url: /templates/dev/head/components/(.*\.(html))$
+  static_files: core/templates/dev/head/components/\1
+  upload: core/templates/dev/head/components/(.*\.(html))$
+  # TODO(vojtechjelinek): Remove application_readable after all
+  # components are referenced directly by URL
+  application_readable: true
+  secure: always
 - url: /third_party/static
   static_dir: third_party/static
   secure: always
