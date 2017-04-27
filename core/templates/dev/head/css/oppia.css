@@ -858,6 +858,13 @@ textarea {
     margin-top: 0;
     margin-left: 5px;
   }
+  ul.nav.navbar-nav.oppia-navbar-nav.navbar-right {
+    display: flex;
+    float: right;
+    margin: 0;
+  }
+}
+@media(max-width: 651px) {
   .navbar-nav.oppia-navbar-nav > li > a {
     display: none;
   }
