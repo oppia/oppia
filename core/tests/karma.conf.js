@@ -12,11 +12,7 @@ module.exports = function(config) {
     files: [
       'core/tests/karma-globals.js',
       // Constants must be loaded before everything else.
-      {
-        pattern: 'assets/constants.json',
-        included: false
-      },
-      'core/tests/karma-constants.js',
+      'assets/constants.js',
       // Since jquery,jquery-ui,angular,angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.0.0/jquery.min.js',

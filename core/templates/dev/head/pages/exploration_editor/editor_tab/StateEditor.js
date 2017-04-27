@@ -41,7 +41,7 @@ oppia.controller('StateEditor', [
     $scope.isInteractionShown = false;
 
     $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
-      '/avatar/oppia_black_72px.png');
+      '/avatar/oppia_avatar_100px.svg');
 
     $scope.isCurrentStateInitialState = function() {
       return (
@@ -141,12 +141,16 @@ oppia.factory('trainingModalService', [
           templateUrl: 'modals/trainUnresolvedAnswer',
           backdrop: true,
           controller: [
-            '$scope', '$modalInstance', 'explorationStatesService',
-            'editorContextService', 'AnswerClassificationService',
-            'explorationContextService', 'oppiaPlayerService',
-            function($scope, $modalInstance, explorationStatesService,
-                editorContextService, AnswerClassificationService,
-                explorationContextService, oppiaPlayerService) {
+            '$scope', '$injector', '$modalInstance',
+            'explorationStatesService', 'editorContextService',
+            'AnswerClassificationService', 'explorationContextService',
+            'stateInteractionIdService', 'angularNameService',
+            'oppiaPlayerService'
+            function($scope, $injector, $modalInstance,
+                explorationStatesService, editorContextService,
+                AnswerClassificationService, explorationContextService,
+                stateInteractionIdService, angularNameService,
+                oppiaPlayerService) {
               $scope.trainingDataAnswer = '';
               $scope.trainingDataFeedback = '';
               $scope.trainingDataOutcomeDest = '';
@@ -171,9 +175,18 @@ oppia.factory('trainingModalService', [
                   editorContextService.getActiveStateName();
                 var state = explorationStatesService.getState(currentStateName);
 
+                // Retrieve the interaction ID.
+                var interactionId = stateInteractionIdService.savedMemento;
+
+                var rulesServiceName = 
+                  angularNameService.getNameOfInteractionRulesService(
+                    interactionId)
+
+                // Inject RulesService dynamically.
+                var rulesService = $injector.get(rulesServiceName);
+
                 AnswerClassificationService.getMatchingClassificationResult(
-                  explorationId, explorationVersion, currentStateName,
-                  state, unhandledAnswer, true)
+                  explorationId, state, unhandledAnswer, true, rulesService)
                   .then(function(classificationResult) {
                     var feedback = 'Nothing';
                     var dest = classificationResult.outcome.dest;
@@ -219,7 +232,7 @@ oppia.factory('trainingDataService', [
       $rootScope, $http, responsesService, RULE_TYPE_CLASSIFIER,
       RuleObjectFactory) {
     var _trainingDataAnswers = [];
-    var _trainingDataCounts = [];
+    var _trainingDataFrequencies = [];
 
     var _getIndexOfTrainingData = function(answer, trainingData) {
       var index = -1;
@@ -296,7 +309,7 @@ oppia.factory('trainingDataService', [
 
       var index = _removeAnswerFromTrainingData(answer, _trainingDataAnswers);
       if (index !== -1) {
-        _trainingDataCounts.splice(index, 1);
+        _trainingDataFrequencies.splice(index, 1);
         $rootScope.$broadcast('updatedTrainingData');
       }
     };
@@ -308,11 +321,11 @@ oppia.factory('trainingDataService', [
         $http.get(trainingDataUrl).then(function(response) {
           var unhandledAnswers = response.data.unhandled_answers;
           _trainingDataAnswers = [];
-          _trainingDataCounts = [];
+          _trainingDataFrequencies = [];
           for (var i = 0; i < unhandledAnswers.length; i++) {
             var unhandledAnswer = unhandledAnswers[i];
-            _trainingDataAnswers.push(unhandledAnswer.value);
-            _trainingDataCounts.push(unhandledAnswer.count);
+            _trainingDataAnswers.push(unhandledAnswer.answer);
+            _trainingDataFrequencies.push(unhandledAnswer.frequency);
           }
           $rootScope.$broadcast('updatedTrainingData');
         });
@@ -322,8 +335,8 @@ oppia.factory('trainingDataService', [
         return _trainingDataAnswers;
       },
 
-      getTrainingDataCounts: function() {
-        return _trainingDataCounts;
+      getTrainingDataFrequencies: function() {
+        return _trainingDataFrequencies;
       },
 
       getAllPotentialOutcomes: function(state) {

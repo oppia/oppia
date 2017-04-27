@@ -107,7 +107,10 @@
     </table>
     <div ng-show="showingJobOutput" id="job-output">
       <h4>Job Output</h4>
-      <p><[jobOutput]></p>
+      <ul ng-if="jobOutput.length != 0">
+        <li ng-repeat="output in jobOutput track by $index"><[output]></li>
+      </ul>
+      <em ng-if="jobOutput.length == 0">None</em>
     </div>
   </md-card>
 </script>

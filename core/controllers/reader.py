@@ -251,36 +251,35 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         # The reader's answer.
         answer = self.payload.get('answer')
         # Parameters associated with the learner.
-        old_params = self.payload.get('params', {})
-        old_params['answer'] = answer
+        params = self.payload.get('params', {})
         # The version of the exploration.
         version = self.payload.get('version')
+        session_id = self.payload.get('session_id')
+        client_time_spent_in_secs = self.payload.get(
+            'client_time_spent_in_secs')
         # The answer group and rule spec indexes, which will be used to get
         # the rule spec string.
         answer_group_index = self.payload.get('answer_group_index')
         rule_spec_index = self.payload.get('rule_spec_index')
+        classification_categorization = self.payload.get(
+            'classification_categorization')
 
         exploration = exp_services.get_exploration_by_id(
             exploration_id, version=version)
 
         old_interaction = exploration.states[old_state_name].interaction
 
-        if answer_group_index == len(old_interaction.answer_groups):
-            rule_spec_string = exp_domain.DEFAULT_RULESPEC_STR
-        else:
-            rule_spec_string = (
-                old_interaction.answer_groups[answer_group_index].rule_specs[
-                    rule_spec_index].stringify_classified_rule())
-
         old_interaction_instance = (
             interaction_registry.Registry.get_interaction_by_id(
                 old_interaction.id))
+
         normalized_answer = old_interaction_instance.normalize_answer(answer)
-        # TODO(sll): Should this also depend on `params`?
+
         event_services.AnswerSubmissionEventHandler.record(
-            exploration_id, version, old_state_name, rule_spec_string,
-            old_interaction_instance.get_stats_log_html(
-                old_interaction.customization_args, normalized_answer))
+            exploration_id, version, old_state_name,
+            exploration.states[old_state_name].interaction.id,
+            answer_group_index, rule_spec_index, classification_categorization,
+            session_id, client_time_spent_in_secs, params, normalized_answer)
         self.render_json({})
 
 

@@ -75,9 +75,6 @@ oppia.directive('collectionEditorNavbar', [function() {
               $scope.collectionRights.setPublic();
               CollectionEditorStateService.setCollectionRights(
                 $scope.collectionRights);
-            }, function() {
-              alertsService.addWarning(
-                'There was an error when publishing the collection.');
             });
         };
 
