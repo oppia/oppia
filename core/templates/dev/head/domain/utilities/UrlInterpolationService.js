@@ -181,6 +181,11 @@ oppia.factory('UrlInterpolationService', [
         validateResourcePath(componentPath);
         return GLOBALS.TEMPLATE_DIR_PREFIX + '/components' + componentPath;
       }
+
+      getPagesUrl: function(pagesPath) {
+        validateResourcePath(pagesPath);
+        return GLOBALS.TEMPLATE_DIR_PREFIX + '/pages' + pagesPath;
+      }
     };
   }
 ]);

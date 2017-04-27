@@ -27,7 +27,7 @@ oppia.directive('adminJobsTab', [
       scope: {
         setStatusMessage: '='
       },
-      templateUrl: UrlInterpolationService.getComponentUrl(
+      templateUrl: UrlInterpolationService.getPagesUrl(
         '/admin/jobs_tab/admin_jobs_tab_directive.html'),
       controller: ['$scope', function($scope) {
         $scope.HUMAN_READABLE_CURRENT_TIME = (
