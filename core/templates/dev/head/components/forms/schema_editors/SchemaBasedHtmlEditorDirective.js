@@ -18,15 +18,16 @@
 
 oppia.directive('schemaBasedHtmlEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
-  return {
-    scope: {
-      localValue: '=',
-      isDisabled: '&',
-      allowExpressions: '&',
-      labelForFocusTarget: '&',
-      uiConfig: '&'
-    },
-    templateUrl: UrlInterpolationService.getComponentUrl('schemaBasedEditor/html'),
-    restrict: 'E'
-  };
-}]);
+    return {
+      scope: {
+        localValue: '=',
+        isDisabled: '&',
+        allowExpressions: '&',
+        labelForFocusTarget: '&',
+        uiConfig: '&'
+      },
+      templateUrl: UrlInterpolationService.getComponentUrl(
+                   'schemaBasedEditor/html'),
+      restrict: 'E'
+    };
+  }]);

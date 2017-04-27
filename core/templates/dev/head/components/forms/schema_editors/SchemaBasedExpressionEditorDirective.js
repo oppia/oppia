@@ -18,16 +18,17 @@
 
 oppia.directive('schemaBasedExpressionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
-  return {
-    scope: {
-      localValue: '=',
-      isDisabled: '&',
-      // TODO(sll): Currently only takes a string which is either 'bool', 'int'
-      // or 'float'. May need to generalize.
-      outputType: '&',
-      labelForFocusTarget: '&'
-    },
-    templateUrl: UrlInterpolationService.getComponentUrl('schemaBasedEditor/expression'),
-    restrict: 'E'
-  };
-}]);
+    return {
+      scope: {
+        localValue: '=',
+        isDisabled: '&',
+        // TODO(sll): Currently only takes a string which is either 'bool',
+        // 'int' or 'float'. May need to generalize.
+        outputType: '&',
+        labelForFocusTarget: '&'
+      },
+      templateUrl: UrlInterpolationService.getComponentUrl(
+                   'schemaBasedEditor/expression'),
+      restrict: 'E'
+    };
+  }]);
