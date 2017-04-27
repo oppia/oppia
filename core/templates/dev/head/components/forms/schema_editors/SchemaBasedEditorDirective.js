@@ -29,7 +29,7 @@ oppia.directive('schemaBasedEditor', [
         onInputFocus: '='
       },
       templateUrl: UrlInterpolationService.getComponentUrl(
-                   'schemaBasedEditor/master'),
+                   '/schemaBasedEditor/master'),
       restrict: 'E'
     };
   }]);

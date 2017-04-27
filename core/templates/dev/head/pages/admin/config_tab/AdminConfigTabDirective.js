@@ -25,7 +25,7 @@ oppia.directive('adminConfigTab', [
       scope: {
         setStatusMessage: '='
       },
-      templateUrl: UrlInterpolationService.getComponentUrl('admin/configTag'),
+      templateUrl: UrlInterpolationService.getComponentUrl('/admin/configTag'),
       controller: ['$scope', function($scope) {
         $scope.configProperties = {};
 

@@ -30,7 +30,7 @@ oppia.directive('schemaBasedDictEditor', [
         labelForFocusTarget: '&'
       },
       templateUrl: UrlInterpolationService.getComponentUrl(
-                   'schemaBasedEditor/dict'),
+                   '/schemaBasedEditor/dict'),
       restrict: 'E',
       compile: recursionHelper.compile,
       controller: [

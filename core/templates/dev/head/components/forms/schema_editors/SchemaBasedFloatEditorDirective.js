@@ -29,7 +29,7 @@ oppia.directive('schemaBasedFloatEditor', [
         onInputFocus: '='
       },
       templateUrl: UrlInterpolationService.getComponentUrl(
-                   'schemaBasedEditor/float'),
+                   '/schemaBasedEditor/float'),
       restrict: 'E',
       controller: [
         '$scope', '$filter', '$timeout', 'parameterSpecsService',

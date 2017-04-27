@@ -30,7 +30,7 @@ oppia.directive('schemaBasedUnicodeEditor', [
         onInputFocus: '='
       },
       templateUrl: UrlInterpolationService.getComponentUrl(
-                   'schemaBasedEditor/unicode'),
+                   '/schemaBasedEditor/unicode'),
       restrict: 'E',
       controller: [
         '$scope', '$filter', '$sce', 'parameterSpecsService',

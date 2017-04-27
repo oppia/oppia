@@ -39,7 +39,7 @@ oppia.directive('schemaBasedListEditor', [
         labelForFocusTarget: '&'
       },
       templateUrl: UrlInterpolationService.getComponentUrl(
-                   'schemaBasedEditor/list'),
+                   '/schemaBasedEditor/list'),
       restrict: 'E',
       compile: recursionHelper.compile,
       controller: ['$scope', function($scope) {

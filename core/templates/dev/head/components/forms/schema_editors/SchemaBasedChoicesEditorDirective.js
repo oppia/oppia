@@ -30,7 +30,7 @@ oppia.directive('schemaBasedChoicesEditor', [
         isDisabled: '&'
       },
       templateUrl: UrlInterpolationService.getComponentUrl(
-                   'schemaBasedEditor/choices'),
+                   '/schemaBasedEditor/choices'),
       restrict: 'E',
       compile: recursionHelper.compile,
       controller: ['$scope', function($scope) {
