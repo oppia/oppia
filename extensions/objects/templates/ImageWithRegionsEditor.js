@@ -36,17 +36,30 @@ oppia.directive('imageWithRegionsEditor', [
         '$scope', '$element', '$modal', function($scope, $element, $modal) {
           $scope.alwaysEditable = true;
 
-          $scope.REGION_LABEL_OFFSET_X = 6;
-          $scope.REGION_LABEL_OFFSET_Y = 18;
-          $scope.REGION_LABEL_STYLE = (
-            'fill: white; font-size: large; pointer-events: none;');
-          $scope.SELECTED_REGION_STYLE = 'fill: orange; opacity: 0.5;';
-          $scope.UNSELECTED_REGION_STYLE = 'fill: blue; opacity: 0.5;';
+          // Dynamically defines the CSS style for the region rectangle.
           $scope.getRegionStyle = function(index) {
             if (index === $scope.selectedRegion) {
-              return $scope.SELECTED_REGION_STYLE;
+              return 'fill: blue; opacity: 0.5;';
             } else {
-              return $scope.UNSELECTED_REGION_STYLE;
+              return 'fill: white; opacity: 0.5;';
+            }
+          };
+
+          // Dynamically defines the CSS style for the region rectangle.
+          $scope.getRegionTrashStyle = function(index) {
+            if (index === $scope.selectedRegion) {
+              return 'fill: #eee; opacity: 0.7';
+            } else {
+              return 'fill: #333; opacity: 0.7';
+            }
+          };
+
+          // Dynammically defines the CSS style for the region rectangle.
+          $scope.getRegionLabelStyle = function(index) {
+            if (index === $scope.selectedRegion) {
+              return 'fill: #eee; font-size: 14px; pointer-events: none;';
+            } else {
+              return 'fill: #333; font-size: 14px; pointer-events: none;';
             }
           };
 
@@ -99,6 +112,13 @@ oppia.directive('imageWithRegionsEditor', [
           $scope.hoveredRegion = null;
           // Index of region currently selected.
           $scope.selectedRegion = null;
+
+          // Temporary label list
+          var labelList = $scope.$parent.value.labeledRegions.map(
+            function(region) {
+              return region.label;
+            }
+          );
 
           // Temporary label list
           var labelList = $scope.$parent.value.labeledRegions.map(
@@ -327,8 +347,9 @@ oppia.directive('imageWithRegionsEditor', [
                 // that doesn't overlap with currently existing labels.
                 var newLabel = null;
                 for (var i = 1; i <= labels.length + 1; i++) {
-                  if (labels.indexOf(i.toString()) === -1) {
-                    newLabel = i.toString();
+                  var candidateLabel = 'region ' + i.toString();
+                  if (labels.indexOf(candidateLabel) === -1) {
+                    newLabel = candidateLabel;
                     break;
                   }
                 }
