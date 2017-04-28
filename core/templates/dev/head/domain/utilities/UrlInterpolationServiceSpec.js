@@ -228,7 +228,7 @@ describe('URL Interpolation Service', function() {
     expect(uis.getDirectiveTemplateUrl('/test.html')).toBe(
       GLOBALS.TEMPLATE_DIR_PREFIX + '/test.html');
     expect(uis.getDirectiveTemplateUrl('/test_url/test.html')).toBe(
-      GLOBALS.TEMPLATE_DIR_PREFIX + 'test_url/test.html');
+      GLOBALS.TEMPLATE_DIR_PREFIX + '/test_url/test.html');
   });
 
   it('should throw an error for empty path', function() {
