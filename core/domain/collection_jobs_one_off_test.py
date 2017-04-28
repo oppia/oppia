@@ -123,7 +123,7 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
             title=collection_category,
             objective='',
             tags=[],
-            schema_version=1,
+            schema_version=2,
         )
         model.commit(self.albert_id, 'Made a new collection!', [{
             'cmd': collection_services.CMD_CREATE_NEW,
@@ -165,7 +165,7 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
             title=collection_title,
             objective='An objective',
             tags=[],
-            schema_version=1,
+            schema_version=2,
             nodes=[node.to_dict()],
         )
         model.commit(self.albert_id, 'Made a new collection!', [{

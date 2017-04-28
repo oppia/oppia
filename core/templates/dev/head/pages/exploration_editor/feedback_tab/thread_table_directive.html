@@ -1,4 +1,12 @@
 <script type="text/ng-template" id="feedbackTab/threadTable">
+  <style>
+    thread-table .oppia-feedback-tab-row {
+      cursor: pointer;
+    }
+    thread-table .oppia-feedback-tab-row:hover {
+      background: #eee;
+    }
+  </style>
   <table class="table">
     <tr ng-if="getThreads().length > 0">
       <th class="col-lg-1 col-md-1 col-sm-1">Status</th>
