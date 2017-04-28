@@ -54,13 +54,14 @@ describe('oppiaInteractiveLabelingInputValidator', function() {
     };
     goodAnswerGroups = [{
       rules: [{
-        type: 'IsInRegion',
+        type: 'Misses',
         inputs: {
-          x: 'SecondLabel'
+          incorrectElements: [],
+          x: 'FirstLabel'
         }
       }],
       outcome: goodDefaultOutcome,
-      correct: false
+      correct: true
     }];
   }));
 
@@ -93,7 +94,7 @@ describe('oppiaInteractiveLabelingInputValidator', function() {
     'alphanumeric labels',
     function() {
       var regions = customizationArguments.imageAndLabels.value.labeledRegions;
-      regions[0].label = '';
+      regions[1].label = '';
       var warnings = validator(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
@@ -102,7 +103,7 @@ describe('oppiaInteractiveLabelingInputValidator', function() {
         message: 'Please ensure the image region strings are nonempty.'
       }]);
 
-      regions[0].label = 'SecondLabel';
+      regions[1].label = 'FirstLabel';
       warnings = validator(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
@@ -118,7 +119,7 @@ describe('oppiaInteractiveLabelingInputValidator', function() {
       expect(warnings).toEqual([{
         type: WARNING_TYPES.CRITICAL,
         message: 'The image region strings should consist of characters ' +
-          'from [A-Za-z0-9].'
+          'from [A-Za-z0-9] and spaces.'
       }]);
 
       customizationArguments.imageAndLabels.value.labeledRegions = [];

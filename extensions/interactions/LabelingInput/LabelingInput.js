@@ -22,9 +22,9 @@
 
 oppia.directive('oppiaInteractiveLabelingInput', [
   '$sce', 'oppiaHtmlEscaper', 'explorationContextService',
-  'imageClickInputRulesService',
+  'labelingInputRulesService',
   function($sce, oppiaHtmlEscaper, explorationContextService,
-           imageClickInputRulesService) {
+           labelingInputRulesService) {
     return {
       restrict: 'E',
       scope: {
@@ -56,12 +56,14 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           $scope.mouseX = 0;
           $scope.mouseY = 0;
           $scope.submitted = 0;
+          $scope.maxRGBValue = 255;
           $scope.correctElements = [];
           $scope.incorrectElements = [];
           $scope.incorrectBoxes = [];
           $scope.currentDraggedElement = "";
           $scope.currentlyHoveredRegions = [];
           $scope.allRegions = imageAndLabels.labeledRegions;
+          $scope.numRegions = $scope.allRegions.length;
           //Ensure no duplicates of elements in our element tracking arrays
           $scope.checkAndRemoveElement = function(name){
             var index = $scope.correctElements.indexOf(name);
@@ -73,10 +75,6 @@ oppia.directive('oppiaInteractiveLabelingInput', [
               $scope.incorrectElements.splice(index, 1);
               $scope.incorrectBoxes.splice(index, 1);
             }
-            // index = $scope.incorrectBoxes.indexOf(name);
-            // if (index > -1){
-            //   $scope.incorrectBoxes.splice(index, 1);
-            // }
             return;
           }
           //Get the current element label
@@ -88,17 +86,21 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           //If all labels have been placed, run a correctness check
           $scope.runSubmitCheck = function(){
             $scope.submitted = 1;
-            $scope.onSubmit({
-              answer: {
-                clickPosition: [$scope.mouseX, $scope.mouseY],
-                clickedRegions: $scope.currentlyHoveredRegions,
-                incorrectElements: $scope.incorrectElements
-              },
-              rulesService: imageClickInputRulesService
-            });
+            if ($scope.numRegions == 0){
+              $scope.numRegions = $scope.incorrectElements.length;
+              $scope.onSubmit({
+                answer: {
+                  clickPosition: [$scope.mouseX, $scope.mouseY],
+                  clickedRegions: $scope.currentlyHoveredRegions,
+                  incorrectElements: $scope.incorrectElements
+                },
+                rulesService: labelingInputRulesService
+              });
+            }
           }
           //Check if our value is the one of the region, and handle acccordingly
           $scope.checkTheValues = function(event, ui, correctName){
+            $scope.numRegions--;
             if (correctName == $scope.currentDraggedElement){
               $scope.correctElements.push($scope.currentDraggedElement);
             } else {
@@ -184,29 +186,20 @@ oppia.directive('oppiaInteractiveLabelingInput', [
             if (!$scope.submitted){
               return 0;
             }
-            return 255 * ($scope.incorrectBoxes.indexOf(region.label) !== -1);
+            return $scope.maxRGBValue * 
+                        ($scope.incorrectBoxes.indexOf(region.label) !== -1);
           }
 
           $scope.getBValue = function(region){
             console.log(region);
             console.log($scope);
             if (!$scope.submitted){
-              return 255;
+              return $scope.maxRGBValue;
             }
-            return 255 * ($scope.incorrectBoxes.indexOf(region.label) === -1);
-          }
-        
-          //TODO: Delete below
-          $scope.onClickImage = function() {
-            $scope.onSubmit({
-              answer: {
-                clickPosition: [$scope.mouseX, $scope.mouseY],
-                clickedRegions: $scope.currentlyHoveredRegions,
-                incorrectElements: $scope.incorrectElements
-              },
-              rulesService: imageClickInputRulesService
-            });
+            return $scope.maxRGBValue * 
+                        ($scope.incorrectBoxes.indexOf(region.label) === -1);
           };
+        
         }
       ]
     };
@@ -246,7 +239,7 @@ oppia.directive('oppiaShortResponseLabelingInput', [
   }
 ]);
 
-oppia.factory('imageClickInputRulesService', [function() {
+oppia.factory('labelingInputRulesService', [function() {
   return {
     /*
     Answer has clicked regions, check that the label of the clicked

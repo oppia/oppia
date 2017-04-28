@@ -88,7 +88,7 @@ oppia.filter('oppiaInteractiveLabelingInputValidator', [
     for (var i = 0; i < answerGroups.length; i++) {
       var rules = answerGroups[i].rules;
       for (var j = 0; j < rules.length; j++) {
-        if (rules[j].type === 'IsInRegion') {
+        if (rules[j].type === 'Misses') {
           var label = rules[j].inputs.x;
           if (seenRegionStrings.indexOf(label) === -1) {
             warningsList.push({

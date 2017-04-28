@@ -64,8 +64,6 @@
       "description": "is not correct due to {{c|LogicErrorCategory}}"
     }
   },
-  "FillInTheBlank": {
-  },
   "LabelingInput": {
     "GetsAllCorrect": {
       "description": "gets all labels correct"
