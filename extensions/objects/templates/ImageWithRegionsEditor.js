@@ -39,13 +39,13 @@ oppia.directive('imageWithRegionsEditor', [
           // Dynamically defines the CSS style for the region rectangle.
           $scope.getRegionStyle = function(index) {
             if (index === $scope.selectedRegion) {
-              return 'fill: blue; opacity: 0.5;';
+              return 'fill: #00f; opacity: 0.5; stroke: #00d';
             } else {
-              return 'fill: white; opacity: 0.5;';
+              return 'fill: white; opacity: 0.5; stroke: #ddd';
             }
           };
 
-          // Dynamically defines the CSS style for the region rectangle.
+          // Dynamically defines the CSS style for the region trash icon.
           $scope.getRegionTrashStyle = function(index) {
             if (index === $scope.selectedRegion) {
               return 'fill: #eee; opacity: 0.7';
@@ -54,7 +54,7 @@ oppia.directive('imageWithRegionsEditor', [
             }
           };
 
-          // Dynammically defines the CSS style for the region rectangle.
+          // Dynamically defines the CSS style for the region label.
           $scope.getRegionLabelStyle = function(index) {
             if (index === $scope.selectedRegion) {
               return 'fill: #eee; font-size: 14px; pointer-events: none;';
