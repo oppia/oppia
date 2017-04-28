@@ -120,13 +120,6 @@ oppia.directive('imageWithRegionsEditor', [
             }
           );
 
-          // Temporary label list
-          var labelList = $scope.$parent.value.labeledRegions.map(
-            function(region) {
-              return region.label;
-            }
-          );
-
           // Calculates the dimensions of the image, assuming that the width
           // of the image is scaled down to fit the svg element if necessary.
           var _calculateImageDimensions = function() {
