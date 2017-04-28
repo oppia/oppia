@@ -285,7 +285,8 @@ describe('URL Interpolation Service', function() {
       expect(uis.getDirectiveTemplateUrl.bind(null, 'test_fail.html')).toThrow(
         new Error(
           'Path must start with \'\/\': \'' + 'test_fail.html' + '\'.'));
-      expect(uis.getDirectiveTemplateUrl.bind(null, 'test_url/fail.html')).toThrow(
+      expect(
+         uis.getDirectiveTemplateUrl.bind(null, 'test_url/fail.html')).toThrow(
         new Error(
           'Path must start with \'\/\': \'' + 'test_url/fail.html' + '\'.'));
     });
