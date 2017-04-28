@@ -1,0 +1,47 @@
+{% extends 'pages/base.html' %}
+
+{% block maintitle %}
+  I18N_FRACTION_LANDING_PAGE_TITLE
+{% endblock maintitle %}
+
+{% block navbar_breadcrumb %}
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+<div class="section">
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-4">
+        <img src="otter.png" id="otter" height="220" width="227" class="pull-right"/>
+      </div>
+          
+      <div class="col-xs-4">
+        <div class="bubble" style="background-color: rgb(252, 248, 227); border-color: rgb(250, 235, 204); border-width: 1px;">
+        
+          <strong>Great!</strong>&nbsp;You've come to the right place if you want to learn about fractions!
+        
+          <div class="pointer" style="content: '';position: absolute;border-style: solid;border-width: 13px 28px 13px 0;border-color: transparent #fcf8e3;display: block;width: 0;z-index: 1;margin-top: -13px;left: -28px;top: 50%;">
+          </div>
+          <div class="pointerBorder" style="content: '';position: absolute;border-style: solid;border-width: 13px 28px 13px 0;border-color: transparent #faebcc;display: block;width: 0;z-index: 0;margin-top: -13px;left: -29px;top: 50%;">
+          </div>
+        </div>
+      </div>
+    </div>
+        
+    <div class="row">
+      <div class="col-md-12">
+        <div class="jumbotron">
+          <h1>Free lessons for fractions</h1>
+          
+          <p>
+            Fractions represent numbers "between" the counting numbers. For example, if I cut a cake into four equal pieces, and eat one of them (yum!), I need a number between 0 and 1 to represent how much I've eaten.
+            <a href="">Start the first lesson</a> to learn more.
+          </p>
+              
+          <a class="btn btn-primary btn-lg btn-green">Continue to the first lesson</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
