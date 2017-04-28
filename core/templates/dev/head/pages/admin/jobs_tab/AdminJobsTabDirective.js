@@ -28,7 +28,8 @@ oppia.directive('adminJobsTab', [
         setStatusMessage: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/admin/jobs_tab/admin_jobs_tab_directive.html'),
+        '/pages/admin/jobs_tab/' +
+        'admin_jobs_tab_directive.html'),
       controller: ['$scope', function($scope) {
         $scope.HUMAN_READABLE_CURRENT_TIME = (
           GLOBALS.HUMAN_READABLE_CURRENT_TIME);

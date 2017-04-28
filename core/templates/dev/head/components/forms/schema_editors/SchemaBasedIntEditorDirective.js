@@ -29,7 +29,8 @@ oppia.directive('schemaBasedIntEditor', [
         onInputFocus: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema_editors/schema_based_int_editor_directive.html'),
+        '/components/forms/schema_editors/' +
+        'schema_based_int_editor_directive.html'),
       restrict: 'E',
       controller: [
         '$scope', 'parameterSpecsService',

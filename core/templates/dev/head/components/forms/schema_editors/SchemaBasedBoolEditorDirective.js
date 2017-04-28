@@ -27,7 +27,8 @@ oppia.directive('schemaBasedBoolEditor', [
         labelForFocusTarget: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema_editors/schema_based_bool_editor_directive.html'),
+        '/components/forms/schema_editors/' +
+        'schema_based_bool_editor_directive.html'),
       restrict: 'E',
       controller: [
         '$scope', 'parameterSpecsService',

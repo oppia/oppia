@@ -28,7 +28,8 @@ oppia.directive('adminMiscTab', [
         setStatusMessage: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/admin/misc_tab/admin_misc_tab_directive.html'),
+        '/pages/admin/misc_tab/' +
+        'admin_misc_tab_directive.html'),
       controller: ['$scope', function($scope) {
         $scope.clearSearchIndex = function() {
           if (AdminTaskManagerService.isTaskRunning()) {
