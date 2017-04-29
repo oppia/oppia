@@ -42,6 +42,23 @@ describe('Editor context service', function() {
   });
 });
 
+describe('Angular names service', function() {
+  beforeEach(module('oppia'));
+
+  describe('angular name service', function() {
+    var ans = null;
+
+    beforeEach(inject(function($injector) {
+      ans = $injector.get('angularNameService');
+    }));
+
+    it('should map interaction ID to correct RulesService', function() {
+      expect(ans.getNameOfInteractionRulesService('TextInput')).toEqual(
+        'textInputRulesService');
+    });
+  });
+});
+
 describe('Change list service', function() {
   beforeEach(module('oppia'));
 

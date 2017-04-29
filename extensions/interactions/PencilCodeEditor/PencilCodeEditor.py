@@ -41,3 +41,5 @@ class PencilCodeEditor(base.BaseInteraction):
         },
         'default_value': '# Add the initial code snippet here.'
     }]
+
+    _auxiliary_calculation_ids = ['TopAnswersByCategorization']

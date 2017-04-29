@@ -170,6 +170,16 @@ oppia.factory('UrlInterpolationService', [
         }
         return getCachePrefixedUrl('/extensions/interactions/' +
           interactionId + '/static/' + interactionId + '.png');
+      },
+
+      /**
+       * Given an componenth path relative to /components folder,
+       * returns the complete url path to that component, prefixing the
+       * appropriate cache_slug to it.
+       */
+      getComponentUrl: function(componentPath) {
+        validateResourcePath(componentPath);
+        return GLOBALS.TEMPLATE_DIR_PREFIX + '/components' + componentPath;
       }
     };
   }
