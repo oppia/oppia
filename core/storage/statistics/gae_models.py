@@ -71,7 +71,6 @@ class UsernameDistributionModel(base_models.BaseModel):
     The length of the username is the id/key of an instance of this class.
     """
     number_of_users = ndb.IntegerProperty(default=0, indexed=False)
-    username_length = ndb.IntegerProperty(default=0, indexed=False)
 
     @classmethod
     def get_or_create(cls, username_length):
@@ -88,10 +87,9 @@ class UsernameDistributionModel(base_models.BaseModel):
         for username_length_model in username_length_models:
             total_number_of_users += username_length_model.number_of_users
             total_length_of_usernames += (
-                username_length_model.number_of_users*username_length_model.username_length) # pylint: disable=line-too-long
+                username_length_model.number_of_users*int(
+                    username_length_model.id))
 
-        print "total users", total_number_of_users
-        print "total username", total_length_of_usernames
         if total_number_of_users == 0:
             return 0.0
         else:

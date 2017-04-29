@@ -89,7 +89,6 @@ class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceJobManager):
         username_length_model = (
             statistics_models.UsernameDistributionModel.get_or_create(key))
         username_length_model.number_of_users = len(username_list)
-        username_length_model.username_length = int(key)
         username_length_model.put()
 
 
