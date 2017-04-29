@@ -85,7 +85,6 @@ class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def reduce(key, usernames):
         username_list = [ast.literal_eval(v) for v in usernames]
-        print "username list", username_list
         username_length_model = (
             statistics_models.UsernameDistributionModel.get_or_create(key))
         username_length_model.number_of_users = len(username_list)
