@@ -36,10 +36,21 @@
         ng-mousemove="onMouseMoveRegion()"
         ng-mousedown="onMousedownRegion($index)">
       </rect>
+      <a ng-repeat="labeledRegion in $parent.$parent.value.labeledRegions" href
+        ng-click="deleteRegion($index)"
+        target="_blank">
+        <text
+          font-family="Material Icons"
+          font-size="20px"
+          text-decoration="none"
+          ng-attr-style="<[getRegionTrashStyle($index)]>"
+          ng-attr-x="<[labeledRegion.region.area[1][0] * getImageWidth() - 25]>"
+          ng-attr-y="<[labeledRegion.region.area[1][1] * getImageHeight() - 5]>">&#xE872;</text>
+      </a>
       <text ng-repeat="labeledRegion in $parent.$parent.value.labeledRegions"
-        ng-attr-style="<[::REGION_LABEL_STYLE]>"
-        ng-attr-x="<[labeledRegion.region.area[0][0] * getImageWidth() + REGION_LABEL_OFFSET_X]>"
-        ng-attr-y="<[labeledRegion.region.area[0][1] * getImageHeight() + REGION_LABEL_OFFSET_Y]>">
+        ng-attr-style="<[getRegionLabelStyle($index)]>"
+        ng-attr-x="<[labeledRegion.region.area[0][0] * getImageWidth() + 6]>"
+        ng-attr-y="<[labeledRegion.region.area[0][1] * getImageHeight() + 18]>">
         <[labeledRegion.label]>
       </text>
     </svg>
@@ -50,7 +61,6 @@
           ng-model="regionLabelGetterSetter(selectedRegion)" 
           ng-model-options="{getterSetter: true}">
         </input>
-        <button style="margin-top: -6px;" type="button" class="btn btn-danger btn-sm" ng-click="deleteRegion(selectedRegion)">Delete Region</button>
       </div>  
 
   </div>
