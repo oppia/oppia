@@ -1030,9 +1030,9 @@ textarea {
 }
 
 .oppia-fractions-landing-page-generic-title {
+  color: inherit;
   font-weight: 500;
   line-height: 1.1;
-  color: inherit;
 }
 
 .oppia-fractions-landing-page-bubble {
@@ -1049,17 +1049,6 @@ textarea {
   padding: 20px;
   position: relative;
   width: 250px;
-}
-
-.oppia-fractions-landing-page-bubble:before {
-  border-color: transparent #faebcc;
-  border-style: solid;
-  border-width: 13px 28px 13px 0;
-  content: '';
-  left: -29px;
-  margin-top: -13px;
-  position: absolute;
-  top: 50%;
 }
 
 .oppia-fractions-landing-page-pointer {

@@ -36,7 +36,6 @@ class FractionLandingPage(base.BaseHandler):
         self.redirect(url_to_display)
 
 
-
 class FractionLandingPageA(base.BaseHandler):
     """Page showing landing page for fractions - version A."""
 
