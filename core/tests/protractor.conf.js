@@ -61,7 +61,7 @@ exports.config = {
     ],
 
     mainEditor: [
-      'protractor/editorAndPlayer.js',
+      //'protractor/editorAndPlayer.js',
       'protractor/stateEditor.js'
     ],
 

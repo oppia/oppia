@@ -206,9 +206,8 @@ oppia.factory('StateImprovementSuggestionService', [
         };
 
         var rankedStates = [];
-        var stateNames = Object.keys(explorationStates);
-        for (var i = 0; i < stateNames.length; i++) {
-          var stateName = stateNames[i];
+
+        explorationStates.getStateNames().map(function(stateName) {
           var stateStats = allStateStats[stateName];
 
           var totalEntryCount = stateStats.total_entry_count;
@@ -216,7 +215,7 @@ oppia.factory('StateImprovementSuggestionService', [
           var defaultAnswerCount = stateStats.num_default_answers;
 
           if (totalEntryCount == 0) {
-            continue;
+            return;
           }
 
           var threshold = 0.2 * totalEntryCount;
@@ -245,7 +244,7 @@ oppia.factory('StateImprovementSuggestionService', [
               type: eligibleFlags[0].improveType,
             });
           }
-        }
+        });
 
         // The returned suggestions are sorted decreasingly by their ranks.
         rankedStates.sort(rankComparator);
