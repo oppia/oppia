@@ -64,6 +64,40 @@ class StateCounterModel(base_models.BaseModel):
         return counter
 
 
+class UsernameDistributionModel(base_models.BaseModel):
+    """Stores the distribution of username lengths - the number of users having
+    username of a particular length.
+
+    The length of the username is the id/key of an instance of this class.
+    """
+    number_of_users = ndb.IntegerProperty(default=0, indexed=False)
+    username_length = ndb.IntegerProperty(default=0, indexed=False)
+
+    @classmethod
+    def get_or_create(cls, username_length):
+        username_length_instance = cls.get(username_length, strict=False)
+        if not username_length_instance:
+            username_length_instance = cls(id=username_length)
+        return username_length_instance
+
+    @classmethod
+    def compute_average_length(cls):
+        username_length_models = cls.get_all()
+        total_number_of_users = 0.0
+        total_length_of_usernames = 0.0
+        for username_length_model in username_length_models:
+            total_number_of_users += username_length_model.number_of_users
+            total_length_of_usernames += (
+                username_length_model.number_of_users*username_length_model.username_length)
+
+        print "total users", total_number_of_users
+        print "total username", total_length_of_usernames
+        if total_number_of_users == 0:
+            return 0.0
+        else:
+            return round(total_length_of_usernames/total_number_of_users, 2)
+
+
 class StateRuleAnswerLogModel(base_models.BaseModel):
     """The log of all answers hitting a given state rule.
 
