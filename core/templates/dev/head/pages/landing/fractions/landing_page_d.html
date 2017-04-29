@@ -8,9 +8,9 @@
 {% endblock navbar_breadcrumb %}
 
 {% block content %}
-<div class="section">
+<div ng-controller="Fractions" class="section" ng-style="{'background-image': 'url(' + getStaticImageUrl('/background/background_fractions.png') + ')'}" style="font-family: 'Capriola', 'Roboto', Arial, sans-serif;">
   <div class="container">
-    <div class="row">
+    <div class="row" style="margin-top: 20px;">
       <div class="col-md-12">
         <div class="alert alert-dismissable alert-success">
           <strong>Great!</strong>&nbsp;You've come to the right place if you want to learn about fractions!
@@ -18,50 +18,88 @@
       </div>
     </div>
         
-    <img src="otter.png" id="otter" height="220" width="227"/>
+    <img ng-src="<[getStaticImageUrl('/general/otter.png')]>" style="position: relative; margin-bottom: -30px; z-index: 999;" height="220" width="227">
     
     <div class="row">
       <div class="col-md-12">
-        <div class="jumbotron">
-          <h1>Free lessons for fractions</h1>
+        <div class="jumbotron" style="background: white;">
+          <h1 class="oppia-fractions-landing-page-generic-title" style="color: #024340;">Free lessons for fractions</h1>
               
-          <h2>Learn Fractions</h2>
+          <h2 class="fraction-faqs oppia-fractions-landing-page-generic-title">Learn Fractions</h2>
               
-          <a class="btn btn-primary btn-small btn-green">Continue to the first lesson</a>
+          <a class="btn btn-primary btn-small first-lesson-btn">Continue to the first lesson</a>
               
-          <h2>What are fractions?</h2>
+          <h2 class="fraction-faqs oppia-fractions-landing-page-generic-title">What are fractions?</h2>
 
-          <p>
+          <p class="fraction-faqs-answers">
             Fractions represent numbers "between" the counting numbers. For example, if I cut a cake into four equal pieces, and eat one of them (yum!), I need a number between 0 and 1 to represent how much I've eaten.
             <a href="">Start the first lesson</a> to learn more.
           </p>
 
-          <h2>Where can I learn fractions for free?</h2>
-          <p>Right here!</p>
+          <h2 class="fraction-faqs oppia-fractions-landing-page-generic-title">Where can I learn fractions for free?</h2>
+          <p class="fraction-faqs-answers">Right here!</p>
 
-          <h2>How long does it take to learn fractions?</h2>
-          <p>It's up to you. <a>Just get started</a> and then go as fast or slow as you want</p>
+          <h2 class="fraction-faqs oppia-fractions-landing-page-generic-title">How long does it take to learn fractions?</h2>
+          <p class="fraction-faqs-answers">It's up to you. <a>Just get started</a> and then go as fast or slow as you want</p>
           
-          <h2>Is there a test?</h2>
-          <p>No, but we'll give you some questions along the way, so you can see how you're doing</p>
+          <h2 class="fraction-faqs oppia-fractions-landing-page-generic-title">Is there a test?</h2>
+          <p class="fraction-faqs-answers">No, but we'll give you some questions along the way, so you can see how you're doing</p>
           
-          <h2>What if I get stuck?</h2>
-          <p>Simple! You can just go back to the previous step, and then carry on.</p>
+          <h2 class="fraction-faqs oppia-fractions-landing-page-generic-title">What if I get stuck?</h2>
+          <p class="fraction-faqs-answers">Simple! You can just go back to the previous step, and then carry on.</p>
 
-          <h2>Can I really learn fractions online?</h2>
-          <p>
+          <h2 class="fraction-faqs oppia-fractions-landing-page-generic-title">Can I really learn fractions online?</h2>
+          <p class="fraction-faqs-answers">
             This week, 100 students like you learnt about fractions here. If they can do it, so can you! If you don't have much time now, you can start by <a href="">reading the introduction</a>.
           </p>
 
-          <h2>What are these fractions lessons like?</h2>
-          <p>
+          <h2 class="fraction-faqs oppia-fractions-landing-page-generic-title">What are these fractions lessons like?</h2>
+          <p class="fraction-faqs-answers">
             Each lesson starts simple: just telling you a little bit about the topic. When you're ready to move on, just click the button to continue. You'll have learned fractions before you know it.
           </p>
             
-          <a class="btn btn-primary btn-small btn-green">Get started FREE</a>
+          <a class="btn btn-primary btn-small first-lesson-btn">Get started FREE</a>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<style>
+  h1, h2, h3, h4 h5, h6 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+
+  .fraction-faqs {
+    color: #04857c;
+    font-family: "Rubik, regular", "Roboto", Arial, sans-serif;
+    font-size: 30px;
+    font-weight: 500;
+    line-height: 1.1;
+    padding-top: 0.5em;
+  }
+
+  .fraction-faqs-answers {
+    font-size: 21px;
+    font-weight: 200;
+    padding: 10px;
+    margin-bottom: 15px;
+  }
+
+  .first-lesson-btn {
+    background-color: rgba(0, 150, 136, 0.85);
+  }
+
+  .first-lesson-btn:hover {
+    color: #fff;
+    background-color: #286090;
+    border-color: #204d74;
+  }
+</style>
 {% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/landing/fractions/Fractions.js"></script>
+{% endblock footer_js %}
