@@ -20,6 +20,7 @@ import random
 import feconf
 from core.controllers import base
 
+
 class FractionLandingPage(base.BaseHandler):
     """Page showing the landing page for fractions. It will randomly select a
     version out of the four versions of fractions landing page and display it.
@@ -27,7 +28,6 @@ class FractionLandingPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-
         version_urls = [feconf.FRACTIONS_LANDING_PAGE_A_URL,
                         feconf.FRACTIONS_LANDING_PAGE_B_URL,
                         feconf.FRACTIONS_LANDING_PAGE_C_URL,
