@@ -25,9 +25,9 @@ from core.platform import models
 import utils
 
 (exp_models, collection_models, feedback_models, user_models,
-    statistics_models) = (models.Registry.import_models([
-        models.NAMES.exploration, models.NAMES.collection,
-        models.NAMES.feedback, models.NAMES.user, models.NAMES.statistics]))
+ statistics_models) = (models.Registry.import_models([
+     models.NAMES.exploration, models.NAMES.collection,
+     models.NAMES.feedback, models.NAMES.user, models.NAMES.statistics]))
 
 
 class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):

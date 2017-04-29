@@ -88,7 +88,7 @@ class UsernameDistributionModel(base_models.BaseModel):
         for username_length_model in username_length_models:
             total_number_of_users += username_length_model.number_of_users
             total_length_of_usernames += (
-                username_length_model.number_of_users*username_length_model.username_length)
+                username_length_model.number_of_users*username_length_model.username_length) # pylint: disable=line-too-long
 
         print "total users", total_number_of_users
         print "total username", total_length_of_usernames

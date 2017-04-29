@@ -36,7 +36,7 @@ import feconf
 
 (user_models, feedback_models, statistics_models) = (
     models.Registry.import_models([models.NAMES.user, models.NAMES.feedback,
-        models.NAMES.statistics]))
+                                   models.NAMES.statistics]))
 taskqueue_services = models.Registry.import_taskqueue_services()
 search_services = models.Registry.import_search_services()
 
@@ -177,7 +177,7 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
         """
         self._run_one_off_job()
         average_username_length = (
-            statistics_models.UsernameDistributionModel.compute_average_length())
+            statistics_models.UsernameDistributionModel.compute_average_length()) # pylint: disable=line-too-long
         self.assertEqual(average_username_length, 13.0)
 
     def test_single_user_case(self):
@@ -185,11 +185,10 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
         user - 'tmpsuperadm1n'.
         """
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
-        self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
 
         self._run_one_off_job()
         average_username_length = (
-            statistics_models.UsernameDistributionModel.compute_average_length())
+            statistics_models.UsernameDistributionModel.compute_average_length()) # pylint: disable=line-too-long
         self.assertEqual(average_username_length, 7.0)
         username_length_model = (
             statistics_models.UsernameDistributionModel.get_or_create('1'))
@@ -200,13 +199,11 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
         default user - 'tmpsuperadm1n'.
         """
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
-        self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
         self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
-        self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
 
         self._run_one_off_job()
         average_username_length = (
-            statistics_models.UsernameDistributionModel.compute_average_length())
+            statistics_models.UsernameDistributionModel.compute_average_length()) # pylint: disable=line-too-long
         self.assertEqual(average_username_length, 5.33)
         username_length_model_1 = (
             statistics_models.UsernameDistributionModel.get_or_create('1'))
@@ -216,13 +213,11 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(username_length_model_2.number_of_users, 1)
 
         self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
-        self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
         self.signup(self.USER_D_EMAIL, self.USER_D_USERNAME)
-        self.user_d_id = self.get_user_id_from_email(self.USER_D_EMAIL)
 
         self._run_one_off_job()
         average_username_length = (
-            statistics_models.UsernameDistributionModel.compute_average_length())
+            statistics_models.UsernameDistributionModel.compute_average_length()) # pylint: disable=line-too-long
         self.assertEqual(average_username_length, 4.2)
         username_length_model_2 = (
             statistics_models.UsernameDistributionModel.get_or_create('2'))
