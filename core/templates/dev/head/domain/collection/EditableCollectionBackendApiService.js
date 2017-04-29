@@ -29,90 +29,91 @@
 // after deciding and acting upon the decision (which would mean implementing
 // it if it's agreed upon).
 oppia.factory('EditableCollectionBackendApiService', [
-    '$http', '$q', 'COLLECTION_DATA_URL_TEMPLATE',
-    'EDITABLE_COLLECTION_DATA_URL_TEMPLATE', 'UrlInterpolationService',
-    'ReadOnlyCollectionBackendApiService',
-    function($http, $q, COLLECTION_DATA_URL_TEMPLATE,
-      EDITABLE_COLLECTION_DATA_URL_TEMPLATE, UrlInterpolationService,
-      ReadOnlyCollectionBackendApiService) {
-      var _fetchCollection = function(
-          collectionId, successCallback, errorCallback) {
-        var collectionDataUrl = UrlInterpolationService.interpolateUrl(
-          EDITABLE_COLLECTION_DATA_URL_TEMPLATE, {
-            collection_id: collectionId
-          });
-
-        $http.get(collectionDataUrl).then(function(response) {
-          var collection = angular.copy(response.data.collection);
-          if (successCallback) {
-            successCallback(collection);
-          }
-        }, function(errorResponse) {
-          if (errorCallback) {
-            errorCallback(errorResponse.data);
-          }
+  '$http', '$q', 'COLLECTION_DATA_URL_TEMPLATE',
+  'EDITABLE_COLLECTION_DATA_URL_TEMPLATE', 'UrlInterpolationService',
+  'ReadOnlyCollectionBackendApiService',
+  function($http, $q, COLLECTION_DATA_URL_TEMPLATE,
+    EDITABLE_COLLECTION_DATA_URL_TEMPLATE, UrlInterpolationService,
+    ReadOnlyCollectionBackendApiService) {
+    var _fetchCollection = function(
+        collectionId, successCallback, errorCallback) {
+      var collectionDataUrl = UrlInterpolationService.interpolateUrl(
+        EDITABLE_COLLECTION_DATA_URL_TEMPLATE, {
+          collection_id: collectionId
         });
-      };
 
-      var _updateCollection = function(
-          collectionId, collectionVersion, commitMessage, changeList,
-          successCallback, errorCallback) {
-        var editableCollectionDataUrl = UrlInterpolationService.interpolateUrl(
-          EDITABLE_COLLECTION_DATA_URL_TEMPLATE, {
-            collection_id: collectionId
-          });
-
-        var putData = {
-          version: collectionVersion,
-          commit_message: commitMessage,
-          change_list: changeList
-        };
-        $http.put(editableCollectionDataUrl, putData).then(function(response) {
-          // The returned data is an updated collection dict.
-          var collection = angular.copy(response.data.collection);
-
-          // Update the ReadOnlyCollectionBackendApiService's cache with the new
-          // collection.
-          ReadOnlyCollectionBackendApiService.cacheCollection(
-            collectionId, collection);
-
-          if (successCallback) {
-            successCallback(collection);
-          }
-        }, function(errorResponse) {
-          if (errorCallback) {
-            errorCallback(errorResponse.data);
-          }
-        });
-      };
-
-      return {
-        fetchCollection: function(collectionId) {
-          return $q(function(resolve, reject) {
-            _fetchCollection(collectionId, resolve, reject);
-          });
-        },
-
-        /**
-         * Updates a collection in the backend with the provided collection ID.
-         * The changes only apply to the collection of the given version and the
-         * request to update the collection will fail if the provided collection
-         * version is older than the current version stored in the backend. Both
-         * the changes and the message to associate with those changes are used
-         * to commit a change to the collection. The new collection is passed to
-         * the success callback, if one is provided to the returned promise
-         * object. Errors are passed to the error callback, if one is provided.
-         * Finally, if the update is successful, the returned collection will be
-         * cached within the CollectionBackendApiService to ensure the cache is
-         * not out-of-date with any updates made by this backend API service.
-         */
-        updateCollection: function(
-            collectionId, collectionVersion, commitMessage, changeList) {
-          return $q(function(resolve, reject) {
-            _updateCollection(
-              collectionId, collectionVersion, commitMessage, changeList,
-              resolve, reject);
-          });
+      $http.get(collectionDataUrl).then(function(response) {
+        var collection = angular.copy(response.data.collection);
+        if (successCallback) {
+          successCallback(collection);
         }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
+    var _updateCollection = function(
+        collectionId, collectionVersion, commitMessage, changeList,
+        successCallback, errorCallback) {
+      var editableCollectionDataUrl = UrlInterpolationService.interpolateUrl(
+        EDITABLE_COLLECTION_DATA_URL_TEMPLATE, {
+          collection_id: collectionId
+        });
+
+      var putData = {
+        version: collectionVersion,
+        commit_message: commitMessage,
+        change_list: changeList
       };
-    }]);
+      $http.put(editableCollectionDataUrl, putData).then(function(response) {
+        // The returned data is an updated collection dict.
+        var collection = angular.copy(response.data.collection);
+
+        // Update the ReadOnlyCollectionBackendApiService's cache with the new
+        // collection.
+        ReadOnlyCollectionBackendApiService.cacheCollection(
+          collectionId, collection);
+
+        if (successCallback) {
+          successCallback(collection);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
+    return {
+      fetchCollection: function(collectionId) {
+        return $q(function(resolve, reject) {
+          _fetchCollection(collectionId, resolve, reject);
+        });
+      },
+
+      /**
+       * Updates a collection in the backend with the provided collection ID.
+       * The changes only apply to the collection of the given version and the
+       * request to update the collection will fail if the provided collection
+       * version is older than the current version stored in the backend. Both
+       * the changes and the message to associate with those changes are used
+       * to commit a change to the collection. The new collection is passed to
+       * the success callback, if one is provided to the returned promise
+       * object. Errors are passed to the error callback, if one is provided.
+       * Finally, if the update is successful, the returned collection will be
+       * cached within the CollectionBackendApiService to ensure the cache is
+       * not out-of-date with any updates made by this backend API service.
+       */
+      updateCollection: function(
+          collectionId, collectionVersion, commitMessage, changeList) {
+        return $q(function(resolve, reject) {
+          _updateCollection(
+            collectionId, collectionVersion, commitMessage, changeList,
+            resolve, reject);
+        });
+      }
+    };
+  }
+]);

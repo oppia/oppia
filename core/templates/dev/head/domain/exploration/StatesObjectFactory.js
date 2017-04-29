@@ -17,8 +17,8 @@
  * domain objects given a list of backend state dictionaries.
  */
 
- oppia.factory('StatesObjectFactory', ['StateObjectFactory',
-  function(StateObjectFactory) {
+oppia.factory('StatesObjectFactory', [
+  'StateObjectFactory', function(StateObjectFactory) {
     var createFromBackendDict = function(statesBackendDict) {
       var stateObjectsDict = {};
       for (var stateName in statesBackendDict) {

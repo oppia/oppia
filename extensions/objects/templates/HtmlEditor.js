@@ -19,22 +19,22 @@
 // This directive is based on the UnicodeString directive.
 
 oppia.directive('htmlEditor', [
-    '$compile', 'OBJECT_EDITOR_URL_PREFIX',
-    function($compile, OBJECT_EDITOR_URL_PREFIX) {
-  return {
-    link: function(scope, element) {
-      scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_URL_PREFIX + 'Html';
-      };
-      $compile(element.contents())(scope);
-    },
-    restrict: 'E',
-    scope: true,
-    template: '<div ng-include="getTemplateUrl()"></div>',
-    controller: ['$scope', function($scope) {
-      $scope.schema = {
-        type: 'html'
-      };
-    }]
-  };
-}]);
+  '$compile', 'OBJECT_EDITOR_URL_PREFIX',
+  function($compile, OBJECT_EDITOR_URL_PREFIX) {
+    return {
+      link: function(scope, element) {
+        scope.getTemplateUrl = function() {
+          return OBJECT_EDITOR_URL_PREFIX + 'Html';
+        };
+        $compile(element.contents())(scope);
+      },
+      restrict: 'E',
+      scope: true,
+      template: '<div ng-include="getTemplateUrl()"></div>',
+      controller: ['$scope', function($scope) {
+        $scope.schema = {
+          type: 'html'
+        };
+      }]
+    };
+  }]);

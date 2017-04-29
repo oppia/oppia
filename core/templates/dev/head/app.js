@@ -26,8 +26,7 @@ var oppia = angular.module(
     'ui.validate', 'textAngular', 'pascalprecht.translate', 'ngCookies',
     'toastr'
   ].concat(
-    window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
-                   : []));
+    window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
 
 for (var constantName in constants) {
   oppia.constant(constantName, constants[constantName]);
@@ -238,19 +237,19 @@ oppia.factory('oppiaHtmlEscaper', ['$log', function($log) {
     },
     unescapedStrToEscapedStr: function(str) {
       return String(str)
-                  .replace(/&/g, '&amp;')
-                  .replace(/"/g, '&quot;')
-                  .replace(/'/g, '&#39;')
-                  .replace(/</g, '&lt;')
-                  .replace(/>/g, '&gt;');
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
     },
     escapedStrToUnescapedStr: function(value) {
       return String(value)
-                  .replace(/&quot;/g, '"')
-                  .replace(/&#39;/g, '\'')
-                  .replace(/&lt;/g, '<')
-                  .replace(/&gt;/g, '>')
-                  .replace(/&amp;/g, '&');
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, '\'')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&');
     }
   };
   return htmlEscaper;
@@ -291,83 +290,84 @@ oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
 // Service for validating things and (optionally) displaying warning messages
 // if the validation fails.
 oppia.factory('validatorsService', [
-    '$filter', 'alertsService', function($filter, alertsService) {
-  return {
-    /**
-     * Checks whether an entity name is valid, and displays a warning message
-     * if it isn't.
-     * @param {string} input - The input to be checked.
-     * @param {boolean} showWarnings - Whether to show warnings in the
-     *   butterbar.
-     * @return {boolean} True if the entity name is valid, false otherwise.
-     */
-    isValidEntityName: function(input, showWarnings, allowEmpty) {
-      input = $filter('normalizeWhitespace')(input);
-      if (!input && !allowEmpty) {
-        if (showWarnings) {
-          alertsService.addWarning('Please enter a non-empty name.');
-        }
-        return false;
-      }
-
-      for (var i = 0; i < GLOBALS.INVALID_NAME_CHARS.length; i++) {
-        if (input.indexOf(GLOBALS.INVALID_NAME_CHARS[i]) !== -1) {
+  '$filter', 'alertsService', function($filter, alertsService) {
+    return {
+      /**
+       * Checks whether an entity name is valid, and displays a warning message
+       * if it isn't.
+       * @param {string} input - The input to be checked.
+       * @param {boolean} showWarnings - Whether to show warnings in the
+       *   butterbar.
+       * @return {boolean} True if the entity name is valid, false otherwise.
+       */
+      isValidEntityName: function(input, showWarnings, allowEmpty) {
+        input = $filter('normalizeWhitespace')(input);
+        if (!input && !allowEmpty) {
           if (showWarnings) {
-            alertsService.addWarning(
-             'Invalid input. Please use a non-empty description consisting ' +
-             'of alphanumeric characters, spaces and/or hyphens.'
-            );
+            alertsService.addWarning('Please enter a non-empty name.');
           }
           return false;
         }
-      }
-      return true;
-    },
-    isValidExplorationTitle: function(input, showWarnings) {
-      if (!this.isValidEntityName(input, showWarnings)) {
-        return false;
-      }
 
-      if (input.length > 40) {
-        if (showWarnings) {
-          alertsService.addWarning(
-            'Exploration titles should be at most 40 characters long.');
+        for (var i = 0; i < GLOBALS.INVALID_NAME_CHARS.length; i++) {
+          if (input.indexOf(GLOBALS.INVALID_NAME_CHARS[i]) !== -1) {
+            if (showWarnings) {
+              alertsService.addWarning(
+               'Invalid input. Please use a non-empty description consisting ' +
+               'of alphanumeric characters, spaces and/or hyphens.'
+              );
+            }
+            return false;
+          }
         }
-        return false;
-      }
-
-      return true;
-    },
-    // NB: this does not check whether the card name already exists in the
-    // states dict.
-    isValidStateName: function(input, showWarnings) {
-      if (!this.isValidEntityName(input, showWarnings)) {
-        return false;
-      }
-
-      if (input.length > 50) {
-        if (showWarnings) {
-          alertsService.addWarning(
-            'Card names should be at most 50 characters long.');
+        return true;
+      },
+      isValidExplorationTitle: function(input, showWarnings) {
+        if (!this.isValidEntityName(input, showWarnings)) {
+          return false;
         }
-        return false;
-      }
 
-      return true;
-    },
-    isNonempty: function(input, showWarnings) {
-      if (!input) {
-        if (showWarnings) {
-          // TODO(sll): Allow this warning to be more specific in terms of what
-          // needs to be entered.
-          alertsService.addWarning('Please enter a non-empty value.');
+        if (input.length > 40) {
+          if (showWarnings) {
+            alertsService.addWarning(
+              'Exploration titles should be at most 40 characters long.');
+          }
+          return false;
         }
-        return false;
+
+        return true;
+      },
+      // NB: this does not check whether the card name already exists in the
+      // states dict.
+      isValidStateName: function(input, showWarnings) {
+        if (!this.isValidEntityName(input, showWarnings)) {
+          return false;
+        }
+
+        if (input.length > 50) {
+          if (showWarnings) {
+            alertsService.addWarning(
+              'Card names should be at most 50 characters long.');
+          }
+          return false;
+        }
+
+        return true;
+      },
+      isNonempty: function(input, showWarnings) {
+        if (!input) {
+          if (showWarnings) {
+            // TODO(sll): Allow this warning to be more specific in terms of
+            // what needs to be entered.
+            alertsService.addWarning('Please enter a non-empty value.');
+          }
+          return false;
+        }
+        return true;
       }
-      return true;
-    }
-  };
-}]);
+    };
+  }
+]);
 
 // Service for generating random IDs.
 oppia.factory('IdGenerationService', [function() {
@@ -425,9 +425,10 @@ oppia.factory('urlService', ['$window', function($window) {
     getUrlParams: function() {
       var params = {};
       var parts = $window.location.href.replace(
-          /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
-        params[key] = value;
-      });
+        /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
+          params[key] = value;
+        }
+      );
       return params;
     },
     isIframed: function() {
@@ -697,19 +698,20 @@ oppia.factory('currentLocationService', ['$window', function($window) {
 
 // Service for assembling extension tags (for gadgets and interactions).
 oppia.factory('extensionTagAssemblerService', [
-    '$filter', 'oppiaHtmlEscaper', function($filter, oppiaHtmlEscaper) {
-  return {
-    formatCustomizationArgAttrs: function(element, customizationArgSpecs) {
-      for (var caSpecName in customizationArgSpecs) {
-        var caSpecValue = customizationArgSpecs[caSpecName].value;
-        element.attr(
-          $filter('camelCaseToHyphens')(caSpecName) + '-with-value',
-          oppiaHtmlEscaper.objToEscapedJson(caSpecValue));
+  '$filter', 'oppiaHtmlEscaper', function($filter, oppiaHtmlEscaper) {
+    return {
+      formatCustomizationArgAttrs: function(element, customizationArgSpecs) {
+        for (var caSpecName in customizationArgSpecs) {
+          var caSpecValue = customizationArgSpecs[caSpecName].value;
+          element.attr(
+            $filter('camelCaseToHyphens')(caSpecName) + '-with-value',
+            oppiaHtmlEscaper.objToEscapedJson(caSpecValue));
+        }
+        return element;
       }
-      return element;
-    }
-  };
-}]);
+    };
+  }
+]);
 
 // Add a String.prototype.trim() polyfill for IE8.
 if (typeof String.prototype.trim !== 'function') {

@@ -35,6 +35,9 @@ oppia.directive('explorationSummaryTile', [function() {
       // summary tile is clicked.
       openInNewWindow: '@openInNewWindow',
       isCommunityOwned: '&isCommunityOwned',
+      // If this is not undefined, collection preview tile for mobile
+      // will be displayed.
+      isCollectionPreviewTile: '@isCollectionPreviewTile',
       // If the screen width is below the threshold defined here, the mobile
       // version of the summary tile is displayed. This attribute is optional:
       // if it is not specified, it is treated as 0, which means that the

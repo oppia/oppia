@@ -17,31 +17,33 @@
  * the interaction.
  */
 
-oppia.filter('oppiaInteractiveEndExplorationValidator', ['WARNING_TYPES',
-    'baseInteractionValidationService',
-    function(WARNING_TYPES, baseInteractionValidationService) {
-  // Returns a list of warnings.
-  return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
-    var warningsList = [];
+oppia.filter('oppiaInteractiveEndExplorationValidator', [
+  'WARNING_TYPES', 'baseInteractionValidationService',
+  function(WARNING_TYPES, baseInteractionValidationService) {
+    // Returns a list of warnings.
+    return function(
+      stateName, customizationArgs, answerGroups, defaultOutcome) {
+      var warningsList = [];
 
-    baseInteractionValidationService.requireCustomizationArguments(
-      customizationArgs, ['recommendedExplorationIds']);
+      baseInteractionValidationService.requireCustomizationArguments(
+        customizationArgs, ['recommendedExplorationIds']);
 
-    if (answerGroups.length !== 0) {
-      warningsList.push({
-        type: WARNING_TYPES.ERROR,
-        message: 'Please make sure end exploration interactions do not have ' +
-          'any answer groups.'
-      });
-    }
-    if (defaultOutcome) {
-      warningsList.push({
-        type: WARNING_TYPES.ERROR,
-        message: 'Please make sure end exploration interactions do not have ' +
-          'a default outcome.'
-      });
-    }
+      if (answerGroups.length !== 0) {
+        warningsList.push({
+          type: WARNING_TYPES.ERROR,
+          message: 'Please make sure end exploration interactions do not ' +
+            'have any answer groups.'
+        });
+      }
+      if (defaultOutcome) {
+        warningsList.push({
+          type: WARNING_TYPES.ERROR,
+          message: 'Please make sure end exploration interactions do not ' +
+          'have a default outcome.'
+        });
+      }
 
-    return warningsList;
-  };
-}]);
+      return warningsList;
+    };
+  }
+]);

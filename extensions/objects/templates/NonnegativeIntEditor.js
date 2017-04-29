@@ -17,30 +17,30 @@
 // in via initArgs.
 
 oppia.directive('nonnegativeIntEditor', [
-    '$compile', 'OBJECT_EDITOR_URL_PREFIX',
-    function($compile, OBJECT_EDITOR_URL_PREFIX) {
-  return {
-    link: function(scope, element) {
-      scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_URL_PREFIX + 'NonnegativeInt';
-      };
-      $compile(element.contents())(scope);
-    },
-    restrict: 'E',
-    scope: true,
-    template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: ['$scope', function($scope) {
-      $scope.SCHEMA = {
-        type: 'int',
-        validators: [{
-          id: 'is_at_least',
-          min_value: 0
-        }]
-      };
+  '$compile', 'OBJECT_EDITOR_URL_PREFIX',
+  function($compile, OBJECT_EDITOR_URL_PREFIX) {
+    return {
+      link: function(scope, element) {
+        scope.getTemplateUrl = function() {
+          return OBJECT_EDITOR_URL_PREFIX + 'NonnegativeInt';
+        };
+        $compile(element.contents())(scope);
+      },
+      restrict: 'E',
+      scope: true,
+      template: '<span ng-include="getTemplateUrl()"></span>',
+      controller: ['$scope', function($scope) {
+        $scope.SCHEMA = {
+          type: 'int',
+          validators: [{
+            id: 'is_at_least',
+            min_value: 0
+          }]
+        };
 
-      if (!$scope.$parent.value) {
-        $scope.$parent.value = 0;
-      }
-    }]
-  };
-}]);
+        if (!$scope.$parent.value) {
+          $scope.$parent.value = 0;
+        }
+      }]
+    };
+  }]);

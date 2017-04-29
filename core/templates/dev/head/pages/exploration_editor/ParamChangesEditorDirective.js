@@ -28,11 +28,11 @@ oppia.directive('paramChangesEditor', [function() {
     controller: [
       '$scope', '$rootScope', 'editabilityService',
       'explorationParamSpecsService', 'alertsService',
-      'UrlInterpolationService',
+      'UrlInterpolationService', 'ParamChangeObjectFactory',
       function(
           $scope, $rootScope, editabilityService,
           explorationParamSpecsService, alertsService,
-          UrlInterpolationService) {
+          UrlInterpolationService, ParamChangeObjectFactory) {
         $scope.editabilityService = editabilityService;
         $scope.isParamChangesEditorOpen = false;
         $scope.warningText = '';
@@ -45,29 +45,12 @@ oppia.directive('paramChangesEditor', [function() {
         var DEFAULT_PARAM_SPEC = {
           obj_type: 'UnicodeString'
         };
-        var DEFAULT_CUSTOMIZATION_ARGS = {
-          Copier: {
-            parse_with_jinja: true,
-            value: '5'
-          },
-          RandomSelector: {
-            list_of_values: ['sample value']
-          }
-        };
 
         $scope.$on('externalSave', function() {
           if ($scope.isParamChangesEditorOpen) {
             $scope.saveParamChanges();
           }
         });
-
-        var getDefaultParameterChange = function(name) {
-          return angular.copy({
-            customization_args: angular.copy(DEFAULT_CUSTOMIZATION_ARGS.Copier),
-            generator_id: 'Copier',
-            name: name
-          });
-        };
 
         var generateParamNameChoices = function() {
           return Object.keys(
@@ -91,15 +74,15 @@ oppia.directive('paramChangesEditor', [function() {
           var newParamName = (
             $scope.paramNameChoices.length > 0 ?
             $scope.paramNameChoices[0].id : 'x');
-          var newParamChange = getDefaultParameterChange(newParamName);
+          var newParamChange = ParamChangeObjectFactory.createDefault(
+            newParamName);
           // Add the new param name to $scope.paramNameChoices, if necessary,
           // so that it shows up in the dropdown.
           if (!$scope.paramNameChoices.hasOwnProperty(newParamChange.name)) {
             explorationParamSpecsService.displayed[newParamChange.name] = (
               angular.copy(DEFAULT_PARAM_SPEC));
             $scope.paramNameChoices = generateParamNameChoices();
-          };
-
+          }
           $scope.paramChangesService.displayed.push(newParamChange);
         };
 
@@ -117,8 +100,7 @@ oppia.directive('paramChangesEditor', [function() {
         };
 
         $scope.onChangeGeneratorType = function(paramChange) {
-          paramChange.customization_args = angular.copy(
-            DEFAULT_CUSTOMIZATION_ARGS[paramChange.generator_id]);
+          paramChange.resetCustomizationArgs();
         };
 
         $scope.HUMAN_READABLE_ARGS_RENDERERS = {
@@ -161,8 +143,8 @@ oppia.directive('paramChangesEditor', [function() {
               return false;
             }
 
-            var generatorId = paramChanges[i].generator_id;
-            var customizationArgs = paramChanges[i].customization_args;
+            var generatorId = paramChanges[i].generatorId;
+            var customizationArgs = paramChanges[i].customizationArgs;
 
             if (!$scope.PREAMBLE_TEXT.hasOwnProperty(generatorId)) {
               $scope.warningText = 'Each parameter should have a generator id.';

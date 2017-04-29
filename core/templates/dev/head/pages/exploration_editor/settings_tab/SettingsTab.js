@@ -293,7 +293,7 @@ oppia.controller('SettingsTab', [
       });
     };
 
-    $scope.deleteExploration = function(role) {
+    $scope.deleteExploration = function() {
       alertsService.clearWarnings();
 
       $modal.open({
@@ -311,9 +311,6 @@ oppia.controller('SettingsTab', [
         ]
       }).result.then(function() {
         var deleteUrl = $scope.explorationDataUrl;
-        if (role) {
-          deleteUrl += ('?role=' + role);
-        }
         $http['delete'](deleteUrl).then(function() {
           $window.location = DASHBOARD_PAGE_URL;
         });
@@ -339,32 +336,33 @@ oppia.controller('SettingsTab', [
             }
           },
           controller: [
-              '$scope', '$modalInstance', 'draftEmailBody',
-              function($scope, $modalInstance, draftEmailBody) {
-            $scope.action = action;
-            $scope.willEmailBeSent = Boolean(draftEmailBody);
-            $scope.emailBody = draftEmailBody;
+            '$scope', '$modalInstance', 'draftEmailBody',
+            function($scope, $modalInstance, draftEmailBody) {
+              $scope.action = action;
+              $scope.willEmailBeSent = Boolean(draftEmailBody);
+              $scope.emailBody = draftEmailBody;
 
-            if ($scope.willEmailBeSent) {
-              $scope.EMAIL_BODY_SCHEMA = {
-                type: 'unicode',
-                ui_config: {
-                  rows: 20
-                }
+              if ($scope.willEmailBeSent) {
+                $scope.EMAIL_BODY_SCHEMA = {
+                  type: 'unicode',
+                  ui_config: {
+                    rows: 20
+                  }
+                };
+              }
+
+              $scope.reallyTakeAction = function() {
+                $modalInstance.close({
+                  emailBody: $scope.emailBody
+                });
+              };
+
+              $scope.cancel = function() {
+                $modalInstance.dismiss('cancel');
+                alertsService.clearWarnings();
               };
             }
-
-            $scope.reallyTakeAction = function() {
-              $modalInstance.close({
-                emailBody: $scope.emailBody
-              });
-            };
-
-            $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
-            };
-          }]
+          ]
         }).result.then(function(result) {
           explorationRightsService.saveModeratorChangeToBackend(
             action, result.emailBody);

@@ -129,7 +129,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         output = DummyJobManager.get_output(job_id)
         error = DummyJobManager.get_error(job_id)
         self.assertIsNone(metadata)
-        self.assertEqual(output, 'output')
+        self.assertEqual(output, ['output'])
         self.assertIsNone(error)
 
         self.assertFalse(DummyJobManager.is_active(job_id))
@@ -148,9 +148,9 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         self.assertTrue(DummyJobManagerWithParams.has_finished(job_id_1))
-        self.assertEqual(DummyJobManagerWithParams.get_output(job_id_1), 60)
+        self.assertEqual(DummyJobManagerWithParams.get_output(job_id_1), ['60'])
         self.assertTrue(DummyJobManagerWithParams.has_finished(job_id_2))
-        self.assertEqual(DummyJobManagerWithParams.get_output(job_id_2), 25)
+        self.assertEqual(DummyJobManagerWithParams.get_output(job_id_2), ['25'])
 
     def test_job_failure(self):
         job_id = DummyFailingJobManager.create_new()
@@ -188,12 +188,12 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         job_id = DummyJobManager.create_new()
         DummyJobManager.enqueue(job_id)
         DummyJobManager.register_start(job_id)
-        DummyJobManager.register_completion(job_id, 'output')
+        DummyJobManager.register_completion(job_id, ['output'])
 
         with self.assertRaisesRegexp(Exception, 'Invalid status code change'):
             DummyJobManager.enqueue(job_id)
         with self.assertRaisesRegexp(Exception, 'Invalid status code change'):
-            DummyJobManager.register_completion(job_id, 'output')
+            DummyJobManager.register_completion(job_id, ['output'])
         with self.assertRaisesRegexp(Exception, 'Invalid status code change'):
             DummyJobManager.register_failure(job_id, 'error')
 
@@ -253,7 +253,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
 
         # The job then finishes.
         with self.assertRaisesRegexp(Exception, 'Invalid status code change'):
-            DummyJobManager.register_completion(job_id, 'job_output')
+            DummyJobManager.register_completion(job_id, ['job_output'])
 
         self.assertFalse(DummyJobManager.is_active(job_id))
         self.assertEquals(
@@ -283,7 +283,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         self.assertEquals(
             DummyJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_COMPLETED)
-        self.assertEquals(DummyJobManager.get_output(job_id), 'output')
+        self.assertEquals(DummyJobManager.get_output(job_id), ['output'])
         self.assertIsNone(DummyJobManager.get_error(job_id))
 
     def test_cancel_does_not_kill_failed_job(self):
@@ -346,7 +346,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         DummyJobManager.cancel(job1_id, 'admin_user_id')
         with self.assertRaisesRegexp(Exception, 'Invalid status code change'):
             self.process_and_flush_pending_tasks()
-        DummyJobManager.register_completion(job2_id, 'output')
+        DummyJobManager.register_completion(job2_id, ['output'])
 
         self.assertFalse(DummyJobManager.is_active(job1_id))
         self.assertFalse(DummyJobManager.is_active(job2_id))
@@ -357,7 +357,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
             DummyJobManager.get_status_code(job2_id),
             jobs.STATUS_CODE_COMPLETED)
         self.assertIsNone(DummyJobManager.get_output(job1_id))
-        self.assertEquals(DummyJobManager.get_output(job2_id), 'output')
+        self.assertEquals(DummyJobManager.get_output(job2_id), ['output'])
         self.assertEquals(
             'Canceled by admin_user_id', DummyJobManager.get_error(job1_id))
         self.assertIsNone(DummyJobManager.get_error(job2_id))
@@ -514,7 +514,7 @@ class MapReduceJobIntegrationTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         self.assertEqual(
-            SampleMapReduceJobManager.get_output(job_id), [['sum', 1]])
+            SampleMapReduceJobManager.get_output(job_id), ['[u\'sum\', 1]'])
         self.assertEqual(
             SampleMapReduceJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_COMPLETED)
@@ -619,7 +619,7 @@ class TwoClassesMapReduceJobIntegrationTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         self.assertEqual(
-            TwoClassesMapReduceJobManager.get_output(job_id), [['sum', 2]])
+            TwoClassesMapReduceJobManager.get_output(job_id), ['[u\'sum\', 2]'])
         self.assertEqual(
             TwoClassesMapReduceJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_COMPLETED)

@@ -349,6 +349,15 @@ class Collection(object):
         return collection_dict
 
     @classmethod
+    def _convert_v2_dict_to_v3_dict(cls, collection_dict):
+        """Converts a v2 collection dict into a v3 collection dict.
+
+        Does nothing since the changes are handled while loading the collection.
+        """
+        collection_dict['schema_version'] = 3
+        return collection_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):
         try:
             collection_dict = utils.dict_from_yaml(yaml_content)
@@ -367,9 +376,13 @@ class Collection(object):
                 'Sorry, we can only process v1 to v%s collection YAML files at '
                 'present.' % feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
-        if collection_schema_version == 1:
-            collection_dict = cls._convert_v1_dict_to_v2_dict(collection_dict)
-            collection_schema_version = 2
+        while (collection_schema_version <
+               feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
+            conversion_fn = getattr(
+                cls, '_convert_v%s_dict_to_v%s_dict' % (
+                    collection_schema_version, collection_schema_version + 1))
+            collection_dict = conversion_fn(collection_dict)
+            collection_schema_version += 1
 
         return collection_dict
 
@@ -385,6 +398,14 @@ class Collection(object):
             cls, collection_contents):
         """Converts from version 1 to 2. Does nothing since this migration only
         changes the language code.
+        """
+        return collection_contents
+
+    @classmethod
+    def _convert_collection_contents_v2_dict_to_v3_dict(
+            cls, collection_contents):
+        """Converts from version 2 to 3. Does nothing since the changes are
+        handled while loading the collection.
         """
         return collection_contents
 

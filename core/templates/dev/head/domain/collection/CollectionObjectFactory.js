@@ -18,8 +18,8 @@
  */
 
 oppia.factory('CollectionObjectFactory', [
-    'CollectionNodeObjectFactory', 'SkillListObjectFactory',
-    function(CollectionNodeObjectFactory, SkillListObjectFactory) {
+  'CollectionNodeObjectFactory', 'SkillListObjectFactory',
+  function(CollectionNodeObjectFactory, SkillListObjectFactory) {
     var Collection = function(collectionBackendObject) {
       this._id = collectionBackendObject.id;
       this._title = collectionBackendObject.title;

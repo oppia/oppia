@@ -13,18 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Loads constants for the Karma test environment.
+ * @fileoverview The controller for the maintenance page.
  */
 
-/* This should be kept in parity with how CONSTANTS is set in base.html */
-var constants = (function() {
-  var request = new XMLHttpRequest();
-  /* The overrideMimeType method was not implemented in IE prior to IE11. */
-  if (request.overrideMimeType) {
-    request.overrideMimeType('application/json');
+oppia.controller('Maintenance', [
+  '$scope', '$rootScope', 'UrlInterpolationService',
+  function($scope, $rootScope, UrlInterpolationService) {
+    $scope.currentLang = 'en';
+    $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
+    $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
   }
-  request.open(
-   'GET', GLOBALS.ASSET_DIR_PREFIX + '/assets/constants.json', false);
-  request.send(null);
-  return JSON.parse(request.responseText);
-})();
+]);

@@ -20,45 +20,45 @@
 oppia.directive('graphPropertyEditor', [
   '$compile', 'OBJECT_EDITOR_URL_PREFIX',
   function($compile, OBJECT_EDITOR_URL_PREFIX) {
-  return {
-    link: function(scope, element) {
-      scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_URL_PREFIX + 'GraphProperty';
-      };
-      $compile(element.contents())(scope);
-    },
-    restrict: 'E',
-    scope: true,
-    template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: ['$scope', function($scope) {
-      $scope.alwaysEditable = true;
+    return {
+      link: function(scope, element) {
+        scope.getTemplateUrl = function() {
+          return OBJECT_EDITOR_URL_PREFIX + 'GraphProperty';
+        };
+        $compile(element.contents())(scope);
+      },
+      restrict: 'E',
+      scope: true,
+      template: '<span ng-include="getTemplateUrl()"></span>',
+      controller: ['$scope', function($scope) {
+        $scope.alwaysEditable = true;
 
-      $scope.graphProperties = [{
-        name: 'regular',
-        humanReadableName: 'regular'
-      }, {
-        name: 'acyclic',
-        humanReadableName: 'acyclic'
-      }, {
-        name: 'strongly_connected',
-        humanReadableName: 'strongly connected'
-      }, {
-        name: 'weakly_connected',
-        humanReadableName: 'weakly connected'
-      }];
-      $scope.localValue = {
-        property: $scope.graphProperties[0]
-      };
+        $scope.graphProperties = [{
+          name: 'regular',
+          humanReadableName: 'regular'
+        }, {
+          name: 'acyclic',
+          humanReadableName: 'acyclic'
+        }, {
+          name: 'strongly_connected',
+          humanReadableName: 'strongly connected'
+        }, {
+          name: 'weakly_connected',
+          humanReadableName: 'weakly connected'
+        }];
+        $scope.localValue = {
+          property: $scope.graphProperties[0]
+        };
 
-      for (var i = 0; i < $scope.graphProperties.length; i++) {
-        if ($scope.graphProperties[i].name === $scope.$parent.value) {
-          $scope.localValue.property = $scope.graphProperties[i];
+        for (var i = 0; i < $scope.graphProperties.length; i++) {
+          if ($scope.graphProperties[i].name === $scope.$parent.value) {
+            $scope.localValue.property = $scope.graphProperties[i];
+          }
         }
-      }
 
-      $scope.$watch('localValue.property', function() {
-        $scope.$parent.value = $scope.localValue.property.name;
-      });
-    }]
-  };
-}]);
+        $scope.$watch('localValue.property', function() {
+          $scope.$parent.value = $scope.localValue.property.name;
+        });
+      }]
+    };
+  }]);

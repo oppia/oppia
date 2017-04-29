@@ -15,48 +15,48 @@
 // This directive is based on the unicodeStringEditor one.
 
 oppia.directive('sanitizedUrlEditor', [
-    '$compile', 'OBJECT_EDITOR_URL_PREFIX',
-    function($compile, OBJECT_EDITOR_URL_PREFIX) {
-  // Editable URL directive.
-  return {
-    link: function(scope, element) {
-      scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_URL_PREFIX + 'SanitizedUrl';
-      };
-      $compile(element.contents())(scope);
-    },
-    restrict: 'E',
-    scope: true,
-    template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: ['$scope', function($scope) {
-      $scope.$watch('$parent.initArgs', function(newValue) {
-        $scope.largeInput = false;
-        if (newValue && newValue.largeInput) {
-          $scope.largeInput = newValue.largeInput;
-        }
-      });
-
-      $scope.$watch('$parent.value', function(newValue) {
-        $scope.localValue = {
-          label: String(newValue) || ''
+  '$compile', 'OBJECT_EDITOR_URL_PREFIX',
+  function($compile, OBJECT_EDITOR_URL_PREFIX) {
+    // Editable URL directive.
+    return {
+      link: function(scope, element) {
+        scope.getTemplateUrl = function() {
+          return OBJECT_EDITOR_URL_PREFIX + 'SanitizedUrl';
         };
-      }, true);
+        $compile(element.contents())(scope);
+      },
+      restrict: 'E',
+      scope: true,
+      template: '<span ng-include="getTemplateUrl()"></span>',
+      controller: ['$scope', function($scope) {
+        $scope.$watch('$parent.initArgs', function(newValue) {
+          $scope.largeInput = false;
+          if (newValue && newValue.largeInput) {
+            $scope.largeInput = newValue.largeInput;
+          }
+        });
 
-      $scope.alwaysEditable = true;
+        $scope.$watch('$parent.value', function(newValue) {
+          $scope.localValue = {
+            label: String(newValue) || ''
+          };
+        }, true);
 
-      $scope.$watch('localValue.label', function(newValue) {
-        $scope.$parent.value = newValue;
-      });
+        $scope.alwaysEditable = true;
 
-      $scope.$on('externalSave', function() {
-        var currentValue = String($scope.localValue.label);
-        if ($scope.active) {
-          $scope.replaceValue(currentValue);
-          // The $scope.$apply() call is needed to propagate the replaced
-          // value.
-          $scope.$apply();
-        }
-      });
-    }]
-  };
-}]);
+        $scope.$watch('localValue.label', function(newValue) {
+          $scope.$parent.value = newValue;
+        });
+
+        $scope.$on('externalSave', function() {
+          var currentValue = String($scope.localValue.label);
+          if ($scope.active) {
+            $scope.replaceValue(currentValue);
+            // The $scope.$apply() call is needed to propagate the replaced
+            // value.
+            $scope.$apply();
+          }
+        });
+      }]
+    };
+  }]);
