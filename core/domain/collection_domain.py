@@ -124,7 +124,7 @@ class CollectionChange(object):
         elif self.cmd == CMD_ADD_COLLECTION_SKILL:
             self.name = change_dict['name']
         elif self.cmd == CMD_DELETE_COLLECTION_SKILL:
-            self.name = change_dict['skill_id']
+            self.skill_id = change_dict['skill_id']
         else:
             raise Exception('Invalid change_dict: %s' % change_dict)
 

@@ -665,7 +665,7 @@ def apply_change_list(collection_id, change_list):
             elif change.cmd == collection_domain.CMD_ADD_COLLECTION_SKILL:
                 collection.add_skill(change.name)
             elif change.cmd == collection_domain.CMD_DELETE_COLLECTION_SKILL:
-                collection.add_skill(change.skill_id)
+                collection.delete_skill(change.skill_id)
         return collection
 
     except Exception as e:
@@ -948,11 +948,9 @@ def update_collection(
             'received none.')
 
     collection = get_collection_by_id(collection_id)
-    print collection.to_dict()
 
     collection = apply_change_list(collection_id, change_list)
 
-    print collection.to_dict()
     _save_collection(committer_id, collection, commit_message, change_list)
     update_collection_summary(collection.id, committer_id)
 
