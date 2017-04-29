@@ -192,7 +192,7 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
             [{
                 'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
                 'name': 'skill0'
-            },{
+            }, {
                 'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
                 'exploration_id': self.EXP_ID_0,
                 'property_name': 'acquired_skills',

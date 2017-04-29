@@ -45,11 +45,12 @@ describe('Collection skill object factory', function() {
   });
 
   it('should be able to create a new collection skill by ID and name',
-      function() {
-    var collectionSkill = CollectionSkillObjectFactory.createFromIdAndName(
-      'skill1', 'skill name');
-    expect(collectionSkill.getId()).toEqual('skill1');
-    expect(collectionSkill.getName()).toEqual('skill name');
-    expect(collectionSkill.getQuestionIds()).toEqual([]);
-  });
+    function() {
+      var collectionSkill = CollectionSkillObjectFactory.createFromIdAndName(
+        'skill1', 'skill name');
+      expect(collectionSkill.getId()).toEqual('skill1');
+      expect(collectionSkill.getName()).toEqual('skill name');
+      expect(collectionSkill.getQuestionIds()).toEqual([]);
+    }
+  );
 });

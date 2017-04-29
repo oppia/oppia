@@ -881,7 +881,7 @@ class Collection(object):
                     'Expected skill ID to end with a number, received %s' %
                     skill_id)
 
-            if not int(skill_id[1:]) < self.skill_id_count:
+            if int(skill_id[1:]) >= self.skill_id_count:
                 raise utils.ValidationError(
                     'Expected skill ID number to be less than %s, received %s' %
                     self.skill_id_count, skill_id)

@@ -18,7 +18,7 @@
  */
 
 oppia.factory('CollectionSkillObjectFactory', [
-      function() {
+  function() {
     var CollectionSkill = function(skillId, collectionSkillBackendObject) {
       this._id = skillId;
       this._name = collectionSkillBackendObject.name;

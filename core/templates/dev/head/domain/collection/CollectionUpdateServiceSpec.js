@@ -303,13 +303,14 @@ describe('Collection update service', function() {
   });
 
   it('should create a proper backend change dict for adding a skill',
-      function() {
-    CollectionUpdateService.addCollectionSkill(_sampleCollection, 'skill1');
-    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
-      cmd: 'add_collection_skill',
-      name: 'skill1'
-    }]);
-  });
+    function() {
+      CollectionUpdateService.addCollectionSkill(_sampleCollection, 'skill1');
+      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: 'add_collection_skill',
+        name: 'skill1'
+      }]);
+    }
+  );
 
   it('should remove/add a new skill', function() {
     var oldCollectionSkill = CollectionSkillObjectFactory.createFromIdAndName(
@@ -329,11 +330,12 @@ describe('Collection update service', function() {
   });
 
   it('should create a proper backend change dict for removing a skill',
-      function() {
-    CollectionUpdateService.deleteCollectionSkill(_sampleCollection, 's0');
-    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
-      cmd: 'delete_collection_skill',
-      skill_id: 's0'
-    }]);
-  });
+    function() {
+      CollectionUpdateService.deleteCollectionSkill(_sampleCollection, 's0');
+      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: 'delete_collection_skill',
+        skill_id: 's0'
+      }]);
+    }
+  );
 });

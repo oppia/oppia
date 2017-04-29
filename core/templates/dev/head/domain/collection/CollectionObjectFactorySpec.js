@@ -338,39 +338,41 @@ describe('Collection object factory', function() {
   );
 
   it('should contain a collection skill defined in the backend object',
-      function() {
-    var collectionSkillBackendObject = {
-      name: 'skill01',
-      question_ids: []
-    };
-    var collection = CollectionObjectFactory.create({
-      id: 'collection_id',
-      nodes: [],
-      skills: {
-        s0: collectionSkillBackendObject
-      },
-      skill_id_count: 1
-    });
-    expect(collection.containsCollectionSkill('s0')).toBe(true);
-    expect(collection.containsCollectionSkill('fake skill')).toBe(false);
-    expect(collection.getCollectionSkills()).toEqual({
-      s0: CollectionSkillObjectFactory.create(
-        's0', collectionSkillBackendObject)
-    });
-  });
+    function() {
+      var collectionSkillBackendObject = {
+        name: 'skill01',
+        question_ids: []
+      };
+      var collection = CollectionObjectFactory.create({
+        id: 'collection_id',
+        nodes: [],
+        skills: {
+          s0: collectionSkillBackendObject
+        },
+        skill_id_count: 1
+      });
+      expect(collection.containsCollectionSkill('s0')).toBe(true);
+      expect(collection.containsCollectionSkill('fake skill')).toBe(false);
+      expect(collection.getCollectionSkills()).toEqual({
+        s0: CollectionSkillObjectFactory.create(
+          's0', collectionSkillBackendObject)
+      });
+    }
+  );
 
   it('should be able to add an existing skill object to the collection',
-      function() {
-    var collectionSkillBackendObject = {
-      name: 'skill01',
-      question_ids: []
-    };
-    _sampleCollection.setSkillIdCount(1);
-    expect(_sampleCollection.addCollectionSkill(
-      CollectionSkillObjectFactory.create(
-        's0', collectionSkillBackendObject))).toBe(true);
-    expect(_sampleCollection.containsCollectionSkill('s0')).toBe(true);
-  });
+    function() {
+      var collectionSkillBackendObject = {
+        name: 'skill01',
+        question_ids: []
+      };
+      _sampleCollection.setSkillIdCount(1);
+      expect(_sampleCollection.addCollectionSkill(
+        CollectionSkillObjectFactory.create(
+          's0', collectionSkillBackendObject))).toBe(true);
+      expect(_sampleCollection.containsCollectionSkill('s0')).toBe(true);
+    }
+  );
 
   it('should be able to add new skills by skill name', function() {
     expect(_addCollectionSkill('new skill')).toBe(true);
