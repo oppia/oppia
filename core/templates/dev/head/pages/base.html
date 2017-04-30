@@ -1,5 +1,5 @@
 {% macro warnings_and_loader() -%}
-  <div ng-cloak>
+  <div tabindex="0" aria-label="Oppia Main Content" id="oppia-main-content" class="protractor-test-main-content" ng-cloak>
     <div class="oppia-toast-container toast-top-center">
       <div ng-repeat="warning in (alertsService.warnings | limitTo:5) track by $index" class="toast toast-warning oppia-toast">
         <button type="button" class="toast-close-button" ng-click="alertsService.deleteWarning(warning)" role="button">&times;</button>
@@ -139,6 +139,7 @@
     {% if iframed %}
       {{ warnings_and_loader() }}
     {% else %}
+      <div role="button" tabindex="0" ng-click="skipToMainContent()" class="oppia-skip-to-content protractor-test-skip-link">Skip to Main Content</div>
       <promo-bar ng-if="promoBarIsEnabled" promo-message="promoBarMessage">
       </promo-bar>
 
