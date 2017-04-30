@@ -21,7 +21,6 @@ oppia.controller('StateEditor', [
   'editabilityService', 'explorationStatesService', 'INTERACTION_SPECS',
   'explorationInitStateNameService', 'explorationAdvancedFeaturesService',
   'UrlInterpolationService', 'editorFirstTimeEventsService',
-  'explorationData',
   function(
       $scope, $rootScope, editorContextService, changeListService,
       editabilityService, explorationStatesService, INTERACTION_SPECS,
@@ -145,7 +144,7 @@ oppia.factory('trainingModalService', [
             'explorationStatesService', 'editorContextService',
             'AnswerClassificationService', 'explorationContextService',
             'stateInteractionIdService', 'angularNameService',
-            'explorationData'
+            'explorationData',
             function($scope, $injector, $modalInstance,
                 explorationStatesService, editorContextService,
                 AnswerClassificationService, explorationContextService,

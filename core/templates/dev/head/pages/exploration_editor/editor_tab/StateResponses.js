@@ -566,7 +566,7 @@ oppia.controller('StateResponses', [
           'explorationContextService', 'editorContextService',
           'explorationStatesService', 'trainingDataService',
           'AnswerClassificationService', 'focusService',
-          'angularNameService', 'RULE_TYPE_CLASSIFIER', 'explorationData'
+          'angularNameService', 'RULE_TYPE_CLASSIFIER', 'explorationData',
           function(
               $scope, $injector, $modalInstance,
               oppiaExplorationHtmlFormatterService,
