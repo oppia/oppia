@@ -21,7 +21,7 @@ oppia.controller('StateEditor', [
   'editabilityService', 'explorationStatesService', 'INTERACTION_SPECS',
   'explorationInitStateNameService', 'explorationAdvancedFeaturesService',
   'UrlInterpolationService', 'editorFirstTimeEventsService',
-  'oppiaPlayerService',
+  'explorationData',
   function(
       $scope, $rootScope, editorContextService, changeListService,
       editabilityService, explorationStatesService, INTERACTION_SPECS,
@@ -145,12 +145,12 @@ oppia.factory('trainingModalService', [
             'explorationStatesService', 'editorContextService',
             'AnswerClassificationService', 'explorationContextService',
             'stateInteractionIdService', 'angularNameService',
-            'oppiaPlayerService'
+            'explorationData'
             function($scope, $injector, $modalInstance,
                 explorationStatesService, editorContextService,
                 AnswerClassificationService, explorationContextService,
                 stateInteractionIdService, angularNameService,
-                oppiaPlayerService) {
+                explorationData) {
               $scope.trainingDataAnswer = '';
               $scope.trainingDataFeedback = '';
               $scope.trainingDataOutcomeDest = '';
@@ -170,7 +170,7 @@ oppia.factory('trainingModalService', [
                 var explorationId =
                   explorationContextService.getExplorationId();
                 var explorationVersion =
-                  oppiaPlayerService.getExplorationVersion();
+                  explorationData.data.version
                 var currentStateName =
                   editorContextService.getActiveStateName();
                 var state = explorationStatesService.getState(currentStateName);
@@ -186,7 +186,8 @@ oppia.factory('trainingModalService', [
                 var rulesService = $injector.get(rulesServiceName);
 
                 AnswerClassificationService.getMatchingClassificationResult(
-                  explorationId, state, unhandledAnswer, true, rulesService)
+                  explorationId, explorationVersion, currentStateName, state,
+                  unhandledAnswer, true, rulesService)
                   .then(function(classificationResult) {
                     var feedback = 'Nothing';
                     var dest = classificationResult.outcome.dest;

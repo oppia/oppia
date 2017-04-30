@@ -46,12 +46,12 @@ oppia.factory('responsesService', [
   '$rootScope', 'stateInteractionIdService', 'INTERACTION_SPECS',
   'answerGroupsCache', 'editorContextService', 'changeListService',
   'explorationStatesService', 'graphDataService', 'OutcomeObjectFactory',
-  'oppiaPlayerService',
+  'explorationData',
   function(
       $rootScope, stateInteractionIdService, INTERACTION_SPECS,
       answerGroupsCache, editorContextService, changeListService,
       explorationStatesService, graphDataService, OutcomeObjectFactory,
-      oppiaPlayerService) {
+      explorationData) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
     var _confirmedUnclassifiedAnswersMemento = null;
@@ -566,7 +566,7 @@ oppia.controller('StateResponses', [
           'explorationContextService', 'editorContextService',
           'explorationStatesService', 'trainingDataService',
           'AnswerClassificationService', 'focusService',
-          'angularNameService', 'RULE_TYPE_CLASSIFIER', 'oppiaPlayerService'
+          'angularNameService', 'RULE_TYPE_CLASSIFIER', 'explorationData'
           function(
               $scope, $injector, $modalInstance,
               oppiaExplorationHtmlFormatterService,
@@ -574,9 +574,9 @@ oppia.controller('StateResponses', [
               explorationContextService, editorContextService,
               explorationStatesService, trainingDataService,
               AnswerClassificationService, focusService,
-              angularNameService, RULE_TYPE_CLASSIFIER, oppiaPlayerService) {
+              angularNameService, RULE_TYPE_CLASSIFIER, explorationData) {
             var _explorationId = explorationContextService.getExplorationId();
-            var _explorationVersion = oppiaPlayerService.getExplorationVersion();
+            var _explorationVersion = explorationData.data.version
             var _stateName = editorContextService.getActiveStateName();
             var _state = explorationStatesService.getState(_stateName);
 
