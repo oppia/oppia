@@ -173,8 +173,8 @@ oppia.factory('UrlInterpolationService', [
       },
 
       /**
-       * Given a path relative to head folder,
-       * returns the complete url path to that component, prefixing the
+       * Given a directive path relative to head folder,
+       * returns the complete url path to that directive, prefixing the
        * appropriate cache_slug to it.
        */
       getDirectiveTemplateUrl: function(path) {
