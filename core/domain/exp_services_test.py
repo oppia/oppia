@@ -1068,7 +1068,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertIn('new state', exploration.states)
 
     def test_rename_state_cmd(self):
-        """Test updating of state name."""
+        """Test updating of state name"""
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
@@ -1082,6 +1082,24 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertIn('state', exploration.states)
+        self.assertNotIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
+
+    def test_update_state_name_with_unicode(self):
+        """Test updating of state name to one that uses unicode characters."""
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+
+        self.assertNotIn(u'¡Hola! αβγ', exploration.states)
+        self.assertIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
+
+        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
+            'cmd': exp_domain.CMD_RENAME_STATE,
+            'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'new_state_name': u'¡Hola! αβγ',
+        }], 'Change state name')
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertIn(u'¡Hola! αβγ', exploration.states)
         self.assertNotIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
 
     def test_delete_state_cmd(self):
@@ -1105,25 +1123,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertNotIn('new state', exploration.states)
-
-    def test_update_state_name_with_unicode(self):
-        """Test updating of state name to one that uses unicode characters."""
-
-
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-
-        self.assertNotIn(u'¡Hola! αβγ', exploration.states)
-        self.assertIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
-
-        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-            'cmd': exp_domain.CMD_RENAME_STATE,
-            'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'new_state_name': u'¡Hola! αβγ',
-        }], 'Change state name')
-
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        self.assertIn(u'¡Hola! αβγ', exploration.states)
-        self.assertNotIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
 
     def test_update_param_changes(self):
         """Test updating of param_changes."""
