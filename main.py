@@ -25,7 +25,7 @@ from core.controllers import dashboard
 from core.controllers import email_dashboard
 from core.controllers import editor
 from core.controllers import feedback
-from core.controllers import fractions_landing_page
+from core.controllers import custom_landing_pages
 from core.controllers import library
 from core.controllers import moderator
 from core.controllers import pages
@@ -213,15 +213,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler),
     get_redirect_route(r'%s' % feconf.FRACTIONS_LANDING_PAGE_URL,
-                       fractions_landing_page.FractionLandingPage),
-    get_redirect_route(r'%s' % feconf.FRACTIONS_LANDING_PAGE_A_URL,
-                       fractions_landing_page.FractionLandingPageA),
-    get_redirect_route(r'%s' % feconf.FRACTIONS_LANDING_PAGE_B_URL,
-                       fractions_landing_page.FractionLandingPageB),
-    get_redirect_route(r'%s' % feconf.FRACTIONS_LANDING_PAGE_C_URL,
-                       fractions_landing_page.FractionLandingPageC),
-    get_redirect_route(r'%s' % feconf.FRACTIONS_LANDING_PAGE_D_URL,
-                       fractions_landing_page.FractionLandingPageD),
+                       custom_landing_pages.FractionLandingPage),
     get_redirect_route(r'%s' % feconf.LIBRARY_INDEX_URL, library.LibraryPage),
     get_redirect_route(r'%s' % feconf.LIBRARY_INDEX_DATA_URL,
                        library.LibraryIndexHandler),
