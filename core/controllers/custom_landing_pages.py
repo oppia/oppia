@@ -17,7 +17,6 @@
 """Controllers for custom landing pages."""
 
 import random
-import feconf
 from core.controllers import base
 
 
@@ -36,4 +35,4 @@ class FractionLandingPage(base.BaseHandler):
             self.redirect('/fractions?v=%s' % version_id)
 
         self.render_template(
-            'pages/landing/fractions/landing_page_%s.html' % version_id)  
+            'pages/landing/fractions/landing_page_%s.html' % version_id)
