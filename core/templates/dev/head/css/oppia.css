@@ -3697,10 +3697,16 @@ md-card.preview-conversation-skin-supplemental-card {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 1em;
   font-weight: normal;
+  hyphens: auto;
   line-height: 1.2em;
   margin: 0.3em 0.5em;
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  overflow-wrap: break-word;
   padding: 0.2em;
   position: absolute;
+  word-break: break-word;
+  -webkit-hyphens: auto;
 }
 .oppia-activity-summary-tile .objective {
   display: -webkit-box;
