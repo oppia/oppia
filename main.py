@@ -21,11 +21,11 @@ from core.controllers import admin
 from core.controllers import base
 from core.controllers import collection_editor
 from core.controllers import collection_viewer
+from core.controllers import custom_landing_pages
 from core.controllers import dashboard
 from core.controllers import email_dashboard
 from core.controllers import editor
 from core.controllers import feedback
-from core.controllers import custom_landing_pages
 from core.controllers import library
 from core.controllers import moderator
 from core.controllers import pages
