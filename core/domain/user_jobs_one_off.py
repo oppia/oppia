@@ -24,10 +24,10 @@ from core.domain import user_services
 from core.platform import models
 import utils
 
-(exp_models, collection_models, feedback_models, user_models,
- statistics_models) = (models.Registry.import_models([
-     models.NAMES.exploration, models.NAMES.collection,
-     models.NAMES.feedback, models.NAMES.user, models.NAMES.statistics]))
+(exp_models, collection_models, feedback_models, user_models) = (
+    models.Registry.import_models([
+        models.NAMES.exploration, models.NAMES.collection,
+        models.NAMES.feedback, models.NAMES.user]))
 
 
 class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
@@ -78,17 +78,13 @@ class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def map(item):
         if item.username is not None:
-            yield (len(item.username), {
-                'username': item.username
-            })
+            yield (len(item.username), 1)
 
     @staticmethod
-    def reduce(key, usernames):
-        username_list = [ast.literal_eval(v) for v in usernames]
-        username_length_model = (
-            statistics_models.UsernameDistributionModel.get_or_create(key))
-        username_length_model.number_of_users = len(username_list)
-        username_length_model.put()
+    def reduce(key, stringified_username_counter):
+        username_counter = [
+        ast.literal_eval(v) for v in stringified_username_counter]
+        yield (key, len(username_counter))
 
 
 class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
