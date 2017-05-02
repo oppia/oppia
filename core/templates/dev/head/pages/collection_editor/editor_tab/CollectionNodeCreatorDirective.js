@@ -49,6 +49,8 @@ oppia.directive('collectionNodeCreator', [function() {
             return;
           }
 
+          alertsService.clearWarnings();
+
           ExplorationSummaryBackendApiService
             .loadPublicAndPrivateExplorationSummaries([newExplorationId])
             .then(function(summaries) {
