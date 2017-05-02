@@ -17,6 +17,7 @@
 """Tests for user-related one-off computations."""
 
 import datetime
+import re
 
 from core.domain import collection_domain
 from core.domain import collection_services
@@ -33,7 +34,6 @@ from core.platform import models
 from core.tests import test_utils
 
 import feconf
-import re
 
 (user_models, feedback_models, job_models,) = models.Registry.import_models(
     [models.NAMES.user, models.NAMES.feedback, models.NAMES.job])

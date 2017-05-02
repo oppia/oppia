@@ -83,7 +83,7 @@ class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def reduce(key, stringified_username_counter):
         username_counter = [
-        ast.literal_eval(v) for v in stringified_username_counter]
+            ast.literal_eval(v) for v in stringified_username_counter]
         yield (key, len(username_counter))
 
 
