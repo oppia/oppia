@@ -43,7 +43,7 @@ oppia.directive('imageWithLabelsEditor', [
         $scope.REGION_LABEL_OFFSET_X = 6;
         $scope.REGION_LABEL_OFFSET_Y = 18;
         $scope.REGION_LABEL_STYLE = (
-          'fill: white; font-size: large; pointer-events: none;');
+          'fill: white; pointer-events: none; font-size: 9pt; text-align: center; width: 100%;');
         $scope.SELECTED_REGION_STYLE = 'fill: orange; opacity: 0.5;';
         $scope.UNSELECTED_REGION_STYLE = 'fill: blue; opacity: 0.5;';
         $scope.getRegionStyle = function(index) {
