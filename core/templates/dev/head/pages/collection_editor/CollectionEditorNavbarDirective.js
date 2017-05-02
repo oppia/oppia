@@ -110,7 +110,9 @@ oppia.directive('collectionEditorNavbar', [
           $scope.saveChanges = function() {
             var isPrivate = $scope.collectionRights.isPrivate();
             var modalInstance = $modal.open({
-              templateUrl: 'modals/saveCollection',
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/collection_editor/' +
+                'collection_editor_save_modal_directive.html'),
               backdrop: true,
               controller: [
                 '$scope', '$modalInstance', function($scope, $modalInstance) {
