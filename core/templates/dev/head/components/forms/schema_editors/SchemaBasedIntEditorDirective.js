@@ -16,47 +16,50 @@
  * @fileoverview Directive for a schema-based editor for integers.
  */
 
-oppia.directive('schemaBasedIntEditor', [function() {
-  return {
-    scope: {
-      localValue: '=',
-      isDisabled: '&',
-      allowExpressions: '&',
-      validators: '&',
-      labelForFocusTarget: '&',
-      onInputBlur: '=',
-      onInputFocus: '='
-    },
-    templateUrl: 'schemaBasedEditor/int',
-    restrict: 'E',
-    controller: [
-      '$scope', 'parameterSpecsService',
-      function($scope, parameterSpecsService) {
-        if ($scope.localValue === undefined) {
-          $scope.localValue = 0;
-        }
-
-        $scope.onKeypress = function(evt) {
-          if (evt.keyCode === 13) {
-            $scope.$emit('submittedSchemaBasedIntForm');
+oppia.directive('schemaBasedIntEditor', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      scope: {
+        localValue: '=',
+        isDisabled: '&',
+        allowExpressions: '&',
+        validators: '&',
+        labelForFocusTarget: '&',
+        onInputBlur: '=',
+        onInputFocus: '='
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/forms/schema_editors/' +
+        'schema_based_int_editor_directive.html'),
+      restrict: 'E',
+      controller: [
+        '$scope', 'parameterSpecsService',
+        function($scope, parameterSpecsService) {
+          if ($scope.localValue === undefined) {
+            $scope.localValue = 0;
           }
-        };
 
-        if ($scope.allowExpressions()) {
-          $scope.paramNames = parameterSpecsService.getAllParamsOfType('int');
-          $scope.expressionMode = angular.isString($scope.localValue);
-
-          $scope.$watch('localValue', function(newValue) {
-            $scope.expressionMode = angular.isString(newValue);
-          });
-
-          $scope.toggleExpressionMode = function() {
-            $scope.expressionMode = !$scope.expressionMode;
-            $scope.localValue = (
-              $scope.expressionMode ? $scope.paramNames[0] : 0);
+          $scope.onKeypress = function(evt) {
+            if (evt.keyCode === 13) {
+              $scope.$emit('submittedSchemaBasedIntForm');
+            }
           };
+
+          if ($scope.allowExpressions()) {
+            $scope.paramNames = parameterSpecsService.getAllParamsOfType('int');
+            $scope.expressionMode = angular.isString($scope.localValue);
+
+            $scope.$watch('localValue', function(newValue) {
+              $scope.expressionMode = angular.isString(newValue);
+            });
+
+            $scope.toggleExpressionMode = function() {
+              $scope.expressionMode = !$scope.expressionMode;
+              $scope.localValue = (
+                $scope.expressionMode ? $scope.paramNames[0] : 0);
+            };
+          }
         }
-      }
-    ]
-  };
-}]);
+      ]
+    };
+  }]);

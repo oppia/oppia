@@ -19,9 +19,10 @@
 oppia.directive('schemaBasedListEditor', [
   'schemaDefaultValueService', 'recursionHelper', 'focusService',
   'schemaUndefinedLastElementService', 'IdGenerationService',
-  function(
+  'UrlInterpolationService', function(
     schemaDefaultValueService, recursionHelper, focusService,
-    schemaUndefinedLastElementService, IdGenerationService) {
+    schemaUndefinedLastElementService, IdGenerationService,
+    UrlInterpolationService) {
     return {
       scope: {
         localValue: '=',
@@ -37,7 +38,9 @@ oppia.directive('schemaBasedListEditor', [
         validators: '&',
         labelForFocusTarget: '&'
       },
-      templateUrl: 'schemaBasedEditor/list',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/forms/schema_editors/' +
+        'schema_based_list_editor_directive.html'),
       restrict: 'E',
       compile: recursionHelper.compile,
       controller: ['$scope', function($scope) {
