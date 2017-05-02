@@ -16,35 +16,38 @@
  * @fileoverview Directive for the classifier panel.
  */
 
-oppia.directive('classifierRulePanel', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      onTrainingDataDeletion: '&',
-      ruleInputs: '='
-    },
-    templateUrl: 'rules/classifierRulePanel',
-    controller: [
-      '$scope', '$modal', 'oppiaExplorationHtmlFormatterService',
-      'stateInteractionIdService', 'stateCustomizationArgsService',
-      'trainingModalService',
-      function($scope, $modal, oppiaExplorationHtmlFormatterService,
-          stateInteractionIdService, stateCustomizationArgsService,
-          trainingModalService) {
-        $scope.trainingDataHtmlList = [];
-        var trainingData = $scope.ruleInputs.training_data;
-        for (var i = 0; i < trainingData.length; i++) {
-          $scope.trainingDataHtmlList.push(
-            oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
-              trainingData[i], stateInteractionIdService.savedMemento,
-              stateCustomizationArgsService.savedMemento));
-        }
+oppia.directive('classifierRulePanel', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        onTrainingDataDeletion: '&',
+        ruleInputs: '='
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/' +
+        'classifier_panel_directive.html'),
+      controller: [
+        '$scope', '$modal', 'oppiaExplorationHtmlFormatterService',
+        'stateInteractionIdService', 'stateCustomizationArgsService',
+        'trainingModalService',
+        function($scope, $modal, oppiaExplorationHtmlFormatterService,
+            stateInteractionIdService, stateCustomizationArgsService,
+            trainingModalService) {
+          $scope.trainingDataHtmlList = [];
+          var trainingData = $scope.ruleInputs.training_data;
+          for (var i = 0; i < trainingData.length; i++) {
+            $scope.trainingDataHtmlList.push(
+              oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
+                trainingData[i], stateInteractionIdService.savedMemento,
+                stateCustomizationArgsService.savedMemento));
+          }
 
-        $scope.openRetrainAnswerModal = function(trainingDataIndex) {
-          trainingModalService.openTrainUnresolvedAnswerModal(
-            trainingData[trainingDataIndex], false);
-        };
-      }
-    ]
-  };
-}]);
+          $scope.openRetrainAnswerModal = function(trainingDataIndex) {
+            trainingModalService.openTrainUnresolvedAnswerModal(
+              trainingData[trainingDataIndex], false);
+          };
+        }
+      ]
+    };
+  }]);
