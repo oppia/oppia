@@ -141,7 +141,9 @@ oppia.directive('collectionEditorNavbar', [
 
             if (additionalMetadataNeeded) {
               $modal.open({
-                templateUrl: 'modals/addCollectionMetadata',
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/pages/collection_editor/' +
+                  'collection_editor_pre_publish_modal_directive.html'),
                 backdrop: true,
                 controller: [
                   '$scope', '$modalInstance', 'CollectionEditorStateService',
