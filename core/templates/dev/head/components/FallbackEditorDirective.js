@@ -26,7 +26,7 @@ oppia.directive('fallbackEditor', [
         outcome: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        'components/' +
+        '/components/' +
         'fallback_editor_directive.html'),
       controller: [
         '$scope', 'editabilityService', function($scope, editabilityService) {
