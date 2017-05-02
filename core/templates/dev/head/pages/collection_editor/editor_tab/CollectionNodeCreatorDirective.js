@@ -47,8 +47,8 @@ oppia.directive('collectionNodeCreator', [
             }
             if ($scope.collection.containsCollectionNode(newExplorationId)) {
               alertsService.addWarning(
-                'There is already an exploration in this collection with that ' +
-                'id.');
+                'There is already an exploration in this collection ' +
+                'with that id.');
               return;
             }
 
@@ -92,8 +92,9 @@ oppia.directive('collectionNodeCreator', [
               $scope.newExplorationTitle = '';
               var newExplorationId = response.data.explorationId;
 
-              siteAnalyticsService.registerCreateNewExplorationInCollectionEvent(
-                newExplorationId);
+              siteAnalyticsService
+                .registerCreateNewExplorationInCollectionEvent(
+                  newExplorationId);
               addExplorationToCollection(newExplorationId);
             });
           };

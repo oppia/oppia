@@ -84,7 +84,8 @@ oppia.directive('collectionEditorNavbar', [
           $scope.$on(
             EVENT_COLLECTION_INITIALIZED, _validateCollection);
           $scope.$on(EVENT_COLLECTION_REINITIALIZED, _validateCollection);
-          $scope.$on(EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateCollection);
+          $scope.$on(
+            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateCollection);
 
           $scope.getWarningsCount = function() {
             return $scope.validationIssues.length;

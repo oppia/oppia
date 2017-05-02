@@ -29,8 +29,9 @@ oppia.directive('collectionPermissionsCard', [
         function($scope, CollectionEditorStateService) {
           $scope.collectionRights =
             CollectionEditorStateService.getCollectionRights();
-          $scope.hasPageLoaded = CollectionEditorStateService.hasLoadedCollection;
+          $scope.hasPageLoaded =
+            CollectionEditorStateService.hasLoadedCollection;
         }
       ]
     };
-}]);
+  }]);

@@ -69,8 +69,8 @@ oppia.directive('collectionDetailsEditor', [
               }
             );
 
-            // If the current category is not in the dropdown, add it as the first
-            // option.
+            // If the current category is not in the dropdown, add it
+            // as the first option.
             if (!categoryIsInSelect2 && $scope.collection.getCategory()) {
               $scope.CATEGORY_LIST_FOR_SELECT2.unshift({
                 id: $scope.collection.getCategory(),
@@ -126,4 +126,4 @@ oppia.directive('collectionDetailsEditor', [
         }
       ]
     };
-}]);
+  }]);

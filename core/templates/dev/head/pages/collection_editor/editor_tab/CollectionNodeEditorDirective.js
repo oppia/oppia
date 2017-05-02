@@ -60,12 +60,14 @@ oppia.directive('collectionNodeEditor', [
             return angular.copy(collectionNode.getAcquiredSkillList());
           };
 
-          // Adds a prerequisite skill to the frontend collection object and also
-          // updates the changelist.
+          // Adds a prerequisite skill to the frontend collection object
+          // and also updates the changelist.
           $scope.addNewPrerequisiteSkill = function() {
             var collectionNode = $scope.getCollectionNode();
             var prerequisiteSkillList = _copyPrerequisiteSkillList();
-            if (!_addSkill(prerequisiteSkillList, $scope.prerequisiteSkillName)) {
+            if (
+              !_addSkill(prerequisiteSkillList, $scope.prerequisiteSkillName)
+              ) {
               return;
             }
             CollectionUpdateService.setPrerequisiteSkills(
@@ -74,8 +76,8 @@ oppia.directive('collectionNodeEditor', [
             $scope.prerequisiteSkillName = '';
           };
 
-          // Removes a prerequisite skill from the frontend collection object and
-          // also updates the changelist.
+          // Removes a prerequisite skill from the frontend collection object
+          // and also updates the changelist.
           $scope.removePrerequisiteSkill = function(index) {
             var collectionNode = $scope.getCollectionNode();
             var prerequisiteSkillList = _copyPrerequisiteSkillList();
@@ -110,8 +112,8 @@ oppia.directive('collectionNodeEditor', [
               acquiredSkillList.getSkills());
           };
 
-          // Deletes this collection node from the frontend collection object and
-          // also updates the changelist.
+          // Deletes this collection node from the frontend collection
+          // object and also updates the changelist.
           $scope.deleteNode = function() {
             var explorationId = $scope.getCollectionNode().getExplorationId();
             if (!CollectionLinearizerService.removeCollectionNode(
@@ -141,8 +143,8 @@ oppia.directive('collectionNodeEditor', [
             if (!CollectionLinearizerService.shiftNodeRight(
                 $scope.collection, explorationId)) {
               alertsService.fatalWarning(
-                'Internal collection editor error. Could not shift node right ' +
-                'with ID: ' + explorationId);
+                'Internal collection editor error. Could not shift node ' +
+                'right with ID: ' + explorationId);
             }
           };
         }

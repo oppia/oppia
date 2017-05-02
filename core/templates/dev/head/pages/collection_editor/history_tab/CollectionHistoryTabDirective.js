@@ -17,12 +17,12 @@
  */
 
 oppia.directive('collectionHistoryTab', [
-	'UrlInterpolationService', function(UrlInterpolationService) {
-		return {
-			restrict: 'E',
-			templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-				'/pages/collection_editor/history_tab/' +
-				'collection_history_tab_directive.html'),
-			controller: [function() {}]
-		};
-	}]);
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                   '/pages/collection_editor/history_tab/' +
+                   'collection_history_tab_directive.html'),
+      controller: [function() {}]
+    };
+  }]);
