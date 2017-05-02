@@ -30,6 +30,7 @@ from core.domain import recommendations_jobs_one_off
 # on the admin dashboard.
 ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
+    user_jobs_one_off.UsernameLengthDistributionOneOffJob,
     exp_jobs_one_off.IndexAllExplorationsJobManager,
     exp_jobs_one_off.ExpSummariesCreationOneOffJob,
     exp_jobs_one_off.ExplorationValidityJobManager,

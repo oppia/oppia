@@ -33,9 +33,10 @@ from core.platform import models
 from core.tests import test_utils
 
 import feconf
+import re
 
-(user_models, feedback_models) = models.Registry.import_models(
-    [models.NAMES.user, models.NAMES.feedback])
+(user_models, feedback_models, job_models,) = models.Registry.import_models(
+    [models.NAMES.user, models.NAMES.feedback, models.NAMES.job])
 taskqueue_services = models.Registry.import_taskqueue_services()
 search_services = models.Registry.import_search_services()
 
@@ -145,8 +146,84 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
             [self.EXP_ID_2])
 
 
-# class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
-#     """Tests for the one-off username length distribution job."""
+class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for the one-off username length distribution job."""
+    USER_A_EMAIL = 'a@example.com'
+    USER_A_USERNAME = 'a'
+    USER_B_EMAIL = 'ab@example.com'
+    USER_B_USERNAME = 'ab'
+    USER_C_EMAIL = 'bc@example.com'
+    USER_C_USERNAME = 'bc'
+    USER_D_EMAIL = 'bcd@example.com'
+    USER_D_USERNAME = 'bcd'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.UsernameLengthDistributionOneOffJob.create_new())
+        user_jobs_one_off.UsernameLengthDistributionOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            user_jobs_one_off.UsernameLengthDistributionOneOffJob.get_output(
+                job_id))
+
+        output = {}
+        for stringified_distribution in stringified_output:
+            value = re.findall(r'\d+', stringified_distribution)
+            # output['username length'] = number of users
+            output[value[0]] = int(value[1])
+
+        return output
+
+    def setUp(self):
+        super(UsernameLengthDistributionOneOffJobTests, self).setUp()
+
+    def test_null_case(self):
+        """Tests the case when there are no signed up users but there is one
+        default user having the username - 'tmpsuperadm1n'.
+        """
+        output = self._run_one_off_job()
+        # number of users = 1.
+        # length of usernames = 13 (tmpsuperadm1n).
+        self.assertEqual(output['13'], 1)
+
+    def test_single_user_case(self):
+        """Tests the case when there is only one signed up user and a default
+        user - 'tmpsuperadm1n'.
+        """
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
+        output = self._run_one_off_job()
+        # number of users = 2.
+        # length of usernames = 13 (tmpsuperadm1n), 1 (a).
+        self.assertEqual(output['13'], 1)
+        self.assertEqual(output['1'], 1)
+
+    def test_multiple_users_case(self):
+        """Tests the case when there are multiple signed up users and a
+        default user - 'tmpsuperadm1n'.
+        """
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
+        output = self._run_one_off_job()
+        # number of users = 3
+        # length of usernames = 13 (tmpsuperadm1n), 2 (ab), 1 (a).
+        self.assertEqual(output['13'], 1)
+        self.assertEqual(output['2'], 1)
+        self.assertEqual(output['1'], 1)
+
+        self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
+        self.signup(self.USER_D_EMAIL, self.USER_D_USERNAME)
+        output = self._run_one_off_job()
+        # number of users = 5
+        # length of usernames = 13 (tmpsuperadm1n), 3 (bcd), 2 (ab, bc), 1 (a).
+        self.assertEqual(output['13'], 1)
+        self.assertEqual(output['3'], 1)
+        self.assertEqual(output['2'], 2)
+        self.assertEqual(output['1'], 1)
 
 
 class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
