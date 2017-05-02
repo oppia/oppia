@@ -35,8 +35,8 @@ from core.tests import test_utils
 
 import feconf
 
-(user_models, feedback_models, job_models,) = models.Registry.import_models(
-    [models.NAMES.user, models.NAMES.feedback, models.NAMES.job])
+(user_models, feedback_models) = models.Registry.import_models(
+    [models.NAMES.user, models.NAMES.feedback])
 taskqueue_services = models.Registry.import_taskqueue_services()
 search_services = models.Registry.import_search_services()
 
