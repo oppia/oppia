@@ -18,109 +18,112 @@
  * adding a new exploration.
  */
 
-oppia.directive('collectionDetailsEditor', [function() {
-  return {
-    restrict: 'E',
-    templateUrl: 'inline/collection_details_editor_directive',
-    controller: [
-      '$scope', 'CollectionEditorStateService', 'CollectionUpdateService',
-      'CollectionValidationService', 'alertsService', 'ALL_CATEGORIES',
-      'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
-      'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
-      function(
-          $scope, CollectionEditorStateService, CollectionUpdateService,
-          CollectionValidationService, alertsService, ALL_CATEGORIES,
-          EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED,
-          COLLECTION_TITLE_INPUT_FOCUS_LABEL) {
-        $scope.collection = CollectionEditorStateService.getCollection();
-        $scope.COLLECTION_TITLE_INPUT_FOCUS_LABEL = (
-          COLLECTION_TITLE_INPUT_FOCUS_LABEL);
-        $scope.hasPageLoaded = (
-          CollectionEditorStateService.hasLoadedCollection);
-        $scope.CATEGORY_LIST_FOR_SELECT2 = ALL_CATEGORIES.map(
-          function(category) {
-            return {
-              id: category,
-              text: category
-            };
-          }
-        );
-
-        $scope.languageListForSelect = GLOBALS.ALL_LANGUAGE_CODES;
-        $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
-
-        var refreshSettingsTab = function() {
-          $scope.displayedCollectionTitle = $scope.collection.getTitle();
-          $scope.displayedCollectionObjective = (
-            $scope.collection.getObjective());
-          $scope.displayedCollectionCategory = (
-            $scope.collection.getCategory());
-          $scope.displayedCollectionLanguage = (
-            $scope.collection.getLanguageCode());
-          $scope.displayedCollectionTags = (
-            $scope.collection.getTags());
-
-          var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2.some(
-            function(categoryItem) {
-              return categoryItem.id === $scope.collection.getCategory();
+oppia.directive('collectionDetailsEditor', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/collection_editor/settings_tab/' +
+        'collection_details_editor_directive.html'),
+      controller: [
+        '$scope', 'CollectionEditorStateService', 'CollectionUpdateService',
+        'CollectionValidationService', 'alertsService', 'ALL_CATEGORIES',
+        'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
+        'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
+        function(
+            $scope, CollectionEditorStateService, CollectionUpdateService,
+            CollectionValidationService, alertsService, ALL_CATEGORIES,
+            EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED,
+            COLLECTION_TITLE_INPUT_FOCUS_LABEL) {
+          $scope.collection = CollectionEditorStateService.getCollection();
+          $scope.COLLECTION_TITLE_INPUT_FOCUS_LABEL = (
+            COLLECTION_TITLE_INPUT_FOCUS_LABEL);
+          $scope.hasPageLoaded = (
+            CollectionEditorStateService.hasLoadedCollection);
+          $scope.CATEGORY_LIST_FOR_SELECT2 = ALL_CATEGORIES.map(
+            function(category) {
+              return {
+                id: category,
+                text: category
+              };
             }
           );
 
-          // If the current category is not in the dropdown, add it as the first
-          // option.
-          if (!categoryIsInSelect2 && $scope.collection.getCategory()) {
-            $scope.CATEGORY_LIST_FOR_SELECT2.unshift({
-              id: $scope.collection.getCategory(),
-              text: $scope.collection.getCategory()
-            });
-          }
-        };
+          $scope.languageListForSelect = GLOBALS.ALL_LANGUAGE_CODES;
+          $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
 
-        $scope.$on(EVENT_COLLECTION_INITIALIZED, refreshSettingsTab);
-        $scope.$on(EVENT_COLLECTION_REINITIALIZED, refreshSettingsTab);
+          var refreshSettingsTab = function() {
+            $scope.displayedCollectionTitle = $scope.collection.getTitle();
+            $scope.displayedCollectionObjective = (
+              $scope.collection.getObjective());
+            $scope.displayedCollectionCategory = (
+              $scope.collection.getCategory());
+            $scope.displayedCollectionLanguage = (
+              $scope.collection.getLanguageCode());
+            $scope.displayedCollectionTags = (
+              $scope.collection.getTags());
 
-        $scope.updateCollectionTitle = function() {
-          CollectionUpdateService.setCollectionTitle(
-            $scope.collection, $scope.displayedCollectionTitle);
-        };
+            var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2.some(
+              function(categoryItem) {
+                return categoryItem.id === $scope.collection.getCategory();
+              }
+            );
 
-        $scope.updateCollectionObjective = function() {
-          CollectionUpdateService.setCollectionObjective(
-            $scope.collection, $scope.displayedCollectionObjective);
-        };
+            // If the current category is not in the dropdown, add it as the first
+            // option.
+            if (!categoryIsInSelect2 && $scope.collection.getCategory()) {
+              $scope.CATEGORY_LIST_FOR_SELECT2.unshift({
+                id: $scope.collection.getCategory(),
+                text: $scope.collection.getCategory()
+              });
+            }
+          };
 
-        $scope.updateCollectionCategory = function() {
-          CollectionUpdateService.setCollectionCategory(
-            $scope.collection, $scope.displayedCollectionCategory);
-        };
+          $scope.$on(EVENT_COLLECTION_INITIALIZED, refreshSettingsTab);
+          $scope.$on(EVENT_COLLECTION_REINITIALIZED, refreshSettingsTab);
 
-        $scope.updateCollectionLanguageCode = function() {
-          CollectionUpdateService.setCollectionLanguageCode(
-            $scope.collection, $scope.displayedCollectionLanguage);
-        };
+          $scope.updateCollectionTitle = function() {
+            CollectionUpdateService.setCollectionTitle(
+              $scope.collection, $scope.displayedCollectionTitle);
+          };
 
-        // Normalize the tags for the collection
-        var normalizeTags = function(tags) {
-          for (var i = 0; i < tags.length; i++) {
-            tags[i] = tags[i].trim().replace(/\s+/g, ' ');
-          }
-          return tags;
-        };
+          $scope.updateCollectionObjective = function() {
+            CollectionUpdateService.setCollectionObjective(
+              $scope.collection, $scope.displayedCollectionObjective);
+          };
 
-        $scope.updateCollectionTags = function() {
-          $scope.displayedCollectionTags = normalizeTags(
-            $scope.displayedCollectionTags);
-          if (!CollectionValidationService.isTagValid(
-                $scope.displayedCollectionTags)) {
-            alertsService.addWarning(
-              'Please ensure that there are no duplicate tags and that all ' +
-              'tags contain only lower case and spaces.');
-            return;
-          }
-          CollectionUpdateService.setCollectionTags(
-            $scope.collection, $scope.displayedCollectionTags);
-        };
-      }
-    ]
-  };
+          $scope.updateCollectionCategory = function() {
+            CollectionUpdateService.setCollectionCategory(
+              $scope.collection, $scope.displayedCollectionCategory);
+          };
+
+          $scope.updateCollectionLanguageCode = function() {
+            CollectionUpdateService.setCollectionLanguageCode(
+              $scope.collection, $scope.displayedCollectionLanguage);
+          };
+
+          // Normalize the tags for the collection
+          var normalizeTags = function(tags) {
+            for (var i = 0; i < tags.length; i++) {
+              tags[i] = tags[i].trim().replace(/\s+/g, ' ');
+            }
+            return tags;
+          };
+
+          $scope.updateCollectionTags = function() {
+            $scope.displayedCollectionTags = normalizeTags(
+              $scope.displayedCollectionTags);
+            if (!CollectionValidationService.isTagValid(
+                  $scope.displayedCollectionTags)) {
+              alertsService.addWarning(
+                'Please ensure that there are no duplicate tags and that all ' +
+                'tags contain only lower case and spaces.');
+              return;
+            }
+            CollectionUpdateService.setCollectionTags(
+              $scope.collection, $scope.displayedCollectionTags);
+          };
+        }
+      ]
+    };
 }]);
