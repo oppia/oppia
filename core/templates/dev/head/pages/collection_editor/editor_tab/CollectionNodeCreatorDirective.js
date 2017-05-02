@@ -16,90 +16,93 @@
  * @fileoverview Directive for creating a new collection node.
  */
 
-oppia.directive('collectionNodeCreator', [function() {
-  return {
-    restrict: 'E',
-    templateUrl: 'collectionEditor/newNodeCreator',
-    controller: [
-      '$scope', '$http', '$window', '$filter', 'alertsService',
-      'validatorsService', 'CollectionEditorStateService',
-      'CollectionLinearizerService', 'CollectionUpdateService',
-      'CollectionNodeObjectFactory', 'ExplorationSummaryBackendApiService',
-      'siteAnalyticsService',
-      function(
-          $scope, $http, $window, $filter, alertsService,
-          validatorsService, CollectionEditorStateService,
-          CollectionLinearizerService, CollectionUpdateService,
-          CollectionNodeObjectFactory, ExplorationSummaryBackendApiService,
-          siteAnalyticsService) {
-        $scope.collection = CollectionEditorStateService.getCollection();
-        $scope.newExplorationId = '';
-        $scope.newExplorationTitle = '';
-        var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
-
-        var addExplorationToCollection = function(newExplorationId) {
-          if (!newExplorationId) {
-            alertsService.addWarning('Cannot add an empty exploration ID.');
-            return;
-          }
-          if ($scope.collection.containsCollectionNode(newExplorationId)) {
-            alertsService.addWarning(
-              'There is already an exploration in this collection with that ' +
-              'id.');
-            return;
-          }
-
-          ExplorationSummaryBackendApiService
-            .loadPublicAndPrivateExplorationSummaries([newExplorationId])
-            .then(function(summaries) {
-              var summaryBackendObject = null;
-              if (summaries.length !== 0 &&
-                  summaries[0].id === newExplorationId) {
-                summaryBackendObject = summaries[0];
-              }
-              if (summaryBackendObject) {
-                CollectionLinearizerService.appendCollectionNode(
-                  $scope.collection, newExplorationId, summaryBackendObject);
-              } else {
-                alertsService.addWarning(
-                  'That exploration does not exist or you do not have edit ' +
-                  'access to it.');
-              }
-            }, function() {
-              alertsService.addWarning(
-                'There was an error while adding an exploration to the ' +
-                'collection.');
-            }
-          );
-        };
-
-        // Creates a new exploration, then adds it to the collection.
-        $scope.createNewExploration = function() {
-          var title = $filter('normalizeWhitespace')(
-            $scope.newExplorationTitle);
-
-          if (!validatorsService.isValidExplorationTitle(title, true)) {
-            return;
-          }
-
-          // Create a new exploration with the given title.
-          $http.post('/contributehandler/create_new', {
-            title: title
-          }).then(function(response) {
-            $scope.newExplorationTitle = '';
-            var newExplorationId = response.data.explorationId;
-
-            siteAnalyticsService.registerCreateNewExplorationInCollectionEvent(
-              newExplorationId);
-            addExplorationToCollection(newExplorationId);
-          });
-        };
-
-        $scope.addExploration = function() {
-          addExplorationToCollection($scope.newExplorationId);
+oppia.directive('collectionNodeCreator', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/collection_editor/editor_tab/' +
+        'collection_node_creator_directive.html'),
+      controller: [
+        '$scope', '$http', '$window', '$filter', 'alertsService',
+        'validatorsService', 'CollectionEditorStateService',
+        'CollectionLinearizerService', 'CollectionUpdateService',
+        'CollectionNodeObjectFactory', 'ExplorationSummaryBackendApiService',
+        'siteAnalyticsService',
+        function(
+            $scope, $http, $window, $filter, alertsService,
+            validatorsService, CollectionEditorStateService,
+            CollectionLinearizerService, CollectionUpdateService,
+            CollectionNodeObjectFactory, ExplorationSummaryBackendApiService,
+            siteAnalyticsService) {
+          $scope.collection = CollectionEditorStateService.getCollection();
           $scope.newExplorationId = '';
-        };
-      }
-    ]
-  };
-}]);
+          $scope.newExplorationTitle = '';
+          var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
+
+          var addExplorationToCollection = function(newExplorationId) {
+            if (!newExplorationId) {
+              alertsService.addWarning('Cannot add an empty exploration ID.');
+              return;
+            }
+            if ($scope.collection.containsCollectionNode(newExplorationId)) {
+              alertsService.addWarning(
+                'There is already an exploration in this collection with that ' +
+                'id.');
+              return;
+            }
+
+            ExplorationSummaryBackendApiService
+              .loadPublicAndPrivateExplorationSummaries([newExplorationId])
+              .then(function(summaries) {
+                var summaryBackendObject = null;
+                if (summaries.length !== 0 &&
+                    summaries[0].id === newExplorationId) {
+                  summaryBackendObject = summaries[0];
+                }
+                if (summaryBackendObject) {
+                  CollectionLinearizerService.appendCollectionNode(
+                    $scope.collection, newExplorationId, summaryBackendObject);
+                } else {
+                  alertsService.addWarning(
+                    'That exploration does not exist or you do not have edit ' +
+                    'access to it.');
+                }
+              }, function() {
+                alertsService.addWarning(
+                  'There was an error while adding an exploration to the ' +
+                  'collection.');
+              }
+            );
+          };
+
+          // Creates a new exploration, then adds it to the collection.
+          $scope.createNewExploration = function() {
+            var title = $filter('normalizeWhitespace')(
+              $scope.newExplorationTitle);
+
+            if (!validatorsService.isValidExplorationTitle(title, true)) {
+              return;
+            }
+
+            // Create a new exploration with the given title.
+            $http.post('/contributehandler/create_new', {
+              title: title
+            }).then(function(response) {
+              $scope.newExplorationTitle = '';
+              var newExplorationId = response.data.explorationId;
+
+              siteAnalyticsService.registerCreateNewExplorationInCollectionEvent(
+                newExplorationId);
+              addExplorationToCollection(newExplorationId);
+            });
+          };
+
+          $scope.addExploration = function() {
+            addExplorationToCollection($scope.newExplorationId);
+            $scope.newExplorationId = '';
+          };
+        }
+      ]
+    };
+  }]);
