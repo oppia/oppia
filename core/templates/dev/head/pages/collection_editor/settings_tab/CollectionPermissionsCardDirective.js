@@ -17,17 +17,20 @@
  * permissions.
  */
 
-oppia.directive('collectionPermissionsCard', [function() {
-  return {
-    restrict: 'E',
-    templateUrl: 'inline/collection_permissions_card_directive',
-    controller: [
-      '$scope', 'CollectionEditorStateService',
-      function($scope, CollectionEditorStateService) {
-        $scope.collectionRights =
-          CollectionEditorStateService.getCollectionRights();
-        $scope.hasPageLoaded = CollectionEditorStateService.hasLoadedCollection;
-      }
-    ]
-  };
+oppia.directive('collectionPermissionsCard', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/collection_editor/settings_tab/' +
+        'collection_permissions_card_directive.html'),
+      controller: [
+        '$scope', 'CollectionEditorStateService',
+        function($scope, CollectionEditorStateService) {
+          $scope.collectionRights =
+            CollectionEditorStateService.getCollectionRights();
+          $scope.hasPageLoaded = CollectionEditorStateService.hasLoadedCollection;
+        }
+      ]
+    };
 }]);
