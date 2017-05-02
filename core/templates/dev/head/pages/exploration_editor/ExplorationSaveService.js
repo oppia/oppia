@@ -25,7 +25,7 @@ oppia.factory('explorationSaveService', [
   'explorationWarningsService', 'ExplorationDiffService',
   'explorationInitStateNameService', 'routerService',
   'focusService', 'changeListService', 'siteAnalyticsService',
-  'StateObjectFactory',
+  'StateObjectFactory', 'UrlInterpolationService',
   function(
       $modal, $timeout, $rootScope, $log, $q,
       alertsService, explorationData, explorationStatesService,
@@ -35,7 +35,7 @@ oppia.factory('explorationSaveService', [
       explorationWarningsService, ExplorationDiffService,
       explorationInitStateNameService, routerService,
       focusService, changeListService, siteAnalyticsService,
-      StateObjectFactory) {
+      StateObjectFactory, UrlInterpolationService) {
     // Whether or not a save action is currently in progress
     // (request has been sent to backend but no reply received yet)
     var saveIsInProgress = false;
@@ -79,9 +79,7 @@ oppia.factory('explorationSaveService', [
         backdrop: true,
         controller: [
           '$scope', '$modalInstance', 'explorationContextService',
-          'UrlInterpolationService',
-          function($scope, $modalInstance, explorationContextService,
-            UrlInterpolationService) {
+          function($scope, $modalInstance, explorationContextService) {
             $scope.congratsImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/general/congrats.svg');
             $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
@@ -219,7 +217,9 @@ oppia.factory('explorationSaveService', [
           $rootScope.$broadcast('externalSave');
 
           $modal.open({
-            templateUrl: 'modals/reloadingEditor',
+            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+              '/pages/exploration_editor/' +
+              'editor_reloading_modal_directive.html'),
             backdrop: 'static',
             keyboard: false,
             controller: [
@@ -257,7 +257,9 @@ oppia.factory('explorationSaveService', [
         // 'add exploration metadata' modal.
         if (isAdditionalMetadataNeeded()) {
           var modalInstance = $modal.open({
-            templateUrl: 'modals/addExplorationMetadata',
+            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+              '/pages/exploration_editor/' +
+              'exploration_metadata_modal_directive.html'),
             backdrop: 'static',
             controller: [
               '$scope', '$modalInstance', 'explorationObjectiveService',
