@@ -46,7 +46,6 @@ oppia.factory('responsesService', [
   '$rootScope', 'stateInteractionIdService', 'INTERACTION_SPECS',
   'answerGroupsCache', 'editorContextService', 'changeListService',
   'explorationStatesService', 'graphDataService', 'OutcomeObjectFactory',
-  'explorationData',
   function(
       $rootScope, stateInteractionIdService, INTERACTION_SPECS,
       answerGroupsCache, editorContextService, changeListService,
@@ -899,4 +898,4 @@ oppia.filter('summarizeDefaultOutcome', [
       return summary;
     };
   }
-]);s
+]);
