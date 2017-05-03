@@ -64,6 +64,16 @@ describe('Validators service', function() {
       expect(vs.isNonempty(null)).toBe(false);
       expect(vs.isNonempty(undefined)).toBe(false);
     });
+
+    it('should correctly validate exploration IDs', function() {
+      expect(vs.isValidExplorationId('b')).toBe(true);
+      expect(vs.isValidExplorationId('2')).toBe(true);
+      expect(vs.isValidExplorationId('asbfjkdAFS-_')).toBe(true);
+
+      expect(vs.isValidExplorationId('abc def')).toBe(false);
+      expect(vs.isValidExplorationId('')).toBe(false);
+      expect(vs.isValidExplorationId('abcd;')).toBe(false);
+    });
   });
 });
 
