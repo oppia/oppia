@@ -21,9 +21,7 @@ oppia.directive('editorNavigation', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/' +
-        'editor_navigation_directive.html'),
+      templateUrl: 'inline/editor_navigation_directive',
       controller: [
         '$scope', '$rootScope', '$timeout', '$modal',
         'routerService', 'explorationRightsService',
