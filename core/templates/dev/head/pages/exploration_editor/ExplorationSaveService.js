@@ -75,7 +75,9 @@ oppia.factory('explorationSaveService', [
 
     var showCongratulatorySharingModal = function() {
       return $modal.open({
-        templateUrl: 'modals/shareExplorationAfterPublish',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/' +
+          'post_publish_modal_directive.html'),
         backdrop: true,
         controller: [
           '$scope', '$modalInstance', 'explorationContextService',
