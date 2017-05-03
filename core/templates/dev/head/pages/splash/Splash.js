@@ -51,5 +51,8 @@ oppia.controller('Splash', [
       }, 150);
       return false;
     };
+
+    $scope.aboutPageMascotImgUrl = UrlInterpolationService.getStaticImageUrl(
+      '/general/about_page_mascot.png');
   }
 ]);

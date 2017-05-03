@@ -20,7 +20,7 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-md-4 oppia-display-desktop-only col-sm-3">
-					<img src="https://www.oppia.org/build/bcbnbz/assets/images/general/about_page_mascot.png" id="oppia-splash-new-otter" />
+					<img ng-src="<[aboutPageMascotImgUrl]>" id="oppia-splash-new-otter" />
 				</div>
 				<div class="col-xs-12 col-sm-9 col-md-6" style="margin-top: 20px;">
 					<h1 class="oppia-splash-new-h1">Welcome to Oppia</h1>
@@ -72,7 +72,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="oppia-about-extra-info">
+		<div class="oppia-splash-new-callout">
 			<button type="button"
 							ng-click="onClickBrowseLibraryButton()"
 							class="btn oppia-transition-200">
@@ -158,14 +158,14 @@
 			-webkit-font-smoothing: subpixel-antialiased;
     }
 
-		.oppia-about-extra-info {
+		.oppia-splash-new-callout {
       background-color: #009788;
       color: #ffffff;
       height: 150px;
       text-align: center;
     }
 
-    .oppia-about-extra-info button {
+    .oppia-splash-new-callout button {
       background-color: #00796d;
       font-family: 'Capriola', 'Roboto', Arial, sans-serif;
       font-size: 18px;
@@ -182,7 +182,7 @@
 			-webkit-font-smoothing: subpixel-antialiased;
     }
 
-    .oppia-about-extra-info button:hover {
+    .oppia-splash-new-callout button:hover {
       background-color: #05beb2;
 			color: #ffffff;
     }
@@ -201,18 +201,18 @@
 				margin-bottom: 5px;
 			}
 
-			.oppia-about-extra-info {
+			.oppia-splash-new-callout {
         padding: 15px 0;
         height: auto;
       }
 
-      .oppia-about-extra-info button {
+      .oppia-splash-new-callout button {
         position: auto;
         top: auto;
         transform: none;
       }
 
-      .oppia-about-extra-info button:first-of-type {
+      .oppia-splash-new-callout button:first-of-type {
         margin-top: 15px;
       }
 		}

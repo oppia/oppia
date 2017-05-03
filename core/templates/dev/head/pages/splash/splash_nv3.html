@@ -20,7 +20,7 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-md-4 oppia-display-desktop-only col-sm-3">
-					<img src="https://www.oppia.org/build/bcbnbz/assets/images/general/about_page_mascot.png" id="oppia-splash-new-otter" />
+					<img ng-src="<[aboutPageMascotImgUrl]>" id="oppia-splash-new-otter" />
 				</div>
 				<div class="col-xs-12 col-sm-9 col-md-6" style="margin-top: 20px;">
 					<h1 class="oppia-splash-new-h1">Welcome to Oppia</h1>
@@ -39,32 +39,11 @@
 					</div>
 				</div>
 			</div>
-			<div class="jumbotron">
-				<div class="row">
-					<div class="col-sm-4 oppia-bullet-holder">
-						<div class="row">
-							<img ng-src="<[getStaticImageUrl('/splash/bullet1icon.svg')]>" alt="">
-						</div>
-						<div class="row">
-							<p>Oppia's lessons are more fun and immersive than static videos or text, helping people learn by doing.</p>
-						</div>
-					</div>
-					<div class="col-sm-4 oppia-bullet-holder">
-						<div class="row">
-							<img ng-src="<[getStaticImageUrl('/splash/bullet2icon.svg')]>" alt="">
-						</div>
-						<div class="row">
-							<p>Lessons are simple to create and even easier to play. Learners receive tailored feedback based on areas for improvement.</p>
-						</div>
-					</div>
-					<div class="col-sm-4 oppia-bullet-holder">
-						<div class="row">
-							<img ng-src="<[getStaticImageUrl('/splash/bullet3icon.svg')]>" alt="">
-						</div>
-						<div class="row">
-							<p>Join over 250,000 learners and educators from around the world: <a ng-click="onClickBrowseLibraryButton()">start learning</a> or <a ng-click="onRedirectToLogin('/dashboard?mode=create')">share your knowledge</a> today!</p>
-						</div>
-					</div>
+			<div class="jumbotron oppia-jumbotron-bottom-padding-reduction">
+				<div class="row oppia-row-maintain-horizontal-margin">
+          <h2 class="oppia-splash-new-h2"><strong>Oppia</strong> is a free online learning tool that enables anyone to easily create and share interactive activities, or lessons, simulating a one-on-one conversation with an intelligent tutor.</h2>
+          <br />
+          <h2 class="oppia-splash-new-h2">Imagine what you could learn today&hellip;</h2>
 				</div>
 			</div>
       <div class="row">
@@ -72,7 +51,7 @@
         <!-- TODO: put carousel here -->
       </div>
 		</div>
-		<div class="oppia-about-extra-info container">
+		<div class="oppia-splash-new-callout container-fluid">
       <h2>Share Your Knowledge</h2>
       <p>Whether you're a K-12 educator, a graduate student, or an individual who's passionate about a specific subject and wants to share your knowledge, Oppia welcomes you. Join the community and start exploring with us.</p>
 			<button type="button"
@@ -104,6 +83,21 @@
 			text-rendering: auto;
     }
 
+    .jumbotron .oppia-splash-new-h2 {
+      font-size: 1.75em;
+      line-height: 1.6;
+      margin: 0 auto;
+      max-width: 750px;
+    }
+
+    .oppia-jumbotron-bottom-padding-reduction {
+      padding-bottom: 1.67em;
+    }
+
+    .oppia-row-maintain-horizontal-margin {
+        margin: auto 15px;
+    }
+
 		.oppia-splash-new-h3 {
       font-family: 'Rubik', 'Roboto', Arial, sans-serif;
       font-size: 1.5em;
@@ -112,10 +106,6 @@
       text-align: left;
       margin: 18px 0;
 			-webkit-font-smoothing: subpixel-antialiased;
-    }
-
-    .jumbotron .oppia-splash-new-h2 {
-      margin-top: 0;
     }
 
 		#oppia-splash-new-otter {
@@ -165,14 +155,14 @@
 			-webkit-font-smoothing: subpixel-antialiased;
     }
 
-		.oppia-about-extra-info {
+		.oppia-splash-new-callout {
       background-color: #009788;
       color: #ffffff;
       text-align: center;
       font-family: 'Rubik', 'Roboto', Arial, sans-serif;
     }
 
-    .oppia-about-extra-info h2 {
+    .oppia-splash-new-callout h2 {
       font-size: 2em;
       font-weight: 600;
       color: #ffffff;
@@ -180,7 +170,7 @@
       margin-top: 22px;
     }
 
-    .oppia-about-extra-info p {
+    .oppia-splash-new-callout p {
       max-width: 650px;
       line-height: 1.8;
       font-size: 1.3em;
@@ -188,7 +178,7 @@
       margin: 15px auto;
     }
 
-    .oppia-about-extra-info button {
+    .oppia-splash-new-callout button {
       background-color: #00796d;
       font-family: 'Capriola', 'Roboto', Arial, sans-serif;
       padding: 10px 20px;
@@ -200,7 +190,7 @@
       margin-bottom: 22px;
     }
 
-    .oppia-about-extra-info button:hover {
+    .oppia-splash-new-callout button:hover {
       background-color: #05beb2;
 			color: #ffffff;
     }
@@ -219,18 +209,22 @@
 				margin-bottom: 5px;
 			}
 
-			.oppia-about-extra-info {
-        padding: 15px 0;
+      .oppia-jumbotron-bottom-padding-reduction {
+        padding-top: 1.67em;
+      }
+
+			.oppia-splash-new-callout {
+        padding: 15px;
         height: auto;
       }
 
-      .oppia-about-extra-info button {
+      .oppia-splash-new-callout button {
         position: auto;
         top: auto;
         transform: none;
       }
 
-      .oppia-about-extra-info button:first-of-type {
+      .oppia-splash-new-callout button:first-of-type {
         margin-top: 15px;
       }
 		}
