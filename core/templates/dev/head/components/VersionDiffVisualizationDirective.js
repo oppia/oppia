@@ -211,7 +211,9 @@ oppia.directive('versionDiffVisualization', [
         $scope.showStateDiffModal = function(
             newStateName, oldStateName, stateProperty) {
           $modal.open({
-            templateUrl: 'modals/stateDiff',
+            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+              '/pages/exploration_editor/' +
+              'state_diff_modal_directive.html'),
             backdrop: true,
             windowClass: 'state-diff-modal',
             resolve: {
