@@ -20,9 +20,7 @@ oppia.directive('collectionEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/' +
-        'collection_editor_navbar_directive.html'),
+      templateUrl: 'inline/collection_editor_navbar_directive',
       controller: [
         '$scope', '$modal', 'alertsService', 'routerService', 'UndoRedoService',
         'CollectionEditorStateService', 'CollectionValidationService',
