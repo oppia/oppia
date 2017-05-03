@@ -2459,7 +2459,9 @@ oppia.factory('autosaveInfoModalsService', [
       },
       showVersionMismatchModal: function(lostChanges) {
         $modal.open({
-          templateUrl: 'modals/saveVersionMismatch',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_editor/' +
+            'save_version_mismatch_modal.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
           controller: ['$scope', function($scope) {
