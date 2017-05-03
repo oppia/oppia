@@ -88,10 +88,6 @@ class BaseModel(ndb.Model):
                 (cls.__name__, entity_id))
         return entity
 
-    def put(self):
-        """Stores this entity's data."""
-        super(BaseModel, self).put()
-
     @classmethod
     def get_multi(cls, entity_ids, include_deleted=False):
         """Gets list of entities by list of ids.

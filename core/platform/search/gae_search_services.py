@@ -126,8 +126,7 @@ def _make_fields(key, value):
     if isinstance(value, numbers.Number):
         return [gae_search.NumberField(name=key, value=value)]
 
-    if isinstance(value, datetime.datetime) or isinstance(
-            value, datetime.date):
+    if isinstance(value, (datetime.datetime, datetime.date)):
         return [gae_search.DateField(name=key, value=value)]
 
     raise ValueError(
@@ -141,10 +140,8 @@ def _validate_list(key, value):
     passed in to make better error messages."""
 
     for ind, element in enumerate(value):
-        if not (isinstance(element, basestring) or
-                isinstance(element, datetime.date) or
-                isinstance(element, datetime.datetime) or
-                isinstance(element, numbers.Number)):
+        if not isinstance(element, (
+                basestring, datetime.date, datetime.datetime, numbers.Number)):
             raise ValueError(
                 'All values of a multi-valued field must be numbers, strings, '
                 'date or datetime instances, The %dth value for field %s has'
