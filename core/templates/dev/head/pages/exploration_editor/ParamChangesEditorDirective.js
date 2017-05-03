@@ -31,11 +31,11 @@ oppia.directive('paramChangesEditor', [
       controller: [
         '$scope', '$rootScope', 'editabilityService',
         'explorationParamSpecsService', 'alertsService',
-        'UrlInterpolationService', 'ParamChangeObjectFactory',
+        'ParamChangeObjectFactory',
         function(
             $scope, $rootScope, editabilityService,
             explorationParamSpecsService, alertsService,
-            UrlInterpolationService, ParamChangeObjectFactory) {
+            ParamChangeObjectFactory) {
           $scope.editabilityService = editabilityService;
           $scope.isParamChangesEditorOpen = false;
           $scope.warningText = '';
