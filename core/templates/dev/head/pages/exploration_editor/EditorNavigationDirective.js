@@ -56,7 +56,9 @@ oppia.directive('editorNavigation', [
             var explorationId = explorationContextService.getExplorationId();
             siteAnalyticsService.registerClickHelpButtonEvent(explorationId);
             var modalInstance = $modal.open({
-              templateUrl: 'modals/userHelp',
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/exploration_editor/' +
+                'help_modal_directive.html'),
               backdrop: true,
               controller: [
                 '$scope', '$modalInstance',
