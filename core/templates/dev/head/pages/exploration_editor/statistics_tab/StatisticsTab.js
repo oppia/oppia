@@ -24,7 +24,7 @@ oppia.controller('StatisticsTab', [
   '$scope', '$http', '$modal', 'alertsService', 'explorationStatesService',
   'explorationData', 'computeGraphService', 'oppiaDatetimeFormatter',
   'StatesObjectFactory', 'StateImprovementSuggestionService',
-  'ReadOnlyExplorationBackendApiService'
+  'ReadOnlyExplorationBackendApiService',
   'IMPROVE_TYPE_DEFAULT', 'IMPROVE_TYPE_INCOMPLETE',
   function(
       $scope, $http, $modal, alertsService, explorationStatesService,
