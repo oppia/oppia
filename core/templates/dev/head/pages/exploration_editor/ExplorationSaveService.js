@@ -100,7 +100,9 @@ oppia.factory('explorationSaveService', [
       var whenModalClosed = $q.defer();
 
       var publishModalInstance = $modal.open({
-        templateUrl: 'modals/publishExploration',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/' +
+          'exploration_publish_modal_directive.html'),
         backdrop: true,
         controller: [
           '$scope', '$modalInstance', function($scope, $modalInstance) {
