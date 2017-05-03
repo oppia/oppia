@@ -20,9 +20,8 @@
             <span translate="I18N_PLAYER_PREVIOUS_RESPONSES"
                   translate-values="{previousResponses: <[activeCard.answerFeedbackPairs.length - (isInteractionInline ? 1 : 0)]>}">
             </span>
-            <span class="conversation-skin-responses-dropdown-icon"
-                  ng-class="{'conversation-skin-responses-dropdown-icon-rotated': arePreviousResponsesShown}">
-              <i class="material-icons">&#xE037;</i>
+            <span class="conversation-skin-responses-dropdown-icon">
+              <i class="material-icons conversation-skin-responses-dropdown-icon" ng-class="{'conversation-skin-responses-dropdown-icon-rotated': arePreviousResponsesShown}">&#xE037;</i>
             </span>
           </span>
         </h4>
@@ -196,16 +195,17 @@
       -moz-transition: all 0.2s;
       -o-transition: all 0.2s;
       -webkit-transition: all 0.2s;
-      font-size: 10px;
-      margin-bottom: -4px;
-      transition: 0.2s;
+      font-size: 20px;
+      margin-bottom: -2px;
     }
 
     .conversation-skin-responses-dropdown-icon-rotated {
+      margin-bottom: -2px;
       -moz-transform: rotate(90deg);
       -o-transform: rotate(90deg);
       -webkit-transform: rotate(90deg);
       transform: rotate(90deg);
+      transition: transform 0.2s ease-in-out;
     }
 
     .conversation-skin-inline-interaction {

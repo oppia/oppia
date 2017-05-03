@@ -1,44 +1,42 @@
-<script type="text/ng-template" id="schemaBasedEditor/unicode">
-  <span ng-if="!allowExpressions()">
-    <textarea ng-if="!getCodingMode() && getRows()"
-              ng-model="$parent.$parent.localValue"
-              rows="<[getRows()]>"
-              placeholder="<[getPlaceholder()]>"
-              ng-disabled="isDisabled()"
-              class="form-control" focus-on="<[labelForFocusTarget()]>"
-              ng-blur="onInputBlur()"
-              ng-focus="onInputFocus()">
-    </textarea>
+<span ng-if="!allowExpressions()">
+  <textarea ng-if="!getCodingMode() && getRows()"
+            ng-model="$parent.$parent.localValue"
+            rows="<[getRows()]>"
+            placeholder="<[getPlaceholder()]>"
+            ng-disabled="isDisabled()"
+            class="form-control" focus-on="<[labelForFocusTarget()]>"
+            ng-blur="onInputBlur()"
+            ng-focus="onInputFocus()">
+  </textarea>
 
-    <span ng-if="!getCodingMode() && !getRows()">
-      <input type="text" ng-disabled="isDisabled()" class="form-control"
-             ng-model="$parent.$parent.localValue" ng-blur="onInputBlur()"
-             ng-focus="onInputFocus()" focus-on="<[labelForFocusTarget()]>"
-             ng-keypress="onKeypress($event)" placeholder="<[getPlaceholder()]>" apply-validation="validators()"
-             style="display: inline;">
-    </span>
+  <span ng-if="!getCodingMode() && !getRows()">
+    <input type="text" ng-disabled="isDisabled()" class="form-control"
+           ng-model="$parent.$parent.localValue" ng-blur="onInputBlur()"
+           ng-focus="onInputFocus()" focus-on="<[labelForFocusTarget()]>"
+           ng-keypress="onKeypress($event)" placeholder="<[getPlaceholder()]>" apply-validation="validators()"
+           style="display: inline;">
+  </span>
 
-    <!-- Note that we do not yet support ng-blur for the code editor. -->
-    <div ng-if="getCodingMode()" style="border: 1px solid #ccc;">
-      <div ui-codemirror
-           ng-model="$parent.$parent.localValue"
-           ui-codemirror-opts="codemirrorOptions"
-           ui-refresh="codemirrorStatus">
-      </div>
+  <!-- Note that we do not yet support ng-blur for the code editor. -->
+  <div ng-if="getCodingMode()" style="border: 1px solid #ccc;">
+    <div ui-codemirror
+         ng-model="$parent.$parent.localValue"
+         ui-codemirror-opts="codemirrorOptions"
+         ui-refresh="codemirrorStatus">
     </div>
-  </span>
+  </div>
+</span>
 
-  <!-- Note that we do not yet support ng-blur for the expression editor. -->
-  <span ng-if="allowExpressions()">
-    <span ng-if="isDisabled()"
-          ng-class="{'oppia-disabled-contenteditable': isDisabled()}"
-          ng-bind-html="getDisplayedValue()">
-    </span>
-    <span ng-if="!isDisabled()">
-      <unicode-with-parameters-editor local-value="$parent.$parent.localValue"
-                                      allowed-parameter-names="allowedParameterNames"
-                                      focus-on="<[labelForFocusTarget()]>">
-      </unicode-with-parameters-editor>
-    </span>
+<!-- Note that we do not yet support ng-blur for the expression editor. -->
+<span ng-if="allowExpressions()">
+  <span ng-if="isDisabled()"
+        ng-class="{'oppia-disabled-contenteditable': isDisabled()}"
+        ng-bind-html="getDisplayedValue()">
   </span>
-</script>
+  <span ng-if="!isDisabled()">
+    <unicode-with-parameters-editor local-value="$parent.$parent.localValue"
+                                    allowed-parameter-names="allowedParameterNames"
+                                    focus-on="<[labelForFocusTarget()]>">
+    </unicode-with-parameters-editor>
+  </span>
+</span>

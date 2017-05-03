@@ -17,7 +17,8 @@
  */
 
 oppia.directive('schemaBasedChoicesEditor', [
-  'recursionHelper', function(recursionHelper) {
+  'recursionHelper', 'UrlInterpolationService',
+  function(recursionHelper, UrlInterpolationService) {
     return {
       scope: {
         localValue: '=',
@@ -28,7 +29,9 @@ oppia.directive('schemaBasedChoicesEditor', [
         schema: '&',
         isDisabled: '&'
       },
-      templateUrl: 'schemaBasedEditor/choices',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/forms/schema_editors/' +
+        'schema_based_choices_editor_directive.html'),
       restrict: 'E',
       compile: recursionHelper.compile,
       controller: ['$scope', function($scope) {
