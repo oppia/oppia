@@ -81,7 +81,7 @@ RELEASE_DIR_NAME = 'deploy-%s-%s' % (
 RELEASE_DIR_PATH = os.path.join(os.getcwd(), '..', RELEASE_DIR_NAME)
 
 APPCFG_PATH = os.path.join(
-    '..', 'oppia_tools', 'google_appengine_1.9.19', 'google_appengine',
+    '..', 'oppia_tools', 'google_appengine_1.9.50', 'google_appengine',
     'appcfg.py')
 
 LOG_FILE_PATH = os.path.join('..', 'deploy.log')
@@ -190,7 +190,7 @@ def _execute_deployment():
         subprocess.check_output(['python', 'scripts/build.py'])
 
         # Deploy to GAE.
-        subprocess.check_output([APPCFG_PATH, 'update', '.', '--oauth2'])
+        subprocess.check_output([APPCFG_PATH, 'update', '.'])
 
         # Writing log entry.
         common.ensure_directory_exists(os.path.dirname(LOG_FILE_PATH))

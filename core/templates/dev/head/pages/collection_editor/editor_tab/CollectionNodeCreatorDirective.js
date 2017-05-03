@@ -51,7 +51,7 @@ oppia.directive('collectionNodeCreator', [
                 'with that id.');
               return;
             }
-
+      
             ExplorationSummaryBackendApiService
               .loadPublicAndPrivateExplorationSummaries([newExplorationId])
               .then(function(summaries) {

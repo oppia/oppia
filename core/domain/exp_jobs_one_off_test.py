@@ -244,9 +244,6 @@ class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
 
     EXP_ID = 'exp_id'
 
-    def setUp(self):
-        super(OneOffExplorationFirstPublishedJobTest, self).setUp()
-
     def test_first_published_time_of_exploration_that_is_unpublished(self):
         """This tests that, if an exploration is published, unpublished, and
         then published again, the job uses the first publication time as the
@@ -300,9 +297,6 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
     USERNAME_B = 'usernameb'
     EMAIL_A = 'emaila@example.com'
     EMAIL_B = 'emailb@example.com'
-
-    def setUp(self):
-        super(ExpSummariesContributorsOneOffJobTest, self).setUp()
 
     def test_contributors_for_valid_contribution(self):
         """Test that if only one commit is made, that the contributor

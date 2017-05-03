@@ -107,10 +107,13 @@ if [ ! -d "$TOOLS_DIR/numpy-1.6.1" ]; then
 fi
 
 echo Checking if pylint is installed in $TOOLS_DIR/pip_packages
-if [ ! -d "$TOOLS_DIR/pylint-1.5.2" ]; then
+if [ ! -d "$TOOLS_DIR/pylint-1.7.1" ]; then
   echo Installing Pylint
 
-  pip install pylint==1.5.2 --target="$TOOLS_DIR/pylint-1.5.2"
+  pip install pylint==1.7.1 --target="$TOOLS_DIR/pylint-1.7.1"
+  # Add __init__.py file so that pylint dependency backports are resolved
+  # correctly.
+  touch $TOOLS_DIR/pylint-1.7.1/backports/__init__.py
 fi
 
 # Install webtest.
