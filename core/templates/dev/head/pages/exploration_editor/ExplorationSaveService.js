@@ -488,7 +488,9 @@ oppia.factory('explorationSaveService', [
           }
 
           var modalInstance = $modal.open({
-            templateUrl: 'modals/saveExploration',
+            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+              '/pages/exploration_editor/' +
+              'exploration_save_modal_directive.html'),
             backdrop: true,
             resolve: {
               isExplorationPrivate: function() {
