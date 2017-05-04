@@ -1038,12 +1038,11 @@ textarea {
 .oppia-fractions-landing-page-bubble {
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
-  background-color: rgb(252, 248, 227);
+  background-color: #fdfdfd;
   border: #faebcc solid 1px;
   border-color: rgb(250, 235, 204);
   border-radius: 10px;
   border-width: 1px;
-  color: #8a6d3b;
   font-size: 15px;
   height: 120px;
   padding: 20px;
@@ -1052,7 +1051,7 @@ textarea {
 }
 
 .oppia-fractions-landing-page-pointer {
-  border-color: transparent #fcf8e3;
+  border-color: transparent #fdfdfd;
   border-style: solid;
   border-width: 13px 28px 13px 0;
   content: '';
