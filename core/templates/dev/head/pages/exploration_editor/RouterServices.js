@@ -43,11 +43,19 @@ oppia.factory('routerService', [
     $rootScope.$watch(function() {
       return $location.path();
     }, function(newPath, oldPath) {
+      if (newPath === '/') {
+        if (oldPath.includes('/gui/')) {
+          $window.history.go(-1);
+        }
+        $location.path('').replace();
+      }
       if (newPath === '') {
+        if (oldPath === '') {
+          $location.path('/dashboard').replace();
+        }
         $location.path(oldPath);
         return;
       }
-
       if (!oldPath) {
         // This can happen when clicking on links whose href is "#".
         return;

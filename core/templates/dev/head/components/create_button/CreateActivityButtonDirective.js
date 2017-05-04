@@ -23,9 +23,11 @@ oppia.directive('createActivityButton', [function() {
     controller: [
       '$scope', '$timeout', '$window', '$modal', 'ExplorationCreationService',
       'CollectionCreationService', 'siteAnalyticsService', 'urlService',
+      '$location',
       function(
           $scope, $timeout, $window, $modal, ExplorationCreationService,
-          CollectionCreationService, siteAnalyticsService, urlService) {
+          CollectionCreationService, siteAnalyticsService, urlService,
+          $location) {
         $scope.creationInProgress = false;
 
         $scope.showUploadExplorationModal = (
@@ -48,7 +50,11 @@ oppia.directive('createActivityButton', [function() {
           $scope.creationInProgress = true;
 
           if (!GLOBALS.can_create_collections) {
-            ExplorationCreationService.createNewExploration();
+            if (urlService.getPathname() !== '/dashboard') {
+              $window.location.href = '/dashboard?mode=create';
+            } else {
+              ExplorationCreationService.createNewExploration();
+            }
           } else if (urlService.getPathname() !== '/dashboard') {
             $window.location.replace('/dashboard?mode=create');
           } else {
@@ -92,6 +98,9 @@ oppia.directive('createActivityButton', [function() {
         // editor if the create modal does not need to be shown).
         if (urlService.getUrlParams().mode === 'create') {
           if (!GLOBALS.can_create_collections) {
+            // It appends '/' to the url so that the creation loop is
+            // prevented when the user presses the back button.
+            $location.path('').replace();
             ExplorationCreationService.createNewExploration();
           } else {
             $scope.initCreationProcess();
