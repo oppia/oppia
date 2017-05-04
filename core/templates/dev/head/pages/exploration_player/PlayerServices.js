@@ -278,12 +278,11 @@ oppia.factory('oppiaPlayerService', [
           return;
         }
 
-        var explorationVersion = getExplorationVersion();
         answerIsBeingProcessed = true;
         var oldState = exploration.getState(
           playerTranscriptService.getLastStateName());
         AnswerClassificationService.getMatchingClassificationResult(
-          _explorationId, explorationVersion,
+          _explorationId, version,
           playerTranscriptService.getLastStateName(),
           oldState, answer, false, interactionRulesService
         ).then(function(classificationResult) {
