@@ -29,7 +29,7 @@ oppia.directive('htmlSelect', [
         options: '=',
         selection: '='
       },
-      templateUrl: UrlInterpolationService(
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/' +
         'html_select_directive.html'),
       controller: ['$scope', function($scope) {
