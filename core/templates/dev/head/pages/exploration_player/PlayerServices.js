@@ -42,7 +42,7 @@ oppia.factory('oppiaPlayerService', [
       PAGE_CONTEXT, oppiaExplorationHtmlFormatterService,
       playerTranscriptService, ExplorationObjectFactory,
       expressionInterpolationService, StatsReportingService,
-      UrlInterpolationService) {
+      UrlInterpolationService, explorationData) {
     var _explorationId = explorationContextService.getExplorationId();
     var _explorationVersion = explorationData.data.version
     var _editorPreviewMode = (
