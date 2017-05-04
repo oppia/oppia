@@ -147,15 +147,16 @@ class StatisticsAudit(jobs.BaseMapReduceJobManager):
                         'completions': # of times exploration was
                             completed.
                         'state_hit': a dict containing the hit counts for the
-                            states in the exploration. It is formatted as follows:
+                            states in the exploration. It is formatted
+                            as follows:
                             {
                                 state_name: {
-                                    'first_entry_count': # of sessions which hit
-                                        this state.
-                                    'total_entry_count': # of total hits for this
-                                        state.
-                                    'no_answer_count': # of hits with no answer for
-                                        this state.
+                                    'first_entry_count': # of sessions
+                                        which hit this state.
+                                    'total_entry_count': # of total
+                                        hits for this state.
+                                    'no_answer_count': # of hits with
+                                        no answer for this state.
                                 }
                             }
                     }
