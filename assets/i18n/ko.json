@@ -265,6 +265,7 @@
 	"I18N_TOPNAV_NOTIFICATIONS": "알림",
 	"I18N_TOPNAV_PREFERENCES": "환경 설정",
 	"I18N_TOPNAV_SIGN_IN": "로그인",
+	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Google로 로그인",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Oppia로 가르치기",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "당신은 총 <[totalSubscribers]>명의 구독자가 있습니다.",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "구독 해지"

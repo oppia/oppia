@@ -362,6 +362,7 @@
 	"I18N_TOPNAV_NOTIFICATIONS": "सूचनाएं",
 	"I18N_TOPNAV_PREFERENCES": "प्राथमिकताएं",
 	"I18N_TOPNAV_SIGN_IN": "खाता खोले",
+	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Google खाते से प्रवेश",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Oppia के साथ  सिखाये",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "आपके पास <[totalSubscribers]> ग्राहकों है।",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "सदस्यता समाप्त"

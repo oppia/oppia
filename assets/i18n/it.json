@@ -134,6 +134,7 @@
 	"I18N_TOPNAV_NOTIFICATIONS": "Notifiche",
 	"I18N_TOPNAV_PREFERENCES": "Preferenze",
 	"I18N_TOPNAV_SIGN_IN": "Accedi",
+	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Accedi con Google",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Insegna con Oppia",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Cancella iscrizione"
 }

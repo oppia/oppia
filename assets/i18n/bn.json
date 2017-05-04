@@ -334,6 +334,7 @@
 	"I18N_TOPNAV_NOTIFICATIONS": "বিজ্ঞপ্তি",
 	"I18N_TOPNAV_PREFERENCES": "পছন্দসমূহ",
 	"I18N_TOPNAV_SIGN_IN": "প্রবেশ",
+	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "গুগল দিয়ে প্রবেশ করুন",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Oppia দিয়ে শিখান",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "আপনার মোট <[totalSubscribers]> জন গ্রাহক রয়েছে।",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "সদস্যতা ত্যাগ"
