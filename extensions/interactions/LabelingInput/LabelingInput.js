@@ -249,7 +249,11 @@ oppia.factory('labelingInputRulesService', [function() {
       return answer.incorrectElements.length === 0;
     },
     HasMultipleMisses: function(answer, inputs){
-      return answer.incorrectElements.length >= 2;
+      if (!(inputs.x)){
+        //Backwards compatability
+        return answer.incorrectElements.length >= 2;
+      }
+      return answer.incorrectElements.length >= (inputs.x);
     },
     Misses: function(answer, inputs){
       return answer.incorrectElements.indexOf(inputs.x) !== -1;

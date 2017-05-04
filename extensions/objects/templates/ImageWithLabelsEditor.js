@@ -381,26 +381,6 @@ oppia.directive('imageWithLabelsEditor', [
           region = cornerAndDimensionsFromRegionArea(
             $scope.$parent.value.labeledRegions[
               $scope.hoveredRegion].region.area);
-          // if (!$scope.xDirectionToggled && !$scope.yDirectionToggled) {
-          //   if ($scope.mouseY <= region.y + $scope.resizableBorderWidthPx) {
-          //     $scope.yDirection = 1;
-          //   } else if (
-          //       $scope.mouseY >= region.height + region.y -
-          //       $scope.resizableBorderWidthPx) {
-          //     $scope.yDirection = -1;
-          //   } else {
-          //     $scope.yDirection = 0;
-          //   }
-          //   if ($scope.mouseX <= region.x + $scope.resizableBorderWidthPx) {
-          //     $scope.xDirection = 1;
-          //   } else if (
-          //       $scope.mouseX >= region.width + region.x -
-          //       $scope.resizableBorderWidthPx) {
-          //     $scope.xDirection = -1;
-          //   } else {
-          //     $scope.xDirection = 0;
-          //   }
-          // }
         };
         $scope.onMouseoutRegion = function(index) {
           if ($scope.hoveredRegion === index) {
@@ -433,31 +413,6 @@ oppia.directive('imageWithLabelsEditor', [
         $scope.getCursorStyle = function() {
           var xDirectionCursor = '';
           var yDirectionCursor = '';
-          // if ($scope.xDirection || $scope.yDirection) {
-          //   if (
-          //       ($scope.xDirection === 1 && !$scope.xDirectionToggled) ||
-          //       ($scope.xDirection === -1 && $scope.xDirectionToggled)) {
-          //     xDirectionCursor = 'w';
-          //   } else if (
-          //     ($scope.xDirection === -1 && !$scope.xDirectionToggled) ||
-          //     ($scope.xDirection === 1 && $scope.xDirectionToggled)) {
-          //     xDirectionCursor = 'e';
-          //   } else {
-          //     xDirectionCursor = '';
-          //   }
-          //   if (
-          //       ($scope.yDirection === 1 && !$scope.yDirectionToggled) ||
-          //       ($scope.yDirection === -1 && $scope.yDirectionToggled)) {
-          //     yDirectionCursor = 'n';
-          //   } else if (
-          //     ($scope.yDirection === -1 && !$scope.yDirectionToggled) ||
-          //     ($scope.yDirection === 1 && $scope.yDirectionToggled)) {
-          //     yDirectionCursor = 's';
-          //   } else {
-          //     yDirectionCursor = '';
-          //   }
-          //   return yDirectionCursor + xDirectionCursor + '-resize';
-          // }
           return ($scope.regionDrawMode) ? 'crosshair' : 'default';
         };
 

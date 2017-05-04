@@ -102,6 +102,33 @@ oppia.filter('oppiaInteractiveLabelingInputValidator', [
       }
     }
 
+    for (var i = 0; i < answerGroups.length; i++) {
+      var rules = answerGroups[i].rules;
+      for (var j = 0; j < rules.length; j++) {
+        if (rules[j].type === 'HasMultipleMisses') {
+          var label = rules[j].inputs.x;
+          console.log(label);
+          if (!label){
+            break;
+          }
+          if (label < 2){
+            warningsList.push({
+              type: WARNING_TYPES.CRITICAL,
+              message: (
+                'Must check at least 2 misses!')
+            });
+          }
+          if (label > seenRegionStrings.length){
+            warningsList.push({
+              type: WARNING_TYPES.CRITICAL,
+              message: (
+                'Must check a number of regions no more than the total number of regions!')
+            });
+          }
+        }
+      }
+    }
+
     if (!defaultOutcome ||
         $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
       warningsList.push({

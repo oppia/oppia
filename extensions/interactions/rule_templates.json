@@ -69,7 +69,7 @@
       "description": "gets all labels correct"
     },
     "HasMultipleMisses": {
-      "description": "misses two or more labels"
+      "description": "misses {{x|Int}} or more labels"
     },
     "Misses": {
       "description": "does not correctly place the label {{x|UnicodeString}}"
