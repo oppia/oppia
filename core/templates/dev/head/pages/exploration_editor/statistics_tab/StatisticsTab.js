@@ -112,7 +112,7 @@ oppia.controller('StatisticsTab', [
         // terminal nodes, instead? If so, explorationStatesService needs to be
         // able to provide whether given states are terminal
 
-        explorationStatesService.getStateNames().map(function(stateName) {
+        explorationStatesService.getStateNames().forEach(function(stateName) {
           var visits = 0;
           if ($scope.stateStats.hasOwnProperty(stateName)) {
             visits = $scope.stateStats[stateName].first_entry_count;

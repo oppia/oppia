@@ -127,7 +127,7 @@ oppia.factory('StatesObjectFactory', [
       });
       newState.interaction.defaultOutcome.dest = newStateName;
       return newState;
-    }
+    };
 
     return States;
   }

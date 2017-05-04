@@ -1663,7 +1663,7 @@ oppia.factory('computeGraphService', [
       var links = [];
       var finalStateIds = states.getFinalStateNames();
 
-      states.getStateNames().map(function(stateName) {
+      states.getStateNames().forEach(function(stateName) {
         var interaction = states.getState(stateName).interaction;
         nodes[stateName] = stateName;
         if (interaction.id) {
@@ -1821,7 +1821,7 @@ oppia.factory('explorationWarningsService', [
 
       var states = explorationStatesService.getStates();
 
-      states.getStateNames().map(function(stateName) {
+      states.getStateNames().forEach(function(stateName) {
         if (!states.getState(stateName).interaction.id) {
           statesWithoutInteractionIds.push(stateName);
         }
@@ -1937,7 +1937,7 @@ oppia.factory('explorationWarningsService', [
 
       var states = explorationStatesService.getStates();
 
-      states.getStateNames().map(function(stateName) {
+      states.getStateNames().forEach(function(stateName) {
         var groupIndexes = _getAnswerGroupIndexesWithEmptyClassifiers(
           states.getState(stateName));
         if (groupIndexes.length > 0) {
@@ -1960,7 +1960,7 @@ oppia.factory('explorationWarningsService', [
       var _graphData = graphDataService.getGraphData();
 
       var _states = explorationStatesService.getStates();
-      _states.getStateNames().map(function(stateName) {
+      _states.getStateNames().forEach(function(stateName) {
         var interaction = _states.getState(stateName).interaction;
         if (interaction.id) {
           var validatorName = (

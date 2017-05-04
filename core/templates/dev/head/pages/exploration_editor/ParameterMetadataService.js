@@ -164,7 +164,7 @@ oppia.factory('parameterMetadataService', [
           }
         });
 
-        states.getStateNames().map(function(stateName) {
+        states.getStateNames().forEach(function(stateName) {
           stateParamMetadatas[stateName] = getStateParamMetadata(
             states.getState(stateName));
           for (var i = 0; i < stateParamMetadatas[stateName].length; i++) {
