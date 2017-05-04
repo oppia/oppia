@@ -35,7 +35,7 @@ oppia.factory('oppiaPlayerService', [
   'PAGE_CONTEXT', 'oppiaExplorationHtmlFormatterService',
   'playerTranscriptService', 'ExplorationObjectFactory',
   'expressionInterpolationService', 'StatsReportingService',
-  'UrlInterpolationService',
+  'UrlInterpolationService', 'explorationData',
   function(
       $http, $rootScope, $q, LearnerParamsService,
       alertsService, AnswerClassificationService, explorationContextService,
@@ -44,6 +44,7 @@ oppia.factory('oppiaPlayerService', [
       expressionInterpolationService, StatsReportingService,
       UrlInterpolationService) {
     var _explorationId = explorationContextService.getExplorationId();
+    var _explorationVersion = explorationData.data.version
     var _editorPreviewMode = (
       explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
     var _isLoggedIn = GLOBALS.userIsLoggedIn;
@@ -282,7 +283,7 @@ oppia.factory('oppiaPlayerService', [
         var oldState = exploration.getState(
           playerTranscriptService.getLastStateName());
         AnswerClassificationService.getMatchingClassificationResult(
-          _explorationId, getExplorationVersion(),
+          _explorationId, _explorationVersion,
           playerTranscriptService.getLastStateName(),
           oldState, answer, false, interactionRulesService
         ).then(function(classificationResult) {
