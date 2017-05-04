@@ -71,6 +71,9 @@ def _get_answer_dict_size(answer_dict):
 
 
 class StatisticsAudit(jobs.BaseMapReduceJobManager):
+    """A one-off computation job that counts 'start exploration' and
+    'complete exploration' events.
+    """
 
     _STATE_COUNTER_ERROR_KEY = 'State Counter ERROR'
 
@@ -82,6 +85,35 @@ class StatisticsAudit(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+
+        Args:
+            item: ExplorationAnnotationsModel or
+                StateCounterModel.
+
+        Yields:
+            tuple. 2-tuple in the form ('exploration_id', value).
+                `exploration_id` corresponds to the id of the exploration.
+                `value`: value yielded is:
+                    {
+                        'version': Version of the exploration,
+                        'starts': # of times exploration was started.
+                        'completions': # of times exploration was
+                            completed.
+                        'state_hit': a dict containing the hit counts for the
+                            states in the exploration. It is formatted as follows:
+                            {
+                                state_name: {
+                                    'first_entry_count': # of sessions which hit
+                                        this state.
+                                    'total_entry_count': # of total hits for this
+                                        state.
+                                    'no_answer_count': # of hits with no answer for
+                                        this state.
+                                }
+                            }
+                    }
+        """
         if isinstance(item, stats_models.StateCounterModel):
             if item.first_entry_count < 0:
                 yield (
@@ -101,6 +133,32 @@ class StatisticsAudit(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Updates statistics for the given exploration
+
+        Args:
+            key: str. The exploration id of the exploration
+            stringified_values: list(str). A list of stringified values
+                associated with the given key. An element of stringfield_values
+                would be of the form:
+                    {
+                        'version': Version of the exploration,
+                        'starts': # of times exploration was started.
+                        'completions': # of times exploration was
+                            completed.
+                        'state_hit': a dict containing the hit counts for the
+                            states in the exploration. It is formatted as follows:
+                            {
+                                state_name: {
+                                    'first_entry_count': # of sessions which hit
+                                        this state.
+                                    'total_entry_count': # of total hits for this
+                                        state.
+                                    'no_answer_count': # of hits with no answer for
+                                        this state.
+                                }
+                            }
+                    }
+        """
         if key == StatisticsAudit._STATE_COUNTER_ERROR_KEY:
             for value_str in stringified_values:
                 yield (value_str,)
