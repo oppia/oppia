@@ -179,9 +179,6 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
 
         return output
 
-    def setUp(self):
-        super(UsernameLengthDistributionOneOffJobTests, self).setUp()
-
     def test_null_case(self):
         """Tests the case when there are no signed up users but there is one
         default user having the username - 'tmpsuperadm1n'.
