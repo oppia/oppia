@@ -287,9 +287,29 @@ oppia.directive('imageWithRegionsEditor', [
               var draggedRegion = labeledRegions[$scope.selectedRegion].region;
               var deltaX = $scope.mouseX - $scope.originalMouseX;
               var deltaY = $scope.mouseY - $scope.originalMouseY;
+              var newX1 = $scope.originalRectArea.x + deltaX;
+              var newY1 = $scope.originalRectArea.y + deltaY;
+              var newX2 = newX1 + $scope.originalRectArea.width;
+              var newY2 = newY1 + $scope.originalRectArea.height;
+              if (newX1 < 0) {
+                newX1 = 0;
+                newX2 = $scope.originalRectArea.width;
+              }
+              if (newY1 < 0) {
+                newY1 = 0;
+                newY2 = $scope.originalRectArea.height;
+              }
+              if (newX2 > $scope.getImageWidth()) {
+                newX2 = $scope.getImageWidth();
+                newX1 = newX2 - $scope.originalRectArea.width;
+              }
+              if (newY2 > $scope.getImageHeight()) {
+                newY2 = $scope.getImageHeight();
+                newY1 = newY2 - $scope.originalRectArea.height;
+              }
               draggedRegion.area = regionAreaFromCornerAndDimensions(
-                $scope.originalRectArea.x + deltaX,
-                $scope.originalRectArea.y + deltaY,
+                newX1,
+                newY1,
                 $scope.originalRectArea.width,
                 $scope.originalRectArea.height
               );
