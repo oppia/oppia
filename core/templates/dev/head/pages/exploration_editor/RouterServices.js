@@ -89,10 +89,9 @@ oppia.factory('routerService', [
       var pathBase = '/' + pathType + '/';
       var putativeStateName = path.substring(pathBase.length);
       var waitForStatesToLoad = $interval(function() {
-        var allStates = explorationStatesService.getStates();
-        if (allStates) {
+        if (explorationStatesService.isInitialized()) {
           $interval.cancel(waitForStatesToLoad);
-          if (allStates.hasOwnProperty(putativeStateName)) {
+          if (explorationStatesService.hasState(putativeStateName)) {
             editorContextService.setActiveStateName(putativeStateName);
             if (pathType === SLUG_GUI) {
               $rootScope.$broadcast('refreshStateEditor');

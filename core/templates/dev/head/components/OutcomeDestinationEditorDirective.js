@@ -72,12 +72,20 @@ oppia.directive('outcomeDestinationEditor', [
               text: '(try again)'
             }];
 
+<<<<<<< HEAD
             // Arrange the remaining states based on their order in the state
             // graph.
             var lastComputedArrangement = (
               StateGraphLayoutService.getLastComputedArrangement());
             var allStateNames = Object.keys(
               explorationStatesService.getStates());
+=======
+          // Arrange the remaining states based on their order in the state
+          // graph.
+          var lastComputedArrangement = (
+            StateGraphLayoutService.getLastComputedArrangement());
+          var allStateNames = explorationStatesService.getStateNames();
+>>>>>>> upstream/develop
 
             var maxDepth = 0;
             var maxOffset = 0;

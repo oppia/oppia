@@ -364,6 +364,17 @@ oppia.factory('validatorsService', [
           return false;
         }
         return true;
+      },
+      isValidExplorationId: function(input, showWarnings) {
+        // Exploration IDs are urlsafe base64-encoded.
+        var VALID_ID_CHARS_REGEX = /^[a-zA-Z0-9_\-]+$/g;
+        if (!input || !VALID_ID_CHARS_REGEX.test(input)) {
+          if (showWarnings) {
+            alertsService.addWarning('Please enter a valid exploration ID.');
+          }
+          return false;
+        }
+        return true;
       }
     };
   }

@@ -25,7 +25,11 @@ oppia.factory('explorationSaveService', [
   'explorationWarningsService', 'ExplorationDiffService',
   'explorationInitStateNameService', 'routerService',
   'focusService', 'changeListService', 'siteAnalyticsService',
+<<<<<<< HEAD
   'StateObjectFactory', 'UrlInterpolationService',
+=======
+  'StatesObjectFactory',
+>>>>>>> upstream/develop
   function(
       $modal, $timeout, $rootScope, $log, $q,
       alertsService, explorationData, explorationStatesService,
@@ -35,7 +39,11 @@ oppia.factory('explorationSaveService', [
       explorationWarningsService, ExplorationDiffService,
       explorationInitStateNameService, routerService,
       focusService, changeListService, siteAnalyticsService,
+<<<<<<< HEAD
       StateObjectFactory, UrlInterpolationService) {
+=======
+      StatesObjectFactory) {
+>>>>>>> upstream/develop
     // Whether or not a save action is currently in progress
     // (request has been sent to backend but no reply received yet)
     var saveIsInProgress = false;
@@ -309,8 +317,7 @@ oppia.factory('explorationSaveService', [
                   });
                 }
 
-                var _states = explorationStatesService.getStates();
-                if (_states) {
+                if (explorationStatesService.isInitialized()) {
                   var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2
                   .some(
                     function(categoryItem) {
@@ -456,13 +463,10 @@ oppia.factory('explorationSaveService', [
         }
 
         explorationData.getLastSavedData().then(function(data) {
-          var oldStates = {};
-          for (var stateName in data.states) {
-            oldStates[stateName] =
-              (StateObjectFactory.createFromBackendDict(
-                stateName, data.states[stateName]));
-          }
-          var newStates = explorationStatesService.getStates();
+          var oldStates = StatesObjectFactory.createFromBackendDict(
+            data.states).getStateObjects();
+          var newStates = explorationStatesService.getStates()
+            .getStateObjects();
           var diffGraphData = ExplorationDiffService.getDiffGraphData(
             oldStates, newStates, [{
               changeList: changeListService.getChangeList(),

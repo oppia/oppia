@@ -68,6 +68,25 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
                     edited_exploration_ids))
 
 
+class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceJobManager):
+    """One-off job for calculating the distribution of username lengths."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(item):
+        if item.username is not None:
+            yield (len(item.username), 1)
+
+    @staticmethod
+    def reduce(key, stringified_username_counter):
+        username_counter = [
+            ast.literal_eval(v) for v in stringified_username_counter]
+        yield (key, len(username_counter))
+
+
 class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
     """One-off job for subscribing users to explorations, collections, and
     feedback threads.

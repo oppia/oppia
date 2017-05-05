@@ -265,8 +265,8 @@ class BaseInteraction(object):
         """Gets the parameter type for a given rule parameter name."""
         rule_param_list = self.get_rule_param_list(rule_name)
 
-        for rule_name, rule_type in rule_param_list:
-            if rule_name == rule_param_name:
-                return rule_type
+        for param_name, param_type in rule_param_list:
+            if param_name == rule_param_name:
+                return param_type
         raise Exception(
             'Rule %s has no param called %s' % (rule_name, rule_param_name))
