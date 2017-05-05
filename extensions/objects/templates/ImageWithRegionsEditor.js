@@ -106,8 +106,6 @@ oppia.directive('imageWithRegionsEditor', [
           // Dimensions of original image.
           $scope.originalImageWidth = 0;
           $scope.originalImageHeight = 0;
-          // Is the user preparing to draw a rectangle?
-          $scope.regionDrawMode = false;
           // Index of region currently hovered over.
           $scope.hoveredRegion = null;
           // Index of region currently selected.
@@ -322,7 +320,7 @@ oppia.directive('imageWithRegionsEditor', [
             evt.preventDefault();
             $scope.originalMouseX = $scope.mouseX;
             $scope.originalMouseY = $scope.mouseY;
-            if ($scope.regionDrawMode) {
+            if ($scope.hoveredRegion === null) {
               $scope.rectWidth = $scope.rectHeight = 0;
               $scope.userIsCurrentlyDrawing = true;
             }
@@ -332,9 +330,6 @@ oppia.directive('imageWithRegionsEditor', [
             if ($scope.hoveredRegion === null) {
               $scope.selectedRegion = null;
             }
-            $scope.userIsCurrentlyDrawing = false;
-            $scope.userIsCurrentlyDragging = false;
-            $scope.userIsCurrentlyResizing = false;
             if ($scope.yDirectionToggled) {
               $scope.yDirection = ($scope.yDirection === 1) ? -1 : 1;
             }
@@ -345,11 +340,7 @@ oppia.directive('imageWithRegionsEditor', [
               $scope.xDirection = 0;
               $scope.yDirection = 0;
             }
-            $scope.movedOutOfRegion = false;
-            $scope.yDirectionToggled = false;
-            $scope.xDirectionToggled = false;
-            if ($scope.regionDrawMode) {
-              $scope.regionDrawMode = false;
+            if ($scope.userIsCurrentlyDrawing) {
               if ($scope.rectWidth !== 0 && $scope.rectHeight !== 0) {
                 var labels = $scope.$parent.value.labeledRegions.map(
                   function(region) {
@@ -384,6 +375,12 @@ oppia.directive('imageWithRegionsEditor', [
                   $scope.$parent.value.labeledRegions.length - 1);
               }
             }
+            $scope.userIsCurrentlyDrawing = false;
+            $scope.userIsCurrentlyDragging = false;
+            $scope.userIsCurrentlyResizing = false;
+            $scope.movedOutOfRegion = false;
+            $scope.yDirectionToggled = false;
+            $scope.xDirectionToggled = false;
           };
           $scope.onMouseoverRegion = function(index) {
             if ($scope.hoveredRegion === null) {
@@ -443,19 +440,11 @@ oppia.directive('imageWithRegionsEditor', [
                 $scope.hoveredRegion].region.area
             );
           };
-          $scope.onDocumentMouseUp = function() {
-            if ($scope.regionDrawMode && !$scope.userIsCurrentlyDrawing) {
-              $scope.regionDrawMode = false;
-            }
-          };
-          $document.on('mouseup', $scope.onDocumentMouseUp);
-          $scope.setDrawMode = function() {
-            $scope.regionDrawMode = true;
-          };
           $scope.getCursorStyle = function() {
             var xDirectionCursor = '';
             var yDirectionCursor = '';
             if ($scope.xDirection || $scope.yDirection) {
+              // User is resizing, so we figure out the direction.
               if (
                   ($scope.xDirection === 1 && !$scope.xDirectionToggled) ||
                   ($scope.xDirection === -1 && $scope.xDirectionToggled)) {
@@ -479,8 +468,11 @@ oppia.directive('imageWithRegionsEditor', [
                 yDirectionCursor = '';
               }
               return yDirectionCursor + xDirectionCursor + '-resize';
+            } else if ($scope.hoveredRegion !== null) {
+              // User is not resizing but cursor is over a region.
+              return 'pointer';
             }
-            return ($scope.regionDrawMode) ? 'crosshair' : 'default';
+            return 'crosshair';
           };
           $scope.resetEditor = function() {
             $modal.open({

@@ -55,13 +55,11 @@
       </text>
     </svg>
    
-  <button style="margin-top: 10px;" type="button" class="btn btn-default" ng-click="setDrawMode()">Draw New Region</button>
-      <div style="display: inline-block; float:right; margin-top:10px;" ng-if="selectedRegion !== null">
-        <input type="text" style="margin-left: 10px; height: 34px; width: 100px;"
-          ng-model="regionLabelGetterSetter(selectedRegion)" 
-          ng-model-options="{getterSetter: true}">
-        </input>
-      </div>  
+    <div style="display: inline-block; float:right; margin-top:10px;" ng-if="selectedRegion !== null">
+      <input type="text" style="margin-left: 10px; height: 34px; width: 100px;"
+        ng-model="regionLabelGetterSetter(selectedRegion)"
+        ng-model-options="{getterSetter: true}">
+    </div>
 
   </div>
   <br><div style="color: red;"><[errorText]></div>
