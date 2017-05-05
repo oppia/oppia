@@ -229,8 +229,8 @@ oppia.animation('.conversation-skin-animate-cards', function() {
 });
 
 oppia.directive('conversationSkin', [
-  '$scope', 'urlService', 'UrlInterpolationService',
-  function($scope, urlService, UrlInterpolationService) {
+  'urlService', 'UrlInterpolationService',
+  function(urlService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -246,7 +246,7 @@ oppia.directive('conversationSkin', [
       },
       template: '<div ng-include="directiveTemplate"></div>',
       controller: [
-        '$timeout', '$rootScope', '$window', '$translate', '$http',
+        '$scope', '$timeout', '$rootScope', '$window', '$translate', '$http',
         'messengerService', 'oppiaPlayerService', 'urlService', 'focusService',
         'LearnerViewRatingService', 'windowDimensionsService',
         'playerTranscriptService', 'LearnerParamsService',
@@ -256,7 +256,7 @@ oppia.directive('conversationSkin', [
         'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX', 'alertsService',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
         function(
-            $timeout, $rootScope, $window, $translate, $http,
+            $scope, $timeout, $rootScope, $window, $translate, $http,
             messengerService, oppiaPlayerService, urlService, focusService,
             LearnerViewRatingService, windowDimensionsService,
             playerTranscriptService, LearnerParamsService,
