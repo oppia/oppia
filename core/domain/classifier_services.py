@@ -103,7 +103,6 @@ def classify_string_classifier_rule(
                 for doc in classifier_rule_spec.inputs['training_data']])
 
     exploration = exp_services.get_exploration_by_id(exp_id)
-    print exploration.title
     state_obj = exploration.states[state_name]
     algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']
     if state_obj.classifier_model_id:
@@ -118,10 +117,10 @@ def classify_string_classifier_rule(
             algorithm_id)
         sc.train(training_examples)
         cached_classifier_data = sc.to_dict()
-        schema_version = exploration.states_schema_version
+        algorithm_version = feconf.CLASSIFIER_VERSION_MAPPING[algorithm_id]
         classifier = classifier_domain.Classifier(
             '0', exploration.id, exp_version, state_name, algorithm_id,
-            cached_classifier_data, schema_version)
+            cached_classifier_data, algorithm_version)
         classifier_id = save_classifier(classifier)
         #state.classifier_model_id = classifier_id
         change_list = [{

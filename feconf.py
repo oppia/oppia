@@ -75,6 +75,11 @@ INTERACTION_CLASSIFIER_MAPPING = {
     'TextInput': 'LDAStringClassifier'
 }
 
+# A mapping of classifier algorithms to their current version numbers.
+CLASSIFIER_VERSION_MAPPING = {
+    'LDAStringClassifier': 1 
+}
+
 # Default label for classification algorithms.
 DEFAULT_CLASSIFIER_LABEL = '_default'
 
