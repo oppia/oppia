@@ -25,11 +25,7 @@ oppia.factory('explorationSaveService', [
   'explorationWarningsService', 'ExplorationDiffService',
   'explorationInitStateNameService', 'routerService',
   'focusService', 'changeListService', 'siteAnalyticsService',
-<<<<<<< HEAD
-  'StateObjectFactory', 'UrlInterpolationService',
-=======
-  'StatesObjectFactory',
->>>>>>> upstream/develop
+  'StatesObjectFactory', 'UrlInterpolationService',
   function(
       $modal, $timeout, $rootScope, $log, $q,
       alertsService, explorationData, explorationStatesService,
@@ -39,11 +35,7 @@ oppia.factory('explorationSaveService', [
       explorationWarningsService, ExplorationDiffService,
       explorationInitStateNameService, routerService,
       focusService, changeListService, siteAnalyticsService,
-<<<<<<< HEAD
-      StateObjectFactory, UrlInterpolationService) {
-=======
-      StatesObjectFactory) {
->>>>>>> upstream/develop
+      StatesObjectFactory, UrlInterpolationService) {
     // Whether or not a save action is currently in progress
     // (request has been sent to backend but no reply received yet)
     var saveIsInProgress = false;
