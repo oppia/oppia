@@ -171,8 +171,6 @@ class DashboardHandler(base.BaseHandler):
 
         exploration_ids_subscribed_to = [
             summary.id for summary in subscribed_exploration_summaries]
-        collection_ids_subscribed_to = [
-            summary.id for summary in subscribed_collection_summaries]
 
         exp_summary_dicts = summary_services.get_displayable_exp_summary_dicts(
             subscribed_exploration_summaries)
