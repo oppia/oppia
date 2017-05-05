@@ -236,12 +236,15 @@ oppia.directive('conversationSkin', [
       scope: {},
       link: function(scope) {
         var isIframed = urlService.isIframed();
-        scope.directiveTemplateUrl = isIframed ?
-          '/pages/exploration_player/conversation_skin_embed_directive.html' :
-          '/pages/exploration_player/conversation_skin_directive.html';
+        scope.directiveTemplate = isIframed ?
+          UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_player/' +
+            'conversation_skin_embed_directive.html') :
+          UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_player/' +
+            'conversation_skin_directive.html');
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        $scope.directiveTemplateUrl),
+      template: '<div ng-include="directiveTemplate"></div>',
       controller: [
         '$timeout', '$rootScope', '$window', '$translate', '$http',
         'messengerService', 'oppiaPlayerService', 'urlService', 'focusService',
