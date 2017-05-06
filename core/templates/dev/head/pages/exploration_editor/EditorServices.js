@@ -18,8 +18,8 @@
 
 // Service for handling all interactions with the exploration editor backend.
 oppia.factory('explorationData', [
-  '$http', '$log', 'alertsService', '$q',
-  function($http, $log, alertsService, $q) {
+  '$http', '$log', 'alertsService', '$q', 'UrlInterpolationService',
+  function($http, $log, alertsService, $q, UrlInterpolationService) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
     var pathnameArray = window.location.pathname.split('/');
@@ -2366,7 +2366,9 @@ oppia.factory('autosaveInfoModalsService', [
     return {
       showNonStrictValidationFailModal: function() {
         $modal.open({
-          templateUrl: 'modals/saveValidationFail',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_editor/' +
+            'save_validation_fail_modal.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
           controller: [
@@ -2390,7 +2392,9 @@ oppia.factory('autosaveInfoModalsService', [
       },
       showVersionMismatchModal: function(lostChanges) {
         $modal.open({
-          templateUrl: 'modals/saveVersionMismatch',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_editor/' +
+            'save_version_mismatch_modal.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
           controller: ['$scope', function($scope) {
