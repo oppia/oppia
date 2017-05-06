@@ -105,7 +105,7 @@ oppia.factory('EditableExplorationBackendApiService', [
         return UrlInterpolationService.interpolateUrl(
         EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE, {
           exploration_id: explorationId,
-          applyDraft: JSON.stringify(applyDraft)
+          apply_draft: JSON.stringify(applyDraft)
         });
       }
       return UrlInterpolationService.interpolateUrl(

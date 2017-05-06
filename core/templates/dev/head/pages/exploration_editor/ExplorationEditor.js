@@ -34,7 +34,7 @@ oppia.constant(
   '/createhandler/data/<exploration_id>');
 oppia.constant(
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
-  '/createhandler/data/<exploration_id>?apply_draft=<applyDraft>');
+  '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
 oppia.constant(
   'EDITABLE_EXPLORATION_DATA_ROLE_URL_TEMPLATE',
   '/createhandler/data/<exploration_id>?role=<role>');
