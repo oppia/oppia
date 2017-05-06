@@ -120,8 +120,8 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
         # Load demo exploration.
-        self.unused_exp_id = '0'
-        self.exp_id = '15'
+        self.unused_exp_id = '15'
+        self.exp_id = '16'
         self.title = 'Testing String Classifier'
         self.category = 'Test'
         self.state_name = 'Home'
