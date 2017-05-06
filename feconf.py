@@ -75,7 +75,7 @@ INTERACTION_CLASSIFIER_MAPPING = {
     'TextInput': 'LDAStringClassifier'
 }
 
-# A mapping of classifier algorithms to their current version numbers.
+# A mapping of classifier algorithms to classifier schema data versions.
 CLASSIFIER_VERSION_MAPPING = {
     'LDAStringClassifier': 1
 }

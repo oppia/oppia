@@ -121,11 +121,10 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
 
         # Load demo exploration.
         self.unused_exp_id = '0'
-        self.exp_id = '16'
+        self.exp_id = '15'
         self.title = 'Testing String Classifier'
         self.category = 'Test'
         self.state_name = 'Home'
-        exp_services.delete_demo(self.unused_exp_id)
         exp_services.load_demo(self.unused_exp_id)
 
         test_exp_filepath = os.path.join(
