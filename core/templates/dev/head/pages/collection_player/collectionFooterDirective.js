@@ -18,7 +18,7 @@
  */
 
 oppia.directive('collectionFooter', [
-  'UrlInterpolationService', function() {
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
