@@ -25,17 +25,34 @@ oppia.directive('collectionNodeCreator', [function() {
       'validatorsService', 'CollectionEditorStateService',
       'CollectionLinearizerService', 'CollectionUpdateService',
       'CollectionNodeObjectFactory', 'ExplorationSummaryBackendApiService',
-      'siteAnalyticsService',
+      'SearchExplorationsBackendApiService', 'siteAnalyticsService',
       function(
           $scope, $http, $window, $filter, alertsService,
           validatorsService, CollectionEditorStateService,
           CollectionLinearizerService, CollectionUpdateService,
           CollectionNodeObjectFactory, ExplorationSummaryBackendApiService,
-          siteAnalyticsService) {
+          SearchExplorationsBackendApiService, siteAnalyticsService) {
         $scope.collection = CollectionEditorStateService.getCollection();
         $scope.newExplorationId = '';
         $scope.newExplorationTitle = '';
         var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
+
+        $scope.fetchExplorationsMetadata = function(searchQuery) {
+          if (/^[a-zA-Z0-9- ]*$/.test(searchQuery)) {
+            return SearchExplorationsBackendApiService.getExplorations(
+              searchQuery).then(
+            function(explorationMetadataObject) {
+              return explorationMetadataObject.collection_node_metadata_list.
+                map(function(item) {
+                  return '(#' + item.id + ') ' + item.title;
+                });
+            },
+            function() {
+              alertsService.addWarning(
+                'There was an error when searching the explorations.');
+            });
+          }
+        };
 
         var addExplorationToCollection = function(newExplorationId) {
           if (!newExplorationId) {
@@ -75,6 +92,16 @@ oppia.directive('collectionNodeCreator', [function() {
           );
         };
 
+        var cleanExplorationId = function(newExplorationId) {
+          if (newExplorationId.length > 1 && newExplorationId[0] === '(') {
+            var temp = '';
+            for (var i = 2; newExplorationId[i] !== ')'; i++) {
+              temp += newExplorationId[i];
+            }
+            $scope.newExplorationId = temp;
+          }
+        };
+
         // Creates a new exploration, then adds it to the collection.
         $scope.createNewExploration = function() {
           var title = $filter('normalizeWhitespace')(
@@ -98,6 +125,7 @@ oppia.directive('collectionNodeCreator', [function() {
         };
 
         $scope.addExploration = function() {
+          cleanExplorationId($scope.newExplorationId);
           addExplorationToCollection($scope.newExplorationId);
           $scope.newExplorationId = '';
         };
