@@ -129,7 +129,7 @@ if not os.getcwd().endswith('oppia'):
     print 'ERROR    Please run this script from the oppia root directory.'
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.5.2')
+_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.7.1')
 if not os.path.exists(_PYLINT_PATH):
     print ''
     print 'ERROR    Please run start.sh first to install pylint '
@@ -140,16 +140,16 @@ _PATHS_TO_INSERT = [
     _PYLINT_PATH,
     os.getcwd(),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.19',
+        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.50',
         'google_appengine', 'lib', 'webapp2-2.3'),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.19',
+        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.50',
         'google_appengine', 'lib', 'yaml-3.10'),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.19',
+        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.50',
         'google_appengine', 'lib', 'jinja2-2.6'),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.19',
+        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.50',
         'google_appengine'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'webtest-1.4.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'numpy-1.6.1'),

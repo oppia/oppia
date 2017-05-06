@@ -16,40 +16,43 @@
  * @fileoverview Directives for the outcome feedback editor.
  */
 
-oppia.directive('outcomeFeedbackEditor', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      outcome: '='
-    },
-    templateUrl: 'rules/outcomeFeedbackEditor',
-    controller: ['$scope', function($scope) {
-      $scope.OUTCOME_FEEDBACK_SCHEMA = {
-        type: 'html'
-      };
+oppia.directive('outcomeFeedbackEditor', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        outcome: '='
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/' +
+        'outcome_feedback_editor_directive.html'),
+      controller: ['$scope', function($scope) {
+        $scope.OUTCOME_FEEDBACK_SCHEMA = {
+          type: 'html'
+        };
 
-      $scope.$on('saveOutcomeFeedbackDetails', function() {
-        // Remove null feedback. If the first element of the feedback is null or
-        // empty, clear the entire feedback array. This is so that if the first
-        // feedback is removed all feedback is thereby removed. Only the first
-        // feedback is usable and editable. This also preserves all feedback
-        // entries after the first if the first is non-empty.
-        var nonemptyFeedback = [];
-        for (var i = 0; i < $scope.outcome.feedback.length; i++) {
-          var feedbackStr = $scope.outcome.feedback[i];
-          if (feedbackStr) {
-            feedbackStr = feedbackStr.trim();
+        $scope.$on('saveOutcomeFeedbackDetails', function() {
+          // Remove null feedback. If the first element of the feedback is null
+          // or empty, clear the entire feedback array. This is so that if the
+          // first feedback is removed all feedback is thereby removed. Only
+          // first feedback is usable and editable. This also preserves all
+          // feedback entries after the first if the first is non-empty.
+          var nonemptyFeedback = [];
+          for (var i = 0; i < $scope.outcome.feedback.length; i++) {
+            var feedbackStr = $scope.outcome.feedback[i];
+            if (feedbackStr) {
+              feedbackStr = feedbackStr.trim();
+            }
+            if (feedbackStr) {
+              nonemptyFeedback.push(feedbackStr);
+            }
+            if (!feedbackStr && i === 0) {
+              // If the first feedback is empty, copy no more feedback after.
+              break;
+            }
           }
-          if (feedbackStr) {
-            nonemptyFeedback.push(feedbackStr);
-          }
-          if (!feedbackStr && i === 0) {
-            // If the first feedback is empty, copy no more feedback after.
-            break;
-          }
-        }
-        $scope.outcome.feedback = nonemptyFeedback;
-      });
-    }]
-  };
-}]);
+          $scope.outcome.feedback = nonemptyFeedback;
+        });
+      }]
+    };
+  }]);

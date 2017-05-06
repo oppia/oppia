@@ -16,54 +16,57 @@
  * @fileoverview Directive for an answer/feedback pair in the learner view.
  */
 
-oppia.directive('answerFeedbackPair', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      data: '=',
-      oppiaAvatarImageUrl: '&',
-      profilePicture: '&'
-    },
-    templateUrl: 'components/answerFeedbackPair',
-    controller: [
-      '$scope', 'oppiaPlayerService', 'playerTranscriptService',
-      'oppiaExplorationHtmlFormatterService', 'INTERACTION_SPECS',
-      'playerPositionService',
-      function(
-          $scope, oppiaPlayerService, playerTranscriptService,
-          oppiaExplorationHtmlFormatterService, INTERACTION_SPECS,
-          playerPositionService) {
-        $scope.isCurrentCardAtEndOfTranscript = function() {
-          return playerTranscriptService.isLastCard(
-            playerPositionService.getActiveCardIndex());
-        };
+oppia.directive('answerFeedbackPair', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        data: '=',
+        oppiaAvatarImageUrl: '&',
+        profilePicture: '&'
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/exploration_player/' +
+        'answer_feedback_pair_directive.html'),
+      controller: [
+        '$scope', 'oppiaPlayerService', 'playerTranscriptService',
+        'oppiaExplorationHtmlFormatterService', 'INTERACTION_SPECS',
+        'playerPositionService',
+        function(
+            $scope, oppiaPlayerService, playerTranscriptService,
+            oppiaExplorationHtmlFormatterService, INTERACTION_SPECS,
+            playerPositionService) {
+          $scope.isCurrentCardAtEndOfTranscript = function() {
+            return playerTranscriptService.isLastCard(
+              playerPositionService.getActiveCardIndex());
+          };
 
-        $scope.getAnswerHtml = function() {
-          var interaction = oppiaPlayerService.getInteraction(
-            playerPositionService.getCurrentStateName());
-          if ($scope.data) {
-            return oppiaExplorationHtmlFormatterService.getAnswerHtml(
-              $scope.data.learnerAnswer, interaction.id,
-              interaction.customizationArgs);
-          }
-        };
-
-        // Returns a HTML string representing a short summary of the answer, or
-        // null if the answer does not have to be summarized.
-        $scope.getShortAnswerHtml = function() {
-          var interaction = oppiaPlayerService.getInteraction(
-            playerPositionService.getCurrentStateName());
-          var shortAnswerHtml = '';
-          if ($scope.data && interaction.id &&
-              INTERACTION_SPECS[interaction.id].needs_summary) {
-            shortAnswerHtml = (
-              oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
+          $scope.getAnswerHtml = function() {
+            var interaction = oppiaPlayerService.getInteraction(
+              playerPositionService.getCurrentStateName());
+            if ($scope.data) {
+              return oppiaExplorationHtmlFormatterService.getAnswerHtml(
                 $scope.data.learnerAnswer, interaction.id,
-                interaction.customizationArgs));
-          }
-          return shortAnswerHtml;
-        };
-      }
-    ]
-  };
-}]);
+                interaction.customizationArgs);
+            }
+          };
+
+          // Returns a HTML string representing a short summary of the answer
+          // , or null if the answer does not have to be summarized.
+          $scope.getShortAnswerHtml = function() {
+            var interaction = oppiaPlayerService.getInteraction(
+              playerPositionService.getCurrentStateName());
+            var shortAnswerHtml = '';
+            if ($scope.data && interaction.id &&
+                INTERACTION_SPECS[interaction.id].needs_summary) {
+              shortAnswerHtml = (
+                oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
+                  $scope.data.learnerAnswer, interaction.id,
+                  interaction.customizationArgs));
+            }
+            return shortAnswerHtml;
+          };
+        }
+      ]
+    };
+  }]);

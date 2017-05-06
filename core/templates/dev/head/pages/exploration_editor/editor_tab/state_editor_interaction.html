@@ -77,6 +77,7 @@
   </div>
 
   <div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()" ng-if="!hasCustomizationArgs">Cancel</button>
     <!-- Do not show this button if an interaction is already selected. -->
     <button class="btn btn-default" style="float: left;" ng-click="returnToInteractionSelector()" ng-if="stateInteractionIdService.displayed && !stateInteractionIdService.savedMemento && hasCustomizationArgs">Change Interaction</button>
 
