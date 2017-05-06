@@ -20,9 +20,6 @@
 // named 'schemaBasedFormsShown'. This should be called by clients
 // when these forms first come into view.
 
-// The conditioning on window.GLOBALS.RTE_COMPONENT_SPECS is because, in the
-// Karma tests, this value is undefined.
-
 // Service for retrieving parameter specifications.
 oppia.factory('parameterSpecsService', ['$log', function($log) {
   var paramSpecs = {};

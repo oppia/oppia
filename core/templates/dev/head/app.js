@@ -61,6 +61,8 @@ oppia.constant('FATAL_ERROR_CODES', [400, 401, 404, 500]);
 
 oppia.constant('EVENT_ACTIVE_CARD_CHANGED', 'activeCardChanged');
 
+// The conditioning on window.GLOBALS.RTE_COMPONENT_SPECS is because, in the
+// Karma tests, this value is undefined.
 oppia.constant(
   'RTE_COMPONENT_SPECS',
   window.GLOBALS.RTE_COMPONENT_SPECS ? window.GLOBALS.RTE_COMPONENT_SPECS : {});
