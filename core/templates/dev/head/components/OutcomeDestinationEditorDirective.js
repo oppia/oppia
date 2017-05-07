@@ -16,111 +16,115 @@
  * @fileoverview Directives for the outcome destination editor.
  */
 
-oppia.directive('outcomeDestinationEditor', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      outcomeHasFeedback: '=',
-      outcome: '='
-    },
-    templateUrl: 'rules/outcomeDestinationEditor',
-    controller: [
-      '$scope', 'editorContextService', 'explorationStatesService',
-      'StateGraphLayoutService', 'PLACEHOLDER_OUTCOME_DEST', 'focusService',
-      'editorFirstTimeEventsService',
-      function(
-          $scope, editorContextService, explorationStatesService,
-          StateGraphLayoutService, PLACEHOLDER_OUTCOME_DEST, focusService,
-          editorFirstTimeEventsService) {
-        $scope.$on('saveOutcomeDestDetails', function() {
-          // Create new state if specified.
-          if ($scope.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
-            editorFirstTimeEventsService.registerFirstCreateSecondStateEvent();
+oppia.directive('outcomeDestinationEditor', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        outcomeHasFeedback: '=',
+        outcome: '='
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/' +
+        'outcome_destination_editor_directive.html'),
+      controller: [
+        '$scope', 'editorContextService', 'explorationStatesService',
+        'StateGraphLayoutService', 'PLACEHOLDER_OUTCOME_DEST', 'focusService',
+        'editorFirstTimeEventsService',
+        function(
+            $scope, editorContextService, explorationStatesService,
+            StateGraphLayoutService, PLACEHOLDER_OUTCOME_DEST, focusService,
+            editorFirstTimeEventsService) {
+          $scope.$on('saveOutcomeDestDetails', function() {
+            // Create new state if specified.
+            if ($scope.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
+              editorFirstTimeEventsService
+                .registerFirstCreateSecondStateEvent();
 
-            var newStateName = $scope.outcome.newStateName;
-            $scope.outcome.dest = newStateName;
-            delete $scope.outcome.newStateName;
+              var newStateName = $scope.outcome.newStateName;
+              $scope.outcome.dest = newStateName;
+              delete $scope.outcome.newStateName;
 
-            explorationStatesService.addState(newStateName, null);
-          }
-        });
-
-        $scope.onDestSelectorChange = function() {
-          if ($scope.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
-            focusService.setFocus('newStateNameInputField');
-          }
-        };
-
-        $scope.isCreatingNewState = function(outcome) {
-          return outcome.dest === PLACEHOLDER_OUTCOME_DEST;
-        };
-
-        $scope.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
-        $scope.destChoices = [];
-        $scope.$watch(explorationStatesService.getStates, function() {
-          var currentStateName = editorContextService.getActiveStateName();
-
-          // This is a list of objects, each with an ID and name. These
-          // represent all states, as well as an option to create a
-          // new state.
-          $scope.destChoices = [{
-            id: currentStateName,
-            text: '(try again)'
-          }];
-
-          // Arrange the remaining states based on their order in the state
-          // graph.
-          var lastComputedArrangement = (
-            StateGraphLayoutService.getLastComputedArrangement());
-          var allStateNames = Object.keys(explorationStatesService.getStates());
-
-          var maxDepth = 0;
-          var maxOffset = 0;
-          for (var stateName in lastComputedArrangement) {
-            maxDepth = Math.max(
-              maxDepth, lastComputedArrangement[stateName].depth);
-            maxOffset = Math.max(
-              maxOffset, lastComputedArrangement[stateName].offset);
-          }
-
-          // Higher scores come later.
-          var allStateScores = {};
-          var unarrangedStateCount = 0;
-          for (var i = 0; i < allStateNames.length; i++) {
-            var stateName = allStateNames[i];
-            if (lastComputedArrangement.hasOwnProperty(stateName)) {
-              allStateScores[stateName] = (
-                lastComputedArrangement[stateName].depth * (maxOffset + 1) +
-                lastComputedArrangement[stateName].offset);
-            } else {
-              // States that have just been added in the rule 'create new'
-              // modal are not yet included as part of lastComputedArrangement,
-              // so we account for them here.
-              allStateScores[stateName] = (
-                (maxDepth + 1) * (maxOffset + 1) + unarrangedStateCount);
-              unarrangedStateCount++;
+              explorationStatesService.addState(newStateName, null);
             }
-          }
-
-          var stateNames = allStateNames.sort(function(a, b) {
-            return allStateScores[a] - allStateScores[b];
           });
 
-          for (var i = 0; i < stateNames.length; i++) {
-            if (stateNames[i] !== currentStateName) {
-              $scope.destChoices.push({
-                id: stateNames[i],
-                text: stateNames[i]
-              });
+          $scope.onDestSelectorChange = function() {
+            if ($scope.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
+              focusService.setFocus('newStateNameInputField');
             }
-          }
+          };
 
-          $scope.destChoices.push({
-            id: PLACEHOLDER_OUTCOME_DEST,
-            text: 'A New Card Called...'
-          });
-        }, true);
-      }
-    ]
-  };
-}]);
+          $scope.isCreatingNewState = function(outcome) {
+            return outcome.dest === PLACEHOLDER_OUTCOME_DEST;
+          };
+
+          $scope.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
+          $scope.destChoices = [];
+          $scope.$watch(explorationStatesService.getStates, function() {
+            var currentStateName = editorContextService.getActiveStateName();
+
+            // This is a list of objects, each with an ID and name. These
+            // represent all states, as well as an option to create a
+            // new state.
+            $scope.destChoices = [{
+              id: currentStateName,
+              text: '(try again)'
+            }];
+
+            // Arrange the remaining states based on their order in the state
+            // graph.
+            var lastComputedArrangement = (
+              StateGraphLayoutService.getLastComputedArrangement());
+            var allStateNames = explorationStatesService.getStateNames();
+
+            var maxDepth = 0;
+            var maxOffset = 0;
+            for (var stateName in lastComputedArrangement) {
+              maxDepth = Math.max(
+                maxDepth, lastComputedArrangement[stateName].depth);
+              maxOffset = Math.max(
+                maxOffset, lastComputedArrangement[stateName].offset);
+            }
+
+            // Higher scores come later.
+            var allStateScores = {};
+            var unarrangedStateCount = 0;
+            for (var i = 0; i < allStateNames.length; i++) {
+              var stateName = allStateNames[i];
+              if (lastComputedArrangement.hasOwnProperty(stateName)) {
+                allStateScores[stateName] = (
+                  lastComputedArrangement[stateName].depth * (maxOffset + 1) +
+                  lastComputedArrangement[stateName].offset);
+              } else {
+                // States that have just been added in the rule 'create new'
+                // modal are not yet included as part of
+                // lastComputedArrangement so we account for them here.
+                allStateScores[stateName] = (
+                  (maxDepth + 1) * (maxOffset + 1) + unarrangedStateCount);
+                unarrangedStateCount++;
+              }
+            }
+
+            var stateNames = allStateNames.sort(function(a, b) {
+              return allStateScores[a] - allStateScores[b];
+            });
+
+            for (var i = 0; i < stateNames.length; i++) {
+              if (stateNames[i] !== currentStateName) {
+                $scope.destChoices.push({
+                  id: stateNames[i],
+                  text: stateNames[i]
+                });
+              }
+            }
+
+            $scope.destChoices.push({
+              id: PLACEHOLDER_OUTCOME_DEST,
+              text: 'A New Card Called...'
+            });
+          }, true);
+        }
+      ]
+    };
+  }]);

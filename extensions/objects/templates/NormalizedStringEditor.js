@@ -15,69 +15,69 @@
 // This is a copy of the UnicodeStringEditor.
 
 oppia.directive('normalizedStringEditor', [
-    '$compile', 'OBJECT_EDITOR_URL_PREFIX',
-    function($compile, OBJECT_EDITOR_URL_PREFIX) {
-  return {
-    link: function(scope, element) {
-      scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_URL_PREFIX + 'NormalizedString';
-      };
-      $compile(element.contents())(scope);
-    },
-    restrict: 'E',
-    scope: true,
-    template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: ['$scope', function($scope) {
-      $scope.alwaysEditable = $scope.$parent.alwaysEditable;
-      $scope.largeInput = false;
-
-      $scope.$watch('$parent.initArgs', function(newValue) {
+  '$compile', 'OBJECT_EDITOR_URL_PREFIX',
+  function($compile, OBJECT_EDITOR_URL_PREFIX) {
+    return {
+      link: function(scope, element) {
+        scope.getTemplateUrl = function() {
+          return OBJECT_EDITOR_URL_PREFIX + 'NormalizedString';
+        };
+        $compile(element.contents())(scope);
+      },
+      restrict: 'E',
+      scope: true,
+      template: '<span ng-include="getTemplateUrl()"></span>',
+      controller: ['$scope', function($scope) {
+        $scope.alwaysEditable = $scope.$parent.alwaysEditable;
         $scope.largeInput = false;
-        if (newValue && newValue.largeInput) {
-          $scope.largeInput = newValue.largeInput;
-        }
-      });
 
-      // Reset the component each time the value changes (e.g. if this is part
-      // of an editable list).
-      $scope.$watch('$parent.value', function() {
-        $scope.localValue = {
-          label: $scope.$parent.value || ''
-        };
-      }, true);
-
-      if ($scope.alwaysEditable) {
-        $scope.$watch('localValue.label', function(newValue) {
-          $scope.$parent.value = newValue;
-        });
-      } else {
-        $scope.openEditor = function() {
-          $scope.active = true;
-        };
-
-        $scope.closeEditor = function() {
-          $scope.active = false;
-        };
-
-        $scope.replaceValue = function(newValue) {
-          $scope.localValue = {
-            label: newValue
-          };
-          $scope.$parent.value = newValue;
-          $scope.closeEditor();
-        };
-
-        $scope.$on('externalSave', function() {
-          if ($scope.active) {
-            $scope.replaceValue($scope.localValue.label);
-            // The $scope.$apply() call is needed to propagate the replaced
-            // value.
-            $scope.$apply();
+        $scope.$watch('$parent.initArgs', function(newValue) {
+          $scope.largeInput = false;
+          if (newValue && newValue.largeInput) {
+            $scope.largeInput = newValue.largeInput;
           }
         });
 
-        $scope.closeEditor();
-      }
-    }]
-  };
-}]);
+        // Reset the component each time the value changes (e.g. if this is part
+        // of an editable list).
+        $scope.$watch('$parent.value', function() {
+          $scope.localValue = {
+            label: $scope.$parent.value || ''
+          };
+        }, true);
+
+        if ($scope.alwaysEditable) {
+          $scope.$watch('localValue.label', function(newValue) {
+            $scope.$parent.value = newValue;
+          });
+        } else {
+          $scope.openEditor = function() {
+            $scope.active = true;
+          };
+
+          $scope.closeEditor = function() {
+            $scope.active = false;
+          };
+
+          $scope.replaceValue = function(newValue) {
+            $scope.localValue = {
+              label: newValue
+            };
+            $scope.$parent.value = newValue;
+            $scope.closeEditor();
+          };
+
+          $scope.$on('externalSave', function() {
+            if ($scope.active) {
+              $scope.replaceValue($scope.localValue.label);
+              // The $scope.$apply() call is needed to propagate the replaced
+              // value.
+              $scope.$apply();
+            }
+          });
+
+          $scope.closeEditor();
+        }
+      }]
+    };
+  }]);

@@ -230,11 +230,11 @@
         }
       },
       "guppy": {
-        "version": "1.1.0",
+        "version": "260da662c907e95f3da0a335c896fe9621fc165d",
         "downloadFormat": "zip",
-        "url": "https://github.com/daniel3735928559/guppy/archive/v1.1.0.zip",
+        "url": "https://github.com/daniel3735928559/guppy/archive/260da662c907e95f3da0a335c896fe9621fc165d.zip",
         "rootDirPrefix": "guppy-",
-        "targetDirPrefix": "guppy-"
+        "targetDir": "guppy-260da6"
       },
       "hammerJs": {
         "version": "2.0.4",
@@ -283,11 +283,11 @@
         "targetDirPrefix": "jquery-ui-touch-punch-"
       },
       "mathExpressions": {
-        "version": "10186afeb160aa48ed94b20afd6353759c059dee",
+        "version": "370a77f6a98974c14a37b4096bea88f8ec36797a",
         "downloadFormat": "zip",
-        "url": "https://github.com/kisonecat/math-expressions/archive/10186afeb160aa48ed94b20afd6353759c059dee.zip",
+        "url": "https://github.com/kisonecat/math-expressions/archive/370a77f6a98974c14a37b4096bea88f8ec36797a.zip",
         "rootDirPrefix": "math-expressions-",
-        "targetDir": "math-expressions-10186a"
+        "targetDir": "math-expressions-370a77"
       },
       "mathJax": {
         "version": "2.6.0",

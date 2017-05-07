@@ -573,6 +573,47 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
             collection_domain.Collection.from_yaml('collection3', None)
 
 
+class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
+    """Tests the presence of appropriate schema migration methods in the
+    Collection domain object class.
+    """
+
+    def test_correct_collection_contents_schema_conversion_methods_exist(self):
+        """Test that the right collection_contents schema conversion methods
+        exist.
+        """
+        current_collection_schema_version = (
+            feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
+        for version_num in range(1, current_collection_schema_version):
+            self.assertTrue(hasattr(
+                collection_domain.Collection,
+                '_convert_collection_contents_v%s_dict_to_v%s_dict' % (
+                    version_num, version_num + 1)))
+
+        self.assertFalse(hasattr(
+            collection_domain.Collection,
+            '_convert_collection_contents_v%s_dict_to_v%s_dict' % (
+                current_collection_schema_version,
+                current_collection_schema_version + 1)))
+
+    def test_correct_collection_schema_conversion_methods_exist(self):
+        """Test that the right collection schema conversion methods exist."""
+        current_collection_schema_version = (
+            feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
+
+        for version_num in range(1, current_collection_schema_version):
+            self.assertTrue(hasattr(
+                collection_domain.Collection,
+                '_convert_v%s_dict_to_v%s_dict' % (
+                    version_num, version_num + 1)))
+
+        self.assertFalse(hasattr(
+            collection_domain.Collection,
+            '_convert_v%s_dict_to_v%s_dict' % (
+                current_collection_schema_version,
+                current_collection_schema_version + 1)))
+
+
 class SchemaMigrationUnitTests(test_utils.GenericTestBase):
     """Test migration methods for yaml content."""
 
@@ -600,9 +641,23 @@ schema_version: 2
 tags: []
 title: A title
 """)
+    YAML_CONTENT_V3 = ("""category: A category
+language_code: en
+nodes:
+- acquired_skills:
+  - Skill1
+  - Skill2
+  exploration_id: Exp1
+  prerequisite_skills: []
+objective: ''
+schema_version: 3
+tags: []
+title: A title
+""")
 
     _LATEST_YAML_CONTENT = YAML_CONTENT_V1
     _LATEST_YAML_CONTENT = YAML_CONTENT_V2
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V3
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -618,4 +673,12 @@ title: A title
             'Exp1', 'user@example.com', end_state_name='End')
         collection = collection_domain.Collection.from_yaml(
             'cid', self.YAML_CONTENT_V2)
+        self.assertEqual(collection.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v3(self):
+        """Test direct loading from a v3 yaml file."""
+        self.save_new_valid_exploration(
+            'Exp1', 'user@example.com', end_state_name='End')
+        collection = collection_domain.Collection.from_yaml(
+            'cid', self.YAML_CONTENT_V3)
         self.assertEqual(collection.to_yaml(), self._LATEST_YAML_CONTENT)

@@ -20,7 +20,7 @@
 
 function maybeInstallDependencies {
   # Parse additional command line arguments.
-  # Credit: http://stackoverflow.com/questions/192249
+  # Credit: https://stackoverflow.com/questions/192249
   export SKIP_INSTALLING_THIRD_PARTY_LIBS=$DEFAULT_SKIP_INSTALLING_THIRD_PARTY_LIBS
   export RUN_MINIFIED_TESTS=$DEFAULT_RUN_MINIFIED_TESTS
   for i in "$@"; do
@@ -59,16 +59,17 @@ function maybeInstallDependencies {
 
     $NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js build
 
-    install_node_module karma 0.12.16
-    install_node_module karma-jasmine 0.1.0
+    install_node_module jasmine-core 2.5.2
+    install_node_module karma 1.5.0
+    install_node_module karma-jasmine 1.1.0
     install_node_module karma-jasmine-jquery 0.1.1
     install_node_module karma-json-fixtures-preprocessor 0.0.6
-    install_node_module karma-coverage 0.5.2
-    install_node_module karma-ng-html2js-preprocessor 0.1.0
-    install_node_module karma-chrome-launcher 0.1.4
-    install_node_module protractor 4.0.11
+    install_node_module karma-coverage 1.1.1
+    install_node_module karma-ng-html2js-preprocessor 1.0.0
+    install_node_module karma-chrome-launcher 2.0.0
+    install_node_module protractor 5.1.1
     install_node_module protractor-screenshot-reporter 0.0.5
-    install_node_module jasmine-spec-reporter 2.2.2
+    install_node_module jasmine-spec-reporter 3.2.0
 
     $NODE_MODULE_DIR/.bin/webdriver-manager update
   fi
@@ -177,7 +178,7 @@ if [ ! -d "$NODE_PATH" ]; then
     fi
   fi
 
-  curl --silent http://nodejs.org/dist/v6.9.1/$NODE_FILE_NAME.tar.gz -o node-download.tgz
+  curl -o node-download.tgz https://nodejs.org/dist/v6.9.1/$NODE_FILE_NAME.tar.gz
   tar xzf node-download.tgz --directory $TOOLS_DIR
   mv $TOOLS_DIR/$NODE_FILE_NAME $NODE_PATH
   rm node-download.tgz
@@ -251,7 +252,7 @@ if ! test_python_version $PYTHON_CMD; then
         echo "If you have two versions of Python (ie, Python 2.7 and 3), specify 2.7 before other versions of Python when setting the PATH."
         echo "Here are some helpful articles:"
         echo "http://docs.python-guide.org/en/latest/starting/install/win/"
-        echo "http://stackoverflow.com/questions/3701646/how-to-add-to-the-pythonpath-in-windows-7"
+        echo "https://stackoverflow.com/questions/3701646/how-to-add-to-the-pythonpath-in-windows-7"
     fi
     # Exit when no suitable Python environment can be found.
     return 1

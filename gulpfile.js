@@ -64,7 +64,7 @@ var manifest = require('./manifest.json');
 var cleanCss = require('gulp-clean-css');
 var path = require('path');
 var sourcemaps = require('gulp-sourcemaps');
-var minify = require('gulp-minify');
+var uglify = require('gulp-uglify');
 
 var gaeDevserverPath = argv.gae_devserver_path;
 var params = {
@@ -168,28 +168,27 @@ gulp.task('collectDependencyFilepaths', function() {
 gulp.task('generateCss', function() {
   requireFilesExist(cssFilePaths);
   gulp.src(cssFilePaths)
+    .pipe(isMinificationNeeded ? sourcemaps.init() : gulpUtil.noop())
+    .pipe(isMinificationNeeded ? concat('third_party.min.css') :
+        concat('third_party.css'))
     .pipe(isMinificationNeeded ? cleanCss({}) : gulpUtil.noop())
-    .pipe(concat('third_party.css'))
+    .pipe(isMinificationNeeded ? sourcemaps.write('.') : gulpUtil.noop())
     .pipe(gulp.dest(generatedCssTargetDir));
 });
 
 gulp.task('generateJs', function() {
   requireFilesExist(jsFilePaths);
   gulp.src(jsFilePaths)
-    .pipe(sourcemaps.init())
-      .pipe(concat('third_party.js'))
-      .pipe(isMinificationNeeded ? minify({
-        ext: {
-          src: '.js',
-          min: '.min.js'
-        }
-      }) : gulpUtil.noop())
+    .pipe(isMinificationNeeded ? sourcemaps.init() : gulpUtil.noop())
+    .pipe(isMinificationNeeded ? concat('third_party.min.js') :
+        concat('third_party.js'))
+    .pipe(isMinificationNeeded ? uglify() : gulpUtil.noop())
     // This maps a combined/minified file back to an unbuilt state by holding
     // information about original files. When you query a certain line and
     // column number in your generated JavaScript, you can do a lookup in the
     // source map which returns the original location.
     // http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/
-    .pipe(sourcemaps.write())
+    .pipe(isMinificationNeeded ? sourcemaps.write('.') : gulpUtil.noop())
     .pipe(gulp.dest(generatedJsTargetDir));
 });
 // This task is used to copy all fonts which are used by

@@ -139,4 +139,3 @@ class JinjaUtilsUnitTests(test_utils.GenericTestBase):
         parsed_str = jinja_utils.interpolate_cache_slug(
             '{{invalid_test}}/test/test.css')
         self.assertEqual(parsed_str, '/test/test.css')
-

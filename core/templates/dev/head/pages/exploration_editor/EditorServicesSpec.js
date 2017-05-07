@@ -42,6 +42,23 @@ describe('Editor context service', function() {
   });
 });
 
+describe('Angular names service', function() {
+  beforeEach(module('oppia'));
+
+  describe('angular name service', function() {
+    var ans = null;
+
+    beforeEach(inject(function($injector) {
+      ans = $injector.get('angularNameService');
+    }));
+
+    it('should map interaction ID to correct RulesService', function() {
+      expect(ans.getNameOfInteractionRulesService('TextInput')).toEqual(
+        'textInputRulesService');
+    });
+  });
+});
+
 describe('Change list service', function() {
   beforeEach(module('oppia'));
 
@@ -240,6 +257,7 @@ describe('Change list service', function() {
             value: 'Tips'
           }
         },
+        panel: 'right',
         visible_in_states: ['newState1']
       };
       cls.addGadget(gadgetDict);
@@ -262,8 +280,10 @@ describe('Change list service', function() {
               value: 'Tips'
             }
           },
+          panel: 'right',
           visible_in_states: ['newState1']
-        }
+        },
+        panel: 'right'
       }]);
       expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
@@ -789,71 +809,5 @@ describe('Exploration gadgets service', function() {
     // TODO(vjoisar/sll): Add the test case when we delete the only state that
     // contains the gadget.
     // Also ensure right confirmation boxes show up in various cases.
-  });
-});
-
-describe('New state template service', function() {
-  beforeEach(module('oppia'));
-
-  describe('new state template service', function() {
-    var nsts = null;
-    var NEW_STATE_NAME = 'new state name';
-
-    beforeEach(inject(function($injector) {
-      // TODO(sll): Find a way to have this and the backend dict read from the
-      // same single source of truth.
-      GLOBALS.NEW_STATE_TEMPLATE = {
-        content: [{
-          type: 'text',
-          value: ''
-        }],
-        interaction: {
-          customization_args: {
-            rows: {
-              value: 1
-            },
-            placeholder: {
-              value: 'Type your answer here.'
-            }
-          },
-          default_outcome: {
-            dest: '(untitled state)',
-            feedback: [],
-            param_changes: []
-          },
-          id: 'TextInput'
-        },
-        param_changes: [],
-        unresolved_answers: {}
-      };
-      nsts = $injector.get('newStateTemplateService');
-    }));
-
-    it('should make a new state template given a state name', function() {
-      expect(nsts.getNewStateTemplate(NEW_STATE_NAME)).toEqual({
-        content: [{
-          type: 'text',
-          value: ''
-        }],
-        interaction: {
-          customization_args: {
-            rows: {
-              value: 1
-            },
-            placeholder: {
-              value: 'Type your answer here.'
-            }
-          },
-          default_outcome: {
-            dest: NEW_STATE_NAME,
-            feedback: [],
-            param_changes: []
-          },
-          id: 'TextInput'
-        },
-        param_changes: [],
-        unresolved_answers: {}
-      });
-    });
   });
 });

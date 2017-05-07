@@ -187,7 +187,7 @@ describe('Embedding', function() {
       general.waitForSystem();
       browser.waitForAngular();
       expect(driver.findElement(by.css('.protractor-test-float-form-input'))
-          .getAttribute('placeholder')).toBe(expectedPlaceholder);
+        .getAttribute('placeholder')).toBe(expectedPlaceholder);
       browser.switchTo().defaultContent();
     };
 

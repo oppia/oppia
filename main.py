@@ -21,6 +21,7 @@ from core.controllers import admin
 from core.controllers import base
 from core.controllers import collection_editor
 from core.controllers import collection_viewer
+from core.controllers import custom_landing_pages
 from core.controllers import dashboard
 from core.controllers import email_dashboard
 from core.controllers import editor
@@ -32,6 +33,7 @@ from core.controllers import profile
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
+from core.controllers import subscriptions
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -42,6 +44,7 @@ from mapreduce import parameters as mapreduce_parameters
 import webapp2
 from webapp2_extras.routes import RedirectRoute
 
+current_user_services = models.Registry.import_current_user_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -70,7 +73,17 @@ class HomePageRedirectHandler(base.BaseHandler):
     """
     def get(self):
         if self.user_id and user_services.has_fully_registered(self.user_id):
-            self.redirect(feconf.DASHBOARD_URL)
+            user_contributions = user_services.get_user_contributions(
+                self.user_id)
+
+            # 'Creator' is a user who has created or edited an exploration.
+            user_is_creator = user_contributions and (
+                user_contributions.created_exploration_ids or
+                user_contributions.edited_exploration_ids)
+            if user_is_creator:
+                self.redirect(feconf.DASHBOARD_URL)
+            else:
+                self.redirect(feconf.LIBRARY_INDEX_URL)
         else:
             self.redirect(feconf.SPLASH_URL)
 
@@ -198,7 +211,8 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler),
-
+    get_redirect_route(r'%s' % feconf.FRACTIONS_LANDING_PAGE_URL,
+                       custom_landing_pages.FractionLandingPage),
     get_redirect_route(r'%s' % feconf.LIBRARY_INDEX_URL, library.LibraryPage),
     get_redirect_route(r'%s' % feconf.LIBRARY_INDEX_DATA_URL,
                        library.LibraryIndexHandler),
@@ -227,7 +241,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/profilehandler/data/<username>', profile.ProfileHandler),
     get_redirect_route(r'/preferences', profile.PreferencesPage),
     get_redirect_route(
-        r'/preferenceshandler/data', profile.PreferencesHandler),
+        feconf.PREFERENCES_DATA_URL, profile.PreferencesHandler),
     get_redirect_route(
         r'/preferenceshandler/profile_picture', profile.ProfilePictureHandler),
     get_redirect_route(
@@ -292,9 +306,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/createhandler/imageupload/<exploration_id>',
         editor.ImageUploadHandler),
-    get_redirect_route(
-        r'/createhandler/resolved_answers/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long
-        editor.ResolvedAnswersHandler),
     get_redirect_route(r'/createhandler/state_yaml', editor.StateYamlHandler),
     get_redirect_route(
         r'/createhandler/training_data/<exploration_id>/<escaped_state_name>',
@@ -311,6 +322,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/createhandler/moderatorrights/<exploration_id>',
         editor.ExplorationModeratorRightsHandler),
+    get_redirect_route(
+        r'/createhandler/notificationpreferences/<exploration_id>',
+        editor.UserExplorationEmailsHandler),
     get_redirect_route(
         r'/createhandler/snapshots/<exploration_id>',
         editor.ExplorationSnapshotsHandler),
@@ -352,6 +366,12 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.SUGGESTION_URL_PREFIX,
         feedback.SuggestionHandler),
+    get_redirect_route(
+        r'%s' % feconf.SUBSCRIBE_URL_PREFIX,
+        subscriptions.SubscribeHandler),
+    get_redirect_route(
+        r'%s' % feconf.UNSUBSCRIBE_URL_PREFIX,
+        subscriptions.UnsubscribeHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.FLAG_EXPLORATION_URL_PREFIX,
         reader.FlagExplorationHandler),
@@ -406,5 +426,21 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/<:.*>', base.Error404Handler),
 ]
 
+URLS_TO_SERVE = []
+
+if (feconf.ENABLE_MAINTENANCE_MODE and
+        not current_user_services.is_current_user_super_admin()):
+    # Show only the maintenance mode page.
+    URLS_TO_SERVE = [
+        get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
+        get_redirect_route(r'/adminhandler', admin.AdminHandler),
+        get_redirect_route(r'/adminjoboutput', admin.AdminJobOutput),
+        get_redirect_route(
+            r'/admintopicscsvdownloadhandler',
+            admin.AdminTopicsCsvDownloadHandler),
+        get_redirect_route(r'/<:.*>', pages.MaintenancePage)]
+else:
+    URLS_TO_SERVE = URLS
+
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
-    webapp2.WSGIApplication(URLS, debug=feconf.DEBUG))
+    webapp2.WSGIApplication(URLS_TO_SERVE, debug=feconf.DEBUG))

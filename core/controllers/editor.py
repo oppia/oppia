@@ -22,6 +22,7 @@ import logging
 
 import jinja2
 
+from constants import constants
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import dependency_registry
@@ -38,6 +39,7 @@ from core.domain import rte_component_registry
 from core.domain import stats_services
 from core.domain import user_services
 from core.domain import value_generators_domain
+from core.domain import visualization_registry
 from core.platform import models
 import feconf
 import utils
@@ -52,13 +54,13 @@ current_user_services = models.Registry.import_current_user_services()
 # state name and the destination of the default rule should first be
 # changed to the desired new state name.
 NEW_STATE_TEMPLATE = {
+    'classifier_model_id': None,
     'content': [{
         'type': 'text',
         'value': ''
     }],
     'interaction': exp_domain.State.NULL_INTERACTION_DICT,
     'param_changes': [],
-    'unresolved_answers': {},
 }
 
 DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = config_domain.ConfigProperty(
@@ -159,7 +161,7 @@ class ExplorationPage(EditorHandler):
 
     def get(self, exploration_id):
         """Handles GET requests."""
-        if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
+        if exploration_id in constants.DISABLED_EXPLORATION_IDS:
             self.render_template(
                 'pages/error/disabled_exploration.html',
                 iframe_restriction=None)
@@ -178,6 +180,8 @@ class ExplorationPage(EditorHandler):
             self.username not in config_domain.BANNED_USERNAMES.value and
             rights_manager.Actor(self.user_id).can_edit(
                 feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
+
+        visualizations_html = visualization_registry.Registry.get_full_html()
 
         interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
@@ -237,6 +241,7 @@ class ExplorationPage(EditorHandler):
             'value_generators_js': jinja2.utils.Markup(
                 get_value_generators_js()),
             'title': exploration.title,
+            'visualizations_html': jinja2.utils.Markup(visualizations_html),
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'ALLOWED_GADGETS': feconf.ALLOWED_GADGETS,
             'ALLOWED_INTERACTION_CATEGORIES': (
@@ -273,9 +278,6 @@ class ExplorationHandler(EditorHandler):
         states = {}
         for state_name in exploration.states:
             state_dict = exploration.states[state_name].to_dict()
-            state_dict['unresolved_answers'] = (
-                stats_services.get_top_unresolved_answers_for_default_rule(
-                    exploration_id, state_name))
             states[state_name] = state_dict
         exp_user_data = user_models.ExplorationUserDataModel.get(
             self.user_id, exploration_id)
@@ -286,6 +288,9 @@ class ExplorationHandler(EditorHandler):
                 exploration_id, exp_user_data.draft_change_list_exp_version)
             if exp_user_data and exp_user_data.draft_change_list_exp_version
             else None)
+        exploration_email_preferences = (
+            user_services.get_email_preferences_for_exploration(
+                self.user_id, exploration_id))
         editor_dict = {
             'category': exploration.category,
             'exploration_id': exploration_id,
@@ -305,7 +310,8 @@ class ExplorationHandler(EditorHandler):
             'title': exploration.title,
             'version': exploration.version,
             'is_version_of_draft_valid': is_version_of_draft_valid,
-            'draft_changes': draft_changes
+            'draft_changes': draft_changes,
+            'email_preferences': exploration_email_preferences.to_dict()
         }
 
         return editor_dict
@@ -334,7 +340,6 @@ class ExplorationHandler(EditorHandler):
 
         commit_message = self.payload.get('commit_message')
         change_list = self.payload.get('change_list')
-
         try:
             exp_services.update_exploration(
                 self.user_id, exploration_id, change_list, commit_message)
@@ -347,32 +352,21 @@ class ExplorationHandler(EditorHandler):
     @require_editor
     def delete(self, exploration_id):
         """Deletes the given exploration."""
-        role = self.request.get('role')
-        if not role:
-            role = None
 
-        if role == rights_manager.ROLE_ADMIN:
-            if not self.is_admin:
-                logging.error(
-                    '%s tried to delete an exploration, but is not an admin.'
-                    % self.user_id)
-                raise self.UnauthorizedUserException(
-                    'User %s does not have permissions to delete exploration '
-                    '%s' % (self.user_id, exploration_id))
-        elif role == rights_manager.ROLE_MODERATOR:
-            if not self.is_moderator:
-                logging.error(
-                    '%s tried to delete an exploration, but is not a '
-                    'moderator.' % self.user_id)
-                raise self.UnauthorizedUserException(
-                    'User %s does not have permissions to delete exploration '
-                    '%s' % (self.user_id, exploration_id))
-        elif role is not None:
-            raise self.InvalidInputException('Invalid role: %s' % role)
+        role_description = ''
+        if self.is_admin:
+            role_description = 'admin'
+        elif self.is_moderator:
+            role_description = 'moderator'
 
-        logging.info(
-            '%s %s tried to delete exploration %s' %
-            (role, self.user_id, exploration_id))
+        log_debug_string = ''
+        if role_description == '':
+            log_debug_string = '%s tried to delete exploration %s' % (
+                self.user_id, exploration_id)
+        else:
+            log_debug_string = '(%s) %s tried to delete exploration %s' % (
+                role_description, self.user_id, exploration_id)
+        logging.debug(log_debug_string)
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
         can_delete = rights_manager.Actor(self.user_id).can_delete(
@@ -387,9 +381,14 @@ class ExplorationHandler(EditorHandler):
         exp_services.delete_exploration(
             self.user_id, exploration_id, force_deletion=is_exploration_cloned)
 
-        logging.info(
-            '%s %s deleted exploration %s' %
-            (role, self.user_id, exploration_id))
+        log_info_string = ''
+        if role_description == '':
+            log_info_string = '%s deleted exploration %s' % (
+                self.user_id, exploration_id)
+        else:
+            log_info_string = '(%s) %s deleted exploration %s' % (
+                role_description, self.user_id, exploration_id)
+        logging.info(log_info_string)
 
 
 class ExplorationRightsHandler(EditorHandler):
@@ -545,6 +544,42 @@ class ExplorationModeratorRightsHandler(EditorHandler):
         })
 
 
+class UserExplorationEmailsHandler(EditorHandler):
+    """Handles management of user email notification preferences for this
+    exploration.
+    """
+
+    def put(self, exploration_id):
+        """Updates the email notification preferences for the given exploration.
+
+        Args:
+            exploration_id: str. The exploration id.
+
+        Raises:
+            InvalidInputException: Invalid message type.
+        """
+
+        mute = self.payload.get('mute')
+        message_type = self.payload.get('message_type')
+
+        if message_type == feconf.MESSAGE_TYPE_FEEDBACK:
+            user_services.set_email_preferences_for_exploration(
+                self.user_id, exploration_id, mute_feedback_notifications=mute)
+        elif message_type == feconf.MESSAGE_TYPE_SUGGESTION:
+            user_services.set_email_preferences_for_exploration(
+                self.user_id, exploration_id,
+                mute_suggestion_notifications=mute)
+        else:
+            raise self.InvalidInputException(
+                'Invalid message type.')
+
+        exploration_email_preferences = (
+            user_services.get_email_preferences_for_exploration(
+                self.user_id, exploration_id))
+        self.render_json({
+            'email_preferences': exploration_email_preferences.to_dict()
+        })
+
 class ResolvedAnswersHandler(EditorHandler):
     """Allows learners' answers for a state to be marked as resolved."""
 
@@ -567,7 +602,7 @@ class ResolvedAnswersHandler(EditorHandler):
 
 class UntrainedAnswersHandler(EditorHandler):
     """Returns answers that learners have submitted, but that Oppia hasn't been
-    explicitly trained to respond to be an exploration author.
+    explicitly trained to respond to by an exploration author.
     """
     NUMBER_OF_TOP_ANSWERS_PER_RULE = 50
 
@@ -605,10 +640,10 @@ class UntrainedAnswersHandler(EditorHandler):
         # The total number of possible answers is 100 because it requests the
         # top 50 answers matched to the default rule and the top 50 answers
         # matched to the classifier individually.
-        answers = stats_services.get_top_state_rule_answers(
+        submitted_answers = stats_services.get_top_state_rule_answers(
             exploration_id, state_name, [
-                exp_domain.DEFAULT_RULESPEC_STR,
-                exp_domain.CLASSIFIER_RULESPEC_STR])[
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION,
+                exp_domain.TRAINING_DATA_CLASSIFICATION])[
                     :self.NUMBER_OF_TOP_ANSWERS_PER_RULE]
 
         interaction = state.interaction
@@ -620,15 +655,15 @@ class UntrainedAnswersHandler(EditorHandler):
 
             try:
                 # Normalize the answers.
-                for answer in answers:
-                    answer['value'] = interaction_instance.normalize_answer(
-                        answer['value'])
+                for answer in submitted_answers:
+                    answer['answer'] = interaction_instance.normalize_answer(
+                        answer['answer'])
 
                 trained_answers = set()
                 for answer_group in interaction.answer_groups:
                     for rule_spec in answer_group.rule_specs:
                         if (rule_spec.rule_type ==
-                                exp_domain.CLASSIFIER_RULESPEC_STR):
+                                exp_domain.RULE_TYPE_CLASSIFIER):
                             trained_answers.update(
                                 interaction_instance.normalize_answer(trained)
                                 for trained
@@ -642,8 +677,8 @@ class UntrainedAnswersHandler(EditorHandler):
                     in interaction.confirmed_unclassified_answers))
 
                 unhandled_answers = [
-                    answer for answer in answers
-                    if answer['value'] not in trained_answers
+                    answer for answer in submitted_answers
+                    if answer['answer'] not in trained_answers
                 ]
             except Exception as e:
                 logging.warning(
@@ -836,8 +871,8 @@ class StateRulesStatsHandler(EditorHandler):
             raise self.PageNotFoundException
 
         self.render_json({
-            'rules_stats': stats_services.get_state_rules_stats(
-                exploration_id, state_name)
+            'visualizations_info': stats_services.get_visualizations_info(
+                exploration_id, state_name),
         })
 
 

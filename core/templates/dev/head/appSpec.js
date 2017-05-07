@@ -64,6 +64,16 @@ describe('Validators service', function() {
       expect(vs.isNonempty(null)).toBe(false);
       expect(vs.isNonempty(undefined)).toBe(false);
     });
+
+    it('should correctly validate exploration IDs', function() {
+      expect(vs.isValidExplorationId('b')).toBe(true);
+      expect(vs.isValidExplorationId('2')).toBe(true);
+      expect(vs.isValidExplorationId('asbfjkdAFS-_')).toBe(true);
+
+      expect(vs.isValidExplorationId('abc def')).toBe(false);
+      expect(vs.isValidExplorationId('')).toBe(false);
+      expect(vs.isValidExplorationId('abcd;')).toBe(false);
+    });
   });
 });
 
@@ -78,13 +88,14 @@ describe('HTML escaper', function() {
     }));
 
     it('should correctly translate between escaped and unescaped strings',
-        function() {
-      var strs = ['abc', 'a&b<html>', '&&&&&'];
-      for (var i = 0; i < strs.length; i++) {
-        expect(ohe.escapedStrToUnescapedStr(
-          ohe.unescapedStrToEscapedStr(strs[i]))).toEqual(strs[i]);
+      function() {
+        var strs = ['abc', 'a&b<html>', '&&&&&'];
+        for (var i = 0; i < strs.length; i++) {
+          expect(ohe.escapedStrToUnescapedStr(
+            ohe.unescapedStrToEscapedStr(strs[i]))).toEqual(strs[i]);
+        }
       }
-    });
+    );
 
     it('should correctly escape and unescape JSON', function() {
       var objs = [{
@@ -112,7 +123,7 @@ describe('Datetime Formatter', function() {
 
       // Mock Date() to give a time of NOW_MILLIS in GMT. (Unfortunately, there
       // doesn't seem to be a good way to set the timezone locale directly.)
-      spyOn(window, 'Date').andCallFake(function() {
+      spyOn(window, 'Date').and.callFake(function() {
         return new OldDate(NOW_MILLIS);
       });
     }));
@@ -231,5 +242,21 @@ describe('Code Normalization', function() {
       '    hij klm\n' +
       '    ab "cde fgh"'
     );
+  });
+});
+
+describe('Constants Generating', function() {
+  beforeEach(module('oppia'));
+
+  var $injector = null;
+  beforeEach(inject(function(_$injector_) {
+    $injector = _$injector_.get('$injector');
+  }));
+
+  it('should transform all key value pairs to angular constants', function() {
+    for (var constantName in constants) {
+      expect($injector.has(constantName)).toBe(true);
+      expect($injector.get(constantName)).toBe(constants[constantName]);
+    }
   });
 });

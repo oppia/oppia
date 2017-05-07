@@ -71,24 +71,25 @@ describe('Site language', function() {
   });
 
   it('should save the language selected in the footer into the preferences.',
-      function() {
-    users.createUser('feanor@example.com', 'Feanor');
-    users.login('feanor@example.com');
-    browser.get('/about');
-    _selectLanguage('Español');
-    browser.get('/library');
-    expect(browser.getTitle()).toEqual('Biblioteca - Oppia');
+    function() {
+      users.createUser('feanor@example.com', 'Feanor');
+      users.login('feanor@example.com');
+      browser.get('/about');
+      _selectLanguage('Español');
+      browser.get('/library');
+      expect(browser.getTitle()).toEqual('Biblioteca - Oppia');
 
-    // The preference page shows the last selected language
-    browser.get('/preferences');
-    language = element(by.css('.protractor-test-system-language-selector'))
-      .element(by.css('.select2-chosen'));
-    expect(language.getText(), 'Español');
-    expect(browser.getTitle()).toEqual(
-      'Cambiar sus preferencias de perfil - Oppia');
-    general.ensurePageHasNoTranslationIds();
-    users.logout();
-  });
+      // The preference page shows the last selected language
+      browser.get('/preferences');
+      language = element(by.css('.protractor-test-system-language-selector'))
+        .element(by.css('.select2-chosen'));
+      expect(language.getText(), 'Español');
+      expect(browser.getTitle()).toEqual(
+        'Cambiar sus preferencias de perfil - Oppia');
+      general.ensurePageHasNoTranslationIds();
+      users.logout();
+    }
+  );
 
   it('should be used in titles of pages without controllers', function() {
     browser.get('/about');

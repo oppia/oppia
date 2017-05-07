@@ -1,4 +1,29 @@
 <script type="text/ng-template" id="inline/editor_navigation_directive">
+  <style>
+    /* Overwrite the Bootstrap defaults. */
+    .nav > li > a.oppia-editor-navbar-tab-anchor {
+      padding: 15px 11px;
+    }
+    editor-navigation .oppia-exploration-open-threads-count {
+      bottom: 8px;
+      color: white;
+      font-size: 9px;
+      position: relative;
+    }
+    editor-navigation .oppia-exploration-open-threads-color {
+      background-color: #4078C0;
+      border: 1px solid rgb(243, 243, 243);
+    }
+    editor-navigation .oppia-exploration-open-threads-indicator {
+      border-radius: 10%;
+      bottom: 10px;
+      height: 13px;
+      position: absolute;
+      right: 5px;
+      text-align: center;
+      width: 16px;
+    }
+  </style>
   <ul class="nav navbar-nav oppia-navbar-nav pull-right ng-cloak" style="margin-left: 20px;">
     <li ng-class="{'active': getTabStatuses().active === 'main', 'dropdown': countWarnings()}">
       <a href="#" tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()"
@@ -33,7 +58,7 @@
       </li>
     {% endif %}
 
-    <li ng-class="{'active': getTabStatuses().active === 'settings'}">
+    <li ng-if="isLargeScreen" ng-class="{'active': getTabStatuses().active === 'settings'}">
       <a href="#" tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()"
          class="oppia-editor-navbar-tab-anchor protractor-test-settings-tab">
         <i class="material-icons">&#xE8B8;</i>
@@ -41,7 +66,7 @@
     </li>
 
     {% if username %}
-      <li ng-class="{'active': getTabStatuses().active === 'stats'}">
+      <li ng-if="isLargeScreen" ng-class="{'active': getTabStatuses().active === 'stats'}">
         <a href="#" tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()"
            class="oppia-editor-navbar-tab-anchor">
           <i class="material-icons">&#xE24B;</i>
@@ -49,7 +74,7 @@
       </li>
     {% endif %}
 
-    <li ng-class="{'active': getTabStatuses().active === 'history'}">
+    <li ng-if="isLargeScreen" ng-class="{'active': getTabStatuses().active === 'history'}">
       <a href="#" tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()"
          disabled="explorationRightsService.isCloned()"
          class="oppia-editor-navbar-tab-anchor protractor-test-history-tab">
@@ -57,7 +82,7 @@
       </a>
     </li>
 
-    <li ng-class="{'active': getTabStatuses().active === 'feedback'}" ng-click="selectFeedbackTab()">
+    <li ng-if="isLargeScreen" ng-class="{'active': getTabStatuses().active === 'feedback'}" ng-click="selectFeedbackTab()">
       <a href="#" tooltip="Feedback" tooltip-placement="bottom"
          class="oppia-editor-navbar-tab-anchor protractor-test-feedback-tab">
         <i class="material-icons">&#xE87F;</i>
@@ -70,6 +95,7 @@
     </li>
 
     {% if username %}
+    <div class="nav navbar-nav oppia-navbar-nav oppia-help-dropdown pull-right ng-cloak">
       <li class="dropdown" popover-is-open="postTutorialHelpPopoverIsShown"
           popover-placement="bottom" popover-trigger="none"
           popover="To get help in the future, click here!">
@@ -78,6 +104,23 @@
           <i class="material-icons">&#xE887;</i>
         </a>
       </li>
+    </div>
     {% endif %}
   </ul>
+  <style type="text/css">
+    .oppia-help-dropdown .popover{
+      background-color: black;
+      color: white;
+      font-size: 13px;
+      max-width: 300px;
+      text-align: center;
+      z-index: -1;
+    }
+    .oppia-help-dropdown .popover.bottom > .arrow{
+      border-bottom-color: #000;
+    }
+    .oppia-help-dropdown .popover.bottom > .arrow:after {
+      border-bottom-color: #000;
+    }
+  </style>
 </script>
