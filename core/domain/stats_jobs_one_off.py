@@ -432,6 +432,27 @@ class AnswersAudit2(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+
+        Args:
+            item: StateAnswerModel
+
+        Yields:
+            tuple. 2-tuple in the form (reduce_type, value).
+                'reduce_type' corresponds to the counter type passed to the
+                reduce function
+                'value': value yielded is:
+                    {
+                        'reduce_type' corresponds to the counter type passed
+                        to the reduce function
+                        'rule_spec_str': item.id (for 'submit handler name'
+                        or 'unknown handler' rule types)
+                        'rule_str': rule_str (for 'handler standard rule'
+                        rule types)
+                        'rule_args': rule_args (for 'handler standard rule'
+                        rule types)
+                    }
+        """
         for answer in item.submitted_answer_list:
             yield (AnswersAudit2._CUMULATIVE_ANSWER_COUNTER_KEY, {
                 'reduce_type': AnswersAudit2._CUMULATIVE_ANSWER_COUNTER_KEY
@@ -467,6 +488,27 @@ class AnswersAudit2(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Counts a given rule type
+
+        Args:
+            key: str. The rule type
+            stringified_values: list(str). A list of stringified values
+                associated with the given key. An element of stringfield_values
+                would be of the form:
+                    {
+                        'reduce_type' corresponds to the counter type passed
+                        to the reduce function
+                        'rule_spec_str': item.id (for 'submit handler name'
+                        or 'unknown handler' rule types)
+                        'rule_str': rule_str (for 'handler standard rule'
+                        rule types)
+                        'rule_args': rule_args (for 'handler standard rule'
+                        rule types)
+                    }
+
+        Yields:
+            Result messages reporting the count of the rule type
+        """
         reduce_type = None
         reduce_count = len(stringified_values)
         for value_str in stringified_values:
