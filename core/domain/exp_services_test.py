@@ -786,7 +786,10 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations represented as a dict whose keys
     are state names and whose values are YAML strings representing the state's
     contents."""
-    _SAMPLE_INIT_STATE_CONTENT = ("""content:
+
+
+    _SAMPLE_INIT_STATE_CONTENT = ("""classifier_model_id: null
+content:
 - type: text
   value: ''
 interaction:
