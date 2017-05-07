@@ -33,11 +33,11 @@
           </schema-based-viewer>
         </td>
         <td class="col-sm-3 col-md-3 col-lg-3">
-          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value" is-disabled="true" allow-expressions="unicodeForm.allowExpressions">
+          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value" is-disabled="true">
           </form-overlay>
         </td>
         <td class="col-sm-3 col-md-3 col-lg-3">
-          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value" allow-expressions="unicodeForm.allowExpressions">
+          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value">
           </form-overlay>
         </td>
       </tr>
@@ -50,11 +50,11 @@
           </schema-based-viewer>
         </td>
         <td class="col-sm-3 col-md-3 col-lg-3">
-          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value" is-disabled="true" allow-expressions="unicodeForm.allowExpressions">
+          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value" is-disabled="true">
           </form-overlay>
         </td>
         <td class="col-sm-3 col-md-3 col-lg-3">
-          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value" allow-expressions="unicodeForm.allowExpressions">
+          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value">
           </form-overlay>
         </td>
       </tr>
@@ -84,11 +84,11 @@
             </schema-based-viewer>
           </td>
           <td class="col-sm-3 col-md-3 col-lg-3">
-            <form-overlay definition="form.schema" saved-value="form.value" is-disabled="true" allow-expressions="form.allowExpressions">
+            <form-overlay definition="form.schema" saved-value="form.value" is-disabled="true">
             </form-overlay>
           </td>
           <td class="col-sm-3 col-md-3 col-lg-3">
-            <form-overlay definition="form.schema" saved-value="form.value" allow-expressions="form.allowExpressions">
+            <form-overlay definition="form.schema" saved-value="form.value">
             </form-overlay>
           </td>
         </tr>
@@ -98,7 +98,7 @@
 
   <script type="text/ng-template" id="formOverlay/entryPoint">
     <ng-form name="schemaForm">
-      <schema-based-editor local-value="localValue" schema="definition" is-disabled="isDisabled()" allow-expressions="allowExpressions()">
+      <schema-based-editor local-value="localValue" schema="definition" is-disabled="isDisabled()">
       </schema-based-editor>
     </ng-form>
 

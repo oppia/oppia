@@ -22,7 +22,6 @@ oppia.directive('schemaBasedFloatEditor', [
       scope: {
         localValue: '=',
         isDisabled: '&',
-        allowExpressions: '&',
         validators: '&',
         labelForFocusTarget: '&',
         onInputBlur: '=',
@@ -33,10 +32,8 @@ oppia.directive('schemaBasedFloatEditor', [
         'schema_based_float_editor_directive.html'),
       restrict: 'E',
       controller: [
-        '$scope', '$filter', '$timeout', 'parameterSpecsService',
-        'focusService',
-        function(
-            $scope, $filter, $timeout, parameterSpecsService, focusService) {
+        '$scope', '$filter', '$timeout', 'focusService',
+        function($scope, $filter, $timeout, focusService) {
           $scope.hasLoaded = false;
           $scope.isUserCurrentlyTyping = false;
           $scope.hasFocusedAtLeastOnce = false;
@@ -94,22 +91,6 @@ oppia.directive('schemaBasedFloatEditor', [
 
           if ($scope.localValue === undefined) {
             $scope.localValue = 0.0;
-          }
-
-          if ($scope.allowExpressions()) {
-            $scope.paramNames = parameterSpecsService.getAllParamsOfType(
-                                'float');
-            $scope.expressionMode = angular.isString($scope.localValue);
-
-            $scope.$watch('localValue', function(newValue) {
-              $scope.expressionMode = angular.isString(newValue);
-            });
-
-            $scope.toggleExpressionMode = function() {
-              $scope.expressionMode = !$scope.expressionMode;
-              $scope.localValue = (
-                $scope.expressionMode ? $scope.paramNames[0] : 0.0);
-            };
           }
 
           // This prevents the red 'invalid input' warning message from flashing
