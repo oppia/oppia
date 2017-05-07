@@ -1029,6 +1029,41 @@ textarea {
   }
 }
 
+.oppia-fractions-landing-page-generic-title {
+  color: inherit;
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+.oppia-fractions-landing-page-bubble {
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  background-color: #fdfdfd;
+  border: #faebcc solid 1px;
+  border-color: rgb(250, 235, 204);
+  border-radius: 10px;
+  border-width: 1px;
+  font-size: 15px;
+  height: 120px;
+  padding: 20px;
+  position: relative;
+  width: 250px;
+}
+
+.oppia-fractions-landing-page-pointer {
+  border-color: transparent #fdfdfd;
+  border-style: solid;
+  border-width: 13px 28px 13px 0;
+  content: '';
+  display: block;
+  left: -28px;
+  margin-top: -13px;
+  position: absolute;
+  top: 50%;
+  width: 0;
+  z-index: 1;
+}
+
 .oppia-library-group {
   display: block;
   height: 350px;
