@@ -20,9 +20,7 @@ oppia.directive('createActivityButton', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/create_button/' +
-        'create_activity_button_directive.html'),
+      templateUrl: 'components/createActivityButton',
       controller: [
         '$scope', '$timeout', '$window', '$modal', 'ExplorationCreationService',
         'CollectionCreationService', 'siteAnalyticsService', 'urlService',
