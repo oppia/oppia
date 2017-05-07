@@ -16,17 +16,20 @@
  * @fileoverview Directive for a schema-based viewer for primitive types.
  */
 
-oppia.directive('schemaBasedPrimitiveViewer', [function() {
-  return {
-    scope: {
-      localValue: '='
-    },
-    templateUrl: 'schemaBasedViewer/primitive',
-    restrict: 'E',
-    controller: ['$scope', function($scope) {
-      $scope.isExpression = function(value) {
-        return angular.isString(value);
-      };
-    }]
-  };
-}]);
+oppia.directive('schemaBasedPrimitiveViewer', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      scope: {
+        localValue: '='
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/forms/schema_viewers/' +
+        'schema_based_primitive_viewer_directive.html'),
+      restrict: 'E',
+      controller: ['$scope', function($scope) {
+        $scope.isExpression = function(value) {
+          return angular.isString(value);
+        };
+      }]
+    };
+  }]);
