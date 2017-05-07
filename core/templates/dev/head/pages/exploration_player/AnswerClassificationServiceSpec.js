@@ -33,6 +33,9 @@ describe('Answer classification service with string classifier disabled',
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
+    var EXPLICIT_CLASSIFICATION = 'explicit';
+    var DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome';
+
     var acs, sof, oof, $httpBackend, successHandler, failHandler, $rootScope,
       state;
     beforeEach(inject(function($injector) {
@@ -137,7 +140,8 @@ describe('Answer classification service with string classifier disabled',
       expect(successHandler).toHaveBeenCalledWith({
         outcome: oof.createNew('outcome 1', [''], []),
         answerGroupIndex: 0,
-        ruleIndex: 0
+        ruleIndex: 0,
+        classificationCategorization: EXPLICIT_CLASSIFICATION
       });
       expect(failHandler).not.toHaveBeenCalled();
 
@@ -148,7 +152,8 @@ describe('Answer classification service with string classifier disabled',
       expect(successHandler).toHaveBeenCalledWith({
         outcome: oof.createNew('outcome 2', [''], []),
         answerGroupIndex: 1,
-        ruleIndex: 0
+        ruleIndex: 0,
+        classificationCategorization: EXPLICIT_CLASSIFICATION
       });
       expect(failHandler).not.toHaveBeenCalled();
 
@@ -159,7 +164,8 @@ describe('Answer classification service with string classifier disabled',
       expect(successHandler).toHaveBeenCalledWith({
         outcome: oof.createNew('outcome 2', [''], []),
         answerGroupIndex: 1,
-        ruleIndex: 1
+        ruleIndex: 1,
+        classificationCategorization: EXPLICIT_CLASSIFICATION
       });
       expect(failHandler).not.toHaveBeenCalled();
     });
@@ -172,7 +178,8 @@ describe('Answer classification service with string classifier disabled',
       expect(successHandler).toHaveBeenCalledWith({
         outcome: oof.createNew('default', [], []),
         answerGroupIndex: 2,
-        ruleIndex: 0
+        ruleIndex: 0,
+        classificationCategorization: DEFAULT_OUTCOME_CLASSIFICATION
       });
       expect(failHandler).not.toHaveBeenCalled();
     });
@@ -237,6 +244,9 @@ describe('Answer classification service with string classifier enabled',
     });
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+
+    var EXPLICIT_CLASSIFICATION = 'explicit';
+    var DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome';
 
     var acs, sof, oof, $httpBackend, successHandler, failHandler, $rootScope,
       state, state2;
@@ -328,12 +338,14 @@ describe('Answer classification service with string classifier enabled',
       var backendClassifiedOutcome = {
         outcome: 'outcome',
         answer_group_index: 0,
-        rule_spec_index: 0
+        rule_spec_index: 0,
+        classification_categorization: EXPLICIT_CLASSIFICATION
       };
       var expectedClassificationResult = {
         outcome: 'outcome',
         answerGroupIndex: 0,
-        ruleIndex: 0
+        ruleIndex: 0,
+        classificationCategorization: EXPLICIT_CLASSIFICATION
       };
       $httpBackend.expectPOST(
         '/explorehandler/classify/' + explorationId).respond(
@@ -357,7 +369,8 @@ describe('Answer classification service with string classifier enabled',
       expect(successHandler).toHaveBeenCalledWith({
         outcome: oof.createNew('default', [], []),
         answerGroupIndex: 2,
-        ruleIndex: 0
+        ruleIndex: 0,
+        classificationCategorization: DEFAULT_OUTCOME_CLASSIFICATION
       });
       expect(failHandler).not.toHaveBeenCalled();
     });

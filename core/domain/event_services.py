@@ -19,7 +19,8 @@
 import inspect
 
 from core import jobs_registry
-from core.domain import exp_domain
+from core.domain import stats_domain
+from core.domain import stats_services
 from core.platform import models
 import feconf
 
@@ -73,28 +74,22 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
         pass
 
     @classmethod
-    def _handle_event(cls, exploration_id, exploration_version, state_name,
-                      rule_spec_string, answer):
-        """Records an event when an answer triggers a rule."""
+    def _handle_event(
+            cls, exploration_id, exploration_version, state_name,
+            interaction_id, answer_group_index, rule_spec_index,
+            classification_categorization, session_id, time_spent_in_secs,
+            params, normalized_answer):
+        """Records an event when an answer triggers a rule. The answer recorded
+        here is a Python-representation of the actual answer submitted by the
+        user.
+        """
         # TODO(sll): Escape these args?
-        stats_models.process_submitted_answer(
-            exploration_id, exploration_version, state_name,
-            rule_spec_string, answer)
-
-
-class DefaultRuleAnswerResolutionEventHandler(BaseEventHandler):
-    """Event handler for recording resolving of answers triggering the default
-    rule."""
-
-    EVENT_TYPE = feconf.EVENT_TYPE_DEFAULT_ANSWER_RESOLVED
-
-    @classmethod
-    def _handle_event(cls, exploration_id, state_name, answers):
-        """Resolves a list of answers for the default rule of this state."""
-        # TODO(sll): Escape these args?
-        stats_models.resolve_answers(
-            exploration_id, state_name,
-            exp_domain.DEFAULT_RULESPEC_STR, answers)
+        stats_services.record_answer(
+            exploration_id, exploration_version, state_name, interaction_id,
+            stats_domain.SubmittedAnswer(
+                normalized_answer, interaction_id, answer_group_index,
+                rule_spec_index, classification_categorization, params,
+                session_id, time_spent_in_secs))
 
 
 class StartExplorationEventHandler(BaseEventHandler):
@@ -103,8 +98,9 @@ class StartExplorationEventHandler(BaseEventHandler):
     EVENT_TYPE = feconf.EVENT_TYPE_START_EXPLORATION
 
     @classmethod
-    def _handle_event(cls, exp_id, exp_version, state_name, session_id,
-                      params, play_type):
+    def _handle_event(
+            cls, exp_id, exp_version, state_name, session_id, params,
+            play_type):
         stats_models.StartExplorationEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id, params,
             play_type)

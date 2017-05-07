@@ -16,10 +16,13 @@
  * @fileoverview Controller for the settings tab of the collection editor.
  */
 
-oppia.directive('collectionSettingsTab', [function() {
-  return {
-    restrict: 'E',
-    templateUrl: 'inline/collection_settings_tab_directive',
-    controller: [function() {}]
-  };
-}]);
+oppia.directive('collectionSettingsTab', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/collection_editor/settings_tab/' +
+        'collection_settings_tab_directive.html'),
+      controller: [function() {}]
+    };
+  }]);

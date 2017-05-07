@@ -16,66 +16,69 @@
  * @fileoverview Directive for the Social Sharing Links.
  */
 
-oppia.directive('sharingLinks', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      layoutType: '@',
-      layoutAlignType: '@',
-      shareType: '@',
-      getTwitterText: '&twitterText',
-      getExplorationId: '&explorationId',
-      getCollectionId: '&collectionId'
-    },
-    templateUrl: 'components/sharingLinks',
-    controller: [
-      '$scope', '$window', 'oppiaHtmlEscaper', 'ExplorationEmbedButtonService',
-      'siteAnalyticsService', 'UrlInterpolationService',
-      function(
-          $scope, $window, oppiaHtmlEscaper, ExplorationEmbedButtonService,
-          siteAnalyticsService, UrlInterpolationService) {
-        $scope.registerShareEvent = null;
+oppia.directive('sharingLinks', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        layoutType: '@',
+        layoutAlignType: '@',
+        shareType: '@',
+        getTwitterText: '&twitterText',
+        getExplorationId: '&explorationId',
+        getCollectionId: '&collectionId'
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/share/' +
+        'sharing_links_directive.html'),
+      controller: [
+        '$scope', '$window', 'oppiaHtmlEscaper',
+        'ExplorationEmbedButtonService', 'siteAnalyticsService',
+        function(
+            $scope, $window, oppiaHtmlEscaper, ExplorationEmbedButtonService,
+            siteAnalyticsService) {
+          $scope.registerShareEvent = null;
 
-        if ($scope.shareType === 'exploration') {
-          $scope.explorationId = $scope.getExplorationId();
+          if ($scope.shareType === 'exploration') {
+            $scope.explorationId = $scope.getExplorationId();
 
-          $scope.activityType = 'explore';
-          $scope.activityId = $scope.explorationId;
+            $scope.activityType = 'explore';
+            $scope.activityId = $scope.explorationId;
 
-          $scope.registerShareEvent = (
-            siteAnalyticsService.registerShareExplorationEvent);
+            $scope.registerShareEvent = (
+              siteAnalyticsService.registerShareExplorationEvent);
 
-          $scope.showEmbedExplorationModal = (
-            ExplorationEmbedButtonService.showModal);
-        } else if ($scope.shareType === 'collection') {
-          $scope.collectionId = $scope.getCollectionId();
+            $scope.showEmbedExplorationModal = (
+              ExplorationEmbedButtonService.showModal);
+          } else if ($scope.shareType === 'collection') {
+            $scope.collectionId = $scope.getCollectionId();
 
-          $scope.activityType = 'collection';
-          $scope.activityId = $scope.collectionId;
+            $scope.activityType = 'collection';
+            $scope.activityId = $scope.collectionId;
 
-          $scope.registerShareEvent = (
-            siteAnalyticsService.registerShareCollectionEvent);
-        } else {
-          throw Error(
-            'SharingLinks directive can only be used either in the' +
-            'collection player or the exploration player');
+            $scope.registerShareEvent = (
+              siteAnalyticsService.registerShareCollectionEvent);
+          } else {
+            throw Error(
+              'SharingLinks directive can only be used either in the' +
+              'collection player or the exploration player');
+          }
+
+          $scope.serverName = (
+            $window.location.protocol + '//' + $window.location.host);
+
+          $scope.escapedTwitterText = (
+            oppiaHtmlEscaper.unescapedStrToEscapedStr($scope.getTwitterText()));
+
+          $scope.gplusUrl = UrlInterpolationService.getStaticImageUrl(
+            '/general/gplus.png');
+
+          $scope.fbUrl = UrlInterpolationService.getStaticImageUrl(
+            '/general/fb.png');
+
+          $scope.twitterUrl = UrlInterpolationService.getStaticImageUrl(
+            '/general/twitter.png');
         }
-
-        $scope.serverName = (
-          $window.location.protocol + '//' + $window.location.host);
-
-        $scope.escapedTwitterText = (
-          oppiaHtmlEscaper.unescapedStrToEscapedStr($scope.getTwitterText()));
-
-        $scope.gplusUrl = UrlInterpolationService.getStaticImageUrl(
-          '/general/gplus.png');
-
-        $scope.fbUrl = UrlInterpolationService.getStaticImageUrl(
-          '/general/fb.png');
-
-        $scope.twitterUrl = UrlInterpolationService.getStaticImageUrl(
-          '/general/twitter.png');
-      }
-    ]
-  };
-}]);
+      ]
+    };
+  }]);

@@ -81,10 +81,25 @@ CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property'
 CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION = (
     'migrate_states_schema_to_latest_version')
 
-# This represents the stringified version of a 'default rule.' This is to be
-# used as an identifier for the default rule when storing which rule an answer
-# was matched against.
-DEFAULT_RULESPEC_STR = 'Default'
+# These are categories to which answers may be classified. These values should
+# not be changed because they are persisted in the data store within answer
+# logs.
+
+# Represents answers classified using rules defined as part of an interaction.
+EXPLICIT_CLASSIFICATION = 'explicit'
+# Represents answers which are contained within the training data of an answer
+# group.
+TRAINING_DATA_CLASSIFICATION = 'training_data_match'
+# Represents answers which were predicted using a statistical training model
+# from training data within an answer group.
+STATISTICAL_CLASSIFICATION = 'statistical_classifier'
+# Represents answers which led to the 'default outcome' of an interaction,
+# rather than belonging to a specific answer group.
+DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome'
+
+# This represents the stringified version of a rule which uses statistical
+# classification for evaluation. Answers which are matched to rules with this
+# rulespec will be stored with the STATISTICAL_CLASSIFICATION category.
 RULE_TYPE_CLASSIFIER = 'FuzzyMatches'
 
 
@@ -112,8 +127,8 @@ def _validate_customization_args_and_values(
     validation.
 
     Note that this may modify the given customization_args dict, if it has
-    extra or missing keys. It also normalizes any HTML in the
-    customization_args dict.
+    extra or missing keys. It also normalizes any HTML in the customization_args
+    dict.
     """
     ca_spec_names = [
         ca_spec.name for ca_spec in ca_specs_to_validate_against]
@@ -359,15 +374,6 @@ class RuleSpec(object):
     def __init__(self, rule_type, inputs):
         self.rule_type = rule_type
         self.inputs = inputs
-
-    def stringify_classified_rule(self):
-        """Returns a string representation of a rule (for the stats log)."""
-        if self.rule_type == RULE_TYPE_CLASSIFIER:
-            return self.rule_type
-        else:
-            param_list = [
-                utils.to_ascii(val) for val in self.inputs.values()]
-            return '%s(%s)' % (self.rule_type, ','.join(param_list))
 
     def validate(self, rule_params_list, exp_param_specs_dict):
         """Validates a RuleSpec value object. It ensures the inputs dict does
@@ -2174,10 +2180,15 @@ class Exploration(object):
                     else:
                         answer_groups.append(group)
 
-            is_terminal = (
-                interaction_registry.Registry.get_interaction_by_id(
-                    interaction['id']
-                ).is_terminal if interaction['id'] is not None else False)
+            try:
+                is_terminal = (
+                    interaction_registry.Registry.get_interaction_by_id(
+                        interaction['id']
+                    ).is_terminal if interaction['id'] is not None else False)
+            except KeyError:
+                raise utils.ExplorationConversionError(
+                    'Trying to migrate exploration containing non-existent '
+                    'interaction ID: %s' % interaction['id'])
             if not is_terminal:
                 interaction['answer_groups'] = answer_groups
                 interaction['default_outcome'] = default_outcome
@@ -2232,6 +2243,8 @@ class Exploration(object):
 
         return states_dict
 
+    # TODO(bhenning): Remove pre_v4_states_conversion_func when the answer
+    # migration is completed.
     @classmethod
     def _convert_states_v7_dict_to_v8_dict(cls, states_dict):
         """Converts from version 7 to 8. Version 8 contains classifier
@@ -2254,10 +2267,16 @@ class Exploration(object):
 
     @classmethod
     def update_states_from_model(
-            cls, versioned_exploration_states, current_states_schema_version):
+            cls, versioned_exploration_states, current_states_schema_version,
+            pre_v4_states_conversion_func=None):
         """Converts the states blob contained in the given
         versioned_exploration_states dict from current_states_schema_version to
         current_states_schema_version + 1.
+
+        If pre_v4_states_conversion_func is provided, it will be called in the
+        migration process before migrating from v3 to v4. It is provided a
+        states dict and will overwrite the migrated states dict with the dict it
+        returns.
 
         Note that the versioned_exploration_states being passed in is modified
         in-place.
@@ -2265,6 +2284,10 @@ class Exploration(object):
         versioned_exploration_states['states_schema_version'] = (
             current_states_schema_version + 1)
 
+        if pre_v4_states_conversion_func and current_states_schema_version == 3:
+            versioned_exploration_states['states'] = (
+                pre_v4_states_conversion_func(
+                    versioned_exploration_states['states']))
         conversion_fn = getattr(cls, '_convert_states_v%s_dict_to_v%s_dict' % (
             current_states_schema_version, current_states_schema_version + 1))
         versioned_exploration_states['states'] = conversion_fn(

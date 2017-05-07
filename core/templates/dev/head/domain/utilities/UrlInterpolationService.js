@@ -170,6 +170,16 @@ oppia.factory('UrlInterpolationService', [
         }
         return getCachePrefixedUrl('/extensions/interactions/' +
           interactionId + '/static/' + interactionId + '.png');
+      },
+
+      /**
+       * Given a directive path relative to head folder,
+       * returns the complete url path to that directive, prefixing the
+       * appropriate cache_slug to it.
+       */
+      getDirectiveTemplateUrl: function(path) {
+        validateResourcePath(path);
+        return GLOBALS.TEMPLATE_DIR_PREFIX + path;
       }
     };
   }

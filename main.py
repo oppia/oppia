@@ -76,10 +76,9 @@ class HomePageRedirectHandler(base.BaseHandler):
                 self.user_id)
 
             # 'Creator' is a user who has created or edited an exploration.
-            user_is_creator = (
-                user_contributions is not None and
-                (len(user_contributions.created_exploration_ids) > 0 or
-                 len(user_contributions.edited_exploration_ids) > 0))
+            user_is_creator = user_contributions and (
+                user_contributions.created_exploration_ids or
+                user_contributions.edited_exploration_ids)
             if user_is_creator:
                 self.redirect(feconf.DASHBOARD_URL)
             else:
@@ -305,9 +304,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/createhandler/imageupload/<exploration_id>',
         editor.ImageUploadHandler),
-    get_redirect_route(
-        r'/createhandler/resolved_answers/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long
-        editor.ResolvedAnswersHandler),
     get_redirect_route(r'/createhandler/state_yaml', editor.StateYamlHandler),
     get_redirect_route(
         r'/createhandler/training_data/<exploration_id>/<escaped_state_name>',

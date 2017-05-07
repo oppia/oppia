@@ -2330,7 +2330,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                         'contributor_ids', 'version',
                         'exploration_model_created_on',
                         'exploration_model_last_updated']
-        for exp_id in actual_summaries.keys():
+        for exp_id in actual_summaries:
             for prop in simple_props:
                 self.assertEqual(getattr(actual_summaries[exp_id], prop),
                                  getattr(expected_summaries[exp_id], prop))
@@ -2372,7 +2372,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                         'editor_ids', 'viewer_ids', 'contributor_ids',
                         'version', 'exploration_model_created_on',
                         'exploration_model_last_updated']
-        for exp_id in actual_summaries.keys():
+        for exp_id in actual_summaries:
             for prop in simple_props:
                 self.assertEqual(getattr(actual_summaries[exp_id], prop),
                                  getattr(expected_summaries[exp_id], prop))

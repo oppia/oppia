@@ -1,44 +1,42 @@
-<script type="text/ng-template" id="collectionEditor/editorTab">
-  <div ng-if="hasLoadedCollection()">
-    <div class="collection-editor-cards-container">
-      <md-card class="oppia-page-card oppia-long-text">
-        <!-- Collection node list graph -->
-        <div class="collection-editor-node-list-container">
-          <div ng-if="collection.getCollectionNodeCount() === 0">
-            No explorations have been added to this collection yet.
-          </div>
-          <div ng-if="collection.getCollectionNodeCount() > 0">
-            <div class="collection-editor-node-container"
-                 ng-repeat="node in getLinearlySortedNodes() track by $index">
-              <collection-node-editor collection-node="node"
-                                      linear-index="$index"
-                                      ng-class="{true: 'collection-editor-last-node'} [$last]">
-              </collection-node-editor>
+<div ng-if="hasLoadedCollection()">
+  <div class="collection-editor-cards-container">
+    <md-card class="oppia-page-card oppia-long-text">
+      <!-- Collection node list graph -->
+      <div class="collection-editor-node-list-container">
+        <div ng-if="collection.getCollectionNodeCount() === 0">
+          No explorations have been added to this collection yet.
+        </div>
+        <div ng-if="collection.getCollectionNodeCount() > 0">
+          <div class="collection-editor-node-container"
+               ng-repeat="node in getLinearlySortedNodes() track by $index">
+            <collection-node-editor collection-node="node"
+                                    linear-index="$index"
+                                    ng-class="{true: 'collection-editor-last-node'} [$last]">
+            </collection-node-editor>
 
-              <div ng-if="!$last"
-                   class="collection-editor-node-connector-container">
-                <svg class="collection-editor-node-connector">
-                  <defs>
-                    <marker id="arrow" markerWidth="10" markerHeight="10"
-                            refx="0" refy="3" orient="auto"
-                            markerUnits="strokeWidth" viewBox="0 0 20 20">
-                      <path d="M0,0 L0,6 L9,3 z" stroke="#88888A"/>
-                    </marker>
-                  </defs>
+            <div ng-if="!$last"
+                 class="collection-editor-node-connector-container">
+              <svg class="collection-editor-node-connector">
+                <defs>
+                  <marker id="arrow" markerWidth="10" markerHeight="10"
+                          refx="0" refy="3" orient="auto"
+                          markerUnits="strokeWidth" viewBox="0 0 20 20">
+                    <path d="M0,0 L0,6 L9,3 z" stroke="#88888A"/>
+                  </marker>
+                </defs>
 
-                  <line x1="0" y1="25" x2="35" y2="25" stroke="#88888A"
-                        stroke-width="2" marker-end="url(#arrow)" />
-                </svg>
-              </div>
+                <line x1="0" y1="25" x2="35" y2="25" stroke="#88888A"
+                      stroke-width="2" marker-end="url(#arrow)" />
+              </svg>
             </div>
           </div>
         </div>
-
-        <collection-node-creator></collection-node-creator>
       </div>
+
+      <collection-node-creator></collection-node-creator>
     </div>
   </div>
-</script>
+</div>
 
 <style>
   .collection-editor-cards-container {

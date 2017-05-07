@@ -107,6 +107,11 @@ indexes:
   - name: exploration_id
   - name: last_updated
 
+- kind: InteractionAnswerSummariesRealtimeModel
+  properties:
+  - name: realtime_layer
+  - name: created_on
+
 - kind: JobModel
   properties:
   - name: status_code

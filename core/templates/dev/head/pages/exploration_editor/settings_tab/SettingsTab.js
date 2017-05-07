@@ -81,12 +81,11 @@ oppia.controller('SettingsTab', [
     };
 
     $scope.refreshSettingsTab = function() {
-      var _states = explorationStatesService.getStates();
       // Ensure that explorationStatesService has been initialized before
       // getting the state names from it. (Otherwise, navigating to the
       // settings tab directly (by entering a URL that ends with /settings)
       // results in a console error.
-      if (_states) {
+      if (explorationStatesService.isInitialized()) {
         var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2.some(
           function(categoryItem) {
             return categoryItem.id === explorationCategoryService.savedMemento;
@@ -103,7 +102,7 @@ oppia.controller('SettingsTab', [
           });
         }
 
-        $scope.stateNames = Object.keys(_states);
+        $scope.stateNames = explorationStatesService.getStateNames();
       }
     };
 

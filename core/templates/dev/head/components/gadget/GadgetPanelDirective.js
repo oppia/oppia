@@ -16,13 +16,16 @@
  * @fileoverview Directive for gadget panels.
  */
 
-oppia.directive('oppiaGadgetPanel', function() {
-  return {
-    restrict: 'E',
-    scope: {
-      panelContents: '&',
-      currentStateName: '&'
-    },
-    templateUrl: 'components/gadgetPanel'
-  };
-});
+oppia.directive('oppiaGadgetPanel', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        panelContents: '&',
+        currentStateName: '&'
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/gadget/' +
+        'gadget_panel_directive.html')
+    };
+  }]);

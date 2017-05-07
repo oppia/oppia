@@ -432,11 +432,6 @@ input.ng-dirty.ng-invalid, md-input-group.md-default-theme input.ng-dirty.ng-inv
   color: red;
 }
 
-.oppia-confusing-outcome-warning-text {
-  color: rgb(200, 0, 0);
-  font-style: italic;
-}
-
 .oppia-serious-warning-text {
   color: red;
 }
@@ -735,17 +730,10 @@ textarea {
   list-style-position: inside;
   list-style-type: none;
 }
-.oppia-footer-social a:hover,
-.oppia-footer-social a:focus {
-  text-decoration: none;
-}
-.oppia-footer-social a:focus > img,
+
 .oppia-language-selector:focus {
   outline: 1px dotted #FFF;
   outline: auto 5px -webkit-focus-ring-color;
-}
-.oppia-footer-social a > img {
-  width: 30px;
 }
 .oppia-footer-padding {
   height: 198px;
@@ -883,7 +871,6 @@ textarea {
    clicked -- so, in such cases (e.g. for the 'Sign in' link at the top right),
    we use this instead.
 */
-.oppia-navbar-clickable-dropdown:hover ul.dropdown-menu,
 .oppia-clickable-navbar-element:hover {
   display: block;
 }
@@ -925,6 +912,13 @@ textarea {
     margin-top: 0;
     margin-left: 5px;
   }
+  ul.nav.navbar-nav.oppia-navbar-nav.navbar-right {
+    display: flex;
+    float: right;
+    margin: 0;
+  }
+}
+@media(max-width: 651px) {
   .navbar-nav.oppia-navbar-nav > li > a {
     display: none;
   }
@@ -1535,18 +1529,6 @@ md-card.oppia-dashboard-tile {
   min-height: 100%;
 }
 
-.oppia-cc-icon {
-  bottom: 50px;
-  opacity: 0.4;
-  position: fixed;
-  right: 25px;
-}
-
-.oppia-cc-icon:hover {
-  opacity: 0.7;
-  text-decoration: none;
-}
-
 .oppia-wide-panel {
   border: 1px solid #dde0FF;
   border-radius: 20px;
@@ -1614,11 +1596,6 @@ md-card.oppia-dashboard-tile {
     padding-bottom: 6px;
     width: 125px;
   }
-}
-
-/* Overwrite the Bootstrap defaults. */
-.nav > li > a.oppia-editor-navbar-tab-anchor {
-  padding: 15px 11px;
 }
 
 .oppia-save-publish-loading.oppia-save-publish-button-icon {
@@ -1710,6 +1687,7 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-editor-card-section {
   padding: 20px 50px 20px 35px;
+  word-break: break-word;
 }
 
 .oppia-state-content {
@@ -1910,16 +1888,6 @@ pre.oppia-pre-wrapped-text {
   margin-right: 5px;
 }
 
-.oppia-nested-link {
-  color: #0844aa;
-  cursor: pointer;
-}
-
-.oppia-nested-link:hover {
-  color: #3f2c76;
-  text-decoration: underline;
-}
-
 .oppia-add-interaction-button,
 .oppia-add-response-button,
 .oppia-add-fallback-button {
@@ -2000,7 +1968,6 @@ pre.oppia-pre-wrapped-text {
   padding-top: 3px;
 }
 
-.oppia-delete-param-change-button,
 .oppia-delete-interaction-button,
 .oppia-close-popover-button,
 .oppia-delete-list-entry-button {
@@ -2012,7 +1979,6 @@ pre.oppia-pre-wrapped-text {
   opacity: 0.5;
   width: 30px;
 }
-.oppia-delete-param-change-button,
 .oppia-delete-interaction-button,
 .oppia-close-popover-button {
   position: absolute;
@@ -2022,6 +1988,7 @@ pre.oppia-pre-wrapped-text {
   right: 8px;
   top: 8px;
 }
+
 .oppia-delete-param-change-button {
   right: -30px;
   top: 0;
@@ -2044,20 +2011,17 @@ pre.oppia-pre-wrapped-text {
 .oppia-delete-response-button:hover,
 .oppia-delete-rule-button:hover,
 .oppia-delete-list-entry-button:hover {
+=======
+
+.oppia-delete-interaction-button:hover,
+.oppia-close-popover-button:hover {
+
   opacity: 1;
 }
 
 .oppia-close-popover-button:focus {
   outline: 1px dotted #212121;
   outline: auto 5px -webkit-focus-ring-color;
-}
-
-.oppia-graph-resize-button {
-  border: 0;
-  padding: 9px 10px 6px 10px;
-  position: absolute;
-  right: 2px;
-  top: 2px;
 }
 
 .nav-pills > li > a.oppia-rule-tab {
@@ -2132,6 +2096,7 @@ pre.oppia-pre-wrapped-text {
   z-index: 1;
 }
 
+
 .oppia-response-header-block {
   overflow: hidden;
   padding-left: 24px;
@@ -2155,6 +2120,7 @@ pre.oppia-pre-wrapped-text {
   white-space: nowrap;
 }
 
+ 
 .oppia-rule-sort-handle, .oppia-fallback-sort-handle {
   cursor: move;
   left: 10px;
@@ -2192,18 +2158,6 @@ pre.oppia-pre-wrapped-text {
   width:22px;
 }
 
-.oppia-param-change-sort-handle {
-  cursor: move;
-  left: -20px;
-  opacity: 0.3;
-  position: absolute;
-  top: 4px;
-}
-
-.oppia-rule-edit-feedback {
-  position: relative;
-}
-
 .oppia-rule-details-header {
   margin-bottom: 6px;
 }
@@ -2235,14 +2189,6 @@ oppia-parameter {
   text-align: center;
   vertical-align: baseline;
   white-space: nowrap;
-}
-
-.oppia-param-editor-row {
-  position: relative;
-}
-
-.oppia-param-display-row {
-  margin-bottom: 4px;
 }
 
 .oppia-tutorial-tooltip {
@@ -2548,28 +2494,6 @@ div#ng-curtain {
   /* This ensures that content is not tucked behind the fixed navbar. */
   height: 56px;
 }
-.oppia-navbar-menu {
-  margin-left: 10px;
-  opacity: 0.9;
-  outline-color: transparent;
-  padding-top: 20px;
-}
-.oppia-navbar-close-icon {
-  color: #fff;
-  margin-right: 4px;
-  margin-top: -10px;
-}
-.oppia-navbar-menu-icon {
-  color: #fff;
-  margin-top: -5px;
-}
-.oppia-navbar-menu:hover {
-  opacity: 1;
-}
-.oppia-navbar-menu:focus {
-  outline: 1px dotted #212121;
-  outline: auto 5px -webkit-focus-ring-color;
-}
 
 .oppia-navbar-brand-name {
   float: left;
@@ -2601,7 +2525,7 @@ div#ng-curtain {
   display: inline-block;
   vertical-align: top;
 }
-.oppia-navbar-clickable-dropdown:hover ul.dropdown-menu, .oppia-clickable-navbar-element:hover {
+.oppia-clickable-navbar-element:hover {
   display: inline-block;
 }
 .oppia-navbar-nav .dropdown-menu {
@@ -2629,9 +2553,7 @@ div#ng-curtain {
   height: 56px;
   color: #fff;
 }
-.oppia-navbar-profile {
-  float: right;
-}
+
 .oppia-navbar-nav > li > a:hover,
 .oppia-navbar-nav > li > a:focus,
 .oppia-navbar-nav .open > a,
@@ -2643,16 +2565,7 @@ div#ng-curtain {
   background-color: #fff;
   color: #009688;
 }
-.oppia-navbar-profile-admin > li > a:hover,
-.oppia-navbar-profile-admin > li > a:focus,
-.oppia-navbar-profile-admin .open > a,
-.oppia-navbar-profile-admin .open > a:hover,
-.oppia-navbar-profile-admin .open > a:focus,
-.oppia-navbar-tabs-admin > li > a:hover,
-.oppia-navbar-tabs-admin > li > a:focus {
-  background-color: #fff;
-  color: #00376d;
-}
+
 .oppia-navbar-dropdown {
   border: 0;
   border-top-left-radius: 0;
@@ -2675,6 +2588,7 @@ div#ng-curtain {
   height: 32px;
   width: 32px;
 }
+
 .oppia-navbar-role-indicator {
   background-color: #f7a541;
   border-radius: 20px;
@@ -2711,19 +2625,13 @@ div#ng-curtain {
   right: 4px;
 }
 
+
 .oppia-select {
   background: white;
   border: #ddd solid 1px;
   border-radius: 4px;
   color: #555;
   padding: 5px;
-}
-
-.oppia-feedback-tab-row {
-  cursor: pointer;
-}
-.oppia-feedback-tab-row:hover {
-  background: #eee;
 }
 
 .oppia-editor-sidebar {
@@ -2783,26 +2691,6 @@ div#ng-curtain {
 }
 .oppia-editor-warnings-count {
   margin-left: -3px;
-}
-
-.oppia-exploration-open-threads-indicator {
-  border-radius: 10%;
-  bottom: 10px;
-  height: 13px;
-  position: absolute;
-  right: 5px;
-  text-align: center;
-  width: 16px;
-}
-.oppia-exploration-open-threads-color {
-  background-color: #4078C0;
-  border: 1px solid rgb(243, 243, 243);
-}
-.oppia-exploration-open-threads-count {
-  bottom: 8px;
-  color: white;
-  font-size: 9px;
-  position: relative;
 }
 
 .dropdown-menu.oppia-editor-warnings-box {
@@ -3009,13 +2897,6 @@ div#ng-curtain {
 /* Styles for the feedback popover component in the learner view. */
 .oppia-feedback-popover-submit-btn-enabled {
   color: #009688;
-}
-.oppia-feedback-popover-textarea {
-  border: 1px solid rgba(0,0,0,0.2);
-  margin-top: 4px;
-  padding: 4px;
-  resize: none;
-  width: 200px;
 }
 
 .oppia-rte-toolbar-image {
@@ -3920,11 +3801,37 @@ md-card.preview-conversation-skin-supplemental-card {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 1em;
   font-weight: normal;
+  hyphens: auto;
   line-height: 1.2em;
   margin: 0.3em 0.5em;
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  overflow-wrap: break-word;
   padding: 0.2em;
   position: absolute;
+
   word-break: break-all;
+=======
+  word-break: break-word;
+  -webkit-hyphens: auto;
+}
+.oppia-activity-summary-tile .objective {
+  display: -webkit-box;
+  font-family: "Rubik", "Roboto", Arial, sans-serif;
+  font-size: 0.85em;
+  height: 70px;
+  line-height: 1.26;
+  /* `max-height` is calculated as: 1.26 (line-height) * 3 (lines) / 0.85
+  (font-size). An additional (1.26 (line-height) * 0.85 (font-size) * 0.25) is added
+  to account for letters (like y,j and g) that fall beneath the baseline.
+  This is done to limit the text to 3 lines for non-webkit browsers. */
+  max-height: 4.71em;
+  overflow: hidden;
+  padding: 12px;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3; /* Truncating to 3 lines. */
+
 }
 
 .oppia-activity-summary-tile .objective {

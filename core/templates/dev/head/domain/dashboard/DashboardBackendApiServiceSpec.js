@@ -50,13 +50,13 @@ describe('Dashboard backend API service', function() {
       top_unresolved_answers: [
         {
           state: 'Introduction',
-          value: '40',
-          count: 2
+          answer: '40',
+          frequency: 2
         },
         {
           state: 'Introduction',
-          value: '20',
-          count: 1
+          answer: '20',
+          frequency: 1
         }
       ]
     }],
