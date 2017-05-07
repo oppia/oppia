@@ -549,6 +549,27 @@ class PartialAnswerValidationAudit(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+
+        Args:
+            item: StateAnswerModel
+
+        Yields:
+            tuple. 2-tuple in the form (key, value).
+                'key': a string consisting of the model type and answer
+                rule spec str
+                'value': value yielded is (old model):
+                    {
+                        'exploration_id': the exploration id associated
+                        with the rule spec str
+                        'state_name': the associated state name
+                        'rule_spec_str': the rule spec str itself
+                    }
+                    (new model)
+                    {
+                        'answer_str': the answer itself
+                    }
+        """
         if item.exploration_id == '0' and item.state_name == 'Numeric input':
             for submitted_answer in item.submitted_answer_list:
                 yield ('%s:%s' % (
@@ -567,6 +588,28 @@ class PartialAnswerValidationAudit(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Counts a given rule type
+
+        Args:
+            'key': a string consisting of the model type and answer
+            rule spec str
+            stringified_values: list(str). A list of stringified values
+                associated with the given key. An element of stringfield_values
+                would be of the form:
+                {
+                    'exploration_id': the exploration id associated
+                    with the rule spec str
+                    'state_name': the associated state name
+                    'rule_spec_str': the rule spec str itself
+                }
+                (new model)
+                {
+                    'answer_str': the answer itself
+                }
+
+        Yields:
+            The float verified answer str
+        """
         first_value_dict = ast.literal_eval(stringified_values[0])
         if key.startswith(PartialAnswerValidationAudit._OLD_ANSWER_MODEL_TYPE):
             exp_id = first_value_dict['exploration_id']
