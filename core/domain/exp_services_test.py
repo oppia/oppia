@@ -1081,7 +1081,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertIn('state', exploration.states)
         self.assertNotIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
 
-    def test_update_state_name_with_unicode(self):
+    def test_rename_state_cmd_with_unicode(self):
         """Test updating of state name to one that uses unicode characters."""
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
