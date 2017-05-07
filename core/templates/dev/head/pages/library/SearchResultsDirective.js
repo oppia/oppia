@@ -20,9 +20,7 @@ oppia.directive('searchResults', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/library/' +
-        'search_results_directive.html'),
+      templateUrl: 'components/searchResults',
       controller: [
         '$scope', '$rootScope', '$timeout', '$window', 'siteAnalyticsService',
         function($scope, $rootScope, $timeout, $window, siteAnalyticsService) {
