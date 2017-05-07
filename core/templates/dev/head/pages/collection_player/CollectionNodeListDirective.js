@@ -26,7 +26,7 @@ oppia.directive('collectionNodeList', [
         getCollectionNodes: '&collectionNodes'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      	'/pages/collection_player/' +
-      	'collection_node_list_directive.html')
+        '/pages/collection_player/' +
+        'collection_node_list_directive.html')
     };
   }]);
