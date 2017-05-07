@@ -56,9 +56,7 @@ oppia.directive('createActivityButton', [
               $window.location.replace('/dashboard?mode=create');
             } else {
               $modal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/dashboard/' +
-                  'create_activity_modal_directive.html'),
+                templateUrl: 'modals/createActivity',
                 backdrop: true,
                 controller: [
                   '$scope', '$modalInstance',
