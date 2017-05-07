@@ -38,7 +38,21 @@
 			</div>
 			<div class="jumbotron">
 				<h2 class="oppia-splash-new-h2">Start learning with some of our most popular lessons:</h2>
-				<!-- TODO: put carousel here -->
+        <div class="oppia-splash-new-exploration-summaries">
+        	<div ng-repeat="tile in activityList" style="display: inline-block;">
+          	<exploration-summary-tile exploration-id="tile.id"
+                                    	exploration-title="tile.title"
+                                    	last-updated-msec="tile.last_updated_msec"
+	                                    objective="tile.objective"
+	                                    category="tile.category"
+	                                    ratings="tile.ratings"
+	                                    num-views="tile.num_views"
+	                                    thumbnail-icon-url="tile.thumbnail_icon_url"
+	                                    thumbnail-bg-color="tile.thumbnail_bg_color"
+	                                    class="protractor-test-exp-summary-tile">
+          	</exploration-summary-tile>
+          </div>
+				</div>
 			</div>
 			<div class="jumbotron">
 				<div class="row">
@@ -153,6 +167,10 @@
 			-webkit-font-smoothing: subpixel-antialiased;
     }
 
+    .oppia-splash-new-exploration-summaries {
+      text-align: center;
+    }
+
 		.oppia-splash-new-callout {
       background-color: #009788;
       color: #ffffff;
@@ -221,5 +239,7 @@
 
 {% block footer_js %}
 	{{ super() }}
-	<script src="{{TEMPLATE_DIR_PREFIX}}/pages/splash/Splash.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/splash/Splash.js"></script>
+	<script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
+	<script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
 {% endblock footer_js %}
