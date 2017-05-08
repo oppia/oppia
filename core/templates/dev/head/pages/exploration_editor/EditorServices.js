@@ -172,7 +172,6 @@ oppia.factory('editorContextService', ['$log', function($log) {
   };
 }]);
 
-
 // A service that maps IDs to Angular names
 oppia.factory('angularNameService', [function() {
   var angularName = null;
@@ -181,7 +180,7 @@ oppia.factory('angularNameService', [function() {
     getNameOfInteractionRulesService: function(interactionId) {
       angularName = interactionId.charAt(0).toLowerCase() +
         interactionId.slice(1) + 'RulesService';
-      return angularName
+      return angularName;
     }
   };
 }]);
@@ -595,7 +594,7 @@ oppia.factory('explorationPropertyService', [
           return paramChange.toBackendDict();
         });
       }
-    }
+    };
 
     return {
       init: function(value) {
@@ -1657,8 +1656,8 @@ oppia.factory('explorationGadgetsService', [
 ]);
 
 // A service that returns the frontend representation of a newly-added state.
-oppia.factory('newStateTemplateService',
-  ['StateObjectFactory', function(StateObjectFactory) {
+oppia.factory('newStateTemplateService', [
+  'StateObjectFactory', function(StateObjectFactory) {
     return {
       // Returns a template for the new state with the given state name,
       // changing the default rule destination to the new state name in
@@ -1680,7 +1679,7 @@ oppia.factory('newStateTemplateService',
 ]);
 
 oppia.factory('computeGraphService', [
-  'INTERACTION_SPECS', function(INTERACTION_SPECS) {
+  function() {
     var _computeGraphData = function(initStateId, states) {
       var nodes = {};
       var links = [];
