@@ -62,7 +62,17 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           $scope.incorrectBoxes = [];
           $scope.currentDraggedElement = "";
           $scope.currentlyHoveredRegions = [];
+          $scope.shuffle = function(a) {
+              var j, x, i;
+              for (i = a.length; i; i--) {
+                  j = Math.floor(Math.random() * i);
+                  x = a[i - 1];
+                  a[i - 1] = a[j];
+                  a[j] = x;
+              }
+          }
           $scope.allRegions = imageAndLabels.labeledRegions;
+          $scope.shuffle($scope.allRegions);
           $scope.numRegions = $scope.allRegions.length;
           //Ensure no duplicates of elements in our element tracking arrays
           $scope.checkAndRemoveElement = function(name){
