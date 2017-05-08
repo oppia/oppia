@@ -623,12 +623,16 @@ class LDAStringClassifier(BaseClassifier):
             '_label_to_id',
             '_word_to_id'
         ]
-        list_properties = [
+        list_of_list_int_properties = [
             '_w_dp',
-            '_b_dl',
             '_l_dp',
             '_c_dl',
-            '_c_lw',
+            '_c_lw'
+        ]
+        list_of_list_bool_properties = [
+            '_b_dl'
+        ]
+        list_properties = [
             '_c_l'
         ]
 
@@ -685,3 +689,37 @@ class LDAStringClassifier(BaseClassifier):
                     raise utils.ValidationError(
                         'Expected values of %s to be a int, received %s' % (
                             list_property, value))
+
+        for list_of_list_property in list_of_list_int_properties:
+            if list_of_list_property not in classifier_data:
+                raise utils.ValidationError(
+                    'Expected %s to be a key in classifier_data' %
+                    list_of_list_property)
+            if not isinstance(classifier_data[list_of_list_property], list):
+                raise utils.ValidationError(
+                    'Expected %s to be a list, received %s' % (
+                        list_of_list_property,
+                        classifier_data[list_of_list_property]))
+            for inner_list in classifier_data[list_of_list_property]:
+                for value in inner_list:
+                    if not isinstance(value, int):
+                        raise utils.ValidationError(
+                            'Expected values of %s to be a int, received %s' % (
+                                list_of_list_property, value))
+
+        for list_of_list_property in list_of_list_bool_properties:
+            if list_of_list_property not in classifier_data:
+                raise utils.ValidationError(
+                    'Expected %s to be a key in classifier_data' %
+                    list_of_list_property)
+            if not isinstance(classifier_data[list_of_list_property], list):
+                raise utils.ValidationError(
+                    'Expected %s to be a list, received %s' % (
+                        list_of_list_property,
+                        classifier_data[list_of_list_property]))
+            for inner_list in classifier_data[list_of_list_property]:
+                for value in inner_list:
+                    if not isinstance(value, bool):
+                        raise utils.ValidationError(
+                            'Expected values of %s to be bool, received %s' % (
+                                list_of_list_property, value))

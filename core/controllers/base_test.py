@@ -394,8 +394,7 @@ class I18nDictsTest(test_utils.GenericTestBase):
         files_checked = 0
         missing_keys_count = 0
         for directory in dirs_to_search:
-            for root, _, files in os.walk(os.path.join(
-                    os.getcwd(), directory)):
+            for root, _, files in os.walk(os.path.join(os.getcwd(), directory)):
                 for filename in files:
                     if filename.endswith('.html'):
                         files_checked += 1

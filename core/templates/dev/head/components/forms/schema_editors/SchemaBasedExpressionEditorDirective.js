@@ -16,17 +16,21 @@
  * @fileoverview Directive for a schema-based editor for expressions.
  */
 
-oppia.directive('schemaBasedExpressionEditor', [function() {
-  return {
-    scope: {
-      localValue: '=',
-      isDisabled: '&',
-      // TODO(sll): Currently only takes a string which is either 'bool', 'int'
-      // or 'float'. May need to generalize.
-      outputType: '&',
-      labelForFocusTarget: '&'
-    },
-    templateUrl: 'schemaBasedEditor/expression',
-    restrict: 'E'
-  };
-}]);
+oppia.directive('schemaBasedExpressionEditor', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      scope: {
+        localValue: '=',
+        isDisabled: '&',
+        // TODO(sll): Currently only takes a string which is either 'bool',
+        // 'int' or 'float'. May need to generalize.
+        outputType: '&',
+        labelForFocusTarget: '&'
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/forms/schema_editors/' +
+        'schema_based_expression_editor_directive.html'
+        ),
+      restrict: 'E'
+    };
+  }]);

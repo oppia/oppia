@@ -19,6 +19,23 @@
 oppia.controller('About', [
   '$scope', 'UrlInterpolationService',
   function($scope, UrlInterpolationService) {
+    var listOfNamesToThank = ['Alex Kauffmann', 'Allison Barros',
+                              'Amy Latten', 'Brett Barros',
+                              'Crystal Kwok', 'Daniel Hernandez',
+                              'Divya Siddarth', 'Ilwon Yoon',
+                              'Jennifer Chen', 'John Cox',
+                              'John Orr', 'Katie Berlent',
+                              'Michael Wawszczak', 'Mike Gainer',
+                              'Neil Fraser', 'Noah Falstein',
+                              'Nupur Jain', 'Peter Norvig',
+                              'Philip Guo', 'Piotr Mitros',
+                              'Rachel Chen', 'Rahim Nathwani',
+                              'Robyn Choo', 'Tricia Ngoon',
+                              'Vikrant Nanda', 'Vinamrata Singal',
+                              'Yarin Feigenbaum'];
+    $scope.listOfNames = listOfNamesToThank
+      .slice(0, listOfNamesToThank.length - 1).join(', ') +
+      ' & ' + listOfNamesToThank[listOfNamesToThank.length - 1];
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     $scope.aboutPageMascotImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/general/about_page_mascot.png');

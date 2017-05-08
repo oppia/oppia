@@ -141,11 +141,8 @@ def get_collection_from_model(collection_model, run_conversion=True):
             copy.deepcopy(collection_model.collection_contents)
     }
 
-    # If collection_contents is empty, attempt to retrieve nodes data from nodes
-    # instead. This is temporary, and intended to not break backwards
-    # compatibility before the migration job is run.
-    # TODO(wxy): Remove this after collection migration is completed.
-    if not versioned_collection_contents['collection_contents']:
+    # If collection is in version 2, copy nodes data to collection contents
+    if collection_model.schema_version == 2:
         versioned_collection_contents['collection_contents'] = {
             'nodes': copy.deepcopy(collection_model.nodes)
         }

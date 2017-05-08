@@ -19,10 +19,12 @@
 
 oppia.factory('ExplorationObjectFactory', [
   'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE', 'StateObjectFactory',
-  'StatesObjectFactory', 'UrlInterpolationService',
+  'StatesObjectFactory', 'ParamChangesObjectFactory',
+  'UrlInterpolationService',
   function(
       INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE, StateObjectFactory,
-      StatesObjectFactory, UrlInterpolationService) {
+      StatesObjectFactory, ParamChangesObjectFactory,
+      UrlInterpolationService) {
     var Exploration = function(
         initStateName, paramChanges, paramSpecs, skinCustomizations,
         states, title, languageCode) {
@@ -54,16 +56,16 @@ oppia.factory('ExplorationObjectFactory', [
     };
 
     Exploration.prototype.getInteraction = function(stateName) {
-      return this.states[stateName].interaction;
+      return this.states.getState(stateName).interaction;
     };
 
     Exploration.prototype.getInteractionId = function(stateName) {
-      return this.states[stateName].interaction.id;
+      return this.states.getState(stateName).interaction.id;
     };
 
     Exploration.prototype.getInteractionCustomizationArgs =
       function(stateName) {
-        return this.states[stateName].interaction.customizationArgs;
+        return this.states.getState(stateName).interaction.customizationArgs;
       };
 
     Exploration.prototype.getInteractionInstructions = function(stateName) {
@@ -105,7 +107,7 @@ oppia.factory('ExplorationObjectFactory', [
     };
 
     Exploration.prototype.getState = function(stateName) {
-      return this.states[stateName];
+      return this.states.getState(stateName);
     };
 
     Exploration.prototype.getInitialState = function() {
@@ -125,7 +127,8 @@ oppia.factory('ExplorationObjectFactory', [
     Exploration.createFromBackendDict = function(explorationBackendDict) {
       return new Exploration(
         explorationBackendDict.init_state_name,
-        explorationBackendDict.param_changes,
+        ParamChangesObjectFactory.createFromBackendList(
+          explorationBackendDict.param_changes),
         explorationBackendDict.param_specs,
         explorationBackendDict.skin_customizations,
         StatesObjectFactory.createFromBackendDict(

@@ -95,7 +95,7 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             collection_services.get_collection_by_id(self.COLLECTION_ID)
 
-        # Start migration job on sample exploration.
+        # Start migration job on sample collection.
         job_id = (
             collection_jobs_one_off.CollectionMigrationJob.create_new())
         collection_jobs_one_off.CollectionMigrationJob.enqueue(job_id)
@@ -107,6 +107,42 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
         # Ensure the exploration is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             collection_services.get_collection_by_id(self.COLLECTION_ID)
+
+    def test_migrate_colections_failing_strict_validation(self):
+        """Tests that the collection migration job migrates collections which
+        do not pass strict validation.
+        """
+        # Save a collection without an objective or explorations in version 1.
+        collection_title = 'A title'
+        collection_category = 'A category'
+        rights_manager.create_new_collection_rights(
+            self.COLLECTION_ID, self.albert_id)
+        model = collection_models.CollectionModel(
+            id=self.COLLECTION_ID,
+            category=collection_title,
+            title=collection_category,
+            objective='',
+            tags=[],
+            schema_version=2,
+        )
+        model.commit(self.albert_id, 'Made a new collection!', [{
+            'cmd': collection_services.CMD_CREATE_NEW,
+            'title': collection_title,
+            'category': collection_category,
+        }])
+
+        # Start migration job on sample collection.
+        job_id = (
+            collection_jobs_one_off.CollectionMigrationJob.create_new())
+        collection_jobs_one_off.CollectionMigrationJob.enqueue(job_id)
+
+        # This running without errors indicates the collection is migrated.
+        self.process_and_flush_pending_tasks()
+
+        # Check the version number of the new model
+        new_model = collection_models.CollectionModel.get(self.COLLECTION_ID)
+        self.assertEqual(
+            new_model.schema_version, feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
     def test_migration_job_migrates_collection_nodes(self):
         """Tests that the collection migration job migrates content from
@@ -129,7 +165,7 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
             title=collection_title,
             objective='An objective',
             tags=[],
-            schema_version=1,
+            schema_version=2,
             nodes=[node.to_dict()],
         )
         model.commit(self.albert_id, 'Made a new collection!', [{

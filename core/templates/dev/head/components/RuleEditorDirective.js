@@ -20,207 +20,211 @@
 // to a rule. It also includes 'Cancel' and 'Save Answer' buttons which call
 // respective 'onCancelRuleEdit' and 'onSaveRule' callbacks when called. These
 // buttons only show up if 'isEditingRuleInline' is true.
-oppia.directive('ruleEditor', ['$log', function($log) {
-  return {
-    restrict: 'E',
-    scope: {
-      isEditable: '=',
-      isEditingRuleInline: '&',
-      onCancelRuleEdit: '&',
-      onSaveRule: '&',
-      rule: '='
-    },
-    templateUrl: 'inline/rule_editor',
-    controller: [
-      '$scope', '$timeout', 'editorContextService',
-      'explorationStatesService', 'routerService', 'validatorsService',
-      'responsesService', 'stateInteractionIdService', 'INTERACTION_SPECS',
-      'RULE_TYPE_CLASSIFIER', function(
-          $scope, $timeout, editorContextService,
-          explorationStatesService, routerService, validatorsService,
-          responsesService, stateInteractionIdService, INTERACTION_SPECS,
-          RULE_TYPE_CLASSIFIER) {
-        var DEFAULT_OBJECT_VALUES = GLOBALS.DEFAULT_OBJECT_VALUES;
+oppia.directive('ruleEditor', [
+  '$log', 'UrlInterpolationService', function($log, UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        isEditable: '=',
+        isEditingRuleInline: '&',
+        onCancelRuleEdit: '&',
+        onSaveRule: '&',
+        rule: '='
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/' +
+        'rule_editor_directive.html'),
+      controller: [
+        '$scope', '$timeout', 'editorContextService',
+        'explorationStatesService', 'routerService', 'validatorsService',
+        'responsesService', 'stateInteractionIdService', 'INTERACTION_SPECS',
+        'RULE_TYPE_CLASSIFIER', function(
+            $scope, $timeout, editorContextService,
+            explorationStatesService, routerService, validatorsService,
+            responsesService, stateInteractionIdService, INTERACTION_SPECS,
+            RULE_TYPE_CLASSIFIER) {
+          var DEFAULT_OBJECT_VALUES = GLOBALS.DEFAULT_OBJECT_VALUES;
 
-        $scope.currentInteractionId = stateInteractionIdService.savedMemento;
-        $scope.editRuleForm = {};
+          $scope.currentInteractionId = stateInteractionIdService.savedMemento;
+          $scope.editRuleForm = {};
 
-        // This returns the rule description string.
-        var computeRuleDescriptionFragments = function() {
-          if (!$scope.rule.type) {
-            $scope.ruleDescriptionFragments = [];
-            return '';
-          }
-
-          var ruleDescription = (
-            INTERACTION_SPECS[$scope.currentInteractionId].rule_descriptions[
-              $scope.rule.type]);
-
-          var PATTERN = /\{\{\s*(\w+)\s*\|\s*(\w+)\s*\}\}/;
-          var finalInputArray = ruleDescription.split(PATTERN);
-          if (finalInputArray.length % 3 !== 1) {
-            $log.error('Could not process rule description.');
-          }
-
-          var result = [];
-          for (var i = 0; i < finalInputArray.length; i += 3) {
-            result.push({
-              // Omit the leading noneditable string.
-              text: i !== 0 ? finalInputArray[i] : '',
-              type: 'noneditable'
-            });
-            if (i === finalInputArray.length - 1) {
-              break;
+          // This returns the rule description string.
+          var computeRuleDescriptionFragments = function() {
+            if (!$scope.rule.type) {
+              $scope.ruleDescriptionFragments = [];
+              return '';
             }
 
-            var answerChoices = responsesService.getAnswerChoices();
+            var ruleDescription = (
+              INTERACTION_SPECS[$scope.currentInteractionId].rule_descriptions[
+                $scope.rule.type]);
 
-            if (answerChoices) {
-              // This rule is for a multiple-choice, image-click, or item
-              // selection interaction.
-              // TODO(sll): Remove the need for this special case.
-              if (answerChoices.length > 0) {
-                if (finalInputArray[2] === 'SetOfHtmlString') {
-                  $scope.ruleDescriptionChoices = answerChoices.map(
-                    function(choice) {
-                      return {
-                        id: choice.label,
-                        val: choice.label
-                      };
+            var PATTERN = /\{\{\s*(\w+)\s*\|\s*(\w+)\s*\}\}/;
+            var finalInputArray = ruleDescription.split(PATTERN);
+            if (finalInputArray.length % 3 !== 1) {
+              $log.error('Could not process rule description.');
+            }
+
+            var result = [];
+            for (var i = 0; i < finalInputArray.length; i += 3) {
+              result.push({
+                // Omit the leading noneditable string.
+                text: i !== 0 ? finalInputArray[i] : '',
+                type: 'noneditable'
+              });
+              if (i === finalInputArray.length - 1) {
+                break;
+              }
+
+              var answerChoices = responsesService.getAnswerChoices();
+
+              if (answerChoices) {
+                // This rule is for a multiple-choice, image-click, or item
+                // selection interaction.
+                // TODO(sll): Remove the need for this special case.
+                if (answerChoices.length > 0) {
+                  if (finalInputArray[2] === 'SetOfHtmlString') {
+                    $scope.ruleDescriptionChoices = answerChoices.map(
+                      function(choice) {
+                        return {
+                          id: choice.label,
+                          val: choice.label
+                        };
+                      }
+                    );
+                    result.push({
+                      type: 'checkboxes',
+                      varName: finalInputArray[i + 1]
+                    });
+                  } else {
+                    $scope.ruleDescriptionChoices = answerChoices.map(
+                      function(choice) {
+                        return {
+                          id: choice.val,
+                          val: choice.label
+                        };
+                      }
+                    );
+                    result.push({
+                      type: 'select',
+                      varName: finalInputArray[i + 1]
+                    });
+                    if (!$scope.rule.inputs[finalInputArray[i + 1]]) {
+                      $scope.rule.inputs[finalInputArray[i + 1]] = (
+                        $scope.ruleDescriptionChoices[0].id);
                     }
-                  );
-                  result.push({
-                    type: 'checkboxes',
-                    varName: finalInputArray[i + 1]
-                  });
-                } else {
-                  $scope.ruleDescriptionChoices = answerChoices.map(
-                    function(choice) {
-                      return {
-                        id: choice.val,
-                        val: choice.label
-                      };
-                    }
-                  );
-                  result.push({
-                    type: 'select',
-                    varName: finalInputArray[i + 1]
-                  });
-                  if (!$scope.rule.inputs[finalInputArray[i + 1]]) {
-                    $scope.rule.inputs[finalInputArray[i + 1]] = (
-                      $scope.ruleDescriptionChoices[0].id);
                   }
+                } else {
+                  $scope.ruleDescriptionChoices = [];
+                  result.push({
+                    text: ' [Error: No choices available] ',
+                    type: 'noneditable'
+                  });
                 }
               } else {
-                $scope.ruleDescriptionChoices = [];
                 result.push({
-                  text: ' [Error: No choices available] ',
-                  type: 'noneditable'
+                  type: finalInputArray[i + 2],
+                  varName: finalInputArray[i + 1]
                 });
               }
-            } else {
-              result.push({
-                type: finalInputArray[i + 2],
-                varName: finalInputArray[i + 1]
-              });
-            }
-          }
-
-          // The following is necessary in order to ensure that the
-          // object-editor HTML tags load correctly when the rule type is
-          // changed. This is an issue for, e.g., the MusicNotesInput
-          // interaction, where the rule inputs can sometimes be integers and
-          // sometimes be lists of music notes.
-          $scope.ruleDescriptionFragments = [];
-          $timeout(function() {
-            $scope.ruleDescriptionFragments = result;
-          }, 10);
-
-          return ruleDescription;
-        };
-
-        $scope.$on('updateAnswerGroupInteractionId', function(
-            evt, newInteractionId) {
-          $scope.currentInteractionId = newInteractionId;
-        });
-
-        $scope.onSelectNewRuleType = function(newRuleType) {
-          var oldRuleInputs = angular.copy($scope.rule.inputs) || {};
-          var oldRuleInputTypes = angular.copy($scope.rule.inputTypes) || {};
-
-          $scope.rule.type = newRuleType;
-          $scope.rule.inputs = {};
-          $scope.rule.inputTypes = {};
-
-          var tmpRuleDescription = computeRuleDescriptionFragments();
-          // This provides the list of choices for the multiple-choice and
-          // image-click interactions.
-          var answerChoices = responsesService.getAnswerChoices();
-
-          // Finds the parameters and sets them in $scope.rule.inputs.
-          var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
-          while (true) {
-            if (!tmpRuleDescription.match(PATTERN)) {
-              break;
-            }
-            var varName = tmpRuleDescription.match(PATTERN)[1];
-            var varType = null;
-            if (tmpRuleDescription.match(PATTERN)[2]) {
-              varType = tmpRuleDescription.match(PATTERN)[2].substring(1);
-            }
-            $scope.rule.inputTypes[varName] = varType;
-
-            // TODO(sll): Find a more robust way of doing this. For example,
-            // we could associate a particular varName with answerChoices
-            // depending on the interaction. This varName would take its
-            // default value from answerChoices, but other variables would
-            // take their default values from the DEFAULT_OBJECT_VALUES dict.
-            if (angular.equals(DEFAULT_OBJECT_VALUES[varType], [])) {
-              $scope.rule.inputs[varName] = [];
-            } else if (answerChoices) {
-              $scope.rule.inputs[varName] = angular.copy(answerChoices[0].val);
-            } else {
-              $scope.rule.inputs[varName] = DEFAULT_OBJECT_VALUES[varType];
             }
 
-            tmpRuleDescription = tmpRuleDescription.replace(PATTERN, ' ');
-          }
+            // The following is necessary in order to ensure that the
+            // object-editor HTML tags load correctly when the rule type is
+            // changed. This is an issue for, e.g., the MusicNotesInput
+            // interaction, where the rule inputs can sometimes be integers and
+            // sometimes be lists of music notes.
+            $scope.ruleDescriptionFragments = [];
+            $timeout(function() {
+              $scope.ruleDescriptionFragments = result;
+            }, 10);
 
-          for (var key in $scope.rule.inputs) {
-            if (oldRuleInputs.hasOwnProperty(key) &&
-              oldRuleInputTypes[key] === $scope.rule.inputTypes[key]) {
-              $scope.rule.inputs[key] = oldRuleInputs[key];
+            return ruleDescription;
+          };
+
+          $scope.$on('updateAnswerGroupInteractionId', function(
+              evt, newInteractionId) {
+            $scope.currentInteractionId = newInteractionId;
+          });
+
+          $scope.onSelectNewRuleType = function(newRuleType) {
+            var oldRuleInputs = angular.copy($scope.rule.inputs) || {};
+            var oldRuleInputTypes = angular.copy($scope.rule.inputTypes) || {};
+
+            $scope.rule.type = newRuleType;
+            $scope.rule.inputs = {};
+            $scope.rule.inputTypes = {};
+
+            var tmpRuleDescription = computeRuleDescriptionFragments();
+            // This provides the list of choices for the multiple-choice and
+            // image-click interactions.
+            var answerChoices = responsesService.getAnswerChoices();
+
+            // Finds the parameters and sets them in $scope.rule.inputs.
+            var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
+            while (true) {
+              if (!tmpRuleDescription.match(PATTERN)) {
+                break;
+              }
+              var varName = tmpRuleDescription.match(PATTERN)[1];
+              var varType = null;
+              if (tmpRuleDescription.match(PATTERN)[2]) {
+                varType = tmpRuleDescription.match(PATTERN)[2].substring(1);
+              }
+              $scope.rule.inputTypes[varName] = varType;
+
+              // TODO(sll): Find a more robust way of doing this. For example,
+              // we could associate a particular varName with answerChoices
+              // depending on the interaction. This varName would take its
+              // default value from answerChoices, but other variables would
+              // take their default values from the DEFAULT_OBJECT_VALUES dict.
+              if (angular.equals(DEFAULT_OBJECT_VALUES[varType], [])) {
+                $scope.rule.inputs[varName] = [];
+              } else if (answerChoices) {
+                $scope.rule.inputs[varName] = angular.copy(
+                  answerChoices[0].val);
+              } else {
+                $scope.rule.inputs[varName] = DEFAULT_OBJECT_VALUES[varType];
+              }
+
+              tmpRuleDescription = tmpRuleDescription.replace(PATTERN, ' ');
             }
-          }
-        };
 
-        $scope.onDeleteTrainingDataEntry = function(index) {
-          if ($scope.rule.type === RULE_TYPE_CLASSIFIER) {
-            var trainingData = $scope.rule.inputs.training_data;
-            if (index < trainingData.length) {
-              trainingData.splice(index, 1);
+            for (var key in $scope.rule.inputs) {
+              if (oldRuleInputs.hasOwnProperty(key) &&
+                oldRuleInputTypes[key] === $scope.rule.inputTypes[key]) {
+                $scope.rule.inputs[key] = oldRuleInputs[key];
+              }
             }
-          }
-        };
+          };
 
-        $scope.cancelThisEdit = function() {
-          $scope.onCancelRuleEdit();
-        };
+          $scope.onDeleteTrainingDataEntry = function(index) {
+            if ($scope.rule.type === RULE_TYPE_CLASSIFIER) {
+              var trainingData = $scope.rule.inputs.training_data;
+              if (index < trainingData.length) {
+                trainingData.splice(index, 1);
+              }
+            }
+          };
 
-        $scope.saveThisRule = function() {
-          $scope.onSaveRule();
-        };
+          $scope.cancelThisEdit = function() {
+            $scope.onCancelRuleEdit();
+          };
 
-        $scope.init = function() {
-          // Select a default rule type, if one isn't already selected.
-          if ($scope.rule.type === null) {
-            $scope.onSelectNewRuleType($scope.rule.type);
-          }
-          computeRuleDescriptionFragments();
-        };
+          $scope.saveThisRule = function() {
+            $scope.onSaveRule();
+          };
 
-        $scope.init();
-      }
-    ]
-  };
-}]);
+          $scope.init = function() {
+            // Select a default rule type, if one isn't already selected.
+            if ($scope.rule.type === null) {
+              $scope.onSelectNewRuleType($scope.rule.type);
+            }
+            computeRuleDescriptionFragments();
+          };
+
+          $scope.init();
+        }
+      ]
+    };
+  }]);

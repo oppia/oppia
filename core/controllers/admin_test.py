@@ -31,18 +31,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
 
-    def test_admin_page(self):
-        """Test that the admin page shows the expected sections."""
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.testapp.get('/admin')
-        self.assertEqual(response.status_int, 200)
-        response.mustcontain(
-            'Configuration',
-            'Reload a single exploration',
-            'three_balls')
-
-        self.logout()
-
     def test_admin_page_rights(self):
         """Test access rights to the admin page."""
 

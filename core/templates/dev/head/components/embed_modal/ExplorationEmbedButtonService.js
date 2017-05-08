@@ -17,12 +17,15 @@
  */
 
 oppia.factory('ExplorationEmbedButtonService', [
-  '$modal', 'siteAnalyticsService', function($modal, siteAnalyticsService) {
+  '$modal', 'siteAnalyticsService', 'UrlInterpolationService',
+  function($modal, siteAnalyticsService, UrlInterpolationService) {
     return {
       showModal: function(explorationId) {
         $modal.open({
           backdrop: true,
-          templateUrl: 'modals/embedExploration',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/components/embed_modal/' +
+            'embed_exploration_modal_directive.html'),
           resolve: {
             explorationId: function() {
               return explorationId;
