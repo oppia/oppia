@@ -628,6 +628,9 @@ class PartialAnswerValidationAudit(jobs.BaseMapReduceJobManager):
 
 
 class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
+    """Perform an audit of number of answers submitted per exploration and
+    in total within the old and new answer models. Report any discrepancies
+    """
 
     _KEY_PRINT_TOTAL_COUNT = 'print_total_count'
     _OLD_ANSWER_MODEL_TYPE = 'StateRuleAnswerLogModel'
@@ -641,6 +644,24 @@ class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+
+        Args:
+            item: StateAnswersModel or StateRuleAnswerLogModel
+
+        Yields:
+            tuple. 2-tuple in the form (key, value).
+                'key': either the item id or an aggregation key for
+                the associated rule
+                'value': value yielded is a dict of the form
+                    {
+                        'frequency': the answer submission count
+                        'type': the model type
+                        'item_id': the item id (doesn't apply to
+                        aggregation values)
+                        'rule_name': the rule name
+                    }
+        """
         if isinstance(item, stats_models.StateRuleAnswerLogModel):
             exp_id, state_name, _, rule_str = (
                 _unpack_state_rule_answer_log_model_id(item.id))
@@ -692,6 +713,26 @@ class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Aggregates answer submission counts per model type and
+        reports any differences
+
+        Args:
+            'key': either the item id or an aggregation key for
+            the associated rule
+            stringified_values: list(str). A list of stringified values
+                associated with the given key. An element of stringfield_values
+                would be of the form:
+                {
+                    'frequency': the answer submission count
+                    'type': the model type
+                    'item_id': the item id (doesn't apply to
+                    aggregation values)
+                    'rule_name': the rule name
+                }
+
+        Yields:
+            String report of count differences in a given rule type or in total
+        """
         value_dict_list = [
             ast.literal_eval(stringified_value)
             for stringified_value in stringified_values]
