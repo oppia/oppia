@@ -435,7 +435,7 @@ class AnswersAudit2(jobs.BaseMapReduceJobManager):
         """Implements the map function. Must be declared @staticmethod.
 
         Args:
-            item: StateAnswerModel
+            item: StateAnswersModel
 
         Yields:
             tuple. 2-tuple in the form (reduce_type, value).
@@ -552,7 +552,7 @@ class PartialAnswerValidationAudit(jobs.BaseMapReduceJobManager):
         """Implements the map function. Must be declared @staticmethod.
 
         Args:
-            item: StateAnswerModel
+            item: StateAnswersModel
 
         Yields:
             tuple. 2-tuple in the form (key, value).
@@ -588,7 +588,7 @@ class PartialAnswerValidationAudit(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
-        """Counts a given rule type
+        """Applies the float function to the answers
 
         Args:
             'key': a string consisting of the model type and answer
