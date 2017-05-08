@@ -14,6 +14,7 @@
 
 """Controllers for the Oppia exploration learner view."""
 
+import datetime
 import json
 import logging
 import random
@@ -31,6 +32,7 @@ from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import gadget_registry
 from core.domain import interaction_registry
+from core.domain import learner_progress_services
 from core.domain import moderator_services
 from core.domain import rating_services
 from core.domain import recommendations_services
@@ -393,6 +395,9 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
         collection_id = self.payload.get('collection_id')
         user_id = self.user_id
 
+        learner_progress_services.add_exp_id_to_completed_list(
+            user_id, exploration_id)
+
         event_services.CompleteExplorationEventHandler.record(
             exploration_id,
             self.payload.get('version'),
@@ -418,10 +423,18 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
     @require_playable
     def post(self, exploration_id):
         """Handles POST requests."""
+        version = self.payload.get('version')
+        state_name = self.payload.get('state_name')
+        user_id = self.user_id
+        timestamp = datetime.datetime.utcnow()
+
+        learner_progress_services.add_exp_to_partially_completed_list(
+            user_id, exploration_id, timestamp, state_name, version)
+
         event_services.MaybeLeaveExplorationEventHandler.record(
             exploration_id,
-            self.payload.get('version'),
-            self.payload.get('state_name'),
+            version,
+            state_name,
             self.payload.get('session_id'),
             self.payload.get('client_time_spent_in_secs'),
             self.payload.get('params'),

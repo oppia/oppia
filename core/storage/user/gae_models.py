@@ -97,6 +97,25 @@ class UserSettingsModel(base_models.BaseModel):
             cls.normalized_username == normalized_username).get()
 
 
+class ActivitiesCompletedByLearnerModel(base_models.BaseModel):
+    """Keeps track of all the explorations and collections completed by the
+    learner.
+
+    Instances of this class are keyed by the user id.
+    """
+    completed_exp_ids = ndb.StringProperty(repeated=True, indexed=True)
+
+
+class ExplorationsPartiallyCompletedByLearnerModel(base_models.BaseModel):
+    """Keeps track of all the explorations currently being completed by the
+    learner.
+
+    Instances of this class are keyed by the user id.
+    """
+    partially_completed_exps = ndb.JsonProperty(
+        repeated=True, indexed=True)
+
+
 class UserContributionsModel(base_models.BaseModel):
     """Tracks explorations created/edited for a particular user.
 
