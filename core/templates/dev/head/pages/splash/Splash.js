@@ -54,8 +54,7 @@ oppia.controller('Splash', [
       params: {
         group_name: 'splash_page_featured'
       }
-    }).success(
-    function(data) {
+    }).success(function(data) {
       $scope.activityList = data.activity_list;
     });
   }

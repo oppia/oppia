@@ -736,6 +736,9 @@ LIBRARY_PAGE_MODE_INDEX = 'index'
 # Page mode for the search results page.
 LIBRARY_PAGE_MODE_SEARCH = 'search'
 
+# group_name param for GET request in Splash.js
+SPLASH_PAGE_FEATURED = 'splash_page_featured'
+
 # List of supported language codes. Each description has a
 # parenthetical part that may be stripped out to give a shorter
 # description.
