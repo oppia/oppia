@@ -86,6 +86,17 @@ oppia.directive('filepathEditor', [
             return;
           }
 
+          var imageNotSupported = (!file.type.match('image.jpeg') &&
+              !file.type.match('image.gif') && !file.type.match('image.jpg') &&
+              !file.type.match('image.png'));
+          
+          if (imageNotSupported) {
+            $scope.uploadWarning = 'This image format is not supported.';
+            $scope.resetImageUploader();
+            $scope.$apply();
+            return;
+          }
+
           $scope.currentFile = file;
           $scope.currentFilename = filename;
           $scope.uploadWarning = null;

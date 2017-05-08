@@ -16,30 +16,33 @@
  * @fileoverview Directives for gadgets.
  */
 
-oppia.directive('oppiaGadget', function() {
-  return {
-    restrict: 'E',
-    scope: {
-      gadgetCustomizationArgs: '&',
-      gadgetName: '&',
-      gadgetType: '&'
-    },
-    templateUrl: 'components/gadget',
-    controller: [
-      '$scope', '$filter', 'oppiaHtmlEscaper', 'extensionTagAssemblerService',
-      function(
-          $scope, $filter, oppiaHtmlEscaper, extensionTagAssemblerService) {
-        var el = $(
-          '<oppia-gadget-' +
-          $filter('camelCaseToHyphens')($scope.gadgetType()) + '>');
-        el = extensionTagAssemblerService.formatCustomizationArgAttrs(
-          el, $scope.gadgetCustomizationArgs());
-        el.attr(
-          'gadget-name',
-          oppiaHtmlEscaper.objToEscapedJson($scope.gadgetName()));
+oppia.directive('oppiaGadget', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        gadgetCustomizationArgs: '&',
+        gadgetName: '&',
+        gadgetType: '&'
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/gadget/' +
+        'gadget_directive.html'),
+      controller: [
+        '$scope', '$filter', 'oppiaHtmlEscaper', 'extensionTagAssemblerService',
+        function(
+            $scope, $filter, oppiaHtmlEscaper, extensionTagAssemblerService) {
+          var el = $(
+            '<oppia-gadget-' +
+            $filter('camelCaseToHyphens')($scope.gadgetType()) + '>');
+          el = extensionTagAssemblerService.formatCustomizationArgAttrs(
+            el, $scope.gadgetCustomizationArgs());
+          el.attr(
+            'gadget-name',
+            oppiaHtmlEscaper.objToEscapedJson($scope.gadgetName()));
 
-        $scope.gadgetHtml = ($('<div>').append(el)).html();
-      }
-    ]
-  };
-});
+          $scope.gadgetHtml = ($('<div>').append(el)).html();
+        }
+      ]
+    };
+  }]);

@@ -17,14 +17,19 @@
  * pre-requisite skills) associated with a collection.
  */
 
-oppia.directive('collectionSkillList', [function() {
-  return {
-    restrict: 'E',
-    templateUrl: 'inline/collection_skill_list_directive',
-    controller: ['$scope', 'CollectionEditorStateService',
-    function($scope, CollectionEditorStateService) {
-      $scope.collectionSkillList = (
-        CollectionEditorStateService.getCollectionSkillList());
-    }]
-  };
-}]);
+oppia.directive('collectionSkillList', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/collection_editor/editor_tab/' +
+        'collection_skill_list_directive.html'),
+      controller: [
+        '$scope', 'CollectionEditorStateService',
+        function($scope, CollectionEditorStateService) {
+          $scope.collectionSkillList = (
+            CollectionEditorStateService.getCollectionSkillList());
+        }
+      ]
+    };
+  }]);

@@ -17,32 +17,32 @@
 // in via initArgs.
 
 oppia.directive('setOfUnicodeStringEditor', [
-    '$compile', 'OBJECT_EDITOR_URL_PREFIX',
-    function($compile, OBJECT_EDITOR_URL_PREFIX) {
-  return {
-    link: function(scope, element) {
-      scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_URL_PREFIX + 'SetOfUnicodeString';
-      };
-      $compile(element.contents())(scope);
-    },
-    restrict: 'E',
-    scope: true,
-    template: '<div ng-include="getTemplateUrl()"></div>',
-    controller: ['$scope', function($scope) {
-      $scope.SCHEMA = {
-        type: 'list',
-        items: {
-          type: 'unicode'
-        },
-        validators: [{
-          id: 'is_uniquified'
-        }]
-      };
+  '$compile', 'OBJECT_EDITOR_URL_PREFIX',
+  function($compile, OBJECT_EDITOR_URL_PREFIX) {
+    return {
+      link: function(scope, element) {
+        scope.getTemplateUrl = function() {
+          return OBJECT_EDITOR_URL_PREFIX + 'SetOfUnicodeString';
+        };
+        $compile(element.contents())(scope);
+      },
+      restrict: 'E',
+      scope: true,
+      template: '<div ng-include="getTemplateUrl()"></div>',
+      controller: ['$scope', function($scope) {
+        $scope.SCHEMA = {
+          type: 'list',
+          items: {
+            type: 'unicode'
+          },
+          validators: [{
+            id: 'is_uniquified'
+          }]
+        };
 
-      if (!$scope.$parent.value) {
-        $scope.$parent.value = [];
-      }
-    }]
-  };
-}]);
+        if (!$scope.$parent.value) {
+          $scope.$parent.value = [];
+        }
+      }]
+    };
+  }]);

@@ -22,37 +22,40 @@
 // support both displaying the current title of the collection (or untitled if
 // it does not yet have one) or setting a new title in the case of an untitled
 // collection.
-oppia.directive('collectionEditorNavbarBreadcrumb', [function() {
-  return {
-    restrict: 'E',
-    scope: {},
-    templateUrl: 'inline/collection_editor_navbar_breadcrumb_directive',
-    controller: [
-      '$scope', 'routerService', 'CollectionEditorStateService',
-      'focusService', 'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
-      function(
-          $scope, routerService, CollectionEditorStateService,
-          focusService, COLLECTION_TITLE_INPUT_FOCUS_LABEL) {
-        var _TAB_NAMES_TO_HUMAN_READABLE_NAMES = {
-          main: 'Edit',
-          preview: 'Preview',
-          settings: 'Settings',
-          stats: 'Statistics',
-          history: 'History'
-        };
+oppia.directive('collectionEditorNavbarBreadcrumb', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/collection_editor/' +
+        'collection_editor_navbar_breadcrumb_directive.html'),
+      controller: [
+        '$scope', 'routerService', 'CollectionEditorStateService',
+        'focusService', 'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
+        function(
+            $scope, routerService, CollectionEditorStateService,
+            focusService, COLLECTION_TITLE_INPUT_FOCUS_LABEL) {
+          var _TAB_NAMES_TO_HUMAN_READABLE_NAMES = {
+            main: 'Edit',
+            preview: 'Preview',
+            settings: 'Settings',
+            stats: 'Statistics',
+            history: 'History'
+          };
 
-        $scope.collection = CollectionEditorStateService.getCollection();
+          $scope.collection = CollectionEditorStateService.getCollection();
 
-        $scope.getCurrentTabName = function() {
-          return _TAB_NAMES_TO_HUMAN_READABLE_NAMES[
-            routerService.getTabStatuses().active];
-        };
+          $scope.getCurrentTabName = function() {
+            return _TAB_NAMES_TO_HUMAN_READABLE_NAMES[
+              routerService.getTabStatuses().active];
+          };
 
-        $scope.editCollectionTitle = function() {
-          routerService.navigateToSettingsTab();
-          focusService.setFocus(COLLECTION_TITLE_INPUT_FOCUS_LABEL);
-        };
-      }
-    ]
-  };
-}]);
+          $scope.editCollectionTitle = function() {
+            routerService.navigateToSettingsTab();
+            focusService.setFocus(COLLECTION_TITLE_INPUT_FOCUS_LABEL);
+          };
+        }
+      ]
+    };
+  }]);

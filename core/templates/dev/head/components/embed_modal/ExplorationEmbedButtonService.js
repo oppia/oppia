@@ -17,41 +17,46 @@
  */
 
 oppia.factory('ExplorationEmbedButtonService', [
-    '$modal', 'siteAnalyticsService', function($modal, siteAnalyticsService) {
-  return {
-    showModal: function(explorationId) {
-      $modal.open({
-        backdrop: true,
-        templateUrl: 'modals/embedExploration',
-        resolve: {
-          explorationId: function() {
-            return explorationId;
-          }
-        },
-        controller: ['$scope', '$modalInstance', '$window', 'explorationId',
-          function($scope, $modalInstance, $window, explorationId) {
-            $scope.explorationId = explorationId;
-            $scope.serverName = (
-              $window.location.protocol + '//' + $window.location.host);
+  '$modal', 'siteAnalyticsService', 'UrlInterpolationService',
+  function($modal, siteAnalyticsService, UrlInterpolationService) {
+    return {
+      showModal: function(explorationId) {
+        $modal.open({
+          backdrop: true,
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/components/embed_modal/' +
+            'embed_exploration_modal_directive.html'),
+          resolve: {
+            explorationId: function() {
+              return explorationId;
+            }
+          },
+          controller: [
+            '$scope', '$modalInstance', '$window', 'explorationId',
+            function($scope, $modalInstance, $window, explorationId) {
+              $scope.explorationId = explorationId;
+              $scope.serverName = (
+                $window.location.protocol + '//' + $window.location.host);
 
-            $scope.close = function() {
-              $modalInstance.dismiss('close');
-            };
+              $scope.close = function() {
+                $modalInstance.dismiss('close');
+              };
 
-            $scope.selectText = function($event) {
-              var codeDiv = $event.currentTarget;
-              var range = document.createRange();
-              range.setStartBefore(codeDiv.firstChild);
-              range.setEndAfter(codeDiv.lastChild);
-              var selection = window.getSelection();
-              selection.removeAllRanges();
-              selection.addRange(range);
-            };
-          }
-        ]
-      });
+              $scope.selectText = function($event) {
+                var codeDiv = $event.currentTarget;
+                var range = document.createRange();
+                range.setStartBefore(codeDiv.firstChild);
+                range.setEndAfter(codeDiv.lastChild);
+                var selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+              };
+            }
+          ]
+        });
 
-      siteAnalyticsService.registerOpenEmbedInfoEvent(explorationId);
-    }
-  };
-}]);
+        siteAnalyticsService.registerOpenEmbedInfoEvent(explorationId);
+      }
+    };
+  }
+]);

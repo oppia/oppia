@@ -1,62 +1,63 @@
-<script type="text/ng-template" id="simpleEditorQuestions/MultipleChoiceInput">
-  <anchor-header header-id="getSubfieldId('Multiple choice')"
-                 header-text="Multiple choice"></anchor-header>
-  <div class="options-container">
-    <ul style="margin-bottom: 0;">
-      <li ng-repeat="choice in getChoices() track by $index" class="option" style="list-style-type: disc;">
-        <button ng-click="deleteChoice($index)" class="btn-delete-option"
-                ng-if="getChoices().length > 1">
-          <i class="material-icons md-18">&#xE5CD;</i>
-        </button>
-        <editor-html-field class="option-text"
-                           original-value="choice"
-                           on-finish-editing="saveChoice($index, newValue)"
-                           field-id="<[getFieldId($index)]>"
-                           validator="isChoiceValid($index, newValue)">
-        </editor-html-field>
-      </li>
-    </ul>
+<anchor-header header-id="getSubfieldId('Multiple choice')"
+               header-text="Multiple choice">
+</anchor-header>
+<div class="options-container">
+  <ul style="margin-bottom: 0;">
+    <li ng-repeat="choice in getChoices() track by $index" class="option" style="list-style-type: disc;">
+      <button ng-click="deleteChoice($index)" class="btn-delete-option"
+              ng-if="getChoices().length > 1">
+        <i class="material-icons md-18">&#xE5CD;</i>
+      </button>
+      <editor-html-field class="option-text"
+                         original-value="choice"
+                         on-finish-editing="saveChoice($index, newValue)"
+                         field-id="<[getFieldId($index)]>"
+                         validator="isChoiceValid($index, newValue)">
+      </editor-html-field>
+    </li>
+  </ul>
 
-    <button ng-click="addChoice()" class="btn-add-option">
-      <i class="material-icons md-18 btn-add-option-icon">&#xE145;</i>
-      Add option
-    </button>
-  </div>
+  <button ng-click="addChoice()" class="btn-add-option">
+    <i class="material-icons md-18 btn-add-option-icon">&#xE145;</i>
+    Add option
+  </button>
+</div>
 
-  <anchor-header header-id="getSubfieldId('Correct answer')"
-                 header-text="Pick the correct answer"></anchor-header>
-  <div class="correct-answer-picker-container">
-    <button class="correct-answer-option"
-            ng-repeat="choice in getChoices() track by $index"
-            ng-click="selectCorrectAnswer($index)"
-            ng-class="{'correct-answer-option-selected': isCorrectAnswer($index)}">
-      <div class="correct-answer-radio-button-container">
-        <span class="correct-answer-outer-radio-button">
-          <span class="correct-answer-inner-radio-button"></span>
-        </span>
-      </div>
-      <div class="correct-answer-content-container">
-        <span angular-html-bind="choice"></span>
-      </div>
-    </button>
-  </div>
+<anchor-header header-id="getSubfieldId('Correct answer')"
+               header-text="Pick the correct answer">
+</anchor-header>
+<div class="correct-answer-picker-container">
+  <button class="correct-answer-option"
+          ng-repeat="choice in getChoices() track by $index"
+          ng-click="selectCorrectAnswer($index)"
+          ng-class="{'correct-answer-option-selected': isCorrectAnswer($index)}">
+    <div class="correct-answer-radio-button-container">
+      <span class="correct-answer-outer-radio-button">
+        <span class="correct-answer-inner-radio-button"></span>
+      </span>
+    </div>
+    <div class="correct-answer-content-container">
+      <span angular-html-bind="choice"></span>
+    </div>
+  </button>
+</div>
 
-  <div ng-if="getAnswerGroups().length > 0">
-    <h3>Provide additional explanation for the correct answer</h3>
-    <editor-html-field original-value="getAnswerGroups()[0].outcome.feedback[0]"
-                       on-finish-editing="saveCorrectAnswerFeedback(newValue)"
-                       placeholder="Type something"
-                       field-id="<[getFieldId('correct-response')]>">
-    </editor-html-field>
-  </div>
-
-  <anchor-header header-id="getSubfieldId('Hints')"
-                 header-text="Provide a hint for all other answers"></anchor-header>
-  <editor-html-field original-value="getDefaultOutcome().feedback[0]"
-                     on-finish-editing="saveDefaultFeedback(newValue)"
-                     placeholder="Type something">
+<div ng-if="getAnswerGroups().length > 0">
+  <h3>Provide additional explanation for the correct answer</h3>
+  <editor-html-field original-value="getAnswerGroups()[0].outcome.feedback[0]"
+                     on-finish-editing="saveCorrectAnswerFeedback(newValue)"
+                     placeholder="Type something"
+                     field-id="<[getFieldId('correct-response')]>">
   </editor-html-field>
-</script>
+</div>
+
+<anchor-header header-id="getSubfieldId('Hints')"
+               header-text="Provide a hint for all other answers">
+</anchor-header>
+<editor-html-field original-value="getDefaultOutcome().feedback[0]"
+                   on-finish-editing="saveDefaultFeedback(newValue)"
+                   placeholder="Type something">
+</editor-html-field>
 
 <style>
   multiple-choice-editor .options-container {

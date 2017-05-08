@@ -194,50 +194,50 @@ oppia.directive('oppiaShortResponsePencilCodeEditor', [
 ]);
 
 oppia.factory('pencilCodeEditorRulesService', [
-    '$filter', 'codeNormalizationService',
-    function($filter, codeNormalizationService) {
-  return {
-    CodeEquals: function(answer, inputs) {
-      var normalizedCode =
-        codeNormalizationService.getNormalizedCode(answer.code);
-      var normalizedExpectedCode =
-        codeNormalizationService.getNormalizedCode(inputs.x);
-      return normalizedCode === normalizedExpectedCode;
-    },
-    CodeContains: function(answer, inputs) {
-      var normalizedCode =
-        codeNormalizationService.getNormalizedCode(answer.code);
-      var normalizedSnippet =
-        codeNormalizationService.getNormalizedCode(inputs.x);
-      return normalizedCode.indexOf(normalizedSnippet) !== -1;
-    },
-    CodeDoesNotContain: function(answer, inputs) {
-      var normalizedCode =
-        codeNormalizationService.getNormalizedCode(answer.code);
-      var normalizedSnippet =
-        codeNormalizationService.getNormalizedCode(inputs.x);
-      return normalizedCode.indexOf(normalizedSnippet) === -1;
-    },
-    OutputEquals: function(answer, inputs) {
-      var normalizedOutput = $filter('normalizeWhitespace')(answer.output);
-      var normalizedExpectedOutput =
-        $filter('normalizeWhitespace')(inputs.x);
-      return normalizedOutput === normalizedExpectedOutput;
-    },
-    OutputRoughlyEquals: function(answer, inputs) {
-      var normalizedOutput = $filter(
-        'normalizeWhitespacePunctuationAndCase')(answer.output);
-      var normalizedExpectedOutput =
-        $filter('normalizeWhitespacePunctuationAndCase')(inputs.x);
-      return normalizedOutput === normalizedExpectedOutput;
-    },
-    ResultsInError: function(answer) {
-      return !!(answer.error.trim());
-    },
-    ErrorContains: function(answer, inputs) {
-      var normalizedError = $filter('normalizeWhitespace')(answer.error);
-      var normalizedSnippet = $filter('normalizeWhitespace')(inputs.x);
-      return normalizedError.indexOf(normalizedSnippet) !== -1;
-    }
-  };
-}]);
+  '$filter', 'codeNormalizationService',
+  function($filter, codeNormalizationService) {
+    return {
+      CodeEquals: function(answer, inputs) {
+        var normalizedCode =
+          codeNormalizationService.getNormalizedCode(answer.code);
+        var normalizedExpectedCode =
+          codeNormalizationService.getNormalizedCode(inputs.x);
+        return normalizedCode === normalizedExpectedCode;
+      },
+      CodeContains: function(answer, inputs) {
+        var normalizedCode =
+          codeNormalizationService.getNormalizedCode(answer.code);
+        var normalizedSnippet =
+          codeNormalizationService.getNormalizedCode(inputs.x);
+        return normalizedCode.indexOf(normalizedSnippet) !== -1;
+      },
+      CodeDoesNotContain: function(answer, inputs) {
+        var normalizedCode =
+          codeNormalizationService.getNormalizedCode(answer.code);
+        var normalizedSnippet =
+          codeNormalizationService.getNormalizedCode(inputs.x);
+        return normalizedCode.indexOf(normalizedSnippet) === -1;
+      },
+      OutputEquals: function(answer, inputs) {
+        var normalizedOutput = $filter('normalizeWhitespace')(answer.output);
+        var normalizedExpectedOutput =
+          $filter('normalizeWhitespace')(inputs.x);
+        return normalizedOutput === normalizedExpectedOutput;
+      },
+      OutputRoughlyEquals: function(answer, inputs) {
+        var normalizedOutput = $filter(
+          'normalizeWhitespacePunctuationAndCase')(answer.output);
+        var normalizedExpectedOutput =
+          $filter('normalizeWhitespacePunctuationAndCase')(inputs.x);
+        return normalizedOutput === normalizedExpectedOutput;
+      },
+      ResultsInError: function(answer) {
+        return !!(answer.error.trim());
+      },
+      ErrorContains: function(answer, inputs) {
+        var normalizedError = $filter('normalizeWhitespace')(answer.error);
+        var normalizedSnippet = $filter('normalizeWhitespace')(inputs.x);
+        return normalizedError.indexOf(normalizedSnippet) !== -1;
+      }
+    };
+  }]);

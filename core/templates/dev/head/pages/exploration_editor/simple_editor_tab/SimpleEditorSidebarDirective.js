@@ -16,12 +16,15 @@
  * @fileoverview Directive for the sidebar of the simple editor.
  */
 
-oppia.directive('simpleEditorSidebar', [function() {
-  return {
-    restrict: 'E',
-    templateUrl: 'simpleEditor/sidebar',
-    controller: [
-       '$scope', 'EditorModeService', 'SimpleEditorManagerService',
+oppia.directive('simpleEditorSidebar', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/exploration_editor/simple_editor_tab/' +
+        'simple_editor_sidebar_directive.html'),
+      controller: [
+        '$scope', 'EditorModeService', 'SimpleEditorManagerService',
         'ScrollSyncService', 'QuestionIdService',
         function($scope, EditorModeService, SimpleEditorManagerService,
                  ScrollSyncService, QuestionIdService) {
@@ -33,11 +36,13 @@ oppia.directive('simpleEditorSidebar', [function() {
             'Multiple choice', 'Correct answer', 'Hints', 'Bridge text'];
           $scope.questionList = SimpleEditorManagerService.getQuestionList();
           $scope.ID_PREFIX = QuestionIdService.SIDEBAR_PREFIX;
+
           $scope.getSidebarItemId = function(question, subfieldLabel) {
             return QuestionIdService.getSidebarItemId(
               question.getId(), subfieldLabel
             );
           };
+
           $scope.scrollToField = function(question, subfieldLabel) {
             ScrollSyncService.scrollTo(
               QuestionIdService.getSubfieldId(
@@ -45,13 +50,18 @@ oppia.directive('simpleEditorSidebar', [function() {
               )
             );
           };
+
           $scope.scrollToHeader = ScrollSyncService.scrollTo;
+
           $scope.scrollToQuestion = function(question) {
             ScrollSyncService.scrollTo(question.getId());
           };
+
           $scope.$on('SimpleEditorSidebarToggleCollapse', function() {
             $scope.$apply();
           });
-        }]
-  };
-}]);
+        }
+      ]
+    };
+  }
+]);

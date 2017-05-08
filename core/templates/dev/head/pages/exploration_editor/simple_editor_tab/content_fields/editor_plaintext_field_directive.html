@@ -1,20 +1,18 @@
-<script type="text/ng-template" id="simpleEditorFields/plaintext">
-  <div ng-show="!inEditMode" ng-click="startEditing()"
-       class="view-mode">
-    <span ng-if="getOriginalValue()"><[getOriginalValue()]></span>
-    <span ng-if="!getOriginalValue() && placeholder" class="placeholder">
-      <[placeholder]>
-    </span>
-    <i class="material-icons edit-icon" title="Edit plain text">&#xE254;</i>
-  </div>
+<div ng-show="!inEditMode" ng-click="startEditing()"
+     class="view-mode">
+  <span ng-if="getOriginalValue()"><[getOriginalValue()]></span>
+  <span ng-if="!getOriginalValue() && placeholder" class="placeholder">
+    <[placeholder]>
+  </span>
+  <i class="material-icons edit-icon" title="Edit plain text">&#xE254;</i>
+</div>
 
-  <div ng-show="inEditMode" class="edit-mode">
-    <input type="text" ng-model="data.valueBeingEdited" ng-blur="finishEditing()"
-           ng-keypress="onKeypress($event)" focus-on="<[focusLabel]>"
-           placeholder="Type the title of your exploration.">
-    <span class="bar"></span>
-  </div>
-</script>
+<div ng-show="inEditMode" class="edit-mode">
+  <input type="text" ng-model="data.valueBeingEdited" ng-blur="finishEditing()"
+         ng-keypress="onKeypress($event)" focus-on="<[focusLabel]>"
+         placeholder="Type the title of your exploration.">
+  <span class="bar"></span>
+</div>
 
 <style>
   editor-plaintext-field {

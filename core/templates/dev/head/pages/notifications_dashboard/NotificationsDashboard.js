@@ -17,31 +17,32 @@
  */
 
 oppia.controller('DashboardNotifications', [
-    '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
-    function($scope, $http, $rootScope, oppiaDatetimeFormatter) {
-  $scope.getItemUrl = function(activityId, notificationType) {
-    return (
-      '/create/' + activityId + (
-        notificationType === 'feedback_thread' ? '#/feedback' : ''));
-  };
+  '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
+  function($scope, $http, $rootScope, oppiaDatetimeFormatter) {
+    $scope.getItemUrl = function(activityId, notificationType) {
+      return (
+        '/create/' + activityId + (
+          notificationType === 'feedback_thread' ? '#/feedback' : ''));
+    };
 
-  $scope.navigateToProfile = function($event, username) {
-    $event.stopPropagation();
-    window.location.href = '/profile/' + username;
-  };
+    $scope.navigateToProfile = function($event, username) {
+      $event.stopPropagation();
+      window.location.href = '/profile/' + username;
+    };
 
-  $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
-    return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
-      millisSinceEpoch);
-  };
+    $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
+      return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
+        millisSinceEpoch);
+    };
 
-  $rootScope.loadingMessage = 'Loading';
-  $http.get('/notificationsdashboardhandler/data').then(function(response) {
-    var data = response.data;
-    $scope.recentNotifications = data.recent_notifications;
-    $scope.jobQueuedMsec = data.job_queued_msec;
-    $scope.lastSeenMsec = data.last_seen_msec || 0.0;
-    $scope.currentUsername = data.username;
-    $rootScope.loadingMessage = '';
-  });
-}]);
+    $rootScope.loadingMessage = 'Loading';
+    $http.get('/notificationsdashboardhandler/data').then(function(response) {
+      var data = response.data;
+      $scope.recentNotifications = data.recent_notifications;
+      $scope.jobQueuedMsec = data.job_queued_msec;
+      $scope.lastSeenMsec = data.last_seen_msec || 0.0;
+      $scope.currentUsername = data.username;
+      $rootScope.loadingMessage = '';
+    });
+  }
+]);

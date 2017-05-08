@@ -17,49 +17,52 @@
  * in editor navbar.
  */
 
-oppia.directive('editorNavbarBreadcrumb', [function() {
-  return {
-    restrict: 'E',
-    templateUrl: 'inline/editor_navbar_breadcrumb_directive',
-    controller: [
-      '$scope', 'explorationTitleService', 'routerService',
-      'focusService', 'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
-      function(
-          $scope, explorationTitleService, routerService,
-          focusService, EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
-        $scope.navbarTitle = null;
-        $scope.$on('explorationPropertyChanged', function() {
-          var _MAX_TITLE_LENGTH = 20;
-          $scope.navbarTitle = explorationTitleService.savedMemento;
-          if ($scope.navbarTitle.length > _MAX_TITLE_LENGTH) {
-            $scope.navbarTitle = (
-              $scope.navbarTitle.substring(0, _MAX_TITLE_LENGTH - 3) + '...');
-          }
-        });
+oppia.directive('editorNavbarBreadcrumb', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/exploration_editor/' +
+        'editor_navbar_breadcrumb_directive.html'),
+      controller: [
+        '$scope', 'explorationTitleService', 'routerService',
+        'focusService', 'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
+        function(
+            $scope, explorationTitleService, routerService,
+            focusService, EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
+          $scope.navbarTitle = null;
+          $scope.$on('explorationPropertyChanged', function() {
+            var _MAX_TITLE_LENGTH = 20;
+            $scope.navbarTitle = explorationTitleService.savedMemento;
+            if ($scope.navbarTitle.length > _MAX_TITLE_LENGTH) {
+              $scope.navbarTitle = (
+                $scope.navbarTitle.substring(0, _MAX_TITLE_LENGTH - 3) + '...');
+            }
+          });
 
-        $scope.editTitle = function() {
-          routerService.navigateToSettingsTab();
-          focusService.setFocus(EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
-        };
+          $scope.editTitle = function() {
+            routerService.navigateToSettingsTab();
+            focusService.setFocus(EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
+          };
 
-        var _TAB_NAMES_TO_HUMAN_READABLE_NAMES = {
-          main: 'Edit',
-          preview: 'Preview',
-          settings: 'Settings',
-          stats: 'Statistics',
-          history: 'History',
-          feedback: 'Feedback'
-        };
+          var _TAB_NAMES_TO_HUMAN_READABLE_NAMES = {
+            main: 'Edit',
+            preview: 'Preview',
+            settings: 'Settings',
+            stats: 'Statistics',
+            history: 'History',
+            feedback: 'Feedback'
+          };
 
-        $scope.getCurrentTabName = function() {
-          if (!routerService.getTabStatuses()) {
-            return '';
-          } else {
-            return _TAB_NAMES_TO_HUMAN_READABLE_NAMES[
-              routerService.getTabStatuses().active];
-          }
-        };
-      }
-    ]
-  };
-}]);
+          $scope.getCurrentTabName = function() {
+            if (!routerService.getTabStatuses()) {
+              return '';
+            } else {
+              return _TAB_NAMES_TO_HUMAN_READABLE_NAMES[
+                routerService.getTabStatuses().active];
+            }
+          };
+        }
+      ]
+    };
+  }]);

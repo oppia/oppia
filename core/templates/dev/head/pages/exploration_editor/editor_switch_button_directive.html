@@ -1,38 +1,37 @@
-<script type="text/ng-template" id="inline/editor_switch_button_directive">
-  <div class="oppia-switch-editor-container">
-    <button type="button" class="btn btn-default oppia-switch-editor-btn" ng-click="setEditorModeToFull()" ng-if="isEditorInSimpleMode()">
-      Use Advanced Editor
-    </button>
-    <button type="button" class="btn btn-default oppia-switch-editor-btn" ng-click="setEditorModeToSimple()" ng-if="isEditorInFullMode()">
-      Use Simple Editor
-    </button>
-  </div>
-  <style>
+<div class="oppia-switch-editor-container">
+  <button type="button" class="btn btn-default oppia-switch-editor-btn" ng-click="setEditorModeToFull()" ng-if="isEditorInSimpleMode()">
+    Use Advanced Editor
+  </button>
+  <button type="button" class="btn btn-default oppia-switch-editor-btn" ng-click="setEditorModeToSimple()" ng-if="isEditorInFullMode()">
+    Use Simple Editor
+  </button>
+</div>
+
+<style>
+  .oppia-switch-editor-container {
+    bottom: 0;
+    position: fixed;
+    right: 31px;
+    width: 158px;
+  }
+  .oppia-switch-editor-btn, .oppia-switch-editor-btn:hover {
+    background-color: #fff;
+    border-bottom-width: 0px;
+    border-color: #009688;
+    border-radius: 5px 5px 0 0;
+    border-width: 2px 2px 0 2px;
+    color: #009688;
+    min-width: 150px;
+    padding: 11px 14px;
+  }
+  .oppia-switch-editor-btn:focus, .oppia-switch-editor-btn:active {
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    outline: none;
+  }
+  @media (max-width: 768px) {
     .oppia-switch-editor-container {
-      bottom: 0;
-      position: fixed;
-      right: 31px;
-      width: 158px;
+      display: none;
     }
-    .oppia-switch-editor-btn, .oppia-switch-editor-btn:hover {
-      background-color: #fff;
-      border-bottom-width: 0px;
-      border-color: #009688;
-      border-radius: 5px 5px 0 0;
-      border-width: 2px 2px 0 2px;
-      color: #009688;
-      min-width: 150px;
-      padding: 11px 14px;
-    }
-    .oppia-switch-editor-btn:focus, .oppia-switch-editor-btn:active {
-      box-shadow: none;
-      -webkit-box-shadow: none;
-      outline: none;
-    }
-    @media (max-width: 768px) {
-      .oppia-switch-editor-container {
-        display: none;
-      }
-    }
-  </style>
-</script>
+  }
+</style>

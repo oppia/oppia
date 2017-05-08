@@ -1,39 +1,37 @@
-<script type="text/ng-template" id="simpleEditor/sidebar">
-  <div class="sidebar">
-    <ul>
-      <li id="<[ID_PREFIX + 'title']>"
-          ng-click="scrollToHeader('title')" class="sidebar-item sidebar-header">
-        <strong>Title</strong>
-      </li>
+<div class="sidebar">
+  <ul>
+    <li id="<[ID_PREFIX + 'title']>"
+        ng-click="scrollToHeader('title')" class="sidebar-item sidebar-header">
+      <strong>Title</strong>
+    </li>
 
-      <li id="<[ID_PREFIX + 'intro']>"
-          ng-click="scrollToHeader('intro')" class="sidebar-item sidebar-header">
-        <strong>Introduction</strong>
-      </li>
+    <li id="<[ID_PREFIX + 'intro']>"
+        ng-click="scrollToHeader('intro')" class="sidebar-item sidebar-header">
+      <strong>Introduction</strong>
+    </li>
 
-      <li class="sidebar-item" ng-repeat="question in questionList.getQuestions() track by $index">
-        <div id="<[ID_PREFIX + question.getId()]>" class="sidebar-item-header">
-          <i ng-click="question.toggleCollapse()" class="collapse-icon material-icons">
-            <[isCollapsed(question) ? '&#xE5C7;' : '&#xE5C5;']>
-          </i>
-          <strong ng-click="scrollToQuestion(question)">Question <[$index + 1]></strong>
-        </div>
+    <li class="sidebar-item" ng-repeat="question in questionList.getQuestions() track by $index">
+      <div id="<[ID_PREFIX + question.getId()]>" class="sidebar-item-header">
+        <i ng-click="question.toggleCollapse()" class="collapse-icon material-icons">
+          <[isCollapsed(question) ? '&#xE5C7;' : '&#xE5C5;']>
+        </i>
+        <strong ng-click="scrollToQuestion(question)">Question <[$index + 1]></strong>
+      </div>
 
-        <ul ng-show="question.isCollapsed()">
-          <li class="sidebar-item sidebar-item-indented"
-              ng-repeat="subfieldLabel in SUBFIELD_LABELS track by $index"
-              ng-click="scrollToField(question, subfieldLabel)"
-              id="<[getSidebarItemId(question, subfieldLabel)]>">
-            <span>
-              <a><[subfieldLabel]></a>
-            </span>
-          </li>
-        </ul>
-      </li>
-    </ul>
+      <ul ng-show="question.isCollapsed()">
+        <li class="sidebar-item sidebar-item-indented"
+            ng-repeat="subfieldLabel in SUBFIELD_LABELS track by $index"
+            ng-click="scrollToField(question, subfieldLabel)"
+            id="<[getSidebarItemId(question, subfieldLabel)]>">
+          <span>
+            <a><[subfieldLabel]></a>
+          </span>
+        </li>
+      </ul>
+    </li>
+  </ul>
 
-  </div>
-</script>
+</div>
 
 <style>
   simple-editor-sidebar {

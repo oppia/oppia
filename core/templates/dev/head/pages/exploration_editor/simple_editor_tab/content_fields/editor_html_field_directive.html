@@ -1,24 +1,22 @@
-<script type="text/ng-template" id="simpleEditorFields/html">
-  <div ng-show="!inEditMode" ng-click="startEditing()" class="view-mode">
-    <span angular-html-bind="getOriginalValue()"></span>
-    <span ng-if="!getOriginalValue() && placeholder" class="placeholder">
-      <[placeholder]>
-    </span>
-    <i class="material-icons edit-icon" title="Edit HTML">&#xE254;</i>
-  </div>
+<div ng-show="!inEditMode" ng-click="startEditing()" class="view-mode">
+  <span angular-html-bind="getOriginalValue()"></span>
+  <span ng-if="!getOriginalValue() && placeholder" class="placeholder">
+    <[placeholder]>
+  </span>
+  <i class="material-icons edit-icon" title="Edit HTML">&#xE254;</i>
+</div>
 
-  <div ng-if="inEditMode" class="edit-mode">
-    <schema-based-editor schema="SCHEMA" local-value="data.valueBeingEdited"
-                         label-for-focus-target="focusLabel">
-    </schema-based-editor>
-    <span class="bar"></span>
+<div ng-if="inEditMode" class="edit-mode">
+  <schema-based-editor schema="SCHEMA" local-value="data.valueBeingEdited"
+                       label-for-focus-target="focusLabel">
+  </schema-based-editor>
+  <span class="bar"></span>
 
-    <button type="button" ng-click="finishEditing()" ng-disabled="!canSave()"
-            class="btn btn-default">
-      Save
-    </button>
-  </div>
-</script>
+  <button type="button" ng-click="finishEditing()" ng-disabled="!canSave()"
+          class="btn btn-default">
+    Save
+  </button>
+</div>
 
 <style>
   editor-html-field .view-mode {

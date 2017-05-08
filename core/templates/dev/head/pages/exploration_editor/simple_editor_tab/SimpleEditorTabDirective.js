@@ -17,11 +17,14 @@
  * editor.
  */
 
-oppia.directive('simpleEditorTab', [function() {
-  return {
-    restrict: 'E',
-    scope: {},
-    templateUrl: 'editor/simpleEditorTab',
-    controller: [function() {}]
-  };
-}]);
+oppia.directive('simpleEditorTab', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/exploration_editor/simple_editor_tab/' +
+        'simple_editor_tab_directive.html')
+    };
+  }
+]);

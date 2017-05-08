@@ -460,28 +460,15 @@ describe('Music Notes Input rules service', function() {
   });
 
   it('should have a correct \'is transposition of except for\' rule',
-      function() {
-    expect(mnirs.IsTranspositionOfExceptFor([{
-      readableNoteName: 'G4',
-      noteDuration: {
-        num: 1,
-        den: 1
-      }
-    }, {
-      readableNoteName: 'B4',
-      noteDuration: {
-        num: 1,
-        den: 1
-      }
-    }, {
-      readableNoteName: 'E4',
-      noteDuration: {
-        num: 1,
-        den: 1
-      }
-    }], {
-      x: [{
-        readableNoteName: 'C4',
+    function() {
+      expect(mnirs.IsTranspositionOfExceptFor([{
+        readableNoteName: 'G4',
+        noteDuration: {
+          num: 1,
+          den: 1
+        }
+      }, {
+        readableNoteName: 'B4',
         noteDuration: {
           num: 1,
           den: 1
@@ -492,44 +479,38 @@ describe('Music Notes Input rules service', function() {
           num: 1,
           den: 1
         }
-      }, {
-        readableNoteName: 'G4',
-        noteDuration: {
-          num: 1,
-          den: 1
-        }
-      }],
-      y: 7,
-      k: 1
-    })).toBe(true);
+      }], {
+        x: [{
+          readableNoteName: 'C4',
+          noteDuration: {
+            num: 1,
+            den: 1
+          }
+        }, {
+          readableNoteName: 'E4',
+          noteDuration: {
+            num: 1,
+            den: 1
+          }
+        }, {
+          readableNoteName: 'G4',
+          noteDuration: {
+            num: 1,
+            den: 1
+          }
+        }],
+        y: 7,
+        k: 1
+      })).toBe(true);
 
-    expect(mnirs.IsTranspositionOfExceptFor([{
-      readableNoteName: 'F4',
-      noteDuration: {
-        num: 1,
-        den: 1
-      }
-    }, {
-      readableNoteName: 'A4',
-      noteDuration: {
-        num: 1,
-        den: 1
-      }
-    }, {
-      readableNoteName: 'D5',
-      noteDuration: {
-        num: 1,
-        den: 1
-      }
-    }], {
-      x: [{
-        readableNoteName: 'G4',
+      expect(mnirs.IsTranspositionOfExceptFor([{
+        readableNoteName: 'F4',
         noteDuration: {
           num: 1,
           den: 1
         }
       }, {
-        readableNoteName: 'B4',
+        readableNoteName: 'A4',
         noteDuration: {
           num: 1,
           den: 1
@@ -540,75 +521,95 @@ describe('Music Notes Input rules service', function() {
           num: 1,
           den: 1
         }
-      }],
-      y: -2,
-      k: 1
-    })).toBe(true);
+      }], {
+        x: [{
+          readableNoteName: 'G4',
+          noteDuration: {
+            num: 1,
+            den: 1
+          }
+        }, {
+          readableNoteName: 'B4',
+          noteDuration: {
+            num: 1,
+            den: 1
+          }
+        }, {
+          readableNoteName: 'D5',
+          noteDuration: {
+            num: 1,
+            den: 1
+          }
+        }],
+        y: -2,
+        k: 1
+      })).toBe(true);
 
-    expect(mnirs.IsTranspositionOfExceptFor([{
-      readableNoteName: 'G4',
-      noteDuration: {
-        num: 1,
-        den: 1
-      }
-    }, {
-      readableNoteName: 'C4',
-      noteDuration: {
-        num: 1,
-        den: 1
-      }
-    }, {
-      readableNoteName: 'A4',
-      noteDuration: {
-        num: 1,
-        den: 1
-      }
-    }], {
-      x: [{
-        readableNoteName: 'E4',
-        noteDuration: {
-          num: 1,
-          den: 1
-        }
-      }, {
+      expect(mnirs.IsTranspositionOfExceptFor([{
         readableNoteName: 'G4',
         noteDuration: {
           num: 1,
           den: 1
         }
       }, {
-        readableNoteName: 'B4',
-        noteDuration: {
-          num: 1,
-          den: 1
-        }
-      }],
-      y: 3,
-      k: 1
-    })).toBe(false);
-
-    expect(mnirs.IsTranspositionOfExceptFor([{
-      readableNoteName: 'C4',
-      noteDuration: {
-        num: 1,
-        den: 1
-      }
-    }], {
-      x: [{
-        readableNoteName: 'F4',
+        readableNoteName: 'C4',
         noteDuration: {
           num: 1,
           den: 1
         }
       }, {
-        readableNoteName: 'B4',
+        readableNoteName: 'A4',
         noteDuration: {
           num: 1,
           den: 1
         }
-      }],
-      y: 1,
-      k: 1
-    })).toBe(false);
-  });
+      }], {
+        x: [{
+          readableNoteName: 'E4',
+          noteDuration: {
+            num: 1,
+            den: 1
+          }
+        }, {
+          readableNoteName: 'G4',
+          noteDuration: {
+            num: 1,
+            den: 1
+          }
+        }, {
+          readableNoteName: 'B4',
+          noteDuration: {
+            num: 1,
+            den: 1
+          }
+        }],
+        y: 3,
+        k: 1
+      })).toBe(false);
+
+      expect(mnirs.IsTranspositionOfExceptFor([{
+        readableNoteName: 'C4',
+        noteDuration: {
+          num: 1,
+          den: 1
+        }
+      }], {
+        x: [{
+          readableNoteName: 'F4',
+          noteDuration: {
+            num: 1,
+            den: 1
+          }
+        }, {
+          readableNoteName: 'B4',
+          noteDuration: {
+            num: 1,
+            den: 1
+          }
+        }],
+        y: 1,
+        k: 1
+      })).toBe(false);
+    }
+  );
 });

@@ -29,6 +29,7 @@ describe('Simple Editor Manager Service', function() {
   var questionObjectFactory;
   var answerGroupObjectFactory;
   var ruleObjectFactory;
+  var outcomeObjectFactory;
   var explorationStatesService;
   var explorationTitleService;
   var explorationInitStateNameService;
@@ -53,6 +54,7 @@ describe('Simple Editor Manager Service', function() {
     questionObjectFactory = $injector.get('QuestionObjectFactory');
     answerGroupObjectFactory = $injector.get('AnswerGroupObjectFactory');
     ruleObjectFactory = $injector.get('RuleObjectFactory');
+    outcomeObjectFactory = $injector.get('OutcomeObjectFactory');
     explorationStatesService = $injector.get('explorationStatesService');
     explorationTitleService = $injector.get('explorationTitleService');
     explorationInitStateNameService = $injector
@@ -228,8 +230,8 @@ describe('Simple Editor Manager Service', function() {
     questionList = questionListObjectFactory.create(questions);
     lastStateName = questionList.getLastQuestion().getDestinationStateName();
 
-    spyOn(validatorsService, 'isValidEntityName').andReturn(true);
-    spyOn(mockExplorationData, 'autosaveChangeList').andReturn(true);
+    spyOn(validatorsService, 'isValidEntityName').and.returnValue(true);
+    spyOn(mockExplorationData, 'autosaveChangeList').and.returnValue(true);
   });
 
   it('should initialize the local data variables', function() {
@@ -245,7 +247,7 @@ describe('Simple Editor Manager Service', function() {
 
   it('should return false if initializing the question list fails',
     function() {
-      spyOn(statesToQuestionsService, 'getQuestions').andReturn(null);
+      spyOn(statesToQuestionsService, 'getQuestions').and.returnValue(null);
       expect(simpleEditorManagerService.tryToInit()).toBe(false);
     });
 
@@ -319,13 +321,8 @@ describe('Simple Editor Manager Service', function() {
     var newAnswerGroupRuleSpecs = [ruleObjectFactory.createNew('Contains', {
       x: 'ate'
     })];
-    var newAnswerGroupOutcome = {
-      param_changes: [],
-      feedback: [
-        '<p>Omnomnom.</p>'
-      ],
-      dest: 'Question 1'
-    };
+    var newAnswerGroupOutcome = outcomeObjectFactory.createNew(
+      'Question 1', ['<p>Omnomnom.</p>'], []);
     var expectedNewAnswerGroups = [answerGroupObjectFactory
       .createNew(newAnswerGroupRuleSpecs, newAnswerGroupOutcome, false)];
     simpleEditorManagerService.tryToInit();
@@ -337,12 +334,8 @@ describe('Simple Editor Manager Service', function() {
 
   it('should save the default outcome', function() {
     var testStateName = 'Introduction';
-    var expectedNewDefaultOutcome = {
-      dest: 'Introduction',
-      feedback: [
-        '<p>One is wrong bcz many reasons</p>'
-      ]
-    };
+    var expectedNewDefaultOutcome = outcomeObjectFactory.createNew(
+      'Introduction', ['<p>One is wrong bcz many reasons</p>'], []);
     simpleEditorManagerService.tryToInit();
     simpleEditorManagerService.saveDefaultOutcome(
       testStateName, expectedNewDefaultOutcome);
@@ -366,11 +359,8 @@ describe('Simple Editor Manager Service', function() {
   it('should add new question', function() {
     var expectedInteraction = DEFAULT_INTERACTION;
     var expectedLastStateName = lastStateName;
-    var expectedDefaultOutcome = {
-      dest: expectedLastStateName,
-      feedback: [''],
-      param_changes: []
-    };
+    var expectedDefaultOutcome = outcomeObjectFactory.createNew(
+      expectedLastStateName, [''], []);
     simpleEditorManagerService.tryToInit();
     simpleEditorManagerService.addNewQuestion();
     var state = explorationStatesService.getState(expectedLastStateName);

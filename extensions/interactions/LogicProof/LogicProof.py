@@ -53,3 +53,23 @@ class LogicProof(base.BaseInteraction):
             'default_proof_string': ''
         },
     }]
+
+    _answer_visualization_specs = [{
+        # Table with answer counts for top N answers.
+        'id': 'FrequencyTable',
+        'options': {
+            'column_headers': ['Answer', 'Count'],
+            'title': 'Top 5 answers'
+        },
+        'calculation_id': 'Top5AnswerFrequencies',
+    }, {
+        # Table with answer counts.
+        'id': 'FrequencyTable',
+        'options': {
+            'column_headers': ['Answer', 'Count'],
+            'title': 'All answers'
+        },
+        'calculation_id': 'AnswerFrequencies',
+    }]
+
+    _auxiliary_calculation_ids = ['TopAnswersByCategorization']

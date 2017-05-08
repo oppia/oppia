@@ -16,61 +16,64 @@
  * @fileoverview Directive for the fallback editor.
  */
 
-oppia.directive('fallbackEditor', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      trigger: '=',
-      getOnSaveFn: '&onSave',
-      outcome: '='
-    },
-    templateUrl: 'components/fallbackEditor',
-    controller: [
-      '$scope', 'editabilityService', function($scope, editabilityService) {
-        $scope.isEditable = editabilityService.isEditable();
+oppia.directive('fallbackEditor', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        trigger: '=',
+        getOnSaveFn: '&onSave',
+        outcome: '='
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/' +
+        'fallback_editor_directive.html'),
+      controller: [
+        '$scope', 'editabilityService', function($scope, editabilityService) {
+          $scope.isEditable = editabilityService.isEditable();
 
-        $scope.editFallbackForm = {};
-        $scope.triggerEditorIsOpen = false;
-
-        $scope.INT_FORM_SCHEMA = {
-          type: 'int',
-          ui_config: {},
-          validators: [{
-            id: 'is_at_least',
-            min_value: 1
-          }]
-        };
-
-        $scope.displayFeedback = true;
-
-        $scope.triggerMemento = null;
-
-        $scope.openTriggerEditor = function() {
-          if ($scope.isEditable) {
-            $scope.triggerMemento = angular.copy($scope.trigger);
-            $scope.triggerEditorIsOpen = true;
-          }
-        };
-
-        $scope.saveThisTrigger = function() {
+          $scope.editFallbackForm = {};
           $scope.triggerEditorIsOpen = false;
-          $scope.triggerMemento = null;
-          $scope.getOnSaveFn()();
-        };
 
-        $scope.cancelThisTriggerEdit = function() {
-          $scope.trigger = angular.copy($scope.triggerMemento);
-          $scope.triggerMemento = null;
-          $scope.triggerEditorIsOpen = false;
-        };
+          $scope.INT_FORM_SCHEMA = {
+            type: 'int',
+            ui_config: {},
+            validators: [{
+              id: 'is_at_least',
+              min_value: 1
+            }]
+          };
 
-        $scope.$on('externalSave', function() {
-          if ($scope.triggerEditorIsOpen &&
-              $scope.editFallbackForm.editTriggerForm.$valid) {
-            $scope.saveThisTrigger();
-          }
-        });
-      }
-    ]
-  };
-}]);
+          $scope.displayFeedback = true;
+
+          $scope.triggerMemento = null;
+
+          $scope.openTriggerEditor = function() {
+            if ($scope.isEditable) {
+              $scope.triggerMemento = angular.copy($scope.trigger);
+              $scope.triggerEditorIsOpen = true;
+            }
+          };
+
+          $scope.saveThisTrigger = function() {
+            $scope.triggerEditorIsOpen = false;
+            $scope.triggerMemento = null;
+            $scope.getOnSaveFn()();
+          };
+
+          $scope.cancelThisTriggerEdit = function() {
+            $scope.trigger = angular.copy($scope.triggerMemento);
+            $scope.triggerMemento = null;
+            $scope.triggerEditorIsOpen = false;
+          };
+
+          $scope.$on('externalSave', function() {
+            if ($scope.triggerEditorIsOpen &&
+                $scope.editFallbackForm.editTriggerForm.$valid) {
+              $scope.saveThisTrigger();
+            }
+          });
+        }
+      ]
+    };
+  }]);

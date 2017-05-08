@@ -16,21 +16,22 @@
  * @fileoverview Directive for Editor switch button.
  */
 
-oppia.directive('editorSwitchButton', [function() {
-  return {
-    restrict: 'E',
-    templateUrl: 'inline/editor_switch_button_directive',
-    controller: [
-      '$scope', 'EditorModeService',
-      function(
-          $scope, EditorModeService) {
-        $scope.isEditorInSimpleMode = EditorModeService.isEditorInSimpleMode;
-        $scope.isEditorInFullMode = EditorModeService.isEditorInFullMode;
+oppia.directive('editorSwitchButton', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/exploration_editor/editor_switch_button_directive.html'),
+      controller: [
+        '$scope', 'EditorModeService', function($scope, EditorModeService) {
+          $scope.isEditorInSimpleMode = EditorModeService.isEditorInSimpleMode;
+          $scope.isEditorInFullMode = EditorModeService.isEditorInFullMode;
 
-        // For switching exploration editor
-        $scope.setEditorModeToFull = EditorModeService.setModeToFull;
-        $scope.setEditorModeToSimple = EditorModeService.setModeToSimple;
-      }
-    ]
-  };
-}]);
+          // For switching exploration editor
+          $scope.setEditorModeToFull = EditorModeService.setModeToFull;
+          $scope.setEditorModeToSimple = EditorModeService.setModeToSimple;
+        }
+      ]
+    };
+  }
+]);

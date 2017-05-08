@@ -69,6 +69,9 @@ describe('Simple Editor Shim Service', function() {
         getStates: function() {
           return states;
         },
+        getStateNames: function() {
+          return ['state1', 'state2'];
+        },
         saveStateContent: function() { },
         saveInteractionId: function() { },
         saveInteractionCustomizationArgs: function() { },

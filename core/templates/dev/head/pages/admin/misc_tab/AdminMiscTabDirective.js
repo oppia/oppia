@@ -18,16 +18,18 @@
 
 oppia.directive('adminMiscTab', [
   '$http', '$window', 'AdminTaskManagerService', 'ADMIN_HANDLER_URL',
-  'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL',
+  'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', 'UrlInterpolationService',
   function(
       $http, $window, AdminTaskManagerService, ADMIN_HANDLER_URL,
-      ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL) {
+      ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
         setStatusMessage: '='
       },
-      templateUrl: 'admin/miscTab',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/admin/misc_tab/' +
+        'admin_misc_tab_directive.html'),
       controller: ['$scope', function($scope) {
         $scope.clearSearchIndex = function() {
           if (AdminTaskManagerService.isTaskRunning()) {

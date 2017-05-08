@@ -88,34 +88,35 @@ describe('Skill list object factory', function() {
   });
 
   it('should be able to detect being a superset of another skill list',
-      function() {
-    var skillList1 = SkillListObjectFactory.create(['skill0', 'skill1']);
-    var skillList2 = SkillListObjectFactory.create(['skill0']);
+    function() {
+      var skillList1 = SkillListObjectFactory.create(['skill0', 'skill1']);
+      var skillList2 = SkillListObjectFactory.create(['skill0']);
 
-    expect(skillList1.isSupersetOfSkillList(skillList2)).toBe(true);
-    expect(skillList2.isSupersetOfSkillList(skillList1)).toBe(false);
+      expect(skillList1.isSupersetOfSkillList(skillList2)).toBe(true);
+      expect(skillList2.isSupersetOfSkillList(skillList1)).toBe(false);
 
-    // The empty list is a subset of all lists.
-    var skillList3 = SkillListObjectFactory.create([]);
-    expect(skillList1.isSupersetOfSkillList(skillList3)).toBe(true);
-    expect(skillList2.isSupersetOfSkillList(skillList3)).toBe(true);
-    expect(skillList3.isSupersetOfSkillList(skillList1)).toBe(false);
-    expect(skillList3.isSupersetOfSkillList(skillList2)).toBe(false);
+      // The empty list is a subset of all lists.
+      var skillList3 = SkillListObjectFactory.create([]);
+      expect(skillList1.isSupersetOfSkillList(skillList3)).toBe(true);
+      expect(skillList2.isSupersetOfSkillList(skillList3)).toBe(true);
+      expect(skillList3.isSupersetOfSkillList(skillList1)).toBe(false);
+      expect(skillList3.isSupersetOfSkillList(skillList2)).toBe(false);
 
-    // A list is the superset of itself, including the empty list.
-    expect(skillList1.isSupersetOfSkillList(skillList1)).toBe(true);
-    expect(skillList2.isSupersetOfSkillList(skillList2)).toBe(true);
-    expect(skillList3.isSupersetOfSkillList(skillList3)).toBe(true);
+      // A list is the superset of itself, including the empty list.
+      expect(skillList1.isSupersetOfSkillList(skillList1)).toBe(true);
+      expect(skillList2.isSupersetOfSkillList(skillList2)).toBe(true);
+      expect(skillList3.isSupersetOfSkillList(skillList3)).toBe(true);
 
-    // A list can be made the superset of another.
-    var skillList4 = SkillListObjectFactory.create([]);
-    skillList4.addSkillsFromSkillList(skillList1);
-    expect(skillList1.isSupersetOfSkillList(skillList4)).toBe(true);
-    expect(skillList4.isSupersetOfSkillList(skillList1)).toBe(true);
-    skillList4.removeSkillByIndex(0);
-    expect(skillList1.isSupersetOfSkillList(skillList4)).toBe(true);
-    expect(skillList4.isSupersetOfSkillList(skillList1)).toBe(false);
-  });
+      // A list can be made the superset of another.
+      var skillList4 = SkillListObjectFactory.create([]);
+      skillList4.addSkillsFromSkillList(skillList1);
+      expect(skillList1.isSupersetOfSkillList(skillList4)).toBe(true);
+      expect(skillList4.isSupersetOfSkillList(skillList1)).toBe(true);
+      skillList4.removeSkillByIndex(0);
+      expect(skillList1.isSupersetOfSkillList(skillList4)).toBe(true);
+      expect(skillList4.isSupersetOfSkillList(skillList1)).toBe(false);
+    }
+  );
 
   it('should be able to clear skills', function() {
     var skillList = SkillListObjectFactory.create(['first', 'second']);

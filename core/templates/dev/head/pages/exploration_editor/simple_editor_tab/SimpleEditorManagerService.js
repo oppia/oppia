@@ -22,10 +22,10 @@
 
 oppia.factory('SimpleEditorManagerService', [
   'StatesToQuestionsService', 'SimpleEditorShimService',
-  'QuestionObjectFactory', 'QuestionListObjectFactory',
+  'QuestionObjectFactory', 'QuestionListObjectFactory', 'OutcomeObjectFactory',
   function(
       StatesToQuestionsService, SimpleEditorShimService,
-      QuestionObjectFactory, QuestionListObjectFactory) {
+      QuestionObjectFactory, QuestionListObjectFactory, OutcomeObjectFactory) {
     var data = {
       title: null,
       introductionHtml: null,
@@ -131,11 +131,8 @@ oppia.factory('SimpleEditorManagerService', [
           lastStateName, DEFAULT_INTERACTION.ID);
         SimpleEditorShimService.saveCustomizationArgs(
           lastStateName, DEFAULT_INTERACTION.CUSTOMIZATION_ARGS);
-        SimpleEditorShimService.saveDefaultOutcome(lastStateName, {
-          dest: lastStateName,
-          feedback: [''],
-          param_changes: []
-        });
+        SimpleEditorShimService.saveDefaultOutcome(
+          lastStateName, OutcomeObjectFactory.createEmpty(lastStateName));
 
         var stateData = SimpleEditorShimService.getState(lastStateName);
         data.questionList.addQuestion(QuestionObjectFactory.create(
