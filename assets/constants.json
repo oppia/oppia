@@ -1,11 +1,72 @@
 {
-  "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
-    "Art", "Astronomy", "Biology", "Business", "Calculus", "Chemistry",
-    "Combinatorics", "Computing", "Economics", "Education", "Engineering",
-    "English", "Environment", "Gaulish", "Geography", "Geometry", "Government",
-    "Graph Theory", "History", "Languages", "Latin", "Law", "Logic",
-    "Mathematics", "Medicine", "Music", "Philosophy", "Physics", "Poetry",
-    "Probability", "Programming", "Puzzles", "Reading", "Spanish", "Sport",
-    "Statistics", "Trigonometry", "Welcome"],
-  "DISABLED_EXPLORATION_IDS": ["5"]
+  "ALL_CATEGORIES": [
+    "Algebra",
+    "Algorithms",
+    "Architecture",
+    "Arithmetic",
+    "Art",
+    "Astronomy",
+    "Biology",
+    "Business",
+    "Calculus",
+    "Chemistry",
+    "Combinatorics",
+    "Computing",
+    "Economics",
+    "Education",
+    "Engineering",
+    "English",
+    "Environment",
+    "Gaulish",
+    "Geography",
+    "Geometry",
+    "Government",
+    "Graph Theory",
+    "History",
+    "Languages",
+    "Latin",
+    "Law",
+    "Logic",
+    "Mathematics",
+    "Medicine",
+    "Music",
+    "Philosophy",
+    "Physics",
+    "Poetry",
+    "Probability",
+    "Programming",
+    "Puzzles",
+    "Reading",
+    "Spanish",
+    "Sport",
+    "Statistics",
+    "Trigonometry",
+    "Welcome"
+  ],
+  "DISABLED_EXPLORATION_IDS": [
+    "5"
+  ],
+  "NEW_STATE_TEMPLATE": {
+    "classifier_model_id": null,
+    "content": [
+      {
+        "type": "text",
+        "value": ""
+      }
+    ],
+    "interaction": {
+      "id": null,
+      "customization_args": {},
+      "answer_groups": [],
+      "default_outcome": {
+        "dest": "Introduction",
+        "feedback": [],
+        "param_changes": []
+      },
+      "confirmed_unclassified_answers": [],
+      "fallbacks": []
+    },
+    "param_changes": [],
+    "unresolved_answers": {}
+  }
 }

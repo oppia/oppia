@@ -800,33 +800,6 @@ describe('New state template service', function() {
     var NEW_STATE_NAME = 'new state name';
 
     beforeEach(inject(function($injector) {
-      GLOBALS.NEW_STATE_TEMPLATE = {
-        classifier_model_id: null,
-        content: [{
-          type: 'text',
-          value: ''
-        }],
-        interaction: {
-          answer_groups: [],
-          confirmed_unclassified_answers: [],
-          customization_args: {
-            rows: {
-              value: 1
-            },
-            placeholder: {
-              value: 'Type your answer here.'
-            }
-          },
-          default_outcome: {
-            dest: '(untitled state)',
-            feedback: [],
-            param_changes: []
-          },
-          fallbacks: [],
-          id: 'TextInput'
-        },
-        param_changes: []
-      };
       nsts = $injector.get('newStateTemplateService');
     }));
 
@@ -843,21 +816,14 @@ describe('New state template service', function() {
           interaction: {
             answerGroups: [],
             confirmedUnclassifiedAnswers: [],
-            customizationArgs: {
-              rows: {
-                value: 1
-              },
-              placeholder: {
-                value: 'Type your answer here.'
-              }
-            },
+            customizationArgs: {},
             defaultOutcome: {
               dest: NEW_STATE_NAME,
               feedback: [],
               param_changes: []
             },
             fallbacks: [],
-            id: 'TextInput'
+            id: null
           },
           paramChanges: []
         });

@@ -19,28 +19,71 @@
 describe('Multiple choice input checker service', function() {
   beforeEach(module('oppia'));
 
-  var AnswerGroupObjectFactory = null, mcics = null;
-  var customizationArgs = {"choices":{"value":["<p>Option 1</p>","<p>Option 2</p>","<p>Op 3</p>"]}};
-  var answerGroupsFalse = [{"rules":[{"type":"Equals","inputs":{"x":0}},{"type":"Equals","inputs":{"x":2}}],"outcome":{"param_changes":[],"feedback":[""],"dest":"Question 1"},"correct":false}];
-  var answerGroupsTrue = [{"rules":[{"type":"Equals","inputs":{"x":0}}],"outcome":{"feedback":[""],"param_changes":[],"dest":"Question 2"},"correct":false}];
+  var AnswerGroupObjectFactory, mcics, customizationArgs,
+    answerGroupsFalse, answerGroupsTrue;
+
+  customizationArgs = {
+    choices: {
+        value: [
+          '<p>Option 1</p>',
+          '<p>Option 2</p>',
+          '<p>Op 3</p>'
+        ]
+      }
+  };
 
   beforeEach(inject(function($injector) {
     AnswerGroupObjectFactory = $injector.get('AnswerGroupObjectFactory');
     mcics = $injector.get('MultipleChoiceInputCheckerService');
   }));
 
-
   it('should return false for two Equals rules', function() {
-    var x = mcics.isValid(customizationArgs, answerGroupsFalse);
-    console.log("Dev110 " + x);
-    expect(x).toBe(false);
+    answerGroupsFalse = [
+      {
+        rules: [
+          {
+            type: 'Equals',
+            inputs: {
+              x: 0
+            }
+          },
+          {
+            type: 'Equals',
+            inputs: {
+              x: 2
+            }
+          }
+        ],
+        outcome: {
+          param_changes: [],
+          feedback: [],
+          dest: 'Question 1'
+        },
+        correct: false
+      }
+    ];
+    expect(mcics.isValid(customizationArgs, answerGroupsFalse)).toBe(false);
   });
 
-  
   it('should return true for one Equals rules', function() {
-    var x = mcics.isValid(customizationArgs, answerGroupsTrue);
-    console.log("Dev110 " + x);
-    expect(x).toBe(true);
+    answerGroupsTrue = [
+      {
+        rules: [
+          {
+            type: 'Equals',
+            inputs: {
+              x: 0
+            }
+          }
+        ],
+        outcome: {
+          feedback: [],
+          param_changes: [],
+          dest: 'Question 2'
+        },
+        correct: false
+      }
+    ];
+    expect(mcics.isValid(customizationArgs, answerGroupsTrue)).toBe(true);
   });
-
 });
