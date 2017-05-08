@@ -43,8 +43,10 @@ oppia.directive('explorationFooter', [function() {
         };
 
         $scope.windowIsNarrow = windowDimensionsService.isWindowNarrow();
-        console.log($scope.windowIsNarrow);
-        // add hook
+        windowDimensionsService.registerOnResizeHook(function() {
+          $scope.windowIsNarrow = windowDimensionsService.isWindowNarrow();
+          $scope.$apply();
+        });
 
         ExplorationSummaryBackendApiService
           .loadPublicAndPrivateExplorationSummaries([$scope.explorationId])
