@@ -781,6 +781,10 @@ class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
 
 
 class ClearUnknownMissingAnswersJob(jobs.BaseMapReduceJobManager):
+    """Delete states of records that have inconsistincies between the old
+    and new models. These will be re-migrated the next time the
+    AnswerMigrationJob runs.
+    """
 
     _OLD_ANSWER_MODEL_TYPE = 'StateRuleAnswerLogModel'
     _NEW_ANSWER_MODEL_TYPE = 'StateAnswersModel'
@@ -793,6 +797,23 @@ class ClearUnknownMissingAnswersJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+
+        Args:
+            item: StateAnswersModel or StateRuleAnswerLogModel
+
+        Yields:
+            tuple. 2-tuple in the form (key, value).
+                'key': either the item id or an aggregation key for
+                the associated rule
+                'value': value yielded is a dict of the form
+                    {
+                        'frequency': the answer submission count
+                        'type': the model type
+                        'item_id': the item id
+                        'rule_name': the rule name
+                    }
+        """
         if isinstance(item, stats_models.StateRuleAnswerLogModel):
             exp_id, state_name, _, rule_str = (
                 _unpack_state_rule_answer_log_model_id(item.id))
@@ -835,6 +856,24 @@ class ClearUnknownMissingAnswersJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(_, stringified_values):
+        """Delete states of records that have inconsistincies between the old
+        and new models
+
+        Args:
+            '_': the item id (unused)
+            stringified_values: list(str). A list of stringified values
+                associated with the given key. An element of stringfield_values
+                would be of the form:
+                {
+                    'frequency': the answer submission count
+                    'type': the model type
+                    'item_id': the item id
+                    'rule_name': the rule name
+                }
+
+        Yields:
+            String report of deleted states
+        """
         value_dict_list = [
             ast.literal_eval(stringified_value)
             for stringified_value in stringified_values]
