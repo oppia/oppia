@@ -27,9 +27,11 @@ oppia.directive('explorationFooter', [function() {
     controller: [
       '$scope', '$http', '$log', 'explorationContextService',
       'UrlInterpolationService', 'ExplorationSummaryBackendApiService',
+      'windowDimensionsService',
       function(
           $scope, $http, $log, explorationContextService,
-          UrlInterpolationService, ExplorationSummaryBackendApiService) {
+          UrlInterpolationService, ExplorationSummaryBackendApiService,
+          windowDimensionsService) {
         $scope.explorationId = explorationContextService.getExplorationId();
 
         $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
@@ -39,6 +41,10 @@ oppia.directive('explorationFooter', [function() {
         $scope.getTwitterText = function() {
           return $scope.twitterText;
         };
+
+        $scope.windowIsNarrow = windowDimensionsService.isWindowNarrow();
+        console.log($scope.windowIsNarrow);
+        // add hook
 
         ExplorationSummaryBackendApiService
           .loadPublicAndPrivateExplorationSummaries([$scope.explorationId])

@@ -23,6 +23,24 @@
       padding-left: 0;
     }
 
+    .oppia-exploration-footer .mobile-feedback {
+      color: #fff;
+      list-style-type: none;
+      padding-left: 0;
+    }
+
+    .oppia-exploration-footer .mobile-feedback li > a {
+      margin-top: 2px;
+    }
+
+    .oppia-exploration-footer .mobile-feedback .popover {
+      color: rgba(0,0,0,0.87);
+    }
+
+    .oppia-exploration-footer .mobile-feedback .popover > .arrow {
+      display: none;
+    }
+
     .oppia-exploration-footer .author-profile a:hover {
       text-decoration: none;
     }
@@ -131,7 +149,7 @@
   <div class="footer navbar-fixed-bottom oppia-exploration-footer">
     <div class="row">
       <div class="col-sm-5">
-        <ul class="author-profile">
+        <ul class="author-profile" ng-if="!windowIsNarrow">
           <li>
             <img ng-src="<[getStaticImageUrl('/general/apple.svg')]>" class="exploration-footer-img"
                  alt="">
@@ -161,6 +179,14 @@
             </div>
           </li>
           <li></li>
+        </ul>
+        <ul class="mobile-feedback" ng-if="windowIsNarrow">
+          <li popover-placement="top" popover-template="'popover/feedback'" popover-trigger="click">
+            <a href="" class="btn oppia-navbar-button" tooltip="<['I18N_PLAYER_FEEDBACK_TOOLTIP' | translate]>" tooltip-placement="top">
+              <i class="material-icons">&#xE87F;</i>
+              <span><['I18N_PLAYER_FEEDBACK_TOOLTIP' | translate]></span>
+            </a>
+          </li>
         </ul>
       </div>
       <div class="col-sm-7">
