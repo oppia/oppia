@@ -75,8 +75,7 @@ var constants = {
       "confirmed_unclassified_answers": [],
       "fallbacks": []
     },
-    "param_changes": [],
-    "unresolved_answers": {}
+    "param_changes": []
   },
   "TESTING_CONSTANT": "test"
 }

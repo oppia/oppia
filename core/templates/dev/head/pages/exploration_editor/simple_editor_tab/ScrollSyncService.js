@@ -42,7 +42,7 @@ oppia.factory('ScrollSyncService', [
           $rootScope.$broadcast('SimpleEditorSidebarToggleCollapse');
           break;
         }
-      };
+      }
     };
 
     var scrollSyncService = {
@@ -63,12 +63,12 @@ oppia.factory('ScrollSyncService', [
           elm.addClass(CSS_CLASS_HIGHLIGHTED);
           if (id === 'intro' || id === 'title') {
             return;
-          };
+          }
 
           // Uncollapse the nav link in case hidden
           if (elm.is(':hidden')) {
             toggleCollapse(QuestionIdService.getParentQuestionId(id));
-          };
+          }
           // TODO(andromfins): If the nav link is not displayed when the sidebar
           // is overflown, scroll to it.
         }
@@ -97,11 +97,11 @@ oppia.factory('ScrollSyncService', [
           minDy = dy;
           minPositiveTarget = targets[i];
         }
-      };
+      }
 
       if (angular.isDefined(minPositiveTarget)) {
         scrollSyncService.updateActive(minPositiveTarget.attr('id'));
-      };
+      }
     });
 
     return scrollSyncService;
