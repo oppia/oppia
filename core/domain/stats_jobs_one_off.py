@@ -1190,6 +1190,21 @@ class SplitLargeAnswerBucketsJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+        Conditionally performs the LargeAnswerBucketModel insertion.
+
+        Args:
+            item: StateRuleAnswerLogModel
+
+        Yields:
+            tuple. 2-tuple in the form (key, value).
+                'key': 'split_answer_count'
+                'value': value yielded is a dict of the form
+                    {
+                        'item_id': the item id
+                        'answer_count': length of item.answers
+                    }
+        """
         if stats_models.LargeAnswerBucketModel.should_split_log_entity(item):
             stats_models.LargeAnswerBucketModel.insert_state_rule_answer_log_entity(item) # pylint: disable=line-too-long
             yield (SplitLargeAnswerBucketsJob._SPLIT_ANSWER_KEY, {
@@ -1199,6 +1214,21 @@ class SplitLargeAnswerBucketsJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(_, stringified_values):
+        """Reports number of answers split for migration per exploration
+
+        Args:
+            '_': 'split_answer_count' (unused)
+            stringified_values: list(str). A list of stringified values
+                associated with the given key. An element of stringfield_values
+                would be of the form:
+                {
+                        'item_id': the item id
+                        'answer_count': length of item.answers
+                }
+
+        Yields:
+            String report of number of split answers per exploration
+        """
         value_dict_list = [
             ast.literal_eval(stringified_value)
             for stringified_value in stringified_values]
