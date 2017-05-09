@@ -109,6 +109,7 @@
         SYSTEM_USERNAMES: JSON.parse('{{SYSTEM_USERNAMES|js_string}}'),
         SUPPORTED_SITE_LANGUAGES: JSON.parse(
           '{{SUPPORTED_SITE_LANGUAGES|js_string}}'),
+        TEMPLATE_DIR_PREFIX: JSON.parse('{{TEMPLATE_DIR_PREFIX|js_string}}'),
         isAdmin: JSON.parse('{{is_admin|js_string}}'),
         isModerator: JSON.parse('{{is_moderator|js_string}}'),
         isSuperAdmin: JSON.parse('{{is_super_admin|js_string}}'),
@@ -116,7 +117,9 @@
         logoutUrl: JSON.parse('{{logout_url|js_string}}'),
         profilePictureDataUrl: JSON.parse('{{profile_picture_data_url|js_string}}'),
         userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}'),
-        username: JSON.parse('{{username|js_string}}')
+        username: JSON.parse('{{username|js_string}}'),
+        PROMO_BAR_IS_ENABLED: JSON.parse('{{promo_bar_enabled|js_string}}'),
+        PROMO_BAR_MESSAGE: JSON.parse('{{promo_bar_message|js_string}}')
       };
 
       {% if additional_angular_modules %}
@@ -136,6 +139,9 @@
     {% if iframed %}
       {{ warnings_and_loader() }}
     {% else %}
+      <promo-bar ng-if="promoBarIsEnabled" promo-message="promoBarMessage">
+      </promo-bar>
+
       <div class="oppia-base-container"
            ng-class="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
            ng-swipe-left="closeSidebarOnSwipe()">
@@ -200,22 +206,10 @@
 
     {% include 'pages/footer_js_libs.html' %}
 
-    {% include 'components/background/background_banner_directive.html' %}
     {% include 'components/create_button/create_activity_button_directive.html' %}
 
     {% include 'components/forms/form_builder_templates.html' %}
     {% include 'components/forms/image_uploader_directive.html' %}
-    {% include 'components/forms/schema_editors/schema_based_bool_editor_directive.html' %}
-    {% include 'components/forms/schema_editors/schema_based_choices_editor_directive.html' %}
-    {% include 'components/forms/schema_editors/schema_based_custom_editor_directive.html' %}
-    {% include 'components/forms/schema_editors/schema_based_dict_editor_directive.html' %}
-    {% include 'components/forms/schema_editors/schema_based_editor_directive.html' %}
-    {% include 'components/forms/schema_editors/schema_based_expression_editor_directive.html' %}
-    {% include 'components/forms/schema_editors/schema_based_float_editor_directive.html' %}
-    {% include 'components/forms/schema_editors/schema_based_html_editor_directive.html' %}
-    {% include 'components/forms/schema_editors/schema_based_int_editor_directive.html' %}
-    {% include 'components/forms/schema_editors/schema_based_list_editor_directive.html' %}
-    {% include 'components/forms/schema_editors/schema_based_unicode_editor_directive.html' %}
     {% include 'components/forms/schema_viewers/schema_based_custom_viewer_directive.html' %}
     {% include 'components/forms/schema_viewers/schema_based_dict_viewer_directive.html' %}
     {% include 'components/forms/schema_viewers/schema_based_html_viewer_directive.html' %}
@@ -225,6 +219,7 @@
     {% include 'components/forms/schema_viewers/schema_based_viewer_directive.html' %}
 
     {% include 'components/loading/loading_dots_directive.html' %}
+    {% include 'components/promo/promo_bar_directive.html' %}
     {% include 'components/summary_tile/circular_image_directive.html' %}
     {% include 'components/summary_tile/collection_summary_tile_directive.html' %}
     {% include 'components/summary_tile/exploration_summary_tile_directive.html' %}
@@ -248,8 +243,8 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/alerts/AlertMessageDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/create_button/CreateActivityButtonDirective.js"></script>
 
-    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/ObjectEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/promo/PromoBarDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/side_navigation_bar/SideNavigationBarDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/social_buttons/SocialButtonsDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/top_navigation_bar/TopNavigationBarDirective.js"></script>

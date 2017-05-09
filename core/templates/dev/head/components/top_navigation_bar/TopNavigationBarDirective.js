@@ -99,7 +99,8 @@ oppia.directive('topNavigationBar', [function() {
         $scope.navElementsVisibilityStatus = {};
         // The order of the elements in this array specifies the order in which
         // they will be hidden. Earlier elements will be hidden first.
-        var NAV_ELEMENTS_ORDER = ['I18N_TOPNAV_DONATE', 'I18N_TOPNAV_ABOUT',
+        var NAV_ELEMENTS_ORDER = [
+          'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_ABOUT',
           'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
         for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
           $scope.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] = true;

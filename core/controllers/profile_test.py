@@ -30,7 +30,7 @@ class SignupTest(test_utils.GenericTestBase):
         response = self.testapp.get(feconf.SIGNUP_URL)
         self.assertEqual(response.status_int, 200)
         # Sign in can't be inside an html tag, but can appear inside js code
-        response.mustcontain(no=['Logout', '>Sign in'])
+        response.mustcontain(no=['Logout'])
         self.logout()
 
     def test_going_somewhere_else_while_signing_in_logs_user_out(self):

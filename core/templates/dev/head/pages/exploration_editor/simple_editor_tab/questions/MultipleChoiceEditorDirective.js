@@ -21,9 +21,9 @@
 // concept of "state in an exploration".
 oppia.directive('multipleChoiceEditor', [
   'QuestionIdService', 'AnswerGroupObjectFactory', 'RuleObjectFactory',
-  'StatusObjectFactory',
+  'StatusObjectFactory', 'OutcomeObjectFactory', 'UrlInterpolationService',
   function(QuestionIdService, AnswerGroupObjectFactory, RuleObjectFactory,
-      StatusObjectFactory) {
+      StatusObjectFactory, OutcomeObjectFactory, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -38,7 +38,9 @@ oppia.directive('multipleChoiceEditor', [
         saveDefaultOutcome: '&',
         addState: '&'
       },
-      templateUrl: 'simpleEditorQuestions/MultipleChoiceInput',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/exploration_editor/simple_editor_tab/questions/' +
+        'multiple_choice_editor_directive.html'),
       controller: [
         '$scope', '$timeout', 'alertsService',
         function($scope, $timeout, alertsService) {
@@ -228,11 +230,7 @@ oppia.directive('multipleChoiceEditor', [
                 RuleObjectFactory.createNew('Equals', {
                   x: index
                 })
-              ], {
-                dest: newStateName,
-                feedback: [''],
-                param_changes: []
-              }, false));
+              ], OutcomeObjectFactory.createEmpty(newStateName), false));
 
               $scope.saveAnswerGroups({
                 newValue: newAnswerGroups

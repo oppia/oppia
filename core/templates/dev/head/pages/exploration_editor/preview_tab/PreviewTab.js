@@ -25,6 +25,7 @@ oppia.controller('PreviewTab', [
   'explorationParamChangesService', 'explorationParamSpecsService',
   'explorationStatesService', 'explorationTitleService',
   'oppiaPlayerService', 'parameterMetadataService',
+  'ParamChangeObjectFactory',
   function(
       $scope, $modal, $q, $timeout, LearnerParamsService,
       explorationData, explorationAdvancedFeaturesService,
@@ -32,7 +33,8 @@ oppia.controller('PreviewTab', [
       explorationGadgetsService, explorationInitStateNameService,
       explorationParamChangesService, explorationParamSpecsService,
       explorationStatesService, explorationTitleService,
-      oppiaPlayerService, parameterMetadataService) {
+      oppiaPlayerService, parameterMetadataService,
+      ParamChangeObjectFactory) {
     $scope.isExplorationPopulated = false;
     explorationData.getData().then(function() {
       var initStateNameForPreview = editorContextService.getActiveStateName();
@@ -48,10 +50,11 @@ oppia.controller('PreviewTab', [
       }
 
       // Prompt user to enter any unset parameters, then populate exploration
-      manualParamChanges = $scope.getManualParamChanges(
-        initStateNameForPreview).then(function(manualParamChanges) {
-        $scope.loadPreviewState(initStateNameForPreview, manualParamChanges);
-      });
+      manualParamChanges = $scope.getManualParamChanges(initStateNameForPreview)
+        .then(function(manualParamChanges) {
+          $scope.loadPreviewState(initStateNameForPreview, manualParamChanges);
+        }
+      );
     });
 
     $scope.getManualParamChanges = function(initStateNameForPreview) {
@@ -61,22 +64,12 @@ oppia.controller('PreviewTab', [
         [initStateNameForPreview]);
 
       // Construct array to hold required parameter changes
-      var getDefaultParameterChange = function(name) {
-        return angular.copy({
-          customization_args: {
-            parse_with_jinja: true,
-            value: ''
-          },
-          generator_id: 'Copier',
-          name: name
-        });
-      };
       var manualParamChanges = [];
       for (var i = 0; i < unsetParametersInfo.length; i++) {
-        var newParamChange =
-          getDefaultParameterChange(unsetParametersInfo[i].paramName);
+        var newParamChange = ParamChangeObjectFactory.createEmpty(
+          unsetParametersInfo[i].paramName);
         manualParamChanges.push(newParamChange);
-      };
+      }
 
       // Use modal to populate parameter change values
       if (manualParamChanges.length > 0) {
@@ -85,7 +78,7 @@ oppia.controller('PreviewTab', [
         });
       } else {
         deferred.resolve([]);
-      };
+      }
 
       return deferred.promise;
     };

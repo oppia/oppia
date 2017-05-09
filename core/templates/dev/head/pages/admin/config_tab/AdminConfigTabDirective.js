@@ -18,13 +18,16 @@
 
 oppia.directive('adminConfigTab', [
   '$http', 'AdminTaskManagerService', 'ADMIN_HANDLER_URL',
-  function($http, AdminTaskManagerService, ADMIN_HANDLER_URL) {
+  'UrlInterpolationService', function($http, AdminTaskManagerService,
+  ADMIN_HANDLER_URL, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
         setStatusMessage: '='
       },
-      templateUrl: 'admin/configTag',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/admin/config_tab/' +
+        'admin_config_tab_directive.html'),
       controller: ['$scope', function($scope) {
         $scope.configProperties = {};
 

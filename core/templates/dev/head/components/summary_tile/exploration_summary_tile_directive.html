@@ -1,5 +1,5 @@
 <script type="text/ng-template" id="summaryTile/exploration">
-  <md-card class="oppia-activity-summary-tile" ng-class="{'small-width': !isWindowLarge}">
+  <md-card ng-class="[isCollectionPreviewTile ? 'oppia-activity-summary-tile-mobile' : 'oppia-activity-summary-tile', {'small-width': !isWindowLarge}]">
     <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
       <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
         <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>" alt="<[getCategory()]>">
@@ -7,6 +7,7 @@
           <span ng-if="isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
           <span ng-if="!isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
         </h3>
+
         <!-- Note that if this is ng-if instead, the avatar area will not detect a mouseover and the tile will behave incorrectly. -->
         <div ng-show="isWindowLarge && avatarsList.length > 0" class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
           <div>
@@ -28,8 +29,7 @@
           <span translate="I18N_LIBRARY_NO_OBJECTIVE">
           </span>
         </div>
-
-        <ul layout="row" class="metrics" layout-align="space-between center">
+        <ul ng-if="!isCollectionPreviewTile" layout="row" class="metrics" layout-align="space-between center">
           <li>
             <span class="protractor-test-exp-summary-tile-rating" ng-class="{'rating-disabled': !getAverageRating()}">
               <span class="fa fa-star fa-lg" tooltip="<['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]>" tooltip-placement="top">
@@ -61,13 +61,11 @@
             </span>
           </li>
         </ul>
+        <button ng-if="isCollectionPreviewTile" class="oppia-learner-continue-button md-button md-default-theme"
+                style="display: block; margin: auto; touch-action: pan-y; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
+          <span translate="I18N_PLAYER_PLAY_EXPLORATION"></span>
+        </button>
       </div>
     </a>
   </md-card>
 </script>
-
-<style>
-  .oppia-activity-summary-tile .oppia-inactive-summary-tile-attribute {
-    opacity: 0.5;
-  }
-</style>

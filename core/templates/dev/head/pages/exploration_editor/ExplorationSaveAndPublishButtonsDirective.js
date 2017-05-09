@@ -15,101 +15,104 @@
 /**
  * @fileoverview Directive for the exploration save & publish buttons.
  */
-oppia.directive('explorationSaveAndPublishButtons', [function() {
-  return {
-    restrict: 'E',
-    templateUrl: 'inline/exploration_save_and_publish_buttons_directive',
-    controller: [
-      '$scope', 'changeListService', 'editabilityService',
-      'explorationRightsService', 'explorationWarningsService',
-      'explorationSaveService',
-      function(
-          $scope, changeListService, editabilityService,
-          explorationRightsService, explorationWarningsService,
-          explorationSaveService) {
-        $scope.saveIsInProcess = false;
-        $scope.publishIsInProcess = false;
-        $scope.loadingDotsAreShown = false;
-
-        $scope.isPrivate = function() {
-          return explorationRightsService.isPrivate();
-        };
-
-        $scope.isExplorationLockedForEditing = function() {
-          return changeListService.isExplorationLockedForEditing();
-        };
-
-        $scope.isEditableOutsideTutorialMode = function() {
-          return editabilityService.isEditableOutsideTutorialMode();
-        };
-
-        $scope.countWarnings = function() {
-          return explorationWarningsService.countWarnings();
-        };
-
-        $scope.discardChanges = function() {
-          explorationSaveService.discardChanges();
-        };
-
-        $scope.getChangeListLength = function() {
-          return changeListService.getChangeList().length;
-        };
-
-        $scope.isExplorationSaveable = function() {
-          return explorationSaveService.isExplorationSaveable();
-        };
-
-        $scope.getPublishExplorationButtonTooltip = function() {
-          if (explorationWarningsService.countWarnings() > 0) {
-            return 'Please resolve the warnings before publishing.';
-          } else if (changeListService.isExplorationLockedForEditing()) {
-            return 'Please save your changes before publishing.';
-          } else {
-            return 'Publish to Oppia Library';
-          }
-        };
-
-        $scope.getSaveButtonTooltip = function() {
-          if (explorationWarningsService.hasCriticalWarnings() > 0) {
-            return 'Please resolve the warnings.';
-          } else if (explorationRightsService.isPrivate()) {
-            return 'Save Draft';
-          } else {
-            return 'Publish Changes';
-          }
-        };
-
-        showLoadingDots = function() {
-          $scope.loadingDotsAreShown = true;
-        };
-
-        hideLoadingDots = function() {
+oppia.directive('explorationSaveAndPublishButtons', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/exploration_editor/' +
+        'exploration_save_and_publish_buttons_directive.html'),
+      controller: [
+        '$scope', 'changeListService', 'editabilityService',
+        'explorationRightsService', 'explorationWarningsService',
+        'explorationSaveService',
+        function(
+            $scope, changeListService, editabilityService,
+            explorationRightsService, explorationWarningsService,
+            explorationSaveService) {
+          $scope.saveIsInProcess = false;
+          $scope.publishIsInProcess = false;
           $scope.loadingDotsAreShown = false;
-        };
 
-        $scope.showPublishExplorationModal = function() {
-          $scope.publishIsInProcess = true;
-          $scope.loadingDotsAreShown = true;
+          $scope.isPrivate = function() {
+            return explorationRightsService.isPrivate();
+          };
 
-          explorationSaveService.showPublishExplorationModal(showLoadingDots,
-            hideLoadingDots)
+          $scope.isExplorationLockedForEditing = function() {
+            return changeListService.isExplorationLockedForEditing();
+          };
+
+          $scope.isEditableOutsideTutorialMode = function() {
+            return editabilityService.isEditableOutsideTutorialMode();
+          };
+
+          $scope.countWarnings = function() {
+            return explorationWarningsService.countWarnings();
+          };
+
+          $scope.discardChanges = function() {
+            explorationSaveService.discardChanges();
+          };
+
+          $scope.getChangeListLength = function() {
+            return changeListService.getChangeList().length;
+          };
+
+          $scope.isExplorationSaveable = function() {
+            return explorationSaveService.isExplorationSaveable();
+          };
+
+          $scope.getPublishExplorationButtonTooltip = function() {
+            if (explorationWarningsService.countWarnings() > 0) {
+              return 'Please resolve the warnings before publishing.';
+            } else if (changeListService.isExplorationLockedForEditing()) {
+              return 'Please save your changes before publishing.';
+            } else {
+              return 'Publish to Oppia Library';
+            }
+          };
+
+          $scope.getSaveButtonTooltip = function() {
+            if (explorationWarningsService.hasCriticalWarnings() > 0) {
+              return 'Please resolve the warnings.';
+            } else if (explorationRightsService.isPrivate()) {
+              return 'Save Draft';
+            } else {
+              return 'Publish Changes';
+            }
+          };
+
+          showLoadingDots = function() {
+            $scope.loadingDotsAreShown = true;
+          };
+
+          hideLoadingDots = function() {
+            $scope.loadingDotsAreShown = false;
+          };
+
+          $scope.showPublishExplorationModal = function() {
+            $scope.publishIsInProcess = true;
+            $scope.loadingDotsAreShown = true;
+
+            explorationSaveService.showPublishExplorationModal(
+              showLoadingDots, hideLoadingDots)
               .then(function() {
                 $scope.publishIsInProcess = false;
                 $scope.loadingDotsAreShown = false;
               });
-        };
+          };
 
-        $scope.saveChanges = function() {
-          $scope.saveIsInProcess = true;
-          $scope.loadingDotsAreShown = true;
+          $scope.saveChanges = function() {
+            $scope.saveIsInProcess = true;
+            $scope.loadingDotsAreShown = true;
 
-          explorationSaveService.saveChanges(showLoadingDots, hideLoadingDots)
-            .then(function() {
-              $scope.saveIsInProcess = false;
-              $scope.loadingDotsAreShown = false;
-            });
-        };
-      }
-    ]
-  };
-}]);
+            explorationSaveService.saveChanges(showLoadingDots, hideLoadingDots)
+              .then(function() {
+                $scope.saveIsInProcess = false;
+                $scope.loadingDotsAreShown = false;
+              });
+          };
+        }
+      ]
+    };
+  }]);

@@ -3,7 +3,7 @@ var isMinificationNeeded = (argv.minify === 'True');
 var generatedJs = 'third_party/generated/js/third_party.js';
 if (isMinificationNeeded) {
   generatedJs = 'third_party/generated/js/third_party.min.js';
-};
+}
 
 module.exports = function(config) {
   config.set({
@@ -12,11 +12,7 @@ module.exports = function(config) {
     files: [
       'core/tests/karma-globals.js',
       // Constants must be loaded before everything else.
-      {
-        pattern: 'assets/constants.json',
-        included: false
-      },
-      'core/tests/karma-constants.js',
+      'assets/constants.js',
       // Since jquery,jquery-ui,angular,angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.0.0/jquery.min.js',
@@ -91,6 +87,11 @@ module.exports = function(config) {
     browsers: ['Chrome_Travis'],
     // Kill the browser if it does not capture in the given timeout [ms].
     captureTimeout: 60000,
+    browserConsoleLogOptions: {
+      level: 'log',
+      format: '%b %T: %m',
+      terminal: true
+    },
     browserNoActivityTimeout: 60000,
     // Continue running in the background after running tests.
     singleRun: true,

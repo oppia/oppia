@@ -19,6 +19,7 @@
 describe('Question object factory', function() {
   var AnswerGroupObjectFactory;
   var InteractionObjectFactory;
+  var OutcomeObjectFactory;
   var QuestionObjectFactory;
   var sampleQuestion;
 
@@ -27,6 +28,7 @@ describe('Question object factory', function() {
   beforeEach(inject(function($injector) {
     AnswerGroupObjectFactory = $injector.get('AnswerGroupObjectFactory');
     InteractionObjectFactory = $injector.get('InteractionObjectFactory');
+    OutcomeObjectFactory = $injector.get('OutcomeObjectFactory');
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
 
     sampleQuestion = QuestionObjectFactory.create(
@@ -92,11 +94,8 @@ describe('Question object factory', function() {
         }]
       })
     ]);
-    expect(sampleQuestion.getDefaultOutcome()).toEqual({
-      dest: 'First state',
-      feedback: ['Try again.'],
-      param_changes: []
-    });
+    expect(sampleQuestion.getDefaultOutcome()).toEqual(
+      OutcomeObjectFactory.createNew('First state', ['Try again.'], []));
     expect(sampleQuestion.getDestinationStateName()).toEqual('Second state');
     expect(sampleQuestion.getBridgeHtml()).toEqual('Second state content');
   });
@@ -175,21 +174,12 @@ describe('Question object factory', function() {
   });
 
   it('should allow the default outcome to be set', function() {
-    expect(sampleQuestion.getDefaultOutcome()).toEqual({
-      dest: 'First state',
-      feedback: ['Try again.'],
-      param_changes: []
-    });
-    sampleQuestion.setDefaultOutcome({
-      dest: 'Second state',
-      feedback: ['Carry on.'],
-      param_changes: []
-    });
-    expect(sampleQuestion.getDefaultOutcome()).toEqual({
-      dest: 'Second state',
-      feedback: ['Carry on.'],
-      param_changes: []
-    });
+    expect(sampleQuestion.getDefaultOutcome()).toEqual(
+      OutcomeObjectFactory.createNew('First state', ['Try again.'], []));
+    sampleQuestion.setDefaultOutcome(
+      OutcomeObjectFactory.createNew('Second state', ['Carry on.'], []));
+    expect(sampleQuestion.getDefaultOutcome()).toEqual(
+      OutcomeObjectFactory.createNew('Second state', ['Carry on.'], []));
   });
 
   it('should allow the bridge HTML to be set', function() {

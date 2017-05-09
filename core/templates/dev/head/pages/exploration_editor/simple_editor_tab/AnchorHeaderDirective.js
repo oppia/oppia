@@ -25,9 +25,11 @@ oppia.directive('anchorHeader', [function() {
       headerText: '@'
     },
     template: '<h3 id="<[getHeaderId()]>"><[headerText]></h3>',
-    controller: ['$scope', '$element', 'ScrollSyncService',
-        function($scope, $element, ScrollSyncService) {
-      ScrollSyncService.addTarget($element.children(0));
-    }]
+    controller: [
+      '$scope', '$element', 'ScrollSyncService',
+      function($scope, $element, ScrollSyncService) {
+        ScrollSyncService.addTarget($element.children(0));
+      }
+    ]
   };
 }]);

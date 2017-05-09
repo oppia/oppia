@@ -1,17 +1,15 @@
-<script type="text/ng-template" id="components/htmlSelect">
-  <div class="oppia-html-select">
-    <button class="btn btn-default dropdown-toggle oppia-html-select-selection" type="button" aria-expanded="false" data-toggle="dropdown">
-      <div class="oppia-html-select-selection-element" angular-html-bind="options[selection].val"></div>
-      <span class="caret oppia-html-select-selection-caret"></span>
-    </button>
-    <ul class="dropdown-menu" style="width: inherit;">
-      <li ng-repeat="choice in options">
-        <a class="oppia-html-select-option protractor-test-html-select-option" angular-html-bind="choice.val" ng-click="select(choice.id)">
-        </a>
-      </li>
-    </ul>
-  </div>
-</script>
+<div class="oppia-html-select">
+  <button class="btn btn-default dropdown-toggle oppia-html-select-selection" type="button" aria-expanded="false" data-toggle="dropdown">
+    <div class="oppia-html-select-selection-element" angular-html-bind="options[selection].val"></div>
+    <span class="caret oppia-html-select-selection-caret"></span>
+  </button>
+  <ul class="dropdown-menu" style="width: inherit;">
+    <li ng-repeat="choice in options">
+      <a class="oppia-html-select-option protractor-test-html-select-option" angular-html-bind="choice.val" ng-click="select(choice.id)">
+      </a>
+    </li>
+  </ul>
+</div>
 
 <style>
   .oppia-html-select {

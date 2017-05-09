@@ -37,11 +37,11 @@ oppia.factory('StatesToQuestionsService', [
     // - A feedback array with exactly one element.
     // - A destination that is a self-loop (if expectSelfLoop is
     //   true), or a non-self-loop otherwise.
-    // - An empty param_changes array.
+    // - An empty paramChanges array.
     var isOutcomeValid = function(outcome, currentStateName, expectSelfLoop) {
       return (
         outcome.feedback.length === 1 &&
-        outcome.param_changes.length === 0 && (
+        outcome.paramChanges.length === 0 && (
           (expectSelfLoop && outcome.dest === currentStateName) ||
           (!expectSelfLoop && outcome.dest !== currentStateName)
         )

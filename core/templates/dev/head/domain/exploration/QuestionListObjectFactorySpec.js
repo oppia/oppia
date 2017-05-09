@@ -194,7 +194,9 @@ describe('Question List Object Factory', function() {
     var randomState = 'Random State';
     expect(function() {
       questionList.getNextStateName(randomState);
-    }).toThrow('Could not find next state name after: ' + randomState);
+    }).toThrow(
+      new Error('Could not find next state name after: ' + randomState)
+    );
   });
 
   it('should return bindable question', function() {
@@ -209,7 +211,8 @@ describe('Question List Object Factory', function() {
     expect(function() {
       questionList.getBindableQuestion(randomState);
     }).toThrow(
-      'Cannot find question corresponding to state named: ' + randomState
+      new Error(
+        'Cannot find question corresponding to state named: ' + randomState)
     );
   });
 

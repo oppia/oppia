@@ -1,63 +1,61 @@
-<script type="text/ng-template" id="simpleEditor/body">
-  <div class="main">
-    <div class="content">
-      <anchor-header header-id="'title'" header-text="What would you like to teach?">
-      </anchor-header>
-      <editor-plaintext-field original-value="data.title"
-                              on-finish-editing="saveTitle(newValue)"
-                              placeholder="Type the title of your exploration.">
-      </editor-plaintext-field>
+<div class="main">
+  <div class="content">
+    <anchor-header header-id="'title'" header-text="What would you like to teach?">
+    </anchor-header>
+    <editor-plaintext-field original-value="data.title"
+                            on-finish-editing="saveTitle(newValue)"
+                            placeholder="Type the title of your exploration.">
+    </editor-plaintext-field>
 
-      <anchor-header header-id="'intro'" header-text="Introduction"></anchor-header>
-      <editor-html-field original-value="data.introductionHtml"
-                         on-finish-editing="saveIntroductionHtml(newValue)"
-                         placeholder="Type an introduction.">
-      </editor-html-field>
+    <anchor-header header-id="'intro'" header-text="Introduction"></anchor-header>
+    <editor-html-field original-value="data.introductionHtml"
+                       on-finish-editing="saveIntroductionHtml(newValue)"
+                       placeholder="Type an introduction.">
+    </editor-html-field>
 
-      <div ng-repeat="question in data.questionList.getQuestions() track by $index">
-        <anchor-header header-id="question.getId()" header-text="Question <[$index +1]>"></anchor-header>
+    <div ng-repeat="question in data.questionList.getQuestions() track by $index">
+      <anchor-header header-id="question.getId()" header-text="Question <[$index +1]>"></anchor-header>
 
-        <multiple-choice-editor ng-if="question.getInteractionId() === 'MultipleChoiceInput'"
-                                unique-id="question.getId()"
-                                customization-args="question.getInteractionCustomizationArgs()"
-                                answer-groups="question.getAnswerGroups()"
-                                default-outcome="question.getDefaultOutcome()"
-                                save-customization-args="saveCustomizationArgs(question.getStateName(), newValue)"
-                                save-answer-groups="saveAnswerGroups(question.getStateName(), newValue)"
-                                save-default-outcome="saveDefaultOutcome(question.getStateName(), newValue)"
-                                add-state="addState()">
-        </multiple-choice-editor>
+      <multiple-choice-editor ng-if="question.getInteractionId() === 'MultipleChoiceInput'"
+                              unique-id="question.getId()"
+                              customization-args="question.getInteractionCustomizationArgs()"
+                              answer-groups="question.getAnswerGroups()"
+                              default-outcome="question.getDefaultOutcome()"
+                              save-customization-args="saveCustomizationArgs(question.getStateName(), newValue)"
+                              save-answer-groups="saveAnswerGroups(question.getStateName(), newValue)"
+                              save-default-outcome="saveDefaultOutcome(question.getStateName(), newValue)"
+                              add-state="addState()">
+      </multiple-choice-editor>
 
-        <!-- TODO(sll): Update this condition when control of individual field visibility is added. -->
-        <div ng-if="!$last">
-          <anchor-header header-id="getSubfieldId(question, 'Bridge text')"
-                         header-text="Bridge text"></anchor-header>
-          <editor-html-field original-value="question.getBridgeHtml()"
-                             on-finish-editing="saveBridgeHtml(question.getStateName(), newValue)">
-          </editor-html-field>
-        </div>
+      <!-- TODO(sll): Update this condition when control of individual field visibility is added. -->
+      <div ng-if="!$last">
+        <anchor-header header-id="getSubfieldId(question, 'Bridge text')"
+                       header-text="Bridge text"></anchor-header>
+        <editor-html-field original-value="question.getBridgeHtml()"
+                           on-finish-editing="saveBridgeHtml(question.getStateName(), newValue)">
+        </editor-html-field>
       </div>
     </div>
-
-    <div class="advance-btn-wrapper">
-      <span class="advance-btn-description" ng-show="advBtnHovered">Add new question</span>
-      <button ng-disabled="!canAddNewQuestion()" type="button"
-              class="btn btn-default advance-btn" ng-click="addNewQuestion(); advBtnHovered = false"
-              ng-mouseenter="advBtnHovered = true" ng-mouseleave="advBtnHovered = false">
-        <i class="material-icons md-30">&#xE5CF;</i>
-      </button>
-    </div>
-    <div class="advance-btn-wrapper end-exploration-btn-wrapper">
-      <span class="advance-btn-description" ng-show="finishBtnHovered">Finish exploration</span>
-      <button ng-show="canTryToFinishExploration()" ng-disabled="!isExplorationFinishable()" type="button"
-              class="btn btn-default advance-btn"
-              ng-click="publishChanges(); finishBtnHovered = false"
-              ng-mouseenter="finishBtnHovered = true" ng-mouseleave="finishBtnHovered = false">
-        <i class="material-icons md-30">&#xE047;</i>
-      </button>
-    </div>
   </div>
-</script>
+
+  <div class="advance-btn-wrapper">
+    <span class="advance-btn-description" ng-show="advBtnHovered">Add new question</span>
+    <button ng-disabled="!canAddNewQuestion()" type="button"
+            class="btn btn-default advance-btn" ng-click="addNewQuestion(); advBtnHovered = false"
+            ng-mouseenter="advBtnHovered = true" ng-mouseleave="advBtnHovered = false">
+      <i class="material-icons md-30">&#xE5CF;</i>
+    </button>
+  </div>
+  <div class="advance-btn-wrapper end-exploration-btn-wrapper">
+    <span class="advance-btn-description" ng-show="finishBtnHovered">Finish exploration</span>
+    <button ng-show="canTryToFinishExploration()" ng-disabled="!isExplorationFinishable()" type="button"
+            class="btn btn-default advance-btn"
+            ng-click="publishChanges(); finishBtnHovered = false"
+            ng-mouseenter="finishBtnHovered = true" ng-mouseleave="finishBtnHovered = false">
+      <i class="material-icons md-30">&#xE047;</i>
+    </button>
+  </div>
+</div>
 
 <style>
   simple-editor-body h3 {

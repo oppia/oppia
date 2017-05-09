@@ -783,6 +783,7 @@ var ResponseEditor = function(responseNum) {
       // Save the new rule.
       element(by.css('.protractor-test-save-answer')).click();
     },
+    // eslint-disable-next-line quote-props
     delete: function() {
       headerElem.element(by.css('.protractor-test-delete-response')).click();
       element(by.css('.protractor-test-confirm-delete-response')).click();
@@ -864,6 +865,7 @@ var FallbackEditor = function(fallbackNum) {
       // Save destination.
       element(by.css('.protractor-test-save-outcome-dest')).click();
     },
+    // eslint-disable-next-line quote-props
     delete: function() {
       headerElem.element(by.css('.protractor-test-delete-response')).click();
       element(by.css('.protractor-test-confirm-delete-fallback')).click();
@@ -1042,12 +1044,13 @@ var setLanguage = function(language) {
 
 var expectAvailableFirstStatesToBe = function(names) {
   runFromSettingsTab(function() {
-    element(by.css('.protractor-test-initial-state-select')).
-        all(by.tagName('option')).map(function(elem) {
-      return elem.getText();
-    }).then(function(options) {
-      expect(options.sort()).toEqual(names.sort());
-    });
+    element(by.css('.protractor-test-initial-state-select'))
+      .all(by.tagName('option')).map(function(elem) {
+        return elem.getText();
+      }).then(function(options) {
+        expect(options.sort()).toEqual(names.sort());
+      }
+    );
   });
 };
 
@@ -1139,44 +1142,49 @@ var _selectComparedVersions = function(v1, v2) {
   var v1Position = null;
   var v2Position = null;
   element.all(by.css('.protractor-test-history-checkbox-selector')).count()
-      .then(function(versionNumber) {
-    if (v1 < 0) {
-      throw Error('In editor._selectComparedVersions(' + v1 + ', ' + v2 + '),' +
-      'expected v1 to be >= 0');
-    }
-    if (v2 < 0) {
-      throw Error('In editor._selectComparedVersions(' + v1 + ', ' + v2 + '),' +
-      'expected v2 to be >= 0');
-    }
-    // Check to ensure no negative indices are queried
-    if (v1 > versionNumber) {
-      throw Error(
-        'In editor._selectComparedVersions(' + v1 + ', ' + v2 + '),' +
-        'expected v1 to be less than or equal to total number of saved ' +
-        'revisions');
-    }
-    if (v2 > versionNumber) {
-      throw Error('In editor._selectComparedVersions(' + v1 + ', ' + v2 + '),' +
-      'expected v2 be less than or equal to total number of saved revisions');
-    }
+    .then(function(versionNumber) {
+      if (v1 < 0) {
+        throw Error(
+          'In editor._selectComparedVersions(' + v1 + ', ' + v2 + '),' +
+          'expected v1 to be >= 0');
+      }
+      if (v2 < 0) {
+        throw Error(
+          'In editor._selectComparedVersions(' + v1 + ', ' + v2 + '),' +
+          'expected v2 to be >= 0');
+      }
+      // Check to ensure no negative indices are queried
+      if (v1 > versionNumber) {
+        throw Error(
+          'In editor._selectComparedVersions(' + v1 + ', ' + v2 + '),' +
+          'expected v1 to be less than or equal to total number of saved ' +
+          'revisions');
+      }
+      if (v2 > versionNumber) {
+        throw Error(
+          'In editor._selectComparedVersions(' + v1 + ', ' + v2 + '),' +
+        'expected v2 be less than or equal to total number of saved revisions');
+      }
 
-    v1Position = versionNumber - v1;
-    v2Position = versionNumber - v2;
+      v1Position = versionNumber - v1;
+      v2Position = versionNumber - v2;
 
-    element.all(by.css('.protractor-test-history-checkbox-selector'))
-      .get(v1Position).click();
-    element.all(by.css('.protractor-test-history-checkbox-selector'))
-      .get(v2Position).click();
-    browser.waitForAngular();
-  });
+      element.all(by.css('.protractor-test-history-checkbox-selector'))
+        .get(v1Position).click();
+      element.all(by.css('.protractor-test-history-checkbox-selector'))
+        .get(v2Position).click();
+      browser.waitForAngular();
+    }
+  );
 
   // Click button to show graph if necessary
   element(by.css('.protractor-test-show-history-graph')).isDisplayed()
-      .then(function(isDisplayed) {
-    if (isDisplayed) {
-      element(by.css('.protractor-test-show-history-graph')).click();
+    .then(function(isDisplayed) {
+      if (isDisplayed) {
+        element(by.css('.protractor-test-show-history-graph')).click();
+      }
     }
-  });
+  );
 };
 
 var expectGraphComparisonOf = function(v1, v2) {
@@ -1188,21 +1196,22 @@ var expectGraphComparisonOf = function(v1, v2) {
   //   - 'color': color of the node
   var _expectHistoryStatesToBe = function(expectedStates) {
     element(by.css('.protractor-test-history-graph'))
-        .all(by.css('.protractor-test-node')).map(function(stateNode) {
-      return {
-        label: stateNode.element(
-          by.css('.protractor-test-node-label')).getText(),
-        color: stateNode.element(
-          by.css('.protractor-test-node-background')).getCssValue('fill')
-      };
-    }).then(function(states) {
-      // Note: we need to compare this way because the state graph is sometimes
-      // generated with states in different configurations.
-      expect(states.length).toEqual(expectedStates.length);
-      for (var i = 0; i < states.length; i++) {
-        expect(expectedStates).toContain(states[i]);
+      .all(by.css('.protractor-test-node')).map(function(stateNode) {
+        return {
+          label: stateNode.element(
+            by.css('.protractor-test-node-label')).getText(),
+          color: stateNode.element(
+            by.css('.protractor-test-node-background')).getCssValue('fill')
+        };
+      }).then(function(states) {
+        // Note: we need to compare this way because the state graph is
+        // sometimes generated with states in different configurations.
+        expect(states.length).toEqual(expectedStates.length);
+        for (var i = 0; i < states.length; i++) {
+          expect(expectedStates).toContain(states[i]);
+        }
       }
-    });
+    );
   };
 
   // Checks that the history graph contains totalLinks links altogether,
@@ -1215,48 +1224,49 @@ var expectGraphComparisonOf = function(v1, v2) {
     var addedCount = 0;
     var deletedCount = 0;
     element(by.css('.protractor-test-history-graph'))
-        .all(by.css('.protractor-test-link')).map(function(link) {
-      return link.getCssValue('stroke').then(function(linkColor) {
-        if (linkColor === COLOR_ADDED) {
-          return 'added';
-        } else if (linkColor === COLOR_DELETED) {
-          return 'deleted';
-        } else {
-          return 'other';
+      .all(by.css('.protractor-test-link')).map(function(link) {
+        return link.getCssValue('stroke').then(function(linkColor) {
+          if (linkColor === COLOR_ADDED) {
+            return 'added';
+          } else if (linkColor === COLOR_DELETED) {
+            return 'deleted';
+          } else {
+            return 'other';
+          }
+        });
+      }).then(function(linkTypes) {
+        var totalCount = 0;
+        var addedCount = 0;
+        var deletedCount = 0;
+        for (var i = 0; i < linkTypes.length; i++) {
+          totalCount++;
+          if (linkTypes[i] === 'added') {
+            addedCount++;
+          } else if (linkTypes[i] === 'deleted') {
+            deletedCount++;
+          }
         }
-      });
-    }).then(function(linkTypes) {
-      var totalCount = 0;
-      var addedCount = 0;
-      var deletedCount = 0;
-      for (var i = 0; i < linkTypes.length; i++) {
-        totalCount++;
-        if (linkTypes[i] === 'added') {
-          addedCount++;
-        } else if (linkTypes[i] === 'deleted') {
-          deletedCount++;
-        }
-      }
 
-      if (totalCount !== totalLinks) {
-        throw Error(
-          'In editor.expectGraphComparisonOf(' + v1 + ', ' + v2 + '), ' +
-          'expected to find ' + totalLinks + ' links in total, ' +
-          'but found ' + totalCount);
+        if (totalCount !== totalLinks) {
+          throw Error(
+            'In editor.expectGraphComparisonOf(' + v1 + ', ' + v2 + '), ' +
+            'expected to find ' + totalLinks + ' links in total, ' +
+            'but found ' + totalCount);
+        }
+        if (addedCount !== addedLinks) {
+          throw Error(
+            'In editor.expectGraphComparisonOf(' + v1 + ', ' + v2 + '), ' +
+            'expected to find ' + addedLinks + ' added links, ' + 'but found ' +
+            addedCount);
+        }
+        if (deletedCount !== deletedLinks) {
+          throw Error(
+            'In editor.expectGraphComparisonOf(' + v1 + ', ' + v2 + '), ' +
+            'expected to find ' + deletedLinks + ' deleted links, ' +
+            'but found ' + deletedCount);
+        }
       }
-      if (addedCount !== addedLinks) {
-        throw Error(
-          'In editor.expectGraphComparisonOf(' + v1 + ', ' + v2 + '), ' +
-          'expected to find ' + addedLinks + ' added links, ' + 'but found ' +
-          addedCount);
-      }
-      if (deletedCount !== deletedLinks) {
-        throw Error(
-          'In editor.expectGraphComparisonOf(' + v1 + ', ' + v2 + '), ' +
-          'expected to find ' + deletedLinks + ' deleted links, ' +
-          'but found ' + deletedCount);
-      }
-    });
+    );
   };
 
   return {

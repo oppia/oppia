@@ -37,10 +37,11 @@ var DictionaryEditor = function(elem) {
 var ListEditor = function(elem) {
   // NOTE: this returns a promise, not an integer.
   var _getLength = function() {
-    return elem.all(by.repeater('item in localValue track by $index')).
-        then(function(items) {
-      return items.length;
-    });
+    return elem.all(by.repeater('item in localValue track by $index'))
+      .then(function(items) {
+        return items.length;
+      }
+    );
   };
   // If objectType is specified this returns an editor for objects of that type
   // which can be used to make changes to the newly-added item (for example
@@ -217,16 +218,17 @@ var AutocompleteMultiDropdownEditor = function(elem) {
     setValues: function(texts) {
       // Clear all existing choices.
       elem.element(by.css('.select2-choices'))
-          .all(by.tagName('li')).map(function(choiceElem) {
-        return choiceElem.element(by.css('.select2-search-choice-close'));
-      }).then(function(deleteButtons) {
-        // We iterate in descending order, because clicking on a delete button
-        // removes the element from the DOM. We also omit the last element
-        // because it is the field for new input.
-        for (var i = deleteButtons.length - 2; i >= 0; i--) {
-          deleteButtons[i].click();
+        .all(by.tagName('li')).map(function(choiceElem) {
+          return choiceElem.element(by.css('.select2-search-choice-close'));
+        }).then(function(deleteButtons) {
+          // We iterate in descending order, because clicking on a delete button
+          // removes the element from the DOM. We also omit the last element
+          // because it is the field for new input.
+          for (var i = deleteButtons.length - 2; i >= 0; i--) {
+            deleteButtons[i].click();
+          }
         }
-      });
+      );
 
       for (var i = 0; i < texts.length; i++) {
         elem.element(by.css('.select2-container')).click();
@@ -235,14 +237,15 @@ var AutocompleteMultiDropdownEditor = function(elem) {
     },
     expectCurrentSelectionToBe: function(expectedCurrentSelection) {
       elem.element(by.css('.select2-choices'))
-          .all(by.tagName('li')).map(function(choiceElem) {
-        return choiceElem.getText();
-      }).then(function(actualSelection) {
-        // Remove the element corresponding to the last <li>, which actually
-        // corresponds to the field for new input.
-        actualSelection.pop();
-        expect(actualSelection).toEqual(expectedCurrentSelection);
-      });
+        .all(by.tagName('li')).map(function(choiceElem) {
+          return choiceElem.getText();
+        }).then(function(actualSelection) {
+          // Remove the element corresponding to the last <li>, which actually
+          // corresponds to the field for new input.
+          actualSelection.pop();
+          expect(actualSelection).toEqual(expectedCurrentSelection);
+        }
+      );
     }
   };
 };
@@ -298,14 +301,15 @@ var MultiSelectEditor = function(elem) {
 
       // Find the selected elements.
       elem.element(by.css('.dropdown-menu'))
-          .all(by.css('.protractor-test-selected')).map(function(selectedElem) {
-        return selectedElem.getText();
-      }).then(function(actualSelection) {
-        expect(actualSelection).toEqual(expectedCurrentSelection);
+        .all(by.css('.protractor-test-selected')).map(function(selectedElem) {
+          return selectedElem.getText();
+        }).then(function(actualSelection) {
+          expect(actualSelection).toEqual(expectedCurrentSelection);
 
-        // Close the dropdown menu at the end.
-        elem.element(by.css('.dropdown-toggle')).click();
-      });
+          // Close the dropdown menu at the end.
+          elem.element(by.css('.dropdown-toggle')).click();
+        }
+      );
     }
   };
 };
@@ -385,7 +389,9 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
 
   var _readFormattedText = function(text, tagName) {
     expect(arrayOfElems[arrayPointer].getTagName()).toBe(tagName);
-    expect(arrayOfElems[arrayPointer].getInnerHtml()).toBe(text);
+    expect(
+      arrayOfElems[arrayPointer].getAttribute('innerHTML')
+      ).toBe(text);
     expect(arrayOfTexts[arrayPointer]).toEqual(text);
     arrayPointer = arrayPointer + 1;
     textPointer = textPointer + text.length;
@@ -492,23 +498,25 @@ var CodeMirrorChecker = function(elem) {
     general.waitForSystem();
     elem.all(by.xpath('./div')).map(function(lineElement) {
       return lineElement.element(by.css('.CodeMirror-linenumber')).getText()
-          .then(function(lineNumber) {
-        // Note: the last line in codemirror will have an empty string for line
-        // number and for text. This is to skip that line.
-        if (lineNumber === '') {
+        .then(function(lineNumber) {
+          // Note: the last line in codemirror will have an empty string for
+          // line number and for text. This is to skip that line.
+          if (lineNumber === '') {
+            return lineNumber;
+          }
+          if (!compareDict.hasOwnProperty(lineNumber)) {
+            throw Error('Line ' + lineNumber + ' not found in CodeMirror');
+          }
+          expect(lineElement.element(by.xpath('./pre')).getText())
+            .toEqual(compareDict[lineNumber].text);
+          expect(
+            lineElement.element(
+              by.css('.CodeMirror-linebackground')).isPresent())
+            .toEqual(compareDict[lineNumber].highlighted);
+          compareDict[lineNumber].checked = true;
           return lineNumber;
         }
-        if (!compareDict.hasOwnProperty(lineNumber)) {
-          throw Error('Line ' + lineNumber + ' not found in CodeMirror');
-        }
-        expect(lineElement.element(by.xpath('./pre')).getText())
-          .toEqual(compareDict[lineNumber].text);
-        expect(
-          lineElement.element(by.css('.CodeMirror-linebackground')).isPresent())
-          .toEqual(compareDict[lineNumber].highlighted);
-        compareDict[lineNumber].checked = true;
-        return lineNumber;
-      });
+      );
     }).then(function(lineNumbers) {
       var largestLineNumber = lineNumbers[lineNumbers.length - 1];
       if (largestLineNumber !== currentLineNumber) {

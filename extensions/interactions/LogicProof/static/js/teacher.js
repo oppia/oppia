@@ -196,9 +196,8 @@ var logicProofTeacher = (function() {
         content: ' has already been defined.'
       }]],
       parameters: {
-        // jscs:disable disallowQuotedKeysInObjects
+        // eslint-disable-next-line quote-props
         'function': {
-          // jscs:enable disallowQuotedKeysInObjects
           format: 'string'
         }
       }

@@ -16,70 +16,75 @@
  * @fileoverview Directive for the body of the simple editor.
  */
 
-oppia.directive('simpleEditorBody', [function() {
-  return {
-    restrict: 'E',
-    scope: {},
-    templateUrl: 'simpleEditor/body',
-    controller: [
-      '$scope', 'SimpleEditorManagerService',
-      'explorationSaveService', 'explorationRightsService',
-      'explorationWarningsService', 'QuestionIdService',
-      function($scope, SimpleEditorManagerService,
-          explorationSaveService, explorationRightsService,
-          explorationWarningsService, QuestionIdService) {
-        $scope.data = SimpleEditorManagerService.getData();
+oppia.directive('simpleEditorBody', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/exploration_editor/simple_editor_tab/' +
+        'simple_editor_body_directive.html'),
+      controller: [
+        '$scope', 'SimpleEditorManagerService',
+        'explorationSaveService', 'explorationRightsService',
+        'explorationWarningsService', 'QuestionIdService',
+        function($scope, SimpleEditorManagerService,
+            explorationSaveService, explorationRightsService,
+            explorationWarningsService, QuestionIdService) {
+          $scope.data = SimpleEditorManagerService.getData();
 
-        $scope.saveTitle = SimpleEditorManagerService.saveTitle;
-        $scope.saveIntroductionHtml = (
-          SimpleEditorManagerService.saveIntroductionHtml);
-        $scope.saveCustomizationArgs = (
-          SimpleEditorManagerService.saveCustomizationArgs);
-        $scope.saveAnswerGroups = SimpleEditorManagerService.saveAnswerGroups;
-        $scope.saveDefaultOutcome = (
-          SimpleEditorManagerService.saveDefaultOutcome);
-        $scope.saveBridgeHtml = SimpleEditorManagerService.saveBridgeHtml;
-        $scope.canAddNewQuestion = SimpleEditorManagerService.canAddNewQuestion;
-        $scope.addState = SimpleEditorManagerService.addState;
-        $scope.addNewQuestion = SimpleEditorManagerService.addNewQuestion;
-        $scope.canTryToFinishExploration =
-          SimpleEditorManagerService.canTryToFinishExploration;
+          $scope.saveTitle = SimpleEditorManagerService.saveTitle;
+          $scope.saveIntroductionHtml = (
+            SimpleEditorManagerService.saveIntroductionHtml);
+          $scope.saveCustomizationArgs = (
+            SimpleEditorManagerService.saveCustomizationArgs);
+          $scope.saveAnswerGroups = SimpleEditorManagerService.saveAnswerGroups;
+          $scope.saveDefaultOutcome = (
+            SimpleEditorManagerService.saveDefaultOutcome);
+          $scope.saveBridgeHtml = SimpleEditorManagerService.saveBridgeHtml;
+          $scope.canAddNewQuestion = (
+            SimpleEditorManagerService.canAddNewQuestion);
+          $scope.addState = SimpleEditorManagerService.addState;
+          $scope.addNewQuestion = SimpleEditorManagerService.addNewQuestion;
+          $scope.canTryToFinishExploration =
+            SimpleEditorManagerService.canTryToFinishExploration;
 
-        $scope.getSubfieldId = function(question, label) {
-          return QuestionIdService.getSubfieldId(question.getId(), label);
-        };
-        $scope.isExplorationFinishable = function() {
-          if (explorationRightsService.isPrivate()) {
-            if (!explorationWarningsService.countWarnings()) {
+          $scope.getSubfieldId = function(question, label) {
+            return QuestionIdService.getSubfieldId(question.getId(), label);
+          };
+          $scope.isExplorationFinishable = function() {
+            if (explorationRightsService.isPrivate()) {
+              if (!explorationWarningsService.countWarnings()) {
+                return true;
+              }
+            } else if (explorationSaveService.isExplorationSaveable()) {
               return true;
             }
-          } else if (explorationSaveService.isExplorationSaveable()) {
-            return true;
-          }
 
-          return false;
-        };
+            return false;
+          };
 
-        $scope.publishChanges = function() {
-          // If exploration is not yet published
-          // and doesn't have unsaved changes,
-          // we can just open publishing modal straight away.
-          if (explorationRightsService.isPrivate() &&
-              !explorationSaveService.isExplorationSaveable()) {
-            explorationSaveService.showPublishExplorationModal();
-          } else {
-            explorationSaveService.saveChanges()
-              .then(function(saveSucceeded) {
-                // The publish modal is shown here only if changes were saved
-                // and the exploration has not been published yet.
-                if (saveSucceeded &&
-                    explorationRightsService.isPrivate()) {
-                  explorationSaveService.showPublishExplorationModal();
-                }
-              });
-          }
-        };
-      }
-    ]
-  };
-}]);
+          $scope.publishChanges = function() {
+            // If exploration is not yet published
+            // and doesn't have unsaved changes,
+            // we can just open publishing modal straight away.
+            if (explorationRightsService.isPrivate() &&
+                !explorationSaveService.isExplorationSaveable()) {
+              explorationSaveService.showPublishExplorationModal();
+            } else {
+              explorationSaveService.saveChanges()
+                .then(function(saveSucceeded) {
+                  // The publish modal is shown here only if changes were saved
+                  // and the exploration has not been published yet.
+                  if (saveSucceeded &&
+                      explorationRightsService.isPrivate()) {
+                    explorationSaveService.showPublishExplorationModal();
+                  }
+                });
+            }
+          };
+        }
+      ]
+    };
+  }
+]);
