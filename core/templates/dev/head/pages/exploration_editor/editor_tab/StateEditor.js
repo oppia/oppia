@@ -169,7 +169,7 @@ oppia.factory('trainingModalService', [
                 var explorationId =
                   explorationContextService.getExplorationId();
                 var explorationVersion =
-                  explorationData.data.version
+                  explorationData.data.version;
                 var currentStateName =
                   editorContextService.getActiveStateName();
                 var state = explorationStatesService.getState(currentStateName);

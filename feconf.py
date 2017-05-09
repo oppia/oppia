@@ -70,14 +70,12 @@ OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
     os.getcwd(), 'extensions', 'interactions', 'rule_templates.json')
 
-# A mapping of interaction ids to their default classifier.
+# A mapping of interaction ids to classifier properties.
 INTERACTION_CLASSIFIER_MAPPING = {
-    'TextInput': 'LDAStringClassifier'
-}
-
-# A mapping of classifier algorithms to classifier schema data versions.
-CLASSIFIER_VERSION_MAPPING = {
-    'LDAStringClassifier': 1
+    'TextInput': {
+        'classifier_id' : 'LDAStringClassifier',
+        'current_data_schema_version' : 1
+    }
 }
 
 # Default label for classification algorithms.

@@ -127,9 +127,9 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
         self.state_name = 'Home'
         exp_services.load_demo(self.unused_exp_id)
 
-        test_exp_filepath = os.path.join(
+        exp_yaml_filepath = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
-        yaml_content = utils.get_file_contents(test_exp_filepath)
+        yaml_content = utils.get_file_contents(exp_yaml_filepath)
         assets_list = []
         exp_services.save_new_exploration_from_yaml_and_assets(
             feconf.SYSTEM_COMMITTER_ID, yaml_content, self.exp_id,
@@ -148,9 +148,9 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
             old_state_dict = self.exp_state.to_dict()
             answer = 'Permutations'
             params = {}
-            res = self.post_json('/explorehandler/classify/%s'
-                                 % self.unused_exp_id,
-                                 {'params' : params,
+            res = self.post_json(
+                '/explorehandler/classify/%s' % self.unused_exp_id, {
+                                  'params' : params,
                                   'old_state' : old_state_dict,
                                   'answer' : answer,
                                   'state_name' : self.state_name,

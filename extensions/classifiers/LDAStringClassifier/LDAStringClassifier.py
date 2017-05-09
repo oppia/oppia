@@ -516,7 +516,7 @@ class LDAStringClassifier(BaseClassifier):
         Args:
             model: A dict representing a StringClassifier.
         """
-        model = self._unpickle_json_serialization(model)
+        model = self._convert_json_to_numpy(model)
         self._alpha = copy.deepcopy(model['_alpha'])
         self._beta = copy.deepcopy(model['_beta'])
         self._prediction_threshold = copy.deepcopy(
@@ -547,43 +547,61 @@ class LDAStringClassifier(BaseClassifier):
         Returns:
             model: A dict representing a StringClassifier
         """
-        model["_b_dl"] = model["_b_dl"].tolist()
-        for k in range(len(model["_b_dl"])):
-            for i in range(len(model["_b_dl"][k])):
-                if isinstance(model["_b_dl"][k][i], numpy.integer):
-                    model["_b_dl"][k][i] = int(model["_b_dl"][k][i])
-                elif isinstance(model["_b_dl"][k][i], numpy.floating):
-                    model["_b_dl"][k][i] = float(model["_b_dl"][k][i])
-        model["_c_dl"] = model["_c_dl"].tolist()
-        for k in range(len(model["_c_dl"])):
-            for i in range(len(model["_c_dl"][k])):
-                if isinstance(model["_c_dl"][k][i], numpy.integer):
-                    model["_c_dl"][k][i] = int(model["_c_dl"][k][i])
-                elif isinstance(model["_c_dl"][k][i], numpy.floating):
-                    model["_c_dl"][k][i] = float(model["_c_dl"][k][i])
-        model["_c_lw"] = model["_c_lw"].tolist()
-        for k in range(len(model["_c_lw"])):
-            for i in range(len(model["_c_lw"][k])):
-                if isinstance(model["_c_lw"][k][i], numpy.integer):
-                    model["_c_lw"][k][i] = int(model["_c_lw"][k][i])
-                elif isinstance(model["_c_lw"][k][i], numpy.floating):
-                    model["_c_lw"][k][i] = float(model["_c_lw"][k][i])
-        model["_c_l"] = model["_c_l"].tolist()
-        for k in range(len(model["_c_l"])):
-            if isinstance(model["_c_l"][k], numpy.integer):
-                model["_c_lw"][k] = int(model["_c_lw"][k])
-            elif isinstance(model["_c_l"][k], numpy.floating):
-                model["_c_lw"][k] = float(model["_c_lw"][k])
-        model["_l_dp"] = model["_l_dp"]
-        for k in range(len(model["_l_dp"])):
-            for i in range(len(model["_l_dp"][k])):
-                if isinstance(model["_l_dp"][k][i], numpy.integer):
-                    model["_l_dp"][k][i] = int(model["_l_dp"][k][i])
-                elif isinstance(model["_l_dp"][k][i], numpy.floating):
-                    model["_l_dp"][k][i] = float(model["_l_dp"][k][i])
+
+        conversion_list_of_list_properties = [
+            '_b_dl',
+            '_c_dl',
+            '_c_lw'
+        ]
+        
+        conversion_list_properties = [
+            '_c_l'
+        ]
+
+        conversion_properties = [
+            '_l_dp'
+        ]
+
+        for classifier_property in conversion_list_of_list_properties:
+            model[classifier_property] = model[classifier_property].tolist()
+            for k in range(len(model[classifier_property])):
+                for i in range(len(model[classifier_property][k])):
+                    if isinstance(
+                        model[classifier_property][k][i], numpy.integer):
+                            model[classifier_property][k][i] = int(
+                                model[classifier_property][k][i])
+                    elif isinstance(
+                        model[classifier_property][k][i], numpy.floating):
+                            model[classifier_property][k][i] = float(
+                                model[classifier_property][k][i])
+
+        for classifier_property in conversion_list_properties:
+            model[classifier_property] = model[classifier_property].tolist()
+            for k in range(len(model[classifier_property])):
+                if isinstance(
+                    model[classifier_property][k], numpy.integer):
+                        model[classifier_property][k] = int(
+                            model[classifier_property][k])
+                elif isinstance(
+                    model[classifier_property][k], numpy.floating):
+                        model[classifier_property][k] = float(
+                            model[classifier_property][k])
+
+        for classifier_property in conversion_properties:
+            model[classifier_property] = model[classifier_property]
+            for k in range(len(model[classifier_property])):
+                for i in range(len(model[classifier_property][k])):
+                    if isinstance(
+                        model[classifier_property][k][i], numpy.integer):
+                            model[classifier_property][k][i] = int(
+                                model[classifier_property][k][i])
+                    elif isinstance(
+                        model[classifier_property][k][i], numpy.floating):
+                            model[classifier_property][k][i] = float(
+                                model[classifier_property][k][i])
         return model
 
-    def _unpickle_json_serialization(self, model):
+    def _convert_json_to_numpy(self, model):
         """Converts the JSON serialized data back to Numpy format.
 
         Args:
