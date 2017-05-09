@@ -26,7 +26,6 @@ oppia.directive('schemaBasedDictEditor', [
         // Read-only property. An object whose keys and values are the dict
         // properties and the corresponding schemas.
         propertySchemas: '&',
-        allowExpressions: '&',
         labelForFocusTarget: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
