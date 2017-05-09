@@ -57,7 +57,6 @@ def _count_at_least_editable_exploration_summaries(user_id):
 
 class ExplorationServicesUnitTests(test_utils.GenericTestBase):
     """Test the exploration services module."""
-
     EXP_ID = 'An_exploration_id'
 
     def setUp(self):
@@ -83,7 +82,6 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
 
 class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
     """Tests query methods."""
-
     def test_get_exploration_titles_and_categories(self):
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories([]), {})
@@ -314,7 +312,6 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
 
 class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     """Test creation and deletion methods."""
-
     def test_retrieval_of_explorations(self):
         """Test the get_exploration_by_id() method."""
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
@@ -464,7 +461,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, [{
-                'cmd': 'edit_exploration_property',
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'param_specs',
                 'new_value': {
                     'theParameter':
@@ -487,7 +484,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         # Change param spec.
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, [{
-                'cmd': 'edit_exploration_property',
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'param_specs',
                 'new_value': {
                     'theParameter':
@@ -498,11 +495,11 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         # Change title and category.
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, [{
-                'cmd': 'edit_exploration_property',
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'A new title'
             }, {
-                'cmd': 'edit_exploration_property',
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'category',
                 'new_value': 'A new category'
             }], 'Change title and category')
@@ -567,7 +564,6 @@ class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
 # pylint: disable=protected-access
 class ZipFileExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations represented as zip files."""
-
     SAMPLE_YAML_CONTENT = ("""author_notes: ''
 blurb: ''
 category: A category
@@ -777,7 +773,6 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations represented as a dict whose keys
     are state names and whose values are YAML strings representing the state's
     contents."""
-
     _SAMPLE_INIT_STATE_CONTENT = ("""classifier_model_id: null
 content:
 - type: text
@@ -900,16 +895,128 @@ param_changes: []
 def _get_change_list(state_name, property_name, new_value):
     """Generates a change list for a single state change."""
     return [{
-        'cmd': 'edit_state_property',
+        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
         'state_name': state_name,
         'property_name': property_name,
         'new_value': new_value
     }]
 
 
+class UpdateGadgetTests(ExplorationServicesUnitTests):
+    """Test updating a gadget."""
+    def setUp(self):
+        super(UpdateGadgetTests, self).setUp()
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id)
+        # Default outcome specification for an interaction.
+        self.init_state_name = exploration.init_state_name
+
+        self.interaction_default_outcome = {
+            'dest': self.init_state_name,
+            'feedback': ['Incorrect', '<b>Wrong answer</b>'],
+            'param_changes': []
+        }
+
+    def test_add_gadget_cmd(self):
+        """Test adding of a gadget."""
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+
+        self.assertNotIn('NewGadget', exploration.get_all_gadget_names())
+        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
+            'cmd': exp_domain.CMD_ADD_GADGET,
+            'panel': 'bottom',
+            'gadget_dict' : {
+                'gadget_type': 'ScoreBar',
+                'gadget_name': 'NewGadget',
+                'customization_args': {
+                    'adviceObjects': {
+                        'value': [{
+                            'adviceTitle': 'b',
+                            'adviceHtml': '<p>c</p>'
+                        }]
+                    }
+                },
+                'visible_in_states':[feconf.DEFAULT_INIT_STATE_NAME]}
+            }], 'add a new gadget')
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+
+        self.assertIn('NewGadget', exploration.get_all_gadget_names())
+
+    def test_rename_gadget_cmd(self):
+        """Test renaming a gadget."""
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+
+        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
+            'cmd': exp_domain.CMD_ADD_GADGET,
+            'panel': 'bottom',
+            'gadget_dict' : {
+                'gadget_type': 'ScoreBar',
+                'gadget_name': 'Gadget',
+                'customization_args': {
+                    'adviceObjects': {
+                        'value': [{
+                            'adviceTitle': 'b',
+                            'adviceHtml': '<p>c</p>'
+                        }]
+                    }
+                },
+                'visible_in_states':[feconf.DEFAULT_INIT_STATE_NAME]}
+            }], 'add a new gadget')
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+
+        self.assertIn('Gadget', exploration.get_all_gadget_names())
+        self.assertNotIn('RenameGadget', exploration.get_all_gadget_names())
+
+        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
+            'cmd': exp_domain.CMD_RENAME_GADGET,
+            'new_gadget_name': 'RenameGadget',
+            'old_gadget_name': 'Gadget',
+            }], 'rename a gadget')
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+
+        self.assertIn('RenameGadget', exploration.get_all_gadget_names())
+        self.assertNotIn('Gadget', exploration.get_all_gadget_names())
+
+    def test_delete_gadget_cmd(self):
+        """Test deleting a gadget."""
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+
+        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
+            'cmd': exp_domain.CMD_ADD_GADGET,
+            'panel': 'bottom',
+            'gadget_dict' : {
+                'gadget_type': 'ScoreBar',
+                'gadget_name': 'NewGadget',
+                'customization_args': {
+                    'adviceObjects': {
+                        'value': [{
+                            'adviceTitle': 'b',
+                            'adviceHtml': '<p>c</p>'
+                        }]
+                    }
+                },
+                'visible_in_states':[feconf.DEFAULT_INIT_STATE_NAME]}
+            }], 'add a new gadget')
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+
+        self.assertIn('NewGadget', exploration.get_all_gadget_names())
+
+        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
+            'cmd': exp_domain.CMD_DELETE_GADGET,
+            'gadget_name': 'NewGadget',
+            }], 'delete a gadget')
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+
+        self.assertNotIn('NewGadget', exploration.get_all_gadget_names())
+
+
 class UpdateStateTests(ExplorationServicesUnitTests):
     """Test updating a single state."""
-
     def setUp(self):
         super(UpdateStateTests, self).setUp()
         exploration = self.save_new_valid_exploration(
@@ -944,24 +1051,45 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'param_changes': []
         }
 
-    def test_update_state_name(self):
-        """Test updating of state name."""
+    def test_add_state_cmd(self):
+        """ Test adding of states."""
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+
+        self.assertNotIn('new state', exploration.states)
+
         exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-            'cmd': 'rename_state',
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': 'new state',
+        }], 'Add state name')
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertIn('new state', exploration.states)
+
+    def test_rename_state_cmd(self):
+        """Test updating of state name"""
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+
+        self.assertIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
+
+        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
+            'cmd': exp_domain.CMD_RENAME_STATE,
             'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'new_state_name': 'new name',
+            'new_state_name': 'state',
         }], 'Change state name')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        self.assertIn('new name', exploration.states)
+        self.assertIn('state', exploration.states)
         self.assertNotIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
 
-    def test_update_state_name_with_unicode(self):
+    def test_rename_state_cmd_with_unicode(self):
         """Test updating of state name to one that uses unicode characters."""
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+
+        self.assertNotIn(u'¡Hola! αβγ', exploration.states)
+        self.assertIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
+
         exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-            'cmd': 'rename_state',
+            'cmd': exp_domain.CMD_RENAME_STATE,
             'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'new_state_name': u'¡Hola! αβγ',
         }], 'Change state name')
@@ -969,6 +1097,27 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertIn(u'¡Hola! αβγ', exploration.states)
         self.assertNotIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
+
+    def test_delete_state_cmd(self):
+        """Test deleting a state name."""
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+
+        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': 'new state',
+        }], 'Add state name')
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+
+        self.assertIn('new state', exploration.states)
+
+        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
+            'cmd': exp_domain.CMD_DELETE_STATE,
+            'state_name': 'new state',
+            }], 'delete state')
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertNotIn('new state', exploration.states)
 
     def test_update_param_changes(self):
         """Test updating of param_changes."""
@@ -1255,7 +1404,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
 class CommitMessageHandlingTests(ExplorationServicesUnitTests):
     """Test the handling of commit messages."""
-
     def setUp(self):
         super(CommitMessageHandlingTests, self).setUp()
         exploration = self.save_new_valid_exploration(
@@ -1293,7 +1441,6 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
 
     def test_unpublished_explorations_can_accept_commit_message(self):
         """Test unpublished explorations can accept optional commit messages"""
-
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, _get_change_list(
                 self.init_state_name,
@@ -1315,7 +1462,6 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
 
 class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
     """Test methods relating to exploration snapshots."""
-
     SECOND_USERNAME = 'abc123'
     SECOND_EMAIL = 'abc123@gmail.com'
 
@@ -1329,7 +1475,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         exp_services.update_exploration(
             feconf.MIGRATION_BOT_USER_ID, self.EXP_ID, [{
-                'cmd': 'edit_exploration_property',
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'New title'
             }], 'Did migration.')
@@ -1388,7 +1534,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         # Modify the exploration. This affects the exploration version history.
         change_list = [{
-            'cmd': 'edit_exploration_property',
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
             'property_name': 'title',
             'new_value': 'First title'
         }]
@@ -1429,7 +1575,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         # Another person modifies the exploration.
         new_change_list = [{
-            'cmd': 'edit_exploration_property',
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
             'property_name': 'title',
             'new_value': 'New title'
         }]
@@ -1593,7 +1739,6 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
 class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     """Test methods relating to the exploration commit log."""
-
     ALBERT_EMAIL = 'albert@example.com'
     BOB_EMAIL = 'bob@example.com'
     ALBERT_NAME = 'albert'
@@ -1819,7 +1964,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
 
 class ExplorationCommitLogSpecialCasesUnitTests(ExplorationServicesUnitTests):
     """Test special cases relating to the exploration commit logs."""
-
     def test_paging_with_no_commits(self):
         all_commits = exp_services.get_next_page_of_all_commits(page_size=5)[0]
         self.assertEqual(len(all_commits), 0)
@@ -1827,7 +1971,6 @@ class ExplorationCommitLogSpecialCasesUnitTests(ExplorationServicesUnitTests):
 
 class ExplorationSearchTests(ExplorationServicesUnitTests):
     """Test exploration search."""
-
     USER_ID_1 = 'user_1'
     USER_ID_2 = 'user_2'
 
@@ -2110,7 +2253,6 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
 
 class ExplorationSummaryTests(ExplorationServicesUnitTests):
     """Test exploration summaries."""
-
     ALBERT_EMAIL = 'albert@example.com'
     BOB_EMAIL = 'bob@example.com'
     ALBERT_NAME = 'albert'
@@ -2162,7 +2304,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         # Have Albert update that exploration.
         exp_services.update_exploration(
             albert_id, self.EXP_ID_1, [{
-                'cmd': 'edit_exploration_property',
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
             }], 'Changed title.')
@@ -2194,7 +2336,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
          # Have Bob update that exploration. Version 2
         exp_services.update_exploration(
             bob_id, self.EXP_ID_1, [{
-                'cmd': 'edit_exploration_property',
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
             }], 'Changed title.')
@@ -2203,7 +2345,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         # Have Bob update that exploration. Version 3
         exp_services.update_exploration(
             bob_id, self.EXP_ID_1, [{
-                'cmd': 'edit_exploration_property',
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
             }], 'Changed title.')
@@ -2213,7 +2355,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         # Have Albert update that exploration. Version 4
         exp_services.update_exploration(
             albert_id, self.EXP_ID_1, [{
-                'cmd': 'edit_exploration_property',
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
             }], 'Changed title.')
@@ -2227,7 +2369,6 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
 
 class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
     """Test exploration summaries get_* functions."""
-
     ALBERT_EMAIL = 'albert@example.com'
     BOB_EMAIL = 'bob@example.com'
     ALBERT_NAME = 'albert'
@@ -2267,7 +2408,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
 
         exp_services.update_exploration(
             self.bob_id, self.EXP_ID_1, [{
-                'cmd': 'edit_exploration_property',
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
             }], 'Changed title.')
@@ -2276,14 +2417,14 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
 
         exp_services.update_exploration(
             self.albert_id, self.EXP_ID_1, [{
-                'cmd': 'edit_exploration_property',
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 1 Albert title'
             }], 'Changed title to Albert1 title.')
 
         exp_services.update_exploration(
             self.albert_id, self.EXP_ID_2, [{
-                'cmd': 'edit_exploration_property',
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 2 Albert title'
             }], 'Changed title to Albert2 title.')
@@ -2582,7 +2723,7 @@ title: Old Title
                 'Update exploration states from schema version 0 to %d.' %
                 feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
             'commit_cmds': [{
-                'cmd': 'migrate_states_schema_to_latest_version',
+                'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
                 'from_version': '0',
                 'to_version': str(
                     feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
@@ -2642,7 +2783,6 @@ title: Old Title
 
 class SuggestionActionUnitTests(test_utils.GenericTestBase):
     """Test learner suggestion action functions in exp_services."""
-
     THREAD_ID1 = '1111'
     EXP_ID1 = 'exp_id1'
     EXP_ID2 = 'exp_id2'
@@ -2760,7 +2900,6 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
 
 class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
     """Test editor auto saving functions in exp_services."""
-
     EXP_ID1 = 'exp_id1'
     EXP_ID2 = 'exp_id2'
     EXP_ID3 = 'exp_id3'
@@ -2771,7 +2910,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
     OLDER_DATETIME = datetime.datetime.strptime('2016-01-16', '%Y-%m-%d')
     NEWER_DATETIME = datetime.datetime.strptime('2016-03-16', '%Y-%m-%d')
     NEW_CHANGELIST = [{
-        'cmd': 'edit_exploration_property',
+        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
         'property_name': 'title',
         'new_value': 'New title'}]
 
