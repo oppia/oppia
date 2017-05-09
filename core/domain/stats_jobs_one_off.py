@@ -987,7 +987,7 @@ class ClearMigratedAnswersJob(jobs.BaseMapReduceJobManager):
 
 class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
     """This job deletes all answers stored in
-    stats_models.StateRuleAnswerLogModel which do not or cannot correspond to an
+    stats_models.StateRuleAnswerLogModel that do not or cannot correspond to an
     existing, accessible exploration.
     """
     _AGGREGATION_KEY = 'aggregation_key'
@@ -1008,6 +1008,20 @@ class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+        Deletes all answers stored in stats_models.StateRuleAnswerLogModel
+        that do not or cannot correspond to an existing, accessible exploration
+        Can also remove empty multiple choice answers or erroneously
+        non-numeric answers
+
+        Args:
+            item: StateRuleAnswerLogModel
+
+        Yields:
+            tuple. 2-tuple in the form (key, value).
+                'key': reason for deleting the item
+                'value': an empty dict
+        """
         exp_id, _, handler_name, rule_str = (
             _unpack_state_rule_answer_log_model_id(item.id))
 
@@ -1107,6 +1121,17 @@ class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Report count of deleted items per model
+
+        Args:
+            key: reason for deleting item
+            stringified_values: list(str). A list of stringified values
+                associated with the given key. The content of the values
+                will be identical; the values are merely counted.
+
+        Yields:
+            String report of deleted/modified item count per type
+        """
         removed_count = len(stringified_values)
         if key == PurgeInconsistentAnswersJob._AGGREGATION_KEY:
             yield 'Removed a total of %d answer(s)' % removed_count
