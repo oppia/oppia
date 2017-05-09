@@ -104,7 +104,8 @@ def classify_string_classifier_rule(
 
     exploration = exp_services.get_exploration_by_id(exp_id)
     state = exploration.states[state_name]
-    algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['classifier_id']
+    algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
+        'TextInput']['classifier_id']
     if state.classifier_model_id:
         classifier = get_classifier_by_id(state.classifier_model_id)
         sc_dict = classifier.cached_classifier_data
@@ -117,7 +118,8 @@ def classify_string_classifier_rule(
             algorithm_id)
         sc.train(training_examples)
         cached_classifier_data = sc.to_dict()
-        algorithm_version = feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['current_data_schema_version']
+        algorithm_version = feconf.INTERACTION_CLASSIFIER_MAPPING[
+            'TextInput']['current_data_schema_version']
         classifier = classifier_domain.Classifier(
             '0', exploration.id, exp_version, state_name, algorithm_id,
             cached_classifier_data, algorithm_version)

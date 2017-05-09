@@ -553,7 +553,7 @@ class LDAStringClassifier(BaseClassifier):
             '_c_dl',
             '_c_lw'
         ]
-        
+
         conversion_list_properties = [
             '_c_l'
         ]
