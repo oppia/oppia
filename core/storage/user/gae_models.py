@@ -103,15 +103,51 @@ class ActivitiesCompletedByLearnerModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
+    # IDs of all the explorations completed by the user.
     completed_exp_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # IDs of all the collections completed by the user.
+    completed_collection_ids = ndb.StringProperty(repeated=True, indexed=True)
 
 
-class ExplorationsPartiallyCompletedByLearnerModel(base_models.BaseModel):
+class IncompleteCollectionsModel(base_models.BaseModel):
+    """Keeps track of all the collections currently being completed by the
+    learner.
+
+    Instances of this class are keyed by the user id.
+    """
+    incomplete_collection_ids = ndb.StringProperty(
+        repeated=True, indexed=True)
+
+
+class ExplorationsPartiallyCompletedModel(base_models.BaseModel):
     """Keeps track of all the explorations currently being completed by the
     learner.
 
     Instances of this class are keyed by the user id.
     """
+    # A list which stores the explorations partially completed by the learner.
+    # Each item in the list is a json object keyed by exploration id and the
+    # value correspond to a few extra details -
+    # timestamp: When did the learner leave the exploration.
+    # version: Version of the exploration.
+    # state_name: The name of the state at which the learner left the
+    # exploration.
+    # [
+    #  {
+    #   (exp_id_1): {
+    #    'timestamp': timestamp,
+    #    'version': version,
+    #    'state_name': state_name
+    #   }
+    #  },
+    #  {
+    #   (exp_id_2): {
+    #    'timestamp': timestamp,
+    #    'version': version,
+    #    'state_name': state_name
+    #   }
+    #  },
+    # ]
     partially_completed_exps = ndb.JsonProperty(
         repeated=True, indexed=True)
 
