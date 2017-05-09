@@ -958,11 +958,30 @@ class ClearMigratedAnswersJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+
+        Args:
+            item: StateAnswersModel or MigratedAnswerModel
+
+        Yields:
+            tuple. 2-tuple in the form (model name, 'Deleted answer.').
+        """
         item.delete()
         yield (item.__class__.__name__, 'Deleted answer.')
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Report count of delete items per model
+
+        Args:
+            key: model type
+            stringified_values: list(str). A list of stringified values
+                associated with the given key. The content of the values
+                will be identical; the values are merely counted.
+
+        Yields:
+            String report of deleted item count
+        """
         yield '%s: deleted %d items' % (key, len(stringified_values))
 
 
