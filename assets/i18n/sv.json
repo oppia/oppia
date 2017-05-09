@@ -223,6 +223,7 @@
 	"I18N_TOPNAV_NOTIFICATIONS": "Notifikationer",
 	"I18N_TOPNAV_PREFERENCES": "Inställningar",
 	"I18N_TOPNAV_SIGN_IN": "Logga in",
+	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Logga in med Google",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Undervisa med Oppia",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Du har totalt <[totalSubscribers]> prenumeranter."
 }
