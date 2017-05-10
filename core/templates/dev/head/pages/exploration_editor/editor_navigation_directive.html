@@ -97,7 +97,7 @@
     {% if username %}
     <div class="nav navbar-nav oppia-navbar-nav oppia-help-dropdown pull-right ng-cloak">
       <li class="dropdown" popover-is-open="postTutorialHelpPopoverIsShown"
-          popover-placement="bottom" popover-trigger="none"
+          popover-placement="bottom" popover-trigger="click"
           popover="To get help in the future, click here!">
         <a href="#" tooltip="Help" tooltip-placement="bottom"
            class="oppia-editor-navbar-tab-anchor" ng-click="showUserHelpModal()">
@@ -111,8 +111,8 @@
     .oppia-help-dropdown .popover{
       background-color: black;
       color: white;
-      font-size: 13px;
-      max-width: 300px;
+      font-size: 14px;
+      max-width: 200px;
       text-align: center;
       z-index: -1;
     }

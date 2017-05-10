@@ -4558,9 +4558,3 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 0;
   width: 1px;
 }
-
-
-.popover.bottom.fade.in {
-  height: 56px !important;
-  width: 200px !important;
-}
