@@ -1353,6 +1353,19 @@ class AnswerMigrationValidationJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+        Performs answer migration validation on the item
+
+        Args:
+            item: StateRuleAnswerLogModel
+
+        Yields:
+            tuple. 2-tuple in the form: (key, value)
+                key: AnswerMigrationValidationJob._ERROR_KEY
+                value: error string
+
+            only if an error is found
+        """
         try:
             stats_models.MigratedAnswerModel.validate_answers_are_migrated(item)
         except utils.ValidationError as e:
@@ -1362,6 +1375,19 @@ class AnswerMigrationValidationJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Reports all errors for a given key
+
+        Args:
+              key: AnswerMigrationValidationJob._ERROR_KEY
+              stringified_values: list(str). A list of stringified values
+                  associated with the given key. An element of stringfield_values
+                  would be an error string.
+
+        Yields:
+            all error strings for a given key
+
+            only if an error is found
+        """
         if key == AnswerMigrationValidationJob._ERROR_KEY:
             for value in stringified_values:
                 yield value
