@@ -99,8 +99,8 @@ def _get_exploration_player_data(
     Args:
         exploration_id: str. The ID of the exploration to get metadata for.
         version: int or None. If specified, the version of the exploration to
-            get metadata for. However, if the exploration is being played outside the
-            context of a collection, the value should be None.
+            get metadata for. However, if the exploration is being played
+            outside the context of a collection, the value should be None.
         collection_id: str. The id of the collection which the exploration
             belongs to.
         can_edit: bool. Whether the exploration is editable by the learner.
@@ -387,8 +387,8 @@ class ClassifyHandler(base.BaseHandler):
         Returns:
             dict. A classification result, which is a dictionary containing
                 three keys.
-                'outcome': dict. A dict representing the outcome of the answer group
-                    matched.
+                'outcome': dict. A dict representing the outcome of the answer
+                    group matched.
                 'answer_group_index': int. An index into the answer groups list
                     indicating which one was selected as the group which this
                     answer belongs to. This is equal to the number of answer
