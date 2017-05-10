@@ -1380,8 +1380,8 @@ class AnswerMigrationValidationJob(jobs.BaseMapReduceJobManager):
         Args:
               key: AnswerMigrationValidationJob._ERROR_KEY
               stringified_values: list(str). A list of stringified values
-                  associated with the given key. An element of stringfield_values
-                  would be an error string.
+                  associated with the given key. An element of
+                  stringfield_values would be an error string.
 
         Yields:
             all error strings for a given key
