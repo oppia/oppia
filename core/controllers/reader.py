@@ -66,7 +66,7 @@ def require_playable(handler):
                 play the exploration.
 
         Raises:
-            PageNotFound: The learner cannot play the exploration.
+            PageNotFoundException: The learner cannot play the exploration.
         """
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             self.render_template(
@@ -99,7 +99,8 @@ def _get_exploration_player_data(
     Args:
         exploration_id: str. The ID of the exploration to get metadata for.
         version: int or None. If specified, the version of the exploration to
-            get metadata for.
+            get metadata for. However, if the exploration is being played outside the
+            context of a collection, the value should be None.
         collection_id: str. The id of the collection which the exploration
             belongs to.
         can_edit: bool. Whether the exploration is editable by the learner.
@@ -109,8 +110,7 @@ def _get_exploration_player_data(
             such as GADGET_SPECS, can_edit, title, version etc.
 
     Raises:
-        Exception: The collection is not in current available collections list
-            or any error that may occur while getting the exploration object.
+        Exception: The given exploration cannot be fetched.
     """
     try:
         exploration = exp_services.get_exploration_by_id(
@@ -184,8 +184,7 @@ class ExplorationPageEmbed(base.BaseHandler):
                 learner.
 
         Raises:
-            PageNotFound: The collection which the exploration belongs to is not
-                in the currently available list.
+            PageNotFoundException: The exploration data cannot be retrieved.
         """
         version_str = self.request.get('v')
         version = int(version_str) if version_str else None
@@ -220,12 +219,11 @@ class ExplorationPage(base.BaseHandler):
         """Handles GET requests.
 
         Args:
-           exploration_id: str. The ID of the exploration requested by the
-                learner.
+            exploration_id: str. The ID of the exploration requested by the
+              learner.
 
         Raises:
-            PageNotFound: The collection which the exploration belongs to is not
-                currently available.
+            PageNotFoundException: The exploration data cannot be retrieved.
         """
         version_str = self.request.get('v')
         version = int(version_str) if version_str else None
@@ -268,10 +266,11 @@ class ExplorationHandler(base.BaseHandler):
 
         Args:
             exploration_id: str. The ID of the exploration requested by the
-                learner.
+              learner.
 
         Raises:
-            PageNotFound: The exploration does not exist or not available.
+            PageNotFoundException: The exploration does not exist or is not
+              available.
         """
         version = self.request.get('v')
         version = int(version) if version else None
@@ -303,12 +302,10 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
     @require_playable
     def post(self, exploration_id):
         """Handles learner answer POST requests.
-        The require_playable decorator ensures the learner can play
-        the exploration with the id exploration_id.
 
         Args:
             exploration_id: str. The ID of the exploration the learner
-                has posted an answer.
+                has posted an answer to.
         """
         old_state_name = self.payload.get('old_state_name')
         answer = self.payload.get('answer')
@@ -351,12 +348,11 @@ class StateHitEventHandler(base.BaseHandler):
 
     @require_playable
     def post(self, exploration_id):
-        """Handles POST requests.
-        Records that a learner has hit new state in the exploration.
+        """Handles POST requests. Records that a learner has hit new a state in
+         the exploration.
 
         Args:
-            exploration_id: str. The ID of the exploration the learner has hit
-                a new state.
+            exploration_id: str. The ID of the exploration.
         """
         new_state_name = self.payload.get('new_state_name')
         exploration_version = self.payload.get('exploration_version')
@@ -391,17 +387,22 @@ class ClassifyHandler(base.BaseHandler):
         Returns:
             dict. A classification result, which is a dictionary containing
                 three keys.
-                'outcome': dict. A dictionary representing the outcome of the
-                    answer group matched previous state with items such as
-                     name, previous answer etc.
-                'answer_group_index': The index of the matched answer group.
-                'rule_spec_index': The index of the matched rule spec in the
-                    matched answer group.
+                'outcome': dict. A dict representing the outcome of the answer group
+                    matched.
+                'answer_group_index': int. An index into the answer groups list
+                    indicating which one was selected as the group which this
+                    answer belongs to. This is equal to the number of answer
+                    groups if the default outcome was matched.
+                'rule_spec_index': int. An index into the rule specs list of
+                    the matched answer group which was selected that indicates
+                    which rule spec was matched. This is equal to 0 if the
+                    default outcome is selected.
         """
+        # FIXME: Document 'outcome' dict keys above.
         # A domain object representing the old state.
         old_state = exp_domain.State.from_dict(self.payload.get('old_state'))
         # The learner's raw answer.
-        answer = self.payload.get('answerexp_do')
+        answer = self.payload.get('answer')
         # The learner's parameter values.
         params = self.payload.get('params')
         params['answer'] = answer
@@ -416,12 +417,12 @@ class ReaderFeedbackHandler(base.BaseHandler):
 
     @require_playable
     def post(self, exploration_id):
-        """Handles POST requests.
-        Records the feedback submitted by a learner to an exploration.
+        """Handles POST requests. Records the feedback submitted by a learner
+        to an exploration.
 
         Args:
             exploration_id: str. The ID of the exploration the learner has
-                submitted a feedback.
+                submitted feedback to.
         """
         state_name = self.payload.get('state_name')
         subject = self.payload.get('subject', 'Feedback from a learner')
@@ -447,8 +448,8 @@ class ExplorationStartEventHandler(base.BaseHandler):
         """Handles POST requests.
 
         Args:
-            exploration_id: str. The ID of the exploration the learner has
-                started exploring.
+            exploration_id: str. The ID of the exploration the learner has just
+                started.
         """
         event_services.StartExplorationEventHandler.record(
             exploration_id, self.payload.get('version'),
@@ -532,7 +533,7 @@ class RatingHandler(base.BaseHandler):
 
         Args:
             exploration_id: str. The ID of the exploration the learner wants to
-                get the rating.
+                get the rating of.
         """
         self.values.update({
             'overall_ratings':
@@ -550,8 +551,8 @@ class RatingHandler(base.BaseHandler):
         exploration.
 
         Args:
-            exploration_id: str. The ID of the exploration the learner has
-                rated.
+            exploration_id: str. The ID of the exploration the learner is
+                rating.
         """
         user_rating = self.payload.get('user_rating')
         rating_services.assign_rating_to_exploration(
@@ -575,7 +576,7 @@ class RecommendationsHandler(base.BaseHandler):
 
         Args:
             exploration_id: str. The ID of the exploration the learner wants
-                to get other recommendations.
+                to get other recommendations for.
         """
         collection_id = self.request.get('collection_id')
         include_system_recommendations = self.request.get(
