@@ -1252,11 +1252,30 @@ class ClearLargeAnswerBucketsJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+        Performs item deletion
+
+        Args:
+            item: LargeAnswerBucketModel
+
+        Yields:
+            tuple. 2-tuple in the form:
+                (ClearLargeAnswerBucketsJob._REMOVED_KEY, 1)
+        """
         item.delete()
         yield (ClearLargeAnswerBucketsJob._REMOVED_KEY, 1)
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Reports number of items deleted
+
+        Args:
+            key: ClearLargeAnswerBucketsJob._REMOVED_KEY
+             stringified_values: used for count only
+
+        Yields:
+            Report of number of items deleted
+        """
         yield '%s: %d' % (key, len(stringified_values))
 
 
