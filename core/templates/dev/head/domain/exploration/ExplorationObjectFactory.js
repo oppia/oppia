@@ -19,10 +19,12 @@
 
 oppia.factory('ExplorationObjectFactory', [
   'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE', 'StateObjectFactory',
-  'StatesObjectFactory', 'UrlInterpolationService',
+  'StatesObjectFactory', 'ParamChangesObjectFactory',
+  'UrlInterpolationService',
   function(
       INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE, StateObjectFactory,
-      StatesObjectFactory, UrlInterpolationService) {
+      StatesObjectFactory, ParamChangesObjectFactory,
+      UrlInterpolationService) {
     var Exploration = function(
         initStateName, paramChanges, paramSpecs, skinCustomizations,
         states, title, languageCode) {
@@ -84,8 +86,8 @@ oppia.factory('ExplorationObjectFactory', [
       // state_editor_interaction.html.
       var interactionId = this.getInteractionId(stateName);
       return interactionId ? (
-        UrlInterpolationService.getInteractionThumbnailImageUrl(interactionId))
-        : '';
+        UrlInterpolationService
+          .getInteractionThumbnailImageUrl(interactionId)) : '';
     };
 
     Exploration.prototype.isInteractionInline = function(stateName) {
@@ -125,7 +127,8 @@ oppia.factory('ExplorationObjectFactory', [
     Exploration.createFromBackendDict = function(explorationBackendDict) {
       return new Exploration(
         explorationBackendDict.init_state_name,
-        explorationBackendDict.param_changes,
+        ParamChangesObjectFactory.createFromBackendList(
+          explorationBackendDict.param_changes),
         explorationBackendDict.param_specs,
         explorationBackendDict.skin_customizations,
         StatesObjectFactory.createFromBackendDict(

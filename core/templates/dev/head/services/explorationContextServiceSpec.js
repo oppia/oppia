@@ -92,13 +92,15 @@ describe('Exploration context service', function() {
     }));
 
     it('should throw an error when trying to retrieve the exploration id',
-        function() {
-      expect(ecs.getExplorationId).toThrow();
-    });
+      function() {
+        expect(ecs.getExplorationId).toThrow();
+      }
+    );
 
     it('should retrieve other as page context',
-        function() {
-      expect(ecs.getPageContext()).toBe('other');
-    });
+      function() {
+        expect(ecs.getPageContext()).toBe('other');
+      }
+    );
   });
 });

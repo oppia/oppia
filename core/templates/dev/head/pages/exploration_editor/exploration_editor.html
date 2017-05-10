@@ -271,6 +271,7 @@
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/preview_tab/PreviewTab.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/statistics_tab/StateImprovementSuggestionService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/statistics_tab/StatisticsTab.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/statistics_tab/BarChartDirective.js"></script>
 
@@ -290,8 +291,12 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/InteractionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/AnswerGroupObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/FallbackObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/TriggerObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/OutcomeObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ContentObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/RuleObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamChangeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamChangesObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/StopwatchObjectFactory.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/TutorCardDirective.js"></script>
@@ -319,5 +324,6 @@
   <script src="{{ASSET_DIR_PREFIX}}/extensions/interactions/baseValidator.js"></script>
 
   {{ interaction_templates }}
+  {{ visualizations_html }}
   {{ gadget_templates }}
 {% endblock footer_js %}

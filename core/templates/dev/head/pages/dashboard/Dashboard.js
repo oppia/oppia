@@ -113,6 +113,17 @@ oppia.controller('Dashboard', [
       return ($window.innerWidth < 500);
     };
 
+    $scope.showUsernamePopover = function(subscriberUsername) {
+      // The popover on the subscription card is only shown if the length of
+      // the subscriber username is greater than 10 and the user hovers over
+      // the truncated username.
+      if (subscriberUsername.length > 10) {
+        return 'mouseenter';
+      } else {
+        return 'none';
+      }
+    };
+
     $scope.updatesGivenScreenWidth = function() {
       if ($scope.checkMobileView()) {
         $scope.myExplorationsView = 'card';
@@ -176,7 +187,7 @@ oppia.controller('Dashboard', [
     $scope.topUnresolvedAnswersCount = function(exploration) {
       var topUnresolvedAnswersCount = 0;
       exploration.top_unresolved_answers.forEach(function(answer) {
-        topUnresolvedAnswersCount += answer.count;
+        topUnresolvedAnswersCount += answer.frequency;
       });
       return topUnresolvedAnswersCount;
     };

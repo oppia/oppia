@@ -18,39 +18,41 @@
  */
 
 oppia.filter('oppiaInteractiveContinueValidator', [
-    '$filter', 'WARNING_TYPES', 'baseInteractionValidationService',
-    function($filter, WARNING_TYPES, baseInteractionValidationService) {
-  // Returns a list of warnings.
-  return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
-    var warningsList = [];
+  '$filter', 'WARNING_TYPES', 'baseInteractionValidationService',
+  function($filter, WARNING_TYPES, baseInteractionValidationService) {
+    // Returns a list of warnings.
+    return function(
+      stateName, customizationArgs, answerGroups, defaultOutcome) {
+      var warningsList = [];
 
-    baseInteractionValidationService.requireCustomizationArguments(
-      customizationArgs, ['buttonText']);
+      baseInteractionValidationService.requireCustomizationArguments(
+        customizationArgs, ['buttonText']);
 
-    if (customizationArgs.buttonText.value.length === 0) {
-      warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
-        message: 'The button text should not be empty.'
-      });
-    }
+      if (customizationArgs.buttonText.value.length === 0) {
+        warningsList.push({
+          type: WARNING_TYPES.CRITICAL,
+          message: 'The button text should not be empty.'
+        });
+      }
 
-    if (answerGroups.length > 0) {
-      warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
-        message: (
-          'Only the default outcome is necessary for a continue interaction.')
-      });
-    }
+      if (answerGroups.length > 0) {
+        warningsList.push({
+          type: WARNING_TYPES.CRITICAL,
+          message: (
+            'Only the default outcome is necessary for a continue interaction.')
+        });
+      }
 
-    if (!defaultOutcome ||
-        $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
-      warningsList.push({
-        type: WARNING_TYPES.ERROR,
-        message: (
-          'Please specify what Oppia should do after the button is clicked.')
-      });
-    }
+      if (!defaultOutcome ||
+          $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
+        warningsList.push({
+          type: WARNING_TYPES.ERROR,
+          message: (
+            'Please specify what Oppia should do after the button is clicked.')
+        });
+      }
 
-    return warningsList;
-  };
-}]);
+      return warningsList;
+    };
+  }
+]);

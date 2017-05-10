@@ -22,13 +22,14 @@ echo Installing third-party JS libraries and zip files.
 $PYTHON_CMD scripts/install_third_party.py
 
 # Install third-party node modules needed for the build process.
+install_node_module eslint 3.18.0
+install_node_module eslint-plugin-html 2.0.1
 install_node_module gulp 3.9.0
 install_node_module through2 2.0.0
 install_node_module yargs 3.29.0
 install_node_module gulp-concat 2.6.0
 install_node_module gulp-clean-css 2.0.2
 install_node_module gulp-util 3.0.7
-install_node_module jscs 2.3.0
 install_node_module gulp-sourcemaps 1.6.0
 install_node_module gulp-uglify 2.0.1
 

@@ -55,14 +55,14 @@
     </li>
   </ul>
 
-  <ul class="nav navbar-nav oppia-navbar-nav navbar-right">
+  <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-if="!isLoadingCollection()">
     <li style="margin-right: 10px; margin-top: 8px;">
       <button class="btn btn-default oppia-save-draft-button"
               ng-class="{'btn-success': isCollectionSaveable()}"
               ng-click="saveChanges()"
               ng-disabled="!isCollectionSaveable()">
         <span ng-if="!isSaveInProgress()">
-          <span ng-if="isPrivate">
+          <span ng-if="collectionRights.isPrivate()">
             <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
                alt="Save Collection">&#xE161;</i>
             <span class="oppia-save-publish-button-label">Save Draft</span>
@@ -71,7 +71,7 @@
               (<[getChangeListCount()]>)
             </span>
           </span>
-          <span ng-if="!isPrivate" title="Publish Changes">
+          <span ng-if="collectionRights.isPublic()" title="Publish Changes">
             <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
                alt="Publish Changes">&#xE2C3;</i>
             <span class="oppia-save-publish-button-label">Publish Changes</span>
@@ -79,13 +79,13 @@
         </span>
 
         <span ng-if="isSaveInProgress()">
-          <span ng-if="isPrivate" class="oppia-save-publish-button-label">Saving</span>
-          <span ng-if="!isPrivate" class="oppia-save-publish-button-label">Publishing</span>
+          <span ng-if="collectionRights.isPrivate()" class="oppia-save-publish-button-label">Saving</span>
+          <span ng-if="collectionRights.isPublic()" class="oppia-save-publish-button-label">Publishing</span>
           <loading-dots></loading-dots>
         </span>
       </button>
 
-      <button type="button" ng-if="isPrivate"
+      <button type="button" ng-if="collectionRights.isPrivate()"
               class="btn btn-default oppia-editor-publish-button"
               ng-class="{'btn-success': isCollectionPublishable()}"
               ng-click="publishCollection()"
@@ -96,7 +96,7 @@
       </button>
 
       <button type="button" ng-click="unpublishCollection()"
-              ng-if="!isPrivate && canUnpublish"
+              ng-if="collectionRights.isPublic() && collectionRights.canUnpublish()"
               class="btn btn-default">
         Unpublish (as moderator)
       </button>

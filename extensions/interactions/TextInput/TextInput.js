@@ -27,36 +27,38 @@ oppia.directive('oppiaInteractiveTextInput', [
         onSubmit: '&'
       },
       templateUrl: 'interaction/TextInput',
-      controller: ['$scope', '$attrs', 'focusService', 'textInputRulesService',
-          function($scope, $attrs, focusService, textInputRulesService) {
-        $scope.placeholder = oppiaHtmlEscaper.escapedJsonToObj(
-          $attrs.placeholderWithValue);
-        $scope.rows = oppiaHtmlEscaper.escapedJsonToObj($attrs.rowsWithValue);
-        $scope.answer = '';
-        $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
+      controller: [
+        '$scope', '$attrs', 'focusService', 'textInputRulesService',
+        function($scope, $attrs, focusService, textInputRulesService) {
+          $scope.placeholder = oppiaHtmlEscaper.escapedJsonToObj(
+            $attrs.placeholderWithValue);
+          $scope.rows = oppiaHtmlEscaper.escapedJsonToObj($attrs.rowsWithValue);
+          $scope.answer = '';
+          $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
-        $scope.schema = {
-          type: 'unicode',
-          ui_config: {}
-        };
-        if ($scope.placeholder) {
-          $scope.schema.ui_config.placeholder = $scope.placeholder;
-        }
-        if ($scope.rows && $scope.rows !== 1) {
-          $scope.schema.ui_config.rows = $scope.rows;
-        }
-
-        $scope.submitAnswer = function(answer) {
-          if (!answer) {
-            return;
+          $scope.schema = {
+            type: 'unicode',
+            ui_config: {}
+          };
+          if ($scope.placeholder) {
+            $scope.schema.ui_config.placeholder = $scope.placeholder;
+          }
+          if ($scope.rows && $scope.rows !== 1) {
+            $scope.schema.ui_config.rows = $scope.rows;
           }
 
-          $scope.onSubmit({
-            answer: answer,
-            rulesService: textInputRulesService
-          });
-        };
-      }]
+          $scope.submitAnswer = function(answer) {
+            if (!answer) {
+              return;
+            }
+
+            $scope.onSubmit({
+              answer: answer,
+              rulesService: textInputRulesService
+            });
+          };
+        }
+      ]
     };
   }
 ]);

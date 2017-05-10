@@ -17,6 +17,7 @@
 """Common classes and methods for managing long running jobs."""
 
 import ast
+import collections
 import copy
 import datetime
 import json
@@ -152,8 +153,10 @@ class BaseJobManager(object):
         cls._post_start_hook(job_id)
 
     @classmethod
-    def register_completion(cls, job_id, output):
+    def register_completion(cls, job_id, output_list):
         """Marks a job as completed."""
+        _MAX_OUTPUT_LENGTH_CHARS = 900000
+
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_valid_transition(
@@ -162,7 +165,32 @@ class BaseJobManager(object):
 
         model.status_code = STATUS_CODE_COMPLETED
         model.time_finished_msec = utils.get_current_time_in_millisecs()
-        model.output = output
+
+        # TODO(bhenning): Add tests for this.
+        output_str_list = ['%s' % output_value for output_value in output_list]
+
+        # De-duplicate the lines of output since it's not very useful to repeat
+        # them.
+        counter = collections.Counter(list(output_str_list))
+        output_str_frequency_list = [
+            (output_str, counter[output_str]) for output_str in counter]
+        output_str_list = [
+            line if freq == 1 else '%s (%d times)' % (line, freq)
+            for (line, freq) in output_str_frequency_list
+        ]
+
+        cutoff_index = 0
+        total_output_size = 0
+        for idx, output_str in enumerate(output_str_list):
+            cutoff_index += 1
+            total_output_size += len(output_str)
+            if total_output_size >= _MAX_OUTPUT_LENGTH_CHARS:
+                max_element_length = (
+                    total_output_size - _MAX_OUTPUT_LENGTH_CHARS)
+                output_str_list[idx] = output_str[:max_element_length]
+                output_str_list[idx] += ' <TRUNCATED>'
+                break
+        model.output = output_str_list[:cutoff_index]
         model.put()
 
         cls._post_completed_hook(job_id)
@@ -355,7 +383,7 @@ class BaseDeferredJobManager(BaseJobManager):
         # Note that the job may have been canceled after it started and before
         # it reached this stage. This will result in an exception when the
         # validity of the status code transition is checked.
-        cls.register_completion(job_id, result)
+        cls.register_completion(job_id, [result])
         logging.info(
             'Job %s completed at %s' %
             (job_id, utils.get_current_time_in_millisecs()))
@@ -557,7 +585,7 @@ class BaseMapReduceJobManager(BaseJobManager):
 
 
 class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
-    _ENTITY_KINDS_PARAM = 'entity_kinds'
+    _ENTITY_KINDS_PARAM = MAPPER_PARAM_KEY_ENTITY_KINDS
     _READER_LIST_PARAM = 'readers'
 
     def __init__(self, reader_list):
@@ -582,18 +610,18 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
         params = mapper_spec.params
         entity_kinds = params.get(cls._ENTITY_KINDS_PARAM)
 
-        splits = []
+        readers_list = []
         for entity_kind in entity_kinds:
             new_mapper_spec = copy.deepcopy(mapper_spec)
             new_mapper_spec.params['entity_kind'] = entity_kind
-            splits.append(
+            readers_list.append(
                 input_readers.DatastoreInputReader.split_input(
                     new_mapper_spec))
 
         inputs = []
-        for split in splits:
-            for item in split:
-                inputs.append(MultipleDatastoreEntitiesInputReader(item))
+        for reader_list in readers_list:
+            for reader in reader_list:
+                inputs.append(MultipleDatastoreEntitiesInputReader(reader))
         return inputs
 
     @classmethod

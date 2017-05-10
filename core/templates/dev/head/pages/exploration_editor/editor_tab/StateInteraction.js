@@ -148,8 +148,8 @@ oppia.controller('StateInteraction', [
         stateInteractionIdService.displayed !==
         stateInteractionIdService.savedMemento);
       if (hasInteractionIdChanged) {
-        if (INTERACTION_SPECS[
-              stateInteractionIdService.displayed].is_terminal) {
+        if (INTERACTION_SPECS[stateInteractionIdService.displayed]
+          .is_terminal) {
           updateDefaultTerminalStateContentIfEmpty();
         }
         stateInteractionIdService.saveDisplayedValue();

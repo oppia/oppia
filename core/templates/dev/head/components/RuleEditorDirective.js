@@ -82,24 +82,26 @@ oppia.directive('ruleEditor', ['$log', function($log) {
               if (answerChoices.length > 0) {
                 if (finalInputArray[2] === 'SetOfHtmlString') {
                   $scope.ruleDescriptionChoices = answerChoices.map(
-                      function(choice) {
-                    return {
-                      id: choice.label,
-                      val: choice.label
-                    };
-                  });
+                    function(choice) {
+                      return {
+                        id: choice.label,
+                        val: choice.label
+                      };
+                    }
+                  );
                   result.push({
                     type: 'checkboxes',
                     varName: finalInputArray[i + 1]
                   });
                 } else {
                   $scope.ruleDescriptionChoices = answerChoices.map(
-                      function(choice) {
-                    return {
-                      id: choice.val,
-                      val: choice.label
-                    };
-                  });
+                    function(choice) {
+                      return {
+                        id: choice.val,
+                        val: choice.label
+                      };
+                    }
+                  );
                   result.push({
                     type: 'select',
                     varName: finalInputArray[i + 1]

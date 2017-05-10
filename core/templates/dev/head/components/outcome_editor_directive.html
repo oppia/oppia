@@ -1,4 +1,10 @@
 <script type="text/ng-template" id="components/outcomeEditor">
+  <style>
+    outcome-editor .oppia-confusing-outcome-warning-text {
+      color: rgb(200, 0, 0);
+      font-style: italic;
+    }
+  </style>
   <div ng-if="!feedbackEditorIsOpen && displayFeedback"
        title="<[isEditable() ? 'Edit feedback' : '']>"
        style="height: 100%;">
