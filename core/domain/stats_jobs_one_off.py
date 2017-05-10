@@ -1271,7 +1271,7 @@ class ClearLargeAnswerBucketsJob(jobs.BaseMapReduceJobManager):
 
         Args:
             key: ClearLargeAnswerBucketsJob._REMOVED_KEY
-             stringified_values: used for count only
+            stringified_values: used for count only
 
         Yields:
             Report of number of items deleted
@@ -1293,6 +1293,17 @@ class CleanupLargeBucketLabelsFromNewAnswersJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+        Performs item deletion
+
+        Args:
+            item: StateAnswersModel
+
+        Yields:
+            tuple. 2-tuple in the form: (key, value)
+                key: indicates whether the model was updated
+                value: 1
+        """
         submitted_answers = [
             stats_domain.SubmittedAnswer.from_dict(submitted_answer_dict)
             for submitted_answer_dict in item.submitted_answer_list]
@@ -1316,6 +1327,16 @@ class CleanupLargeBucketLabelsFromNewAnswersJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Reports count of items updated/not updated
+
+        Args:
+            key: CleanupLargeBucketLabelsFromNewAnswersJob._UPDATED_KEY or
+            CleanupLargeBucketLabelsFromNewAnswersJob._IGNORED_KEY
+            stringified_values: used only for count
+
+        Yields:
+            report of number if items updated or ignored
+        """
         yield '%s: %d' % (key, len(stringified_values))
 
 
