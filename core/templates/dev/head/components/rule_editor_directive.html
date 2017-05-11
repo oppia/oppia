@@ -28,8 +28,8 @@
     </div>
 
     <div ng-if="rule.type == 'FuzzyMatches'">
-      <classifier-panel rule-inputs="rule.inputs" on-training-data-deletion="onDeleteTrainingDataEntry(index)">
-      </classifier-panel>
+      is similar to
+      <fuzzy-rule-editor rule="rule" on-delete-training-data-entry="onDeleteTrainingDataEntry()"></fuzzy-rule-editor>
     </div>
   </form>
 
