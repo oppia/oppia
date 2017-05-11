@@ -33,12 +33,25 @@
       margin-top: 2px;
     }
 
-    .oppia-exploration-footer .mobile-feedback .popover {
+    .oppia-exploration-footer .mobile-feedback > .popover {
+      /* Inline styles are applied by bootstrap-ui javascript, since they have
+      the highest specificity only !important can override them. This can be
+      resolved by updating bootstrap-ui.
+       */
       color: rgba(0,0,0,0.87);
+      margin-left: 5px;
+      margin-right: 5px;
+      max-width: 100vw;
+      right: 15px;
+      width: auto !important;
     }
 
     .oppia-exploration-footer .mobile-feedback .popover > .arrow {
       display: none;
+    }
+
+    .oppia-exploration-footer .mobile-feedback feedback-popup .oppia-feedback-popover-textarea {
+      width: 100%;
     }
 
     .oppia-exploration-footer .author-profile a:hover {
@@ -181,7 +194,7 @@
           <li></li>
         </ul>
         <ul class="mobile-feedback" ng-if="windowIsNarrow">
-          <li popover-placement="top" popover-template="'popover/feedback'" popover-trigger="click">
+          <li popover-placement="top-left" popover-template="'popover/feedback'" popover-trigger="click">
             <a href="" class="btn oppia-navbar-button" tooltip="<['I18N_PLAYER_FEEDBACK_TOOLTIP' | translate]>" tooltip-placement="top">
               <i class="material-icons">&#xE87F;</i>
               <span translate="I18N_PLAYER_FEEDBACK_TOOLTIP"></span>
