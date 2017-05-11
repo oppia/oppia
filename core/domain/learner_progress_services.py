@@ -19,9 +19,7 @@
 from core.platform import models
 from core.domain import subscription_services
 
-(user_models,) = models.Registry.import_models([
-    models.NAMES.user
-])
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 def add_exp_id_to_completed_list(user_id, exp_id):
     """Adds the exploration id to the completed list of the user.
@@ -63,6 +61,7 @@ def add_collection_id_to_completed_list(user_id, collection_id):
 
     if (collection_id not in collection_created_ids and
             collection_id not in activities_completed_model.completed_collection_ids):  # pylint: disable=line-too-long
+        remove_collection_from_incomplete_list(user_id, collection_id)
         activities_completed_model.completed_collection_ids.append(
             collection_id)
         activities_completed_model.put()
@@ -143,7 +142,8 @@ def add_collection_id_to_incomplete_list(user_id, collection_id):
     if (collection_id not in collection_created_ids and
             collection_id not in incomplete_collections_model.incomplete_collection_ids and # pylint: disable=line-too-long
             collection_id not in activities_completed_model.completed_collection_ids): # pylint: disable=line-too-long
-        incomplete_collections_model.incomplete_collection_ids.append()
+        incomplete_collections_model.incomplete_collection_ids.append(
+            collection_id)
         incomplete_collections_model.put()
 
 def remove_exp_from_partially_completed_list(user_id, exploration_id):
@@ -156,10 +156,12 @@ def remove_exp_from_partially_completed_list(user_id, exploration_id):
         user_models.ExplorationsPartiallyCompletedModel.get(
             user_id, strict=False))
 
-    for exp in exp_partially_completed_model.partially_completed_exps:
-        if exploration_id == exp.keys()[0]:
-            exp_partially_completed_model.partially_completed_exps.remove(exp)
-            exp_partially_completed_model.put()
+    if exp_partially_completed_model:
+        for exp in exp_partially_completed_model.partially_completed_exps:
+            if exploration_id == exp.keys()[0]:
+                exp_partially_completed_model.partially_completed_exps.remove(
+                    exp)
+                exp_partially_completed_model.put()
 
 def remove_collection_from_incomplete_list(user_id, collection_id):
     """Removes the collection id from the list of partially completed
@@ -171,10 +173,11 @@ def remove_collection_from_incomplete_list(user_id, collection_id):
     incomplete_collections_model = (
         user_models.IncompleteCollectionsModel.get(user_id, strict=False))
 
-    if collection_id in incomplete_collections_model.incomplete_collection_ids:
-        incomplete_collections_model.incomplete_collection_ids.remove(
-            collection_id)
-        incomplete_collections_model.put()
+    if incomplete_collections_model:
+        if collection_id in incomplete_collections_model.incomplete_collection_ids: # pylint: disable=line-too-long
+            incomplete_collections_model.incomplete_collection_ids.remove(
+                collection_id)
+            incomplete_collections_model.put()
 
 def get_all_completed_exp_ids(user_id):
     """Returns a list with the ids of all the explorations completed by the
