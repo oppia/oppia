@@ -567,38 +567,38 @@ class LDAStringClassifier(BaseClassifier):
             for k in range(len(model[classifier_property])):
                 for i in range(len(model[classifier_property][k])):
                     if isinstance(
-                        model[classifier_property][k][i], numpy.integer):
-                            model[classifier_property][k][i] = int(
-                                model[classifier_property][k][i])
+                            model[classifier_property][k][i], numpy.integer):
+                        model[classifier_property][k][i] = int(
+                            model[classifier_property][k][i])
                     elif isinstance(
-                        model[classifier_property][k][i], numpy.floating):
-                            model[classifier_property][k][i] = float(
-                                model[classifier_property][k][i])
+                            model[classifier_property][k][i], numpy.floating):
+                        model[classifier_property][k][i] = float(
+                            model[classifier_property][k][i])
 
         for classifier_property in conversion_list_properties:
             model[classifier_property] = model[classifier_property].tolist()
             for k in range(len(model[classifier_property])):
                 if isinstance(
-                    model[classifier_property][k], numpy.integer):
-                        model[classifier_property][k] = int(
-                            model[classifier_property][k])
+                        model[classifier_property][k], numpy.integer):
+                    model[classifier_property][k] = int(
+                        model[classifier_property][k])
                 elif isinstance(
-                    model[classifier_property][k], numpy.floating):
-                        model[classifier_property][k] = float(
-                            model[classifier_property][k])
+                        model[classifier_property][k], numpy.floating):
+                    model[classifier_property][k] = float(
+                        model[classifier_property][k])
 
         for classifier_property in conversion_properties:
             model[classifier_property] = model[classifier_property]
             for k in range(len(model[classifier_property])):
                 for i in range(len(model[classifier_property][k])):
                     if isinstance(
-                        model[classifier_property][k][i], numpy.integer):
-                            model[classifier_property][k][i] = int(
-                                model[classifier_property][k][i])
+                            model[classifier_property][k][i], numpy.integer):
+                        model[classifier_property][k][i] = int(
+                            model[classifier_property][k][i])
                     elif isinstance(
-                        model[classifier_property][k][i], numpy.floating):
-                            model[classifier_property][k][i] = float(
-                                model[classifier_property][k][i])
+                            model[classifier_property][k][i], numpy.floating):
+                        model[classifier_property][k][i] = float(
+                            model[classifier_property][k][i])
         return model
 
     def _convert_json_to_numpy(self, model):
@@ -708,7 +708,9 @@ class LDAStringClassifier(BaseClassifier):
             '_w_dp',
             '_l_dp',
             '_c_dl',
-            '_c_lw',
+            '_c_lw'
+        ]
+        list_of_list_binary_int_properties = [
             '_b_dl'
         ]
         list_properties = [
@@ -784,4 +786,25 @@ class LDAStringClassifier(BaseClassifier):
                     if not isinstance(value, int):
                         raise utils.ValidationError(
                             'Expected values of %s to be a int, received %s' % (
+                                list_of_list_property, value))
+
+        for list_of_list_property in list_of_list_binary_int_properties:
+            if list_of_list_property not in classifier_data:
+                raise utils.ValidationError(
+                    'Expected %s to be a key in classifier_data' %
+                    list_of_list_property)
+            if not isinstance(classifier_data[list_of_list_property], list):
+                raise utils.ValidationError(
+                    'Expected %s to be a list, received %s' % (
+                        list_of_list_property,
+                        classifier_data[list_of_list_property]))
+            for inner_list in classifier_data[list_of_list_property]:
+                for value in inner_list:
+                    if not isinstance(value, int):
+                        raise utils.ValidationError(
+                            'Expected values of %s to be a int, received %s' % (
+                                list_of_list_property, value))
+                    if not (value == 0 or value == 1):
+                        raise utils.ValidationError(
+                            'Expected values of %s to be 0/1, received %s' % (
                                 list_of_list_property, value))
