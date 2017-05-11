@@ -131,8 +131,8 @@ oppia.directive('feedbackPopup', [
           };
 
           $scope.$on('$destroy', function() {
-           $('#mobile-feedback-backdrop').remove();
-        })
+            $('#mobile-feedback-backdrop').remove();
+          })
         }
       ]
     };
