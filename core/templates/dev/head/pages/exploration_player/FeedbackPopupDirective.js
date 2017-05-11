@@ -47,6 +47,9 @@ oppia.directive('feedbackPopup', [
           $scope.feedbackPopoverId = (
             'feedbackPopover' + Math.random().toString(36).slice(2));
 
+          $element.parents('.mobile-feedback').append(
+            '<div id="mobile-feedback-backdrop"></div>');
+
           focusService.setFocus($scope.feedbackPopoverId);
 
           var feedbackUrl = (
@@ -126,6 +129,10 @@ oppia.directive('feedbackPopup', [
               getTriggerElt().trigger('click');
             });
           };
+
+          $scope.$on('$destroy', function() {
+           $('#mobile-feedback-backdrop').remove();
+        })
         }
       ]
     };

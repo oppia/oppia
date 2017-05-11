@@ -11,6 +11,16 @@
       resize: none;
       width: 200px;
     }
+
+    #mobile-feedback-backdrop {
+      background: rgba(0,0,0,0.33);
+      height: 100vh;
+      left: 0;
+      position: fixed;
+      top: 0;
+      width: 100vw;
+      z-index: -1;
+    }
   </style>
   <div style="min-width: 200px;">
     <div ng-show="!feedbackSubmitted">
@@ -43,4 +53,5 @@
     <div ng-show="feedbackSubmitted" translate="I18N_PLAYER_THANK_FEEDBACK">
     </div>
   </div>
+  <!---->
 </script>
