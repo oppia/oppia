@@ -102,7 +102,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         state = 'Home'
         classifier_id = classifier_models.ClassifierModel.create(
             exp_id, 1, state,
-            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['classifier_id'], [], 1)
+            feconf.INTERACTION_CLASSIFIER_MAPPING[
+                'TextInput']['classifier_id'], [], 1)
         classifier = classifier_services.get_classifier_by_id(
             classifier_id)
         self.assertEqual(classifier.exp_id, exp_id)
@@ -119,7 +120,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         state = 'Home'
         classifier_id = classifier_models.ClassifierModel.create(
             exp_id, 1, state,
-            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['classifier_id'], [], 1)
+            feconf.INTERACTION_CLASSIFIER_MAPPING[
+                'TextInput']['classifier_id'], [], 1)
         classifier_services.delete_classifier(classifier_id)
         with self.assertRaisesRegexp(Exception, (
             "Entity for class ClassifierModel with id %s not found" %(
@@ -152,7 +154,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         }
         classifier = classifier_domain.Classifier(
             '1', exp_id, 1, state_name,
-            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['classifier_id'], cached_data, 1)
+            feconf.INTERACTION_CLASSIFIER_MAPPING[
+                'TextInput']['classifier_id'], cached_data, 1)
         classifier_id = (
             classifier_services.save_classifier(classifier))
         classifier = classifier_services.get_classifier_by_id(

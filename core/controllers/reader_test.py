@@ -150,12 +150,12 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
             params = {}
             res = self.post_json(
                 '/explorehandler/classify/%s' % self.unused_exp_id, {
-                                  'params' : params,
-                                  'old_state' : old_state_dict,
-                                  'answer' : answer,
-                                  'state_name' : self.state_name,
-                                  'exp_id' : self.exp_id,
-                                  'exp_version' : self.exp_version})
+                    'params' : params,
+                    'old_state' : old_state_dict,
+                    'answer' : answer,
+                    'state_name' : self.state_name,
+                    'exp_id' : self.exp_id,
+                    'exp_version' : self.exp_version})
             self.assertEqual(res['outcome']['feedback'][0],
                              '<p>Detected permutation.</p>')
 
