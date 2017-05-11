@@ -29,7 +29,9 @@
 
     <div ng-if="rule.type == 'FuzzyMatches'">
       is similar to
-      <fuzzy-rule-editor rule="rule" on-delete-training-data-entry="onDeleteTrainingDataEntry()"></fuzzy-rule-editor>
+      <select2-dropdown choices="choices" item="selectedTrainingInput">
+      </select2-dropdown>
+      <button type="button" class="btn btn-danger" ng-click="onDeleteTrainingDataEntry(selectedTrainingInput)">Remove this input</button>
     </div>
   </form>
 

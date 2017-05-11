@@ -114,6 +114,13 @@ oppia.directive('select2Dropdown', [function() {
       $scope.$watch('item', function(newValue) {
         $(select2Node).select2('val', newValue);
       });
+
+      // Respond to external changes in $scope.choices
+      $scope.$watch('choices', function(newValue) {
+        $(select2Node).select2('destroy').empty();
+        select2Options.data = newValue;
+        $(select2Node).select2(select2Options);
+      });
     }]
   };
 }]);

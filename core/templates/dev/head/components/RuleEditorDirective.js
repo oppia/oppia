@@ -142,6 +142,21 @@ oppia.directive('ruleEditor', [
             return ruleDescription;
           };
 
+          var initializeFuzzyRuleAnswerChoices = function() {
+            if($scope.rule.type === 'FuzzyMatches') {
+              $scope.choices = [];
+              var count = 0;
+              for (var input in $scope.rule.inputs.training_data) {
+                $scope.choices.push({
+                  id: count,
+                  text: $scope.rule.inputs.training_data[count]
+                });
+                count++;
+              }
+              $scope.selectedTrainingInput = 0;
+            }
+          };
+
           $scope.$on('updateAnswerGroupInteractionId', function(
               evt, newInteractionId) {
             $scope.currentInteractionId = newInteractionId;
@@ -204,6 +219,8 @@ oppia.directive('ruleEditor', [
               if (index < trainingData.length) {
                 trainingData.splice(index, 1);
               }
+              $scope.rule.inputs.training_data = trainingData;
+              initializeFuzzyRuleAnswerChoices();
             }
           };
 
@@ -221,6 +238,7 @@ oppia.directive('ruleEditor', [
               $scope.onSelectNewRuleType($scope.rule.type);
             }
             computeRuleDescriptionFragments();
+            initializeFuzzyRuleAnswerChoices();
           };
 
           $scope.init();
