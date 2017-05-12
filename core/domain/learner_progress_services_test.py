@@ -92,7 +92,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         return (
             [exp.keys()[0] for exp in
              incomplete_exp_model.incomplete_exps] if
-             incomplete_exp_model else [])
+            incomplete_exp_model else [])
 
     def _get_incomplete_exp_details(self, user_id, exp_id):
         incomplete_exp_model = (user_models.IncompleteExplorationsModel.get(
