@@ -490,7 +490,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             category='Architecture', language_code='fi')
 
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID_2)
-        
+
         self.save_new_default_collection(
             self.COL_ID_1, self.owner_id, title='Bridges in England',
             category='Architecture')
@@ -502,12 +502,12 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID_3)
 
         for exp_id in [self.EXP_ID_2, self.EXP_ID_3]:
-	        collection_services.update_collection(
-	            self.owner_id, self.COL_ID_1, [{
-	                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-	                'exploration_id': exp_id
-	            }], 'Added new exploration')
-        
+            collection_services.update_collection(
+                self.owner_id, self.COL_ID_1, [{
+                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                    'exploration_id': exp_id
+                }], 'Added new exploration')
+
         rights_manager.publish_collection(self.owner_id, self.COL_ID_1)
 
     def test_exp_complete_event_handler(self):
@@ -592,7 +592,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             payload, csrf_token)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
-            self.user_id), [self.EXP_ID])
+                self.user_id), [self.EXP_ID])
 
         # Adding the exploration again has no effect.
         self.post_json(
@@ -600,7 +600,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             payload, csrf_token)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
-            self.user_id), [self.EXP_ID])
+                self.user_id), [self.EXP_ID])
 
         payload = {
             'client_time_spent_in_secs': 0,
@@ -618,11 +618,11 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             payload, csrf_token)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
-            self.user_id), [self.EXP_ID, self.EXP_ID_2])
+                self.user_id), [self.EXP_ID, self.EXP_ID_2])
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
-            self.user_id), [self.COL_ID_1])
-        
+                self.user_id), [self.COL_ID_1])
+
     def test_remove_exp_from_incomplete_list_handler(self):
         """Test handler for removing explorations from partially completed
         list.
@@ -651,8 +651,8 @@ class LearnerProgressTest(test_utils.GenericTestBase):
 
         # Remove one exploration.
         self.post_json(
-        	'%s/remove_in_progress_exploration' % feconf.LEARNER_DASHBOARD_URL,
-        	payload, csrf_token)
+            '%s/remove_in_progress_exploration' % feconf.LEARNER_DASHBOARD_URL,
+            payload, csrf_token)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [self.EXP_ID_1])
@@ -661,10 +661,10 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             'exploration_id': self.EXP_ID_1
         }
 
-       	# Remove another exploration.
-       	self.post_json(
-       		'%s/remove_in_progress_exploration' % feconf.LEARNER_DASHBOARD_URL,
-        	payload, csrf_token)
+        # Remove another exploration.
+        self.post_json(
+            '%s/remove_in_progress_exploration' % feconf.LEARNER_DASHBOARD_URL,
+            payload, csrf_token)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [])
@@ -691,7 +691,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
 
         # Remove one collection.
         self.post_json(
-        	'%s/remove_in_progress_collection' % feconf.LEARNER_DASHBOARD_URL,
+            '%s/remove_in_progress_collection' % feconf.LEARNER_DASHBOARD_URL,
             payload, csrf_token)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
@@ -703,7 +703,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
 
         # Remove another collection.
         self.post_json(
-        	'%s/remove_in_progress_collection' % feconf.LEARNER_DASHBOARD_URL,
+            '%s/remove_in_progress_collection' % feconf.LEARNER_DASHBOARD_URL,
             payload, csrf_token)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
