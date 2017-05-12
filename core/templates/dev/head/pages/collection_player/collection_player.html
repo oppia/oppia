@@ -295,6 +295,7 @@
       <div ng-if="collection" class="oppia-collection-table hidden-md hidden-lg hidden-xl">
         <img ng-src="<[getStaticImageUrl('/general/collection_mascot.svg')]>" class="mobile-lesson-icon">
         <div class="mobile-path-segment" ng-repeat="node in collection.getCollectionNodes()" id="mobile-path-anchor-<[$index]>">
+          <a href="<[getExplorationUrl(node.getExplorationId())]>">
           <svg width="100"
                height="150"
                xmlns="http://www.w3.org/2000/svg"
@@ -347,6 +348,7 @@
               <[$index + 1]>
             </text>
           </svg>
+          </a>
           <img ng-src="<[getStaticImageUrl('/general/mobile_path_segment.svg')]>">
           <div style="position: fixed; z-index: 100; top: 100px; left: 50%; transform: translate(-130px);">
             <exploration-summary-tile ng-if="explorationCardIsShown"
