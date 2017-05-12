@@ -143,7 +143,7 @@ oppia.directive('ruleEditor', [
           };
 
           var initializeFuzzyRuleAnswerChoices = function() {
-            if($scope.rule.type === 'FuzzyMatches') {
+            if ($scope.rule.type === 'FuzzyMatches') {
               $scope.choices = [];
               var count = 0;
               for (var input in $scope.rule.inputs.training_data) {
