@@ -1385,8 +1385,6 @@ class AnswerMigrationValidationJob(jobs.BaseMapReduceJobManager):
 
         Yields:
             all error strings for a given key
-
-            only if an error is found
         """
         if key == AnswerMigrationValidationJob._ERROR_KEY:
             for value in stringified_values:
@@ -1412,6 +1410,15 @@ class AnswerMigrationCleanupJob(jobs.BaseMapReduceJobManager):
     @classmethod
     def _remove_partially_migrated_answers(
             cls, all_models, incomplete_bucket_ids):
+        """Removes answers with a large bucket entity ID in our incomplete
+        bucket ids list
+
+        Args:
+              all_models: all StateAnswerModels associated with a given exploration
+              id-version
+              incomplete_bucket_ids: list of ids of buckets with
+              unfinished migrations
+        """
         for state_answer_model in all_models:
             # The answer is not being deleted, but if it
             # contains any answers with a large bucket entity ID
@@ -1449,6 +1456,19 @@ class AnswerMigrationCleanupJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+        deletes items with zero large buckets, or removes answers from
+        inconsistent buckets.
+
+        Args:
+            item: MigratedAnswerModel
+
+        Yields:
+            tuple. 2-tuple in the form: (key, value)
+                key: designates an answer removed, a bucket removed,
+                an inconsistent large bucket, or unremoved large buckets
+                value: 1 (constant)
+        """
         if not item.finished_migration:
             if item.expected_large_answer_bucket_count == 0 or len(
                     item.started_large_answer_bucket_ids) == 0:
@@ -1501,6 +1521,18 @@ class AnswerMigrationCleanupJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Reports count of each key yielded from the map
+
+        Args:
+              key: designates an answer removed, a bucket removed,
+              an inconsistent large bucket, or unremoved large buckets
+              stringified_values: list(str). A list of stringified values
+                  associated with the given key. Used only for counting
+                  number of keys
+
+        Yields:
+            count of each key
+        """
         yield '%s: %d' % (key, len(stringified_values))
 
 
