@@ -1537,6 +1537,9 @@ class AnswerMigrationCleanupJob(jobs.BaseMapReduceJobManager):
 
 
 class RefreshInteractionRegistryJob(jobs.BaseMapReduceJobManager):
+    """This job refreshes exploration models in the interadction
+    registry.
+    """
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -1544,10 +1547,27 @@ class RefreshInteractionRegistryJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item): # pylint: disable=unused-argument
+        """Implements the map function. Must be declared @staticmethod.
+
+        Args:
+            item: ExplorationModel
+
+        Yields:
+            tuple. 2-tuple in the form: ('key', 'value')
+        """
         yield ('key', 'value')
 
     @staticmethod
     def reduce(key, stringified_values): # pylint: disable=unused-argument
+        """Refreshes the interaction registry
+
+        Args:
+            key: unused
+            stringified_values: unused
+
+        Yields:
+            'Refreshed interaction registry.'
+        """
         # pylint: disable=protected-access
         interaction_registry.Registry._refresh()
         # pylint: enable=protected-access
