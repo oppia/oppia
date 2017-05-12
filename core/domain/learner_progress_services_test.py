@@ -85,22 +85,20 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             activities_completed_model.completed_collection_ids if
             activities_completed_model else [])
 
-    def _get_all_partially_completed_exp_ids(self, user_id):
-        exp_partially_completed_model = (
-            user_models.ExplorationsPartiallyCompletedModel.get(
+    def _get_all_incomplete_exp_ids(self, user_id):
+        incomplete_exp_model = (user_models.IncompleteExplorationsModel.get(
                 user_id, strict=False))
 
         return (
             [exp.keys()[0] for exp in
-            exp_partially_completed_model.partially_completed_exps] if
-            exp_partially_completed_model else [])
+            incomplete_exp_model.incomplete_exps] if
+            incomplete_exp_model else [])
 
-    def _get_partially_completed_exp_details(self, user_id, exp_id):
-        exp_partially_completed_model = (
-            user_models.ExplorationsPartiallyCompletedModel.get(
+    def _get_incomplete_exp_details(self, user_id, exp_id):
+        incomplete_exp_model = (user_models.IncompleteExplorationsModel.get(
                 user_id, strict=False))
 
-        for exp in exp_partially_completed_model.partially_completed_exps:
+        for exp in incomplete_exp_model.incomplete_exps:
             if exp_id == exp.keys()[0]:
                 return exp
 
@@ -132,9 +130,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         version = 1
 
         # Add an exploration to the in progress list of the learner.
-        learner_progress_services.add_exp_to_partially_completed_list(
+        learner_progress_services.add_exp_to_incomplete_list(
             self.user_id, self.EXP_ID_1, timestamp, state_name, version)
-        self.assertEqual(self._get_all_partially_completed_exp_ids(
+        self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_1])
         # Test that on adding an incomplete exploration to the completed list
         # it gets removed from the incomplete list.
@@ -142,7 +140,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.EXP_ID_1)
         self.assertEqual(self._get_all_completed_exp_ids(
             self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
-        self.assertEqual(self._get_all_partially_completed_exp_ids(
+        self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [])
 
         # Test that an exploration created by the user is not added to the
@@ -191,8 +189,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_completed_collection_ids(
             self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
-    def test_add_exp_to_partially_completed_list(self):
-        self.assertEqual(self._get_all_partially_completed_exp_ids(
+    def test_add_exp_to_incomplete_list(self):
+        self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [])
 
         timestamp = '2017-04-13 12:15:04.948282'
@@ -207,12 +205,12 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             }
         }
 
-        # Add an exploration to the partially completed list of a learner.
-        learner_progress_services.add_exp_to_partially_completed_list(
+        # Add an exploration to the incomplete list of a learner.
+        learner_progress_services.add_exp_to_incomplete_list(
             self.user_id, self.EXP_ID_0, timestamp, state_name, version)
-        self.assertEqual(self._get_all_partially_completed_exp_ids(
+        self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_0])
-        self.assertEqual(self._get_partially_completed_exp_details(
+        self.assertEqual(self._get_incomplete_exp_details(
             self.user_id, self.EXP_ID_0), exp_details)
 
         timestamp = '2017-05-13 11:15:03.948282'
@@ -228,26 +226,26 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # On adding an exploration again, its details are updated to the latest
         # version.
-        learner_progress_services.add_exp_to_partially_completed_list(
+        learner_progress_services.add_exp_to_incomplete_list(
             self.user_id, self.EXP_ID_0, timestamp, state_name, version)
-        self.assertEqual(self._get_all_partially_completed_exp_ids(
+        self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_0])
-        self.assertEqual(self._get_partially_completed_exp_details(
+        self.assertEqual(self._get_incomplete_exp_details(
             self.user_id, self.EXP_ID_0), modified_exp_details)
 
         # If an exploration has already been completed, it is not added.
         learner_progress_services.add_exp_id_to_completed_list(
             self.user_id, self.EXP_ID_1)
-        learner_progress_services.add_exp_to_partially_completed_list(
+        learner_progress_services.add_exp_to_incomplete_list(
             self.user_id, self.EXP_ID_1, timestamp, state_name, version)
-        self.assertEqual(self._get_all_partially_completed_exp_ids(
+        self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_0])
 
         # Test that an exploration created by the user is not added to the
-        # partially completed list.
-        learner_progress_services.add_exp_to_partially_completed_list(
+        # incomplete list.
+        learner_progress_services.add_exp_to_incomplete_list(
             self.user_id, self.EXP_ID_2, timestamp, state_name, version)
-        self.assertEqual(self._get_all_partially_completed_exp_ids(
+        self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_0])
 
     def test_add_collection_id_to_incomplete_list(self):
@@ -282,38 +280,38 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_incomplete_collection_ids(
             self.user_id), [self.COL_ID_0])
 
-    def test_remove_exp_from_partially_completed_list(self):
-        self.assertEqual(self._get_all_partially_completed_exp_ids(
+    def test_remove_exp_from_incomplete_list(self):
+        self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [])
 
         timestamp = '2017-04-13 12:15:04.948282'
         state_name = 'state name'
         version = 1
 
-        # Add partially completed explorations.
-        learner_progress_services.add_exp_to_partially_completed_list(
+        # Add incomplete explorations.
+        learner_progress_services.add_exp_to_incomplete_list(
             self.user_id, self.EXP_ID_0, timestamp, state_name, version)
-        learner_progress_services.add_exp_to_partially_completed_list(
+        learner_progress_services.add_exp_to_incomplete_list(
             self.user_id, self.EXP_ID_1, timestamp, state_name, version)
-        self.assertEqual(self._get_all_partially_completed_exp_ids(
+        self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
         # Removing an exploration.
-        learner_progress_services.remove_exp_from_partially_completed_list(
+        learner_progress_services.remove_exp_from_incomplete_list(
             self.user_id, self.EXP_ID_0)
-        self.assertEqual(self._get_all_partially_completed_exp_ids(
+        self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_1])
 
         # Removing the same exploration again has no effect.
-        learner_progress_services.remove_exp_from_partially_completed_list(
+        learner_progress_services.remove_exp_from_incomplete_list(
             self.user_id, self.EXP_ID_0)
-        self.assertEqual(self._get_all_partially_completed_exp_ids(
+        self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_1])
 
         # Removing the second exploration again.
-        learner_progress_services.remove_exp_from_partially_completed_list(
+        learner_progress_services.remove_exp_from_incomplete_list(
             self.user_id, self.EXP_ID_1)
-        self.assertEqual(self._get_all_partially_completed_exp_ids(
+        self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [])
 
     def test_remove_collection_from_incomplete_list(self):
@@ -375,27 +373,27 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             learner_progress_services.get_all_completed_collection_ids(
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
-    def test_get_all_partially_completed_exp_ids(self):
+    def test_get_all_incomplete_exp_ids(self):
         self.assertEqual(
-            learner_progress_services.get_all_partially_completed_exp_ids(
+            learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [])
 
         timestamp = '2017-04-13 12:15:04.948282'
         state_name = 'state name'
         version = 1
 
-        # Add an exploration to the partially completed list.
-        learner_progress_services.add_exp_to_partially_completed_list(
+        # Add an exploration to the incomplete list.
+        learner_progress_services.add_exp_to_incomplete_list(
             self.user_id, self.EXP_ID_0, timestamp, state_name, version)
         self.assertEqual(
-            learner_progress_services.get_all_partially_completed_exp_ids(
+            learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [self.EXP_ID_0])
 
         # Add another exploration.
-        learner_progress_services.add_exp_to_partially_completed_list(
+        learner_progress_services.add_exp_to_incomplete_list(
             self.user_id, self.EXP_ID_1, timestamp, state_name, version)
         self.assertEqual(
-            learner_progress_services.get_all_partially_completed_exp_ids(
+            learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
     def test_get_all_incomplete_collection_ids(self):

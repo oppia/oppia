@@ -119,7 +119,7 @@ class IncompleteCollectionsModel(base_models.BaseModel):
         repeated=True, indexed=True)
 
 
-class ExplorationsPartiallyCompletedModel(base_models.BaseModel):
+class IncompleteExplorationsModel(base_models.BaseModel):
     """Keeps track of all the explorations currently being completed by the
     learner.
 
@@ -148,7 +148,7 @@ class ExplorationsPartiallyCompletedModel(base_models.BaseModel):
     #   }
     #  },
     # ]
-    partially_completed_exps = ndb.JsonProperty(
+    incomplete_exps = ndb.JsonProperty(
         repeated=True, indexed=True)
 
 

@@ -39,7 +39,7 @@ def add_exp_id_to_completed_list(user_id, exp_id):
 
     if (exp_id not in exploration_created_ids and
             exp_id not in activities_completed_model.completed_exp_ids):
-        remove_exp_from_partially_completed_list(user_id, exp_id)
+        remove_exp_from_incomplete_list(user_id, exp_id)
         activities_completed_model.completed_exp_ids.append(exp_id)
         activities_completed_model.put()
 
@@ -66,19 +66,19 @@ def add_collection_id_to_completed_list(user_id, collection_id):
             collection_id)
         activities_completed_model.put()
 
-def add_exp_to_partially_completed_list(
+def add_exp_to_incomplete_list(
         user_id, exploration_id, timestamp, state_name, version):
-    """Adds the exploration id to the partially completed list of the user.
+    """Adds the exploration id to the incomplete list of the user.
 
     Callers of this function must ensure that all the arguments provided are
     valid.
     """
-    exp_partially_completed_model = (
-        user_models.ExplorationsPartiallyCompletedModel.get(
+    incomplete_exp_model = (
+        user_models.IncompleteExplorationsModel.get(
             user_id, strict=False))
-    if not exp_partially_completed_model:
-        exp_partially_completed_model = (
-            user_models.ExplorationsPartiallyCompletedModel(
+    if not incomplete_exp_model:
+        incomplete_exp_model = (
+            user_models.IncompleteExplorationsModel(
                 id=user_id))
 
     activities_completed_model = (
@@ -91,14 +91,14 @@ def add_exp_to_partially_completed_list(
     exploration_created_ids = (
         subscription_services.get_exploration_ids_subscribed_to(user_id))
 
-    partially_completed_exp_details = {
+    incomplete_exp_details = {
         'timestamp': str(timestamp),
         'state_name': state_name,
         'version': version
     }
 
-    partially_completed_exp = {
-        exploration_id: partially_completed_exp_details
+    incomplete_exp = {
+        exploration_id: incomplete_exp_details
     }
 
     exp_already_present = False
@@ -106,15 +106,15 @@ def add_exp_to_partially_completed_list(
             activities_completed_model.completed_exp_ids and
             exploration_id not in exploration_created_ids):
 
-        for exp in exp_partially_completed_model.partially_completed_exps:
+        for exp in incomplete_exp_model.incomplete_exps:
             if exploration_id == exp.keys()[0]:
-                exp[exploration_id] = partially_completed_exp_details
+                exp[exploration_id] = incomplete_exp_details
                 exp_already_present = True
 
         if not exp_already_present:
-            exp_partially_completed_model.partially_completed_exps.append(
-                partially_completed_exp)
-        exp_partially_completed_model.put()
+            incomplete_exp_model.incomplete_exps.append(
+                incomplete_exp)
+        incomplete_exp_model.put()
 
 def add_collection_id_to_incomplete_list(user_id, collection_id):
     """Adds the collection id to the list of collections partially completed by
@@ -146,26 +146,24 @@ def add_collection_id_to_incomplete_list(user_id, collection_id):
             collection_id)
         incomplete_collections_model.put()
 
-def remove_exp_from_partially_completed_list(user_id, exploration_id):
-    """Removes the exploration from the partially completed list of the user.
+def remove_exp_from_incomplete_list(user_id, exploration_id):
+    """Removes the exploration from the incomplete list of the user.
 
     Callers of this function must ensure that the user id and the
     exploration id are valid.
     """
-    exp_partially_completed_model = (
-        user_models.ExplorationsPartiallyCompletedModel.get(
-            user_id, strict=False))
+    incomplete_exp_model = (
+        user_models.IncompleteExplorationsModel.get(user_id, strict=False))
 
-    if exp_partially_completed_model:
-        for exp in exp_partially_completed_model.partially_completed_exps:
+    if incomplete_exp_model:
+        for exp in incomplete_exp_model.incomplete_exps:
             if exploration_id == exp.keys()[0]:
-                exp_partially_completed_model.partially_completed_exps.remove(
+                incomplete_exp_model.incomplete_exps.remove(
                     exp)
-                exp_partially_completed_model.put()
+                incomplete_exp_model.put()
 
 def remove_collection_from_incomplete_list(user_id, collection_id):
-    """Removes the collection id from the list of partially completed
-    collections.
+    """Removes the collection id from the list of incomplete collections.
 
     Callers of this function must ensure that the user id and
     collection id are valid.
@@ -207,24 +205,23 @@ def get_all_completed_collection_ids(user_id):
         activities_completed_model.completed_collection_ids if
         activities_completed_model else [])
 
-def get_all_partially_completed_exp_ids(user_id):
+def get_all_incomplete_exp_ids(user_id):
     """Returns a list with the ids of all the explorations partially completed
     by the user.
 
     Callers of this function must ensure that the user id is valid.
     """
-    exp_partially_completed_model = (
-        user_models.ExplorationsPartiallyCompletedModel.get(
+    incomplete_exp_model = (
+        user_models.IncompleteExplorationsModel.get(
             user_id, strict=False))
 
-    if exp_partially_completed_model:
-        partially_completed_exp_ids = [
-            exp.keys()[0] for exp in
-            exp_partially_completed_model.partially_completed_exps]
+    if incomplete_exp_model:
+        incomplete_exp_ids = [
+            exp.keys()[0] for exp in incomplete_exp_model.incomplete_exps]
     else:
-        partially_completed_exp_ids = []
+        incomplete_exp_ids = []
 
-    return partially_completed_exp_ids
+    return incomplete_exp_ids
 
 def get_all_incomplete_collection_ids(user_id):
     """Returns a list with the ids of all the collections partially completed
