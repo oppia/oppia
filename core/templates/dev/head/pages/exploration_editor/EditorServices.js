@@ -179,7 +179,7 @@ oppia.factory('angularNameService', [function() {
 
   return {
     getNameOfInteractionRulesService: function(interactionId) {
-      angularName = interactionId.charAt(0).toLowerCase() + 
+      angularName = interactionId.charAt(0).toLowerCase() +
         interactionId.slice(1) + 'RulesService';
       return angularName
     }
@@ -2352,10 +2352,10 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
 // response received as a result of the autosaving request.
 oppia.factory('autosaveInfoModalsService', [
   '$log', '$modal', '$timeout', '$window', 'lostChangesService',
-  'explorationData',
+  'explorationData', 'UrlInterpolationService',
   function(
       $log, $modal, $timeout, $window, lostChangesService,
-      explorationData) {
+      explorationData, UrlInterpolationService) {
     var _isModalOpen = false;
     var _refreshPage = function(delay) {
       $timeout(function() {
