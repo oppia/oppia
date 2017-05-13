@@ -23,7 +23,6 @@ from core.domain import exp_services
 from core.domain import learner_progress_services
 from core.domain import param_domain
 from core.domain import rights_manager
-from core.domain import user_services
 from core.tests import test_utils
 import feconf
 
@@ -483,8 +482,6 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        user_services.get_or_create_user(self.owner_id, self.OWNER_EMAIL)
-
         self.save_new_valid_exploration(
             self.EXP_ID_2, self.owner_id, title='Sillat Suomi',
             category='Architecture', language_code='fi')
@@ -582,7 +579,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             'client_time_spent_in_secs': 0,
             'params': {},
             'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
-            'state_name': 'final',
+            'state_name': 'middle',
             'version': 1
         }
 
@@ -607,7 +604,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             'collection_id': self.COL_ID_1,
             'params': {},
             'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
-            'state_name': 'final',
+            'state_name': 'middle',
             'version': 1
         }
 
@@ -624,7 +621,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                 self.user_id), [self.COL_ID_1])
 
     def test_remove_exp_from_incomplete_list_handler(self):
-        """Test handler for removing explorations from partially completed
+        """Test handler for removing explorations from the partially completed
         list.
         """
 
@@ -633,7 +630,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(response)
 
         timestamp = '2017-04-13 12:15:04.948282'
-        state_name = 'state name'
+        state_name = 'state_name'
         version = 1
 
         # Add two exploration to the partially completed list.

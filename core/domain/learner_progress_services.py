@@ -39,6 +39,8 @@ def add_exp_id_to_completed_list(user_id, exp_id):
 
     if (exp_id not in exploration_created_ids and
             exp_id not in activities_completed_model.completed_exp_ids):
+        # Remove the exploration from the in progress list (if present) as it is
+        # now completed.
         remove_exp_from_incomplete_list(user_id, exp_id)
         activities_completed_model.completed_exp_ids.append(exp_id)
         activities_completed_model.put()
@@ -60,7 +62,10 @@ def add_collection_id_to_completed_list(user_id, collection_id):
         subscription_services.get_collection_ids_subscribed_to(user_id))
 
     if (collection_id not in collection_created_ids and
-            collection_id not in activities_completed_model.completed_collection_ids):  # pylint: disable=line-too-long
+            collection_id not in
+            activities_completed_model.completed_collection_ids):
+        # Remove the collection from the in progress list (if present) as it is
+        # now completed.
         remove_collection_from_incomplete_list(user_id, collection_id)
         activities_completed_model.completed_collection_ids.append(
             collection_id)
@@ -81,12 +86,7 @@ def add_exp_to_incomplete_list(
             user_models.IncompleteExplorationsModel(
                 id=user_id))
 
-    activities_completed_model = (
-        user_models.ActivitiesCompletedByLearnerModel.get(
-            user_id, strict=False))
-    if not activities_completed_model:
-        activities_completed_model = (
-            user_models.ActivitiesCompletedByLearnerModel(id=user_id))
+    completed_exp_ids = get_all_completed_exp_ids(user_id)
 
     exploration_created_ids = (
         subscription_services.get_exploration_ids_subscribed_to(user_id))
@@ -102,8 +102,7 @@ def add_exp_to_incomplete_list(
     }
 
     exp_already_present = False
-    if (exploration_id not in
-            activities_completed_model.completed_exp_ids and
+    if (exploration_id not in completed_exp_ids and
             exploration_id not in exploration_created_ids):
 
         for exp in incomplete_exp_model.incomplete_exps:
@@ -123,25 +122,20 @@ def add_collection_id_to_incomplete_list(user_id, collection_id):
     Callers of this function must ensure that the user id and collection id are
     valid.
     """
-    activities_completed_model = (
-        user_models.ActivitiesCompletedByLearnerModel.get(
-            user_id, strict=False))
-    if not activities_completed_model:
-        activities_completed_model = (
-            user_models.ActivitiesCompletedByLearnerModel(id=user_id))
-
     incomplete_collections_model = (
         user_models.IncompleteCollectionsModel.get(user_id, strict=False))
     if not incomplete_collections_model:
         incomplete_collections_model = (
             user_models.IncompleteCollectionsModel(id=user_id))
 
+    completed_collection_ids = get_all_completed_collection_ids(user_id)
+
     collection_created_ids = (
         subscription_services.get_collection_ids_subscribed_to(user_id))
 
     if (collection_id not in collection_created_ids and
             collection_id not in incomplete_collections_model.incomplete_collection_ids and # pylint: disable=line-too-long
-            collection_id not in activities_completed_model.completed_collection_ids): # pylint: disable=line-too-long
+            collection_id not in completed_collection_ids):
         incomplete_collections_model.incomplete_collection_ids.append(
             collection_id)
         incomplete_collections_model.put()

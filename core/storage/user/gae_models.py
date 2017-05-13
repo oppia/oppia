@@ -127,11 +127,11 @@ class IncompleteExplorationsModel(base_models.BaseModel):
     """
     # A list which stores the explorations partially completed by the learner.
     # Each item in the list is a json object keyed by exploration id and the
-    # value correspond to a few extra details -
+    # value corresponds to a few extra details -
     # timestamp: When did the learner leave the exploration.
     # version: Version of the exploration.
     # state_name: The name of the state at which the learner left the
-    # exploration.
+    # exploration. Example -
     # [
     #  {
     #   (exp_id_1): {

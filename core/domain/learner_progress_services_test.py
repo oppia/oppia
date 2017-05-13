@@ -16,7 +16,6 @@
 
 """Tests for learner progress services."""
 
-from core.domain import rights_manager
 from core.domain import learner_progress_services
 from core.platform import models
 from core.tests import test_utils
@@ -62,10 +61,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.save_new_default_collection(
             self.COL_ID_2, self.user_id,
             title='Introduce Interactions in Oppia', category='Welcome')
-
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_0)
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_1)
-        rights_manager.publish_exploration(self.user_id, self.EXP_ID_2)
 
     def _get_all_completed_exp_ids(self, user_id):
         activities_completed_model = (
@@ -308,7 +303,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_1])
 
-        # Removing the second exploration again.
+        # Removing the second exploration.
         learner_progress_services.remove_exp_from_incomplete_list(
             self.user_id, self.EXP_ID_1)
         self.assertEqual(self._get_all_incomplete_exp_ids(
@@ -327,6 +322,12 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
         # Remove one collection.
+        learner_progress_services.remove_collection_from_incomplete_list(
+            self.user_id, self.COL_ID_0)
+        self.assertEqual(self._get_all_incomplete_collection_ids(
+            self.user_id), [self.COL_ID_1])
+
+        # Removing the same collection again has no effect.
         learner_progress_services.remove_collection_from_incomplete_list(
             self.user_id, self.COL_ID_0)
         self.assertEqual(self._get_all_incomplete_collection_ids(
