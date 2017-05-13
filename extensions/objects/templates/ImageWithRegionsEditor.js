@@ -340,7 +340,7 @@ oppia.directive('imageWithRegionsEditor', [
                 // that doesn't overlap with currently existing labels.
                 var newLabel = null;
                 for (var i = 1; i <= labels.length + 1; i++) {
-                  var candidateLabel = 'Region ' + i.toString();
+                  var candidateLabel = 'Region' + i.toString();
                   if (labels.indexOf(candidateLabel) === -1) {
                     newLabel = candidateLabel;
                     break;
