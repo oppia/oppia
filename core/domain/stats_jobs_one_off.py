@@ -1414,8 +1414,8 @@ class AnswerMigrationCleanupJob(jobs.BaseMapReduceJobManager):
         bucket ids list
 
         Args:
-              all_models: all StateAnswerModels associated with a given exploration
-              id-version
+              all_models: all StateAnswerModels associated with a given
+              exploration id-version
               incomplete_bucket_ids: list of ids of buckets with
               unfinished migrations
         """
@@ -2646,12 +2646,15 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 dict of the form:
                     'item_id': the item id
                     'exploration_id': the exploration id
-                    'exploration_max_version': the max version found for the exploration
+                    'exploration_max_version': the max version found for
+                    the exploration
                     'state_name': the state name
                     'rule_str': the rule string
                     'last_updated': timestamp of most recent update
-                    'large_answer_bucket_id': large answer bucket id, if applicable
-                    'large_answer_bucket_count': large answer bucket count, if applicable
+                    'large_answer_bucket_id': large answer bucket id,
+                    if applicable
+                    'large_answer_bucket_count': large answer
+                    bucket count, if applicable
 
         Yields:
             Any error strings if an error is encountered.
