@@ -362,7 +362,7 @@ oppia.controller('StateInteraction', [
         var imageWithRegions = currentCustomizationArgs.imageAndRegions.value;
         for (var j = 0; j < imageWithRegions.labeledRegions.length; j++) {
           _answerChoices.push({
-            val: j,
+            val: imageWithRegions.labeledRegions[j].label,
             label: imageWithRegions.labeledRegions[j].label
           });
         }

@@ -33,6 +33,14 @@ oppia.directive('htmlSelect', [function() {
       $scope.select = function(id) {
         $scope.selection = id;
       };
+
+      $scope.getSelectionIndex = function() {
+        for (var i = 0; i < $scope.options.length; i++) {
+          if (($scope.options[i].val === $scope.selection) || ($scope.options[i].id === $scope.selection)) {
+            return i;
+          }
+        }
+      };
     }
     ]
   };
