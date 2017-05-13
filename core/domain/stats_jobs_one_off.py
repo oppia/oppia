@@ -2536,6 +2536,25 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+        Performs various validation checks on items in preparation of
+        migration.
+
+        Args:
+            item: StateRuleAnswerLogModel or
+            LargeAnswerBucketModel
+
+        Yields:
+            tuple. 2-tuple in the form: ('key', 'value')
+              key: either one of the following:
+                  'Answer Migration ERROR'
+                  'Answer ALREADY MIGRATED'
+                  'Answer SKIPPED'
+
+                  or an identifier string in the form:
+                      <exp_id>.<max_version>.<state_name>
+        })
+        """
         # If this answer bucket has already been migrated, skip it.
         if isinstance(item, stats_models.StateRuleAnswerLogModel):
             item_id = item.id
@@ -2611,6 +2630,32 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Attempts to retrieve all explorations versions for a given id.
+        If successful, attempts to perform migration to the new model.
+
+        Args:
+            key: either one of the following:
+                'Answer Migration ERROR'
+                'Answer ALREADY MIGRATED'
+                'Answer SKIPPED'
+
+                or an identifier string in the form:
+                    <exp_id>.<max_version>.<state_name>
+            stringified_values: list(str). A list of stringified values
+                associated with the given key. Each value represents a
+                dict of the form:
+                    'item_id': the item id
+                    'exploration_id': the exploration id
+                    'exploration_max_version': the max version found for the exploration
+                    'state_name': the state name
+                    'rule_str': the rule string
+                    'last_updated': timestamp of most recent update
+                    'large_answer_bucket_id': large answer bucket id, if applicable
+                    'large_answer_bucket_count': large answer bucket count, if applicable
+
+        Yields:
+            Any error strings if an error is encountered.
+        """
         # Output any errors or notices encountered during the map step.
         if (key == AnswerMigrationJob._ERROR_KEY
                 or key == AnswerMigrationJob._ALREADY_MIGRATED_KEY
