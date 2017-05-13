@@ -71,7 +71,9 @@ def _get_answer_dict_size(answer_dict):
 
 
 class StatisticsAudit(jobs.BaseMapReduceJobManager):
-    """A one-off computation job that counts 'start exploration' and
+    """A one-off statistics audit.
+
+    A one-off computation job that counts 'start exploration' and
     'complete exploration' events.
     """
 
@@ -134,7 +136,7 @@ class StatisticsAudit(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
-        """Updates statistics for the given exploration
+        """Updates statistics for the given exploration.
 
         Args:
             key: str. The exploration id of the exploration
@@ -237,7 +239,9 @@ class StatisticsAudit(jobs.BaseMapReduceJobManager):
 
 
 class AnswersAudit(jobs.BaseMapReduceJobManager):
-    """Provides statistics for the number of times each rule type occurs in
+    """Provides statistics for the number of times each rule type occurs.
+
+    Provides statistics for the number of times each rule type occurs in
     StateRuleAnswerLogModel. This job is successful if no errors are reported in
     the job output. The statistics computed by this job can be compared to
     results from AnswersAudit2 to determine whether the AnswerMigrationJob was
@@ -413,7 +417,9 @@ class AnswersAudit(jobs.BaseMapReduceJobManager):
 
 
 class AnswersAudit2(jobs.BaseMapReduceJobManager):
-    """Functionally equivalent to AnswersAudit except this audits answers in
+    """AnswersAudit equivalent for StateAnswersModel.
+
+    Functionally equivalent to AnswersAudit except this audits answers in
     StateAnswersModel and does not include handler information since no handlers
     are stored in the new answer model.
     """
@@ -488,7 +494,7 @@ class AnswersAudit2(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
-        """Counts a given rule type
+        """Counts a given rule type.
 
         Args:
             key: str. The rule type
@@ -537,7 +543,9 @@ class AnswersAudit2(jobs.BaseMapReduceJobManager):
 
 
 class PartialAnswerValidationAudit(jobs.BaseMapReduceJobManager):
-    """Perform an answer value validation for numeric input answers submitted to
+    """Perform an answer value validation for numeric input.
+
+    Perform an answer value validation for numeric input answers submitted to
     exploration 0 state NumericInput.
     """
     _OLD_ANSWER_MODEL_TYPE = 'StateRuleAnswerLogModel'
@@ -628,7 +636,9 @@ class PartialAnswerValidationAudit(jobs.BaseMapReduceJobManager):
 
 
 class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
-    """Perform an audit of number of answers submitted per exploration and
+    """Perform an audit of number of answers per model type.
+
+    Perform an audit of number of answers submitted per exploration and
     in total within the old and new answer models. Report any discrepancies
     """
 
@@ -713,7 +723,9 @@ class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
-        """Aggregates answer submission counts per model type and
+        """Aggregates answer submission counts per model type.
+
+        Aggregates answer submission counts per model type and
         reports any differences
 
         Args:
@@ -781,7 +793,9 @@ class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
 
 
 class ClearUnknownMissingAnswersJob(jobs.BaseMapReduceJobManager):
-    """Delete states of records that have inconsistincies between the old
+    """Delete states of records that have inconsistincies between model types.
+
+    Delete states of records that have inconsistincies between the old
     and new models. These will be re-migrated the next time the
     AnswerMigrationJob runs.
     """
@@ -856,7 +870,9 @@ class ClearUnknownMissingAnswersJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(_, stringified_values):
-        """Delete states of records that have inconsistincies between the old
+        """Delete states of records that contain inconsistincies.
+
+        Delete states of records that contain inconsistincies between the old
         and new models
 
         Args:
@@ -947,7 +963,9 @@ class ClearUnknownMissingAnswersJob(jobs.BaseMapReduceJobManager):
 
 
 class ClearMigratedAnswersJob(jobs.BaseMapReduceJobManager):
-    """This job deletes all answers stored in the
+    """This job deletes all migrated answer information.
+
+    This job deletes all answers stored in the
     stats_models.StateAnswersModel and all book-keeping information stored in
     stats_models.MigratedAnswerModel.
     """
@@ -971,7 +989,7 @@ class ClearMigratedAnswersJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
-        """Report count of delete items per model
+        """Report count of delete items per model.
 
         Args:
             key: model type
@@ -986,7 +1004,9 @@ class ClearMigratedAnswersJob(jobs.BaseMapReduceJobManager):
 
 
 class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
-    """This job deletes all answers stored in
+    """Deletes all answers that don't correspond to an existing exploration.
+
+    This job deletes all answers stored in
     stats_models.StateRuleAnswerLogModel that do not or cannot correspond to an
     existing, accessible exploration.
     """
@@ -1009,10 +1029,11 @@ class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def map(item):
         """Implements the map function. Must be declared @staticmethod.
+
         Deletes all answers stored in stats_models.StateRuleAnswerLogModel
         that do not or cannot correspond to an existing, accessible exploration
         Can also remove empty multiple choice answers or erroneously
-        non-numeric answers
+        non-numeric answers.
 
         Args:
             item: StateRuleAnswerLogModel
@@ -1121,7 +1142,7 @@ class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
-        """Report count of deleted items per model
+        """Report count of deleted items per model.
 
         Args:
             key: reason for deleting item
@@ -1177,7 +1198,9 @@ class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
 
 
 class SplitLargeAnswerBucketsJob(jobs.BaseMapReduceJobManager):
-    """This job checks all answer buckets in
+    """This job splits answers into buckets when the model contains too many.
+
+    This job checks all answer buckets in
     stats_models.StateRuleAnswerLogModel and splits them into multiple entities
     to be stored in stats_models.LargeAnswerBucketModel if there are too many
     entities to be migrated at once by the migration job.
@@ -1191,6 +1214,7 @@ class SplitLargeAnswerBucketsJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def map(item):
         """Implements the map function. Must be declared @staticmethod.
+
         Conditionally performs the LargeAnswerBucketModel insertion.
 
         Args:
@@ -1214,7 +1238,7 @@ class SplitLargeAnswerBucketsJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(_, stringified_values):
-        """Reports number of answers split for migration per exploration
+        """Reports number of answers split for migration per exploration.
 
         Args:
             '_': 'split_answer_count' (unused)
@@ -1253,6 +1277,7 @@ class ClearLargeAnswerBucketsJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def map(item):
         """Implements the map function. Must be declared @staticmethod.
+
         Performs item deletion
 
         Args:
@@ -1267,7 +1292,7 @@ class ClearLargeAnswerBucketsJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
-        """Reports number of items deleted
+        """Reports number of items deleted.
 
         Args:
             key: ClearLargeAnswerBucketsJob._REMOVED_KEY
@@ -1280,7 +1305,9 @@ class ClearLargeAnswerBucketsJob(jobs.BaseMapReduceJobManager):
 
 
 class CleanupLargeBucketLabelsFromNewAnswersJob(jobs.BaseMapReduceJobManager):
-    """This job cleans up all StateAnswersModels by removing all occurrences of
+    """This job removes large_bucket_entity_id's from StateAnswersModels.
+
+    This job cleans up all StateAnswersModels by removing all occurrences of
     large_bucket_entity_id and computing the sizes of each answer and answer
     shard in these cases.
     """
@@ -1294,6 +1321,7 @@ class CleanupLargeBucketLabelsFromNewAnswersJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def map(item):
         """Implements the map function. Must be declared @staticmethod.
+
         Performs item deletion
 
         Args:
@@ -1327,7 +1355,7 @@ class CleanupLargeBucketLabelsFromNewAnswersJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
-        """Reports count of items updated/not updated
+        """Reports count of items updated/not updated.
 
         Args:
             key: CleanupLargeBucketLabelsFromNewAnswersJob._UPDATED_KEY or
@@ -1341,7 +1369,9 @@ class CleanupLargeBucketLabelsFromNewAnswersJob(jobs.BaseMapReduceJobManager):
 
 
 class AnswerMigrationValidationJob(jobs.BaseMapReduceJobManager):
-    """This job performs a strict validation to check if every answer in the old
+    """This job performs a strict validation on migrated answers.
+
+    This job performs a strict validation to check if every answer in the old
     storage model has at least been migrated to the new model (no form of
     correctness happens in this test, only accountability).
     """
@@ -1354,6 +1384,7 @@ class AnswerMigrationValidationJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def map(item):
         """Implements the map function. Must be declared @staticmethod.
+
         Performs answer migration validation on the item
 
         Args:
@@ -1375,7 +1406,7 @@ class AnswerMigrationValidationJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
-        """Reports all errors for a given key
+        """Reports all errors for a given key.
 
         Args:
               key: AnswerMigrationValidationJob._ERROR_KEY
@@ -1392,7 +1423,9 @@ class AnswerMigrationValidationJob(jobs.BaseMapReduceJobManager):
 
 
 class AnswerMigrationCleanupJob(jobs.BaseMapReduceJobManager):
-    """This job performs a cleanup of the bookkeeping model for the answer
+    """Performs a cleanup of the bookkeeping model for the answer migration job.
+
+    This job performs a cleanup of the bookkeeping model for the answer
     migration job. It removes all "dirty" entries (which correspond to answer
     buckets which started being migrated, but failed for some reason). It also
     deletes any answers which have been submitted to the new data model which
@@ -1410,7 +1443,9 @@ class AnswerMigrationCleanupJob(jobs.BaseMapReduceJobManager):
     @classmethod
     def _remove_partially_migrated_answers(
             cls, all_models, incomplete_bucket_ids):
-        """Removes answers with a large bucket entity ID in our incomplete
+        """Removes answers with a large bucket ID of an incomplete bucket.
+
+        Removes answers with a large bucket entity ID in our incomplete
         bucket ids list
 
         Args:
@@ -1457,7 +1492,8 @@ class AnswerMigrationCleanupJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def map(item):
         """Implements the map function. Must be declared @staticmethod.
-        deletes items with zero large buckets, or removes answers from
+
+        Deletes items with zero large buckets, or removes answers from
         inconsistent buckets.
 
         Args:
@@ -1521,7 +1557,7 @@ class AnswerMigrationCleanupJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
-        """Reports count of each key yielded from the map
+        """Reports count of each key yielded from the map.
 
         Args:
               key: designates an answer removed, a bucket removed,
@@ -1537,9 +1573,7 @@ class AnswerMigrationCleanupJob(jobs.BaseMapReduceJobManager):
 
 
 class RefreshInteractionRegistryJob(jobs.BaseMapReduceJobManager):
-    """This job refreshes exploration models in the interadction
-    registry.
-    """
+    """Refreshes exploration models in the interaction registry."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -1559,7 +1593,7 @@ class RefreshInteractionRegistryJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values): # pylint: disable=unused-argument
-        """Refreshes the interaction registry
+        """Refreshes the interaction registry.
 
         Args:
             key: unused
@@ -1575,7 +1609,9 @@ class RefreshInteractionRegistryJob(jobs.BaseMapReduceJobManager):
 
 
 class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
-    """This job is responsible for migrating all answers stored within
+    """Migrates answers from old do new model.
+
+    This job is responsible for migrating all answers stored within
     stats_models.StateRuleAnswerLogModel to stats_models.StateAnswersModel
     """
     _ERROR_KEY = 'Answer Migration ERROR'
