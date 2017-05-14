@@ -19,18 +19,18 @@
   <div ng-controller="Splash" style="background-color: #afd2eb; font-size: 14px;">
     <div class="container">
       <div class="row">
-        <div class="oppia-splash-new-main-cta">
+        <div class="oppia-splash-new-main-cta col-xs-12">
           <h1 class="oppia-splash-new-h1">Welcome to Oppia</h1>
           <h2 class="oppia-splash-new-h2">Oppia's mission is to help anyone learn in an effective and enjoyable way.</h2>
           <div class="oppia-button-container">
             <button type="button"
                     ng-click="onClickBrowseLibraryButton()"
-                    class="btn oppia-transition-200 oppia-splash-new-cta-button">
+                    class="btn oppia-transition-200">
               Start Learning
             </button>
             <button type="button"
                     ng-click="onRedirectToLogin('/dashboard?mode=create')"
-                    class="btn oppia-transition-200 oppia-splash-new-cta-button">
+                    class="btn oppia-transition-200">
               Share Your Knowledge
             </button>
           </div>
@@ -99,6 +99,7 @@
 
   <style>
     .oppia-splash-new-main-cta {
+      float: none;
       margin: 30px auto 20px auto;
       max-width: 650px;
     }
@@ -142,7 +143,7 @@
       font-size: 16px;
       margin: auto 5px;
       max-width: 300px;
-      padding: 10px 0;
+      padding: 10px;
       text-transform: uppercase;
       width: 100%;
     }
@@ -168,6 +169,7 @@
     }
 
     .oppia-splash-new-exploration-summaries {
+      font-size: 16px;
       text-align: center;
     }
 
@@ -226,6 +228,12 @@
 
       .oppia-splash-new-callout button:first-of-type {
         margin-top: 15px;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .oppia-activity-summary-tile {
+        margin: 8px 5.5px;
       }
     }
   </style>

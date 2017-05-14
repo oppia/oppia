@@ -28,12 +28,12 @@
           <div class="oppia-button-container">
             <button type="button"
                     ng-click="onClickBrowseLibraryButton()"
-                    class="btn oppia-transition-200 oppia-splash-new-cta-button">
+                    class="btn oppia-transition-200">
               Start Learning
             </button>
             <button type="button"
                     ng-click="onRedirectToLogin('/dashboard?mode=create')"
-                    class="btn oppia-transition-200 oppia-splash-new-cta-button">
+                    class="btn oppia-transition-200">
               Share Your Knowledge
             </button>
           </div>
@@ -144,7 +144,7 @@
       font-size: 16px;
       margin: auto 5px;
       max-width: 300px;
-      padding: 10px 0;
+      padding: 10px;
       text-transform: uppercase;
       width: 100%;
     }
@@ -170,6 +170,7 @@
     }
 
     .oppia-splash-new-exploration-summaries {
+      font-size: 16px;
       margin-bottom: 2em;
       text-align: center;
     }
@@ -185,8 +186,7 @@
       color: #ffffff;
       font-size: 2em;
       font-weight: 600;
-      margin-top: 22px;
-      margin: 0;
+      margin: 22px auto 0 auto;
     }
 
     .oppia-splash-new-callout p {
@@ -252,6 +252,20 @@
       #oppia-splash-new-otter {
         bottom: -85px;
         width: 175px;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .oppia-splash-new-h1 {
+        margin-top: 10px;
+      }
+      
+      .oppia-splash-new-h3 {
+        text-align: center;
+      }
+      
+      .oppia-activity-summary-tile {
+        margin: 8px 5.5px;
       }
     }
   </style>
