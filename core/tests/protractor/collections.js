@@ -46,7 +46,28 @@ describe('Collections', function() {
     dropdown.element(by.css('.protractor-test-dashboard-link')).click();
     browser.waitForAngular();
     element(by.css('.protractor-test-create-activity')).click();
+    // Create new collection.
     element(by.css('.protractor-test-create-collection')).click();
+    // Add existing explorations.
+    element(by.css('.protractor-test-add-exploration-input')).sendKeys('0\n');
+    element(by.css('.protractor-test-add-exploration-input')).sendKeys('4\n');
+    element(by.css('.protractor-test-add-exploration-input')).sendKeys('13\n');
+    // Shifting nodes in the node graph.
+    element.all(by.css('.protractor-test-editor-shift-left')).get(1).click();
+    element.all(by.css('.protractor-test-editor-shift-right')).get(1).click();
+    // Delete node in the node graph.
+    element.all(by.css('.protractor-test-editor-delete-node')).get(1).click();
+    // Publish the collection.
+    element(by.css('.protractor-test-save-draft-button')).click();
+    element(by.css('.protractor-test-close-save-modal')).click();
+    element(by.css('.protractor-test-editor-publish-button')).click();
+    element(by.css('.protractor-collection-editor-title-input')).sendKeys('Test Collection');
+    element(by.css('.protractor-collection-editor-objective-input')).sendKeys('This is a test collection.');
+    var options = element.all(by.css('.protractor-test-collection-editor-category-dropdown'));
+    options.first().click();
+    browser.driver.switchTo().activeElement().sendKeys('Algebra\n');
+    element(by.css('.protractor-test-collection-save-changes-button')).click();
+    browser.waitForAngular();
     users.logout();
   });
 
