@@ -537,6 +537,8 @@ class LDAStringClassifier(BaseClassifier):
         self._c_lw = copy.deepcopy(model['_c_lw'])
         self._c_l = copy.deepcopy(model['_c_l'])
 
+        return self
+
     def _make_json_serializable(self, model):
         """Makes the StringClassifier dict JSON serializable by
         converting numpy data types to Python data types.
