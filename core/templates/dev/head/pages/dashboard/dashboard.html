@@ -208,11 +208,6 @@
                   <[exploration.num_open_threads]>
                 </a>
               </td>
-              <td ng-if="exploration.status !== 'private'">
-                <a ng-href="<[getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
-                  <[exploration.num_unresolved_answers]>
-                </a>
-              </td>
               <td>
                 <a ng-href="<[getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
                   <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
@@ -286,13 +281,6 @@
                 </span>
                 <span class="oppia-dashboard-card-statistic-value">
                   <[exploration.num_views]>
-                </span>
-              </li>
-
-              <li flex="50" style="padding-left: 8px;">
-                <img ng-src="<[unresolvedAnswersIconUrl]>" style="width: 15px; padding-top: 1px;" tooltip="Unresolved Answers" tooltip-placement="top" class="oppia-dashboard-card-statistic-icon" alt="Unresolved Answers">
-                <span class="oppia-dashboard-card-statistic-value">
-                  <[exploration.num_unresolved_answers]>
                 </span>
               </li>
 

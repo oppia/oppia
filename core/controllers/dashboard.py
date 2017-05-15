@@ -23,7 +23,6 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import stats_services
 from core.domain import subscription_services
 from core.domain import summary_services
 from core.domain import user_jobs_continuous
@@ -154,49 +153,40 @@ class DashboardHandler(base.BaseHandler):
         def _round_average_ratings(rating):
             return round(rating, feconf.AVERAGE_RATINGS_DASHBOARD_PRECISION)
 
-        exploration_ids_subscribed_to = (
-            subscription_services.get_exploration_ids_subscribed_to(
-                self.user_id))
-
-        subscribed_exploration_summaries = filter(None, (
+        # We need to do the filtering because some activities that were
+        # originally subscribed to may have been deleted since.
+        subscribed_exploration_summaries = [
+            summary for summary in
             exp_services.get_exploration_summaries_matching_ids(
-                exploration_ids_subscribed_to)))
-        subscribed_collection_summaries = filter(None, (
+                subscription_services.get_exploration_ids_subscribed_to(
+                    self.user_id))
+            if summary is not None]
+        subscribed_collection_summaries = [
+            summary for summary in
             collection_services.get_collection_summaries_matching_ids(
                 subscription_services.get_collection_ids_subscribed_to(
-                    self.user_id))))
+                    self.user_id))
+            if summary is not None]
 
-        exp_summary_list = summary_services.get_displayable_exp_summary_dicts(
+        exploration_ids_subscribed_to = [
+            summary.id for summary in subscribed_exploration_summaries]
+
+        exp_summary_dicts = summary_services.get_displayable_exp_summary_dicts(
             subscribed_exploration_summaries)
-        collection_summary_list = []
+        collection_summary_dicts = []
 
         feedback_thread_analytics = (
             feedback_services.get_thread_analytics_multi(
                 exploration_ids_subscribed_to))
 
-        unresolved_answers_dict = (
-            stats_services.get_exps_unresolved_answers_for_default_rule(
-                exploration_ids_subscribed_to))
-
-        total_unresolved_answers = 0
-
-        for ind, exploration in enumerate(exp_summary_list):
+        # TODO(bhenning): Update this to use unresovled answers from
+        # stats_services once the training interface is enabled and it's cheaper
+        # to retrieve top answers from stats_services.
+        for ind, exploration in enumerate(exp_summary_dicts):
             exploration.update(feedback_thread_analytics[ind].to_dict())
-            exploration.update({
-                'num_unresolved_answers': (
-                    unresolved_answers_dict[exploration['id']]['frequency']
-                    if exploration['id'] in unresolved_answers_dict else 0
-                ),
-                'top_unresolved_answers': (
-                    unresolved_answers_dict[exploration['id']]
-                    ['unresolved_answers']
-                    [:feconf.TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD]
-                )
-            })
-            total_unresolved_answers += exploration['num_unresolved_answers']
 
-        exp_summary_list = sorted(
-            exp_summary_list,
+        exp_summary_dicts = sorted(
+            exp_summary_dicts,
             key=lambda x: (x['num_open_threads'], x['last_updated_msec']),
             reverse=True)
 
@@ -205,7 +195,7 @@ class DashboardHandler(base.BaseHandler):
             for collection_summary in subscribed_collection_summaries:
                 # TODO(sll): Reuse _get_displayable_collection_summary_dicts()
                 # in summary_services, instead of replicating it like this.
-                collection_summary_list.append({
+                collection_summary_dicts.append({
                     'id': collection_summary.id,
                     'title': collection_summary.title,
                     'category': collection_summary.category,
@@ -230,8 +220,7 @@ class DashboardHandler(base.BaseHandler):
                 self.user_id))
         dashboard_stats.update({
             'total_open_feedback': feedback_services.get_total_open_threads(
-                feedback_thread_analytics),
-            'total_unresolved_answers': total_unresolved_answers
+                feedback_thread_analytics)
         })
         if dashboard_stats and dashboard_stats.get('average_ratings'):
             dashboard_stats['average_ratings'] = (
@@ -259,8 +248,8 @@ class DashboardHandler(base.BaseHandler):
             subscribers_list.append(subscriber_summary)
 
         self.values.update({
-            'explorations_list': exp_summary_list,
-            'collections_list': collection_summary_list,
+            'explorations_list': exp_summary_dicts,
+            'collections_list': collection_summary_dicts,
             'dashboard_stats': dashboard_stats,
             'last_week_stats': last_week_stats,
             'subscribers_list': subscribers_list

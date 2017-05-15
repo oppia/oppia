@@ -28,6 +28,8 @@ from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
+# TODO(bhenning): Update this to work correctly & efficiently with the new
+# storage model.
 def get_exps_unresolved_answers_for_default_rule(exp_ids):
     """Gets unresolved answers per exploration for default rule across all
     states for explorations with ids in exp_ids. The value of total count should

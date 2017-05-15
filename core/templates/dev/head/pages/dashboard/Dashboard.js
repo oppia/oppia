@@ -17,8 +17,7 @@
  */
 
 oppia.constant('EXPLORATION_DROPDOWN_STATS', {
-  OPEN_FEEDBACK: 'open_feedback',
-  TOP_UNRESOLVED_ANSWERS: 'top_unresolved_answers'
+  OPEN_FEEDBACK: 'open_feedback'
 });
 
 oppia.constant('EXPLORATIONS_SORT_BY_KEYS', {
@@ -26,7 +25,6 @@ oppia.constant('EXPLORATIONS_SORT_BY_KEYS', {
   RATING: 'ratings',
   NUM_VIEWS: 'num_views',
   OPEN_FEEDBACK: 'num_open_threads',
-  UNRESOLVED_ANSWERS: 'num_unresolved_answers',
   LAST_UPDATED: 'last_updated_msec'
 });
 
@@ -35,7 +33,6 @@ oppia.constant('HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', {
   RATING: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_AVERAGE_RATING',
   NUM_VIEWS: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_TOTAL_PLAYS',
   OPEN_FEEDBACK: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_OPEN_FEEDBACK',
-  UNRESOLVED_ANSWERS: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_UNRESOLVED_ANSWERS',
   LAST_UPDATED: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_LAST_UPDATED'
 });
 
@@ -182,14 +179,6 @@ oppia.controller('Dashboard', [
         value = (averageRating || 0);
       }
       return value;
-    };
-
-    $scope.topUnresolvedAnswersCount = function(exploration) {
-      var topUnresolvedAnswersCount = 0;
-      exploration.top_unresolved_answers.forEach(function(answer) {
-        topUnresolvedAnswersCount += answer.frequency;
-      });
-      return topUnresolvedAnswersCount;
     };
 
     $rootScope.loadingMessage = 'Loading';
