@@ -509,37 +509,35 @@ class LDAStringClassifier(BaseClassifier):
         model = self._make_json_serializable(model)
         return model
 
-    @classmethod
-    def from_dict(cls, model):
+    def from_dict(self, model):
         """Initializes the properties of this classifier from a dict
         constructed using to_dict().
 
         Args:
             model: A dict representing a StringClassifier.
         """
-        string_classifier = cls()
-        model = string_classifier._convert_json_to_numpy(model)
-        string_classifier._alpha = copy.deepcopy(model['_alpha'])
-        string_classifier._beta = copy.deepcopy(model['_beta'])
-        string_classifier._prediction_threshold = copy.deepcopy(
+        model = self._convert_json_to_numpy(model)
+        self._alpha = copy.deepcopy(model['_alpha'])
+        self._beta = copy.deepcopy(model['_beta'])
+        self._prediction_threshold = copy.deepcopy(
             model['_prediction_threshold'])
-        string_classifier._training_iterations = copy.deepcopy(
+        self._training_iterations = copy.deepcopy(
             model['_training_iterations'])
-        string_classifier._prediction_iterations = copy.deepcopy(
+        self._prediction_iterations = copy.deepcopy(
             model['_prediction_iterations'])
-        string_classifier._num_labels = copy.deepcopy(model['_num_labels'])
-        string_classifier._num_docs = copy.deepcopy(model['_num_docs'])
-        string_classifier._num_words = copy.deepcopy(model['_num_words'])
-        string_classifier._label_to_id = copy.deepcopy(model['_label_to_id'])
-        string_classifier._word_to_id = copy.deepcopy(model['_word_to_id'])
-        string_classifier._w_dp = copy.deepcopy(model['_w_dp'])
-        string_classifier._b_dl = copy.deepcopy(model['_b_dl'])
-        string_classifier._l_dp = copy.deepcopy(model['_l_dp'])
-        string_classifier._c_dl = copy.deepcopy(model['_c_dl'])
-        string_classifier._c_lw = copy.deepcopy(model['_c_lw'])
-        string_classifier._c_l = copy.deepcopy(model['_c_l'])
+        self._num_labels = copy.deepcopy(model['_num_labels'])
+        self._num_docs = copy.deepcopy(model['_num_docs'])
+        self._num_words = copy.deepcopy(model['_num_words'])
+        self._label_to_id = copy.deepcopy(model['_label_to_id'])
+        self._word_to_id = copy.deepcopy(model['_word_to_id'])
+        self._w_dp = copy.deepcopy(model['_w_dp'])
+        self._b_dl = copy.deepcopy(model['_b_dl'])
+        self._l_dp = copy.deepcopy(model['_l_dp'])
+        self._c_dl = copy.deepcopy(model['_c_dl'])
+        self._c_lw = copy.deepcopy(model['_c_lw'])
+        self._c_l = copy.deepcopy(model['_c_l'])
 
-        return string_classifier
+        return self
 
         return self
 
