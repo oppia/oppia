@@ -53,6 +53,7 @@
                     !isOnTerminalCard()">
           <md-button aria-label="" class="oppia-learner-continue-button protractor-test-continue-to-next-card-button" focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>" ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)" translate="I18N_PLAYER_CONTINUE_BUTTON">
           </md-button>
+          <img class="logo-bottom-nav-bar" ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)" src="/assets/images/icons/626x626_continue_icon.png">
         </div>
         <div ng-if="isOnTerminalCard()" class="nav-bar-bottom-replay-content">
           <i ng-click="reloadExploration()" class="material-icons replay-nav-icon">replay</i>
