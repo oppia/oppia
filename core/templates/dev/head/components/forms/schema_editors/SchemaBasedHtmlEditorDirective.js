@@ -22,7 +22,6 @@ oppia.directive('schemaBasedHtmlEditor', [
       scope: {
         localValue: '=',
         isDisabled: '&',
-        allowExpressions: '&',
         labelForFocusTarget: '&',
         uiConfig: '&'
       },

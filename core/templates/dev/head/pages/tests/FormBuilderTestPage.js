@@ -21,8 +21,7 @@ oppia.directive('formOverlay', ['recursionHelper', function(recursionHelper) {
     scope: {
       definition: '=',
       isDisabled: '&',
-      savedValue: '=',
-      allowExpressions: '&'
+      savedValue: '='
     },
     templateUrl: 'formOverlay/entryPoint',
     restrict: 'E',
@@ -44,25 +43,14 @@ oppia.directive('formOverlay', ['recursionHelper', function(recursionHelper) {
 }]);
 
 oppia.controller('FormBuilderTests', [
-  '$scope', 'parameterSpecsService',
-  function($scope, parameterSpecsService) {
-    parameterSpecsService.addParamSpec('paramBool1', 'bool');
-    parameterSpecsService.addParamSpec('paramBool2', 'bool');
-    parameterSpecsService.addParamSpec('paramInt1', 'int');
-    parameterSpecsService.addParamSpec('paramFloat1', 'float');
-    parameterSpecsService.addParamSpec('paramFloat2', 'float');
-    parameterSpecsService.addParamSpec('paramUnicode1', 'unicode');
-    parameterSpecsService.addParamSpec('paramUnicode2', 'unicode');
-    parameterSpecsService.addParamSpec('paramUnicode3', 'unicode');
-
+  '$scope', function($scope) {
     $scope.testText = 'abc{{paramUnicode1}}';
 
     $scope.unicodeForm = {
       schema: {
         type: 'unicode'
       },
-      value: 'aab{{paramUnicode1}}',
-      allowExpressions: true
+      value: 'aab{{paramUnicode1}}'
     };
 
     $scope.booleanForms = [{
@@ -71,13 +59,6 @@ oppia.controller('FormBuilderTests', [
         type: 'bool'
       },
       value: true
-    }, {
-      name: 'Boolean form with expressions',
-      schema: {
-        type: 'bool'
-      },
-      value: 'paramBool1',
-      allowExpressions: true
     }];
 
     $scope.intForms = [{
@@ -90,14 +71,6 @@ oppia.controller('FormBuilderTests', [
         }]
       },
       value: 3
-    }, {
-      // TODO(sll): Add test for bad initialization.
-      name: 'Integer form with expressions',
-      schema: {
-        type: 'int'
-      },
-      value: 'paramInt1',
-      allowExpressions: true
     }];
 
     $scope.floatForms = [{
@@ -112,20 +85,6 @@ oppia.controller('FormBuilderTests', [
           max_value: 6.0
         }]
       },
-      value: 3.14
-    }, {
-      name: 'Float form with expressions (value must be between -3 and 6)',
-      schema: {
-        type: 'float',
-        validators: [{
-          id: 'is_at_least',
-          min_value: -3.0
-        }, {
-          id: 'is_at_most',
-          max_value: 6.0
-        }]
-      },
-      allowExpressions: true,
       value: 3.14
     }];
 

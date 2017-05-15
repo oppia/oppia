@@ -34,7 +34,6 @@ oppia.directive('schemaBasedListEditor', [
         len: '=',
         // UI configuration. May be undefined.
         uiConfig: '&',
-        allowExpressions: '&',
         validators: '&',
         labelForFocusTarget: '&'
       },
