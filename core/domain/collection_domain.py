@@ -74,22 +74,24 @@ class CollectionChange(object):
     def __init__(self, change_dict):
         """Initializes an CollectionChange object from a dict.
 
-        change_dict represents a command. It should have a 'cmd' key, and one
-        or more other keys. The keys depend on what the value for 'cmd' is.
-
-        The possible values for 'cmd' are listed below, together with the other
-        keys in the dict:
-        - 'add_collection_node' (with exploration_id)
-        - 'delete_collection_node' (with exploration_id)
-        - 'edit_collection_node_property' (with exploration_id,
-            property_name, new_value and, optionally, old_value)
-        - 'edit_collection_property' (with property_name, new_value and,
-            optionally, old_value)
-        - 'migrate_schema' (with from_version and to_version)
-
-        For a collection node, property_name must be one of
-        COLLECTION_NODE_PROPERTIES. For a collection, property_name must be
-        one of COLLECTION_PROPERTIES.
+        Args:
+            change_dict: dict. Represents a command. It should have a 'cmd'
+                key, and one or more other keys. The keys depend on what the
+                value for 'cmd' is. The possible values for 'cmd' are listed
+                below, together with the other keys in the dict:
+                    - 'add_collection_node' (with exploration_id)
+                    - 'delete_collection_node' (with exploration_id)
+                    - 'edit_collection_node_property' (with exploration_id,
+                        property_name, new_value and, optionally, old_value)
+                    - 'edit_collection_property' (with property_name, new_value
+                        and, optionally, old_value)
+                    - 'migrate_schema' (with from_version and to_version)
+            For a collection node, property_name must be one of
+            COLLECTION_NODE_PROPERTIES. For a collection, property_name must be
+            one of COLLECTION_PROPERTIES.
+			
+        Raises:
+            Exception: ìf change_dict is not valid.
         """
         if 'cmd' not in change_dict:
             raise Exception('Invalid change_dict: %s' % change_dict)
