@@ -86,9 +86,6 @@ oppia.controller('Dashboard', [
     $scope.emptyDashboardImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/general/empty_dashboard.svg');
 
-    $scope.unresolvedAnswersIconUrl = UrlInterpolationService.getStaticImageUrl(
-      '/icons/unresolved_answers.svg');
-
     $scope.setActiveTab = function(newActiveTabName) {
       $scope.activeTab = newActiveTabName;
     };
