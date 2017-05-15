@@ -1,5 +1,5 @@
 application: oppiaserver
-version: 2-4-6
+version: 2-4-7
 runtime: python27
 api_version: 1
 threadsafe: false
@@ -145,5 +145,4 @@ skip_files:
 - \.gitignore
 - ^\.git/.*
 - \.*\.lint$
-- ^fabfile\.py
 - ^testrunner\.py
