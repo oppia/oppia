@@ -62,6 +62,7 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           $scope.incorrectBoxes = [];
           $scope.currentDraggedElement = "";
           $scope.currentlyHoveredRegions = [];
+          //Shuffle function to shuffle array to ensure random word bank
           $scope.shuffle = function(a) {
               var j, x, i;
               for (i = a.length; i; i--) {
@@ -154,6 +155,7 @@ oppia.directive('oppiaInteractiveLabelingInput', [
             var image = $($element).find('.oppia-image-click-img');
             return image.height();
           }
+          //Get offset to draw image lines
           $scope.getLeftDelta = function(){
             var image = $($element).find('.oppia-image-click-img');
             return image.offset().left - image.parent().offset().left;
@@ -162,6 +164,7 @@ oppia.directive('oppiaInteractiveLabelingInput', [
             var image = $($element).find('.oppia-image-click-img');
             return image.offset().top - image.parent().offset().top;
           }
+          //Draw line on canvas, no line HTML class is available
           $scope.getLineDistance = function(x1, x2, y1, y2){
             var xDiff = Math.pow((x2 - x1), 2);
             var yDiff = Math.pow((y2 - y1), 2);
@@ -189,7 +192,7 @@ oppia.directive('oppiaInteractiveLabelingInput', [
               }
             }
           };
-
+          //Change to red if the input is not correct
           $scope.getRValue = function(region){
             //Get the region it is in and not the label
             console.log(region);
@@ -199,7 +202,7 @@ oppia.directive('oppiaInteractiveLabelingInput', [
             return $scope.maxRGBValue * 
                         ($scope.incorrectBoxes.indexOf(region.label) !== -1);
           }
-
+          //Change to blue if the input is correct
           $scope.getBValue = function(region){
             console.log(region);
             console.log($scope);
