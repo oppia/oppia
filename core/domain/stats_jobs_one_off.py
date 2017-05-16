@@ -1609,7 +1609,7 @@ class RefreshInteractionRegistryJob(jobs.BaseMapReduceJobManager):
 
 
 class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
-    """Migrates answers from old do new model.
+    """Migrates answers from old to new model.
 
     This job is responsible for migrating all answers stored within
     stats_models.StateRuleAnswerLogModel to stats_models.StateAnswersModel
@@ -1685,7 +1685,9 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _ensure_removed_interactions_are_in_registry(cls):
-        """Checks if the FileReadInput or TarFileReadInput deleted interactions
+        """Checks for file input deleted interactions in interaction_registry.
+
+        Checks if the FileReadInput or TarFileReadInput deleted interactions
         are present in the interaction_registry. If they are not, placeholder
         versions of them will be injected for the purposes of migrating answers
         from explorations that used to contain them.
@@ -1707,14 +1709,17 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _get_exploration_models_by_versions(cls, exp_id, versions):
-        """Similar to VersionedModel.get_version(), except this allows retrieval
+        """Get version; allows retrieval of deleted exploration models.
+
+        Similar to VersionedModel.get_version(), except this allows retrieval
         of exploration models marked as deleted.
 
-        Returns a tuple with the first element a list of exploration models, one
-        for each version in the versions list and in the same order. The second
-        element is an error, if any occurred. Either the first or second element
-        will be None and one will always be None, depending on the outcome of
-        the method.
+        Returns:
+            Tuple with the first element a list of exploration models, one
+            for each version in the versions list and in the same order. The second
+            element is an error, if any occurred. Either the first or second element
+            will be None and one will always be None, depending on the outcome of
+            the method.
         """
         try:
             # pylint: disable=protected-access
@@ -1765,12 +1770,15 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _get_explorations_from_models(cls, exp_models_by_versions):
-        """Returns a tuple with the first element being a list of Exploration
-        objects for each ExplorationModel passed in exp_models_by_versions. The
-        second element is a boolean indicating whether a conversion error
-        occurred when performing an needed exploration migrations for one of the
-        ExplorationModels. The third element is any errors that occurred,
-        ExplorationConversionError or otherwise.
+        """Get list of exploration models passed in exp_models_by_versions.
+
+        Returns:
+            Tuple with the first element being a list of Exploration
+            objects for each ExplorationModel passed in exp_models_by_versions. The
+            second element is a boolean indicating whether a conversion error
+            occurred when performing an needed exploration migrations for one of the
+            ExplorationModels. The third element is any errors that occurred,
+            ExplorationConversionError or otherwise.
         """
         cls._ensure_removed_interactions_are_in_registry()
         try:
@@ -1795,13 +1803,16 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _get_all_exploration_versions(cls, exp_id, max_version):
-        """Returns a tuple with the first element being a list of explorations
-        up to the max_version specified and the second element being any
-        migration errors that occurred while retrieivng the explorations, or
-        None if no migration errors occurred. The returned explorations are in
-        descending order by version. This function can retrieve deleted
-        explorations, but not permanently deleted explorations (in which case
-        the first element of the tuple will be empty list).
+        """Get list of explorations with associated migration errors.
+
+        Returns:
+            Tuple with the first element being a list of explorations
+            up to the max_version specified and the second element being any
+            migration errors that occurred while retrieivng the explorations, or
+            None if no migration errors occurred. The returned explorations are in
+            descending order by version. This function can retrieve deleted
+            explorations, but not permanently deleted explorations (in which case
+            the first element of the tuple will be empty list).
         """
         # NOTE(bhenning): It's possible some of these answers were submitted
         # during a playthrough where the exploration was changed midway. There's
@@ -1820,13 +1831,16 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     # This function comes from extensions.answer_summarizers.models.
     @classmethod
     def _get_hashable_value(cls, value):
-        """This function returns a hashable version of the input value. If the
-        value itself is hashable, it simply returns that value. If it's a list,
-        it will return a tuple with all of the list's elements converted to
-        hashable types. If it's a dictionary, it will first convert it to a list
-        of pairs, where the key and value of the pair are converted to hashable
-        types, then it will convert this list as any other list would be
-        converted.
+        """This function returns a hashable version of the input value.
+
+        Returns:
+            Hashable version of the input value. If the
+            value itself is hashable, it simply returns that value. If it's a list,
+            it will return a tuple with all of the list's elements converted to
+            hashable types. If it's a dictionary, it will first convert it to a list
+            of pairs, where the key and value of the pair are converted to hashable
+            types, then it will convert this list as any other list would be
+            converted.
         """
         if isinstance(value, list):
             return tuple([cls._get_hashable_value(elem) for elem in value])
@@ -1841,7 +1855,9 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _permute_index(cls, value_list, idx):
-        """Takes a list of values and a specific index and yields every
+        """Forms all possible permutations of a list element.
+
+        Takes a list of values and a specific index and yields every
         permutation of the value at the specified index in a new list with only
         the corresponding index changed for the new permutation. For instance,
         given the following example call to this method:
@@ -1852,6 +1868,15 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
             ['a', [1, 2], 'b']
             ['a', [2, 1], 'b']
+
+        Args:
+            value_list: list containing a list as at least one item.
+            idx: index of item to permute.
+
+        Returns:
+            List of lists, with each element being an altered version of
+            value_list such that the item at index idx contains a unique
+            permutation of the original item at index idx of value_list. 
         """
         if idx == len(value_list):
             yield value_list
@@ -1873,7 +1898,9 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _stringify_classified_rule(cls, rule_spec):
-        """This is based on the original
+        """Stringifies rules based on multiple permutations of the rule_spec inputs.
+
+       "This is based on the original
         exp_domain.RuleSpec.stringify_classified_rule, however it returns a list
         of possible matches by permuting the rule_spec inputs, since the order
         of a Python dict is implementation-dependent. Our stringified string may
