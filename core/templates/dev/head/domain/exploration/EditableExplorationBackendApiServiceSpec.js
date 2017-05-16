@@ -90,6 +90,24 @@ describe('Editable exploration backend API service', function() {
     }
   );
 
+  it('should fetch and apply the draft of am exploration',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      // Loading a exploration the first time should fetch it from the backend.
+      $httpBackend.expect('GET', '/createhandler/data/0?apply_draft=true').respond(
+        sampleDataResults);
+
+      EditableExplorationBackendApiService.fetchApplyDraftExploration(
+        '0').then(successHandler, failHandler);
+      $httpBackend.flush();
+
+      expect(successHandler).toHaveBeenCalledWith(exploration);
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+  );
+
   it('should use the rejection handler if the backend request failed',
     function() {
       var successHandler = jasmine.createSpy('success');
@@ -206,12 +224,10 @@ describe('Editable exploration backend API service', function() {
       expect(successHandler).toHaveBeenCalledWith(exploration);
       expect(failHandler).not.toHaveBeenCalled();
 
-      $httpBackend.expect('DELETE', '/createhandler/data/0').respond(
-        {});
+      $httpBackend.expect('DELETE', '/createhandler/data/0').respond({});
       EditableExplorationBackendApiService.deleteExploration(
-        exploration.exploration_id, null).then(
+        exploration.exploration_id).then(
           successHandler, failHandler);
-
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith({});

@@ -78,7 +78,8 @@ oppia.controller('StatisticsTab', [
             $scope.highlightStates = {};
             improvements.forEach(function(impItem) {
               // TODO(bhenning): This is the feedback for improvement types and
-              // should be included with the definitions of the improvement types.
+              // should be included with the definitions of the improvement
+              // types.
               if (impItem.type === IMPROVE_TYPE_DEFAULT) {
                 $scope.highlightStates[impItem.stateName] = (
                   'Needs more feedback');
@@ -86,7 +87,8 @@ oppia.controller('StatisticsTab', [
                 $scope.highlightStates[impItem.stateName] = 'May be confusing';
               }
             });
-        });
+          }
+        );
         var data = response.data;
         var numVisits = data.num_starts;
         var numCompletions = data.num_completions;

@@ -20,17 +20,17 @@ oppia.factory('EditableExplorationBackendApiService', [
   '$http', '$q', 'EXPLORATION_DATA_URL_TEMPLATE',
   'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
-  'EDITABLE_EXPLORATION_DATA_ROLE_URL_TEMPLATE', 'UrlInterpolationService',
+  'UrlInterpolationService',
   'ReadOnlyExplorationBackendApiService',
   function($http, $q, EXPLORATION_DATA_URL_TEMPLATE,
     EDITABLE_EXPLORATION_DATA_URL_TEMPLATE,
     EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE,
-    EDITABLE_EXPLORATION_DATA_ROLE_URL_TEMPLATE, UrlInterpolationService,
+    UrlInterpolationService,
     ReadOnlyExplorationBackendApiService) {
     var _fetchExploration = function(
         explorationId, applyDraft, successCallback, errorCallback) {
       var editableExplorationDataUrl = _getExplorationUrl(
-        explorationId, applyDraft, null);
+        explorationId, applyDraft);
 
       $http.get(editableExplorationDataUrl).then(function(response) {
         var exploration = angular.copy(response.data);
@@ -48,7 +48,7 @@ oppia.factory('EditableExplorationBackendApiService', [
         explorationId, explorationVersion, commitMessage, changeList,
         successCallback, errorCallback) {
       var editableExplorationDataUrl = _getExplorationUrl(
-        explorationId, null, null);
+        explorationId, null);
 
       var putData = {
         version: explorationVersion,
@@ -75,9 +75,8 @@ oppia.factory('EditableExplorationBackendApiService', [
     };
 
     var _deleteExploration = function(
-      explorationId, role, successCallback, errorCallback) {
-      var editableExplorationDataUrl = _getExplorationUrl(
-          explorationId, null, role);
+      explorationId, successCallback, errorCallback) {
+      var editableExplorationDataUrl = _getExplorationUrl(explorationId, null);
 
       $http['delete'](editableExplorationDataUrl).then(function() {
         // Delete item from the ReadOnlyExplorationBackendApiService's cache
@@ -93,26 +92,18 @@ oppia.factory('EditableExplorationBackendApiService', [
       });
     };
 
-    var _getExplorationUrl = function(explorationId, applyDraft, role) {
-      if (role) {
-        return UrlInterpolationService.interpolateUrl(
-        EDITABLE_EXPLORATION_DATA_ROLE_URL_TEMPLATE, {
-          exploration_id: explorationId,
-          role: JSON.stringify(role)
-        });
-      }
+    var _getExplorationUrl = function(explorationId, applyDraft) {
       if (applyDraft) {
         return UrlInterpolationService.interpolateUrl(
-        EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE, {
-          exploration_id: explorationId,
-          apply_draft: JSON.stringify(applyDraft)
-        });
+          EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE, {
+            exploration_id: explorationId,
+            apply_draft: JSON.stringify(applyDraft)
+          });
       }
       return UrlInterpolationService.interpolateUrl(
         EDITABLE_EXPLORATION_DATA_URL_TEMPLATE, {
           exploration_id: explorationId
-        }
-      );
+        });
     };
 
     return {
@@ -155,14 +146,14 @@ oppia.factory('EditableExplorationBackendApiService', [
 
       /**
        * Deletes an exploration in the backend with the provided exploration
-       * ID, for a particular role. If successful, the exploration will
-       * also be deleted from the ReadOnlyExplorationBackendApiService cache
-       * as well. Errors are passed to the error callback, if one is provided.
+       * ID. If successful, the exploration will also be deleted from the
+       * ReadOnlyExplorationBackendApiService cache as well. 
+       * Errors are passed to the error callback, if one is provided.
        */
-      deleteExploration: function(explorationId, role) {
+      deleteExploration: function(explorationId) {
         return $q(function(resolve, reject) {
           _deleteExploration(
-            explorationId, role, resolve, reject);
+            explorationId, resolve, reject);
         });
       }
     };

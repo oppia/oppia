@@ -35,9 +35,6 @@ oppia.constant(
 oppia.constant(
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
-oppia.constant(
-  'EDITABLE_EXPLORATION_DATA_ROLE_URL_TEMPLATE',
-  '/createhandler/data/<exploration_id>?role=<role>');
 
 oppia.controller('ExplorationEditor', [
   '$scope', '$http', '$window', '$rootScope', '$log', '$timeout',
