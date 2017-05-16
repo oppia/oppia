@@ -655,7 +655,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         # If the exploration is played in the context of a collection, the
         # collection is also added to the incomplete list.
         self.post_json(
-            '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_1_0,
+            '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_1_0, # pylint: disable=line-too-long
             payload, csrf_token)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
