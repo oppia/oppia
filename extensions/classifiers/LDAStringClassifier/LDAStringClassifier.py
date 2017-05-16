@@ -539,8 +539,6 @@ class LDAStringClassifier(BaseClassifier):
 
         return self
 
-        return self
-
     def _make_json_serializable(self, model):
         """Makes the StringClassifier dict JSON serializable by
         converting numpy data types to Python data types.
