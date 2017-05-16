@@ -49,6 +49,7 @@ describe('Collections', function() {
     element(by.css('.protractor-test-create-activity')).click();
     // Create new collection.
     element(by.css('.protractor-test-create-collection')).click();
+    browser.waitForAngular();
     // Add existing explorations.
     collectionEditor.addExistingExploration('0');
     collectionEditor.addExistingExploration('4');
