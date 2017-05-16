@@ -23,7 +23,6 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import stats_services
 from core.domain import subscription_services
 from core.domain import summary_services
 from core.domain import user_jobs_continuous
@@ -180,26 +179,11 @@ class DashboardHandler(base.BaseHandler):
             feedback_services.get_thread_analytics_multi(
                 exploration_ids_subscribed_to))
 
-        unresolved_answers_dict = (
-            stats_services.get_exps_unresolved_answers_for_default_rule(
-                exploration_ids_subscribed_to))
-
-        total_unresolved_answers = 0
-
+        # TODO(bhenning): Update this to use unresolved answers from
+        # stats_services once the training interface is enabled and it's cheaper
+        # to retrieve top answers from stats_services.
         for ind, exploration in enumerate(exp_summary_dicts):
             exploration.update(feedback_thread_analytics[ind].to_dict())
-            exploration.update({
-                'num_unresolved_answers': (
-                    unresolved_answers_dict[exploration['id']]['frequency']
-                    if exploration['id'] in unresolved_answers_dict else 0
-                ),
-                'top_unresolved_answers': (
-                    unresolved_answers_dict[exploration['id']]
-                    ['unresolved_answers']
-                    [:feconf.TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD]
-                )
-            })
-            total_unresolved_answers += exploration['num_unresolved_answers']
 
         exp_summary_dicts = sorted(
             exp_summary_dicts,
@@ -236,8 +220,7 @@ class DashboardHandler(base.BaseHandler):
                 self.user_id))
         dashboard_stats.update({
             'total_open_feedback': feedback_services.get_total_open_threads(
-                feedback_thread_analytics),
-            'total_unresolved_answers': total_unresolved_answers
+                feedback_thread_analytics)
         })
         if dashboard_stats and dashboard_stats.get('average_ratings'):
             dashboard_stats['average_ratings'] = (

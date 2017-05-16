@@ -206,6 +206,14 @@ class LibraryGroupIndexHandler(base.BaseHandler):
                 activity_list = top_rated_activity_summary_dicts
                 header_i18n_id = feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS
 
+        # TODO: create a Splash controller and implement this properly.
+        elif group_name == feconf.LIBRARY_CATEGORY_SPLASH_PAGE_FEATURED:
+            splash_page_featured_exploration_ids = [
+                '0', 'yvqBFOQNDz5e', 'BvpDpLSmO2Iu', 'gC4_ggkWar-L']
+            activity_list = (
+                summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                    splash_page_featured_exploration_ids))
+
         else:
             return self.PageNotFoundException
 
