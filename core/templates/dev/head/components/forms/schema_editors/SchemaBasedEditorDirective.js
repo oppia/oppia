@@ -23,7 +23,6 @@ oppia.directive('schemaBasedEditor', [
         schema: '&',
         isDisabled: '&',
         localValue: '=',
-        allowExpressions: '&',
         labelForFocusTarget: '&',
         onInputBlur: '=',
         onInputFocus: '='

@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,16 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the statistics tab of the collection editor.
+ * @fileoverview Controllers for fractions landing page.
  */
 
-oppia.directive('collectionStatisticsTab', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/statistics_tab/' +
-        'collection_statistics_tab_directive.html'),
-      controller: [function() {}]
-    };
-  }]);
+oppia.controller('Fractions', [
+  '$scope', 'UrlInterpolationService',
+  function($scope, UrlInterpolationService) {
+    $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+  }
+]);
