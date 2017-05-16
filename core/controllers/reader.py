@@ -444,7 +444,7 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
 
         if user_id:
             learner_progress_services.add_exp_to_incomplete_list(
-                user_id, exploration_id, timestamp, state_name, version)
+                user_id, timestamp, exploration_id, state_name, version)
 
         if user_id and collection_id:
             learner_progress_services.add_collection_id_to_incomplete_list(

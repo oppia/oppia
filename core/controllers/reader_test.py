@@ -14,6 +14,7 @@
 
 """Tests for the page that allows learners to play through an exploration."""
 
+import datetime
 import os
 
 from core.domain import collection_domain
@@ -462,53 +463,58 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
 class LearnerProgressTest(test_utils.GenericTestBase):
     """Tests for tracking learner progress."""
 
-    EXP_ID = '0'
+    EXP_ID_0 = '0'
     EXP_ID_1 = '1'
     EXP_ID_2 = 'exp_2'
     EXP_ID_3 = 'exp_3'
-    COL_ID = '0'
+    COL_ID_0 = '0'
     COL_ID_1 = 'a collection id'
     USER_EMAIL = 'user@example.com'
     USER_USERNAME = 'user'
 
     def setUp(self):
         super(LearnerProgressTest, self).setUp()
-        exp_services.load_demo(self.EXP_ID)
+        exp_services.load_demo(self.EXP_ID_0)
         exp_services.load_demo(self.EXP_ID_1)
-        collection_services.load_demo(self.COL_ID)
+        collection_services.load_demo(self.COL_ID_0)
 
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
+        # Save and publish a new exploration.
         self.save_new_valid_exploration(
             self.EXP_ID_2, self.owner_id, title='Sillat Suomi',
             category='Architecture', language_code='fi')
-
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID_2)
 
-        self.save_new_default_collection(
-            self.COL_ID_1, self.owner_id, title='Bridges in England',
-            category='Architecture')
-
+        # Save and publish another exploration.
         self.save_new_valid_exploration(
             self.EXP_ID_3, self.owner_id,
             title='Introduce Interactions in Oppia',
             category='Welcome', language_code='en')
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID_3)
 
+        # Save a new collection.
+        self.save_new_default_collection(
+            self.COL_ID_1, self.owner_id, title='Bridges in England',
+            category='Architecture')
+
+        # Add two explorations to the previously saved collection and publish
+        # it.
         for exp_id in [self.EXP_ID_2, self.EXP_ID_3]:
             collection_services.update_collection(
                 self.owner_id, self.COL_ID_1, [{
                     'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
                     'exploration_id': exp_id
                 }], 'Added new exploration')
-
         rights_manager.publish_collection(self.owner_id, self.COL_ID_1)
 
-    def test_exp_complete_event_handler(self):
-        """Test handler for exploration completion events."""
+    def test_independent_exp_complete_event_handler(self):
+        """Test handler for completion of explorations not in the context of
+        collections.
+        """
 
         self.login(self.USER_EMAIL)
         response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
@@ -522,13 +528,34 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             'version': 1
         }
 
-        # When an exploration is completed but is not under the context of a
+        # When an exploration is completed but is not in the context of a
         # collection, it is just added to the completed list.
         self.post_json(
-            '/explorehandler/exploration_complete_event/%s' % self.EXP_ID,
+            '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_0,
             payload, csrf_token)
         self.assertEqual(learner_progress_services.get_all_completed_exp_ids(
-            self.user_id), [self.EXP_ID])
+            self.user_id), [self.EXP_ID_0])
+
+        # Even when an exploration is a part of a collection, if it's not
+        # played in the context of that collection, only the exploration id
+        # is added to the completed list.
+        self.post_json(
+            '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_2,
+            payload, csrf_token)
+        self.assertEqual(learner_progress_services.get_all_completed_exp_ids(
+            self.user_id), [self.EXP_ID_0, self.EXP_ID_2])
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_collection_ids(
+                self.user_id), [])
+
+    def test_exp_complete_event_in_collection(self):
+        """Test handler for completion of explorations in the context of
+        collections.
+        """
+
+        self.login(self.USER_EMAIL)
+        response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
 
         payload = {
             'client_time_spent_in_secs': 0,
@@ -539,7 +566,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             'version': 1
         }
 
-        # If the exploration is completed under the context of a collection,
+        # If the exploration is completed in the context of a collection,
         # then in addition to the exploration being added to the completed
         # list, the collection is also added to the incomplete/complete list
         # dependent on whether there are more explorations left to complete.
@@ -552,7 +579,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [self.COL_ID_1])
         self.assertEqual(learner_progress_services.get_all_completed_exp_ids(
-            self.user_id), [self.EXP_ID, self.EXP_ID_2])
+            self.user_id), [self.EXP_ID_2])
 
         # Now we test the case when the collection is completed.
         self.post_json(
@@ -566,7 +593,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                 self.user_id), [self.COL_ID_1])
         self.assertEqual(
             learner_progress_services.get_all_completed_exp_ids(
-                self.user_id), [self.EXP_ID, self.EXP_ID_2, self.EXP_ID_3])
+                self.user_id), [self.EXP_ID_2, self.EXP_ID_3])
 
     def test_exp_incomplete_event_handler(self):
         """Test handler for leaving an exploration incomplete."""
@@ -585,19 +612,19 @@ class LearnerProgressTest(test_utils.GenericTestBase):
 
         # Add the incomplete exploration id to the incomplete list.
         self.post_json(
-            '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID,
+            '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_0,
             payload, csrf_token)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
-                self.user_id), [self.EXP_ID])
+                self.user_id), [self.EXP_ID_0])
 
         # Adding the exploration again has no effect.
         self.post_json(
-            '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID,
+            '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_0,
             payload, csrf_token)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
-                self.user_id), [self.EXP_ID])
+                self.user_id), [self.EXP_ID_0])
 
         payload = {
             'client_time_spent_in_secs': 0,
@@ -615,7 +642,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             payload, csrf_token)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
-                self.user_id), [self.EXP_ID, self.EXP_ID_2])
+                self.user_id), [self.EXP_ID_0, self.EXP_ID_2])
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [self.COL_ID_1])
@@ -629,21 +656,21 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
         csrf_token = self.get_csrf_token_from_response(response)
 
-        timestamp = '2017-04-13 12:15:04.948282'
+        timestamp = datetime.datetime.utcnow()
         state_name = 'state_name'
         version = 1
 
-        # Add two exploration to the partially completed list.
+        # Add two explorations to the partially completed list.
         learner_progress_services.add_exp_to_incomplete_list(
-            self.user_id, self.EXP_ID, timestamp, state_name, version)
+            self.user_id, timestamp, self.EXP_ID_0, state_name, version)
         learner_progress_services.add_exp_to_incomplete_list(
-            self.user_id, self.EXP_ID_1, timestamp, state_name, version)
+            self.user_id, timestamp, self.EXP_ID_1, state_name, version)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
-                self.user_id), [self.EXP_ID, self.EXP_ID_1])
+                self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
         payload = {
-            'exploration_id': self.EXP_ID
+            'exploration_id': self.EXP_ID_0
         }
 
         # Remove one exploration.
@@ -675,15 +702,15 @@ class LearnerProgressTest(test_utils.GenericTestBase):
 
         # Add two collections to incomplete list.
         learner_progress_services.add_collection_id_to_incomplete_list(
-            self.user_id, self.COL_ID)
+            self.user_id, self.COL_ID_0)
         learner_progress_services.add_collection_id_to_incomplete_list(
             self.user_id, self.COL_ID_1)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
-                self.user_id), [self.COL_ID, self.COL_ID_1])
+                self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
         payload = {
-            'collection_id': self.COL_ID
+            'collection_id': self.COL_ID_0
         }
 
         # Remove one collection.

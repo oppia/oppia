@@ -104,7 +104,7 @@ class ActivitiesCompletedByLearnerModel(base_models.BaseModel):
     Instances of this class are keyed by the user id.
     """
     # IDs of all the explorations completed by the user.
-    completed_exp_ids = ndb.StringProperty(repeated=True, indexed=True)
+    completed_exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of all the collections completed by the user.
     completed_collection_ids = ndb.StringProperty(repeated=True, indexed=True)
 
@@ -128,21 +128,22 @@ class IncompleteExplorationsModel(base_models.BaseModel):
     # A list which stores the explorations partially completed by the learner.
     # Each item in the list is a json object keyed by exploration id and the
     # value corresponds to a few extra details -
-    # timestamp: When did the learner leave the exploration.
-    # version: Version of the exploration.
+    # timestamp_msec: The time between the learner leaving the exploration and
+    #   epoch.
+    # version: Version of the exploration played by the learner.
     # state_name: The name of the state at which the learner left the
     # exploration. Example -
     # [
     #  {
     #   (exp_id_1): {
-    #    'timestamp': timestamp,
+    #    'timestamp_msec': time,
     #    'version': version,
     #    'state_name': state_name
     #   }
     #  },
     #  {
     #   (exp_id_2): {
-    #    'timestamp': timestamp,
+    #    'timestamp_msec': time,
     #    'version': version,
     #    'state_name': state_name
     #   }

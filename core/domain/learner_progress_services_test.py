@@ -15,10 +15,11 @@
 # limitations under the License.
 
 """Tests for learner progress services."""
-
+import datetime
 from core.domain import learner_progress_services
 from core.platform import models
 from core.tests import test_utils
+import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -68,7 +69,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 user_id, strict=False))
 
         return (
-            activities_completed_model.completed_exp_ids if
+            activities_completed_model.completed_exploration_ids if
             activities_completed_model else [])
 
     def _get_all_completed_collection_ids(self, user_id):
@@ -120,13 +121,13 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_all_completed_exp_ids(self.user_id), [self.EXP_ID_0])
 
-        timestamp = '2017-04-13 12:15:04.948282'
-        state_name = 'state name'
+        timestamp = datetime.datetime.utcnow()
+        state_name = 'state_name'
         version = 1
 
         # Add an exploration to the in progress list of the learner.
         learner_progress_services.add_exp_to_incomplete_list(
-            self.user_id, self.EXP_ID_1, timestamp, state_name, version)
+            self.user_id, timestamp, self.EXP_ID_1, state_name, version)
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_1])
         # Test that on adding an incomplete exploration to the completed list
@@ -188,13 +189,13 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [])
 
-        timestamp = '2017-04-13 12:15:04.948282'
+        timestamp = datetime.datetime.utcnow()
         state_name = 'state name'
         version = 1
 
         exp_details = {
             self.EXP_ID_0: {
-                'timestamp': timestamp,
+                'timestamp_msec': utils.get_time_in_millisecs(timestamp),
                 'state_name': state_name,
                 'version': version
             }
@@ -202,18 +203,18 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Add an exploration to the incomplete list of a learner.
         learner_progress_services.add_exp_to_incomplete_list(
-            self.user_id, self.EXP_ID_0, timestamp, state_name, version)
+            self.user_id, timestamp, self.EXP_ID_0, state_name, version)
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_0])
         self.assertEqual(self._get_incomplete_exp_details(
             self.user_id, self.EXP_ID_0), exp_details)
 
-        timestamp = '2017-05-13 11:15:03.948282'
+        timestamp = datetime.datetime.utcnow()
         version = 2
 
         modified_exp_details = {
             self.EXP_ID_0: {
-                'timestamp': timestamp,
+                'timestamp_msec': utils.get_time_in_millisecs(timestamp),
                 'state_name': state_name,
                 'version': version
             }
@@ -222,7 +223,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # On adding an exploration again, its details are updated to the latest
         # version.
         learner_progress_services.add_exp_to_incomplete_list(
-            self.user_id, self.EXP_ID_0, timestamp, state_name, version)
+            self.user_id, timestamp, self.EXP_ID_0, state_name, version)
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_0])
         self.assertEqual(self._get_incomplete_exp_details(
@@ -232,14 +233,14 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         learner_progress_services.add_exp_id_to_completed_list(
             self.user_id, self.EXP_ID_1)
         learner_progress_services.add_exp_to_incomplete_list(
-            self.user_id, self.EXP_ID_1, timestamp, state_name, version)
+            self.user_id, timestamp, self.EXP_ID_1, state_name, version)
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_0])
 
         # Test that an exploration created by the user is not added to the
         # incomplete list.
         learner_progress_services.add_exp_to_incomplete_list(
-            self.user_id, self.EXP_ID_2, timestamp, state_name, version)
+            self.user_id, timestamp, self.EXP_ID_2, state_name, version)
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_0])
 
@@ -279,15 +280,15 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [])
 
-        timestamp = '2017-04-13 12:15:04.948282'
+        timestamp = datetime.datetime.utcnow()
         state_name = 'state name'
         version = 1
 
         # Add incomplete explorations.
         learner_progress_services.add_exp_to_incomplete_list(
-            self.user_id, self.EXP_ID_0, timestamp, state_name, version)
+            self.user_id, timestamp, self.EXP_ID_0, state_name, version)
         learner_progress_services.add_exp_to_incomplete_list(
-            self.user_id, self.EXP_ID_1, timestamp, state_name, version)
+            self.user_id, timestamp, self.EXP_ID_1, state_name, version)
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
@@ -379,20 +380,20 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [])
 
-        timestamp = '2017-04-13 12:15:04.948282'
+        timestamp = datetime.datetime.utcnow()
         state_name = 'state name'
         version = 1
 
         # Add an exploration to the incomplete list.
         learner_progress_services.add_exp_to_incomplete_list(
-            self.user_id, self.EXP_ID_0, timestamp, state_name, version)
+            self.user_id, timestamp, self.EXP_ID_0, state_name, version)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [self.EXP_ID_0])
 
         # Add another exploration.
         learner_progress_services.add_exp_to_incomplete_list(
-            self.user_id, self.EXP_ID_1, timestamp, state_name, version)
+            self.user_id, timestamp, self.EXP_ID_1, state_name, version)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1])

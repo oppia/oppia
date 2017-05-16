@@ -16,16 +16,21 @@
 
 """Services for tracking the progress of the learner."""
 
-from core.platform import models
 from core.domain import subscription_services
+from core.platform import models
+import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
-def add_exp_id_to_completed_list(user_id, exp_id):
-    """Adds the exploration id to the completed list of the user.
 
-    Callers of this function must ensure that the user id and the
-    exploration id are valid.
+def add_exp_id_to_completed_list(user_id, exp_id):
+    """Adds the exploration id to the completed list of the user unless the
+    exploration has already been completed or has been created by the user.
+    It is also removed from the incomplete list (if present).
+
+    Args:
+        user_id: str. The id of the learner.
+        exp_id: str. The id of the exploration.
     """
     activities_completed_model = (
         user_models.ActivitiesCompletedByLearnerModel.get(
@@ -38,18 +43,21 @@ def add_exp_id_to_completed_list(user_id, exp_id):
         subscription_services.get_exploration_ids_subscribed_to(user_id))
 
     if (exp_id not in exploration_created_ids and
-            exp_id not in activities_completed_model.completed_exp_ids):
+            exp_id not in activities_completed_model.completed_exploration_ids):
         # Remove the exploration from the in progress list (if present) as it is
         # now completed.
         remove_exp_from_incomplete_list(user_id, exp_id)
-        activities_completed_model.completed_exp_ids.append(exp_id)
+        activities_completed_model.completed_exploration_ids.append(exp_id)
         activities_completed_model.put()
 
 def add_collection_id_to_completed_list(user_id, collection_id):
-    """Adds the collection id to the list of collections completed by the user.
+    """Adds the collection id to the list of collections completed by the user
+    unless the collection has already been completed or has been created by the
+    user. It is also removed from the incomplete list (if present).
 
-    Callers of this function must ensure that the user id and collection id are
-    valid.
+    Args:
+        user_id: str. The id of the learner.
+        collection_id: str. The id of the collection.
     """
     activities_completed_model = (
         user_models.ActivitiesCompletedByLearnerModel.get(
@@ -72,29 +80,39 @@ def add_collection_id_to_completed_list(user_id, collection_id):
         activities_completed_model.put()
 
 def add_exp_to_incomplete_list(
-        user_id, exploration_id, timestamp, state_name, version):
-    """Adds the exploration id to the incomplete list of the user.
+        user_id, timestamp, exploration_id, state_name, exploration_version):
+    """Adds the exploration id to the incomplete list of the user unless the
+    exploration has been already completed or has been created by the user. If
+    the exploration is already present in the incomplete list, just the details
+    associated with it are updated.
 
-    Callers of this function must ensure that all the arguments provided are
-    valid.
+    Args:
+        user_id: str. The id of the learner.
+        timestamp: datetime.datetime. The time at which the user left the
+            exploraion.
+        exploration_id: str. The id of the exploration.
+        state_name: str. The name of the state at which the user left the
+            exploration.
+        exploration_version: str. The version of the exploration played by the
+            learner.
     """
-    incomplete_exp_model = (
+    incomplete_exps_model = (
         user_models.IncompleteExplorationsModel.get(
             user_id, strict=False))
-    if not incomplete_exp_model:
-        incomplete_exp_model = (
+    if not incomplete_exps_model:
+        incomplete_exps_model = (
             user_models.IncompleteExplorationsModel(
                 id=user_id))
 
-    completed_exp_ids = get_all_completed_exp_ids(user_id)
+    completed_exploration_ids = get_all_completed_exp_ids(user_id)
 
     exploration_created_ids = (
         subscription_services.get_exploration_ids_subscribed_to(user_id))
 
     incomplete_exp_details = {
-        'timestamp': str(timestamp),
+        'timestamp_msec': utils.get_time_in_millisecs(timestamp),
         'state_name': state_name,
-        'version': version
+        'version': exploration_version
     }
 
     incomplete_exp = {
@@ -102,25 +120,27 @@ def add_exp_to_incomplete_list(
     }
 
     exp_already_present = False
-    if (exploration_id not in completed_exp_ids and
+    if (exploration_id not in completed_exploration_ids and
             exploration_id not in exploration_created_ids):
 
-        for exp in incomplete_exp_model.incomplete_exps:
+        for exp in incomplete_exps_model.incomplete_exps:
             if exploration_id == exp.keys()[0]:
                 exp[exploration_id] = incomplete_exp_details
                 exp_already_present = True
 
         if not exp_already_present:
-            incomplete_exp_model.incomplete_exps.append(
+            incomplete_exps_model.incomplete_exps.append(
                 incomplete_exp)
-        incomplete_exp_model.put()
+        incomplete_exps_model.put()
 
 def add_collection_id_to_incomplete_list(user_id, collection_id):
     """Adds the collection id to the list of collections partially completed by
-    the user.
+    the user unless the collection has already been completed or has been
+    created by the user or is already present in the incomplete list.
 
-    Callers of this function must ensure that the user id and collection id are
-    valid.
+    Args:
+        user_id: str. The id of the learner.
+        collection_id: str. The id of the collection.
     """
     incomplete_collections_model = (
         user_models.IncompleteCollectionsModel.get(user_id, strict=False))
@@ -141,26 +161,30 @@ def add_collection_id_to_incomplete_list(user_id, collection_id):
         incomplete_collections_model.put()
 
 def remove_exp_from_incomplete_list(user_id, exploration_id):
-    """Removes the exploration from the incomplete list of the user.
+    """Removes the exploration from the incomplete list of the user
+    (if present).
 
-    Callers of this function must ensure that the user id and the
-    exploration id are valid.
+    Args:
+        user_id: str. The id of the learner.
+        exploration_id: str. The id of the exploration.
     """
-    incomplete_exp_model = (
+    incomplete_exps_model = (
         user_models.IncompleteExplorationsModel.get(user_id, strict=False))
 
-    if incomplete_exp_model:
-        for exp in incomplete_exp_model.incomplete_exps:
+    if incomplete_exps_model:
+        for exp in incomplete_exps_model.incomplete_exps:
             if exploration_id == exp.keys()[0]:
-                incomplete_exp_model.incomplete_exps.remove(
+                incomplete_exps_model.incomplete_exps.remove(
                     exp)
-                incomplete_exp_model.put()
+                incomplete_exps_model.put()
 
 def remove_collection_from_incomplete_list(user_id, collection_id):
-    """Removes the collection id from the list of incomplete collections.
+    """Removes the collection id from the list of incomplete collections
+    (if present).
 
-    Callers of this function must ensure that the user id and
-    collection id are valid.
+    Args:
+        user_id: str. The id of the learner.
+        collection_id: str. The id of the collection.
     """
     incomplete_collections_model = (
         user_models.IncompleteCollectionsModel.get(user_id, strict=False))
@@ -175,21 +199,31 @@ def get_all_completed_exp_ids(user_id):
     """Returns a list with the ids of all the explorations completed by the
     user.
 
-    Callers of this function should ensure that the user_id is valid.
+    Args:
+        user_id: str. The id of the learner.
+
+    Returns:
+        list(str). A list of the ids of the explorations completed by the
+            learner.
     """
     activities_completed_model = (
         user_models.ActivitiesCompletedByLearnerModel.get(
             user_id, strict=False))
 
     return (
-        activities_completed_model.completed_exp_ids if
+        activities_completed_model.completed_exploration_ids if
         activities_completed_model else [])
 
 def get_all_completed_collection_ids(user_id):
     """Returns a list with the ids of all the collections completed by the
     user.
 
-    Callers of this function should ensure that the user id is valid.
+    Args:
+        user_id: str. The id of the learner.
+
+    Returns:
+        list(str). A list of the ids of the collections completed by the
+            learner.
     """
     activities_completed_model = (
         user_models.ActivitiesCompletedByLearnerModel.get(
@@ -203,15 +237,20 @@ def get_all_incomplete_exp_ids(user_id):
     """Returns a list with the ids of all the explorations partially completed
     by the user.
 
-    Callers of this function must ensure that the user id is valid.
+    Args:
+        user_id: str. The id of the learner.
+
+    Returns:
+        list(str). A list of the ids of the explorations partially completed by
+            the learner.
     """
-    incomplete_exp_model = (
+    incomplete_exps_model = (
         user_models.IncompleteExplorationsModel.get(
             user_id, strict=False))
 
-    if incomplete_exp_model:
+    if incomplete_exps_model:
         incomplete_exp_ids = [
-            exp.keys()[0] for exp in incomplete_exp_model.incomplete_exps]
+            exp.keys()[0] for exp in incomplete_exps_model.incomplete_exps]
     else:
         incomplete_exp_ids = []
 
@@ -221,7 +260,12 @@ def get_all_incomplete_collection_ids(user_id):
     """Returns a list with the ids of all the collections partially completed
     by the user.
 
-    Callers of this function must ensure that the user id is valid.
+    Args:
+        user_id: str. The id of the learner.
+
+    Returns:
+        list(str). A list of the ids of the collections partially completed by
+            the learner.
     """
     incomplete_collections_model = (
         user_models.IncompleteCollectionsModel.get(user_id, strict=False))
