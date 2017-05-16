@@ -96,42 +96,34 @@ def add_exp_to_incomplete_list(
         exploration_version: str. The version of the exploration played by the
             learner.
     """
-    incomplete_exps_model = (
+    incomplete_explorations_model = (
         user_models.IncompleteExplorationsModel.get(
             user_id, strict=False))
-    if not incomplete_exps_model:
-        incomplete_exps_model = (
-            user_models.IncompleteExplorationsModel(
-                id=user_id))
+    if not incomplete_explorations_model:
+        incomplete_explorations_model = (
+            user_models.IncompleteExplorationsModel(id=user_id))
 
     completed_exploration_ids = get_all_completed_exp_ids(user_id)
 
     exploration_created_ids = (
         subscription_services.get_exploration_ids_subscribed_to(user_id))
 
-    incomplete_exp_details = {
-        'timestamp_msec': utils.get_time_in_millisecs(timestamp),
-        'state_name': state_name,
-        'version': exploration_version
-    }
-
-    incomplete_exp = {
-        exploration_id: incomplete_exp_details
-    }
-
-    exp_already_present = False
     if (exploration_id not in completed_exploration_ids and
             exploration_id not in exploration_created_ids):
 
-        for exp in incomplete_exps_model.incomplete_exps:
-            if exploration_id == exp.keys()[0]:
-                exp[exploration_id] = incomplete_exp_details
-                exp_already_present = True
+        if exploration_id not in incomplete_explorations_model.incomplete_exploration_ids: # pylint: disable=line-too-long
+            incomplete_explorations_model.incomplete_exploration_ids.append(
+                exploration_id)
 
-        if not exp_already_present:
-            incomplete_exps_model.incomplete_exps.append(
-                incomplete_exp)
-        incomplete_exps_model.put()
+        incomplete_exploration_user_model = (
+            incomplete_explorations_model.get_last_playthrough_information_model( # pylint: disable=line-too-long
+                exploration_id))
+        incomplete_exploration_user_model.update_last_played_information(
+            utils.get_time_in_millisecs(timestamp),
+            exploration_version,
+            state_name)
+
+        incomplete_explorations_model.put()
 
 def add_collection_id_to_incomplete_list(user_id, collection_id):
     """Adds the collection id to the list of collections partially completed by
@@ -168,15 +160,18 @@ def remove_exp_from_incomplete_list(user_id, exploration_id):
         user_id: str. The id of the learner.
         exploration_id: str. The id of the exploration.
     """
-    incomplete_exps_model = (
+    incomplete_explorations_model = (
         user_models.IncompleteExplorationsModel.get(user_id, strict=False))
 
-    if incomplete_exps_model:
-        for exp in incomplete_exps_model.incomplete_exps:
-            if exploration_id == exp.keys()[0]:
-                incomplete_exps_model.incomplete_exps.remove(
-                    exp)
-                incomplete_exps_model.put()
+    if incomplete_explorations_model:
+        if exploration_id in incomplete_explorations_model.incomplete_exploration_ids: # pylint: disable=line-too-long
+            incomplete_explorations_model.incomplete_exploration_ids.remove(
+                exploration_id)
+            incomplete_exploration_user_model = (
+                incomplete_explorations_model.get_last_playthrough_information_model( # pylint: disable=line-too-long
+                    exploration_id))
+            incomplete_exploration_user_model.delete()
+            incomplete_explorations_model.put()
 
 def remove_collection_from_incomplete_list(user_id, collection_id):
     """Removes the collection id from the list of incomplete collections
@@ -244,17 +239,14 @@ def get_all_incomplete_exp_ids(user_id):
         list(str). A list of the ids of the explorations partially completed by
             the learner.
     """
-    incomplete_exps_model = (
+    incomplete_explorations_model = (
         user_models.IncompleteExplorationsModel.get(
             user_id, strict=False))
 
-    if incomplete_exps_model:
-        incomplete_exp_ids = [
-            exp.keys()[0] for exp in incomplete_exps_model.incomplete_exps]
-    else:
-        incomplete_exp_ids = []
+    return (
+        incomplete_explorations_model.incomplete_exploration_ids if
+        incomplete_explorations_model else [])
 
-    return incomplete_exp_ids
 
 def get_all_incomplete_collection_ids(user_id):
     """Returns a list with the ids of all the collections partially completed

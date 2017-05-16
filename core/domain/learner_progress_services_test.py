@@ -82,21 +82,26 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             activities_completed_model else [])
 
     def _get_all_incomplete_exp_ids(self, user_id):
-        incomplete_exp_model = (user_models.IncompleteExplorationsModel.get(
-            user_id, strict=False))
+        incomplete_explorations_model = (
+            user_models.IncompleteExplorationsModel.get(user_id, strict=False))
 
         return (
-            [exp.keys()[0] for exp in
-             incomplete_exp_model.incomplete_exps] if
-            incomplete_exp_model else [])
+            incomplete_explorations_model.incomplete_exploration_ids if
+            incomplete_explorations_model else [])
 
-    def _get_incomplete_exp_details(self, user_id, exp_id):
-        incomplete_exp_model = (user_models.IncompleteExplorationsModel.get(
-            user_id, strict=False))
+    def _get_incomplete_exp_details(self, user_id, exploration_id):
+        incomplete_explorations_model = (
+            user_models.IncompleteExplorationsModel.get(user_id, strict=False))
 
-        for exp in incomplete_exp_model.incomplete_exps:
-            if exp_id == exp.keys()[0]:
-                return exp
+        incomplete_exploration_user_model = (
+            incomplete_explorations_model.get_last_playthrough_information_model( # pylint: disable=line-too-long
+                exploration_id))
+
+        return {
+            'timestamp_msec': incomplete_exploration_user_model.time_last_played_msec, # pylint: disable=line-too-long
+            'state_name': incomplete_exploration_user_model.last_state_played,
+            'version': incomplete_exploration_user_model.version_last_played
+        }
 
     def _get_all_incomplete_collection_ids(self, user_id):
         incomplete_collections_model = (
@@ -194,11 +199,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         version = 1
 
         exp_details = {
-            self.EXP_ID_0: {
-                'timestamp_msec': utils.get_time_in_millisecs(timestamp),
-                'state_name': state_name,
-                'version': version
-            }
+            'timestamp_msec': utils.get_time_in_millisecs(timestamp),
+            'state_name': state_name,
+            'version': version
         }
 
         # Add an exploration to the incomplete list of a learner.
@@ -210,14 +213,13 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.EXP_ID_0), exp_details)
 
         timestamp = datetime.datetime.utcnow()
+        state_name = 'new_state_name'
         version = 2
 
         modified_exp_details = {
-            self.EXP_ID_0: {
-                'timestamp_msec': utils.get_time_in_millisecs(timestamp),
-                'state_name': state_name,
-                'version': version
-            }
+            'timestamp_msec': utils.get_time_in_millisecs(timestamp),
+            'state_name': state_name,
+            'version': version
         }
 
         # On adding an exploration again, its details are updated to the latest

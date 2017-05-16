@@ -125,32 +125,103 @@ class IncompleteExplorationsModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
-    # A list which stores the explorations partially completed by the learner.
-    # Each item in the list is a json object keyed by exploration id and the
-    # value corresponds to a few extra details -
-    # timestamp_msec: The time between the learner leaving the exploration and
-    #   epoch.
-    # version: Version of the exploration played by the learner.
-    # state_name: The name of the state at which the learner left the
-    # exploration. Example -
-    # [
-    #  {
-    #   (exp_id_1): {
-    #    'timestamp_msec': time,
-    #    'version': version,
-    #    'state_name': state_name
-    #   }
-    #  },
-    #  {
-    #   (exp_id_2): {
-    #    'timestamp_msec': time,
-    #    'version': version,
-    #    'state_name': state_name
-    #   }
-    #  },
-    # ]
-    incomplete_exps = ndb.JsonProperty(
-        repeated=True, indexed=True)
+    # The ids of the explorations partially completed by the user.
+    incomplete_exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
+
+    def get_last_playthrough_information_model(self, exploration_id):
+        """Get the information regarding the last playthrough of the user of
+        the given exploration.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+
+        Returns:
+            IncompleteExplorationUserModel. A instance of the
+            IncompleteExplorationUserModel if present or it creates a new one.
+        """
+        incomplete_exploration_user_model = IncompleteExplorationUserModel.get(
+            self.id, exploration_id)
+
+        if not incomplete_exploration_user_model:
+            incomplete_exploration_user_model = (
+                IncompleteExplorationUserModel.create(self.id, exploration_id))
+
+        return incomplete_exploration_user_model
+
+
+class IncompleteExplorationUserModel(base_models.BaseModel):
+    """Stores the "last playthrough" information of the exploration since the
+    user left it partially completed.
+
+    Instances of this class have keys of the form
+    [user_id].[exploration_id]
+    """
+    # The user id.
+    user_id = ndb.StringProperty(required=True, indexed=True)
+    # The exploration id.
+    exploration_id = ndb.StringProperty(required=True, indexed=True)
+    # The version of the exploration last played by the user.
+    version_last_played = ndb.IntegerProperty(default=None)
+    # The time since the user last played the exploration.
+    time_last_played_msec = ndb.FloatProperty(default=None)
+    # The state at which the learner left the exploration when he/she last
+    # played it.
+    last_state_played = ndb.StringProperty(default=None)
+
+    @classmethod
+    def _generate_id(cls, user_id, exploration_id):
+        return '%s.%s' % (user_id, exploration_id)
+
+    @classmethod
+    def create(cls, user_id, exploration_id):
+        """Creates a new IncompleteExplorationUserModel instance and returns it.
+
+        Args:
+            user_id: str. The id of the user.
+            exploration_id: str. The id of the exploration.
+
+        Returns:
+            IncompleteExplorationUserModel. The newly created
+            IncompleteExplorationUserModel instance.
+        """
+        instance_id = cls._generate_id(user_id, exploration_id)
+        return cls(
+            id=instance_id, user_id=user_id, exploration_id=exploration_id)
+
+    @classmethod
+    def get(cls, user_id, exploration_id):
+        """Gets the IncompleteExplorationUserModel for the given user and
+        exploration id.
+
+        Args:
+            user_id: str. The id of the user.
+            exploration_id: str. The id of the exploration.
+
+        Returns:
+            IncompleteExplorationUserModel. The IncompleteExplorationUserModel
+            instance which matches with the given user_id and exploration_id.
+        """
+        instance_id = cls._generate_id(user_id, exploration_id)
+        return super(IncompleteExplorationUserModel, cls).get(
+            instance_id, strict=False)
+
+    def update_last_played_information(self, time_last_played_msec,
+                                       version_last_played,
+                                       last_state_played):
+        """Updates the last playthrough information of the user.
+
+        Args:
+            time_last_played_msec: int. The time in milliseconds since the user
+                last played the exploration.
+            version_last_played: int. The version of the exploration that was
+                played by the user.
+            last_state_played: str. The name of the state at which the learner
+                left the exploration.
+        """
+        self.time_last_played_msec = time_last_played_msec
+        self.version_last_played = version_last_played
+        self.last_state_played = last_state_played
+        self.put()
 
 
 class UserContributionsModel(base_models.BaseModel):
