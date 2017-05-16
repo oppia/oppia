@@ -1,0 +1,253 @@
+{% extends 'pages/base.html' %}
+
+{% block prerender %}
+  <link rel="prerender" href="/library">
+{% endblock prerender %}
+
+{% block maintitle %}
+  I18N_SPLASH_PAGE_TITLE
+{% endblock maintitle %}
+
+{% block header_js %}
+  {{ super() }}
+{% endblock %}
+
+{% block navbar_breadcrumb %}
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <div ng-controller="Splash" style="background-color: #afd2eb; font-size: 14px;">
+    <div class="container">
+      <div class="row">
+        <div class="oppia-splash-new-main-cta col-xs-12">
+          <h1 class="oppia-splash-new-h1">Welcome to Oppia</h1>
+          <h2 class="oppia-splash-new-h2">Oppia's mission is to help anyone learn in an effective and enjoyable way.</h2>
+          <div class="oppia-button-container">
+            <button type="button"
+                    ng-click="onClickBrowseLibraryButton()"
+                    class="btn oppia-transition-200">
+              Start Learning
+            </button>
+            <button type="button"
+                    ng-click="onRedirectToLogin('/dashboard?mode=create')"
+                    class="btn oppia-transition-200">
+              Share Your Knowledge
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="jumbotron">
+        <h2 class="oppia-splash-new-h2">Start learning with some of our most popular lessons:</h2>
+        <div class="oppia-splash-new-exploration-summaries">
+          <div ng-repeat="tile in activityList" style="display: inline-block;">
+            <exploration-summary-tile exploration-id="tile.id"
+                                      exploration-title="tile.title"
+                                      last-updated-msec="tile.last_updated_msec"
+                                      objective="tile.objective"
+                                      category="tile.category"
+                                      ratings="tile.ratings"
+                                      num-views="tile.num_views"
+                                      thumbnail-icon-url="tile.thumbnail_icon_url"
+                                      thumbnail-bg-color="tile.thumbnail_bg_color"
+                                      class="protractor-test-exp-summary-tile">
+            </exploration-summary-tile>
+          </div>
+        </div>
+      </div>
+      <div class="jumbotron">
+        <div class="row">
+          <div class="col-sm-4 oppia-bullet-holder">
+            <div class="row">
+              <img ng-src="<[getStaticImageUrl('/splash/bullet1icon.svg')]>" alt="">
+            </div>
+            <div class="row">
+              <p>Oppia's lessons are more fun and immersive than static videos or text, helping people learn by doing.</p>
+            </div>
+          </div>
+          <div class="col-sm-4 oppia-bullet-holder">
+            <div class="row">
+              <img ng-src="<[getStaticImageUrl('/splash/bullet2icon.svg')]>" alt="">
+            </div>
+            <div class="row">
+              <p>Lessons are simple to create and even easier to play. Learners receive tailored feedback based on areas for improvement.</p>
+            </div>
+          </div>
+          <div class="col-sm-4 oppia-bullet-holder">
+            <div class="row">
+              <img ng-src="<[getStaticImageUrl('/splash/bullet3icon.svg')]>" alt="">
+            </div>
+            <div class="row">
+              <p>Join over 250,000 learners and educators from around the world: <a ng-click="onClickBrowseLibraryButton()">start learning</a> or <a ng-click="onRedirectToLogin('/dashboard?mode=create')">share your knowledge</a> today!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="oppia-splash-new-callout">
+      <button type="button"
+              ng-click="onClickBrowseLibraryButton()"
+              class="btn oppia-transition-200">
+        Start Learning
+      </button>
+      <button type="button"
+              ng-click="onRedirectToLogin('/dashboard?mode=create')"
+              class="btn oppia-transition-200">
+        Share Your Knowledge
+      </button>
+    </div>
+  </div>
+
+  <style>
+    .oppia-splash-new-main-cta {
+      float: none;
+      margin: 30px auto 20px auto;
+      max-width: 650px;
+    }
+
+    .oppia-splash-new-h1 {
+      color: #024340;
+      font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+      font-size: 2.75em;
+      margin: 20px auto 0 auto;
+      text-align: center;
+    }
+
+    .oppia-splash-new-h2 {
+      -webkit-font-smoothing: subpixel-antialiased;
+      color: #04857c;
+      font-family: 'Rubik', 'Roboto', Arial, sans-serif;
+      font-size: 2em;
+      font-weight: 300;
+      line-height: 1.2;
+      margin: 18px 0;
+      text-align: center;
+      text-rendering: auto;
+    }
+
+    .jumbotron .oppia-splash-new-h2 {
+      margin-top: 0;
+    }
+
+    .oppia-button-container {
+      display: flex;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .oppia-button-container button {
+      background-color: #015c53;
+      border-radius: 0;
+      border: none;
+      color: #ffffff;
+      font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+      font-size: 16px;
+      margin: auto 5px;
+      max-width: 300px;
+      padding: 10px;
+      text-transform: uppercase;
+      width: 100%;
+    }
+
+    .oppia-button-container button:hover {
+      background-color: #05beb2;
+      color: #ffffff;
+    }
+
+    .oppia-bullet-holder img {
+      display: block;
+      height: 125px;
+      margin: auto;
+    }
+
+    .oppia-bullet-holder p {
+      color: #333333;
+      font-family: 'Rubik', 'Roboto', Arial, sans-serif;
+      -webkit-font-smoothing: subpixel-antialiased;
+      font-weight: 300;
+      line-height: 1.45;
+      padding: 5px 15px;
+    }
+
+    .oppia-splash-new-exploration-summaries {
+      font-size: 16px;
+      text-align: center;
+    }
+
+    .oppia-splash-new-callout {
+      background-color: #009788;
+      color: #ffffff;
+      height: 150px;
+      text-align: center;
+    }
+
+    .oppia-splash-new-callout button {
+      background-color: #00796d;
+      border-radius: 5px;
+      font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+      font-size: 18px;
+      -webkit-font-smoothing: subpixel-antialiased;
+      margin: 0 15px 15px 15px;
+      max-width: 90%;
+      padding: 15px;
+      position: relative;
+      text-transform: uppercase;
+      top: 50%;
+      transform: translateY(-50%);
+      white-space: normal;
+      width: 352px;
+    }
+
+    .oppia-splash-new-callout button:hover {
+      background-color: #05beb2;
+      color: #ffffff;
+    }
+
+    @media (max-width: 768px) {
+      .oppia-display-desktop-only {
+        display: none !important;
+      }
+
+      .oppia-button-container {
+        flex-wrap: wrap;
+      }
+
+      .oppia-button-container button {
+        margin-bottom: 5px;
+      }
+
+      .oppia-splash-new-callout {
+        height: auto;
+        padding: 15px 0;
+      }
+
+      .oppia-splash-new-callout button {
+        position: auto;
+        top: auto;
+        transform: none;
+      }
+
+      .oppia-splash-new-callout button:first-of-type {
+        margin-top: 15px;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .oppia-activity-summary-tile {
+        margin: 8px 5.5px;
+      }
+    }
+  </style>
+
+  <link rel="stylesheet" type="text/css" media="screen" href="https://fonts.googleapis.com/css?family=Rubik:300">
+{% endblock %}
+
+{% block footer %}
+  {% include 'pages/footer.html' %}
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/splash/Splash.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
+{% endblock footer_js %}

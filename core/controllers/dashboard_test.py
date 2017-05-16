@@ -42,7 +42,7 @@ class HomePageTest(test_utils.GenericTestBase):
 
         self.assertEqual(response.status_int, 302)
         self.assertIn('splash', response.headers['location'])
-        response.follow().mustcontain(
+        response.follow().follow().mustcontain(
             'I18N_SIDEBAR_ABOUT_LINK', 'I18N_TOPNAV_SIGN_IN')
 
     def test_notifications_dashboard_redirects_for_logged_out_users(self):

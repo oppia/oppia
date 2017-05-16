@@ -45,20 +45,7 @@ describe('Dashboard backend API service', function() {
       thumbnail_bg_color: '#bb8b2f',
       num_views: 2,
       num_open_threads: 0,
-      num_total_threads: 0,
-      num_unresolved_answers: 2,
-      top_unresolved_answers: [
-        {
-          state: 'Introduction',
-          value: '40',
-          count: 2
-        },
-        {
-          state: 'Introduction',
-          value: '20',
-          count: 1
-        }
-      ]
+      num_total_threads: 0
     }],
     collections_list: [],
     dashboard_stats: {

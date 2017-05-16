@@ -18,9 +18,9 @@ nodes:
   - About Oppia
   exploration_id: '14'
   prerequisite_skills:
-  - Demonstrating fuzzy rules
+  - Demonstrating soft rules
 - acquired_skills:
-  - Demonstrating fuzzy rules
+  - Demonstrating soft rules
   exploration_id: '15'
   prerequisite_skills:
   - Three Balls

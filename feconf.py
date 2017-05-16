@@ -64,6 +64,7 @@ FRONTEND_TEMPLATES_DIR = os.path.join(
     'core', 'templates', TEMPLATES_DIR_PREFIX, 'head')
 DEPENDENCIES_TEMPLATES_DIR = os.path.join('extensions', 'dependencies')
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
+VISUALIZATIONS_DIR = os.path.join('extensions', 'visualizations')
 OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
     'extensions', 'interactions', 'object_defaults.json')
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
@@ -112,6 +113,10 @@ CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 9
 # changes are made to any of the blob schemas in the data store, this version
 # number must be changed.
 CURRENT_COLLECTION_SCHEMA_VERSION = 3
+
+# This value should be updated in the event of any
+# StateAnswersModel.submitted_answer_list schema change.
+CURRENT_STATE_ANSWERS_SCHEMA_VERSION = 1
 
 # The default number of exploration tiles to load at a time in the search
 # results page.
@@ -418,6 +423,12 @@ ALLOWED_INTERACTION_CATEGORIES = [{
     ],
 }]
 
+# The list of interaction IDs which correspond to interactions that set their
+# is_linear property to true. Linear interactions do not support branching and
+# thus only allow for default answer classification. This value is guarded by a
+# test in extensions.interactions.base_test.
+LINEAR_INTERACTION_IDS = ['Continue']
+
 ALLOWED_GADGETS = {
     'ScoreBar': {
         'dir': os.path.join(GADGETS_DIR, 'ScoreBar')
@@ -706,6 +717,8 @@ LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = (
 # The i18n id for the header of the "Recently Published" category in the
 # library index page.
 LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'I18N_LIBRARY_GROUPS_RECENTLY_PUBLISHED'
+# group_name param for GET request in Splash.js
+LIBRARY_CATEGORY_SPLASH_PAGE_FEATURED = 'splash_page_featured'
 
 # The group name that appears at the end of the url for the recently published
 # page.

@@ -224,6 +224,11 @@ describe('URL Interpolation Service', function() {
     expect(uis.getInteractionThumbnailImageUrl('LogicProof')).toBe(
       GLOBALS.ASSET_DIR_PREFIX + '/extensions/interactions/LogicProof' +
       '/static/LogicProof.png');
+
+    expect(uis.getComponentUrl('/test.html')).toBe(
+      GLOBALS.TEMPLATE_DIR_PREFIX + '/components/test.html');
+    expect(uis.getComponentUrl('/test_url/test.html')).toBe(
+      GLOBALS.TEMPLATE_DIR_PREFIX + '/components/test_url/test.html');
   });
 
   it('should throw an error for empty path', function() {
@@ -254,6 +259,11 @@ describe('URL Interpolation Service', function() {
     expect(uis.getInteractionThumbnailImageUrl.bind(null, '')).toThrow(
       new Error(
         'Empty interactionId passed in getInteractionThumbnailImageUrl.'));
+
+    expect(uis.getComponentUrl.bind(null, null)).toThrow(
+      new Error('Empty path passed in method.'));
+    expect(uis.getComponentUrl.bind(null, '')).toThrow(
+      new Error('Empty path passed in method.'));
   });
 
   it('should throw an error for imagePath not beginning with forward slash',
@@ -271,5 +281,12 @@ describe('URL Interpolation Service', function() {
       expect(uis.getStaticImageUrl.bind(null, 'test_url/fail.png')).toThrow(
         new Error(
           'Path must start with \'\/\': \'' + 'test_url/fail.png' + '\'.'));
+
+      expect(uis.getComponentUrl.bind(null, 'test_fail.html')).toThrow(
+        new Error(
+          'Path must start with \'\/\': \'' + 'test_fail.html' + '\'.'));
+      expect(uis.getComponentUrl.bind(null, 'test_url/fail.html')).toThrow(
+        new Error(
+          'Path must start with \'\/\': \'' + 'test_url/fail.html' + '\'.'));
     });
 });

@@ -75,7 +75,8 @@ class JobModel(base_models.BaseModel):
     # jobs.
     metadata = ndb.JsonProperty(indexed=False)
     # The output of the job. This is only populated if the job has status code
-    # STATUS_CODE_COMPLETED, and is None otherwise.
+    # STATUS_CODE_COMPLETED, and is None otherwise. If populated, this is
+    # expected to be a list of strings.
     output = ndb.JsonProperty(indexed=False)
     # The error message, if applicable. Only populated if the job has status
     # code STATUS_CODE_FAILED or STATUS_CODE_CANCELED; None otherwise.
