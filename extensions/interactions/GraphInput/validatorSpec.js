@@ -62,7 +62,8 @@ describe('oppiaInteractiveGraphInputValidator', function() {
           }
         },
         rule_type: 'IsIsomorphicTo'
-      }]
+      }],
+      correct: false
     };
     answerGroups = [answerGroup, angular.copy(answerGroup)];
   }));

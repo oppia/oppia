@@ -16,6 +16,7 @@
 
 """Job registries."""
 
+from core.domain import collection_jobs_one_off
 from core.domain import exp_jobs_one_off
 from core.domain import feedback_jobs_continuous
 from core.domain import stats_jobs_continuous
@@ -29,10 +30,25 @@ from core.domain import recommendations_jobs_one_off
 # on the admin dashboard.
 ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
+    user_jobs_one_off.UsernameLengthDistributionOneOffJob,
     exp_jobs_one_off.IndexAllExplorationsJobManager,
     exp_jobs_one_off.ExpSummariesCreationOneOffJob,
     exp_jobs_one_off.ExplorationValidityJobManager,
     stats_jobs_one_off.StatisticsAudit,
+    stats_jobs_one_off.AnswersAudit,
+    stats_jobs_one_off.AnswersAudit2,
+    stats_jobs_one_off.PartialAnswerValidationAudit,
+    stats_jobs_one_off.RuleTypeBreakdownAudit,
+    stats_jobs_one_off.ClearMigratedAnswersJob,
+    stats_jobs_one_off.PurgeInconsistentAnswersJob,
+    stats_jobs_one_off.SplitLargeAnswerBucketsJob,
+    stats_jobs_one_off.ClearLargeAnswerBucketsJob,
+    stats_jobs_one_off.CleanupLargeBucketLabelsFromNewAnswersJob,
+    stats_jobs_one_off.AnswerMigrationValidationJob,
+    stats_jobs_one_off.AnswerMigrationCleanupJob,
+    stats_jobs_one_off.ClearUnknownMissingAnswersJob,
+    stats_jobs_one_off.RefreshInteractionRegistryJob,
+    stats_jobs_one_off.AnswerMigrationJob,
     user_jobs_one_off.UserContributionsOneOffJob,
     exp_jobs_one_off.ExplorationFirstPublishedOneOffJob,
     exp_jobs_one_off.ExpSummariesContributorsOneOffJob,
@@ -44,13 +60,15 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UserProfilePictureOneOffJob,
     exp_jobs_one_off.ItemSelectionInteractionOneOffJob,
     user_jobs_one_off.UserLastExplorationActivityOneOffJob,
-    recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob]
+    recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
+    collection_jobs_one_off.CollectionMigrationJob]
 
 # List of all ContinuousComputation managers to show controls for on the
 # admin dashboard.
 # NOTE TO DEVELOPERS: When a new ContinuousComputation manager is defined,
 # it should be registered here.
 ALL_CONTINUOUS_COMPUTATION_MANAGERS = [
+    stats_jobs_continuous.InteractionAnswerSummariesAggregator,
     stats_jobs_continuous.StatisticsAggregator,
     user_jobs_continuous.DashboardRecentUpdatesAggregator,
     user_jobs_continuous.UserStatsAggregator,

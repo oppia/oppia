@@ -92,3 +92,13 @@ class BaseClassifier(object):
                 of labels that the data should be matched.
         """
         raise NotImplementedError
+
+    @abc.abstractmethod
+    def validate(self, classifier_data):
+        """Validates classifier data.
+
+        Args:
+            classifier_data: dict of the classifier attributes specific to
+            the classifier algorithm used.
+        """
+        raise NotImplementedError

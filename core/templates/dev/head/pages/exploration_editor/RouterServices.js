@@ -89,10 +89,9 @@ oppia.factory('routerService', [
       var pathBase = '/' + pathType + '/';
       var putativeStateName = path.substring(pathBase.length);
       var waitForStatesToLoad = $interval(function() {
-        var allStates = explorationStatesService.getStates();
-        if (allStates) {
+        if (explorationStatesService.isInitialized()) {
           $interval.cancel(waitForStatesToLoad);
-          if (allStates.hasOwnProperty(putativeStateName)) {
+          if (explorationStatesService.hasState(putativeStateName)) {
             editorContextService.setActiveStateName(putativeStateName);
             if (pathType === SLUG_GUI) {
               $rootScope.$broadcast('refreshStateEditor');
@@ -167,7 +166,6 @@ oppia.factory('routerService', [
         if (_tabs.active === MAIN_TAB) {
           $('.oppia-editor-cards-container').fadeOut(function() {
             _actuallyNavigate(SLUG_GUI, stateName);
-            // jscs:disable maximumLineLength
             // We need to use $apply to update all our bindings. However we
             // can't directly use $apply, as there is already another $apply in
             // progress, the one which angular itself has called at the start.
@@ -175,7 +173,6 @@ oppia.factory('routerService', [
             // after the previous $apply is finished executing. Refer to this
             // link for more information -
             // http://blog.theodybrothers.com/2015/08/getting-inside-angular-scopeapplyasync.html
-            // jscs:enable maximumLineLength
             $rootScope.$applyAsync();
             $timeout(function() {
               $('.oppia-editor-cards-container').fadeIn();

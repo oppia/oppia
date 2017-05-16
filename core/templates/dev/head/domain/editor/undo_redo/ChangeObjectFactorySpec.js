@@ -79,18 +79,19 @@ describe('Factory for Change domain objects', function() {
   });
 
   it('should not receive changes to the provided change backend object',
-      function() {
-    var backendChangeObject = {
-      property_name: 'value'
-    };
-    var changeDomainObject = ChangeObjectFactory.create(
-      backendChangeObject, function() {}, function() {});
+    function() {
+      var backendChangeObject = {
+        property_name: 'value'
+      };
+      var changeDomainObject = ChangeObjectFactory.create(
+        backendChangeObject, function() {}, function() {});
 
-    var returnedBackendObject = changeDomainObject.getBackendChangeObject();
-    returnedBackendObject.property_name = 'new value';
+      var returnedBackendObject = changeDomainObject.getBackendChangeObject();
+      returnedBackendObject.property_name = 'new value';
 
-    expect(changeDomainObject.getBackendChangeObject()).toEqual({
-      property_name: 'value'
-    });
-  });
+      expect(changeDomainObject.getBackendChangeObject()).toEqual({
+        property_name: 'value'
+      });
+    }
+  );
 });

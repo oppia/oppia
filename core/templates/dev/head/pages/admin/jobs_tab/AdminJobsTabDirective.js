@@ -27,7 +27,9 @@ oppia.directive('adminJobsTab', [
       scope: {
         setStatusMessage: '='
       },
-      templateUrl: 'admin/jobsTab',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/admin/jobs_tab/' +
+        'admin_jobs_tab_directive.html'),
       controller: ['$scope', function($scope) {
         $scope.HUMAN_READABLE_CURRENT_TIME = (
           GLOBALS.HUMAN_READABLE_CURRENT_TIME);
@@ -45,7 +47,8 @@ oppia.directive('adminJobsTab', [
             });
           $http.get(adminJobOutputUrl).then(function(response) {
             $scope.showingJobOutput = true;
-            $scope.jobOutput = response.data.output;
+            $scope.jobOutput = response.data.output || [];
+            $scope.jobOutput.sort();
             $timeout(function() {
               document.querySelector('#job-output').scrollIntoView();
             });

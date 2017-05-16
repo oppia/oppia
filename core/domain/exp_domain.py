@@ -81,11 +81,26 @@ CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property'
 CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION = (
     'migrate_states_schema_to_latest_version')
 
-# This represents the stringified version of a 'default rule.' This is to be
-# used as an identifier for the default rule when storing which rule an answer
-# was matched against.
-DEFAULT_RULESPEC_STR = 'Default'
-CLASSIFIER_RULESPEC_STR = 'FuzzyMatches'
+# These are categories to which answers may be classified. These values should
+# not be changed because they are persisted in the data store within answer
+# logs.
+
+# Represents answers classified using rules defined as part of an interaction.
+EXPLICIT_CLASSIFICATION = 'explicit'
+# Represents answers which are contained within the training data of an answer
+# group.
+TRAINING_DATA_CLASSIFICATION = 'training_data_match'
+# Represents answers which were predicted using a statistical training model
+# from training data within an answer group.
+STATISTICAL_CLASSIFICATION = 'statistical_classifier'
+# Represents answers which led to the 'default outcome' of an interaction,
+# rather than belonging to a specific answer group.
+DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome'
+
+# This represents the stringified version of a rule which uses statistical
+# classification for evaluation. Answers which are matched to rules with this
+# rulespec will be stored with the STATISTICAL_CLASSIFICATION category.
+RULE_TYPE_CLASSIFIER = 'FuzzyMatches'
 
 
 def _get_full_customization_args(customization_args, ca_specs):
@@ -112,8 +127,8 @@ def _validate_customization_args_and_values(
     validation.
 
     Note that this may modify the given customization_args dict, if it has
-    extra or missing keys. It also normalizes any HTML in the
-    customization_args dict.
+    extra or missing keys. It also normalizes any HTML in the customization_args
+    dict.
     """
     ca_spec_names = [
         ca_spec.name for ca_spec in ca_specs_to_validate_against]
@@ -164,6 +179,12 @@ class ExplorationChange(object):
     interpreted in general) preserve backward-compatibility with the
     exploration snapshots in the datastore. Do not modify the definitions of
     cmd keys that already exist.
+
+    NOTE TO DEVELOPERS: Please note that, for a brief period around
+    Feb - Apr 2017, change dicts related to editing of answer groups
+    accidentally stored the old_value using a ruleSpecs key instead of a
+    rule_specs key. So, if you are making use of this data, make sure to
+    verify the format of the old_value before doing any processing.
     """
 
     STATE_PROPERTIES = (
@@ -354,15 +375,6 @@ class RuleSpec(object):
         self.rule_type = rule_type
         self.inputs = inputs
 
-    def stringify_classified_rule(self):
-        """Returns a string representation of a rule (for the stats log)."""
-        if self.rule_type == CLASSIFIER_RULESPEC_STR:
-            return self.rule_type
-        else:
-            param_list = [
-                utils.to_ascii(val) for val in self.inputs.values()]
-            return '%s(%s)' % (self.rule_type, ','.join(param_list))
-
     def validate(self, rule_params_list, exp_param_specs_dict):
         """Validates a RuleSpec value object. It ensures the inputs dict does
         not refer to any non-existent parameters and that it contains values
@@ -504,6 +516,7 @@ class AnswerGroup(object):
             'rule_specs': [rule_spec.to_dict()
                            for rule_spec in self.rule_specs],
             'outcome': self.outcome.to_dict(),
+            'correct': self.correct,
         }
 
     @classmethod
@@ -511,14 +524,16 @@ class AnswerGroup(object):
         return cls(
             Outcome.from_dict(answer_group_dict['outcome']),
             [RuleSpec.from_dict(rs) for rs in answer_group_dict['rule_specs']],
+            answer_group_dict['correct'],
         )
 
-    def __init__(self, outcome, rule_specs):
+    def __init__(self, outcome, rule_specs, correct):
         self.rule_specs = [RuleSpec(
             rule_spec.rule_type, rule_spec.inputs
         ) for rule_spec in rule_specs]
 
         self.outcome = outcome
+        self.correct = correct
 
     def validate(self, interaction, exp_param_specs_dict):
         """Rule validation.
@@ -532,8 +547,11 @@ class AnswerGroup(object):
                 % self.rule_specs)
         if len(self.rule_specs) < 1:
             raise utils.ValidationError(
-                'There must be at least one rule for each answer group.'
-                % self.rule_specs)
+                'There must be at least one rule for each answer group.')
+        if not isinstance(self.correct, bool):
+            raise utils.ValidationError(
+                'The "correct" field should be a boolean, received %s'
+                % self.correct)
 
         seen_classifier_rule = False
         for rule_spec in self.rule_specs:
@@ -541,7 +559,7 @@ class AnswerGroup(object):
                 raise utils.ValidationError(
                     'Unrecognized rule type: %s' % rule_spec.rule_type)
 
-            if rule_spec.rule_type == CLASSIFIER_RULESPEC_STR:
+            if rule_spec.rule_type == RULE_TYPE_CLASSIFIER:
                 if seen_classifier_rule:
                     raise utils.ValidationError(
                         'AnswerGroups can only have one classifier rule.')
@@ -558,7 +576,7 @@ class AnswerGroup(object):
         if it doesn't exist.
         """
         for (rule_spec_index, rule_spec) in enumerate(self.rule_specs):
-            if rule_spec.rule_type == CLASSIFIER_RULESPEC_STR:
+            if rule_spec.rule_type == RULE_TYPE_CLASSIFIER:
                 return rule_spec_index
         return None
 
@@ -1181,7 +1199,7 @@ class State(object):
                     'received %s' % rule_specs_list)
 
             answer_group = AnswerGroup(Outcome.from_dict(
-                answer_group_dict['outcome']), [])
+                answer_group_dict['outcome']), [], answer_group_dict['correct'])
             answer_group.outcome.feedback = [
                 html_cleaner.clean(feedback)
                 for feedback in answer_group.outcome.feedback]
@@ -1399,6 +1417,7 @@ class Exploration(object):
                         'inputs': rule_spec['inputs'],
                         'rule_type': rule_spec['rule_type'],
                     } for rule_spec in group['rule_specs']],
+                    'correct': False,
                 })
                 for group in idict['answer_groups']]
 
@@ -2161,10 +2180,15 @@ class Exploration(object):
                     else:
                         answer_groups.append(group)
 
-            is_terminal = (
-                interaction_registry.Registry.get_interaction_by_id(
-                    interaction['id']
-                ).is_terminal if interaction['id'] is not None else False)
+            try:
+                is_terminal = (
+                    interaction_registry.Registry.get_interaction_by_id(
+                        interaction['id']
+                    ).is_terminal if interaction['id'] is not None else False)
+            except KeyError:
+                raise utils.ExplorationConversionError(
+                    'Trying to migrate exploration containing non-existent '
+                    'interaction ID: %s' % interaction['id'])
             if not is_terminal:
                 interaction['answer_groups'] = answer_groups
                 interaction['default_outcome'] = default_outcome
@@ -2219,6 +2243,8 @@ class Exploration(object):
 
         return states_dict
 
+    # TODO(bhenning): Remove pre_v4_states_conversion_func when the answer
+    # migration is completed.
     @classmethod
     def _convert_states_v7_dict_to_v8_dict(cls, states_dict):
         """Converts from version 7 to 8. Version 8 contains classifier
@@ -2229,11 +2255,28 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v8_dict_to_v9_dict(cls, states_dict):
+        """Converts from version 8 to 9. Version 9 contains 'correct'
+        field in answer groups.
+        """
+        for state_dict in states_dict.values():
+            answer_groups = state_dict['interaction']['answer_groups']
+            for answer_group in answer_groups:
+                answer_group['correct'] = False
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
-            cls, versioned_exploration_states, current_states_schema_version):
+            cls, versioned_exploration_states, current_states_schema_version,
+            pre_v4_states_conversion_func=None):
         """Converts the states blob contained in the given
         versioned_exploration_states dict from current_states_schema_version to
         current_states_schema_version + 1.
+
+        If pre_v4_states_conversion_func is provided, it will be called in the
+        migration process before migrating from v3 to v4. It is provided a
+        states dict and will overwrite the migrated states dict with the dict it
+        returns.
 
         Note that the versioned_exploration_states being passed in is modified
         in-place.
@@ -2241,6 +2284,10 @@ class Exploration(object):
         versioned_exploration_states['states_schema_version'] = (
             current_states_schema_version + 1)
 
+        if pre_v4_states_conversion_func and current_states_schema_version == 3:
+            versioned_exploration_states['states'] = (
+                pre_v4_states_conversion_func(
+                    versioned_exploration_states['states']))
         conversion_fn = getattr(cls, '_convert_states_v%s_dict_to_v%s_dict' % (
             current_states_schema_version, current_states_schema_version + 1))
         versioned_exploration_states['states'] = conversion_fn(
@@ -2250,7 +2297,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 11
+    CURRENT_EXP_SCHEMA_VERSION = 12
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -2426,6 +2473,19 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v11_dict_to_v12_dict(cls, exploration_dict):
+        """Converts a v11 exploration dict into a v12 exploration dict."""
+
+        exploration_dict['schema_version'] = 12
+
+        exploration_dict['states'] = cls._convert_states_v8_dict_to_v9_dict(
+            exploration_dict['states'])
+
+        exploration_dict['states_schema_version'] = 9
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         try:
@@ -2494,6 +2554,12 @@ class Exploration(object):
             exploration_dict = cls._convert_v10_dict_to_v11_dict(
                 exploration_dict)
             exploration_schema_version = 11
+
+        if exploration_schema_version == 11:
+            exploration_dict = cls._convert_v11_dict_to_v12_dict(
+                exploration_dict)
+            exploration_schema_version = 12
+
 
         return (exploration_dict, initial_schema_version)
 

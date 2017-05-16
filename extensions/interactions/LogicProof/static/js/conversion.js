@@ -21,7 +21,7 @@ var logicProofConversion = (function() {
   // NOTE: the 'old' values must all be single characters
   var REPLACEMENT_PAIRS = [{
     old: '&',
-    // jscs:disable disallowQuotedKeysInObjects
+    // eslint-disable quote-props
     'new': '\u2227'
   }, {
     old: '|',
@@ -38,7 +38,7 @@ var logicProofConversion = (function() {
   }, {
     old: '\u0009',
     'new': '  '
-    // jscs:enable disallowQuotedKeysInObjects
+    // eslint-enable quote-props
   }];
 
   var convertToLogicCharacters = function(oldString) {

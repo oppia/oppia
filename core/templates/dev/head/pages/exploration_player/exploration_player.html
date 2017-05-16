@@ -38,7 +38,7 @@
         display: block;
       }
     }
-    @media(max-width: 600px) {
+    @media(max-width: 500px) {
       img.oppia-logo {
         height: 48px;
         margin-left: 0;
@@ -73,6 +73,7 @@
     </li>
     <li ng-click="showInformationCard()" tooltip="<['I18N_PLAYER_INFO_TOOLTIP' | translate]>" tooltip-placement="bottom" style="cursor: pointer;" class="oppia-exploration-info-icon protractor-test-exploration-info-icon" tabindex="0">
       <i class="material-icons oppia-navbar-breadcrumb-icon" style="font-size: 20px;">&#xE88E;</i>
+      <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_INFO_TOOLTIP' | translate]></span>
     </li>
   </ul>
 {% endblock navbar_breadcrumb %}
@@ -98,16 +99,16 @@
       <h3>Suggest a Change</h3>
     </div>
 
-    <div class="modal-body">
+    <div class="modal-body protractor-test-exploration-suggestion-modal">
       <text-angular-rte ng-show="showEditor" html-content="suggestionContent"></text-angular-rte>
       <br>
       Briefly describe your changes (required):
-      <input type="text" ng-model="description" style="width: 100%">
+      <input type="text" ng-model="description" class="protractor-test-suggestion-description-input" style="width: 100%">
     </div>
 
     <div class="modal-footer">
       <button class="btn btn-default" ng-click="cancelSuggestion()">Cancel</button>
-      <button class="btn btn-success" ng-click="submitSuggestion()" ng-disabled="(initContent == suggestionContent) || !description">
+      <button class="btn btn-success protractor-test-suggestion-submit-btn" ng-click="submitSuggestion()" ng-disabled="(initContent == suggestionContent) || !description">
         Submit Suggestion
       </button>
     </div>
@@ -138,33 +139,18 @@
       padding-top: 12px;
     }
   </style>
-  {% include 'components/attribution_guide/attribution_guide_directive.html' %}
-  {% include 'components/embed_modal/embed_exploration_modal_directive.html' %}
-  {% include 'components/gadget/gadget_directive.html' %}
-  {% include 'components/gadget/gadget_panel_directive.html' %}
   {% include 'components/profile_link/profile_link_image_directive.html' %}
 
-  {% if iframed %}
-    {% include 'pages/exploration_player/conversation_skin_embed_directive.html' %}
-  {% else %}
-    {% include 'pages/exploration_player/conversation_skin_directive.html' %}
-  {% endif %}
-
-  {% include 'pages/exploration_player/tutor_card_directive.html' %}
-  {% include 'pages/exploration_player/supplemental_card_directive.html' %}
-  {% include 'pages/exploration_player/answer_feedback_pair_directive.html' %}
   {% include 'pages/exploration_player/exploration_successfully_flagged_modal.html' %}
   {% include 'pages/exploration_player/feedback_popup_directive.html' %}
   {% include 'pages/exploration_player/flag_exploration_modal.html' %}
   {% include 'pages/exploration_player/information_card_modal.html' %}
-  {% include 'pages/exploration_player/progress_dots_directive.html' %}
 
 {% endblock %}
 
 {% block footer %}
   {% if not iframed %}
     {% include 'pages/exploration_player/exploration_footer_directive.html' %}
-    {% include 'components/share/sharing_links_directive.html' %}
     <exploration-footer twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></exploration-footer>
   {% endif %}
 {% endblock %}
@@ -174,6 +160,7 @@
   <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/MathLatexStringEditor.js"></script>
   <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/SanitizedUrlEditor.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/autoplayedVideosService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/explorationServices.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/messengerService.js"></script>
 
@@ -186,7 +173,16 @@
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ExplorationObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StateObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StatesObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/InteractionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/AnswerGroupObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/FallbackObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/TriggerObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/OutcomeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ContentObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/RuleObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamChangeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamChangesObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/summary/ExplorationSummaryBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/StopwatchObjectFactory.js"></script>
 
@@ -210,8 +206,12 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ProgressDotsDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/StatsReportingService.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionSyntaxTree.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/evaluator.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/parser.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionInterpolationService.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedCustomEditorDirective.js"></script>

@@ -1,0 +1,117 @@
+{
+  "extends": [
+    "eslint:recommended",
+  ],
+  "plugins": [
+    "html"
+  ],
+  "rules": {
+    "no-empty": [
+      "error",
+      {
+        "allowEmptyCatch": true
+      }
+    ],
+    "no-redeclare": [
+      "off"
+    ],
+    "no-unused-vars": [
+      "off"
+    ],
+    "no-console": [
+      "off"
+    ],
+    "no-constant-condition": [
+      "off"
+    ],
+    "func-style": [
+      "error",
+      "expression"
+    ],
+    "no-multi-str": [
+      "error"
+    ],
+    "no-multi-spaces": [
+      "error"
+    ],
+    "no-undef": [
+      "off"
+    ],
+    "one-var": [
+      "off"
+    ],
+    "padded-blocks": [
+      "error",
+      "never"
+    ],
+    "quote-props": [
+      "error",
+      "as-needed",
+      {
+        "keywords": true
+      }
+    ],
+    "space-unary-ops": [
+      "error",
+      {
+        "words": true,
+        "nonwords": false,
+      }
+    ],
+    "space-before-function-paren": [
+      "error",
+      {
+        "anonymous": "ignore",
+        "named": "never"
+      }
+    ],
+    "indent": [
+      "error",
+      2,
+      {
+        "ArrayExpression": "first",
+        "MemberExpression": 1,
+        "SwitchCase": 1
+      }
+    ],
+    "max-len": [
+      "error",
+      "code": 80,
+      "ignoreUrls": true
+    ],
+    "camelcase": [
+      "error",
+      {
+        "properties": "never"
+      }
+    ],
+    "curly": [
+      "error",
+      "all"
+    ],
+    "dot-notation": [
+      "error",
+      {
+        "allowKeywords": false
+      }
+    ],
+    "operator-linebreak": [
+      "error",
+      "after"
+    ],
+    "wrap-iife": [
+      "error",
+      "any"
+    ],
+    "space-infix-ops": [
+      "error"
+    ],
+    "quotes": [
+      "error",
+      "single",
+      {
+        "avoidEscape": true
+      }
+    ]
+  }
+}

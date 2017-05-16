@@ -24,7 +24,7 @@ var logicProofData = (function() {
     arbitrary: ['was arbitrary', 'is arbitrary'],
     take: ['take'],
     satisfying: ['satisfying', 'such that'],
-    // jscs:disable disallowQuotedKeysInObjects
+    // eslint-disable quote-props
     'if': ['if'],
     given: ['given'],
     contradiction: ['contradiction'],
@@ -46,7 +46,7 @@ var logicProofData = (function() {
   var BASE_STUDENT_LANGUAGE = {
     types: {
       'boolean': {
-        // jscs:enable disallowQuotedKeysInObjects
+        // eslint-enable quote-props
         quantifiable: false
       },
       element: {
@@ -336,9 +336,8 @@ var logicProofData = (function() {
 
   var BASE_CONTROL_LANGUAGE = {
     types: {
-      // jscs:disable disallowQuotedKeysInObjects
+      // eslint-disable-next-line quote-props
       'boolean': {
-        // jscs:enable disallowQuotedKeysInObjects
         quantifiable: false
       },
       // Used for line numbers & indentation.
@@ -720,9 +719,8 @@ var logicProofData = (function() {
           output: 'set_of_formulas'
         }]
       },
-      // jscs:disable disallowQuotedKeysInObjects
+      // eslint-disable-next-line quote-props
       'if': {
-        // jscs:enable disallowQuotedKeysInObjects
         // NOTE: this prefix function is unusual in having a boolean input
         kind: 'prefix_function',
         typing: [{

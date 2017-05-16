@@ -24,9 +24,6 @@ import feconf
 
 class BaseCollectionEditorControllerTest(test_utils.GenericTestBase):
 
-    CAN_EDIT_STR = 'GLOBALS.canEdit = JSON.parse(\'true\');'
-    CANNOT_EDIT_STR = 'GLOBALS.canEdit = JSON.parse(\'false\');'
-
     def setUp(self):
         """Completes the sign-up process for self.EDITOR_EMAIL."""
         super(BaseCollectionEditorControllerTest, self).setUp()
@@ -52,21 +49,6 @@ class BaseCollectionEditorControllerTest(test_utils.GenericTestBase):
             }]
         }
 
-    def assert_can_edit(self, response_body):
-        """Returns True if the response body indicates that the collection is
-        editable.
-        """
-        self.assertIn(self.CAN_EDIT_STR, response_body)
-        self.assertNotIn(self.CANNOT_EDIT_STR, response_body)
-
-    def assert_cannot_edit(self, response_body):
-        """Returns True if the response body indicates that the collection is
-        not editable.
-        """
-        self.assertIn(self.CANNOT_EDIT_STR, response_body)
-        self.assertNotIn(self.CAN_EDIT_STR, response_body)
-
-
 class CollectionEditorTest(BaseCollectionEditorControllerTest):
     COLLECTION_ID = '0'
 
@@ -90,7 +72,6 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
             '%s/%s?v=1' % (feconf.COLLECTION_DATA_URL_PREFIX,
                            self.COLLECTION_ID))
         self.assertEqual(response.status_int, 200)
-        self.assertIn('Introduction to Collections in Oppia', response.body)
 
         # Check that non-editors cannot access the editor page. This is due
         # to them not being whitelisted.
@@ -105,8 +86,10 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
             '%s/%s' % (feconf.COLLECTION_EDITOR_URL_PREFIX,
                        self.COLLECTION_ID))
         self.assertEqual(response.status_int, 200)
-        self.assertIn('Introduction to Collections in Oppia', response.body)
-        self.assert_can_edit(response.body)
+
+        json_response = self.get_json(
+            '%s/%s' % (feconf.COLLECTION_RIGHTS_PREFIX, self.COLLECTION_ID))
+        self.assertTrue(json_response['can_edit'])
         self.logout()
 
     def test_editable_collection_handler_get(self):
@@ -130,9 +113,6 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
             '%s/%s' % (feconf.EDITABLE_COLLECTION_DATA_URL_PREFIX,
                        self.COLLECTION_ID))
         self.assertEqual(self.COLLECTION_ID, json_response['collection']['id'])
-        self.assertEqual(
-            'Introduction to Collections in Oppia',
-            json_response['collection']['title'])
         self.logout()
 
     def test_editable_collection_handler_put_cannot_access(self):
@@ -197,8 +177,6 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
 
         self.assertEqual(self.COLLECTION_ID, json_response['collection']['id'])
         self.assertEqual(2, json_response['collection']['version'])
-        self.assertEqual(
-            'A new title', json_response['collection']['title'])
         self.logout()
 
     def test_collection_rights_handler(self):
@@ -226,3 +204,28 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         collection_rights = rights_manager.get_collection_rights(collection_id)
         self.assertEqual(collection_rights.status,
                          rights_manager.ACTIVITY_STATUS_PRIVATE)
+
+    def test_get_collection_rights(self):
+        whitelisted_usernames = [self.OWNER_USERNAME]
+        self.set_config_property(
+            config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES,
+            whitelisted_usernames)
+
+        self.login(self.OWNER_EMAIL)
+
+        collection_id = 'collection_id'
+        collection = collection_domain.Collection.create_default_collection(
+            collection_id, 'A title', 'A Category', 'An Objective')
+        collection_services.save_new_collection(self.owner_id, collection)
+
+        # Check that collection is published correctly.
+        rights_manager.publish_collection(self.owner_id, collection_id)
+
+        json_response = self.get_json(
+            '%s/%s' % (feconf.COLLECTION_RIGHTS_PREFIX, self.COLLECTION_ID))
+
+        self.assertTrue(json_response['can_edit'])
+        self.assertFalse(json_response['can_unpublish'])
+        self.assertEqual(self.COLLECTION_ID, json_response['collection_id'])
+        self.assertFalse(json_response['is_private'])
+        self.logout()

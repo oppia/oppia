@@ -16,21 +16,23 @@
  * @fileoverview Directive for the background banner.
  */
 
-oppia.directive('backgroundBanner', [function() {
-  return {
-    restrict: 'E',
-    scope: {},
-    templateUrl: 'background/banner',
-    controller: [
-      '$scope', 'UrlInterpolationService',
-      function($scope, UrlInterpolationService) {
-        var possibleBannerFilenames = [
-          'bannerA.svg', 'bannerB.svg', 'bannerC.svg', 'bannerD.svg'];
-        var bannerImageFilename = possibleBannerFilenames[
-          Math.floor(Math.random() * possibleBannerFilenames.length)];
-        $scope.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
-          '/background/' + bannerImageFilename);
-      }
-    ]
-  };
-}]);
+oppia.directive('backgroundBanner', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/background/background_banner_directive.html'),
+      controller: [
+        '$scope',
+        function($scope) {
+          var possibleBannerFilenames = [
+            'bannerA.svg', 'bannerB.svg', 'bannerC.svg', 'bannerD.svg'];
+          var bannerImageFilename = possibleBannerFilenames[
+            Math.floor(Math.random() * possibleBannerFilenames.length)];
+          $scope.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
+            '/background/' + bannerImageFilename);
+        }
+      ]
+    };
+  }]);

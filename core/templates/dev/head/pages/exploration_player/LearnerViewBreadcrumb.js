@@ -72,7 +72,7 @@ oppia.controller('LearnerViewBreadcrumb', [
                 } else {
                   tagsInTooltip.push(arrayOfTags[i]);
                 }
-              };
+              }
 
               return {
                 tagsToShow: tagsToShow,

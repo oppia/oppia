@@ -36,7 +36,8 @@ oppia.controller('ExplorationEditor', [
   'explorationWarningsService', '$templateCache', 'explorationContextService',
   'explorationAdvancedFeaturesService', '$modal', 'changeListService',
   'autosaveInfoModalsService', 'siteAnalyticsService',
-  'UserEmailPreferencesService',
+  'UserEmailPreferencesService', 'ParamChangesObjectFactory',
+  'UrlInterpolationService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       explorationData, editorContextService, explorationTitleService,
@@ -49,7 +50,8 @@ oppia.controller('ExplorationEditor', [
       explorationWarningsService, $templateCache, explorationContextService,
       explorationAdvancedFeaturesService, $modal, changeListService,
       autosaveInfoModalsService, siteAnalyticsService,
-      UserEmailPreferencesService) {
+      UserEmailPreferencesService, ParamChangesObjectFactory,
+      UrlInterpolationService) {
     $scope.editabilityService = editabilityService;
     $scope.editorContextService = editorContextService;
 
@@ -103,7 +105,8 @@ oppia.controller('ExplorationEditor', [
         explorationInitStateNameService.init(data.init_state_name);
         explorationTagsService.init(data.tags);
         explorationParamSpecsService.init(data.param_specs);
-        explorationParamChangesService.init(data.param_changes || []);
+        explorationParamChangesService.init(
+          ParamChangesObjectFactory.createFromBackendList(data.param_changes));
 
         $scope.explorationTitleService = explorationTitleService;
         $scope.explorationCategoryService = explorationCategoryService;
@@ -357,13 +360,15 @@ oppia.controller('ExplorationEditor', [
 
     $scope.showWelcomeExplorationModal = function() {
       var modalInstance = $modal.open({
-        templateUrl: 'modals/welcomeExploration',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/' +
+          'welcome_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', 'UrlInterpolationService',
-          'siteAnalyticsService', 'explorationContextService',
-          function($scope, $modalInstance, UrlInterpolationService,
-              siteAnalyticsService, explorationContextService) {
+          '$scope', '$modalInstance', 'siteAnalyticsService',
+          'explorationContextService',
+          function($scope, $modalInstance, siteAnalyticsService,
+          explorationContextService) {
             var explorationId = explorationContextService.getExplorationId();
 
             siteAnalyticsService.registerTutorialModalOpenEvent(explorationId);

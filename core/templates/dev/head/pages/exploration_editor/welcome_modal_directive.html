@@ -1,34 +1,32 @@
-<script type="text/ng-template" id="modals/welcomeExploration">
-  <div class="modal-body oppia-long-text protractor-test-welcome-modal">
-    <div class="row">
-      <div class="col-lg-8 col-md-8 col-sm-8 col-xs-7">
-        <h1 class="oppia-welcome-modal-h1">Welcome!</h1>
-        <p class="oppia-welcome-modal-p">
-          It looks like you're new to creating explorations.
-        </p>
-        <p class="oppia-welcome-modal-p">
-          Would you like an introduction to creating in Oppia?
-        </p>
+<div class="modal-body oppia-long-text protractor-test-welcome-modal">
+  <div class="row">
+    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-7">
+      <h1 class="oppia-welcome-modal-h1">Welcome!</h1>
+      <p class="oppia-welcome-modal-p">
+        It looks like you're new to creating explorations.
+      </p>
+      <p class="oppia-welcome-modal-p">
+        Would you like an introduction to creating in Oppia?
+      </p>
 
-        <button type="button"
-                class="btn oppia-welcome-modal-button oppia-transition-200 protractor-test-start-tutorial"
-                ng-click="beginTutorial()">
-          Yes, please!
-        </button>
+      <button type="button"
+              class="btn oppia-welcome-modal-button oppia-transition-200 protractor-test-start-tutorial"
+              ng-click="beginTutorial()">
+        Yes, please!
+      </button>
 
-        <button type="button"
-                class="btn oppia-welcome-modal-button oppia-transition-200 protractor-test-dismiss-welcome-modal"
-                ng-click="cancel()">
-          Nope, take me to the editor
-        </button>
-      </div>
+      <button type="button"
+              class="btn oppia-welcome-modal-button oppia-transition-200 protractor-test-dismiss-welcome-modal"
+              ng-click="cancel()">
+        Nope, take me to the editor
+      </button>
+    </div>
 
-      <div class="col-lg-4 col-md-4 col-sm-4 col-xs-5">
-        <img class="oppia-welcome-modal-img" ng-src="<[editorWelcomeImgUrl]>">
-      </div>
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-5">
+      <img class="oppia-welcome-modal-img" ng-src="<[editorWelcomeImgUrl]>">
     </div>
   </div>
-</script>
+</div>
 
 <style>
   .oppia-welcome-modal .modal-body {

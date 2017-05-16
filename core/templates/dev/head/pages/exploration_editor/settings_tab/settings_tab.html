@@ -8,22 +8,27 @@
             <div class="form-group" ng-class="{'has-error': !explorationTitleService.displayed}">
               <label for="explorationTitle" class="col-lg-2 col-md-2 col-sm-2">Title</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
-                <input id="explorationTitle" type="text" class="form-control protractor-test-exploration-title-input" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()" placeholder="Choose a title for your exploration." focus-on="<[::EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>" maxlength="40">
+                <input id="explorationTitle" type="text" class="form-control protractor-test-exploration-title-input" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()" placeholder="Choose a title for your exploration." focus-on="<[::EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>" maxlength="40" ng-trim="false">
                 <span class="help-block" style="font-size: smaller">
                   <em>Please use at most 40 characters, so that this fits in the summary card.</em>
+                  <span ng-if="explorationTitleService.displayed.length > 0">
+                    <em>Characters used: <[(explorationTitleService.displayed.length)]>/40</em>
+                  </span>
                 </span>
               </div>
             </div>
-            <div class="form-group" ng-class="{'has-error': !explorationObjectiveService.displayed || explorationObjectiveService.displayed.length < 15}">
+            <div class="form-group" ng-class="{'has-error': !explorationObjectiveService.displayed || ((explorationObjectiveService.displayed.length < 15) || (explorationObjectiveService.displayed.length > 100))}">
               <label for="explorationObjective" class="col-lg-2 col-md-2 col-sm-2">Goal</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
                 <input id="explorationObjective" type="text"
                        class="form-control protractor-test-exploration-objective-input"
                        ng-model="explorationObjectiveService.displayed"
-                       ng-blur="saveExplorationObjective()" placeholder="Learn how to ...">
-                <span class="help-block" style="font-size: smaller">
-                  What does this exploration help people to do?
-                  <span ng-if="!explorationObjectiveService.displayed || explorationObjectiveService.displayed.length < 15">Please provide a complete, descriptive sentence.</span>
+                       ng-blur="saveExplorationObjective()" placeholder="Learn how to..." ng-trim="false">
+                <span class="help-block" style="font-size: smaller"> 
+                  <em>In a complete sentence, tell people what they'll learn from this exploration.</em>
+                  <span ng-if="explorationObjectiveService.displayed.length > 0">
+                    <em>Characters used: <[(explorationObjectiveService.displayed.length)]>/100</em>
+                  </span>
                 </span>
               </div>
             </div>
@@ -85,6 +90,13 @@
                   <em>Tags help learners discover your exploration when searching.</em>
                 </span>
               </div>
+            </div>
+            <div class="text-right">
+              <button type="button" class="btn btn-default protractor-test-open-preview-summary-modal"
+                      ng-click="previewSummaryTile()"
+                      title="Preview this exploration's summary card">
+                Preview Summary
+              </button>
             </div>
           </div>
         </div>
@@ -417,7 +429,7 @@
         {% if can_delete %}
           <p class="oppia-exploration-ctrl">
             <button type="button" ng-if="explorationRightsService.isPrivate()"
-                    class="btn btn-danger" ng-click="deleteExploration('')"
+                    class="btn btn-danger" ng-click="deleteExploration()"
                     title="Delete this exploration">
               Delete Exploration
             </button>
@@ -460,7 +472,7 @@
 
         <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-if="explorationRightsService.isPublic() && (currentUserIsAdmin || currentUserIsModerator)">
           <button type="button" class="btn btn-danger"
-                  ng-click="currentUserIsAdmin ? deleteExploration('admin') : deleteExploration('moderator')">
+                  ng-click="deleteExploration()">
             Delete Exploration
             <span ng-if="currentUserIsAdmin">(as admin)</span>
             <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
@@ -584,5 +596,27 @@
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     <button class="btn btn-danger" ng-click="reallyDelete()">Delete Exploration</button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="modals/previewSummaryTile">
+  <div class="modal-header">
+    <h3>Preview Summary Card</h3>
+  </div>
+
+  <div class="modal-body text-center">
+    This is how your activity will appear to learners in search results
+    or the library.
+    <exploration-summary-tile exploration-title="getExplorationTitle()"
+                              objective="getExplorationObjective()"
+                              category="getExplorationCategory()"
+                              thumbnail-icon-url="getThumbnailIconUrl()"
+                              thumbnail-bg-color="getThumbnailBgColor()"
+                              class="protractor-test-exploration-summary-tile">
+    </exploration-summary-tile>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default protractor-test-close-preview-summary-modal" ng-click="close()">Return to editor</button>
   </div>
 </script>

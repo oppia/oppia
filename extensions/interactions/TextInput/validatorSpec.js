@@ -35,8 +35,9 @@ describe('oppiaInteractiveTextInputValidator', function() {
     };
 
     goodAnswerGroups = [{
-      ruleSpecs: [],
-      outcome: goodDefaultOutcome
+      rules: [],
+      outcome: goodDefaultOutcome,
+      correct: false
     }];
   }));
 

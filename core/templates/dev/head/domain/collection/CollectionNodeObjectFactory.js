@@ -23,8 +23,8 @@
 oppia.constant('ACTIVITY_STATUS_PRIVATE', 'private');
 
 oppia.factory('CollectionNodeObjectFactory', [
-      'SkillListObjectFactory', 'ACTIVITY_STATUS_PRIVATE',
-      function(SkillListObjectFactory, ACTIVITY_STATUS_PRIVATE) {
+  'SkillListObjectFactory', 'ACTIVITY_STATUS_PRIVATE',
+  function(SkillListObjectFactory, ACTIVITY_STATUS_PRIVATE) {
     var CollectionNode = function(collectionNodeBackendObject) {
       this._explorationId = collectionNodeBackendObject.exploration_id;
       this._prerequisiteSkillList = SkillListObjectFactory.create(
