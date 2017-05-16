@@ -1716,10 +1716,10 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
         Returns:
             Tuple with the first element a list of exploration models, one
-            for each version in the versions list and in the same order. The second
-            element is an error, if any occurred. Either the first or second element
-            will be None and one will always be None, depending on the outcome of
-            the method.
+            for each version in the versions list and in the same order. The
+            second element is an error, if any occurred. Either the first or
+            second element will be None and one will always be None,
+            depending on the outcome of the method.
         """
         try:
             # pylint: disable=protected-access
@@ -1809,10 +1809,10 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             Tuple with the first element being a list of explorations
             up to the max_version specified and the second element being any
             migration errors that occurred while retrieivng the explorations, or
-            None if no migration errors occurred. The returned explorations are in
-            descending order by version. This function can retrieve deleted
-            explorations, but not permanently deleted explorations (in which case
-            the first element of the tuple will be empty list).
+            None if no migration errors occurred. The returned explorations are
+            in descending order by version. This function can retrieve deleted
+            explorations, but not permanently deleted explorations (in which
+            case the first element of the tuple will be empty list).
         """
         # NOTE(bhenning): It's possible some of these answers were submitted
         # during a playthrough where the exploration was changed midway. There's
@@ -1835,12 +1835,12 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
         Returns:
             Hashable version of the input value. If the
-            value itself is hashable, it simply returns that value. If it's a list,
-            it will return a tuple with all of the list's elements converted to
-            hashable types. If it's a dictionary, it will first convert it to a list
-            of pairs, where the key and value of the pair are converted to hashable
-            types, then it will convert this list as any other list would be
-            converted.
+            value itself is hashable, it simply returns that value. If it's a
+            list, it will return a tuple with all of the list's elements
+            converted hashable types. If it's a dictionary, it will first
+            convert it to a list of pairs, where the key and value of the
+            pair are converted to hashable types, then it will convert this
+            list as any other list would be converted.
         """
         if isinstance(value, list):
             return tuple([cls._get_hashable_value(elem) for elem in value])
