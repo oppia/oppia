@@ -90,7 +90,7 @@ describe('Editable exploration backend API service', function() {
     }
   );
 
-  it('should fetch and apply the draft of am exploration',
+  it('should fetch and apply the draft of an exploration',
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
