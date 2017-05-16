@@ -19,6 +19,7 @@
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var admin = require('../protractor_utils/admin.js');
+var collectionEditor = require('../protractor_utils/collectionEditor.js');
 
 describe('Collections', function() {
   beforeAll(function() {
@@ -49,28 +50,22 @@ describe('Collections', function() {
     // Create new collection.
     element(by.css('.protractor-test-create-collection')).click();
     // Add existing explorations.
-    element(by.css('.protractor-test-add-exploration-input')).sendKeys('0\n');
-    element(by.css('.protractor-test-add-exploration-input')).sendKeys('4\n');
-    element(by.css('.protractor-test-add-exploration-input')).sendKeys('13\n');
+    collectionEditor.addExistingExploration('0');
+    collectionEditor.addExistingExploration('4');
+    collectionEditor.addExistingExploration('13');
     // Shifting nodes in the node graph.
-    element.all(by.css('.protractor-test-editor-shift-left')).get(1).click();
-    element.all(by.css('.protractor-test-editor-shift-right')).get(1).click();
+    collectionEditor.shiftNodeLeft(1);
+    collectionEditor.shiftNodeRight(1);
     // Delete node in the node graph.
-    element.all(by.css('.protractor-test-editor-delete-node')).get(1).click();
+    collectionEditor.deleteNode(1);
     // Publish the collection.
-    element(by.css('.protractor-test-save-draft-button')).click();
-    element(by.css('.protractor-test-close-save-modal')).click();
-    element(by.css('.protractor-test-editor-publish-button')).click();
-    element(by.css('.protractor-collection-editor-title-input')
-    ).sendKeys('Test Collection');
-    element(by.css('.protractor-collection-editor-objective-input')
-    ).sendKeys('This is a test collection.');
-    var options = element.all(
-      by.css('.protractor-test-collection-editor-category-dropdown')
-    );
-    options.first().click();
-    browser.driver.switchTo().activeElement().sendKeys('Algebra\n');
-    element(by.css('.protractor-test-collection-save-changes-button')).click();
+    collectionEditor.saveDraft();
+    collectionEditor.closeSaveModal();
+    collectionEditor.publishCollection();
+    collectionEditor.setTitle('Test Collection');
+    collectionEditor.setObjective('This is a test collection.');
+    collectionEditor.setCategory('Algebra');
+    collectionEditor.saveChanges();
     browser.waitForAngular();
     users.logout();
   });
