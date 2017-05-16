@@ -113,9 +113,9 @@ oppia.factory('EditableExplorationBackendApiService', [
         });
       },
 
-      fetchApplyDraftExploration: function(explorationId, applyDraft) {
+      fetchApplyDraftExploration: function(explorationId) {
         return $q(function(resolve, reject) {
-          _fetchExploration(explorationId, applyDraft, resolve, reject);
+          _fetchExploration(explorationId, true, resolve, reject);
         });
       },
 

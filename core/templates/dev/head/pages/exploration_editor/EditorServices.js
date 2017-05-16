@@ -89,7 +89,7 @@ oppia.factory('explorationData', [
           // (which is cached here) will be reused.
           return (
             EditableExplorationBackendApiService.fetchApplyDraftExploration(
-            explorationId, true).then(function(response) {
+            explorationId).then(function(response) {
               $log.info('Retrieved exploration data.');
               $log.info(response);
 

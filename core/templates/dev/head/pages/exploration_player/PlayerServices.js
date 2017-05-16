@@ -191,7 +191,7 @@ oppia.factory('oppiaPlayerService', [
 
         if (_editorPreviewMode) {
           EditableExplorationBackendApiService.fetchApplyDraftExploration(
-            _explorationId, true).then(function(data) {
+            _explorationId).then(function(data) {
               exploration = ExplorationObjectFactory.createFromBackendDict(
                 data);
               exploration.setInitialStateName(initStateName);
