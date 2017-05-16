@@ -1775,10 +1775,10 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         Returns:
             Tuple with the first element being a list of Exploration
             objects for each ExplorationModel passed in exp_models_by_versions.
-            The second element is a boolean indicating whether a conversion error
-            occurred when performing an needed exploration migrations for one
-            of the ExplorationModels. The third element is any errors that
-            occurred, ExplorationConversionError or otherwise.
+            The second element is a boolean indicating whether a conversion
+            error occurred when performing an needed exploration migrations
+            for one of the ExplorationModels. The third element is any errors
+            that occurred, ExplorationConversionError or otherwise.
         """
         cls._ensure_removed_interactions_are_in_registry()
         try:
@@ -1876,7 +1876,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         Returns:
             List of lists, with each element being an altered version of
             value_list such that the item at index idx contains a unique
-            permutation of the original item at index idx of value_list. 
+            permutation of the original item at index idx of value_list.
         """
         if idx == len(value_list):
             yield value_list
@@ -1898,7 +1898,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _stringify_classified_rule(cls, rule_spec):
-        """Stringifies rules based on multiple permutations of the rule_spec inputs.
+        """Stringifies rules based on permutations of the rule_spec inputs.
 
        "This is based on the original
         exp_domain.RuleSpec.stringify_classified_rule, however it returns a list
