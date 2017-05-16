@@ -29,8 +29,8 @@ def add_exp_id_to_completed_list(user_id, exp_id):
     It is also removed from the incomplete list (if present).
 
     Args:
-        user_id: str. The id of the learner.
-        exp_id: str. The id of the exploration.
+        user_id: str. The id of the user who has completed the exploration.
+        exp_id: str. The id of the completed exploration.
     """
     activities_completed_model = (
         user_models.ActivitiesCompletedByLearnerModel.get(
@@ -56,8 +56,8 @@ def add_collection_id_to_completed_list(user_id, collection_id):
     user. It is also removed from the incomplete list (if present).
 
     Args:
-        user_id: str. The id of the learner.
-        collection_id: str. The id of the collection.
+        user_id: str. The id of the user who completed the collection.
+        collection_id: str. The id of the completed collection.
     """
     activities_completed_model = (
         user_models.ActivitiesCompletedByLearnerModel.get(
@@ -87,10 +87,11 @@ def add_exp_to_incomplete_list(
     associated with it are updated.
 
     Args:
-        user_id: str. The id of the learner.
+        user_id: str. The id of the user who partially completed the
+            exploration.
         timestamp: datetime.datetime. The time at which the user left the
             exploraion.
-        exploration_id: str. The id of the exploration.
+        exploration_id: str. The id of the partially completed exploration.
         state_name: str. The name of the state at which the user left the
             exploration.
         exploration_version: str. The version of the exploration played by the
@@ -131,8 +132,8 @@ def add_collection_id_to_incomplete_list(user_id, collection_id):
     created by the user or is already present in the incomplete list.
 
     Args:
-        user_id: str. The id of the learner.
-        collection_id: str. The id of the collection.
+        user_id: str. The id of the user who partially completed the collection.
+        collection_id: str. The id of the partially completed collection.
     """
     incomplete_collections_model = (
         user_models.IncompleteCollectionsModel.get(user_id, strict=False))
@@ -157,8 +158,8 @@ def remove_exp_from_incomplete_list(user_id, exploration_id):
     (if present).
 
     Args:
-        user_id: str. The id of the learner.
-        exploration_id: str. The id of the exploration.
+        user_id: str. The id of the user.
+        exploration_id: str. The id of the exploration to be removed.
     """
     incomplete_explorations_model = (
         user_models.IncompleteExplorationsModel.get(user_id, strict=False))
@@ -178,8 +179,8 @@ def remove_collection_from_incomplete_list(user_id, collection_id):
     (if present).
 
     Args:
-        user_id: str. The id of the learner.
-        collection_id: str. The id of the collection.
+        user_id: str. The id of the user.
+        collection_id: str. The id of the collection to be removed.
     """
     incomplete_collections_model = (
         user_models.IncompleteCollectionsModel.get(user_id, strict=False))
@@ -195,7 +196,7 @@ def get_all_completed_exp_ids(user_id):
     user.
 
     Args:
-        user_id: str. The id of the learner.
+        user_id: str. The id of the user.
 
     Returns:
         list(str). A list of the ids of the explorations completed by the

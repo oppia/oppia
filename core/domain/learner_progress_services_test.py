@@ -23,6 +23,7 @@ import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
+
 class LearnerProgressTests(test_utils.GenericTestBase):
     """Test the services related to tracking the progress of the learner."""
 
@@ -43,6 +44,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
 
+        # Save a few explorations.
         self.save_new_valid_exploration(
             self.EXP_ID_0, self.owner_id, title='Bridges in England',
             category='Architecture', language_code='en')
@@ -53,6 +55,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.EXP_ID_2, self.user_id, title='Introduce Oppia',
             category='Welcome', language_code='en')
 
+        # Save a few collections.
         self.save_new_default_collection(
             self.COL_ID_0, self.owner_id, title='Bridges in England',
             category='Architecture')

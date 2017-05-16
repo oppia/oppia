@@ -463,40 +463,51 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
 class LearnerProgressTest(test_utils.GenericTestBase):
     """Tests for tracking learner progress."""
 
-    EXP_ID_0 = '0'
-    EXP_ID_1 = '1'
+    EXP_ID_0 = 'exp_0'
+    EXP_ID_1 = 'exp_1'
     EXP_ID_2 = 'exp_2'
     EXP_ID_3 = 'exp_3'
-    COL_ID_0 = '0'
-    COL_ID_1 = 'a collection id'
+    COL_ID_0 = 'col_0'
+    COL_ID_1 = 'col_1'
     USER_EMAIL = 'user@example.com'
     USER_USERNAME = 'user'
 
     def setUp(self):
         super(LearnerProgressTest, self).setUp()
-        exp_services.load_demo(self.EXP_ID_0)
-        exp_services.load_demo(self.EXP_ID_1)
-        collection_services.load_demo(self.COL_ID_0)
 
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        # Save and publish a new exploration.
+        # Save and publish explorations.
+        self.save_new_valid_exploration(
+            self.EXP_ID_0, self.owner_id, title='Bridges in England',
+            category='Architecture', language_code='en')
+
+        self.save_new_valid_exploration(
+            self.EXP_ID_1, self.owner_id, title='Welcome to Gadgets',
+            category='Architecture', language_code='fi')
+
         self.save_new_valid_exploration(
             self.EXP_ID_2, self.owner_id, title='Sillat Suomi',
             category='Architecture', language_code='fi')
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_2)
 
-        # Save and publish another exploration.
         self.save_new_valid_exploration(
             self.EXP_ID_3, self.owner_id,
             title='Introduce Interactions in Oppia',
             category='Welcome', language_code='en')
+
+        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_0)
+        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_1)
+        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_2)
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID_3)
 
         # Save a new collection.
+        self.save_new_default_collection(
+            self.COL_ID_0, self.owner_id, title='Welcome',
+            category='Architecture')
+
         self.save_new_default_collection(
             self.COL_ID_1, self.owner_id, title='Bridges in England',
             category='Architecture')
@@ -509,6 +520,8 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                     'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
                     'exploration_id': exp_id
                 }], 'Added new exploration')
+
+        rights_manager.publish_collection(self.owner_id, self.COL_ID_0)
         rights_manager.publish_collection(self.owner_id, self.COL_ID_1)
 
     def test_independent_exp_complete_event_handler(self):
@@ -535,10 +548,11 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             payload, csrf_token)
         self.assertEqual(learner_progress_services.get_all_completed_exp_ids(
             self.user_id), [self.EXP_ID_0])
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_collection_ids(
+                self.user_id), [])
 
-        # Even when an exploration is a part of a collection, if it's not
-        # played in the context of that collection, only the exploration id
-        # is added to the completed list.
+        # Test another exploration.
         self.post_json(
             '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_2,
             payload, csrf_token)
