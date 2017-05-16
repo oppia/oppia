@@ -97,6 +97,13 @@ elif [ -e /Applications/Google\ Chrome.app ]; then
   echo "  Chrome browser window pointing to this server."
   echo ""
   (sleep 5; open /Applications/Google\ Chrome.app http://localhost:8181/ )&
+elif [ -f "/usr/bin/chromium-browser" ]; then
+  echo ""
+  echo "  INFORMATION"
+  echo "  Setting up a local development server at localhost:8181. Opening a"
+  echo "  Chromium browser window pointing to this server."
+  echo ""
+  (sleep 5; /usr/bin/chromium-browser http://localhost:8181/ )&
 else
   echo ""
   echo "  INFORMATION"

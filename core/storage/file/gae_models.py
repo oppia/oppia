@@ -49,30 +49,88 @@ class FileMetadataModel(base_models.VersionedModel):
 
     @classmethod
     def get_undeleted(cls):
+        """Retrieve values that have not been deleted in the file metadata
+        model.
+
+        Returns:
+            list. A list of undeleted items from the query.
+        """
         return cls.get_all().filter(cls.deleted == False).fetch(  # pylint: disable=singleton-comparison
             feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def _construct_id(cls, exploration_id, filepath):
+        """Generates the path to the FileMetadataModel.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+            filepath: str. The path to the exploration file.
+
+        Returns:
+            str. The path of the id to be generated.
+        """
         return utils.vfs_construct_path('/', exploration_id, filepath)
 
     @classmethod
     def create(cls, exploration_id, filepath):
+        """Creates a new file meta data model entry.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+            filepath: str. The path to the exploration file.
+
+        Returns:
+            str. Instance of the new file meta data model entry.
+        """
         model_id = cls._construct_id(exploration_id, filepath)
         return cls(id=model_id, deleted=False)
 
     @classmethod
     def get_model(cls, exploration_id, filepath, strict=False):
+        """Gets a FileMetadataModel instance.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+            filepath: str. The path to the exploration file.
+            strict: bool. Not fail noisily if no FileMetadataModel
+            entry is found.
+
+        Returns:
+            FileMetadataModel. The FileMetadataModel instance that corresponds
+            to the given ID.
+        """
         model_id = cls._construct_id(exploration_id, filepath)
         return super(FileMetadataModel, cls).get(model_id, strict=strict)
 
     @classmethod
     def get_version(cls, exploration_id, filepath, version_number):
+        """Gets a VersionedModel instance representing a given version
+        in VersionedModel.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+            filepath: str. The path to the exploration file.
+            version_number: str. The version number of the filemetadata model
+            to retrieve.
+
+        Returns:
+            A VersionedModel instance representing a model id from
+            FilemetadataModel.
+        """
         model_id = cls._construct_id(exploration_id, filepath)
         return super(FileMetadataModel, cls).get_version(
             model_id, version_number)
 
     def commit(self, committer_id, commit_cmds):
+        """Saves a version snapshot and updates the model.
+
+        Args:
+            committer_id: int. ID of the user saving the snapshot.
+            commit_cmds: str. Information on how to reconstruct the commit.
+
+        Returns:
+           str. A version snapshot from the FileMetadataModel.
+        """
         return super(FileMetadataModel, self).commit(
             committer_id, '', commit_cmds)
 
