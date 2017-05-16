@@ -67,6 +67,10 @@
                      translate="I18N_PLAYER_CONTINUE_BUTTON"
                      aria-label="Continue">
           </md-button>
+          <i class="fa fa-arrow-circle-right"
+             ng-click="onClickContinueButton()"
+             style="font-size: 2em; padding-left: 10px; position: absolute; top: 9 px; color:#115FD4;"
+             aria-hidden="true"></i>
         </div>
         <div ng-if="activeCard.interactionHtml && !activeCard.destStateName">
           <div class="protractor-test-conversation-input"
