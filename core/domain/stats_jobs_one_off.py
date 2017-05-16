@@ -1774,11 +1774,11 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
         Returns:
             Tuple with the first element being a list of Exploration
-            objects for each ExplorationModel passed in exp_models_by_versions. The
-            second element is a boolean indicating whether a conversion error
-            occurred when performing an needed exploration migrations for one of the
-            ExplorationModels. The third element is any errors that occurred,
-            ExplorationConversionError or otherwise.
+            objects for each ExplorationModel passed in exp_models_by_versions.
+            The second element is a boolean indicating whether a conversion error
+            occurred when performing an needed exploration migrations for one
+            of the ExplorationModels. The third element is any errors that
+            occurred, ExplorationConversionError or otherwise.
         """
         cls._ensure_removed_interactions_are_in_registry()
         try:
