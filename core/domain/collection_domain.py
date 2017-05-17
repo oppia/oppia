@@ -131,6 +131,29 @@ class CollectionCommitLogEntry(object):
             commit_type, commit_message, commit_cmds, version,
             post_commit_status, post_commit_community_owned,
             post_commit_is_private):
+        """Initializes a CollectionCommitLogEntry domain object.
+        
+        Args:
+            created_on: datetime.datetime. Date and time when the collection
+                commits was created.
+            last_updated: datetime.datetime. Date and time when the collection
+                commits was updated last time.
+            user_id: str. User id of the user who has made the commit.
+            username: str. Username of the user who has made the commit.
+            collection_id: str. Id of the collection.
+            commit_type: str. The type of commit.
+            commit_message: str. A description of changes made to the
+                collection.
+            commit_cmds: list(dict). A list of change commands made to the given
+                collection.
+            version: int. The version of the collection.
+            post_commit_status: str. The new collection status after the 
+                commit.
+            post_commit_community_owned: bool. Whether the collection is
+                community-owned after the edit event.
+            post_commit_is_private: bool. Whether the collection is private
+                after the edit event.
+        """
         self.created_on = created_on
         self.last_updated = last_updated
         self.user_id = user_id
@@ -145,7 +168,13 @@ class CollectionCommitLogEntry(object):
         self.post_commit_is_private = post_commit_is_private
 
     def to_dict(self):
-        """This omits created_on, user_id and (for now) commit_cmds."""
+        """Returns a dict representing this CollectionCommitLogEntry domain
+            object. This omits created_on, user_id and (for now) commit_cmds.
+
+        Returns:
+            A dict, mapping all fields of CollectionCommitLogEntry istance,
+            except created_on, user_id and (for now) commit_cmds field.
+        """
         return {
             'last_updated': utils.get_time_in_millisecs(self.last_updated),
             'username': self.username,
@@ -168,18 +197,26 @@ class CollectionNode(object):
     """
 
     def __init__(self, exploration_id, prerequisite_skills, acquired_skills):
-        """Constructs a new CollectionNode object.
+        """Initializes a CollectionCommitLogEntry domain object.
 
         Args:
-        - exploration_id: A valid ID of an exploration referenced by this node.
-        - prerequisite_skills: A list of skills (strings).
-        - acquired_skills: A list of skills (strings).
+            exploration_id: str. A valid ID of an exploration referenced by this
+                node.
+            prerequisite_skills: list(str). A list of prerequisite skills.
+            acquired_skills: list(str). A list of acquired skills once the
+                exploration is completed.
         """
         self.exploration_id = exploration_id
         self.prerequisite_skills = prerequisite_skills
         self.acquired_skills = acquired_skills
 
     def to_dict(self):
+        """Returns a dict representing this CollectionNode domain object.
+
+        Returns:
+            A dict, mapping all fields (exploration_id, prerequisite_skills,
+            acquired_skills) of CollectionNode istance.
+        """
         return {
             'exploration_id': self.exploration_id,
             'prerequisite_skills': self.prerequisite_skills,
@@ -188,6 +225,14 @@ class CollectionNode(object):
 
     @classmethod
     def from_dict(cls, node_dict):
+        """Return a CollectionNode domain object from a dict.
+
+        Args:
+            node_dict: dict. The dict representation of CollectionNode object.
+
+		Returns:
+            A CollectionNode domain object.
+        """
         return cls(
             copy.deepcopy(node_dict['exploration_id']),
             copy.deepcopy(node_dict['prerequisite_skills']),
@@ -195,20 +240,37 @@ class CollectionNode(object):
 
     @property
     def skills(self):
-        """Returns a set of skills where each prerequisite and acquired skill
-        in this collection node is represented at most once.
+        """Returns a set of skills.
+
+        Returns:
+            The union of prerequisete set and acquired skill set. The skills
+            is represented at most once.
         """
         return set(self.prerequisite_skills) | set(self.acquired_skills)
 
     def update_prerequisite_skills(self, prerequisite_skills):
+        """Update the prerequise skills
+
+        Args:
+            prerequisite_skills: list(str). The new list of prerequisite
+                skills to set.
+        """
         self.prerequisite_skills = copy.deepcopy(prerequisite_skills)
 
     def update_acquired_skills(self, acquired_skills):
+        """Update the acquired skills
+
+        Args:
+            acquired_skills: list(str). The new list of acquired skills to set.
+        """
         self.acquired_skills = copy.deepcopy(acquired_skills)
 
     def validate(self):
-        """Validates various properties of the collection node."""
+        """Validates various properties of the collection node.
 
+        Raises:
+            ValidationError.
+        """
         if not isinstance(self.exploration_id, basestring):
             raise utils.ValidationError(
                 'Expected exploration ID to be a string, received %s' %
@@ -256,6 +318,14 @@ class CollectionNode(object):
 
     @classmethod
     def create_default_node(cls, exploration_id):
+        """Returns a CollectionNode domain object with default values.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+
+        Returns:
+            CollectionNode. The node domain object with the default values.
+        """
         return cls(exploration_id, [], [])
 
 
