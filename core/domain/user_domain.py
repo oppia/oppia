@@ -107,3 +107,49 @@ class UserExplorationPrefs(object):
             'mute_feedback_notifications': self.mute_feedback_notifications,
             'mute_suggestion_notifications': self.mute_suggestion_notifications
         }
+
+
+class ExpUserLastPlaythrough(object):
+    """Domain object for an exploration last playthrough model."""
+
+    def __init__(self, user_id, exploration_id, version_last_played,
+                 time_last_played_msec, last_state_played):
+        self.id = '%s.%s' % (user_id, exploration_id)
+        self.user_id = user_id
+        self.exploration_id = exploration_id
+        self.version_last_played = version_last_played
+        self.time_last_played_msec = time_last_played_msec
+        self.last_state_played = last_state_played
+
+    def to_dict(self):
+        """Constructs a dict representation of exploration last playthrough
+        domain object.
+
+        Returns:
+            A dict representation of exploration last playthrough domain object.
+        """
+
+        return {
+            'user_id': user_id,
+            'exploration_id': exploration_id,
+            'version_last_played': version_last_played,
+            'time_last_played_msec': time_last_played_msec,
+            'last_state_played': last_state_played
+        }
+
+    def update_last_played_information(self, time_last_played_msec,
+                                       version_last_played,
+                                       last_state_played):
+        """Updates the last playthrough information of the user.
+
+        Args:
+            time_last_played_msec: int. The time in milliseconds since the user
+                last played the exploration.
+            version_last_played: int. The version of the exploration that was
+                played by the user.
+            last_state_played: str. The name of the state at which the learner
+                left the exploration.
+        """
+        self.time_last_played_msec = time_last_played_msec
+        self.version_last_played = version_last_played
+        self.last_state_played = last_state_played

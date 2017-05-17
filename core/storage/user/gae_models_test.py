@@ -21,31 +21,31 @@ from core.tests import test_utils
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
-class IncompleteExplorationUserModelTest(test_utils.GenericTestBase):
-    """Tests for IncompleteExplorationUserModel class."""
+class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
+    """Tests for ExpUserLastPlaythroughModel class."""
 
     USER_ID = 'user_id'
     EXP_ID_0 = 'exp_id_0'
     EXP_ID_1 = 'exp_id_1'
 
     def setUp(self):
-        super(IncompleteExplorationUserModelTest, self).setUp()
-        user_models.IncompleteExplorationUserModel(
+        super(ExpUserLastPlaythroughModelTest, self).setUp()
+        user_models.ExpUserLastPlaythroughModel(
             id='%s.%s' % (self.USER_ID, self.EXP_ID_0), user_id=self.USER_ID,
             exploration_id=self.EXP_ID_0, version_last_played=1,
             time_last_played_msec=1000, last_state_played='state_name').put()
 
     def test_create_success(self):
-        user_models.IncompleteExplorationUserModel.create(
+        user_models.ExpUserLastPlaythroughModel.create(
             self.USER_ID, self.EXP_ID_1).put()
-        retrieved_object = user_models.IncompleteExplorationUserModel.get_by_id(
+        retrieved_object = user_models.ExpUserLastPlaythroughModel.get_by_id(
             '%s.%s' % (self.USER_ID, self.EXP_ID_1))
 
         self.assertEqual(retrieved_object.user_id, self.USER_ID)
         self.assertEqual(retrieved_object.exploration_id, self.EXP_ID_1)
 
     def test_get_success(self):
-        retrieved_object = user_models.IncompleteExplorationUserModel.get(
+        retrieved_object = user_models.ExpUserLastPlaythroughModel.get(
             self.USER_ID, self.EXP_ID_0)
 
         self.assertEqual(retrieved_object.user_id, self.USER_ID)
@@ -55,13 +55,13 @@ class IncompleteExplorationUserModelTest(test_utils.GenericTestBase):
         self.assertEqual(retrieved_object.last_state_played, 'state_name')
 
     def test_get_failure(self):
-        retrieved_object = user_models.IncompleteExplorationUserModel.get(
+        retrieved_object = user_models.ExpUserLastPlaythroughModel.get(
             self.USER_ID, 'unknown_exp_id')
 
         self.assertEqual(retrieved_object, None)
 
     def test_update_last_played_information(self):
-        retrieved_object = user_models.IncompleteExplorationUserModel.get_by_id(
+        retrieved_object = user_models.ExpUserLastPlaythroughModel.get_by_id(
             '%s.%s' % (self.USER_ID, self.EXP_ID_0))
         retrieved_object.update_last_played_information(
             2000, 2, 'new_state_name')

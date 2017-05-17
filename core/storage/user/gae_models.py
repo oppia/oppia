@@ -136,20 +136,20 @@ class IncompleteExplorationsModel(base_models.BaseModel):
             exploration_id: str. The id of the exploration.
 
         Returns:
-            IncompleteExplorationUserModel. A instance of the
-            IncompleteExplorationUserModel if present or it creates a new one.
+            ExpUserLastPlaythroughModel. A instance of the
+            ExpUserLastPlaythroughModel if present or it creates a new one.
         """
-        incomplete_exploration_user_model = IncompleteExplorationUserModel.get(
+        incomplete_exploration_user_model = ExpUserLastPlaythroughModel.get(
             self.id, exploration_id)
 
         if not incomplete_exploration_user_model:
             incomplete_exploration_user_model = (
-                IncompleteExplorationUserModel.create(self.id, exploration_id))
+                ExpUserLastPlaythroughModel.create(self.id, exploration_id))
 
         return incomplete_exploration_user_model
 
 
-class IncompleteExplorationUserModel(base_models.BaseModel):
+class ExpUserLastPlaythroughModel(base_models.BaseModel):
     """Stores the "last playthrough" information of the exploration since the
     user left it partially completed.
 
@@ -174,15 +174,15 @@ class IncompleteExplorationUserModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, user_id, exploration_id):
-        """Creates a new IncompleteExplorationUserModel instance and returns it.
+        """Creates a new ExpUserLastPlaythroughModel instance and returns it.
 
         Args:
             user_id: str. The id of the user.
             exploration_id: str. The id of the exploration.
 
         Returns:
-            IncompleteExplorationUserModel. The newly created
-            IncompleteExplorationUserModel instance.
+            ExpUserLastPlaythroughModel. The newly created
+            ExpUserLastPlaythroughModel instance.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
         return cls(
@@ -190,7 +190,7 @@ class IncompleteExplorationUserModel(base_models.BaseModel):
 
     @classmethod
     def get(cls, user_id, exploration_id):
-        """Gets the IncompleteExplorationUserModel for the given user and
+        """Gets the ExpUserLastPlaythroughModel for the given user and
         exploration id.
 
         Args:
@@ -198,11 +198,11 @@ class IncompleteExplorationUserModel(base_models.BaseModel):
             exploration_id: str. The id of the exploration.
 
         Returns:
-            IncompleteExplorationUserModel. The IncompleteExplorationUserModel
+            ExpUserLastPlaythroughModel. The ExpUserLastPlaythroughModel
             instance which matches with the given user_id and exploration_id.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
-        return super(IncompleteExplorationUserModel, cls).get(
+        return super(ExpUserLastPlaythroughModel, cls).get(
             instance_id, strict=False)
 
     def update_last_played_information(self, time_last_played_msec,
