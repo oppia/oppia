@@ -69,7 +69,7 @@
           </md-button>
           <i class="fa fa-arrow-circle-right"
              ng-click="onClickContinueButton()"
-             style="font-size: 2em; padding-left: 10px; position: absolute; top: 9 px; color:#115FD4;"
+             style="font-size: 2em; padding-left: 6px; padding-bottom: 1.5px; padding-right: 6px; border-radius: 3px; position: absolute; top: 9 px; margin-left: -10px; color: white; background-color: #115FD4;"
              aria-hidden="true"></i>
         </div>
         <div ng-if="activeCard.interactionHtml && !activeCard.destStateName">
@@ -84,7 +84,7 @@
         class="conversation-skin-inline-interaction" style="opacity: 0.8;">
       <div ng-if="!isViewportNarrow()" style="padding: 6px 12px;">
         <[interactionInstructions]>
-        <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
+        <i class="material-icons md-18" style="position: relative; top: 3px; left: 10px">&#xE5C8;</i>
       </div>
       <div ng-if="isViewportNarrow()">
         <md-button class="instructions-button" ng-click="onDismiss()">
