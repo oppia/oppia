@@ -77,4 +77,35 @@ describe('Multiple choice input checker service', function() {
     }];
     expect(mcics.isValid(customizationArgs, answerGroupsTrue)).toBe(true);
   });
+
+  it('should return false for duplicate rules', function() {
+    var answerGroupsTrue = [{
+      rules: [{
+        type: 'Equals',
+        inputs: {
+          x: 0
+        }
+      }],
+      outcome: {
+        feedback: [],
+        param_changes: [],
+        dest: 'Question 2'
+      },
+      correct: false
+    }, {
+      rules: [{
+        type: 'Equals',
+        inputs: {
+          x: 0
+        }
+      }],
+      outcome: {
+        feedback: [],
+        param_changes: [],
+        dest: 'Question 2'
+      },
+      correct: false
+    }];
+    expect(mcics.isValid(customizationArgs, answerGroupsTrue)).toBe(false);
+  });
 });
