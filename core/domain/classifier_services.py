@@ -124,18 +124,17 @@ def classify_string_classifier_rule(state, normalized_answer):
 
     return None
 
-def train(exp_id):
+def train(exploration):
     """Trains classifiers for all states in an exploration that satisfies
     the necessary conditions.
 
     Args:
-        exp_id: str. ID of the exploration.
+        exploration: Domain object for an exploration.
 
     Returns:
         exploration: Domain object for an exploration.
     """
     algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']
-    exploration = exp_services.get_exploration_by_id(exp_id)
     states = exploration.states
     for state_name in states:
         state = states[state_name]
