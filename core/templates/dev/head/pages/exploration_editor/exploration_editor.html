@@ -78,7 +78,6 @@
       <!-- This is an ng-if, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
       <div ng-if="getTabStatuses().active === 'preview'">
         {% include 'pages/exploration_editor/preview_tab/preview_tab.html' %}
-        {% include 'pages/exploration_editor/preview_tab/preview_set_parameters_modal_directive.html' %}
       </div>
 
       <div ng-show="getTabStatuses().active === 'stats'">
@@ -95,7 +94,6 @@
 
       <div ng-show="getTabStatuses().active === 'feedback'">
         {% include 'pages/exploration_editor/feedback_tab/feedback_tab.html' %}
-        {% include 'pages/exploration_editor/feedback_tab/thread_table_directive.html' %}
       </div>
     </div>
   </div>
