@@ -32,6 +32,7 @@ import StringIO
 import zipfile
 
 from core.domain import activity_services
+from core.domain import classifier_services
 from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import feedback_services
@@ -656,6 +657,10 @@ def apply_change_list(exploration_id, change_list):
                 if (change.property_name ==
                         exp_domain.STATE_PROPERTY_PARAM_CHANGES):
                     state.update_param_changes(change.new_value)
+                elif (
+                        change.property_name ==
+                        exp_domain.STATE_PROPERTY_CLASSIFIER_MODEL_ID):
+                    state.update_classifier_model_id(change.new_value)
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                     state.update_content(change.new_value)
                 elif (
@@ -788,6 +793,8 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
                 'Trying to update version %s of exploration from version %s, '
                 'which is too old. Please reload the page and try again.'
                 % (exploration_model.version, exploration.version))
+
+    exploration = exp_services.train(exploration.id)
 
     exploration_model.category = exploration.category
     exploration_model.title = exploration.title
