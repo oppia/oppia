@@ -794,7 +794,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
                 'which is too old. Please reload the page and try again.'
                 % (exploration_model.version, exploration.version))
 
-    exploration = exp_services.train(exploration.id)
+    exploration = classifier_services.train(exploration.id)
 
     exploration_model.category = exploration.category
     exploration_model.title = exploration.title
