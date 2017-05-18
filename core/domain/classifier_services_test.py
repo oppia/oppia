@@ -50,6 +50,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self.exp_id = exploration_id
         self.exp_state = (
             exp_services.get_exploration_by_id(exploration_id).states['Home'])
+        self.exp_state_2 = (
+            exp_services.get_exploration_by_id(exploration_id).states['End'])
 
     def _is_string_classifier_called(self, answer):
         sc = classifier_registry.Registry.get_classifier_by_algorithm_id(
@@ -125,8 +127,13 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
     def test_training_conditions_of_classifiers(self):
         """Test the check_classification_condition() method"""
+        # A state with 786 training examples.
         self.assertTrue(
             classifier_services.check_classification_condition(self.exp_state))
+
+        # A state with no training examples.
+        self.assertFalse(
+            classifier_services.check_classification_condition(self.exp_state_2))
 
     def test_update_of_classifiers(self):
         """Test the save_classifier method."""
