@@ -124,6 +124,33 @@ def classify_string_classifier_rule(state, normalized_answer):
 
     return None
 
+def check_classification_condition(state):
+    """Checks if conditions for training are satisfied.
+
+    Args:
+        state: Domain object for the State.
+
+    Returns:
+        int: Returns 1 if conditions are satisfied, 0 otherwise.
+    """
+    training_examples = [
+        [doc, []] for doc in state.interaction.confirmed_unclassified_answers]
+    for (answer_group_index, answer_group) in enumerate(
+            state.interaction.answer_groups):
+        classifier_rule_spec_index = answer_group.get_classifier_rule_index()
+        if classifier_rule_spec_index is not None:
+            classifier_rule_spec = answer_group.rule_specs[
+                classifier_rule_spec_index]
+        else:
+            classifier_rule_spec = None
+        if classifier_rule_spec is not None:
+            training_examples.extend([
+                [doc, [str(answer_group_index)]]
+                for doc in classifier_rule_spec.inputs['training_data']])
+    if (len(training_examples) >= feconf.MIN_TOTAL_TRAINING_EXAMPLES) and
+        (len(state.interaction.answer_groups) >= feconf.MIN_ASSIGNED_LABELS):
+        return 1
+    return 0
 
 def get_classifier_from_model(classifier_model):
     """Gets a classifier domain object from a classifier model.
