@@ -30,13 +30,20 @@ oppia.directive('htmlSelect', [
         selection: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/' +
-        'html_select_directive.html'),
+        '/components/forms/html_select_directive.html'),
       controller: ['$scope', function($scope) {
         $scope.select = function(id) {
           $scope.selection = id;
         };
-      }
-      ]
+
+        $scope.getSelectionIndex = function() {
+          for (var index = 0; index < $scope.options.length; index++) {
+            if ($scope.options[index].id === $scope.selection) {
+              return index;
+            }
+          }
+        };
+      }]
     };
-  }]);
+  }
+]);
