@@ -324,7 +324,8 @@ class CollectionNode(object):
             exploration_id: str. The id of the exploration.
 
         Returns:
-            CollectionNode. The node domain object with the default values.
+            CollectionNode. The CollectionNode domain object with the default
+            values.
         """
         return cls(exploration_id, [], [])
 
@@ -349,6 +350,23 @@ class Collection(object):
         feconf.CURRENT_COLLECTION_SCHEMA_VERSION should be incremented and the
         new value should be saved in the collection after the migration
         process, ensuring it represents the latest schema version.
+
+        Args:
+            collection_id: str. The unique id of the collection.
+            title: str. The title of the collection.
+            category: str. The category of the collection.
+            objective: str. The objective of the collection.
+            language_code: str. The language code of the collection (like 'en'
+                for English).
+            tags: list(str). The list of tags given to the collection.
+            schema_version: int. The schema version for the collection.
+            nodes: list(CollectionNode). The list of nodes present in the
+                collection.
+            version: int. The version of the collection.
+            created_on: datetime.datetime. Date and time when the collection is
+                created.
+            last_updated: datetime.datetime. Date and time when the
+                collection was updated last time.
         """
         self.id = collection_id
         self.title = title
@@ -363,6 +381,11 @@ class Collection(object):
         self.last_updated = last_updated
 
     def to_dict(self):
+        """Returns a dict representing this Collection domain object.
+
+        Returns:
+            A dict, mapping all fields of Collection istance.
+        """
         return {
             'id': self.id,
             'title': self.title,
@@ -382,6 +405,20 @@ class Collection(object):
             category=feconf.DEFAULT_COLLECTION_CATEGORY,
             objective=feconf.DEFAULT_COLLECTION_OBJECTIVE,
             language_code=feconf.DEFAULT_LANGUAGE_CODE):
+        """Returns a Collection domain object with default values.
+
+        Args:
+            collection_id: str. The unique id of the collection.
+            title: str. The title of the collection.
+            category: str. The category of the collection.
+            objective: str. The objective of the collection.
+            language_code: str. The language code of the collection (like 'en'
+                for English).
+
+        Returns:
+            Collection. The Collection domain object with the default
+            values.
+        """
         return cls(
             collection_id, title, category, objective, language_code, [],
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION, [], 0)
@@ -390,6 +427,20 @@ class Collection(object):
     def from_dict(
             cls, collection_dict, collection_version=0,
             collection_created_on=None, collection_last_updated=None):
+        """Return a Collection domain object from a dict.
+
+        Args:
+            collection_dict: dict. The dictionary representation of  the
+                collection.
+            collection_version: int. The version of the collection.
+            collection_created_on: datetime.datetime. Date and time when the
+                collection is created.
+            collection_last_updated: datetime.datetime. Date and time when
+                the collection is updated last time.
+
+		Returns:
+            A Collection domain object.
+        """
         collection = cls(
             collection_dict['id'], collection_dict['title'],
             collection_dict['category'], collection_dict['objective'],
@@ -404,6 +455,11 @@ class Collection(object):
         return collection
 
     def to_yaml(self):
+        """Convert the Collection domain object into YAML.
+
+		Returns:
+            YAML representation of Collection domain object.
+        """
         collection_dict = self.to_dict()
 
         # The ID is the only property which should not be stored within the
@@ -414,7 +470,15 @@ class Collection(object):
 
     @classmethod
     def _convert_v1_dict_to_v2_dict(cls, collection_dict):
-        """Converts a v1 collection dict into a v2 collection dict."""
+        """Converts a v1 collection dict into a v2 collection dict.
+
+        Args:
+            collection_dict: dict. The dictionary representation of collection.
+
+        Returns:
+            dict. The dict representation of the Collection domain object,
+            following schema version v2.
+        """
         collection_dict['schema_version'] = 2
         collection_dict['language_code'] = feconf.DEFAULT_LANGUAGE_CODE
         collection_dict['tags'] = []
@@ -424,13 +488,31 @@ class Collection(object):
     def _convert_v2_dict_to_v3_dict(cls, collection_dict):
         """Converts a v2 collection dict into a v3 collection dict.
 
-        Does nothing since the changes are handled while loading the collection.
+        Args:
+            collection_dict: dict. The dictionary representation of collection.
+
+        Returns:
+            dict. The dict representation of the Collection domain object,
+            following schema version v3.
         """
         collection_dict['schema_version'] = 3
         return collection_dict
 
     @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):
+        """Return the YAML content of the collection in the latest schema
+           format.
+
+        Args:
+            yaml_content: str. The YAML representation of the collection.
+
+        Returns:
+            YAML content of the collection.
+
+        Raises:
+            Exception. ìf 'yaml_content' or collection schema version is not
+            valid.
+        """
         try:
             collection_dict = utils.dict_from_yaml(yaml_content)
         except Exception as e:
@@ -460,6 +542,15 @@ class Collection(object):
 
     @classmethod
     def from_yaml(cls, collection_id, yaml_content):
+        """Converts a YAML string to Collection domain object.
+
+        Args:
+            collection_id: str. The id of the collection.
+            yaml_content: str. The YAML representation of the collection.
+
+        Returns:
+            Collection. The corresponding collection domain object.
+        """
         collection_dict = cls._migrate_to_latest_yaml_version(yaml_content)
 
         collection_dict['id'] = collection_id
