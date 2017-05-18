@@ -123,6 +123,11 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
                 classifier_id))):
             classifier_services.get_classifier_by_id(classifier_id)
 
+    def test_training_conditions_of_classifiers(self):
+        """Test the check_classification_condition() method"""
+        self.assertTrue(
+            classifier_services.check_classification_condition(self.exp_state))
+
     def test_update_of_classifiers(self):
         """Test the save_classifier method."""
 

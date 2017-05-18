@@ -131,7 +131,7 @@ def check_classification_condition(state):
         state: Domain object for the State.
 
     Returns:
-        int: Returns 1 if conditions are satisfied, 0 otherwise.
+        bool: True, if the conditions are satisfied.
     """
     training_examples = [
         [doc, []] for doc in state.interaction.confirmed_unclassified_answers]
@@ -147,10 +147,10 @@ def check_classification_condition(state):
             training_examples.extend([
                 [doc, [str(answer_group_index)]]
                 for doc in classifier_rule_spec.inputs['training_data']])
-    if (len(training_examples) >= feconf.MIN_TOTAL_TRAINING_EXAMPLES) and
-        (len(state.interaction.answer_groups) >= feconf.MIN_ASSIGNED_LABELS):
-        return 1
-    return 0
+    if ((len(training_examples) >= feconf.MIN_TOTAL_TRAINING_EXAMPLES) and
+        (len(state.interaction.answer_groups) >= feconf.MIN_ASSIGNED_LABELS)):
+        return True
+    return False
 
 def get_classifier_from_model(classifier_model):
     """Gets a classifier domain object from a classifier model.
