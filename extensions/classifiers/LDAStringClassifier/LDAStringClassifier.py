@@ -506,6 +506,7 @@ class LDAStringClassifier(BaseClassifier):
         model['_c_dl'] = copy.deepcopy(self._c_dl)
         model['_c_lw'] = copy.deepcopy(self._c_lw)
         model['_c_l'] = copy.deepcopy(self._c_l)
+        model = self._make_json_serializable(model)
         return model
 
     def from_dict(self, model):
@@ -515,6 +516,7 @@ class LDAStringClassifier(BaseClassifier):
         Args:
             model: A dict representing a StringClassifier.
         """
+        model = self._convert_json_to_numpy(model)
         self._alpha = copy.deepcopy(model['_alpha'])
         self._beta = copy.deepcopy(model['_beta'])
         self._prediction_threshold = copy.deepcopy(
@@ -534,6 +536,85 @@ class LDAStringClassifier(BaseClassifier):
         self._c_dl = copy.deepcopy(model['_c_dl'])
         self._c_lw = copy.deepcopy(model['_c_lw'])
         self._c_l = copy.deepcopy(model['_c_l'])
+
+    def _make_json_serializable(self, model):
+        """Makes the StringClassifier dict JSON serializable by
+        converting numpy data types to Python data types.
+
+        Args:
+            model: A dict representing a StringClassifier.
+
+        Returns:
+            model: A dict representing a StringClassifier
+        """
+
+        conversion_list_of_list_properties = [
+            '_b_dl',
+            '_c_dl',
+            '_c_lw'
+        ]
+
+        conversion_list_properties = [
+            '_c_l'
+        ]
+
+        conversion_properties = [
+            '_l_dp'
+        ]
+
+        for classifier_property in conversion_list_of_list_properties:
+            model[classifier_property] = model[classifier_property].tolist()
+            for k in range(len(model[classifier_property])):
+                for i in range(len(model[classifier_property][k])):
+                    if isinstance(
+                            model[classifier_property][k][i], numpy.integer):
+                        model[classifier_property][k][i] = int(
+                            model[classifier_property][k][i])
+                    elif isinstance(
+                            model[classifier_property][k][i], numpy.floating):
+                        model[classifier_property][k][i] = float(
+                            model[classifier_property][k][i])
+
+        for classifier_property in conversion_list_properties:
+            model[classifier_property] = model[classifier_property].tolist()
+            for k in range(len(model[classifier_property])):
+                if isinstance(
+                        model[classifier_property][k], numpy.integer):
+                    model[classifier_property][k] = int(
+                        model[classifier_property][k])
+                elif isinstance(
+                        model[classifier_property][k], numpy.floating):
+                    model[classifier_property][k] = float(
+                        model[classifier_property][k])
+
+        for classifier_property in conversion_properties:
+            model[classifier_property] = model[classifier_property]
+            for k in range(len(model[classifier_property])):
+                for i in range(len(model[classifier_property][k])):
+                    if isinstance(
+                            model[classifier_property][k][i], numpy.integer):
+                        model[classifier_property][k][i] = int(
+                            model[classifier_property][k][i])
+                    elif isinstance(
+                            model[classifier_property][k][i], numpy.floating):
+                        model[classifier_property][k][i] = float(
+                            model[classifier_property][k][i])
+        return model
+
+    def _convert_json_to_numpy(self, model):
+        """Converts the JSON serialized data back to Numpy format.
+
+        Args:
+            model: A dict representing a StringClassifier.
+
+        Returns:
+            model: A dict representing a StringClassifier
+        """
+        model["_b_dl"] = numpy.array(model["_b_dl"])
+        model["_c_dl"] = numpy.array(model["_c_dl"])
+        model["_c_lw"] = numpy.array(model["_c_lw"])
+        model["_c_l"] = numpy.array(model["_c_l"])
+        return model
 
     def train(self, training_data):
         """Sets the internal state of the classifier, assigns random initial
@@ -629,7 +710,7 @@ class LDAStringClassifier(BaseClassifier):
             '_c_dl',
             '_c_lw'
         ]
-        list_of_list_bool_properties = [
+        list_of_list_binary_int_properties = [
             '_b_dl'
         ]
         list_properties = [
@@ -707,7 +788,7 @@ class LDAStringClassifier(BaseClassifier):
                             'Expected values of %s to be a int, received %s' % (
                                 list_of_list_property, value))
 
-        for list_of_list_property in list_of_list_bool_properties:
+        for list_of_list_property in list_of_list_binary_int_properties:
             if list_of_list_property not in classifier_data:
                 raise utils.ValidationError(
                     'Expected %s to be a key in classifier_data' %
@@ -719,7 +800,11 @@ class LDAStringClassifier(BaseClassifier):
                         classifier_data[list_of_list_property]))
             for inner_list in classifier_data[list_of_list_property]:
                 for value in inner_list:
-                    if not isinstance(value, bool):
+                    if not isinstance(value, int):
                         raise utils.ValidationError(
-                            'Expected values of %s to be bool, received %s' % (
+                            'Expected values of %s to be a int, received %s' % (
+                                list_of_list_property, value))
+                    if not (value == 0 or value == 1):
+                        raise utils.ValidationError(
+                            'Expected values of %s to be 0/1, received %s' % (
                                 list_of_list_property, value))

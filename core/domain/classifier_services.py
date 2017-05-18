@@ -165,7 +165,7 @@ def train(exploration):
             cached_classifier_data = sc.to_dict()
             algorithm_version = 1
             classifier = classifier_domain.Classifier(
-                '0', exp_id, exploration.version, state_name, algorithm_id,
+                '0', exploration.id, exploration.version, state_name, algorithm_id,
                 cached_classifier_data, algorithm_version)
             classifier_id = save_classifier(classifier)
             exploration.states[state_name].classifier_model_id = classifier_id
