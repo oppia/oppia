@@ -148,7 +148,7 @@ def check_classification_condition(state):
                 [doc, [str(answer_group_index)]]
                 for doc in classifier_rule_spec.inputs['training_data']])
     if ((len(training_examples) >= feconf.MIN_TOTAL_TRAINING_EXAMPLES) and
-        (len(state.interaction.answer_groups) >= feconf.MIN_ASSIGNED_LABELS)):
+            (len(state.interaction.answer_groups) >= feconf.MIN_ASSIGNED_LABELS)):
         return True
     return False
 
