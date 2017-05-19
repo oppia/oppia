@@ -139,7 +139,6 @@
       padding-top: 12px;
     }
   </style>
-  {% include 'components/profile_link/profile_link_image_directive.html' %}
 
   {% include 'pages/exploration_player/exploration_successfully_flagged_modal.html' %}
   {% include 'pages/exploration_player/feedback_popup_directive.html' %}
@@ -150,7 +149,6 @@
 
 {% block footer %}
   {% if not iframed %}
-    {% include 'pages/exploration_player/exploration_footer_directive.html' %}
     <exploration-footer twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></exploration-footer>
   {% endif %}
 {% endblock %}

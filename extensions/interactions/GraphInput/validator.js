@@ -35,8 +35,9 @@ oppia.filter('oppiaInteractiveGraphInputValidator', [
       if (customizationArgs.graph.value.vertices.length > VERTICES_LIMIT) {
         warningsList.push({
           type: WARNING_TYPES.CRITICAL,
-          message: 'The graph used in customization exceeds supported ' +
-                   'maximum number of vertices of ' + VERTICES_LIMIT + '.'
+          message: (
+            'The graph used in customization exceeds supported ' +
+            'maximum number of vertices of ' + VERTICES_LIMIT + '.')
         });
       }
 
@@ -44,8 +45,8 @@ oppia.filter('oppiaInteractiveGraphInputValidator', [
           customizationArgs.canEditEdgeWeight.value) {
         warningsList.push({
           type: WARNING_TYPES.CRITICAL,
-          message: 'The learner cannot edit edge weights for an unweighted ' +
-            'graph.'
+          message: (
+            'The learner cannot edit edge weights for an unweighted graph.')
         });
       }
 
@@ -53,8 +54,8 @@ oppia.filter('oppiaInteractiveGraphInputValidator', [
           customizationArgs.canEditVertexLabel.value) {
         warningsList.push({
           type: WARNING_TYPES.CRITICAL,
-          message: 'The learner cannot edit vertex labels for an unlabeled ' +
-            'graph.'
+          message: (
+            'The learner cannot edit vertex labels for an unlabeled graph.')
         });
       }
 
@@ -62,29 +63,29 @@ oppia.filter('oppiaInteractiveGraphInputValidator', [
         baseInteractionValidationService.getAllOutcomeWarnings(
           answerGroups, defaultOutcome, stateName));
       for (var i = 0; i < answerGroups.length; i++) {
-        var ruleSpecs = answerGroups[i].ruleSpecs;
-        for (var j = 0; j < ruleSpecs.length; j++) {
-          var ruleSpec = ruleSpecs[j];
+        var rules = answerGroups[i].rules;
+        for (var j = 0; j < rules.length; j++) {
+          var rule = rules[j];
           try {
-            if (ruleSpec.rule_type === 'HasGraphProperty') {
+            if (rule.type === 'HasGraphProperty') {
               continue;
-            } else if (ruleSpec.rule_type === 'IsIsomorphicTo' &&
-                ruleSpec.inputs.g.vertices.length >
-                  ISOMORPHISM_VERTICES_LIMIT) {
+            } else if (rule.type === 'IsIsomorphicTo' &&
+                rule.inputs.g.vertices.length > ISOMORPHISM_VERTICES_LIMIT) {
               warningsList.push({
                 type: WARNING_TYPES.CRITICAL,
-                message: 'The graph used in the rule ' + (j + 1) +
-                         ' in group ' + (i + 1) +
-                         ' exceeds supported maximum number of vertices of ' +
-                          ISOMORPHISM_VERTICES_LIMIT + ' for isomorphism check.'
+                message: (
+                  'The graph used in the rule ' + (j + 1) + ' in group ' +
+                  (i + 1) + ' exceeds supported maximum number of vertices ' +
+                  'of ' + ISOMORPHISM_VERTICES_LIMIT +
+                  ' for isomorphism check.')
               });
-            } else if (ruleSpec.inputs.g.vertices.length > VERTICES_LIMIT) {
+            } else if (rule.inputs.g.vertices.length > VERTICES_LIMIT) {
               warningsList.push({
                 type: WARNING_TYPES.CRITICAL,
-                message: 'The graph used in the rule ' + (j + 1) +
-                         ' in group ' + (i + 1) +
-                         ' exceeds supported maximum number of vertices of ' +
-                          VERTICES_LIMIT + '.'
+                message: (
+                  'The graph used in the rule ' + (j + 1) + ' in group ' +
+                  (i + 1) + ' exceeds supported maximum number of vertices ' +
+                  'of ' + VERTICES_LIMIT + '.')
               });
             }
           }
@@ -92,8 +93,7 @@ oppia.filter('oppiaInteractiveGraphInputValidator', [
             warningsList.push({
               type: WARNING_TYPES.CRITICAL,
               message: (
-                'The rule ' + (j + 1) +
-                ' in group ' + (i + 1) + ' is invalid.')
+                'The rule ' + (j + 1) + ' in group ' + (i + 1) + ' is invalid.')
             });
           }
         }
