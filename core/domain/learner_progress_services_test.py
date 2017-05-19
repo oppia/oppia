@@ -93,12 +93,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             incomplete_explorations_model else [])
 
     def _get_incomplete_exp_details(self, user_id, exploration_id):
-        incomplete_explorations_model = (
-            user_models.IncompleteExplorationsModel.get(user_id, strict=False))
-
         incomplete_exploration_user_model = (
-            incomplete_explorations_model.get_last_playthrough_information_model( # pylint: disable=line-too-long
-                exploration_id))
+            user_models.ExpUserLastPlaythroughModel.get(
+                user_id, exploration_id))
 
         return {
             'timestamp_msec': incomplete_exploration_user_model.time_last_played_msec, # pylint: disable=line-too-long

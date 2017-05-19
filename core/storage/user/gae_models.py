@@ -128,26 +128,6 @@ class IncompleteExplorationsModel(base_models.BaseModel):
     # The ids of the explorations partially completed by the user.
     incomplete_exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
 
-    def get_last_playthrough_information_model(self, exploration_id):
-        """Get the information regarding the last playthrough of the user of
-        the given exploration.
-
-        Args:
-            exploration_id: str. The id of the exploration.
-
-        Returns:
-            ExpUserLastPlaythroughModel. A instance of the
-            ExpUserLastPlaythroughModel if present or it creates a new one.
-        """
-        incomplete_exploration_user_model = ExpUserLastPlaythroughModel.get(
-            self.id, exploration_id)
-
-        if not incomplete_exploration_user_model:
-            incomplete_exploration_user_model = (
-                ExpUserLastPlaythroughModel.create(self.id, exploration_id))
-
-        return incomplete_exploration_user_model
-
 
 class ExpUserLastPlaythroughModel(base_models.BaseModel):
     """Stores the "last playthrough" information of the exploration since the
@@ -162,7 +142,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
     exploration_id = ndb.StringProperty(required=True, indexed=True)
     # The version of the exploration last played by the user.
     version_last_played = ndb.IntegerProperty(default=None)
-    # The time since the user last played the exploration.
+    # The time since the Epoch when the user last played the exploration.
     time_last_played_msec = ndb.FloatProperty(default=None)
     # The state at which the learner left the exploration when he/she last
     # played it.
@@ -204,24 +184,6 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         instance_id = cls._generate_id(user_id, exploration_id)
         return super(ExpUserLastPlaythroughModel, cls).get(
             instance_id, strict=False)
-
-    def update_last_played_information(self, time_last_played_msec,
-                                       version_last_played,
-                                       last_state_played):
-        """Updates the last playthrough information of the user.
-
-        Args:
-            time_last_played_msec: int. The time in milliseconds since the user
-                last played the exploration.
-            version_last_played: int. The version of the exploration that was
-                played by the user.
-            last_state_played: str. The name of the state at which the learner
-                left the exploration.
-        """
-        self.time_last_played_msec = time_last_played_msec
-        self.version_last_played = version_last_played
-        self.last_state_played = last_state_played
-        self.put()
 
 
 class UserContributionsModel(base_models.BaseModel):

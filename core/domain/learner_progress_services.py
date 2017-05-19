@@ -293,11 +293,8 @@ def remove_exp_from_incomplete_list(user_id, exploration_id):
             incomplete_explorations_model)
         if exploration_id in incomplete_explorations.incomplete_exploration_ids:
             incomplete_explorations.remove_exploration_id(exploration_id)
-
-            incomplete_exploration_user_model = (
-                incomplete_explorations_model.get_last_playthrough_information_model( # pylint: disable=line-too-long
-                    exploration_id))
-            incomplete_exploration_user_model.delete()
+            incomplete_explorations.delete_last_playthrough_information(
+                exploration_id)
 
             save_incomplete_explorations(incomplete_explorations)
 

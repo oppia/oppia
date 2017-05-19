@@ -131,8 +131,8 @@ class ExpUserLastPlaythrough(object):
         """Updates the last playthrough information of the user.
 
         Args:
-            time_last_played_msec: int. The time in milliseconds since the user
-                last played the exploration.
+            time_last_played_msec: float. The time in milliseconds since the
+                Epoch when the user last played the explorations.
             version_last_played: int. The version of the exploration that was
                 played by the user.
             last_state_played: str. The name of the state at which the learner
@@ -166,7 +166,8 @@ class IncompleteExplorations(object):
         the given exploration.
 
         Args:
-            exploration_id: str. The id of the exploration.
+            exploration_id: str. The id of the exploration for which we have to
+            get the last playthrough information.
 
         Returns:
             ExpUserLastPlaythrough. A ExpUserLastPlaythrough domain object
@@ -186,6 +187,20 @@ class IncompleteExplorations(object):
             incomplete_exploration_user_model.version_last_played,
             incomplete_exploration_user_model.time_last_played_msec,
             incomplete_exploration_user_model.last_state_played)
+
+    def delete_last_playthrough_information(self, exploration_id):
+        """Deletes the last playthrough information model corresponding to the
+        given user id and exploration id.
+
+        Args:
+            exploration_id: str. The id of the exploration for which we have to
+            delete the last playthrough information model.
+        """
+        incomplete_exploration_user_model = (
+            user_models.ExpUserLastPlaythroughModel.get(
+                self.id, exploration_id))
+
+        incomplete_exploration_user_model.delete()
 
 
 class ActivitiesCompletedByLearner(object):
