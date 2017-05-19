@@ -233,9 +233,10 @@ class ExplorationHandler(base.BaseHandler):
                 rights_manager.Actor(self.user_id).can_edit(
                     feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id)),
             'exploration': exploration.to_player_dict(),
+            'exploration_id': exploration_id,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
-            'version': exploration.version,
+            'version': exploration.version
         })
         self.render_json(self.values)
 
