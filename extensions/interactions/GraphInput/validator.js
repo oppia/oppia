@@ -22,14 +22,15 @@ oppia.factory('GraphInputValidationService', [
     return {
       getAllWarnings: function(
           stateName, customizationArgs, answerGroups, defaultOutcome) {
-        baseInteractionValidationService.requireCustomizationArguments(
-          customizationArgs,
-          ['graph', 'canEditEdgeWeight', 'canEditVertexLabel']);
-
         var VERTICES_LIMIT = 50;
         var ISOMORPHISM_VERTICES_LIMIT = 10;
 
         var warningsList = [];
+
+        baseInteractionValidationService.requireCustomizationArguments(
+          customizationArgs,
+          ['graph', 'canEditEdgeWeight', 'canEditVertexLabel']);
+
         if (customizationArgs.graph.value.vertices.length > VERTICES_LIMIT) {
           warningsList.push({
             type: WARNING_TYPES.CRITICAL,
