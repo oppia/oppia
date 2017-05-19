@@ -50,7 +50,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self.exp_id = exploration_id
         self.exp_state = (
             exp_services.get_exploration_by_id(exploration_id).states['Home'])
-        self.exp_state_2 = (
+        self.exp_state_without_training_data = (
             exp_services.get_exploration_by_id(exploration_id).states['End'])
 
     def _is_string_classifier_called(self, answer):
@@ -134,7 +134,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         # A state with no training examples.
         self.assertFalse(
             classifier_services.check_classification_condition(
-                self.exp_state_2))
+                self.exp_state_without_training_data))
 
     def test_update_of_classifiers(self):
         """Test the save_classifier method."""

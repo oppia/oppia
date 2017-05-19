@@ -135,6 +135,7 @@ def check_classification_condition(state):
     """
     training_examples = [
         [doc, []] for doc in state.interaction.confirmed_unclassified_answers]
+    labels_ctr = 0
     for (answer_group_index, answer_group) in enumerate(
             state.interaction.answer_groups):
         classifier_rule_spec_index = answer_group.get_classifier_rule_index()
@@ -147,9 +148,9 @@ def check_classification_condition(state):
             training_examples.extend([
                 [doc, [str(answer_group_index)]]
                 for doc in classifier_rule_spec.inputs['training_data']])
+            labels_ctr += 1
     if ((len(training_examples) >= feconf.MIN_TOTAL_TRAINING_EXAMPLES) and
-            (len(state.interaction.answer_groups) >= (
-                feconf.MIN_ASSIGNED_LABELS))):
+            (labels_ctr >= feconf.MIN_ASSIGNED_LABELS)):
         return True
     return False
 
