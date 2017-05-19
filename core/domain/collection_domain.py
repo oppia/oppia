@@ -91,7 +91,7 @@ class CollectionChange(object):
             one of COLLECTION_PROPERTIES.
 			
         Raises:
-            Exception: ìf change_dict is not valid.
+            Exception: if change_dict is not valid.
         """
         if 'cmd' not in change_dict:
             raise Exception('Invalid change_dict: %s' % change_dict)
@@ -269,7 +269,7 @@ class CollectionNode(object):
         """Validates various properties of the collection node.
 
         Raises:
-            ValidationError.
+            ValidationError: if some attributes are not valid. 
         """
         if not isinstance(self.exploration_id, basestring):
             raise utils.ValidationError(
@@ -510,7 +510,7 @@ class Collection(object):
             YAML content of the collection.
 
         Raises:
-            Exception. ìf 'yaml_content' or collection schema version is not
+            Exception: if 'yaml_content' or collection schema version is not
             valid.
         """
         try:
@@ -561,6 +561,13 @@ class Collection(object):
             cls, collection_contents):
         """Converts from version 1 to 2. Does nothing since this migration only
         changes the language code.
+
+        Args:
+            collection_contents: Collection. The Collection domain object to
+                convert.
+
+        Returns:
+            Collection. The new Collection domain object.
         """
         return collection_contents
 
@@ -569,6 +576,13 @@ class Collection(object):
             cls, collection_contents):
         """Converts from version 2 to 3. Does nothing since the changes are
         handled while loading the collection.
+
+        Args:
+            collection_contents: Collection. The Collection domain object to
+                convert.
+
+        Returns:
+            Collection. The new Collection domain object.
         """
         return collection_contents
 
@@ -577,10 +591,16 @@ class Collection(object):
             cls, versioned_collection_contents, current_version):
         """Converts the states blob contained in the given
         versioned_collection_contents dict from current_version to
-        current_version + 1.
+        current_version + 1. Note that the versioned_collection_contents being
+        passed in is modified in-place.
 
-        Note that the versioned_collection_contents being passed in is modified
-        in-place.
+        Args:
+            versioned_collection_contents: dict.
+            current_version: int. The current collection schema version.
+
+        Raises:
+            Exception: if the value of the key 'schema_version' in
+            versioned_collection_contents is not valid.
         """
         if (versioned_collection_contents['schema_version'] + 1 >
                 feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
@@ -602,7 +622,9 @@ class Collection(object):
     def skills(self):
         """The skills of a collection are made up of all prerequisite and
         acquired skills of each exploration that is part of this collection.
-        This returns a sorted list of all the skills of the collection.
+
+        Returns:
+            list(str). A sorted list of all the skills of the collection.
         """
         unique_skills = set()
         for node in self.nodes:
@@ -613,6 +635,9 @@ class Collection(object):
     def exploration_ids(self):
         """Returns a list of all the exploration IDs that are part of this
         collection.
+
+        Returns:
+            list(str).
         """
         return [node.exploration_id for node in self.nodes]
 
@@ -622,6 +647,9 @@ class Collection(object):
         collection (ie, they require no prior skills to complete). The order
         of these IDs is given by the order each respective exploration was
         added to the collection.
+
+        Returns:
+            list(str). List of exploration IDs.
         """
         init_exp_ids = []
         for node in self.nodes:
@@ -637,6 +665,14 @@ class Collection(object):
         list is empty, then only explorations with no prerequisite skills are
         returned. The order of the exploration IDs is given by the order in
         which each exploration was added to the collection.
+
+        Args:
+            completed_exploration_ids: list(str). List of completed exploration
+                ids.
+
+        Returns:
+            list(str). A list of exploration IDs for which the prerequisite
+            skills are satisfied.
         """
         acquired_skills = set()
         for completed_exp_id in completed_exploration_ids:
@@ -653,7 +689,7 @@ class Collection(object):
                 next_exp_ids.append(node.exploration_id)
         return next_exp_ids
 
-    def get_next_exploration_ids_in_sequence(self, current_exploration):
+    def get_next_exploration_ids_in_sequence(self, current_exploration_id):
         """Returns a list of exploration IDs that a logged-out user should
         complete next based on the prerequisite skills they must have attained
         by the time they completed the current exploration.  This recursively
@@ -661,12 +697,29 @@ class Collection(object):
         'learned skills' and the current exploration's acquired skills,
         returns either a list of exploration ids that have either just
         unlocked or the user is qualified to explore.  If neither of these
-        lists can be generated a blank list is returned instead."""
+        lists can be generated a blank list is returned instead.
+
+        Args:
+            current_exploration_id: str. The id of exploration currently
+                completed.
+
+        Returns:
+            list(str). List of exploration IDs that a logged-out user should
+            complete next.
+        """
         skills_learned_by_exp_id = {}
 
         def _recursively_find_learned_skills(node):
             """Given a node, returns the skills that the user must have
-            acquired by the time they've completed it."""
+            acquired by the time they've completed it.
+
+            Arg:
+                node: CollectionNode. A node in the exploration graph of a
+                    collection.
+
+            Returns:
+                list(str). A list of acquired skills by user.
+            """
             if node.exploration_id in skills_learned_by_exp_id:
                 return skills_learned_by_exp_id[node.exploration_id]
 
@@ -684,7 +737,7 @@ class Collection(object):
         explorations_just_unlocked = []
         explorations_qualified_for = []
 
-        collection_node = self.get_node(current_exploration)
+        collection_node = self.get_node(current_exploration_id)
         collected_skills = _recursively_find_learned_skills(collection_node)
 
         for node in self.nodes:
@@ -708,30 +761,75 @@ class Collection(object):
 
     @classmethod
     def is_demo_collection_id(cls, collection_id):
-        """Whether the collection id is that of a demo collection."""
+        """Whether the collection id is that of a demo collection.
+
+        Args:
+            collection_id: str. The id of the collection.
+
+        Returs:
+            bool. True if the collection is a Demo else False.
+        """
         return collection_id in feconf.DEMO_COLLECTIONS
 
     @property
     def is_demo(self):
-        """Whether the collection is one of the demo collections."""
+        """Whether the collection is one of the demo collections.
+
+        Returs:
+            bool. True if the collection is a Demo else False.
+        """
         return self.is_demo_collection_id(self.id)
 
     def update_title(self, title):
+        """Updates the title of the collection.
+
+        Args:
+            title: str. The new title of the collection.
+        """
         self.title = title
 
     def update_category(self, category):
+        """Updates the category of the collection.
+
+        Args:
+            category: str. The new category of the collection.
+        """
         self.category = category
 
     def update_objective(self, objective):
+        """Updates the objective of the collection.
+
+        Args:
+            objective: str. The new objective of the collection.
+        """
         self.objective = objective
 
     def update_language_code(self, language_code):
+        """Updates the language code of the collection.
+
+        Args:
+            language_code: str. The new language code of the collection.
+        """
         self.language_code = language_code
 
     def update_tags(self, tags):
+        """Updates the tags of the collection.
+
+        Args:
+            tags: list(str). The new tags of the collection.
+        """
         self.tags = tags
 
     def _find_node(self, exploration_id):
+        """Returns the index of the collection node with the given exploration
+        id, or None if the exploration id is not in the nodes list.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+
+        Returns:
+            int. Index of node or None.
+        """
         for ind, node in enumerate(self.nodes):
             if node.exploration_id == exploration_id:
                 return ind
@@ -740,6 +838,13 @@ class Collection(object):
     def get_node(self, exploration_id):
         """Retrieves a collection node from the collection based on an
         exploration ID.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+
+        Returns:
+            CollectionNode. If the list of nodes contains the given exploration
+            then it will return the node, else None.
         """
         for node in self.nodes:
             if node.exploration_id == exploration_id:
@@ -747,6 +852,12 @@ class Collection(object):
         return None
 
     def add_node(self, exploration_id):
+        """Adds a collection node to the collection based on an
+        exploration id.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+        """
         if self.get_node(exploration_id) is not None:
             raise ValueError(
                 'Exploration is already part of this collection: %s' %
@@ -754,6 +865,12 @@ class Collection(object):
         self.nodes.append(CollectionNode.create_default_node(exploration_id))
 
     def delete_node(self, exploration_id):
+	    """Delete a collection node from the collection based on an
+        exploration id.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+        """
         node_index = self._find_node(exploration_id)
         if node_index is None:
             raise ValueError(
@@ -762,7 +879,11 @@ class Collection(object):
         del self.nodes[node_index]
 
     def validate(self, strict=True):
-        """Validates all properties of this collection and its constituents."""
+        """Validates all properties of this collection and its constituents.
+
+        Raises:
+            ValidationError: if some attributes are not valid.
+        """
 
         # NOTE TO DEVELOPERS: Please ensure that this validation logic is the
         # same as that in the frontend CollectionValidatorService.
