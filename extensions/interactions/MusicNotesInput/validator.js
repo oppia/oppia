@@ -13,18 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Frontend validator for customization args and rules of
- * the interaction.
+ * @fileoverview Validator service for the interaction.
  */
 
-oppia.filter('oppiaInteractiveMusicNotesInputValidator', [
+oppia.factory('MusicNotesInputValidationService', [
   'baseInteractionValidationService',
   function(baseInteractionValidationService) {
-    // Returns a list of warnings.
-    return function(
-        stateName, customizationArgs, answerGroups, defaultOutcome) {
-      return baseInteractionValidationService.getAllOutcomeWarnings(
-        answerGroups, defaultOutcome, stateName);
+    return {
+      getAllWarnings: function(
+          stateName, customizationArgs, answerGroups, defaultOutcome) {
+        return baseInteractionValidationService.getAllOutcomeWarnings(
+          answerGroups, defaultOutcome, stateName);
+      }
     };
   }
 ]);

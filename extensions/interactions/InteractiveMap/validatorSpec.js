@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-describe('oppiaInteractiveInteractiveMapValidator', function() {
-  var validator, WARNING_TYPES;
+describe('InteractiveMapValidationService', function() {
+  var validatorService, WARNING_TYPES;
 
   var currentState;
   var goodAnswerGroups, goodDefaultOutcome;
@@ -24,8 +24,7 @@ describe('oppiaInteractiveInteractiveMapValidator', function() {
   });
 
   beforeEach(inject(function($rootScope, $controller, $injector) {
-    var filter = $injector.get('$filter');
-    validator = filter('oppiaInteractiveInteractiveMapValidator');
+    validatorService = $injector.get('InteractiveMapValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 
     currentState = 'First State';
@@ -60,7 +59,7 @@ describe('oppiaInteractiveInteractiveMapValidator', function() {
   }));
 
   it('should be able to perform basic validation', function() {
-    var warnings = validator(
+    var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([]);
@@ -69,7 +68,8 @@ describe('oppiaInteractiveInteractiveMapValidator', function() {
   it('should expect latitude and longitude customization arguments',
     function() {
       expect(function() {
-        validator(currentState, {}, goodAnswerGroups, goodDefaultOutcome);
+        validatorService.getAllWarnings(
+          currentState, {}, goodAnswerGroups, goodDefaultOutcome);
       }).toThrow('Expected customization arguments to have properties: ' +
         'latitude, longitude');
     }
@@ -80,7 +80,7 @@ describe('oppiaInteractiveInteractiveMapValidator', function() {
     function() {
       customizationArguments.latitude.value = -120;
       customizationArguments.longitude.value = 200;
-      var warnings = validator(
+      var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
       expect(warnings).toEqual([{
@@ -93,7 +93,7 @@ describe('oppiaInteractiveInteractiveMapValidator', function() {
 
       customizationArguments.latitude.value = 120;
       customizationArguments.longitude.value = -200;
-      warnings = validator(
+      warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
       expect(warnings).toEqual([{
@@ -110,7 +110,7 @@ describe('oppiaInteractiveInteractiveMapValidator', function() {
     function() {
       goodAnswerGroups[0].rules[0].inputs.d = -90;
       goodAnswerGroups[0].rules[1].inputs.d = -180;
-      var warnings = validator(
+      var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
       expect(warnings).toEqual([{

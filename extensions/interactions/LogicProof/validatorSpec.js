@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-describe('oppiaInteractiveLogicProofValidator', function() {
-  var validator, WARNING_TYPES;
+describe('LogicProofValidationService', function() {
+  var validatorService, WARNING_TYPES;
 
   var currentState;
   var badOutcome, goodAnswerGroups, goodDefaultOutcome;
@@ -23,8 +23,7 @@ describe('oppiaInteractiveLogicProofValidator', function() {
   });
 
   beforeEach(inject(function($rootScope, $controller, $injector) {
-    var filter = $injector.get('$filter');
-    validator = filter('oppiaInteractiveLogicProofValidator');
+    validatorService = $injector.get('LogicProofValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 
     currentState = 'First State';
@@ -47,13 +46,14 @@ describe('oppiaInteractiveLogicProofValidator', function() {
   }));
 
   it('should be able to perform basic validation', function() {
-    var warnings = validator(
+    var warnings = validatorService.getAllWarnings(
       currentState, {}, goodAnswerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
 
   it('should not have warnings for a confusing default outcome', function() {
-    var warnings = validator(currentState, {}, [], badOutcome);
+    var warnings = validatorService.getAllWarnings(
+      currentState, {}, [], badOutcome);
     expect(warnings).toEqual([]);
   });
 });
