@@ -20,8 +20,7 @@ oppia.factory('InteractiveMapValidationService', [
   'WARNING_TYPES', 'baseInteractionValidationService',
   function(WARNING_TYPES, baseInteractionValidationService) {
     return {
-      getAllWarnings: function(
-          stateName, customizationArgs, answerGroups, defaultOutcome) {
+      getCustomizationArgsWarnings: function(customizationArgs) {
         var warningsList = [];
 
         baseInteractionValidationService.requireCustomizationArguments(
@@ -42,6 +41,14 @@ oppia.factory('InteractiveMapValidationService', [
             message: 'Please pick a starting longitude between -180 and 180.'
           });
         }
+        return warningsList;
+      },
+      getAllWarnings: function(
+          stateName, customizationArgs, answerGroups, defaultOutcome) {
+        var warningsList = [];
+
+        warningsList = warningsList.concat(
+          this.getCustomizationArgsWarnings(customizationArgs));
 
         for (var i = 0; i < answerGroups.length; i++) {
           var rules = answerGroups[i].rules;

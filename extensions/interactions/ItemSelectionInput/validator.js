@@ -20,8 +20,7 @@ oppia.factory('ItemSelectionInputValidationService', [
   '$filter', 'WARNING_TYPES', 'baseInteractionValidationService',
   function($filter, WARNING_TYPES, baseInteractionValidationService) {
     return {
-      getAllWarnings: function(
-          stateName, customizationArgs, answerGroups, defaultOutcome) {
+      getCustomizationArgsWarnings: function(customizationArgs) {
         var warningsList = [];
 
         baseInteractionValidationService.requireCustomizationArguments(
@@ -89,12 +88,29 @@ oppia.factory('ItemSelectionInputValidationService', [
               'count.')
           });
         }
+        return warningsList;
+      },
+      getAllWarnings: function(
+          stateName, customizationArgs, answerGroups, defaultOutcome) {
+        var warningsList = [];
+
+        warningsList = warningsList.concat(
+          this.getCustomizationArgsWarnings(customizationArgs));
 
         warningsList = warningsList.concat(
           baseInteractionValidationService.getAnswerGroupWarnings(
             answerGroups, stateName));
 
-        var selectedChoices = [];
+        var seenChoices = customizationArgs.choices.value;
+        var handledAnswers = seenChoices.map(function(item) {
+          return false;
+        });
+        var minAllowedCount =
+          customizationArgs.minAllowableSelectionCount.value;
+        var maxAllowedCount =
+          customizationArgs.maxAllowableSelectionCount.value;
+
+        var areAllChoicesCovered = false;
         if (maxAllowedCount === 1) {
           var answerChoiceToIndex = {};
           seenChoices.forEach(function(seenChoice, choiceIndex) {

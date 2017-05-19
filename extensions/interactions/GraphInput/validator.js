@@ -20,13 +20,9 @@ oppia.factory('GraphInputValidationService', [
   'WARNING_TYPES', 'baseInteractionValidationService',
   function(WARNING_TYPES, baseInteractionValidationService) {
     return {
-      getAllWarnings: function(
-          stateName, customizationArgs, answerGroups, defaultOutcome) {
+      getCustomizationArgsWarnings: function(customizationArgs) {
         var VERTICES_LIMIT = 50;
-        var ISOMORPHISM_VERTICES_LIMIT = 10;
-
         var warningsList = [];
-
         baseInteractionValidationService.requireCustomizationArguments(
           customizationArgs,
           ['graph', 'canEditEdgeWeight', 'canEditVertexLabel']);
@@ -57,6 +53,17 @@ oppia.factory('GraphInputValidationService', [
               'The learner cannot edit vertex labels for an unlabeled graph.')
           });
         }
+        return warningsList;
+      },
+      getAllWarnings: function(
+          stateName, customizationArgs, answerGroups, defaultOutcome) {
+        var VERTICES_LIMIT = 50;
+        var ISOMORPHISM_VERTICES_LIMIT = 10;
+
+        var warningsList = [];
+
+        warningsList = warningsList.concat(
+          this.getCustomizationArgsWarnings(customizationArgs));
 
         warningsList = warningsList.concat(
           baseInteractionValidationService.getAllOutcomeWarnings(

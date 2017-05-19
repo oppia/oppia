@@ -20,11 +20,19 @@ oppia.factory('MathExpressionInputValidationService', [
   'baseInteractionValidationService', 'WARNING_TYPES',
   function(baseInteractionValidationService, WARNING_TYPES) {
     return {
+      getCustomizationArgsWarnings: function(customizationArgs) {
+        return [];
+      },
       getAllWarnings: function(
           stateName, customizationArgs, answerGroups, defaultOutcome) {
-        var warningsList =
+        var warningsList = [];
+
+        warningsList = warningsList.concat(
+          this.getCustomizationArgsWarnings(customizationArgs));
+
+        warningsList = warningsList.concat(
           baseInteractionValidationService.getAllOutcomeWarnings(
-            answerGroups, defaultOutcome, stateName);
+            answerGroups, defaultOutcome, stateName));
 
         // Check that each rule has a valid math expression.
         for (var i = 0; i < answerGroups.length; i++) {

@@ -20,8 +20,7 @@ oppia.factory('MultipleChoiceInputValidationService', [
   '$filter', 'WARNING_TYPES', 'baseInteractionValidationService',
   function($filter, WARNING_TYPES, baseInteractionValidationService) {
     return {
-      getAllWarnings: function(
-          stateName, customizationArgs, answerGroups, defaultOutcome) {
+      getCustomizationArgsWarnings: function(customizationArgs) {
         var warningsList = [];
 
         baseInteractionValidationService.requireCustomizationArguments(
@@ -54,7 +53,16 @@ oppia.factory('MultipleChoiceInputValidationService', [
             message: 'Please ensure the choices are unique.'
           });
         }
+        return warningsList;
+      },
+      getAllWarnings: function(
+          stateName, customizationArgs, answerGroups, defaultOutcome) {
+        var warningsList = [];
 
+        warningsList = warningsList.concat(
+          this.getCustomizationArgsWarnings(customizationArgs));
+
+        var numChoices = customizationArgs.choices.value.length;
         var selectedEqualsChoices = [];
         for (var i = 0; i < answerGroups.length; i++) {
           var rules = answerGroups[i].rules;

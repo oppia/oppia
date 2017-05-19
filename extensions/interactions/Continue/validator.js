@@ -20,10 +20,8 @@ oppia.factory('ContinueValidationService', [
   '$filter', 'WARNING_TYPES', 'baseInteractionValidationService',
   function($filter, WARNING_TYPES, baseInteractionValidationService) {
     return {
-      getAllWarnings: function(
-          stateName, customizationArgs, answerGroups, defaultOutcome) {
+      getCustomizationArgsWarnings: function(customizationArgs) {
         var warningsList = [];
-
         baseInteractionValidationService.requireCustomizationArguments(
           customizationArgs, ['buttonText']);
 
@@ -33,6 +31,11 @@ oppia.factory('ContinueValidationService', [
             message: 'The button text should not be empty.'
           });
         }
+        return warningsList;
+      },
+      getAllWarnings: function(
+          stateName, customizationArgs, answerGroups, defaultOutcome) {
+        var warningsList = this.getCustomizationArgsWarnings(customizationArgs);
 
         if (answerGroups.length > 0) {
           warningsList.push({

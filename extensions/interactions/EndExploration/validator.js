@@ -20,12 +20,17 @@ oppia.factory('EndExplorationValidationService', [
   'WARNING_TYPES', 'baseInteractionValidationService',
   function(WARNING_TYPES, baseInteractionValidationService) {
     return {
+      getCustomizationArgsWarnings: function(customizationArgs) {
+        baseInteractionValidationService.requireCustomizationArguments(
+          customizationArgs, ['recommendedExplorationIds']);
+        return [];
+      },
       getAllWarnings: function(
           stateName, customizationArgs, answerGroups, defaultOutcome) {
         var warningsList = [];
 
-        baseInteractionValidationService.requireCustomizationArguments(
-          customizationArgs, ['recommendedExplorationIds']);
+        warningsList = warningsList.concat(
+          this.getCustomizationArgsWarnings(customizationArgs));
 
         if (answerGroups.length !== 0) {
           warningsList.push({

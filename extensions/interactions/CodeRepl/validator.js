@@ -20,10 +20,14 @@ oppia.factory('CodeReplValidationService', [
   'baseInteractionValidationService',
   function(baseInteractionValidationService) {
     return {
+      getCustomizationArgsWarnings: function(customizationArgs) {
+        return [];
+      },
       getAllWarnings: function(stateName, customizationArgs, answerGroups,
           defaultOutcome) {
-        return baseInteractionValidationService.getAllOutcomeWarnings(
-          answerGroups, defaultOutcome, stateName);
+        return this.getCustomizationArgsWarnings(customizationArgs).concat(
+          baseInteractionValidationService.getAllOutcomeWarnings(
+            answerGroups, defaultOutcome, stateName));
       }
     };
   }]);
