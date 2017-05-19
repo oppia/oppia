@@ -133,7 +133,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
         # A state with no training examples.
         self.assertFalse(
-            classifier_services.check_classification_condition(self.exp_state_2))
+            classifier_services.check_classification_condition(
+                self.exp_state_2))
 
     def test_update_of_classifiers(self):
         """Test the save_classifier method."""
