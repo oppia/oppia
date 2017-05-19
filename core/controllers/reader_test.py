@@ -678,9 +678,9 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         version = 1
 
         # Add two explorations to the partially completed list.
-        learner_progress_services.add_exp_to_incomplete_list(
+        learner_progress_services.mark_exploration_as_incomplete(
             self.user_id, timestamp, self.EXP_ID_0, state_name, version)
-        learner_progress_services.add_exp_to_incomplete_list(
+        learner_progress_services.mark_exploration_as_incomplete(
             self.user_id, timestamp, self.EXP_ID_1, state_name, version)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
@@ -718,9 +718,9 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(response)
 
         # Add two collections to incomplete list.
-        learner_progress_services.add_collection_id_to_incomplete_list(
+        learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_0)
-        learner_progress_services.add_collection_id_to_incomplete_list(
+        learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_1)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(

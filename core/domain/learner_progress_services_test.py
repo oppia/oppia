@@ -114,17 +114,17 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             incomplete_collections_model.incomplete_collection_ids if
             incomplete_collections_model else [])
 
-    def test_add_exp_id_to_completed_list(self):
+    def test_mark_exploration_as_completed(self):
         self.assertEqual(self._get_all_completed_exp_ids(self.user_id), [])
 
         # Add an exploration to the completed list of a learner.
-        learner_progress_services.add_exp_id_to_completed_list(
+        learner_progress_services.mark_exploration_as_completed(
             self.user_id, self.EXP_ID_0)
         self.assertEqual(
             self._get_all_completed_exp_ids(self.user_id), [self.EXP_ID_0])
 
         # Completing an exploration again has no effect.
-        learner_progress_services.add_exp_id_to_completed_list(
+        learner_progress_services.mark_exploration_as_completed(
             self.user_id, self.EXP_ID_0)
         self.assertEqual(
             self._get_all_completed_exp_ids(self.user_id), [self.EXP_ID_0])
@@ -134,13 +134,13 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         version = 1
 
         # Add an exploration to the in progress list of the learner.
-        learner_progress_services.add_exp_to_incomplete_list(
+        learner_progress_services.mark_exploration_as_incomplete(
             self.user_id, timestamp, self.EXP_ID_1, state_name, version)
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_1])
         # Test that on adding an incomplete exploration to the completed list
         # it gets removed from the incomplete list.
-        learner_progress_services.add_exp_id_to_completed_list(
+        learner_progress_services.mark_exploration_as_completed(
             self.user_id, self.EXP_ID_1)
         self.assertEqual(self._get_all_completed_exp_ids(
             self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
@@ -149,29 +149,29 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Test that an exploration created by the user is not added to the
         # completed list.
-        learner_progress_services.add_exp_id_to_completed_list(
+        learner_progress_services.mark_exploration_as_completed(
             self.user_id, self.EXP_ID_2)
         self.assertEqual(self._get_all_completed_exp_ids(
             self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
-    def test_add_collection_id_to_completed_list(self):
+    def test_mark_collection_as_completed(self):
         self.assertEqual(
             self._get_all_completed_collection_ids(self.user_id), [])
 
         # Add a collection to the completed list.
-        learner_progress_services.add_collection_id_to_completed_list(
+        learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_0)
         self.assertEqual(self._get_all_completed_collection_ids(
             self.user_id), [self.COL_ID_0])
 
         # Completing a collection again has no effect.
-        learner_progress_services.add_collection_id_to_completed_list(
+        learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_0)
         self.assertEqual(self._get_all_completed_collection_ids(
             self.user_id), [self.COL_ID_0])
 
         # Add a collection to the incomplete list.
-        learner_progress_services.add_collection_id_to_incomplete_list(
+        learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_1)
         self.assertEqual(self._get_all_incomplete_collection_ids(
             self.user_id), [self.COL_ID_1])
@@ -179,7 +179,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # If the collection is present in the incomplete list, on completion
         # it is removed from the incomplete list and added to the complete
         # list.
-        learner_progress_services.add_collection_id_to_completed_list(
+        learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_1)
         self.assertEqual(self._get_all_incomplete_collection_ids(
             self.user_id), [])
@@ -188,12 +188,12 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Test that a collection created by the user is not added to the
         # completed list.
-        learner_progress_services.add_collection_id_to_completed_list(
+        learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_2)
         self.assertEqual(self._get_all_completed_collection_ids(
             self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
-    def test_add_exp_to_incomplete_list(self):
+    def test_mark_exploration_as_incomplete(self):
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [])
 
@@ -208,7 +208,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         }
 
         # Add an exploration to the incomplete list of a learner.
-        learner_progress_services.add_exp_to_incomplete_list(
+        learner_progress_services.mark_exploration_as_incomplete(
             self.user_id, timestamp, self.EXP_ID_0, state_name, version)
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_0])
@@ -227,7 +227,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # On adding an exploration again, its details are updated to the latest
         # version.
-        learner_progress_services.add_exp_to_incomplete_list(
+        learner_progress_services.mark_exploration_as_incomplete(
             self.user_id, timestamp, self.EXP_ID_0, state_name, version)
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_0])
@@ -235,48 +235,48 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.EXP_ID_0), modified_exp_details)
 
         # If an exploration has already been completed, it is not added.
-        learner_progress_services.add_exp_id_to_completed_list(
+        learner_progress_services.mark_exploration_as_completed(
             self.user_id, self.EXP_ID_1)
-        learner_progress_services.add_exp_to_incomplete_list(
+        learner_progress_services.mark_exploration_as_incomplete(
             self.user_id, timestamp, self.EXP_ID_1, state_name, version)
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_0])
 
         # Test that an exploration created by the user is not added to the
         # incomplete list.
-        learner_progress_services.add_exp_to_incomplete_list(
+        learner_progress_services.mark_exploration_as_incomplete(
             self.user_id, timestamp, self.EXP_ID_2, state_name, version)
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_0])
 
-    def test_add_collection_id_to_incomplete_list(self):
+    def test_mark_collection_as_incomplete(self):
         self.assertEqual(self._get_all_incomplete_collection_ids(
             self.user_id), [])
 
         # Add a collection to the incomplete list of the learner.
-        learner_progress_services.add_collection_id_to_incomplete_list(
+        learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_0)
         self.assertEqual(self._get_all_incomplete_collection_ids(
             self.user_id), [self.COL_ID_0])
 
         # Adding a collection again has no effect.
-        learner_progress_services.add_collection_id_to_incomplete_list(
+        learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_0)
         self.assertEqual(self._get_all_incomplete_collection_ids(
             self.user_id), [self.COL_ID_0])
 
         # If a collection has been completed, it is not added to the incomplete
         # list.
-        learner_progress_services.add_collection_id_to_completed_list(
+        learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_1)
-        learner_progress_services.add_collection_id_to_incomplete_list(
+        learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_1)
         self.assertEqual(self._get_all_incomplete_collection_ids(
             self.user_id), [self.COL_ID_0])
 
         # Test that a collection created by the user is not added to the
         # incomplete list.
-        learner_progress_services.add_collection_id_to_incomplete_list(
+        learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_2)
         self.assertEqual(self._get_all_incomplete_collection_ids(
             self.user_id), [self.COL_ID_0])
@@ -290,9 +290,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         version = 1
 
         # Add incomplete explorations.
-        learner_progress_services.add_exp_to_incomplete_list(
+        learner_progress_services.mark_exploration_as_incomplete(
             self.user_id, timestamp, self.EXP_ID_0, state_name, version)
-        learner_progress_services.add_exp_to_incomplete_list(
+        learner_progress_services.mark_exploration_as_incomplete(
             self.user_id, timestamp, self.EXP_ID_1, state_name, version)
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
@@ -320,9 +320,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id), [])
 
         # Add two collections to the incomplete list.
-        learner_progress_services.add_collection_id_to_incomplete_list(
+        learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_0)
-        learner_progress_services.add_collection_id_to_incomplete_list(
+        learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_1)
         self.assertEqual(self._get_all_incomplete_collection_ids(
             self.user_id), [self.COL_ID_0, self.COL_ID_1])
@@ -350,13 +350,13 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id), [])
 
         # Add an exploration to the completed list.
-        learner_progress_services.add_exp_id_to_completed_list(
+        learner_progress_services.mark_exploration_as_completed(
             self.user_id, self.EXP_ID_0)
         self.assertEqual(learner_progress_services.get_all_completed_exp_ids(
             self.user_id), [self.EXP_ID_0])
 
         # Add another exploration.
-        learner_progress_services.add_exp_id_to_completed_list(
+        learner_progress_services.mark_exploration_as_completed(
             self.user_id, self.EXP_ID_1)
         self.assertEqual(learner_progress_services.get_all_completed_exp_ids(
             self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
@@ -367,14 +367,14 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [])
 
         # Add a collection to the completed list.
-        learner_progress_services.add_collection_id_to_completed_list(
+        learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_0)
         self.assertEqual(
             learner_progress_services.get_all_completed_collection_ids(
                 self.user_id), [self.COL_ID_0])
 
         # Add another collection.
-        learner_progress_services.add_collection_id_to_completed_list(
+        learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_1)
         self.assertEqual(
             learner_progress_services.get_all_completed_collection_ids(
@@ -390,14 +390,14 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         version = 1
 
         # Add an exploration to the incomplete list.
-        learner_progress_services.add_exp_to_incomplete_list(
+        learner_progress_services.mark_exploration_as_incomplete(
             self.user_id, timestamp, self.EXP_ID_0, state_name, version)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [self.EXP_ID_0])
 
         # Add another exploration.
-        learner_progress_services.add_exp_to_incomplete_list(
+        learner_progress_services.mark_exploration_as_incomplete(
             self.user_id, timestamp, self.EXP_ID_1, state_name, version)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
@@ -409,14 +409,14 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [])
 
         # Add a collection to the incomplete list.
-        learner_progress_services.add_collection_id_to_incomplete_list(
+        learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_0)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [self.COL_ID_0])
 
         # Add another collection.
-        learner_progress_services.add_collection_id_to_incomplete_list(
+        learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_1)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(

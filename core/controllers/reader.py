@@ -405,7 +405,7 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
             feconf.PLAY_TYPE_NORMAL)
 
         if user_id:
-            learner_progress_services.add_exp_id_to_completed_list(
+            learner_progress_services.mark_exploration_as_completed(
                 user_id, exploration_id)
 
         if user_id and collection_id:
@@ -416,10 +416,10 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
                     user_id, collection_id))
 
             if not collections_left_to_complete:
-                learner_progress_services.add_collection_id_to_completed_list(
+                learner_progress_services.mark_collection_as_completed(
                     user_id, collection_id)
             else:
-                learner_progress_services.add_collection_id_to_incomplete_list(
+                learner_progress_services.mark_collection_as_incomplete(
                     user_id, collection_id)
 
         self.render_json(self.values)
@@ -443,11 +443,11 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
         collection_id = self.payload.get('collection_id')
 
         if user_id:
-            learner_progress_services.add_exp_to_incomplete_list(
+            learner_progress_services.mark_exploration_as_incomplete(
                 user_id, timestamp, exploration_id, state_name, version)
 
         if user_id and collection_id:
-            learner_progress_services.add_collection_id_to_incomplete_list(
+            learner_progress_services.mark_collection_as_incomplete(
                 user_id, collection_id)
 
         event_services.MaybeLeaveExplorationEventHandler.record(

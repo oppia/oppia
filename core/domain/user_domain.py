@@ -16,7 +16,11 @@
 
 """Domain objects for user."""
 
+from core.platform import models
 import feconf
+
+(user_models,) = models.Registry.import_models([models.NAMES.user])
+
 
 class UserGlobalPrefs(object):
     """Domain object for user global email preferences.
@@ -121,22 +125,6 @@ class ExpUserLastPlaythrough(object):
         self.time_last_played_msec = time_last_played_msec
         self.last_state_played = last_state_played
 
-    def to_dict(self):
-        """Constructs a dict representation of exploration last playthrough
-        domain object.
-
-        Returns:
-            A dict representation of exploration last playthrough domain object.
-        """
-
-        return {
-            'user_id': user_id,
-            'exploration_id': exploration_id,
-            'version_last_played': version_last_played,
-            'time_last_played_msec': time_last_played_msec,
-            'last_state_played': last_state_played
-        }
-
     def update_last_played_information(self, time_last_played_msec,
                                        version_last_played,
                                        last_state_played):
@@ -153,3 +141,88 @@ class ExpUserLastPlaythrough(object):
         self.time_last_played_msec = time_last_played_msec
         self.version_last_played = version_last_played
         self.last_state_played = last_state_played
+
+class IncompleteExplorations(object):
+    """Domain object for the incomplete explorations model."""
+
+    def __init__(self, user_id, incomplete_exploration_ids):
+        self.id = user_id
+        self.incomplete_exploration_ids = incomplete_exploration_ids
+
+    def add_exploration_id(self, exploration_id):
+        """Adds the exploration id to the list of incomplete exploration ids."""
+
+        self.incomplete_exploration_ids.append(exploration_id)
+
+    def remove_exploration_id(self, exploration_id):
+        """Removes the exploration id from the list of incomplete exploration
+        ids.
+        """
+
+        self.incomplete_exploration_ids.remove(exploration_id)
+
+    def get_last_playthrough_information(self, exploration_id):
+        """Get the information regarding the last playthrough of the user of
+        the given exploration.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+
+        Returns:
+            ExpUserLastPlaythrough. A ExpUserLastPlaythrough domain object
+            corresponding to the given exploration id.
+        """
+        incomplete_exploration_user_model = (
+            user_models.ExpUserLastPlaythroughModel.get(
+                self.id, exploration_id))
+
+        if not incomplete_exploration_user_model:
+            incomplete_exploration_user_model = (
+                user_models.ExpUserLastPlaythroughModel.create(
+                    self.id, exploration_id))
+
+        return ExpUserLastPlaythrough(
+            self.id, exploration_id,
+            incomplete_exploration_user_model.version_last_played,
+            incomplete_exploration_user_model.time_last_played_msec,
+            incomplete_exploration_user_model.last_state_played)
+
+
+class ActivitiesCompletedByLearner(object):
+    """Domain object for the activities completed by learner model."""
+
+    def __init__(self, user_id, completed_exploration_ids,
+                 completed_collection_ids):
+        self.id = user_id
+        self.completed_exploration_ids = completed_exploration_ids
+        self.completed_collection_ids = completed_collection_ids
+
+    def add_exploration_id(self, exploration_id):
+        """Adds the exploration id to the list of completed exploration ids."""
+
+        self.completed_exploration_ids.append(exploration_id)
+
+    def add_collection_id(self, collection_id):
+        """Adds the collection id to the list of completed collection ids."""
+
+        self.completed_collection_ids.append(collection_id)
+
+
+class IncompleteCollections(object):
+    """Domain object for the collections partially completed by the user."""
+
+    def __init__(self, user_id, incomplete_collection_ids):
+        self.id = user_id
+        self.incomplete_collection_ids = incomplete_collection_ids
+
+    def add_collection_id(self, collection_id):
+        """Adds the collection id to the list of incomplete collection ids."""
+
+        self.incomplete_collection_ids.append(collection_id)
+
+    def remove_collection_id(self, collection_id):
+        """Removes the collection id from the list of incomplete collection
+        ids.
+        """
+
+        self.incomplete_collection_ids.remove(collection_id)
