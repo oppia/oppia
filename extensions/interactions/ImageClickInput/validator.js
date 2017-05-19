@@ -26,8 +26,8 @@ oppia.factory('ImageClickInputValidationService', [
 
         var warningsList = [];
 
-        var argsValue = customizationArgs.imageAndRegions.value;
-        if (!argsValue.imagePath) {
+        var imgAndRegionArgValue = customizationArgs.imageAndRegions.value;
+        if (!imgAndRegionArgValue.imagePath) {
           warningsList.push({
             type: WARNING_TYPES.CRITICAL,
             message: 'Please add an image for the learner to click on.'
@@ -37,16 +37,16 @@ oppia.factory('ImageClickInputValidationService', [
         var areAnyRegionStringsEmpty = false;
         var areAnyRegionStringsDuplicated = false;
         var seenRegionStrings = [];
-        if (argsValue.labeledRegions.length == 0) {
+        if (imgAndRegionArgValue.labeledRegions.length == 0) {
           warningsList.push({
             type: WARNING_TYPES.ERROR,
             message: 'Please specify at least one image region to click on.'
           });
         }
 
-        for (var i = 0; i < argsValue.labeledRegions.length; i++) {
+        for (var i = 0; i < imgAndRegionArgValue.labeledRegions.length; i++) {
           var regionLabel = (
-            argsValue.labeledRegions[i].label);
+            imgAndRegionArgValue.labeledRegions[i].label);
 
           var ALPHANUMERIC_REGEX = /^[A-Za-z0-9]+$/;
           if (regionLabel.trim().length === 0) {
@@ -85,10 +85,11 @@ oppia.factory('ImageClickInputValidationService', [
           baseInteractionValidationService.getAnswerGroupWarnings(
             answerGroups, stateName);
 
-        var argsValue = customizationArgs.imageAndRegions.value;
-        var seenRegionStrings = argsValue.labeledRegions.map(function(region) {
-          return region.label;
-        });
+        var imgAndRegionArgValue = customizationArgs.imageAndRegions.value;
+        var seenRegionStrings = imgAndRegionArgValue.labeledRegions.map(
+          function(region) {
+            return region.label;
+          });
 
         // Check that each rule refers to a valid region string.
         for (var i = 0; i < answerGroups.length; i++) {
