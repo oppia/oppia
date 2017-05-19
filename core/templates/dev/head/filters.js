@@ -194,7 +194,6 @@ oppia.filter('parameterizeRuleDescription', [
       var replacementText = '[INVALID]';
       // Special case for MultipleChoiceInput, ImageClickInput, and
       // ItemSelectionInput.
-      console.log(choices);
       if (choices) {
         if (varType === 'SetOfHtmlString') {
           replacementText = '[';

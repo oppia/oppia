@@ -37,12 +37,10 @@ oppia.directive('oppiaInteractiveLabelingInput', [
             $attrs.imageAndLabelsWithValue);
           $scope.imageTitle = $attrs.imageTitleWithValue;
           $scope.drawLines = ($attrs.showLinesWithValue == 'true');
-          console.log($scope.drawLines);
           //Need to strip unicode
           var unicodeStripCount = 6;
           $scope.imageTitle = $scope.imageTitle.slice(unicodeStripCount)
           $scope.imageTitle = $scope.imageTitle.slice(0, -unicodeStripCount);
-          console.log($scope.imageTitle);
           $scope.alwaysShowRegions = 'true';
           if ($scope.alwaysShowRegions) {
             $scope.highlightRegionsOnHover = false;
@@ -97,6 +95,7 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           //If all labels have been placed, run a correctness check
           $scope.runSubmitCheck = function(){
             $scope.submitted = 1;
+            console.log($scope.numRegions);
             if ($scope.numRegions == 0){
               $scope.numRegions = $scope.incorrectElements.length;
               $scope.onSubmit({
@@ -112,6 +111,9 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           //Check if our value is the one of the region, and handle acccordingly
           $scope.checkTheValues = function(event, ui, correctName){
             $scope.numRegions--;
+            if ($scope.numRegions < 0){
+              $scope.numRegions = 0;
+            }
             if (correctName == $scope.currentDraggedElement){
               $scope.correctElements.push($scope.currentDraggedElement);
             } else {
@@ -120,6 +122,8 @@ oppia.directive('oppiaInteractiveLabelingInput', [
             }
             var correctLen = $scope.correctElements.length;
             var incorrectLen = $scope.incorrectElements.length;
+            console.log(correctLen);
+            console.log(incorrectLen);
             if ((correctLen + incorrectLen) === $scope.allRegions.length){
               $scope.runSubmitCheck();
             }
@@ -195,7 +199,6 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           //Change to red if the input is not correct
           $scope.getRValue = function(region){
             //Get the region it is in and not the label
-            console.log(region);
             if (!$scope.submitted){
               return 0;
             }
@@ -204,8 +207,6 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           }
           //Change to blue if the input is correct
           $scope.getBValue = function(region){
-            console.log(region);
-            console.log($scope);
             if (!$scope.submitted){
               return $scope.maxRGBValue;
             }

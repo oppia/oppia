@@ -703,6 +703,35 @@ class ImageWithLabels(BaseObject):
         }]
     }
 
+class LabelingInputAnswer(BaseObject):
+    """A click on an image and the clicked regions."""
+
+    description = "Position of a click and a list of regions clicked."
+
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'clickPosition',
+            'schema': {
+                'type': 'list',
+                'items': Real.SCHEMA,
+                'len': 2
+            }
+        }, {
+            'name': 'clickedRegions',
+            'schema': {
+                'type': 'list',
+                'items': UnicodeString.SCHEMA
+            },
+        }, {
+            'name': 'incorrectElements',
+            'schema': {
+                'type': 'list',
+                'items': UnicodeString.SCHEMA
+            },
+        }]
+    }    
+
 
 class ImageWithRegions(BaseObject):
     """An image overlaid with labeled regions."""
