@@ -3760,7 +3760,7 @@ md-card.preview-conversation-skin-supplemental-card {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3; /* Truncating to 3 lines. */
 }
-.oppia-activity-summary-tile-pre-hover-preview{
+.oppia-activity-summary-tile-pre-hover-preview {
   margin-bottom: 35px;
 }
 
