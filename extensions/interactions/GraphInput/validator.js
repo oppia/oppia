@@ -22,7 +22,6 @@ oppia.factory('GraphInputValidationService', [
     return {
       getAllWarnings: function(
           stateName, customizationArgs, answerGroups, defaultOutcome) {
-
         baseInteractionValidationService.requireCustomizationArguments(
           customizationArgs,
           ['graph', 'canEditEdgeWeight', 'canEditVertexLabel']);
