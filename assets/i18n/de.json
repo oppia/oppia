@@ -315,7 +315,7 @@
 	"I18N_PREFERENCES_CANCEL_BUTTON": "Abbrechen",
 	"I18N_PREFERENCES_CHANGE_PICTURE": "Profilbild ändern",
 	"I18N_PREFERENCES_EMAIL": "E-Mail-Adresse",
-	"I18N_PREFERENCES_EMAIL_EXPLAIN": "Nur Moderatoren und Websiteadministratoren können dies ansehen.",
+	"I18N_PREFERENCES_EMAIL_EXPLAIN": "Nur Moderatoren und Websiteadministratoren können deine E-Mail-Adresse ansehen.",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_EDIT_RIGHTS_NEWS": "E-Mails erhalten, wenn dir jemand Bearbeitungsrechte für eine Erforschung gibt",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_FEEDBACK_NEWS": "E-Mails erhalten, wenn dir jemand eine Rückmeldung zu einer Erforschung sendet",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_NEWS": "Nachrichten und Aktualisierungen über die Website erhalten",

@@ -263,7 +263,7 @@
 	"I18N_PREFERENCES_CANCEL_BUTTON": "Cancelar",
 	"I18N_PREFERENCES_CHANGE_PICTURE": "Cambia tu foto de perfil",
 	"I18N_PREFERENCES_EMAIL": "Correo electrónico",
-	"I18N_PREFERENCES_EMAIL_EXPLAIN": "Sólo moderadores y administradores pueden ver esto.",
+	"I18N_PREFERENCES_EMAIL_EXPLAIN": "Sólo moderadores y administradores pueden ver tu correo electrónico.",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_EDIT_RIGHTS_NEWS": "Recibir correos electrónicos cuando alguien te concede permisos de edición a una exploración",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_FEEDBACK_NEWS": "Recibir correos electrónicos cuando alguien te envía comentarios sobre una exploración",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_NEWS": "Recibir noticias y actualizaciones sobre el sitio.",
