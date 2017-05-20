@@ -20,7 +20,6 @@ import datetime
 from core.domain import learner_progress_services
 from core.platform import models
 from core.tests import test_utils
-import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
