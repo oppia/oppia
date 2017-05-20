@@ -86,6 +86,10 @@ oppia.factory('ImageClickInputValidationService', [
         warningsList = warningsList.concat(
           this.getCustomizationArgsWarnings(customizationArgs));
 
+        warningsList = warningsList.concat(
+          baseInteractionValidationService.getAnswerGroupWarnings(
+            answerGroups, stateName));
+
         var imgAndRegionArgValue = customizationArgs.imageAndRegions.value;
         var seenRegionStrings = imgAndRegionArgValue.labeledRegions.map(
           function(region) {

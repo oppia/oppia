@@ -21,7 +21,7 @@ oppia.factory('SetInputValidationService', [
   function(baseInteractionValidationService) {
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {
-        // TODO: Implement customization args validations.
+        // TODO(juansaba): Implement customization args validations.
         return [];
       },
       getAllWarnings: function(
