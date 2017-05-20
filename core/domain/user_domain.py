@@ -117,28 +117,24 @@ class ExpUserLastPlaythrough(object):
     """Domain object for an exploration last playthrough model."""
 
     def __init__(self, user_id, exploration_id, last_played_exp_version,
-                 time_last_played_msec, last_played_state_name):
+                 last_updated, last_played_state_name):
         self.id = '%s.%s' % (user_id, exploration_id)
         self.user_id = user_id
         self.exploration_id = exploration_id
         self.last_played_exp_version = last_played_exp_version
-        self.time_last_played_msec = time_last_played_msec
+        self.last_updated = last_updated
         self.last_played_state_name = last_played_state_name
 
-    def update_last_played_information(self, time_last_played_msec,
-                                       last_played_exp_version,
+    def update_last_played_information(self, last_played_exp_version,
                                        last_played_state_name):
         """Updates the last playthrough information of the user.
 
         Args:
-            time_last_played_msec: float. The time in milliseconds since the
-                Epoch when the user last played the explorations.
             last_played_exp_version: int. The version of the exploration that
                 was played by the user.
             last_played_state_name: str. The name of the state at which the
                 learner left the exploration.
         """
-        self.time_last_played_msec = time_last_played_msec
         self.last_played_exp_version = last_played_exp_version
         self.last_played_state_name = last_played_state_name
 

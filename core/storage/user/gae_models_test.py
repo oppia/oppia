@@ -33,7 +33,6 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
         user_models.ExpUserLastPlaythroughModel(
             id='%s.%s' % (self.USER_ID, self.EXP_ID_0), user_id=self.USER_ID,
             exploration_id=self.EXP_ID_0, last_played_exp_version=1,
-            time_last_played_msec=1000,
             last_played_state_name='state_name').put()
 
     def test_create_success(self):
@@ -52,7 +51,6 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
         self.assertEqual(retrieved_object.user_id, self.USER_ID)
         self.assertEqual(retrieved_object.exploration_id, self.EXP_ID_0)
         self.assertEqual(retrieved_object.last_played_exp_version, 1)
-        self.assertEqual(retrieved_object.time_last_played_msec, 1000)
         self.assertEqual(retrieved_object.last_played_state_name, 'state_name')
 
     def test_get_failure(self):

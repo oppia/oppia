@@ -134,8 +134,6 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
     exploration_id = ndb.StringProperty(required=True, indexed=True)
     # The version of the exploration last played by the user.
     last_played_exp_version = ndb.IntegerProperty(default=None)
-    # The time since the Epoch when the user last played the exploration.
-    time_last_played_msec = ndb.FloatProperty(default=None)
     # The name of the state at which the learner left the exploration when
     # he/she last played it.
     last_played_state_name = ndb.StringProperty(default=None)

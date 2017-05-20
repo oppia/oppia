@@ -16,6 +16,7 @@
 
 """Tests for learner progress services."""
 
+import datetime
 from core.domain import learner_progress_services
 from core.platform import models
 from core.tests import test_utils
@@ -98,12 +99,28 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 user_id, exploration_id))
 
         return {
-            'timestamp_msec': (
-                incomplete_exploration_user_model.time_last_played_msec),
+            'timestamp': (
+                incomplete_exploration_user_model.last_updated),
             'state_name': (
                 incomplete_exploration_user_model.last_played_state_name),
             'version': incomplete_exploration_user_model.last_played_exp_version
         }
+
+    def _check_if_exp_details_match(self, actual_details,
+                                    details_fetched_from_model):
+        self.assertEqual(
+            actual_details['state_name'],
+            details_fetched_from_model['state_name'])
+        self.assertEqual(
+            actual_details['version'],
+            details_fetched_from_model['version'])
+        # Due to the slight difference in the time in which we call the
+        # get_current_time_in_millisecs function while testing, the times are
+        # usually offset by  few seconds. Therefore we check if the difference
+        # between the times is less than 10 seconds.
+        self.assertLess((
+            actual_details['timestamp'] -
+            details_fetched_from_model['timestamp']).total_seconds(), 10)
 
     def _get_all_incomplete_collection_ids(self, user_id):
         incomplete_activities_model = (
@@ -199,7 +216,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         version = 1
 
         exp_details = {
-            'timestamp_msec': utils.get_current_time_in_millisecs(),
+            'timestamp': datetime.datetime.utcnow(),
             'state_name': state_name,
             'version': version
         }
@@ -209,27 +226,15 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.EXP_ID_0, state_name, version)
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_0])
-        self.assertEqual(
-            self._get_incomplete_exp_details(
-                self.user_id, self.EXP_ID_0)['state_name'],
-            exp_details['state_name'])
-        self.assertEqual(self._get_incomplete_exp_details(
-            self.user_id, self.EXP_ID_0)['version'], exp_details['version'])
-        # Due to the slight difference in the time in which we call the
-        # get_current_time_in_millisecs function while testing, the times are
-        # usually offset by  few seconds. Therefore we divide the times by 1000
-        # and compare upto two decimal places to ensure that the times are
-        # almost equal.
-        self.assertAlmostEqual(
-            self._get_incomplete_exp_details(
-                self.user_id, self.EXP_ID_0)['timestamp_msec']/1000,
-            exp_details['timestamp_msec']/1000, places=2)
+        self._check_if_exp_details_match(
+            self._get_incomplete_exp_details(self.user_id, self.EXP_ID_0),
+            exp_details)
 
         state_name = u'new_state_name'
         version = 2
 
         modified_exp_details = {
-            'timestamp_msec': utils.get_current_time_in_millisecs(),
+            'timestamp': datetime.datetime.utcnow(),
             'state_name': state_name,
             'version': version
         }
@@ -240,18 +245,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.EXP_ID_0, state_name, version)
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_0])
-        self.assertEqual(
-            self._get_incomplete_exp_details(
-                self.user_id, self.EXP_ID_0)['state_name'],
-            modified_exp_details['state_name'])
-        self.assertEqual(
-            self._get_incomplete_exp_details(
-                self.user_id, self.EXP_ID_0)['version'],
-            modified_exp_details['version'])
-        self.assertAlmostEqual(
-            self._get_incomplete_exp_details(
-                self.user_id, self.EXP_ID_0)['timestamp_msec']/1000,
-            modified_exp_details['timestamp_msec']/1000, places=2)
+        self._check_if_exp_details_match(
+            self._get_incomplete_exp_details(self.user_id, self.EXP_ID_0),
+            modified_exp_details)
 
         # If an exploration has already been completed, it is not added.
         learner_progress_services.mark_exploration_as_completed(

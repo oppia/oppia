@@ -75,7 +75,7 @@ def get_last_playthrough_information(last_playthrough_model):
         last_playthrough_model.user_id,
         last_playthrough_model.exploration_id,
         last_playthrough_model.last_played_exp_version,
-        last_playthrough_model.time_last_played_msec,
+        last_playthrough_model.last_updated,
         last_playthrough_model.last_played_state_name)
 
 
@@ -129,8 +129,6 @@ def save_last_playthrough_information(last_playthrough_information):
             exploration_id=last_playthrough_information.exploration_id,
             last_played_exp_version=(
                 last_playthrough_information.last_played_exp_version),
-            time_last_played_msec=(
-                last_playthrough_information.time_last_played_msec),
             last_played_state_name=(
                 last_playthrough_information.last_played_state_name)))
     last_playthrough_information_model.put()
@@ -248,7 +246,6 @@ def mark_exploration_as_incomplete(
         last_playthrough_information = get_last_playthrough_information(
             last_playthrough_information_model)
         last_playthrough_information.update_last_played_information(
-            utils.get_current_time_in_millisecs(),
             exploration_version, state_name)
 
         save_last_playthrough_information(last_playthrough_information)
