@@ -2038,7 +2038,7 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
 
     def test_can_undergo_classification(self):
         """Test the can_undergo_classification() function."""
-        exploration_id = '16'
+        exploration_id = 'eid'
         test_exp_filepath = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
