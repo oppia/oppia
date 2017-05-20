@@ -2047,18 +2047,17 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
             assets_list)
 
-        self.exp_state = (
-            exp_services.get_exploration_by_id(exploration_id).states['Home'])
-        self.exp_state_without_training_data = (
-            exp_services.get_exploration_by_id(exploration_id).states['End'])
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        state_with_training_data = exploration.states['Home']
+        state_without_training_data = exploration.states['End']
 
         # A state with 786 training examples.
         self.assertTrue(
-            (self.exp_state).can_undergo_classification())
+            state_with_training_data.can_undergo_classification())
 
         # A state with no training examples.
         self.assertFalse(
-            self.exp_state_without_training_data.can_undergo_classification())
+            state_without_training_data.can_undergo_classification())
 
     def test_delete_state(self):
         """Test deletion of states."""
