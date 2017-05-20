@@ -74,10 +74,15 @@ def require_user(handler):
 
 
 def require_moderator(handler):
-    """Decorator that checks if the current user is a moderator."""
+    """Decorator that checks whether the current user is a moderator."""
 
     def test_is_moderator(self, **kwargs):
-        """Check that the user is a moderator."""
+        """Check that the user has a registered user_id and have moderator permissions in the
+        rights_manager.
+
+        Raises: 
+            UnauthorizedUserException: If no sufficient credentials
+        """
         if not self.user_id:
             self.redirect(current_user_services.create_login_url(
                 self.request.uri))
@@ -93,12 +98,16 @@ def require_moderator(handler):
 
 def require_fully_signed_up(handler):
     """Decorator that checks if the user is logged in and has completed the
-    signup process. If any of these checks fail, an UnauthorizedUserException
-    is raised.
+    signup process.
     """
 
     def test_registered_as_editor(self, **kwargs):
-        """Check that the user has registered as an editor."""
+        """Check that the user has registered as an editor.
+
+        Raises: 
+            UnauthorizedUserException: If no sufficient credentials
+
+        """
         if (not self.user_id
                 or self.username in config_domain.BANNED_USERNAMES.value
                 or not user_services.has_fully_registered(self.user_id)):
@@ -113,6 +122,7 @@ def require_fully_signed_up(handler):
 def _clear_login_cookies(response_headers):
     # AppEngine sets the ACSID cookie for http:// and the SACSID cookie
     # for https:// . We just unset both below.
+    """" Decorator that clears one day old login cookies"""
     cookie = Cookie.SimpleCookie()
     for cookie_name in ['ACSID', 'SACSID']:
         cookie = Cookie.SimpleCookie()
@@ -125,9 +135,10 @@ def _clear_login_cookies(response_headers):
 
 
 class LogoutPage(webapp2.RequestHandler):
+    """ Class which handles the logout logic"""
 
     def get(self):
-        """Logs the user out, and returns them to a specified page or the home
+        """Logs out the user/developer, and returns them to a specified page or the home
         page.
         """
         # The str conversion is needed, otherwise an InvalidResponseError
@@ -224,7 +235,12 @@ class BaseHandler(webapp2.RequestHandler):
             self.payload = None
 
     def dispatch(self):
-        """Overrides dispatch method in webapp2 superclass."""
+        """Overrides dispatch method in webapp2 superclass.
+
+            Raises:
+                CSRF token Exception: If CSRF token is missing
+                Unauthorized User Exception: If session expires
+        """
         # If the request is to the old demo server, redirect it permanently to
         # the new demo server.
         if self.request.uri.startswith('https://oppiaserver.appspot.com'):
@@ -278,6 +294,9 @@ class BaseHandler(webapp2.RequestHandler):
         raise self.PageNotFoundException
 
     def render_json(self, values):
+        """ Decorator to render and writes data sent from the server 
+        to the client via JSON
+        """
         self.response.content_type = 'application/javascript; charset=utf-8'
         self.response.headers['Content-Disposition'] = (
             'attachment; filename="oppia-attachment.txt"')
@@ -504,7 +523,14 @@ class CsrfTokenManager(object):
 
     @classmethod
     def _create_token(cls, user_id, issued_on):
-        """Creates a digest (string representation) of a token."""
+        """Creates a digest (string representation) of a token.
+        Args:   
+            user_id: User Id.
+            issued_on: Round time to seconds.
+
+        Returns: 
+            token: Digest in Base64. 
+        """
         cls.init_csrf_secret()
 
         # The token has 4 parts: hash of the actor user id, hash of the page
@@ -513,7 +539,7 @@ class CsrfTokenManager(object):
         if user_id is None:
             user_id = cls._USER_ID_DEFAULT
 
-        # Round time to seconds.
+        
         issued_on = long(issued_on)
 
         digester = hmac.new(str(CSRF_SECRET.value))
@@ -536,7 +562,7 @@ class CsrfTokenManager(object):
 
     @classmethod
     def is_csrf_token_valid(cls, user_id, token):
-        """Validate a given CSRF token with the CSRF secret in memcache."""
+        """Validates a given CSRF token with the CSRF secret in memcache."""
         try:
             parts = token.split('/')
             if len(parts) != 2:
