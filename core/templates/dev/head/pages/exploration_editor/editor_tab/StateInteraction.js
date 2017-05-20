@@ -44,13 +44,13 @@ oppia.factory('interactionDetailsCache', [function() {
 }]);
 
 oppia.controller('StateInteraction', [
-  '$scope', '$http', '$rootScope', '$modal', '$filter', 'alertsService',
-  'editorContextService', 'oppiaHtmlEscaper', 'INTERACTION_SPECS',
-  'stateInteractionIdService', 'stateCustomizationArgsService',
-  'editabilityService', 'explorationStatesService', 'graphDataService',
-  'interactionDetailsCache', 'oppiaExplorationHtmlFormatterService',
-  'UrlInterpolationService',
-  function($scope, $http, $rootScope, $modal, $filter, alertsService,
+  '$scope', '$http', '$rootScope', '$modal', '$injector', '$filter',
+  'alertsService', 'editorContextService', 'oppiaHtmlEscaper',
+  'INTERACTION_SPECS', 'stateInteractionIdService',
+  'stateCustomizationArgsService', 'editabilityService',
+  'explorationStatesService', 'graphDataService', 'interactionDetailsCache',
+  'oppiaExplorationHtmlFormatterService', 'UrlInterpolationService',
+  function($scope, $http, $rootScope, $modal, $injector, $filter, alertsService,
       editorContextService, oppiaHtmlEscaper, INTERACTION_SPECS,
       stateInteractionIdService, stateCustomizationArgsService,
       editabilityService, explorationStatesService, graphDataService,
@@ -186,12 +186,12 @@ oppia.controller('StateInteraction', [
           backdrop: 'static',
           resolve: {},
           controller: [
-            '$scope', '$modalInstance', 'stateInteractionIdService',
-            'stateCustomizationArgsService', 'interactionDetailsCache',
-            'INTERACTION_SPECS', 'UrlInterpolationService',
-            'editorFirstTimeEventsService',
+            '$scope', '$modalInstance', '$injector',
+            'stateInteractionIdService', 'stateCustomizationArgsService',
+            'interactionDetailsCache', 'INTERACTION_SPECS',
+            'UrlInterpolationService', 'editorFirstTimeEventsService',
             function(
-                $scope, $modalInstance, stateInteractionIdService,
+                $scope, $modalInstance, $injector, stateInteractionIdService,
                 stateCustomizationArgsService, interactionDetailsCache,
                 INTERACTION_SPECS, UrlInterpolationService,
                 editorFirstTimeEventsService) {
@@ -243,6 +243,21 @@ oppia.controller('StateInteraction', [
                 $scope.hasCustomizationArgs = (Object.keys(
                   stateCustomizationArgsService.displayed).length > 0);
               }
+
+              $scope.areCustomizationArgsValid = function() {
+                if (!stateCustomizationArgsService.displayed) {
+                  return false;
+                }
+                var validationService =
+                  $injector.get(
+                    INTERACTION_SPECS[
+                      $scope.stateInteractionIdService.displayed].id +
+                    'ValidationService');
+                var warningsList =
+                  validationService.getCustomizationArgsWarnings(
+                    stateCustomizationArgsService.displayed);
+                return warningsList.length == 0;
+              };
 
               $scope.onChangeInteractionId = function(newInteractionId) {
                 editorFirstTimeEventsService

@@ -83,7 +83,7 @@
 
     <button class="btn btn-default" ng-click="cancel()" ng-if="hasCustomizationArgs">Cancel</button>
     <button class="btn btn-success protractor-test-save-interaction" ng-click="save()"
-            ng-disabled="!stateInteractionIdService.displayed || form.schemaForm.$invalid"
+            ng-disabled="!stateInteractionIdService.displayed || form.schemaForm.$invalid || !areCustomizationArgsValid()"
             ng-if="hasCustomizationArgs">
       Save Interaction
     </button>
