@@ -116,7 +116,7 @@ oppia.directive('imageWithRegionsEditor', [
             // A boolean that is set whenever the cursor moves out of the
             // rectangular region while resizing.
             $scope.movedOutOfRegion = false;
-            // The region along borders which when hovered provides resize cursor.
+            // The region along borders that will display the resize cursor.
             $scope.resizableBorderWidthPx = 10;
             // Dimensions of original image.
             $scope.originalImageWidth = 0;
