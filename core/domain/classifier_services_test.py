@@ -125,17 +125,6 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
                 classifier_id))):
             classifier_services.get_classifier_by_id(classifier_id)
 
-    def test_training_conditions_of_classifiers(self):
-        """Test the check_classification_condition() method"""
-        # A state with 786 training examples.
-        self.assertTrue(
-            classifier_services.check_classification_condition(self.exp_state))
-
-        # A state with no training examples.
-        self.assertFalse(
-            classifier_services.check_classification_condition(
-                self.exp_state_without_training_data))
-
     def test_update_of_classifiers(self):
         """Test the save_classifier method."""
 

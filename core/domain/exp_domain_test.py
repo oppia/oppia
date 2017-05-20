@@ -2036,6 +2036,30 @@ class ConversionUnitTests(test_utils.GenericTestBase):
 class StateOperationsUnitTests(test_utils.GenericTestBase):
     """Test methods operating on states."""
 
+    def test_can_undergo_classification(self):
+        """Test the can_undergo_classification() function."""
+        exploration_id = '16'
+        test_exp_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
+            assets_list)
+
+        self.exp_state = (
+            exp_services.get_exploration_by_id(exploration_id).states['Home'])
+        self.exp_state_without_training_data = (
+            exp_services.get_exploration_by_id(exploration_id).states['End'])
+
+        # A state with 786 training examples.
+        self.assertTrue(
+            (self.exp_state).can_undergo_classification())
+
+        # A state with no training examples.
+        self.assertFalse(
+            self.exp_state_without_training_data.can_undergo_classification())
+
     def test_delete_state(self):
         """Test deletion of states."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')

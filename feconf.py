@@ -78,7 +78,7 @@ INTERACTION_CLASSIFIER_MAPPING = {
 # The minimum number of training samples required for training a classifier.
 MIN_TOTAL_TRAINING_EXAMPLES = 50
 
-#The minimum number of assigned labels required for training a classifier.
+# The minimum number of assigned labels required for training a classifier.
 MIN_ASSIGNED_LABELS = 2
 
 # Default label for classification algorithms.

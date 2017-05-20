@@ -1259,6 +1259,36 @@ class State(object):
         self.interaction.confirmed_unclassified_answers = (
             confirmed_unclassified_answers)
 
+    def can_undergo_classification(self):
+        """Checks if conditions for training are satisfied.
+
+        Args:
+            self: State. The state whose properties are to be checked for
+            training.
+
+        Returns:
+            bool: True, if the conditions are satisfied.
+        """
+        training_examples = [
+            [doc, []] for doc in (
+                self.interaction.confirmed_unclassified_answers)]
+        labels_ctr = 0
+        for (answer_group_index, answer_group) in enumerate(
+                self.interaction.answer_groups):
+            classifier_rule_spec_index = (
+                answer_group.get_classifier_rule_index())
+            if classifier_rule_spec_index is not None:
+                classifier_rule_spec = answer_group.rule_specs[
+                    classifier_rule_spec_index]
+                training_examples.extend([
+                    [doc, [str(answer_group_index)]]
+                    for doc in classifier_rule_spec.inputs['training_data']])
+                labels_ctr += 1
+        if ((len(training_examples) >= feconf.MIN_TOTAL_TRAINING_EXAMPLES) and
+                (labels_ctr >= feconf.MIN_ASSIGNED_LABELS)):
+            return True
+        return False
+
     def update_interaction_fallbacks(self, fallbacks_list):
         if not isinstance(fallbacks_list, list):
             raise Exception(
