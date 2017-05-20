@@ -12,10 +12,10 @@
 # distributed under the License is distributed on an "AS-IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License.
-
+# limitations under tactivities
 """Services for tracking the progress of the learner."""
 
+import datetime
 from core.domain import subscription_services
 from core.domain import user_domain
 from core.platform import models
@@ -36,45 +36,49 @@ def get_activities_completed_from_model(activities_completed_model):
         ActivitiesCompletedByLearner: ActivitiesCompletedByLearner. A domain
         object corresponding to the given model.
     """
-
     return user_domain.ActivitiesCompletedByLearner(
         activities_completed_model.id,
         activities_completed_model.completed_exploration_ids,
         activities_completed_model.completed_collection_ids)
 
-def get_incomplete_explorations_from_model(incomplete_explorations_model):
-    """Returns an incomplete explorations domain object given an incomplete
-    explorations model loaded from the datastore.
+
+def get_incomplete_activities_from_model(incomplete_activities_model):
+    """Returns an incomplete activities domain object given an incomplete
+    activities model loaded from the datastore.
 
     Args:
-        incomplete_explorations_model: IncompleteExplorationsModel. The
-            incomplete explorations model loaded from the datastore.
+        incomplete_activities_model: IncompleteActivitiesModel. The
+            incomplete activities model loaded from the datastore.
 
     Returns:
-        IncompleteExplorations: IncompleteExplorations. A IncompleteExplorations
-        domain object corresponding to the given model.
+        IncompleteActivities: IncompleteActivities. An
+        IncompleteActivities domain object corresponding to the given model.
     """
+    return user_domain.IncompleteActivities(
+        incomplete_activities_model.id,
+        incomplete_activities_model.incomplete_exploration_ids,
+        incomplete_activities_model.incomplete_collection_ids)
 
-    return user_domain.IncompleteExplorations(
-        incomplete_explorations_model.id,
-        incomplete_explorations_model.incomplete_exploration_ids)
 
-def get_incomplete_collections_from_model(incomplete_collections_model):
-    """Returns an incomplete collections domain object given an incomplete
-    collections model loaded from the datastore.
+def get_last_playthrough_information(last_playthrough_model):
+    """Returns an ExpUserLastPlaythrough domain object given an
+    ExpUserLastPlaythroughModel loaded from the datastore.
 
     Args:
-        incomplete_collections_model: IncompleteCollectionsModel. The
-            incomplete collections model loaded from the datastore.
+        last_playthrough_model: ExpUserLastPlaythroughModel. The last
+            last playthrough information loaded from the datastore.
 
     Returns:
-        IncompleteCollections: IncompleteCollections. A IncompleteCollections
-        domain object corresponding to the given model.
+        ExpUserLastPlaythrough: ExpUserLastPlaythrough. The last playthrough
+        information domain object corresponding to the given model.
     """
+    return user_domain.ExpUserLastPlaythrough(
+        last_playthrough_model.user_id,
+        last_playthrough_model.exploration_id,
+        last_playthrough_model.last_played_exp_version,
+        last_playthrough_model.time_last_played_msec,
+        last_playthrough_model.last_played_state_name)
 
-    return user_domain.IncompleteCollections(
-        incomplete_collections_model.id,
-        incomplete_collections_model.incomplete_collection_ids)
 
 def save_activities_completed(activities_completed):
     """Save an activities completed domain object as an
@@ -92,55 +96,51 @@ def save_activities_completed(activities_completed):
 
     activities_completed_model.put()
 
-def save_incomplete_explorations(incomplete_explorations,
-                                 last_playthrough_information=None):
-    """Save an incomplete explorations domain object as an
-    IncompleteExplorationsModel entity in the datastore.
+
+def save_incomplete_activities(incomplete_activities):
+    """Save an incomplete activities domain object as an
+    IncompleteActivitiesModel entity in the datastore.
 
     Args:
-        incomplete_explorations: IncompleteExplorations. The incomplete
-            explorations domain object to be saved in the datastore.
+        incomplete_activities: IncompleteActivities. The incomplete
+            activities domain object to be saved in the datastore.
     """
-    incomplete_explorations_model = user_models.IncompleteExplorationsModel(
-        id=incomplete_explorations.id,
+    incomplete_activities_model = user_models.IncompleteActivitiesModel(
+        id=incomplete_activities.id,
         incomplete_exploration_ids=(
-            incomplete_explorations.incomplete_exploration_ids))
+            incomplete_activities.incomplete_exploration_ids),
+        incomplete_collection_ids=(
+            incomplete_activities.incomplete_collection_ids))
 
-    if last_playthrough_information:
-        last_playthrough_information_model = (
-            user_models.ExpUserLastPlaythroughModel(
-                id=last_playthrough_information.id,
-                user_id=last_playthrough_information.user_id,
-                exploration_id=last_playthrough_information.exploration_id,
-                version_last_played=(
-                    last_playthrough_information.version_last_played),
-                time_last_played_msec=(
-                    last_playthrough_information.time_last_played_msec),
-                last_state_played=(
-                    last_playthrough_information.last_state_played)))
-        last_playthrough_information_model.put()
+    incomplete_activities_model.put()
 
-    incomplete_explorations_model.put()
 
-def save_incomplete_collections(incomplete_collections):
-    """Save an incomplete collections domain object as an
-    IncompleteCollectionsModel entity in the datastore.
+def save_last_playthrough_information(last_playthrough_information):
+    """Save an ExpUserLastPlaythrough domain object as an
+    ExpUserLastPlaythroughModel entity in the datastore.
 
     Args:
-        incomplete_collections: IncompleteCollections. The incomplete
-            collections domain object to be saved in the datastore.
+        last_playthrough_information: ExpUserLastPlaythrough. The last
+            playthrough information domain object to be saved in the datastore.
     """
-    incomplete_collections_model = user_models.IncompleteCollectionsModel(
-        id=incomplete_collections.id,
-        incomplete_collection_ids=(
-            incomplete_collections.incomplete_collection_ids))
+    last_playthrough_information_model = (
+        user_models.ExpUserLastPlaythroughModel(
+            id=last_playthrough_information.id,
+            user_id=last_playthrough_information.user_id,
+            exploration_id=last_playthrough_information.exploration_id,
+            last_played_exp_version=(
+                last_playthrough_information.last_played_exp_version),
+            time_last_played_msec=(
+                last_playthrough_information.time_last_played_msec),
+            last_played_state_name=(
+                last_playthrough_information.last_played_state_name)))
+    last_playthrough_information_model.put()
 
-    incomplete_collections_model.put()
 
 def mark_exploration_as_completed(user_id, exp_id):
     """Adds the exploration id to the completed list of the user unless the
-    exploration has already been completed or has been created by the user.
-    It is also removed from the incomplete list (if present).
+    exploration has already been completed or has been created/edited by the
+    user. It is also removed from the incomplete list (if present).
 
     Args:
         user_id: str. The id of the user who has completed the exploration.
@@ -153,13 +153,13 @@ def mark_exploration_as_completed(user_id, exp_id):
         activities_completed_model = (
             user_models.ActivitiesCompletedByLearnerModel(id=user_id))
 
-    exploration_created_ids = (
+    subscribed_exploration_ids = (
         subscription_services.get_exploration_ids_subscribed_to(user_id))
 
     activities_completed = get_activities_completed_from_model(
         activities_completed_model)
 
-    if (exp_id not in exploration_created_ids and
+    if (exp_id not in subscribed_exploration_ids and
             exp_id not in activities_completed.completed_exploration_ids):
         # Remove the exploration from the in progress list (if present) as it is
         # now completed.
@@ -167,10 +167,11 @@ def mark_exploration_as_completed(user_id, exp_id):
         activities_completed.add_exploration_id(exp_id)
         save_activities_completed(activities_completed)
 
+
 def mark_collection_as_completed(user_id, collection_id):
     """Adds the collection id to the list of collections completed by the user
-    unless the collection has already been completed or has been created by the
-    user. It is also removed from the incomplete list (if present).
+    unless the collection has already been completed or has been created/edited
+    by the user. It is also removed from the incomplete list (if present).
 
     Args:
         user_id: str. The id of the user who completed the collection.
@@ -183,13 +184,13 @@ def mark_collection_as_completed(user_id, collection_id):
         activities_completed_model = (
             user_models.ActivitiesCompletedByLearnerModel(id=user_id))
 
-    collection_created_ids = (
+    subscribed_collection_ids = (
         subscription_services.get_collection_ids_subscribed_to(user_id))
 
     activities_completed = get_activities_completed_from_model(
         activities_completed_model)
 
-    if (collection_id not in collection_created_ids and
+    if (collection_id not in subscribed_collection_ids and
             collection_id not in activities_completed.completed_collection_ids):
         # Remove the collection from the in progress list (if present) as it is
         # now completed.
@@ -197,12 +198,13 @@ def mark_collection_as_completed(user_id, collection_id):
         activities_completed.add_collection_id(collection_id)
         save_activities_completed(activities_completed)
 
+
 def mark_exploration_as_incomplete(
-        user_id, timestamp, exploration_id, state_name, exploration_version):
+        user_id, exploration_id, state_name, exploration_version):
     """Adds the exploration id to the incomplete list of the user unless the
-    exploration has been already completed or has been created by the user. If
-    the exploration is already present in the incomplete list, just the details
-    associated with it are updated.
+    exploration has been already completed or has been created/edited by the
+    user. If the exploration is already present in the incomplete list, just the
+    details associated with it are updated.
 
     Args:
         user_id: str. The id of the user who partially completed the
@@ -215,67 +217,76 @@ def mark_exploration_as_incomplete(
         exploration_version: str. The version of the exploration played by the
             learner.
     """
-    incomplete_explorations_model = (
-        user_models.IncompleteExplorationsModel.get(
+    incomplete_activities_model = (
+        user_models.IncompleteActivitiesModel.get(
             user_id, strict=False))
-    if not incomplete_explorations_model:
-        incomplete_explorations_model = (
-            user_models.IncompleteExplorationsModel(id=user_id))
+    if not incomplete_activities_model:
+        incomplete_activities_model = (
+            user_models.IncompleteActivitiesModel(id=user_id))
 
     completed_exploration_ids = get_all_completed_exp_ids(user_id)
 
-    exploration_created_ids = (
+    subscribed_exploration_ids = (
         subscription_services.get_exploration_ids_subscribed_to(user_id))
 
-    incomplete_explorations = get_incomplete_explorations_from_model(
-        incomplete_explorations_model)
+    incomplete_activities = get_incomplete_activities_from_model(
+        incomplete_activities_model)
 
     if (exploration_id not in completed_exploration_ids and
-            exploration_id not in exploration_created_ids):
+            exploration_id not in subscribed_exploration_ids):
 
-        if exploration_id not in incomplete_explorations.incomplete_exploration_ids: # pylint: disable=line-too-long
-            incomplete_explorations.add_exploration_id(exploration_id)
+        if exploration_id not in incomplete_activities.incomplete_exploration_ids: # pylint: disable=line-too-long
+            incomplete_activities.add_exploration_id(exploration_id)
 
-        last_playthrough_information = (
-            incomplete_explorations.get_last_playthrough_information(
-                exploration_id))
+        timestamp = datetime.datetime.utcnow()
 
+        last_playthrough_information_model = (
+            user_models.ExpUserLastPlaythroughModel.get(
+                user_id, exploration_id))
+        if not last_playthrough_information_model:
+            last_playthrough_information_model = (
+                user_models.ExpUserLastPlaythroughModel.create(
+                    user_id, exploration_id))
+
+        last_playthrough_information = get_last_playthrough_information(
+            last_playthrough_information_model)
         last_playthrough_information.update_last_played_information(
             utils.get_time_in_millisecs(timestamp),
-            exploration_version,
-            state_name)
+            exploration_version, state_name)
 
-        save_incomplete_explorations(
-            incomplete_explorations, last_playthrough_information)
+        save_last_playthrough_information(last_playthrough_information)
+        save_incomplete_activities(incomplete_activities)
+
 
 def mark_collection_as_incomplete(user_id, collection_id):
     """Adds the collection id to the list of collections partially completed by
     the user unless the collection has already been completed or has been
-    created by the user or is already present in the incomplete list.
+    created/edited by the user or is already present in the incomplete list.
 
     Args:
         user_id: str. The id of the user who partially completed the collection.
         collection_id: str. The id of the partially completed collection.
     """
-    incomplete_collections_model = (
-        user_models.IncompleteCollectionsModel.get(user_id, strict=False))
-    if not incomplete_collections_model:
-        incomplete_collections_model = (
-            user_models.IncompleteCollectionsModel(id=user_id))
+    incomplete_activities_model = (
+        user_models.IncompleteActivitiesModel.get(user_id, strict=False))
+    if not incomplete_activities_model:
+        incomplete_activities_model = (
+            user_models.IncompleteActivitiesModel(id=user_id))
 
     completed_collection_ids = get_all_completed_collection_ids(user_id)
 
-    collection_created_ids = (
+    subscribed_collection_ids = (
         subscription_services.get_collection_ids_subscribed_to(user_id))
 
-    incomplete_collections = get_incomplete_collections_from_model(
-        incomplete_collections_model)
+    incomplete_activities = get_incomplete_activities_from_model(
+        incomplete_activities_model)
 
-    if (collection_id not in collection_created_ids and
-            collection_id not in incomplete_collections.incomplete_collection_ids and # pylint: disable=line-too-long
+    if (collection_id not in subscribed_collection_ids and
+            collection_id not in incomplete_activities.incomplete_collection_ids and # pylint: disable=line-too-long
             collection_id not in completed_collection_ids):
-        incomplete_collections.add_collection_id(collection_id)
-        save_incomplete_collections(incomplete_collections)
+        incomplete_activities.add_collection_id(collection_id)
+        save_incomplete_activities(incomplete_activities)
+
 
 def remove_exp_from_incomplete_list(user_id, exploration_id):
     """Removes the exploration from the incomplete list of the user
@@ -285,18 +296,21 @@ def remove_exp_from_incomplete_list(user_id, exploration_id):
         user_id: str. The id of the user.
         exploration_id: str. The id of the exploration to be removed.
     """
-    incomplete_explorations_model = (
-        user_models.IncompleteExplorationsModel.get(user_id, strict=False))
+    incomplete_activities_model = (
+        user_models.IncompleteActivitiesModel.get(user_id, strict=False))
 
-    if incomplete_explorations_model:
-        incomplete_explorations = get_incomplete_explorations_from_model(
-            incomplete_explorations_model)
-        if exploration_id in incomplete_explorations.incomplete_exploration_ids:
-            incomplete_explorations.remove_exploration_id(exploration_id)
-            incomplete_explorations.delete_last_playthrough_information(
-                exploration_id)
+    if incomplete_activities_model:
+        incomplete_activities = get_incomplete_activities_from_model(
+            incomplete_activities_model)
+        if exploration_id in incomplete_activities.incomplete_exploration_ids:
+            incomplete_activities.remove_exploration_id(exploration_id)
+            last_playthrough_information_model = (
+                user_models.ExpUserLastPlaythroughModel.get(
+                    user_id, exploration_id))
+            last_playthrough_information_model.delete()
 
-            save_incomplete_explorations(incomplete_explorations)
+            save_incomplete_activities(incomplete_activities)
+
 
 def remove_collection_from_incomplete_list(user_id, collection_id):
     """Removes the collection id from the list of incomplete collections
@@ -306,15 +320,16 @@ def remove_collection_from_incomplete_list(user_id, collection_id):
         user_id: str. The id of the user.
         collection_id: str. The id of the collection to be removed.
     """
-    incomplete_collections_model = (
-        user_models.IncompleteCollectionsModel.get(user_id, strict=False))
+    incomplete_activities_model = (
+        user_models.IncompleteActivitiesModel.get(user_id, strict=False))
 
-    if incomplete_collections_model:
-        incomplete_collections = get_incomplete_collections_from_model(
-            incomplete_collections_model)
-        if collection_id in incomplete_collections.incomplete_collection_ids:
-            incomplete_collections.remove_collection_id(collection_id)
-            save_incomplete_collections(incomplete_collections)
+    if incomplete_activities_model:
+        incomplete_activities = get_incomplete_activities_from_model(
+            incomplete_activities_model)
+        if collection_id in incomplete_activities.incomplete_collection_ids:
+            incomplete_activities.remove_collection_id(collection_id)
+            save_incomplete_activities(incomplete_activities)
+
 
 def get_all_completed_exp_ids(user_id):
     """Returns a list with the ids of all the explorations completed by the
@@ -338,6 +353,7 @@ def get_all_completed_exp_ids(user_id):
     else:
         return []
 
+
 def get_all_completed_collection_ids(user_id):
     """Returns a list with the ids of all the collections completed by the
     user.
@@ -360,6 +376,7 @@ def get_all_completed_collection_ids(user_id):
     else:
         return []
 
+
 def get_all_incomplete_exp_ids(user_id):
     """Returns a list with the ids of all the explorations partially completed
     by the user.
@@ -371,16 +388,17 @@ def get_all_incomplete_exp_ids(user_id):
         list(str). A list of the ids of the explorations partially completed by
             the learner.
     """
-    incomplete_explorations_model = (
-        user_models.IncompleteExplorationsModel.get(
+    incomplete_activities_model = (
+        user_models.IncompleteActivitiesModel.get(
             user_id, strict=False))
 
-    if incomplete_explorations_model:
-        incomplete_explorations = get_incomplete_explorations_from_model(
-            incomplete_explorations_model)
-        return incomplete_explorations.incomplete_exploration_ids
+    if incomplete_activities_model:
+        incomplete_activities = get_incomplete_activities_from_model(
+            incomplete_activities_model)
+        return incomplete_activities.incomplete_exploration_ids
     else:
         return []
+
 
 def get_all_incomplete_collection_ids(user_id):
     """Returns a list with the ids of all the collections partially completed
@@ -393,12 +411,12 @@ def get_all_incomplete_collection_ids(user_id):
         list(str). A list of the ids of the collections partially completed by
             the learner.
     """
-    incomplete_collections_model = (
-        user_models.IncompleteCollectionsModel.get(user_id, strict=False))
+    incomplete_activities_model = (
+        user_models.IncompleteActivitiesModel.get(user_id, strict=False))
 
-    if incomplete_collections_model:
-        incomplete_collections = get_incomplete_collections_from_model(
-            incomplete_collections_model)
-        return incomplete_collections.incomplete_collection_ids
+    if incomplete_activities_model:
+        incomplete_activities = get_incomplete_activities_from_model(
+            incomplete_activities_model)
+        return incomplete_activities.incomplete_collection_ids
     else:
         return []

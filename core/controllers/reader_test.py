@@ -14,7 +14,6 @@
 
 """Tests for the page that allows learners to play through an exploration."""
 
-import datetime
 import os
 
 from core.domain import collection_domain
@@ -545,7 +544,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         }
 
         # When an exploration is completed but is not in the context of a
-        # collection, it is just added to the completed list.
+        # collection, it is just added to the completed explorations list.
         self.post_json(
             '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_0,
             payload, csrf_token)
@@ -673,15 +672,14 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
         csrf_token = self.get_csrf_token_from_response(response)
 
-        timestamp = datetime.datetime.utcnow()
         state_name = 'state_name'
         version = 1
 
         # Add two explorations to the partially completed list.
         learner_progress_services.mark_exploration_as_incomplete(
-            self.user_id, timestamp, self.EXP_ID_0, state_name, version)
+            self.user_id, self.EXP_ID_0, state_name, version)
         learner_progress_services.mark_exploration_as_incomplete(
-            self.user_id, timestamp, self.EXP_ID_1, state_name, version)
+            self.user_id, self.EXP_ID_1, state_name, version)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1])

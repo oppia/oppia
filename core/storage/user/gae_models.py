@@ -109,24 +109,16 @@ class ActivitiesCompletedByLearnerModel(base_models.BaseModel):
     completed_collection_ids = ndb.StringProperty(repeated=True, indexed=True)
 
 
-class IncompleteCollectionsModel(base_models.BaseModel):
-    """Keeps track of all the collections currently being completed by the
-    learner.
-
-    Instances of this class are keyed by the user id.
-    """
-    incomplete_collection_ids = ndb.StringProperty(
-        repeated=True, indexed=True)
-
-
-class IncompleteExplorationsModel(base_models.BaseModel):
-    """Keeps track of all the explorations currently being completed by the
+class IncompleteActivitiesModel(base_models.BaseModel):
+    """Keeps track of all the activities currently being completed by the
     learner.
 
     Instances of this class are keyed by the user id.
     """
     # The ids of the explorations partially completed by the user.
     incomplete_exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # The ids of the collections partially completed by the user.
+    incomplete_collection_ids = ndb.StringProperty(repeated=True, indexed=True)
 
 
 class ExpUserLastPlaythroughModel(base_models.BaseModel):
@@ -141,12 +133,12 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
     # The exploration id.
     exploration_id = ndb.StringProperty(required=True, indexed=True)
     # The version of the exploration last played by the user.
-    version_last_played = ndb.IntegerProperty(default=None)
+    last_played_exp_version = ndb.IntegerProperty(default=None)
     # The time since the Epoch when the user last played the exploration.
     time_last_played_msec = ndb.FloatProperty(default=None)
-    # The state at which the learner left the exploration when he/she last
-    # played it.
-    last_state_played = ndb.StringProperty(default=None)
+    # The name of the state at which the learner left the exploration when
+    # he/she last played it.
+    last_played_state_name = ndb.StringProperty(default=None)
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
@@ -162,7 +154,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
         Returns:
             ExpUserLastPlaythroughModel. The newly created
-            ExpUserLastPlaythroughModel instance.
+                ExpUserLastPlaythroughModel instance.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
         return cls(

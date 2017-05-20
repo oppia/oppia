@@ -116,91 +116,61 @@ class UserExplorationPrefs(object):
 class ExpUserLastPlaythrough(object):
     """Domain object for an exploration last playthrough model."""
 
-    def __init__(self, user_id, exploration_id, version_last_played,
-                 time_last_played_msec, last_state_played):
+    def __init__(self, user_id, exploration_id, last_played_exp_version,
+                 time_last_played_msec, last_played_state_name):
         self.id = '%s.%s' % (user_id, exploration_id)
         self.user_id = user_id
         self.exploration_id = exploration_id
-        self.version_last_played = version_last_played
+        self.last_played_exp_version = last_played_exp_version
         self.time_last_played_msec = time_last_played_msec
-        self.last_state_played = last_state_played
+        self.last_played_state_name = last_played_state_name
 
     def update_last_played_information(self, time_last_played_msec,
-                                       version_last_played,
-                                       last_state_played):
+                                       last_played_exp_version,
+                                       last_played_state_name):
         """Updates the last playthrough information of the user.
 
         Args:
             time_last_played_msec: float. The time in milliseconds since the
                 Epoch when the user last played the explorations.
-            version_last_played: int. The version of the exploration that was
-                played by the user.
-            last_state_played: str. The name of the state at which the learner
-                left the exploration.
+            last_played_exp_version: int. The version of the exploration that
+                was played by the user.
+            last_played_state_name: str. The name of the state at which the
+                learner left the exploration.
         """
         self.time_last_played_msec = time_last_played_msec
-        self.version_last_played = version_last_played
-        self.last_state_played = last_state_played
+        self.last_played_exp_version = last_played_exp_version
+        self.last_played_state_name = last_played_state_name
 
-class IncompleteExplorations(object):
-    """Domain object for the incomplete explorations model."""
 
-    def __init__(self, user_id, incomplete_exploration_ids):
+class IncompleteActivities(object):
+    """Domain object for the incomplete activities model."""
+
+    def __init__(self, user_id, incomplete_exploration_ids,
+                 incomplete_collection_ids):
         self.id = user_id
         self.incomplete_exploration_ids = incomplete_exploration_ids
+        self.incomplete_collection_ids = incomplete_collection_ids
 
     def add_exploration_id(self, exploration_id):
         """Adds the exploration id to the list of incomplete exploration ids."""
-
         self.incomplete_exploration_ids.append(exploration_id)
 
     def remove_exploration_id(self, exploration_id):
         """Removes the exploration id from the list of incomplete exploration
         ids.
         """
-
         self.incomplete_exploration_ids.remove(exploration_id)
 
-    def get_last_playthrough_information(self, exploration_id):
-        """Get the information regarding the last playthrough of the user of
-        the given exploration.
+    def add_collection_id(self, collection_id):
+        """Adds the collection id to the list of incomplete collection ids."""
+        self.incomplete_collection_ids.append(collection_id)
 
-        Args:
-            exploration_id: str. The id of the exploration for which we have to
-            get the last playthrough information.
-
-        Returns:
-            ExpUserLastPlaythrough. A ExpUserLastPlaythrough domain object
-            corresponding to the given exploration id.
+    def remove_collection_id(self, collection_id):
+        """Removes the collection id from the list of incomplete collection
+        ids.
         """
-        incomplete_exploration_user_model = (
-            user_models.ExpUserLastPlaythroughModel.get(
-                self.id, exploration_id))
-
-        if not incomplete_exploration_user_model:
-            incomplete_exploration_user_model = (
-                user_models.ExpUserLastPlaythroughModel.create(
-                    self.id, exploration_id))
-
-        return ExpUserLastPlaythrough(
-            self.id, exploration_id,
-            incomplete_exploration_user_model.version_last_played,
-            incomplete_exploration_user_model.time_last_played_msec,
-            incomplete_exploration_user_model.last_state_played)
-
-    def delete_last_playthrough_information(self, exploration_id):
-        """Deletes the last playthrough information model corresponding to the
-        given user id and exploration id.
-
-        Args:
-            exploration_id: str. The id of the exploration for which we have to
-            delete the last playthrough information model.
-        """
-        incomplete_exploration_user_model = (
-            user_models.ExpUserLastPlaythroughModel.get(
-                self.id, exploration_id))
-
-        incomplete_exploration_user_model.delete()
+        self.incomplete_collection_ids.remove(collection_id)
 
 
 class ActivitiesCompletedByLearner(object):
@@ -214,30 +184,8 @@ class ActivitiesCompletedByLearner(object):
 
     def add_exploration_id(self, exploration_id):
         """Adds the exploration id to the list of completed exploration ids."""
-
         self.completed_exploration_ids.append(exploration_id)
 
     def add_collection_id(self, collection_id):
         """Adds the collection id to the list of completed collection ids."""
-
         self.completed_collection_ids.append(collection_id)
-
-
-class IncompleteCollections(object):
-    """Domain object for the collections partially completed by the user."""
-
-    def __init__(self, user_id, incomplete_collection_ids):
-        self.id = user_id
-        self.incomplete_collection_ids = incomplete_collection_ids
-
-    def add_collection_id(self, collection_id):
-        """Adds the collection id to the list of incomplete collection ids."""
-
-        self.incomplete_collection_ids.append(collection_id)
-
-    def remove_collection_id(self, collection_id):
-        """Removes the collection id from the list of incomplete collection
-        ids.
-        """
-
-        self.incomplete_collection_ids.remove(collection_id)

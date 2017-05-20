@@ -14,7 +14,6 @@
 
 """Controllers for the Oppia exploration learner view."""
 
-import datetime
 import json
 import logging
 import random
@@ -439,12 +438,11 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
         version = self.payload.get('version')
         state_name = self.payload.get('state_name')
         user_id = self.user_id
-        timestamp = datetime.datetime.utcnow()
         collection_id = self.payload.get('collection_id')
 
         if user_id:
             learner_progress_services.mark_exploration_as_incomplete(
-                user_id, timestamp, exploration_id, state_name, version)
+                user_id, exploration_id, state_name, version)
 
         if user_id and collection_id:
             learner_progress_services.mark_collection_as_incomplete(

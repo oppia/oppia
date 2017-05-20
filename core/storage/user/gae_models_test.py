@@ -32,8 +32,9 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
         super(ExpUserLastPlaythroughModelTest, self).setUp()
         user_models.ExpUserLastPlaythroughModel(
             id='%s.%s' % (self.USER_ID, self.EXP_ID_0), user_id=self.USER_ID,
-            exploration_id=self.EXP_ID_0, version_last_played=1,
-            time_last_played_msec=1000, last_state_played='state_name').put()
+            exploration_id=self.EXP_ID_0, last_played_exp_version=1,
+            time_last_played_msec=1000,
+            last_played_state_name='state_name').put()
 
     def test_create_success(self):
         user_models.ExpUserLastPlaythroughModel.create(
@@ -50,27 +51,15 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
 
         self.assertEqual(retrieved_object.user_id, self.USER_ID)
         self.assertEqual(retrieved_object.exploration_id, self.EXP_ID_0)
-        self.assertEqual(retrieved_object.version_last_played, 1)
+        self.assertEqual(retrieved_object.last_played_exp_version, 1)
         self.assertEqual(retrieved_object.time_last_played_msec, 1000)
-        self.assertEqual(retrieved_object.last_state_played, 'state_name')
+        self.assertEqual(retrieved_object.last_played_state_name, 'state_name')
 
     def test_get_failure(self):
         retrieved_object = user_models.ExpUserLastPlaythroughModel.get(
             self.USER_ID, 'unknown_exp_id')
 
         self.assertEqual(retrieved_object, None)
-
-    def test_update_last_played_information(self):
-        retrieved_object = user_models.ExpUserLastPlaythroughModel.get_by_id(
-            '%s.%s' % (self.USER_ID, self.EXP_ID_0))
-        retrieved_object.update_last_played_information(
-            2000, 2, 'new_state_name')
-
-        self.assertEqual(retrieved_object.user_id, self.USER_ID)
-        self.assertEqual(retrieved_object.exploration_id, self.EXP_ID_0)
-        self.assertEqual(retrieved_object.version_last_played, 2)
-        self.assertEqual(retrieved_object.time_last_played_msec, 2000)
-        self.assertEqual(retrieved_object.last_state_played, 'new_state_name')
 
 
 class ExplorationUserDataModelTest(test_utils.GenericTestBase):
