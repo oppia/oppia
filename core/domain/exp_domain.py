@@ -1169,10 +1169,10 @@ class State(object):
         Returns:
             bool: True, if the conditions are satisfied.
         """
-        training_examples = [
-            [doc, []] for doc in (
-                self.interaction.confirmed_unclassified_answers)]
+        training_examples_ctr = 0
         labels_ctr = 0
+        training_examples_ctr += len(
+            self.interaction.confirmed_unclassified_answers)
         for (answer_group_index, answer_group) in enumerate(
                 self.interaction.answer_groups):
             classifier_rule_spec_index = (
@@ -1180,11 +1180,10 @@ class State(object):
             if classifier_rule_spec_index is not None:
                 classifier_rule_spec = answer_group.rule_specs[
                     classifier_rule_spec_index]
-                training_examples.extend([
-                    [doc, [str(answer_group_index)]]
-                    for doc in classifier_rule_spec.inputs['training_data']])
+                training_examples_ctr += len(
+                    classifier_rule_spec.inputs['training_data'])
                 labels_ctr += 1
-        if ((len(training_examples) >= feconf.MIN_TOTAL_TRAINING_EXAMPLES) and
+        if ((training_examples_ctr >= feconf.MIN_TOTAL_TRAINING_EXAMPLES) and
                 (labels_ctr >= feconf.MIN_ASSIGNED_LABELS)):
             return True
         return False
