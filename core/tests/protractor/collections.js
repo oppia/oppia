@@ -19,6 +19,7 @@
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var admin = require('../protractor_utils/admin.js');
+var collectionEditor = require('../protractor_utils/collectionEditor.js');
 
 describe('Collections', function() {
   beforeAll(function() {
@@ -46,7 +47,27 @@ describe('Collections', function() {
     dropdown.element(by.css('.protractor-test-dashboard-link')).click();
     browser.waitForAngular();
     element(by.css('.protractor-test-create-activity')).click();
+    // Create new collection.
     element(by.css('.protractor-test-create-collection')).click();
+    browser.waitForAngular();
+    // Add existing explorations.
+    collectionEditor.addExistingExploration('0');
+    collectionEditor.addExistingExploration('4');
+    collectionEditor.addExistingExploration('13');
+    // Shifting nodes in the node graph.
+    collectionEditor.shiftNodeLeft(1);
+    collectionEditor.shiftNodeRight(1);
+    // Delete node in the node graph.
+    collectionEditor.deleteNode(1);
+    // Publish the collection.
+    collectionEditor.saveDraft();
+    collectionEditor.closeSaveModal();
+    collectionEditor.publishCollection();
+    collectionEditor.setTitle('Test Collection');
+    collectionEditor.setObjective('This is a test collection.');
+    collectionEditor.setCategory('Algebra');
+    collectionEditor.saveChanges();
+    browser.waitForAngular();
     users.logout();
   });
 

@@ -24,11 +24,13 @@ oppia.controller('StatisticsTab', [
   '$scope', '$http', '$modal', 'alertsService', 'explorationStatesService',
   'explorationData', 'computeGraphService', 'oppiaDatetimeFormatter',
   'StatesObjectFactory', 'StateImprovementSuggestionService',
+  'ReadOnlyExplorationBackendApiService',
   'IMPROVE_TYPE_DEFAULT', 'IMPROVE_TYPE_INCOMPLETE',
   function(
       $scope, $http, $modal, alertsService, explorationStatesService,
       explorationData, computeGraphService, oppiaDatetimeFormatter,
       StatesObjectFactory, StateImprovementSuggestionService,
+      ReadOnlyExplorationBackendApiService,
       IMPROVE_TYPE_DEFAULT, IMPROVE_TYPE_INCOMPLETE) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
       chartAreaWidth: 300,
@@ -62,32 +64,31 @@ oppia.controller('StatisticsTab', [
         '/createhandler/statistics/' + explorationData.explorationId +
         '/' + version);
       $http.get($scope.explorationStatisticsUrl).then(function(response) {
-        var explorationDataUrl = (
-          '/createhandler/data/' + explorationData.explorationId);
+        ReadOnlyExplorationBackendApiService.loadLatestExploration(
+          explorationData.explorationId).then(function(response) {
+            var statesDict = response.exploration.states;
+            var states = StatesObjectFactory.createFromBackendDict(statesDict);
+            var initStateName = response.exploration.init_state_name;
 
-        $http.get(explorationDataUrl).then(function(response) {
-          var statesDict = response.data.states;
-          var states = StatesObjectFactory.createFromBackendDict(statesDict);
-          var initStateName = response.data.init_state_name;
-          $scope.statsGraphData = computeGraphService.compute(
-            initStateName, states);
-
-          var improvements = (
-            StateImprovementSuggestionService.getStateImprovements(
-              states, $scope.stateStats));
-          $scope.highlightStates = {};
-          improvements.forEach(function(impItem) {
-            // TODO(bhenning): This is the feedback for improvement types and
-            // should be included with the definitions of the improvement types.
-            if (impItem.type === IMPROVE_TYPE_DEFAULT) {
-              $scope.highlightStates[impItem.stateName] = (
-                'Needs more feedback');
-            } else if (impItem.type === IMPROVE_TYPE_INCOMPLETE) {
-              $scope.highlightStates[impItem.stateName] = 'May be confusing';
-            }
-          });
-        });
-
+            $scope.statsGraphData = computeGraphService.compute(
+              initStateName, states);
+            var improvements = (
+              StateImprovementSuggestionService.getStateImprovements(
+                states, $scope.stateStats));
+            $scope.highlightStates = {};
+            improvements.forEach(function(impItem) {
+              // TODO(bhenning): This is the feedback for improvement types and
+              // should be included with the definitions of the improvement
+              // types.
+              if (impItem.type === IMPROVE_TYPE_DEFAULT) {
+                $scope.highlightStates[impItem.stateName] = (
+                  'Needs more feedback');
+              } else if (impItem.type === IMPROVE_TYPE_INCOMPLETE) {
+                $scope.highlightStates[impItem.stateName] = 'May be confusing';
+              }
+            });
+          }
+        );
         var data = response.data;
         var numVisits = data.num_starts;
         var numCompletions = data.num_completions;

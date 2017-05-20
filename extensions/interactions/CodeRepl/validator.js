@@ -13,17 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Frontend validator for customization args and rules of
- * the interaction.
+ * @fileoverview Validator service for the interaction.
  */
 
-oppia.filter('oppiaInteractiveCodeReplValidator', [
+oppia.factory('CodeReplValidationService', [
   'baseInteractionValidationService',
   function(baseInteractionValidationService) {
-    // Returns a list of warnings.
-    return function(stateName, customizationArgs, answerGroups,
-                    defaultOutcome) {
-      return baseInteractionValidationService.getAllOutcomeWarnings(
-        answerGroups, defaultOutcome, stateName);
+    return {
+      getCustomizationArgsWarnings: function(customizationArgs) {
+        // TODO(juansaba): Implement customization args validations.
+        return [];
+      },
+      getAllWarnings: function(stateName, customizationArgs, answerGroups,
+          defaultOutcome) {
+        return this.getCustomizationArgsWarnings(customizationArgs).concat(
+          baseInteractionValidationService.getAllOutcomeWarnings(
+            answerGroups, defaultOutcome, stateName));
+      }
     };
   }]);

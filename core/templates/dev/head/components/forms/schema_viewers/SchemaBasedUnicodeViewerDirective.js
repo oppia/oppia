@@ -16,18 +16,23 @@
  * @fileoverview Directive for a schema-based viewer for unicode strings.
  */
 
-oppia.directive('schemaBasedUnicodeViewer', [function() {
-  return {
-    scope: {
-      localValue: '='
-    },
-    templateUrl: 'schemaBasedViewer/unicode',
-    restrict: 'E',
-    controller: ['$scope', '$filter', '$sce', function($scope, $filter, $sce) {
-      $scope.getDisplayedValue = function() {
-        return $sce.trustAsHtml($filter('convertUnicodeWithParamsToHtml')(
-          $scope.localValue));
-      };
-    }]
-  };
-}]);
+oppia.directive('schemaBasedUnicodeViewer', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      scope: {
+        localValue: '='
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/forms/schema_viewers/' +
+        'schema_based_unicode_viewer_directive.html'),
+      restrict: 'E',
+      controller: [
+      '$scope', '$filter', '$sce',
+      function($scope, $filter, $sce) {
+        $scope.getDisplayedValue = function() {
+          return $sce.trustAsHtml($filter('convertUnicodeWithParamsToHtml')(
+            $scope.localValue));
+        };
+      }]
+    };
+  }]);

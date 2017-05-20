@@ -13,37 +13,43 @@
 // limitations under the License.
 
 /**
- * @fileoverview Frontend validator for customization args and rules of
- * the interaction.
+ * @fileoverview Validator service for the interaction.
  */
 
-oppia.filter('oppiaInteractiveEndExplorationValidator', [
+oppia.factory('EndExplorationValidationService', [
   'WARNING_TYPES', 'baseInteractionValidationService',
   function(WARNING_TYPES, baseInteractionValidationService) {
-    // Returns a list of warnings.
-    return function(
-      stateName, customizationArgs, answerGroups, defaultOutcome) {
-      var warningsList = [];
+    return {
+      getCustomizationArgsWarnings: function(customizationArgs) {
+        baseInteractionValidationService.requireCustomizationArguments(
+          customizationArgs, ['recommendedExplorationIds']);
+        // TODO(juansaba): Implement customization args validations.
+        return [];
+      },
+      getAllWarnings: function(
+          stateName, customizationArgs, answerGroups, defaultOutcome) {
+        var warningsList = [];
 
-      baseInteractionValidationService.requireCustomizationArguments(
-        customizationArgs, ['recommendedExplorationIds']);
+        warningsList = warningsList.concat(
+          this.getCustomizationArgsWarnings(customizationArgs));
 
-      if (answerGroups.length !== 0) {
-        warningsList.push({
-          type: WARNING_TYPES.ERROR,
-          message: 'Please make sure end exploration interactions do not ' +
-            'have any answer groups.'
-        });
+        if (answerGroups.length !== 0) {
+          warningsList.push({
+            type: WARNING_TYPES.ERROR,
+            message: 'Please make sure end exploration interactions do not ' +
+              'have any answer groups.'
+          });
+        }
+        if (defaultOutcome) {
+          warningsList.push({
+            type: WARNING_TYPES.ERROR,
+            message: 'Please make sure end exploration interactions do not ' +
+            'have a default outcome.'
+          });
+        }
+
+        return warningsList;
       }
-      if (defaultOutcome) {
-        warningsList.push({
-          type: WARNING_TYPES.ERROR,
-          message: 'Please make sure end exploration interactions do not ' +
-          'have a default outcome.'
-        });
-      }
-
-      return warningsList;
     };
   }
 ]);
