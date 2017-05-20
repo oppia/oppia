@@ -50,8 +50,6 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self.exp_id = exploration_id
         self.exp_state = (
             exp_services.get_exploration_by_id(exploration_id).states['Home'])
-        self.exp_state_without_training_data = (
-            exp_services.get_exploration_by_id(exploration_id).states['End'])
 
     def _is_string_classifier_called(self, answer):
         sc = classifier_registry.Registry.get_classifier_by_algorithm_id(
