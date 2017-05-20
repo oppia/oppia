@@ -89,7 +89,7 @@ class CollectionChange(object):
             For a collection node, property_name must be one of
             COLLECTION_NODE_PROPERTIES. For a collection, property_name must be
             one of COLLECTION_PROPERTIES.
-			
+
         Raises:
             Exception: if change_dict is not valid.
         """
@@ -132,7 +132,7 @@ class CollectionCommitLogEntry(object):
             post_commit_status, post_commit_community_owned,
             post_commit_is_private):
         """Initializes a CollectionCommitLogEntry domain object.
-        
+
         Args:
             created_on: datetime.datetime. Date and time when the collection
                 commits was created.
@@ -144,10 +144,10 @@ class CollectionCommitLogEntry(object):
             commit_type: str. The type of commit.
             commit_message: str. A description of changes made to the
                 collection.
-            commit_cmds: list(dict). A list of change commands made to the given
-                collection.
+            commit_cmds: list(dict). A list of change commands made to the
+                given collection.
             version: int. The version of the collection.
-            post_commit_status: str. The new collection status after the 
+            post_commit_status: str. The new collection status after the
                 commit.
             post_commit_community_owned: bool. Whether the collection is
                 community-owned after the edit event.
@@ -200,8 +200,8 @@ class CollectionNode(object):
         """Initializes a CollectionCommitLogEntry domain object.
 
         Args:
-            exploration_id: str. A valid ID of an exploration referenced by this
-                node.
+            exploration_id: str. A valid ID of an exploration referenced by
+                this node.
             prerequisite_skills: list(str). A list of prerequisite skills.
             acquired_skills: list(str). A list of acquired skills once the
                 exploration is completed.
@@ -230,7 +230,7 @@ class CollectionNode(object):
         Args:
             node_dict: dict. The dict representation of CollectionNode object.
 
-		Returns:
+        Returns:
             A CollectionNode domain object.
         """
         return cls(
@@ -269,7 +269,7 @@ class CollectionNode(object):
         """Validates various properties of the collection node.
 
         Raises:
-            ValidationError: if some attributes are not valid. 
+            ValidationError: if some attributes are not valid.
         """
         if not isinstance(self.exploration_id, basestring):
             raise utils.ValidationError(
@@ -438,7 +438,7 @@ class Collection(object):
             collection_last_updated: datetime.datetime. Date and time when
                 the collection is updated last time.
 
-		Returns:
+        Returns:
             A Collection domain object.
         """
         collection = cls(
@@ -457,7 +457,7 @@ class Collection(object):
     def to_yaml(self):
         """Convert the Collection domain object into YAML.
 
-		Returns:
+        Returns:
             YAML representation of Collection domain object.
         """
         collection_dict = self.to_dict()
@@ -865,7 +865,7 @@ class Collection(object):
         self.nodes.append(CollectionNode.create_default_node(exploration_id))
 
     def delete_node(self, exploration_id):
-	    """Delete a collection node from the collection based on an
+        """Delete a collection node from the collection based on an
         exploration id.
 
         Args:
@@ -1030,6 +1030,34 @@ class CollectionSummary(object):
                  viewer_ids, contributor_ids, contributors_summary, version,
                  node_count, collection_model_created_on,
                  collection_model_last_updated):
+        """Constructs an CollectionSummary domain object.
+
+        Args:
+            collection_id: str. The unique id of the collection.
+            title: str. The title of the collection.
+            category: str. The category of the collection.
+            objective: str. The objective of the collection.
+            language_code: str. The language code of the collection.
+            tags: list(str). The tags given to the collection.
+            status: str. The status of the collection.
+            community_owned: bool. If the collection is owned by community.
+            owner_ids: list(str). List of the user ids who are the owner of
+                this collection.
+            editor_ids: list(str). List of the user ids of the users who have
+                access to edit this collection.
+            viewer_ids: lsit(str). List of the user ids of the users who have
+                view this collection.
+            contributor_ids: list(str). List of the user ids of the user who
+                have contributed to  this collection.
+            contributors_summary: dict. The summary given by the contributors
+                to the collection, user id as the key and summary as value.
+            version: int. The version of the collection.
+            node_count: int. The number of nodes present in the collection.
+            collection_model_created_on: datetime.datetime. Date and time when
+                the collection model is created.
+            collection_model_last_updated: datetime.datetime. Date and time
+                when the collection model was updated last time.
+        """
         self.id = collection_id
         self.title = title
         self.category = category
@@ -1049,6 +1077,11 @@ class CollectionSummary(object):
         self.collection_model_last_updated = collection_model_last_updated
 
     def to_dict(self):
+        """Returns a dict representing this CollectionSummary domain object.
+
+        Returns:
+            A dict, mapping all fields of CollectionSummary istance.
+        """
         return {
             'id': self.id,
             'title': self.title,
