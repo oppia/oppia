@@ -15,7 +15,6 @@
 # limitations under tactivities
 """Services for tracking the progress of the learner."""
 
-import datetime
 from core.domain import subscription_services
 from core.domain import user_domain
 from core.platform import models
@@ -238,8 +237,6 @@ def mark_exploration_as_incomplete(
         if exploration_id not in incomplete_activities.incomplete_exploration_ids: # pylint: disable=line-too-long
             incomplete_activities.add_exploration_id(exploration_id)
 
-        timestamp = datetime.datetime.utcnow()
-
         last_playthrough_information_model = (
             user_models.ExpUserLastPlaythroughModel.get(
                 user_id, exploration_id))
@@ -251,7 +248,7 @@ def mark_exploration_as_incomplete(
         last_playthrough_information = get_last_playthrough_information(
             last_playthrough_information_model)
         last_playthrough_information.update_last_played_information(
-            utils.get_time_in_millisecs(timestamp),
+            utils.get_current_time_in_millisecs(),
             exploration_version, state_name)
 
         save_last_playthrough_information(last_playthrough_information)
