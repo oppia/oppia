@@ -79,11 +79,12 @@ oppia.factory('ImageClickInputValidationService', [
         }
         return warningsList;
       },
-      getAnswerGroupWarnings: function(
-          customizationArgs, answerGroups, stateName) {
-        var warningsList =
-          baseInteractionValidationService.getAnswerGroupWarnings(
-            answerGroups, stateName);
+      getAllWarnings: function(
+          stateName, customizationArgs, answerGroups, defaultOutcome) {
+        var warningsList = [];
+
+        warningsList = warningsList.concat(
+          this.getCustomizationArgsWarnings(customizationArgs));
 
         var imgAndRegionArgValue = customizationArgs.imageAndRegions.value;
         var seenRegionStrings = imgAndRegionArgValue.labeledRegions.map(
@@ -109,10 +110,7 @@ oppia.factory('ImageClickInputValidationService', [
             }
           }
         }
-        return warningsList;
-      },
-      getDefaultOutcomeWarnings: function(defaultOutcome, stateName) {
-        var warningsList = [];
+
         if (!defaultOutcome ||
             $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
           warningsList.push({
@@ -122,14 +120,8 @@ oppia.factory('ImageClickInputValidationService', [
               'given regions are clicked.')
           });
         }
+
         return warningsList;
-      },
-      getAllWarnings: function(
-          stateName, customizationArgs, answerGroups, defaultOutcome) {
-        return this.getCustomizationArgsWarnings(customizationArgs).concat(
-          this.getAnswerGroupWarnings(
-            customizationArgs, answerGroups, stateName)).concat(
-              this.getDefaultOutcomeWarnings(defaultOutcome, stateName));
       }
     };
   }]);

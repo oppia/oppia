@@ -23,6 +23,7 @@ oppia.factory('EndExplorationValidationService', [
       getCustomizationArgsWarnings: function(customizationArgs) {
         baseInteractionValidationService.requireCustomizationArguments(
           customizationArgs, ['recommendedExplorationIds']);
+        // TODO: Implement customization args validations.
         return [];
       },
       getAllWarnings: function(

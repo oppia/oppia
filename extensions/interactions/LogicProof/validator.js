@@ -21,10 +21,13 @@ oppia.factory('LogicProofValidationService', [
   function(baseInteractionValidationService) {
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {
+        // TODO: Implement customization args validations.
         return [];
       },
       getAllWarnings: function(
           stateName, customizationArgs, answerGroups, defaultOutcome) {
+        // We do not require a default rule for this interaction, since the
+        // feedback is mostly provided from within the interaction itself.
         return this.getCustomizationArgsWarnings(customizationArgs).concat(
           baseInteractionValidationService.getAnswerGroupWarnings(
             answerGroups, stateName));

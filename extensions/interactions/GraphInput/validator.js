@@ -19,9 +19,9 @@
 oppia.factory('GraphInputValidationService', [
   'WARNING_TYPES', 'baseInteractionValidationService',
   function(WARNING_TYPES, baseInteractionValidationService) {
+    var VERTICES_LIMIT = 50;
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {
-        var VERTICES_LIMIT = 50;
         var warningsList = [];
         baseInteractionValidationService.requireCustomizationArguments(
           customizationArgs,
@@ -57,7 +57,6 @@ oppia.factory('GraphInputValidationService', [
       },
       getAllWarnings: function(
           stateName, customizationArgs, answerGroups, defaultOutcome) {
-        var VERTICES_LIMIT = 50;
         var ISOMORPHISM_VERTICES_LIMIT = 10;
 
         var warningsList = [];

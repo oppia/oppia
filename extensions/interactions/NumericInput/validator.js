@@ -21,6 +21,7 @@ oppia.factory('NumericInputValidationService', [
   function(baseInteractionValidationService) {
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {
+        // TODO: Implement customization args validations.
         return [];
       },
       getAllWarnings: function(

@@ -21,6 +21,7 @@ oppia.factory('MathExpressionInputValidationService', [
   function(baseInteractionValidationService, WARNING_TYPES) {
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {
+        // TODO: Implement customization args validations.
         return [];
       },
       getAllWarnings: function(

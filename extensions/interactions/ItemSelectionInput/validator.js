@@ -31,7 +31,6 @@ oppia.factory('ItemSelectionInputValidationService', [
         var seenChoices = [];
         var handledAnswers = [];
         var numChoices = customizationArgs.choices.value.length;
-        var areAllChoicesCovered = false;
 
         for (var i = 0; i < numChoices; i++) {
           var choice = customizationArgs.choices.value[i];
@@ -105,8 +104,6 @@ oppia.factory('ItemSelectionInputValidationService', [
         var handledAnswers = seenChoices.map(function(item) {
           return false;
         });
-        var minAllowedCount =
-          customizationArgs.minAllowableSelectionCount.value;
         var maxAllowedCount =
           customizationArgs.maxAllowableSelectionCount.value;
 
