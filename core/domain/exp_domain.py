@@ -1185,7 +1185,7 @@ class State(object):
         if ((training_examples_count >= feconf.MIN_TOTAL_TRAINING_EXAMPLES) and
                 (labels_count >= feconf.MIN_ASSIGNED_LABELS)):
             return True
-        return False            
+        return False
 
     def update_content(self, content_list):
         # TODO(sll): Must sanitize all content in RTE component attrs.
