@@ -97,16 +97,16 @@ class UserSettingsModel(base_models.BaseModel):
             cls.normalized_username == normalized_username).get()
 
 
-class ActivitiesCompletedByLearnerModel(base_models.BaseModel):
+class CompletedActivitiesModel(base_models.BaseModel):
     """Keeps track of all the explorations and collections completed by the
     learner.
 
     Instances of this class are keyed by the user id.
     """
     # IDs of all the explorations completed by the user.
-    completed_exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
+    exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of all the collections completed by the user.
-    completed_collection_ids = ndb.StringProperty(repeated=True, indexed=True)
+    collection_ids = ndb.StringProperty(repeated=True, indexed=True)
 
 
 class IncompleteActivitiesModel(base_models.BaseModel):
@@ -116,14 +116,14 @@ class IncompleteActivitiesModel(base_models.BaseModel):
     Instances of this class are keyed by the user id.
     """
     # The ids of the explorations partially completed by the user.
-    incomplete_exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
+    exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
     # The ids of the collections partially completed by the user.
-    incomplete_collection_ids = ndb.StringProperty(repeated=True, indexed=True)
+    collection_ids = ndb.StringProperty(repeated=True, indexed=True)
 
 
 class ExpUserLastPlaythroughModel(base_models.BaseModel):
-    """Stores the "last playthrough" information of the exploration since the
-    user left it partially completed.
+    """Stores the "last playthrough" information for partially-completed
+    explorations.
 
     Instances of this class have keys of the form
     [user_id].[exploration_id]
@@ -152,7 +152,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
         Returns:
             ExpUserLastPlaythroughModel. The newly created
-                ExpUserLastPlaythroughModel instance.
+            ExpUserLastPlaythroughModel instance.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
         return cls(

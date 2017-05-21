@@ -67,29 +67,29 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             title='Introduce Interactions in Oppia', category='Welcome')
 
     def _get_all_completed_exp_ids(self, user_id):
-        activities_completed_model = (
-            user_models.ActivitiesCompletedByLearnerModel.get(
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel.get(
                 user_id, strict=False))
 
         return (
-            activities_completed_model.completed_exploration_ids if
-            activities_completed_model else [])
+            completed_activities_model.exploration_ids if
+            completed_activities_model else [])
 
     def _get_all_completed_collection_ids(self, user_id):
-        activities_completed_model = (
-            user_models.ActivitiesCompletedByLearnerModel.get(
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel.get(
                 user_id, strict=False))
 
         return (
-            activities_completed_model.completed_collection_ids if
-            activities_completed_model else [])
+            completed_activities_model.collection_ids if
+            completed_activities_model else [])
 
     def _get_all_incomplete_exp_ids(self, user_id):
         incomplete_activities_model = (
             user_models.IncompleteActivitiesModel.get(user_id, strict=False))
 
         return (
-            incomplete_activities_model.incomplete_exploration_ids if
+            incomplete_activities_model.exploration_ids if
             incomplete_activities_model else [])
 
     def _get_incomplete_exp_details(self, user_id, exploration_id):
@@ -126,7 +126,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             user_models.IncompleteActivitiesModel.get(user_id, strict=False))
 
         return (
-            incomplete_activities_model.incomplete_collection_ids if
+            incomplete_activities_model.collection_ids if
             incomplete_activities_model else [])
 
     def test_mark_exploration_as_completed(self):

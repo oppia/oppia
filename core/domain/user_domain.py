@@ -142,46 +142,46 @@ class ExpUserLastPlaythrough(object):
 class IncompleteActivities(object):
     """Domain object for the incomplete activities model."""
 
-    def __init__(self, user_id, incomplete_exploration_ids,
-                 incomplete_collection_ids):
+    def __init__(self, user_id, exploration_ids,
+                 collection_ids):
         self.id = user_id
-        self.incomplete_exploration_ids = incomplete_exploration_ids
-        self.incomplete_collection_ids = incomplete_collection_ids
+        self.exploration_ids = exploration_ids
+        self.collection_ids = collection_ids
 
     def add_exploration_id(self, exploration_id):
         """Adds the exploration id to the list of incomplete exploration ids."""
-        self.incomplete_exploration_ids.append(exploration_id)
+        self.exploration_ids.append(exploration_id)
 
     def remove_exploration_id(self, exploration_id):
         """Removes the exploration id from the list of incomplete exploration
         ids.
         """
-        self.incomplete_exploration_ids.remove(exploration_id)
+        self.exploration_ids.remove(exploration_id)
 
     def add_collection_id(self, collection_id):
         """Adds the collection id to the list of incomplete collection ids."""
-        self.incomplete_collection_ids.append(collection_id)
+        self.collection_ids.append(collection_id)
 
     def remove_collection_id(self, collection_id):
         """Removes the collection id from the list of incomplete collection
         ids.
         """
-        self.incomplete_collection_ids.remove(collection_id)
+        self.collection_ids.remove(collection_id)
 
 
-class ActivitiesCompletedByLearner(object):
+class CompletedActivities(object):
     """Domain object for the activities completed by learner model."""
 
-    def __init__(self, user_id, completed_exploration_ids,
-                 completed_collection_ids):
+    def __init__(self, user_id, exploration_ids,
+                 collection_ids):
         self.id = user_id
-        self.completed_exploration_ids = completed_exploration_ids
-        self.completed_collection_ids = completed_collection_ids
+        self.exploration_ids = exploration_ids
+        self.collection_ids = collection_ids
 
     def add_exploration_id(self, exploration_id):
         """Adds the exploration id to the list of completed exploration ids."""
-        self.completed_exploration_ids.append(exploration_id)
+        self.exploration_ids.append(exploration_id)
 
     def add_collection_id(self, collection_id):
         """Adds the collection id to the list of completed collection ids."""
-        self.completed_collection_ids.append(collection_id)
+        self.collection_ids.append(collection_id)
