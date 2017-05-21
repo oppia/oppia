@@ -19,7 +19,7 @@ import re
 import shutil
 import subprocess
 import sys
-import yaml
+import hashlib
 
 
 HEAD_DIR = os.path.join('core', 'templates', 'dev', 'head', '')
@@ -29,7 +29,7 @@ YUICOMPRESSOR_DIR = os.path.join(
     '..', 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar')
 
 FILE_EXTENSIONS_TO_IGNORE = ['.py']
-
+HASH_BLOCK_SIZE = 2**20
 
 def _minify(source_path, target_path):
     """Runs the given file through a minifier and outputs it to target_path."""
@@ -44,9 +44,16 @@ def ensure_directory_exists(f):
         os.makedirs(d)
 
 
-def process_html(filename, target):
+def process_html(filename, target, file_hashes):
     f = open(filename, 'r')
     content = f.read()
+
+    for filepath, file_hash in file_hashes.iteritems():
+        if filepath.endswith('.html'):
+            continue
+        filepath_with_hash = filepath + "?v=" + file_hash
+        content = content.replace(filepath, filepath_with_hash)
+
     content = REMOVE_WS(' ', content)
     ensure_directory_exists(target)
     d = open(target, 'w+')
@@ -106,7 +113,51 @@ def copy_files_source_to_target(source, target):
             shutil.copyfile(source_path, target_path)
 
 
-def build_files(source, target):
+def generate_file_md5(filepath):
+    """Returns md5 hash of file.
+
+    Args:
+        filepath: str. Path to the file.
+
+    Returns:
+        str. Hexadecimal hash of specified file.
+    """
+    m = hashlib.md5()
+    with open(filepath, "rb") as f:
+        while True:
+            buf = f.read(HASH_BLOCK_SIZE)
+            if not buf:
+                break
+            m.update(buf)
+    return m.hexdigest()
+
+
+def get_file_hashes(folder_path):
+    """Returns hashes of all files in folder tree.
+
+    Args:
+        folder_path: str. Root folder of the tree.
+
+    Returns:
+        dict(str, str). Dictionary with keys specifying file paths and values
+        specifying file hashes.
+    """
+    file_hashes = dict()
+
+    print 'Processing %s' % os.path.join(os.getcwd(), folder_path)
+
+    for root, dirs, files in os.walk(os.path.join(os.getcwd(), folder_path)):
+        for directory in dirs:
+            print 'Processing %s' % os.path.join(root, directory)
+        for filename in files:
+            file_path = os.path.join(root, filename)
+            relative_file_path = os.path.relpath(file_path, folder_path)
+            file_hashes[relative_file_path] = generate_file_md5(file_path)
+
+    return file_hashes
+
+
+def build_files(source, target, file_hashes):
     """Minifies all css and js files, and removes whitespace from html in source
     directory and copies it to target.
     Arguments:
@@ -133,7 +184,7 @@ def build_files(source, target):
                 continue
 
             if filename.endswith('.html'):
-                process_html(source_path, target_path)
+                process_html(source_path, target_path, file_hashes)
             elif filename.endswith('.css'):
                 process_css(source_path, target_path)
             elif filename.endswith('.js'):
@@ -142,18 +193,9 @@ def build_files(source, target):
                 ensure_directory_exists(target_path)
                 shutil.copyfile(source_path, target_path)
 
-def get_cache_slug():
-    """Returns the cache slug read from file."""
-    with open('cache_slug.yaml', 'r') as cache_slug_file:
-        content = cache_slug_file.read()
-    retrieved_dict = yaml.safe_load(content)
-    assert isinstance(retrieved_dict, dict)
-    return retrieved_dict['cache_slug']
-
-
 if __name__ == '__main__':
-    CACHE_SLUG = get_cache_slug()
-    BUILD_DIR = os.path.join('build', CACHE_SLUG)
+    hashes = dict() # pylint: disable=C0103
+    BUILD_DIR = os.path.join('build')
 
     # os.path.dirname(path)(in ensure_directory_exists()) returns parent
     # directory of a path passed as an argument to it. This is as intended
@@ -163,22 +205,26 @@ if __name__ == '__main__':
     ASSETS_SRC_DIR = os.path.join('assets', '')
     ASSETS_OUT_DIR = os.path.join(BUILD_DIR, 'assets', '')
     copy_files_source_to_target(ASSETS_SRC_DIR, ASSETS_OUT_DIR)
+    hashes.update(get_file_hashes(ASSETS_OUT_DIR))
 
     # Process third_party resources, copy it to
     # build/[cache_slug]/third_party/generated
     THIRD_PARTY_GENERATED_OUT_DIR = os.path.join(
         BUILD_DIR, 'third_party', 'generated')
     build_minified_third_party_libs(THIRD_PARTY_GENERATED_OUT_DIR)
+    hashes.update(get_file_hashes(THIRD_PARTY_GENERATED_OUT_DIR))
 
     # Minify extension static resources, copy it to
     # build/[cache_slug]/extensions
     EXTENSIONS_SRC_DIR = os.path.join('extensions', '')
     EXTENSIONS_OUT_DIR = os.path.join(BUILD_DIR, 'extensions', '')
-    build_files(EXTENSIONS_SRC_DIR, EXTENSIONS_OUT_DIR)
+    hashes.update(get_file_hashes(EXTENSIONS_SRC_DIR))
+    build_files(EXTENSIONS_SRC_DIR, EXTENSIONS_OUT_DIR, hashes)
 
     TEMPLATES_HEAD_DIR = os.path.join('core', 'templates', 'dev', 'head', '')
     TEMPLATES_OUT_DIR = os.path.join('core', 'templates', 'prod', 'head', '')
-    build_files(TEMPLATES_HEAD_DIR, TEMPLATES_OUT_DIR)
+    hashes.update(get_file_hashes(TEMPLATES_HEAD_DIR))
+    build_files(TEMPLATES_HEAD_DIR, TEMPLATES_OUT_DIR, hashes)
 
     # Process core/templates/prod/head/css, copy it to build/[cache_slug]/css
     CSS_SRC_DIR = os.path.join('core', 'templates', 'prod', 'head', 'css', '')

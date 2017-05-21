@@ -32,6 +32,7 @@ handlers:
 - url: /build
   static_dir: build
   secure: always
+  application_readable: true
   expiration: 30d
   http_headers:
     Cache-Control: 'public, max-age=2592000'

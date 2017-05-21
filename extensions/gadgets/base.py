@@ -84,7 +84,8 @@ class BaseGadget(object):
         once the necessary attributes are supplied.
         """
         html_templates = utils.get_file_contents(os.path.join(
-            feconf.GADGETS_DIR, self.type, '%s.html' % self.type))
+            utils.get_asset_dir_prefix()[1:], feconf.GADGETS_DIR,
+            self.type, '%s.html' % self.type))
         return jinja_utils.interpolate_cache_slug('%s' % html_templates)
 
     def validate(self, customization_args):
