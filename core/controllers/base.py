@@ -462,7 +462,12 @@ class BaseHandler(webapp2.RequestHandler):
 
     def handle_exception(self, exception, unused_debug_mode):
 
-        """Overwrites the default exception handler."""
+        """Overwrites the default exception handler
+        Agrs:
+          exception: int. Raised while assertion of error code
+          unused_debug_mode: Currently an unused argument
+        """
+
         logging.info(''.join(traceback.format_exception(*sys.exc_info())))
         logging.error('Exception raised: %s', exception)
 
