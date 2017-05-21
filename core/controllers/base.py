@@ -119,10 +119,10 @@ def require_fully_signed_up(handler):
 
 
 def _clear_login_cookies(response_headers):
-  
+
     """"Clears login cookies from the given response headers.
-    App Engine sets the ACSID cookie for the ACSID cookie 
-    for http:// and the SACSID cookie"""
+    App Engine sets the ACSID cookie for
+    http:// and the SACSID cookie"""
 
     # for https:// . We just unset both below.
     cookie = Cookie.SimpleCookie()
@@ -141,7 +141,7 @@ class LogoutPage(webapp2.RequestHandler):
 
     def get(self):
 
-        """Logs the user out, and returns them to a 
+        """Logs the user out, and returns them to a
         specified (or the home page if no follow-up page is specified).
         """
 
@@ -299,7 +299,7 @@ class BaseHandler(webapp2.RequestHandler):
 
     def render_json(self, values):
         """Prepare JSON response to sent to the client
-        Args: 
+        Args:
           values: dict.The key-value pairs to encode in the JSON response.
         """
         self.response.content_type = 'application/javascript; charset=utf-8'
@@ -315,6 +315,13 @@ class BaseHandler(webapp2.RequestHandler):
     def render_template(
             self, filename, iframe_restriction='DENY',
             redirect_url_on_logout=None):
+
+        """Write the various values and renders the template
+        Args:
+            filename: str. Name of the template file
+            iframe_restriction: str. Value for iframe restriction.
+            redirect_url_on_logout: bool. Redirects after logging out.
+        """
         values = self.values
 
         scheme, netloc, path, _, _ = urlparse.urlsplit(self.request.uri)
@@ -430,6 +437,11 @@ class BaseHandler(webapp2.RequestHandler):
             self.jinja2_env.get_template(filename).render(**values))
 
     def _render_exception(self, error_code, values):
+        """Asserts error code and renders exception
+         Args:
+          error_code: int. Type of the error code (400, 401, 404, 500)
+          values: dict. list of values of cookies
+        """
         assert error_code in [400, 401, 404, 500]
         values['code'] = error_code
 
@@ -449,6 +461,7 @@ class BaseHandler(webapp2.RequestHandler):
                 self.render_template('pages/error/error.html')
 
     def handle_exception(self, exception, unused_debug_mode):
+
         """Overwrites the default exception handler."""
         logging.info(''.join(traceback.format_exception(*sys.exc_info())))
         logging.error('Exception raised: %s', exception)
@@ -571,8 +584,8 @@ class CsrfTokenManager(object):
 
         """Validates a given CSRF token with the CSRF secret in memcache.
         Args:
-          user_id: The user_id for whom to create the token.
-          tokem: The token for respective user_id.
+          user_id: str. The user_id to validate CSRF token.
+          token: str. Newly Generated CSRF token.
         """
         try:
             parts = token.split('/')
