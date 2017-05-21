@@ -77,10 +77,10 @@ def require_moderator(handler):
     """Decorator that checks whether the current user is a moderator."""
 
     def test_is_moderator(self, **kwargs):
-        """Check that the user has a registered user_id and have moderator permissions in the
-        rights_manager.
+        """Check that the user has a registered user_id and have moderator
+        permissions in the rights_manager.
 
-        Raises: 
+        Raises:
             UnauthorizedUserException: If no sufficient credentials
         """
         if not self.user_id:
@@ -103,8 +103,7 @@ def require_fully_signed_up(handler):
 
     def test_registered_as_editor(self, **kwargs):
         """Check that the user has registered as an editor.
-
-        Raises: 
+        Raises:
             UnauthorizedUserException: If no sufficient credentials
 
         """
@@ -138,8 +137,8 @@ class LogoutPage(webapp2.RequestHandler):
     """ Class which handles the logout logic"""
 
     def get(self):
-        """Logs out the user/developer, and returns them to a specified page or the home
-        page.
+        """Logs out the user/developer, and returns them to a specified
+        page or the home.
         """
         # The str conversion is needed, otherwise an InvalidResponseError
         # asking for the 'Location' header value to be str instead of
@@ -294,7 +293,7 @@ class BaseHandler(webapp2.RequestHandler):
         raise self.PageNotFoundException
 
     def render_json(self, values):
-        """ Decorator to render and writes data sent from the server 
+        """ Decorator to render and writes data sent from the server
         to the client via JSON
         """
         self.response.content_type = 'application/javascript; charset=utf-8'
@@ -524,12 +523,12 @@ class CsrfTokenManager(object):
     @classmethod
     def _create_token(cls, user_id, issued_on):
         """Creates a digest (string representation) of a token.
-        Args:   
-            user_id: User Id.
-            issued_on: Round time to seconds.
+        Args:
+          user_id: User Id.
+          issued_on: Round time to seconds.
 
-        Returns: 
-            token: Digest in Base64. 
+        Returns:
+          token: Digest in Base64.
         """
         cls.init_csrf_secret()
 
@@ -539,7 +538,6 @@ class CsrfTokenManager(object):
         if user_id is None:
             user_id = cls._USER_ID_DEFAULT
 
-        
         issued_on = long(issued_on)
 
         digester = hmac.new(str(CSRF_SECRET.value))
