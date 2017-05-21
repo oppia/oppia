@@ -465,7 +465,7 @@ class BaseHandler(webapp2.RequestHandler):
         """Overwrites the default exception handler
         Agrs:
           exception: int. Raised while assertion of error code
-          unused_debug_mode: Currently an unused argument
+          unused_debug_mode: The uncaught exception
         """
 
         logging.info(''.join(traceback.format_exception(*sys.exc_info())))
