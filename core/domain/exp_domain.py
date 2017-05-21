@@ -1162,6 +1162,31 @@ class State(object):
         elif self.interaction.id is not None:
             self.interaction.validate(exp_param_specs_dict)
 
+    def can_undergo_classification(self):
+        """Checks whether the answers for this state satisfy the preconditions
+        for a ML model to be trained.
+
+        Returns:
+            bool: True, if the conditions are satisfied.
+        """
+        training_examples_count = 0
+        labels_count = 0
+        training_examples_count += len(
+            self.interaction.confirmed_unclassified_answers)
+        for answer_group in self.interaction.answer_groups:
+            classifier_rule_spec_index = (
+                answer_group.get_classifier_rule_index())
+            if classifier_rule_spec_index is not None:
+                classifier_rule_spec = answer_group.rule_specs[
+                    classifier_rule_spec_index]
+                training_examples_count += len(
+                    classifier_rule_spec.inputs['training_data'])
+                labels_count += 1
+        if ((training_examples_count >= feconf.MIN_TOTAL_TRAINING_EXAMPLES) and
+                (labels_count >= feconf.MIN_ASSIGNED_LABELS)):
+            return True
+        return False
+
     def update_content(self, content_list):
         # TODO(sll): Must sanitize all content in RTE component attrs.
         self.content = [Content.from_dict(content_list[0])]
