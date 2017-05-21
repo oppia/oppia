@@ -96,7 +96,6 @@ def require_moderator(handler):
 
 
 def require_fully_signed_up(handler):
-
     """Decorator that checks if the user is logged in and has completed the
     signup process.
     """
@@ -104,8 +103,9 @@ def require_fully_signed_up(handler):
     def test_registered_as_editor(self, **kwargs):
 
         """Check that the user has registered as an editor.
+
         Raises:
-            UnauthorizedUserException: If no sufficient credentials
+            UnauthorizedUserException: The user has insufficient credential.
         """
         if (not self.user_id
                 or self.username in config_domain.BANNED_USERNAMES.value
@@ -119,10 +119,8 @@ def require_fully_signed_up(handler):
 
 
 def _clear_login_cookies(response_headers):
-
-    """"Clears login cookies from the given response headers.
-    App Engine sets the ACSID cookie for
-    http:// and the SACSID cookie"""
+    """Clears login cookies from the given response headers."""
+    # App Engine sets the ACSID cookie for http:// and the SACSID cookie
 
     # for https:// . We just unset both below.
     cookie = Cookie.SimpleCookie()
@@ -137,7 +135,7 @@ def _clear_login_cookies(response_headers):
 
 
 class LogoutPage(webapp2.RequestHandler):
-    """ Class which handles the logout URL"""
+    """Class which handles the logout URL."""
 
     def get(self):
 
@@ -242,8 +240,8 @@ class BaseHandler(webapp2.RequestHandler):
         """Overrides dispatch method in webapp2 superclass.
 
         Raises:
-                Exception: The CSRF token is missing.
-                Unauthorized User Exception: The CSRF token is invalid.
+          Exception: The CSRF token is missing.
+          Unauthorized User Exception: The CSRF token is invalid.
         """
         # If the request is to the old demo server, redirect it permanently to
         # the new demo server.
@@ -437,10 +435,10 @@ class BaseHandler(webapp2.RequestHandler):
             self.jinja2_env.get_template(filename).render(**values))
 
     def _render_exception(self, error_code, values):
-        """Asserts error code and renders exception
+        """Asserts error code and renders exception.
          Args:
-          error_code: int. Type of the error code (400, 401, 404, 500)
-          values: dict. list of values of cookies
+            error_code: int. Type of the error code (400, 401, 404, 500)
+            values: dict. list of values of cookies
         """
         assert error_code in [400, 401, 404, 500]
         values['code'] = error_code
@@ -463,9 +461,9 @@ class BaseHandler(webapp2.RequestHandler):
     def handle_exception(self, exception, unused_debug_mode):
 
         """Overwrites the default exception handler
-        Agrs:
-          exception: int. Raised while assertion of error code
-          unused_debug_mode: The uncaught exception
+        Args:
+            exception: int. Raised while assertion of error code
+            unused_debug_mode: The uncaught exception
         """
 
         logging.info(''.join(traceback.format_exception(*sys.exc_info())))
