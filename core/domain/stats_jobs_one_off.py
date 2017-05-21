@@ -71,6 +71,11 @@ def _get_answer_dict_size(answer_dict):
 
 
 class StatisticsAudit(jobs.BaseMapReduceJobManager):
+    """A one-off statistics audit.
+
+    A one-off computation job that counts 'start exploration' and
+    'complete exploration' events.
+    """
 
     _STATE_COUNTER_ERROR_KEY = 'State Counter ERROR'
 
@@ -82,6 +87,36 @@ class StatisticsAudit(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+
+        Args:
+            item: ExplorationAnnotationsModel or
+                StateCounterModel.
+
+        Yields:
+            tuple. 2-tuple in the form ('exploration_id', value).
+                `exploration_id` corresponds to the id of the exploration.
+                `value`: value yielded is:
+                    {
+                        'version': Version of the exploration,
+                        'starts': # of times exploration was started.
+                        'completions': # of times exploration was
+                            completed.
+                        'state_hit': a dict containing the hit counts for the
+                            states in the exploration. It is formatted as
+                            follows:
+                            {
+                                state_name: {
+                                    'first_entry_count': # of sessions which
+                                        hit this state.
+                                    'total_entry_count': # of total hits for
+                                        this state.
+                                    'no_answer_count': # of hits with no
+                                        answer for this state.
+                                }
+                            }
+                    }
+        """
         if isinstance(item, stats_models.StateCounterModel):
             if item.first_entry_count < 0:
                 yield (
@@ -101,6 +136,36 @@ class StatisticsAudit(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Updates statistics for the given exploration.
+
+        Args:
+            key: str. The exploration id of the exploration
+            stringified_values: list(str). A list of stringified values
+                associated with the given key. An element of stringfield_values
+                would be of the form:
+                    {
+                        'version': Version of the exploration,
+                        'starts': # of times exploration was started.
+                        'completions': # of times exploration was
+                            completed.
+                        'state_hit': a dict containing the hit counts for the
+                            states in the exploration. It is formatted
+                            as follows:
+                            {
+                                state_name: {
+                                    'first_entry_count': # of sessions
+                                        which hit this state.
+                                    'total_entry_count': # of total
+                                        hits for this state.
+                                    'no_answer_count': # of hits with
+                                        no answer for this state.
+                                }
+                            }
+                    }
+
+        Yields:
+            various error messages are possible
+        """
         if key == StatisticsAudit._STATE_COUNTER_ERROR_KEY:
             for value_str in stringified_values:
                 yield (value_str,)
@@ -174,7 +239,9 @@ class StatisticsAudit(jobs.BaseMapReduceJobManager):
 
 
 class AnswersAudit(jobs.BaseMapReduceJobManager):
-    """Provides statistics for the number of times each rule type occurs in
+    """Provides statistics for the number of times each rule type occurs.
+
+    Provides statistics for the number of times each rule type occurs in
     StateRuleAnswerLogModel. This job is successful if no errors are reported in
     the job output. The statistics computed by this job can be compared to
     results from AnswersAudit2 to determine whether the AnswerMigrationJob was
@@ -206,6 +273,27 @@ class AnswersAudit(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+
+        Args:
+            item: StateRuleAnswerLogModel
+
+        Yields:
+            tuple. 2-tuple in the form (reduce_type, value).
+                'reduce_type' corresponds to the counter type passed to the
+                reduce function
+                'value': value yielded is:
+                    {
+                        'reduce_type' corresponds to the counter type passed
+                        to the reduce function
+                        'rule_spec_str': item.id (for 'submit handler name'
+                        or 'unknown handler' rule types)
+                        'rule_str': rule_str (for 'handler standard rule'
+                        rule types)
+                        'rule_args': rule_args (for 'handler standard rule'
+                        rule types)
+                    }
+        """
         item_id = item.id
         if 'submit' not in item_id:
             yield (AnswersAudit._UNKNOWN_HANDLER_NAME_COUNTER_KEY, {
@@ -268,6 +356,27 @@ class AnswersAudit(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Counts a given rule type
+
+        Args:
+            key: str. The rule type
+            stringified_values: list(str). A list of stringified values
+                associated with the given key. An element of stringfield_values
+                would be of the form:
+                    {
+                        'reduce_type' corresponds to the counter type passed
+                        to the reduce function
+                        'rule_spec_str': item.id (for 'submit handler name'
+                        or 'unknown handler' rule types)
+                        'rule_str': rule_str (for 'handler standard rule'
+                        rule types)
+                        'rule_args': rule_args (for 'handler standard rule'
+                        rule types)
+                    }
+
+        Yields:
+            Result messages reporting the count of the rule type
+        """
         reduce_type = None
         reduce_count = len(stringified_values)
         for value_str in stringified_values:
@@ -308,7 +417,9 @@ class AnswersAudit(jobs.BaseMapReduceJobManager):
 
 
 class AnswersAudit2(jobs.BaseMapReduceJobManager):
-    """Functionally equivalent to AnswersAudit except this audits answers in
+    """AnswersAudit equivalent for StateAnswersModel.
+
+    Functionally equivalent to AnswersAudit except this audits answers in
     StateAnswersModel and does not include handler information since no handlers
     are stored in the new answer model.
     """
@@ -327,6 +438,27 @@ class AnswersAudit2(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+
+        Args:
+            item: StateAnswersModel
+
+        Yields:
+            tuple. 2-tuple in the form (reduce_type, value).
+                'reduce_type' corresponds to the counter type passed to the
+                reduce function
+                'value': value yielded is:
+                    {
+                        'reduce_type' corresponds to the counter type passed
+                        to the reduce function
+                        'rule_spec_str': item.id (for 'submit handler name'
+                        or 'unknown handler' rule types)
+                        'rule_str': rule_str (for 'handler standard rule'
+                        rule types)
+                        'rule_args': rule_args (for 'handler standard rule'
+                        rule types)
+                    }
+        """
         for answer in item.submitted_answer_list:
             yield (AnswersAudit2._CUMULATIVE_ANSWER_COUNTER_KEY, {
                 'reduce_type': AnswersAudit2._CUMULATIVE_ANSWER_COUNTER_KEY
@@ -362,6 +494,27 @@ class AnswersAudit2(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Counts a given rule type.
+
+        Args:
+            key: str. The rule type
+            stringified_values: list(str). A list of stringified values
+                associated with the given key. An element of stringfield_values
+                would be of the form:
+                    {
+                        'reduce_type' corresponds to the counter type passed
+                        to the reduce function
+                        'rule_spec_str': item.id (for 'submit handler name'
+                        or 'unknown handler' rule types)
+                        'rule_str': rule_str (for 'handler standard rule'
+                        rule types)
+                        'rule_args': rule_args (for 'handler standard rule'
+                        rule types)
+                    }
+
+        Yields:
+            Result messages reporting the count of the rule type
+        """
         reduce_type = None
         reduce_count = len(stringified_values)
         for value_str in stringified_values:
@@ -390,7 +543,9 @@ class AnswersAudit2(jobs.BaseMapReduceJobManager):
 
 
 class PartialAnswerValidationAudit(jobs.BaseMapReduceJobManager):
-    """Perform an answer value validation for numeric input answers submitted to
+    """Perform an answer value validation for numeric input.
+
+    Perform an answer value validation for numeric input answers submitted to
     exploration 0 state NumericInput.
     """
     _OLD_ANSWER_MODEL_TYPE = 'StateRuleAnswerLogModel'
@@ -402,6 +557,27 @@ class PartialAnswerValidationAudit(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+
+        Args:
+            item: StateAnswersModel
+
+        Yields:
+            tuple. 2-tuple in the form (key, value).
+                'key': a string consisting of the model type and answer
+                rule spec str
+                'value': value yielded is (old model):
+                    {
+                        'exploration_id': the exploration id associated
+                        with the rule spec str
+                        'state_name': the associated state name
+                        'rule_spec_str': the rule spec str itself
+                    }
+                    (new model)
+                    {
+                        'answer_str': the answer itself
+                    }
+        """
         if item.exploration_id == '0' and item.state_name == 'Numeric input':
             for submitted_answer in item.submitted_answer_list:
                 yield ('%s:%s' % (
@@ -420,6 +596,28 @@ class PartialAnswerValidationAudit(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Applies the float function to the answers
+
+        Args:
+            'key': a string consisting of the model type and answer
+            rule spec str
+            stringified_values: list(str). A list of stringified values
+                associated with the given key. An element of stringfield_values
+                would be of the form:
+                {
+                    'exploration_id': the exploration id associated
+                    with the rule spec str
+                    'state_name': the associated state name
+                    'rule_spec_str': the rule spec str itself
+                }
+                (new model)
+                {
+                    'answer_str': the answer itself
+                }
+
+        Yields:
+            The float verified answer str
+        """
         first_value_dict = ast.literal_eval(stringified_values[0])
         if key.startswith(PartialAnswerValidationAudit._OLD_ANSWER_MODEL_TYPE):
             exp_id = first_value_dict['exploration_id']
@@ -438,6 +636,11 @@ class PartialAnswerValidationAudit(jobs.BaseMapReduceJobManager):
 
 
 class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
+    """Perform an audit of number of answers per model type.
+
+    Perform an audit of number of answers submitted per exploration and
+    in total within the old and new answer models. Report any discrepancies
+    """
 
     _KEY_PRINT_TOTAL_COUNT = 'print_total_count'
     _OLD_ANSWER_MODEL_TYPE = 'StateRuleAnswerLogModel'
@@ -451,6 +654,24 @@ class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+
+        Args:
+            item: StateAnswersModel or StateRuleAnswerLogModel
+
+        Yields:
+            tuple. 2-tuple in the form (key, value).
+                'key': either the item id or an aggregation key for
+                the associated rule
+                'value': value yielded is a dict of the form
+                    {
+                        'frequency': the answer submission count
+                        'type': the model type
+                        'item_id': the item id (doesn't apply to
+                        aggregation values)
+                        'rule_name': the rule name
+                    }
+        """
         if isinstance(item, stats_models.StateRuleAnswerLogModel):
             exp_id, state_name, _, rule_str = (
                 _unpack_state_rule_answer_log_model_id(item.id))
@@ -502,6 +723,28 @@ class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Aggregates answer submission counts per model type.
+
+        Aggregates answer submission counts per model type and
+        reports any differences
+
+        Args:
+            'key': either the item id or an aggregation key for
+            the associated rule
+            stringified_values: list(str). A list of stringified values
+                associated with the given key. An element of stringfield_values
+                would be of the form:
+                {
+                    'frequency': the answer submission count
+                    'type': the model type
+                    'item_id': the item id (doesn't apply to
+                    aggregation values)
+                    'rule_name': the rule name
+                }
+
+        Yields:
+            String report of count differences in a given rule type or in total
+        """
         value_dict_list = [
             ast.literal_eval(stringified_value)
             for stringified_value in stringified_values]
@@ -550,6 +793,12 @@ class RuleTypeBreakdownAudit(jobs.BaseMapReduceJobManager):
 
 
 class ClearUnknownMissingAnswersJob(jobs.BaseMapReduceJobManager):
+    """Delete states of records that have inconsistincies between model types.
+
+    Delete states of records that have inconsistincies between the old
+    and new models. These will be re-migrated the next time the
+    AnswerMigrationJob runs.
+    """
 
     _OLD_ANSWER_MODEL_TYPE = 'StateRuleAnswerLogModel'
     _NEW_ANSWER_MODEL_TYPE = 'StateAnswersModel'
@@ -562,6 +811,23 @@ class ClearUnknownMissingAnswersJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+
+        Args:
+            item: StateAnswersModel or StateRuleAnswerLogModel
+
+        Yields:
+            tuple. 2-tuple in the form (key, value).
+                'key': either the item id or an aggregation key for
+                the associated rule
+                'value': value yielded is a dict of the form
+                    {
+                        'frequency': the answer submission count
+                        'type': the model type
+                        'item_id': the item id
+                        'rule_name': the rule name
+                    }
+        """
         if isinstance(item, stats_models.StateRuleAnswerLogModel):
             exp_id, state_name, _, rule_str = (
                 _unpack_state_rule_answer_log_model_id(item.id))
@@ -604,6 +870,26 @@ class ClearUnknownMissingAnswersJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(_, stringified_values):
+        """Delete states of records that contain inconsistincies.
+
+        Delete states of records that contain inconsistincies between the old
+        and new models
+
+        Args:
+            '_': the item id (unused)
+            stringified_values: list(str). A list of stringified values
+                associated with the given key. An element of stringfield_values
+                would be of the form:
+                {
+                    'frequency': the answer submission count
+                    'type': the model type
+                    'item_id': the item id
+                    'rule_name': the rule name
+                }
+
+        Yields:
+            String report of deleted states
+        """
         value_dict_list = [
             ast.literal_eval(stringified_value)
             for stringified_value in stringified_values]
@@ -677,7 +963,9 @@ class ClearUnknownMissingAnswersJob(jobs.BaseMapReduceJobManager):
 
 
 class ClearMigratedAnswersJob(jobs.BaseMapReduceJobManager):
-    """This job deletes all answers stored in the
+    """This job deletes all migrated answer information.
+
+    This job deletes all answers stored in the
     stats_models.StateAnswersModel and all book-keeping information stored in
     stats_models.MigratedAnswerModel.
     """
@@ -688,17 +976,38 @@ class ClearMigratedAnswersJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+
+        Args:
+            item: StateAnswersModel or MigratedAnswerModel
+
+        Yields:
+            tuple. 2-tuple in the form (model name, 'Deleted answer.').
+        """
         item.delete()
         yield (item.__class__.__name__, 'Deleted answer.')
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Report count of delete items per model.
+
+        Args:
+            key: model type
+            stringified_values: list(str). A list of stringified values
+                associated with the given key. The content of the values
+                will be identical; the values are merely counted.
+
+        Yields:
+            String report of deleted item count
+        """
         yield '%s: deleted %d items' % (key, len(stringified_values))
 
 
 class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
-    """This job deletes all answers stored in
-    stats_models.StateRuleAnswerLogModel which do not or cannot correspond to an
+    """Deletes all answers that don't correspond to an existing exploration.
+
+    This job deletes all answers stored in
+    stats_models.StateRuleAnswerLogModel that do not or cannot correspond to an
     existing, accessible exploration.
     """
     _AGGREGATION_KEY = 'aggregation_key'
@@ -719,6 +1028,21 @@ class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+
+        Deletes all answers stored in stats_models.StateRuleAnswerLogModel
+        that do not or cannot correspond to an existing, accessible exploration
+        Can also remove empty multiple choice answers or erroneously
+        non-numeric answers.
+
+        Args:
+            item: StateRuleAnswerLogModel
+
+        Yields:
+            tuple. 2-tuple in the form (key, value).
+                'key': reason for deleting the item
+                'value': an empty dict
+        """
         exp_id, _, handler_name, rule_str = (
             _unpack_state_rule_answer_log_model_id(item.id))
 
@@ -818,6 +1142,17 @@ class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Report count of deleted items per model.
+
+        Args:
+            key: reason for deleting item
+            stringified_values: list(str). A list of stringified values
+                associated with the given key. The content of the values
+                will be identical; the values are merely counted.
+
+        Yields:
+            String report of deleted/modified item count per type
+        """
         removed_count = len(stringified_values)
         if key == PurgeInconsistentAnswersJob._AGGREGATION_KEY:
             yield 'Removed a total of %d answer(s)' % removed_count
@@ -863,7 +1198,9 @@ class PurgeInconsistentAnswersJob(jobs.BaseMapReduceJobManager):
 
 
 class SplitLargeAnswerBucketsJob(jobs.BaseMapReduceJobManager):
-    """This job checks all answer buckets in
+    """This job splits answers into buckets when the model contains too many.
+
+    This job checks all answer buckets in
     stats_models.StateRuleAnswerLogModel and splits them into multiple entities
     to be stored in stats_models.LargeAnswerBucketModel if there are too many
     entities to be migrated at once by the migration job.
@@ -876,6 +1213,22 @@ class SplitLargeAnswerBucketsJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+
+        Conditionally performs the LargeAnswerBucketModel insertion.
+
+        Args:
+            item: StateRuleAnswerLogModel
+
+        Yields:
+            tuple. 2-tuple in the form (key, value).
+                'key': 'split_answer_count'
+                'value': value yielded is a dict of the form
+                    {
+                        'item_id': the item id
+                        'answer_count': length of item.answers
+                    }
+        """
         if stats_models.LargeAnswerBucketModel.should_split_log_entity(item):
             stats_models.LargeAnswerBucketModel.insert_state_rule_answer_log_entity(item) # pylint: disable=line-too-long
             yield (SplitLargeAnswerBucketsJob._SPLIT_ANSWER_KEY, {
@@ -885,6 +1238,21 @@ class SplitLargeAnswerBucketsJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(_, stringified_values):
+        """Reports number of answers split for migration per exploration.
+
+        Args:
+            '_': 'split_answer_count' (unused)
+            stringified_values: list(str). A list of stringified values
+                associated with the given key. An element of stringfield_values
+                would be of the form:
+                {
+                        'item_id': the item id
+                        'answer_count': length of item.answers
+                }
+
+        Yields:
+            String report of number of split answers per exploration
+        """
         value_dict_list = [
             ast.literal_eval(stringified_value)
             for stringified_value in stringified_values]
@@ -908,16 +1276,38 @@ class ClearLargeAnswerBucketsJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+
+        Performs item deletion
+
+        Args:
+            item: LargeAnswerBucketModel
+
+        Yields:
+            tuple. 2-tuple in the form:
+                (ClearLargeAnswerBucketsJob._REMOVED_KEY, 1)
+        """
         item.delete()
         yield (ClearLargeAnswerBucketsJob._REMOVED_KEY, 1)
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Reports number of items deleted.
+
+        Args:
+            key: ClearLargeAnswerBucketsJob._REMOVED_KEY
+            stringified_values: used for count only
+
+        Yields:
+            Report of number of items deleted
+        """
         yield '%s: %d' % (key, len(stringified_values))
 
 
 class CleanupLargeBucketLabelsFromNewAnswersJob(jobs.BaseMapReduceJobManager):
-    """This job cleans up all StateAnswersModels by removing all occurrences of
+    """This job removes large_bucket_entity_id's from StateAnswersModels.
+
+    This job cleans up all StateAnswersModels by removing all occurrences of
     large_bucket_entity_id and computing the sizes of each answer and answer
     shard in these cases.
     """
@@ -930,6 +1320,18 @@ class CleanupLargeBucketLabelsFromNewAnswersJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+
+        Performs item deletion
+
+        Args:
+            item: StateAnswersModel
+
+        Yields:
+            tuple. 2-tuple in the form: (key, value)
+                key: indicates whether the model was updated
+                value: 1
+        """
         submitted_answers = [
             stats_domain.SubmittedAnswer.from_dict(submitted_answer_dict)
             for submitted_answer_dict in item.submitted_answer_list]
@@ -953,11 +1355,23 @@ class CleanupLargeBucketLabelsFromNewAnswersJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Reports count of items updated/not updated.
+
+        Args:
+            key: CleanupLargeBucketLabelsFromNewAnswersJob._UPDATED_KEY or
+            CleanupLargeBucketLabelsFromNewAnswersJob._IGNORED_KEY
+            stringified_values: used only for count
+
+        Yields:
+            report of number if items updated or ignored
+        """
         yield '%s: %d' % (key, len(stringified_values))
 
 
 class AnswerMigrationValidationJob(jobs.BaseMapReduceJobManager):
-    """This job performs a strict validation to check if every answer in the old
+    """This job performs a strict validation on migrated answers.
+
+    This job performs a strict validation to check if every answer in the old
     storage model has at least been migrated to the new model (no form of
     correctness happens in this test, only accountability).
     """
@@ -969,6 +1383,20 @@ class AnswerMigrationValidationJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+
+        Performs answer migration validation on the item
+
+        Args:
+            item: StateRuleAnswerLogModel
+
+        Yields:
+            tuple. 2-tuple in the form: (key, value)
+                key: AnswerMigrationValidationJob._ERROR_KEY
+                value: error string
+
+            only if an error is found
+        """
         try:
             stats_models.MigratedAnswerModel.validate_answers_are_migrated(item)
         except utils.ValidationError as e:
@@ -978,13 +1406,26 @@ class AnswerMigrationValidationJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Reports all errors for a given key.
+
+        Args:
+              key: AnswerMigrationValidationJob._ERROR_KEY
+              stringified_values: list(str). A list of stringified values
+                  associated with the given key. An element of
+                  stringfield_values would be an error string.
+
+        Yields:
+            all error strings for a given key
+        """
         if key == AnswerMigrationValidationJob._ERROR_KEY:
             for value in stringified_values:
                 yield value
 
 
 class AnswerMigrationCleanupJob(jobs.BaseMapReduceJobManager):
-    """This job performs a cleanup of the bookkeeping model for the answer
+    """Performs a cleanup of the bookkeeping model for the answer migration job.
+
+    This job performs a cleanup of the bookkeeping model for the answer
     migration job. It removes all "dirty" entries (which correspond to answer
     buckets which started being migrated, but failed for some reason). It also
     deletes any answers which have been submitted to the new data model which
@@ -1002,6 +1443,17 @@ class AnswerMigrationCleanupJob(jobs.BaseMapReduceJobManager):
     @classmethod
     def _remove_partially_migrated_answers(
             cls, all_models, incomplete_bucket_ids):
+        """Removes answers with a large bucket ID of an incomplete bucket.
+
+        Removes answers with a large bucket entity ID in our incomplete
+        bucket ids list
+
+        Args:
+              all_models: all StateAnswerModels associated with a given
+              exploration id-version
+              incomplete_bucket_ids: list of ids of buckets with
+              unfinished migrations
+        """
         for state_answer_model in all_models:
             # The answer is not being deleted, but if it
             # contains any answers with a large bucket entity ID
@@ -1039,6 +1491,20 @@ class AnswerMigrationCleanupJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+
+        Deletes items with zero large buckets, or removes answers from
+        inconsistent buckets.
+
+        Args:
+            item: MigratedAnswerModel
+
+        Yields:
+            tuple. 2-tuple in the form: (key, value)
+                key: designates an answer removed, a bucket removed,
+                an inconsistent large bucket, or unremoved large buckets
+                value: 1 (constant)
+        """
         if not item.finished_migration:
             if item.expected_large_answer_bucket_count == 0 or len(
                     item.started_large_answer_bucket_ids) == 0:
@@ -1091,10 +1557,23 @@ class AnswerMigrationCleanupJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Reports count of each key yielded from the map.
+
+        Args:
+              key: designates an answer removed, a bucket removed,
+              an inconsistent large bucket, or unremoved large buckets
+              stringified_values: list(str). A list of stringified values
+                  associated with the given key. Used only for counting
+                  number of keys
+
+        Yields:
+            count of each key
+        """
         yield '%s: %d' % (key, len(stringified_values))
 
 
 class RefreshInteractionRegistryJob(jobs.BaseMapReduceJobManager):
+    """Refreshes exploration models in the interaction registry."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -1102,10 +1581,27 @@ class RefreshInteractionRegistryJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item): # pylint: disable=unused-argument
+        """Implements the map function. Must be declared @staticmethod.
+
+        Args:
+            item: ExplorationModel
+
+        Yields:
+            tuple. 2-tuple in the form: ('key', 'value')
+        """
         yield ('key', 'value')
 
     @staticmethod
     def reduce(key, stringified_values): # pylint: disable=unused-argument
+        """Refreshes the interaction registry.
+
+        Args:
+            key: unused
+            stringified_values: unused
+
+        Yields:
+            'Refreshed interaction registry.'
+        """
         # pylint: disable=protected-access
         interaction_registry.Registry._refresh()
         # pylint: enable=protected-access
@@ -1113,7 +1609,9 @@ class RefreshInteractionRegistryJob(jobs.BaseMapReduceJobManager):
 
 
 class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
-    """This job is responsible for migrating all answers stored within
+    """Migrates answers from old to new model.
+
+    This job is responsible for migrating all answers stored within
     stats_models.StateRuleAnswerLogModel to stats_models.StateAnswersModel
     """
     _ERROR_KEY = 'Answer Migration ERROR'
@@ -1187,7 +1685,9 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _ensure_removed_interactions_are_in_registry(cls):
-        """Checks if the FileReadInput or TarFileReadInput deleted interactions
+        """Checks for file input deleted interactions in interaction_registry.
+
+        Checks if the FileReadInput or TarFileReadInput deleted interactions
         are present in the interaction_registry. If they are not, placeholder
         versions of them will be injected for the purposes of migrating answers
         from explorations that used to contain them.
@@ -1209,14 +1709,17 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _get_exploration_models_by_versions(cls, exp_id, versions):
-        """Similar to VersionedModel.get_version(), except this allows retrieval
+        """Get version; allows retrieval of deleted exploration models.
+
+        Similar to VersionedModel.get_version(), except this allows retrieval
         of exploration models marked as deleted.
 
-        Returns a tuple with the first element a list of exploration models, one
-        for each version in the versions list and in the same order. The second
-        element is an error, if any occurred. Either the first or second element
-        will be None and one will always be None, depending on the outcome of
-        the method.
+        Returns:
+            Tuple with the first element a list of exploration models, one
+            for each version in the versions list and in the same order. The
+            second element is an error, if any occurred. Either the first or
+            second element will be None and one will always be None,
+            depending on the outcome of the method.
         """
         try:
             # pylint: disable=protected-access
@@ -1267,12 +1770,15 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _get_explorations_from_models(cls, exp_models_by_versions):
-        """Returns a tuple with the first element being a list of Exploration
-        objects for each ExplorationModel passed in exp_models_by_versions. The
-        second element is a boolean indicating whether a conversion error
-        occurred when performing an needed exploration migrations for one of the
-        ExplorationModels. The third element is any errors that occurred,
-        ExplorationConversionError or otherwise.
+        """Get list of exploration models passed in exp_models_by_versions.
+
+        Returns:
+            Tuple with the first element being a list of Exploration
+            objects for each ExplorationModel passed in exp_models_by_versions.
+            The second element is a boolean indicating whether a conversion
+            error occurred when performing an needed exploration migrations
+            for one of the ExplorationModels. The third element is any errors
+            that occurred, ExplorationConversionError or otherwise.
         """
         cls._ensure_removed_interactions_are_in_registry()
         try:
@@ -1297,13 +1803,16 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _get_all_exploration_versions(cls, exp_id, max_version):
-        """Returns a tuple with the first element being a list of explorations
-        up to the max_version specified and the second element being any
-        migration errors that occurred while retrieivng the explorations, or
-        None if no migration errors occurred. The returned explorations are in
-        descending order by version. This function can retrieve deleted
-        explorations, but not permanently deleted explorations (in which case
-        the first element of the tuple will be empty list).
+        """Get list of explorations with associated migration errors.
+
+        Returns:
+            Tuple with the first element being a list of explorations
+            up to the max_version specified and the second element being any
+            migration errors that occurred while retrieivng the explorations, or
+            None if no migration errors occurred. The returned explorations are
+            in descending order by version. This function can retrieve deleted
+            explorations, but not permanently deleted explorations (in which
+            case the first element of the tuple will be empty list).
         """
         # NOTE(bhenning): It's possible some of these answers were submitted
         # during a playthrough where the exploration was changed midway. There's
@@ -1322,13 +1831,16 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     # This function comes from extensions.answer_summarizers.models.
     @classmethod
     def _get_hashable_value(cls, value):
-        """This function returns a hashable version of the input value. If the
-        value itself is hashable, it simply returns that value. If it's a list,
-        it will return a tuple with all of the list's elements converted to
-        hashable types. If it's a dictionary, it will first convert it to a list
-        of pairs, where the key and value of the pair are converted to hashable
-        types, then it will convert this list as any other list would be
-        converted.
+        """This function returns a hashable version of the input value.
+
+        Returns:
+            Hashable version of the input value. If the
+            value itself is hashable, it simply returns that value. If it's a
+            list, it will return a tuple with all of the list's elements
+            converted hashable types. If it's a dictionary, it will first
+            convert it to a list of pairs, where the key and value of the
+            pair are converted to hashable types, then it will convert this
+            list as any other list would be converted.
         """
         if isinstance(value, list):
             return tuple([cls._get_hashable_value(elem) for elem in value])
@@ -1343,7 +1855,9 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _permute_index(cls, value_list, idx):
-        """Takes a list of values and a specific index and yields every
+        """Forms all possible permutations of a list element.
+
+        Takes a list of values and a specific index and yields every
         permutation of the value at the specified index in a new list with only
         the corresponding index changed for the new permutation. For instance,
         given the following example call to this method:
@@ -1354,6 +1868,15 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
             ['a', [1, 2], 'b']
             ['a', [2, 1], 'b']
+
+        Args:
+            value_list: list containing a list as at least one item.
+            idx: index of item to permute.
+
+        Returns:
+            List of lists, with each element being an altered version of
+            value_list such that the item at index idx contains a unique
+            permutation of the original item at index idx of value_list.
         """
         if idx == len(value_list):
             yield value_list
@@ -1375,7 +1898,9 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _stringify_classified_rule(cls, rule_spec):
-        """This is based on the original
+        """Stringifies rules based on permutations of the rule_spec inputs.
+
+       "This is based on the original
         exp_domain.RuleSpec.stringify_classified_rule, however it returns a list
         of possible matches by permuting the rule_spec inputs, since the order
         of a Python dict is implementation-dependent. Our stringified string may
@@ -2074,6 +2599,25 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+        Performs various validation checks on items in preparation of
+        migration.
+
+        Args:
+            item: StateRuleAnswerLogModel or
+            LargeAnswerBucketModel
+
+        Yields:
+            tuple. 2-tuple in the form: ('key', 'value')
+              key: either one of the following:
+                  'Answer Migration ERROR'
+                  'Answer ALREADY MIGRATED'
+                  'Answer SKIPPED'
+
+                  or an identifier string in the form:
+                      <exp_id>.<max_version>.<state_name>
+        })
+        """
         # If this answer bucket has already been migrated, skip it.
         if isinstance(item, stats_models.StateRuleAnswerLogModel):
             item_id = item.id
@@ -2149,6 +2693,35 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Attempts to retrieve all explorations versions for a given id.
+        If successful, attempts to perform migration to the new model.
+
+        Args:
+            key: either one of the following:
+                'Answer Migration ERROR'
+                'Answer ALREADY MIGRATED'
+                'Answer SKIPPED'
+
+                or an identifier string in the form:
+                    <exp_id>.<max_version>.<state_name>
+            stringified_values: list(str). A list of stringified values
+                associated with the given key. Each value represents a
+                dict of the form:
+                    'item_id': the item id
+                    'exploration_id': the exploration id
+                    'exploration_max_version': the max version found for
+                    the exploration
+                    'state_name': the state name
+                    'rule_str': the rule string
+                    'last_updated': timestamp of most recent update
+                    'large_answer_bucket_id': large answer bucket id,
+                    if applicable
+                    'large_answer_bucket_count': large answer
+                    bucket count, if applicable
+
+        Yields:
+            Any error strings if an error is encountered.
+        """
         # Output any errors or notices encountered during the map step.
         if (key == AnswerMigrationJob._ERROR_KEY
                 or key == AnswerMigrationJob._ALREADY_MIGRATED_KEY
