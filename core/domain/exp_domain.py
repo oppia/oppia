@@ -1173,12 +1173,11 @@ class State(object):
         labels_count = 0
         training_examples_count += len(
             self.interaction.confirmed_unclassified_answers)
-        for answer_group in enumerate(
-                self.interaction.answer_groups):
+        for answer_group in self.interaction.answer_groups:
             classifier_rule_spec_index = (
-                answer_group[1].get_classifier_rule_index())
+                answer_group.get_classifier_rule_index())
             if classifier_rule_spec_index is not None:
-                classifier_rule_spec = answer_group[1].rule_specs[
+                classifier_rule_spec = answer_group.rule_specs[
                     classifier_rule_spec_index]
                 training_examples_count += len(
                     classifier_rule_spec.inputs['training_data'])
