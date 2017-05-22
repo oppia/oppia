@@ -399,7 +399,7 @@ class ClassifyHandler(base.BaseHandler):
                     which rule spec was matched. This is equal to 0 if the
                     default outcome is selected.
         """
-        # FIXME: Document 'outcome' dict keys above.
+        # FIXME: Document 'outcome' dict keys.
         # A domain object representing the old state.
         old_state = exp_domain.State.from_dict(self.payload.get('old_state'))
         # The learner's raw answer.
