@@ -540,7 +540,6 @@ class CsrfTokenManager(object):
 
     @classmethod
     def _create_token(cls, user_id, issued_on):
-
         """Creates a new CSRF token.
         Args:
           user_id: str.The user_id for whom to create the token.
