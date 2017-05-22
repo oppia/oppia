@@ -297,7 +297,7 @@ class BaseHandler(webapp2.RequestHandler):
         """Prepare JSON response to sent to the client
 
         Args:
-          values: dict.The key-value pairs to encode in the JSON response.
+            values: dict.The key-value pairs to encode in the JSON response.
         """
         self.response.content_type = 'application/javascript; charset=utf-8'
         self.response.headers['Content-Disposition'] = (
@@ -547,11 +547,11 @@ class CsrfTokenManager(object):
         """Creates a new CSRF token.
 
         Args:
-          user_id: str.The user_id for whom to create the token.
-          issued_on: Round time to seconds.
+            user_id: str.The user_id for whom to create the token.
+            issued_on: Round time to seconds.
 
         Returns:
-          str: The generated CSRF token.
+            str: The generated CSRF token.
         """
         cls.init_csrf_secret()
 
@@ -587,8 +587,8 @@ class CsrfTokenManager(object):
         """Validates a given CSRF token with the CSRF secret in memcache.
 
         Args:
-          user_id: str. The user_id to validate CSRF token.
-          token: str. Newly Generated CSRF token.
+            user_id: str. The user_id to validate CSRF token.
+            token: str. Newly Generated CSRF token.
         """
         try:
             parts = token.split('/')
