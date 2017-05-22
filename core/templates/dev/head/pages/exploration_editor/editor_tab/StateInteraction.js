@@ -50,12 +50,12 @@ oppia.controller('StateInteraction', [
   'stateCustomizationArgsService', 'editabilityService',
   'explorationStatesService', 'graphDataService', 'interactionDetailsCache',
   'oppiaExplorationHtmlFormatterService', 'UrlInterpolationService',
-  function($scope, $http, $rootScope, $modal, $injector, $filter, alertsService,
-      editorContextService, oppiaHtmlEscaper, INTERACTION_SPECS,
-      stateInteractionIdService, stateCustomizationArgsService,
-      editabilityService, explorationStatesService, graphDataService,
-      interactionDetailsCache, oppiaExplorationHtmlFormatterService,
-      UrlInterpolationService) {
+  function($scope, $http, $rootScope, $modal, $injector, $filter,
+      alertsService, editorContextService, oppiaHtmlEscaper,
+      INTERACTION_SPECS, stateInteractionIdService,
+      stateCustomizationArgsService, editabilityService,
+      explorationStatesService, graphDataService, interactionDetailsCache,
+      oppiaExplorationHtmlFormatterService, UrlInterpolationService) {
     var DEFAULT_TERMINAL_STATE_CONTENT = 'Congratulations, you have finished!';
 
     // Declare dummy submitAnswer() and adjustPageHeight() methods for the
@@ -191,10 +191,10 @@ oppia.controller('StateInteraction', [
             'interactionDetailsCache', 'INTERACTION_SPECS',
             'UrlInterpolationService', 'editorFirstTimeEventsService',
             function(
-                $scope, $modalInstance, $injector, stateInteractionIdService,
-                stateCustomizationArgsService, interactionDetailsCache,
-                INTERACTION_SPECS, UrlInterpolationService,
-                editorFirstTimeEventsService) {
+                $scope, $modalInstance, $injector,
+                stateInteractionIdService, stateCustomizationArgsService,
+                interactionDetailsCache, INTERACTION_SPECS,
+                UrlInterpolationService, editorFirstTimeEventsService) {
               editorFirstTimeEventsService
                 .registerFirstClickAddInteractionEvent();
 
@@ -244,19 +244,25 @@ oppia.controller('StateInteraction', [
                   stateCustomizationArgsService.displayed).length > 0);
               }
 
-              $scope.areCustomizationArgsValid = function() {
-                if (!stateCustomizationArgsService.displayed) {
-                  return false;
-                }
-                var validationService =
-                  $injector.get(
-                    INTERACTION_SPECS[
-                      $scope.stateInteractionIdService.displayed].id +
-                    'ValidationService');
+              $scope.getCustomizationArgsWarningsList = function() {
+                var validationServiceName =
+                  INTERACTION_SPECS[
+                    $scope.stateInteractionIdService.displayed].id +
+                  'ValidationService';
+                var validationService = $injector.get(validationServiceName);
                 var warningsList =
                   validationService.getCustomizationArgsWarnings(
                     stateCustomizationArgsService.displayed);
-                return warningsList.length == 0;
+                return warningsList;
+              }
+
+              $scope.areCustomizationArgsValid = function() {
+                if ($scope.hasCustomizationArgs &&
+                    stateCustomizationArgsService.displayed) {
+                  return $scope.getCustomizationArgsWarningsList().length === 0;
+                } else {
+                  return false;
+                }
               };
 
               $scope.onChangeInteractionId = function(newInteractionId) {
@@ -301,6 +307,48 @@ oppia.controller('StateInteraction', [
                 stateInteractionIdService.displayed = null;
                 stateCustomizationArgsService.displayed = {};
               };
+
+              $scope.getSaveInteractionButtonStyleTooltip = function() {
+                if (!$scope.hasCustomizationArgs) {
+                  return 'No customization arguments';
+                }
+                if (!$scope.stateInteractionIdService.displayed) {
+                  return 'No interaction being displayed';
+                }
+
+                var warningsList = $scope.getCustomizationArgsWarningsList();
+                var warningMessages = warningsList.map(function(warning) {
+                  return warning.message;
+                });
+
+                if (warningMessages.length === 0) {
+                  if ($scope.form.schemaForm.$invalid) {
+                    return 'Some of the form controls failed validation';
+                  } else {
+                    return '';
+                  }
+                } else if (warningMessages.length === 1) {
+                  return warningMessages[0];
+                } else {
+                  return '• ' + warningMessages.join('\n• ');
+                }
+              }
+
+              $scope.getSaveInteractionButtonStyle = function() {
+                if ($scope.hasCustomizationArgs &&
+                    $scope.stateInteractionIdService.displayed &&
+                    $scope.form.schemaForm.$valid &&
+                    $scope.areCustomizationArgsValid()) {
+                  return '';
+                } else {
+                  return 'background-size: 20px 20px; ' +
+                    'background-position: 6px; ' +
+                    'padding-left: 32px; ' +
+                    'background-repeat: no-repeat; ' +
+                    'background-image: ' +
+                    'url("../assets/common/images/general/warning.png")';
+                }
+              }
 
               $scope.save = function() {
                 editorFirstTimeEventsService

@@ -57,7 +57,7 @@
   </svg>
 
   <input type="text" ng-if="selectedRegion !== null"
-    class="region-label-editor"
+    class="oppia-image-with-regions-region-label-editor"
     ng-attr-style="<[getRegionLabelEditorStyle()]>"
     ng-mouseup="regionLabelEditorMouseUp()"
     ng-model="regionLabelGetterSetter(selectedRegion)"
@@ -68,7 +68,7 @@
 </div>
 <script type="text/ng-template" id="modals/imageRegionsResetConfirmation">    
   <div class="modal-header">
-    <h4 class="modal-title"><span>Clear Image and Regions</span></h4>
+    <h4 class="modal-title">Clear Image and Regions</h4>
   </div>
   <div class="modal-body">
     <span>This will remove the image and all regions. Are you sure?</span>
@@ -78,8 +78,8 @@
     <button type="button" ng-click="confirmClear()" class="btn btn-danger">Clear Image and Regions</button>
   </div>
 </script>
-<style type='text/css'>
-  input.region-label-editor {
+<style>
+  input.oppia-image-with-regions-region-label-editor {
     position: absolute;
     display: block;
     margin: 0px;

@@ -58,9 +58,9 @@ oppia.directive('imageWithRegionsEditor', [
           $scope.getRegionLabelStyle = function(index) {
             var commonStyles = 'font-size: 14px; pointer-events: none;';
             if (index === $scope.selectedRegion) {
-              return commonStyles + 'fill: #eee; visibility: hidden;';
+              return commonStyles + ' fill: #eee; visibility: hidden;';
             } else {
-              return commonStyles + 'fill: #333; visibility: visible;';
+              return commonStyles + ' fill: #333; visibility: visible;';
             }
           };
 
@@ -77,7 +77,7 @@ oppia.directive('imageWithRegionsEditor', [
               'width: ' + (area.width - 12) + 'px;';
           };
 
-          $scope.setInitialState = function() {
+          $scope.initializeEditor = function() {
             // All coordinates have origin at top-left,
             // increasing in x to the right and increasing in y down
             // Current mouse position in SVG coordinates
@@ -129,7 +129,7 @@ oppia.directive('imageWithRegionsEditor', [
             $scope.errorText = '';
           };
 
-          $scope.setInitialState();
+          $scope.initializeEditor();
 
           // Calculates the dimensions of the image, assuming that the width
           // of the image is scaled down to fit the svg element if necessary.
@@ -509,7 +509,7 @@ oppia.directive('imageWithRegionsEditor', [
             }).result.then(function() {
               $scope.$parent.value.imagePath = '';
               $scope.$parent.value.labeledRegions = [];
-              $scope.setInitialState();
+              $scope.initializeEditor();
             });
           };
           $scope.deleteRegion = function(index) {
