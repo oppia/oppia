@@ -84,7 +84,7 @@ def classify_string_classifier_rule(state, normalized_answer):
     best_matched_rule_spec_index = None
 
     sc = classifier_registry.Registry.get_classifier_by_algorithm_id(
-        feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'])
+        feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['classifier_id'])
 
     training_examples = [
         [doc, []] for doc in state.interaction.confirmed_unclassified_answers]
@@ -134,7 +134,8 @@ def train(exploration):
     Returns:
         exploration: Domain object for an exploration.
     """
-    algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']
+    algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
+        'classifier_id']
     states = exploration.states
     for state_name in states:
         state = states[state_name]
@@ -164,7 +165,8 @@ def train(exploration):
 
                 sc.train(training_examples)
                 cached_classifier_data = sc.to_dict()
-                algorithm_version = 1
+                algorithm_version = feconf.INTERACTION_CLASSIFIER_MAPPING[
+                    'TextInput']['current_data_schema_version']
                 classifier = classifier_domain.Classifier(
                     '0', exploration.id, exploration.version, state_name,
                     algorithm_id, cached_classifier_data, algorithm_version)
