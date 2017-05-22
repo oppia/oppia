@@ -23,6 +23,7 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import learner_progress_services
 from core.domain import subscription_services
 from core.domain import summary_services
 from core.domain import user_jobs_continuous
@@ -253,6 +254,145 @@ class DashboardHandler(base.BaseHandler):
             'dashboard_stats': dashboard_stats,
             'last_week_stats': last_week_stats,
             'subscribers_list': subscribers_list
+        })
+        self.render_json(self.values)
+
+
+class LearnerDashboardPage(base.BaseHandler):
+    """Page showing the user's learner dashboard."""
+
+    @base.require_user
+    def get(self):
+        if self.username in config_domain.BANNED_USERNAMES.value:
+            raise self.UnauthorizedUserException(
+                'You do not have the credentials to access this page.')
+        elif user_services.has_fully_registered(self.user_id):
+            self.values.update({
+                'nav_mode': feconf.NAV_MODE_LEARNER_DASHBOARD
+            })
+            self.render_template(
+                'pages/learner_dashboard/learner_dashboard.html',
+                redirect_url_on_logout='/')
+        else:
+            self.redirect(utils.set_url_query_parameter(
+                feconf.SIGNUP_URL, 'return_url', feconf.LEARNER_DASHBOARD_URL))
+
+
+class LearnerDashboardHandler(base.BaseHandler):
+    """Provides data for the user's learner dashboard page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    def get(self):
+        """Handles GET requests."""
+        if self.user_id is None:
+            raise self.PageNotFoundException
+
+        completed_exploration_summaries = [
+            summary for summary in
+            exp_services.get_exploration_summaries_matching_ids(
+                learner_progress_services.get_all_completed_exp_ids(
+                    self.user_id))
+            if summary is not None]
+
+        completed_collection_summaries = [
+            summary for summary in
+            collection_services.get_collection_summaries_matching_ids(
+                learner_progress_services.get_all_completed_collection_ids(
+                    self.user_id))
+            if summary is not None]
+
+        incomplete_exploration_summaries = [
+            summary for summary in
+            exp_services.get_exploration_summaries_matching_ids(
+                learner_progress_services.get_all_incomplete_exp_ids(
+                    self.user_id))
+            if summary is not None]
+
+        incomplete_collection_summaries = [
+            summary for summary in
+            collection_services.get_collection_summaries_matching_ids(
+                learner_progress_services.get_all_incomplete_collection_ids(
+                    self.user_id))
+            if summary is not None]
+
+        completed_exp_summary_dicts = (
+            summary_services.get_displayable_exp_summary_dicts(
+                completed_exploration_summaries))
+
+        incomplete_exp_summary_dicts = (
+            summary_services.get_displayable_exp_summary_dicts(
+                incomplete_exploration_summaries))
+
+        completed_collection_summary_dicts = []
+        incomplete_collection_summary_dicts = []
+
+        for collection_summary in completed_collection_summaries:
+            completed_collection_summary_dicts.append({
+                'id': collection_summary.id,
+                'title': collection_summary.title,
+                'category': collection_summary.category,
+                'objective': collection_summary.objective,
+                'language_code': collection_summary.language_code,
+                'last_updated': utils.get_time_in_millisecs(
+                    collection_summary.collection_model_last_updated),
+                'created_on': utils.get_time_in_millisecs(
+                    collection_summary.collection_model_created_on),
+                'status': collection_summary.status,
+                'node_count': collection_summary.node_count,
+                'community_owned': collection_summary.community_owned,
+                'thumbnail_icon_url': (
+                    utils.get_thumbnail_icon_url_for_category(
+                        collection_summary.category)),
+                'thumbnail_bg_color': utils.get_hex_color_for_category(
+                    collection_summary.category),
+            })
+
+        for collection_summary in incomplete_collection_summaries:
+            incomplete_collection_summary_dicts.append({
+                'id': collection_summary.id,
+                'title': collection_summary.title,
+                'category': collection_summary.category,
+                'objective': collection_summary.objective,
+                'language_code': collection_summary.language_code,
+                'last_updated': utils.get_time_in_millisecs(
+                    collection_summary.collection_model_last_updated),
+                'created_on': utils.get_time_in_millisecs(
+                    collection_summary.collection_model_created_on),
+                'status': collection_summary.status,
+                'node_count': collection_summary.node_count,
+                'community_owned': collection_summary.community_owned,
+                'thumbnail_icon_url': (
+                    utils.get_thumbnail_icon_url_for_category(
+                        collection_summary.category)),
+                'thumbnail_bg_color': utils.get_hex_color_for_category(
+                    collection_summary.category),
+            })
+
+        creators_subscribed_to = (
+            subscription_services.get_all_creators_subscribed_to(self.user_id))
+        creators_settings = user_services.get_users_settings(
+            creators_subscribed_to)
+        subscription_list = []
+
+        for index, creator_settings in enumerate(creators_settings):
+            subscription_summary = {
+                'creator_picture_data_url': (
+                    creator_settings.profile_picture_data_url),
+                'creator_username': creator_settings.username,
+                'creator_impact': (
+                    user_services.get_user_impact_score(
+                        creators_subscribed_to[index]))
+            }
+
+            subscription_list.append(subscription_summary)
+
+        self.values.update({
+            'completed_explorations_list': completed_exp_summary_dicts,
+            'completed_collections_list': completed_collection_summary_dicts,
+            'incomplete_explorations_list': incomplete_exp_summary_dicts,
+            'incomplete_collections_list': incomplete_collection_summary_dicts,
+            'subscription_list': subscription_list
         })
         self.render_json(self.values)
 

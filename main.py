@@ -201,7 +201,11 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.UPLOAD_EXPLORATION_URL, dashboard.UploadExploration),
     get_redirect_route(
         r'/my_explorations', dashboard.DashboardRedirectPage),
-
+    get_redirect_route(
+        r'%s' % feconf.LEARNER_DASHBOARD_URL, dashboard.LearnerDashboardPage),
+    get_redirect_route(
+        r'%s' % feconf.LEARNER_DASHBOARD_DATA_URL,
+        dashboard.LearnerDashboardHandler),
     get_redirect_route(
         r'%s/remove_in_progress_exploration' % feconf.LEARNER_DASHBOARD_URL,
         reader.RemoveExpFromIncompleteListHandler),
