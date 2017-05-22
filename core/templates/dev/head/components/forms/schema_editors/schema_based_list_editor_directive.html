@@ -20,7 +20,6 @@
   <tr ng-repeat="item in localValue track by $index">
     <td>
       <schema-based-editor schema="itemSchema()" is-disabled="isDisabled()" local-value="localValue[$index]"
-                           allow-expressions="allowExpressions()"
                            label-for-focus-target="getFocusLabel($index)"
                            on-input-blur="($last ? lastElementOnBlur : showAddItemButton)"
                            on-input-focus="($last ? hideAddItemButton : showAddItemButton)">

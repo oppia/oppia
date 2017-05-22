@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the rule object factory.
+ * @fileoverview Unit tests for the Rule object factory.
  */
 
 describe('Rule object factory', function() {

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-describe('oppiaInteractiveCodeReplValidator', function() {
-  var WARNING_TYPES, validator;
+describe('CodeReplValidationService', function() {
+  var WARNING_TYPES, validatorService;
   var currentState, goodAnswerGroups, goodDefaultOutcome;
 
   beforeEach(function() {
@@ -21,7 +21,7 @@ describe('oppiaInteractiveCodeReplValidator', function() {
   });
 
   beforeEach(inject(function($rootScope, $controller, $injector) {
-    validator = $injector.get('$filter')('oppiaInteractiveCodeReplValidator');
+    validatorService = $injector.get('CodeReplValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 
     currentState = 'First State';
@@ -37,7 +37,7 @@ describe('oppiaInteractiveCodeReplValidator', function() {
   }));
 
   it('should be able to perform basic validation', function() {
-    var warnings = validator(
+    var warnings = validatorService.getAllWarnings(
       currentState, {}, goodAnswerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });

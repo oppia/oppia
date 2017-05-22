@@ -18,8 +18,11 @@
 
 // Service for handling all interactions with the exploration editor backend.
 oppia.factory('explorationData', [
-  '$http', '$log', 'alertsService', '$q',
-  function($http, $log, alertsService, $q) {
+  '$http', '$log', 'alertsService',
+  'EditableExplorationBackendApiService',
+  'ReadOnlyExplorationBackendApiService','$q',
+  function($http, $log, alertsService, EditableExplorationBackendApiService,
+    ReadOnlyExplorationBackendApiService,$q) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
     var pathnameArray = window.location.pathname.split('/');
@@ -37,7 +40,6 @@ oppia.factory('explorationData', [
       return {};
     }
 
-    var explorationDataUrl = '/createhandler/data/' + explorationId;
     var resolvedAnswersUrlPrefix = (
       '/createhandler/resolved_answers/' + explorationId);
     var explorationDraftAutosaveUrl = (
@@ -85,29 +87,29 @@ oppia.factory('explorationData', [
           // changes applied. This makes a force-refresh necessary when changes
           // are discarded, otherwise the exploration-with-draft-changes
           // (which is cached here) will be reused.
-          return $http.get(explorationDataUrl, {
-            params: {
-              apply_draft: true
-            }
-          }).then(function(response) {
-            $log.info('Retrieved exploration data.');
-            $log.info(response.data);
+          return (
+            EditableExplorationBackendApiService.fetchApplyDraftExploration(
+            explorationId).then(function(response) {
+              $log.info('Retrieved exploration data.');
+              $log.info(response);
 
-            explorationData.data = response.data;
+              explorationData.data = response;
 
-            return response.data;
-          });
+              return response;
+            })
+          );
         }
       },
       // Returns a promise supplying the last saved version for the current
       // exploration.
       getLastSavedData: function() {
-        return $http.get(explorationDataUrl).then(function(response) {
-          $log.info('Retrieved saved exploration data.');
-          $log.info(response.data);
+        return ReadOnlyExplorationBackendApiService.loadLatestExploration(
+          explorationId).then(function(response) {
+            $log.info('Retrieved saved exploration data.');
+            $log.info(response);
 
-          return response.data;
-        });
+            return response.exploration;
+          });
       },
       resolveAnswers: function(stateName, resolvedAnswersList) {
         alertsService.clearWarnings();
@@ -129,23 +131,22 @@ oppia.factory('explorationData', [
        */
       save: function(
           changeList, commitMessage, successCallback, errorCallback) {
-        $http.put(explorationDataUrl, {
-          change_list: changeList,
-          commit_message: commitMessage,
-          version: explorationData.data.version
-        }).then(function(response) {
-          alertsService.clearWarnings();
-          explorationData.data = response.data;
-          if (successCallback) {
-            successCallback(
-              response.data.is_version_of_draft_valid,
-              response.data.draft_changes);
-          }
-        }, function() {
-          if (errorCallback) {
-            errorCallback();
-          }
-        });
+        EditableExplorationBackendApiService.updateExploration(explorationId,
+          explorationData.data.version, commitMessage, changeList).then(
+            function(response) {
+              alertsService.clearWarnings();
+              explorationData.data = response;
+              if (successCallback) {
+                successCallback(
+                  response.is_version_of_draft_valid,
+                  response.draft_changes);
+              }
+            }, function() {
+              if (errorCallback) {
+                errorCallback();
+              }
+            }
+          );
       }
     };
 
@@ -179,7 +180,7 @@ oppia.factory('angularNameService', [function() {
 
   return {
     getNameOfInteractionRulesService: function(interactionId) {
-      angularName = interactionId.charAt(0).toLowerCase() + 
+      angularName = interactionId.charAt(0).toLowerCase() +
         interactionId.slice(1) + 'RulesService';
       return angularName
     }
@@ -820,13 +821,13 @@ oppia.factory('explorationParamChangesService', [
 oppia.factory('explorationStatesService', [
   '$log', '$modal', '$filter', '$location', '$rootScope',
   'explorationInitStateNameService', 'alertsService', 'changeListService',
-  'editorContextService', 'validatorsService', 'newStateTemplateService',
-  'explorationGadgetsService', 'StateObjectFactory',
+  'editorContextService', 'validatorsService', 'explorationGadgetsService',
+  'StatesObjectFactory',
   function(
       $log, $modal, $filter, $location, $rootScope,
       explorationInitStateNameService, alertsService, changeListService,
-      editorContextService, validatorsService, newStateTemplateService,
-      explorationGadgetsService, StateObjectFactory) {
+      editorContextService, validatorsService, explorationGadgetsService,
+      StatesObjectFactory) {
     var _states = null;
     // Properties that have a different backend representation from the
     // frontend and must be converted.
@@ -870,7 +871,7 @@ oppia.factory('explorationStatesService', [
     };
 
     var _setState = function(stateName, stateData, refreshGraph) {
-      _states[stateName] = angular.copy(stateData);
+      _states.setState(stateName, angular.copy(stateData));
       if (refreshGraph) {
         $rootScope.$broadcast('refreshGraph');
       }
@@ -879,7 +880,7 @@ oppia.factory('explorationStatesService', [
     var getStatePropertyMemento = function(stateName, backendName) {
       var accessorList = PROPERTY_REF_DATA[backendName];
 
-      var propertyRef = _states[stateName];
+      var propertyRef = _states.getState(stateName);
       accessorList.forEach(function(key) {
         propertyRef = propertyRef[key];
       });
@@ -901,7 +902,7 @@ oppia.factory('explorationStatesService', [
         changeListService.editStateProperty(
           stateName, backendName, newBackendValue, oldBackendValue);
 
-        var newStateData = angular.copy(_states[stateName]);
+        var newStateData = _states.getState(stateName);
         var accessorList = PROPERTY_REF_DATA[backendName];
 
         var propertyRef = newStateData;
@@ -929,28 +930,26 @@ oppia.factory('explorationStatesService', [
 
     // TODO(sll): Add unit tests for all get/save methods.
     return {
-      init: function(states) {
-        _states = {};
-        for (var stateName in states) {
-          var stateData = angular.copy(states[stateName]);
-          _states[stateName] = StateObjectFactory.createFromBackendDict(
-            stateName, stateData);
-        }
+      init: function(statesBackendDict) {
+        _states = StatesObjectFactory.createFromBackendDict(statesBackendDict);
       },
       getStates: function() {
         return angular.copy(_states);
       },
+      getStateNames: function() {
+        return _states.getStateNames();
+      },
       hasState: function(stateName) {
-        return _states.hasOwnProperty(stateName);
+        return _states.hasState(stateName);
       },
       getState: function(stateName) {
-        return angular.copy(_states[stateName]);
+        return angular.copy(_states.getState(stateName));
       },
       setState: function(stateName, stateData) {
         _setState(stateName, stateData, true);
       },
       isNewStateNameValid: function(newStateName, showWarnings) {
-        if (_states.hasOwnProperty(newStateName)) {
+        if (_states.hasState(newStateName)) {
           if (showWarnings) {
             alertsService.addWarning('A state with this name already exists.');
           }
@@ -1011,19 +1010,22 @@ oppia.factory('explorationStatesService', [
       saveFallbacks: function(stateName, newFallbacks) {
         saveStateProperty(stateName, 'fallbacks', newFallbacks);
       },
+      isInitialized: function() {
+        return _states != null;
+      },
       addState: function(newStateName, successCallback) {
         newStateName = $filter('normalizeWhitespace')(newStateName);
         if (!validatorsService.isValidStateName(newStateName, true)) {
           return;
         }
-        if (_states.hasOwnProperty(newStateName)) {
+        if (_states.hasState(newStateName)) {
           alertsService.addWarning('A state with this name already exists.');
           return;
         }
         alertsService.clearWarnings();
 
-        _states[newStateName] = newStateTemplateService.getNewStateTemplate(
-          newStateName);
+        _states.addState(newStateName);
+
         changeListService.addState(newStateName);
         $rootScope.$broadcast('refreshGraph');
         if (successCallback) {
@@ -1037,7 +1039,7 @@ oppia.factory('explorationStatesService', [
         if (deleteStateName === initStateName) {
           return;
         }
-        if (!_states[deleteStateName]) {
+        if (!_states.hasState(deleteStateName)) {
           alertsService.addWarning(
             'No state with name ' + deleteStateName + ' exists.');
           return;
@@ -1093,28 +1095,8 @@ oppia.factory('explorationStatesService', [
             }
           ]
         }).result.then(function(deleteStateName) {
-          delete _states[deleteStateName];
-          for (var otherStateName in _states) {
-            var interaction = _states[otherStateName].interaction;
-            var groups = interaction.answerGroups;
-            for (var i = 0; i < groups.length; i++) {
-              if (groups[i].outcome.dest === deleteStateName) {
-                groups[i].outcome.dest = otherStateName;
-              }
-            }
-            if (interaction.defaultOutcome) {
-              if (interaction.defaultOutcome.dest === deleteStateName) {
-                interaction.defaultOutcome.dest = otherStateName;
-              }
-            }
+          _states.deleteState(deleteStateName);
 
-            var fallbacks = interaction.fallbacks;
-            for (var i = 0; i < fallbacks.length; i++) {
-              if (fallbacks[i].outcome.dest === deleteStateName) {
-                fallbacks[i].outcome.dest = otherStateName;
-              }
-            }
-          }
           changeListService.deleteState(deleteStateName);
 
           if (editorContextService.getActiveStateName() === deleteStateName) {
@@ -1136,36 +1118,13 @@ oppia.factory('explorationStatesService', [
         if (!validatorsService.isValidStateName(newStateName, true)) {
           return;
         }
-        if (_states[newStateName]) {
+        if (_states.hasState(newStateName)) {
           alertsService.addWarning('A state with this name already exists.');
           return;
         }
         alertsService.clearWarnings();
 
-        _states[newStateName] = angular.copy(_states[oldStateName]);
-        delete _states[oldStateName];
-
-        for (var otherStateName in _states) {
-          var interaction = _states[otherStateName].interaction;
-          var groups = interaction.answerGroups;
-          for (var i = 0; i < groups.length; i++) {
-            if (groups[i].outcome.dest === oldStateName) {
-              groups[i].outcome.dest = newStateName;
-            }
-          }
-          if (interaction.defaultOutcome) {
-            if (interaction.defaultOutcome.dest === oldStateName) {
-              interaction.defaultOutcome.dest = newStateName;
-            }
-          }
-
-          var fallbacks = interaction.fallbacks;
-          for (var i = 0; i < fallbacks.length; i++) {
-            if (fallbacks[i].outcome.dest === oldStateName) {
-              fallbacks[i].outcome.dest = newStateName;
-            }
-          }
-        }
+        _states.renameState(oldStateName, newStateName);
 
         editorContextService.setActiveStateName(newStateName);
         // The 'rename state' command must come before the 'change
@@ -1698,43 +1657,16 @@ oppia.factory('explorationGadgetsService', [
   }
 ]);
 
-// A service that returns the frontend representation of a newly-added state.
-oppia.factory('newStateTemplateService', [
-  'StateObjectFactory', function(StateObjectFactory) {
-    return {
-      // Returns a template for the new state with the given state name,
-      // changing the default rule destination to the new state name in
-      // the process.
-      // NB: clients should ensure that the desired state name is valid.
-      getNewStateTemplate: function(newStateName) {
-        var newStateTemplate = angular.copy(GLOBALS.NEW_STATE_TEMPLATE);
-        var newState = StateObjectFactory.createFromBackendDict(newStateName, {
-          classifier_model_id: newStateTemplate.classifier_model_id,
-          content: newStateTemplate.content,
-          interaction: newStateTemplate.interaction,
-          param_changes: newStateTemplate.param_changes
-        });
-        newState.interaction.defaultOutcome.dest = newStateName;
-        return newState;
-      }
-    };
-  }
-]);
-
 oppia.factory('computeGraphService', [
   'INTERACTION_SPECS', function(INTERACTION_SPECS) {
     var _computeGraphData = function(initStateId, states) {
       var nodes = {};
       var links = [];
-      var finalStateIds = [];
-      for (var stateName in states) {
-        var interaction = states[stateName].interaction;
-        if (interaction.id && INTERACTION_SPECS[interaction.id].is_terminal) {
-          finalStateIds.push(stateName);
-        }
+      var finalStateIds = states.getFinalStateNames();
 
+      states.getStateNames().forEach(function(stateName) {
+        var interaction = states.getState(stateName).interaction;
         nodes[stateName] = stateName;
-
         if (interaction.id) {
           var groups = interaction.answerGroups;
           for (var h = 0; h < groups.length; h++) {
@@ -1762,7 +1694,7 @@ oppia.factory('computeGraphService', [
             });
           }
         }
-      }
+      });
 
       return {
         finalStateIds: finalStateIds,
@@ -1872,12 +1804,12 @@ oppia.constant('STATE_ERROR_MESSAGES', {
 
 // Service for the list of exploration warnings.
 oppia.factory('explorationWarningsService', [
-  '$filter', 'graphDataService', 'explorationStatesService',
+  '$injector', 'graphDataService', 'explorationStatesService',
   'expressionInterpolationService', 'explorationParamChangesService',
   'parameterMetadataService', 'INTERACTION_SPECS', 'WARNING_TYPES',
   'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
   function(
-      $filter, graphDataService, explorationStatesService,
+      $injector, graphDataService, explorationStatesService,
       expressionInterpolationService, explorationParamChangesService,
       parameterMetadataService, INTERACTION_SPECS, WARNING_TYPES,
       STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
@@ -1889,11 +1821,12 @@ oppia.factory('explorationWarningsService', [
       var statesWithoutInteractionIds = [];
 
       var states = explorationStatesService.getStates();
-      for (var stateName in states) {
-        if (!states[stateName].interaction.id) {
+
+      states.getStateNames().forEach(function(stateName) {
+        if (!states.getState(stateName).interaction.id) {
           statesWithoutInteractionIds.push(stateName);
         }
-      }
+      });
 
       return statesWithoutInteractionIds;
     };
@@ -2004,16 +1937,17 @@ oppia.factory('explorationWarningsService', [
       var results = [];
 
       var states = explorationStatesService.getStates();
-      for (var stateName in states) {
+
+      states.getStateNames().forEach(function(stateName) {
         var groupIndexes = _getAnswerGroupIndexesWithEmptyClassifiers(
-          states[stateName]);
+          states.getState(stateName));
         if (groupIndexes.length > 0) {
           results.push({
             groupIndexes: groupIndexes,
             stateName: stateName
           });
         }
-      }
+      });
 
       return results;
     };
@@ -2027,13 +1961,13 @@ oppia.factory('explorationWarningsService', [
       var _graphData = graphDataService.getGraphData();
 
       var _states = explorationStatesService.getStates();
-      for (var stateName in _states) {
-        var interaction = _states[stateName].interaction;
+      _states.getStateNames().forEach(function(stateName) {
+        var interaction = _states.getState(stateName).interaction;
         if (interaction.id) {
-          var validatorName = (
-            'oppiaInteractive' + _states[stateName].interaction.id +
-            'Validator');
-          var interactionWarnings = $filter(validatorName)(
+          var validatorServiceName =
+            _states.getState(stateName).interaction.id + 'ValidationService';
+          var validatorService = $injector.get(validatorServiceName);
+          var interactionWarnings = validatorService.getAllWarnings(
             stateName, interaction.customizationArgs,
             interaction.answerGroups, interaction.defaultOutcome);
 
@@ -2049,7 +1983,7 @@ oppia.factory('explorationWarningsService', [
             }
           }
         }
-      }
+      });
 
       var statesWithoutInteractionIds = _getStatesWithoutInteractionIds();
       angular.forEach(statesWithoutInteractionIds, function(
@@ -2419,10 +2353,10 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
 // response received as a result of the autosaving request.
 oppia.factory('autosaveInfoModalsService', [
   '$log', '$modal', '$timeout', '$window', 'lostChangesService',
-  'explorationData',
+  'explorationData', 'UrlInterpolationService',
   function(
       $log, $modal, $timeout, $window, lostChangesService,
-      explorationData) {
+      explorationData, UrlInterpolationService) {
     var _isModalOpen = false;
     var _refreshPage = function(delay) {
       $timeout(function() {
@@ -2433,7 +2367,9 @@ oppia.factory('autosaveInfoModalsService', [
     return {
       showNonStrictValidationFailModal: function() {
         $modal.open({
-          templateUrl: 'modals/saveValidationFail',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_editor/' +
+            'save_validation_fail_modal.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
           controller: [
@@ -2457,7 +2393,9 @@ oppia.factory('autosaveInfoModalsService', [
       },
       showVersionMismatchModal: function(lostChanges) {
         $modal.open({
-          templateUrl: 'modals/saveVersionMismatch',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_editor/' +
+            'save_version_mismatch_modal.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
           controller: ['$scope', function($scope) {

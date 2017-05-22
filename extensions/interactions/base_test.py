@@ -305,7 +305,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self.assertNotIn('<script>', js_file_content)
             self.assertNotIn('</script>', js_file_content)
             self.assertIn(
-                'oppiaInteractive%sValidator' % interaction_id,
+                '%sValidationService' % interaction_id,
                 validator_js_file_content)
             self.assertNotIn('<script>', validator_js_file_content)
             self.assertNotIn('</script>', validator_js_file_content)

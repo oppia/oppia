@@ -23,6 +23,18 @@ oppia.constant('PANEL_SPECS', GLOBALS.PANEL_SPECS);
 oppia.constant(
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
   'explorationTitleInputFocusLabel');
+oppia.constant(
+  'EXPLORATION_DATA_URL_TEMPLATE',
+  '/explorehandler/init/<exploration_id>');
+oppia.constant(
+  'EXPLORATION_VERSION_DATA_URL_TEMPLATE',
+  '/explorehandler/init/<exploration_id>?v=<version>');
+oppia.constant(
+  'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
+  '/createhandler/data/<exploration_id>');
+oppia.constant(
+  'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
+  '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
 
 oppia.controller('ExplorationEditor', [
   '$scope', '$http', '$window', '$rootScope', '$log', '$timeout',
@@ -37,6 +49,7 @@ oppia.controller('ExplorationEditor', [
   'explorationAdvancedFeaturesService', '$modal', 'changeListService',
   'autosaveInfoModalsService', 'siteAnalyticsService',
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
+  'UrlInterpolationService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       explorationData, editorContextService, explorationTitleService,
@@ -49,7 +62,8 @@ oppia.controller('ExplorationEditor', [
       explorationWarningsService, $templateCache, explorationContextService,
       explorationAdvancedFeaturesService, $modal, changeListService,
       autosaveInfoModalsService, siteAnalyticsService,
-      UserEmailPreferencesService, ParamChangesObjectFactory) {
+      UserEmailPreferencesService, ParamChangesObjectFactory,
+      UrlInterpolationService) {
     $scope.editabilityService = editabilityService;
     $scope.editorContextService = editorContextService;
 
@@ -63,7 +77,6 @@ oppia.controller('ExplorationEditor', [
 
     $scope.explorationId = explorationContextService.getExplorationId();
     $scope.explorationUrl = '/create/' + $scope.explorationId;
-    $scope.explorationDataUrl = '/createhandler/data/' + $scope.explorationId;
     $scope.explorationDownloadUrl = (
       '/createhandler/download/' + $scope.explorationId);
     $scope.revertExplorationUrl = (
@@ -358,13 +371,15 @@ oppia.controller('ExplorationEditor', [
 
     $scope.showWelcomeExplorationModal = function() {
       var modalInstance = $modal.open({
-        templateUrl: 'modals/welcomeExploration',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/' +
+          'welcome_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', 'UrlInterpolationService',
-          'siteAnalyticsService', 'explorationContextService',
-          function($scope, $modalInstance, UrlInterpolationService,
-              siteAnalyticsService, explorationContextService) {
+          '$scope', '$modalInstance', 'siteAnalyticsService',
+          'explorationContextService',
+          function($scope, $modalInstance, siteAnalyticsService,
+          explorationContextService) {
             var explorationId = explorationContextService.getExplorationId();
 
             siteAnalyticsService.registerTutorialModalOpenEvent(explorationId);

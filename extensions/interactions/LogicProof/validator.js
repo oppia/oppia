@@ -13,25 +13,25 @@
 // limitations under the License.
 
 /**
- * @fileoverview Frontend validator for customization args and rules of
- * the interaction.
+ * @fileoverview Validator service for the interaction.
  */
 
-oppia.filter('oppiaInteractiveLogicProofValidator', [
+oppia.factory('LogicProofValidationService', [
   'baseInteractionValidationService',
   function(baseInteractionValidationService) {
-    // Returns a list of warnings.
-    return function(stateName, customizationArgs, answerGroups) {
-      var warningsList = [];
-
-      warningsList = warningsList.concat(
-        baseInteractionValidationService.getAnswerGroupWarnings(
-          answerGroups, stateName));
-
-      // We do not require a default rule for this interaction, since the
-      // feedback is mostly provided from within the interaction itself.
-
-      return warningsList;
+    return {
+      getCustomizationArgsWarnings: function(customizationArgs) {
+        // TODO(juansaba): Implement customization args validations.
+        return [];
+      },
+      getAllWarnings: function(
+          stateName, customizationArgs, answerGroups, defaultOutcome) {
+        // We do not require a default rule for this interaction, since the
+        // feedback is mostly provided from within the interaction itself.
+        return this.getCustomizationArgsWarnings(customizationArgs).concat(
+          baseInteractionValidationService.getAnswerGroupWarnings(
+            answerGroups, stateName));
+      }
     };
   }
 ]);
