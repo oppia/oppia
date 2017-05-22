@@ -312,6 +312,7 @@ class BaseHandler(webapp2.RequestHandler):
             self, filename, iframe_restriction='DENY',
             redirect_url_on_logout=None):
         """Write the various values and renders the template
+
         Args:
             filename: str. Name of the template file
             iframe_restriction: str. Value for iframe restriction.
@@ -433,6 +434,7 @@ class BaseHandler(webapp2.RequestHandler):
 
     def _render_exception(self, error_code, values):
         """Asserts error code and renders exception.
+
          Args:
             error_code: int. Type of the error code (400, 401, 404, 500)
             values: dict. list of values of cookies
@@ -457,6 +459,7 @@ class BaseHandler(webapp2.RequestHandler):
 
     def handle_exception(self, exception, unused_debug_mode):
         """Overwrites the default exception handler
+
         Args:
             exception: int. Raised while assertion of error code
             unused_debug_mode: The uncaught exception
@@ -541,6 +544,7 @@ class CsrfTokenManager(object):
     @classmethod
     def _create_token(cls, user_id, issued_on):
         """Creates a new CSRF token.
+
         Args:
           user_id: str.The user_id for whom to create the token.
           issued_on: Round time to seconds.
@@ -580,6 +584,7 @@ class CsrfTokenManager(object):
     @classmethod
     def is_csrf_token_valid(cls, user_id, token):
         """Validates a given CSRF token with the CSRF secret in memcache.
+
         Args:
           user_id: str. The user_id to validate CSRF token.
           token: str. Newly Generated CSRF token.
