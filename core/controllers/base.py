@@ -295,6 +295,7 @@ class BaseHandler(webapp2.RequestHandler):
 
     def render_json(self, values):
         """Prepare JSON response to sent to the client
+
         Args:
           values: dict.The key-value pairs to encode in the JSON response.
         """
@@ -311,7 +312,7 @@ class BaseHandler(webapp2.RequestHandler):
     def render_template(
             self, filename, iframe_restriction='DENY',
             redirect_url_on_logout=None):
-        """Write the various values and renders the template
+        """Renders a template file
 
         Args:
             filename: str. Name of the template file
