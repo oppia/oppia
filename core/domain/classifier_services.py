@@ -139,7 +139,7 @@ def train(exploration):
     for state_name in states:
         state = states[state_name]
         if state.can_undergo_classification() and (
-            state.classifier_model_id is None):
+                state.classifier_model_id is None):
 
             sc = classifier_registry.Registry.get_classifier_by_algorithm_id(
                 algorithm_id)
