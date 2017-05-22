@@ -97,6 +97,85 @@ class UserSettingsModel(base_models.BaseModel):
             cls.normalized_username == normalized_username).get()
 
 
+class CompletedActivitiesModel(base_models.BaseModel):
+    """Keeps track of all the explorations and collections completed by the
+    learner.
+
+    Instances of this class are keyed by the user id.
+    """
+    # IDs of all the explorations completed by the user.
+    exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # IDs of all the collections completed by the user.
+    collection_ids = ndb.StringProperty(repeated=True, indexed=True)
+
+
+class IncompleteActivitiesModel(base_models.BaseModel):
+    """Keeps track of all the activities currently being completed by the
+    learner.
+
+    Instances of this class are keyed by the user id.
+    """
+    # The ids of the explorations partially completed by the user.
+    exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # The ids of the collections partially completed by the user.
+    collection_ids = ndb.StringProperty(repeated=True, indexed=True)
+
+
+class ExpUserLastPlaythroughModel(base_models.BaseModel):
+    """Stores the "last playthrough" information for partially-completed
+    explorations.
+
+    Instances of this class have keys of the form
+    [user_id].[exploration_id]
+    """
+    # The user id.
+    user_id = ndb.StringProperty(required=True, indexed=True)
+    # The exploration id.
+    exploration_id = ndb.StringProperty(required=True, indexed=True)
+    # The version of the exploration last played by the user.
+    last_played_exp_version = ndb.IntegerProperty(default=None)
+    # The name of the state at which the learner left the exploration when
+    # he/she last played it.
+    last_played_state_name = ndb.StringProperty(default=None)
+
+    @classmethod
+    def _generate_id(cls, user_id, exploration_id):
+        return '%s.%s' % (user_id, exploration_id)
+
+    @classmethod
+    def create(cls, user_id, exploration_id):
+        """Creates a new ExpUserLastPlaythroughModel instance and returns it.
+
+        Args:
+            user_id: str. The id of the user.
+            exploration_id: str. The id of the exploration.
+
+        Returns:
+            ExpUserLastPlaythroughModel. The newly created
+            ExpUserLastPlaythroughModel instance.
+        """
+        instance_id = cls._generate_id(user_id, exploration_id)
+        return cls(
+            id=instance_id, user_id=user_id, exploration_id=exploration_id)
+
+    @classmethod
+    def get(cls, user_id, exploration_id):
+        """Gets the ExpUserLastPlaythroughModel for the given user and
+        exploration id.
+
+        Args:
+            user_id: str. The id of the user.
+            exploration_id: str. The id of the exploration.
+
+        Returns:
+            ExpUserLastPlaythroughModel. The ExpUserLastPlaythroughModel
+            instance which matches with the given user_id and exploration_id.
+        """
+        instance_id = cls._generate_id(user_id, exploration_id)
+        return super(ExpUserLastPlaythroughModel, cls).get(
+            instance_id, strict=False)
+
+
 class UserContributionsModel(base_models.BaseModel):
     """Tracks explorations created/edited for a particular user.
 
