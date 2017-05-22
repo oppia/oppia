@@ -101,7 +101,6 @@ def require_fully_signed_up(handler):
     """
 
     def test_registered_as_editor(self, **kwargs):
-
         """Check that the user has registered as an editor.
 
         Raises:
@@ -120,8 +119,8 @@ def require_fully_signed_up(handler):
 
 def _clear_login_cookies(response_headers):
     """Clears login cookies from the given response headers."""
-    # App Engine sets the ACSID cookie for http:// and the SACSID cookie
 
+    # App Engine sets the ACSID cookie for http:// and the SACSID cookie
     # for https:// . We just unset both below.
     cookie = Cookie.SimpleCookie()
     for cookie_name in ['ACSID', 'SACSID']:
@@ -138,7 +137,6 @@ class LogoutPage(webapp2.RequestHandler):
     """Class which handles the logout URL."""
 
     def get(self):
-
         """Logs the user out, and returns them to a
         specified (or the home page if no follow-up page is specified).
         """
@@ -240,8 +238,8 @@ class BaseHandler(webapp2.RequestHandler):
         """Overrides dispatch method in webapp2 superclass.
 
         Raises:
-          Exception: The CSRF token is missing.
-          Unauthorized User Exception: The CSRF token is invalid.
+            Exception: The CSRF token is missing.
+            Unauthorized User Exception: The CSRF token is invalid.
         """
         # If the request is to the old demo server, redirect it permanently to
         # the new demo server.
@@ -313,7 +311,6 @@ class BaseHandler(webapp2.RequestHandler):
     def render_template(
             self, filename, iframe_restriction='DENY',
             redirect_url_on_logout=None):
-
         """Write the various values and renders the template
         Args:
             filename: str. Name of the template file
@@ -459,7 +456,6 @@ class BaseHandler(webapp2.RequestHandler):
                 self.render_template('pages/error/error.html')
 
     def handle_exception(self, exception, unused_debug_mode):
-
         """Overwrites the default exception handler
         Args:
             exception: int. Raised while assertion of error code
@@ -584,7 +580,6 @@ class CsrfTokenManager(object):
 
     @classmethod
     def is_csrf_token_valid(cls, user_id, token):
-
         """Validates a given CSRF token with the CSRF secret in memcache.
         Args:
           user_id: str. The user_id to validate CSRF token.
