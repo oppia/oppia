@@ -138,37 +138,39 @@ def train(exploration):
     states = exploration.states
     for state_name in states:
         state = states[state_name]
-        best_matched_answer_group = None
-        best_matched_answer_group_index = len(state.interaction.answer_groups)
-        best_matched_rule_spec_index = None
+        if state.can_undergo_classification() and (
+            state.classifier_model_id is None):
+            best_matched_answer_group = None
+            best_matched_answer_group_index = len(
+                state.interaction.answer_groups)
+            best_matched_rule_spec_index = None
 
-        sc = classifier_registry.Registry.get_classifier_by_algorithm_id(
-            algorithm_id)
+            sc = classifier_registry.Registry.get_classifier_by_algorithm_id(
+                algorithm_id)
 
-        training_examples = [
-            [doc, []] for doc in state.interaction.confirmed_unclassified_answers]
-        for (answer_group_index, answer_group) in enumerate(
-                state.interaction.answer_groups):
-            classifier_rule_spec_index = answer_group.get_classifier_rule_index()
-            if classifier_rule_spec_index is not None:
-                classifier_rule_spec = answer_group.rule_specs[
-                    classifier_rule_spec_index]
-            else:
-                classifier_rule_spec = None
-            if classifier_rule_spec is not None:
-                training_examples.extend([
-                    [doc, [str(answer_group_index)]]
-                    for doc in classifier_rule_spec.inputs['training_data']])
+            training_examples = [
+                [doc, []] for doc in state.interaction.confirmed_unclassified_answers]
+            for (answer_group_index, answer_group) in enumerate(
+                    state.interaction.answer_groups):
+                classifier_rule_spec_index = answer_group.get_classifier_rule_index()
+                if classifier_rule_spec_index is not None:
+                    classifier_rule_spec = answer_group.rule_specs[
+                        classifier_rule_spec_index]
+                else:
+                    classifier_rule_spec = None
+                if classifier_rule_spec is not None:
+                    training_examples.extend([
+                        [doc, [str(answer_group_index)]]
+                        for doc in classifier_rule_spec.inputs['training_data']])
 
-        if len(training_examples) > 0:
-            sc.train(training_examples)
-            cached_classifier_data = sc.to_dict()
-            algorithm_version = 1
-            classifier = classifier_domain.Classifier(
-                '0', exploration.id, exploration.version, state_name, algorithm_id,
-                cached_classifier_data, algorithm_version)
-            classifier_id = save_classifier(classifier)
-            exploration.states[state_name].classifier_model_id = classifier_id
+                sc.train(training_examples)
+                cached_classifier_data = sc.to_dict()
+                algorithm_version = 1
+                classifier = classifier_domain.Classifier(
+                    '0', exploration.id, exploration.version, state_name, algorithm_id,
+                    cached_classifier_data, algorithm_version)
+                classifier_id = save_classifier(classifier)
+                exploration.states[state_name].classifier_model_id = classifier_id
 
     return exploration
 
