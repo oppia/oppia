@@ -2292,16 +2292,10 @@ class Exploration(object):
 
     @classmethod
     def update_states_from_model(
-            cls, versioned_exploration_states, current_states_schema_version,
-            pre_v4_states_conversion_func=None):
+            cls, versioned_exploration_states, current_states_schema_version):
         """Converts the states blob contained in the given
         versioned_exploration_states dict from current_states_schema_version to
         current_states_schema_version + 1.
-
-        If pre_v4_states_conversion_func is provided, it will be called in the
-        migration process before migrating from v3 to v4. It is provided a
-        states dict and will overwrite the migrated states dict with the dict it
-        returns.
 
         Note that the versioned_exploration_states being passed in is modified
         in-place.
@@ -2309,10 +2303,6 @@ class Exploration(object):
         versioned_exploration_states['states_schema_version'] = (
             current_states_schema_version + 1)
 
-        if pre_v4_states_conversion_func and current_states_schema_version == 3:
-            versioned_exploration_states['states'] = (
-                pre_v4_states_conversion_func(
-                    versioned_exploration_states['states']))
         conversion_fn = getattr(cls, '_convert_states_v%s_dict_to_v%s_dict' % (
             current_states_schema_version, current_states_schema_version + 1))
         versioned_exploration_states['states'] = conversion_fn(
