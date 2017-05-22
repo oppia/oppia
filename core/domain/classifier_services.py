@@ -149,8 +149,8 @@ def train(exploration):
                     state.interaction.confirmed_unclassified_answers)]
             for (answer_group_index, answer_group) in enumerate(
                     state.interaction.answer_groups):
-                classifier_rule_spec_index =
-                    answer_group.get_classifier_rule_index()
+                classifier_rule_spec_index = (
+                    answer_group.get_classifier_rule_index())
                 if classifier_rule_spec_index is not None:
                     classifier_rule_spec = answer_group.rule_specs[
                         classifier_rule_spec_index]
@@ -169,8 +169,8 @@ def train(exploration):
                     '0', exploration.id, exploration.version, state_name,
                     algorithm_id, cached_classifier_data, algorithm_version)
                 classifier_id = save_classifier(classifier)
-                exploration.states[state_name].classifier_model_id =
-                    classifier_id
+                exploration.states[state_name].classifier_model_id = (
+                    classifier_id)
 
     return exploration
 
