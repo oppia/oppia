@@ -27,7 +27,10 @@ from core.platform import models
 
 
 class StatisticsAudit(jobs.BaseMapReduceJobManager):
-
+    """Performs a brief audit of exploration completions and state hit counts to
+    make sure they match counts stored in StateCounterModel. It also checks for
+    some possible error cases like negative counts.
+    """
     _STATE_COUNTER_ERROR_KEY = 'State Counter ERROR'
 
     @classmethod
