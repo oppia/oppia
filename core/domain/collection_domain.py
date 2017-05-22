@@ -492,7 +492,7 @@ class Collection(object):
 
         Args:
             collection_dict: dict. The dict representation of a collection with
-                schema version v1.
+                schema version v2.
 
         Returns:
             dict. The dict representation of the Collection domain object,
@@ -599,7 +599,10 @@ class Collection(object):
         passed in is modified in-place.
 
         Args:
-            versioned_collection_contents: dict.
+            versioned_collection_contents: dict. A dict with two keys:
+                - schema_version: str. The schema version for the collection.
+                - collection_contents: dict. The dict comprising the collection
+                    contents.
             current_version: int. The current collection schema version.
 
         Raises:
@@ -849,7 +852,7 @@ class Collection(object):
 
         Returns:
             CollectionNode or None. If the list of nodes contains the given
-            exploration then it will return the node, else None.
+            exploration then it will return the corresponding node, else None.
         """
         for node in self.nodes:
             if node.exploration_id == exploration_id:
