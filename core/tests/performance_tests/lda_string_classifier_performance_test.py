@@ -108,7 +108,7 @@ class LDAStringClassifierBenchmarker(object):
         classifier = (
             classifier_registry.Registry.get_classifier_by_algorithm_id(
                 feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
-                    'classifier_id']))
+                    'algorithm_id']))
         classifier.train(self.examples[:num])
         classifier_dict = classifier.to_dict()
         return classifier_dict
@@ -132,7 +132,7 @@ class LDAStringClassifierBenchmarker(object):
         classifier = (
             classifier_registry.Registry.get_classifier_by_algorithm_id(
                 feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
-                    'classifier_id']))
+                    'algorithm_id']))
         classifier.from_dict(self.classifier_model_dict)
         classifier.predict(self.docs_to_classify[:num])
 
