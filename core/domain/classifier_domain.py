@@ -155,7 +155,6 @@ class Classifier(object):
             self.algorithm_id, 'the algorithm id')
         list_algorithms = []
         for interaction_type in feconf.INTERACTION_CLASSIFIER_MAPPING.values():
-            print interaction_type['classifier_id']
             list_algorithms.append(interaction_type['classifier_id'])
         if self.algorithm_id not in list_algorithms:
             raise utils.ValidationError(

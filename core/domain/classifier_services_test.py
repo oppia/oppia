@@ -73,6 +73,15 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         return (answer_group.get_classifier_rule_index() == rule_spec_index and
                 predict_counter.times_called == 1)
 
+    def test_training_on_exploration_save(self):
+        """Load a YAML exploration, save it and check if a classifier is being
+        generated.
+        """
+        exploration = exp_services.get_exploration_by_id(self.exp_id)
+        state_with_classifier = exploration.states['Home']
+        state_without_classifier = exploration.states['End']
+        self.assertTrue(state_with_classifier.classifier_model_id, not None)
+        self.assertTrue(state_without_classifier.classifier_model_id, None)
     def test_string_classifier_classification(self):
         """All these responses trigger the string classifier."""
 
