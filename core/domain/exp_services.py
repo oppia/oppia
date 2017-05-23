@@ -837,6 +837,7 @@ def _create_exploration(
     # but the creation of an exploration object will fail.
     exploration.validate()
     rights_manager.create_new_exploration_rights(exploration.id, committer_id)
+    exploration = classifier_services.train(exploration)
     model = exp_models.ExplorationModel(
         id=exploration.id,
         category=exploration.category,
