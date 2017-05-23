@@ -57,7 +57,7 @@
 
   <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-if="!isLoadingCollection()">
     <li style="margin-right: 10px; margin-top: 8px;">
-      <button class="btn btn-default oppia-save-draft-button"
+      <button class="btn btn-default oppia-save-draft-button protractor-test-save-draft-button"
               ng-class="{'btn-success': isCollectionSaveable()}"
               ng-click="saveChanges()"
               ng-disabled="!isCollectionSaveable()">
@@ -86,7 +86,7 @@
       </button>
 
       <button type="button" ng-if="collectionRights.isPrivate()"
-              class="btn btn-default oppia-editor-publish-button"
+              class="btn btn-default oppia-editor-publish-button protractor-test-editor-publish-button"
               ng-class="{'btn-success': isCollectionPublishable()}"
               ng-click="publishCollection()"
               ng-disabled="!isCollectionPublishable()">

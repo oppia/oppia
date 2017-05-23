@@ -12,20 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-describe('oppiaInteractiveMultipleChoiceInputValidator', function() {
+describe('MultipleChoiceInputValidationService', function() {
   var WARNING_TYPES;
 
   var currentState, goodOutcomeDest;
   var badOutcome, goodAnswerGroups, goodDefaultOutcome;
-  var validator, customizationArguments;
+  var validatorService, customizationArguments;
 
   beforeEach(function() {
     module('oppia');
   });
 
   beforeEach(inject(function($rootScope, $controller, $injector) {
-    var filter = $injector.get('$filter');
-    validator = filter('oppiaInteractiveMultipleChoiceInputValidator');
+    validatorService = $injector.get('MultipleChoiceInputValidationService');
 
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 
@@ -65,7 +64,7 @@ describe('oppiaInteractiveMultipleChoiceInputValidator', function() {
   }));
 
   it('should be able to perform basic validation', function() {
-    var warnings = validator(
+    var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([]);
@@ -73,13 +72,14 @@ describe('oppiaInteractiveMultipleChoiceInputValidator', function() {
 
   it('should expect a choices customization argument', function() {
     expect(function() {
-      validator(currentState, {}, goodAnswerGroups, goodDefaultOutcome);
+      validatorService.getAllWarnings(
+        currentState, {}, goodAnswerGroups, goodDefaultOutcome);
     }).toThrow('Expected customization arguments to have property: choices');
   });
 
   it('should expect non-empty and unique choices', function() {
     customizationArguments.choices.value[0] = '';
-    var warnings = validator(
+    var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -88,7 +88,7 @@ describe('oppiaInteractiveMultipleChoiceInputValidator', function() {
     }]);
 
     customizationArguments.choices.value[0] = 'Option 2';
-    warnings = validator(
+    warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -100,7 +100,7 @@ describe('oppiaInteractiveMultipleChoiceInputValidator', function() {
   it('should validate answer group rules refer to valid choices only once',
     function() {
       goodAnswerGroups[0].rules[0].inputs.x = 2;
-      var warnings = validator(
+      var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
       expect(warnings).toEqual([{
@@ -109,7 +109,7 @@ describe('oppiaInteractiveMultipleChoiceInputValidator', function() {
       }]);
 
       goodAnswerGroups[0].rules[0].inputs.x = 1;
-      warnings = validator(
+      warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
       // Rule 2 will be caught when trying to verify whether any rules are
@@ -125,7 +125,7 @@ describe('oppiaInteractiveMultipleChoiceInputValidator', function() {
   it('should expect a non-confusing and non-null default outcome only when ' +
     'not all choices are covered by rules',
     function() {
-      var warnings = validator(
+      var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups, badOutcome);
       // All of the multiple choice options are targeted by rules, therefore no
       // warning should be issued for a bad default outcome.
@@ -134,7 +134,7 @@ describe('oppiaInteractiveMultipleChoiceInputValidator', function() {
       // Taking away 1 rule reverts back to the expect validation behavior with
       // default outcome.
       goodAnswerGroups[0].rules.splice(1, 1);
-      warnings = validator(
+      warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups, null);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
@@ -142,7 +142,7 @@ describe('oppiaInteractiveMultipleChoiceInputValidator', function() {
           'Please add something for Oppia to say in the ' +
           '\"All other answers\" response.')
       }]);
-      warnings = validator(
+      warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups, badOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,

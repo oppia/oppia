@@ -3,6 +3,38 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://github.com/oppia/oppia/commits/master
 
 
+v2.5.0 (14 May 2017)
+--------------------
+Infrastructure:
+* Fix #1442: Provide a new framework for visualizing answer statistics (PR #3294)
+* Fix #3292: Migrate all answers to a new storage system (PR #1205)
+* Fix part of #2700: Update directives to directly reference templates (PR #3346)
+* Fix #3283: fix the interactionRulesService error in trainUnresolvedAnswerModal. (PR #3325)
+
+Learner view:
+* Fix #3332: Rescale Lesson Avatar Image (PR #3337)
+* Fix #2482: Make learner's answers contained within card in mobile view. (PR #3248)
+* Fix #3362: Improve responsiveness of navbar (PR #3364)
+
+Interactions:
+* Fix #3343: Add trash icon for deleting regions (PR #3373)
+
+Other UI:
+* Fix #3329: 'Error 404: Page not found' has broken footer (PR #3354)
+* Fix #3355: Change of Font Awesome Icons for relevancy (PR #3367)
+* Fixed #3327 Changed text from 'highlight' to 'hover over' (PR #3335)
+
+Misc:
+* Allow admins to edit private activities (PR #3359)
+* Fixes open in new tab bug for Firefox (PR #3348)
+
+I18N:
+* Fix part of #3132: add i18n keys to About and Profile pages; minor Hindi translations for the search bar (PR #3299)
+
+Code health:
+* Fix #3064: Pull directive-specific CSS into the corresponding directives (PR #3352)
+
+
 v2.4.2 (22 Apr 2017)
 --------------------
 Collection player:

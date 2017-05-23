@@ -13,35 +13,45 @@
 // limitations under the License.
 
 /**
- * @fileoverview Frontend validator for customization args and rules of
- * the interaction.
+ * @fileoverview Validator service for the interaction.
  */
 
-oppia.filter('oppiaInteractiveMathExpressionInputValidator', [
+oppia.factory('MathExpressionInputValidationService', [
   'baseInteractionValidationService', 'WARNING_TYPES',
   function(baseInteractionValidationService, WARNING_TYPES) {
-    // Returns a list of warnings.
-    return function(
-      stateName, customizationArgs, answerGroups, defaultOutcome) {
-      var warningsList = baseInteractionValidationService.getAllOutcomeWarnings(
-        answerGroups, defaultOutcome, stateName);
+    return {
+      getCustomizationArgsWarnings: function(customizationArgs) {
+        // TODO(juansaba): Implement customization args validations.
+        return [];
+      },
+      getAllWarnings: function(
+          stateName, customizationArgs, answerGroups, defaultOutcome) {
+        var warningsList = [];
 
-      // Check that each rule has a valid math expression.
-      for (var i = 0; i < answerGroups.length; i++) {
-        var rules = answerGroups[i].rules;
-        for (var j = 0; j < rules.length; j++) {
-          try {
-            MathExpression.fromLatex(rules[j].inputs.x);
-          } catch (e) {
-            warningsList.push({
-              type: WARNING_TYPES.CRITICAL,
-              message: (
-                'The math expression used in rule ' + String(j + 1) +
-                ' in group ' + String(i + 1) + ' is invalid.')
-            });
+        warningsList = warningsList.concat(
+          this.getCustomizationArgsWarnings(customizationArgs));
+
+        warningsList = warningsList.concat(
+          baseInteractionValidationService.getAllOutcomeWarnings(
+            answerGroups, defaultOutcome, stateName));
+
+        // Check that each rule has a valid math expression.
+        for (var i = 0; i < answerGroups.length; i++) {
+          var rules = answerGroups[i].rules;
+          for (var j = 0; j < rules.length; j++) {
+            try {
+              MathExpression.fromLatex(rules[j].inputs.x);
+            } catch (e) {
+              warningsList.push({
+                type: WARNING_TYPES.CRITICAL,
+                message: (
+                  'The math expression used in rule ' + String(j + 1) +
+                  ' in group ' + String(i + 1) + ' is invalid.')
+              });
+            }
           }
         }
+        return warningsList;
       }
-      return warningsList;
     };
   }]);

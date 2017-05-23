@@ -16,10 +16,13 @@
  * @fileoverview Controller for the statistics tab of the collection editor.
  */
 
-oppia.directive('collectionStatisticsTab', [function() {
-  return {
-    restrict: 'E',
-    templateUrl: 'inline/collection_statistics_tab_directive',
-    controller: [function() {}]
-  };
-}]);
+oppia.directive('collectionStatisticsTab', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/collection_editor/statistics_tab/' +
+        'collection_statistics_tab_directive.html'),
+      controller: [function() {}]
+    };
+  }]);

@@ -103,9 +103,6 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
 class FeedbackAnalyticsDomainUnitTests(test_utils.GenericTestBase):
     EXP_ID = 'exp0'
 
-    def setUp(self):
-        super(FeedbackAnalyticsDomainUnitTests, self).setUp()
-
     def test_to_dict(self):
         expected_thread_analytics = feedback_domain.FeedbackAnalytics(
             self.EXP_ID, 1, 2)

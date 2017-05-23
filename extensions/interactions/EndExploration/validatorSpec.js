@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-describe('oppiaInteractiveEndExplorationValidator', function() {
-  var WARNING_TYPES;
+describe('EndExplorationValidationService', function() {
+  var WARNING_TYPES, validatorService;
 
   var currentState;
   var badOutcome, goodAnswerGroups;
@@ -24,8 +24,7 @@ describe('oppiaInteractiveEndExplorationValidator', function() {
   });
 
   beforeEach(inject(function($rootScope, $controller, $injector) {
-    var filter = $injector.get('$filter');
-    validator = filter('oppiaInteractiveEndExplorationValidator');
+    validatorService = $injector.get('EndExplorationValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 
     currentState = 'First State';
@@ -55,13 +54,14 @@ describe('oppiaInteractiveEndExplorationValidator', function() {
 
   it('should not have warnings for no answer groups or no default outcome',
     function() {
-      var warnings = validator(currentState, customizationArguments, [], null);
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArguments, [], null);
       expect(warnings).toEqual([]);
     });
 
   it('should have warnings for any answer groups or default outcome',
     function() {
-      var warnings = validator(
+      var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups, badOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
@@ -78,7 +78,7 @@ describe('oppiaInteractiveEndExplorationValidator', function() {
 
   it('should throw for missing recommendations argument', function() {
     expect(function() {
-      validator(currentState, {}, [], null);
+      validatorService.getAllWarnings(currentState, {}, [], null);
     }).toThrow(
       'Expected customization arguments to have property: ' +
       'recommendedExplorationIds');
@@ -86,14 +86,16 @@ describe('oppiaInteractiveEndExplorationValidator', function() {
 
   it('should not have warnings for 0 or 8 recommendations', function() {
     customizationArguments.recommendedExplorationIds.value = [];
-    var warnings = validator(currentState, customizationArguments, [], null);
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, [], null);
     expect(warnings).toEqual([]);
 
     customizationArguments.recommendedExplorationIds.value = [
       'ExpID0', 'ExpID1', 'ExpID2', 'ExpID3',
       'ExpID4', 'ExpID5', 'ExpID6', 'ExpID7'
     ];
-    warnings = validator(currentState, customizationArguments, [], null);
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, [], null);
     expect(warnings).toEqual([]);
   });
 });

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-describe('oppiaInteractiveItemSelectionInputValidator', function() {
-  var WARNING_TYPES, validator;
+describe('ItemSelectionInputValidationService', function() {
+  var WARNING_TYPES, validatorService;
 
   var currentState;
   var goodAnswerGroups, goodDefaultOutcome;
@@ -24,8 +24,7 @@ describe('oppiaInteractiveItemSelectionInputValidator', function() {
   });
 
   beforeEach(inject(function($rootScope, $controller, $injector) {
-    var filter = $injector.get('$filter');
-    validator = filter('oppiaInteractiveItemSelectionInputValidator');
+    validatorService = $injector.get('ItemSelectionInputValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 
     currentState = 'First State';
@@ -59,7 +58,7 @@ describe('oppiaInteractiveItemSelectionInputValidator', function() {
   }));
 
   it('should be able to perform basic validation', function() {
-    var warnings = validator(
+    var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([]);
@@ -67,7 +66,8 @@ describe('oppiaInteractiveItemSelectionInputValidator', function() {
 
   it('should expect a choices customization argument', function() {
     expect(function() {
-      validator(currentState, {}, goodAnswerGroups, goodDefaultOutcome);
+      validatorService.getAllWarnings(
+        currentState, {}, goodAnswerGroups, goodDefaultOutcome);
     }).toThrow('Expected customization arguments to have property: choices');
   });
 
@@ -76,7 +76,7 @@ describe('oppiaInteractiveItemSelectionInputValidator', function() {
     function() {
       customizationArguments.minAllowableSelectionCount.value = 3;
 
-      var warnings = validator(
+      var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
       expect(warnings).toEqual([{
@@ -95,7 +95,7 @@ describe('oppiaInteractiveItemSelectionInputValidator', function() {
       // Remove the last choice.
       customizationArguments.choices.value.splice(2, 1);
 
-      var warnings = validator(
+      var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
       expect(warnings).toEqual([{
@@ -114,7 +114,7 @@ describe('oppiaInteractiveItemSelectionInputValidator', function() {
       customizationArguments.minAllowableSelectionCount.value = 3;
       customizationArguments.maxAllowableSelectionCount.value = 3;
 
-      var warnings = validator(
+      var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
       expect(warnings).toEqual([{
@@ -128,7 +128,7 @@ describe('oppiaInteractiveItemSelectionInputValidator', function() {
     // Set the first choice to empty.
     customizationArguments.choices.value[0] = '';
 
-    var warnings = validator(
+    var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -141,7 +141,7 @@ describe('oppiaInteractiveItemSelectionInputValidator', function() {
     // Repeat the last choice.
     customizationArguments.choices.value.push('Selection 3');
 
-    var warnings = validator(
+    var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{

@@ -135,12 +135,10 @@ class SubmittedAnswer(object):
     # referenced in future migration or mapreduce jobs, or they may be removed
     # without warning or migration.
 
-    # TODO(bhenning): Remove large_bucket_entity_id once the answer migration is
-    # completed in production.
     def __init__(self, answer, interaction_id, answer_group_index,
                  rule_spec_index, classification_categorization, params,
                  session_id, time_spent_in_sec, rule_spec_str=None,
-                 answer_str=None, large_bucket_entity_id=None):
+                 answer_str=None):
         self.answer = answer
         self.interaction_id = interaction_id
         self.answer_group_index = answer_group_index
@@ -151,7 +149,6 @@ class SubmittedAnswer(object):
         self.time_spent_in_sec = time_spent_in_sec
         self.rule_spec_str = rule_spec_str
         self.answer_str = answer_str
-        self.large_bucket_entity_id = large_bucket_entity_id
 
     def to_dict(self):
         submitted_answer_dict = {
@@ -168,9 +165,6 @@ class SubmittedAnswer(object):
             submitted_answer_dict['rule_spec_str'] = self.rule_spec_str
         if self.answer_str is not None:
             submitted_answer_dict['answer_str'] = self.answer_str
-        if self.large_bucket_entity_id is not None:
-            submitted_answer_dict['large_bucket_entity_id'] = (
-                self.large_bucket_entity_id)
         return submitted_answer_dict
 
     @classmethod
@@ -185,9 +179,7 @@ class SubmittedAnswer(object):
             submitted_answer_dict['session_id'],
             submitted_answer_dict['time_spent_in_sec'],
             rule_spec_str=submitted_answer_dict.get('rule_spec_str'),
-            answer_str=submitted_answer_dict.get('answer_str'),
-            large_bucket_entity_id=submitted_answer_dict.get(
-                'large_bucket_entity_id'))
+            answer_str=submitted_answer_dict.get('answer_str'))
 
     def validate(self):
         """Validates this submitted answer object."""
