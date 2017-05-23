@@ -41,5 +41,16 @@ oppia.controller('Base', [
       SidebarStatusService.onDocumentClick();
       $scope.$apply();
     });
+
+    $scope.skipToMainContent = function() {
+      var mainContentElement = document.getElementById('oppia-main-content');
+
+      if (!mainContentElement) {
+        throw Error('Variable mainContentElement is undefined.');
+      }
+      mainContentElement.tabIndex = -1;
+      mainContentElement.scrollIntoView();
+      mainContentElement.focus();
+    };
   }
 ]);

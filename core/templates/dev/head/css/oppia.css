@@ -144,6 +144,33 @@ body {
   width: 100%;
 }
 
+.oppia-skip-to-content {
+  left: -10000px;
+  padding: 6px;
+  position: absolute;
+  top: auto;
+  transition-duration: 1s;
+  transition-property: color left;
+  transition-timing-function: ease-in;
+  z-index: 99999;
+}
+.oppia-skip-to-content:active,
+.oppia-skip-to-content:hover,
+.oppia-skip-to-content:focus {
+  background-color: #e8e7e3;
+  border-bottom: 1px solid black;
+  border-bottom-right-radius: 5px;
+  border-right: 1px solid black;
+  color: #23527e;
+  height: auto;
+  left: 0;
+  position: absolute;
+  transition-duration: .5s;
+  transition-property: color left;
+  transition-timing-function: ease-out;
+  width: auto;
+}
+
 .oppia-stop-scroll {
   overflow-y: hidden;
 }

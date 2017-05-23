@@ -31,6 +31,7 @@ from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import gadget_registry
 from core.domain import interaction_registry
+from core.domain import learner_progress_services
 from core.domain import moderator_services
 from core.domain import rating_services
 from core.domain import recommendations_services
@@ -403,9 +404,25 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
             self.payload.get('params'),
             feconf.PLAY_TYPE_NORMAL)
 
+        if user_id:
+            learner_progress_services.mark_exploration_as_completed(
+                user_id, exploration_id)
+
         if user_id and collection_id:
             collection_services.record_played_exploration_in_collection_context(
                 user_id, collection_id, exploration_id)
+            collections_left_to_complete = (
+                collection_services.get_next_exploration_ids_to_complete_by_user( # pylint: disable=line-too-long
+                    user_id, collection_id))
+
+            if not collections_left_to_complete:
+                learner_progress_services.mark_collection_as_completed(
+                    user_id, collection_id)
+            else:
+                learner_progress_services.mark_collection_as_incomplete(
+                    user_id, collection_id)
+
+        self.render_json(self.values)
 
 
 class ExplorationMaybeLeaveHandler(base.BaseHandler):
@@ -419,14 +436,56 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
     @require_playable
     def post(self, exploration_id):
         """Handles POST requests."""
+        version = self.payload.get('version')
+        state_name = self.payload.get('state_name')
+        user_id = self.user_id
+        collection_id = self.payload.get('collection_id')
+
+        if user_id:
+            learner_progress_services.mark_exploration_as_incomplete(
+                user_id, exploration_id, state_name, version)
+
+        if user_id and collection_id:
+            learner_progress_services.mark_collection_as_incomplete(
+                user_id, collection_id)
+
         event_services.MaybeLeaveExplorationEventHandler.record(
             exploration_id,
-            self.payload.get('version'),
-            self.payload.get('state_name'),
+            version,
+            state_name,
             self.payload.get('session_id'),
             self.payload.get('client_time_spent_in_secs'),
             self.payload.get('params'),
             feconf.PLAY_TYPE_NORMAL)
+        self.render_json(self.values)
+
+
+class RemoveExpFromIncompleteListHandler(base.BaseHandler):
+    """Handles operations related to removing an exploration from the partially
+    completed list of a user.
+    """
+
+    @base.require_user
+    def post(self):
+        """Handles POST requests."""
+        exploration_id = self.payload.get('exploration_id')
+        learner_progress_services.remove_exp_from_incomplete_list(
+            self.user_id, exploration_id)
+        self.render_json(self.values)
+
+
+class RemoveCollectionFromIncompleteListHandler(base.BaseHandler):
+    """Handles operations related to removing a collection from the partially
+    completed list of a user.
+    """
+
+    @base.require_user
+    def post(self):
+        """Handles POST requests."""
+        collection_id = self.payload.get('collection_id')
+        learner_progress_services.remove_collection_from_incomplete_list(
+            self.user_id, collection_id)
+        self.render_json(self.values)
 
 
 class RatingHandler(base.BaseHandler):
