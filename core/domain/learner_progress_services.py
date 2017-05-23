@@ -288,6 +288,46 @@ def mark_collection_as_incomplete(user_id, collection_id):
         save_incomplete_activities(incomplete_activities)
 
 
+def remove_exp_from_completed_list(user_id, exploration_id):
+    """Removes the exploration from the completed list of the user
+    (if present).
+
+    Args:
+        user_id: str. The id of the user.
+        exploration_id: str. The id of the exploration to be removed.
+    """
+    completed_activities_model = (
+        user_models.CompletedActivitiesModel.get(
+            user_id, strict=False))
+
+    if completed_activities_model:
+        activities_completed = get_completed_activities_from_model(
+            completed_activities_model)
+        if exploration_id in activities_completed.exploration_ids:
+            activities_completed.remove_exploration_id(exploration_id)
+            save_completed_activities(activities_completed)
+
+
+def remove_collection_from_completed_list(user_id, collection_id):
+    """Removes the collection id from the list of completed collections
+    (if present).
+
+    Args:
+        user_id: str. The id of the user.
+        collection_id: str. The id of the collection to be removed.
+    """
+    completed_activities_model = (
+        user_models.CompletedActivitiesModel.get(
+            user_id, strict=False))
+
+    if completed_activities_model:
+        activities_completed = get_completed_activities_from_model(
+            completed_activities_model)
+        if collection_id in activities_completed.collection_ids:
+            activities_completed.remove_collection_id(collection_id)
+            save_completed_activities(activities_completed)
+
+
 def remove_exp_from_incomplete_list(user_id, exploration_id):
     """Removes the exploration from the incomplete list of the user
     (if present).

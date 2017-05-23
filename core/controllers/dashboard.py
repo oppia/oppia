@@ -288,33 +288,64 @@ class LearnerDashboardHandler(base.BaseHandler):
         if self.user_id is None:
             raise self.PageNotFoundException
 
-        completed_exploration_summaries = [
-            summary for summary in
-            exp_services.get_exploration_summaries_matching_ids(
-                learner_progress_services.get_all_completed_exp_ids(
-                    self.user_id))
-            if summary is not None]
+        completed_exploration_summaries = []
+        completed_exploration_ids = (
+            learner_progress_services.get_all_completed_exp_ids(self.user_id))
 
-        completed_collection_summaries = [
-            summary for summary in
-            collection_services.get_collection_summaries_matching_ids(
-                learner_progress_services.get_all_completed_collection_ids(
-                    self.user_id))
-            if summary is not None]
+        index = 0
+        for summary in exp_services.get_exploration_summaries_matching_ids(
+                completed_exploration_ids):
+            if summary is not None:
+                completed_exploration_summaries.append(summary)
+            else:
+                learner_progress_services.remove_exp_from_completed_list(
+                    self.user_id, completed_exploration_ids[index])
+            index = index + 1
 
-        incomplete_exploration_summaries = [
-            summary for summary in
-            exp_services.get_exploration_summaries_matching_ids(
-                learner_progress_services.get_all_incomplete_exp_ids(
-                    self.user_id))
-            if summary is not None]
 
-        incomplete_collection_summaries = [
-            summary for summary in
-            collection_services.get_collection_summaries_matching_ids(
-                learner_progress_services.get_all_incomplete_collection_ids(
-                    self.user_id))
-            if summary is not None]
+        completed_collection_summaries = []
+        completed_collection_ids = (
+            learner_progress_services.get_all_completed_collection_ids(
+                self.user_id))
+
+        index = 0
+        for summary in collection_services.get_collection_summaries_matching_ids( # pylint: disable=line-too-long
+                completed_collection_ids):
+            if summary is not None:
+                completed_collection_summaries.append(summary)
+            else:
+                learner_progress_services.remove_collection_from_completed_list(
+                    self.user_id, completed_collection_ids[index])
+            index = index + 1
+
+        incomplete_exploration_summaries = []
+        incomplete_exploration_ids = (
+            learner_progress_services.get_all_incomplete_exp_ids(self.user_id))
+
+        index = 0
+        for summary in exp_services.get_exploration_summaries_matching_ids(
+                incomplete_exploration_ids):
+            if summary is not None:
+                incomplete_exploration_summaries.append(summary)
+            else:
+                learner_progress_services.remove_exp_from_incomplete_list(
+                    self.user_id, incomplete_exploration_ids[index])
+            index = index + 1
+
+        incomplete_collection_summaries = []
+        incomplete_collection_ids = (
+            learner_progress_services.get_all_incomplete_collection_ids(
+                self.user_id))
+
+        index = 0
+        for summary in collection_services.get_collection_summaries_matching_ids( # pylint: disable=line-too-long
+                incomplete_collection_ids):
+            if summary is not None:
+                incomplete_collection_summaries.append(summary)
+            else:
+                learner_progress_services.remove_collection_from_incomplete_list( # pylint: disable=line-too-long
+                    self.user_id, incomplete_collection_ids[index])
+            index = index + 1
 
         completed_exp_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts(
