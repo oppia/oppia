@@ -134,14 +134,13 @@ def train(exploration):
     Returns:
         exploration: Domain object for an exploration.
     """
-    algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
-        'classifier_id']
     states = exploration.states
     for state_name in states:
         state = states[state_name]
         if state.can_undergo_classification() and (
                 state.classifier_model_id is None):
-
+            algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
+                state.interaction.id]['classifier_id']
             sc = classifier_registry.Registry.get_classifier_by_algorithm_id(
                 algorithm_id)
 
@@ -155,9 +154,6 @@ def train(exploration):
                 if classifier_rule_spec_index is not None:
                     classifier_rule_spec = answer_group.rule_specs[
                         classifier_rule_spec_index]
-                else:
-                    classifier_rule_spec = None
-                if classifier_rule_spec is not None:
                     training_examples.extend([
                         [doc, [str(answer_group_index)]]
                         for doc in classifier_rule_spec.inputs[
@@ -166,7 +162,7 @@ def train(exploration):
                 sc.train(training_examples)
                 cached_classifier_data = sc.to_dict()
                 algorithm_version = feconf.INTERACTION_CLASSIFIER_MAPPING[
-                    'TextInput']['current_data_schema_version']
+                    state.interaction.id]['current_data_schema_version']
                 classifier = classifier_domain.Classifier(
                     '0', exploration.id, exploration.version, state_name,
                     algorithm_id, cached_classifier_data, algorithm_version)

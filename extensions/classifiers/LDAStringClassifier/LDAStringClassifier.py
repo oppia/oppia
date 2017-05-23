@@ -610,10 +610,10 @@ class LDAStringClassifier(BaseClassifier):
         Returns:
             model: A dict representing a StringClassifier
         """
-        model["_b_dl"] = numpy.array(model["_b_dl"])
-        model["_c_dl"] = numpy.array(model["_c_dl"])
-        model["_c_lw"] = numpy.array(model["_c_lw"])
-        model["_c_l"] = numpy.array(model["_c_l"])
+        model['_b_dl'] = numpy.array(model['_b_dl'])
+        model['_c_dl'] = numpy.array(model['_c_dl'])
+        model['_c_lw'] = numpy.array(model['_c_lw'])
+        model['_c_l'] = numpy.array(model['_c_l'])
         return model
 
     def train(self, training_data):
