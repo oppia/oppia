@@ -55,7 +55,7 @@ oppia.controller('LearnerDashboard', [
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
     $scope.setActiveSection = function(newActiveSectionName) {
-        $scope.activeSection = newActiveSectionName;
+      $scope.activeSection = newActiveSectionName;
     };
 
     $scope.setActiveSubSection = function(newActiveSubSectionName) {
@@ -83,10 +83,6 @@ oppia.controller('LearnerDashboard', [
       } else {
         return 'none';
       }
-    };
-
-    $scope.updatesGivenScreenWidth = function() {
-      ;
     };
 
     $scope.updatesGivenScreenWidth();
@@ -149,9 +145,10 @@ oppia.controller('LearnerDashboard', [
 
             $scope.remove = function() {
               if (subSectionName === 'Explorations') {
-                $http.post('/learner_dashboard/remove_in_progress_exploration', {
-                  exploration_id: entity.id
-                });
+                $http.post(
+                  '/learner_dashboard/remove_in_progress_exploration', {
+                    exploration_id: entity.id
+                  });
               } else if (subSectionName === 'Collections') {
                 $http.post('/learner_dashboard/remove_in_progress_collection', {
                   collection_id: entity.id
