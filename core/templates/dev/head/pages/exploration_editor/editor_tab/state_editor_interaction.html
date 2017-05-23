@@ -84,11 +84,11 @@
     <button class="btn btn-default" ng-click="cancel()" ng-if="hasCustomizationArgs">Cancel</button>
     <div class="btn-group"
          ng-if="hasCustomizationArgs"
-         title="<[getSaveInteractionButtonStyleTooltip()]>">
+         title="<[getSaveInteractionButtonTooltip()]>">
       <button class="btn btn-success protractor-test-save-interaction"
+              ng-class="{'oppia-interaction-customization-save-disabled': !isSaveInteractionEnabled()}"
               ng-click="save()"
-              ng-disabled="!stateInteractionIdService.displayed || form.schemaForm.$invalid || !areCustomizationArgsValid()"
-              ng-attr-style="<[getSaveInteractionButtonStyle()]>">
+              ng-disabled="!isSaveInteractionEnabled()">
         Save Interaction
       </button>
     </div>
@@ -156,3 +156,12 @@
     </div>
   </div>
 </script>
+<style>
+  .oppia-interaction-customization-save-disabled {
+    background-size: 20px 20px;
+    background-position: 6px;
+    padding-left: 32px;
+    background-repeat: no-repeat;
+    background-image: url('../assets/common/images/general/warning.png');
+  }
+</style>

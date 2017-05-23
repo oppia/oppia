@@ -256,15 +256,6 @@ oppia.controller('StateInteraction', [
                 return warningsList;
               }
 
-              $scope.areCustomizationArgsValid = function() {
-                if ($scope.hasCustomizationArgs &&
-                    stateCustomizationArgsService.displayed) {
-                  return $scope.getCustomizationArgsWarningsList().length === 0;
-                } else {
-                  return false;
-                }
-              };
-
               $scope.onChangeInteractionId = function(newInteractionId) {
                 editorFirstTimeEventsService
                   .registerFirstSelectInteractionTypeEvent();
@@ -308,7 +299,20 @@ oppia.controller('StateInteraction', [
                 stateCustomizationArgsService.displayed = {};
               };
 
-              $scope.getSaveInteractionButtonStyleTooltip = function() {
+              $scope.isSaveInteractionEnabled = function() {
+                return $scope.hasCustomizationArgs &&
+                  $scope.stateInteractionIdService.displayed &&
+                  $scope.form.schemaForm.$valid &&
+                  $scope.areCustomizationArgsValid();
+              };
+
+              // This function assumes that there are customization args and so
+              // does not do any checks for it.
+              $scope.areCustomizationArgsValid = function() {
+                return $scope.getCustomizationArgsWarningsList().length === 0;
+              };
+
+              $scope.getSaveInteractionButtonTooltip = function() {
                 if (!$scope.hasCustomizationArgs) {
                   return 'No customization arguments';
                 }
@@ -323,7 +327,7 @@ oppia.controller('StateInteraction', [
 
                 if (warningMessages.length === 0) {
                   if ($scope.form.schemaForm.$invalid) {
-                    return 'Some of the form controls failed validation';
+                    return 'Some of the form entries are invalid.';
                   } else {
                     return '';
                   }
@@ -331,22 +335,6 @@ oppia.controller('StateInteraction', [
                   return warningMessages[0];
                 } else {
                   return '• ' + warningMessages.join('\n• ');
-                }
-              }
-
-              $scope.getSaveInteractionButtonStyle = function() {
-                if ($scope.hasCustomizationArgs &&
-                    $scope.stateInteractionIdService.displayed &&
-                    $scope.form.schemaForm.$valid &&
-                    $scope.areCustomizationArgsValid()) {
-                  return '';
-                } else {
-                  return 'background-size: 20px 20px; ' +
-                    'background-position: 6px; ' +
-                    'padding-left: 32px; ' +
-                    'background-repeat: no-repeat; ' +
-                    'background-image: ' +
-                    'url("../assets/common/images/general/warning.png")';
                 }
               }
 
