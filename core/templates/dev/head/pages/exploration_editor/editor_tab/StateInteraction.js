@@ -299,17 +299,11 @@ oppia.controller('StateInteraction', [
                 stateCustomizationArgsService.displayed = {};
               };
 
-              $scope.isSaveInteractionEnabled = function() {
+              $scope.isSaveInteractionButtonEnabled = function() {
                 return $scope.hasCustomizationArgs &&
                   $scope.stateInteractionIdService.displayed &&
                   $scope.form.schemaForm.$valid &&
-                  $scope.areCustomizationArgsValid();
-              };
-
-              // This function assumes that there are customization args and so
-              // does not do any checks for it.
-              $scope.areCustomizationArgsValid = function() {
-                return $scope.getCustomizationArgsWarningsList().length === 0;
+                  $scope.getCustomizationArgsWarningsList().length === 0;
               };
 
               $scope.getSaveInteractionButtonTooltip = function() {

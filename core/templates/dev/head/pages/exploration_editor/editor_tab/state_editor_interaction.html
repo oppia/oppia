@@ -86,9 +86,9 @@
          ng-if="hasCustomizationArgs"
          title="<[getSaveInteractionButtonTooltip()]>">
       <button class="btn btn-success protractor-test-save-interaction"
-              ng-class="{'oppia-interaction-customization-save-disabled': !isSaveInteractionEnabled()}"
+              ng-class="{'oppia-save-interaction-button-disabled': !isSaveInteractionButtonEnabled()}"
               ng-click="save()"
-              ng-disabled="!isSaveInteractionEnabled()">
+              ng-disabled="!isSaveInteractionButtonEnabled()">
         Save Interaction
       </button>
     </div>
@@ -157,7 +157,7 @@
   </div>
 </script>
 <style>
-  .oppia-interaction-customization-save-disabled {
+  .oppia-save-interaction-button-disabled {
     background-size: 20px 20px;
     background-position: 6px;
     padding-left: 32px;
