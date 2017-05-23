@@ -82,6 +82,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         state_without_classifier = exploration.states['End']
         self.assertTrue(state_with_classifier.classifier_model_id, not None)
         self.assertTrue(state_without_classifier.classifier_model_id, None)
+
     def test_string_classifier_classification(self):
         """All these responses trigger the string classifier."""
 
