@@ -55,7 +55,8 @@ class FileMetadataModel(base_models.VersionedModel):
         feconf.DEFAULT_QUERY_LIMIT results are returned.
 
         Returns:
-            list(FileMetadataModel). Contains all undeleted instances of this class.
+            list(FileMetadataModel). Contains all undeleted instances of
+            this class.
         """
         return cls.get_all().filter(cls.deleted == False).fetch(  # pylint: disable=singleton-comparison
             feconf.DEFAULT_QUERY_LIMIT)
@@ -109,8 +110,8 @@ class FileMetadataModel(base_models.VersionedModel):
 
     @classmethod
     def get_version(cls, exploration_id, filepath, version_number):
-        """Returns the specified version of an existing FileMetadataModel instance
-        describing the given exploration and filepath.
+        """Returns the specified version of an existing FileMetadataModel
+        instance describing the given exploration and filepath.
 
         Args:
             exploration_id: str. The id of the exploration.
