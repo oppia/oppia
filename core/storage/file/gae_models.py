@@ -153,7 +153,8 @@ class FileSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
 class FileSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Class for storing the content of the file snapshots (where the content
-    is a JSON blob, i.e. a string)."""
+    is an uninterpreted bytestring).
+    """
 
     # Overwrite the superclass member to use a BlobProperty for raw strings.
     content = ndb.BlobProperty(indexed=False)
@@ -161,6 +162,7 @@ class FileSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
 class FileModel(base_models.VersionedModel):
     """File data model, keyed by exploration id and absolute file name."""
+
     # The class which stores the commit history of the file snapshots.
     SNAPSHOT_METADATA_CLASS = FileSnapshotMetadataModel
     # The class which stores the content of the file snapshots.
@@ -174,7 +176,7 @@ class FileModel(base_models.VersionedModel):
         instance from a snapshot.
 
         Args:
-            snapshot_blob: str. A JSON blob to which this instance's content
+            snapshot_blob: str. A bytestring to which this instance's content
                 field will be set.
 
         Returns:
@@ -189,7 +191,7 @@ class FileModel(base_models.VersionedModel):
         this FileModel instance.
 
         Returns:
-            str. A JSON blob snapshot of this instance's content.
+            str. A bytestring snapshot of this instance's content.
         """
         return self.content
 
@@ -208,7 +210,7 @@ class FileModel(base_models.VersionedModel):
 
         Returns:
             str. Uniquely identifying string for the given exploration and
-            filepath (concatenation of exploration id and filepath).
+            filepath.
         """
         return utils.vfs_construct_path('/', exploration_id, filepath)
 
