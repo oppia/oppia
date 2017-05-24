@@ -41,15 +41,15 @@ oppia.factory('NumericInputValidationService', [
         }
         */
         var overlaps = function(ra, rb) {
-          var a_extends_b = false;
+          var aExtendsB = false;
           if ((ra.ub > rb.lb) || (ra.ub >= rb.lb && ra.ubi && rb.lbi)) {
-            a_extends_b = true;
+            aExtendsB = true;
           }
-          var b_extends_a = false;
+          var bExtendsA = false;
           if ((rb.ub > ra.lb) || (rb.ub >= ra.lb && rb.ubi && ra.lbi)) {
-            b_extends_a = true;
+            bExtendsA = true;
           }
-          return a_extends_b && b_extends_a;
+          return aExtendsB && bExtendsA;
         };
 
         var ranges = [];
@@ -59,35 +59,35 @@ oppia.factory('NumericInputValidationService', [
             var rule = rules[j];
             var range = {};
             switch (rule.type) {
-              case "Equals":
+              case 'Equals':
                 var x = rule.inputs.x;
                 range = { lb: x, ub: x, lbi: true, ubi: true };
                 break;
-              case "IsInclusivelyBetween":
+              case 'IsInclusivelyBetween':
                 var a = rule.inputs.a;
                 var b = rule.inputs.b;
                 range = { lb: a, ub: b, lbi: true, ubi: true };
                 break;
-              case "IsGreaterThan":
+              case 'IsGreaterThan':
                 var x = rule.inputs.x;
                 range = { lb: x, ub: Infinity, lbi: false, ubi: false };
                 break;
-              case "IsGreaterThanOrEqualTo":
+              case 'IsGreaterThanOrEqualTo':
                 var x = rule.inputs.x;
                 range = { lb: x, ub: Infinity, lbi: true, ubi: false };
                 break;
-              case "IsLessThanOrEqualTo":
+              case 'IsLessThan':
                 var x = rule.inputs.x;
                 range = { lb: -Infinity, ub: x, lbi: false, ubi: false };
                 break;
-              case "IsLessThanOrEqualTo":
+              case 'IsLessThanOrEqualTo':
                 var x = rule.inputs.x;
                 range = { lb: -Infinity, ub: x, lbi: false, ubi: true };
                 break;
-              case "IsWithinTolerance":
+              case 'IsWithinTolerance':
                 var x = rule.inputs.x;
                 var tol = rule.inputs.tol;
-                range = { lb: x-tol, ub: x+tol, lbi: true, ubi: true };
+                range = { lb: x - tol, ub: x + tol, lbi: true, ubi: true };
                 break;
               default:
             }
