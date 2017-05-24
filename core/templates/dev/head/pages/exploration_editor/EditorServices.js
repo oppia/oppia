@@ -1804,12 +1804,12 @@ oppia.constant('STATE_ERROR_MESSAGES', {
 
 // Service for the list of exploration warnings.
 oppia.factory('explorationWarningsService', [
-  '$filter', 'graphDataService', 'explorationStatesService',
+  '$injector', 'graphDataService', 'explorationStatesService',
   'expressionInterpolationService', 'explorationParamChangesService',
   'parameterMetadataService', 'INTERACTION_SPECS', 'WARNING_TYPES',
   'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
   function(
-      $filter, graphDataService, explorationStatesService,
+      $injector, graphDataService, explorationStatesService,
       expressionInterpolationService, explorationParamChangesService,
       parameterMetadataService, INTERACTION_SPECS, WARNING_TYPES,
       STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
@@ -1964,10 +1964,10 @@ oppia.factory('explorationWarningsService', [
       _states.getStateNames().forEach(function(stateName) {
         var interaction = _states.getState(stateName).interaction;
         if (interaction.id) {
-          var validatorName = (
-            'oppiaInteractive' + _states.getState(stateName).interaction.id +
-            'Validator');
-          var interactionWarnings = $filter(validatorName)(
+          var validatorServiceName =
+            _states.getState(stateName).interaction.id + 'ValidationService';
+          var validatorService = $injector.get(validatorServiceName);
+          var interactionWarnings = validatorService.getAllWarnings(
             stateName, interaction.customizationArgs,
             interaction.answerGroups, interaction.defaultOutcome);
 

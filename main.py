@@ -203,6 +203,12 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/my_explorations', dashboard.DashboardRedirectPage),
 
     get_redirect_route(
+        r'%s/remove_in_progress_exploration' % feconf.LEARNER_DASHBOARD_URL,
+        reader.RemoveExpFromIncompleteListHandler),
+    get_redirect_route(
+        r'%s/remove_in_progress_collection' % feconf.LEARNER_DASHBOARD_URL,
+        reader.RemoveCollectionFromIncompleteListHandler),
+    get_redirect_route(
         r'/imagehandler/<exploration_id>/<encoded_filepath>',
         resources.ImageHandler),
     get_redirect_route(

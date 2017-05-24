@@ -94,7 +94,8 @@ exports.config = {
       'protractor/collections.js',
       'protractor/explorationFeedback.js',
       'protractor/subscriptions.js',
-      'protractor/suggestions.js'
+      'protractor/suggestions.js',
+      'protractor/accessibility.js'
     ],
 
     i18n: [
