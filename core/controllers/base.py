@@ -294,7 +294,7 @@ class BaseHandler(webapp2.RequestHandler):
         raise self.PageNotFoundException
 
     def render_json(self, values):
-        """Prepares JSON response to be sent to the client
+        """Prepares JSON response to be sent to the client.
 
         Args:
             values: dict. The key-value pairs to encode in the JSON response.
@@ -441,7 +441,7 @@ class BaseHandler(webapp2.RequestHandler):
          Args:
             error_code: int. The HTTP status code (expected to be one of
                         400, 401,404 or 500).
-            values: dict. list of values of cookies
+            values: dict. list of values from JSON response.
         """
         assert error_code in [400, 401, 404, 500]
         values['code'] = error_code
