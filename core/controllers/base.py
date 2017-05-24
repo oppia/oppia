@@ -315,9 +315,11 @@ class BaseHandler(webapp2.RequestHandler):
         """Prepares an HTML response to be sent to the client.
 
         Args:
-            filename: str. Name of the template file.
-            iframe_restriction: str. Value for iframe restriction.
-            redirect_url_on_logout: bool. Redirects after logging out.
+            filename: str. The template filename, related to the
+                           templates directory.
+            iframe_restriction: str. Keyword argument used as variable for
+                                iframe restriction.
+            redirect_url_on_logout: str. URL to redirect on logout.
         """
         values = self.values
 
@@ -463,8 +465,8 @@ class BaseHandler(webapp2.RequestHandler):
         """Overwrites the default exception handler.
 
         Args:
-            exception: int. Raised while assertion of error code
-            unused_debug_mode: The uncaught exception
+            exception: The exception that was thrown.
+            unused_debug_mode: The uncaught exception.
         """
 
         logging.info(''.join(traceback.format_exception(*sys.exc_info())))
@@ -548,8 +550,8 @@ class CsrfTokenManager(object):
         """Creates a new CSRF token.
 
         Args:
-            user_id: str. The user_id for whom to create the token.
-            issued_on: Round time to seconds.
+            user_id: str. The user_id for whom token is generated
+            issued_on: The time while generating token.
 
         Returns:
             str: The generated CSRF token.
