@@ -36,17 +36,10 @@ class FileMetadataSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
 
 class FileMetadataModel(base_models.VersionedModel):
-    """File metadata model, keyed by exploration id and absolute file name.
-
-    Attributes:
-        SNAPSHOT_METADATA_CLASS: FileMetadataSnapshotMetadataModel. The class
-            which stores the commit history of the metadata snapshots.
-        SNAPSHOT_CONTENT_CLASS: FileMetadataSnapshotContentModel. The class
-            which stores the content of the metadata snapshots.
-        size: IntegerProperty. The size of the file described by a
-            FileMetadataModel instance.
-    """
+    """File metadata model, keyed by exploration id and absolute file name."""
+    # The class which stores the commit history of the metadata snapshots.
     SNAPSHOT_METADATA_CLASS = FileMetadataSnapshotMetadataModel
+    # The class which stores the content of the metadata snapshots.
     SNAPSHOT_CONTENT_CLASS = FileMetadataSnapshotContentModel
 
     # The size of the file.
@@ -62,7 +55,7 @@ class FileMetadataModel(base_models.VersionedModel):
         feconf.DEFAULT_QUERY_LIMIT results are returned.
 
         Returns:
-            list. Contains all undeleted instances of this class.
+            list(FileMetadataModel). Contains all undeleted instances of this class.
         """
         return cls.get_all().filter(cls.deleted == False).fetch(  # pylint: disable=singleton-comparison
             feconf.DEFAULT_QUERY_LIMIT)
@@ -79,7 +72,7 @@ class FileMetadataModel(base_models.VersionedModel):
 
         Returns:
             str. Uniquely identifying string for the given exploration and
-                filepath (concatenation of exploration id and filepath).
+            filepath (concatenation of exploration id and filepath).
         """
         return utils.vfs_construct_path('/', exploration_id, filepath)
 
@@ -100,7 +93,7 @@ class FileMetadataModel(base_models.VersionedModel):
 
     @classmethod
     def get_model(cls, exploration_id, filepath, strict=False):
-        """Returns newest version of an existing FileMetadataModel instance
+        """Returns the newest version of an existing FileMetadataModel instance
         describing the given exploration and filepath.
 
         Args:
@@ -108,25 +101,26 @@ class FileMetadataModel(base_models.VersionedModel):
             filepath: str. The path to the relevant file within the exploration.
 
         Returns:
-            FileMetadataModel. An undeleted instance of this class, uniquely
-                identified by exploration_id and filepath.
+            FileMetadataModel. An instance of this class, uniquely
+            identified by exploration_id and filepath.
         """
         model_id = cls._construct_id(exploration_id, filepath)
         return super(FileMetadataModel, cls).get(model_id, strict=strict)
 
     @classmethod
     def get_version(cls, exploration_id, filepath, version_number):
-        """Returns specified version of an existing FileMetadataModel instance
+        """Returns the specified version of an existing FileMetadataModel instance
         describing the given exploration and filepath.
 
         Args:
             exploration_id: str. The id of the exploration.
             filepath: str. The path to the relevant file within the exploration.
-            version_number: int. The instance version to be returned.
+            version_number: int. The version number of the instance to
+                be returned.
 
         Returns:
-            FileMetadataModel. An undeleted instance of this class, uniquely
-                identified by exploration_id, filepath, and version_number.
+            FileMetadataModel. An instance of this class, uniquely identified
+            by exploration_id, filepath, and version_number.
         """
         model_id = cls._construct_id(exploration_id, filepath)
         return super(FileMetadataModel, cls).get_version(
@@ -157,43 +151,34 @@ class FileSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
 
 class FileSnapshotContentModel(base_models.BaseSnapshotContentModel):
-    """Class for storing the content of the file snapshots.
-
-    Attributes:
-        content: BlobProperty. The contents of a file snapshot.
-    """
+    """Class for storing the content of the file snapshots (where the content
+    is a JSON blob, i.e. a string)."""
 
     # Overwrite the superclass member to use a BlobProperty for raw strings.
     content = ndb.BlobProperty(indexed=False)
 
 
 class FileModel(base_models.VersionedModel):
-    """File data model, keyed by exploration id and absolute file name.
-
-    Attributes:
-        SNAPSHOT_METADATA_CLASS: FileSnapshotMetadataModel. The class which
-            stores the commit history of the file snapshots.
-        SNAPSHOT_CONTENT_CLASS: FileSnapshotContentModel. The class which
-            stores the content of the file snapshots.
-        content: BlobProperty. The contents of the file.
-    """
+    """File data model, keyed by exploration id and absolute file name."""
+    # The class which stores the commit history of the file snapshots.
     SNAPSHOT_METADATA_CLASS = FileSnapshotMetadataModel
+    # The class which stores the content of the file snapshots.
     SNAPSHOT_CONTENT_CLASS = FileSnapshotContentModel
 
     # The contents of the file.
     content = ndb.BlobProperty(indexed=False)
 
     def _reconstitute(self, snapshot_blob):
-        """Manually overwrite the superclass method. Reconstitutes a FileModel
+        """Overrides the superclass method. Reconstitutes a FileModel
         instance from a snapshot.
 
         Args:
-            snapshot_blob: BlobProperty. A snapshot to which this instance's
-                content field will be set.
+            snapshot_blob: str. A JSON blob to which this instance's content
+                field will be set.
 
         Returns:
             FileModel. An instance of this class, with content set to
-                snapshot_blob.
+            snapshot_blob.
         """
         self.content = snapshot_blob
         return self
@@ -203,7 +188,7 @@ class FileModel(base_models.VersionedModel):
         this FileModel instance.
 
         Returns:
-            BlobProperty. A snapshot of this instance's content.
+            str. A JSON blob snapshot of this instance's content.
         """
         return self.content
 
@@ -222,7 +207,7 @@ class FileModel(base_models.VersionedModel):
 
         Returns:
             str. Uniquely identifying string for the given exploration and
-                filepath (concatenation of exploration id and filepath).
+            filepath (concatenation of exploration id and filepath).
         """
         return utils.vfs_construct_path('/', exploration_id, filepath)
 
@@ -243,16 +228,16 @@ class FileModel(base_models.VersionedModel):
 
     @classmethod
     def get_model(cls, exploration_id, filepath, strict=False):
-        """Returns newest version of an existing FileModel instance specified by
-        the given exploration and filepath.
+        """Returns the newest version of an existing FileModel instance
+        specified by the given exploration and filepath.
 
         Args:
             exploration_id: str. The id of the exploration.
             filepath: str. The path to the relevant file within the exploration.
 
         Returns:
-            FileModel. An undeleted instance of this class, uniquely
-                identified by exploration_id and filepath.
+            FileModel. An instance of this class, uniquely
+            identified by exploration_id and filepath.
         """
         model_id = cls._construct_id(exploration_id, filepath)
         return super(FileModel, cls).get(model_id, strict=strict)
@@ -276,16 +261,17 @@ class FileModel(base_models.VersionedModel):
 
     @classmethod
     def get_version(cls, exploration_id, filepath, version_number):
-        """Returns chosen version of an existing FileModel instance specified by
-        the given exploration and filepath.
+        """Returns the chosen version of an existing FileModel instance
+        specified by the given exploration and filepath.
 
         Args:
             exploration_id: str. The id of the exploration.
             filepath: str. The path to the relevant file within the exploration.
-            version_number: int. The instance version to be returned.
+            version_number: int. The version number of the instance to
+                be returned.
 
         Returns:
-            FileModel. An undeleted instance of this class, uniquely
+            FileModel. An instance of this class, uniquely
                 identified by exploration_id, filepath, and version_number.
         """
         model_id = cls._construct_id(exploration_id, filepath)
