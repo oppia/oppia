@@ -4,7 +4,7 @@
     schema="{type: 'custom', obj_type: 'Filepath'}">
   </schema-based-editor>
 </div>
-<div ng-if="$parent.value.imagePath !== ''">
+<div style="position: relative" ng-if="$parent.value.imagePath !== ''">
   <div>Add new regions by clicking on the image and dragging:</div>
   <svg class="oppia-image-with-regions-editor-svg"
     width="100%"
@@ -56,21 +56,19 @@
     </text>
   </svg>
 
-  <div style="display: inline-block; float:right; margin-top:10px;" ng-if="selectedRegion !== null">
-    <input type="text" style="margin-left: 10px; height: 34px; width: 100px;"
-      ng-model="regionLabelGetterSetter(selectedRegion)"
-      ng-model-options="{getterSetter: true}">
-  </div>
+  <input type="text" ng-if="selectedRegion !== null"
+    class="oppia-image-with-regions-region-label-editor"
+    ng-attr-style="<[getRegionLabelEditorStyle()]>"
+    ng-mouseup="regionLabelEditorMouseUp()"
+    ng-model="regionLabelGetterSetter(selectedRegion)"
+    ng-model-options="{getterSetter: true}">
 
-  <br><div style="color: red;"><[errorText]></div>
-  <br>
+  <div style="color: red; margin-bottom: 4px"><[errorText]></div>
   <button type="button" class="btn btn-danger" ng-click="resetEditor()">Clear Image and Regions</button>
 </div>
 <script type="text/ng-template" id="modals/imageRegionsResetConfirmation">    
   <div class="modal-header">
-    <h4 class="modal-title">
-      <span>Clear Image and Regions</span>
-    </h4>
+    <h4 class="modal-title">Clear Image and Regions</h4>
   </div>
   <div class="modal-body">
     <span>This will remove the image and all regions. Are you sure?</span>
@@ -80,3 +78,15 @@
     <button type="button" ng-click="confirmClear()" class="btn btn-danger">Clear Image and Regions</button>
   </div>
 </script>
+<style>
+  input.oppia-image-with-regions-region-label-editor {
+    background-color: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: white;
+    display: block;
+    font-size: 14px;
+    margin: 0;
+    padding: 0 6px;
+    position: absolute;
+  }
+</style>
