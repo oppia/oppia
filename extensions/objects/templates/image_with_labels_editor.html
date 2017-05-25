@@ -26,7 +26,8 @@
         ng-attr-height="<[rectHeight]>"
         ng-attr-style="<[getRegionStyle(null)]>">
       </rect>
-      <line ng-if="userIsCurrentlyDrawing" ng-attr-x1="<[originalMouseX]>" ng-attr-y1="<[originalMouseY]>" ng-attr-x2="<[mouseX]>" ng-attr-y2="<[mouseY]>" style="stroke:rgb(0,0,0);stroke-width:2" />
+      <line ng-if="userIsCurrentlyDrawing" ng-attr-x1="<[originalMouseX]>" 
+        ng-attr-y1="<[originalMouseY]>" ng-attr-x2="<[mouseX]>" ng-attr-y2="<[mouseY]>" style="stroke:rgb(0,0,0);stroke-width:2" />
       <rect ng-repeat="labeledRegion in $parent.$parent.value.labeledRegions"
         ng-attr-x="<[labeledRegion.region.area[0][0] * getImageWidth()]>"
         ng-attr-y="<[labeledRegion.region.area[0][1] * getImageHeight()]>"

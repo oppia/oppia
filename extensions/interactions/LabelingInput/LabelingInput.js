@@ -60,7 +60,9 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           $scope.incorrectBoxes = [];
           $scope.currentDraggedElement = "";
           $scope.currentlyHoveredRegions = [];
-          //Shuffle function to shuffle array to ensure random word bank
+          /* Shuffle function to shuffle array to ensure random word bank
+          Borrowed from:
+          stackoverflow.com/questions/6274339/how-can-i-shuffle-an-array */
           $scope.shuffle = function(a) {
               var j, x, i;
               for (i = a.length; i; i--) {
@@ -85,6 +87,15 @@ oppia.directive('oppiaInteractiveLabelingInput', [
               $scope.incorrectBoxes.splice(index, 1);
             }
             return;
+          }
+          $scope.getButtonColor = function(name){
+            if (!$scope.submitted){
+              return 'primary';
+            }
+            if ($scope.incorrectElements.indexOf(name) > -1){
+              return 'danger';              
+            }
+            return 'primary';
           }
           //Get the current element label
           $scope.getThisName = function(event, ui, name){
@@ -122,8 +133,6 @@ oppia.directive('oppiaInteractiveLabelingInput', [
             }
             var correctLen = $scope.correctElements.length;
             var incorrectLen = $scope.incorrectElements.length;
-            console.log(correctLen);
-            console.log(incorrectLen);
             if ((correctLen + incorrectLen) === $scope.allRegions.length){
               $scope.runSubmitCheck();
             }
@@ -168,7 +177,7 @@ oppia.directive('oppiaInteractiveLabelingInput', [
             var image = $($element).find('.oppia-image-click-img');
             return image.offset().top - image.parent().offset().top;
           }
-          //Draw line on canvas, no line HTML class is available
+          //Draw line on canvas, no line HTML class is available due to div
           $scope.getLineDistance = function(x1, x2, y1, y2){
             var xDiff = Math.pow((x2 - x1), 2);
             var yDiff = Math.pow((y2 - y1), 2);
@@ -264,7 +273,7 @@ oppia.factory('labelingInputRulesService', [function() {
     },
     HasMultipleMisses: function(answer, inputs){
       if (!(inputs.x)){
-        //Backwards compatability
+        //Backwards compatability, consider removing
         return answer.incorrectElements.length >= 2;
       }
       return answer.incorrectElements.length >= (inputs.x);
