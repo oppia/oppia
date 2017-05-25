@@ -35,10 +35,10 @@ oppia.factory('fatigueDetectionService',
               controller: [
                 '$scope', '$modalInstance',
                 function($scope, $modalInstance) {
-                $scope.okay = function() {
-                  $modalInstance.close('okay');
-                };
-              }]
+                  $scope.okay = function() {
+                    $modalInstance.close('okay');
+                  };
+                }]
             });
             return true;
           }
@@ -49,5 +49,4 @@ oppia.factory('fatigueDetectionService',
         submissionTimes = [];
       }
     }
-  }
-]);
+  }]);
