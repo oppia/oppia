@@ -310,12 +310,12 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
 
     def render_template(
-            self, filename, iframe_restriction='DENY',
+            self, filepath, iframe_restriction='DENY',
             redirect_url_on_logout=None):
         """Prepares an HTML response to be sent to the client.
 
         Args:
-            filename: str. The template filepath.
+            filepath: str. The template filepath.
             iframe_restriction: str or None. X-Frame-Options expected
                 from ['DENY','SAMEORIGIN'].
 
@@ -436,7 +436,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.pragma = 'no-cache'
 
         self.response.write(
-            self.jinja2_env.get_template(filename).render(**values))
+            self.jinja2_env.get_template(filepath).render(**values))
 
     def _render_exception(self, error_code, values):
         """Renders an error page, or an error JSON response.
@@ -472,7 +472,6 @@ class BaseHandler(webapp2.RequestHandler):
             unused_debug_mode:  bool. True if the web application is running
                 in debug mode.
         """
-
         logging.info(''.join(traceback.format_exception(*sys.exc_info())))
         logging.error('Exception raised: %s', exception)
 
@@ -554,7 +553,7 @@ class CsrfTokenManager(object):
         """Creates a new CSRF token.
 
         Args:
-            user_id: str. The user_id for whom token is generated.
+            user_id: str. The user_id for whom the token is generated.
             issued_on: The time while generating token.
 
         Returns:
