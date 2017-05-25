@@ -288,20 +288,37 @@ class LearnerDashboardHandler(base.BaseHandler):
         if self.user_id is None:
             raise self.PageNotFoundException
 
+        incomplete_exploration_summaries = []
+        incomplete_exploration_ids = (
+            learner_progress_services.get_all_incomplete_exp_ids(self.user_id))
+
+        index = 0
+        number_of_deleted_incomplete_explorations = 0
+        for summary in exp_services.get_exploration_summaries_matching_ids(
+                incomplete_exploration_ids):
+            if summary is not None:
+                incomplete_exploration_summaries.append(summary)
+            else:
+                number_of_deleted_incomplete_explorations += 1
+                learner_progress_services.remove_exp_from_incomplete_list(
+                    self.user_id, incomplete_exploration_ids[index])
+            index = index + 1
+
         completed_exploration_summaries = []
         completed_exploration_ids = (
             learner_progress_services.get_all_completed_exp_ids(self.user_id))
 
         index = 0
+        number_of_deleted_completed_explorations = 0
         for summary in exp_services.get_exploration_summaries_matching_ids(
                 completed_exploration_ids):
             if summary is not None:
                 completed_exploration_summaries.append(summary)
             else:
+                number_of_deleted_completed_explorations += 1
                 learner_progress_services.remove_exp_from_completed_list(
                     self.user_id, completed_exploration_ids[index])
             index = index + 1
-
 
         completed_collection_summaries = []
         completed_collection_ids = (
@@ -309,27 +326,24 @@ class LearnerDashboardHandler(base.BaseHandler):
                 self.user_id))
 
         index = 0
+        number_of_deleted_completed_collections = 0
+        completed_to_incomplete_collections = []
         for summary in collection_services.get_collection_summaries_matching_ids( # pylint: disable=line-too-long
                 completed_collection_ids):
             if summary is not None:
-                completed_collection_summaries.append(summary)
+                if collection_services.get_next_exploration_ids_to_complete_by_user( # pylint: disable=line-too-long
+                        self.user_id, summary.id):
+                    learner_progress_services.remove_collection_from_completed_list( # pylint: disable=line-too-long
+                        self.user_id, summary.id)
+                    learner_progress_services.mark_collection_as_incomplete(
+                        self.user_id, summary.id)
+                    completed_to_incomplete_collections.append(summary.title)
+                else:
+                    completed_collection_summaries.append(summary)
             else:
+                number_of_deleted_completed_collections += 1
                 learner_progress_services.remove_collection_from_completed_list(
                     self.user_id, completed_collection_ids[index])
-            index = index + 1
-
-        incomplete_exploration_summaries = []
-        incomplete_exploration_ids = (
-            learner_progress_services.get_all_incomplete_exp_ids(self.user_id))
-
-        index = 0
-        for summary in exp_services.get_exploration_summaries_matching_ids(
-                incomplete_exploration_ids):
-            if summary is not None:
-                incomplete_exploration_summaries.append(summary)
-            else:
-                learner_progress_services.remove_exp_from_incomplete_list(
-                    self.user_id, incomplete_exploration_ids[index])
             index = index + 1
 
         incomplete_collection_summaries = []
@@ -338,11 +352,13 @@ class LearnerDashboardHandler(base.BaseHandler):
                 self.user_id))
 
         index = 0
+        number_of_deleted_incomplete_collections = 0
         for summary in collection_services.get_collection_summaries_matching_ids( # pylint: disable=line-too-long
                 incomplete_collection_ids):
             if summary is not None:
                 incomplete_collection_summaries.append(summary)
             else:
+                number_of_deleted_incomplete_collections += 1
                 learner_progress_services.remove_collection_from_incomplete_list( # pylint: disable=line-too-long
                     self.user_id, incomplete_collection_ids[index])
             index = index + 1
@@ -423,6 +439,18 @@ class LearnerDashboardHandler(base.BaseHandler):
             'completed_collections_list': completed_collection_summary_dicts,
             'incomplete_explorations_list': incomplete_exp_summary_dicts,
             'incomplete_collections_list': incomplete_collection_summary_dicts,
+            'number_of_deleted_activities': {
+                'incomplete_explorations': (
+                    number_of_deleted_incomplete_explorations),
+                'incomplete_collections': (
+                    number_of_deleted_incomplete_collections),
+                'completed_explorations': (
+                    number_of_deleted_completed_explorations),
+                'completed_collections': (
+                    number_of_deleted_completed_collections)
+            },
+            'completed_to_incomplete_collections': (
+                completed_to_incomplete_collections),
             'subscription_list': subscription_list
         })
         self.render_json(self.values)

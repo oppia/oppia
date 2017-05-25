@@ -16,6 +16,17 @@
  * @fileoverview Controllers for the creator dashboard.
  */
 
+oppia.constant('LEARNER_DASHBOARD_SECTIONS', {
+  INCOMPLETE: 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION',
+  COMPLETED: 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION',
+  SUBSCRIPTIONS: 'I18N_LEARNER_DASHBOARD_SUBSCRIPTIONS_SECTION'
+});
+
+oppia.constant('LEARNER_DASHBOARD_SUB_SECTIONS', {
+  EXPLORATIONS: 'I18N_DASHBOARD_EXPLORATIONS',
+  COLLECTIONS: 'I18N_DASHBOARD_COLLECTIONS'
+});
+
 oppia.constant('EXPLORATIONS_SORT_BY_KEYS', {
   TITLE: 'title',
   CATEGORY: 'category'
@@ -42,16 +53,21 @@ oppia.controller('LearnerDashboard', [
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS',
   'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
   'LearnerDashboardBackendApiService', 'UrlInterpolationService',
+  'LEARNER_DASHBOARD_SECTIONS', 'LEARNER_DASHBOARD_SUB_SECTIONS',
   function(
       $scope, $rootScope, $window, $http, $modal, EXPLORATIONS_SORT_BY_KEYS,
       SUBSCRIPTION_SORT_BY_KEYS, HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS, 
       HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS,
-      LearnerDashboardBackendApiService, UrlInterpolationService) {
+      LearnerDashboardBackendApiService, UrlInterpolationService,
+      LEARNER_DASHBOARD_SECTIONS, LEARNER_DASHBOARD_SUB_SECTIONS) {
     $scope.EXPLORATIONS_SORT_BY_KEYS = EXPLORATIONS_SORT_BY_KEYS;
     $scope.SUBSCRIPTION_SORT_BY_KEYS = SUBSCRIPTION_SORT_BY_KEYS;
     $scope.HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS = (
       HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS);
-    $scope.SUBSCRIPTION_SORT_BY_KEYS = SUBSCRIPTION_SORT_BY_KEYS;
+    $scope.HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS = (
+      HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS);
+    $scope.LEARNER_DASHBOARD_SECTIONS = LEARNER_DASHBOARD_SECTIONS;
+    $scope.LEARNER_DASHBOARD_SUB_SECTIONS = LEARNER_DASHBOARD_SUB_SECTIONS;
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
     $scope.setActiveSection = function(newActiveSectionName) {
@@ -84,12 +100,6 @@ oppia.controller('LearnerDashboard', [
         return 'none';
       }
     };
-
-    $scope.updatesGivenScreenWidth();
-    angular.element($window).bind('resize', function() {
-      $scope.updatesGivenScreenWidth();
-    });
-
 
     $scope.setExplorationsSortingOptions = function(sortType) {
       if (sortType === $scope.currentExpSortType) {
@@ -144,12 +154,15 @@ oppia.controller('LearnerDashboard', [
             $scope.entityTitle = entity.title;
 
             $scope.remove = function() {
-              if (subSectionName === 'Explorations') {
+              /* eslint-disable max-len */
+              if (subSectionName === LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS) {
+              /*eslint-enable */
                 $http.post(
                   '/learner_dashboard/remove_in_progress_exploration', {
                     exploration_id: entity.id
                   });
-              } else if (subSectionName === 'Collections') {
+              } else if (
+                subSectionName === LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS) {
                 $http.post('/learner_dashboard/remove_in_progress_collection', {
                   collection_id: entity.id
                 });
@@ -163,12 +176,13 @@ oppia.controller('LearnerDashboard', [
           }
         ]
       }).result.then(function() {
-        if (subSectionName === 'Explorations') {
+        if (subSectionName === LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS) {
           var index = $scope.incompleteExplorationsList.indexOf(entity);
           if (index !== -1) {
             $scope.incompleteExplorationsList.splice(index, 1);
           }
-        } else if (subSectionName === 'Collections') {
+        } else if (
+          subSectionName === LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS) {
           var index = $scope.incompleteCollectionsList.indexOf(entity);
           if (index !== -1) {
             $scope.incompleteCollectionsList.splice(index, 1);
@@ -198,9 +212,24 @@ oppia.controller('LearnerDashboard', [
         $scope.subscriptionsList = (
           responseData.subscription_list
         );
+        $scope.numberDeletedIncompleteExplorations = (
+          responseData.number_of_deleted_activities.incomplete_explorations
+        );
+        $scope.numberDeletedIncompleteCollections = (
+          responseData.number_of_deleted_activities.incomplete_collections
+        );
+        $scope.numberDeletedCompletedExplorations = (
+          responseData.number_of_deleted_activities.completed_explorations
+        );
+        $scope.numberDeletedCompletedCollections = (
+          responseData.number_of_deleted_activities.completed_collections
+        );
+        $scope.completedToIncompleteCollections = (
+          responseData.completed_to_incomplete_collections
+        );
 
-        $scope.activeSection = 'In Progress';
-        $scope.activeSubSection = 'Explorations';
+        $scope.activeSection = LEARNER_DASHBOARD_SECTIONS.INCOMPLETE;
+        $scope.activeSubSection = LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS;
 
         $scope.noActivity = (
           ($scope.completedExplorationsList.length === 0) &&
