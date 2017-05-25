@@ -1,277 +1,275 @@
-<script type="text/ng-template" id="components/topNavigationBar">
-  <div class="navbar-header protractor-test-navbar-header pull-left">
-    <a ng-if="windowIsNarrow" ng-click="toggleSidebar()"
-       class="navbar-brand oppia-navbar-menu oppia-transition-200" tabindex="0">
-      <i class="material-icons oppia-navbar-menu-icon" ng-if="!isSidebarShown()" >&#xE5D2;</i>
-      <i class="material-icons oppia-navbar-close-icon" ng-if="isSidebarShown()" >&#10005;</i>
-    </a>
+<div class="navbar-header protractor-test-navbar-header pull-left">
+  <a ng-if="windowIsNarrow" ng-click="toggleSidebar()"
+     class="navbar-brand oppia-navbar-menu oppia-transition-200" tabindex="0">
+    <i class="material-icons oppia-navbar-menu-icon" ng-if="!isSidebarShown()" >&#xE5D2;</i>
+    <i class="material-icons oppia-navbar-close-icon" ng-if="isSidebarShown()" >&#10005;</i>
+  </a>
 
-    <a class="oppia-navbar-brand-name oppia-transition-200" href="/"
-       focus-on="<[::LABEL_FOR_CLEARING_FOCUS]>">
-      <img ng-src="<[getStaticImageUrl('/logo/288x128_logo_white.png')]>" class="oppia-logo"
-           ng-class="windowIsNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'" alt="Oppia Home">
-    </a>
-    <!-- This is needed for the correct image to appear when an exploration is shared using G+. -->
-    <a style="display: none;">
-      <img ng-src="<[getStaticImageUrl('/logo/288x128_logo_mint.png')]>" itemprop="image" alt="Oppia Home">
-    </a>
-  </div>
+  <a class="oppia-navbar-brand-name oppia-transition-200" href="/"
+     focus-on="<[::LABEL_FOR_CLEARING_FOCUS]>">
+    <img ng-src="<[getStaticImageUrl('/logo/288x128_logo_white.png')]>" class="oppia-logo"
+         ng-class="windowIsNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'" alt="Oppia Home">
+  </a>
+  <!-- This is needed for the correct image to appear when an exploration is shared using G+. -->
+  <a style="display: none;">
+    <img ng-src="<[getStaticImageUrl('/logo/288x128_logo_mint.png')]>" itemprop="image" alt="Oppia Home">
+  </a>
+</div>
 
-  <div ng-cloak class="navbar-header pull-right" ng-if="userMenuIsShown">
-    <ul class="nav oppia-navbar-nav" ng-if="standardNavIsShown">
-      <ul ng-if="windowIsNarrow" class="nav oppia-navbar-tabs-narrow">
-        <create-activity-button></create-activity-button>
-      </ul>
-      <ul ng-if="!windowIsNarrow" class="nav oppia-navbar-tabs">
-        <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_LIBRARY" class="oppia-clickable-navbar-element">
-          <a class="oppia-navbar-tab oppia-navbar-tab-content" href="/library" translate="I18N_TOPNAV_LIBRARY"></a>
-        </li>
-        <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_ABOUT" class="dropdown oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
-          <a class="oppia-navbar-tab"
-             role="menuitem"
-             aria-haspopup="true"
-             aria-expanded="false"
-             tabindex="0">
-            <span class="oppia-navbar-tab-content" translate="I18N_TOPNAV_ABOUT"></span>
-            <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu oppia-navbar-dropdown"
-              ng-mouseover="onMouseoverDropdownMenu($event)"
-              ng-mouseleave="onMouseoutDropdownMenu($event)"
-              role="menu">
-            <li><a class="protractor-test-about-link oppia-navbar-tab-content" href="/about" translate="I18N_TOPNAV_ABOUT_OPPIA"></a></li>
-            <li><a class="protractor-test-get-started-link oppia-navbar-tab-content" href="/get_started" translate="I18N_TOPNAV_GET_STARTED"></a></li>
-            <li><a class="protractor-test-teach-link oppia-navbar-tab-content" href="/teach" translate="I18N_TOPNAV_TEACH_WITH_OPPIA"></a></li>
-            <li><a href="/blog" class="oppia-navbar-tab-content" translate="I18N_TOPNAV_BLOG"></a></li>
-            <li><a href="/forum" class="oppia-navbar-tab-content" translate="I18N_TOPNAV_FORUM"></a></li>
-            <li><a class="protractor-test-contact-link oppia-navbar-tab-content" href="/contact" translate="I18N_TOPNAV_CONTACT_US"></a></li>
-          </ul>
-        </li>
-        <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_DONATE">
-          <div class="oppia-navbar-button-container">
-            <a href="/donate"
-               class="btn oppia-navbar-button oppia-navbar-hide-on-small-width oppia-transition-200">
-              <span class="oppia-navbar-tab-content" translate="I18N_TOPNAV_DONATE"></span>
-            </a>
-          </div>
-        </li>
-        <create-activity-button ng-show="navElementsVisibilityStatus.I18N_CREATE_EXPLORATION_CREATE"></create-activity-button>
-      </ul>
+<div ng-cloak class="navbar-header pull-right" ng-if="userMenuIsShown">
+  <ul class="nav oppia-navbar-nav" ng-if="standardNavIsShown">
+    <ul ng-if="windowIsNarrow" class="nav oppia-navbar-tabs-narrow">
+      <create-activity-button></create-activity-button>
     </ul>
-    <ul class="nav oppia-navbar-nav oppia-navbar-profile">
-      <li ng-if="username" class="dropdown protractor-test-profile-dropdown">
-        <a class="dropdown-toggle oppia-navbar-dropdown-toggle" data-toggle="dropdown"
-           ng-mouseover="onMouseoverProfilePictureOrDropdown($event)"
-           ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)"
+    <ul ng-if="!windowIsNarrow" class="nav oppia-navbar-tabs">
+      <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_LIBRARY" class="oppia-clickable-navbar-element">
+        <a class="oppia-navbar-tab oppia-navbar-tab-content" href="/library" translate="I18N_TOPNAV_LIBRARY"></a>
+      </li>
+      <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_ABOUT" class="dropdown oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
+        <a class="oppia-navbar-tab"
            role="menuitem"
            aria-haspopup="true"
            aria-expanded="false"
-           aria-label="User Menu"
            tabindex="0">
-          <div class="oppia-navbar-profile-picture-container">
-            <span ng-if="profilePictureDataUrl">
-              <img ng-src="<[profilePictureDataUrl]>" class="oppia-navbar-profile-picture img-circle" alt="User Avatar">
-              <span class="caret" style="margin-top: 10px;"></span>
-            </span>
-            <span ng-if="!profilePictureDataUrl">
-              <i class="material-icons md-40" style="margin-top: -1px;">&#xE853;</i>
-              <span class="oppia-icon-accessibility-label">User Avatar</span>
-              <span class="caret" style="margin-top: -26px;"></span>
-            </span>
-
-            <div class="oppia-navbar-dashboard-indicator ng-cloak" ng-if="numUnseenNotifications > 0">
-              <span class="oppia-navbar-dashboard-indicator-text">
-                <[numUnseenNotifications]>
-              </span>
-            </div>
-
-            <div class="oppia-navbar-role-indicator" ng-if="isAdmin || isModerator">
-              <!--
-               "right: 4px;" is necessary here but not in moderator to prevent 'A'
-               from appearing off-center because 'A' is slightly thinner than 'M' in
-               this font.
-              -->
-              <span ng-if="isAdmin" class="oppia-navbar-role-text" style="right: 4px;">A</span>
-              <span ng-if="isModerator && !isAdmin" class="oppia-navbar-role-text">M</span>
-            </div>
-          </div>
+          <span class="oppia-navbar-tab-content" translate="I18N_TOPNAV_ABOUT"></span>
+          <span class="caret"></span>
         </a>
-
-        <ul class="dropdown-menu ng-cloak oppia-navbar-dropdown" role="menu"
-            ng-mouseover="onMouseoverProfilePictureOrDropdown($event)"
-            ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)"
-            ng-show="profileDropdownIsActive">
-          <li>
-            <a ng-click="onMouseoutProfilePictureOrDropdown($event)" ng-href="<[profilePageUrl]>"
-               class="protractor-test-profile-link">
-              <strong><[username]></strong>
-            </a>
-          </li>
-          <hr class="oppia-top-right-menu-item-separator">
-          <li>
-            <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/dashboard"
-               class="protractor-test-dashboard-link">
-              <span translate="I18N_TOPNAV_DASHBOARD"></span>
-            </a>
-          </li>
-          <li>
-            <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/notifications_dashboard"
-               class="protractor-test-notifications-link">
-              <span translate="I18N_TOPNAV_NOTIFICATIONS"></span>
-              <span ng-if="numUnseenNotifications > 0">
-                (<[numUnseenNotifications]>)
-              </span>
-            </a>
-          </li>
-          <li>
-            <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/preferences"
-               class="protractor-test-preferences-link">
-              <span translate="I18N_TOPNAV_PREFERENCES"></span>
-            </a>
-          </li>
-          <li ng-if="isModerator">
-            <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/moderator" target="_blank">
-              <span translate="I18N_TOPNAV_MODERATOR_PAGE"></span>
-            </a>
-          </li>
-          <li ng-if="isSuperAdmin">
-            <a class="protractor-test-admin-link" ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/admin" target="_blank">
-              <span translate="I18N_TOPNAV_ADMIN_PAGE"></span>
-            </a>
-          </li>
-
-          <hr class="oppia-top-right-menu-item-separator">
-
-          <li>
-            <a ng-click="onMouseoutProfilePictureOrDropdown($event)" ng-href="<[logoutUrl]>">
-              <span translate="I18N_TOPNAV_LOGOUT"></span>
-            </a>
-          </li>
-        </ul>
-      </li>
-
-      <li ng-if="!username" class="dropdown oppia-navbar-clickable-dropdown">
-        <div class="oppia-navbar-button-container" style="margin-right: 10px;">
-          <button class="btn oppia-navbar-button"
-                  ng-click="onLoginButtonClicked()">
-            <span translate="I18N_TOPNAV_SIGN_IN"></span>
-            <span class="caret"></span>
-          </button>
-        </div>
-        <ul class="dropdown-menu oppia-navbar-dropdown" role="menu"
-            style="margin-right: 15px; padding: 0;"
+        <ul class="dropdown-menu oppia-navbar-dropdown"
             ng-mouseover="onMouseoverDropdownMenu($event)"
-            ng-mouseleave="onMouseoutDropdownMenu($event)">
-          <li>
-            <a href style="padding: 0; width: 200px;" ng-click="onLoginButtonClicked()">
-              <div class="oppia-signin-google">
-                <i class="oppia-signin-google-icon fa fa-google-plus"></i>
-                <div class="oppia-signin-google-separator"></div>
-                <b><span translate="I18N_TOPNAV_SIGN_IN_WITH_GOOGLE"></span></b>
-              </div>
-            </a>
-          </li>
+            ng-mouseleave="onMouseoutDropdownMenu($event)"
+            role="menu">
+          <li><a class="protractor-test-about-link oppia-navbar-tab-content" href="/about" translate="I18N_TOPNAV_ABOUT_OPPIA"></a></li>
+          <li><a class="protractor-test-get-started-link oppia-navbar-tab-content" href="/get_started" translate="I18N_TOPNAV_GET_STARTED"></a></li>
+          <li><a class="protractor-test-teach-link oppia-navbar-tab-content" href="/teach" translate="I18N_TOPNAV_TEACH_WITH_OPPIA"></a></li>
+          <li><a href="/blog" class="oppia-navbar-tab-content" translate="I18N_TOPNAV_BLOG"></a></li>
+          <li><a href="/forum" class="oppia-navbar-tab-content" translate="I18N_TOPNAV_FORUM"></a></li>
+          <li><a class="protractor-test-contact-link oppia-navbar-tab-content" href="/contact" translate="I18N_TOPNAV_CONTACT_US"></a></li>
         </ul>
       </li>
+      <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_DONATE">
+        <div class="oppia-navbar-button-container">
+          <a href="/donate"
+             class="btn oppia-navbar-button oppia-navbar-hide-on-small-width oppia-transition-200">
+            <span class="oppia-navbar-tab-content" translate="I18N_TOPNAV_DONATE"></span>
+          </a>
+        </div>
+      </li>
+      <create-activity-button ng-show="navElementsVisibilityStatus.I18N_CREATE_EXPLORATION_CREATE"></create-activity-button>
     </ul>
-  </div>
-  <style>
-    .oppia-navbar-brand-name:focus {
-      outline: 1px dotted #fff;
-      outline: auto 5px -webkit-focus-ring-color;
-    }
-    top-navigation-bar .oppia-signin-google {
-      background: #dd4b39;
-      color: white;
-      font-family: Roboto;
-      font-size: 13px;
-      margin: 3px 3px 3px;
-      padding: 9px;
-    }
-    top-navigation-bar .oppia-signin-google i.oppia-signin-google-icon.fa.fa-google-plus {
-      font-size: 22px;
-      margin-right: 25.5px;
-      padding-right: 3px;
-      vertical-align: middle;
-    }
-    top-navigation-bar .oppia-signin-google-separator {
-      background: rgba(175, 10, 10, 0.72);
-      display: -webkit-inline-box;
-      height: 40px;
-      left: 37px;
-      position: absolute;
-      top: 3px;
-      width: 1px;
-    }
-    top-navigation-bar .oppia-signin-google b {
-      font-weight: bold;
-      position: absolute;
-      top: 13.7px;
-    }
-    top-navigation-bar .oppia-navbar-menu-icon {
-      color: #fff;
-      margin-top: -5px;
-    }
-    top-navigation-bar .oppia-navbar-dashboard-indicator-text {
-      bottom: 0;
-      color: white;
-      font-size: 1.12rem;
-      font-weight: bold;
-      position: absolute;
-      right: 4px;
-    }
-    top-navigation-bar .oppia-navbar-clickable-dropdown:hover ul.dropdown-menu {
-      display: block;
-    }
-    top-navigation-bar .oppia-navbar-clickable-dropdown:hover ul.dropdown-menu {
-      display: inline-block;
-    }
-    top-navigation-bar .oppia-navbar-role-text {
-      bottom: 0;
-      color: white;
-      font-size: 1.12rem;
-      font-weight: bold;
-      position: absolute;
-      right: 3px;
-    }
-    top-navigation-bar .oppia-navbar-dashboard-indicator {
-      background-color: #f7a541;
-      border-radius: 20px;
-      height: 15px;
-      position: absolute;
-      right: 25px;
-      top: 8px;
-      width: 15px;
-    }
-    top-navigation-bar .oppia-navbar-menu {
-      margin-left: 10px;
-      opacity: 0.9;
-      outline-color: transparent;
-      padding-top: 20px;
-    }
-    top-navigation-bar .oppia-navbar-menu:hover {
-      opacity: 1;
-    }
-    top-navigation-bar .oppia-navbar-menu:focus {
-      outline: 1px dotted #212121;
-      outline: auto 5px -webkit-focus-ring-color;
-    }
-    top-navigation-bar .oppia-navbar-profile {
-      float: right;
-    }
-    top-navigation-bar .oppia-navbar-role-indicator {
-      background-color: #f7a541;
-      border-radius: 20px;
-      bottom: 10px;
-      height: 15px;
-      position: absolute;
-      right: 25px;
-      width: 15px;
-    }
-    top-navigation-bar .oppia-navbar-close-icon {
-      color: #fff;
-      margin-right: 4px;
-      margin-top: -10px;
-    }
-  </style>
-</script>
+  </ul>
+  <ul class="nav oppia-navbar-nav oppia-navbar-profile">
+    <li ng-if="username" class="dropdown protractor-test-profile-dropdown">
+      <a class="dropdown-toggle oppia-navbar-dropdown-toggle" data-toggle="dropdown"
+         ng-mouseover="onMouseoverProfilePictureOrDropdown($event)"
+         ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)"
+         role="menuitem"
+         aria-haspopup="true"
+         aria-expanded="false"
+         aria-label="User Menu"
+         tabindex="0">
+        <div class="oppia-navbar-profile-picture-container">
+          <span ng-if="profilePictureDataUrl">
+            <img ng-src="<[profilePictureDataUrl]>" class="oppia-navbar-profile-picture img-circle" alt="User Avatar">
+            <span class="caret" style="margin-top: 10px;"></span>
+          </span>
+          <span ng-if="!profilePictureDataUrl">
+            <i class="material-icons md-40" style="margin-top: -1px;">&#xE853;</i>
+            <span class="oppia-icon-accessibility-label">User Avatar</span>
+            <span class="caret" style="margin-top: -26px;"></span>
+          </span>
+
+          <div class="oppia-navbar-dashboard-indicator ng-cloak" ng-if="numUnseenNotifications > 0">
+            <span class="oppia-navbar-dashboard-indicator-text">
+              <[numUnseenNotifications]>
+            </span>
+          </div>
+
+          <div class="oppia-navbar-role-indicator" ng-if="isAdmin || isModerator">
+            <!--
+             "right: 4px;" is necessary here but not in moderator to prevent 'A'
+             from appearing off-center because 'A' is slightly thinner than 'M' in
+             this font.
+            -->
+            <span ng-if="isAdmin" class="oppia-navbar-role-text" style="right: 4px;">A</span>
+            <span ng-if="isModerator && !isAdmin" class="oppia-navbar-role-text">M</span>
+          </div>
+        </div>
+      </a>
+
+      <ul class="dropdown-menu ng-cloak oppia-navbar-dropdown" role="menu"
+          ng-mouseover="onMouseoverProfilePictureOrDropdown($event)"
+          ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)"
+          ng-show="profileDropdownIsActive">
+        <li>
+          <a ng-click="onMouseoutProfilePictureOrDropdown($event)" ng-href="<[profilePageUrl]>"
+             class="protractor-test-profile-link">
+            <strong><[username]></strong>
+          </a>
+        </li>
+        <hr class="oppia-top-right-menu-item-separator">
+        <li>
+          <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/dashboard"
+             class="protractor-test-dashboard-link">
+            <span translate="I18N_TOPNAV_DASHBOARD"></span>
+          </a>
+        </li>
+        <li>
+          <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/notifications_dashboard"
+             class="protractor-test-notifications-link">
+            <span translate="I18N_TOPNAV_NOTIFICATIONS"></span>
+            <span ng-if="numUnseenNotifications > 0">
+              (<[numUnseenNotifications]>)
+            </span>
+          </a>
+        </li>
+        <li>
+          <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/preferences"
+             class="protractor-test-preferences-link">
+            <span translate="I18N_TOPNAV_PREFERENCES"></span>
+          </a>
+        </li>
+        <li ng-if="isModerator">
+          <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/moderator" target="_blank">
+            <span translate="I18N_TOPNAV_MODERATOR_PAGE"></span>
+          </a>
+        </li>
+        <li ng-if="isSuperAdmin">
+          <a class="protractor-test-admin-link" ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/admin" target="_blank">
+            <span translate="I18N_TOPNAV_ADMIN_PAGE"></span>
+          </a>
+        </li>
+
+        <hr class="oppia-top-right-menu-item-separator">
+
+        <li>
+          <a ng-click="onMouseoutProfilePictureOrDropdown($event)" ng-href="<[logoutUrl]>">
+            <span translate="I18N_TOPNAV_LOGOUT"></span>
+          </a>
+        </li>
+      </ul>
+    </li>
+
+    <li ng-if="!username" class="dropdown oppia-navbar-clickable-dropdown">
+      <div class="oppia-navbar-button-container" style="margin-right: 10px;">
+        <button class="btn oppia-navbar-button"
+                ng-click="onLoginButtonClicked()">
+          <span translate="I18N_TOPNAV_SIGN_IN"></span>
+          <span class="caret"></span>
+        </button>
+      </div>
+      <ul class="dropdown-menu oppia-navbar-dropdown" role="menu"
+          style="margin-right: 15px; padding: 0;"
+          ng-mouseover="onMouseoverDropdownMenu($event)"
+          ng-mouseleave="onMouseoutDropdownMenu($event)">
+        <li>
+          <a href style="padding: 0; width: 200px;" ng-click="onLoginButtonClicked()">
+            <div class="oppia-signin-google">
+              <i class="oppia-signin-google-icon fa fa-google-plus"></i>
+              <div class="oppia-signin-google-separator"></div>
+              <b><span translate="I18N_TOPNAV_SIGN_IN_WITH_GOOGLE"></span></b>
+            </div>
+          </a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+<style>
+  .oppia-navbar-brand-name:focus {
+    outline: 1px dotted #fff;
+    outline: auto 5px -webkit-focus-ring-color;
+  }
+  top-navigation-bar .oppia-signin-google {
+    background: #dd4b39;
+    color: white;
+    font-family: Roboto;
+    font-size: 13px;
+    margin: 3px 3px 3px;
+    padding: 9px;
+  }
+  top-navigation-bar .oppia-signin-google i.oppia-signin-google-icon.fa.fa-google-plus {
+    font-size: 22px;
+    margin-right: 25.5px;
+    padding-right: 3px;
+    vertical-align: middle;
+  }
+  top-navigation-bar .oppia-signin-google-separator {
+    background: rgba(175, 10, 10, 0.72);
+    display: -webkit-inline-box;
+    height: 40px;
+    left: 37px;
+    position: absolute;
+    top: 3px;
+    width: 1px;
+  }
+  top-navigation-bar .oppia-signin-google b {
+    font-weight: bold;
+    position: absolute;
+    top: 13.7px;
+  }
+  top-navigation-bar .oppia-navbar-menu-icon {
+    color: #fff;
+    margin-top: -5px;
+  }
+  top-navigation-bar .oppia-navbar-dashboard-indicator-text {
+    bottom: 0;
+    color: white;
+    font-size: 1.12rem;
+    font-weight: bold;
+    position: absolute;
+    right: 4px;
+  }
+  top-navigation-bar .oppia-navbar-clickable-dropdown:hover ul.dropdown-menu {
+    display: block;
+  }
+  top-navigation-bar .oppia-navbar-clickable-dropdown:hover ul.dropdown-menu {
+    display: inline-block;
+  }
+  top-navigation-bar .oppia-navbar-role-text {
+    bottom: 0;
+    color: white;
+    font-size: 1.12rem;
+    font-weight: bold;
+    position: absolute;
+    right: 3px;
+  }
+  top-navigation-bar .oppia-navbar-dashboard-indicator {
+    background-color: #f7a541;
+    border-radius: 20px;
+    height: 15px;
+    position: absolute;
+    right: 25px;
+    top: 8px;
+    width: 15px;
+  }
+  top-navigation-bar .oppia-navbar-menu {
+    margin-left: 10px;
+    opacity: 0.9;
+    outline-color: transparent;
+    padding-top: 20px;
+  }
+  top-navigation-bar .oppia-navbar-menu:hover {
+    opacity: 1;
+  }
+  top-navigation-bar .oppia-navbar-menu:focus {
+    outline: 1px dotted #212121;
+    outline: auto 5px -webkit-focus-ring-color;
+  }
+  top-navigation-bar .oppia-navbar-profile {
+    float: right;
+  }
+  top-navigation-bar .oppia-navbar-role-indicator {
+    background-color: #f7a541;
+    border-radius: 20px;
+    bottom: 10px;
+    height: 15px;
+    position: absolute;
+    right: 25px;
+    width: 15px;
+  }
+  top-navigation-bar .oppia-navbar-close-icon {
+    color: #fff;
+    margin-right: 4px;
+    margin-top: -10px;
+  }
+</style>

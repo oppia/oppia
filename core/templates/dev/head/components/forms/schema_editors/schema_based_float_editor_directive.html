@@ -17,19 +17,5 @@
               class="oppia-form-error" aria-live="assertive" translate="I18N_FORMS_TYPE_NUMBER_AT_MOST" translate-values="{maxValue: <[maxValue]>}"></span>
       </span>
     </span>
-
-    <span ng-if="allowExpressions()">
-      <schema-based-expression-editor ng-if="expressionMode" is-disabled="isDisabled()"
-                                      local-value="$parent.$parent.localValue"
-                                      param-names="paramNames" output-type="float"
-                                      label-for-focus-target="labelForFocusTarget()">
-      </schema-based-expression-editor>
-      <span class="input-group-btn">
-        <button type="button" class="btn btn-default" ng-click="toggleExpressionMode()" ng-disabled="isDisabled()">
-          <span ng-if="!expressionMode">E</span>
-          <span ng-if="expressionMode"><del>E</del></span>
-        </button>
-      </span>
-    </span>
   </span>
 </span>

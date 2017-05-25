@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-describe('oppiaInteractiveNumericInputValidator', function() {
-  var validator, WARNING_TYPES;
+describe('NumericInputValidationService', function() {
+  var validatorService, WARNING_TYPES;
 
   var currentState;
   var goodAnswerGroups, goodDefaultOutcome;
@@ -23,8 +23,7 @@ describe('oppiaInteractiveNumericInputValidator', function() {
   });
 
   beforeEach(inject(function($rootScope, $controller, $injector) {
-    var filter = $injector.get('$filter');
-    validator = filter('oppiaInteractiveNumericInputValidator');
+    validatorService = $injector.get('NumericInputValidationService');
 
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 
@@ -41,7 +40,7 @@ describe('oppiaInteractiveNumericInputValidator', function() {
   }));
 
   it('should be able to perform basic validation', function() {
-    var warnings = validator(
+    var warnings = validatorService.getAllWarnings(
       currentState, {}, goodAnswerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
