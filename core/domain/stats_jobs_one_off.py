@@ -50,24 +50,27 @@ class StatisticsAudit(jobs.BaseMapReduceJobManager):
                 StateCounterModel.
 
         Yields:
-            tuple. 2-tuple in the form ('exploration_id', value).
-                `exploration_id` corresponds to the id of the exploration.
-                `value`: value yielded is:
+            tuple. For StateCounterModel, a 2-tuple in the form
+                (_STATE_COUNTER_ERROR_KEY, error message).
+            tuple. For ExplorationAnnotationModel, a 2-tuple in the form
+                ('exploration_id', value).
+                'exploration_id': the id of the exploration.
+                'value': a dict, whose structure is as follows:
                     {
-                        'version': Version of the exploration,
-                        'starts': # of times exploration was started.
-                        'completions': # of times exploration was
+                        'version': version of the exploration.
+                        'starts': int. # of times exploration was started.
+                        'completions': int. # of times exploration was
                             completed.
                         'state_hit': a dict containing the hit counts for the
                             states in the exploration. It is formatted as
                             follows:
                             {
                                 state_name: {
-                                    'first_entry_count': # of sessions which
-                                        hit this state.
-                                    'total_entry_count': # of total hits for
-                                        this state.
-                                    'no_answer_count': # of hits with no
+                                    'first_entry_count': int. # of sessions
+                                        which hit this state.
+                                    'total_entry_count': int. # of total hits
+                                        for this state.
+                                    'no_answer_count': int. # of hits with no
                                         answer for this state.
                                 }
                             }
@@ -100,27 +103,27 @@ class StatisticsAudit(jobs.BaseMapReduceJobManager):
                 associated with the given key. An element of stringfield_values
                 would be of the form:
                     {
-                        'version': Version of the exploration,
-                        'starts': # of times exploration was started.
-                        'completions': # of times exploration was
+                        'version': version of the exploration.
+                        'starts': int. # of times exploration was started.
+                        'completions': int. # of times exploration was
                             completed.
-                        'state_hit': a dict containing the hit counts for the
-                            states in the exploration. It is formatted
+                        'state_hit': dict. a dict containing the hit counts
+                            for the states in the exploration. It is formatted
                             as follows:
                             {
                                 state_name: {
-                                    'first_entry_count': # of sessions
+                                    'first_entry_count': int. # of sessions
                                         which hit this state.
-                                    'total_entry_count': # of total
+                                    'total_entry_count': int. # of total
                                         hits for this state.
-                                    'no_answer_count': # of hits with
+                                    'no_answer_count': int. # of hits with
                                         no answer for this state.
                                 }
                             }
                     }
 
         Yields:
-            various error messages are possible
+            tuple(str). A 1-tuple whose only element is an error message.
         """
         if key == StatisticsAudit._STATE_COUNTER_ERROR_KEY:
             for value_str in stringified_values:
