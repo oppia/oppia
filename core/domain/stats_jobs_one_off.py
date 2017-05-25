@@ -98,7 +98,7 @@ class StatisticsAudit(jobs.BaseMapReduceJobManager):
         """Updates statistics for the given exploration.
 
         Args:
-            key: str. The exploration id of the exploration
+            key: str. The exploration id of the exploration.
             stringified_values: list(str). A list of stringified values
                 associated with the given key. An element of stringfield_values
                 would be of the form:
