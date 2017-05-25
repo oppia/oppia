@@ -104,7 +104,7 @@ def require_fully_signed_up(handler):
         """Check that the user has registered as an editor.
 
         Raises:
-            UnauthorizedUserException: The user has insufficient credential.
+            UnauthorizedUserException: The user has insufficient credentials.
         """
         if (not self.user_id
                 or self.username in config_domain.BANNED_USERNAMES.value
@@ -316,9 +316,9 @@ class BaseHandler(webapp2.RequestHandler):
 
         Args:
             filename: str. The template filename, related to the
-                           templates directory.
+                templates directory.
             iframe_restriction: str. Keyword argument used as variable for
-                                iframe restriction.
+                iframe restriction.
             redirect_url_on_logout: str. URL to redirect on logout.
         """
         values = self.values
