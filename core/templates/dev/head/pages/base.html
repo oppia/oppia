@@ -141,6 +141,8 @@
     {% else %}
       <promo-bar ng-if="promoBarIsEnabled" promo-message="promoBarMessage">
       </promo-bar>
+      <div ng-if="backgroundMaskActive()" class="ng-cloak oppia-background-mask">
+      </div>
 
       <div class="oppia-base-container"
            ng-class="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"

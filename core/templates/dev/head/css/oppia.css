@@ -561,6 +561,19 @@ textarea {
 }
 
 /*
+  Styles for backgroundMaskService.
+*/
+.oppia-background-mask {
+  background: rgba(0,0,0,0.33);
+  height: 100vh;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  z-index: 30;
+}
+
+/*
   Styles for the global navigation sidebar menu.
 */
 .oppia-base-container {

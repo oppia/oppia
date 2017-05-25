@@ -838,6 +838,20 @@ oppia.factory('windowDimensionsService', ['$window', function($window) {
   };
 }]);
 
+// Service for enabling a background mask that leaves navigation visible.
+oppia.factory('backgroundMaskService', function() {
+  var maskActive = false;
+
+  return {
+    getMaskActive: function() {
+      return maskActive;
+    },
+    setMaskState: function(state) {
+      maskActive = state;
+    }
+  };
+});
+
 // Service for sending events to Google Analytics.
 //
 // Note that events are only sent if the CAN_SEND_ANALYTICS_EVENTS flag is
