@@ -315,11 +315,10 @@ class BaseHandler(webapp2.RequestHandler):
         """Prepares an HTML response to be sent to the client.
 
         Args:
-            filename: str. The template filename, related to the
-                templates directory.
-            iframe_restriction: str. Keyword argument used as variable for
+            filename: str. The template filepath.
+            iframe_restriction: str or None. Keyword argument used as variable for
                 iframe restriction.
-            redirect_url_on_logout: str. URL to redirect on logout.
+            redirect_url_on_logout: str or None. URL to redirect to on logout.
         """
         values = self.values
 
@@ -440,7 +439,7 @@ class BaseHandler(webapp2.RequestHandler):
 
          Args:
             error_code: int. The HTTP status code (expected to be one of
-                        400, 401,404 or 500).
+                400, 401, 404 or 500).
             values: dict. list of values from JSON response.
         """
         assert error_code in [400, 401, 404, 500]
@@ -466,7 +465,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         Args:
             exception: The exception that was thrown.
-            unused_debug_mode: The uncaught exception.
+            unused_debug_mode:  bool. True if the web application is running in debug mode.
         """
 
         logging.info(''.join(traceback.format_exception(*sys.exc_info())))
@@ -592,7 +591,6 @@ class CsrfTokenManager(object):
         Args:
             user_id: str. The user_id to validate the CSRF token against.
             token: str. The CSRF token to validate.
-
         """
         try:
             parts = token.split('/')
