@@ -316,8 +316,12 @@ class BaseHandler(webapp2.RequestHandler):
 
         Args:
             filename: str. The template filepath.
-            iframe_restriction: str or None. Keyword argument used as variable for
-                iframe restriction.
+            iframe_restriction: str or None. X-Frame-Options expected
+                from ['DENY','SAMEORIGIN'].
+
+                DENY: Strictly prevents the template to load in an iframe.
+                SAMEORIGIN: The template can only be displayed in a frame
+                    on the same origin as the page itself.
             redirect_url_on_logout: str or None. URL to redirect to on logout.
         """
         values = self.values
@@ -440,7 +444,7 @@ class BaseHandler(webapp2.RequestHandler):
          Args:
             error_code: int. The HTTP status code (expected to be one of
                 400, 401, 404 or 500).
-            values: dict. list of values from JSON response.
+            values: dict. The key-value pairs to include in the response.
         """
         assert error_code in [400, 401, 404, 500]
         values['code'] = error_code
@@ -465,7 +469,8 @@ class BaseHandler(webapp2.RequestHandler):
 
         Args:
             exception: The exception that was thrown.
-            unused_debug_mode:  bool. True if the web application is running in debug mode.
+            unused_debug_mode:  bool. True if the web application is running
+                in debug mode.
         """
 
         logging.info(''.join(traceback.format_exception(*sys.exc_info())))
@@ -549,7 +554,7 @@ class CsrfTokenManager(object):
         """Creates a new CSRF token.
 
         Args:
-            user_id: str. The user_id for whom token is generated
+            user_id: str. The user_id for whom token is generated.
             issued_on: The time while generating token.
 
         Returns:
