@@ -90,13 +90,13 @@ oppia.directive('collectionNodeCreator', [function() {
           );
         };
 
-        var cleanExplorationId = function(newExplorationId) {
+        var convertTypeAheadToExplorationId = function(newExplorationId) {
           if (newExplorationId.length > 1 && newExplorationId[0] === '(') {
-            var temp = '';
+            var explorationId = '';
             for (var i = 2; newExplorationId[i] !== ')'; i++) {
-              temp += newExplorationId[i];
+              explorationId += newExplorationId[i];
             }
-            $scope.newExplorationId = temp;
+            return explorationId;
           }
         };
 
@@ -123,8 +123,8 @@ oppia.directive('collectionNodeCreator', [function() {
         };
 
         $scope.addExploration = function() {
-          cleanExplorationId($scope.newExplorationId);
-          addExplorationToCollection($scope.newExplorationId);
+          addExplorationToCollection(convertTypeAheadToExplorationId(
+            $scope.newExplorationId));
           $scope.newExplorationId = '';
         };
       }
