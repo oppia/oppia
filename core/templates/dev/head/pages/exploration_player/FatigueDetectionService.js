@@ -28,7 +28,8 @@ oppia.factory('FatigueDetectionService',
         submissionTimesMsec.push(+new Date());
         if (submissionTimesMsec.length >= NUM_SUBMISSIONS) {
           var timeThreeSubmissionsAgo = submissionTimesMsec.shift();
-          var timeLastSubmission = submissionTimesMsec[submissionTimesMsec.length - 1];
+          var timeLastSubmission = 
+            submissionTimesMsec[submissionTimesMsec.length - 1];
           if (timeLastSubmission - timeThreeSubmissionsAgo < SPAM_WINDOW) {
             $modal.open({
               templateUrl: 'modals/takeBreak',
