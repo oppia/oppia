@@ -316,8 +316,8 @@ class BaseHandler(webapp2.RequestHandler):
 
         Args:
             filepath: str. The template filepath.
-            iframe_restriction: str or None. X-Frame-Options expected
-                from ['DENY','SAMEORIGIN'].
+            iframe_restriction: str or None. Possible values are
+                'DENY' and 'SAMEORIGIN':
 
                 DENY: Strictly prevents the template to load in an iframe.
                 SAMEORIGIN: The template can only be displayed in a frame
@@ -469,7 +469,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         Args:
             exception: The exception that was thrown.
-            unused_debug_mode:  bool. True if the web application is running
+            unused_debug_mode: bool. True if the web application is running
                 in debug mode.
         """
         logging.info(''.join(traceback.format_exception(*sys.exc_info())))
@@ -554,7 +554,7 @@ class CsrfTokenManager(object):
 
         Args:
             user_id: str. The user_id for whom the token is generated.
-            issued_on: The time while generating token.
+            issued_on: float. The timestamp at which the token was issued.
 
         Returns:
             str: The generated CSRF token.
