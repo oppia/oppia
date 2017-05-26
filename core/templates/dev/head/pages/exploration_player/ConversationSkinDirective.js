@@ -255,7 +255,7 @@ oppia.directive('conversationSkin', [
         'siteAnalyticsService', 'ExplorationPlayerStateService',
         'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX', 'alertsService',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
-        'fatigueDetectionService',
+        'FatigueDetectionService',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
             messengerService, oppiaPlayerService, urlService, focusService,
@@ -266,7 +266,7 @@ oppia.directive('conversationSkin', [
             siteAnalyticsService, ExplorationPlayerStateService,
             TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX, alertsService,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
-            fatigueDetectionService) {
+            FatigueDetectionService) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           // The minimum width, in pixels, needed to be able to show two cards
           // side-by-side.
@@ -484,7 +484,20 @@ oppia.directive('conversationSkin', [
           };
 
           $scope.submitAnswer = function(answer, interactionRulesService) {
-            if (fatigueDetectionService.addSubmission()) {
+            // Safety check to prevent double submissions from occurring.
+            // It's not clear if this is needed as the original
+            // issue may have possibly been resolved in PR#3474
+            // when redundant submitAnswer() calls were removed
+            // from TextInput and NumericInput
+            if (_answerIsBeingProcessed ||
+              !$scope.isCurrentCardAtEndOfTranscript() ||
+              $scope.activeCard.destStateName) {
+              return;
+            }
+
+
+            if (!$scope.isInPreviewMode &&
+                FatigueDetectionService.addSubmission()) {
               $scope.$broadcast('oppiaFeedbackAvailable');
               return;
             }
@@ -542,7 +555,7 @@ oppia.directive('conversationSkin', [
                     // There is a new card. If there is no feedback, move on
                     // immediately. Otherwise, give the learner a chance to read
                     // the feedback, and display a 'Continue' button.
-                    fatigueDetectionService.reset();
+                    FatigueDetectionService.reset();
 
                     _nextFocusLabel = focusService.generateFocusLabel();
 

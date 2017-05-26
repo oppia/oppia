@@ -16,18 +16,20 @@
  * @fileoverview Service for detecting spamming behavior from the learner.
  */
 
-oppia.factory('fatigueDetectionService', 
+oppia.factory('FatigueDetectionService', 
   ['$modal', function($modal) {
-    var submissionTimes = [];
+    // 4 submissions in under 10 seconds triggers modal
+    var NUM_SUBMISSIONS = 4;
+    var SPAM_WINDOW = 10000;
+    var submissionTimesMsec = [];
 
     return {
       addSubmission: function() {
-        submissionTimes.push(+new Date());
-        // 4 submissions in under 10 seconds
-        if (submissionTimes.length > 3) {
-          var timeThreeSubmissionsAgo = submissionTimes.shift();
-          var timeLastSubmission = submissionTimes[submissionTimes.length - 1];
-          if (timeLastSubmission - timeThreeSubmissionsAgo < 10000) {
+        submissionTimesMsec.push(+new Date());
+        if (submissionTimesMsec.length >= NUM_SUBMISSIONS) {
+          var timeThreeSubmissionsAgo = submissionTimesMsec.shift();
+          var timeLastSubmission = submissionTimesMsec[submissionTimesMsec.length - 1];
+          if (timeLastSubmission - timeThreeSubmissionsAgo < SPAM_WINDOW) {
             $modal.open({
               templateUrl: 'modals/takeBreak',
               backdrop: 'static',
@@ -46,7 +48,7 @@ oppia.factory('fatigueDetectionService',
         return false;
       },
       reset: function() {
-        submissionTimes = [];
+        submissionTimesMsec = [];
       }
     }
   }]);
