@@ -18,35 +18,39 @@
 
 oppia.factory('FatigueDetectionService', 
   ['$modal', function($modal) {
-    // 4 submissions in under 10 seconds triggers modal
-    var NUM_SUBMISSIONS = 4;
-    var SPAM_WINDOW = 10000;
+    // 4 submissions in under 10 seconds triggers modal.
+    var SPAM_COUNT_THRESHOLD = 4;
+    var SPAM_WINDOW_MSEC = 10000;
     var submissionTimesMsec = [];
 
     return {
-      addSubmission: function() {
-        submissionTimesMsec.push(+new Date());
-        if (submissionTimesMsec.length >= NUM_SUBMISSIONS) {
-          var timeThreeSubmissionsAgo = submissionTimesMsec.shift();
-          var timeLastSubmission = 
+      recordSubmissionTimestamp: function() {
+        submissionTimesMsec.push((new Date()).getTime());
+      },
+      isSubmittingTooFast: function() {
+        if (submissionTimesMsec.length >= SPAM_COUNT_THRESHOLD) {
+          var windowStartTime = submissionTimesMsec.shift();
+          var windowEndTime = 
             submissionTimesMsec[submissionTimesMsec.length - 1];
-          if (timeLastSubmission - timeThreeSubmissionsAgo < SPAM_WINDOW) {
-            $modal.open({
-              templateUrl: 'modals/takeBreak',
-              backdrop: 'static',
-              resolve: {},
-              controller: [
-                '$scope', '$modalInstance',
-                function($scope, $modalInstance) {
-                  $scope.okay = function() {
-                    $modalInstance.close('okay');
-                  };
-                }]
-            });
+          if (windowEndTime - windowStartTime < SPAM_WINDOW_MSEC) {
             return true;
           }
         }
         return false;
+      },
+      displayTakeBreakMessage: function() {
+        $modal.open({
+          templateUrl: 'modals/takeBreak',
+          backdrop: 'static',
+          resolve: {},
+          controller: [
+            '$scope', '$modalInstance',
+            function($scope, $modalInstance) {
+              $scope.okay = function() {
+                $modalInstance.close('okay');
+              };
+            }]
+        });
       },
       reset: function() {
         submissionTimesMsec = [];

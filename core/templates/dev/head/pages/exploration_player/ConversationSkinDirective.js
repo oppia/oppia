@@ -485,10 +485,6 @@ oppia.directive('conversationSkin', [
 
           $scope.submitAnswer = function(answer, interactionRulesService) {
             // Safety check to prevent double submissions from occurring.
-            // It's not clear if this is needed as the original
-            // issue may have possibly been resolved in PR#3474
-            // when redundant submitAnswer() calls were removed
-            // from TextInput and NumericInput
             if (_answerIsBeingProcessed ||
               !$scope.isCurrentCardAtEndOfTranscript() ||
               $scope.activeCard.destStateName) {
@@ -496,10 +492,13 @@ oppia.directive('conversationSkin', [
             }
 
 
-            if (!$scope.isInPreviewMode &&
-                FatigueDetectionService.addSubmission()) {
-              $scope.$broadcast('oppiaFeedbackAvailable');
-              return;
+            if (!$scope.isInPreviewMode) {
+              FatigueDetectionService.recordSubmissionTimestamp();
+              if (FatigueDetectionService.isSubmittingTooFast()) {
+                FatigueDetectionService.displayTakeBreakMessage();
+                $scope.$broadcast('oppiaFeedbackAvailable');
+                return;
+              }
             }
 
             _answerIsBeingProcessed = true;
