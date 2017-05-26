@@ -23,21 +23,6 @@
 
   {{dependencies_html}}
   <style>
-    @media(max-width: 768px) {
-      /* This prevents the navbar from collapsing in the exploration page,
-      so that the exploration title can be shown. */
-      .oppia-exploration-header {
-        display: block;
-        float: right;
-        max-width: 240px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-      .oppia-navbar-collapse.collapse {
-        display: block;
-      }
-    }
     @media(max-width: 500px) {
       img.oppia-logo {
         height: 48px;
@@ -53,9 +38,6 @@
         max-width: 35px;
         overflow: hidden;
       }
-      .oppia-navbar-breadcrumb-icon {
-        display: none;
-      }
     }
     @media(max-width: 400px) {
       .oppia-exploration-header {
@@ -66,14 +48,10 @@
 {% endblock header_js %}
 
 {% block navbar_breadcrumb %}
-  <ul class="nav navbar-nav oppia-navbar-breadcrumb" ng-controller="LearnerViewBreadcrumb">
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
     <li>
       <span class="oppia-navbar-breadcrumb-separator"></span>
       <h1 class="oppia-exploration-h1"><span class="protractor-test-exploration-header oppia-exploration-header" itemprop="description">{{exploration_title}}</span></h1>
-    </li>
-    <li ng-click="showInformationCard()" tooltip="<['I18N_PLAYER_INFO_TOOLTIP' | translate]>" tooltip-placement="bottom" style="cursor: pointer;" class="oppia-exploration-info-icon protractor-test-exploration-info-icon" tabindex="0">
-      <i class="material-icons oppia-navbar-breadcrumb-icon" style="font-size: 20px;">&#xE88E;</i>
-      <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_INFO_TOOLTIP' | translate]></span>
     </li>
   </ul>
 {% endblock navbar_breadcrumb %}
@@ -130,13 +108,6 @@
       display: inline;
       font-size: 1em;
       font-weight: normal;
-    }
-    .oppia-exploration-info-icon:focus {
-      background: #fff;
-      color: #009688;
-      margin-top: -13px;
-      height: 56px;
-      padding-top: 12px;
     }
   </style>
 
@@ -198,7 +169,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/FeedbackPopupDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerLocalNav.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerParamsService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerViewBreadcrumb.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerViewInfo.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerViewRatingService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerPositionService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerServices.js"></script>
