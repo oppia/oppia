@@ -155,7 +155,7 @@
 <div class="footer navbar-fixed-bottom oppia-exploration-footer">
   <div class="row">
     <div class="col-sm-5">
-      <ul class="author-profile" ng-if="!windowIsNarrow">
+      <ul class="author-profile" ng-if="!mobileFeedbackIsShown">
         <li>
           <img ng-src="<[getStaticImageUrl('/general/apple.svg')]>" class="exploration-footer-img"
                alt="">
@@ -185,7 +185,7 @@
           </div>
         </li>
       </ul>
-      <ul class="mobile-feedback" ng-if="windowIsNarrow">
+      <ul class="mobile-feedback" ng-if="mobileFeedbackIsShown">
         <li popover-placement="top-left" popover-template="'popover/feedback'" popover-trigger="click">
           <a href="" class="btn oppia-navbar-button">
             <i class="material-icons">&#xE87F;</i>

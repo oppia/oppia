@@ -49,7 +49,7 @@ oppia.directive('feedbackPopup', [
           $scope.feedbackPopoverId = (
             'feedbackPopover' + Math.random().toString(36).slice(2));
 
-          if ( windowDimensionsService.isWindowNarrow() ) {
+          if ( windowDimensionsService.getWidth() < 651 ) {
             BackgroundMaskService.activateMask();
           }
 
