@@ -131,6 +131,7 @@ oppia.directive('feedbackPopup', [
             $timeout(function() {
               getTriggerElt().trigger('click');
             });
+            BackgroundMaskService.deactivateMask();
           };
 
           $scope.$on('$destroy', function() {
