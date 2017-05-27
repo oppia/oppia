@@ -58,12 +58,6 @@ describe('Library pages tour', function() {
     users.logout();
   });
 
-  it('visits the recent explorations page', function() {
-    visitLibraryPage();
-    element(by.css('.protractor-test-library-recently-published')).click();
-    expect(browser.getCurrentUrl()).toContain('library/recently_published');
-  });
-
   it('visits the search page', function() {
     visitLibraryPage();
     element(by.css('.protractor-test-search-input')).sendKeys(SEARCH_TERM);
