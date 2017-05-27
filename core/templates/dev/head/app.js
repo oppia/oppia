@@ -816,12 +816,11 @@ oppia.factory('urlService', ['$window', function($window) {
 // Service for computing the window dimensions.
 oppia.factory('windowDimensionsService', ['$window', function($window) {
   var onResizeHooks = [];
-
-  $window.onresize = function() {
+  angular.element($window).bind('resize', function() {
     onResizeHooks.forEach(function(hookFn) {
       hookFn();
     });
-  };
+  });
   return {
     getWidth: function() {
       return (
