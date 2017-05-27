@@ -746,6 +746,12 @@ textarea {
   content: ">";
 }
 
+.oppia-navbar-breadcrumb-icon {
+  height: 20px;
+  margin: 0 12px 4px 12px;
+  width: 20px;
+}
+
 .navbar-default .navbar-nav > li > a:hover,
 .navbar-default .navbar-nav > li > a:focus {
   color: #fff;

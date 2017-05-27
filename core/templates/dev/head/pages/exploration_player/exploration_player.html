@@ -48,10 +48,14 @@
 {% endblock header_js %}
 
 {% block navbar_breadcrumb %}
-  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb" ng-controller="LearnerViewInfo">
     <li>
       <span class="oppia-navbar-breadcrumb-separator"></span>
       <h1 class="oppia-exploration-h1"><span class="protractor-test-exploration-header oppia-exploration-header" itemprop="description">{{exploration_title}}</span></h1>
+    </li>
+    <li ng-click="showInformationCard()" tooltip="<['I18N_PLAYER_INFO_TOOLTIP' | translate]>" tooltip-placement="bottom" style="cursor: pointer;" class="oppia-exploration-info-icon protractor-test-exploration-info-icon" tabindex="0">
+      <i class="material-icons oppia-navbar-breadcrumb-icon" style="font-size: 20px;">&#xE88E;</i>
+      <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_INFO_TOOLTIP' | translate]></span>
     </li>
   </ul>
 {% endblock navbar_breadcrumb %}
@@ -108,6 +112,13 @@
       display: inline;
       font-size: 1em;
       font-weight: normal;
+    }
+    .oppia-exploration-info-icon:hover {
+      background: #fff;
+      color: #009688;
+      margin-top: -13px;
+      height: 56px;
+      padding-top: 12px;
     }
   </style>
 
