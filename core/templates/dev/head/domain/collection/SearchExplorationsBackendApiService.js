@@ -17,33 +17,32 @@
  */
 
 oppia.factory('SearchExplorationsBackendApiService', [
-    '$http', 'alertsService', 'SEARCH_EXPLORATION_URL_TEMPLATE',
-    'UrlInterpolationService', '$q',
-    function(
-        $http, alertsService, SEARCH_EXPLORATION_URL_TEMPLATE,
-        UrlInterpolationService, $q) {
-      var _getExplorations = function(
-        searchQuery, successCallback, errorCallback) {
-        queryUrl = UrlInterpolationService.interpolateUrl(
-          SEARCH_EXPLORATION_URL_TEMPLATE, {
-            query: searchQuery
-          }
-        );
-        $http.get(queryUrl).then(function(response) {
-          if (successCallback) {
-            successCallback(response.data);
-          }
-        }, function(errorResponse) {
-          if (errorCallback) {
-            errorCallback(errorResponse.data);
-          }
-        });
-      };
-      return {
-        getExplorations: function(searchQuery) {
-          return $q(function(resolve, reject) {
-            _getExplorations(searchQuery, resolve, reject);
-          });
+  '$http', '$q', 'alertsService', 'SEARCH_EXPLORATION_URL_TEMPLATE',
+  'UrlInterpolationService',
+  function(
+      $http, $q, alertsService, SEARCH_EXPLORATION_URL_TEMPLATE,
+      UrlInterpolationService) {
+    var _fetchExplorations = function(
+      searchQuery, successCallback, errorCallback) {
+      queryUrl = UrlInterpolationService.interpolateUrl(
+        SEARCH_EXPLORATION_URL_TEMPLATE, {
+          query: searchQuery
         }
-      };
-    }]);
+      );
+      $http.get(queryUrl).then(function(response) {
+        successCallback(response.data);
+      }, function(errorResponse) {
+        errorCallback(errorResponse.data);
+      });
+    };
+    return {
+      /**
+       * Returns exploration's metadata dict, given its search query.
+       */
+      fetchExplorations: function(searchQuery) {
+        return $q(function(resolve, reject) {
+          _fetchExplorations(searchQuery, resolve, reject);
+        });
+      }
+    };
+  }]);

@@ -38,23 +38,35 @@ oppia.directive('collectionNodeCreator', [
           $scope.collection = CollectionEditorStateService.getCollection();
           $scope.newExplorationId = '';
           $scope.newExplorationTitle = '';
+
           var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
 
-          $scope.fetchExplorationsMetadata = function(searchQuery) {
-            if (/^[a-zA-Z0-9- ]*$/.test(searchQuery)) {
-              return SearchExplorationsBackendApiService.getExplorations(
-                searchQuery).then(
-              function(explorationMetadataObject) {
-                return explorationMetadataObject.collection_node_metadata_list.
+          $scope.explorationTitleFragment = function(searchQuery) {
+            if (isValidSearchQuery(searchQuery)) {
+              $scope.searchQueryHasError = false;
+              return SearchExplorationsBackendApiService.fetchExplorations(
+                searchQuery
+              ).then(function(explorationMetadataBackendDict) {
+                return explorationMetadataBackendDict.
+                  collection_node_metadata_list.
                   map(function(item) {
                     return '(#' + item.id + ') ' + item.title;
                   });
-              },
-              function() {
+              }, function() {
                 alertsService.addWarning(
-                  'There was an error when searching the explorations.');
+                  'There was an error when searching for matching ' + 
+                  'explorations.');
               });
+            } else {
+              $scope.searchQueryHasError = true;
             }
+          };
+
+          var isValidSearchQuery = function(searchQuery) {
+            if (/^[a-zA-Z0-9- ]*$/.test(searchQuery)) {
+              return true;
+            }
+            return;
           };
 
           var addExplorationToCollection = function(newExplorationId) {
@@ -93,14 +105,12 @@ oppia.directive('collectionNodeCreator', [
             );
           };
 
-          var convertTypeAheadToExplorationId = function(newExplorationId) {
-            if (newExplorationId.length > 1 && newExplorationId[0] === '(') {
-              var explorationId = '';
-              for (var i = 2; newExplorationId[i] !== ')'; i++) {
-                explorationId += newExplorationId[i];
-              }
-              return explorationId;
+          var convertTypeaheadToExplorationId = function(typeaheadOption) {
+            var option = typeaheadOption.match(/\(#(.*?)\)/);
+            if (option == null) {
+              return typeaheadOption;
             }
+            return option[1];
           };
 
           // Creates a new exploration, then adds it to the collection.
@@ -127,7 +137,7 @@ oppia.directive('collectionNodeCreator', [
           };
 
           $scope.addExploration = function() {
-            addExplorationToCollection(convertTypeAheadToExplorationId(
+            addExplorationToCollection(convertTypeaheadToExplorationId(
               $scope.newExplorationId));
             $scope.newExplorationId = '';
           };

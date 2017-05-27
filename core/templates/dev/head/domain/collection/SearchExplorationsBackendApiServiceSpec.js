@@ -46,7 +46,7 @@ describe('Exploration search backend API service', function() {
       'GET', '/exploration/metadata_search?q=three').respond(200, {
         collection_node_metadata_list: []
       });
-    SearchExplorationsBackendApiService.getExplorations('three').then(
+    SearchExplorationsBackendApiService.fetchExplorations('three').then(
       successHandler, failHandler);
     $httpBackend.flush();
     $rootScope.$digest();
@@ -66,7 +66,7 @@ describe('Exploration search backend API service', function() {
         objective: 
         'learn how to count permutations accurately and systematically',
         title: 'Protractor Test'
-      },{
+      }, {
         id: '4',
         objective: 
         'learn how to count permutations accurately and systematically',
@@ -77,7 +77,7 @@ describe('Exploration search backend API service', function() {
     $httpBackend.expect(
       'GET', '/exploration/metadata_search?q=count').respond(200, 
       searchResults);
-    SearchExplorationsBackendApiService.getExplorations('count').then(
+    SearchExplorationsBackendApiService.fetchExplorations('count').then(
       successHandler, failHandler);
     $httpBackend.flush();
     $rootScope.$digest();
@@ -92,7 +92,7 @@ describe('Exploration search backend API service', function() {
 
     $httpBackend.expect(
       'GET', '/exploration/metadata_search?q=oppia').respond(500);
-    SearchExplorationsBackendApiService.getExplorations('oppia').then(
+    SearchExplorationsBackendApiService.fetchExplorations('oppia').then(
       successHandler, failHandler);
     $httpBackend.flush();
     $rootScope.$digest();
