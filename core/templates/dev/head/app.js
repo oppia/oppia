@@ -838,15 +838,15 @@ oppia.factory('windowDimensionsService', ['$window', function($window) {
 }]);
 
 // Service for enabling a background mask that leaves navigation visible.
-oppia.factory('backgroundMaskService', function() {
-  var maskActive = false;
+oppia.factory('BackgroundMaskService', function() {
+  var maskIsActive = false;
 
   return {
-    getMaskActive: function() {
-      return maskActive;
+    isMaskActive: function() {
+      return maskIsActive;
     },
-    setMaskState: function(state) {
-      maskActive = state;
+    activateMask: function(state) {
+      maskIsActive = state;
     }
   };
 });
