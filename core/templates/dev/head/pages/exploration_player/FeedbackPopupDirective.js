@@ -50,7 +50,7 @@ oppia.directive('feedbackPopup', [
             'feedbackPopover' + Math.random().toString(36).slice(2));
 
           if ( windowDimensionsService.isWindowNarrow() ) {
-            BackgroundMaskService.activateMask(true);
+            BackgroundMaskService.activateMask();
           }
 
           focusService.setFocus($scope.feedbackPopoverId);
@@ -134,7 +134,7 @@ oppia.directive('feedbackPopup', [
           };
 
           $scope.$on('$destroy', function() {
-            BackgroundMaskService.activateMask(false);
+            BackgroundMaskService.deactivateMask();
           });
         }
       ]

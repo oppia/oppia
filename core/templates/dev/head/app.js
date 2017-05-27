@@ -845,8 +845,11 @@ oppia.factory('BackgroundMaskService', function() {
     isMaskActive: function() {
       return maskIsActive;
     },
-    activateMask: function(state) {
-      maskIsActive = state;
+    activateMask: function() {
+      maskIsActive = true;
+    },
+    deactivateMask: function() {
+      maskIsActive = false;
     }
   };
 });
