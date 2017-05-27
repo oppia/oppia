@@ -13,7 +13,7 @@
     }
   </style>
   <div style="min-width: 200px;">
-    <div ng-show="!feedbackSubmitted">
+    <div ng-if="!feedbackSubmitted">
       <button type="button" class="oppia-close-popover-button" ng-click="closePopover()">
         <i class="material-icons md-18">&#xE5CD;</i>
       </button>
@@ -40,7 +40,7 @@
       </div>
     </div>
 
-    <div ng-show="feedbackSubmitted" translate="I18N_PLAYER_THANK_FEEDBACK">
+    <div ng-if="feedbackSubmitted" class="ng-cloak" translate="I18N_PLAYER_THANK_FEEDBACK">
     </div>
   </div>
 </script>
