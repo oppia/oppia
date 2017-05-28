@@ -198,7 +198,7 @@
 	"I18N_INTERACTIONS_SET_INPUT_SUBMIT": "Text displayed in a set interaction. - The text is shown inside a button. When the user clicks the button, the system checks if the answer is correct and continues to the following action.\n{{Identical|Submit}}",
 	"I18N_LANGUAGE_FOOTER_VIEW_IN": "Text for the site language selector. - When the user selects a different language, the site (not the explorations) is translated into that language.",
 	"I18N_LEARNER_DASHBOARD_COMPLETED_SECTION": "Text for the completed section in the learner dashboard.",
-	"I18n_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS": "Text displayed in the learner dashboard. - The text is shown when new exporations are added to the collections the user has already completed.",
+	"I18N_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS": "Text displayed in the learner dashboard. - The text is shown when new exporations are added to the collections the user has already completed.",
 	"I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_COLLECTION": "Text displayed in the learner dashboard. - This text is shown when a completed collection has been deleted.",
 	"I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_EXPLORATION": "Text displayed in the learner dashboard. - This text is shown when a completed exploration has been deleted.",
 	"I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_COLLECTION": "Text displayed in the learner dashboard. - This text is shown when a collection in progress has been deleted.",

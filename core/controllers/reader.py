@@ -469,7 +469,6 @@ class RemoveExpFromIncompleteListHandler(base.BaseHandler):
     def post(self):
         """Handles POST requests."""
         exploration_id = self.payload.get('exploration_id')
-        print "Hello", exploration_id
         learner_progress_services.remove_exp_from_incomplete_list(
             self.user_id, exploration_id)
         self.render_json(self.values)

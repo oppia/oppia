@@ -57,7 +57,7 @@ exports.config = {
   // with --suite=smoke, only the patterns matched by that suite will run.
   suites: {
     full: [
-      'protractor/*.js'
+      'protractor/*.js',
     ],
 
     mainEditor: [
@@ -89,6 +89,7 @@ exports.config = {
       'protractor/preferences.js',
       'protractor/cacheSlugs.js',
       'protractor/staticPagesTour.js',
+      'protractor/learnerDashboard.js',
       'protractor/loginFlow.js',
       'protractor/libraryPagesTour.js',
       'protractor/collections.js',

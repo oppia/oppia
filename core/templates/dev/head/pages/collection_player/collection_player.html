@@ -264,7 +264,8 @@
                              setIconHighlight($index);"
                ng-mouseleave="togglePreviewCard();
                               unsetIconHighlight($index);"
-               ng-class="{'animate-next-exploration': node.getExplorationId() === nextExplorationId}">
+               ng-class="{'animate-next-exploration': node.getExplorationId() === nextExplorationId}"
+               class="protractor-test-collection-exploration">
               <circle ng-show="($index===activeHighlightedIconIndex)?true:false"
                       cx="50"
                       cy="70"

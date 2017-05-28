@@ -97,13 +97,14 @@
                  ng-click="setActiveSubSection(LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS)"
                  translate="I18N_DASHBOARD_EXPLORATIONS">
             </div>
-            <div class="oppia-learner-dashboard-submenu"
+            <div id="completedSection"
+                 class="oppia-learner-dashboard-submenu"
                  ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubSection === LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS}"
                  ng-click="setActiveSubSection(LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS)"
                  translate="I18N_DASHBOARD_COLLECTIONS">
             </div>
           </div>
-          <h4 class="oppia-learner-dashboard-menu"
+          <h4 class="oppia-learner-dashboard-menu protractor-test-completed-section"
               ng-class="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTIONS.COMPLETED}"
               ng-click="setActiveSection(LEARNER_DASHBOARD_SECTIONS.COMPLETED)">
             <span translate="<[LEARNER_DASHBOARD_SECTIONS.COMPLETED]>"></span>
@@ -115,13 +116,14 @@
                  ng-click="setActiveSubSection(LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS)"
                  translate="I18N_DASHBOARD_EXPLORATIONS">
             </div>
-            <div class="oppia-learner-dashboard-submenu"
+            <div id="completedSection"
+                 class="oppia-learner-dashboard-submenu"
                  ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubSection === LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS}"
                  ng-click="setActiveSubSection(LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS)"
                  translate="I18N_DASHBOARD_COLLECTIONS">
             </div>
           </div>
-          <h4 class="oppia-learner-dashboard-menu"
+          <h4 class="oppia-learner-dashboard-menu protractor-test-subscriptions-section"
               ng-class="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTIONS.SUBSCRIPTIONS}"
               ng-click="setActiveSection(LEARNER_DASHBOARD_SECTIONS.SUBSCRIPTIONS)">
             <span translate="<[LEARNER_DASHBOARD_SECTIONS.SUBSCRIPTIONS]>"></span>
