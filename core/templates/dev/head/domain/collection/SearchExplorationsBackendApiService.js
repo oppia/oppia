@@ -37,7 +37,9 @@ oppia.factory('SearchExplorationsBackendApiService', [
     };
     return {
       /**
-       * Returns exploration's metadata dict, given its search query.
+       * Returns exploration's metadata dict, given a search query. Search 
+       * queries are tokens that will be matched against exploration's title
+       * and objective.
        */
       fetchExplorations: function(searchQuery) {
         return $q(function(resolve, reject) {

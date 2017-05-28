@@ -38,10 +38,16 @@ oppia.directive('collectionNodeCreator', [
           $scope.collection = CollectionEditorStateService.getCollection();
           $scope.newExplorationId = '';
           $scope.newExplorationTitle = '';
+          $scope.searchQueryHasError = false;
 
           var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
 
-          $scope.explorationTitleFragment = function(searchQuery) {
+          /**
+           * Fetches a list of exploration metadata dicts from backend, given
+           * a search query. It then extracts the title and id of the
+           * exploration to prepare typeahead options.
+           */
+          $scope.fetchExplorationTitleFragment = function(searchQuery) {
             if (isValidSearchQuery(searchQuery)) {
               $scope.searchQueryHasError = false;
               return SearchExplorationsBackendApiService.fetchExplorations(
@@ -106,11 +112,11 @@ oppia.directive('collectionNodeCreator', [
           };
 
           var convertTypeaheadToExplorationId = function(typeaheadOption) {
-            var option = typeaheadOption.match(/\(#(.*?)\)/);
-            if (option == null) {
+            var matchResults = typeaheadOption.match(/\(#(.*?)\)/);
+            if (matchResults == null) {
               return typeaheadOption;
             }
-            return option[1];
+            return matchResults[1];
           };
 
           // Creates a new exploration, then adds it to the collection.
