@@ -371,7 +371,7 @@
             </md-card>
 
             <md-card class="oppia-subscription-card"
-                     ng-repeat="subscription in subscriptionsList"
+                     ng-repeat="subscription in subscriptionsList | orderBy:sortSubscriptionFunction:isCurrentSubscriptionSortDescending""
                      style="margin: 0 8px 0 4px; width: 197px;">
               <a class="oppia-subscription-profile-link" href="/profile/<[subscription.creator_username]>" target="_blank">
                 <img ng-src="<[subscription.creator_picture_data_url]>" class="oppia-subscription-card-profile-picture img-circle">
