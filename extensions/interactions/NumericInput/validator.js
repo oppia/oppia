@@ -41,8 +41,10 @@ oppia.factory('NumericInputValidationService', [
         }
         */
         var isEnclosedBy = function(ra, rb) {
-          var lower = (rb.lb < ra.lb) || (rb.lb == ra.lb && (!ra.lbi || rb.lbi));
-          var upper = (rb.ub > ra.ub) || (rb.ub == ra.ub && (!ra.ubi || rb.ubi));
+          var lower = 
+              (rb.lb < ra.lb) || (rb.lb == ra.lb && (!ra.lbi || rb.lbi));
+          var upper = 
+              (rb.ub > ra.ub) || (rb.ub == ra.ub && (!ra.ubi || rb.ubi));
           return lower && upper;
         };
 
