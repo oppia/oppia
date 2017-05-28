@@ -26,13 +26,17 @@ var workflow = require('../protractor_utils/workflow.js');
 describe('Library pages tour', function() {
   var EXPLORATION_TITLE = 'Test Exploration';
   var EXPLORATION_OBJECTIVE = 'To learn testing';
-  var EXPLORATION_CATEGORY = 'Random';
+  var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_LANGUAGE = 'English';
   var EXPLORATION_RATING = 4;
   var SEARCH_TERM = 'python';
   var visitLibraryPage = function() {
     browser.get(general.LIBRARY_URL_SUFFIX);
   };
+
+  var visitRecentlyPublishedPage = function() {
+    browser.get('library/recently_published');
+  }
 
   it('visits the library index page', function() {
     visitLibraryPage();
@@ -56,6 +60,11 @@ describe('Library pages tour', function() {
     element(by.css('.protractor-test-library-top-rated')).click();
     expect(browser.getCurrentUrl()).toContain('library/top_rated');
     users.logout();
+  });
+
+  it('visits the recent explorations page', function() {
+    visitRecentlyPublishedPage();
+    expect(browser.getCurrentUrl()).toContain('library/recently_published');
   });
 
   it('visits the search page', function() {
