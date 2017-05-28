@@ -17,72 +17,107 @@
  * the interaction.
  */
 
-oppia.filter('oppiaInteractiveLabelingInputValidator', [
+oppia.factory('LabelingInputValidationService', [
     '$filter', 'WARNING_TYPES', 'baseInteractionValidationService',
     function($filter, WARNING_TYPES, baseInteractionValidationService) {
   // Returns a list of warnings.
-  return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
-    var warningsList = [];
-
-    baseInteractionValidationService.requireCustomizationArguments(
+  return {
+    getCustomizationArgsWarnings: function(customizationArgs) {
+      var warningsList = [];
+      baseInteractionValidationService.requireCustomizationArguments(
       customizationArgs, ['imageAndLabels']);
 
-    if (!customizationArgs.imageAndLabels.value.imagePath) {
-      warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
-        message: 'Please add an image for the learner to click on.'
-      });
-    }
-
-    var areAnyRegionStringsEmpty = false;
-    var areAnyRegionStringsDuplicated = false;
-    var seenRegionStrings = [];
-    if (customizationArgs.imageAndLabels.value.labeledRegions.length === 0) {
-      warningsList.push({
-        type: WARNING_TYPES.ERROR,
-        message: 'Please specify at least one image region to click on.'
-      });
-    }
-
-    for (var i = 0;
-         i < customizationArgs.imageAndLabels.value.labeledRegions.length;
-         i++) {
-      var regionLabel = (
-        customizationArgs.imageAndLabels.value.labeledRegions[i].label);
-
-      var ALPHANUMERIC_REGEX = /^[A-Za-z0-9\s]+$/;
-      if (regionLabel.trim().length === 0) {
-        areAnyRegionStringsEmpty = true;
-      } else if (!ALPHANUMERIC_REGEX.test(regionLabel)) {
+      if (!customizationArgs.imageAndLabels.value.imagePath) {
         warningsList.push({
           type: WARNING_TYPES.CRITICAL,
-          message: (
-            'The image region strings should consist of characters from ' +
-            '[A-Za-z0-9] and spaces.')
+          message: 'Please add an image for the learner to click on.'
         });
-      } else if (seenRegionStrings.indexOf(regionLabel) !== -1) {
-        areAnyRegionStringsDuplicated = true;
-      } else {
-        seenRegionStrings.push(regionLabel);
       }
-    }
 
-    if (areAnyRegionStringsEmpty) {
-      warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
-        message: 'Please ensure the image region strings are nonempty.'
-      });
-    }
-    if (areAnyRegionStringsDuplicated) {
-      warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
-        message: 'Please ensure the image region strings are unique.'
-      });
-    }
+      var areAnyRegionStringsEmpty = false;
+      var areAnyRegionStringsDuplicated = false;
+      var seenRegionStrings = [];
+      if (customizationArgs.imageAndLabels.value.labeledRegions.length === 0) {
+        warningsList.push({
+          type: WARNING_TYPES.ERROR,
+          message: 'Please specify at least one image region to click on.'
+        });
+      }
+
+      for (var i = 0;
+           i < customizationArgs.imageAndLabels.value.labeledRegions.length;
+           i++) {
+        var regionLabel = (
+          customizationArgs.imageAndLabels.value.labeledRegions[i].label);
+
+        var ALPHANUMERIC_REGEX = /^[A-Za-z0-9\s]+$/;
+        if (regionLabel.trim().length === 0) {
+          areAnyRegionStringsEmpty = true;
+        } else if (!ALPHANUMERIC_REGEX.test(regionLabel)) {
+          warningsList.push({
+            type: WARNING_TYPES.CRITICAL,
+            message: (
+              'The image region strings should consist of characters from ' +
+              '[A-Za-z0-9] and spaces.')
+          });
+        } else if (seenRegionStrings.indexOf(regionLabel) !== -1) {
+          areAnyRegionStringsDuplicated = true;
+        } else {
+          seenRegionStrings.push(regionLabel);
+        }
+      }
+
+      if (areAnyRegionStringsEmpty) {
+        warningsList.push({
+          type: WARNING_TYPES.CRITICAL,
+          message: 'Please ensure the image region strings are nonempty.'
+        });
+      }
+      if (areAnyRegionStringsDuplicated) {
+        warningsList.push({
+          type: WARNING_TYPES.CRITICAL,
+          message: 'Please ensure the image region strings are unique.'
+        });
+      }
+      return warningsList;
+    },
+    getAllWarnings: function(stateName, customizationArgs, answerGroups, defaultOutcome) {
+    var warningsList = [];
 
     warningsList = warningsList.concat(
       baseInteractionValidationService.getAnswerGroupWarnings(
         answerGroups, stateName));
+
+    var seenRegionStrings = [];
+      if (customizationArgs.imageAndLabels.value.labeledRegions.length === 0) {
+        warningsList.push({
+          type: WARNING_TYPES.ERROR,
+          message: 'Please specify at least one image region to click on.'
+        });
+      }
+
+      for (var i = 0;
+           i < customizationArgs.imageAndLabels.value.labeledRegions.length;
+           i++) {
+        var regionLabel = (
+          customizationArgs.imageAndLabels.value.labeledRegions[i].label);
+
+        var ALPHANUMERIC_REGEX = /^[A-Za-z0-9\s]+$/;
+        if (regionLabel.trim().length === 0) {
+          areAnyRegionStringsEmpty = true;
+        } else if (!ALPHANUMERIC_REGEX.test(regionLabel)) {
+          warningsList.push({
+            type: WARNING_TYPES.CRITICAL,
+            message: (
+              'The image region strings should consist of characters from ' +
+              '[A-Za-z0-9] and spaces.')
+          });
+        } else if (seenRegionStrings.indexOf(regionLabel) !== -1) {
+          areAnyRegionStringsDuplicated = true;
+        } else {
+          seenRegionStrings.push(regionLabel);
+        }
+      }
 
     // Check that each rule refers to a valid region string.
     for (var i = 0; i < answerGroups.length; i++) {
@@ -140,5 +175,6 @@ oppia.filter('oppiaInteractiveLabelingInputValidator', [
     }
 
     return warningsList;
-  };
+  }
+}
 }]);

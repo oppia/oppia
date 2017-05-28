@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-describe('oppiaInteractiveLabelingInputValidator', function() {
+describe('LabelingInputValidationService', function() {
   var WARNING_TYPES, validator;
 
   var currentState;
@@ -25,7 +25,7 @@ describe('oppiaInteractiveLabelingInputValidator', function() {
 
   beforeEach(inject(function($rootScope, $controller, $injector) {
     var filter = $injector.get('$filter');
-    validator = filter('oppiaInteractiveLabelingInputValidator');
+    validator = filter('LabelingInputValidationService');
 
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 
