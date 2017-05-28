@@ -47,17 +47,20 @@ oppia.directive('collectionNodeCreator', [
            * a search query. It then extracts the title and id of the
            * exploration to prepare typeahead options.
            */
-          $scope.fetchExplorationTitleFragment = function(searchQuery) {
+          $scope.fetchTypeaheadResults = function(searchQuery) {
             if (isValidSearchQuery(searchQuery)) {
               $scope.searchQueryHasError = false;
               return SearchExplorationsBackendApiService.fetchExplorations(
                 searchQuery
               ).then(function(explorationMetadataBackendDict) {
-                return explorationMetadataBackendDict.
-                  collection_node_metadata_list.
+                var options = [];
+                explorationMetadataBackendDict.collection_node_metadata_list.
                   map(function(item) {
-                    return '(#' + item.id + ') ' + item.title;
+                    if (!$scope.collection.containsCollectionNode(item.id)) {
+                      options.push('(#' + item.id + ') ' + item.title);
+                    }
                   });
+                return options;
               }, function() {
                 alertsService.addWarning(
                   'There was an error when searching for matching ' + 
