@@ -17,7 +17,8 @@
  */
 
 oppia.directive('imageUploader', [
-  'IdGenerationService', function(IdGenerationService) {
+  'IdGenerationService', 'UrlInterpolationService',
+  function(IdGenerationService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -25,7 +26,8 @@ oppia.directive('imageUploader', [
         onFileChanged: '=',
         width: '@'
       },
-      templateUrl: 'components/imageUploader',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/forms/image_uploader_directive.html'),
       link: function(scope, elt) {
         var onDragEnd = function(e) {
           e.preventDefault();
@@ -51,11 +53,12 @@ oppia.directive('imageUploader', [
         scope.fileInputClassName = (
           'image-uploader-file-input' + IdGenerationService.generateNewId());
         angular.element(document).on(
-            'change', '.' + scope.fileInputClassName, function(evt) {
-          scope.onFileChanged(
-            evt.currentTarget.files[0],
-            evt.target.value.split(/(\\|\/)/g).pop());
-        });
+          'change', '.' + scope.fileInputClassName, function(evt) {
+            scope.onFileChanged(
+              evt.currentTarget.files[0],
+              evt.target.value.split(/(\\|\/)/g).pop());
+          }
+        );
       }
     };
   }

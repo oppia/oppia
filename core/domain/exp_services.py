@@ -923,12 +923,14 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
 
 
 # Operations on exploration snapshots.
-def get_exploration_snapshots_metadata(exploration_id):
-    """Returns the snapshots for this exploration, as dicts.
+def get_exploration_snapshots_metadata(exploration_id, allow_deleted=False):
+    """Returns the snapshots for this exploration, as dicts, up to and including
+    the latest version of the exploration.
 
     Args:
         exploration_id: str. The id of the exploration whose snapshots_metadata
             is required.
+        allow_deleted: bool. Whether to allow retrieval of deleted snapshots.
 
     Returns:
         list(dict). List of dicts, each representing a recent snapshot. Each
@@ -942,7 +944,7 @@ def get_exploration_snapshots_metadata(exploration_id):
     version_nums = range(1, current_version + 1)
 
     return exp_models.ExplorationModel.get_snapshots_metadata(
-        exploration_id, version_nums)
+        exploration_id, version_nums, allow_deleted=allow_deleted)
 
 
 def _get_last_updated_by_human_ms(exp_id):

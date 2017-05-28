@@ -17,39 +17,39 @@
 // in via initArgs.
 
 oppia.directive('codeStringEditor', [
-    '$compile', 'OBJECT_EDITOR_URL_PREFIX',
-    function($compile, OBJECT_EDITOR_URL_PREFIX) {
-  return {
-    link: function(scope, element) {
-      scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_URL_PREFIX + 'CodeString';
-      };
-      $compile(element.contents())(scope);
-    },
-    restrict: 'E',
-    scope: true,
-    template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: ['$scope', function($scope) {
-      $scope.alwaysEditable = $scope.$parent.alwaysEditable;
-
-      $scope.getWarningText = function() {
-        if ($scope.localValue.label.indexOf('\t') !== -1) {
-          return 'Code may not contain tab characters.';
-        }
-        return '';
-      };
-
-      // Reset the component each time the value changes (e.g. if this is part
-      // of an editable list).
-      $scope.$watch('$parent.value', function() {
-        $scope.localValue = {
-          label: $scope.$parent.value || ''
+  '$compile', 'OBJECT_EDITOR_URL_PREFIX',
+  function($compile, OBJECT_EDITOR_URL_PREFIX) {
+    return {
+      link: function(scope, element) {
+        scope.getTemplateUrl = function() {
+          return OBJECT_EDITOR_URL_PREFIX + 'CodeString';
         };
-      }, true);
+        $compile(element.contents())(scope);
+      },
+      restrict: 'E',
+      scope: true,
+      template: '<span ng-include="getTemplateUrl()"></span>',
+      controller: ['$scope', function($scope) {
+        $scope.alwaysEditable = $scope.$parent.alwaysEditable;
 
-      $scope.$watch('localValue.label', function(newValue) {
-        $scope.$parent.value = newValue;
-      });
-    }]
-  };
-}]);
+        $scope.getWarningText = function() {
+          if ($scope.localValue.label.indexOf('\t') !== -1) {
+            return 'Code may not contain tab characters.';
+          }
+          return '';
+        };
+
+        // Reset the component each time the value changes (e.g. if this is part
+        // of an editable list).
+        $scope.$watch('$parent.value', function() {
+          $scope.localValue = {
+            label: $scope.$parent.value || ''
+          };
+        }, true);
+
+        $scope.$watch('localValue.label', function(newValue) {
+          $scope.$parent.value = newValue;
+        });
+      }]
+    };
+  }]);

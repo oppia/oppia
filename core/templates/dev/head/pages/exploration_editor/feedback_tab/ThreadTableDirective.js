@@ -17,22 +17,26 @@
  * tab of the exploration editor.
  */
 
-oppia.directive('threadTable', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      onClickRow: '=',
-      getThreads: '&threads'
-    },
-    templateUrl: 'feedbackTab/threadTable',
-    controller: [
+oppia.directive('threadTable', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        onClickRow: '=',
+        getThreads: '&threads'
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/exploration_editor/' +
+        'feedback_tab/thread_table_directive.html'),
+      controller: [
         '$scope', 'threadStatusDisplayService', 'oppiaDatetimeFormatter',
         function($scope, threadStatusDisplayService, oppiaDatetimeFormatter) {
-      $scope.getLabelClass = threadStatusDisplayService.getLabelClass;
-      $scope.getHumanReadableStatus = (
-        threadStatusDisplayService.getHumanReadableStatus);
-      $scope.getLocaleAbbreviatedDatetimeString = (
-        oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString);
-    }]
-  };
-}]);
+          $scope.getLabelClass = threadStatusDisplayService.getLabelClass;
+          $scope.getHumanReadableStatus = (
+            threadStatusDisplayService.getHumanReadableStatus);
+          $scope.getLocaleAbbreviatedDatetimeString = (
+            oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString);
+        }
+      ]
+    };
+  }]);

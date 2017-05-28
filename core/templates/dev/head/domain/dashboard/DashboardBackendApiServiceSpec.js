@@ -45,20 +45,7 @@ describe('Dashboard backend API service', function() {
       thumbnail_bg_color: '#bb8b2f',
       num_views: 2,
       num_open_threads: 0,
-      num_total_threads: 0,
-      num_unresolved_answers: 2,
-      top_unresolved_answers: [
-        {
-          state: 'Introduction',
-          value: '40',
-          count: 2
-        },
-        {
-          state: 'Introduction',
-          value: '20',
-          count: 1
-        }
-      ]
+      num_total_threads: 0
     }],
     collections_list: [],
     dashboard_stats: {
@@ -93,32 +80,34 @@ describe('Dashboard backend API service', function() {
   });
 
   it('should successfully fetch an creator dashboard data from the backend',
-      function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expect('GET', DASHBOARD_DATA_URL).respond(
-      sampleDataResults);
-    DashboardBackendApiService.fetchDashboardData().then(
-      successHandler, failHandler);
-    $httpBackend.flush();
+      $httpBackend.expect('GET', DASHBOARD_DATA_URL).respond(
+        sampleDataResults);
+      DashboardBackendApiService.fetchDashboardData().then(
+        successHandler, failHandler);
+      $httpBackend.flush();
 
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  });
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+  );
 
   it('should use rejection handler if dashboard data backend request failed',
-      function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expect('GET', DASHBOARD_DATA_URL).respond(
-      ERROR_STATUS_CODE, 'Error loading dashboard data.');
-    DashboardBackendApiService.fetchDashboardData().then(
-      successHandler, failHandler);
-    $httpBackend.flush();
+      $httpBackend.expect('GET', DASHBOARD_DATA_URL).respond(
+        ERROR_STATUS_CODE, 'Error loading dashboard data.');
+      DashboardBackendApiService.fetchDashboardData().then(
+        successHandler, failHandler);
+      $httpBackend.flush();
 
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
-  });
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    }
+  );
 });

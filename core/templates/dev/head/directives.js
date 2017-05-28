@@ -152,7 +152,7 @@ oppia.directive('mobileFriendlyTooltip', ['$timeout', function($timeout) {
           scope.opened = false;
           scope.$apply();
         });
-      };
+      }
     }
   };
 }]);

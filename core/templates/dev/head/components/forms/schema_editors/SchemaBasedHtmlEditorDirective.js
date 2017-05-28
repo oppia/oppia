@@ -16,16 +16,18 @@
  * @fileoverview Directive for a schema-based editor for HTML.
  */
 
-oppia.directive('schemaBasedHtmlEditor', [function() {
-  return {
-    scope: {
-      localValue: '=',
-      isDisabled: '&',
-      allowExpressions: '&',
-      labelForFocusTarget: '&',
-      uiConfig: '&'
-    },
-    templateUrl: 'schemaBasedEditor/html',
-    restrict: 'E'
-  };
-}]);
+oppia.directive('schemaBasedHtmlEditor', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      scope: {
+        localValue: '=',
+        isDisabled: '&',
+        labelForFocusTarget: '&',
+        uiConfig: '&'
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/forms/schema_editors/' +
+        'schema_based_html_editor_directive.html'),
+      restrict: 'E'
+    };
+  }]);

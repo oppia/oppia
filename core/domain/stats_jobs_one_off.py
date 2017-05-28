@@ -20,14 +20,17 @@ import collections
 from core import jobs
 from core.domain import stats_jobs_continuous
 from core.platform import models
-(base_models, stats_models, exp_models,) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.statistics, models.NAMES.exploration
+
+(stats_models,) = models.Registry.import_models([
+    models.NAMES.statistics
 ])
-transaction_services = models.Registry.import_transaction_services()
 
 
 class StatisticsAudit(jobs.BaseMapReduceJobManager):
-
+    """Performs a brief audit of exploration completions and state hit counts to
+    make sure they match counts stored in StateCounterModel. It also checks for
+    some possible error cases like negative counts.
+    """
     _STATE_COUNTER_ERROR_KEY = 'State Counter ERROR'
 
     @classmethod

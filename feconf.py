@@ -64,6 +64,7 @@ FRONTEND_TEMPLATES_DIR = os.path.join(
     'core', 'templates', TEMPLATES_DIR_PREFIX, 'head')
 DEPENDENCIES_TEMPLATES_DIR = os.path.join('extensions', 'dependencies')
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
+VISUALIZATIONS_DIR = os.path.join('extensions', 'visualizations')
 OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
     'extensions', 'interactions', 'object_defaults.json')
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
@@ -73,6 +74,12 @@ RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
 INTERACTION_CLASSIFIER_MAPPING = {
     'TextInput': 'LDAStringClassifier'
 }
+
+# The minimum number of training samples required for training a classifier.
+MIN_TOTAL_TRAINING_EXAMPLES = 50
+
+# The minimum number of assigned labels required for training a classifier.
+MIN_ASSIGNED_LABELS = 2
 
 # Default label for classification algorithms.
 DEFAULT_CLASSIFIER_LABEL = '_default'
@@ -111,7 +118,11 @@ CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 9
 # structure within the Collection domain object). If any backward-incompatible
 # changes are made to any of the blob schemas in the data store, this version
 # number must be changed.
-CURRENT_COLLECTION_SCHEMA_VERSION = 2
+CURRENT_COLLECTION_SCHEMA_VERSION = 3
+
+# This value should be updated in the event of any
+# StateAnswersModel.submitted_answer_list schema change.
+CURRENT_STATE_ANSWERS_SCHEMA_VERSION = 1
 
 # The default number of exploration tiles to load at a time in the search
 # results page.
@@ -247,6 +258,16 @@ DUPLICATE_EMAIL_INTERVAL_MINS = 2
 # Number of digits after decimal to which the average ratings value in the
 # dashboard is rounded off to.
 AVERAGE_RATINGS_DASHBOARD_PRECISION = 2
+# Whether to enable the promo bar functionality. This does not actually turn on
+# the promo bar, as that is gated by a config value (see config_domain). This
+# merely avoids checking for whether the promo bar is enabled for every Oppia
+# page visited.
+ENABLE_PROMO_BAR = True
+# Whether to enable maintenance mode on the site. For non-admins, this redirects
+# all HTTP requests to the maintenance page. This is the only check which
+# determines whether the site is in maintenance mode to avoid queries to the
+# database by non-admins.
+ENABLE_MAINTENANCE_MODE = False
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
@@ -409,6 +430,12 @@ ALLOWED_INTERACTION_CATEGORIES = [{
     ],
 }]
 
+# The list of interaction IDs which correspond to interactions that set their
+# is_linear property to true. Linear interactions do not support branching and
+# thus only allow for default answer classification. This value is guarded by a
+# test in extensions.interactions.base_test.
+LINEAR_INTERACTION_IDS = ['Continue']
+
 ALLOWED_GADGETS = {
     'ScoreBar': {
         'dir': os.path.join(GADGETS_DIR, 'ScoreBar')
@@ -499,6 +526,8 @@ FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
+FRACTIONS_LANDING_PAGE_URL = '/fractions'
+LEARNER_DASHBOARD_URL = '/learner_dashboard'
 LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
 LIBRARY_INDEX_URL = '/library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
@@ -697,6 +726,8 @@ LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = (
 # The i18n id for the header of the "Recently Published" category in the
 # library index page.
 LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'I18N_LIBRARY_GROUPS_RECENTLY_PUBLISHED'
+# group_name param for GET request in Splash.js
+LIBRARY_CATEGORY_SPLASH_PAGE_FEATURED = 'splash_page_featured'
 
 # The group name that appears at the end of the url for the recently published
 # page.
@@ -821,6 +852,9 @@ SUPPORTED_SITE_LANGUAGES = [{
 }, {
     'id': 'es',
     'text': 'Español'
+}, {
+    'id': 'hu',
+    'text': 'magyar'
 }, {
     'id': 'pt',
     'text': 'Português'

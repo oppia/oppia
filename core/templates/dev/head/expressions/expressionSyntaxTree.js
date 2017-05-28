@@ -350,7 +350,7 @@ oppia.factory('expressionSyntaxTreeService', [
       },
       // Note that removing quotation marks from this key causes issues with
       // minification (when running the deployment scripts).
-      // jscs:disable disallowQuotedKeysInObjects
+      /* eslint-disable quote-props */
       'if': {
         eval: function(args) {
           // TODO(kashida): Make this short-circuit.
@@ -416,7 +416,7 @@ oppia.factory('expressionSyntaxTreeService', [
           return PARAMETER_TYPES.REAL;
         }
       }
-      // jscs:enable disallowQuotedKeysInObjects
+      /* eslint-enable quote-props */
     };
 
     return {

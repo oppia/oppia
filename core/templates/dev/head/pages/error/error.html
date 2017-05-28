@@ -16,7 +16,7 @@
 {% endblock maintitle %}
 
 {% block content %}
-  <div class="oppia-content" ng-controller="Error">
+  <div class="oppia-content oppia-error-page-main-content" ng-controller="Error">
     <br>
 
     <div class="oppia-wide-panel oppia-error-wide-container">
@@ -63,6 +63,14 @@
     .oppia-error-h2 {
       font-size: 1.17em;
       font-weight: 700;
+    }
+    @media screen and (min-width: 768px) {
+      .oppia-error-page-main-content {
+        margin-bottom: 250px;
+      }
+      .oppia-footer {
+        position: absolute;
+      }
     }
   </style>
 {% endblock %}

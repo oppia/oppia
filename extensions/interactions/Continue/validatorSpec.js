@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-describe('oppiaInteractiveContinueValidator', function() {
-  var validator, WARNING_TYPES;
+describe('ContinueValidationService', function() {
+  var validatorService, WARNING_TYPES;
 
   var currentState;
   var goodAnswerGroups, goodDefaultOutcome;
@@ -24,7 +24,7 @@ describe('oppiaInteractiveContinueValidator', function() {
   });
 
   beforeEach(inject(function($rootScope, $controller, $injector) {
-    validator = $injector.get('$filter')('oppiaInteractiveContinueValidator');
+    validatorService = $injector.get('ContinueValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 
     currentState = 'First State';
@@ -47,12 +47,12 @@ describe('oppiaInteractiveContinueValidator', function() {
 
   it('should expect a non-empty button text customization argument',
     function() {
-      var warnings = validator(
+      var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, [], goodDefaultOutcome);
       expect(warnings).toEqual([]);
 
       customizationArguments.buttonText.value = '';
-      warnings = validator(
+      warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, [], goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.CRITICAL,
@@ -60,13 +60,14 @@ describe('oppiaInteractiveContinueValidator', function() {
       }]);
 
       expect(function() {
-        validator(currentState, {}, [], goodDefaultOutcome);
+        validatorService.getAllWarnings(
+          currentState, {}, [], goodDefaultOutcome);
       }).toThrow(
         'Expected customization arguments to have property: buttonText');
     });
 
   it('should expect no answer groups', function() {
-    var warnings = validator(
+    var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -78,7 +79,8 @@ describe('oppiaInteractiveContinueValidator', function() {
 
   it('should expect a non-confusing and non-null default outcome',
     function() {
-      var warnings = validator(currentState, customizationArguments, [], null);
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArguments, [], null);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: (

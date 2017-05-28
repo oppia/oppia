@@ -16,6 +16,7 @@
 
 from core.controllers import dashboard
 from core.domain import event_services
+from core.domain import exp_services
 from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import rating_services
@@ -41,8 +42,6 @@ class HomePageTest(test_utils.GenericTestBase):
 
         self.assertEqual(response.status_int, 302)
         self.assertIn('splash', response.headers['location'])
-        response.follow().mustcontain(
-            'I18N_SIDEBAR_ABOUT_LINK', 'I18N_TOPNAV_SIGN_IN')
 
     def test_notifications_dashboard_redirects_for_logged_out_users(self):
         """Test the logged-out view of the notifications dashboard."""
@@ -65,12 +64,6 @@ class HomePageTest(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/notifications_dashboard')
         self.assertEqual(response.status_int, 200)
-        # The string I18N_TOPNAV_SIGN_IN cannot be part of the inner text of
-        # the tag, but can appear as an attribute value.
-        response.mustcontain(
-            'I18N_TOPNAV_NOTIFICATIONS', 'I18N_TOPNAV_LOGOUT',
-            self.get_expected_logout_url('/'),
-            no=['>I18N_TOPNAV_SIGN_IN<', self.get_expected_login_url('/')])
         self.logout()
 
 
@@ -443,16 +436,31 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
     COLLABORATOR_EMAIL = 'collaborator@example.com'
     COLLABORATOR_USERNAME = 'collaborator'
 
+    OWNER_EMAIL_1 = 'owner1@example.com'
+    OWNER_USERNAME_1 = 'owner1'
+    OWNER_EMAIL_2 = 'owner2@example.com'
+    OWNER_USERNAME_2 = 'owner2'
+
     EXP_ID = 'exp_id'
     EXP_TITLE = 'Exploration title'
+    EXP_ID_1 = 'exp_id_1'
+    EXP_TITLE_1 = 'Exploration title 1'
+    EXP_ID_2 = 'exp_id_2'
+    EXP_TITLE_2 = 'Exploration title 2'
+    EXP_ID_3 = 'exp_id_3'
+    EXP_TITLE_3 = 'Exploration title 3'
 
     def setUp(self):
         super(DashboardHandlerTest, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.OWNER_EMAIL_1, self.OWNER_USERNAME_1)
+        self.signup(self.OWNER_EMAIL_2, self.OWNER_USERNAME_2)
         self.signup(self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner_id_1 = self.get_user_id_from_email(self.OWNER_EMAIL_1)
+        self.owner_id_2 = self.get_user_id_from_email(self.OWNER_EMAIL_2)
         self.collaborator_id = self.get_user_id_from_email(
             self.COLLABORATOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
@@ -461,6 +469,59 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(response['explorations_list'], [])
+        self.logout()
+
+    def test_no_explorations_and_visit_dashboard(self):
+        self.login(self.OWNER_EMAIL)
+        # Testing that creator only visit dashboard without any exploration
+        # created.
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['explorations_list']), 0)
+        self.logout()
+
+    def test_create_single_exploration_and_visit_dashboard(self):
+        self.login(self.OWNER_EMAIL)
+        self.save_new_default_exploration(
+            self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
+        # Testing the quantity of exploration created and it should be 1.
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['explorations_list']), 1)
+        self.logout()
+
+    def test_create_two_explorations_delete_one_and_visit_dashboard(self):
+        self.login(self.OWNER_EMAIL_1)
+        self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
+        self.save_new_default_exploration(
+            self.EXP_ID_2, self.owner_id_1, title=self.EXP_TITLE_2)
+        # Testing the quantity of exploration and it should be 2.
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['explorations_list']), 2)
+        exp_services.delete_exploration(self.owner_id_1, self.EXP_ID_1)
+        # Testing whether 1 exploration left after deletion of previous one.
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['explorations_list']), 1)
+        self.logout()
+
+    def test_create_multiple_explorations_delete_all_and_visit_dashboard(self):
+        self.login(self.OWNER_EMAIL_2)
+        self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id_2, title=self.EXP_TITLE_1)
+        self.save_new_default_exploration(
+            self.EXP_ID_2, self.owner_id_2, title=self.EXP_TITLE_2)
+        self.save_new_default_exploration(
+            self.EXP_ID_3, self.owner_id_2, title=self.EXP_TITLE_3)
+        # Testing for quantity of explorations to be 3.
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['explorations_list']), 3)
+        # Testing for deletion of all created previously.
+        exp_services.delete_exploration(self.owner_id_2, self.EXP_ID_1)
+        exp_services.delete_exploration(self.owner_id_2, self.EXP_ID_2)
+        exp_services.delete_exploration(self.owner_id_2, self.EXP_ID_3)
+        # All explorations have been deleted, so the dashboard query should not
+        # load any explorations.
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['explorations_list']), 0)
         self.logout()
 
     def test_managers_can_see_explorations(self):

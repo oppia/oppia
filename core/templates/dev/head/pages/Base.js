@@ -21,6 +21,8 @@ oppia.controller('Base', [
   function($scope, $rootScope, $document, alertsService, SidebarStatusService) {
     $scope.alertsService = alertsService;
     $scope.currentLang = 'en';
+    $scope.promoBarIsEnabled = GLOBALS.PROMO_BAR_IS_ENABLED;
+    $scope.promoBarMessage = GLOBALS.PROMO_BAR_MESSAGE;
 
     $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
     // If this is nonempty, the whole page goes into 'Loading...' mode.
@@ -39,5 +41,16 @@ oppia.controller('Base', [
       SidebarStatusService.onDocumentClick();
       $scope.$apply();
     });
+
+    $scope.skipToMainContent = function() {
+      var mainContentElement = document.getElementById('oppia-main-content');
+
+      if (!mainContentElement) {
+        throw Error('Variable mainContentElement is undefined.');
+      }
+      mainContentElement.tabIndex = -1;
+      mainContentElement.scrollIntoView();
+      mainContentElement.focus();
+    };
   }
 ]);

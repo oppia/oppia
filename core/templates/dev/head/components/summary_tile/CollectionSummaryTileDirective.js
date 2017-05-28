@@ -21,44 +21,47 @@ oppia.constant(
 oppia.constant(
   'COLLECTION_EDITOR_URL', '/collection_editor/create/<collection_id>');
 
-oppia.directive('collectionSummaryTile', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      getCollectionId: '&collectionId',
-      getCollectionTitle: '&collectionTitle',
-      getObjective: '&objective',
-      getNodeCount: '&nodeCount',
-      getLastUpdatedMsec: '&lastUpdatedMsec',
-      getThumbnailIconUrl: '&thumbnailIconUrl',
-      getThumbnailBgColor: '&thumbnailBgColor',
-      isLinkedToEditorPage: '=?isLinkedToEditorPage',
-      getCategory: '&category'
-    },
-    templateUrl: 'summaryTile/collection',
-    controller: [
-      '$scope', 'oppiaDatetimeFormatter', 'UrlInterpolationService',
-      'COLLECTION_VIEWER_URL', 'COLLECTION_EDITOR_URL', function($scope,
-      oppiaDatetimeFormatter, UrlInterpolationService, COLLECTION_VIEWER_URL,
-      COLLECTION_EDITOR_URL) {
-        $scope.DEFAULT_EMPTY_TITLE = 'Untitled';
-        var targetUrl = (
-          $scope.isLinkedToEditorPage ?
-           COLLECTION_EDITOR_URL : COLLECTION_VIEWER_URL);
+oppia.directive('collectionSummaryTile', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        getCollectionId: '&collectionId',
+        getCollectionTitle: '&collectionTitle',
+        getObjective: '&objective',
+        getNodeCount: '&nodeCount',
+        getLastUpdatedMsec: '&lastUpdatedMsec',
+        getThumbnailIconUrl: '&thumbnailIconUrl',
+        getThumbnailBgColor: '&thumbnailBgColor',
+        isLinkedToEditorPage: '=?isLinkedToEditorPage',
+        getCategory: '&category'
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/summary_tile/' +
+        'collection_summary_tile_directive.html'),
+      controller: [
+        '$scope', 'oppiaDatetimeFormatter',
+        'COLLECTION_VIEWER_URL', 'COLLECTION_EDITOR_URL', function($scope,
+        oppiaDatetimeFormatter, COLLECTION_VIEWER_URL,
+        COLLECTION_EDITOR_URL) {
+          $scope.DEFAULT_EMPTY_TITLE = 'Untitled';
 
-        $scope.getLastUpdatedDatetime = function() {
-          return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
-            $scope.getLastUpdatedMsec());
-        };
+          $scope.getLastUpdatedDatetime = function() {
+            return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
+              $scope.getLastUpdatedMsec());
+          };
 
-        $scope.getCollectionLink = function() {
-          return UrlInterpolationService.interpolateUrl(
-            targetUrl, {
-              collection_id: $scope.getCollectionId()
-            }
-          );
-        };
-      }
-    ]
-  };
-}]);
+          $scope.getCollectionLink = function() {
+            var targetUrl = (
+              $scope.isLinkedToEditorPage ?
+              COLLECTION_EDITOR_URL : COLLECTION_VIEWER_URL);
+            return UrlInterpolationService.interpolateUrl(
+              targetUrl, {
+                collection_id: $scope.getCollectionId()
+              }
+            );
+          };
+        }
+      ]
+    };
+  }]);

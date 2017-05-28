@@ -1,63 +1,4 @@
-<script type="text/ng-template" id="components/explorationFooter">
-  <div class="footer navbar-fixed-bottom oppia-exploration-footer">
-    <div class="row">
-      <div class="col-sm-5">
-        <ul class="author-profile">
-          <li>
-            <img ng-src="<[getStaticImageUrl('/general/apple.svg')]>" class="exploration-footer-img"
-                 ng-if="contributorNames.length > 0" alt="">
-          </li>
-          <li class="hover-link"
-              ng-mouseenter="hovering = true"
-              ng-mouseleave="hovering = false"
-              tabindex="0"
-              aria-haspopup="true"
-              aria-expanded="false">
-            <div class="dropup" ng-class="{'open':hovering}">
-              <a id="dropdownMenu2" class="dropdown-toggle"
-                 ng-class="{'hovered-text':hovering}"
-                 data-toggle="dropdown" 
-                 ng-if="contributorNames.length > 0"
-                 role="menuitem"
-                 aria-haspopup="true"
-                 aria-expanded="false">
-                <h4 translate="I18N_FOOTER_AUTHOR_PROFILES" class="author-profile-text"
-                    ng-class="{'hovered-text':hovering, 'not-hovered' : !hovering}"></h4>
-              </a>
-              <ul class="author-profile-dropdown-menu dropdown-menu" aria-labelledby="dropdownMenu2" role="menu">
-                <li ng-repeat="name in contributorNames | limitTo: 5">
-                  <a href="/profile/<[name]>" target="_blank"><[name]></a>
-                </li>
-              </ul>
-            </div>
-          </li>
-          <li></li>
-        </ul>
-      </div>
-      <div class="col-sm-7">
-        <div class="pull-right">
-          <ul class="author-profile">
-            <li>
-              <h4 translate="I18N_PLAYER_SHARE_THIS_EXPLORATION" class="oppia-share-exploration-footer"></h4>
-            </li>
-            <li>
-              <sharing-links ng-if="explorationStatus !== 'private'"
-                             twitter-text="getTwitterText()"
-                             exploration-id="explorationId"
-                             layout-type="row"
-                             class="oppia-exploration-footer-sharing-links">
-              </sharing-links>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</script>
-
 <style>
-
-
   .oppia-exploration-footer {
     background-color: #094142;
     color: #FFF;
@@ -85,7 +26,7 @@
     text-decoration: none;
   }
 
-  .author-profile li {
+  .oppia-exploration-footer .author-profile li {
     float: left;
   }
 
@@ -185,3 +126,59 @@
     }
   }
 </style>
+
+<div class="footer navbar-fixed-bottom oppia-exploration-footer">
+  <div class="row">
+    <div class="col-sm-5">
+      <ul class="author-profile">
+        <li>
+          <img ng-src="<[getStaticImageUrl('/general/apple.svg')]>" class="exploration-footer-img"
+               alt="">
+        </li>
+        <li class="hover-link"
+            ng-mouseenter="hovering = true"
+            ng-mouseleave="hovering = false"
+            tabindex="0"
+            aria-haspopup="true"
+            aria-expanded="false">
+          <div class="dropup" ng-class="{'open':hovering}">
+            <a id="dropdownMenu2" class="dropdown-toggle"
+               ng-class="{'hovered-text':hovering}"
+               data-toggle="dropdown" 
+               ng-if="contributorNames.length > 0"
+               role="menuitem"
+               aria-haspopup="true"
+               aria-expanded="false">
+              <h4 translate="I18N_FOOTER_AUTHOR_PROFILES" class="author-profile-text"
+                  ng-class="{'hovered-text':hovering, 'not-hovered' : !hovering}"></h4>
+            </a>
+            <ul class="author-profile-dropdown-menu dropdown-menu" aria-labelledby="dropdownMenu2" role="menu">
+              <li ng-repeat="name in contributorNames | limitTo: 5">
+                <a href="/profile/<[name]>" target="_blank"><[name]></a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li></li>
+      </ul>
+    </div>
+    <div class="col-sm-7">
+      <div class="pull-right">
+        <ul class="author-profile">
+          <li>
+            <h4 translate="I18N_PLAYER_SHARE_THIS_EXPLORATION" class="oppia-share-exploration-footer"></h4>
+          </li>
+          <li>
+            <sharing-links ng-if="explorationStatus !== 'private'"
+                           twitter-text="getTwitterText()"
+                           exploration-id="explorationId"
+                           layout-type="row"
+                           share-type="exploration"
+                           class="oppia-exploration-footer-sharing-links">
+            </sharing-links>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

@@ -48,10 +48,11 @@ oppia.directive('oppiaResponseContinue', [function() {
     restrict: 'E',
     scope: {},
     templateUrl: 'response/Continue',
-    controller: ['$scope', '$attrs', 'oppiaHtmlEscaper',
-        function($scope, $attrs, oppiaHtmlEscaper) {
-      $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
-    }]
+    controller: [
+      '$scope', '$attrs', 'oppiaHtmlEscaper',
+      function($scope, $attrs, oppiaHtmlEscaper) {
+        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+      }]
   };
 }]);
 
@@ -60,10 +61,11 @@ oppia.directive('oppiaShortResponseContinue', [function() {
     restrict: 'E',
     scope: {},
     templateUrl: 'shortResponse/Continue',
-    controller: ['$scope', '$attrs', 'oppiaHtmlEscaper',
-        function($scope, $attrs, oppiaHtmlEscaper) {
-      $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
-    }]
+    controller: [
+      '$scope', '$attrs', 'oppiaHtmlEscaper',
+      function($scope, $attrs, oppiaHtmlEscaper) {
+        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+      }]
   };
 }]);
 

@@ -60,30 +60,18 @@ class CollectionModel(base_models.VersionedModel):
     # The version of all property blob schemas.
     schema_version = ndb.IntegerProperty(
         required=True, default=1, indexed=True)
-    # A dict representing all explorations belonging to this collection.
+    # DEPRECATED in v2.4.2. Do not use.
     nodes = ndb.JsonProperty(default={}, indexed=False)
+
+    # A dict representing the contents of a collection. Currently, this
+    # contains the list of nodes. This dict should contain collection data
+    # whose structure might need to be changed in the future.
+    collection_contents = ndb.JsonProperty(default={}, indexed=False)
 
     @classmethod
     def get_collection_count(cls):
         """Returns the total number of collections."""
         return cls.get_all().count()
-
-    def commit(self, committer_id, commit_message, commit_cmds):
-        """Updates the collection model by applying the given commit_cmds, then
-        saves it.
-
-        Args:
-            committer_id: str. The user_id of the user who committed the
-                change.
-            commit_message: str. The commit description message.
-            commit_cmds: list(dict). A list of commands, describing changes
-                made in this model, which should give sufficient information to
-                reconstruct the commit. Each dict always contains:
-                    cmd: str. Unique command.
-                and additional arguments for that command.
-        """
-        super(CollectionModel, self).commit(
-            committer_id, commit_message, commit_cmds)
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):

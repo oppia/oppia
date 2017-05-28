@@ -31,6 +31,7 @@ from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import gadget_registry
 from core.domain import interaction_registry
+from core.domain import learner_progress_services
 from core.domain import moderator_services
 from core.domain import rating_services
 from core.domain import recommendations_services
@@ -233,9 +234,10 @@ class ExplorationHandler(base.BaseHandler):
                 rights_manager.Actor(self.user_id).can_edit(
                     feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id)),
             'exploration': exploration.to_player_dict(),
+            'exploration_id': exploration_id,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
-            'version': exploration.version,
+            'version': exploration.version
         })
         self.render_json(self.values)
 
@@ -251,36 +253,35 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         # The reader's answer.
         answer = self.payload.get('answer')
         # Parameters associated with the learner.
-        old_params = self.payload.get('params', {})
-        old_params['answer'] = answer
+        params = self.payload.get('params', {})
         # The version of the exploration.
         version = self.payload.get('version')
+        session_id = self.payload.get('session_id')
+        client_time_spent_in_secs = self.payload.get(
+            'client_time_spent_in_secs')
         # The answer group and rule spec indexes, which will be used to get
         # the rule spec string.
         answer_group_index = self.payload.get('answer_group_index')
         rule_spec_index = self.payload.get('rule_spec_index')
+        classification_categorization = self.payload.get(
+            'classification_categorization')
 
         exploration = exp_services.get_exploration_by_id(
             exploration_id, version=version)
 
         old_interaction = exploration.states[old_state_name].interaction
 
-        if answer_group_index == len(old_interaction.answer_groups):
-            rule_spec_string = exp_domain.DEFAULT_RULESPEC_STR
-        else:
-            rule_spec_string = (
-                old_interaction.answer_groups[answer_group_index].rule_specs[
-                    rule_spec_index].stringify_classified_rule())
-
         old_interaction_instance = (
             interaction_registry.Registry.get_interaction_by_id(
                 old_interaction.id))
+
         normalized_answer = old_interaction_instance.normalize_answer(answer)
-        # TODO(sll): Should this also depend on `params`?
+
         event_services.AnswerSubmissionEventHandler.record(
-            exploration_id, version, old_state_name, rule_spec_string,
-            old_interaction_instance.get_stats_log_html(
-                old_interaction.customization_args, normalized_answer))
+            exploration_id, version, old_state_name,
+            exploration.states[old_state_name].interaction.id,
+            answer_group_index, rule_spec_index, classification_categorization,
+            session_id, client_time_spent_in_secs, params, normalized_answer)
         self.render_json({})
 
 
@@ -403,9 +404,25 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
             self.payload.get('params'),
             feconf.PLAY_TYPE_NORMAL)
 
+        if user_id:
+            learner_progress_services.mark_exploration_as_completed(
+                user_id, exploration_id)
+
         if user_id and collection_id:
             collection_services.record_played_exploration_in_collection_context(
                 user_id, collection_id, exploration_id)
+            collections_left_to_complete = (
+                collection_services.get_next_exploration_ids_to_complete_by_user( # pylint: disable=line-too-long
+                    user_id, collection_id))
+
+            if not collections_left_to_complete:
+                learner_progress_services.mark_collection_as_completed(
+                    user_id, collection_id)
+            else:
+                learner_progress_services.mark_collection_as_incomplete(
+                    user_id, collection_id)
+
+        self.render_json(self.values)
 
 
 class ExplorationMaybeLeaveHandler(base.BaseHandler):
@@ -419,14 +436,56 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
     @require_playable
     def post(self, exploration_id):
         """Handles POST requests."""
+        version = self.payload.get('version')
+        state_name = self.payload.get('state_name')
+        user_id = self.user_id
+        collection_id = self.payload.get('collection_id')
+
+        if user_id:
+            learner_progress_services.mark_exploration_as_incomplete(
+                user_id, exploration_id, state_name, version)
+
+        if user_id and collection_id:
+            learner_progress_services.mark_collection_as_incomplete(
+                user_id, collection_id)
+
         event_services.MaybeLeaveExplorationEventHandler.record(
             exploration_id,
-            self.payload.get('version'),
-            self.payload.get('state_name'),
+            version,
+            state_name,
             self.payload.get('session_id'),
             self.payload.get('client_time_spent_in_secs'),
             self.payload.get('params'),
             feconf.PLAY_TYPE_NORMAL)
+        self.render_json(self.values)
+
+
+class RemoveExpFromIncompleteListHandler(base.BaseHandler):
+    """Handles operations related to removing an exploration from the partially
+    completed list of a user.
+    """
+
+    @base.require_user
+    def post(self):
+        """Handles POST requests."""
+        exploration_id = self.payload.get('exploration_id')
+        learner_progress_services.remove_exp_from_incomplete_list(
+            self.user_id, exploration_id)
+        self.render_json(self.values)
+
+
+class RemoveCollectionFromIncompleteListHandler(base.BaseHandler):
+    """Handles operations related to removing a collection from the partially
+    completed list of a user.
+    """
+
+    @base.require_user
+    def post(self):
+        """Handles POST requests."""
+        collection_id = self.payload.get('collection_id')
+        learner_progress_services.remove_collection_from_incomplete_list(
+            self.user_id, collection_id)
+        self.render_json(self.values)
 
 
 class RatingHandler(base.BaseHandler):
