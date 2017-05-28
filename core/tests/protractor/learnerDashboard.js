@@ -18,13 +18,10 @@
 
 var admin = require('../protractor_utils/admin.js');
 var collectionEditor = require('../protractor_utils/collectionEditor.js');
-var editor = require('../protractor_utils/editor.js');
-var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var library = require('../protractor_utils/library.js');
 var player = require('../protractor_utils/player.js');
 var users = require('../protractor_utils/users.js');
-var workflow = require('../protractor_utils/workflow.js');
 
 describe('Learner dashboard functionality', function() {
   beforeAll(function() {
