@@ -31,7 +31,7 @@ oppia.factory('NumericInputValidationService', [
           this.getCustomizationArgsWarnings(customizationArgs));
 
         /*
-        Store an answer range for every rule, then check for overlapping
+        Store an answer range for every rule, then check for redundant
         ranges. A range is an object of the form:
         {
           lb: float, lower bound
@@ -40,16 +40,10 @@ oppia.factory('NumericInputValidationService', [
           ubi: bool, is upper bound inclusive
         }
         */
-        var overlaps = function(ra, rb) {
-          var aExtendsB = false;
-          if ((ra.ub > rb.lb) || (ra.ub >= rb.lb && ra.ubi && rb.lbi)) {
-            aExtendsB = true;
-          }
-          var bExtendsA = false;
-          if ((rb.ub > ra.lb) || (rb.ub >= ra.lb && rb.ubi && ra.lbi)) {
-            bExtendsA = true;
-          }
-          return aExtendsB && bExtendsA;
+        var isEnclosedBy = function(ra, rb) {
+          var lower = (rb.lb < ra.lb) || (rb.lb == ra.lb && (!ra.lbi || rb.lbi));
+          var upper = (rb.ub > ra.ub) || (rb.ub == ra.ub && (!ra.ubi || rb.ubi));
+          return lower && upper;
         };
 
         var ranges = [];
@@ -92,10 +86,12 @@ oppia.factory('NumericInputValidationService', [
               default:
             }
             for (var k = 0; k < ranges.length; k++) {
-              if (overlaps(ranges[k], range)) {
+              if (isEnclosedBy(range, ranges[k])) {
                 warningsList.push({
                   type: WARNING_TYPES.CRITICAL,
-                  message: 'Please ensure all numeric ranges are distinct.'
+                  message: (
+                    'Some rules will never be matched because' +
+                    ' they are made redundant by preceding rules.')
                 });
               }
             }
