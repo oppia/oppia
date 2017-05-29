@@ -106,6 +106,14 @@ RULE_TYPE_CLASSIFIER = 'FuzzyMatches'
 def _get_full_customization_args(customization_args, ca_specs):
     """Populates the given customization_args dict with default values
     if any of the expected customization_args are missing.
+
+    Args:
+        customization_args: dict. Costumization dictionary.
+        ca_specs: dict. Specs dictionary.
+
+    Returns:
+        dict. The customization_args dict where missing keys are populated with
+        the default values. 
     """
     for ca_spec in ca_specs:
         if ca_spec.name not in customization_args:
@@ -119,16 +127,22 @@ def _validate_customization_args_and_values(
         item_name, item_type, customization_args,
         ca_specs_to_validate_against):
     """Validates the given `customization_args` dict against the specs set out
-    in `ca_specs_to_validate_against`.
-
-    The item_name is either 'interaction', 'gadget' or 'trigger', and the
-    item_type is the id/type of the interaction/gadget/trigger, respectively.
-    These strings are used to populate any error messages that arise during
-    validation.
-
+    in `ca_specs_to_validate_against`. 'item_name' and 'item_type' are used to
+    populate any error messages that arise during validation.
     Note that this may modify the given customization_args dict, if it has
     extra or missing keys. It also normalizes any HTML in the customization_args
     dict.
+
+    Args:
+        item_name: str. The item_name is either 'interaction', 'gadget' or
+            'trigger'.
+        item_type: str. The item_type is the id/type of the
+            interaction/gadget/trigger, respectively.
+        customization_args: dict. Costumization dictionary.
+        ca_specs_to_validate_against: dict. Specs dictionary.
+
+    Raises:
+        ValidationError: The given 'customization_args' is not valid.
     """
     ca_spec_names = [
         ca_spec.name for ca_spec in ca_specs_to_validate_against]
@@ -211,28 +225,31 @@ class ExplorationChange(object):
     def __init__(self, change_dict):
         """Initializes an ExplorationChange object from a dict.
 
-        change_dict represents a command. It should have a 'cmd' key, and one
-        or more other keys. The keys depend on what the value for 'cmd' is.
+        Args:
+            change_dict: dict. Represents a command. It should have a 'cmd' key
+                and one or more other keys. The keys depend on what the value
+                for 'cmd' is. The possible values for 'cmd' are listed below,
+                together with the other keys in the dict:
+                    - 'add_state' (with state_name)
+                    - 'rename_state' (with old_state_name and new_state_name)
+                    - 'delete_state' (with state_name)
+                    - 'edit_state_property' (with state_name, property_name,
+                        new_value and, optionally, old_value)
+                    - 'add_gadget' (with gadget_dict and panel)
+                    - 'rename_gadget' (with old_gadget_name, new_gadget_name)
+                    - 'delete_gadget' (with gadget_name)
+                    - 'edit_gadget_property' (with gadget_name, property_name,
+                        new_value, and optionally, old_value)
+                    - 'edit_exploration_property' (with property_name,
+                        new_value and, optionally, old_value)
+                    - 'migrate_states_schema' (with from_version, to_version)
+                For a state, property_name must be one of STATE_PROPERTIES.
+                For an exploration, property_name must be one of
+                EXPLORATION_PROPERTIES. For a gadget, property_name must be one
+                of GADGET_PROPERTIES.
 
-        The possible values for 'cmd' are listed below, together with the other
-        keys in the dict:
-        - 'add_state' (with state_name)
-        - 'rename_state' (with old_state_name and new_state_name)
-        - 'delete_state' (with state_name)
-        - 'edit_state_property' (with state_name, property_name, new_value and,
-            optionally, old_value)
-        - 'add_gadget' (with gadget_dict and panel)
-        - 'rename_gadget' (with old_gadget_name and new_gadget_name)
-        - 'delete_gadget' (with gadget_name)
-        - 'edit_gadget_property' (with gadget_name, property_name, new_value,
-            and optionally, old_value)
-        - 'edit_exploration_property' (with property_name, new_value and,
-            optionally, old_value)
-        - 'migrate_states_schema' (with from_version and to_version)
-
-        For a state, property_name must be one of STATE_PROPERTIES. For an
-        exploration, property_name must be one of EXPLORATION_PROPERTIES.
-        For a gadget, property_name must be one of GADGET_PROPERTIES.
+        Raises:
+            Exception: The given change_dict is not valid.
         """
         if 'cmd' not in change_dict:
             raise Exception('Invalid change_dict: %s' % change_dict)
@@ -290,6 +307,29 @@ class ExplorationCommitLogEntry(object):
             commit_type, commit_message, commit_cmds, version,
             post_commit_status, post_commit_community_owned,
             post_commit_is_private):
+        """Initializes a ExplorationCommitLogEntry domain object.
+
+        Args:
+            created_on: datetime.datetime. Date and time when the exploration
+                commits was created.
+            last_updated: datetime.datetime. Date and time when the exploration
+                commits was last updated.
+            user_id: str. User id of the user who has made the commit.
+            username: str. Username of the user who has made the commit.
+            exploration_id: str. Id of the exploration.
+            commit_type: str. The type of commit.
+            commit_message: str. A description of changes made to the
+                exploration.
+            commit_cmds: list(dict). A list of change commands made to the
+                given exploration.
+            version: int. The version of the exploration.
+            post_commit_status: str. The new exploration status after the
+                commit.
+            post_commit_community_owned: bool. Whether the exploration is
+                community-owned after the edit event.
+            post_commit_is_private: bool. Whether the exploration is private
+                after the edit event.
+        """
         self.created_on = created_on
         self.last_updated = last_updated
         self.user_id = user_id
@@ -304,7 +344,13 @@ class ExplorationCommitLogEntry(object):
         self.post_commit_is_private = post_commit_is_private
 
     def to_dict(self):
-        """This omits created_on, user_id and (for now) commit_cmds."""
+        """Returns a dict representing this ExplorationCommitLogEntry domain
+            object. This omits created_on, user_id and (for now) commit_cmds.
+
+        Returns:
+            A dict, mapping all fields of ExplorationCommitLogEntry instance,
+            except created_on, user_id and (for now) commit_cmds field.
+        """
         return {
             'last_updated': utils.get_time_in_millisecs(self.last_updated),
             'username': self.username,
@@ -322,18 +368,42 @@ class Content(object):
     """Value object representing non-interactive content."""
 
     def to_dict(self):
+        """Returns a dict representing this Content domain object.
+
+        Returns:
+            A dict, mapping all fields of Content instance.
+        """
         return {'type': self.type, 'value': self.value}
 
     @classmethod
     def from_dict(cls, content_dict):
+        """Return a Content domain object from a dict.
+
+        Args:
+            content_dict: dict. The dict representation of Content object.
+
+        Returns:
+            Content. The corresponding Content domain object.
+        """
         return cls(content_dict['type'], content_dict['value'])
 
     def __init__(self, content_type, value=''):
+        """Initializes a Content domain object.
+
+        Args:
+            content_type: str. The type of content.
+            value: str. The value of content.
+        """
         self.type = content_type
         self.value = html_cleaner.clean(value)
         self.validate()
 
     def validate(self):
+        """Validates various properties of the Content.
+
+        Raises:
+            ValidationError: One or more attributes of the Content are invalid.
+        """
         # TODO(sll): Add HTML sanitization checking.
         # TODO(sll): Validate customization args for rich-text components.
         if self.type != 'text':
@@ -345,7 +415,11 @@ class Content(object):
     def to_html(self, params):
         """Exports this content object to an HTML string.
 
-        The content object is parameterized using the parameters in `params`.
+        Args:
+            params: dict. The dict representation of Content object.
+
+        Raises:
+            Exception: 'params' is not a dict.
         """
         if not isinstance(params, dict):
             raise Exception(
@@ -359,6 +433,11 @@ class RuleSpec(object):
     """Value object representing a rule specification."""
 
     def to_dict(self):
+        """Returns a dict representing this RuleSpec domain object.
+
+        Returns:
+            A dict, mapping all fields of RuleSpec instance.
+        """
         return {
             'rule_type': self.rule_type,
             'inputs': self.inputs,
@@ -366,12 +445,26 @@ class RuleSpec(object):
 
     @classmethod
     def from_dict(cls, rulespec_dict):
+        """Return a RuleSpec domain object from a dict.
+
+        Args:
+            rulespec_dict: dict. The dict representation of RuleSpec object.
+
+        Returns:
+            RuleSpec. The corresponding RuleSpec domain object.
+        """
         return cls(
             rulespec_dict['rule_type'],
             rulespec_dict['inputs']
         )
 
     def __init__(self, rule_type, inputs):
+        """Initializes a RuleSpec domain object.
+
+        Args:
+            rule_type: str. The type of rule.
+            inputs: dict. TODO
+        """
         self.rule_type = rule_type
         self.inputs = inputs
 
@@ -392,6 +485,9 @@ class RuleSpec(object):
                 value objects with an object type property (obj_type). RuleSpec
                 inputs may have a parameter value which refers to one of these
                 exploration parameters.
+
+        Raises:
+            ValidationError: One or more attributes of the RuleSpec are invalid.
         """
         if not isinstance(self.inputs, dict):
             raise utils.ValidationError(
@@ -446,6 +542,11 @@ class Outcome(object):
     parameter changes.
     """
     def to_dict(self):
+        """Returns a dict representing this Outcome domain object.
+
+        Returns:
+            A dict, mapping all fields of Outcome instance.
+        """
         return {
             'dest': self.dest,
             'feedback': self.feedback,
@@ -455,6 +556,14 @@ class Outcome(object):
 
     @classmethod
     def from_dict(cls, outcome_dict):
+        """Return a Outcome domain object from a dict.
+
+        Args:
+            outcome_dict: dict. The dict representation of Outcome object.
+
+        Returns:
+            Outcome. The corresponding Outcome domain object.
+        """
         return cls(
             outcome_dict['dest'],
             outcome_dict['feedback'],
@@ -465,6 +574,15 @@ class Outcome(object):
         )
 
     def __init__(self, dest, feedback, param_changes):
+        """Initializes a Outcome domain object.
+
+        Args:
+            dest: str. The destination state.
+            feedback: list(str). List of feedback to show the user if this rule
+                is triggered.
+            param_changes: list(str). List of exploration-level parameter
+                changes to make if this rule is triggered.
+        """
         # Id of the destination state.
         # TODO(sll): Check that this state actually exists.
         self.dest = dest
@@ -478,6 +596,11 @@ class Outcome(object):
         self.param_changes = param_changes or []
 
     def validate(self):
+        """Validates various properties of the Outcome.
+
+        Raises:
+            ValidationError: One or more attributes of the Outcome are invalid.
+        """
         if not self.dest:
             raise utils.ValidationError(
                 'Every outcome should have a destination.')
@@ -512,6 +635,11 @@ class AnswerGroup(object):
     example answers dictated by the creator.
     """
     def to_dict(self):
+        """Returns a dict representing this AnswerGroup domain object.
+
+        Returns:
+            A dict, mapping all fields of AnswerGroup instance.
+        """
         return {
             'rule_specs': [rule_spec.to_dict()
                            for rule_spec in self.rule_specs],
@@ -521,6 +649,15 @@ class AnswerGroup(object):
 
     @classmethod
     def from_dict(cls, answer_group_dict):
+        """Return a AnswerGroup domain object from a dict.
+
+        Args:
+            answer_group_dict: dict. The dict representation of AnswerGroup
+                object.
+
+        Returns:
+            AnswerGroup. The corresponding AnswerGroup domain object.
+        """
         return cls(
             Outcome.from_dict(answer_group_dict['outcome']),
             [RuleSpec.from_dict(rs) for rs in answer_group_dict['rule_specs']],
@@ -528,6 +665,13 @@ class AnswerGroup(object):
         )
 
     def __init__(self, outcome, rule_specs, correct):
+        """Initializes a AnswerGroup domain object.
+
+        Args:
+            outcome: Outcome. The outcome of an interaction.
+            rule_specs: list(RuleSpec). List of rule specifications.
+            correct: bool. True if user answers correctly else False.
+        """
         self.rule_specs = [RuleSpec(
             rule_spec.rule_type, rule_spec.inputs
         ) for rule_spec in rule_specs]
@@ -536,10 +680,12 @@ class AnswerGroup(object):
         self.correct = correct
 
     def validate(self, interaction, exp_param_specs_dict):
-        """Rule validation.
+        """Rule validation. Verifies that all rule classes are valid, and that
+        the AnswerGroup only has one classifier rule.
 
-        Verifies that all rule classes are valid, and that the AnswerGroup only
-        has one classifier rule.
+        Raises:
+            ValidationError: One or more attributes of the Content are invalid
+            or contains more than one classifier rule.
         """
         if not isinstance(self.rule_specs, list):
             raise utils.ValidationError(
@@ -572,8 +718,11 @@ class AnswerGroup(object):
         self.outcome.validate()
 
     def get_classifier_rule_index(self):
-        """Returns the index of the classifier in the answer groups, or None
-        if it doesn't exist.
+        """Get the index of the classifier in the answer groups.
+
+        Returns:
+            int or None. Returns the index of the classifier in the answer
+            groups, or None if it doesn't exist.
         """
         for (rule_spec_index, rule_spec) in enumerate(self.rule_specs):
             if rule_spec.rule_type == RULE_TYPE_CLASSIFIER:
