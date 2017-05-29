@@ -28,6 +28,7 @@ oppia.constant('LEARNER_DASHBOARD_SUB_SECTIONS', {
 });
 
 oppia.constant('EXPLORATIONS_SORT_BY_KEYS', {
+  LAST_PLAYED: 'last_played',
   TITLE: 'title',
   CATEGORY: 'category'
 });
@@ -38,8 +39,9 @@ oppia.constant('SUBSCRIPTION_SORT_BY_KEYS', {
 });
 
 oppia.constant('HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', {
+  LAST_PLAYED: 'I18N_LEARNER_DASHBOARD_EXPLORATIONS_SORT_BY_LAST_PLAYED',
   TITLE: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_TITLE ',
-  CATEGORY: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_CATEGORY',
+  CATEGORY: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_CATEGORY'
 });
 
 oppia.constant('HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
@@ -107,7 +109,6 @@ oppia.controller('LearnerDashboard', [
       } else {
         $scope.currentExpSortType = sortType;
       }
-      console.log($scope.currentExpSortType);
     };
 
     $scope.setSubscriptionSortingOptions = function(sortType) {
@@ -116,6 +117,16 @@ oppia.controller('LearnerDashboard', [
           !$scope.isCurrentSubscriptionSortDescending);
       } else {
         $scope.currentSubscriptionSortType = sortType;
+      }
+    };
+
+    $scope.sortExplorationFunction = function(entity) {
+      // This function is passed as a custom comparator function to `orderBy`,
+      // so that special cases can be handled while sorting explorations.
+      if ($scope.currentExpSortType === EXPLORATIONS_SORT_BY_KEYS.LAST_PLAYED) {
+        return null;
+      } else {
+        return entity[$scope.currentExpSortType];
       }
     };
 
@@ -195,7 +206,8 @@ oppia.controller('LearnerDashboard', [
     LearnerDashboardBackendApiService.fetchLearnerDashboardData().then(
       function(response) {
         var responseData = response.data;
-        $scope.currentExpSortType = EXPLORATIONS_SORT_BY_KEYS.TITLE;
+        $scope.isCurrentExpSortDescending = true;
+        $scope.currentExpSortType = EXPLORATIONS_SORT_BY_KEYS.LAST_PLAYED;
         $scope.currentSubscribersSortType = SUBSCRIPTION_SORT_BY_KEYS.USERNAME;
         $scope.completedExplorationsList = (
           responseData.completed_explorations_list

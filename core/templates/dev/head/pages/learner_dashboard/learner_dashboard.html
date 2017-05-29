@@ -200,7 +200,7 @@
               </div>
             </md-card>
 
-            <div ng-repeat="tile in incompleteExplorationsList | orderBy:currentExpSortType:isCurrentExpSortDescending track by tile.id"
+            <div ng-repeat="tile in incompleteExplorationsList | orderBy:sortExplorationFunction:isCurrentExpSortDescending track by tile.id"
                  style="display: inline-block; margin-left: 1px;"
                  ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false">
               <img class="remove-icon"
@@ -246,7 +246,7 @@
               </div>
             </md-card>
 
-            <div ng-repeat="tile in completedExplorationsList | orderBy:currentExpSortType:isCurrentExpSortDescending track by tile.id"
+            <div ng-repeat="tile in completedExplorationsList | orderBy:sortExplorationFunction:isCurrentExpSortDescending track by tile.id"
                  style="display: inline-block; margin-left: 1px;">
               <exploration-summary-tile
                                       exploration-id="tile.id"
