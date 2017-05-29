@@ -21,7 +21,9 @@
 var addExistingExploration = function(explorationId) {
   element(
     by.css('.protractor-test-add-exploration-input')
-  ).sendKeys(explorationId + '\n');
+  ).sendKeys(explorationId);
+  browser.driver.sleep(300);
+  element(by.css('.protractor-test-add-exploration-button')).click();
 };
 
 // Shift a node left in the node graph.
