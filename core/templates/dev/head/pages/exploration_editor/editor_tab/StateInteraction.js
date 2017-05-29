@@ -458,3 +458,29 @@ oppia.directive('testInteractionPanel', [function() {
     ]
   };
 }]);
+oppia.directive('heightWatcher', [function() {
+  return {
+    restrict: 'A',
+    link: function(scope, element) {
+      scope.$watch(
+      function() {
+        return element[0].offsetHeight;
+      },
+      function(newVal, oldVal) {
+        if (newVal !== oldVal) {
+          if (newVal > 630 - 40) {
+            scope.notifyHeight = true;
+          } else {
+            scope.notifyHeight = false;
+          }
+        }
+      }, true);
+    }
+  };
+}]);
+oppia.directive('heightGuide', [function() {
+  return {
+    restrict: 'E',
+    templateUrl: 'notify/heightGuide'
+  };
+}]);
