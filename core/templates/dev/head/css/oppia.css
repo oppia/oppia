@@ -588,6 +588,19 @@ textarea {
 }
 
 /*
+  Styles for BackgroundMaskService.
+*/
+.oppia-background-mask {
+  background: rgba(0,0,0,0.33);
+  height: 100vh;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  z-index: 30;
+}
+
+/*
   Styles for the global navigation sidebar menu.
 */
 .oppia-base-container {
@@ -891,6 +904,10 @@ textarea {
     margin: 0;
   }
 }
+
+/* NOTE TO DEVELOPERS: This value should be updated in
+   windowDimensionsService if changed.
+ */
 @media(max-width: 651px) {
   .navbar-nav.oppia-navbar-nav > li > a {
     display: none;

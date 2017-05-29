@@ -16,17 +16,42 @@
     width: 60px;
   }
 
-  .oppia-exploration-footer .author-profile {
+  .oppia-exploration-footer .author-profile, .oppia-exploration-footer .mobile-feedback {
     color: #fff;
     list-style-type: none;
     padding-left: 0;
   }
 
+  .oppia-exploration-footer .mobile-feedback {
+    margin-bottom: 0;
+  }
+
+  .oppia-exploration-footer .mobile-feedback li > a {
+    margin-top: 2px;
+  }
+
+  .oppia-exploration-footer .mobile-feedback > .popover {
+    color: rgba(0,0,0,0.87);
+    margin-left: 5px;
+    margin-right: 5px;
+    max-width: 97.6vw;
+    right: 15px;
+    width: auto;
+  }
+
+  .oppia-exploration-footer .mobile-feedback .popover > .arrow {
+    display: none;
+  }
+
+  .oppia-exploration-footer .mobile-feedback feedback-popup .oppia-feedback-popover-textarea {
+    width: 100%;
+  }
+  
   .oppia-exploration-footer .author-profile a:hover {
     text-decoration: none;
   }
 
-  .oppia-exploration-footer .author-profile li {
+  .oppia-exploration-footer .author-profile li, .oppia-exploration-footer .mobile-feedback li {
     float: left;
   }
 
@@ -110,6 +135,12 @@
     margin: -8px;
   }
 
+  @media (max-width: 650px) {
+    .oppia-exploration-footer .oppia-exploration-footer-sharing-links ul {
+      margin: 0 -8px;
+    }
+  }
+
   .oppia-exploration-footer .oppia-exploration-footer-sharing-links li {
     float: left;
   }
@@ -130,7 +161,7 @@
 <div class="footer navbar-fixed-bottom oppia-exploration-footer">
   <div class="row">
     <div class="col-sm-5">
-      <ul class="author-profile">
+      <ul class="author-profile" ng-if="!mobileFeedbackIsShown">
         <li>
           <img ng-src="<[getStaticImageUrl('/general/apple.svg')]>" class="exploration-footer-img"
                alt="">
@@ -159,7 +190,14 @@
             </ul>
           </div>
         </li>
-        <li></li>
+      </ul>
+      <ul class="mobile-feedback" ng-if="mobileFeedbackIsShown">
+        <li popover-placement="top-left" popover-template="'popover/feedback'" popover-trigger="click">
+          <a href="" class="btn oppia-navbar-button">
+            <i class="material-icons">&#xE87F;</i>
+            <span translate="I18N_PLAYER_FEEDBACK_TOOLTIP"></span>
+          </a>
+        </li>
       </ul>
     </div>
     <div class="col-sm-7">
