@@ -66,103 +66,6 @@
       exploration-summary-tile md-card {
         box-shadow: none;
       }
-
-      @-webkit-keyframes next-exploration-animation-effect {
-        from, 3.7%, to {
-          -webkit-transform: none;
-          transform: none;
-        }
-
-        7.4% {
-          -webkit-transform: skewX(-12.5deg) skewY(-12.5deg);
-          transform: skewX(-12.5deg) skewY(-12.5deg);
-        }
-
-        11.1% {
-          -webkit-transform: skewX(6.25deg) skewY(6.25deg);
-          transform: skewX(6.25deg) skewY(6.25deg);
-        }
-
-        14.8% {
-          -webkit-transform: skewX(-3.125deg) skewY(-3.125deg);
-          transform: skewX(-3.125deg) skewY(-3.125deg);
-        }
-
-        18.5% {
-          -webkit-transform: skewX(1.5625deg) skewY(1.5625deg);
-          transform: skewX(1.5625deg) skewY(1.5625deg);
-        }
-
-        22.2% {
-          -webkit-transform: skewX(-0.78125deg) skewY(-0.78125deg);
-          transform: skewX(-0.78125deg) skewY(-0.78125deg);
-        }
-
-        25.9% {
-          -webkit-transform: skewX(0.390625deg) skewY(0.390625deg);
-          transform: skewX(0.390625deg) skewY(0.390625deg);
-        }
-
-        29.6% {
-          -webkit-transform: skewX(-0.1953125deg) skewY(-0.1953125deg);
-          transform: skewX(-0.1953125deg) skewY(-0.1953125deg);
-        }
-        100% {
-          -webkit-transform: none;
-          transform: none;
-        }
-      }
-
-      @keyframes next-exploration-animation-effect {
-        from, 3.7%, to {
-          -webkit-transform: none;
-          transform: none;
-        }
-
-        7.4% {
-          -webkit-transform: skewX(-12.5deg) skewY(-12.5deg);
-          transform: skewX(-12.5deg) skewY(-12.5deg);
-        }
-
-        11.1% {
-          -webkit-transform: skewX(6.25deg) skewY(6.25deg);
-          transform: skewX(6.25deg) skewY(6.25deg);
-        }
-
-        14.8% {
-          -webkit-transform: skewX(-3.125deg) skewY(-3.125deg);
-          transform: skewX(-3.125deg) skewY(-3.125deg);
-        }
-
-        18.5% {
-          -webkit-transform: skewX(1.5625deg) skewY(1.5625deg);
-          transform: skewX(1.5625deg) skewY(1.5625deg);
-        }
-
-        22.2% {
-          -webkit-transform: skewX(-0.78125deg) skewY(-0.78125deg);
-          transform: skewX(-0.78125deg) skewY(-0.78125deg);
-        }
-
-        25.9% {
-          -webkit-transform: skewX(0.390625deg) skewY(0.390625deg);
-          transform: skewX(0.390625deg) skewY(0.390625deg);
-        }
-
-        29.6% {
-          -webkit-transform: skewX(-0.1953125deg) skewY(-0.1953125deg);
-          transform: skewX(-0.1953125deg) skewY(-0.1953125deg);
-        }
-        100% {
-          -webkit-transform: none;
-          transform: none;
-        }
-      }
-      .animate-next-exploration {
-        animation: next-exploration-animation-effect 3s infinite;
-        transform-origin: center;
-        -webkit-transform-origin: center;
-      }
       .mobile-path-segment {
         margin: 0 auto;
         width: 250px;
@@ -225,6 +128,13 @@
                 stroke-linecap="round"
                 stroke-width="12"
                 ng-attr-d="<[pathSvgParameters]>"/>
+          <image ng-if="!collectionPlaythrough.hasStartedCollection()" 
+                 x="175"
+                 y="100"
+                 height="100"
+                 width="100"
+                 ng-attr-xlink:href="<[getStaticImageUrl('/general/collection_start_here.svg')]>" 
+                 xlink:href=""></image>
         </svg>
 
         <img ng-src="<[getStaticImageUrl('/general/collection_mascot.svg')]>" class="collection-mascot">
@@ -263,8 +173,15 @@
                ng-mouseover="updateExplorationPreview(node.getExplorationId());
                              setIconHighlight($index);"
                ng-mouseleave="togglePreviewCard();
-                              unsetIconHighlight($index);"
-               ng-class="{'animate-next-exploration': node.getExplorationId() === nextExplorationId}">
+                              unsetIconHighlight($index);">
+              <circle ng-show="node.getExplorationId() === nextExplorationId &&
+                $index !== activeHighlightedIconIndex"
+                      cx="50"
+                      cy="70"
+                      r="50"
+                      id="<['highlight' + $index]>"
+                      fill="#FF8C00"
+                      fill-opacity="0.5"/>
               <circle ng-show="($index===activeHighlightedIconIndex)?true:false"
                       cx="50"
                       cy="70"
@@ -303,6 +220,13 @@
                  version="1.1"
                  style="position: absolute; left: 50%; transform: translate(-50%, 195px);"
                  ng-click="scrollToLocation('mobile-path-anchor-' + $index); updateExplorationPreview(node.getExplorationId());">
+              <image ng-if="!collectionPlaythrough.hasStartedCollection() && $index===0" 
+                     x="0"
+                     y="90"
+                     height="80"
+                     width="80"
+                     ng-attr-xlink:href="<[getStaticImageUrl('/general/collection_start_here.svg')]>" 
+                     xlink:href=""></image>
               <defs>
                 <pattern id="image0<[$index]>" patternUnits="userSpaceOnUse" height="150" width="100">
                   <circle cx="50"
@@ -325,6 +249,14 @@
                          xlink:href=""></image>
                 </pattern>
               </defs>
+              <circle ng-show="node.getExplorationId() === nextExplorationId &&
+                $index !== activeHighlightedIconIndex"
+                      cx="50"
+                      cy="70"
+                      r="50"
+                      id="<['highlight' + $index]>"
+                      fill="#FF8C00"
+                      fill-opacity="0.5"/>
               <circle ng-show="($index===activeHighlightedIconIndex)?true:false"
                       cx="50"
                       cy="70"
@@ -350,6 +282,7 @@
             </svg>
           </a>
           <img ng-src="<[getStaticImageUrl('/general/mobile_path_segment.svg')]>">
+          
           <div style="position: fixed; z-index: 100; top: 100px; left: 50%; transform: translate(-130px);">
             <exploration-summary-tile ng-if="explorationCardIsShown"
                                       collection-id="getCollectionId()"
