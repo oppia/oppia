@@ -435,6 +435,7 @@ md-content.oppia-profile-portfolio-container {
 */
 html p, body p {
   margin-top: -5px;
+  display: inline;
 }
 
 h1, h2 {
