@@ -22,6 +22,7 @@ var addExistingExploration = function(explorationId) {
   element(
     by.css('.protractor-test-add-exploration-input')
   ).sendKeys(explorationId);
+  // Waits until the button becomes active after debouncing.
   browser.driver.sleep(300);
   element(by.css('.protractor-test-add-exploration-button')).click();
 };
