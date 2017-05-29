@@ -63,6 +63,7 @@ def empty_environ():
     os.environ['DEFAULT_VERSION_HOSTNAME'] = '%s:%s' % (
         os.environ['HTTP_HOST'], os.environ['SERVER_PORT'])
 
+
 class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
     """Mock for google.appengine.api.urlfetch"""
 
@@ -73,11 +74,30 @@ class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
         self.request = None
 
     def set_return_values(self, content='', status_code=200, headers=None):
+        """Sets the content, status code and headers that the urlfetch mock
+        should return with.
+
+        Args:
+            content: str. The content to return in subsequent calls to the
+            urlfetch mock.
+            status_code: int. The status_code to return in subsequent calls
+            to the urlfetch mock.
+            headers: dict. The headers to return in subsequent calls to
+            urlfetch mock. The keys of this dict are strings that represent
+            the header name and the value represents corresponding value of
+            that header.
+        """
         self.return_values['content'] = content
         self.return_values['status_code'] = status_code
         self.return_values['headers'] = headers
 
-    def _Dynamic_Fetch(self, request, response): # pylint: disable=invalid-name
+    def _Dynamic_Fetch(self, request, response):  # pylint: disable=invalid-name
+        """Simulates urlfetch mock by setting request & response object.
+
+        Args:
+            request: dict. Request object for the URLMock.
+            response: dict. Response object for the URLMock.
+        """
         return_values = self.return_values
         response.set_content(return_values.get('content', ''))
         response.set_statuscode(return_values.get('status_code', 200))
@@ -143,12 +163,27 @@ class TestBase(unittest.TestCase):
     }
 
     def _get_unicode_test_string(self, suffix):
+        """Tests if unicode string are working properly.
+
+        Args:
+            suffix: str. the suffix pattern to the UNICODE_TEST_STRING.
+
+        Returns:
+            str. string with UNICODE_TEST_STRING appended to the value
+            passed in `suffix` variable.
+        """
         return '%s%s' % (self.UNICODE_TEST_STRING, suffix)
 
     def setUp(self):
+        """Initializes the fixture for the test suite. Subclasses of TestBase
+        should override this method.
+        """
         raise NotImplementedError
 
     def tearDown(self):
+        """Cleans up the fixture after the test runs. Subclasses of
+        TestBaseshould override this method.
+        """
         raise NotImplementedError
 
     def _assert_validation_error(self, item, error_substring):
@@ -168,6 +203,9 @@ class TestBase(unittest.TestCase):
         print '%s%s' % (LOG_LINE_PREFIX, line)
 
     def _delete_all_models(self):
+        """Deletes all keys from the NDB datastore. Subclasses of TestBase
+        should override this method.
+        """
         raise NotImplementedError
 
     def _stash_current_user_env(self):
@@ -197,11 +235,23 @@ class TestBase(unittest.TestCase):
         self.stashed_user_env = None  # pylint: disable=attribute-defined-outside-init
 
     def login(self, email, is_super_admin=False):
+        """Sets environment variables to simulate a login. Sets
+        USER_IS_ADMIN to `1` if is_super_admin is True else `0`.
+
+        Args:
+            email: str. User's email to be picked up from environment variable
+                `USER_EMAIL`.
+            is_super_admin: bool. Optional parameter to be accepted. False
+                by default.
+        """
         os.environ['USER_EMAIL'] = email
         os.environ['USER_ID'] = self.get_user_id_from_email(email)
         os.environ['USER_IS_ADMIN'] = '1' if is_super_admin else '0'
 
     def logout(self):
+        """Resets USER_EMAIL, USER_ID, USER_IS_ADMIN from environment
+        variables.
+        """
         os.environ['USER_EMAIL'] = ''
         os.environ['USER_ID'] = ''
         os.environ['USER_IS_ADMIN'] = '0'
@@ -350,9 +400,22 @@ class TestBase(unittest.TestCase):
             config_domain.MODERATOR_USERNAMES, moderator_usernames)
 
     def get_current_logged_in_user_id(self):
+        """Gets the user_id of the current logged-in user.
+
+        Returns:
+            str. Value of USER_ID env variable.
+        """
         return os.environ['USER_ID']
 
     def get_user_id_from_email(self, email):
+        """Gets the user_id corresponding to the given email.
+
+        Args:
+            email: str. valid email id stored in the Appengine database.
+
+        Returns:
+            user_id: str. Id of user possessing given email.
+        """
         return current_user_services.get_user_id_from_email(email)
 
     def save_new_default_exploration(
@@ -456,6 +519,23 @@ class TestBase(unittest.TestCase):
             language_code=feconf.DEFAULT_LANGUAGE_CODE,
             exploration_id='an_exploration_id',
             end_state_name=DEFAULT_END_STATE_NAME):
+        """Creates an Oppia collection and adds a node saving the
+        exploration details.
+
+        Args:
+            collection_id: int. Id for the collection to be created.
+            owner_id: int. user_id for owner to be linked to the collection.
+            title: str. title for the collection.
+            category: str. category of the exploration.
+            objective: str. objective for the exploration.
+            language_code: str. Defaults to `en` for English.
+            exploration_id: int. exploration_id for the Oppia exploration.
+            end_state_name: str. end state for the exploration.
+
+        Returns:
+            collection: dict. Collection object created with the given
+            exploration node.
+        """
         collection = collection_domain.Collection.create_default_collection(
             collection_id, title, category, objective,
             language_code=language_code)
@@ -544,6 +624,9 @@ class AppEngineTestBase(TestBase):
     """Base class for tests requiring App Engine services."""
 
     def _delete_all_models(self):
+        """Deletes all keys from the NDB datastore. Subclasses of TestBase
+        should override this method.
+        """
         from google.appengine.ext import ndb
         ndb.delete_multi(ndb.Query().iter(keys_only=True))
 
@@ -602,10 +685,10 @@ class AppEngineTestBase(TestBase):
         requests to fetch the Gravatar profile picture for new users while the
         backend tests are being run.
 
-        args:
-          - content: Response content or body.
-          - status_code: Response status code.
-          - headers: Response headers.
+        Args:
+            content: str. Response content or body.
+            status_code: int. Response status code.
+            headers: dict. Response headers.
         """
         if headers is None:
             response_headers = {}
@@ -701,15 +784,20 @@ class FunctionWrapper(object):
     def __init__(self, func):
         """Creates a new FunctionWrapper instance.
 
-        args:
-          - func: a callable, or data descriptor. If it's a descriptor, its
-            __get__ should return a bound method. For example, func can be a
-            function, a method, a static or class method, but not a @property.
+        Args:
+            func: a callable, or data descriptor. If it's a descriptor, its
+                __get__ should return a bound method. For example, func can
+                be a function, a method, a static or class method, but not a
+                @property.
         """
         self._func = func
         self._instance = None
 
     def __call__(self, *args, **kwargs):
+        """Overrides the call method for the function to call pre_call_hook
+        method which would be execute before the function is executed and
+        post_call_hook which would be called after the function is executed.
+        """
         if self._instance is not None:
             args = [self._instance] + list(args)
 
@@ -731,9 +819,22 @@ class FunctionWrapper(object):
         return self
 
     def pre_call_hook(self, args):
+        """Override this to do tasks that should be executed before the
+        actual function call.
+
+        Args:
+            args: Set of arguments that the function accepts.
+        """
         pass
 
     def post_call_hook(self, args, result):
+        """Override this to do tasks that should be executed after the
+        actual function call.
+
+        Args:
+            args: Set of arguments that the function accepts.
+            result: Result returned from the function.
+        """
         pass
 
 
@@ -752,9 +853,15 @@ class CallCounter(FunctionWrapper):
 
     @property
     def times_called(self):
+        """Property that returns the number of times a function is called.
+        """
         return self._times_called
 
     def pre_call_hook(self, args):
+        """Method that is called before each function call to increment the
+        counter tracking the number of times a function is called. This
+        would also be called even when the function raises an exception.
+        """
         self._times_called += 1
 
 
@@ -768,12 +875,12 @@ class FailingFunction(FunctionWrapper):
     def __init__(self, f, exception, num_tries_before_success):
         """Create a new Failing function.
 
-        args:
-          - f: see FunctionWrapper.
-          - exception: the exception to be raised.
-          - num_tries_before_success: the number of times to raise an
-            exception, before a call succeeds. If this is 0, all calls will
-            succeed, if it is FailingFunction.INFINITY, all calls will fail.
+        Args:
+            f: see FunctionWrapper.
+            exception: the exception to be raised.
+            num_tries_before_success: the number of times to raise an
+                exception, before a call succeeds. If this is 0, all calls will
+                succeed, if it is FailingFunction.INFINITY, all calls will fail.
         """
         super(FailingFunction, self).__init__(f)
         self._exception = exception
@@ -789,6 +896,10 @@ class FailingFunction(FunctionWrapper):
                 'or FailingFunction.INFINITY')
 
     def pre_call_hook(self, args):
+        """Method that is called each time before the actual function call
+        to check if the exception is to be raised based on the number of
+        tries before success
+        """
         self._times_called += 1
         call_should_fail = (
             self._num_tries_before_success >= self._times_called)
