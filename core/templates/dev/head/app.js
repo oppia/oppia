@@ -835,6 +835,8 @@ oppia.factory('windowDimensionsService', ['$window', function($window) {
       return this.getWidth() <= NORMAL_NAVBAR_CUTOFF_WIDTH_PX;
     },
     isExplorationPlayerNavHidden: function() {
+      // NOTE TO DEVELOPERS: This value should be updated in oppia.css if
+      // changed.
       var EXPLORATION_PLAYER_NAV_CUTOFF_WIDTH_PX = 651;
       return this.getWidth() < EXPLORATION_PLAYER_NAV_CUTOFF_WIDTH_PX;
     }

@@ -904,6 +904,10 @@ textarea {
     margin: 0;
   }
 }
+
+/* NOTE TO DEVELOPERS: This value should be updated in
+   windowDimensionsService if changed.
+ */
 @media(max-width: 651px) {
   .navbar-nav.oppia-navbar-nav > li > a {
     display: none;
