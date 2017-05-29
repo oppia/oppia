@@ -36,9 +36,15 @@ oppia.directive('oppiaInteractiveLabelingInput', [
           var imageAndLabels = oppiaHtmlEscaper.escapedJsonToObj(
             $attrs.imageAndLabelsWithValue);
           $scope.imageTitle = $attrs.imageTitleWithValue;
+          var unicodeStripCount = 6;
+          $scope.bonusWords = $attrs.bonusWordsWithValue.slice(unicodeStripCount)
+          $scope.bonusWords = $scope.bonusWords.slice(0, -unicodeStripCount);
+          $scope.bonusWords = $scope.bonusWords.split(',');
+          //Remove white spaces
+          $scope.bonusWords.map(function(word){word.trim();});
+          console.log($scope.bonusWords);
           $scope.drawLines = ($attrs.showLinesWithValue == 'true');
           //Need to strip unicode
-          var unicodeStripCount = 6;
           $scope.imageTitle = $scope.imageTitle.slice(unicodeStripCount)
           $scope.imageTitle = $scope.imageTitle.slice(0, -unicodeStripCount);
           $scope.alwaysShowRegions = 'true';

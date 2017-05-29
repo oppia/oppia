@@ -50,6 +50,13 @@ class LabelingInput(base.BaseInteraction):
         },
         'default_value': ''},
     {
+        'name': 'bonusWords',
+        'description': 'Extra words to be used in the word bank (separated by comma: word1, word2, word3)',
+        'schema': {
+            'type': 'unicode'
+        },
+        'default_value': ''},
+    {
         'name': 'showLines',
         'description': 'Show Lines on Image (Applies out of Interaction Editor)',
         'schema': {

@@ -55,6 +55,26 @@
         jqyoui-draggable="{animate:true, onStart:'getThisName(region.label)'}"
         ><[region.label]>
       </div>
+      <div ng-repeat="word in bonusWords"
+        style="
+          margin-bottom: 1rem;
+          display: inline-block;
+          clear: none;
+          line-height: 20px;
+          padding-top: 10px;
+          padding-bottom: 10px;
+          margin-right: 1rem;
+          text-align: center;
+          white-space: normal;
+          z-index: 11;
+          vertical-align: center;
+        "
+        class="btn btn-<[getButtonColor(word)]>"
+        data-drag="true"
+        data-jqyoui-options="{revert: 'invalid'}"
+        jqyoui-draggable="{animate:true, onStart:'getThisName(word)'}"
+        ><[word]>
+      </div>
     </div>
 </div>
     <br>
