@@ -212,16 +212,16 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 feconf.INTERACTIONS_DIR, interaction_id)
             self.assertTrue(os.path.isdir(interaction_dir))
 
-            # In this directory there should only the following files:
+            # In this directory there should only be the following files:
             #  Required:
-            #    * A python file called {interactionName}.py.
-            #    * An html file called {interactionName}.html.
-            #    * A JS file called {interactionName}.js.
-            #    * A JS file called {interactionName}ValidationService.js
+            #    * A python file called {InteractionName}.py.
+            #    * An html file called {InteractionName}.html.
+            #    * A JS file called {InteractionName}.js.
+            #    * A JS file called {InteractionName}ValidationService.js
             #    * A directory named 'static' containing at least a .png file.
             #  Optional:
-            #    * A JS file called {interactionName}ValidationServiceSpecs.js
-            #    * A JS file called {interactionName}RulesServiceSpecs.js
+            #    * A JS file called {InteractionName}ValidationServiceSpecs.js
+            #    * A JS file called {InteractionName}RulesServiceSpecs.js
             #    * A JS file called protractor.js.
             dir_contents = self._listdir_omit_ignored(interaction_dir)
 
