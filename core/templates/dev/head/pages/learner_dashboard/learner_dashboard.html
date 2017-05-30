@@ -200,15 +200,15 @@
               </div>
             </md-card>
 
-            <div ng-repeat="tile in incompleteExplorationsList | orderBy:sortExplorationFunction:isCurrentExpSortDescending track by tile.id"
+            <div ng-repeat="tile in incompleteExplorationsList | orderBy:sortExplorationFunction:isCurrentExpSortDescending | limitTo:PAGE_SIZE:startIncompleteExpIndex track by tile.id"
                  style="display: inline-block; margin-left: 1px;"
                  ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false">
-              <img class="remove-icon"
-                   ng-show="showRemoveIcon"
-                   ng-src="<[getStaticImageUrl('/icons/remove.png')]>"
-                   ng-click="openRemoveEntityModal(activeSection, activeSubSection, tile)"
-                   tooltip="Remove"
-                   tooltip-placement="top">
+              <i class="remove-icon fa fa-times"
+                 ng-show="showRemoveIcon"
+                 aria-hidden="true"
+                 ng-click="openRemoveEntityModal(activeSection, activeSubSection, tile)"
+                 tooltip="Remove"
+                 tooltip-placement="top"></i>
               <exploration-summary-tile
                                       exploration-id="tile.id"
                                       exploration-title="tile.title"
@@ -221,6 +221,14 @@
                                       thumbnail-bg-color="tile.thumbnail_bg_color"
                                       class="protractor-test-exp-summary-tile">
               </exploration-summary-tile>
+            </div>
+
+            <div class="oppia-learner-dashboard-page-portfolio"
+                 ng-if="incompleteExplorationsList.length > 8">
+              <i class="material-icons md-18"
+                 ng-click="goToPreviousPage(LEARNER_DASHBOARD_SECTIONS.INCOMPLETE, LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS)">&#xE5C4;</i>
+              Showing <[startIncompleteExpIndex + 1]> - <[Math.min(startIncompleteExpIndex + PAGE_SIZE, incompleteExplorationsList.length)]> of <[incompleteExplorationsList.length]>
+              <i class="material-icons md-18" ng-click="goToNextPage(LEARNER_DASHBOARD_SECTIONS.INCOMPLETE, LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS)">&#xE5C8;</i>
             </div>
           </div>
 
@@ -261,6 +269,14 @@
                                       class="protractor-test-exp-summary-tile">
               </exploration-summary-tile>
             </div>
+
+            <div class="oppia-learner-dashboard-page-portfolio"
+                 ng-if="completedExplorationsList.length > 8">
+              <i class="material-icons md-18"
+                 ng-click="goToPreviousPage(LEARNER_DASHBOARD_SECTIONS.COMPLETED, LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS)">&#xE5C4;</i>
+              Showing <[startCompletedExpIndex + 1]> - <[Math.min(startCompletedExpIndex + PAGE_SIZE, completedExplorationsList.length)]> of <[completedExplorationsList.length]>
+              <i class="material-icons md-18" ng-click="goToNextPage(LEARNER_DASHBOARD_SECTIONS.COMPLETED, LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS)">&#xE5C8;</i>
+            </div>
           </div>
 
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTIONS.INCOMPLETE && activeSubSection === LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS">
@@ -288,12 +304,12 @@
             <div ng-repeat="tile in incompleteCollectionsList"
                  style="display: inline-block; margin-left: 1px;"
                  ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false">
-              <img class="remove-icon"
-                   ng-show="showRemoveIcon"
-                   ng-src="<[getStaticImageUrl('/icons/remove.png')]>"
-                   ng-click="openRemoveEntityModal(activeSection, activeSubSection, tile)"
-                   tooltip="Remove"
-                   tooltip-placement="top">
+              <i class="remove-icon fa fa-times"
+                 ng-show="showRemoveIcon"
+                 aria-hidden="true"
+                 ng-click="openRemoveEntityModal(activeSection, activeSubSection, tile)"
+                 tooltip="Remove"
+                 tooltip-placement="top"></i>
               <collection-summary-tile
                                        collection-id="tile.id"
                                        collection-title="tile.title"
@@ -304,6 +320,14 @@
                                        thumbnail-icon-url="tile.thumbnail_icon_url"
                                        thumbnail-bg-color="tile.thumbnail_bg_color">
               </collection-summary-tile>
+            </div>
+
+            <div class="oppia-learner-dashboard-page-portfolio"
+                 ng-if="incompleteCollectionsList.length > 8">
+              <i class="material-icons md-18"
+                 ng-click="goToPreviousPage(LEARNER_DASHBOARD_SECTIONS.INCOMPLETE, LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS)">&#xE5C4;</i>
+              Showing <[startIncompleteCollectionIndex + 1]> - <[Math.min(startIncompleteCollectionIndex + PAGE_SIZE, incompleteCollectionsList.length)]> of <[incompleteCollectionsList.length]>
+              <i class="material-icons md-18" ng-click="goToNextPage(LEARNER_DASHBOARD_SECTIONS.INCOMPLETE, LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS)">&#xE5C8;</i>
             </div>
           </div>
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTIONS.COMPLETED && activeSubSection === LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS">
@@ -352,6 +376,14 @@
                                        thumbnail-icon-url="tile.thumbnail_icon_url"
                                        thumbnail-bg-color="tile.thumbnail_bg_color">
               </collection-summary-tile>
+            </div>
+
+            <div class="oppia-learner-dashboard-page-portfolio"
+                 ng-if="completedCollectionsList.length > 8">
+              <i class="material-icons md-18"
+                 ng-click="goToPreviousPage(LEARNER_DASHBOARD_SECTIONS.COMPLETED, LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS)">&#xE5C4;</i>
+              Showing <[startCompletedCollectionIndex + 1]> - <[Math.min(startCompletedCollectionIndex + PAGE_SIZE, completedCollectionsList.length)]> of <[completedCollectionsList.length]>
+              <i class="material-icons md-18" ng-click="goToNextPage(LEARNER_DASHBOARD_SECTIONS.COMPLETE, LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS)">&#xE5C8;</i>
             </div>
           </div>
 

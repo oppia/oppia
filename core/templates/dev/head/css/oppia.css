@@ -201,6 +201,13 @@ body {
   font-style: italic;
 }
 
+.oppia-learner-dashboard-page-portfolio {
+  font-weight: bold;
+  margin-right: 14px;
+  margin-top: 8px;
+  text-align: right;
+}
+
 .oppia-learner-dashboard-title {
   color: #01645c;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
@@ -262,11 +269,14 @@ body {
 }
 
 .oppia-learner-dashboard-main-content .remove-icon {
+  color: white;
   float: right;
+  font-size: 20px;
   left: -7px;
   margin-left: -26px;
   margin-top: 10px;
   position: relative;
+  width: 18px;
   z-index: 20;
 }
 

@@ -71,6 +71,8 @@ oppia.controller('LearnerDashboard', [
     $scope.LEARNER_DASHBOARD_SECTIONS = LEARNER_DASHBOARD_SECTIONS;
     $scope.LEARNER_DASHBOARD_SUB_SECTIONS = LEARNER_DASHBOARD_SUB_SECTIONS;
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+    $scope.PAGE_SIZE = 8;
+    $scope.Math = window.Math;
 
     $scope.setActiveSection = function(newActiveSectionName) {
       $scope.activeSection = newActiveSectionName;
@@ -100,6 +102,54 @@ oppia.controller('LearnerDashboard', [
         return 'mouseenter';
       } else {
         return 'none';
+      }
+    };
+
+    $scope.goToPreviousPage = function(section, subSection) {
+      if (section === LEARNER_DASHBOARD_SECTIONS.INCOMPLETE) {
+        if (subSection === LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS) {
+          $scope.startIncompleteExpIndex = Math.max(
+            $scope.startIncompleteExpIndex - $scope.PAGE_SIZE, 0);
+        } else if (subSection === LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS) {
+          $scope.startIncompleteCollectionIndex = Math.max(
+            $scope.startIncompleteCollectionIndex - $scope.PAGE_SIZE, 0);
+        }
+      } else if (section === LEARNER_DASHBOARD_SECTIONS.COMPLETED) {
+        if (subSection === LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS) {
+          $scope.startCompletedExpIndex = Math.max(
+            $scope.startCompletedExpIndex - $scope.PAGE_SIZE, 0);
+        } else if (subSection === LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS) {
+          $scope.startCompletedCollectionIndex = Math.max(
+            $scope.startCompletedCollectionIndex - $scope.PAGE_SIZE, 0);
+        }
+      }
+    };
+
+    $scope.goToNextPage = function(section, subSection) {
+      if (section === LEARNER_DASHBOARD_SECTIONS.INCOMPLETE) {
+        if (subSection === LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS) {
+          if ($scope.startIncompleteExpIndex +
+            $scope.PAGE_SIZE <= $scope.incompleteExplorationsList.length) {
+            $scope.startIncompleteExpIndex += $scope.PAGE_SIZE;
+          }
+        } else if (subSection === LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS) {
+          if ($scope.startIncompleteCollectionIndex +
+            $scope.PAGE_SIZE <= $scope.startIncompleteCollectionIndex.length) {
+            $scope.startIncompleteCollectionIndex += $scope.PAGE_SIZE;
+          }
+        }
+      } else if (section === LEARNER_DASHBOARD_SECTIONS.COMPLETED) {
+        if (subSection === LEARNER_DASHBOARD_SUB_SECTIONS.EXPLORATIONS) {
+          if ($scope.startCompletedExpIndex +
+            $scope.PAGE_SIZE <= $scope.startCompletedExpIndex.length) {
+            $scope.startCompletedExpIndex += $scope.PAGE_SIZE;
+          }
+        } else if (subSection === LEARNER_DASHBOARD_SUB_SECTIONS.COLLECTIONS) {
+          if ($scope.startCompletedCollectionIndex +
+            $scope.PAGE_SIZE <= $scope.startCompletedCollectionIndex.length) {
+            $scope.startCompletedCollectionIndex += $scope.PAGE_SIZE;
+          }
+        }
       }
     };
 
@@ -209,6 +259,10 @@ oppia.controller('LearnerDashboard', [
         $scope.isCurrentExpSortDescending = true;
         $scope.currentExpSortType = EXPLORATIONS_SORT_BY_KEYS.LAST_PLAYED;
         $scope.currentSubscribersSortType = SUBSCRIPTION_SORT_BY_KEYS.USERNAME;
+        $scope.startIncompleteExpIndex = 0;
+        $scope.startCompletedExpIndex = 0;
+        $scope.startIncompleteCollectionIndex = 0;
+        $scope.startCompletedCollectionIndex = 0;
         $scope.completedExplorationsList = (
           responseData.completed_explorations_list
         );
