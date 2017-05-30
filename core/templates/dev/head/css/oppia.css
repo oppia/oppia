@@ -2922,6 +2922,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-modal-information-card .modal-dialog {
   margin: 100px auto;
+  max-width: 98vw;
   width: 400px;
 }
 

@@ -145,6 +145,18 @@
     float: left;
   }
 
+  .oppia-exploration-footer .oppia-navbar-footer-info-icon {
+    height: 56px;
+    padding: 12px;
+  }
+
+  .oppia-exploration-footer .oppia-navbar-footer-info-icon:hover {
+    background: #fff;
+    color: #009688;
+    height: 56px;
+    padding: 12px;
+  }
+
   @media (max-width: 475px) {
     .oppia-exploration-footer-sharing-links {
       display: none;
@@ -152,7 +164,19 @@
   }
 
   @media (max-width: 658px) {
-    .oppia-share-exploration-footer {
+    .oppia-exploration-footer .oppia-share-exploration-footer {
+      display: none;
+    }
+    .oppia-exploration-footer .oppia-navbar-footer-info-icon {
+      margin-top: -11px;
+    }
+    .oppia-exploration-footer .oppia-navbar-footer-info-icon:hover {
+      margin-top: -11px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .oppia-exploration-footer .oppia-exploration-footer-info-icon {
       display: none;
     }
   }
@@ -202,7 +226,11 @@
     </div>
     <div class="col-sm-7">
       <div class="pull-right">
-        <ul class="author-profile">
+        <ul class="author-profile" ng-controller="LearnerViewInfo">
+          <li ng-click="showInformationCard()" style="cursor: pointer;" class="oppia-exploration-footer-info-icon" tabindex="0">
+            <i class="material-icons oppia-navbar-footer-info-icon" style="font-size: 20px;">&#xE88E;</i>
+            <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_INFO_TOOLTIP' | translate]></span>
+          </li>
           <li>
             <h4 translate="I18N_PLAYER_SHARE_THIS_EXPLORATION" class="oppia-share-exploration-footer"></h4>
           </li>
