@@ -21,6 +21,7 @@ import re
 import string
 import struct
 
+from core.domain import calculation_registry
 from core.domain import dependency_registry
 from core.domain import exp_domain
 from core.domain import interaction_registry
@@ -118,6 +119,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertTrue(isinstance(spec[key], item_type))
                 if item_type == basestring:
                     self.assertTrue(spec[key])
+
+    def _validate_auxiliary_calculation_ids(self, auxiliary_calculation_ids):
+        for calculation_id in auxiliary_calculation_ids:
+            calculation_registry.Registry.get_calculation_by_id(calculation_id)
 
     def _listdir_omit_ignored(self, directory):
         """List all files and directories within 'directory', omitting the ones
@@ -414,6 +419,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     # Check that the rule has a default value.
                     self.assertIn(
                         param_obj_cls.__name__, default_object_values)
+
+            # Verify that the auxiliary calculation IDs are valid.
+            self._validate_auxiliary_calculation_ids(
+                interaction._auxiliary_calculation_ids)  # pylint: disable=protected-access
 
     def test_trainable_interactions_have_classifiers(self):
         all_interaction_ids = (
