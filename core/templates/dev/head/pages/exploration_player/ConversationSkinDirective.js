@@ -255,6 +255,7 @@ oppia.directive('conversationSkin', [
         'siteAnalyticsService', 'ExplorationPlayerStateService',
         'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX', 'alertsService',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
+        'FatigueDetectionService',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
             messengerService, oppiaPlayerService, urlService, focusService,
@@ -264,7 +265,8 @@ oppia.directive('conversationSkin', [
             StatsReportingService,
             siteAnalyticsService, ExplorationPlayerStateService,
             TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX, alertsService,
-            CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED) {
+            CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
+            FatigueDetectionService) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           // The minimum width, in pixels, needed to be able to show two cards
           // side-by-side.
@@ -482,12 +484,21 @@ oppia.directive('conversationSkin', [
           };
 
           $scope.submitAnswer = function(answer, interactionRulesService) {
-            // For some reason, answers are getting submitted twice when the
-            // submit button is clicked. This guards against that.
+            // Safety check to prevent double submissions from occurring.
             if (_answerIsBeingProcessed ||
-                !$scope.isCurrentCardAtEndOfTranscript() ||
-                $scope.activeCard.destStateName) {
+              !$scope.isCurrentCardAtEndOfTranscript() ||
+              $scope.activeCard.destStateName) {
               return;
+            }
+
+
+            if (!$scope.isInPreviewMode) {
+              FatigueDetectionService.recordSubmissionTimestamp();
+              if (FatigueDetectionService.isSubmittingTooFast()) {
+                FatigueDetectionService.displayTakeBreakMessage();
+                $scope.$broadcast('oppiaFeedbackAvailable');
+                return;
+              }
             }
 
             _answerIsBeingProcessed = true;
@@ -543,6 +554,7 @@ oppia.directive('conversationSkin', [
                     // There is a new card. If there is no feedback, move on
                     // immediately. Otherwise, give the learner a chance to read
                     // the feedback, and display a 'Continue' button.
+                    FatigueDetectionService.reset();
 
                     _nextFocusLabel = focusService.generateFocusLabel();
 

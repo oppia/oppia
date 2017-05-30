@@ -62,7 +62,8 @@ exports.config = {
 
     mainEditor: [
       'protractor/editorAndPlayer.js',
-      'protractor/stateEditor.js'
+      'protractor/stateEditor.js',
+      'protractor/explorationFeedback.js'
     ],
 
     editorFeatures: [
@@ -80,24 +81,24 @@ exports.config = {
     library: [
       'protractor/explorationRating.js',
       'protractor/privileges.js',
+      'protractor/libraryPagesTour.js',
       'protractor/publicationAndLibrary.js'
     ],
 
-    misc: [
+    users: [
       'protractor/userManagement.js',
-      'protractor/embedding.js',
-      'protractor/preferences.js',
-      'protractor/cacheSlugs.js',
-      'protractor/staticPagesTour.js',
       'protractor/loginFlow.js',
-      'protractor/libraryPagesTour.js',
-      'protractor/collections.js',
-      'protractor/explorationFeedback.js',
       'protractor/subscriptions.js',
-      'protractor/suggestions.js'
+      'protractor/preferences.js'
     ],
 
-    i18n: [
+    misc: [
+      'protractor/suggestions.js',
+      'protractor/cacheSlugs.js',
+      'protractor/staticPagesTour.js',
+      'protractor/collections.js',
+      'protractor/embedding.js',
+      'protractor/accessibility.js',
       'protractor/i18n.js'
     ]
   },

@@ -75,6 +75,12 @@ INTERACTION_CLASSIFIER_MAPPING = {
     'TextInput': 'LDAStringClassifier'
 }
 
+# The minimum number of training samples required for training a classifier.
+MIN_TOTAL_TRAINING_EXAMPLES = 50
+
+# The minimum number of assigned labels required for training a classifier.
+MIN_ASSIGNED_LABELS = 2
+
 # Default label for classification algorithms.
 DEFAULT_CLASSIFIER_LABEL = '_default'
 
@@ -148,6 +154,11 @@ DEFAULT_COLLECTION_TITLE = ''
 DEFAULT_COLLECTION_CATEGORY = ''
 # Default objective for a newly-minted collection.
 DEFAULT_COLLECTION_OBJECTIVE = ''
+
+# Default ID of VM which is used for training classifier.
+DEFAULT_VM_ID = 'vm_default'
+# Shared secret key for default VM.
+DEFAULT_VM_SHARED_SECRET = '1a2b3c4e'
 
 # A dict containing the accepted image formats (as determined by the imghdr
 # module) and the corresponding allowed extensions in the filenames of uploaded
@@ -520,6 +531,7 @@ FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
+LEARNER_DASHBOARD_URL = '/learner_dashboard'
 LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
 LIBRARY_INDEX_URL = '/library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'

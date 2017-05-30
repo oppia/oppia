@@ -17,8 +17,10 @@
  */
 
 oppia.controller('Base', [
-  '$scope', '$rootScope', '$document', 'alertsService', 'SidebarStatusService',
-  function($scope, $rootScope, $document, alertsService, SidebarStatusService) {
+  '$scope', '$rootScope', '$document', 'alertsService', 'BackgroundMaskService',
+  'SidebarStatusService',
+  function($scope, $rootScope, $document, alertsService, BackgroundMaskService,
+  SidebarStatusService) {
     $scope.alertsService = alertsService;
     $scope.currentLang = 'en';
     $scope.promoBarIsEnabled = GLOBALS.PROMO_BAR_IS_ENABLED;
@@ -31,6 +33,8 @@ oppia.controller('Base', [
     $scope.isSidebarShown = SidebarStatusService.isSidebarShown;
     $scope.closeSidebarOnSwipe = SidebarStatusService.closeSidebar;
 
+    $scope.isBackgroundMaskActive = BackgroundMaskService.isMaskActive;
+
     // Listener function to catch the change in language preference.
     $rootScope.$on('$translateChangeSuccess', function(evt, response) {
       $scope.currentLang = response.language;
@@ -41,5 +45,16 @@ oppia.controller('Base', [
       SidebarStatusService.onDocumentClick();
       $scope.$apply();
     });
+
+    $scope.skipToMainContent = function() {
+      var mainContentElement = document.getElementById('oppia-main-content');
+
+      if (!mainContentElement) {
+        throw Error('Variable mainContentElement is undefined.');
+      }
+      mainContentElement.tabIndex = -1;
+      mainContentElement.scrollIntoView();
+      mainContentElement.focus();
+    };
   }
 ]);

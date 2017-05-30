@@ -78,7 +78,6 @@
       <!-- This is an ng-if, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
       <div ng-if="getTabStatuses().active === 'preview'">
         {% include 'pages/exploration_editor/preview_tab/preview_tab.html' %}
-        {% include 'pages/exploration_editor/preview_tab/preview_set_parameters_modal_directive.html' %}
       </div>
 
       <div ng-show="getTabStatuses().active === 'stats'">
@@ -95,7 +94,6 @@
 
       <div ng-show="getTabStatuses().active === 'feedback'">
         {% include 'pages/exploration_editor/feedback_tab/feedback_tab.html' %}
-        {% include 'pages/exploration_editor/feedback_tab/thread_table_directive.html' %}
       </div>
     </div>
   </div>
@@ -122,6 +120,7 @@
     </defs>
   </svg>
   {% include 'pages/exploration_editor/editor_navigation_directive.html' %}
+
 {% endblock content %}
 
 {% block footer_js %}
@@ -246,7 +245,9 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/feedback_tab/ThreadTableDirective.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/EditableExplorationBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ExplorationObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ReadOnlyExplorationBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StateObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StatesObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/InteractionObjectFactory.js"></script>
@@ -276,6 +277,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerTranscriptService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ProgressDotsDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/StatsReportingService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/FatigueDetectionService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionSyntaxTree.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/evaluator.js"></script>
