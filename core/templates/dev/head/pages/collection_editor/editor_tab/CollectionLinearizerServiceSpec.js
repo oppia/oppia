@@ -40,8 +40,8 @@ describe('Collection linearizer service', function() {
 
     var firstCollectionNodeBackendObject = {
       exploration_id: 'exp_id0',
-      prerequisite_skills: [],
-      acquired_skills: ['skill0'],
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: ['skill0'],
       exploration_summary: {
         title: 'exp title0',
         category: 'exp category',
@@ -55,8 +55,8 @@ describe('Collection linearizer service', function() {
 
     var secondCollectionNodeBackendObject = {
       exploration_id: 'exp_id1',
-      prerequisite_skills: [],
-      acquired_skills: [],
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
       exploration_summary: {
         title: 'exp title1',
         category: 'exp category',
@@ -70,8 +70,8 @@ describe('Collection linearizer service', function() {
 
     var thirdCollectionNodeBackendObject = {
       exploration_id: 'exp_id2',
-      prerequisite_skills: [],
-      acquired_skills: [],
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
       exploration_summary: {
         title: 'exp title2',
         category: 'exp category',
@@ -264,8 +264,8 @@ describe('Collection linearizer service', function() {
       var collection = createLinearCollection();
       var newCollectionNodeBackendObject = {
         exploration_id: 'exp_id3',
-        prerequisite_skills: [],
-        acquired_skills: [],
+        prerequisite_skill_ids: [],
+        acquired_skill_ids: [],
         exploration_summary: {
           title: 'exp title3',
           category: 'exp category',

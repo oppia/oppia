@@ -36,8 +36,8 @@ COLLECTION_PROPERTY_CATEGORY = 'category'
 COLLECTION_PROPERTY_OBJECTIVE = 'objective'
 COLLECTION_PROPERTY_LANGUAGE_CODE = 'language_code'
 COLLECTION_PROPERTY_TAGS = 'tags'
-COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS = 'prerequisite_skills'
-COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS = 'acquired_skills'
+COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS = 'prerequisite_skill_ids'
+COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS = 'acquired_skill_ids'
 
 # This takes an additional 'exploration_id' parameter.
 CMD_ADD_COLLECTION_NODE = 'add_collection_node'
@@ -173,48 +173,49 @@ class CollectionNode(object):
     completed.
     """
 
-    def __init__(self, exploration_id, prerequisite_skills, acquired_skills):
+    def __init__(self, exploration_id, prerequisite_skill_ids,
+                 acquired_skill_ids):
         """Constructs a new CollectionNode object.
 
         Args:
         - exploration_id: A valid ID of an exploration referenced by this node.
-        - prerequisite_skills: A list of skills (strings).
-        - acquired_skills: A list of skills (strings).
+        - prerequisite_skill_ids: A list of skills (strings).
+        - acquired_skill_ids: A list of skills (strings).
         """
         self.exploration_id = exploration_id
-        self.prerequisite_skills = prerequisite_skills
-        self.acquired_skills = acquired_skills
+        self.prerequisite_skill_ids = prerequisite_skill_ids
+        self.acquired_skill_ids = acquired_skill_ids
 
     def to_dict(self):
         return {
             'exploration_id': self.exploration_id,
-            'prerequisite_skills': self.prerequisite_skills,
-            'acquired_skills': self.acquired_skills
+            'prerequisite_skill_ids': self.prerequisite_skill_ids,
+            'acquired_skill_ids': self.acquired_skill_ids
         }
 
     @classmethod
     def from_dict(cls, node_dict):
         return cls(
             copy.deepcopy(node_dict['exploration_id']),
-            copy.deepcopy(node_dict['prerequisite_skills']),
-            copy.deepcopy(node_dict['acquired_skills']))
+            copy.deepcopy(node_dict['prerequisite_skill_ids']),
+            copy.deepcopy(node_dict['acquired_skill_ids']))
 
     @property
     def skills(self):
         """Returns a set of skills where each prerequisite and acquired skill
         in this collection node is represented at most once.
         """
-        return set(self.prerequisite_skills) | set(self.acquired_skills)
+        return set(self.prerequisite_skill_ids) | set(self.acquired_skill_ids)
 
-    def update_prerequisite_skills(self, prerequisite_skills):
+    def update_prerequisite_skill_ids(self, prerequisite_skill_ids):
         """Updates prerequisite skills of collection node."""
 
-        self.prerequisite_skills = copy.deepcopy(prerequisite_skills)
+        self.prerequisite_skill_ids = copy.deepcopy(prerequisite_skill_ids)
 
-    def update_acquired_skills(self, acquired_skills):
+    def update_acquired_skill_ids(self, acquired_skill_ids):
         """Updates acquired skills of collection node."""
 
-        self.acquired_skills = copy.deepcopy(acquired_skills)
+        self.acquired_skill_ids = copy.deepcopy(acquired_skill_ids)
 
     def validate(self):
         """Validates various properties of the collection node."""
@@ -224,40 +225,41 @@ class CollectionNode(object):
                 'Expected exploration ID to be a string, received %s' %
                 self.exploration_id)
 
-        if not isinstance(self.prerequisite_skills, list):
+        if not isinstance(self.prerequisite_skill_ids, list):
             raise utils.ValidationError(
-                'Expected prerequisite_skills to be a list, received %s' %
-                self.prerequisite_skills)
+                'Expected prerequisite_skill_ids to be a list, received %s' %
+                self.prerequisite_skill_ids)
 
-        if len(set(self.prerequisite_skills)) != len(self.prerequisite_skills):
+        if (len(set(self.prerequisite_skill_ids)) !=
+                len(self.prerequisite_skill_ids)):
             raise utils.ValidationError(
-                'The prerequisite_skills list has duplicate entries: %s' %
-                self.prerequisite_skills)
+                'The prerequisite_skill_ids list has duplicate entries: %s' %
+                self.prerequisite_skill_ids)
 
-        for prerequisite_skill in self.prerequisite_skills:
+        for prerequisite_skill in self.prerequisite_skill_ids:
             if not isinstance(prerequisite_skill, basestring):
                 raise utils.ValidationError(
                     'Expected all prerequisite skills to be strings, '
                     'received %s' % prerequisite_skill)
 
-        if not isinstance(self.acquired_skills, list):
+        if not isinstance(self.acquired_skill_ids, list):
             raise utils.ValidationError(
-                'Expected acquired_skills to be a list, received %s' %
-                self.acquired_skills)
+                'Expected acquired_skill_ids to be a list, received %s' %
+                self.acquired_skill_ids)
 
-        if len(set(self.acquired_skills)) != len(self.acquired_skills):
+        if len(set(self.acquired_skill_ids)) != len(self.acquired_skill_ids):
             raise utils.ValidationError(
-                'The acquired_skills list has duplicate entries: %s' %
-                self.acquired_skills)
+                'The acquired_skill_ids list has duplicate entries: %s' %
+                self.acquired_skill_ids)
 
-        for acquired_skill in self.acquired_skills:
+        for acquired_skill in self.acquired_skill_ids:
             if not isinstance(acquired_skill, basestring):
                 raise utils.ValidationError(
                     'Expected all acquired skills to be strings, received %s' %
                     acquired_skill)
 
         redundant_skills = (
-            set(self.prerequisite_skills) & set(self.acquired_skills))
+            set(self.prerequisite_skill_ids) & set(self.acquired_skill_ids))
         if redundant_skills:
             raise utils.ValidationError(
                 'There are some skills which are both required for '
@@ -523,15 +525,24 @@ class Collection(object):
             cls, collection_contents):
         """Converts from version 3 to 4.
 
-        Adds a skills dict and skill id counter. Gets skills in
-        prerequisite_skills and acquired_skills in nodes, and assigns them
-        integer IDs.
+        Adds a skills dict and skill id counter. Migrates prerequisite_skills
+        and acquired_skills to prerequistite_skill_ids and acquired_skill_ids.
+        Then, gets skills in prerequisite_skill_ids and acquired_skill_ids in
+        nodes, and assigns them integer IDs.
         """
+
+        for index, node in enumerate(collection_contents['nodes']):
+            collection_contents['nodes'][index]['prerequisite_skill_ids'] = (
+                node['prerequisite_skills'])
+            del collection_contents['nodes'][index]['prerequisite_skills']
+            collection_contents['nodes'][index]['acquired_skill_ids'] = (
+                node['acquired_skills'])
+            del collection_contents['nodes'][index]['acquired_skills']
 
         skill_names = set()
         for node in collection_contents['nodes']:
-            skill_names.update(node['acquired_skills'])
-            skill_names.update(node['prerequisite_skills'])
+            skill_names.update(node['acquired_skill_ids'])
+            skill_names.update(node['prerequisite_skill_ids'])
         skill_names_to_ids = {
             name: 'skill%s' % index
             for index, name in enumerate(sorted(skill_names))
@@ -539,12 +550,12 @@ class Collection(object):
 
         collection_contents['nodes'] = [{
             'exploration_id': node['exploration_id'],
-            'prerequisite_skills': [
+            'prerequisite_skill_ids': [
                 skill_names_to_ids[prerequisite_skill_name]
-                for prerequisite_skill_name in node['prerequisite_skills']],
-            'acquired_skills': [
+                for prerequisite_skill_name in node['prerequisite_skill_ids']],
+            'acquired_skill_ids': [
                 skill_names_to_ids[acquired_skill_name]
-                for acquired_skill_name in node['acquired_skills']]
+                for acquired_skill_name in node['acquired_skill_ids']]
         } for node in collection_contents['nodes']]
 
         collection_contents['skills'] = {
@@ -601,7 +612,7 @@ class Collection(object):
         """
         init_exp_ids = []
         for node in self.nodes:
-            if not node.prerequisite_skills:
+            if not node.prerequisite_skill_ids:
                 init_exp_ids.append(node.exploration_id)
         return init_exp_ids
 
@@ -614,18 +625,18 @@ class Collection(object):
         returned. The order of the exploration IDs is given by the order in
         which each exploration was added to the collection.
         """
-        acquired_skills = set()
+        acquired_skill_ids = set()
         for completed_exp_id in completed_exploration_ids:
             collection_node = self.get_node(completed_exp_id)
             if collection_node:
-                acquired_skills.update(collection_node.acquired_skills)
+                acquired_skill_ids.update(collection_node.acquired_skill_ids)
 
         next_exp_ids = []
         for node in self.nodes:
             if node.exploration_id in completed_exploration_ids:
                 continue
-            prereq_skills = set(node.prerequisite_skills)
-            if prereq_skills <= acquired_skills:
+            prereq_skills = set(node.prerequisite_skill_ids)
+            if prereq_skills <= acquired_skill_ids:
                 next_exp_ids.append(node.exploration_id)
         return next_exp_ids
 
@@ -646,11 +657,11 @@ class Collection(object):
             if node.exploration_id in skills_learned_by_exp_id:
                 return skills_learned_by_exp_id[node.exploration_id]
 
-            skills_learned = set(node.acquired_skills)
+            skills_learned = set(node.acquired_skill_ids)
             for other_node in self.nodes:
                 if other_node.exploration_id not in skills_learned_by_exp_id:
-                    for skill in node.prerequisite_skills:
-                        if skill in other_node.acquired_skills:
+                    for skill in node.prerequisite_skill_ids:
+                        if skill in other_node.acquired_skill_ids:
                             skills_learned = skills_learned.union(
                                 _recursively_find_learned_skills(other_node))
 
@@ -667,10 +678,10 @@ class Collection(object):
             if node.exploration_id in skills_learned_by_exp_id:
                 continue
 
-            if set(node.prerequisite_skills).issubset(set(collected_skills)):
+            if set(node.prerequisite_skill_ids).issubset(set(collected_skills)):
                 if (any([
-                        skill in collection_node.acquired_skills
-                        for skill in node.prerequisite_skills])):
+                        skill in collection_node.acquired_skill_ids
+                        for skill in node.prerequisite_skill_ids])):
                     explorations_just_unlocked.append(node.exploration_id)
                 else:
                     explorations_qualified_for.append(node.exploration_id)
@@ -756,10 +767,10 @@ class Collection(object):
                 'Skill with ID "%s" does not exist.' % skill_id)
 
         for node in self.nodes:
-            if skill_id in node.prerequisite_skills:
-                node.prerequisite_skills.remove(skill_id)
-            if skill_id in node.acquired_skills:
-                node.acquired_skills.remove(skill_id)
+            if skill_id in node.prerequisite_skill_ids:
+                node.prerequisite_skill_ids.remove(skill_id)
+            if skill_id in node.acquired_skill_ids:
+                node.acquired_skill_ids.remove(skill_id)
 
         del self.skills[skill_id]
 
@@ -884,7 +895,8 @@ class Collection(object):
 
         # Check that prerequisite and acquired skills exist in the skill table
         for node in self.nodes:
-            for skill_id in node.prerequisite_skills + node.acquired_skills:
+            for skill_id in (
+                    node.prerequisite_skill_ids + node.acquired_skill_ids):
                 if skill_id not in self.skills:
                     raise utils.ValidationError(
                         'Skill with ID %s does not exist' % skill_id)

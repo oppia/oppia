@@ -103,12 +103,12 @@ describe('Collection editor state service', function() {
       version: '1',
       nodes: [{
         exploration_id: '0',
-        prerequisite_skills: [],
-        acquired_skills: ['skill0']
+        prerequisite_skill_ids: [],
+        acquired_skill_ids: ['skill0']
       }, {
         exploration_id: '1',
-        prerequisite_skills: ['skill0'],
-        acquired_skills: ['skill1']
+        prerequisite_skill_ids: ['skill0'],
+        acquired_skill_ids: ['skill1']
       }],
       next_skill_id: 2,
       skills: {
@@ -133,8 +133,8 @@ describe('Collection editor state service', function() {
       version: '3',
       nodes: [{
         exploration_id: '0',
-        prerequisite_skills: [],
-        acquired_skills: ['skill0']
+        prerequisite_skill_ids: [],
+        acquired_skill_ids: ['skill0']
       }],
       next_skill_id: 1,
       skills: {

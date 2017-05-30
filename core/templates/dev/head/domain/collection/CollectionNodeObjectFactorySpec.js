@@ -29,8 +29,8 @@ describe('Collection node object factory', function() {
       explorationId, prerequisiteSkills, acquiredSkills) {
     return CollectionNodeObjectFactory.create({
       exploration_id: explorationId,
-      prerequisite_skills: prerequisiteSkills ? prerequisiteSkills : [],
-      acquired_skills: acquiredSkills ? acquiredSkills : [],
+      prerequisite_skill_ids: prerequisiteSkills ? prerequisiteSkills : [],
+      acquired_skill_ids: acquiredSkills ? acquiredSkills : [],
       exploration_summary: {
         title: 'Title',
         status: 'private'
@@ -77,8 +77,8 @@ describe('Collection node object factory', function() {
     };
     var collectionNodeBackendObject = {
       exploration_id: 'exp_id0',
-      prerequisite_skills: [],
-      acquired_skills: [],
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
       exploration_summary: explorationSummaryBackendObject
     };
 

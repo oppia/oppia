@@ -35,8 +35,9 @@ oppia.constant('COLLECTION_PROPERTY_TAGS', 'tags');
 oppia.constant('CMD_ADD_COLLECTION_SKILL', 'add_collection_skill');
 oppia.constant('CMD_DELETE_COLLECTION_SKILL', 'delete_collection_skill');
 oppia.constant(
-  'COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS', 'prerequisite_skills');
-oppia.constant('COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS', 'acquired_skills');
+  'COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS', 'prerequisite_skill_ids');
+oppia.constant(
+  'COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS', 'acquired_skill_ids');
 
 oppia.factory('CollectionUpdateService', [
   'CollectionNodeObjectFactory', 'CollectionSkillObjectFactory',

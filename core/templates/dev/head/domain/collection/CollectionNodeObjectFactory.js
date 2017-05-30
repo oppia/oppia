@@ -28,9 +28,9 @@ oppia.factory('CollectionNodeObjectFactory', [
     var CollectionNode = function(collectionNodeBackendObject) {
       this._explorationId = collectionNodeBackendObject.exploration_id;
       this._prerequisiteSkillList = SkillListObjectFactory.create(
-        collectionNodeBackendObject.prerequisite_skills);
+        collectionNodeBackendObject.prerequisite_skill_ids);
       this._acquiredSkillList = SkillListObjectFactory.create(
-        collectionNodeBackendObject.acquired_skills);
+        collectionNodeBackendObject.acquired_skill_ids);
       this._explorationSummaryObject = angular.copy(
         collectionNodeBackendObject.exploration_summary);
     };
@@ -120,8 +120,8 @@ oppia.factory('CollectionNodeObjectFactory', [
     CollectionNode.createFromExplorationId = function(explorationId) {
       return CollectionNode.create({
         exploration_id: explorationId,
-        acquired_skills: [],
-        prerequisite_skills: [],
+        acquired_skill_ids: [],
+        prerequisite_skill_ids: [],
         exploration_summary: null
       });
     };

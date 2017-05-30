@@ -33,11 +33,11 @@ SAMPLE_YAML_CONTENT = ("""category: A category
 language_code: en
 next_skill_id: 2
 nodes:
-- acquired_skills:
+- acquired_skill_ids:
   - skill0
   - skill1
   exploration_id: an_exploration_id
-  prerequisite_skills: []
+  prerequisite_skill_ids: []
 objective: An objective
 schema_version: %d
 skills:
@@ -144,13 +144,13 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.collection.nodes = [
             collection_domain.CollectionNode.from_dict({
                 'exploration_id': '0',
-                'prerequisite_skills': [],
-                'acquired_skills': ['skill0a']
+                'prerequisite_skill_ids': [],
+                'acquired_skill_ids': ['skill0a']
             }),
             collection_domain.CollectionNode.from_dict({
                 'exploration_id': '0',
-                'prerequisite_skills': ['skill0a'],
-                'acquired_skills': ['skill0b']
+                'prerequisite_skill_ids': ['skill0a'],
+                'acquired_skill_ids': ['skill0b']
             })
         ]
 
@@ -174,7 +174,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             'exp_id_1', 'user@example.com', end_state_name='End')
         collection_node1 = self.collection.get_node('exp_id_1')
-        collection_node1.update_prerequisite_skills(['skill0'])
+        collection_node1.update_prerequisite_skill_ids(['skill0'])
         self._assert_validation_error(
             'Expected to have at least 1 exploration with no prerequisite '
             'skills.')
@@ -216,13 +216,13 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.collection.add_node('exp_id_1')
         self.collection.add_skill('Skill')
         collection_node1 = self.collection.get_node('exp_id_1')
-        collection_node1.update_prerequisite_skills(['skill0'])
+        collection_node1.update_prerequisite_skill_ids(['skill0'])
         self._assert_validation_error(
             'Some explorations are unreachable from the initial explorations')
 
         # Connecting the two explorations should lead to clean validation.
         collection_node0 = self.collection.get_node('exp_id_0')
-        collection_node0.update_acquired_skills(['skill0'])
+        collection_node0.update_acquired_skill_ids(['skill0'])
         self.collection.validate()
 
     def test_collection_node_exploration_id_validation(self):
@@ -231,42 +231,43 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         collection_node0.exploration_id = 2
         self._assert_validation_error('Expected exploration ID to be a string')
 
-    def test_collection_node_prerequisite_skills_validation(self):
+    def test_collection_node_prerequisite_skill_ids_validation(self):
         collection_node0 = self.collection.get_node('exp_id_0')
 
-        collection_node0.prerequisite_skills = {}
+        collection_node0.prerequisite_skill_ids = {}
         self._assert_validation_error(
-            'Expected prerequisite_skills to be a list')
+            'Expected prerequisite_skill_ids to be a list')
 
-        collection_node0.prerequisite_skills = ['skill0a', 'skill0a']
+        collection_node0.prerequisite_skill_ids = ['skill0a', 'skill0a']
         self._assert_validation_error(
-            'The prerequisite_skills list has duplicate entries')
+            'The prerequisite_skill_ids list has duplicate entries')
 
-        collection_node0.prerequisite_skills = ['skill0a', 2]
+        collection_node0.prerequisite_skill_ids = ['skill0a', 2]
         self._assert_validation_error(
             'Expected all prerequisite skills to be strings')
 
-    def test_collection_node_acquired_skills_validation(self):
+    def test_collection_node_acquired_skill_ids_validation(self):
         collection_node0 = self.collection.get_node('exp_id_0')
 
-        collection_node0.acquired_skills = {}
-        self._assert_validation_error('Expected acquired_skills to be a list')
-
-        collection_node0.acquired_skills = ['skill0a', 'skill0a']
+        collection_node0.acquired_skill_ids = {}
         self._assert_validation_error(
-            'The acquired_skills list has duplicate entries')
+            'Expected acquired_skill_ids to be a list')
 
-        collection_node0.acquired_skills = ['skill0a', 2]
+        collection_node0.acquired_skill_ids = ['skill0a', 'skill0a']
+        self._assert_validation_error(
+            'The acquired_skill_ids list has duplicate entries')
+
+        collection_node0.acquired_skill_ids = ['skill0a', 2]
         self._assert_validation_error(
             'Expected all acquired skills to be strings')
 
     def test_collection_node_skills_validation(self):
         collection_node0 = self.collection.get_node('exp_id_0')
 
-        # Ensure prerequisite_skills and acquired_skills do not overlap.
-        collection_node0.prerequisite_skills = [
+        # Ensure prerequisite_skill_ids and acquired_skill_ids do not overlap.
+        collection_node0.prerequisite_skill_ids = [
             'skill0a', 'skill0b', 'skill0c']
-        collection_node0.acquired_skills = [
+        collection_node0.acquired_skill_ids = [
             'skill0z', 'skill0b', 'skill0c', 'skill0d']
         self._assert_validation_error(
             'There are some skills which are both required for exploration '
@@ -376,15 +377,16 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
 
         collection.add_node('exp_id_0')
         collection.add_node('exp_id_1')
-        collection.get_node('exp_id_0').update_acquired_skills(['skill0'])
-        collection.get_node('exp_id_1').update_prerequisite_skills(['skill0'])
+        collection.get_node('exp_id_0').update_acquired_skill_ids(['skill0'])
+        collection.get_node('exp_id_1').update_prerequisite_skill_ids(
+            ['skill0'])
 
         # Check that prerequisite and acquired skills are updated when skill
         # is deleted.
         collection.delete_skill('skill0')
-        self.assertEqual(collection.get_node('exp_id_0').acquired_skills, [])
+        self.assertEqual(collection.get_node('exp_id_0').acquired_skill_ids, [])
         self.assertEqual(
-            collection.get_node('exp_id_1').prerequisite_skills, [])
+            collection.get_node('exp_id_1').prerequisite_skill_ids, [])
 
 class ExplorationGraphUnitTests(test_utils.GenericTestBase):
     """Test the skill graph structure within a collection."""
@@ -408,7 +410,7 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
         # Having prerequisites will make an exploration no longer initial.
         collection.add_node('exp_id_1')
         self.assertEqual(len(collection.nodes), 2)
-        collection.get_node('exp_id_1').update_prerequisite_skills(
+        collection.get_node('exp_id_1').update_prerequisite_skill_ids(
             ['skill0a'])
         self.assertEqual(collection.init_exploration_ids, ['exp_id_0'])
 
@@ -444,7 +446,7 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
         # If the only exploration in the collection has a prerequisite skill,
         # there are no explorations left to do.
         collection_node1 = collection.get_node('exp_id_1')
-        collection_node1.update_prerequisite_skills(['skill0a'])
+        collection_node1.update_prerequisite_skill_ids(['skill0a'])
         self.assertEqual(collection.get_next_exploration_ids([]), [])
 
         # If another exploration has been added with a prerequisite that is the
@@ -453,8 +455,8 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
         # the next one to complete.
         collection.add_node('exp_id_2')
         collection_node2 = collection.get_node('exp_id_2')
-        collection_node1.update_acquired_skills(['skill1b'])
-        collection_node2.update_prerequisite_skills(['skill1b'])
+        collection_node1.update_acquired_skill_ids(['skill1b'])
+        collection_node2.update_prerequisite_skill_ids(['skill1b'])
         self.assertEqual(collection.get_next_exploration_ids([]), [])
         self.assertEqual(collection.get_next_exploration_ids(
             ['exp_id_1']), ['exp_id_2'])
@@ -464,7 +466,7 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
         # suggested to be completed unless exp_id_1 is thereafter completed.
         collection.add_node('exp_id_0')
         collection_node0 = collection.get_node('exp_id_0')
-        collection_node0.update_acquired_skills(['skill0a'])
+        collection_node0.update_acquired_skill_ids(['skill0a'])
         self.assertEqual(
             collection.get_next_exploration_ids([]), ['exp_id_0'])
         self.assertEqual(
@@ -481,8 +483,8 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
         # There may also be multiple suggested explorations at other points,
         # depending on which explorations the learner has completed.
         collection_node3 = collection.get_node('exp_id_3')
-        collection_node3.update_prerequisite_skills(['skill0c'])
-        collection_node0.update_acquired_skills(['skill0a', 'skill0c'])
+        collection_node3.update_prerequisite_skill_ids(['skill0c'])
+        collection_node0.update_acquired_skill_ids(['skill0a', 'skill0c'])
         self.assertEqual(
             collection.get_next_exploration_ids([]), ['exp_id_0'])
         self.assertEqual(
@@ -529,8 +531,8 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
         collection_node0 = collection.get_node('exp_id_0')
         collection_node1 = collection.get_node('exp_id_1')
 
-        collection_node0.update_acquired_skills(['skill1a'])
-        collection_node1.update_prerequisite_skills(['skill1a'])
+        collection_node0.update_acquired_skill_ids(['skill1a'])
+        collection_node1.update_prerequisite_skill_ids(['skill1a'])
         self.assertEqual(
             collection.get_next_exploration_ids_in_sequence(exploration_id),
             ['exp_id_1'])
@@ -545,12 +547,12 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
         collection_node2 = collection.get_node('exp_id_2')
         collection_node3 = collection.get_node('exp_id_3')
 
-        collection_node1.update_acquired_skills(['skill2a'])
-        collection_node2.update_acquired_skills(['skill3a'])
+        collection_node1.update_acquired_skill_ids(['skill2a'])
+        collection_node2.update_acquired_skill_ids(['skill3a'])
 
-        collection_node0.update_prerequisite_skills([])
-        collection_node2.update_prerequisite_skills(['skill2a'])
-        collection_node3.update_prerequisite_skills(['skill3a'])
+        collection_node0.update_prerequisite_skill_ids([])
+        collection_node2.update_prerequisite_skill_ids(['skill2a'])
+        collection_node3.update_prerequisite_skill_ids(['skill3a'])
 
         self.assertEqual(
             collection.get_next_exploration_ids_in_sequence('exp_id_0'),
@@ -600,7 +602,7 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         collection.add_skill('Skill0a')
         collection.add_skill('Skill0b')
         collection_node = collection.get_node(self.EXPLORATION_ID)
-        collection_node.update_acquired_skills(['skill0', 'skill1'])
+        collection_node.update_acquired_skill_ids(['skill0', 'skill1'])
 
         collection.validate()
 
@@ -715,14 +717,14 @@ title: A title
 language_code: en
 next_skill_id: 2
 nodes:
-- acquired_skills:
+- acquired_skill_ids:
   - skill0
   - skill1
   exploration_id: Exp1
-  prerequisite_skills: []
-- acquired_skills: []
+  prerequisite_skill_ids: []
+- acquired_skill_ids: []
   exploration_id: Exp2
-  prerequisite_skills:
+  prerequisite_skill_ids:
   - skill0
 objective: ''
 schema_version: 4

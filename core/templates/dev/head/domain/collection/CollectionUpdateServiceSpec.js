@@ -48,8 +48,8 @@ describe('Collection update service', function() {
       version: '1',
       nodes: [{
         exploration_id: 'exp_id0',
-        prerequisite_skills: [],
-        acquired_skills: [],
+        prerequisite_skill_ids: [],
+        acquired_skill_ids: [],
         exploration: {}
       }],
       next_skill_id: 1,
@@ -247,7 +247,7 @@ describe('Collection update service', function() {
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'edit_collection_node_property',
       exploration_id: 'exp_id0',
-      property_name: 'prerequisite_skills',
+      property_name: 'prerequisite_skill_ids',
       new_value: ['new prereq skill'],
       old_value: []
     }]);
@@ -273,7 +273,7 @@ describe('Collection update service', function() {
       expect(UndoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'edit_collection_node_property',
         exploration_id: 'exp_id0',
-        property_name: 'acquired_skills',
+        property_name: 'acquired_skill_ids',
         new_value: ['new acq skill'],
         old_value: []
       }]);

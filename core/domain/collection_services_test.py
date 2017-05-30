@@ -195,12 +195,12 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
             }, {
                 'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
                 'exploration_id': self.EXP_ID_0,
-                'property_name': 'acquired_skills',
+                'property_name': 'acquired_skill_ids',
                 'new_value': ['skill0']
             }, {
                 'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
                 'exploration_id': self.EXP_ID_2,
-                'property_name': 'prerequisite_skills',
+                'property_name': 'prerequisite_skill_ids',
                 'new_value': ['skill0']
             }],
             'Updated exp 2 to require exp 0 before being playable')

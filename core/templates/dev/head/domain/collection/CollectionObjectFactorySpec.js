@@ -47,8 +47,8 @@ describe('Collection object factory', function() {
   var _addCollectionNode = function(explorationId) {
     var collectionNodeBackendObject = {
       exploration_id: explorationId,
-      prerequisite_skills: [],
-      acquired_skills: [],
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
       exploration: {}
     };
     return _sampleCollection.addCollectionNode(
@@ -83,8 +83,8 @@ describe('Collection object factory', function() {
     function() {
       var collectionNodeBackendObject = {
         exploration_id: 'exp_id0',
-        prerequisite_skills: [],
-        acquired_skills: [],
+        prerequisite_skill_ids: [],
+        acquired_skill_ids: [],
         exploration: {}
       };
       var collection = CollectionObjectFactory.create({
@@ -105,8 +105,8 @@ describe('Collection object factory', function() {
 
       var collectionNodeBackendObject = {
         exploration_id: 'exp_id0',
-        prerequisite_skills: [],
-        acquired_skills: [],
+        prerequisite_skill_ids: [],
+        acquired_skill_ids: [],
         exploration: {}
       };
       var collectionNode = CollectionNodeObjectFactory.create(
@@ -128,8 +128,8 @@ describe('Collection object factory', function() {
   it('should not add duplicate explorations', function() {
     var collectionNodeBackendObject = {
       exploration_id: 'exp_id0',
-      prerequisite_skills: [],
-      acquired_skills: [],
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
       exploration: {}
     };
     var collectionNode = CollectionNodeObjectFactory.create(
@@ -148,14 +148,14 @@ describe('Collection object factory', function() {
 
     var collectionNodeBackendObject1 = {
       exploration_id: 'exp_id0',
-      prerequisite_skills: [],
-      acquired_skills: [],
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
       exploration: {}
     };
     var collectionNodeBackendObject2 = {
       exploration_id: 'exp_id1',
-      prerequisite_skills: [],
-      acquired_skills: [],
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
       exploration: {}
     };
     var collectionNode1 = CollectionNodeObjectFactory.create(
@@ -182,8 +182,8 @@ describe('Collection object factory', function() {
       expect(_getCollectionNode('exp_id0')).toBeUndefined();
       var collectionNodeBackendObject = {
         exploration_id: 'exp_id0',
-        prerequisite_skills: [],
-        acquired_skills: [],
+        prerequisite_skill_ids: [],
+        acquired_skill_ids: [],
         exploration: {}
       };
       _sampleCollection.addCollectionNode(
@@ -462,8 +462,8 @@ describe('Collection object factory', function() {
     });
     secondCollection.addCollectionNode(CollectionNodeObjectFactory.create({
       exploration_id: 'exp_id5',
-      prerequisite_skills: [],
-      acquired_skills: [],
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
       exploration: {}
     }));
     secondCollection.setNextSkillId(1);

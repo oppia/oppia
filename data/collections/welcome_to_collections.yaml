@@ -1,31 +1,48 @@
 category: Welcome
+next_skill_id: 5
 nodes:
-- acquired_skills:
-  - Welcome to Oppia!
+- acquired_skill_ids:
+  - skill0
   exploration_id: '0'
-  prerequisite_skills: []
-- acquired_skills:
-  - The Solar System
+  prerequisite_skill_ids: []
+- acquired_skill_ids:
+  - skill1
   exploration_id: '13'
-  prerequisite_skills:
-  - Welcome to Oppia!
-- acquired_skills:
-  - Three Balls
+  prerequisite_skill_ids:
+  - skill0
+- acquired_skill_ids:
+  - skill2
   exploration_id: '4'
-  prerequisite_skills:
-  - The Solar System
-- acquired_skills:
-  - About Oppia
+  prerequisite_skill_ids:
+  - skill1
+- acquired_skill_ids:
+  - skill3
   exploration_id: '14'
-  prerequisite_skills:
-  - Demonstrating soft rules
-- acquired_skills:
-  - Demonstrating soft rules
+  prerequisite_skill_ids:
+  - skill4
+- acquired_skill_ids:
+  - skill4
   exploration_id: '15'
-  prerequisite_skills:
-  - Three Balls
+  prerequisite_skill_ids:
+  - skill2
 language_code: en
 objective: To introduce collections using demo explorations.
-schema_version: 2
+schema_version: 4
+skills:
+  skill0:
+    name: Welcome to Oppia!
+    question_ids: []
+  skill1:
+    name: The Solar System
+    question_ids: []
+  skill2:
+    name: Three Balls
+    question_ids: []
+  skill3:
+    name: About Oppia
+    question_ids: []
+  skill4:
+    name: Demonstrating soft rules
+    question_ids: []
 tags: []
 title: Introduction to Collections in Oppia
