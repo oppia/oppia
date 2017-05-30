@@ -155,6 +155,11 @@ DEFAULT_COLLECTION_CATEGORY = ''
 # Default objective for a newly-minted collection.
 DEFAULT_COLLECTION_OBJECTIVE = ''
 
+# Default ID of VM which is used for training classifier.
+DEFAULT_VM_ID = 'vm_default'
+# Shared secret key for default VM.
+DEFAULT_VM_SHARED_SECRET = '1a2b3c4e'
+
 # A dict containing the accepted image formats (as determined by the imghdr
 # module) and the corresponding allowed extensions in the filenames of uploaded
 # files.
