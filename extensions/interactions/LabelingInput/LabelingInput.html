@@ -35,7 +35,7 @@
   <h4>Word Bank</h4>
     <div data-drop="true"
         jqyoui-droppable="{animate:true}">
-      <div ng-repeat="region in allRegions"
+      <!-- <div ng-repeat="region in allRegions"
         style="
           margin-bottom: 1rem;
           display: inline-block;
@@ -54,8 +54,8 @@
         data-jqyoui-options="{revert: 'invalid'}"
         jqyoui-draggable="{animate:true, onStart:'getThisName(region.label)'}"
         ><[region.label]>
-      </div>
-      <div ng-repeat="word in bonusWords"
+      </div> -->
+      <div ng-repeat="word in regionsAndBonus"
         style="
           margin-bottom: 1rem;
           display: inline-block;

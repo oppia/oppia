@@ -79,7 +79,9 @@ oppia.directive('oppiaInteractiveLabelingInput', [
               }
           }
           $scope.allRegions = imageAndLabels.labeledRegions;
+          $scope.regionsAndBonus = $scope.allRegions.map(function (x){return x.label;}).concat($scope.bonusWords);
           $scope.shuffle($scope.allRegions);
+          $scope.shuffle($scope.regionsAndBonus);
           $scope.numRegions = $scope.allRegions.length;
           //Ensure no duplicates of elements in our element tracking arrays
           $scope.checkAndRemoveElement = function(name){
