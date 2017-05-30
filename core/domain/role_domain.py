@@ -19,7 +19,7 @@
 # dict to contain the hierarchy information for a role in oppia
 # NOTE FOR DEVELOPERS :
 # - Follow the Playbook in wiki before making any changes to this dict.
-# - Maintain the alphabetical order so that it's easy to find anything.
+# - Maintain the alphabetical in keys.
 ROLE_HIERARCHY = {
     'ADMIN': ['MODERATOR'],
     'BANNED_USER': ['GUEST'],
@@ -34,7 +34,7 @@ ROLE_HIERARCHY = {
 # corresponding to roles.
 # NOTE FOR DEVELOPERS :
 # - Follow the Playbook in wiki before making any changes to this dict.
-# - Maintain the alphabetical order so that it's easy to find anything.
+# - Maintain the alphabetical order in keys.
 ROLE_ACTIONS = {
     'ADMIN': [],
     'BANNED_USER': [],
