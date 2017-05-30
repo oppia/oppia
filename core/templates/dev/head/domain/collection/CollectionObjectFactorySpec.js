@@ -387,6 +387,13 @@ describe('Collection object factory', function() {
   });
 
   it('should be able to delete skills', function() {
+    // Add collection nodes
+    _addCollectionNode('exp_id0');
+    _addCollectionNode('exp_id1');
+
+    var collectionNode0 = _getCollectionNode('exp_id0');
+    var collectionNode1 = _getCollectionNode('exp_id1');
+
     // Add skills
     expect(_addCollectionSkill('skill01')).toBe(true);
     var skillId1 = _sampleCollection.getSkillIdFromName('skill01');
@@ -394,12 +401,19 @@ describe('Collection object factory', function() {
     var skillId2 = _sampleCollection.getSkillIdFromName('skill02');
     expect(_sampleCollection.containsCollectionSkill(skillId2)).toBe(true);
 
+    collectionNode0.getAcquiredSkillList().addSkill(skillId2);
+    collectionNode1.getPrerequisiteSkillList().addSkill(skillId2);
+
     // Delete a skill
     expect(_sampleCollection.deleteCollectionSkill(skillId2)).toBe(true);
     expect(_sampleCollection.containsCollectionSkill(skillId2)).toBe(false);
 
     // Other skill still exists
     expect(_sampleCollection.containsCollectionSkill(skillId2)).toBe(false);
+
+    // Skill ID is deleted from prerequisite and acquired skills
+    expect(collectionNode0.getAcquiredSkillList().getSkills()).toEqual([]);
+    expect(collectionNode1.getPrerequisiteSkillList().getSkills()).toEqual([]);
 
     // Skill ID is not reused
     expect(_addCollectionSkill('skill03')).toBe(true);

@@ -254,6 +254,14 @@ oppia.factory('CollectionObjectFactory', [
     Collection.prototype.deleteCollectionSkill = function(skillId) {
       if (this._skills.hasOwnProperty(skillId)) {
         delete this._skills[skillId];
+        this._nodes.forEach(function(node) {
+          if (node.getPrerequisiteSkillList().containsSkill(skillId)) {
+            node.getPrerequisiteSkillList().removeSkillById(skillId);
+          }
+          if (node.getAcquiredSkillList().containsSkill(skillId)) {
+            node.getAcquiredSkillList().removeSkillById(skillId);
+          }
+        });
         return true;
       }
       return false;

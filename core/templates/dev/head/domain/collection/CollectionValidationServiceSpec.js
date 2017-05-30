@@ -199,7 +199,7 @@ describe('Collection validation service', function() {
       'and acquired after playing it: skill1, skill0'
     ]);
 
-    node1.getAcquiredSkillList().removeSkillByName('skill0');
+    node1.getAcquiredSkillList().removeSkillById('skill0');
     node2.getAcquiredSkillList().clearSkills();
     issues = _findPrivateValidationIssues();
     expect(issues).toEqual([]);
@@ -227,7 +227,7 @@ describe('Collection validation service', function() {
     issues = _findPrivateValidationIssues();
     expect(issues).toEqual([]);
 
-    node0.getAcquiredSkillList().removeSkillByName('skill0');
+    node0.getAcquiredSkillList().removeSkillById('skill0');
     issues = _findPrivateValidationIssues();
     expect(issues).toEqual([
       'The following exploration(s) are unreachable from the initial ' +
@@ -279,7 +279,7 @@ describe('Collection validation service', function() {
         'Private explorations cannot be added to a public collection: exp_id0'
       ]);
 
-      node1.getPrerequisiteSkillList().removeSkillByName('skill0');
+      node1.getPrerequisiteSkillList().removeSkillById('skill0');
       expect(_sampleCollection.deleteCollectionNode('exp_id0')).toBe(true);
       issues = _findPublicValidationIssues();
       expect(issues).toEqual([]);

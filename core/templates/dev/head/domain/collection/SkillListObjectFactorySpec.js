@@ -43,7 +43,7 @@ describe('Skill list object factory', function() {
     expect(_skillList.containsSkill('skill0')).toBe(false);
     expect(_skillList.addSkill('skill0')).toBe(true);
     expect(_skillList.containsSkill('skill0')).toBe(true);
-    expect(_skillList.removeSkillByName('skill0')).toBe(true);
+    expect(_skillList.removeSkillById('skill0')).toBe(true);
     expect(_skillList.containsSkill('skill0')).toBe(false);
   });
 
@@ -54,7 +54,7 @@ describe('Skill list object factory', function() {
 
   it('should not be able to remove non-existent skills by name', function() {
     expect(_skillList.containsSkill('skill0')).toBe(false);
-    expect(_skillList.removeSkillByName('skill0')).toBe(false);
+    expect(_skillList.removeSkillById('skill0')).toBe(false);
   });
 
   it('should be able to add a list of skills, ignoring duplicates', function() {
@@ -167,7 +167,7 @@ describe('Skill list object factory', function() {
     _skillList.addSkill('skill1');
     expect(_skillList.getSkills()).toEqual(['skill2', 'skill0', 'skill1']);
 
-    _skillList.removeSkillByName('skill0');
+    _skillList.removeSkillById('skill0');
     expect(_skillList.getSkills()).toEqual(['skill2', 'skill1']);
   });
 
